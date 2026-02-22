@@ -46,7 +46,7 @@ def get_authenticated_service():
             flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(
                 YOUTUBE_CLIENT_SECRET_FILE, SCOPES
             )
-            creds = flow.run_local_server(port=8080)
+            creds = flow.run_local_server(port=8080, prompt='consent')
             
         with open(token_path, "w") as token:
             token.write(creds.to_json())
