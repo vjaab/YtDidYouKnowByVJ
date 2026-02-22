@@ -5,54 +5,66 @@
         "Sam Altman: Humans Use CRAZY Energy Too! \ud83e\udd2f\ud83d\udd0b",
         "Sam Altman would like to remind you that humans use a lot of energy, too",
         "Microsoft's NEW CEO: NO AI Slop! \ud83c\udfae\ud83d\udeab",
-        "Microsoft\u2019s new gaming CEO vows not to flood the ecosystem with \u2018endless AI slop\u2019"
+        "Microsoft\u2019s new gaming CEO vows not to flood the ecosystem with \u2018endless AI slop\u2019",
+        "Google Warns: AI Startups Facing EXTINCTION! \ud83e\udd16",
+        "Google VP warns that two types of AI startups may not survive"
     ],
     "used_keywords": [
-        "local AI",
-        "Gaming CEO",
-        "human energy",
-        "OpenAI",
-        "Sarvam",
-        "Microsoft Gaming",
-        "Indus AI",
-        "AI chat app",
-        "India AI",
+        "Google warning",
+        "energy consumption",
+        "venture capital",
         "AI Slop",
+        "Sarvam",
+        "AI aggregators",
+        "LLM wrappers",
+        "tech disruption",
+        "Gaming CEO",
+        "Microsoft Gaming",
+        "AI market",
+        "AI energy",
+        "startup survival",
+        "AI startups",
+        "human energy",
+        "AI in Gaming",
+        "OpenAI",
+        "AI chat app",
+        "Indus AI",
         "Gaming Quality",
         "Sam Altman",
-        "AI energy",
-        "AI in Gaming",
-        "energy consumption"
+        "local AI",
+        "India AI"
     ],
     "used_companies": {
         "Sarvam": 1,
         "OpenAI": 2,
         "ChatGPT": 1,
-        "Microsoft": 1
+        "Microsoft": 1,
+        "Google": 1
     },
     "used_subcategories": {
-        "AI": 2,
+        "AI": 3,
         "Gaming": 1
     },
     "last_7_days_stories": [
         "India\u2019s Sarvam launches Indus AI chat app as competition heats up",
         "Sam Altman would like to remind you that humans use a lot of energy, too",
-        "Microsoft\u2019s new gaming CEO vows not to flood the ecosystem with \u2018endless AI slop\u2019"
+        "Microsoft\u2019s new gaming CEO vows not to flood the ecosystem with \u2018endless AI slop\u2019",
+        "Google VP warns that two types of AI startups may not survive"
     ],
     "last_3_days_subcategories": [
         "AI",
-        "AI",
-        "Gaming"
+        "Gaming",
+        "AI"
     ],
     "last_3_days_companies": [
-        "Sarvam",
         "OpenAI",
         "ChatGPT",
         "OpenAI",
-        "Microsoft"
+        "Microsoft",
+        "Google"
     ],
-    "total_uploaded": 3,
-    "last_upload": "2026-02-23",
+    "total_uploaded": 4,
+    "last_upload": "2026-02-22",
     "history": [
         {
             "date": "2026-02-23",
@@ -115,6 +127,29 @@
             "voice_used": "en-US-GuyNeural",
             "youtube_url": "https://youtu.be/CgPb8nu4Es0",
             "news_source_url": "https://techcrunch.com/2026/02/21/microsofts-new-gaming-ceo-vows-not-to-flood-the-ecosystem-with-endless-ai-slop/"
+        },
+        {
+            "date": "2026-02-22",
+            "title": "Google Warns: AI Startups Facing EXTINCTION! \ud83e\udd16",
+            "news_headline": "Google VP warns that two types of AI startups may not survive",
+            "sub_category": "AI",
+            "companies": [
+                "Google"
+            ],
+            "keywords": [
+                "AI startups",
+                "Google warning",
+                "LLM wrappers",
+                "AI aggregators",
+                "tech disruption",
+                "startup survival",
+                "AI market",
+                "venture capital"
+            ],
+            "breaking_news_level": 9,
+            "voice_used": "en-US-GuyNeural",
+            "youtube_url": "https://youtu.be/N9Wo7WmoYPo",
+            "news_source_url": "https://techcrunch.com/2026/02/21/google-vp-warns-that-two-types-of-ai-startups-may-not-survive/"
         }
     ]
 }
