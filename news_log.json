@@ -3,43 +3,55 @@
         "India's NEW AI App Challenges ChatGPT! \ud83c\uddee\ud83c\uddf3\ud83e\udd16",
         "India\u2019s Sarvam launches Indus AI chat app as competition heats up",
         "Sam Altman: Humans Use CRAZY Energy Too! \ud83e\udd2f\ud83d\udd0b",
-        "Sam Altman would like to remind you that humans use a lot of energy, too"
+        "Sam Altman would like to remind you that humans use a lot of energy, too",
+        "Microsoft's NEW CEO: NO AI Slop! \ud83c\udfae\ud83d\udeab",
+        "Microsoft\u2019s new gaming CEO vows not to flood the ecosystem with \u2018endless AI slop\u2019"
     ],
     "used_keywords": [
-        "India AI",
-        "Indus AI",
-        "Sarvam",
-        "Sam Altman",
-        "OpenAI",
-        "human energy",
-        "AI energy",
-        "energy consumption",
         "local AI",
-        "AI chat app"
+        "Gaming CEO",
+        "human energy",
+        "OpenAI",
+        "Sarvam",
+        "Microsoft Gaming",
+        "Indus AI",
+        "AI chat app",
+        "India AI",
+        "AI Slop",
+        "Gaming Quality",
+        "Sam Altman",
+        "AI energy",
+        "AI in Gaming",
+        "energy consumption"
     ],
     "used_companies": {
         "Sarvam": 1,
         "OpenAI": 2,
-        "ChatGPT": 1
+        "ChatGPT": 1,
+        "Microsoft": 1
     },
     "used_subcategories": {
-        "AI": 2
+        "AI": 2,
+        "Gaming": 1
     },
     "last_7_days_stories": [
         "India\u2019s Sarvam launches Indus AI chat app as competition heats up",
-        "Sam Altman would like to remind you that humans use a lot of energy, too"
+        "Sam Altman would like to remind you that humans use a lot of energy, too",
+        "Microsoft\u2019s new gaming CEO vows not to flood the ecosystem with \u2018endless AI slop\u2019"
     ],
     "last_3_days_subcategories": [
         "AI",
-        "AI"
+        "AI",
+        "Gaming"
     ],
     "last_3_days_companies": [
         "Sarvam",
         "OpenAI",
         "ChatGPT",
-        "OpenAI"
+        "OpenAI",
+        "Microsoft"
     ],
-    "total_uploaded": 2,
+    "total_uploaded": 3,
     "last_upload": "2026-02-23",
     "history": [
         {
@@ -83,6 +95,26 @@
             "voice_used": "en-US-GuyNeural",
             "youtube_url": "https://youtu.be/1dxGhxupLU8",
             "news_source_url": "https://techcrunch.com/2026/02/21/sam-altman-would-like-remind-you-that-humans-use-a-lot-of-energy-too/"
+        },
+        {
+            "date": "2026-02-23",
+            "title": "Microsoft's NEW CEO: NO AI Slop! \ud83c\udfae\ud83d\udeab",
+            "news_headline": "Microsoft\u2019s new gaming CEO vows not to flood the ecosystem with \u2018endless AI slop\u2019",
+            "sub_category": "Gaming",
+            "companies": [
+                "Microsoft"
+            ],
+            "keywords": [
+                "Microsoft Gaming",
+                "AI in Gaming",
+                "AI Slop",
+                "Gaming Quality",
+                "Gaming CEO"
+            ],
+            "breaking_news_level": 9,
+            "voice_used": "en-US-GuyNeural",
+            "youtube_url": "https://youtu.be/CgPb8nu4Es0",
+            "news_source_url": "https://techcrunch.com/2026/02/21/microsofts-new-gaming-ceo-vows-not-to-flood-the-ecosystem-with-endless-ai-slop/"
         }
     ]
 }
