@@ -1,0 +1,58 @@
+{
+    "used_titles": [
+        "India's NEW AI App Challenges ChatGPT! \ud83c\uddee\ud83c\uddf3\ud83e\udd16",
+        "India\u2019s Sarvam launches Indus AI chat app as competition heats up"
+    ],
+    "used_keywords": [
+        "Sarvam",
+        "local AI",
+        "India AI",
+        "AI chat app",
+        "Indus AI"
+    ],
+    "used_companies": {
+        "Sarvam": 1,
+        "OpenAI": 1,
+        "ChatGPT": 1
+    },
+    "used_subcategories": {
+        "AI": 1
+    },
+    "last_7_days_stories": [
+        "India\u2019s Sarvam launches Indus AI chat app as competition heats up"
+    ],
+    "last_3_days_subcategories": [
+        "AI"
+    ],
+    "last_3_days_companies": [
+        "Sarvam",
+        "OpenAI",
+        "ChatGPT"
+    ],
+    "total_uploaded": 1,
+    "last_upload": "2026-02-23",
+    "history": [
+        {
+            "date": "2026-02-23",
+            "title": "India's NEW AI App Challenges ChatGPT! \ud83c\uddee\ud83c\uddf3\ud83e\udd16",
+            "news_headline": "India\u2019s Sarvam launches Indus AI chat app as competition heats up",
+            "sub_category": "AI",
+            "companies": [
+                "Sarvam",
+                "OpenAI",
+                "ChatGPT"
+            ],
+            "keywords": [
+                "India AI",
+                "Indus AI",
+                "AI chat app",
+                "Sarvam",
+                "local AI"
+            ],
+            "breaking_news_level": 9,
+            "voice_used": "en-US-GuyNeural",
+            "youtube_url": "https://youtu.be/KfbyGuZDUVA",
+            "news_source_url": "https://techcrunch.com/2026/02/20/indias-sarvam-launches-indus-ai-chat-app-as-competition-heats-up/"
+        }
+    ]
+}
