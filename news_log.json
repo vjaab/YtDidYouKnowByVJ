@@ -1,35 +1,45 @@
 {
     "used_titles": [
         "India's NEW AI App Challenges ChatGPT! \ud83c\uddee\ud83c\uddf3\ud83e\udd16",
-        "India\u2019s Sarvam launches Indus AI chat app as competition heats up"
+        "India\u2019s Sarvam launches Indus AI chat app as competition heats up",
+        "Sam Altman: Humans Use CRAZY Energy Too! \ud83e\udd2f\ud83d\udd0b",
+        "Sam Altman would like to remind you that humans use a lot of energy, too"
     ],
     "used_keywords": [
-        "Sarvam",
-        "local AI",
         "India AI",
-        "AI chat app",
-        "Indus AI"
+        "Indus AI",
+        "Sarvam",
+        "Sam Altman",
+        "OpenAI",
+        "human energy",
+        "AI energy",
+        "energy consumption",
+        "local AI",
+        "AI chat app"
     ],
     "used_companies": {
         "Sarvam": 1,
-        "OpenAI": 1,
+        "OpenAI": 2,
         "ChatGPT": 1
     },
     "used_subcategories": {
-        "AI": 1
+        "AI": 2
     },
     "last_7_days_stories": [
-        "India\u2019s Sarvam launches Indus AI chat app as competition heats up"
+        "India\u2019s Sarvam launches Indus AI chat app as competition heats up",
+        "Sam Altman would like to remind you that humans use a lot of energy, too"
     ],
     "last_3_days_subcategories": [
+        "AI",
         "AI"
     ],
     "last_3_days_companies": [
         "Sarvam",
         "OpenAI",
-        "ChatGPT"
+        "ChatGPT",
+        "OpenAI"
     ],
-    "total_uploaded": 1,
+    "total_uploaded": 2,
     "last_upload": "2026-02-23",
     "history": [
         {
@@ -53,6 +63,26 @@
             "voice_used": "en-US-GuyNeural",
             "youtube_url": "https://youtu.be/KfbyGuZDUVA",
             "news_source_url": "https://techcrunch.com/2026/02/20/indias-sarvam-launches-indus-ai-chat-app-as-competition-heats-up/"
+        },
+        {
+            "date": "2026-02-23",
+            "title": "Sam Altman: Humans Use CRAZY Energy Too! \ud83e\udd2f\ud83d\udd0b",
+            "news_headline": "Sam Altman would like to remind you that humans use a lot of energy, too",
+            "sub_category": "AI",
+            "companies": [
+                "OpenAI"
+            ],
+            "keywords": [
+                "Sam Altman",
+                "AI energy",
+                "human energy",
+                "energy consumption",
+                "OpenAI"
+            ],
+            "breaking_news_level": 9,
+            "voice_used": "en-US-GuyNeural",
+            "youtube_url": "https://youtu.be/1dxGhxupLU8",
+            "news_source_url": "https://techcrunch.com/2026/02/21/sam-altman-would-like-remind-you-that-humans-use-a-lot-of-energy-too/"
         }
     ]
 }
