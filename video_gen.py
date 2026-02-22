@@ -43,6 +43,8 @@ FONT_PATHS = [
     os.path.join(ASSETS_DIR, "fonts", "Roboto-Bold.ttf"),
     "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
     "/System/Library/Fonts/Supplemental/Verdana Bold.ttf",
+    "/usr/share/fonts/truetype/roboto/hinted/Roboto-Bold.ttf",
+    "/usr/share/fonts/truetype/roboto/Roboto-Bold.ttf",  # Linux
 ]
 _fc = {}
 

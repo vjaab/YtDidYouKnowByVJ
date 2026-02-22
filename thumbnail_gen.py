@@ -23,6 +23,8 @@ FONT_PATHS = [
     os.path.join(ASSETS_DIR, "fonts", "Montserrat-Bold.ttf"),
     os.path.join(ASSETS_DIR, "fonts", "Roboto-Bold.ttf"),
     "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
+    "/usr/share/fonts/truetype/roboto/hinted/Roboto-Bold.ttf",
+    "/usr/share/fonts/truetype/roboto/Roboto-Bold.ttf",
 ]
 _fcache = {}
 
