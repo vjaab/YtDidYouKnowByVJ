@@ -68,7 +68,7 @@ def send_topic_selection(articles):
         source  = art.get("source", {}).get("name", "")
         lines.append(f"<b>{i}.</b> {title}\n   <i>— {source}</i>")
 
-    lines.append(f"\n⏳ <i>Auto-selecting in 5 minutes if no reply...</i>")
+    lines.append(f"\n⏳ <i>Waiting for your reply...</i>")
     message_text = "\n".join(lines)
 
     # Inline keyboard — 2 buttons per row
@@ -88,7 +88,6 @@ def send_topic_selection(articles):
     print(f"Sent {len(top_articles)} topics to Telegram. Waiting for reply...")
 
     # ── Poll for callback or text reply ──────────────────────────────────────
-    deadline = time.time() + TIMEOUT_SECONDS
     last_update_id = None
 
     # Drain any old pending updates first
@@ -96,7 +95,7 @@ def send_topic_selection(articles):
     if stale:
         last_update_id = stale[-1]["update_id"] + 1
 
-    while time.time() < deadline:
+    while True:
         try:
             updates = _get_updates(offset=last_update_id)
         except Exception as e:
@@ -139,13 +138,6 @@ def send_topic_selection(articles):
                     return chosen
 
         time.sleep(3)
-
-    # ── Timeout ──────────────────────────────────────────────────────────────
-    print("Telegram selection timed out. Falling back to Gemini auto-selection.")
-    if sent_message_id:
-        _edit_message(sent_message_id,
-                      "⏰ <b>Timed out.</b> Gemini will auto-select the best story...")
-    return None
 
 
 def _send_photo(photo_path, caption=""):
@@ -199,13 +191,12 @@ def send_upload_consent(thumbnail_path, title, duration_sec):
     print("Upload consent sent to Telegram. Waiting...")
 
     # Drain stale updates
-    deadline = time.time() + 300  # 5 min
     last_update_id = None
     stale = _get_updates()
     if stale:
         last_update_id = stale[-1]["update_id"] + 1
 
-    while time.time() < deadline:
+    while True:
         try:
             updates = _get_updates(offset=last_update_id)
         except Exception as e:
@@ -245,11 +236,6 @@ def send_upload_consent(thumbnail_path, title, duration_sec):
                         return False
 
         time.sleep(3)
-
-    print("Upload consent timed out — skipping upload.")
-    if consent_msg_id:
-        _edit_message(consent_msg_id, "⏰ <b>Timed out — upload skipped.</b>")
-    return False
 
 
 def notify_telegram(message, emoji="ℹ️"):
