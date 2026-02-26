@@ -228,6 +228,17 @@ def generate_thumbnail(script_json):
         except Exception:
             pass
 
-    canvas.save(output_path, "JPEG", quality=95)
-    print(f"Thumbnail saved: {output_path}")
-    return output_path
+    output_path1 = os.path.join(OUTPUT_DIR, f"thumbnail_v1_{today}.jpg")
+    output_path2 = os.path.join(OUTPUT_DIR, f"thumbnail_v2_{today}.jpg")
+
+    canvas.save(output_path1, "JPEG", quality=95)
+    print(f"Thumbnail v1 saved: {output_path1}")
+
+    # Version 2: higher contrast, saturated colors
+    from PIL import ImageEnhance
+    canvas2 = ImageEnhance.Color(canvas).enhance(1.4)
+    canvas2 = ImageEnhance.Contrast(canvas2).enhance(1.15)
+    canvas2.save(output_path2, "JPEG", quality=95)
+    print(f"Thumbnail v2 saved: {output_path2}")
+
+    return output_path1

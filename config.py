@@ -6,6 +6,7 @@ load_dotenv()
 # API Keys
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 NEWS_API_KEY = os.getenv("NEWS_API_KEY", "")
+TWITTER_BEARER_TOKEN = os.getenv("TWITTER_BEARER_TOKEN", "")
 YOUTUBE_CLIENT_SECRET_FILE = os.getenv("YOUTUBE_CLIENT_SECRET_FILE", "client_secret.json")
 
 # Directory Paths
@@ -28,4 +29,4 @@ MAX_RETRY_ATTEMPTS = 5
 SIMILARITY_THRESHOLD = 75
 CATEGORY_COOLDOWN_DAYS = 3
 BGM_VOLUME = 0.06
-TARGET_AUDIO_DURATION = (30, 58) # min, max in seconds
+TARGET_AUDIO_DURATION = (55, 75) # min, max in seconds

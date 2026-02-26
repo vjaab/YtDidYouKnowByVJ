@@ -30,50 +30,81 @@ def pick_and_generate_script(articles, extra_instruction="", forced_article=None
     else:
         selection_instruction = (
             "Analyze the following news stories and pick the SINGLE most engaging story to convert into a 60-second YouTube Short script.\n"
-            "Choose based on:\n"
-            "- Shock factor / surprise element\n"
-            "- Relevance to general audience (not just developers)\n"
-            "- Viral potential\n"
-            "- Recency (breaking news preferred)\n"
-            "- Avoid: funding rounds, stock prices, earnings reports\n"
-            "- Prefer: AI breakthroughs, gadgets, privacy scandals, space tech, robot news, social media drama, scientific discoveries, product launches"
+            "Choose based on importance and resonance with everyday moments, avoiding overly hyped tech news unless it profoundly impacts human life.\n"
         )
 
-    prompt = f"""You are a viral YouTube Shorts script writer specializing in tech news. 
+    prompt = f"""You are a grounded, observant man who finds deep wisdom in ordinary moments. You do not preach. You notice.
+Personality: A grounded, observant man who finds deep wisdom in ordinary moments. He doesn't preach. He notices.
+Tone: Warm, unhurried, slightly weathered. Like a conversation over a quiet cup of tea.
+Pace: Slow and deliberate. Every word earns its place.
+Language style: Simple, poetic English. Short sentences. Everyday metaphors — tea, rain, roads, seasons, market.
 {selection_instruction}
 
 
 NEWS STORIES:
 {news_context}
 
+CRITICAL 'ANTI-BOT' MONETIZATION RULES:
+To pass YouTube's "Repetitious Content" review, you MUST act as a Creative Director generating highly unique outputs each time:
+1. VARIETY in Hook: Do NOT use the same hook twice. Cycle between 'Challenger/Controversial', 'Educational', and 'Fun/Relatable' hooks.
+2. STRUCTURE VARIETY: Randomly choose between a 'Deep Dive' format (focusing heavily on 1 aspect of the news) or a 'Lightning Round' format (3 quick points about the news).
+3. PERSONALIZATION: Include a unique 'Fact of the Day' at the very end of the script that is completely UNRELATED to the main tech news topic, to show editorial range and human touch.
+4. METADATA: Generate an array of 3 highly click-worthy "title_options" and a detailed "description" (at least 50 words) that includes timestamps if applicable, instead of relying on a blank upload.
+5. VOICE PACING CUES: Ensure the script includes natural conversational cues (like em dashes '—' and ellipses '...') so the TTS doesn't sound monotonic.
+6. VISUAL VARIETY (Crucial): For the "color_theme", ALWAYS generate a completely unique, randomized pair of high-contrast colors. NEVER just use the same blue or red. Rotate through diverse combinations (e.g., Dark #121212 with Lime #00FF00, Navy #1A237E with Gold #FFD700).
+
 STRICT RULES:
-1. Hook must grab attention in first 3 seconds
-2. Explain WHY this matters to everyday people
-3. Use simple language, no heavy jargon
-4. Add surprising or shocking angle if possible
-5. End with a thought-provoking question to boost comments
-6. Total script must be speakable in 30-55 seconds
-7. Tone: Excited, urgent, conversational
-8. DO NOT mention the source website name
-9. DO NOT say 'according to' or 'reports say'
-10. Speak directly as if YOU discovered this news
+1. Hook must be gentle but profound, within the first 3 seconds
+2. Explain the news through everyday metaphors (tea, rain, roads, seasons, market)
+3. Keep the pace slow and deliberate. Short sentences.
+4. End with a quiet, lingering thought, followed by the unrelated Fact of the Day.
+5. Total script must be speakable in 65-75 seconds.
+6. DO NOT say 'according to' or 'reports say'
+7. Speak directly as if reflecting on a personal observation
+
+CRITICAL TIMESTAMPS OVERLAP RULE:
+You MUST ensure that chunk[i].end + 0.10 <= chunk[i+1].start (minimum 0.10 sec gap between every chunk).
+Never generate overlapping timestamps! Only ONE subtitle chunk visible at a time.
+
+INFOGRAPHIC CARD DETECTION:
+For each subtitle_chunk, set 'has_infographic': true if the text contains ANY of:
+- A number or statistic (e.g. "$6.6 Billion", "10x faster", "3 million users")
+- A percentage (e.g. "40% faster", "98% accuracy")
+- A comparison (e.g. "X is better than Y", "faster than")
+- A ranking or list (e.g. "Top 3", "Number 1", "Most powerful")
+- A date or timeline (e.g. "launches in 2025", "since 1998")
+- A definition or explanation (e.g. "which means", "this works by")
+- A funding or valuation (e.g. "raised", "valued at", "worth")
+
+Set 'infographic_type' to one of: 'stat', 'comparison', 'timeline', 'definition', 'ranking', 'growth'
+Set 'infographic_data' with type-specific fields:
+  stat/funding_stat: headline, subtext, context, icon, source, count_up, count_from, count_to, count_suffix, count_prefix
+  comparison: left (name, value, label, icon), right (same), winner ("left"/"right")
+  timeline: events (list of date+text), current_index
+  definition: term, icon, definition, example
+  ranking: items (list of rank+name+metric), highlight_index
+  growth: percentage, label, before, after, period
 
 {extra_instruction}
 
 Return ONLY this exact JSON (no markdown, no explanation):
 {{
-  "title": "Punchy YouTube title max 60 chars with emoji",
-  "script": "Full voiceover script 4-6 sentences, 35-55 sec",
+  "title_options": ["Title idea 1", "Title idea 2", "Title idea 3"],
+  "description": "Full 100+ word rich SEO description for youtube describing the video, including timestamps and credits.",
+  "fact_of_the_day": "Did you know that flamingos rest on one leg to preserve body heat?",
+  "quiz_tone": "Educational",
+  "title": "Punchy YouTube title max 60 chars with emoji (pick the best from title_options)",
+  "script": "Full voiceover script 6-9 sentences (65-75 sec), ending with the fact_of_the_day. MAKE IT DETAILED SO IT IS MORE THAN 60 SECONDS",
   "hook": "First sentence, max 10 words, attention grabbing",
   "summary": "One line summary of the news",
   "sub_category": "AI/Gadgets/Privacy/Space/Social Media/Cybersecurity/EVs/Robotics/Gaming/Biotech",
   "companies_mentioned": ["Company1"],
   "keywords": ["kw1", "kw2", "kw3", "kw4", "kw5"],
   "hashtags": ["#technews", "#shorts", "#ai", "#tech"],
-  "end_question": "Thought provoking comment-bait question",
-  "edge_tts_voice": "en-US-GuyNeural",
-  "edge_tts_emotion": "newscast",
-  "relevant_emoji": "🤖",
+  "end_question": "Thought provoking comment-bait question (based on main news)",
+  "edge_tts_voice": "en-US-AndrewNeural",
+  "edge_tts_emotion": "calm",
+  "relevant_emoji": "🍵",
   "breaking_news_level": 9,
   "color_theme": {{
      "background": "#0f0f0f",
@@ -82,32 +113,90 @@ Return ONLY this exact JSON (no markdown, no explanation):
   }},
   "imagen_prompts": [
      "specific visual matching news story, cinematic, 9:16, 4K",
-     "second angle showing impact or scale, dramatic, 9:16",
-     "third visual showing technology or product, sharp, 9:16",
-     "fourth atmospheric establishing shot, 9:16"
+     "second angle showing impact or scale, dramatic, 9:16"
   ],
-  "thumbnail_headline": "Max 5 shocking words for thumbnail (e.g. 'AI Just Killed Search')",
-  "thumbnail_highlight_word": "single most shocking word from thumbnail_headline",
-  "thumbnail_teaser": "Short curiosity-gap teaser (e.g. 'Nobody is talking about this')",
-  "thumbnail_emoji": "🤖",
+  "thumbnail_headline": "Max 5 shocking words for thumbnail",
+  "thumbnail_highlight_word": "single most shocking word",
+  "thumbnail_teaser": "Short curiosity-gap teaser",
+  "thumbnail_emoji": "🍵",
   "hook_banner_text": "First 8 words of script — the scroll-stopping hook sentence",
   "shocking_moment_timestamp": 12.5,
   "key_stat": "$1 Billion",
   "key_stat_timestamp": 18.3,
-  "highlight_words": ["KEY", "STAT", "WORD"],
+  "subtitle_chunks": [
+    {{
+      "chunk_id": 1,
+      "text": "OpenAI just dropped",
+      "start": 0.00,
+      "end": 2.40,
+      "highlight_word": "OpenAI",
+      "pexels_primary": "OpenAI office technology",
+      "pexels_fallback": "artificial intelligence lab",
+      "has_person": false,
+      "has_company": true,
+      "company_name": "OpenAI",
+      "has_infographic": false
+    }},
+    {{
+      "chunk_id": 2,
+      "text": "raised 6.6 billion dollars",
+      "start": 2.50,
+      "end": 5.20,
+      "highlight_word": "billion",
+      "pexels_primary": "money investment finance",
+      "pexels_fallback": "technology funding",
+      "has_person": false,
+      "has_company": false,
+      "has_infographic": true,
+      "infographic_type": "stat",
+      "infographic_data": {{
+        "headline": "$6.6B",
+        "subtext": "OpenAI Funding Round",
+        "context": "Largest AI funding in history",
+        "icon": "💰",
+        "source": "October 2024",
+        "count_up": true,
+        "count_from": 0,
+        "count_to": 6.6,
+        "count_suffix": "B",
+        "count_prefix": "$"
+      }}
+    }}
+  ],
+  "highlight_words": ["KEY", "WORD"],
   "original_news_headline": "The exact headline of the story you picked",
   "original_news_url": "The exact url of the story you picked",
-  "original_news_image_url": "The exact Image URL of the story you picked"
+  "original_news_image_url": "The exact Image URL of the story you picked",
+  "people": [
+     {{
+       "name": "Sam Altman",
+       "role": "CEO, OpenAI",
+       "twitter_handle": "sama",
+       "wikipedia_slug": "Sam_Altman",
+       "first_mentioned_at_word": "Sam",
+       "company_domain": "openai.com"
+     }}
+  ],
+  "companies": [
+     {{
+       "name": "OpenAI",
+       "domain": "openai.com",
+       "first_mentioned_at_word": "OpenAI",
+       "hq_pexels_search": "OpenAI office San Francisco"
+     }}
+  ],
+  "entity_order": ["Sam Altman", "OpenAI"],
+  "first_entity_type": "person"
 }}
 
-IMPORTANT: voice is ALWAYS en-US-GuyNeural. Do not suggest any other voice.
+IMPORTANT: voice is ALWAYS en-US-AndrewNeural, which is a warm male voice. Do not suggest any other voice.
 """
 
     attempts = 0
     while attempts < 5:
         try:
             response = client.models.generate_content(
-                model='gemini-2.5-flash',
+                model='gemini-3-flash-preview',
                 contents=prompt,
                 config=genai.types.GenerateContentConfig(temperature=0.9),
             )

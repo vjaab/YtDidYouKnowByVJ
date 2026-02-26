@@ -2,8 +2,7 @@
 audio_gen.py — Audio generation with word-level timestamps.
 
 PRIMARY PATH: Edge TTS stream() captures WordBoundary events → exact timestamps.
-FALLBACK 1:   Kokoro local TTS (no timestamps → estimated from duration).
-FALLBACK 2:   Fish Audio voice clone (no timestamps → estimated).
+FALLBACK 2:   Kokoro local TTS (no timestamps → estimated from duration).
 """
 
 import os
@@ -12,8 +11,30 @@ import re
 from datetime import datetime
 from config import OUTPUT_DIR
 
-FISH_AUDIO_API_KEY = os.getenv("FISH_AUDIO_API_KEY", "")
-FISH_AUDIO_VOICE_ID = os.getenv("FISH_AUDIO_VOICE_ID", "")
+def _apply_stable_ts(audio_path, text):
+    try:
+        import stable_whisper
+        import warnings
+        warnings.filterwarnings("ignore")
+        print("Running stable-ts to extract REAL word timestamps...")
+        model = stable_whisper.load_model('base')
+        result = model.align(audio_path, text, language='en')
+        word_timestamps = []
+        for segment in result.segments:
+            for word in segment.words:
+                clean_word = word.word.strip()
+                if clean_word:
+                    word_timestamps.append({
+                        "word": clean_word,
+                        "start": round(word.start, 3),
+                        "end": round(word.end, 3)
+                    })
+        if word_timestamps:
+            print(f"stable-ts extracted {len(word_timestamps)} real word timestamps.")
+            return word_timestamps
+    except Exception as e:
+        print(f"stable-ts unavailable or failed: {e}")
+    return None
 ASSETS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
 KOKORO_MODEL = os.path.join(ASSETS_DIR, "kokoro-v1.0.onnx")
 KOKORO_VOICES = os.path.join(ASSETS_DIR, "voices-v1.0.bin")
@@ -52,7 +73,8 @@ def get_audio_duration(path):
 # ─────────────────────────────────────────────────────────────────────────────
 async def _edge_tts_stream(text, voice, output_path):
     import edge_tts
-    communicate = edge_tts.Communicate(text, voice, rate="+10%")
+    # Decreasing the rate to match the slow and deliberate pace
+    communicate = edge_tts.Communicate(text, voice, rate="-10%")
     sentence_events = []
     audio_data = bytearray()
 
@@ -97,11 +119,11 @@ async def _edge_tts_stream(text, voice, output_path):
     return word_timestamps
 
 
-LOCKED_VOICE = "en-US-GuyNeural"
+LOCKED_VOICE = "en-US-AndrewNeural"
 
 def _generate_edge_tts(text, voice, output_path):
-    voice = LOCKED_VOICE  # Always use GuyNeural — newscast male voice
-    print(f"Edge TTS → {voice} newscast (with word timestamps)...")
+    voice = LOCKED_VOICE  # Always use AndrewNeural — warm, confident, authentic
+    print(f"Edge TTS → {voice} (with word timestamps)...")
     word_timestamps = asyncio.run(_edge_tts_stream(text, voice, output_path))
     duration = get_audio_duration(output_path)
     print(f"Edge TTS done: {duration:.2f}s | {len(word_timestamps)} word timestamps")
@@ -127,31 +149,6 @@ def _generate_kokoro(text, output_path):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# FALLBACK 2: Fish Audio voice clone
-# ─────────────────────────────────────────────────────────────────────────────
-def _generate_fish_audio(text, output_path):
-    import requests as req
-    print(f"Fish Audio clone → {FISH_AUDIO_VOICE_ID}...")
-    r = req.post(
-        "https://api.fish.audio/v1/tts",
-        json={"text": text, "reference_id": FISH_AUDIO_VOICE_ID,
-              "format": "mp3", "mp3_bitrate": 192, "normalize": True},
-        headers={"Authorization": f"Bearer {FISH_AUDIO_API_KEY}"},
-        timeout=60, stream=True
-    )
-    if r.status_code != 200:
-        raise Exception(f"Fish Audio error {r.status_code}: {r.text[:80]}")
-    with open(output_path, "wb") as f:
-        for chunk in r.iter_content(4096):
-            if chunk:
-                f.write(chunk)
-    duration = get_audio_duration(output_path)
-    word_timestamps = _estimate_timestamps(text, duration)
-    print(f"Fish Audio done: {duration:.2f}s")
-    return output_path, duration, word_timestamps
-
-
-# ─────────────────────────────────────────────────────────────────────────────
 # PUBLIC ENTRY POINT
 # ─────────────────────────────────────────────────────────────────────────────
 def generate_voiceover(text, voice_request="en-US-GuyNeural", emotion="excited"):
@@ -161,17 +158,25 @@ def generate_voiceover(text, voice_request="en-US-GuyNeural", emotion="excited")
     """
     today     = datetime.now().strftime("%Y-%m-%d")
     mp3_path  = os.path.join(OUTPUT_DIR, f"audio_{today}.mp3")
-
-    # Edge TTS — PRIMARY, always GuyNeural
+    # Edge TTS — FALLBACK 1
     try:
-        return _generate_edge_tts(text, LOCKED_VOICE, mp3_path)
+        path, dur, word_timestamps = _generate_edge_tts(text, LOCKED_VOICE, mp3_path)
+        real_ts = _apply_stable_ts(path, text)
+        if real_ts:
+            word_timestamps = real_ts
+        print("⚠️ Falling back to Edge TTS (American accent)")
+        return path, dur, word_timestamps
     except Exception as e:
         print(f"Edge TTS failed: {e}")
 
-    # Kokoro — fallback
+    # Kokoro — FALLBACK 2
     if os.path.exists(KOKORO_MODEL):
         try:
-            return _generate_kokoro(text, mp3_path)
+            path, dur, word_timestamps = _generate_kokoro(text, mp3_path)
+            real_ts = _apply_stable_ts(path, text)
+            if real_ts:
+                word_timestamps = real_ts
+            return path, dur, word_timestamps
         except Exception as e:
             print(f"Kokoro failed: {e}")
 

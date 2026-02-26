@@ -1,5 +1,8 @@
 import os
 import argparse
+import subprocess
+import time
+import requests
 from datetime import datetime
 
 import glob
@@ -24,9 +27,11 @@ def log_message(msg):
     print(msg)
 
 
-def format_description(script, end_question, hashtags):
+def format_description(ai_description, script, end_question, hashtags):
     hashtag_str = " ".join(hashtags) if hashtags else ""
-    return f"""{script}
+    return f"""{ai_description}
+
+{script}
 
 ━━━━━━━━━━━━━━━━━━━━━━
 💡 Every day you're not learning, someone else is getting ahead.
@@ -47,24 +52,43 @@ Don't miss out — join free today 👇
 #technews #shorts #tech #ai #youtubeshorts #dailyfacts"""
 
 
-def run_pipeline():
+def run_pipeline(custom_topic=None):
     log_message("=== STARTING DAILY TECH NEWS SHORTS PIPELINE ===")
 
+    # ── Clean output folder before starting ───────────────────────────────────
+    if os.path.exists(OUTPUT_DIR):
+        for f in glob.glob(os.path.join(OUTPUT_DIR, "*")):
+            try:
+                if os.path.isfile(f):
+                    os.remove(f)
+            except Exception:
+                pass
+        log_message(f"Output folder cleaned: {OUTPUT_DIR}")
+
     # ── STEP 1: Fetch News ────────────────────────────────────────────────────
-    log_message("STEP 1: Fetching Latest AI/Tech News (last 24h)...")
-    news_articles = fetch_tech_news()
+    if custom_topic:
+        log_message("STEP 1: Using Custom Topic...")
+        news_articles = [{"title": "Custom Topic", "description": custom_topic, "url": "", "source": {"name": "User Input"}}]
+    else:
+        log_message("STEP 1: Fetching Latest AI/Tech News (last 24h)...")
+        news_articles = fetch_tech_news()
+        
     if not news_articles:
         log_message("ERROR: No articles fetched. Aborting.")
         return False
     log_message(f"Fetched {len(news_articles)} articles.")
 
     # ── STEP 2: Telegram topic selection ─────────────────────────────────────
-    log_message("STEP 2: Sending topic list to Telegram for your selection...")
-    chosen_article = send_topic_selection(news_articles)
-    if chosen_article:
-        log_message(f"User selected: {chosen_article.get('title')}")
+    if custom_topic:
+        log_message("STEP 2: Skipping Telegram selection since custom topic provided.")
+        chosen_article = news_articles[0]
     else:
-        log_message("No Telegram selection — Gemini will auto-pick best story.")
+        log_message("STEP 2: Sending topic list to Telegram for your selection...")
+        chosen_article = send_topic_selection(news_articles)
+        if chosen_article:
+            log_message(f"User selected: {chosen_article.get('title')}")
+        else:
+            log_message("No Telegram selection — Gemini will auto-pick best story.")
 
     # ── STEP 3: Script Generation (with retry) ────────────────────────────────
     attempts = 0
@@ -88,8 +112,8 @@ def run_pipeline():
 
         title  = script_data.get("title", "Tech News!")
         script = script_data.get("script", "")
-        voice  = script_data.get("edge_tts_voice", "en-US-GuyNeural")
-        emotion = script_data.get("edge_tts_emotion", "excited")
+        voice  = script_data.get("edge_tts_voice", "en-US-AndrewNeural")
+        emotion = script_data.get("edge_tts_emotion", "calm")
         log_message(f"Story: {script_data.get('original_news_headline')}")
         log_message(f"Breaking Level: {script_data.get('breaking_news_level')}")
 
@@ -104,35 +128,35 @@ def run_pipeline():
 
         if duration < min_dur:
             log_message(f"Audio too short ({duration:.1f}s < {min_dur}s). Retrying...")
-            extra_instruction = "The previous script was too short. Expand it significantly."
-            attempts += 1
-            continue
-        elif duration > max_dur:
-            log_message(f"Audio too long ({duration:.1f}s > {max_dur}s). Retrying...")
-            extra_instruction = "The previous script was too long. Make it shorter."
+            extra_instruction = f"The previous script was too short at {duration:.0f}s. Make the script longer, aim for 65-70 seconds of speaking."
             attempts += 1
             continue
 
         log_message(f"Audio OK: {duration:.1f}s | {len(word_timestamps)} word timestamps")
         break   # ← success
 
-    if not audio_path or not script_data or not (min_dur <= duration <= max_dur):
+    if not audio_path or not script_data or duration < min_dur:
         log_message("ERROR: Could not generate valid assets. Aborting.")
         return False
 
     # ── STEP 5: Build Visual Chunks ───────────────────────────────────────────
     log_message("STEP 5: Grouping words into visual chunks...")
-    chunks = build_chunks(word_timestamps)
+    chunks = build_chunks(word_timestamps, script_data.get("subtitle_chunks", []))
     chunks = redistribute_to_audio_duration(chunks, duration)
     log_message(f"Built {len(chunks)} visual chunks from {len(word_timestamps)} words.")
 
-    # ── STEP 6: Fetch Per-Chunk Visuals (Pexels video → photo → Imagen) ───────
-    log_message("STEP 6: Fetching per-chunk visuals from Pexels...")
-    topic_context = script_data.get("original_news_headline", title)
-    chunks = fetch_all_chunk_visuals(chunks, topic_context=topic_context)
+    # ── STEP 6: Fetch Entities (People/Companies) ─────────────────────────────
+    log_message("STEP 6: Fetching entity photos and company logos...")
+    from entity_fetcher import fetch_all_entities
+    script_data = fetch_all_entities(script_data)
 
-    # ── STEP 7: Render Video ──────────────────────────────────────────────────
-    log_message("STEP 7: Rendering final video with karaoke subtitles...")
+    # ── STEP 7: Fetch Per-Chunk Visuals (Decision Tree) ───────────────────────
+    log_message("STEP 7: Fetching per-chunk visuals from Pexels/Imagen...")
+    topic_context = script_data.get("original_news_headline", title)
+    chunks = fetch_all_chunk_visuals(chunks, topic_context=topic_context, script_data=script_data)
+
+    # ── STEP 8: Render Video ──────────────────────────────────────────────────
+    log_message("STEP 8: Rendering final video with all engagement layers...")
     try:
         title  = script_data.get("title")
         script = script_data.get("script")
@@ -143,10 +167,26 @@ def run_pipeline():
         breaking_level = script_data.get("breaking_news_level", 0)
         voice_used  = script_data.get("edge_tts_voice")
 
+        # Visual Variety Override for Anti-Bot Monetization
+        import random
+        visual_styles_palettes = [
+            {"background": "#121212", "accent": "#00E5FF", "text": "#ffffff"}, # Cyber Cyan
+            {"background": "#0D0D1A", "accent": "#FFD700", "text": "#ffffff"}, # Dark Gold
+            {"background": "#1A0000", "accent": "#FF4444", "text": "#ffffff"}, # Deep Red
+            {"background": "#0F1A12", "accent": "#00FF7F", "text": "#ffffff"}, # Hacker Green
+            {"background": "#10002B", "accent": "#E0AAFF", "text": "#ffffff"}, # Neon Purple
+            {"background": "#1A1A1D", "accent": "#F5A623", "text": "#ffffff"}  # Amber Black
+        ]
+        chosen_style = random.choice(visual_styles_palettes)
+        # Override the AI's color theme with our explicit variety matrix
+        script_data["color_theme"] = chosen_style
+
         video_path = create_video(audio_path, script_data, chunks)
         if not video_path or not os.path.exists(video_path):
             raise Exception("Video file not created.")
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         log_message(f"ERROR: Video render failed: {e}")
         return False
 
@@ -164,7 +204,13 @@ def run_pipeline():
 
     # ── STEP 10: YouTube Upload ───────────────────────────────────────────────
     log_message("STEP 10: Uploading to YouTube...")
-    description = format_description(script, script_data.get("end_question", ""), hashtags)
+    ai_desc = script_data.get("description", "")
+    description = format_description(ai_desc, script, script_data.get("end_question", ""), hashtags)
+    # Ensure variety in titles using the options if generated
+    if script_data.get("title_options"):
+        import random
+        title = random.choice(script_data["title_options"])
+    
     tags = list(set(keywords + companies + [t.replace("#", "") for t in hashtags]))[:15]
 
     success, result = upload_video(video_path, title, description, tags)
@@ -201,13 +247,19 @@ def run_pipeline():
     return True
 
 
+def run_local(custom_topic=None):
+    # XTTS server launch removed. Calling pipeline directly.
+    run_pipeline(custom_topic)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--now", action="store_true", help="Run pipeline immediately.")
+    parser.add_argument("--topic", type=str, help="Run pipeline with a specific custom topic.", default=None)
     args = parser.parse_args()
 
-    if args.now:
-        run_pipeline()
+    if args.now or args.topic:
+        run_local(args.topic)
     else:
         print("Usage: python main.py --now")
         print("For scheduled runs: python scheduler.py")

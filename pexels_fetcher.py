@@ -1,15 +1,9 @@
 """
-pexels_fetcher.py — Per-chunk Pexels video/photo search using Gemini for search terms.
-
-Priority per chunk:
-  1. Pexels VIDEO  (portrait, matching duration)
-  2. Pexels PHOTO  (portrait, Ken Burns applied by video_gen)
-  3. Imagen 4 AI   (9:16, generated)
+pexels_fetcher.py — Visual Fetching Decision Tree per chunk, with Gemini Relevance Scoring.
 """
 
 import os
 import io
-import json
 import time
 import threading
 import requests
@@ -22,117 +16,127 @@ PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")
 TODAY = datetime.now().strftime("%Y-%m-%d")
 
 _download_lock = threading.Lock()
-_used_media = set()          # Track used Pexels IDs to prevent duplicates
+_used_media = set()
 
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 # ─────────────────────────────────────────────────────────────────────────────
-# STEP A: Ask Gemini for best Pexels search term per chunk
+# RELEVANCE SCORING
 # ─────────────────────────────────────────────────────────────────────────────
-def get_search_terms(chunks, topic_context=""):
-    """Single Gemini call to assign primary + fallback search term to each chunk."""
+def score_relevance(chunk_text, visual_desc):
+    """
+    Calls Gemini to rate relevance 0-10.
+    10 = Perfect match
+    7+ = Good match
+    5-6 = Acceptable
+    Below 5 = Reject
+    """
     client = genai.Client(api_key=GEMINI_API_KEY)
-
-    chunks_json = json.dumps([
-        {"chunk_id": c["chunk_id"], "text": c["text"], "duration": round(c["duration"], 2)}
-        for c in chunks
-    ], indent=2)
-
-    prompt = f"""You are a visual media selector for a tech news YouTube Shorts video.
-Topic context: {topic_context}
-
-For each subtitle chunk below, generate the best Pexels search term to find a relevant video clip or photo.
-
-Rules:
-- Use 2-3 concrete, visual words that Pexels will have results for
-- Match the spoken content with a real-world visual
-- Avoid abstract words: 'shocking', 'incredible', 'amazing'
-- Prefer: specific nouns + setting (e.g. 'smartphone screen app' not 'technology')
-- Prefer portrait/vertical orientation subjects
-- 'pexels_type' should be 'video' for action/motion concepts, 'photo' for still concepts
-
-Chunks:
-{chunks_json}
-
-Respond ONLY with a valid JSON array, no markdown:
-[
-  {{
-    "chunk_id": 1,
-    "pexels_primary": "two word search",
-    "pexels_fallback": "alternative search",
-    "pexels_type": "video"
-  }}
-]"""
-
+    prompt = f"""Rate relevance 0-10.
+Chunk text: '{chunk_text}'
+Image description: '{visual_desc}'
+Return only a number."""
+    
     try:
-        resp = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=prompt
+        response = client.models.generate_content(
+            model="gemini-3-flash-preview", 
+            contents=prompt,
+            config=genai.types.GenerateContentConfig(temperature=0.0)
         )
-        raw = resp.text.strip()
-        raw = raw.replace("```json", "").replace("```", "").strip()
-        terms = json.loads(raw)
-        # Map back to chunks
-        term_map = {t["chunk_id"]: t for t in terms}
-        for c in chunks:
-            info = term_map.get(c["chunk_id"], {})
-            c["pexels_primary"]  = info.get("pexels_primary", c["text"][:20])
-            c["pexels_fallback"] = info.get("pexels_fallback", "technology news")
-            c["pexels_type"]     = info.get("pexels_type", "photo")
-        print(f"Gemini assigned search terms for {len(chunks)} chunks.")
-        return chunks
+        score_text = response.text.strip()
+        # Find the first number in the response
+        import re
+        match = re.search(r'\d+', score_text)
+        if match:
+             return int(match.group())
+        return 0
     except Exception as e:
-        print(f"Gemini search term generation failed: {e}. Using text as search query.")
-        for c in chunks:
-            c["pexels_primary"]  = " ".join(c["text"].split()[:3])
-            c["pexels_fallback"] = "technology innovation"
-            c["pexels_type"]     = "photo"
-        return chunks
+        print(f"Gemini scoring failed: {e}")
+        return 0
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# STEP B: Download Pexels VIDEO
+# PEXELS SEARCH AND PARSE
 # ─────────────────────────────────────────────────────────────────────────────
-def _search_pexels_video(query, chunk_duration):
+def _search_pexels_videos(query, chunk_duration):
     if not PEXELS_API_KEY:
-        return None
+        return []
     try:
         r = requests.get(
             "https://api.pexels.com/videos/search",
             headers={"Authorization": PEXELS_API_KEY},
-            params={"query": query, "per_page": 10, "orientation": "portrait"},
+            params={"query": query, "per_page": 5, "orientation": "portrait"},
             timeout=15
         )
         if r.status_code != 200:
-            return None
-        videos = r.json().get("videos", [])
-        min_dur = max(1.0, chunk_duration - 1.0)
-        max_dur = chunk_duration + 5.0
-
-        for v in videos:
+            return []
+        
+        results = []
+        for v in r.json().get("videos", []):
             vid_id = v.get("id")
             if vid_id in _used_media:
                 continue
+                
             dur = v.get("duration", 0)
-            if min_dur <= dur <= max_dur:
-                # Pick best portrait file
-                files = v.get("video_files", [])
-                portrait_files = [
-                    f for f in files
-                    if f.get("width", 0) < f.get("height", 1)
-                    and f.get("height", 0) >= 720
-                ]
-                if not portrait_files:
-                    # Accept any file if no portrait
-                    portrait_files = sorted(files, key=lambda f: f.get("height", 0), reverse=True)
-                if portrait_files:
-                    chosen = portrait_files[0]
-                    return {"id": vid_id, "url": chosen["link"], "duration": dur, "type": "video"}
+            if dur < max(1.0, chunk_duration - 1.0):
+                continue
+                
+            # Extract title/description from URL
+            url_slug = v.get("url", "").split("/")[-2] if "pexels.com/video/" in v.get("url", "") else query
+            title = url_slug.replace("-", " ")
+            
+            # Find portrait link
+            files = v.get("video_files", [])
+            portrait_files = [f for f in files if f.get("width", 0) < f.get("height", 1) and f.get("height", 0) >= 720]
+            if not portrait_files:
+                portrait_files = sorted(files, key=lambda f: f.get("height", 0), reverse=True)
+                
+            if portrait_files:
+                results.append({
+                    "id": vid_id, 
+                    "link": portrait_files[0]["link"], 
+                    "desc": title, 
+                    "type": "video"
+                })
+        return results
     except Exception as e:
         print(f"Pexels video search error: {e}")
-    return None
+    return []
 
+def _search_pexels_photos(query):
+    if not PEXELS_API_KEY:
+        return []
+    try:
+        r = requests.get(
+            "https://api.pexels.com/v1/search",
+            headers={"Authorization": PEXELS_API_KEY},
+            params={"query": query, "per_page": 5, "orientation": "portrait"},
+            timeout=15
+        )
+        if r.status_code != 200:
+            return []
+            
+        results = []
+        for p in r.json().get("photos", []):
+            pid = p.get("id")
+            if pid in _used_media:
+                continue
+            
+            alt = p.get("alt", query)
+            url = p.get("src", {}).get("large2x") or p.get("src", {}).get("large")
+            if url:
+                results.append({
+                    "id": pid,
+                    "link": url,
+                    "desc": alt,
+                    "type": "photo"
+                })
+        return results
+    except Exception as e:
+        print(f"Pexels photo search error: {e}")
+    return []
 
-def _download_pexels_video(url, output_path):
+def _download_video(url, output_path):
     try:
         r = requests.get(url, timeout=60, stream=True)
         if r.status_code == 200:
@@ -140,45 +144,16 @@ def _download_pexels_video(url, output_path):
                 for chunk in r.iter_content(65536):
                     f.write(chunk)
             return output_path
-    except Exception as e:
-        print(f"Pexels video download failed: {e}")
-    return None
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# STEP C: Download Pexels PHOTO
-# ─────────────────────────────────────────────────────────────────────────────
-def _search_pexels_photo(query):
-    if not PEXELS_API_KEY:
         return None
-    try:
-        r = requests.get(
-            "https://api.pexels.com/v1/search",
-            headers={"Authorization": PEXELS_API_KEY},
-            params={"query": query, "per_page": 10, "orientation": "portrait"},
-            timeout=15
-        )
-        if r.status_code != 200:
-            return None
-        photos = r.json().get("photos", [])
-        for p in photos:
-            pid = p.get("id")
-            if pid in _used_media:
-                continue
-            url = p.get("src", {}).get("large2x") or p.get("src", {}).get("large")
-            if url:
-                return {"id": pid, "url": url, "type": "photo"}
     except Exception as e:
-        print(f"Pexels photo search error: {e}")
-    return None
+        print(f"Video download err: {e}")
+        return None
 
-
-def _download_save_photo(url, output_path):
+def _download_photo(url, output_path):
     try:
         r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=20)
         if r.status_code == 200:
             img = Image.open(io.BytesIO(r.content)).convert("RGB")
-            # Crop to 9:16
             w, h = img.size
             target_h = int(w * 16 / 9)
             if target_h <= h:
@@ -191,23 +166,38 @@ def _download_save_photo(url, output_path):
             img = img.resize((1080, 1920), Image.LANCZOS)
             img.save(output_path, "JPEG", quality=90)
             return output_path
+        return None
     except Exception as e:
-        print(f"Photo download failed: {e}")
-    return None
-
+        print(f"Photo download err: {e}")
+        return None
 
 # ─────────────────────────────────────────────────────────────────────────────
-# STEP D: Imagen 4 fallback
+# STEP E: Imagen 3
 # ─────────────────────────────────────────────────────────────────────────────
-def _generate_imagen(prompt, output_path):
-    from google.genai import types
+def _generate_imagen3(chunk_text, output_path):
+    # 1. Ask Gemini to craft the perfect Imagen prompt
     client = genai.Client(api_key=GEMINI_API_KEY)
-    style = ", photorealistic, cinematic, dramatic lighting, 9:16 vertical, no text, no watermarks"
+    prompt_builder = f"""Create a detailed Imagen 3 prompt for this text:
+'{chunk_text}'
+Requirements:
+- Photorealistic, cinematic, 9:16 vertical
+- No text, no watermarks, no faces of real people
+- Directly shows what the text describes
+- High detail, dramatic lighting"""
+    
+    try:
+        resp = client.models.generate_content(model="gemini-3-flash-preview", contents=prompt_builder)
+        best_prompt = resp.text.strip()
+    except:
+        best_prompt = chunk_text + " cinematic, dramatic lighting, 9:16 vertical, highly detailed, photorealistic"
+        
+    print(f"  -> Generated Imagen prompt: {best_prompt[:60]}...")
+        
     try:
         result = client.models.generate_images(
-            model="imagen-4.0-fast-generate-001",
-            prompt=prompt + style,
-            config=types.GenerateImagesConfig(
+            model="imagen-3.0-generate-002",
+            prompt=best_prompt,
+            config=genai.types.GenerateImagesConfig(
                 number_of_images=1, aspect_ratio="9:16", output_mime_type="image/jpeg"
             )
         )
@@ -216,93 +206,143 @@ def _generate_imagen(prompt, output_path):
                 f.write(gi.image.image_bytes)
             return output_path
     except Exception as e:
-        print(f"Imagen failed: {e}")
+        print(f"Imagen3 failed: {e}")
     return None
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# MAIN: Fetch visual asset for a single chunk
-# ─────────────────────────────────────────────────────────────────────────────
-def fetch_chunk_visual(chunk):
+def fetch_chunk_visual(chunk, script_data):
     """
-    Fetches the best visual for a given chunk.
-    Adds 'visual_path' and 'visual_type' ('video'|'photo'|'imagen') to chunk dict.
-    Returns the updated chunk.
+    Executes the Visual Fetching Decision Tree (A -> B -> C -> D -> E)
     """
-    cid     = chunk["chunk_id"]
-    dur     = chunk["duration"]
-    primary = chunk.get("pexels_primary", "technology")
-    fallback = chunk.get("pexels_fallback", "innovation")
-    preferred_type = chunk.get("pexels_type", "photo")
-
+    from entity_fetcher import fetch_person_photo, fetch_company_logo
+    cid = chunk["chunk_id"]
+    text = chunk["text"]
+    dur = chunk["duration"]
+    
+    primary_q = chunk.get("pexels_primary", "technology")
+    fallback_q = chunk.get("pexels_fallback", "innovation")
+    
     video_out = os.path.join(OUTPUT_DIR, f"chunk_{cid}_{TODAY}.mp4")
     photo_out = os.path.join(OUTPUT_DIR, f"chunk_{cid}_{TODAY}.jpg")
+    
+    # ── STEP A: Determine if chunk mentions a PERSON ─────────────────────
+    if chunk.get("has_person"):
+        # Match person from script_data
+        person_list = script_data.get("people", [])
+        if person_list:
+            # For simplicity, use first person or matching name
+            p = person_list[0] 
+            path = fetch_person_photo(p)
+            if path:
+                chunk["visual_path"] = path
+                chunk["visual_type"] = "photo"
+                chunk["relevance_score"] = 10
+                chunk["source"] = "Step A: Person"
+                print(f"Chunk {cid} -> STEP A (Person Match): 10/10")
+                return chunk
 
-    # ── Priority 1: Pexels VIDEO ──────────────────────────────────────────────
-    if PEXELS_API_KEY and preferred_type == "video":
-        for q in [primary, fallback]:
-            result = _search_pexels_video(q, dur)
-            if result:
-                path = _download_pexels_video(result["url"], video_out)
-                if path:
-                    with _download_lock:
-                        _used_media.add(result["id"])
-                    chunk["visual_path"] = path
-                    chunk["visual_type"] = "video"
-                    print(f"  Chunk {cid}: Pexels VIDEO ✓ ({q})")
-                    return chunk
+    # ── STEP B: Determine if chunk mentions a COMPANY ────────────────────
+    if chunk.get("has_company"):
+        company_list = script_data.get("companies", [])
+        if company_list:
+            cname = chunk.get("company_name", company_list[0].get("name"))
+            c = next((comp for comp in company_list if comp["name"] == cname), company_list[0])
+            path = fetch_company_logo(c)
+            if path:
+                if path.endswith(".png"):
+                    # We might need to layer this on a background, but for Layer 1 just use it directly (it'll get ken burns)
+                    pass
+                chunk["visual_path"] = path
+                chunk["visual_type"] = "photo"
+                chunk["relevance_score"] = 10
+                chunk["source"] = "Step B: Company"
+                print(f"Chunk {cid} -> STEP B (Company Match): 10/10")
+                return chunk
 
-    # ── Priority 2: Pexels PHOTO ─────────────────────────────────────────────
-    if PEXELS_API_KEY:
-        for q in [primary, fallback]:
-            result = _search_pexels_photo(q)
-            if result:
-                path = _download_save_photo(result["url"], photo_out)
-                if path:
-                    with _download_lock:
-                        _used_media.add(result["id"])
-                    chunk["visual_path"] = path
-                    chunk["visual_type"] = "photo"
-                    print(f"  Chunk {cid}: Pexels PHOTO ✓ ({q})")
-                    return chunk
+    # ── STEP C: Pexels VIDEOS ────────────────────────────────────────────
+    for query in [primary_q, fallback_q]:
+        videos = _search_pexels_videos(query, dur)
+        best_vid = None
+        best_score = -1
+        
+        for v in videos:
+            score = score_relevance(text, v["desc"])
+            if score >= 7:
+                if score > best_score:
+                    best_score = score
+                    best_vid = v
+        
+        if best_vid:
+            path = _download_video(best_vid["link"], video_out)
+            if path:
+                with _download_lock:
+                    _used_media.add(best_vid["id"])
+                chunk["visual_path"] = path
+                chunk["visual_type"] = "video"
+                chunk["relevance_score"] = best_score
+                chunk["source"] = f"Step C: Pexels Video ({query})"
+                print(f"Chunk {cid} -> STEP C (Pexels Video): {best_score}/10")
+                return chunk
 
-    # ── Priority 3: Imagen 4 ─────────────────────────────────────────────────
-    print(f"  Chunk {cid}: Falling back to Imagen4 ({primary})")
-    path = _generate_imagen(primary, photo_out)
+    # ── STEP D: Pexels PHOTOS ────────────────────────────────────────────
+    for query in [primary_q, fallback_q]:
+        photos = _search_pexels_photos(query)
+        best_photo = None
+        best_score = -1
+        
+        for p in photos:
+            score = score_relevance(text, p["desc"])
+            if score >= 7:
+                if score > best_score:
+                    best_score = score
+                    best_photo = p
+                    
+        if best_photo:
+            path = _download_photo(best_photo["link"], photo_out)
+            if path:
+                with _download_lock:
+                    _used_media.add(best_photo["id"])
+                chunk["visual_path"] = path
+                chunk["visual_type"] = "photo"
+                chunk["relevance_score"] = best_score
+                chunk["source"] = f"Step D: Pexels Photo ({query})"
+                print(f"Chunk {cid} -> STEP D (Pexels Photo): {best_score}/10")
+                return chunk
+
+    # ── STEP E: Imagen 3 ─────────────────────────────────────────────────
+    print(f"Chunk {cid} -> STEP E: Fallback to Imagen 3")
+    path = _generate_imagen3(text, photo_out)
     if path:
         chunk["visual_path"] = path
         chunk["visual_type"] = "photo"
+        chunk["relevance_score"] = 9
+        chunk["source"] = "Step E: Imagen 3"
         return chunk
-
+        
     chunk["visual_path"] = None
     chunk["visual_type"] = None
+    chunk["relevance_score"] = 0
+    chunk["source"] = "Failed"
     return chunk
 
 
-def fetch_all_chunk_visuals(chunks, topic_context=""):
-    """
-    Main entry point. Calls Gemini once for all search terms,
-    then downloads visuals for each chunk in parallel threads.
-    """
-    print(f"Getting Pexels search terms for {len(chunks)} chunks...")
-    chunks = get_search_terms(chunks, topic_context)
-
-    print(f"Downloading chunk visuals ({len(chunks)} chunks)...")
+def fetch_all_chunk_visuals(chunks, topic_context="", script_data=None):
+    if script_data is None:
+        script_data = {}
+        
+    print(f"Running Decision Tree for {len(chunks)} chunks...")
     threads = []
     for chunk in chunks:
-        t = threading.Thread(target=fetch_chunk_visual, args=(chunk,))
+        # Pexels fallback/primary might not be there if we skipped the older Gemini step
+        if "pexels_primary" not in chunk:
+            chunk["pexels_primary"] = " ".join(chunk["text"].split()[:3])
+            chunk["pexels_fallback"] = "technology"
+
+        t = threading.Thread(target=fetch_chunk_visual, args=(chunk, script_data))
         t.start()
         threads.append(t)
 
     for t in threads:
         t.join()
-
-    # Report summary
-    videos = sum(1 for c in chunks if c.get("visual_type") == "video")
-    photos = sum(1 for c in chunks if c.get("visual_type") == "photo")
-    imagen = sum(1 for c in chunks if c.get("visual_type") == "imagen")
-    failed = sum(1 for c in chunks if not c.get("visual_path"))
-    print(f"Visuals: {videos} videos, {photos} photos, {imagen} Imagen4, {failed} failed")
 
     # Fill any failed chunks with the previous chunk's visual
     last_path = None
