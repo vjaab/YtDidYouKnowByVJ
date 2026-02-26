@@ -3,18 +3,19 @@ import time
 import pytz
 from datetime import datetime
 from main import run_pipeline
-from config import UPLOAD_TIME, TIMEZONE
+from config import UPLOAD_TIMES, TIMEZONE
 
 def check_time_and_run():
     ist_now = datetime.now(pytz.timezone(TIMEZONE))
-    # E.g. UPLOAD_TIME is "08:00" from config.py
-    if ist_now.strftime("%H:%M") == UPLOAD_TIME:
-        print(f"[{ist_now}] Triggering Top Tech News Pipeline...")
+    current_hhmm = ist_now.strftime("%H:%M")
+    
+    if current_hhmm in UPLOAD_TIMES:
+        print(f"[{ist_now}] Triggering AI Research Pipeline for {current_hhmm} slot...")
         run_pipeline()
         time.sleep(61) # Sleep to avoid double triggering
 
 def start_scheduler():
-    print(f"Tech News Scheduler Started. Target time: {UPLOAD_TIME} {TIMEZONE}")
+    print(f"AI Research Scheduler Started. Target times: {', '.join(UPLOAD_TIMES)} {TIMEZONE}")
     # We check every 30 seconds to ensure we hit the 1 minute window precisely
     schedule.every(30).seconds.do(check_time_and_run)
     

@@ -16,7 +16,7 @@ from pexels_fetcher import fetch_all_chunk_visuals
 from video_gen import create_video
 from thumbnail_gen import generate_thumbnail
 from youtube_upload import upload_video
-from telegram_selector import send_topic_selection, send_upload_consent, notify_telegram
+from telegram_selector import notify_telegram
 
 
 def log_message(msg):
@@ -41,7 +41,7 @@ I share what top devs & AI engineers are reading right now:
 🚀 Hottest AI research (before it goes viral)
 💼 High-paying jobs & hiring alerts
 🛠️ Dev tools & resources that save hours
-📰 Tech news that actually matters
+📰 Deep tech research that actually matters
 
 Don't miss out — join free today 👇
 
@@ -49,11 +49,11 @@ Don't miss out — join free today 👇
 ━━━━━━━━━━━━━━━━━━━━━━
 
 {hashtag_str}
-#technews #shorts #tech #ai #youtubeshorts #dailyfacts"""
+#airesearch #shorts #machinelearning #ai #youtubeshorts #dailyfacts"""
 
 
 def run_pipeline(custom_topic=None):
-    log_message("=== STARTING DAILY TECH NEWS SHORTS PIPELINE ===")
+    log_message("=== STARTING DAILY AI RESEARCH SHORTS PIPELINE ===")
 
     # ── Clean output folder before starting ───────────────────────────────────
     if os.path.exists(OUTPUT_DIR):
@@ -70,7 +70,7 @@ def run_pipeline(custom_topic=None):
         log_message("STEP 1: Using Custom Topic...")
         news_articles = [{"title": "Custom Topic", "description": custom_topic, "url": "", "source": {"name": "User Input"}}]
     else:
-        log_message("STEP 1: Fetching Latest AI/Tech News (last 24h)...")
+        log_message("STEP 1: Fetching Latest AI Research Papers (last 24h)...")
         news_articles = fetch_tech_news()
         
     if not news_articles:
@@ -78,17 +78,13 @@ def run_pipeline(custom_topic=None):
         return False
     log_message(f"Fetched {len(news_articles)} articles.")
 
-    # ── STEP 2: Telegram topic selection ─────────────────────────────────────
+    # ── STEP 2: Auto-select Topic (Telegram interaction removed) ─────────────
     if custom_topic:
-        log_message("STEP 2: Skipping Telegram selection since custom topic provided.")
+        log_message("STEP 2: Using Custom Topic...")
         chosen_article = news_articles[0]
     else:
-        log_message("STEP 2: Sending topic list to Telegram for your selection...")
-        chosen_article = send_topic_selection(news_articles)
-        if chosen_article:
-            log_message(f"User selected: {chosen_article.get('title')}")
-        else:
-            log_message("No Telegram selection — Gemini will auto-pick best story.")
+        log_message("STEP 2: Telegram selection disabled — Gemini will auto-pick the best story.")
+        chosen_article = None
 
     # ── STEP 3: Script Generation (with retry) ────────────────────────────────
     attempts = 0
@@ -194,13 +190,9 @@ def run_pipeline(custom_topic=None):
     log_message("STEP 8: Generating thumbnail...")
     thumbnail_path = generate_thumbnail(script_data)
 
-    # ── STEP 9: Telegram Upload Consent ──────────────────────────────────────
-    log_message("STEP 9: Requesting upload consent via Telegram...")
-    approved = send_upload_consent(thumbnail_path, title, duration)
-    if not approved:
-        log_message("Upload skipped by user or timed out.")
-        notify_telegram(f"Video saved locally.\nTitle: {title}", "⚠️")
-        return True
+    # ── STEP 9: Automatic Upload (Consent removed) ──────────────────────────
+    log_message("STEP 9: Telegram upload consent removed. Proceeding to upload...")
+    approved = True
 
     # ── STEP 10: YouTube Upload ───────────────────────────────────────────────
     log_message("STEP 10: Uploading to YouTube...")

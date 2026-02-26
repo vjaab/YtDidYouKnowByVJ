@@ -9,6 +9,21 @@ from topic_tracker import load_tracker, check_story_uniqueness, check_cooldowns
 def pick_and_generate_script(articles, extra_instruction="", forced_article=None):
     client = genai.Client(api_key=GEMINI_API_KEY)
     
+    # ── Pre-filter articles to avoid repeats ──────────────────────────────────
+    filtered_articles = []
+    for art in articles:
+        title = art.get('title', '')
+        url = art.get('url', '')
+        is_unique, _ = check_story_uniqueness(title, url)
+        if is_unique:
+            filtered_articles.append(art)
+    
+    if not filtered_articles and not forced_article:
+        print("No unique articles remaining to process.")
+        return None
+        
+    articles = filtered_articles # Use the filtered list
+    
     news_context = ""
     for idx, art in enumerate(articles[:20]):
         title = art.get('title', '')
@@ -29,8 +44,8 @@ def pick_and_generate_script(articles, extra_instruction="", forced_article=None
         )
     else:
         selection_instruction = (
-            "Analyze the following news stories and pick the SINGLE most engaging story to convert into a 60-second YouTube Short script.\n"
-            "Choose based on importance and resonance with everyday moments, avoiding overly hyped tech news unless it profoundly impacts human life.\n"
+            "Analyze the following research papers and engineering blogs and pick the SINGLE most engaging one to convert into a 60-second YouTube Short script.\n"
+            "Choose based on deep technological importance and resonance with everyday moments, avoiding generic tech news. Focus on the core AI breakthrough.\n"
         )
 
     prompt = f"""You are a grounded, observant man who finds deep wisdom in ordinary moments. You do not preach. You notice.
@@ -38,24 +53,25 @@ Personality: A grounded, observant man who finds deep wisdom in ordinary moments
 Tone: Warm, unhurried, slightly weathered. Like a conversation over a quiet cup of tea.
 Pace: Slow and deliberate. Every word earns its place.
 Language style: Simple, poetic English. Short sentences. Everyday metaphors — tea, rain, roads, seasons, market.
+Context: You will often receive research paper abstracts. Your job is to extract the core 'wisdom' or discovery and explain it so simply that a child or a farmer would understand the essence, while keeping the awe of the breakthrough.
 {selection_instruction}
 
 
-NEWS STORIES:
+RESEARCH PAPERS & BLOGS:
 {news_context}
 
 CRITICAL 'ANTI-BOT' MONETIZATION RULES:
 To pass YouTube's "Repetitious Content" review, you MUST act as a Creative Director generating highly unique outputs each time:
 1. VARIETY in Hook: Do NOT use the same hook twice. Cycle between 'Challenger/Controversial', 'Educational', and 'Fun/Relatable' hooks.
-2. STRUCTURE VARIETY: Randomly choose between a 'Deep Dive' format (focusing heavily on 1 aspect of the news) or a 'Lightning Round' format (3 quick points about the news).
-3. PERSONALIZATION: Include a unique 'Fact of the Day' at the very end of the script that is completely UNRELATED to the main tech news topic, to show editorial range and human touch.
+2. STRUCTURE VARIETY: Randomly choose between a 'Deep Dive' format (focusing heavily on 1 aspect of the research) or a 'Lightning Round' format (3 quick points about the research).
+3. PERSONALIZATION: Include a unique 'Fact of the Day' at the very end of the script that is completely UNRELATED to the main research topic, to show editorial range and human touch.
 4. METADATA: Generate an array of 3 highly click-worthy "title_options" and a detailed "description" (at least 50 words) that includes timestamps if applicable, instead of relying on a blank upload.
 5. VOICE PACING CUES: Ensure the script includes natural conversational cues (like em dashes '—' and ellipses '...') so the TTS doesn't sound monotonic.
 6. VISUAL VARIETY (Crucial): For the "color_theme", ALWAYS generate a completely unique, randomized pair of high-contrast colors. NEVER just use the same blue or red. Rotate through diverse combinations (e.g., Dark #121212 with Lime #00FF00, Navy #1A237E with Gold #FFD700).
 
 STRICT RULES:
 1. Hook must be gentle but profound, within the first 3 seconds
-2. Explain the news through everyday metaphors (tea, rain, roads, seasons, market)
+2. Explain the research through everyday metaphors (tea, rain, roads, seasons, market)
 3. Keep the pace slow and deliberate. Short sentences.
 4. End with a quiet, lingering thought, followed by the unrelated Fact of the Day.
 5. Total script must be speakable in 65-75 seconds.
@@ -96,12 +112,12 @@ Return ONLY this exact JSON (no markdown, no explanation):
   "title": "Punchy YouTube title max 60 chars with emoji (pick the best from title_options)",
   "script": "Full voiceover script 6-9 sentences (65-75 sec), ending with the fact_of_the_day. MAKE IT DETAILED SO IT IS MORE THAN 60 SECONDS",
   "hook": "First sentence, max 10 words, attention grabbing",
-  "summary": "One line summary of the news",
-  "sub_category": "AI/Gadgets/Privacy/Space/Social Media/Cybersecurity/EVs/Robotics/Gaming/Biotech",
+  "summary": "One line summary of the research",
+  "sub_category": "AI/Machine Learning/Robotics/NLP/Computer Vision",
   "companies_mentioned": ["Company1"],
   "keywords": ["kw1", "kw2", "kw3", "kw4", "kw5"],
-  "hashtags": ["#technews", "#shorts", "#ai", "#tech"],
-  "end_question": "Thought provoking comment-bait question (based on main news)",
+  "hashtags": ["#airesearch", "#shorts", "#machinelearning", "#ai", "#compsci"],
+  "end_question": "Thought provoking comment-bait question (based on main research)",
   "edge_tts_voice": "en-US-AndrewNeural",
   "edge_tts_emotion": "calm",
   "relevant_emoji": "🍵",
@@ -112,7 +128,7 @@ Return ONLY this exact JSON (no markdown, no explanation):
      "text": "#ffffff"
   }},
   "imagen_prompts": [
-     "specific visual matching news story, cinematic, 9:16, 4K",
+     "specific visual matching research discovery, cinematic, 9:16, 4K",
      "second angle showing impact or scale, dramatic, 9:16"
   ],
   "thumbnail_headline": "Max 5 shocking words for thumbnail",
@@ -219,7 +235,8 @@ IMPORTANT: voice is ALWAYS en-US-AndrewNeural, which is a warm male voice. Do no
                 
             # Perform uniqueness check
             headline = script_data.get("original_news_headline", "")
-            is_unique, msg = check_story_uniqueness(headline)
+            news_url = script_data.get("original_news_url", "")
+            is_unique, msg = check_story_uniqueness(headline, news_url)
             if not is_unique:
                 print(f"Duplicate story detected: {msg}")
                 extra_instruction += f"\nNote: You MUST skip the story titled '{headline}'. It was already covered!"

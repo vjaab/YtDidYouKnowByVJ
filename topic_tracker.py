@@ -25,11 +25,20 @@ def save_tracker(tracker_data):
     with open(TRACKER_FILE, 'w') as f:
         json.dump(tracker_data, f, indent=4)
 
-def check_story_uniqueness(new_title):
+def check_story_uniqueness(new_title, new_url=None):
     tracker = load_tracker()
+    
+    # 1. Check Titles (Fuzzy match)
     for old_title in tracker.get('used_titles', []):
-        if fuzz.ratio(new_title.lower(), old_title.lower()) > 75:
+        if fuzz.ratio(new_title.lower(), old_title.lower()) > 85: # Increased threshold for research
             return False, f"Similar to previously covered story: '{old_title}'"
+            
+    # 2. Check URLs (Exact match)
+    if new_url:
+        for entry in tracker.get('history', []):
+            if entry.get('news_source_url') == new_url:
+                return False, f"Exact URL already covered: {new_url}"
+                
     return True, "Unique"
     
 def check_cooldowns(companies, subcategory):
