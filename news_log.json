@@ -7,64 +7,74 @@
         "Microsoft's NEW CEO: NO AI Slop! \ud83c\udfae\ud83d\udeab",
         "Microsoft\u2019s new gaming CEO vows not to flood the ecosystem with \u2018endless AI slop\u2019",
         "Google Warns: AI Startups Facing EXTINCTION! \ud83e\udd16",
-        "Google VP warns that two types of AI startups may not survive"
+        "Google VP warns that two types of AI startups may not survive",
+        "Teaching Machines to Think, Not Mimic",
+        "Reinforcement fine-tuning for Amazon Nova: Teaching AI through feedback"
     ],
     "used_keywords": [
-        "Google warning",
-        "energy consumption",
-        "venture capital",
-        "AI Slop",
-        "Sarvam",
         "AI aggregators",
-        "LLM wrappers",
-        "tech disruption",
-        "Gaming CEO",
-        "Microsoft Gaming",
-        "AI market",
-        "AI energy",
-        "startup survival",
         "AI startups",
-        "human energy",
-        "AI in Gaming",
-        "OpenAI",
-        "AI chat app",
+        "AI Training",
+        "India AI",
+        "Sam Altman",
+        "Gaming CEO",
+        "Sarvam",
+        "Amazon Nova",
         "Indus AI",
         "Gaming Quality",
-        "Sam Altman",
+        "Microsoft Gaming",
+        "AI in Gaming",
+        "AI chat app",
+        "energy consumption",
+        "AI Slop",
+        "Reinforcement Learning",
+        "AI energy",
+        "tech disruption",
+        "LLM wrappers",
         "local AI",
-        "India AI"
+        "Machine Learning",
+        "startup survival",
+        "AI market",
+        "venture capital",
+        "Google warning",
+        "RFT",
+        "OpenAI",
+        "human energy"
     ],
     "used_companies": {
         "Sarvam": 1,
         "OpenAI": 2,
         "ChatGPT": 1,
         "Microsoft": 1,
-        "Google": 1
+        "Google": 1,
+        "Amazon": 1
     },
     "used_subcategories": {
         "AI": 3,
-        "Gaming": 1
+        "Gaming": 1,
+        "AI/Machine Learning/Robotics/NLP/Computer Vision": 1
     },
     "last_7_days_stories": [
         "India\u2019s Sarvam launches Indus AI chat app as competition heats up",
         "Sam Altman would like to remind you that humans use a lot of energy, too",
         "Microsoft\u2019s new gaming CEO vows not to flood the ecosystem with \u2018endless AI slop\u2019",
-        "Google VP warns that two types of AI startups may not survive"
+        "Google VP warns that two types of AI startups may not survive",
+        "Reinforcement fine-tuning for Amazon Nova: Teaching AI through feedback"
     ],
     "last_3_days_subcategories": [
-        "AI",
         "Gaming",
-        "AI"
+        "AI",
+        "AI/Machine Learning/Robotics/NLP/Computer Vision"
     ],
     "last_3_days_companies": [
-        "OpenAI",
         "ChatGPT",
         "OpenAI",
         "Microsoft",
-        "Google"
+        "Google",
+        "Amazon"
     ],
-    "total_uploaded": 4,
-    "last_upload": "2026-02-22",
+    "total_uploaded": 5,
+    "last_upload": "2026-02-27",
     "history": [
         {
             "date": "2026-02-23",
@@ -150,6 +160,26 @@
             "voice_used": "en-US-GuyNeural",
             "youtube_url": "https://youtu.be/N9Wo7WmoYPo",
             "news_source_url": "https://techcrunch.com/2026/02/21/google-vp-warns-that-two-types-of-ai-startups-may-not-survive/"
+        },
+        {
+            "date": "2026-02-27",
+            "title": "Teaching Machines to Think, Not Mimic",
+            "news_headline": "Reinforcement fine-tuning for Amazon Nova: Teaching AI through feedback",
+            "sub_category": "AI/Machine Learning/Robotics/NLP/Computer Vision",
+            "companies": [
+                "Amazon"
+            ],
+            "keywords": [
+                "Reinforcement Learning",
+                "Amazon Nova",
+                "AI Training",
+                "Machine Learning",
+                "RFT"
+            ],
+            "breaking_news_level": 8,
+            "voice_used": "en-US-AndrewNeural",
+            "youtube_url": "https://youtu.be/PzkNGWWQ2ac",
+            "news_source_url": "https://aws.amazon.com/blogs/machine-learning/reinforcement-fine-tuning-for-amazon-nova-teaching-ai-through-feedback/"
         }
     ]
 }
