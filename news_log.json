@@ -8,38 +8,38 @@
         "Microsoft\u2019s new gaming CEO vows not to flood the ecosystem with \u2018endless AI slop\u2019",
         "Google Warns: AI Startups Facing EXTINCTION! \ud83e\udd16",
         "Google VP warns that two types of AI startups may not survive",
-        "Teaching Machines to Think, Not Mimic",
-        "Reinforcement fine-tuning for Amazon Nova: Teaching AI through feedback"
+        "The Deadlock of the Machine Hand",
+        "The Robotic Dexterity Deadlock"
     ],
     "used_keywords": [
-        "AI aggregators",
-        "AI startups",
-        "AI Training",
-        "India AI",
-        "Sam Altman",
-        "Gaming CEO",
-        "Sarvam",
-        "Amazon Nova",
-        "Indus AI",
-        "Gaming Quality",
-        "Microsoft Gaming",
-        "AI in Gaming",
-        "AI chat app",
-        "energy consumption",
-        "AI Slop",
-        "Reinforcement Learning",
-        "AI energy",
-        "tech disruption",
-        "LLM wrappers",
         "local AI",
-        "Machine Learning",
-        "startup survival",
+        "AI startups",
+        "Microsoft Gaming",
+        "AI",
+        "AI in Gaming",
+        "engineering",
+        "India AI",
         "AI market",
-        "venture capital",
+        "Gaming CEO",
+        "AI chat app",
+        "robotics",
+        "AI aggregators",
+        "LLM wrappers",
+        "Sam Altman",
         "Google warning",
-        "RFT",
+        "human energy",
+        "AI Slop",
+        "startup survival",
+        "Indus AI",
+        "venture capital",
         "OpenAI",
-        "human energy"
+        "tech disruption",
+        "energy consumption",
+        "dexterity",
+        "machine learning",
+        "AI energy",
+        "Gaming Quality",
+        "Sarvam"
     ],
     "used_companies": {
         "Sarvam": 1,
@@ -47,34 +47,34 @@
         "ChatGPT": 1,
         "Microsoft": 1,
         "Google": 1,
-        "Amazon": 1
+        "Origami Robotics": 1
     },
     "used_subcategories": {
         "AI": 3,
         "Gaming": 1,
-        "AI/Machine Learning/Robotics/NLP/Computer Vision": 1
+        "Robotics": 1
     },
     "last_7_days_stories": [
         "India\u2019s Sarvam launches Indus AI chat app as competition heats up",
         "Sam Altman would like to remind you that humans use a lot of energy, too",
         "Microsoft\u2019s new gaming CEO vows not to flood the ecosystem with \u2018endless AI slop\u2019",
         "Google VP warns that two types of AI startups may not survive",
-        "Reinforcement fine-tuning for Amazon Nova: Teaching AI through feedback"
+        "The Robotic Dexterity Deadlock"
     ],
     "last_3_days_subcategories": [
         "Gaming",
         "AI",
-        "AI/Machine Learning/Robotics/NLP/Computer Vision"
+        "Robotics"
     ],
     "last_3_days_companies": [
         "ChatGPT",
         "OpenAI",
         "Microsoft",
         "Google",
-        "Amazon"
+        "Origami Robotics"
     ],
     "total_uploaded": 5,
-    "last_upload": "2026-02-27",
+    "last_upload": "2026-02-28",
     "history": [
         {
             "date": "2026-02-23",
@@ -162,24 +162,24 @@
             "news_source_url": "https://techcrunch.com/2026/02/21/google-vp-warns-that-two-types-of-ai-startups-may-not-survive/"
         },
         {
-            "date": "2026-02-27",
-            "title": "Teaching Machines to Think, Not Mimic",
-            "news_headline": "Reinforcement fine-tuning for Amazon Nova: Teaching AI through feedback",
-            "sub_category": "AI/Machine Learning/Robotics/NLP/Computer Vision",
+            "date": "2026-02-28",
+            "title": "The Deadlock of the Machine Hand",
+            "news_headline": "The Robotic Dexterity Deadlock",
+            "sub_category": "Robotics",
             "companies": [
-                "Amazon"
+                "Origami Robotics"
             ],
             "keywords": [
-                "Reinforcement Learning",
-                "Amazon Nova",
-                "AI Training",
-                "Machine Learning",
-                "RFT"
+                "robotics",
+                "dexterity",
+                "AI",
+                "engineering",
+                "machine learning"
             ],
-            "breaking_news_level": 8,
+            "breaking_news_level": 7,
             "voice_used": "en-US-AndrewNeural",
-            "youtube_url": "https://youtu.be/PzkNGWWQ2ac",
-            "news_source_url": "https://aws.amazon.com/blogs/machine-learning/reinforcement-fine-tuning-for-amazon-nova-teaching-ai-through-feedback/"
+            "youtube_url": "https://youtu.be/8SNrsii3a9g",
+            "news_source_url": "https://www.origami-robotics.com/blog/dexterity-deadlocks.html"
         }
     ]
 }

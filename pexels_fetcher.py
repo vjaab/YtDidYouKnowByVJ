@@ -31,28 +31,26 @@ def score_relevance(chunk_text, visual_desc):
     5-6 = Acceptable
     Below 5 = Reject
     """
-    client = genai.Client(api_key=GEMINI_API_KEY)
-    prompt = f"""Rate relevance 0-10.
+    import re
+    try:
+        client = genai.Client(api_key=GEMINI_API_KEY)
+        prompt = f"""Rate relevance 0-10.
 Chunk text: '{chunk_text}'
 Image description: '{visual_desc}'
 Return only a number."""
-    
-    try:
         response = client.models.generate_content(
-            model="gemini-3-flash-preview", 
+            model="gemini-2.0-flash", 
             contents=prompt,
             config=genai.types.GenerateContentConfig(temperature=0.0)
         )
         score_text = response.text.strip()
-        # Find the first number in the response
-        import re
         match = re.search(r'\d+', score_text)
         if match:
              return int(match.group())
         return 0
     except Exception as e:
         print(f"Gemini scoring failed: {e}")
-        return 0
+        return 5  # Return middle score on failure so pipeline doesn't get stuck
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -186,7 +184,7 @@ Requirements:
 - High detail, dramatic lighting"""
     
     try:
-        resp = client.models.generate_content(model="gemini-3-flash-preview", contents=prompt_builder)
+        resp = client.models.generate_content(model="gemini-2.0-flash", contents=prompt_builder)
         best_prompt = resp.text.strip()
     except:
         best_prompt = chunk_text + " cinematic, dramatic lighting, 9:16 vertical, highly detailed, photorealistic"
@@ -264,9 +262,9 @@ def fetch_chunk_visual(chunk, script_data):
         best_vid = None
         best_score = -1
         
-        for v in videos:
+        for v in videos[:3]:  # Limit to top 3 to reduce API calls
             score = score_relevance(text, v["desc"])
-            if score >= 7:
+            if score >= 5:  # Lowered threshold to avoid excessive retries
                 if score > best_score:
                     best_score = score
                     best_vid = v
@@ -289,9 +287,9 @@ def fetch_chunk_visual(chunk, script_data):
         best_photo = None
         best_score = -1
         
-        for p in photos:
+        for p in photos[:3]:  # Limit to top 3 to reduce API calls
             score = score_relevance(text, p["desc"])
-            if score >= 7:
+            if score >= 5:  # Lowered threshold
                 if score > best_score:
                     best_score = score
                     best_photo = p
@@ -329,20 +327,27 @@ def fetch_all_chunk_visuals(chunks, topic_context="", script_data=None):
     if script_data is None:
         script_data = {}
         
-    print(f"Running Decision Tree for {len(chunks)} chunks...")
-    threads = []
-    for chunk in chunks:
+    print(f"Running Decision Tree for {len(chunks)} chunks (sequential with delay)...")
+    
+    for i, chunk in enumerate(chunks):
         # Pexels fallback/primary might not be there if we skipped the older Gemini step
         if "pexels_primary" not in chunk:
             chunk["pexels_primary"] = " ".join(chunk["text"].split()[:3])
             chunk["pexels_fallback"] = "technology"
 
-        t = threading.Thread(target=fetch_chunk_visual, args=(chunk, script_data))
-        t.start()
-        threads.append(t)
-
-    for t in threads:
-        t.join()
+        print(f"  Processing chunk {i+1}/{len(chunks)}...")
+        try:
+            fetch_chunk_visual(chunk, script_data)
+        except Exception as e:
+            print(f"  Chunk {chunk.get('chunk_id')} failed: {e}")
+            chunk["visual_path"] = None
+            chunk["visual_type"] = None
+            chunk["relevance_score"] = 0
+            chunk["source"] = "Failed"
+        
+        # Small delay between chunks to avoid API rate limiting
+        if i < len(chunks) - 1:
+            time.sleep(1)
 
     # Fill any failed chunks with the previous chunk's visual
     last_path = None
