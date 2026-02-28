@@ -1049,7 +1049,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
             bg = ColorClip(size=(FRAME_W, FRAME_H), color=(15, 15, 25), duration=dur)
         
         # Apply the 2026 Obsidian Color Grade
-        bg = bg.fl_image(apply_tech_grade)
+        bg = bg.image_transform(apply_tech_grade)
             
         if idx > 0 and dur >= 3.0:
             bg = bg.with_effects([vfx.CrossFadeIn(0.25 if dur < 5 else 0.40)])
