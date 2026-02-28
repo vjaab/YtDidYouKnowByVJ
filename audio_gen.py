@@ -53,12 +53,7 @@ VJ_REF_WAV = os.path.join(BASE_DIR, "vj.wav")
 VJ_REF_TEXT = (
     "Prosecutors have opened massive investigation into allegations of mixing games and illegal betting. "
     "Different telescope designs perform differently and have different strength and weaknesses. "
-    "We can continue to strengthen the education of good lawyers. "
-    "Feedback must be timely and accurate throughout the project. "
-    "Humans also just distance by using the relative size of object. "
-    "Churches should not encourage it or make it look harmless. "
-    "Learn about setting up wireless network configuration, you can eat them fresh cooked filament. "
-    "Thank you."
+    "We can continue to strengthen the education of good lawyers."
 )
 
 _f5_instance = None
@@ -176,7 +171,8 @@ def _generate_f5_clone(text, output_path):
         ref_file=VJ_REF_WAV,
         ref_text=VJ_REF_TEXT,
         gen_text=text,
-        file_wave=wav_path
+        file_wave=wav_path,
+        speed=0.95
     )
         
     duration = get_audio_duration(wav_path)
