@@ -11,49 +11,56 @@
         "The Deadlock of the Machine Hand",
         "The Robotic Dexterity Deadlock",
         "The Molecule That Built Itself \ud83e\uddec",
-        "Qt45: A small polymerase ribozyme that can synthesize itself"
+        "Qt45: A small polymerase ribozyme that can synthesize itself",
+        "Cognitive Debt: The Invisible Crisis",
+        "Cognitive Debt: When Velocity Exceeds Comprehension"
     ],
     "used_keywords": [
-        "ribozyme",
-        "Sam Altman",
-        "tech disruption",
-        "AI startups",
-        "AI",
-        "India AI",
-        "startup survival",
-        "self-synthesis",
-        "AI market",
-        "venture capital",
-        "robotics",
-        "Gaming CEO",
-        "energy consumption",
-        "engineering",
-        "Qt45",
-        "Google warning",
-        "AI energy",
-        "AI aggregators",
         "synthetic biology",
+        "Gaming CEO",
+        "Qt45",
+        "AI energy",
+        "energy consumption",
         "OpenAI",
-        "origin of life",
-        "Microsoft Gaming",
-        "AI Slop",
-        "Indus AI",
-        "Gaming Quality",
-        "human energy",
-        "AI in Gaming",
-        "local AI",
         "AI chat app",
+        "AI market",
+        "AI aggregators",
+        "AI startups",
+        "Microsoft Gaming",
+        "Sam Altman",
+        "machine learning",
         "dexterity",
-        "Sarvam",
+        "Machine Learning",
         "LLM wrappers",
-        "machine learning"
+        "Gaming Quality",
+        "Human Intelligence",
+        "AI in Gaming",
+        "AI Slop",
+        "local AI",
+        "AI velocity",
+        "Google warning",
+        "venture capital",
+        "human energy",
+        "tech disruption",
+        "robotics",
+        "Indus AI",
+        "India AI",
+        "Explainability",
+        "ribozyme",
+        "origin of life",
+        "Sarvam",
+        "Cognitive Debt",
+        "AI",
+        "self-synthesis",
+        "engineering",
+        "startup survival"
     ],
     "used_companies": {
         "Sarvam": 1,
-        "OpenAI": 2,
+        "OpenAI": 3,
         "ChatGPT": 1,
         "Microsoft": 1,
-        "Google": 1,
+        "Google": 2,
         "Origami Robotics": 1,
         "Science": 1
     },
@@ -61,7 +68,8 @@
         "AI": 3,
         "Gaming": 1,
         "Robotics": 1,
-        "AI/Machine Learning/Robotics/NLP/Computer Vision": 1
+        "AI/Machine Learning/Robotics/NLP/Computer Vision": 1,
+        "AI Philosophy": 1
     },
     "last_7_days_stories": [
         "India\u2019s Sarvam launches Indus AI chat app as competition heats up",
@@ -69,22 +77,23 @@
         "Microsoft\u2019s new gaming CEO vows not to flood the ecosystem with \u2018endless AI slop\u2019",
         "Google VP warns that two types of AI startups may not survive",
         "The Robotic Dexterity Deadlock",
-        "Qt45: A small polymerase ribozyme that can synthesize itself"
+        "Qt45: A small polymerase ribozyme that can synthesize itself",
+        "Cognitive Debt: When Velocity Exceeds Comprehension"
     ],
     "last_3_days_subcategories": [
-        "AI",
         "Robotics",
-        "AI/Machine Learning/Robotics/NLP/Computer Vision"
+        "AI/Machine Learning/Robotics/NLP/Computer Vision",
+        "AI Philosophy"
     ],
     "last_3_days_companies": [
-        "OpenAI",
-        "Microsoft",
         "Google",
         "Origami Robotics",
-        "Science"
+        "Science",
+        "OpenAI",
+        "Google"
     ],
-    "total_uploaded": 6,
-    "last_upload": "2026-02-28",
+    "total_uploaded": 7,
+    "last_upload": "2026-03-01",
     "history": [
         {
             "date": "2026-02-23",
@@ -210,6 +219,27 @@
             "voice_used": "en-US-AndrewNeural",
             "youtube_url": "https://youtu.be/OurrbmvuXtA",
             "news_source_url": "https://www.science.org/doi/10.1126/science.adt2760"
+        },
+        {
+            "date": "2026-03-01",
+            "title": "Cognitive Debt: The Invisible Crisis",
+            "news_headline": "Cognitive Debt: When Velocity Exceeds Comprehension",
+            "sub_category": "AI Philosophy",
+            "companies": [
+                "OpenAI",
+                "Google"
+            ],
+            "keywords": [
+                "Cognitive Debt",
+                "AI velocity",
+                "Human Intelligence",
+                "Machine Learning",
+                "Explainability"
+            ],
+            "breaking_news_level": 8,
+            "voice_used": "en-US-AndrewNeural",
+            "youtube_url": "https://youtu.be/I4Apq_oneWc",
+            "news_source_url": "https://www.rockoder.com/beyondthecode/cognitive-debt-when-velocity-exceeds-comprehension/"
         }
     ]
 }

@@ -29,6 +29,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ffmpeg fonts-roboto
           
+      - name: Verify FFmpeg Installation
+        run: ffmpeg -version
+          
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
@@ -50,6 +53,8 @@ jobs:
           
       - name: Run Pipeline
         # Run main.py --now to trigger the video pipeline immediately
+        env:
+          PYTHONHASHSEED: 0
         run: python main.py --now
         
       - name: Commit Updated Tracking File (news_log.json)

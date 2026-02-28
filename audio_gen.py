@@ -8,8 +8,17 @@ FALLBACK 2:   Kokoro local TTS (no timestamps → estimated from duration).
 import os
 import asyncio
 import re
+import random
 from datetime import datetime
-from config import OUTPUT_DIR
+from config import OUTPUT_DIR, BASE_DIR
+import imageio_ffmpeg
+from pydub import AudioSegment
+AudioSegment.converter = imageio_ffmpeg.get_ffmpeg_exe()
+
+# F5-TTS Imports (Local Voice Cloning)
+import torch
+import soundfile as sf
+from f5_tts.api import F5TTS
 
 def _apply_stable_ts(audio_path, text):
     try:
@@ -38,6 +47,28 @@ def _apply_stable_ts(audio_path, text):
 ASSETS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
 KOKORO_MODEL = os.path.join(ASSETS_DIR, "kokoro-v1.0.onnx")
 KOKORO_VOICES = os.path.join(ASSETS_DIR, "voices-v1.0.bin")
+
+# ── F5-TTS Config ─────────────────────────────────────────────────────────────
+VJ_REF_WAV = os.path.join(BASE_DIR, "vj.wav")
+VJ_REF_TEXT = (
+    "Prosecutors have opened massive investigation into allegations of mixing games and illegal betting. "
+    "Different telescope designs perform differently and have different strength and weaknesses. "
+    "We can continue to strengthen the education of good lawyers. "
+    "Feedback must be timely and accurate throughout the project. "
+    "Humans also just distance by using the relative size of object. "
+    "Churches should not encourage it or make it look harmless. "
+    "Learn about setting up wireless network configuration, you can eat them fresh cooked filament. "
+    "Thank you."
+)
+
+_f5_instance = None
+
+def _get_f5_model():
+    global _f5_instance
+    if _f5_instance is None:
+        print("Initialising F5-TTS (Local Voice Cloning)...")
+        _f5_instance = F5TTS()
+    return _f5_instance
 
 # Edge TTS offset is in 100-nanosecond units → divide by 10_000_000 for seconds
 _NS100_PER_SEC = 10_000_000
@@ -131,6 +162,35 @@ def _generate_edge_tts(text, voice, output_path):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# PRIMARY: F5-TTS (0 Rs / Local Voice Cloning)
+# ─────────────────────────────────────────────────────────────────────────────
+def _generate_f5_clone(text, output_path):
+    print(f"F5-TTS → Cloning VJ's Voice (0 Rs)...")
+    
+    # Run inference via the high-level API
+    wav_path = output_path.replace(".mp3", ".wav")
+    
+    # Generate
+    f5 = _get_f5_model()
+    f5.infer(
+        ref_file=VJ_REF_WAV,
+        ref_text=VJ_REF_TEXT,
+        gen_text=text,
+        file_wave=wav_path
+    )
+        
+    duration = get_audio_duration(wav_path)
+    
+    # Word timestamps via stable-ts
+    word_timestamps = _apply_stable_ts(wav_path, text)
+    if not word_timestamps:
+        word_timestamps = _estimate_timestamps(text, duration)
+        
+    print(f"F5-TTS done: {duration:.2f}s | {len(word_timestamps)} word timestamps")
+    return wav_path, duration, word_timestamps
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # PRIMARY: Kokoro (Local Open Source / 100% Free)
 # ─────────────────────────────────────────────────────────────────────────────
 def _generate_kokoro(text, output_path):
@@ -172,7 +232,14 @@ def generate_voiceover(text, voice_request="en-US-GuyNeural", emotion="excited")
     today     = datetime.now().strftime("%Y-%m-%d")
     mp3_path  = os.path.join(OUTPUT_DIR, f"audio_{today}.mp3")
     
-    # PRIMARY: Kokoro TTS (Free, SOTA Open Source)
+    # 1. PRIMARY: F5-TTS Local Voice Cloning (Your Voice)
+    try:
+        path, dur, word_timestamps = _generate_f5_clone(text, mp3_path)
+        return path, dur, word_timestamps
+    except Exception as e:
+        print(f"⚠️ F5-TTS Cloning failed: {e}")
+
+    # 2. SECONDARY: Kokoro TTS (Free, SOTA Open Source)
     try:
         path, dur, word_timestamps = _generate_kokoro(text, mp3_path)
         return path, dur, word_timestamps

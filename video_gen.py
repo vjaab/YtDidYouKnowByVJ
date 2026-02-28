@@ -33,6 +33,9 @@ from moviepy import (
 import moviepy.video.fx as vfx
 import moviepy.audio.fx as afx
 from config import OUTPUT_DIR, ASSETS_DIR, MUSIC_DIR, BGM_VOLUME, LOGS_DIR
+import imageio_ffmpeg
+from pydub import AudioSegment
+AudioSegment.converter = imageio_ffmpeg.get_ffmpeg_exe()
 
 FRAME_W, FRAME_H = 1080, 1920
 TITLE_BOTTOM_GAP = 192
