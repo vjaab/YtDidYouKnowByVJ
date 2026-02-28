@@ -9,37 +9,44 @@
         "Google Warns: AI Startups Facing EXTINCTION! \ud83e\udd16",
         "Google VP warns that two types of AI startups may not survive",
         "The Deadlock of the Machine Hand",
-        "The Robotic Dexterity Deadlock"
+        "The Robotic Dexterity Deadlock",
+        "The Molecule That Built Itself \ud83e\uddec",
+        "Qt45: A small polymerase ribozyme that can synthesize itself"
     ],
     "used_keywords": [
-        "local AI",
-        "AI startups",
-        "Microsoft Gaming",
-        "AI",
-        "AI in Gaming",
-        "engineering",
-        "India AI",
-        "AI market",
-        "Gaming CEO",
-        "AI chat app",
-        "robotics",
-        "AI aggregators",
-        "LLM wrappers",
+        "ribozyme",
         "Sam Altman",
-        "Google warning",
-        "human energy",
-        "AI Slop",
-        "startup survival",
-        "Indus AI",
-        "venture capital",
-        "OpenAI",
         "tech disruption",
+        "AI startups",
+        "AI",
+        "India AI",
+        "startup survival",
+        "self-synthesis",
+        "AI market",
+        "venture capital",
+        "robotics",
+        "Gaming CEO",
         "energy consumption",
-        "dexterity",
-        "machine learning",
+        "engineering",
+        "Qt45",
+        "Google warning",
         "AI energy",
+        "AI aggregators",
+        "synthetic biology",
+        "OpenAI",
+        "origin of life",
+        "Microsoft Gaming",
+        "AI Slop",
+        "Indus AI",
         "Gaming Quality",
-        "Sarvam"
+        "human energy",
+        "AI in Gaming",
+        "local AI",
+        "AI chat app",
+        "dexterity",
+        "Sarvam",
+        "LLM wrappers",
+        "machine learning"
     ],
     "used_companies": {
         "Sarvam": 1,
@@ -47,33 +54,36 @@
         "ChatGPT": 1,
         "Microsoft": 1,
         "Google": 1,
-        "Origami Robotics": 1
+        "Origami Robotics": 1,
+        "Science": 1
     },
     "used_subcategories": {
         "AI": 3,
         "Gaming": 1,
-        "Robotics": 1
+        "Robotics": 1,
+        "AI/Machine Learning/Robotics/NLP/Computer Vision": 1
     },
     "last_7_days_stories": [
         "India\u2019s Sarvam launches Indus AI chat app as competition heats up",
         "Sam Altman would like to remind you that humans use a lot of energy, too",
         "Microsoft\u2019s new gaming CEO vows not to flood the ecosystem with \u2018endless AI slop\u2019",
         "Google VP warns that two types of AI startups may not survive",
-        "The Robotic Dexterity Deadlock"
+        "The Robotic Dexterity Deadlock",
+        "Qt45: A small polymerase ribozyme that can synthesize itself"
     ],
     "last_3_days_subcategories": [
-        "Gaming",
         "AI",
-        "Robotics"
+        "Robotics",
+        "AI/Machine Learning/Robotics/NLP/Computer Vision"
     ],
     "last_3_days_companies": [
-        "ChatGPT",
         "OpenAI",
         "Microsoft",
         "Google",
-        "Origami Robotics"
+        "Origami Robotics",
+        "Science"
     ],
-    "total_uploaded": 5,
+    "total_uploaded": 6,
     "last_upload": "2026-02-28",
     "history": [
         {
@@ -180,6 +190,26 @@
             "voice_used": "en-US-AndrewNeural",
             "youtube_url": "https://youtu.be/8SNrsii3a9g",
             "news_source_url": "https://www.origami-robotics.com/blog/dexterity-deadlocks.html"
+        },
+        {
+            "date": "2026-02-28",
+            "title": "The Molecule That Built Itself \ud83e\uddec",
+            "news_headline": "Qt45: A small polymerase ribozyme that can synthesize itself",
+            "sub_category": "AI/Machine Learning/Robotics/NLP/Computer Vision",
+            "companies": [
+                "Science"
+            ],
+            "keywords": [
+                "ribozyme",
+                "self-synthesis",
+                "origin of life",
+                "Qt45",
+                "synthetic biology"
+            ],
+            "breaking_news_level": 8,
+            "voice_used": "en-US-AndrewNeural",
+            "youtube_url": "https://youtu.be/OurrbmvuXtA",
+            "news_source_url": "https://www.science.org/doi/10.1126/science.adt2760"
         }
     ]
 }
