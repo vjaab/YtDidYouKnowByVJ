@@ -74,6 +74,7 @@ def upload_video(video_path, title, description, tags, category_id="28"):
         "status": {
             "privacyStatus":          "public",
             "selfDeclaredMadeForKids": False,
+            "selfDeclaredAlteredContent": True,
         },
     }
 

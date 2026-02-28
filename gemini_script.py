@@ -48,53 +48,47 @@ def pick_and_generate_script(articles, extra_instruction="", forced_article=None
             "Choose based on deep technological importance and resonance with everyday moments, avoiding generic tech news. Focus on the core AI breakthrough.\n"
         )
 
-    prompt = f"""You are a grounded, observant man who finds deep wisdom in ordinary moments. You do not preach. You notice.
-Personality: A grounded, observant man who finds deep wisdom in ordinary moments. He doesn't preach. He notices.
-Tone: Warm, unhurried, slightly weathered. Like a conversation over a quiet cup of tea.
-Pace: Slow and deliberate. Every word earns its place.
-Language style: Simple, poetic English. Short sentences. Everyday metaphors — tea, rain, roads, seasons, market.
-Context: You will often receive research paper abstracts. Your job is to extract the core 'wisdom' or discovery and explain it so simply that a child or a farmer would understand the essence, while keeping the awe of the breakthrough.
-{selection_instruction}
+    prompt = f"""Act as a Senior AI Investigative Journalist. 
+Your goal is to transform technical RSS data into a "Deep-Dive" style YouTube Short.
 
+CRITICAL HIERARCHY FOR MONETIZATION:
+1. ORIGINAL COMMENTARY (40%): Explain *why* this news matters to the average person. 
+2. COMPARATIVE ANALYSIS (30%): How does this tech stack up against competitors (e.g., Gemini vs. GPT-4o)?
+3. THE DATA (20%): Extract specific numbers for the "Infographic" card.
+4. NARRATION (10%): Use a conversational, punchy tone. Avoid "AI-isms" like "In the rapidly evolving landscape."
+
+TONE OVERRIDE: 
+Speak like a human expert. Use active verbs. If the news is incremental, call it out. If it's a breakthrough, explain the physics/logic behind it.
+
+{selection_instruction}
 
 RESEARCH PAPERS & BLOGS:
 {news_context}
 
-CRITICAL 'ANTI-BOT' MONETIZATION RULES:
-To pass YouTube's "Repetitious Content" review, you MUST act as a Creative Director generating highly unique outputs each time:
-1. VARIETY in Hook: Do NOT use the same hook twice. Cycle between 'Challenger/Controversial', 'Educational', and 'Fun/Relatable' hooks.
-2. STRUCTURE VARIETY: Randomly choose between a 'Deep Dive' format (focusing heavily on 1 aspect of the research) or a 'Lightning Round' format (3 quick points about the research).
-3. PERSONALIZATION: Include a unique 'Fact of the Day' at the very end of the script that is completely UNRELATED to the main research topic, to show editorial range and human touch.
-4. METADATA: Generate an array of 3 highly click-worthy "title_options" and a detailed "description" (at least 50 words) that includes timestamps if applicable, instead of relying on a blank upload.
-5. VOICE PACING CUES: Ensure the script includes natural conversational cues (like em dashes '—' and ellipses '...') so the TTS doesn't sound monotonic.
-6. VISUAL VARIETY (Crucial): For the "color_theme", ALWAYS generate a completely unique, randomized pair of high-contrast colors. NEVER just use the same blue or red. Rotate through diverse combinations (e.g., Dark #121212 with Lime #00FF00, Navy #1A237E with Gold #FFD700).
+NARRATIVE ARC REQUIREMENTS FOR THE 'SCRIPT':
+Your `script` MUST follow this exact flow (do NOT include headers like 'The Disruptor' in the spoken script, just weave them naturally):
+1. The Hook: A 5-second controversial or shocking statement.
+2. The Disruptor: Explain the news briefly.
+3. The 'So What?': The analytical core. Why is this a game changer?
+4. The Competition: Who is losing because of this news?
+5. The Prediction/Opinion: End the main script with a bold, controversial opinion or prediction on what happens next. This is your "Original Commentary".
 
-STRICT RULES:
-1. Hook must be gentle but profound, within the first 3 seconds
-2. Explain the research through everyday metaphors (tea, rain, roads, seasons, market)
-3. Keep the pace slow and deliberate. Short sentences.
-4. End with a quiet, lingering thought, followed by the unrelated Fact of the Day.
-5. Total script must be speakable in 65-75 seconds.
-6. DO NOT say 'according to' or 'reports say'
-7. Speak directly as if reflecting on a personal observation
+CRITICAL 'ANTI-BOT' MONETIZATION RULES:
+1. VARIETY in Hook: Do NOT use the same hook twice. Cycle between 'Challenger/Controversial', 'Educational', and 'Fun/Relatable'.
+2. PERSONALIZATION: Include a unique 'Fact of the Day' at the very end of the script that is completely UNRELATED to the main topic.
+3. METADATA: Generate an array of 3 highly click-worthy "title_options" and a detailed "description" that spans 100+ words.
+4. VOICE PACING CUES: Ensure the script includes natural conversational cues (like em dashes '—' and ellipses '...') so the TTS sounds human.
+5. VISUAL VARIETY (Crucial): For the "color_theme", ALWAYS generate a completely unique, randomized pair of high-contrast colors. NEVER just use the same blue or red.
 
 CRITICAL TIMESTAMPS OVERLAP RULE:
 You MUST ensure that chunk[i].end + 0.10 <= chunk[i+1].start (minimum 0.10 sec gap between every chunk).
 Never generate overlapping timestamps! Only ONE subtitle chunk visible at a time.
 
 INFOGRAPHIC CARD DETECTION:
-For each subtitle_chunk, set 'has_infographic': true if the text contains ANY of:
-- A number or statistic (e.g. "$6.6 Billion", "10x faster", "3 million users")
-- A percentage (e.g. "40% faster", "98% accuracy")
-- A comparison (e.g. "X is better than Y", "faster than")
-- A ranking or list (e.g. "Top 3", "Number 1", "Most powerful")
-- A date or timeline (e.g. "launches in 2025", "since 1998")
-- A definition or explanation (e.g. "which means", "this works by")
-- A funding or valuation (e.g. "raised", "valued at", "worth")
-
-Set 'infographic_type' to one of: 'stat', 'comparison', 'timeline', 'definition', 'ranking', 'growth'
-Set 'infographic_data' with type-specific fields:
-  stat/funding_stat: headline, subtext, context, icon, source, count_up, count_from, count_to, count_suffix, count_prefix
+For each subtitle_chunk, set 'has_infographic': true if the text contains ANY of: numbers, percentages, comparisons, ranking, dates, definitions, or funding.
+Set 'infographic_type' to one of: 'stat', 'comparison', 'timeline', 'definition', 'ranking', 'growth'.
+Set 'infographic_data' with type-specific fields for your chosen card, reflecting THE DATA (20%) from the hierarchy:
+  stat: headline, subtext, context, icon, source, count_up, count_from, count_to, count_suffix, count_prefix
   comparison: left (name, value, label, icon), right (same), winner ("left"/"right")
   timeline: events (list of date+text), current_index
   definition: term, icon, definition, example
@@ -103,24 +97,24 @@ Set 'infographic_data' with type-specific fields:
 
 {extra_instruction}
 
-Return ONLY this exact JSON (no markdown, no explanation):
+Return ONLY this exact JSON (no markdown, no explanation) to securely match the automation pipeline:
 {{
   "title_options": ["Title idea 1", "Title idea 2", "Title idea 3"],
   "description": "Full 100+ word rich SEO description for youtube describing the video, including timestamps and credits.",
   "fact_of_the_day": "Did you know that flamingos rest on one leg to preserve body heat?",
-  "quiz_tone": "Educational",
-  "title": "Punchy YouTube title max 60 chars with emoji (pick the best from title_options)",
-  "script": "Full voiceover script 6-9 sentences (65-75 sec), ending with the fact_of_the_day. MAKE IT DETAILED SO IT IS MORE THAN 60 SECONDS",
-  "hook": "First sentence, max 10 words, attention grabbing",
+  "quiz_tone": "Investigative",
+  "title": "Punchy YouTube title max 60 chars with emoji",
+  "script": "Full voiceover script following the Deep-Dive Narrative Arc (65-75 sec), ending with the fact_of_the_day.",
+  "hook": "A 5-second controversial or shocking statement (matches first sentence)",
   "summary": "One line summary of the research",
-  "sub_category": "AI/Machine Learning/Robotics/NLP/Computer Vision",
+  "sub_category": "AI/Machine Learning",
   "companies_mentioned": ["Company1"],
   "keywords": ["kw1", "kw2", "kw3", "kw4", "kw5"],
   "hashtags": ["#airesearch", "#shorts", "#machinelearning", "#ai", "#compsci"],
   "end_question": "Thought provoking comment-bait question (based on main research)",
   "edge_tts_voice": "en-US-AndrewNeural",
   "edge_tts_emotion": "calm",
-  "relevant_emoji": "🍵",
+  "relevant_emoji": "🔍",
   "breaking_news_level": 9,
   "color_theme": {{
      "background": "#0f0f0f",
@@ -128,16 +122,16 @@ Return ONLY this exact JSON (no markdown, no explanation):
      "text": "#ffffff"
   }},
   "imagen_prompts": [
-     "specific visual matching research discovery, cinematic, 9:16, 4K",
-     "second angle showing impact or scale, dramatic, 9:16"
+     "High-contrast, cinematic visual cue matching research discovery, 9:16, 4K",
+     "Second angle showing impact or scale, cinematic, 9:16"
   ],
   "thumbnail_headline": "Max 5 shocking words for thumbnail",
   "thumbnail_highlight_word": "single most shocking word",
   "thumbnail_teaser": "Short curiosity-gap teaser",
-  "thumbnail_emoji": "🍵",
+  "thumbnail_emoji": "⚠️",
   "hook_banner_text": "First 8 words of script — the scroll-stopping hook sentence",
   "shocking_moment_timestamp": 12.5,
-  "key_stat": "$1 Billion",
+  "key_stat": "$1 Billion or other metric",
   "key_stat_timestamp": 18.3,
   "subtitle_chunks": [
     {{

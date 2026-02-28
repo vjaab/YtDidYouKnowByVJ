@@ -131,20 +131,33 @@ def _generate_edge_tts(text, voice, output_path):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# FALLBACK 1: Kokoro local TTS (no real timestamps)
+# PRIMARY: Kokoro (Local Open Source / 100% Free)
 # ─────────────────────────────────────────────────────────────────────────────
 def _generate_kokoro(text, output_path):
     import soundfile as sf
     from kokoro_onnx import Kokoro
 
-    print("Kokoro TTS → am_echo...")
+    if not os.path.exists(KOKORO_MODEL) or not os.path.exists(KOKORO_VOICES):
+        raise FileNotFoundError("Kokoro ONNX model or voice bin missing from assets folder.")
+
+    print("Kokoro TTS → am_echo (Local CPU)...")
     kokoro  = Kokoro(KOKORO_MODEL, KOKORO_VOICES)
-    samples, sr = kokoro.create(text, voice="am_echo", speed=1.1, lang="en-us")
+    
+    # 2026 Monetization Strategy: Unique Pitching/Speed
+    import random
+    unique_speed = 1.1 + random.uniform(-0.05, 0.05)
+    
+    samples, sr = kokoro.create(text, voice="am_echo", speed=unique_speed, lang="en-us")
     wav_path = output_path.replace(".mp3", ".wav")
     sf.write(wav_path, samples, sr)
     duration = len(samples) / sr
-    word_timestamps = _estimate_timestamps(text, duration)
-    print(f"Kokoro done: {duration:.2f}s (estimated timestamps)")
+    
+    # Run stable-ts to get actual timestamps from the generated audio
+    word_timestamps = _apply_stable_ts(wav_path, text)
+    if not word_timestamps:
+        word_timestamps = _estimate_timestamps(text, duration)
+        
+    print(f"Kokoro done: {duration:.2f}s | {len(word_timestamps)} word timestamps")
     return wav_path, duration, word_timestamps
 
 
@@ -158,27 +171,24 @@ def generate_voiceover(text, voice_request="en-US-GuyNeural", emotion="excited")
     """
     today     = datetime.now().strftime("%Y-%m-%d")
     mp3_path  = os.path.join(OUTPUT_DIR, f"audio_{today}.mp3")
-    # Edge TTS — FALLBACK 1
+    
+    # PRIMARY: Kokoro TTS (Free, SOTA Open Source)
+    try:
+        path, dur, word_timestamps = _generate_kokoro(text, mp3_path)
+        return path, dur, word_timestamps
+    except Exception as e:
+        print(f"⚠️ Kokoro failed or missing models: {e}")
+
+    # FALLBACK: Edge TTS (Free but bot-like, used only in emergencies)
     try:
         path, dur, word_timestamps = _generate_edge_tts(text, LOCKED_VOICE, mp3_path)
         real_ts = _apply_stable_ts(path, text)
         if real_ts:
             word_timestamps = real_ts
-        print("⚠️ Falling back to Edge TTS (American accent)")
+        print("⚠️ Used Edge TTS as fallback")
         return path, dur, word_timestamps
     except Exception as e:
         print(f"Edge TTS failed: {e}")
-
-    # Kokoro — FALLBACK 2
-    if os.path.exists(KOKORO_MODEL):
-        try:
-            path, dur, word_timestamps = _generate_kokoro(text, mp3_path)
-            real_ts = _apply_stable_ts(path, text)
-            if real_ts:
-                word_timestamps = real_ts
-            return path, dur, word_timestamps
-        except Exception as e:
-            print(f"Kokoro failed: {e}")
 
     print("All TTS engines failed.")
     return None, 0, []

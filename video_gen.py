@@ -37,6 +37,16 @@ from config import OUTPUT_DIR, ASSETS_DIR, MUSIC_DIR, BGM_VOLUME, LOGS_DIR
 FRAME_W, FRAME_H = 1080, 1920
 TITLE_BOTTOM_GAP = 192
 
+import cv2
+
+def apply_tech_grade(frame):
+    # Boost contrast and apply a slight cooling (blue/teal) to shadows
+    # and warming (orange) to highlights
+    frame = frame.astype(np.float32) / 255.0
+    frame[:, :, 0] *= 1.1  # Warm up Reds
+    frame[:, :, 2] *= 1.2  # Cool down Blues
+    return np.clip(frame * 255, 0, 255).astype(np.uint8)
+
 # ── Font ──────────────────────────────────────────────────────────────────────
 FONT_PATHS = [
     os.path.join(ASSETS_DIR, "fonts", "Montserrat-Bold.ttf"),
@@ -68,33 +78,67 @@ def ts(text, font):
 
 # ── Ken Burns ─────────────────────────────────────────────────────────────────
 _kb_idx = 0
-KB_PATTERNS = ["zoom_in", "zoom_out", "pan_right"]
+KB_PATTERNS = ["smooth_zoom", "reveal_zoom", "z_pan_high_energy", "z_pan_subtle"]
 
-def _ease(t):
-    return t * t * (3 - 2 * t)
+def get_ease_factor(t):
+    # Standard Ease-In-Out Quadratic
+    return 2 * t * t if t < 0.5 else 1 - pow(-2 * t + 2, 2) / 2
 
 def build_ken_burns(img_path, duration, pattern_idx):
     pattern = KB_PATTERNS[pattern_idx % len(KB_PATTERNS)]
     try:
-        img = Image.open(img_path).convert("RGB").resize((FRAME_W, FRAME_H), Image.LANCZOS)
+        img = Image.open(img_path).convert("RGB")
     except Exception:
         return ColorClip(size=(FRAME_W, FRAME_H), color=(15, 15, 25), duration=duration)
-    pad  = int(FRAME_W * 0.15)
+        
+    # Heavy padding to ensure we do not hit black borders during diagonal pans/rotations
+    pad = int(FRAME_W * 0.2)
     pw, ph = FRAME_W + pad*2, FRAME_H + pad*2
-    padded = np.array(Image.fromarray(np.array(img)).resize((pw, ph), Image.LANCZOS))
-
+    
+    # Pre-scale to the padded resolution once so we aren't doing heavy lifting in the loop
+    base_img = img.resize((pw, ph), Image.LANCZOS)
+    
     def make_frame(t):
-        p = _ease(min(t / max(duration, 0.01), 1.0))
-        if pattern == "zoom_in":
-            scale = 1.0 + 0.12 * p; cx, cy = pw//2, ph//2
-        elif pattern == "zoom_out":
-            scale = 1.12 - 0.12 * p; cx, cy = pw//2, ph//2
+        progress = min(t / max(duration, 0.01), 1.0)
+        eased_t = get_ease_factor(progress)
+        
+        # Default Centers
+        cx, cy = pw // 2, ph // 2
+        angle = 0
+        
+        if pattern == "smooth_zoom":
+            # Golden Ratio Zoom In (10-15% max)
+            current_scale = 1.0 + (0.15 * eased_t)
+        elif pattern == "reveal_zoom":
+            # Golden Ratio Zoom Out (1.15 to 1.0)
+            current_scale = 1.15 - (0.15 * eased_t)
+        elif pattern == "z_pan_high_energy":
+            # Diagonal pan (Bottom-Left to Top-Right) + 2% rotation
+            current_scale = 1.10 + (0.05 * eased_t)
+            angle = -1.0 + (2.0 * eased_t)
+            cx = pw // 2 + int(-40 + 80 * eased_t)
+            cy = ph // 2 + int(40 - 80 * eased_t)
         else:
-            scale = 1.08; cx = int(pw*(0.45+0.10*p)); cy = ph//2
-        cw, ch = int(FRAME_W/scale), int(FRAME_H/scale)
-        x1 = max(0, min(cx-cw//2, pw-cw)); y1 = max(0, min(cy-ch//2, ph-ch))
-        crop = padded[y1:y1+ch, x1:x1+cw]
-        out = np.array(Image.fromarray(crop).resize((FRAME_W, FRAME_H), Image.BICUBIC), dtype=np.float32)
+            # Subtle Pan (Start slightly off-center left -> zoom toward upper-right third)
+            current_scale = 1.0 + (0.12 * eased_t)
+            cx = pw // 2 + int(-25 + 50 * eased_t)
+            cy = ph // 2 + int(15 - 30 * eased_t)
+
+        cw, ch = int(FRAME_W / current_scale), int(FRAME_H / current_scale)
+        
+        # Keep viewport strictly within bounds
+        cx = max(cw // 2, min(cx, pw - cw // 2))
+        cy = max(ch // 2, min(cy, ph - ch // 2))
+        
+        x1 = cx - cw // 2
+        y1 = cy - ch // 2
+        
+        crop = base_img.crop((x1, y1, x1 + cw, y1 + ch))
+        if angle != 0:
+            crop = crop.rotate(angle, resample=Image.BICUBIC, expand=False)
+            
+        out = np.array(crop.resize((FRAME_W, FRAME_H), Image.BICUBIC), dtype=np.float32)
+        # Small brightness/contrast multiplier for consistency
         return np.clip(out * 0.88 * 1.12, 0, 255).astype(np.uint8)
 
     return VideoClip(make_frame, duration=duration)
@@ -150,32 +194,33 @@ def _gradient_clip(duration):
     return clip.with_mask(mask).with_position(("center", "bottom"))
 
 
-# ── LAYER 4: Ambient particles ────────────────────────────────────────────────
+# ── LAYER 4: Ambient "Obsidian" particles ──────────────────────────────────────
 def _ambient_particles(duration, accent_color):
-    n = 25
+    n = 35
     random.seed(42)
     particles = [(random.uniform(0, FRAME_W), random.uniform(0, FRAME_H),
-                  random.uniform(0.3, 1.2), random.uniform(0, FRAME_H))
+                  random.uniform(0.1, 0.8), random.uniform(0, FRAME_H), random.uniform(8, 25))
                  for _ in range(n)]
 
     def make_frame(t):
-        img = Image.new("RGBA", (FRAME_W, FRAME_H), (0, 0, 0, 0))
-        draw = ImageDraw.Draw(img)
-        for px, py, speed, offset in particles:
+        img = np.zeros((FRAME_H, FRAME_W, 3), dtype=np.uint8)
+        for px, py, speed, offset, p_size in particles:
             y = (py - speed * t * 60 - offset) % FRAME_H
-            draw.ellipse([px-3, y-3, px+3, y+3], fill=(*accent_color, 38))
-        return np.array(img.convert("RGB"))
+            cv2.circle(img, (int(px), int(y)), int(p_size), accent_color, -1)
+        img = cv2.GaussianBlur(img, (75, 75), 0)
+        return img
 
     def make_mask(t):
-        img = Image.new("RGBA", (FRAME_W, FRAME_H), (0, 0, 0, 0))
-        draw = ImageDraw.Draw(img)
-        for px, py, speed, offset in particles:
+        mask = np.zeros((FRAME_H, FRAME_W), dtype=np.uint8)
+        for px, py, speed, offset, p_size in particles:
             y = (py - speed * t * 60 - offset) % FRAME_H
-            draw.ellipse([px-3, y-3, px+3, y+3], fill=(0, 0, 0, 38))
-        return np.array(img.split()[3]).astype(float) / 255.0
+            cv2.circle(mask, (int(px), int(y)), int(p_size), 255, -1)
+        mask = cv2.GaussianBlur(mask, (75, 75), 0)
+        return (mask.astype(float) / 255.0) * 0.25 # 25% Opacity transparent digital dust
 
     clip = VideoClip(make_frame, duration=duration)
     mask = VideoClip(make_mask, is_mask=True, duration=duration)
+    # Use screen blending (simulated by adding lightness later or just standard translucent alpha)
     return clip.with_mask(mask)
 
 
@@ -735,7 +780,7 @@ def wrap_text_to_lines(words, word_widths, max_width):
         lines.append(current_line)
     return lines
 
-def render_subtitle_frame(text, current_words, accent_color=(255,214,0), frame_width=1080, frame_height=1920):
+def render_subtitle_frame(text, current_words, bg_frame=None, accent_color=(255,214,0), frame_width=1080, frame_height=1920):
     img = Image.new("RGBA", (frame_width, frame_height), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     font_black = ImageFont.truetype("assets/fonts/Montserrat-ExtraBold.ttf", 72)
@@ -765,15 +810,43 @@ def render_subtitle_frame(text, current_words, accent_color=(255,214,0), frame_w
     box_x = (frame_width - box_width) // 2
     box_y = 1250 + (230 - box_height) // 2
     
+    bx1 = box_x - box_padding_x
+    by1 = box_y - box_padding_y
+    bx2 = box_x + box_width + box_padding_x
+    by2 = box_y + box_height + box_padding_y
+    
     overlay = Image.new("RGBA", (frame_width, frame_height), (0,0,0,0))
     overlay_draw = ImageDraw.Draw(overlay)
     
+    # --- GLASSMORPHISM FROSTED GLASS EFFECT ---
+    if bg_frame is not None:
+        try:
+            # Crop the background region
+            crop_h, crop_w = by2 - by1, bx2 - bx1
+            bg_crop = bg_frame[max(0, by1):min(frame_height, by2), max(0, bx1):min(frame_width, bx2)]
+            
+            # Apply severe blur
+            blurred = cv2.GaussianBlur(bg_crop, (61, 61), 0)
+            
+            # Blend with 10% white for that translucent frosted look
+            frost_tint = np.full(blurred.shape, 255, dtype=np.uint8)
+            frosted = cv2.addWeighted(blurred, 0.85, frost_tint, 0.15, 0)
+            frosted_pil = Image.fromarray(frosted).convert("RGBA")
+            
+            # Create a rounded mask so it's not a blocky square
+            mask = Image.new("L", (crop_w, crop_h), 0)
+            ImageDraw.Draw(mask).rounded_rectangle([0, 0, crop_w, crop_h], radius=20, fill=255)
+            
+            # Paste the frosted glass onto the overlay
+            overlay.paste(frosted_pil, (bx1, by1), mask=mask)
+        except Exception as e:
+            overlay_draw.rounded_rectangle([bx1, by1, bx2, by2], radius=20, fill=(0, 0, 0, 215))
+    else:
+        overlay_draw.rounded_rectangle([bx1, by1, bx2, by2], radius=20, fill=(0, 0, 0, 215))
+
+    # Add the UI Border
     overlay_draw.rounded_rectangle(
-        [box_x - box_padding_x, box_y - box_padding_y, box_x + box_width + box_padding_x, box_y + box_height + box_padding_y],
-        radius=20, fill=(0, 0, 0, 215)
-    )
-    overlay_draw.rounded_rectangle(
-        [box_x - box_padding_x - 2, box_y - box_padding_y - 2, box_x + box_width + box_padding_x + 2, box_y + box_height + box_padding_y + 2],
+        [bx1 - 2, by1 - 2, bx2 + 2, by2 + 2],
         radius=22, outline=(*accent_color, 255), width=2
     ) 
     
@@ -974,6 +1047,10 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                 bg = build_ken_burns(vpath, dur, _kb_idx); _kb_idx += 1
         if bg is None:
             bg = ColorClip(size=(FRAME_W, FRAME_H), color=(15, 15, 25), duration=dur)
+        
+        # Apply the 2026 Obsidian Color Grade
+        bg = bg.fl_image(apply_tech_grade)
+            
         if idx > 0 and dur >= 3.0:
             bg = bg.with_effects([vfx.CrossFadeIn(0.25 if dur < 5 else 0.40)])
         chunk_clips.append(bg.with_start(chunk["start"]).with_duration(dur))
@@ -1066,7 +1143,10 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                         curr_wds["spoken"].append(w["word"])
                 ctext = " ".join([w["word"] for w in chunk.get("words", [])])
                 if ctext:
-                    subtitle_img = render_subtitle_frame(ctext, curr_wds, accent_color, FRAME_W, FRAME_H)
+                    subtitle_img = render_subtitle_frame(
+                        ctext, curr_wds, bg_frame=bg_frame, 
+                        accent_color=accent_color, frame_width=FRAME_W, frame_height=FRAME_H
+                    )
                 break
                 
         return composite_frame(bg_frame, t, header_img, subtitle_img, cta_img, audio_duration)
