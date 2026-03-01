@@ -17,7 +17,9 @@
         "Qwen 3.5: The End of OpenAI's Monopoly?",
         "Qwen3.5 122B and 35B models offer Sonnet 4.5 performance on local computers",
         "Stop Wasting AI Tokens! \ud83d\udcb8",
-        "MCP server that reduces Claude Code context consumption by 98%"
+        "MCP server that reduces Claude Code context consumption by 98%",
+        "Your AI is holding you hostage. \ud83e\udde0",
+        "Switch to Claude without starting over"
     ],
     "used_keywords": [
         "MCP",
@@ -27,19 +29,21 @@
         "Machine Learning",
         "AI market",
         "Gaming Quality",
-        "tech disruption",
         "Sam Altman",
+        "tech disruption",
         "LLM Benchmarks",
         "India AI",
         "synthetic biology",
         "Microsoft Gaming",
         "Claude 3.5 Sonnet",
         "Gaming CEO",
+        "Data Portability",
         "AI chat app",
         "engineering",
         "Human Intelligence",
         "AI Slop",
         "AI aggregators",
+        "AI Memory",
         "Anthropic",
         "robotics",
         "origin of life",
@@ -59,7 +63,9 @@
         "machine learning",
         "LLM wrappers",
         "Claude Code",
+        "Claude",
         "Token Efficiency",
+        "ChatGPT",
         "AI",
         "Explainability",
         "AI energy",
@@ -71,14 +77,14 @@
     ],
     "used_companies": {
         "Sarvam": 1,
-        "OpenAI": 5,
+        "OpenAI": 6,
         "ChatGPT": 1,
         "Microsoft": 1,
-        "Google": 3,
+        "Google": 4,
         "Origami Robotics": 1,
         "Science": 1,
         "Alibaba": 1,
-        "Anthropic": 2
+        "Anthropic": 3
     },
     "used_subcategories": {
         "AI": 3,
@@ -86,31 +92,31 @@
         "Robotics": 1,
         "AI/Machine Learning/Robotics/NLP/Computer Vision": 1,
         "AI Philosophy": 1,
-        "AI/Machine Learning": 1,
+        "AI/Machine Learning": 2,
         "AI/Software Engineering": 1
     },
     "last_7_days_stories": [
-        "Microsoft\u2019s new gaming CEO vows not to flood the ecosystem with \u2018endless AI slop\u2019",
         "Google VP warns that two types of AI startups may not survive",
         "The Robotic Dexterity Deadlock",
         "Qt45: A small polymerase ribozyme that can synthesize itself",
         "Cognitive Debt: When Velocity Exceeds Comprehension",
         "Qwen3.5 122B and 35B models offer Sonnet 4.5 performance on local computers",
-        "MCP server that reduces Claude Code context consumption by 98%"
+        "MCP server that reduces Claude Code context consumption by 98%",
+        "Switch to Claude without starting over"
     ],
     "last_3_days_subcategories": [
-        "AI Philosophy",
         "AI/Machine Learning",
-        "AI/Software Engineering"
+        "AI/Software Engineering",
+        "AI/Machine Learning"
     ],
     "last_3_days_companies": [
-        "Anthropic",
+        "Google",
         "OpenAI",
         "Anthropic",
-        "Google",
-        "OpenAI"
+        "OpenAI",
+        "Google"
     ],
-    "total_uploaded": 9,
+    "total_uploaded": 10,
     "last_upload": "2026-03-01",
     "history": [
         {
@@ -302,6 +308,28 @@
             "voice_used": "en-US-AndrewNeural",
             "youtube_url": "https://youtu.be/LimbH9B32Rk",
             "news_source_url": "https://mksg.lu/blog/context-mode"
+        },
+        {
+            "date": "2026-03-01",
+            "title": "Your AI is holding you hostage. \ud83e\udde0",
+            "news_headline": "Switch to Claude without starting over",
+            "sub_category": "AI/Machine Learning",
+            "companies": [
+                "Anthropic",
+                "OpenAI",
+                "Google"
+            ],
+            "keywords": [
+                "Claude",
+                "ChatGPT",
+                "AI Memory",
+                "Data Portability",
+                "Anthropic"
+            ],
+            "breaking_news_level": 8,
+            "voice_used": "en-US-AndrewNeural",
+            "youtube_url": "https://youtu.be/Pv3i8a7X1hA",
+            "news_source_url": "https://claude.com/import-memory"
         }
     ]
 }
