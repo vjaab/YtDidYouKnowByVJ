@@ -667,12 +667,12 @@ def render_telegram_cta(accent_color, frame_width=1080):
     draw.line([(0,0),(frame_width,0)], fill=(*accent_color,255), width=4)
     
     f1 = ImageFont.truetype('assets/fonts/Roboto-Bold.ttf', 32)
-    t1 = "join t.me/technewsbyvj"
+    t1 = "📲 EXCLUSIVE TECH UPDATES"
     x1 = (frame_width - draw.textlength(t1, font=f1))//2
     draw.text((x1, 40), t1, font=f1, fill=(180,180,180,255))
     
     f2 = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 56)
-    t2 = "t.me/technews"
+    t2 = "t.me/technewsbyvj"
     x2 = (frame_width - draw.textlength(t2, font=f2))//2
     # Pop effect for the handle
     draw.text((x2, 90), t2, font=f2, fill=(*accent_color,255))
