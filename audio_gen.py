@@ -51,9 +51,8 @@ KOKORO_VOICES = os.path.join(ASSETS_DIR, "voices-v1.0.bin")
 # ── F5-TTS Config ─────────────────────────────────────────────────────────────
 VJ_REF_WAV = os.path.join(BASE_DIR, "vj.wav")
 VJ_REF_TEXT = (
-    "Prosecutors have opened massive investigation into allegations of mixing games and illegal betting. "
-    "Different telescope designs perform differently and have different strength and weaknesses. "
-    "We can continue to strengthen the education of good lawyers."
+    "Welcome you are listening to your channel, we bring you the best insights, ideas and stories. "
+    "After just for you stay tuned and let's get started."
 )
 
 _f5_instance = None

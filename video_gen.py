@@ -24,6 +24,7 @@ import math
 import random
 import threading
 import numpy as np
+import cv2
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from datetime import datetime
 from moviepy import (
@@ -198,6 +199,7 @@ def _gradient_clip(duration):
 
 
 # ── LAYER 4: Ambient "Obsidian" particles ──────────────────────────────────────
+# ── LAYER 4: Ambient "Obsidian" particles ──────────────────────────────────────
 def _ambient_particles(duration, accent_color):
     n = 35
     random.seed(42)
@@ -219,12 +221,89 @@ def _ambient_particles(duration, accent_color):
             y = (py - speed * t * 60 - offset) % FRAME_H
             cv2.circle(mask, (int(px), int(y)), int(p_size), 255, -1)
         mask = cv2.GaussianBlur(mask, (75, 75), 0)
-        return (mask.astype(float) / 255.0) * 0.25 # 25% Opacity transparent digital dust
+        return (mask.astype(float) / 255.0) * 0.15 # 15% Opacity digital dust
 
     clip = VideoClip(make_frame, duration=duration)
     mask = VideoClip(make_mask, is_mask=True, duration=duration)
-    # Use screen blending (simulated by adding lightness later or just standard translucent alpha)
     return clip.with_mask(mask)
+
+# ── LAYER 1: Dynamic Minimalist Background ────────────────────────────────────
+def _dynamic_tech_background(duration, accent_color):
+    """Generates a high-end, 0-cost local dark tech background (Obsidian style)."""
+    # Create base grid and particles
+    cols, rows = 12, 22
+    spacing_x = FRAME_W // cols
+    spacing_y = FRAME_H // rows
+    
+    def make_frame(t):
+        # Dark obsidian base
+        frame = np.full((FRAME_H, FRAME_W, 3), (10, 10, 15), dtype=np.uint8)
+        
+        # Draw moving grid lines
+        grid_alpha = 0.08 + 0.02 * math.sin(t * 0.5)
+        grid_color = tuple(int(c * grid_alpha) for c in accent_color)
+        
+        # Vertical lines with subtle drift
+        drift_x = (t * 10) % spacing_x
+        for x in range(-spacing_x, FRAME_W + spacing_x, spacing_x):
+            cv2.line(frame, (int(x + drift_x), 0), (int(x + drift_x), FRAME_H), grid_color, 1)
+            
+        # Horizontal lines with subtle drift
+        drift_y = (t * 8) % spacing_y
+        for y in range(-spacing_y, FRAME_H + spacing_y, spacing_y):
+            cv2.line(frame, (0, int(y + drift_y)), (FRAME_W, int(y + drift_y)), grid_color, 1)
+
+        # Pulse glow at center
+        pulse = (math.sin(t * 1.2) + 1) / 2
+        glow_radius = int(400 + 50 * pulse)
+        glow_img = np.zeros_like(frame)
+        cv2.circle(glow_img, (FRAME_W//2, FRAME_H//2), glow_radius, accent_color, -1)
+        glow_img = cv2.GaussianBlur(glow_img, (151, 151), 0)
+        
+        # Blend glow with 5% opacity
+        frame = cv2.addWeighted(frame, 1.0, glow_img, 0.05, 0)
+        
+        return frame
+
+    return VideoClip(make_frame, duration=duration)
+
+# ── PROFILE PICTURE LAYER ─────────────────────────────────────────────────────
+def _avatar_clip(duration):
+    """Renders the VJ profile picture in a sleek rounded frame at the bottom."""
+    path = os.path.join(ASSETS_DIR, "vj_profile.jpg")
+    if not os.path.exists(path):
+        return None
+    try:
+        img = Image.open(path).convert("RGBA")
+        # Resize to small circle
+        size = 180
+        img = img.resize((size, size), Image.LANCZOS)
+        
+        # Create circular mask
+        mask = Image.new("L", (size, size), 0)
+        draw = ImageDraw.Draw(mask)
+        draw.ellipse((0, 0, size, size), fill=255)
+        
+        # Apply mask
+        output = Image.new("RGBA", (size, size), (0,0,0,0))
+        output.paste(img, (0, 0), mask=mask)
+        
+        # Add white border
+        draw = ImageDraw.Draw(output)
+        draw.ellipse((2, 2, size-2, size-2), outline=(255, 255, 255, 200), width=6)
+        
+        arr = np.array(output.convert("RGB"))
+        mask_arr = np.array(output.split()[3]).astype(float) / 255.0
+        
+        clip = ImageClip(arr, duration=duration)
+        mclip = VideoClip(lambda t: mask_arr, is_mask=True, duration=duration)
+        
+        # Position at bottom center, just above the progress bar
+        # Adjusted slightly up to not cover telegram handle
+        return clip.with_mask(mclip).with_position(("center", FRAME_H - 180)).with_opacity(0.9)
+    except Exception as e:
+        print(f"Avatar clip failed: {e}")
+        return None
 
 
 # ── LAYER 5: Hook banner ──────────────────────────────────────────────────────
@@ -539,238 +618,111 @@ def _sync_checks(chunks, audio_duration):
     return chunks
 
 
-# ── MAIN ──────────────────────────────────────────────────────────────────────
-from PIL import Image, ImageDraw, ImageFont
-import numpy as np
-
-# --- REBUILD TEXT VISIBILITY FIXES ---
-
-def wrap_text_to_lines(words, word_widths, max_width):
-    lines = []
-    current_line = []
-    current_w = 0
-    font_black = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 72)
-    fake_img = Image.new("RGBA", (1,1))
-    draw = ImageDraw.Draw(fake_img)
-    space_w = draw.textlength(" ", font=font_black)
-    
-    for word, w in zip(words, word_widths):
-        if not current_line or current_w + w <= max_width:
-            current_line.append(word)
-            current_w += w + space_w
-        else:
-            lines.append(current_line)
-            current_line = [word]
-            current_w = w + space_w
-    if current_line:
-        lines.append(current_line)
-    return lines
-
-def render_subtitle_frame(text, current_words, accent_color=(255,214,0), frame_width=1080, frame_height=1920):
-    img = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
-    draw = ImageDraw.Draw(img)
-    font_black = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 72)
-    
-    words = text.split()
-    word_widths = []
-    total_width = 0
-    for word in words:
-        bbox = draw.textbbox((0,0), word+" ", font=font_black)
-        w = bbox[2] - bbox[0]
-        word_widths.append(w)
-        total_width += w
-        
-    max_width = 860
-    if total_width > max_width:
-        lines = wrap_text_to_lines(words, word_widths, max_width)
-    else:
-        lines = [words]
-        
-    line_height = 90
-    total_text_height = len(lines) * line_height
-    box_padding_x = 40
-    box_padding_y = 28
-    box_width = min(total_width + box_padding_x*2, max_width + box_padding_x*2)
-    box_height = total_text_height + box_padding_y*2
-    
-    box_x = (frame_width - box_width) // 2
-    box_y = 1250 + (230 - box_height) // 2
-    
-    overlay = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
-    overlay_draw = ImageDraw.Draw(overlay)
-    
-    overlay_draw.rounded_rectangle(
-        [box_x - box_padding_x, box_y - box_padding_y, box_x + box_width + box_padding_x, box_y + box_height + box_padding_y],
-        radius=20, fill=(0, 0, 0, 215)
-    )
-    overlay_draw.rounded_rectangle(
-        [box_x - box_padding_x - 2, box_y - box_padding_y - 2, box_x + box_width + box_padding_x + 2, box_y + box_height + box_padding_y + 2],
-        radius=22, outline=(*accent_color, 255), width=2
-    ) 
-    
-    img = Image.alpha_composite(img, overlay)
-    draw = ImageDraw.Draw(img)
-    
-    word_index = 0
-    for line_num, line_words in enumerate(lines):
-        line_y = box_y + line_num * line_height
-        line_width = sum(word_widths[word_index:word_index+len(line_words)])
-        line_x = (frame_width - line_width) // 2
-        
-        current_x = line_x
-        for word in line_words:
-            w = word_widths[word_index]
-            if word in current_words.get('current', []):
-                color = (255, 214, 0, 255)
-            elif word in current_words.get('spoken', []):
-                color = (187, 187, 187, 255)
-            else:
-                color = (255, 255, 255, 255)
-                
-            stroke_w = 8
-            for dx in range(-stroke_w, stroke_w+1, 2):
-                for dy in range(-stroke_w, stroke_w+1, 2):
-                    if dx*dx + dy*dy <= stroke_w*stroke_w*1.2:
-                        draw.text((current_x+dx, line_y+dy), word, font=font_black, fill=(0,0,0,255))
-            draw.text((current_x+4, line_y+4), word, font=font_black, fill=(0,0,0,230))
-            draw.text((current_x, line_y), word, font=font_black, fill=color)
-            
-            current_x += w
-            word_index += 1
-            
-    return img
+# ── MINIMALIST TECH UI COMPONENTS ─────────────────────────────────────────────
 
 def render_header_bar(title, category, accent_color, frame_width=1080):
-    header_height = 200
-    img = Image.new('RGBA', (frame_width, header_height), (0,0,0,0))
+    """Sleek minimalist header with floating badge."""
+    header_h = 180
+    img = Image.new('RGBA', (frame_width, header_h), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
-    for y in range(header_height):
-        alpha = int(235 * (1 - (y / header_height)**0.7))
+    # Very subtle top gradient
+    for y in range(header_h):
+        alpha = int(180 * (1 - (y / header_h)**0.6))
         draw.line([(0,y),(frame_width,y)], fill=(0,0,0,alpha))
-        
-    draw.line([(0, header_height-3), (frame_width, header_height-3)], fill=(*accent_color, 180), width=3)
     
-    font_bold = ImageFont.truetype('assets/fonts/Montserrat-Bold.ttf', 30)
-    badge_text = f"{category}"
-    badge_bbox = draw.textbbox((0,0), badge_text, font=font_bold)
-    badge_w = badge_bbox[2] - badge_bbox[0]
-    badge_h = badge_bbox[3] - badge_bbox[1]
+    # Accent line
+    draw.line([(100, 150), (frame_width-100, 150)], fill=(*accent_color, 150), width=2)
     
-    badge_x = 40
-    badge_y = 28
-    badge_pad_x = 22
-    badge_pad_y = 12
+    # Category badge
+    f_badge = ImageFont.truetype('assets/fonts/Montserrat-Bold.ttf', 28)
+    badge_txt = category.upper()
+    bbox = draw.textbbox((0,0), badge_txt, font=f_badge)
+    bw, bh = bbox[2]-bbox[0], bbox[3]-bbox[1]
+    bx, by = 60, 45
+    draw.rounded_rectangle([bx, by, bx+bw+40, by+bh+20], radius=15, fill=(*accent_color, 255))
+    draw.text((bx+20, by+8), badge_txt, font=f_badge, fill=(255,255,255,255))
     
-    draw.rounded_rectangle([badge_x, badge_y, badge_x + badge_w + badge_pad_x*2, badge_y + badge_h + badge_pad_y*2], radius=20, fill=(*accent_color, 255))
-    for dx, dy in [(-2,0),(2,0),(0,-2),(0,2)]:
-        draw.text((badge_x+badge_pad_x+dx, badge_y+badge_pad_y+dy), badge_text, font=font_bold, fill=(0,0,0,255))
-    draw.text((badge_x+badge_pad_x, badge_y+badge_pad_y), badge_text, font=font_bold, fill=(255,255,255,255))
+    # Handle on right
+    f_handle = ImageFont.truetype('assets/fonts/Roboto-Bold.ttf', 24)
+    handle = "t.me/technewsbyvj"
+    hw, _ = draw.textlength(handle, font=f_handle), 24
+    draw.text((frame_width-hw-60, by+10), handle, font=f_handle, fill=(200,200,200,180))
     
-    font_handle = ImageFont.truetype('assets/fonts/Roboto-Bold.ttf', 28)
-    handle_text = "t.me/technewsbyvj"
-    handle_bbox = draw.textbbox((0,0), handle_text, font=font_handle)
-    handle_w = handle_bbox[2] - handle_bbox[0]
-    handle_x = frame_width - handle_w - 40
-    handle_y = 38
-    
-    pad = 14
-    draw.rounded_rectangle([handle_x-pad, handle_y-pad, handle_x+handle_w+pad, handle_y+28+pad], radius=16, fill=(0,0,0,200))
-    for dx, dy in [(-2,0),(2,0),(0,-2),(0,2)]:
-        draw.text((handle_x+dx, handle_y+dy), handle_text, font=font_handle, fill=(0,0,0,255))
-    draw.text((handle_x, handle_y), handle_text, font=font_handle, fill=(204,204,204,255))
-    
-    font_title = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 40)
-    max_title_w = 900
-    while True:
-        t_bbox = draw.textbbox((0,0), title, font=font_title)
-        t_w = t_bbox[2] - t_bbox[0]
-        if t_w <= max_title_w:
-            break
-        title = title[:-4] + "..."
-    title_x = (frame_width - t_w) // 2
-    title_y = 110
-    
-    stroke_w = 7
-    for dx in range(-stroke_w, stroke_w+1, 2):
-        for dy in range(-stroke_w, stroke_w+1, 2):
-            if dx*dx + dy*dy <= stroke_w*stroke_w*1.2:
-                draw.text((title_x+dx, title_y+dy), title, font=font_title, fill=(0,0,0,255))
-    draw.text((title_x+4, title_y+4), title, font=font_title, fill=(0,0,0,220))
-    draw.text((title_x, title_y), title, font=font_title, fill=(255,255,255,255))
-    draw.line([(title_x, title_y+52), (title_x+t_w, title_y+52)], fill=(*accent_color, 200), width=3)
+    # Main Title
+    f_title = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 44)
+    tw = draw.textlength(title, font=f_title)
+    if tw > 800: title = title[:40] + "..."
+    tw = draw.textlength(title, font=f_title)
+    draw.text(((frame_width-tw)//2, 100), title, font=f_title, fill=(255,255,255,255))
     
     return img
 
 def render_telegram_cta(accent_color, frame_width=1080):
-    card_height = 280
-    img = Image.new('RGBA', (frame_width, card_height), (0,0,0,0))
+    """Minimalist Telegram CTA banner."""
+    card_h = 240
+    img = Image.new("RGBA", (frame_width, card_h), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
-    draw.rectangle([0,0,frame_width,card_height], fill=(8,8,8,250))
+    # Translucent dark base
+    draw.rectangle([0,0,frame_width,card_h], fill=(10,10,15,230))
     draw.line([(0,0),(frame_width,0)], fill=(*accent_color,255), width=4)
     
-    f1 = ImageFont.truetype('assets/fonts/Roboto-Bold.ttf', 36)
-    t1 = "📲 Join for daily tech intel"
-    b1 = draw.textbbox((0,0),t1,font=f1)
-    x1 = (frame_width-(b1[2]-b1[0]))//2
-    for dx,dy in [(-3,0),(3,0),(0,-3),(0,3), (-2,-2),(2,-2),(-2,2),(2,2)]:
-        draw.text((x1+dx,30+dy),t1,font=f1, fill=(0,0,0,255))
-    draw.text((x1,30),t1,font=f1, fill=(255,255,255,255))
+    f1 = ImageFont.truetype('assets/fonts/Roboto-Bold.ttf', 32)
+    t1 = "📲 ACCESS DAILY TECH INTEL"
+    x1 = (frame_width - draw.textlength(t1, font=f1))//2
+    draw.text((x1, 40), t1, font=f1, fill=(180,180,180,255))
     
-    f2 = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 52)
+    f2 = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 56)
     t2 = "t.me/technewsbyvj"
-    b2 = draw.textbbox((0,0),t2,font=f2)
-    x2 = (frame_width-(b2[2]-b2[0]))//2
-    for dx,dy in [(-3,0),(3,0),(0,-3),(0,3)]:
-        draw.text((x2+dx,90+dy),t2,font=f2, fill=(0,0,0,255))
-    draw.text((x2,90),t2,font=f2, fill=(*accent_color,255))
+    x2 = (frame_width - draw.textlength(t2, font=f2))//2
+    # Pop effect for the handle
+    draw.text((x2, 90), t2, font=f2, fill=(*accent_color,255))
     
-    f3 = ImageFont.truetype('assets/fonts/Roboto-Regular.ttf', 28)
-    t3 = "Free  •  Daily  •  Exclusive"
-    b3 = draw.textbbox((0,0),t3,font=f3)
-    x3 = (frame_width-(b3[2]-b3[0]))//2
-    draw.text((x3,165),t3,font=f3, fill=(160,160,160,255))
+    f3 = ImageFont.truetype('assets/fonts/Roboto-Regular.ttf', 26)
+    t3 = "JOIN 12,000+ DEVELOPERS & AI ENGINEERS"
+    x3 = (frame_width - draw.textlength(t3, font=f3))//2
+    draw.text((x3, 170), t3, font=f3, fill=(100,100,100,255))
     
     return img
 
 def composite_frame(background_frame, timestamp, header_img, subtitle_img, cta_img, video_duration):
+    """Final assembly of minimalist layers."""
     frame = Image.fromarray(background_frame).convert('RGBA')
+    
+    # 1. Header is always at top
     frame.alpha_composite(header_img, dest=(0,0))
+    
+    # 2. Subtitles on top
     if subtitle_img is not None:
         frame.alpha_composite(subtitle_img, dest=(0,0))
+        
+    # 3. CTA slides up at the end
     if timestamp >= video_duration - 6:
-        progress = (timestamp-(video_duration-6))/0.4
-        progress = min(progress, 1.0)
+        progress = min((timestamp-(video_duration-6))/0.4, 1.0)
+        # Power easing
         progress = 1-(1-progress)**3
-        cta_y = int(1580 + (1-progress)*340)
+        cta_y = int(FRAME_H - (240 * progress))
         frame.alpha_composite(cta_img, dest=(0, cta_y))
+        
     return np.array(frame.convert('RGB'))
 
 def verify_text_visibility(frame_array, zone_name, y_start, y_end):
-    region = frame_array[y_start:y_end, 90:990]
-    white_pixels = np.sum((region[:,:,0] > 200) & (region[:,:,1] > 200) & (region[:,:,2] > 200))
-    dark_pixels = np.sum((region[:,:,0] < 50) & (region[:,:,1] < 50) & (region[:,:,2] < 50))
-    has_text = white_pixels > 500
-    has_bg = dark_pixels > 2000
-    if not has_text:
-        print(f"❌ {zone_name}: NO TEXT VISIBLE")
-    if not has_bg:
-        print(f"❌ {zone_name}: NO DARK BACKGROUND")
-    if has_text and has_bg:
-        print(f"✅ {zone_name}: Text visible correctly")
-    return has_text and has_bg
-
-# --- REBUILD TEXT VISIBILITY FIXES ---
-def wrap_text_to_lines(words, word_widths, max_width):
+    """Validates that text is readable (high contrast)."""
+    region = frame_array[y_start:y_end, 50:1030]
+    # Check for presence of bright pixels (text) and dark pixels (obsidian bg)
+    bright = np.sum(region > 200)
+    dark = np.sum(region < 40)
+    
+    if bright < 500:
+        print(f"⚠️ {zone_name}: WARNING - Low text density detected.")
+    if dark < 1000:
+        print(f"⚠️ {zone_name}: WARNING - Low background contrast.")
+def wrap_text_to_lines(words, word_widths, max_width, font):
     lines = []
     current_line = []
     current_w = 0
-    font_black = ImageFont.truetype("assets/fonts/Montserrat-ExtraBold.ttf", 72)
-    fake_img = Image.new("RGBA", (1,1))
-    draw = ImageDraw.Draw(fake_img)
-    space_w = draw.textlength(" ", font=font_black)
-    
+    space_w = 12
     for word, w in zip(words, word_widths):
         if not current_line or current_w + w <= max_width:
             current_line.append(word)
@@ -784,229 +736,58 @@ def wrap_text_to_lines(words, word_widths, max_width):
     return lines
 
 def render_subtitle_frame(text, current_words, bg_frame=None, accent_color=(255,214,0), frame_width=1080, frame_height=1920):
-    img = Image.new("RGBA", (frame_width, frame_height), (0,0,0,0))
+    """Modern Hormozi-style minimalist captions."""
+    img = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
     draw = ImageDraw.Draw(img)
-    font_black = ImageFont.truetype("assets/fonts/Montserrat-ExtraBold.ttf", 72)
+    
+    f_main = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 78)
+    f_pop = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 88)
     
     words = text.split()
+    current_word_list = current_words.get('current', [])
+    
     word_widths = []
-    total_width = 0
+    fake_draw = ImageDraw.Draw(Image.new("RGBA", (1,1)))
     for word in words:
-        bbox = draw.textbbox((0,0), word+" ", font=font_black)
-        w = bbox[2] - bbox[0]
-        word_widths.append(w)
-        total_width += w
+        f = f_pop if word in current_word_list else f_main
+        bbox = fake_draw.textbbox((0,0), word, font=f)
+        word_widths.append(bbox[2]-bbox[0])
+    
+    lines = wrap_text_to_lines(words, word_widths, 900, f_main)
+    
+    line_h = 110
+    total_h = len(lines) * line_h
+    start_y = 1200 # Higher up to avoid avatar
+    
+    word_idx = 0
+    for i, line in enumerate(lines):
+        line_y = start_y + i * line_h
+        line_w = sum(word_widths[word_idx:word_idx+len(line)]) + 12 * (len(line)-1)
+        cur_x = (frame_width - line_w) // 2
         
-    max_width = 860
-    if total_width > max_width:
-        lines = wrap_text_to_lines(words, word_widths, max_width)
-    else:
-        lines = [words]
-        
-    line_height = 90
-    total_text_height = len(lines) * line_height
-    box_padding_x = 40
-    box_padding_y = 28
-    box_width = min(total_width + box_padding_x*2, max_width + box_padding_x*2)
-    box_height = total_text_height + box_padding_y*2
-    
-    box_x = (frame_width - box_width) // 2
-    box_y = 1250 + (230 - box_height) // 2
-    
-    bx1 = box_x - box_padding_x
-    by1 = box_y - box_padding_y
-    bx2 = box_x + box_width + box_padding_x
-    by2 = box_y + box_height + box_padding_y
-    
-    overlay = Image.new("RGBA", (frame_width, frame_height), (0,0,0,0))
-    overlay_draw = ImageDraw.Draw(overlay)
-    
-    # --- GLASSMORPHISM FROSTED GLASS EFFECT ---
-    if bg_frame is not None:
-        try:
-            # Crop the background region
-            crop_h, crop_w = by2 - by1, bx2 - bx1
-            bg_crop = bg_frame[max(0, by1):min(frame_height, by2), max(0, bx1):min(frame_width, bx2)]
+        for word in line:
+            is_active = word in current_word_list
+            f = f_pop if is_active else f_main
             
-            # Apply severe blur
-            blurred = cv2.GaussianBlur(bg_crop, (61, 61), 0)
-            
-            # Blend with 10% white for that translucent frosted look
-            frost_tint = np.full(blurred.shape, 255, dtype=np.uint8)
-            frosted = cv2.addWeighted(blurred, 0.85, frost_tint, 0.15, 0)
-            frosted_pil = Image.fromarray(frosted).convert("RGBA")
-            
-            # Create a rounded mask so it's not a blocky square
-            mask = Image.new("L", (crop_w, crop_h), 0)
-            ImageDraw.Draw(mask).rounded_rectangle([0, 0, crop_w, crop_h], radius=20, fill=255)
-            
-            # Paste the frosted glass onto the overlay
-            overlay.paste(frosted_pil, (bx1, by1), mask=mask)
-        except Exception as e:
-            overlay_draw.rounded_rectangle([bx1, by1, bx2, by2], radius=20, fill=(0, 0, 0, 215))
-    else:
-        overlay_draw.rounded_rectangle([bx1, by1, bx2, by2], radius=20, fill=(0, 0, 0, 215))
-
-    # Add the UI Border
-    overlay_draw.rounded_rectangle(
-        [bx1 - 2, by1 - 2, bx2 + 2, by2 + 2],
-        radius=22, outline=(*accent_color, 255), width=2
-    ) 
-    
-    img = Image.alpha_composite(img, overlay)
-    draw = ImageDraw.Draw(img)
-    
-    word_index = 0
-    # Simulate spacing
-    space_w = draw.textlength(" ", font=font_black)
-    for line_num, line_words in enumerate(lines):
-        line_y = box_y + line_num * line_height
-        line_width = sum(word_widths[word_index:word_index+len(line_words)]) + space_w * max(0, len(line_words)-1)
-        line_x = (frame_width - line_width) // 2
-        
-        current_x = line_x
-        for word in line_words:
-            w = word_widths[word_index]
-            if word in current_words.get("current", []):
-                color = (255, 214, 0, 255)
-            elif word in current_words.get("spoken", []):
-                color = (187, 187, 187, 255)
+            # Colors
+            if is_active:
+                color = (255, 255, 0, 255)
+            elif word in current_words.get('spoken', []):
+                color = (180, 180, 180, 255)
             else:
                 color = (255, 255, 255, 255)
                 
-            stroke_w = 8
-            for dx in range(-stroke_w, stroke_w+1, 2):
-                for dy in range(-stroke_w, stroke_w+1, 2):
-                    if dx*dx + dy*dy <= stroke_w*stroke_w*1.2:
-                        draw.text((current_x+dx, line_y+dy), word, font=font_black, fill=(0,0,0,255))
-            draw.text((current_x+4, line_y+4), word, font=font_black, fill=(0,0,0,230))
-            draw.text((current_x, line_y), word, font=font_black, fill=color)
+            # Heavy stroke
+            s_w = 8 if is_active else 5
+            for dx in range(-s_w, s_w+1, 2):
+                for dy in range(-s_w, s_w+1, 2):
+                    draw.text((cur_x+dx, line_y+dy), word, font=f, fill=(0,0,0,255))
             
-            current_x += w + space_w
-            word_index += 1
+            draw.text((cur_x, line_y), word, font=f, fill=color)
+            cur_x += word_widths[word_idx] + 12
+            word_idx += 1
             
     return img
-
-def render_header_bar(title, category, accent_color, frame_width=1080):
-    header_height = 200
-    img = Image.new("RGBA", (frame_width, header_height), (0,0,0,0))
-    draw = ImageDraw.Draw(img)
-    
-    for y in range(header_height):
-        alpha = int(235 * (1 - (y / header_height)**0.7))
-        draw.line([(0,y),(frame_width,y)], fill=(0,0,0,alpha))
-        
-    draw.line([(0, header_height-3), (frame_width, header_height-3)], fill=(*accent_color, 180), width=3)
-    
-    font_bold = ImageFont.truetype("assets/fonts/Montserrat-Bold.ttf", 30)
-    badge_text = f"{category}"
-    badge_bbox = draw.textbbox((0,0), badge_text, font=font_bold)
-    badge_w = badge_bbox[2] - badge_bbox[0]
-    badge_h = badge_bbox[3] - badge_bbox[1]
-    
-    badge_x = 40
-    badge_y = 28
-    badge_pad_x = 22
-    badge_pad_y = 12
-    
-    draw.rounded_rectangle([badge_x, badge_y, badge_x + badge_w + badge_pad_x*2, badge_y + badge_h + badge_pad_y*2], radius=20, fill=(*accent_color, 255))
-    for dx, dy in [(-2,0),(2,0),(0,-2),(0,2)]:
-        draw.text((badge_x+badge_pad_x+dx, badge_y+badge_pad_y+dy), badge_text, font=font_bold, fill=(0,0,0,255))
-    draw.text((badge_x+badge_pad_x, badge_y+badge_pad_y), badge_text, font=font_bold, fill=(255,255,255,255))
-    
-    font_handle = ImageFont.truetype("assets/fonts/Roboto-Bold.ttf", 28)
-    handle_text = "t.me/technewsbyvj"
-    handle_bbox = draw.textbbox((0,0), handle_text, font=font_handle)
-    handle_w = handle_bbox[2] - handle_bbox[0]
-    handle_x = frame_width - handle_w - 40
-    handle_y = 38
-    
-    pad = 14
-    draw.rounded_rectangle([handle_x-pad, handle_y-pad, handle_x+handle_w+pad, handle_y+28+pad], radius=16, fill=(0,0,0,200))
-    for dx, dy in [(-2,0),(2,0),(0,-2),(0,2)]:
-        draw.text((handle_x+dx, handle_y+dy), handle_text, font=font_handle, fill=(0,0,0,255))
-    draw.text((handle_x, handle_y), handle_text, font=font_handle, fill=(204,204,204,255))
-    
-    font_title = ImageFont.truetype("assets/fonts/Montserrat-ExtraBold.ttf", 40)
-    max_title_w = 900
-    while True:
-        t_bbox = draw.textbbox((0,0), title, font=font_title)
-        t_w = t_bbox[2] - t_bbox[0]
-        if t_w <= max_title_w:
-            break
-        title = title[:-4] + "..."
-    title_x = (frame_width - t_w) // 2
-    title_y = 110
-    
-    stroke_w = 7
-    for dx in range(-stroke_w, stroke_w+1, 2):
-        for dy in range(-stroke_w, stroke_w+1, 2):
-            if dx*dx + dy*dy <= stroke_w*stroke_w*1.2:
-                draw.text((title_x+dx, title_y+dy), title, font=font_title, fill=(0,0,0,255))
-    draw.text((title_x+4, title_y+4), title, font=font_title, fill=(0,0,0,220))
-    draw.text((title_x, title_y), title, font=font_title, fill=(255,255,255,255))
-    draw.line([(title_x, title_y+52), (title_x+t_w, title_y+52)], fill=(*accent_color, 200), width=3)
-    
-    return img
-
-def render_telegram_cta(accent_color, frame_width=1080):
-    card_height = 280
-    img = Image.new("RGBA", (frame_width, card_height), (0,0,0,0))
-    draw = ImageDraw.Draw(img)
-    
-    draw.rectangle([0,0,frame_width,card_height], fill=(8,8,8,250))
-    draw.line([(0,0),(frame_width,0)], fill=(*accent_color,255), width=4)
-    
-    f1 = ImageFont.truetype("assets/fonts/Roboto-Bold.ttf", 36)
-    t1 = "📲 Join for daily tech intel"
-    b1 = draw.textbbox((0,0),t1,font=f1)
-    x1 = (frame_width-(b1[2]-b1[0]))//2
-    for dx,dy in [(-3,0),(3,0),(0,-3),(0,3), (-2,-2),(2,-2),(-2,2),(2,2)]:
-        draw.text((x1+dx,30+dy),t1,font=f1, fill=(0,0,0,255))
-    draw.text((x1,30),t1,font=f1, fill=(255,255,255,255))
-    
-    f2 = ImageFont.truetype("assets/fonts/Montserrat-ExtraBold.ttf", 52)
-    t2 = "t.me/technewsbyvj"
-    b2 = draw.textbbox((0,0),t2,font=f2)
-    x2 = (frame_width-(b2[2]-b2[0]))//2
-    for dx,dy in [(-3,0),(3,0),(0,-3),(0,3)]:
-        draw.text((x2+dx,90+dy),t2,font=f2, fill=(0,0,0,255))
-    draw.text((x2,90),t2,font=f2, fill=(*accent_color,255))
-    
-    f3 = ImageFont.truetype("assets/fonts/Roboto-Regular.ttf", 28)
-    t3 = "Free  •  Daily  •  Exclusive"
-    b3 = draw.textbbox((0,0),t3,font=f3)
-    x3 = (frame_width-(b3[2]-b3[0]))//2
-    draw.text((x3,165),t3,font=f3, fill=(160,160,160,255))
-    
-    return img
-
-def composite_frame(background_frame, timestamp, header_img, subtitle_img, cta_img, video_duration):
-    frame = Image.fromarray(background_frame).convert("RGBA")
-    frame.alpha_composite(header_img, dest=(0,0))
-    if subtitle_img is not None:
-        frame.alpha_composite(subtitle_img, dest=(0,0))
-    if timestamp >= video_duration - 6:
-        progress = (timestamp-(video_duration-6))/0.4
-        progress = min(progress, 1.0)
-        progress = 1-(1-progress)**3
-        cta_y = int(1580 + (1-progress)*340)
-        frame.alpha_composite(cta_img, dest=(0, cta_y))
-    return np.array(frame.convert("RGB"))
-
-def verify_text_visibility(frame_array, zone_name, y_start, y_end):
-    region = frame_array[y_start:y_end, 90:990]
-    white_pixels = np.sum((region[:,:,0] > 200) & (region[:,:,1] > 200) & (region[:,:,2] > 200))
-    dark_pixels = np.sum((region[:,:,0] < 50) & (region[:,:,1] < 50) & (region[:,:,2] < 50))
-    has_text = white_pixels > 500
-    has_bg = dark_pixels > 2000
-    if not has_text:
-        print(f"❌ {zone_name}: NO TEXT VISIBLE")
-    if not has_bg:
-        print(f"❌ {zone_name}: NO DARK BACKGROUND")
-    if has_text and has_bg:
-        print(f"✅ {zone_name}: Text visible correctly")
-    return has_text and has_bg
 
 def create_video(audio_path, script_json, chunks, output_path=None):
     global _kb_idx
@@ -1035,96 +816,59 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     key_stat_ts    = float(script_json.get("key_stat_timestamp", 0))
     shock_ts       = float(script_json.get("shocking_moment_timestamp", 0))
 
-    # ── LAYER 1: Background chunks ────────────────────────────────────────────
-    print("Building background chunk clips...")
-    chunk_clips = []
-    for idx, chunk in enumerate(chunks):
-        dur   = chunk["duration"]
-        vtype = chunk.get("visual_type", "photo")
-        vpath = chunk.get("visual_path")
-        bg = None
-        if vpath and os.path.exists(vpath):
-            if vtype == "video":
-                bg = build_video_clip(vpath, dur)
-            else:
-                bg = build_ken_burns(vpath, dur, _kb_idx); _kb_idx += 1
-        if bg is None:
-            bg = ColorClip(size=(FRAME_W, FRAME_H), color=(15, 15, 25), duration=dur)
-        
-        # Apply the 2026 Obsidian Color Grade
-        bg = bg.image_transform(apply_tech_grade)
-            
-        if idx > 0 and dur >= 3.0:
-            bg = bg.with_effects([vfx.CrossFadeIn(0.25 if dur < 5 else 0.40)])
-        chunk_clips.append(bg.with_start(chunk["start"]).with_duration(dur))
+    # ── LAYER 1: Dynamic Background ───────────────────────────────────────────
+    print("Building dynamic minimalist background...")
+    base = _dynamic_tech_background(audio_duration, accent_color)
 
-    base = CompositeVideoClip(chunk_clips, size=(FRAME_W, FRAME_H)).with_duration(audio_duration)
+    # ── LAYER 2: Avatar & Identity ────────────────────────────────────────────
+    avatar = _avatar_clip(audio_duration)
+    
+    # ── LAYER 3: Tint ─────────────────────────────────────────────────────────
+    tint = ColorClip(size=(FRAME_W, FRAME_H), color=accent_color, duration=audio_duration).with_opacity(0.02)
 
-    # ── LAYER 2: Tint ─────────────────────────────────────────────────────────
-    tint = ColorClip(size=(FRAME_W, FRAME_H), color=accent_color, duration=audio_duration).with_opacity(0.04)
-
-    # ── LAYER 3: Gradient ─────────────────────────────────────────────────────
+    # ── LAYER 4: Gradient ─────────────────────────────────────────────────────
     gradient = _gradient_clip(audio_duration)
 
-    # ── LAYER 4: Particles ────────────────────────────────────────────────────
-    particle_clips = []
-    if sub_category in ("AI", "Space", "Technology", "Cybersecurity", "Robotics"):
-        particle_clips.append(_ambient_particles(audio_duration, accent_color))
+    # ── LAYER 5: Particles (Subtle) ───────────────────────────────────────────
+    particle_clips = [_ambient_particles(audio_duration, accent_color)]
 
-    # ── LAYER 5: Hook banner ──────────────────────────────────────────────────
+    # ── LAYER 6: Hook banner ──────────────────────────────────────────────────
     hook_clips = []
     if hook_text:
         hook_clips.append(_hook_banner(hook_text, accent_color, audio_duration))
 
-    # ── LAYER 6: Animated logo ────────────────────────────────────────────────
+    # ── LAYER 7: Animated logo ────────────────────────────────────────────────
     logo_clips = []
     logo = _animated_logo(audio_duration)
     if logo:
         logo_clips.append(logo)
 
-    # ── LAYER 7: Fact highlight ───────────────────────────────────────────────
+    # ── LAYER 8: Fact highlight ───────────────────────────────────────────────
     fact_clips = []
     if key_stat and key_stat_ts < audio_duration:
         fb = _fact_box(key_stat, key_stat_ts, accent_color, audio_duration)
         if fb:
             fact_clips.append(fb)
 
-    # ── LAYER 8: Emoji burst ──────────────────────────────────────────────────
+    # ── LAYER 9: Emoji burst ──────────────────────────────────────────────────
     burst_clips = _emoji_burst(shock_ts, audio_duration)
 
-    # ── LAYER 9: Like reminder (50%) ──────────────────────────────────────────
+    # ── LAYER 10: Like reminder (50%) ──────────────────────────────────────────
     reminder_clips = []
     like_t = audio_duration * 0.50
     lr = _pill_reminder("👍 Tap Like if this surprised you!", like_t, audio_duration)
     if lr:
         reminder_clips.append(lr)
 
-    # ── LAYER 10: Share prompt (80%) ──────────────────────────────────────────
-    share_t = audio_duration * 0.80
-    sr = _pill_reminder("📤 Share this with someone who needs to know!", share_t, audio_duration)
-    if sr:
-        reminder_clips.append(sr)
-
-    # ── LAYER 13: Subscribe ───────────────────────────────────────────────────
-    sub_clip = _subscribe_clip(audio_duration)
-
-    # ── LAYER 14: Progress bar ────────────────────────────────────────────────
-    progress = ColorClip(size=(FRAME_W, 6), color=accent_color, duration=audio_duration)
-    progress = progress.with_position(
-        lambda t: (int((t / max(audio_duration, 0.01)) * FRAME_W) - FRAME_W, FRAME_H - 6)
-    )
-
     # ── LAYER 11: Main Composite Base ─────────────────────────────────────────
-    base_layers = (
-        [base, tint, gradient]
-        + particle_clips
-        + hook_clips
-        + logo_clips
-        + fact_clips
-        + burst_clips
-        + reminder_clips
-        + [sub_clip, progress]
-    )
+    base_layers = [base, tint, gradient] + particle_clips + hook_clips + logo_clips + fact_clips + burst_clips + reminder_clips
+    if avatar:
+        base_layers.append(avatar)
+    
+    progress = ColorClip(size=(FRAME_W, 6), color=accent_color, duration=audio_duration)
+    progress = progress.with_position(lambda t: (int((t / max(audio_duration, 0.01)) * FRAME_W) - FRAME_W, FRAME_H - 6))
+    base_layers.append(progress)
+    
     base_comp = CompositeVideoClip(base_layers, size=(FRAME_W, FRAME_H)).with_duration(audio_duration)
 
     # Pre-render custom composite assets
