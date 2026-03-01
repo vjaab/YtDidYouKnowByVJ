@@ -666,21 +666,12 @@ def render_telegram_cta(accent_color, frame_width=1080):
     draw.rectangle([0,0,frame_width,card_h], fill=(10,10,15,230))
     draw.line([(0,0),(frame_width,0)], fill=(*accent_color,255), width=4)
     
-    f1 = ImageFont.truetype('assets/fonts/Roboto-Bold.ttf', 32)
-    t1 = "📲 EXCLUSIVE TECH UPDATES"
+    # Only the handle remains - centered and moved to the top position of the card
+    f1 = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 64)
+    t1 = "t.me/technewsbyvj"
     x1 = (frame_width - draw.textlength(t1, font=f1))//2
-    draw.text((x1, 40), t1, font=f1, fill=(180,180,180,255))
-    
-    f2 = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 56)
-    t2 = "t.me/technewsbyvj"
-    x2 = (frame_width - draw.textlength(t2, font=f2))//2
-    # Pop effect for the handle
-    draw.text((x2, 90), t2, font=f2, fill=(*accent_color,255))
-    
-    f3 = ImageFont.truetype('assets/fonts/Roboto-Regular.ttf', 26)
-    t3 = "JOIN 12,000+ DEVELOPERS & AI ENGINEERS"
-    x3 = (frame_width - draw.textlength(t3, font=f3))//2
-    draw.text((x3, 170), t3, font=f3, fill=(100,100,100,255))
+    # Positioned near the top (y=60) for a clean floating look
+    draw.text((x1, 75), t1, font=f1, fill=(*accent_color,255))
     
     return img
 
