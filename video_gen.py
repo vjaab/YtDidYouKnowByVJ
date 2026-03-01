@@ -645,7 +645,7 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
     
     # Handle on right
     f_handle = ImageFont.truetype('assets/fonts/Roboto-Bold.ttf', 24)
-    handle = "t.me/technewsbyvj"
+    handle = "join t.me/technews"
     hw, _ = draw.textlength(handle, font=f_handle), 24
     draw.text((frame_width-hw-60, by+10), handle, font=f_handle, fill=(200,200,200,180))
     
@@ -674,7 +674,7 @@ def render_telegram_cta(accent_color, frame_width=1080):
     draw.text((x1, 40), t1, font=f1, fill=(180,180,180,255))
     
     f2 = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 56)
-    t2 = "t.me/technewsbyvj"
+    t2 = "t.me/technews"
     x2 = (frame_width - draw.textlength(t2, font=f2))//2
     # Pop effect for the handle
     draw.text((x2, 90), t2, font=f2, fill=(*accent_color,255))
@@ -837,11 +837,8 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     if hook_text:
         hook_clips.append(_hook_banner(hook_text, accent_color, audio_duration))
 
-    # ── LAYER 7: Animated logo ────────────────────────────────────────────────
+    # ── LAYER 7: Animated logo (Removed VJ Branding) ──────────────────────────
     logo_clips = []
-    logo = _animated_logo(audio_duration)
-    if logo:
-        logo_clips.append(logo)
 
     # ── LAYER 8: Fact highlight ───────────────────────────────────────────────
     fact_clips = []
