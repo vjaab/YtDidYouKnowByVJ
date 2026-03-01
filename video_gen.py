@@ -634,20 +634,20 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
     # Accent line
     draw.line([(100, 150), (frame_width-100, 150)], fill=(*accent_color, 150), width=2)
     
-    # Category badge
-    f_badge = ImageFont.truetype('assets/fonts/Montserrat-Bold.ttf', 28)
-    badge_txt = category.upper()
-    bbox = draw.textbbox((0,0), badge_txt, font=f_badge)
-    bw, bh = bbox[2]-bbox[0], bbox[3]-bbox[1]
-    bx, by = 60, 45
-    draw.rounded_rectangle([bx, by, bx+bw+40, by+bh+20], radius=15, fill=(*accent_color, 255))
-    draw.text((bx+20, by+8), badge_txt, font=f_badge, fill=(255,255,255,255))
+    # Category badge - REMOVED for minimalist style
+    # f_badge = ImageFont.truetype('assets/fonts/Montserrat-Bold.ttf', 28)
+    # badge_txt = category.upper()
+    # bbox = draw.textbbox((0,0), badge_txt, font=f_badge)
+    # bw, bh = bbox[2]-bbox[0], bbox[3]-bbox[1]
+    # bx, by = 60, 45
+    # draw.rounded_rectangle([bx, by, bx+bw+40, by+bh+20], radius=15, fill=(*accent_color, 255))
+    # draw.text((bx+20, by+8), badge_txt, font=f_badge, fill=(255,255,255,255))
     
-    # Handle on right
-    f_handle = ImageFont.truetype('assets/fonts/Roboto-Bold.ttf', 24)
-    handle = "join t.me/technews"
-    hw, _ = draw.textlength(handle, font=f_handle), 24
-    draw.text((frame_width-hw-60, by+10), handle, font=f_handle, fill=(200,200,200,180))
+    # Handle on right - REMOVED for minimalist style
+    # f_handle = ImageFont.truetype('assets/fonts/Roboto-Bold.ttf', 24)
+    # handle = "join t.me/technews"
+    # hw, _ = draw.textlength(handle, font=f_handle), 24
+    # draw.text((frame_width-hw-60, by+10), handle, font=f_handle, fill=(200,200,200,180))
     
     # Main Title
     f_title = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 44)
