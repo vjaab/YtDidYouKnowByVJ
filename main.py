@@ -7,7 +7,7 @@ from datetime import datetime
 
 import glob
 from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR
-from fetch_news import fetch_tech_news
+from fetch_research_papers import fetch_tech_news
 from topic_tracker import record_story
 from gemini_script import pick_and_generate_script
 from audio_gen import generate_voiceover
