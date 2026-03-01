@@ -15,17 +15,20 @@
         "Cognitive Debt: The Invisible Crisis",
         "Cognitive Debt: When Velocity Exceeds Comprehension",
         "Qwen 3.5: The End of OpenAI's Monopoly?",
-        "Qwen3.5 122B and 35B models offer Sonnet 4.5 performance on local computers"
+        "Qwen3.5 122B and 35B models offer Sonnet 4.5 performance on local computers",
+        "Stop Wasting AI Tokens! \ud83d\udcb8",
+        "MCP server that reduces Claude Code context consumption by 98%"
     ],
     "used_keywords": [
+        "MCP",
         "venture capital",
         "local AI",
         "Open Source",
         "Machine Learning",
         "AI market",
         "Gaming Quality",
-        "Sam Altman",
         "tech disruption",
+        "Sam Altman",
         "LLM Benchmarks",
         "India AI",
         "synthetic biology",
@@ -37,6 +40,7 @@
         "Human Intelligence",
         "AI Slop",
         "AI aggregators",
+        "Anthropic",
         "robotics",
         "origin of life",
         "startup survival",
@@ -48,11 +52,14 @@
         "ribozyme",
         "Qwen 3.5",
         "human energy",
+        "LLM Context",
         "OpenAI",
         "Qt45",
         "Google warning",
         "machine learning",
         "LLM wrappers",
+        "Claude Code",
+        "Token Efficiency",
         "AI",
         "Explainability",
         "AI energy",
@@ -64,14 +71,14 @@
     ],
     "used_companies": {
         "Sarvam": 1,
-        "OpenAI": 4,
+        "OpenAI": 5,
         "ChatGPT": 1,
         "Microsoft": 1,
-        "Google": 2,
+        "Google": 3,
         "Origami Robotics": 1,
         "Science": 1,
         "Alibaba": 1,
-        "Anthropic": 1
+        "Anthropic": 2
     },
     "used_subcategories": {
         "AI": 3,
@@ -79,30 +86,31 @@
         "Robotics": 1,
         "AI/Machine Learning/Robotics/NLP/Computer Vision": 1,
         "AI Philosophy": 1,
-        "AI/Machine Learning": 1
+        "AI/Machine Learning": 1,
+        "AI/Software Engineering": 1
     },
     "last_7_days_stories": [
-        "Sam Altman would like to remind you that humans use a lot of energy, too",
         "Microsoft\u2019s new gaming CEO vows not to flood the ecosystem with \u2018endless AI slop\u2019",
         "Google VP warns that two types of AI startups may not survive",
         "The Robotic Dexterity Deadlock",
         "Qt45: A small polymerase ribozyme that can synthesize itself",
         "Cognitive Debt: When Velocity Exceeds Comprehension",
-        "Qwen3.5 122B and 35B models offer Sonnet 4.5 performance on local computers"
+        "Qwen3.5 122B and 35B models offer Sonnet 4.5 performance on local computers",
+        "MCP server that reduces Claude Code context consumption by 98%"
     ],
     "last_3_days_subcategories": [
-        "AI/Machine Learning/Robotics/NLP/Computer Vision",
         "AI Philosophy",
-        "AI/Machine Learning"
+        "AI/Machine Learning",
+        "AI/Software Engineering"
     ],
     "last_3_days_companies": [
-        "OpenAI",
-        "Google",
-        "Alibaba",
         "Anthropic",
+        "OpenAI",
+        "Anthropic",
+        "Google",
         "OpenAI"
     ],
-    "total_uploaded": 8,
+    "total_uploaded": 9,
     "last_upload": "2026-03-01",
     "history": [
         {
@@ -272,6 +280,28 @@
             "voice_used": "en-US-AndrewNeural",
             "youtube_url": "https://youtu.be/AfglX_Wlq1g",
             "news_source_url": "https://venturebeat.com/technology/alibabas-new-open-source-qwen3-5-medium-models-offer-sonnet-4-5-performance"
+        },
+        {
+            "date": "2026-03-01",
+            "title": "Stop Wasting AI Tokens! \ud83d\udcb8",
+            "news_headline": "MCP server that reduces Claude Code context consumption by 98%",
+            "sub_category": "AI/Software Engineering",
+            "companies": [
+                "Anthropic",
+                "Google",
+                "OpenAI"
+            ],
+            "keywords": [
+                "Claude Code",
+                "MCP",
+                "Token Efficiency",
+                "LLM Context",
+                "Anthropic"
+            ],
+            "breaking_news_level": 8,
+            "voice_used": "en-US-AndrewNeural",
+            "youtube_url": "https://youtu.be/LimbH9B32Rk",
+            "news_source_url": "https://mksg.lu/blog/context-mode"
         }
     ]
 }
