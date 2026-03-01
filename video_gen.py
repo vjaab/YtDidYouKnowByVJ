@@ -298,9 +298,8 @@ def _avatar_clip(duration):
         clip = ImageClip(arr, duration=duration)
         mclip = VideoClip(lambda t: mask_arr, is_mask=True, duration=duration)
         
-        # Position at bottom center, just above the progress bar
-        # Adjusted slightly up to not cover telegram handle
-        return clip.with_mask(mclip).with_position(("center", FRAME_H - 180)).with_opacity(0.9)
+        # Position at bottom center, balanced with the minimalist CTA
+        return clip.with_mask(mclip).with_position(("center", FRAME_H - 190)).with_opacity(0.9)
     except Exception as e:
         print(f"Avatar clip failed: {e}")
         return None
@@ -850,7 +849,8 @@ def create_video(audio_path, script_json, chunks, output_path=None):
 
     # ── LAYER 11: Main Composite Base ─────────────────────────────────────────
     base_layers = [base, tint, gradient] + particle_clips + hook_clips + logo_clips + fact_clips + burst_clips + reminder_clips
-    # Avatar - REMOVED as requested (left/center branding)
+    if avatar:
+        base_layers.append(avatar)
     
     progress = ColorClip(size=(FRAME_W, 6), color=accent_color, duration=audio_duration)
     progress = progress.with_position(lambda t: (int((t / max(audio_duration, 0.01)) * FRAME_W) - FRAME_W, FRAME_H - 6))
