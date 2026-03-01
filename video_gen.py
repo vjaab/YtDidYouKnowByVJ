@@ -631,8 +631,7 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
         alpha = int(180 * (1 - (y / header_h)**0.6))
         draw.line([(0,y),(frame_width,y)], fill=(0,0,0,alpha))
     
-    # Accent line
-    draw.line([(100, 150), (frame_width-100, 150)], fill=(*accent_color, 150), width=2)
+    # Accent line - REMOVED for clean style
     
     # Category badge - REMOVED for minimalist style
     # f_badge = ImageFont.truetype('assets/fonts/Montserrat-Bold.ttf', 28)
@@ -840,27 +839,18 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     # ── LAYER 7: Animated logo (Removed VJ Branding) ──────────────────────────
     logo_clips = []
 
-    # ── LAYER 8: Fact highlight ───────────────────────────────────────────────
+    # ── LAYER 8: Fact highlight - REMOVED for minimalist style ────────────────
     fact_clips = []
-    if key_stat and key_stat_ts < audio_duration:
-        fb = _fact_box(key_stat, key_stat_ts, accent_color, audio_duration)
-        if fb:
-            fact_clips.append(fb)
 
-    # ── LAYER 9: Emoji burst ──────────────────────────────────────────────────
-    burst_clips = _emoji_burst(shock_ts, audio_duration)
+    # ── LAYER 9: Emoji burst - REMOVED for minimalist style ───────────────────
+    burst_clips = []
 
-    # ── LAYER 10: Like reminder (50%) ──────────────────────────────────────────
+    # ── LAYER 10: Like reminder - REMOVED for minimalist style ────────────────
     reminder_clips = []
-    like_t = audio_duration * 0.50
-    lr = _pill_reminder("👍 Tap Like if this surprised you!", like_t, audio_duration)
-    if lr:
-        reminder_clips.append(lr)
 
     # ── LAYER 11: Main Composite Base ─────────────────────────────────────────
     base_layers = [base, tint, gradient] + particle_clips + hook_clips + logo_clips + fact_clips + burst_clips + reminder_clips
-    if avatar:
-        base_layers.append(avatar)
+    # Avatar - REMOVED as requested (left/center branding)
     
     progress = ColorClip(size=(FRAME_W, 6), color=accent_color, duration=audio_duration)
     progress = progress.with_position(lambda t: (int((t / max(audio_duration, 0.01)) * FRAME_W) - FRAME_W, FRAME_H - 6))
