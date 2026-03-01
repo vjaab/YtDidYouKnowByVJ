@@ -324,11 +324,11 @@ def _hook_banner(hook_text, accent_color, total_dur):
 
     def banner_y(t):
         if t < 0.25:
-            return int(-banner_h + (banner_h + 60) * (t/0.25))
+            return int(-banner_h + (banner_h) * (t/0.25))
         elif t < 1.7:
-            return 60
+            return 0
         else:
-            return int(60 - (banner_h + 60) * ((t - 1.7) / 0.5))
+            return int(0 - (banner_h) * ((t - 1.7) / 0.5))
 
     clip = VideoClip(lambda t: img_arr, duration=dur)
     mask = VideoClip(lambda t: mask_arr, is_mask=True, duration=dur)
@@ -648,12 +648,12 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
     # hw, _ = draw.textlength(handle, font=f_handle), 24
     # draw.text((frame_width-hw-60, by+10), handle, font=f_handle, fill=(200,200,200,180))
     
-    # Main Title
+    # Main Title - shifted down further to avoid overlap with hook
     f_title = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 44)
     tw = draw.textlength(title, font=f_title)
     if tw > 800: title = title[:40] + "..."
     tw = draw.textlength(title, font=f_title)
-    draw.text(((frame_width-tw)//2, 100), title, font=f_title, fill=(255,255,255,255))
+    draw.text(((frame_width-tw)//2, 145), title, font=f_title, fill=(255,255,255,255))
     
     return img
 
@@ -668,7 +668,7 @@ def render_telegram_cta(accent_color, frame_width=1080):
     draw.line([(0,0),(frame_width,0)], fill=(*accent_color,255), width=4)
     
     f1 = ImageFont.truetype('assets/fonts/Roboto-Bold.ttf', 32)
-    t1 = "📲 ACCESS DAILY TECH INTEL"
+    t1 = "join t.me/technewsbyvj"
     x1 = (frame_width - draw.textlength(t1, font=f1))//2
     draw.text((x1, 40), t1, font=f1, fill=(180,180,180,255))
     
