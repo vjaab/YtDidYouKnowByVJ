@@ -13,86 +13,96 @@
         "The Molecule That Built Itself \ud83e\uddec",
         "Qt45: A small polymerase ribozyme that can synthesize itself",
         "Cognitive Debt: The Invisible Crisis",
-        "Cognitive Debt: When Velocity Exceeds Comprehension"
+        "Cognitive Debt: When Velocity Exceeds Comprehension",
+        "Qwen 3.5: The End of OpenAI's Monopoly?",
+        "Qwen3.5 122B and 35B models offer Sonnet 4.5 performance on local computers"
     ],
     "used_keywords": [
-        "synthetic biology",
-        "Gaming CEO",
-        "Qt45",
-        "AI energy",
-        "energy consumption",
-        "OpenAI",
-        "AI chat app",
-        "AI market",
-        "AI aggregators",
-        "AI startups",
-        "Microsoft Gaming",
-        "Sam Altman",
-        "machine learning",
-        "dexterity",
-        "Machine Learning",
-        "LLM wrappers",
-        "Gaming Quality",
-        "Human Intelligence",
-        "AI in Gaming",
-        "AI Slop",
-        "local AI",
-        "AI velocity",
-        "Google warning",
         "venture capital",
-        "human energy",
+        "local AI",
+        "Open Source",
+        "Machine Learning",
+        "AI market",
+        "Gaming Quality",
+        "Sam Altman",
         "tech disruption",
-        "robotics",
-        "Indus AI",
+        "LLM Benchmarks",
         "India AI",
-        "Explainability",
-        "ribozyme",
-        "origin of life",
-        "Sarvam",
-        "Cognitive Debt",
-        "AI",
-        "self-synthesis",
+        "synthetic biology",
+        "Microsoft Gaming",
+        "Claude 3.5 Sonnet",
+        "Gaming CEO",
+        "AI chat app",
         "engineering",
-        "startup survival"
+        "Human Intelligence",
+        "AI Slop",
+        "AI aggregators",
+        "robotics",
+        "origin of life",
+        "startup survival",
+        "AI velocity",
+        "Local AI",
+        "AI startups",
+        "AI in Gaming",
+        "Sarvam",
+        "ribozyme",
+        "Qwen 3.5",
+        "human energy",
+        "OpenAI",
+        "Qt45",
+        "Google warning",
+        "machine learning",
+        "LLM wrappers",
+        "AI",
+        "Explainability",
+        "AI energy",
+        "dexterity",
+        "Cognitive Debt",
+        "Indus AI",
+        "self-synthesis",
+        "energy consumption"
     ],
     "used_companies": {
         "Sarvam": 1,
-        "OpenAI": 3,
+        "OpenAI": 4,
         "ChatGPT": 1,
         "Microsoft": 1,
         "Google": 2,
         "Origami Robotics": 1,
-        "Science": 1
+        "Science": 1,
+        "Alibaba": 1,
+        "Anthropic": 1
     },
     "used_subcategories": {
         "AI": 3,
         "Gaming": 1,
         "Robotics": 1,
         "AI/Machine Learning/Robotics/NLP/Computer Vision": 1,
-        "AI Philosophy": 1
+        "AI Philosophy": 1,
+        "AI/Machine Learning": 1
     },
     "last_7_days_stories": [
-        "India\u2019s Sarvam launches Indus AI chat app as competition heats up",
         "Sam Altman would like to remind you that humans use a lot of energy, too",
         "Microsoft\u2019s new gaming CEO vows not to flood the ecosystem with \u2018endless AI slop\u2019",
         "Google VP warns that two types of AI startups may not survive",
         "The Robotic Dexterity Deadlock",
         "Qt45: A small polymerase ribozyme that can synthesize itself",
-        "Cognitive Debt: When Velocity Exceeds Comprehension"
+        "Cognitive Debt: When Velocity Exceeds Comprehension",
+        "Qwen3.5 122B and 35B models offer Sonnet 4.5 performance on local computers"
     ],
     "last_3_days_subcategories": [
-        "Robotics",
         "AI/Machine Learning/Robotics/NLP/Computer Vision",
-        "AI Philosophy"
+        "AI Philosophy",
+        "AI/Machine Learning"
     ],
     "last_3_days_companies": [
-        "Google",
-        "Origami Robotics",
-        "Science",
         "OpenAI",
-        "Google"
+        "Google",
+        "Alibaba",
+        "Anthropic",
+        "OpenAI"
     ],
-    "total_uploaded": 7,
+    "total_uploaded": 8,
     "last_upload": "2026-03-01",
     "history": [
         {
@@ -240,6 +250,28 @@
             "voice_used": "en-US-AndrewNeural",
             "youtube_url": "https://youtu.be/I4Apq_oneWc",
             "news_source_url": "https://www.rockoder.com/beyondthecode/cognitive-debt-when-velocity-exceeds-comprehension/"
+        },
+        {
+            "date": "2026-03-01",
+            "title": "Qwen 3.5: The End of OpenAI's Monopoly?",
+            "news_headline": "Qwen3.5 122B and 35B models offer Sonnet 4.5 performance on local computers",
+            "sub_category": "AI/Machine Learning",
+            "companies": [
+                "Alibaba",
+                "Anthropic",
+                "OpenAI"
+            ],
+            "keywords": [
+                "Qwen 3.5",
+                "Local AI",
+                "Open Source",
+                "Claude 3.5 Sonnet",
+                "LLM Benchmarks"
+            ],
+            "breaking_news_level": 9,
+            "voice_used": "en-US-AndrewNeural",
+            "youtube_url": "https://youtu.be/AfglX_Wlq1g",
+            "news_source_url": "https://venturebeat.com/technology/alibabas-new-open-source-qwen3-5-medium-models-offer-sonnet-4-5-performance"
         }
     ]
 }
