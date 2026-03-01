@@ -74,6 +74,8 @@ def upload_video(video_path, title, description, tags, category_id="28"):
         "status": {
             "privacyStatus":          "public",
             "selfDeclaredMadeForKids": False,
+            # CRITICAL: Since we use F5-TTS (cloned voice) and AI visuals, 
+            # we MUST disclose altered/synthetic content to remain eligible for monetization.
             "selfDeclaredAlteredContent": True,
         },
     }
