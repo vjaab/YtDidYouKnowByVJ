@@ -6,7 +6,7 @@ import time
 from config import GEMINI_API_KEY, LOGS_DIR
 from topic_tracker import load_tracker, check_story_uniqueness, check_cooldowns
 
-def pick_and_generate_script(articles, extra_instruction="", forced_article=None):
+def pick_and_generate_script(articles, extra_instruction="", forced_article=None, topic_type="research"):
     client = genai.Client(api_key=GEMINI_API_KEY)
     
     # ── Pre-filter articles to avoid repeats ──────────────────────────────────
@@ -34,6 +34,11 @@ def pick_and_generate_script(articles, extra_instruction="", forced_article=None
         news_context += f"\n[{idx+1}] Title: {title}\nDescription: {desc}\nSource: {source}\nURL: {url}\nImage URL: {image_url}\n"
 
     # Build the story selection instruction
+    if topic_type == "tools":
+        content_desc = "latest AI tools and product launches"
+    else:
+        content_desc = "research papers and engineering blogs"
+
     if forced_article:
         forced_title = forced_article.get('title', '')
         forced_url   = forced_article.get('url', '')
@@ -44,7 +49,7 @@ def pick_and_generate_script(articles, extra_instruction="", forced_article=None
         )
     else:
         selection_instruction = (
-            "Analyze the following research papers and engineering blogs and pick the SINGLE most engaging one to convert into a 60-second YouTube Short script.\n"
+            f"Analyze the following {content_desc} and pick the SINGLE most engaging one to convert into a 60-second YouTube Short script.\n"
             "Choose based on deep technological importance and resonance with everyday moments, avoiding generic tech news. Focus on the core AI breakthrough.\n"
         )
 

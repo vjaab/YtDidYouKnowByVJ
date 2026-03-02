@@ -10,8 +10,15 @@ def check_time_and_run():
     current_hhmm = ist_now.strftime("%H:%M")
     
     if current_hhmm in UPLOAD_TIMES:
-        print(f"[{ist_now}] Triggering AI Research Pipeline for {current_hhmm} slot...")
-        run_pipeline()
+        if current_hhmm == "11:00":
+            topic_type = "research"
+        elif current_hhmm == "17:00":
+            topic_type = "tools"
+        else:
+            topic_type = "research"
+            
+        print(f"[{ist_now}] Triggering AI Pipeline ({topic_type.upper()}) for {current_hhmm} slot...")
+        run_pipeline(topic_type=topic_type)
         time.sleep(61) # Sleep to avoid double triggering
 
 def start_scheduler():

@@ -7,7 +7,7 @@ from datetime import datetime
 
 import glob
 from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR
-from fetch_research_papers import fetch_tech_news
+from fetch_research_papers import fetch_tech_news, fetch_ai_tools
 from topic_tracker import record_story
 from gemini_script import pick_and_generate_script
 from audio_gen import generate_voiceover
@@ -52,8 +52,8 @@ Don't miss out — join free today 👇
 #airesearch #shorts #machinelearning #ai #youtubeshorts #dailyfacts"""
 
 
-def run_pipeline(custom_topic=None):
-    log_message("=== STARTING DAILY AI RESEARCH SHORTS PIPELINE ===")
+def run_pipeline(custom_topic=None, topic_type="research"):
+    log_message(f"=== STARTING DAILY AI PIPIELINE ({topic_type.upper()}) ===")
 
     # ── Clean output folder before starting ───────────────────────────────────
     if os.path.exists(OUTPUT_DIR):
@@ -70,8 +70,11 @@ def run_pipeline(custom_topic=None):
         log_message("STEP 1: Using Custom Topic...")
         news_articles = [{"title": "Custom Topic", "description": custom_topic, "url": "", "source": {"name": "User Input"}}]
     else:
-        log_message("STEP 1: Fetching Latest AI Research Papers (last 24h)...")
-        news_articles = fetch_tech_news()
+        log_message(f"STEP 1: Fetching Latest {topic_type.capitalize()}...")
+        if topic_type == "tools":
+            news_articles = fetch_ai_tools()
+        else:
+            news_articles = fetch_tech_news()
         
     if not news_articles:
         log_message("ERROR: No articles fetched. Aborting.")
@@ -98,7 +101,7 @@ def run_pipeline(custom_topic=None):
     while attempts < MAX_RETRY_ATTEMPTS:
         log_message(f"STEP 3 (Attempt {attempts+1}): Generating Script...")
         script_data = pick_and_generate_script(
-            news_articles, extra_instruction, forced_article=chosen_article
+            news_articles, extra_instruction, forced_article=chosen_article, topic_type=topic_type
         )
 
         if not script_data:
@@ -239,19 +242,20 @@ def run_pipeline(custom_topic=None):
     return True
 
 
-def run_local(custom_topic=None):
+def run_local(custom_topic=None, topic_type="research"):
     # XTTS server launch removed. Calling pipeline directly.
-    run_pipeline(custom_topic)
+    run_pipeline(custom_topic, topic_type=topic_type)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--now", action="store_true", help="Run pipeline immediately.")
     parser.add_argument("--topic", type=str, help="Run pipeline with a specific custom topic.", default=None)
+    parser.add_argument("--type", type=str, choices=["research", "tools"], default="research", help="Content type mapped to the schedule")
     args = parser.parse_args()
 
     if args.now or args.topic:
-        run_local(args.topic)
+        run_local(args.topic, topic_type=args.type)
     else:
         print("Usage: python main.py --now")
         print("For scheduled runs: python scheduler.py")

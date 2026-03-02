@@ -11,15 +11,21 @@ RSS_FEEDS = [
     "https://www.anthropic.com/rss",
     "https://huggingface.co/blog/feed.xml",
     "https://aws.amazon.com/blogs/machine-learning/feed/",
+]
+
+TOOL_RSS_FEEDS = [
+    "https://techcrunch.com/category/artificial-intelligence/feed/",
+    "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml",
+    "https://venturebeat.com/category/ai/feed/",
     "https://news.ycombinator.com/rss", 
 ]
 
-def _fetch_from_research_blogs():
-    print("Fetching from AI Research & Engineering blogs...")
+def _fetch_rss(feed_urls, feed_type="research"):
+    print(f"Fetching from {feed_type} blogs...")
     articles = []
     cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
 
-    for feed_url in RSS_FEEDS:
+    for feed_url in feed_urls:
         try:
             feed = feedparser.parse(feed_url)
             for entry in feed.entries[:20]:
@@ -58,15 +64,19 @@ def _fetch_from_research_blogs():
                     "url": entry.link,
                     "urlToImage": image_url,
                     "publishedAt": pub_dt.isoformat() if pub_dt else "",
-                    "type": "research"
+                    "type": feed_type
                 })
         except Exception as e:
             print(f"Feed failed {feed_url}: {e}")
             
-    print(f"Research Blogs: Found {len(articles)} fresh articles.")
+    print(f"{feed_type.capitalize()} Blogs: Found {len(articles)} fresh articles.")
     return articles
 
 
 def fetch_tech_news():
     print("=== FETCH LATEST AI RESEARCH & ENGINEERING NEWS ===")
-    return _fetch_from_research_blogs()
+    return _fetch_rss(RSS_FEEDS, "research")
+
+def fetch_ai_tools():
+    print("=== FETCH LATEST AI TOOLS & PRODUCTS ===")
+    return _fetch_rss(TOOL_RSS_FEEDS, "tools")
