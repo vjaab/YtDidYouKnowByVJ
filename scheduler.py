@@ -15,7 +15,7 @@ def check_time_and_run():
         elif current_hhmm == "17:00":
             topic_type = "tools"
         else:
-            topic_type = "research"
+            topic_type = "tools"
             
         print(f"[{ist_now}] Triggering AI Pipeline ({topic_type.upper()}) for {current_hhmm} slot...")
         run_pipeline(topic_type=topic_type)
