@@ -333,18 +333,46 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
 
     # 3. Handle successful deep learning avatar
     if success and os.path.exists(output_temp_avatar):
-        print("Avatar successfully generated via AI. Loading into composition...")
+        print(f"Avatar successfully generated via AI. Path: {output_temp_avatar}")
         try:
             av_clip = VideoFileClip(output_temp_avatar).subclipped(0, duration)
             
-            # Make circular mask
+            # Upscale if the output is too small for modern displays (e.g. 96x96 -> 500x500)
+            target_h = 500
+            if av_clip.h < target_h:
+                print(f"Upscaling generated avatar from {av_clip.h}px to {target_h}px for clarity.")
+                av_clip = av_clip.resized(height=target_h)
+
             vw, vh = av_clip.size
             size = min(vw, vh)
-            mask_img = np.zeros((vh, vw), dtype=float)
-            cv2.circle(mask_img, (vw//2, vh//2), size//2, 1.0, -1)
             
-            mask_clip = VideoClip(lambda t: mask_img, is_mask=True, duration=duration)
-            return av_clip.with_mask(mask_clip).with_position(("center", "center"))
+            # Create a High-Quality Soft Mask (Feathered Edge)
+            mask_img = np.zeros((vh, vw), dtype=np.uint8)
+            cv2.circle(mask_img, (vw//2, vh//2), size//2 - 2, 255, -1)
+            # Apply Gaussian Blur to the binary mask for soft alpha transitions (premium look)
+            mask_img = cv2.GaussianBlur(mask_img, (15, 15), 0)
+            
+            mask_clip = VideoClip(lambda t: mask_img.astype(float) / 255.0, is_mask=True, duration=duration)
+            av_clip = av_clip.with_mask(mask_clip)
+
+            # Create a Glowing Border Ring behind the avatar
+            border_size = size + 20
+            def make_border_frame(t):
+                # Extra small pulse to make the avatar feel alive
+                pulse = 1.0 + 0.02 * math.sin(t * 2.0)
+                cur_r = int((border_size // 2) * pulse)
+                
+                img = np.zeros((border_size + 40, border_size + 40, 3), dtype=np.uint8)
+                center = (img.shape[1]//2, img.shape[0]//2)
+                # Outer glow
+                cv2.circle(img, center, cur_r, accent_color, 4)
+                img = cv2.GaussianBlur(img, (11, 11), 0)
+                return img
+
+            border_clip = VideoClip(make_border_frame, duration=duration).with_position(("center", 800))
+            
+            # Position avatar slightly above center (800px from top) to avoid overlapping with captions at 1200px
+            return CompositeVideoClip([border_clip, av_clip.with_position(("center", 800))], size=(FRAME_W, FRAME_H))
         except Exception as e:
             print(f"Failed to load generated avatar video: {e}")
             success = False # Proceed to fallback if loading fails
@@ -394,7 +422,7 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
             
             return np.array(frame_bg)
             
-        return VideoClip(make_frame, duration=duration).with_position(("center", "center"))
+        return VideoClip(make_frame, duration=duration).with_position(("center", 800))
     except Exception as e:
         print(f"Visualizer fallback failed: {e}")
         return None
