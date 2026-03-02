@@ -53,52 +53,39 @@ def pick_and_generate_script(articles, extra_instruction="", forced_article=None
             "Choose based on deep technological importance and resonance with everyday moments, avoiding generic tech news. Focus on the core AI breakthrough.\n"
         )
 
-    prompt = f"""Act as a Senior AI Investigative Journalist. 
-Your goal is to transform technical RSS data into a "Deep-Dive" style YouTube Short.
+    prompt = f"""Act as a Senior AI Investigative Journalist & Creative Director. 
+Your goal is to transform technical RSS/Research data into a "Deep-Dive" YouTube Short that balances analytical rigor with high-retention visual storytelling.
 
-CRITICAL HIERARCHY FOR MONETIZATION:
-1. ORIGINAL COMMENTARY (40%): Explain *why* this news matters to the average person. 
-2. COMPARATIVE ANALYSIS (30%): How does this tech stack up against competitors (e.g., Gemini vs. GPT-4o)?
-3. THE DATA (20%): Extract specific numbers for the "Infographic" card.
-4. NARRATION (10%): Use a conversational, punchy tone. Avoid "AI-isms" like "In the rapidly evolving landscape."
+CONTENT HIERARCHY (Monetization & Retention Strategy):
+1. ORIGINAL COMMENTARY (35%): Why this news matters to a human audience.
+2. COMPARATIVE ANALYSIS (25%): Competitive landscape (e.g., AWS vs. OpenAI).
+3. THE DATA (20%): Extract specific numbers for the "Infographic" cards.
+4. VISUAL DIRECTION (10%): Specify "Pattern Interrupts" every 3-5 seconds.
+5. NARRATION (10%): Conversational, punchy tone. Avoid "AI-isms" like "In the rapidly evolving landscape."
 
-TONE OVERRIDE: 
-Speak like a human expert. Use active verbs. If the news is incremental, call it out. If it's a breakthrough, explain the physics/logic behind it.
+NARRATIVE ARC CONFIGURATION:
+1. The Identity Hook (0-5s): A shocking statement paired with a high-contrast visual "Identity" (match the first sentence).
+2. The Disruptor (5-15s): The news leak or breakthrough briefly explained.
+3. The 'So What?' (15-35s): The analytical core. Why is this a game changer?
+4. The Visual Pivot (35-45s): A sudden shift in the script tone/visuals to reset the viewer's attention span.
+5. The Prediction & The Loop (45-55s): A bold prediction that transitions perfectly back into the Hook’s first sentence for infinite replayability.
+
+CRITICAL 'ANTI-BOT' & RETENTION RULES:
+1. PATTERN INTERRUPTS: The visual_cues/retention_cues must change every 3 seconds (Zoom, Pan, B-roll switch).
+2. VOICE PACING: Use em dashes (—) and ellipses (...) for TTS humanization.
+3. THE LOOP: The final 3 words must phonetically or logically lead back into the first 3 words of the Hook.
+4. PROOF OF HUMANITY: End with a unique 'Fact of the Day' at the very end of the script that is completely UNRELATED to the main topic.
+5. TEMPORAL ADAPTATION: 
+   - If topic_type is 'research': Focus on "First Principles" and engineering breakthroughs.
+   - If topic_type is 'tools': Focus on "UI/UX" and immediate productivity gains.
 
 {selection_instruction}
 
-RESEARCH PAPERS & BLOGS:
+RESEARCH PAPERS & BLOGS DATA:
 {news_context}
 
-NARRATIVE ARC REQUIREMENTS FOR THE 'SCRIPT':
-Your `script` MUST follow this exact flow (do NOT include headers like 'The Disruptor' in the spoken script, just weave them naturally):
-1. The Hook: A 5-second controversial or shocking statement.
-2. The Disruptor: Explain the news briefly.
-3. The 'So What?': The analytical core. Why is this a game changer?
-4. The Competition: Who is losing because of this news?
-5. The Prediction/Opinion: End the main script with a bold, controversial opinion or prediction on what happens next. This is your "Original Commentary".
-
-CRITICAL 'ANTI-BOT' MONETIZATION RULES:
-1. VARIETY in Hook: Do NOT use the same hook twice. Cycle between 'Challenger/Controversial', 'Educational', and 'Fun/Relatable'.
-2. PERSONALIZATION: Include a unique 'Fact of the Day' at the very end of the script that is completely UNRELATED to the main topic.
-3. METADATA: Generate an array of 3 highly click-worthy "title_options" and a detailed "description" that spans 100+ words.
-4. VOICE PACING CUES: Ensure the script includes natural conversational cues (like em dashes '—' and ellipses '...') so the TTS sounds human.
-5. VISUAL VARIETY (Crucial): For the "color_theme", ALWAYS generate a completely unique, randomized pair of high-contrast colors. NEVER just use the same blue or red.
-
-CRITICAL TIMESTAMPS OVERLAP RULE:
-You MUST ensure that chunk[i].end + 0.10 <= chunk[i+1].start (minimum 0.10 sec gap between every chunk).
-Never generate overlapping timestamps! Only ONE subtitle chunk visible at a time.
-
-INFOGRAPHIC CARD DETECTION:
-For each subtitle_chunk, set 'has_infographic': true if the text contains ANY of: numbers, percentages, comparisons, ranking, dates, definitions, or funding.
-Set 'infographic_type' to one of: 'stat', 'comparison', 'timeline', 'definition', 'ranking', 'growth'.
-Set 'infographic_data' with type-specific fields for your chosen card, reflecting THE DATA (20%) from the hierarchy:
-  stat: headline, subtext, context, icon, source, count_up, count_from, count_to, count_suffix, count_prefix
-  comparison: left (name, value, label, icon), right (same), winner ("left"/"right")
-  timeline: events (list of date+text), current_index
-  definition: term, icon, definition, example
-  ranking: items (list of rank+name+metric), highlight_index
-  growth: percentage, label, before, after, period
+NARRATIVE FLOW (FOR THE 'SCRIPT' FIELD):
+- Hook -> Disruptor -> So What? -> Visual Pivot -> Prediction/Loop -> Fact of the Day.
 
 {extra_instruction}
 
@@ -106,102 +93,44 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
 {{
   "title_options": ["Title idea 1", "Title idea 2", "Title idea 3"],
   "description": "Full 100+ word rich SEO description for youtube describing the video, including timestamps and credits.",
-  "fact_of_the_day": "Did you know that flamingos rest on one leg to preserve body heat?",
+  "fact_of_the_day": "Unrelated fact here",
   "quiz_tone": "Investigative",
-  "title": "Punchy YouTube title max 60 chars with emoji",
-  "script": "Full voiceover script following the Deep-Dive Narrative Arc (65-75 sec), ending with the fact_of_the_day.",
-  "hook": "A 5-second controversial or shocking statement (matches first sentence)",
-  "summary": "One line summary of the research",
+  "title": "Punchy YouTube title max 60 chars",
+  "script": "Full voiceover script following the Arc (65-75 sec), ending with the fact_of_the_day. Ensure The Loop is implemented.",
+  "hook": "Matches the first sentence of the script",
+  "summary": "One line summary",
   "sub_category": "AI/Machine Learning",
-  "companies_mentioned": ["Company1"],
-  "keywords": ["kw1", "kw2", "kw3", "kw4", "kw5"],
-  "hashtags": ["#airesearch", "#shorts", "#machinelearning", "#ai", "#compsci"],
-  "end_question": "Thought provoking comment-bait question (based on main research)",
-  "edge_tts_voice": "en-US-AndrewNeural",
-  "edge_tts_emotion": "calm",
-  "relevant_emoji": "🔍",
   "breaking_news_level": 9,
+  "loop_score": 10,
+  "retention_cues": [
+    {{"timestamp": 3.0, "effect": "zoom_in", "reason": "hook_impact"}},
+    {{"timestamp": 6.0, "effect": "glitch", "reason": "disruptor_reveal"}}
+  ],
   "color_theme": {{
      "background": "#0f0f0f",
      "accent": "#ff4444",
      "text": "#ffffff"
   }},
+  "relevant_emoji": "🔍",
   "imagen_prompts": [
-     "High-contrast, cinematic visual cue matching research discovery, 9:16, 4K",
-     "Second angle showing impact or scale, cinematic, 9:16"
+     "High-contrast, Tech-noir style visuals, 9:16, cinematic"
   ],
-  "thumbnail_headline": "Max 5 shocking words for thumbnail",
-  "thumbnail_highlight_word": "single most shocking word",
-  "thumbnail_teaser": "Short curiosity-gap teaser",
-  "thumbnail_emoji": "⚠️",
-  "hook_banner_text": "First 8 words of script — the scroll-stopping hook sentence",
+  "hook_banner_text": "First 8 words of script",
   "shocking_moment_timestamp": 12.5,
-  "key_stat": "$1 Billion or other metric",
+  "key_stat": "$1 Billion",
   "key_stat_timestamp": 18.3,
   "subtitle_chunks": [
     {{
       "chunk_id": 1,
-      "text": "OpenAI just dropped",
+      "text": "The first sentence",
       "start": 0.00,
       "end": 2.40,
-      "highlight_word": "OpenAI",
-      "pexels_primary": "OpenAI office technology",
-      "pexels_fallback": "artificial intelligence lab",
-      "has_person": false,
-      "has_company": true,
-      "company_name": "OpenAI",
+      "highlight_word": "First",
       "has_infographic": false
-    }},
-    {{
-      "chunk_id": 2,
-      "text": "raised 6.6 billion dollars",
-      "start": 2.50,
-      "end": 5.20,
-      "highlight_word": "billion",
-      "pexels_primary": "money investment finance",
-      "pexels_fallback": "technology funding",
-      "has_person": false,
-      "has_company": false,
-      "has_infographic": true,
-      "infographic_type": "stat",
-      "infographic_data": {{
-        "headline": "$6.6B",
-        "subtext": "OpenAI Funding Round",
-        "context": "Largest AI funding in history",
-        "icon": "💰",
-        "source": "October 2024",
-        "count_up": true,
-        "count_from": 0,
-        "count_to": 6.6,
-        "count_suffix": "B",
-        "count_prefix": "$"
-      }}
     }}
   ],
-  "highlight_words": ["KEY", "WORD"],
-  "original_news_headline": "The exact headline of the story you picked",
-  "original_news_url": "The exact url of the story you picked",
-  "original_news_image_url": "The exact Image URL of the story you picked",
-  "people": [
-     {{
-       "name": "Sam Altman",
-       "role": "CEO, OpenAI",
-       "twitter_handle": "sama",
-       "wikipedia_slug": "Sam_Altman",
-       "first_mentioned_at_word": "Sam",
-       "company_domain": "openai.com"
-     }}
-  ],
-  "companies": [
-     {{
-       "name": "OpenAI",
-       "domain": "openai.com",
-       "first_mentioned_at_word": "OpenAI",
-       "hq_pexels_search": "OpenAI office San Francisco"
-     }}
-  ],
-  "entity_order": ["Sam Altman", "OpenAI"],
-  "first_entity_type": "person"
+  "original_news_headline": "Exact headline",
+  "original_news_url": "Exact url"
 }}
 
 IMPORTANT: voice is ALWAYS en-US-AndrewNeural, which is a warm male voice. Do not suggest any other voice.
