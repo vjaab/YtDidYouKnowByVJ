@@ -33,7 +33,7 @@ from moviepy import (
 )
 import moviepy.video.fx as vfx
 import moviepy.audio.fx as afx
-from config import OUTPUT_DIR, ASSETS_DIR, MUSIC_DIR, BGM_VOLUME, LOGS_DIR
+from config import OUTPUT_DIR, ASSETS_DIR, MUSIC_DIR, BGM_VOLUME, LOGS_DIR, BASE_DIR
 import imageio_ffmpeg
 from pydub import AudioSegment
 AudioSegment.converter = imageio_ffmpeg.get_ffmpeg_exe()
@@ -268,40 +268,132 @@ def _dynamic_tech_background(duration, accent_color):
     return VideoClip(make_frame, duration=duration)
 
 # ── PROFILE PICTURE LAYER ─────────────────────────────────────────────────────
-def _avatar_clip(duration):
-    """Renders the VJ profile picture in a sleek rounded frame at the bottom."""
-    path = os.path.join(ASSETS_DIR, "vj_profile.jpg")
-    if not os.path.exists(path):
+def _dynamic_avatar_clip(duration, audio_path, accent_color):
+    """
+    Attempts to generate an avatar video using SadTalker or Wav2Lip if their 
+    directories exist. If they fail or are absent, falls back to an audio 
+    visualizer centered around the avatar image.
+    """
+    import numpy as np
+    from pydub import AudioSegment
+    import math
+    import subprocess
+    import glob
+    
+    avatar_img_path = os.path.join(ASSETS_DIR, "vj_profile.jpg")
+    output_temp_avatar = os.path.join(OUTPUT_DIR, "temp_avatar.mp4")
+    
+    if not os.path.exists(avatar_img_path):
         return None
+
+    success = False
+    sadtalker_dir = os.path.join(BASE_DIR, "SadTalker")
+    wav2lip_dir = os.path.join(BASE_DIR, "Wav2Lip")
+
+    # 1. Try SadTalker First
+    if os.path.exists(sadtalker_dir):
+        print(f"SadTalker detected at {sadtalker_dir}. Attempting avatar generation...")
+        cmd = [
+            "python", os.path.join(sadtalker_dir, "inference.py"),
+            "--driven_audio", audio_path,
+            "--source_image", avatar_img_path,
+            "--result_dir", OUTPUT_DIR,
+            "--still",
+            "--preprocess", "crop"
+        ]
+        try:
+            subprocess.run(cmd, check=True)
+            list_of_files = glob.glob(os.path.join(OUTPUT_DIR, "*", "*.mp4"))
+            if list_of_files:
+                output_temp_avatar = max(list_of_files, key=os.path.getctime)
+                success = True
+        except Exception as e:
+            print(f"SadTalker generation failed: {e}")
+
+    # 2. Try Wav2Lip Second
+    elif os.path.exists(wav2lip_dir):
+        print(f"Wav2Lip detected at {wav2lip_dir}. Attempting avatar generation...")
+        cmd = [
+            "python", os.path.join(wav2lip_dir, "inference.py"),
+            "--checkpoint_path", os.path.join(wav2lip_dir, "checkpoints", "wav2lip_gan.pth"),
+            "--face", avatar_img_path,
+            "--audio", audio_path,
+            "--outfile", output_temp_avatar,
+            "--pads", "0", "20", "0", "0"
+        ]
+        try:
+            subprocess.run(cmd, check=True)
+            if os.path.exists(output_temp_avatar):
+                success = True
+        except Exception as e:
+            print(f"Wav2Lip generation failed: {e}")
+
+    # 3. Handle successful deep learning avatar
+    if success and os.path.exists(output_temp_avatar):
+        print("Avatar successfully generated via AI. Loading into composition...")
+        try:
+            av_clip = VideoFileClip(output_temp_avatar).subclipped(0, duration)
+            
+            # Make circular mask
+            vw, vh = av_clip.size
+            size = min(vw, vh)
+            mask_img = np.zeros((vh, vw), dtype=float)
+            cv2.circle(mask_img, (vw//2, vh//2), size//2, 1.0, -1)
+            
+            mask_clip = VideoClip(lambda t: mask_img, is_mask=True, duration=duration)
+            return av_clip.with_mask(mask_clip).with_position(("center", "center"))
+        except Exception as e:
+            print(f"Failed to load generated avatar video: {e}")
+            success = False # Proceed to fallback if loading fails
+    
+    # 4. Fallback: Audio Visualizer
+    print("Falling back to Auto-Visualizer for Avatar...")
     try:
-        img = Image.open(path).convert("RGBA")
-        # Resize to small circle
-        size = 180
+        audio_seg = AudioSegment.from_file(audio_path).set_channels(1).set_frame_rate(20)
+        samples = np.array(audio_seg.get_array_of_samples())
+        samples = np.abs(samples)
+        max_amp = np.max(samples) if np.max(samples) > 0 else 1
+        samples = samples / max_amp
+    except Exception as e:
+        print(f"Audio for visualizer failed: {e}")
+        samples = np.zeros(int(duration * 20))
+        
+    try:
+        img = Image.open(avatar_img_path).convert("RGBA")
+        size = 300
         img = img.resize((size, size), Image.LANCZOS)
         
-        # Create circular mask
+        # Circular mask
         mask = Image.new("L", (size, size), 0)
         draw = ImageDraw.Draw(mask)
         draw.ellipse((0, 0, size, size), fill=255)
+        img.putalpha(mask)
         
-        # Apply mask
-        output = Image.new("RGBA", (size, size), (0,0,0,0))
-        output.paste(img, (0, 0), mask=mask)
-        
-        # Add white border
-        draw = ImageDraw.Draw(output)
-        draw.ellipse((2, 2, size-2, size-2), outline=(255, 255, 255, 200), width=6)
-        
-        arr = np.array(output.convert("RGB"))
-        mask_arr = np.array(output.split()[3]).astype(float) / 255.0
-        
-        clip = ImageClip(arr, duration=duration)
-        mclip = VideoClip(lambda t: mask_arr, is_mask=True, duration=duration)
-        
-        # Position at bottom center, balanced with the minimalist CTA
-        return clip.with_mask(mclip).with_position(("center", FRAME_H - 190)).with_opacity(0.9)
+        def make_frame(t):
+            frame_bg = Image.new("RGBA", (500, 500), (0,0,0,0))
+            d_circle = ImageDraw.Draw(frame_bg)
+            
+            idx = int(t * 20)
+            if idx >= len(samples):
+                idx = len(samples) - 1
+            amp = samples[idx] if idx >= 0 else 0
+            
+            # Draw visualizer ring
+            radius = (size // 2) + 15 + int(60 * amp)
+            center = (250, 250)
+            
+            # Glow effect layer
+            d_circle.ellipse((center[0]-radius, center[1]-radius, center[0]+radius, center[1]+radius), 
+                             outline=(*accent_color, int(150 + 105 * amp)), width=12)
+                             
+            # Paste avatar
+            frame_bg.paste(img, (100, 100), img)
+            
+            return np.array(frame_bg)
+            
+        return VideoClip(make_frame, duration=duration).with_position(("center", "center"))
     except Exception as e:
-        print(f"Avatar clip failed: {e}")
+        print(f"Visualizer fallback failed: {e}")
         return None
 
 
@@ -798,7 +890,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     base = _dynamic_tech_background(audio_duration, accent_color)
 
     # ── LAYER 2: Avatar & Identity ────────────────────────────────────────────
-    avatar = None
+    avatar = _dynamic_avatar_clip(audio_duration, audio_path, accent_color)
     
     # ── LAYER 3: Tint ─────────────────────────────────────────────────────────
     tint = ColorClip(size=(FRAME_W, FRAME_H), color=accent_color, duration=audio_duration).with_opacity(0.02)
@@ -828,6 +920,8 @@ def create_video(audio_path, script_json, chunks, output_path=None):
 
     # ── LAYER 11: Main Composite Base ─────────────────────────────────────────
     base_layers = [base, tint, gradient] + particle_clips + hook_clips + logo_clips + fact_clips + burst_clips + reminder_clips
+    if avatar:
+        base_layers.append(avatar)
     
     progress = ColorClip(size=(FRAME_W, 6), color=accent_color, duration=audio_duration)
     progress = progress.with_position(lambda t: (int((t / max(audio_duration, 0.01)) * FRAME_W) - FRAME_W, FRAME_H - 6))
