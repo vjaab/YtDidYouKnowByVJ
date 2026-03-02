@@ -19,18 +19,21 @@
         "Stop Wasting AI Tokens! \ud83d\udcb8",
         "MCP server that reduces Claude Code context consumption by 98%",
         "Your AI is holding you hostage. \ud83e\udde0",
-        "Switch to Claude without starting over"
+        "Switch to Claude without starting over",
+        "AI Just Hacked the Human Brain \ud83e\udde0",
+        "Evolving descriptive text of mental content from human brain activity"
     ],
     "used_keywords": [
         "MCP",
         "venture capital",
         "local AI",
         "Open Source",
+        "brain-computer interface",
         "Machine Learning",
         "AI market",
         "Gaming Quality",
-        "Sam Altman",
         "tech disruption",
+        "Sam Altman",
         "LLM Benchmarks",
         "India AI",
         "synthetic biology",
@@ -45,6 +48,7 @@
         "AI aggregators",
         "AI Memory",
         "Anthropic",
+        "mind reading",
         "robotics",
         "origin of life",
         "startup survival",
@@ -57,11 +61,13 @@
         "Qwen 3.5",
         "human energy",
         "LLM Context",
+        "neural decoding",
         "OpenAI",
         "Qt45",
         "Google warning",
         "machine learning",
         "LLM wrappers",
+        "privacy",
         "Claude Code",
         "Claude",
         "Token Efficiency",
@@ -73,7 +79,8 @@
         "Cognitive Debt",
         "Indus AI",
         "self-synthesis",
-        "energy consumption"
+        "energy consumption",
+        "fMRI"
     ],
     "used_companies": {
         "Sarvam": 1,
@@ -84,7 +91,8 @@
         "Origami Robotics": 1,
         "Science": 1,
         "Alibaba": 1,
-        "Anthropic": 3
+        "Anthropic": 3,
+        "Neuralink": 1
     },
     "used_subcategories": {
         "AI": 3,
@@ -93,31 +101,32 @@
         "AI/Machine Learning/Robotics/NLP/Computer Vision": 1,
         "AI Philosophy": 1,
         "AI/Machine Learning": 2,
-        "AI/Software Engineering": 1
+        "AI/Software Engineering": 1,
+        "AI/Neuroscience": 1
     },
     "last_7_days_stories": [
-        "Google VP warns that two types of AI startups may not survive",
         "The Robotic Dexterity Deadlock",
         "Qt45: A small polymerase ribozyme that can synthesize itself",
         "Cognitive Debt: When Velocity Exceeds Comprehension",
         "Qwen3.5 122B and 35B models offer Sonnet 4.5 performance on local computers",
         "MCP server that reduces Claude Code context consumption by 98%",
-        "Switch to Claude without starting over"
+        "Switch to Claude without starting over",
+        "Evolving descriptive text of mental content from human brain activity"
     ],
     "last_3_days_subcategories": [
-        "AI/Machine Learning",
         "AI/Software Engineering",
-        "AI/Machine Learning"
+        "AI/Machine Learning",
+        "AI/Neuroscience"
     ],
     "last_3_days_companies": [
-        "Google",
         "OpenAI",
         "Anthropic",
         "OpenAI",
-        "Google"
+        "Google",
+        "Neuralink"
     ],
-    "total_uploaded": 10,
-    "last_upload": "2026-03-01",
+    "total_uploaded": 11,
+    "last_upload": "2026-03-02",
     "history": [
         {
             "date": "2026-02-23",
@@ -330,6 +339,26 @@
             "voice_used": "en-US-AndrewNeural",
             "youtube_url": "https://youtu.be/Pv3i8a7X1hA",
             "news_source_url": "https://claude.com/import-memory"
+        },
+        {
+            "date": "2026-03-02",
+            "title": "AI Just Hacked the Human Brain \ud83e\udde0",
+            "news_headline": "Evolving descriptive text of mental content from human brain activity",
+            "sub_category": "AI/Neuroscience",
+            "companies": [
+                "Neuralink"
+            ],
+            "keywords": [
+                "fMRI",
+                "neural decoding",
+                "brain-computer interface",
+                "privacy",
+                "mind reading"
+            ],
+            "breaking_news_level": 10,
+            "voice_used": "en-US-AndrewNeural",
+            "youtube_url": "https://youtu.be/IGi-O8Tpnrc",
+            "news_source_url": "https://www.bbc.com/future/article/20260226-how-ai-can-read-your-thoughts"
         }
     ]
 }
