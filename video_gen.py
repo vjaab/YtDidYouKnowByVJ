@@ -29,7 +29,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from datetime import datetime
 from moviepy import (
     VideoClip, ImageClip, VideoFileClip, AudioFileClip,
-    CompositeVideoClip, ColorClip, CompositeAudioClip,
+    CompositeVideoClip, ColorClip, CompositeAudioClip, concatenate_videoclips
 )
 import moviepy.video.fx as vfx
 import moviepy.audio.fx as afx
@@ -345,23 +345,13 @@ def _animated_logo(duration):
         logo_img = Image.open(logo_path).convert("RGBA").resize((110, 110), Image.LANCZOS)
         arr  = np.array(logo_img.convert("RGB"))
         mask = np.array(logo_img.split()[3]).astype(float) / 255.0
-
+        # Simple fade‑in animation for the logo
         def pos(t):
-            if t < 0.6:
-                scale = min(t / 0.5, 1.0)
-                x = int((FRAME_W - 110*scale) // 2)
-                y = int(FRAME_H * 0.08)
-                return (x, y)
-            else:
-                return (FRAME_W - 130, 75)
-
-        def opacity_fn(t):
-            return 1.0 if t < 0.6 else 0.28
-
+            # Centered for the intro duration
+            return (int((FRAME_W - 110) // 2), int(FRAME_H * 0.1))
         clip = VideoClip(lambda t: arr, duration=duration)
         mclip = VideoClip(lambda t: mask, is_mask=True, duration=duration)
-        clip = clip.with_mask(mclip)
-        clip = clip.with_position(pos)
+        clip = clip.with_mask(mclip).with_position(pos)
         return clip
     except Exception:
         return None
@@ -625,34 +615,15 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
     img = Image.new('RGBA', (frame_width, header_h), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
-    # Very subtle top gradient
-    for y in range(header_h):
-        alpha = int(180 * (1 - (y / header_h)**0.6))
-        draw.line([(0,y),(frame_width,y)], fill=(0,0,0,alpha))
+    # Solid dark strip behind title for contrast
+    draw.rectangle([0, 0, frame_width, header_h], fill=(0, 0, 0, 180))
     
-    # Accent line - REMOVED for clean style
-    
-    # Category badge - REMOVED for minimalist style
-    # f_badge = ImageFont.truetype('assets/fonts/Montserrat-Bold.ttf', 28)
-    # badge_txt = category.upper()
-    # bbox = draw.textbbox((0,0), badge_txt, font=f_badge)
-    # bw, bh = bbox[2]-bbox[0], bbox[3]-bbox[1]
-    # bx, by = 60, 45
-    # draw.rounded_rectangle([bx, by, bx+bw+40, by+bh+20], radius=15, fill=(*accent_color, 255))
-    # draw.text((bx+20, by+8), badge_txt, font=f_badge, fill=(255,255,255,255))
-    
-    # Handle on right - REMOVED for minimalist style
-    # f_handle = ImageFont.truetype('assets/fonts/Roboto-Bold.ttf', 24)
-    # handle = "join t.me/technews"
-    # hw, _ = draw.textlength(handle, font=f_handle), 24
-    # draw.text((frame_width-hw-60, by+10), handle, font=f_handle, fill=(200,200,200,180))
-    
-    # Main Title - shifted down further to avoid overlap with hook
+    # Main Title – positioned higher for better visibility
     f_title = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 44)
     tw = draw.textlength(title, font=f_title)
     if tw > 800: title = title[:40] + "..."
     tw = draw.textlength(title, font=f_title)
-    draw.text(((frame_width-tw)//2, 145), title, font=f_title, fill=(255,255,255,255))
+    draw.text(((frame_width-tw)//2, 80), title, font=f_title, fill=(255,255,255,255))
     
     return img
 
@@ -674,6 +645,23 @@ def render_telegram_cta(accent_color, frame_width=1080):
     draw.text((x1, 75), t1, font=f1, fill=(*accent_color,255))
     
     return img
+
+def _intro_clip(duration, accent_color):
+    """Create a brief intro segment showing the animated logo on a dark background."""
+    logo = _animated_logo(duration)
+    bg = ColorClip(size=(FRAME_W, FRAME_H), color=(0, 0, 0), duration=duration)
+    if logo is None:
+        return bg
+    # place logo near top-center
+    logo = logo.with_position(("center", int(FRAME_H * 0.15)))
+    return CompositeVideoClip([bg, logo], size=(FRAME_W, FRAME_H)).with_duration(duration)
+
+def _outro_clip(duration, accent_color):
+    """Create a brief outro segment showing the telegram CTA."""
+    bg = ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=duration)
+    cta_img = render_telegram_cta(accent_color, FRAME_W)
+    cta_clip = ImageClip(np.array(cta_img)).with_duration(duration).with_position(("center", "center"))
+    return CompositeVideoClip([bg, cta_clip], size=(FRAME_W, FRAME_H)).with_duration(duration)
 
 def composite_frame(background_frame, timestamp, header_img, subtitle_img, cta_img, video_duration):
     """Final assembly of minimalist layers."""
@@ -810,7 +798,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     base = _dynamic_tech_background(audio_duration, accent_color)
 
     # ── LAYER 2: Avatar & Identity ────────────────────────────────────────────
-    avatar = _avatar_clip(audio_duration)
+    avatar = None
     
     # ── LAYER 3: Tint ─────────────────────────────────────────────────────────
     tint = ColorClip(size=(FRAME_W, FRAME_H), color=accent_color, duration=audio_duration).with_opacity(0.02)
@@ -840,8 +828,6 @@ def create_video(audio_path, script_json, chunks, output_path=None):
 
     # ── LAYER 11: Main Composite Base ─────────────────────────────────────────
     base_layers = [base, tint, gradient] + particle_clips + hook_clips + logo_clips + fact_clips + burst_clips + reminder_clips
-    if avatar:
-        base_layers.append(avatar)
     
     progress = ColorClip(size=(FRAME_W, 6), color=accent_color, duration=audio_duration)
     progress = progress.with_position(lambda t: (int((t / max(audio_duration, 0.01)) * FRAME_W) - FRAME_W, FRAME_H - 6))
@@ -877,20 +863,28 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         return composite_frame(bg_frame, t, header_img, subtitle_img, cta_img, audio_duration)
 
     final = VideoClip(make_final_frame, duration=audio_duration)
+    final = final.with_audio(audio)
+
+    # ── INTRO / OUTRO ────────────────────────────────────────────────────────
+    intro = _intro_clip(2.0, accent_color)
+    outro = _outro_clip(3.0, accent_color)
+    final_video = concatenate_videoclips([intro, final, outro])
+    
+    final_duration = final_video.duration
 
     # ── LAYER 15: BGM ─────────────────────────────────────────────────────────
     music_files = [f for f in os.listdir(MUSIC_DIR) if f.endswith(".mp3")]
     if music_files:
         bgm = AudioFileClip(os.path.join(MUSIC_DIR, random.choice(music_files))).with_volume_scaled(BGM_VOLUME)
-        if bgm.duration < audio_duration:
-            bgm = bgm.with_effects([afx.AudioLoop(duration=audio_duration)])
+        if bgm.duration < final_duration:
+            bgm = bgm.with_effects([afx.AudioLoop(duration=final_duration)])
         else:
-            bgm = bgm.subclipped(0, audio_duration)
-        final = final.with_audio(CompositeAudioClip([audio, bgm]))
-    else:
-        final = final.with_audio(audio)
+            bgm = bgm.subclipped(0, final_duration)
+        final_video = final_video.with_audio(CompositeAudioClip([final_video.audio, bgm]))
 
-    print(f"Exporting {audio_duration:.1f}s → {output_path}")
+    final = final_video
+
+    print(f"Exporting {final_duration:.1f}s → {output_path}")
     
     # ── TEXT VISIBILITY EXPORT CHECK ──
     print("Extracting test frames for text visibility check...")
@@ -901,7 +895,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
             fractions = [0.1, 0.3, 0.6, 0.9]
             timestamps = [audio_duration * p for p in fractions]
             for i, (t, p) in enumerate(zip(timestamps, fractions)):
-                test_frame = final.get_frame(t)
+                test_frame = final.get_frame(t + 2.0)
                 img = Image.fromarray(test_frame)
                 
                 print(f"Validating text rendering at {t:.1f}s...")
