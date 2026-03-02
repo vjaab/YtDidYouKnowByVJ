@@ -299,7 +299,8 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
             "--source_image", avatar_img_path,
             "--result_dir", OUTPUT_DIR,
             "--still",
-            "--preprocess", "crop"
+            "--preprocess", "crop",
+            "--batch_size", "1"
         ]
         try:
             subprocess.run(cmd, check=True, cwd=sadtalker_dir)
@@ -319,7 +320,9 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
             "--face", avatar_img_path,
             "--audio", audio_path,
             "--outfile", output_temp_avatar,
-            "--pads", "0", "20", "0", "0"
+            "--pads", "0", "20", "0", "0",
+            "--face_det_batch_size", "2",
+            "--wav2lip_batch_size", "16"
         ]
         try:
             subprocess.run(cmd, check=True, cwd=wav2lip_dir)

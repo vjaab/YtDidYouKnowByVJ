@@ -60,6 +60,9 @@ jobs:
           # Download pre-trained GAN and face detection weights from HuggingFace mirror
           wget -q -O checkpoints/wav2lip_gan.pth https://huggingface.co/camenduru/Wav2Lip/resolve/main/checkpoints/wav2lip_gan.pth
           wget -q -O face_detection/detection/sfd/s3fd.pth https://huggingface.co/camenduru/Wav2Lip/resolve/main/face_detection/detection/sfd/s3fd.pth
+          # Patch Wav2Lip for modern librosa versions (fixes TypeError on inference)
+          sed -i 's/librosa.filters.mel(hp.sample_rate, hp.n_fft,/librosa.filters.mel(sr=hp.sample_rate, n_fft=hp.n_fft,/g' audio.py
+          sed -i 's/librosa.output.write_wav/librosa.write_wav/g' audio.py || true
 
       - name: Run Pipeline
         # Run main.py --now to trigger the video pipeline immediately
