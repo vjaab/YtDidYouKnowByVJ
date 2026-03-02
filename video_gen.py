@@ -294,7 +294,7 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
     if os.path.exists(sadtalker_dir):
         print(f"SadTalker detected at {sadtalker_dir}. Attempting avatar generation...")
         cmd = [
-            "python", os.path.join(sadtalker_dir, "inference.py"),
+            "python", "inference.py",
             "--driven_audio", audio_path,
             "--source_image", avatar_img_path,
             "--result_dir", OUTPUT_DIR,
@@ -302,7 +302,7 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
             "--preprocess", "crop"
         ]
         try:
-            subprocess.run(cmd, check=True)
+            subprocess.run(cmd, check=True, cwd=sadtalker_dir)
             list_of_files = glob.glob(os.path.join(OUTPUT_DIR, "*", "*.mp4"))
             if list_of_files:
                 output_temp_avatar = max(list_of_files, key=os.path.getctime)
@@ -314,15 +314,15 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
     elif os.path.exists(wav2lip_dir):
         print(f"Wav2Lip detected at {wav2lip_dir}. Attempting avatar generation...")
         cmd = [
-            "python", os.path.join(wav2lip_dir, "inference.py"),
-            "--checkpoint_path", os.path.join(wav2lip_dir, "checkpoints", "wav2lip_gan.pth"),
+            "python", "inference.py",
+            "--checkpoint_path", "checkpoints/wav2lip_gan.pth",
             "--face", avatar_img_path,
             "--audio", audio_path,
             "--outfile", output_temp_avatar,
             "--pads", "0", "20", "0", "0"
         ]
         try:
-            subprocess.run(cmd, check=True)
+            subprocess.run(cmd, check=True, cwd=wav2lip_dir)
             if os.path.exists(output_temp_avatar):
                 success = True
         except Exception as e:
