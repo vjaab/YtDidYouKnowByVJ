@@ -23,7 +23,9 @@
         "AI Just Hacked the Human Brain \ud83e\udde0",
         "Evolving descriptive text of mental content from human brain activity",
         "336x Faster AI? The Death of Python Runtimes \u26a1",
-        "Show HN: Timber \u2013 Ollama for classical ML models, 336x faster than Python"
+        "Show HN: Timber \u2013 Ollama for classical ML models, 336x faster than Python",
+        "Why Your AI is Getting Stupider",
+        "Building specialized AI without sacrificing intelligence: Nova Forge data mixing in action"
     ],
     "used_keywords": [
         "MCP",
@@ -36,8 +38,8 @@
         "AI market",
         "C++",
         "Gaming Quality",
-        "Sam Altman",
         "tech disruption",
+        "Sam Altman",
         "LLM Benchmarks",
         "India AI",
         "Inference",
@@ -109,22 +111,22 @@
         "Robotics": 1,
         "AI/Machine Learning/Robotics/NLP/Computer Vision": 1,
         "AI Philosophy": 1,
-        "AI/Machine Learning": 3,
+        "AI/Machine Learning": 4,
         "AI/Software Engineering": 1,
         "AI/Neuroscience": 1
     },
     "last_7_days_stories": [
-        "Qt45: A small polymerase ribozyme that can synthesize itself",
         "Cognitive Debt: When Velocity Exceeds Comprehension",
         "Qwen3.5 122B and 35B models offer Sonnet 4.5 performance on local computers",
         "MCP server that reduces Claude Code context consumption by 98%",
         "Switch to Claude without starting over",
         "Evolving descriptive text of mental content from human brain activity",
-        "Show HN: Timber \u2013 Ollama for classical ML models, 336x faster than Python"
+        "Show HN: Timber \u2013 Ollama for classical ML models, 336x faster than Python",
+        "Building specialized AI without sacrificing intelligence: Nova Forge data mixing in action"
     ],
     "last_3_days_subcategories": [
-        "AI/Machine Learning",
         "AI/Neuroscience",
+        "AI/Machine Learning",
         "AI/Machine Learning"
     ],
     "last_3_days_companies": [
@@ -134,7 +136,7 @@
         "Ollama",
         "Python"
     ],
-    "total_uploaded": 12,
+    "total_uploaded": 13,
     "last_upload": "2026-03-02",
     "history": [
         {
@@ -390,6 +392,18 @@
             "voice_used": "en-US-AndrewNeural",
             "youtube_url": "https://youtu.be/YzcohQfA96I",
             "news_source_url": "https://github.com/kossisoroyce/timber"
+        },
+        {
+            "date": "2026-03-02",
+            "title": "Why Your AI is Getting Stupider",
+            "news_headline": "Building specialized AI without sacrificing intelligence: Nova Forge data mixing in action",
+            "sub_category": "AI/Machine Learning",
+            "companies": [],
+            "keywords": [],
+            "breaking_news_level": 9,
+            "voice_used": null,
+            "youtube_url": "https://youtu.be/UKzueTpH9ek",
+            "news_source_url": "https://aws.amazon.com/blogs/machine-learning/building-specialized-ai-without-sacrificing-intelligence-nova-forge-data-mixing-in-action/"
         }
     ]
 }
