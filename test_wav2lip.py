@@ -14,7 +14,7 @@ ASSETS_DIR = os.path.join(BASE_DIR, "assets")
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-FACE_IMG = os.path.join(ASSETS_DIR, "vj_video.mp4")
+FACE_IMG = os.path.join(ASSETS_DIR, "Firefly_video.mp4")
 if not os.path.exists(FACE_IMG):
     FACE_IMG = os.path.join(ASSETS_DIR, "youtube_pic.png")
 if not os.path.exists(FACE_IMG):
