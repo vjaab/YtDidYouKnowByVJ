@@ -165,8 +165,11 @@ IMPORTANT: voice is ALWAYS en-US-AndrewNeural, which is a warm male voice. Do no
     attempts = 0
     while attempts < 5:
         try:
+            # Use 2.0-flash as primary, fallback to 1.5-flash if 2.0 is overloaded
+            target_model = 'gemini-2.0-flash' if attempts < 3 else 'gemini-1.5-flash'
+            
             response = client.models.generate_content(
-                model='gemini-3-flash-preview',
+                model=target_model,
                 contents=prompt,
                 config=genai.types.GenerateContentConfig(temperature=0.9),
             )
@@ -212,8 +215,9 @@ IMPORTANT: voice is ALWAYS en-US-AndrewNeural, which is a warm male voice. Do no
             return script_data
             
         except Exception as e:
-            print(f"Gemini generation error: {e}")
+            wait_time = (2 ** attempts) + 5 # Exponential backoff: 6, 7, 9, 13, 21...
+            print(f"Gemini generation error: {e}. Retrying in {wait_time}s...")
             attempts += 1
-            time.sleep(2)
+            time.sleep(wait_time)
             
     return None

@@ -26,31 +26,35 @@ client = genai.Client(api_key=GEMINI_API_KEY)
 def score_relevance(chunk_text, visual_desc):
     """
     Calls Gemini to rate relevance 0-10.
-    10 = Perfect match
-    7+ = Good match
-    5-6 = Acceptable
-    Below 5 = Reject
     """
     import re
-    try:
-        client = genai.Client(api_key=GEMINI_API_KEY)
-        prompt = f"""Rate relevance 0-10.
+    attempts = 0
+    while attempts < 3:
+        try:
+            target_model = "gemini-2.0-flash" if attempts < 2 else "gemini-1.5-flash"
+            prompt = f"""Rate relevance 0-10 between technical text and visual description.
 Chunk text: '{chunk_text}'
-Image description: '{visual_desc}'
-Return only a number."""
-        response = client.models.generate_content(
-            model="gemini-2.0-flash", 
-            contents=prompt,
-            config=genai.types.GenerateContentConfig(temperature=0.0)
-        )
-        score_text = response.text.strip()
-        match = re.search(r'\d+', score_text)
-        if match:
-             return int(match.group())
-        return 0
-    except Exception as e:
-        print(f"Gemini scoring failed: {e}")
-        return 5  # Return middle score on failure so pipeline doesn't get stuck
+Visual description: '{visual_desc}'
+Return ONLY the raw integer (0-10)."""
+            
+            response = client.models.generate_content(
+                model=target_model, 
+                contents=prompt,
+                config=genai.types.GenerateContentConfig(temperature=0.0)
+            )
+            score_text = response.text.strip()
+            match = re.search(r'\d+', score_text)
+            if match:
+                 score = int(match.group())
+                 return min(10, max(0, score))
+            return 5 # Default if no number found
+        except Exception as e:
+            wait_time = (2 ** attempts) + 2
+            print(f"Gemini scoring failed (att {attempts+1}): {e}. Retrying in {wait_time}s...")
+            attempts += 1
+            time.sleep(wait_time)
+            
+    return 5  # Return middle score on total failure
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -174,7 +178,6 @@ def _download_photo(url, output_path):
 # ─────────────────────────────────────────────────────────────────────────────
 def _generate_imagen3(chunk_text, output_path):
     # 1. Ask Gemini to craft the perfect Imagen prompt
-    client = genai.Client(api_key=GEMINI_API_KEY)
     prompt_builder = f"""Create a detailed Imagen 3 prompt for this text:
 '{chunk_text}'
 Requirements:
@@ -183,28 +186,41 @@ Requirements:
 - Directly shows what the text describes
 - High detail, dramatic lighting"""
     
-    try:
-        resp = client.models.generate_content(model="gemini-2.0-flash", contents=prompt_builder)
-        best_prompt = resp.text.strip()
-    except:
-        best_prompt = chunk_text + " cinematic, dramatic lighting, 9:16 vertical, highly detailed, photorealistic"
-        
+    best_prompt = chunk_text # Default
+    attempts = 0
+    while attempts < 3:
+        try:
+            target_model = "gemini-2.0-flash" if attempts < 2 else "gemini-1.5-flash"
+            resp = client.models.generate_content(model=target_model, contents=prompt_builder)
+            best_prompt = resp.text.strip()
+            break
+        except Exception as e:
+            print(f"Imagen prompt gen failed (att {attempts+1}): {e}")
+            attempts += 1
+            time.sleep(2)
+            
     print(f"  -> Generated Imagen prompt: {best_prompt[:60]}...")
         
-    try:
-        result = client.models.generate_images(
-            model="imagen-3.0-generate-002",
-            prompt=best_prompt,
-            config=genai.types.GenerateImagesConfig(
-                number_of_images=1, aspect_ratio="9:16", output_mime_type="image/jpeg"
+    attempts = 0
+    while attempts < 3:
+        try:
+            result = client.models.generate_images(
+                model="imagen-3.0-generate-002",
+                prompt=best_prompt,
+                config=genai.types.GenerateImagesConfig(
+                    number_of_images=1, aspect_ratio="9:16", output_mime_type="image/jpeg"
+                )
             )
-        )
-        for gi in result.generated_images:
-            with open(output_path, "wb") as f:
-                f.write(gi.image.image_bytes)
-            return output_path
-    except Exception as e:
-        print(f"Imagen3 failed: {e}")
+            for gi in result.generated_images:
+                with open(output_path, "wb") as f:
+                    f.write(gi.image.image_bytes)
+                return output_path
+        except Exception as e:
+            wait_time = (2 ** attempts) + 3
+            print(f"Imagen3 generation failed (att {attempts+1}): {e}. Retrying in {wait_time}s...")
+            attempts += 1
+            time.sleep(wait_time)
+            
     return None
 
 def fetch_chunk_visual(chunk, script_data):
