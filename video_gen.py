@@ -649,14 +649,46 @@ def _telegram_cta(accent_color, total_dur):
         draw.line([(0,y),(FRAME_W,y)], fill=(0,0,0,a))
     # Top accent line
     draw.rectangle([0,0,FRAME_W,4], fill=(*accent_color, 255))
-
+    
     f1, f2, f3 = gf(36), gf(44), gf(26)
+
     l1 = "📲 Join for daily tech intel"
-    l2 = "t.me/technewsbyvj"
+    l2_t = "t.me/technewsbyvj"
+    l2_l = "linkedin.com/in/vijayakumar-j/"
     l3 = "Free  •  Daily  •  Exclusive"
-    for i, (txt, font, col) in enumerate([(l1,f1,(255,255,255,255)),(l2,f2,(*accent_color,255)),(l3,f3,(180,180,180,255))]):
-        w, h = ts(txt, font)
-        draw.text(((FRAME_W-w)//2, 30 + i*90), txt, font=font, fill=col)
+    
+    # Render line 1
+    w1, h1 = ts(l1, f1)
+    draw.text(((FRAME_W-w1)//2, 30), l1, font=f1, fill=(255,255,255,255))
+    
+    # Load and Render Icons for line 2
+    try:
+        tg_icon = Image.open(os.path.join(ASSETS_DIR, "icons", "telegram_logo.png")).convert("RGBA").resize((60, 60), Image.LANCZOS)
+        li_icon = Image.open(os.path.join(ASSETS_DIR, "icons", "linkedin_logo.png")).convert("RGBA").resize((60, 60), Image.LANCZOS)
+        
+        # Telegram Row
+        tw_t, th_t = ts(l2_t, f2)
+        tx_t = (FRAME_W - (tw_t + 70)) // 2
+        img.paste(tg_icon, (tx_t, 110), tg_icon)
+        draw.text((tx_t + 75, 110), l2_t, font=f2, fill=(*accent_color, 255))
+        
+        # LinkedIn Row
+        tw_l, th_l = ts(l2_l, f2)
+        tx_l = (FRAME_W - (tw_l + 70)) // 2
+        img.paste(li_icon, (tx_l, 195), li_icon)
+        draw.text((tx_l + 75, 195), l2_l, font=f2, fill=(*accent_color, 255))
+        
+        # Line 3 (Shifted down)
+        w3, h3 = ts(l3, f3)
+        draw.text(((FRAME_W-w3)//2, 285), l3, font=f3, fill=(180,180,180,255))
+    except Exception as e:
+        print(f"Icon render failed: {e}")
+        # Simple text fallback if icons missing
+        l2 = f"{l2_t} | {l2_l}"
+        w, h = ts(l2, f2)
+        draw.text(((FRAME_W-w)//2, 120), l2, font=f2, fill=(*accent_color, 255))
+        w3, h3 = ts(l3, f3)
+        draw.text(((FRAME_W-w3)//2, 210), l3, font=f3, fill=(180,180,180,255))
 
     arr  = np.array(img.convert("RGB"))
     mask = np.array(img.split()[3]).astype(float) / 255.0
@@ -751,8 +783,8 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
     return img
 
 def render_telegram_cta(accent_color, frame_width=1080):
-    """Minimalist Telegram CTA banner."""
-    card_h = 240
+    """Minimalist Telegram & LinkedIn CTA banner."""
+    card_h = 320
     img = Image.new("RGBA", (frame_width, card_h), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
@@ -760,12 +792,26 @@ def render_telegram_cta(accent_color, frame_width=1080):
     draw.rectangle([0,0,frame_width,card_h], fill=(10,10,15,230))
     draw.line([(0,0),(frame_width,0)], fill=(*accent_color,255), width=4)
     
-    # Only the handle remains - centered and moved to the top position of the card
-    f1 = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 64)
+    f1 = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 52)
     t1 = "t.me/technewsbyvj"
-    x1 = (frame_width - draw.textlength(t1, font=f1))//2
-    # Positioned near the top (y=60) for a clean floating look
-    draw.text((x1, 75), t1, font=f1, fill=(*accent_color,255))
+    t2 = "linkedin.com/in/vijayakumar-j/"
+    
+    try:
+        tg_icon = Image.open(os.path.join(ASSETS_DIR, "icons", "telegram_logo.png")).convert("RGBA").resize((70, 70), Image.LANCZOS)
+        li_icon = Image.open(os.path.join(ASSETS_DIR, "icons", "linkedin_logo.png")).convert("RGBA").resize((70, 70), Image.LANCZOS)
+        
+        # TG Row
+        x1 = (frame_width - (draw.textlength(t1, font=f1) + 85)) // 2
+        img.paste(tg_icon, (int(x1), 60), tg_icon)
+        draw.text((x1 + 85, 65), t1, font=f1, fill=(*accent_color, 255))
+        
+        # LI Row
+        x2 = (frame_width - (draw.textlength(t2, font=f1) + 85)) // 2
+        img.paste(li_icon, (int(x2), 165), li_icon)
+        draw.text((x2 + 85, 170), t2, font=f1, fill=(*accent_color, 255))
+    except:
+        x1 = (frame_width - draw.textlength(t1, font=f1))//2
+        draw.text((x1, 75), t1, font=f1, fill=(*accent_color,255))
     
     return img
 

@@ -20,7 +20,8 @@ I share what top devs & AI engineers are reading right now:
 📰 Tech news that actually matters
 
 Don't miss out — join free today 👇
-📲 Telegram → https://t.me/technewsbyvj"""
+🚀 Telegram → https://t.me/technewsbyvj
+💼 LinkedIn → https://www.linkedin.com/in/vijayakumar-j/"""
 
 
 import os.path

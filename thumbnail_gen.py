@@ -211,10 +211,10 @@ def generate_thumbnail(script_json):
     bar_y = THUMB_H - bar_h
     draw.rectangle([0, bar_y, THUMB_W, THUMB_H], fill=(0, 0, 0, 210))
 
-    bf2 = gf(26)
-    tg_text = "t.me/technewsbyvj"
-    tw2, _ = ts(tg_text, bf2)
-    draw.text(((THUMB_W - tw2) // 2, bar_y + 16), tg_text, font=bf2, fill=(255, 255, 255))
+    bf2 = gf(24)
+    cta_text = "t.me/technewsbyvj  |  linkedin.com/in/vijayakumar-j/"
+    tw2, _ = ts(cta_text, bf2)
+    draw.text(((THUMB_W - tw2) // 2, bar_y + 18), cta_text, font=bf2, fill=(255, 255, 255))
 
     bell_f = gf(30)
     draw.text((THUMB_W - 55, bar_y + 12), "🔔", font=bell_f, fill=(255, 255, 255))

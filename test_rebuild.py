@@ -161,34 +161,34 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
     return img
 
 def render_telegram_cta(accent_color, frame_width=1080):
-    card_height = 280
+    """Minimalist Telegram & LinkedIn CTA banner."""
+    card_height = 320
     img = Image.new('RGBA', (frame_width, card_height), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
     draw.rectangle([0,0,frame_width,card_height], fill=(8,8,8,250))
     draw.line([(0,0),(frame_width,0)], fill=(*accent_color,255), width=4)
     
-    f1 = ImageFont.truetype('assets/fonts/Roboto-Bold.ttf', 36)
-    t1 = "📲 Join for daily tech intel"
-    b1 = draw.textbbox((0,0),t1,font=f1)
-    x1 = (frame_width-(b1[2]-b1[0]))//2
-    for dx,dy in [(-3,0),(3,0),(0,-3),(0,3), (-2,-2),(2,-2),(-2,2),(2,2)]:
-        draw.text((x1+dx,30+dy),t1,font=f1, fill=(0,0,0,255))
-    draw.text((x1,30),t1,font=f1, fill=(255,255,255,255))
+    f1_cta = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 52)
+    t1 = "t.me/technewsbyvj"
+    t2 = "linkedin.com/in/vijayakumar-j/"
     
-    f2 = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 52)
-    t2 = "t.me/technewsbyvj"
-    b2 = draw.textbbox((0,0),t2,font=f2)
-    x2 = (frame_width-(b2[2]-b2[0]))//2
-    for dx,dy in [(-3,0),(3,0),(0,-3),(0,3)]:
-        draw.text((x2+dx,90+dy),t2,font=f2, fill=(0,0,0,255))
-    draw.text((x2,90),t2,font=f2, fill=(*accent_color,255))
-    
-    f3 = ImageFont.truetype('assets/fonts/Roboto-Regular.ttf', 28)
-    t3 = "Free  •  Daily  •  Exclusive"
-    b3 = draw.textbbox((0,0),t3,font=f3)
-    x3 = (frame_width-(b3[2]-b3[0]))//2
-    draw.text((x3,165),t3,font=f3, fill=(160,160,160,255))
+    try:
+        tg_icon = Image.open('assets/icons/telegram_logo.png').convert("RGBA").resize((70, 70), Image.LANCZOS)
+        li_icon = Image.open('assets/icons/linkedin_logo.png').convert("RGBA").resize((70, 70), Image.LANCZOS)
+        
+        # TG Row
+        x1 = (frame_width - (draw.textlength(t1, font=f1_cta) + 85)) // 2
+        img.paste(tg_icon, (int(x1), 60), tg_icon)
+        draw.text((x1 + 85, 65), t1, font=f1_cta, fill=(*accent_color, 255))
+        
+        # LI Row
+        x2 = (frame_width - (draw.textlength(t2, font=f1_cta) + 85)) // 2
+        img.paste(li_icon, (int(x2), 165), li_icon)
+        draw.text((x2 + 85, 170), t2, font=f1_cta, fill=(*accent_color, 255))
+    except:
+        x1 = (frame_width - draw.textlength(t1, font=f1_cta))//2
+        draw.text((x1, 90), t1, font=f1_cta, fill=(*accent_color,255))
     
     return img
 
