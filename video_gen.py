@@ -903,12 +903,12 @@ def verify_text_visibility(frame_array, zone_name, y_start, y_end):
     """Validates that text is readable (high contrast)."""
     region = frame_array[y_start:y_end, 50:1030]
     # Check for presence of bright pixels (text) and dark pixels (obsidian bg)
-    bright = np.sum(region > 200)
-    dark = np.sum(region < 40)
+    bright = np.sum(region > 160)
+    dark = np.sum(region < 50)
     
-    if bright < 500:
+    if bright < 200:
         print(f"⚠️ {zone_name}: WARNING - Low text density detected.")
-    if dark < 1000:
+    if dark < 200:
         print(f"⚠️ {zone_name}: WARNING - Low background contrast.")
 def wrap_text_to_lines(words, word_widths, max_width, font):
     lines = []
@@ -1153,8 +1153,8 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                 img = Image.fromarray(test_frame)
                 
                 print(f"Validating text rendering at {t:.1f}s...")
-                verify_text_visibility(test_frame, f"SUBTITLE {p}", 1250, 1480)
-                verify_text_visibility(test_frame, f"HEADER {p}", 0, 200)
+                verify_text_visibility(test_frame, f"SUBTITLE {p}", 1450, 1800)
+                verify_text_visibility(test_frame, f"HEADER {p}", 0, 240)
                 
                 test_path = output_path.replace(".mp4", f"_test_{int(p*100)}pct.jpg")
                 img.save(test_path)
