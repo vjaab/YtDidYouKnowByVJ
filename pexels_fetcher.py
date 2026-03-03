@@ -31,7 +31,7 @@ def score_relevance(chunk_text, visual_desc):
     attempts = 0
     while attempts < 3:
         try:
-            target_model = "gemini-2.0-pro" if attempts < 2 else "gemini-2.0-flash"
+            target_model = "gemini-2.0-pro-exp-02-05" if attempts < 2 else "gemini-2.0-flash"
             prompt = f"""Rate relevance 0-10 between technical text and visual description.
 Chunk text: '{chunk_text}'
 Visual description: '{visual_desc}'
@@ -190,7 +190,7 @@ Requirements:
     attempts = 0
     while attempts < 3:
         try:
-            target_model = "gemini-2.0-pro" if attempts < 2 else "gemini-2.0-flash"
+            target_model = "gemini-2.0-pro-exp-02-05" if attempts < 2 else "gemini-2.0-flash"
             resp = client.models.generate_content(model=target_model, contents=prompt_builder)
             best_prompt = resp.text.strip()
             break
