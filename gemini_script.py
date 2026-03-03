@@ -10,14 +10,30 @@ from ecosystem_logic import get_slot_info, get_category_prompt_enhancement
 def pick_and_generate_script(articles, extra_instruction="", forced_article=None, topic_type="research"):
     client = genai.Client(api_key=GEMINI_API_KEY)
     
-    # ── Pre-filter articles to avoid repeats ──────────────────────────────────
+    # ── Pre-filter articles (Unique against history AND against each other) ──
     filtered_articles = []
+    seen_titles_in_this_batch = []
+    
     for art in articles:
         title = art.get('title', '')
         url = art.get('url', '')
+        
+        # 1. Check against long-term history
         is_unique, _ = check_story_uniqueness(title, url)
-        if is_unique:
+        if not is_unique:
+            continue
+            
+        # 2. Check against other articles in this same feed batch
+        is_internally_unique = True
+        from rapidfuzz import fuzz # In case it's not imported here
+        for seen_title in seen_titles_in_this_batch:
+            if fuzz.token_set_ratio(title.lower(), seen_title.lower()) > 80:
+                is_internally_unique = False
+                break
+        
+        if is_internally_unique:
             filtered_articles.append(art)
+            seen_titles_in_this_batch.append(title)
     
     if not filtered_articles and not forced_article:
         print("No unique articles remaining to process.")
@@ -138,7 +154,9 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
     }}
   ],
   "original_news_headline": "Exact headline",
-  "original_news_url": "Exact url"
+  "original_news_url": "Exact url",
+  "companies_mentioned": ["Company 1", "Company 2"],
+  "keywords": ["Keyword 1", "Keyword 2"]
 }}
 
 IMPORTANT: voice is ALWAYS en-US-AndrewNeural, which is a warm male voice. Do not suggest any other voice.

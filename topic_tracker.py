@@ -28,10 +28,12 @@ def save_tracker(tracker_data):
 def check_story_uniqueness(new_title, new_url=None):
     tracker = load_tracker()
     
-    # 1. Check Titles (Fuzzy match)
+    # 1. Check Titles (Token Set Ratio handles reordering and extra words)
+    from config import SIMILARITY_THRESHOLD
     for old_title in tracker.get('used_titles', []):
-        if fuzz.ratio(new_title.lower(), old_title.lower()) > 85: # Increased threshold for research
-            return False, f"Similar to previously covered story: '{old_title}'"
+        score = fuzz.token_set_ratio(new_title.lower(), old_title.lower())
+        if score > SIMILARITY_THRESHOLD: 
+            return False, f"Similar to previously covered story (score {score}): '{old_title}'"
             
     # 2. Check URLs (Exact match)
     if new_url:
