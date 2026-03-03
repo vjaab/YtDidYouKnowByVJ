@@ -21,3 +21,4 @@ logs/
 !logo.png
 !assets/icons/*.png
 !assets/fonts/*.ttf
+assets/kokoro-v1.0.onnx
