@@ -21,7 +21,8 @@ I share what top devs & AI engineers are reading right now:
 
 Don't miss out — join free today 👇
 🚀 Telegram → https://t.me/technewsbyvj
-💼 LinkedIn → https://www.linkedin.com/in/vijayakumar-j/"""
+💼 LinkedIn → https://www.linkedin.com/in/vijayakumar-j/
+🔗 (Links also in Channel Header/Bio!)"""
 
 
 import os.path

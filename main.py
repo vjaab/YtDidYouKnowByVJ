@@ -48,6 +48,7 @@ Don't miss out — join free today 👇
 
 🚀 Telegram → https://t.me/technewsbyvj
 💼 LinkedIn → https://www.linkedin.com/in/vijayakumar-j/
+🔗 (Links also in Channel Header/Bio!)
 ━━━━━━━━━━━━━━━━━━━━━━
 
 {hashtag_str}
