@@ -44,6 +44,40 @@ def _apply_stable_ts(audio_path, text):
     except Exception as e:
         print(f"stable-ts unavailable or failed: {e}")
     return None
+
+def trim_audio_silence(path, word_timestamps):
+    """
+    Trims silence from the start and end of the audio file 
+    and shifts all word timestamps so that the first word starts at 0.0s.
+    """
+    from pydub import AudioSegment
+    from pydub.silence import detect_leading_silence
+
+    audio = AudioSegment.from_file(path)
+    
+    # Detect start silence (using a conservative -50dBFS threshold)
+    start_trim = detect_leading_silence(audio, silence_threshold=-50.0)
+    # Detect end silence
+    reversed_audio = audio.reverse()
+    end_trim = detect_leading_silence(reversed_audio, silence_threshold=-50.0)
+
+    duration = len(audio)
+    trimmed_audio = audio[start_trim:duration-end_trim]
+    trimmed_audio.export(path, format="wav" if path.endswith(".wav") else "mp3")
+    
+    # Recalibrate timestamps (shift by start_trim in seconds)
+    shift_sec = start_trim / 1000.0
+    new_ts = []
+    for ws in word_timestamps:
+        new_ts.append({
+            "word": ws["word"],
+            "start": max(0.0, round(ws["start"] - shift_sec, 3)),
+            "end": max(0.0, round(ws["end"] - shift_sec, 3))
+        })
+    
+    new_dur = len(trimmed_audio) / 1000.0
+    print(f"Audio trimmed: -{shift_sec:.2f}s from start. New duration: {new_dur:.2f}s")
+    return new_dur, new_ts
 ASSETS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
 KOKORO_MODEL = os.path.join(ASSETS_DIR, "kokoro-v1.0.onnx")
 KOKORO_VOICES = os.path.join(ASSETS_DIR, "voices-v1.0.bin")
@@ -255,30 +289,28 @@ def generate_voiceover(text, voice_request="en-US-GuyNeural", emotion="excited")
     today     = datetime.now().strftime("%Y-%m-%d")
     mp3_path  = os.path.join(OUTPUT_DIR, f"audio_{today}.mp3")
     
+    path, dur, word_timestamps = None, 0, []
+    
     # 1. PRIMARY: F5-TTS Local Voice Cloning (Your Voice)
     try:
         path, dur, word_timestamps = _generate_f5_clone(text, mp3_path)
-        return path, dur, word_timestamps
     except Exception as e:
         print(f"⚠️ F5-TTS Cloning failed: {e}")
+        # 2. SECONDARY: Kokoro TTS
+        try:
+            path, dur, word_timestamps = _generate_kokoro(text, mp3_path)
+        except Exception as e2:
+            print(f"⚠️ Kokoro failed: {e2}")
+            # FALLBACK: Edge TTS
+            try:
+                path, dur, word_timestamps = _generate_edge_tts(text, LOCKED_VOICE, mp3_path)
+                real_ts = _apply_stable_ts(path, text)
+                if real_ts: word_timestamps = real_ts
+            except Exception as e3:
+                print(f"Edge TTS fallback failed: {e3}")
 
-    # 2. SECONDARY: Kokoro TTS (Free, SOTA Open Source)
-    try:
-        path, dur, word_timestamps = _generate_kokoro(text, mp3_path)
-        return path, dur, word_timestamps
-    except Exception as e:
-        print(f"⚠️ Kokoro failed or missing models: {e}")
+    # Post-process: Trim dead air at start/end to ensure 0-gap hook
+    if path and word_timestamps:
+        dur, word_timestamps = trim_audio_silence(path, word_timestamps)
 
-    # FALLBACK: Edge TTS (Free but bot-like, used only in emergencies)
-    try:
-        path, dur, word_timestamps = _generate_edge_tts(text, LOCKED_VOICE, mp3_path)
-        real_ts = _apply_stable_ts(path, text)
-        if real_ts:
-            word_timestamps = real_ts
-        print("⚠️ Used Edge TTS as fallback")
-        return path, dur, word_timestamps
-    except Exception as e:
-        print(f"Edge TTS failed: {e}")
-
-    print("All TTS engines failed.")
-    return None, 0, []
+    return path, dur, word_timestamps
