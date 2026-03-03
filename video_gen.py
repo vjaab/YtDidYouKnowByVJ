@@ -270,9 +270,9 @@ def _dynamic_tech_background(duration, accent_color):
 # ── PROFILE PICTURE LAYER ─────────────────────────────────────────────────────
 def _dynamic_avatar_clip(duration, audio_path, accent_color):
     """
-    Attempts to generate an avatar video using SadTalker or Wav2Lip if their 
-    directories exist. If they fail or are absent, falls back to an audio 
-    visualizer centered around the avatar image.
+    Attempts to generate an avatar video using Wav2Lip if the directory exists.
+    If it fails or is absent, falls back to an audio visualizer centered 
+    around the avatar image.
     """
     import numpy as np
     from pydub import AudioSegment
@@ -287,37 +287,10 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
         return None
 
     success = False
-    sadtalker_dir = os.path.join(BASE_DIR, "SadTalker")
     wav2lip_dir = os.path.join(BASE_DIR, "Wav2Lip")
 
-    # 1. Try SadTalker First
-    if os.path.exists(sadtalker_dir):
-        print(f"SadTalker detected at {sadtalker_dir}. Attempting avatar generation...")
-        cmd = [
-            "python", "inference.py",
-            "--driven_audio", audio_path,
-            "--source_image", avatar_img_path,
-            "--result_dir", OUTPUT_DIR,
-            "--still",
-            "--preprocess", "crop",
-            "--batch_size", "1"
-        ]
-        try:
-            result = subprocess.run(cmd, cwd=sadtalker_dir, capture_output=True, text=True)
-            if result.returncode != 0:
-                print(f"SadTalker STDOUT: {result.stdout}")
-                print(f"SadTalker STDERR: {result.stderr}")
-                raise Exception(f"SadTalker process returned {result.returncode}")
-                
-            list_of_files = glob.glob(os.path.join(OUTPUT_DIR, "*", "*.mp4"))
-            if list_of_files:
-                output_temp_avatar = max(list_of_files, key=os.path.getctime)
-                success = True
-        except Exception as e:
-            print(f"SadTalker generation failed: {e}")
-
-    # 2. Try Wav2Lip Second
-    elif os.path.exists(wav2lip_dir):
+    # 1. Try Wav2Lip (Primary AI Engine)
+    if os.path.exists(wav2lip_dir):
         print(f"Wav2Lip detected at {wav2lip_dir}. Attempting avatar generation...")
         cmd = [
             "python", "inference.py",
