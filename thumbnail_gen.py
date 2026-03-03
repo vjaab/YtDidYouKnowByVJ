@@ -99,24 +99,33 @@ def _draw_star_burst(draw, cx, cy, r_outer, r_inner, points, color):
     draw.polygon(pts, fill=color)
 
 
-def wrap_text(text, font, max_width):
+def wrap_text(text, font, max_width, max_chars_per_line=15):
     words = text.split()
     lines = []
     current_line = []
     
     for word in words:
-        current_line.append(word)
-        # Test width
-        test_text = " ".join(current_line)
+        # Check char count constraint
+        test_line_words = current_line + [word]
+        test_text = " ".join(test_line_words)
+        
         bb = font.getbbox(test_text)
         w = bb[2] - bb[0]
-        if w > max_width and len(current_line) > 1:
-            current_line.pop()
-            lines.append(" ".join(current_line))
-            current_line = [word]
+        
+        if w > max_width or len(test_text) > max_chars_per_line:
+            if not current_line:
+                 # Single word is too long itself, force it anyway
+                 current_line = [word]
+            else:
+                 lines.append(" ".join(current_line))
+                 current_line = [word]
+        else:
+            current_line.append(word)
+            
     if current_line:
         lines.append(" ".join(current_line))
-    return lines
+        
+    return lines[:3] # Max 3 lines
 
 def generate_thumbnail(script_json):
     """
@@ -174,12 +183,13 @@ def generate_thumbnail(script_json):
     # Helper function to render text on a given canvas
     def apply_branding(canvas_img, width, height):
         # ── 4. SUBTLE DARK GRADIENT ───────────────────────────────────────────
-        # Bottom 40% gradient: transparent -> rgba(0,0,0,0.7)
+        # Top 35% gradient overlay masking down for text visibility
         grad = Image.new("RGBA", (width, height), (0, 0, 0, 0))
         grad_draw = ImageDraw.Draw(grad)
-        start_y = int(height * 0.6)
-        for y in range(start_y, height):
-            alpha = int(255 * 0.7 * ((y - start_y) / (height - start_y)))
+        end_y = int(height * 0.35)
+        for y in range(0, end_y):
+            # Fade from 0.55 alpha to transparent
+            alpha = int(255 * 0.55 * (1 - (y / end_y)))
             grad_draw.line([(0, y), (width, y)], fill=(0, 0, 0, alpha))
             
         final_img = Image.alpha_composite(canvas_img, grad)
@@ -189,13 +199,13 @@ def generate_thumbnail(script_json):
         topic_text = topic.upper()
         font_path = os.path.join(ASSETS_DIR, "fonts", "NanumBarunGothic.ttf")
         if not os.path.exists(font_path):
-            font_path = "/System/Library/Fonts/Supplemental/Arial Bold.ttf"
+            font_path = "/System/Library/Fonts/Supplemental/Arial Black.ttf"
             if not os.path.exists(font_path):
                 font_path = "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf"
                 
-        # Auto-scale font size (between 80 and 100)
-        target_size = 100
-        max_width = int(width * 0.8)
+        # Auto-scale font size (between 80 and 150)
+        target_size = 150
+        max_width = width - 80 # 40px padding each side
         
         try:
             font = ImageFont.truetype(font_path, target_size)
@@ -205,7 +215,7 @@ def generate_thumbnail(script_json):
         # Wrap text into lines
         lines = wrap_text(topic_text, font, max_width)
         
-        # If too many lines, shrink font
+        # If text overflows container width too much, scale down but floor at 80
         while len(lines) > 3 and target_size > 80:
             target_size -= 5
             try:
@@ -214,8 +224,11 @@ def generate_thumbnail(script_json):
                 break
             lines = wrap_text(topic_text, font, max_width)
             
+        # Recalculate wrapping with final font size
+        lines = wrap_text(topic_text, font, max_width)
+            
         # Calculate text block height
-        line_spacing = 1.3
+        line_spacing = 1.2
         line_heights = []
         for line in lines:
             bb = font.getbbox(line)
@@ -223,8 +236,8 @@ def generate_thumbnail(script_json):
             
         total_text_h = sum(line_heights) + int((len(lines) - 1) * target_size * (line_spacing - 1))
         
-        # Position slightly upper half
-        start_y = int((height - total_text_h) / 2) - int(height * 0.05)
+        # Position at Top 30% of image height
+        start_y = int(height * 0.15) 
         
         # ── 4. DRAW TEXT WITH SHADOW & STROKE ─────────────────────────────────
         current_y = start_y
@@ -236,6 +249,17 @@ def generate_thumbnail(script_json):
             
             # Drop shadow
             shadow_offset = 4
+            # Draw shadow multiple times slightly offset to simulate blur=8 effect
+            for dx in range(-1, 2):
+                for dy in range(-1, 2):
+                    if dx == 0 and dy == 0: continue
+                    draw.text(
+                        (x + shadow_offset + (dx*2), current_y + shadow_offset + (dy*2)), 
+                        line, 
+                        font=font, 
+                        fill=(0, 0, 0, int(255 * 0.3)),
+                        stroke_width=0
+                    )
             draw.text(
                 (x + shadow_offset, current_y + shadow_offset), 
                 line, 
@@ -250,7 +274,7 @@ def generate_thumbnail(script_json):
                 line, 
                 font=font, 
                 fill=(255, 255, 255, 255),
-                stroke_width=4,
+                stroke_width=6,
                 stroke_fill=(0, 0, 0, 255)
             )
             
