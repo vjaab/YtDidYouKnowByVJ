@@ -173,7 +173,9 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
   "original_news_headline": "Exact headline",
   "original_news_url": "Exact url",
   "companies_mentioned": ["Company 1", "Company 2"],
-  "keywords": ["Keyword 1", "Keyword 2"]
+  "keywords": ["Keyword 1", "Keyword 2"],
+  "comment_hook": "Would you use this? Drop your answer below! 👇",
+  "end_question": "A thought-provoking question for the audience to comment on"
 }}
 
 IMPORTANT: voice is ALWAYS en-US-AndrewNeural, which is a warm male voice. Do not suggest any other voice.

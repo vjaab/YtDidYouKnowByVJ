@@ -837,8 +837,115 @@ def apply_pattern_interrupts(frame_np, t, cues):
             
     return frame_np
 
-def composite_frame(background_frame, timestamp, header_img, subtitle_img, cta_img, video_duration, cues=None):
-    """Final assembly of minimalist layers with Pattern Interrupts."""
+# ── RETENTION BOOSTER OVERLAYS ────────────────────────────────────────────────
+
+def _render_hook_overlay(hook_text, width, height, timestamp):
+    """Bold hook text that flashes in the first 1.5 seconds with fade-in."""
+    try:
+        img = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        
+        # Fade in from 0-0.3s, hold 0.3-1.0s, fade out 1.0-1.5s
+        if timestamp < 0.3:
+            alpha = int(255 * (timestamp / 0.3))
+        elif timestamp < 1.0:
+            alpha = 255
+        else:
+            alpha = int(255 * (1.0 - (timestamp - 1.0) / 0.5))
+        alpha = max(0, min(255, alpha))
+        
+        # Semi-transparent dark backdrop
+        backdrop_alpha = int(alpha * 0.6)
+        draw.rectangle([(0, height // 2 - 120), (width, height // 2 + 120)], 
+                       fill=(0, 0, 0, backdrop_alpha))
+        
+        # Bold hook text
+        try:
+            font = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 72)
+        except:
+            font = ImageFont.load_default()
+        
+        # Truncate to fit
+        text = hook_text.upper()[:40]
+        bb = draw.textbbox((0, 0), text, font=font)
+        tw = bb[2] - bb[0]
+        x = (width - tw) // 2
+        y = height // 2 - 36
+        
+        # White text with stroke
+        draw.text((x, y), text, font=font, fill=(255, 255, 255, alpha),
+                  stroke_width=4, stroke_fill=(0, 0, 0, alpha))
+        
+        return img
+    except Exception as e:
+        print(f"Hook overlay error: {e}")
+        return None
+
+def _render_subscribe_reminder(width, height):
+    """Subtle subscribe pill that appears at ~75% of video duration."""
+    try:
+        img = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        
+        # Red pill badge
+        pill_w, pill_h = 420, 60
+        pill_x = (width - pill_w) // 2
+        pill_y = height - 280
+        
+        draw.rounded_rectangle(
+            [(pill_x, pill_y), (pill_x + pill_w, pill_y + pill_h)],
+            radius=30, fill=(255, 0, 0, 220)
+        )
+        
+        try:
+            font = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 28)
+        except:
+            font = ImageFont.load_default()
+        
+        text = "🔔 SUBSCRIBE FOR MORE"
+        bb = draw.textbbox((0, 0), text, font=font)
+        tw = bb[2] - bb[0]
+        tx = (width - tw) // 2
+        ty = pill_y + 14
+        
+        draw.text((tx, ty), text, font=font, fill=(255, 255, 255, 255))
+        
+        return img
+    except Exception as e:
+        print(f"Subscribe reminder error: {e}")
+        return None
+
+def _render_comment_bait(comment_text, width, height):
+    """Comment engagement prompt at the bottom in the last 3 seconds."""
+    try:
+        img = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        
+        # Dark strip at bottom
+        strip_y = height - 200
+        draw.rectangle([(0, strip_y), (width, strip_y + 120)], fill=(0, 0, 0, 180))
+        
+        try:
+            font = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 32)
+        except:
+            font = ImageFont.load_default()
+        
+        text = f"💬 {comment_text}"
+        bb = draw.textbbox((0, 0), text, font=font)
+        tw = bb[2] - bb[0]
+        x = (width - tw) // 2
+        y = strip_y + 40
+        
+        draw.text((x, y), text, font=font, fill=(255, 255, 0, 255),
+                  stroke_width=2, stroke_fill=(0, 0, 0, 255))
+        
+        return img
+    except Exception as e:
+        print(f"Comment bait error: {e}")
+        return None
+
+def composite_frame(background_frame, timestamp, header_img, subtitle_img, cta_img, video_duration, cues=None, hook_text="", comment_hook=""):
+    """Final assembly of minimalist layers with retention boosters."""
     # Apply visual effects to the base background/avatar frame first
     if cues:
         background_frame = apply_pattern_interrupts(background_frame, timestamp, cues)
@@ -851,8 +958,25 @@ def composite_frame(background_frame, timestamp, header_img, subtitle_img, cta_i
     # 2. Subtitles on top
     if subtitle_img is not None:
         frame.alpha_composite(subtitle_img, dest=(0,0))
-        
-    # 3. CTA removed as per request (Tele/LinkedIn/WhatsApp only in description)
+    
+    # 3. HOOK TEXT FLASH (first 1.5 seconds) — grabs attention immediately
+    if timestamp < 1.5 and hook_text:
+        hook_img = _render_hook_overlay(hook_text, FRAME_W, FRAME_H, timestamp)
+        if hook_img:
+            frame.alpha_composite(hook_img, dest=(0, 0))
+    
+    # 4. SUBSCRIBE REMINDER (at 75-85% of video)
+    progress_pct = timestamp / max(video_duration, 0.01)
+    if 0.72 <= progress_pct <= 0.82:
+        sub_img = _render_subscribe_reminder(FRAME_W, FRAME_H)
+        if sub_img:
+            frame.alpha_composite(sub_img, dest=(0, 0))
+    
+    # 5. COMMENT BAIT (last 3 seconds)
+    if timestamp >= video_duration - 3.0 and comment_hook:
+        comment_img = _render_comment_bait(comment_hook, FRAME_W, FRAME_H)
+        if comment_img:
+            frame.alpha_composite(comment_img, dest=(0, 0))
         
     return np.array(frame.convert('RGB'))
 
@@ -1037,6 +1161,10 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     # Pre-render custom composite assets
     header_img = render_header_bar(title, sub_category, accent_color, FRAME_W)
     cta_img = render_telegram_cta(accent_color, FRAME_W)
+    
+    # Retention booster data from script
+    hook_text = script_json.get("hook", "")[:40]
+    comment_hook = script_json.get("comment_hook", "Comment your thoughts below! 👇")
 
     def make_final_frame(t):
         bg_frame = base_comp.get_frame(t)
@@ -1059,7 +1187,9 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                     )
                 break
                 
-        return composite_frame(bg_frame, t, header_img, subtitle_img, cta_img, audio_duration, cues=script_json.get("retention_cues", []))
+        return composite_frame(bg_frame, t, header_img, subtitle_img, cta_img, audio_duration, 
+                               cues=script_json.get("retention_cues", []),
+                               hook_text=hook_text, comment_hook=comment_hook)
 
     final = VideoClip(make_final_frame, duration=audio_duration)
     final = final.with_audio(audio)

@@ -30,9 +30,23 @@ def log_message(msg):
 
 def format_description(ai_description, script, end_question, hashtags):
     hashtag_str = " ".join(hashtags) if hashtags else ""
+    
+    # Build engagement question section
+    question_section = ""
+    if end_question:
+        question_section = f"\n💬 {end_question}\n👇 Drop your answer in the comments!\n"
+    
     return f"""{ai_description}
+{question_section}
+━━━━━━━━━━━━━━━━━━━━━━
+🔥 AI TOOLS I USE & RECOMMEND:
 
-{script}
+🤖 ChatGPT Plus → https://chat.openai.com
+🎨 Midjourney → https://midjourney.com
+🎬 Runway ML → https://runwayml.com
+✍️ Claude AI → https://claude.ai
+🧠 Google Gemini → https://gemini.google.com
+🔧 Cursor AI → https://cursor.sh
 
 ━━━━━━━━━━━━━━━━━━━━━━
 💡 Every day you're not learning, someone else is getting ahead.
