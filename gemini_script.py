@@ -146,13 +146,30 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
   "subtitle_chunks": [
     {{
       "chunk_id": 1,
-      "text": "The first sentence",
+      "text": "First sentence of script here",
       "start": 0.00,
-      "end": 2.40,
+      "end": 3.50,
       "highlight_word": "First",
       "has_infographic": false
+    }},
+    {{
+      "chunk_id": 2,
+      "text": "Second phrase or sentence",
+      "start": 3.50,
+      "end": 7.00,
+      "highlight_word": "phrase",
+      "has_infographic": false
+    }},
+    {{
+      "chunk_id": 3,
+      "text": "Third sentence continues the story",
+      "start": 7.00,
+      "end": 11.50,
+      "highlight_word": "story",
+      "has_infographic": true
     }}
   ],
+  "NOTE_subtitle_chunks": "CRITICAL: Generate 10-15 subtitle_chunks that together cover the ENTIRE script text. Each chunk should be 1-2 sentences (5-12 words). Every word of the script MUST appear in exactly one chunk. Chunks must not overlap and must cover the full duration.",
   "original_news_headline": "Exact headline",
   "original_news_url": "Exact url",
   "companies_mentioned": ["Company 1", "Company 2"],
@@ -165,8 +182,8 @@ IMPORTANT: voice is ALWAYS en-US-AndrewNeural, which is a warm male voice. Do no
     attempts = 0
     while attempts < 5:
         try:
-            # Use 2.0-flash as primary, fallback to 1.5-flash if 2.0 is overloaded
-            target_model = 'gemini-2.0-flash' if attempts < 3 else 'gemini-1.5-flash'
+            # Use 2.0-flash as primary, fallback to 2.0-flash-lite if 2.0 is overloaded
+            target_model = 'gemini-2.0-flash' if attempts < 3 else 'gemini-2.0-flash-lite'
             
             response = client.models.generate_content(
                 model=target_model,

@@ -294,15 +294,13 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
     if os.path.exists(wav2lip_dir):
         print(f"Wav2Lip detected at {wav2lip_dir}. Attempting avatar generation...")
         
-        # PYTHONHASHSEED must be an integer or "random". We'll ensure it's "0" or just inherit correctly.
-        # Sometimes GitHub Actions environment can pass weird values, so we sanitize.
+        # Build a CLEAN environment for the Wav2Lip subprocess.
+        # The 'Fatal Python error: config_init_hash_seed' crash happens when
+        # PYTHONHASHSEED is missing, empty, or has a non-integer value.
+        # We ALWAYS force it to '0' to guarantee a valid state.
         w2l_env = os.environ.copy()
-        if "PYTHONHASHSEED" in w2l_env:
-            # If it's an empty string or invalid, force it to "0"
-            try:
-                int(w2l_env["PYTHONHASHSEED"])
-            except:
-                w2l_env["PYTHONHASHSEED"] = "0"
+        w2l_env["PYTHONHASHSEED"] = "0"
+        print(f"Wav2Lip env PYTHONHASHSEED forced to: '{w2l_env.get('PYTHONHASHSEED')}'")
 
         cmd = [
             sys.executable, "inference.py",
@@ -314,15 +312,19 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
             "--face_det_batch_size", "2",
             "--wav2lip_batch_size", "16"
         ]
+        print(f"Wav2Lip CMD: {' '.join(str(c) for c in cmd)}")
         try:
-            result = subprocess.run(cmd, cwd=wav2lip_dir, capture_output=True, text=True, env=w2l_env)
+            result = subprocess.run(cmd, cwd=wav2lip_dir, capture_output=True, text=True, env=w2l_env, timeout=600)
+            print(f"Wav2Lip STDOUT: {result.stdout[-500:] if result.stdout else '(empty)'}")
+            print(f"Wav2Lip STDERR: {result.stderr[-500:] if result.stderr else '(empty)'}")
             if result.returncode != 0:
-                print(f"Wav2Lip STDOUT: {result.stdout}")
-                print(f"Wav2Lip STDERR: {result.stderr}")
                 raise Exception(f"Wav2Lip process returned {result.returncode}")
                 
             if os.path.exists(output_temp_avatar):
                 success = True
+                print(f"Wav2Lip output file created: {output_temp_avatar}")
+        except subprocess.TimeoutExpired:
+            print("Wav2Lip generation timed out after 600s.")
         except Exception as e:
             print(f"Wav2Lip generation failed: {e}")
 

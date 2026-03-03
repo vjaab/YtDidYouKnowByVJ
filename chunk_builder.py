@@ -12,8 +12,10 @@ def build_chunks(word_timestamps, subtitle_chunks):
     if not word_timestamps:
         return []
     
-    if not subtitle_chunks:
-        # Fallback to simple duration-based chunks if no template provided
+    if not subtitle_chunks or len(subtitle_chunks) < 3:
+        # Fallback to audio-based chunks if Gemini gave too few subtitle_chunks
+        if subtitle_chunks and len(subtitle_chunks) < 3:
+            print(f"WARNING: Gemini only produced {len(subtitle_chunks)} subtitle_chunks. Falling back to audio-based chunking for proper subtitles.")
         return _fallback_build_chunks(word_timestamps)
 
     def strip_punc(s):
