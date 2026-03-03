@@ -741,19 +741,24 @@ def _sync_checks(chunks, audio_duration):
 
 def render_header_bar(title, category, accent_color, frame_width=1080):
     """Sleek minimalist header with floating badge."""
-    header_h = 180
+    header_h = 240
     img = Image.new('RGBA', (frame_width, header_h), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
-    # Solid dark strip behind title for contrast
-    draw.rectangle([0, 0, frame_width, header_h], fill=(0, 0, 0, 180))
+    # Gradient fade-in from top for header
+    for y in range(header_h):
+        alpha = int(220 * (1 - y/header_h))
+        draw.line([(0, y), (frame_width, y)], fill=(0, 0, 0, alpha))
     
-    # Main Title – positioned higher for better visibility
-    f_title = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 44)
+    # Main Title
+    f_title = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 55)
     tw = draw.textlength(title, font=f_title)
-    if tw > 800: title = title[:40] + "..."
+    if tw > 900: title = title[:45] + "..."
     tw = draw.textlength(title, font=f_title)
-    draw.text(((frame_width-tw)//2, 80), title, font=f_title, fill=(255,255,255,255))
+    
+    # Draw title shadow
+    draw.text(((frame_width-tw)//2 + 4, 94), title, font=f_title, fill=(0,0,0,150))
+    draw.text(((frame_width-tw)//2, 90), title, font=f_title, fill=(255,255,255,255))
     
     return img
 
@@ -927,8 +932,8 @@ def render_subtitle_frame(text, current_words, bg_frame=None, accent_color=(255,
     img = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
-    f_main = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 78)
-    f_pop = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 88)
+    f_main = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 85)
+    f_pop = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 95)
     
     words = text.split()
     current_word_list = current_words.get('current', [])
@@ -942,9 +947,9 @@ def render_subtitle_frame(text, current_words, bg_frame=None, accent_color=(255,
     
     lines = wrap_text_to_lines(words, word_widths, 900, f_main)
     
-    line_h = 110
+    line_h = 130
     total_h = len(lines) * line_h
-    start_y = 1200 # Higher up to avoid avatar
+    start_y = 1450 # Standard lower-third position
     
     word_idx = 0
     for i, line in enumerate(lines):
