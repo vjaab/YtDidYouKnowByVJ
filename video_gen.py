@@ -303,7 +303,12 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
             "--batch_size", "1"
         ]
         try:
-            subprocess.run(cmd, check=True, cwd=sadtalker_dir)
+            result = subprocess.run(cmd, cwd=sadtalker_dir, capture_output=True, text=True)
+            if result.returncode != 0:
+                print(f"SadTalker STDOUT: {result.stdout}")
+                print(f"SadTalker STDERR: {result.stderr}")
+                raise Exception(f"SadTalker process returned {result.returncode}")
+                
             list_of_files = glob.glob(os.path.join(OUTPUT_DIR, "*", "*.mp4"))
             if list_of_files:
                 output_temp_avatar = max(list_of_files, key=os.path.getctime)
@@ -325,7 +330,12 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
             "--wav2lip_batch_size", "16"
         ]
         try:
-            subprocess.run(cmd, check=True, cwd=wav2lip_dir)
+            result = subprocess.run(cmd, cwd=wav2lip_dir, capture_output=True, text=True)
+            if result.returncode != 0:
+                print(f"Wav2Lip STDOUT: {result.stdout}")
+                print(f"Wav2Lip STDERR: {result.stderr}")
+                raise Exception(f"Wav2Lip process returned {result.returncode}")
+                
             if os.path.exists(output_temp_avatar):
                 success = True
         except Exception as e:
