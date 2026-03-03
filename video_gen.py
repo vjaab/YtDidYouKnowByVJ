@@ -310,8 +310,8 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
         cmd = [
             sys.executable, "inference.py",
             "--checkpoint_path", "checkpoints/wav2lip_gan.pth",
-            "--face", avatar_face_path,
-            "--audio", audio_path,
+            "--face", os.path.abspath(avatar_face_path),
+            "--audio", os.path.abspath(audio_path),
             "--outfile", output_temp_avatar,
             "--pads", "0", "20", "0", "0",
             "--face_det_batch_size", "2",
