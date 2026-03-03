@@ -1012,8 +1012,8 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     shock_ts       = float(script_json.get("shocking_moment_timestamp", 0))
 
     # ── LAYER 1: Main Video Background (Firefly v2) ───────────────────────────
-    print("Building main video background from Firefly_video_2.mp4...")
-    bg_path = os.path.join(ASSETS_DIR, "Firefly_video_2.mp4")
+    print("Building main video background from Firefly_video_final.mp4...")
+    bg_path = os.path.join(ASSETS_DIR, "Firefly_video_final.mp4")
     if os.path.exists(bg_path):
         vid_clip = VideoFileClip(bg_path)
         # Handle looping if video is shorter than audio
@@ -1027,10 +1027,21 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         vid_clip = vid_clip.resized(width=FRAME_W)
         
         # We need a 1080x1920 base to avoid black boundaries out-of-bounds.
-        bg_color = _dynamic_tech_background(audio_duration, accent_color)
-        base = CompositeVideoClip([bg_color, vid_clip.with_position("center")], size=(FRAME_W, FRAME_H)).with_duration(audio_duration)
+        # Check for user-provided static background image, else fallback to dynamic tech background
+        bg_image_path = os.path.join(ASSETS_DIR, "gemini_img_without_logo.png")
+        if os.path.exists(bg_image_path):
+            bg_base = ImageClip(bg_image_path).resized(width=FRAME_W, height=FRAME_H).with_duration(audio_duration)
+        else:
+            bg_base = _dynamic_tech_background(audio_duration, accent_color)
+            
+        base = CompositeVideoClip([bg_base, vid_clip.with_position("center")], size=(FRAME_W, FRAME_H)).with_duration(audio_duration)
     else:
-        base = _dynamic_tech_background(audio_duration, accent_color)
+        # Fallback completely if no video is present
+        bg_image_path = os.path.join(ASSETS_DIR, "gemini_img_without_logo.png")
+        if os.path.exists(bg_image_path):
+            base = ImageClip(bg_image_path).resized(width=FRAME_W, height=FRAME_H).with_duration(audio_duration)
+        else:
+            base = _dynamic_tech_background(audio_duration, accent_color)
 
     # ── LAYER 2: Avatar (Bypassed as requested - use raw video instead) ───────
     avatar = None
