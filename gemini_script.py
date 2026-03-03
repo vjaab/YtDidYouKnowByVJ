@@ -182,8 +182,8 @@ IMPORTANT: voice is ALWAYS en-US-AndrewNeural, which is a warm male voice. Do no
     attempts = 0
     while attempts < 5:
         try:
-            # Use 2.0-flash as primary, fallback to 2.0-flash-lite if 2.0 is overloaded
-            target_model = 'gemini-2.0-flash' if attempts < 3 else 'gemini-2.0-flash-lite'
+            # Use gemini-2.0-pro as primary, fallback to flash if overloaded
+            target_model = 'gemini-2.0-pro' if attempts < 3 else 'gemini-2.0-flash'
             
             response = client.models.generate_content(
                 model=target_model,
