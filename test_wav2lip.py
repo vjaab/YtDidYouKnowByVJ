@@ -14,9 +14,9 @@ ASSETS_DIR = os.path.join(BASE_DIR, "assets")
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-FACE_IMG = os.path.join(ASSETS_DIR, "ai_avatar.png")
+FACE_IMG = os.path.join(ASSETS_DIR, "youtube_pic.png")
 if not os.path.exists(FACE_IMG):
-    FACE_IMG = os.path.join(ASSETS_DIR, "vj_profile.jpg")
+    FACE_IMG = os.path.join(ASSETS_DIR, "youtube_pic.png")
 AUDIO_FILE = os.path.join(BASE_DIR, "vj.wav")
 OUTPUT_VIDEO = os.path.join(OUTPUT_DIR, "test_avatar.mp4")
 
