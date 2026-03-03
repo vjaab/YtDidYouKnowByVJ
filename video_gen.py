@@ -379,55 +379,9 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
             print(f"Failed to load generated avatar video: {e}")
             success = False # Proceed to fallback if loading fails
     
-    # 4. Fallback: Audio Visualizer
-    print("Falling back to Auto-Visualizer for Avatar...")
-    try:
-        audio_seg = AudioSegment.from_file(audio_path).set_channels(1).set_frame_rate(20)
-        samples = np.array(audio_seg.get_array_of_samples())
-        samples = np.abs(samples)
-        max_amp = np.max(samples) if np.max(samples) > 0 else 1
-        samples = samples / max_amp
-    except Exception as e:
-        print(f"Audio for visualizer failed: {e}")
-        samples = np.zeros(int(duration * 20))
-        
-    try:
-        img = Image.open(avatar_img_path).convert("RGBA")
-        size = 300
-        img = img.resize((size, size), Image.LANCZOS)
-        
-        # Circular mask
-        mask = Image.new("L", (size, size), 0)
-        draw = ImageDraw.Draw(mask)
-        draw.ellipse((0, 0, size, size), fill=255)
-        img.putalpha(mask)
-        
-        def make_frame(t):
-            frame_bg = Image.new("RGBA", (500, 500), (0,0,0,0))
-            d_circle = ImageDraw.Draw(frame_bg)
-            
-            idx = int(t * 20)
-            if idx >= len(samples):
-                idx = len(samples) - 1
-            amp = samples[idx] if idx >= 0 else 0
-            
-            # Draw visualizer ring
-            radius = (size // 2) + 15 + int(60 * amp)
-            center = (250, 250)
-            
-            # Glow effect layer
-            d_circle.ellipse((center[0]-radius, center[1]-radius, center[0]+radius, center[1]+radius), 
-                             outline=(*accent_color, int(150 + 105 * amp)), width=12)
-                             
-            # Paste avatar
-            frame_bg.paste(img, (100, 100), img)
-            
-            return np.array(frame_bg)
-            
-        return VideoClip(make_frame, duration=duration).with_position(("center", 800))
-    except Exception as e:
-        print(f"Visualizer fallback failed: {e}")
-        return None
+    # 4. Fallback: Skip avatar, use raw video file as-is
+    print("Wav2Lip unavailable — using raw video file without lip sync.")
+    return None
 
 
 
