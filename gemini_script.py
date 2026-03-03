@@ -5,6 +5,7 @@ from datetime import datetime
 import time
 from config import GEMINI_API_KEY, LOGS_DIR
 from topic_tracker import load_tracker, check_story_uniqueness, check_cooldowns
+from ecosystem_logic import get_slot_info, get_category_prompt_enhancement
 
 def pick_and_generate_script(articles, extra_instruction="", forced_article=None, topic_type="research"):
     client = genai.Client(api_key=GEMINI_API_KEY)
@@ -53,31 +54,38 @@ def pick_and_generate_script(articles, extra_instruction="", forced_article=None
             "Choose based on deep technological importance and resonance with everyday moments, avoiding generic tech news. Focus on the core AI breakthrough.\n"
         )
 
-    prompt = f"""Act as a Senior AI Investigative Journalist & Creative Director. 
+    day_name, slot, category = get_slot_info()
+    strategy_enhancement = get_category_prompt_enhancement(category, slot)
+    
+    prompt = f"""Act as a Senior AI Investigative Journalist & Creative Director for a 2026 YouTube Content Ecosystem. 
 Your goal is to transform technical RSS/Research data into a "Deep-Dive" YouTube Short that balances analytical rigor with high-retention visual storytelling.
+
+TODAY'S STRATEGY: 
+Day: {day_name}
+Slot: {slot}
+{strategy_enhancement}
 
 CONTENT HIERARCHY (Monetization & Retention Strategy):
 1. ORIGINAL COMMENTARY (35%): Why this news matters to a human audience.
 2. COMPARATIVE ANALYSIS (25%): Competitive landscape (e.g., AWS vs. OpenAI).
 3. THE DATA (20%): Extract specific numbers for the "Infographic" cards.
-4. VISUAL DIRECTION (10%): Specify "Pattern Interrupts" every 3-5 seconds.
-5. NARRATION (10%): Conversational, punchy tone. Avoid "AI-isms" like "In the rapidly evolving landscape."
+4. VISUAL DIRECTION (10%): Specify "Pattern Interrupts" every 3-5 seconds (glitch, zoom, or split-screen).
+5. NARRATION (10%): Conversational, punchy tone. Use human fillers ('uhm', '...actually') sparingly as "Human-Glitch" hooks.
 
 NARRATIVE ARC CONFIGURATION:
-1. The Identity Hook (0-5s): A shocking statement paired with a high-contrast visual "Identity" (match the first sentence).
-2. The Disruptor (5-15s): The news leak or breakthrough briefly explained.
+1. The 2026 Identity Hook (0-5s): A shocking human-voiced statement. If generating a QUIZ, do not reveal the answer yet.
+2. The Disruptor (5-15s): The news leak or tool reveal.
 3. The 'So What?' (15-35s): The analytical core. Why is this a game changer?
-4. The Visual Pivot (35-45s): A sudden shift in the script tone/visuals to reset the viewer's attention span.
-5. The Prediction & The Loop (45-55s): A bold prediction that transitions perfectly back into the Hook’s first sentence for infinite replayability.
+4. The Visual Pivot (35-45s): A sudden shift in the script tone/visuals to reset the viewer's attention.
+5. The Prediction & The Infinite Loop (45-55s): Since Shorts loop, the last 3 words must logically or phonetically FLOW back to the first 3 words of the script.
 
-CRITICAL 'ANTI-BOT' & RETENTION RULES:
-1. PATTERN INTERRUPTS: The visual_cues/retention_cues must change every 3 seconds (Zoom, Pan, B-roll switch).
-2. VOICE PACING: Use em dashes (—) and ellipses (...) for TTS humanization.
-3. THE LOOP: The final 3 words must phonetically or logically lead back into the first 3 words of the Hook.
-4. PROOF OF HUMANITY: End with a unique 'Fact of the Day' at the very end of the script that is completely UNRELATED to the main topic.
-5. TEMPORAL ADAPTATION: 
-   - If topic_type is 'research': Focus on "First Principles" and engineering breakthroughs.
-   - If topic_type is 'tools': Focus on "UI/UX" and immediate productivity gains.
+CRITICAL '2026 SCALE' RULES:
+1. THE INFINITE LOOP: {{"end_fragment": "and that's why...", "start_fragment": "...AI news is moving fast."}}
+   You MUST write the final sentence of the script so it leads perfectly back to the first sentence of the Hook. 
+   Result: The viewer watches it 1.5 times before they realize it looped.
+2. PATTERN INTERRUPTS: Every 3 seconds, a change in visual state is MANDATORY (Zoom-in, Glitch transition, or Reaction Split-screen).
+3. COMMENT BAITING: If this is an AI QUIZ, NEVER reveal the answer until the last 5 seconds. Explicitly tell users to 'Pause and comment your guess now!'.
+4. THE HUMAN-GLITCH: Include subtle breaths or conversational 'actually...' to trigger the 'Authenticity' flag. Avoid robotic lists.
 
 {selection_instruction}
 
@@ -85,7 +93,7 @@ RESEARCH PAPERS & BLOGS DATA:
 {news_context}
 
 NARRATIVE FLOW (FOR THE 'SCRIPT' FIELD):
-- Hook -> Disruptor -> So What? -> Visual Pivot -> Prediction/Loop -> Fact of the Day.
+- Hook -> Disruptor -> So What? -> Visual Pivot -> Infinite Loop Connect -> Fact of the Day.
 
 {extra_instruction}
 
@@ -96,7 +104,7 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
   "fact_of_the_day": "Unrelated fact here",
   "quiz_tone": "Investigative",
   "title": "Punchy YouTube title max 60 chars",
-  "script": "Full voiceover script following the Arc (65-75 sec), ending with the fact_of_the_day. Ensure The Loop is implemented.",
+  "script": "Full voiceover script following the Arc (50-58 sec), ending with the fact_of_the_day. Ensure The Loop is implemented.",
   "hook": "Matches the first sentence of the script",
   "summary": "One line summary",
   "sub_category": "AI/Machine Learning",

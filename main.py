@@ -10,6 +10,7 @@ from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_D
 from fetch_research_papers import fetch_tech_news, fetch_ai_tools
 from topic_tracker import record_story
 from gemini_script import pick_and_generate_script
+from ecosystem_logic import get_slot_info
 from audio_gen import generate_voiceover
 from chunk_builder import build_chunks, redistribute_to_audio_duration
 from pexels_fetcher import fetch_all_chunk_visuals
@@ -70,8 +71,12 @@ def run_pipeline(custom_topic=None, topic_type="research"):
         log_message("STEP 1: Using Custom Topic...")
         news_articles = [{"title": "Custom Topic", "description": custom_topic, "url": "", "source": {"name": "User Input"}}]
     else:
-        log_message(f"STEP 1: Fetching Latest {topic_type.capitalize()}...")
-        if topic_type == "tools":
+        day_name, slot, category = get_slot_info()
+        log_message(f"STEP 1: Content Ecosystem Check -> Day: {day_name}, Slot: {slot}, Category: {category}")
+        
+        log_message(f"STEP 1: Fetching Latest {topic_type.capitalize()} (Strategy: {category})...")
+        # Logic: If category is Tool or Hands-on, fetch tools. Otherwise fetch research/news.
+        if "Tool" in category or "Hands-on" in category:
             news_articles = fetch_ai_tools()
         else:
             news_articles = fetch_tech_news()

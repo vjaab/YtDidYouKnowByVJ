@@ -164,16 +164,44 @@ def _generate_f5_clone(text, output_path):
     # Run inference via the high-level API
     wav_path = output_path.replace(".mp3", ".wav")
     
+    # Pre-splitting into smaller chunks to avoid the "Audio over 12s clipping" warning
+    # We split by common sentence delimiters but keep chunks under ~200 chars
+    import re
+    sentences = re.split(r'([.?!]+)', text)
+    chunks = []
+    current = ""
+    for i in range(0, len(sentences), 2):
+        s = sentences[i]
+        p = sentences[i+1] if i+1 < len(sentences) else ""
+        if len(current + s + p) < 180:
+            current += s + p
+        else:
+            if current: chunks.append(current.strip())
+            current = s + p
+    if current: chunks.append(current.strip())
+    
     # Generate
     f5 = _get_f5_model()
-    f5.infer(
-        ref_file=VJ_REF_WAV,
-        ref_text=VJ_REF_TEXT,
-        gen_text=text,
-        file_wave=wav_path,
-        speed=0.95
-    )
+    segment_paths = []
+    for i, chunk in enumerate(chunks):
+        seg_path = wav_path.replace(".wav", f"_seg_{i}.wav")
+        f5.infer(
+            ref_file=VJ_REF_WAV,
+            ref_text=VJ_REF_TEXT,
+            gen_text=chunk,
+            file_wave=seg_path,
+            speed=0.95
+        )
+        segment_paths.append(seg_path)
         
+    # Combine segments
+    combined = AudioSegment.empty()
+    for sp in segment_paths:
+        combined += AudioSegment.from_wav(sp)
+        try: os.remove(sp) # Clean up partial segments
+        except: pass
+        
+    combined.export(wav_path, format="wav")
     duration = get_audio_duration(wav_path)
     
     # Word timestamps via stable-ts

@@ -786,8 +786,52 @@ def _outro_clip(duration, accent_color):
     cta_clip = ImageClip(np.array(cta_img)).with_duration(duration).with_position(("center", "center"))
     return CompositeVideoClip([bg, cta_clip], size=(FRAME_W, FRAME_H)).with_duration(duration)
 
-def composite_frame(background_frame, timestamp, header_img, subtitle_img, cta_img, video_duration):
-    """Final assembly of minimalist layers."""
+def apply_pattern_interrupts(frame_np, t, cues):
+    """Applies visual disruption effects based on retention cues (glitches, zooms, shakes)."""
+    if not cues:
+        return frame_np
+        
+    h, w, c = frame_np.shape
+    for cue in cues:
+        start_t = float(cue.get("timestamp", 0))
+        duration = 0.4 # Fast interrupt for high retention
+        
+        if start_t <= t <= (start_t + duration):
+            effect = cue.get("effect", "").lower()
+            
+            if "glitch" in effect:
+                # RGB Channel Splitting / Displacement
+                shift = 12
+                # Green channel shift
+                frame_np[:, shift:, 1] = frame_np[:, :-shift, 1]
+                # Red channel shift
+                frame_np[shift:, :, 0] = frame_np[:-shift, :, 0]
+                
+            elif "zoom" in effect:
+                # 10% Zoom focus
+                zoom_factor = 1.10
+                nh, nw = int(h / zoom_factor), int(w / zoom_factor)
+                dy, dx = (h - nh)//2, (w - nw)//2
+                cropped = frame_np[dy:dy+nh, dx:dx+nw]
+                frame_np = cv2.resize(cropped, (w, h), interpolation=cv2.INTER_CUBIC)
+                
+            elif "shake" in effect:
+                # Rapid displacement
+                dx = random.randint(-20, 20)
+                dy = random.randint(-20, 20)
+                M = np.float32([[1, 0, dx], [0, 1, dy]])
+                frame_np = cv2.warpAffine(frame_np, M, (w, h))
+                
+            break # Apply only one effect at a time
+            
+    return frame_np
+
+def composite_frame(background_frame, timestamp, header_img, subtitle_img, cta_img, video_duration, cues=None):
+    """Final assembly of minimalist layers with Pattern Interrupts."""
+    # Apply visual effects to the base background/avatar frame first
+    if cues:
+        background_frame = apply_pattern_interrupts(background_frame, timestamp, cues)
+        
     frame = Image.fromarray(background_frame).convert('RGBA')
     
     # 1. Header is always at top
@@ -985,26 +1029,40 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                     )
                 break
                 
-        return composite_frame(bg_frame, t, header_img, subtitle_img, cta_img, audio_duration)
+        return composite_frame(bg_frame, t, header_img, subtitle_img, cta_img, audio_duration, cues=script_json.get("retention_cues", []))
 
     final = VideoClip(make_final_frame, duration=audio_duration)
     final = final.with_audio(audio)
 
     # ── INTRO / OUTRO ────────────────────────────────────────────────────────
-    intro = _intro_clip(2.0, accent_color)
-    outro = _outro_clip(3.0, accent_color)
-    final_video = concatenate_videoclips([intro, final, outro])
+    # 2026 Strategy: Infinite Loops need SEAMLESS transition (no intro/outro)
+    is_infinite_loop = script_json.get("loop_score", 0) >= 8
+    
+    if is_infinite_loop:
+        print("INFINITE LOOP DETECTED: Skipping intro/outro for seamless scaling.")
+        final_video = final
+    else:
+        intro = _intro_clip(2.0, accent_color)
+        outro = _outro_clip(3.0, accent_color)
+        final_video = concatenate_videoclips([intro, final, outro])
     
     final_duration = final_video.duration
 
     # ── LAYER 15: BGM ─────────────────────────────────────────────────────────
     music_files = [f for f in os.listdir(MUSIC_DIR) if f.endswith(".mp3")]
     if music_files:
-        bgm = AudioFileClip(os.path.join(MUSIC_DIR, random.choice(music_files))).with_volume_scaled(BGM_VOLUME)
+        bg_music = random.choice(music_files)
+        bgm = AudioFileClip(os.path.join(MUSIC_DIR, bg_music)).with_volume_scaled(BGM_VOLUME)
         if bgm.duration < final_duration:
             bgm = bgm.with_effects([afx.AudioLoop(duration=final_duration)])
         else:
             bgm = bgm.subclipped(0, final_duration)
+            
+        # If it's a loop, we might want to fade the BGM or keep it constant
+        if is_infinite_loop:
+            # Subtle volume dip at the very end to avoid pop
+            bgm = bgm.with_effects([afx.AudioFadeOut(0.1)])
+            
         final_video = final_video.with_audio(CompositeAudioClip([final_video.audio, bgm]))
 
     final = final_video
