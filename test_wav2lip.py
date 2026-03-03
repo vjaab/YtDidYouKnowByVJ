@@ -83,7 +83,7 @@ def test_wav2lip():
             capture_output=True,
             text=True,
             env=w2l_env,
-            timeout=300,
+            timeout=1800,
         )
         elapsed = time.time() - start
 

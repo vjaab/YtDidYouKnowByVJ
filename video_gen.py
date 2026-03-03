@@ -319,7 +319,7 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
         ]
         print(f"Wav2Lip CMD: {' '.join(str(c) for c in cmd)}")
         try:
-            result = subprocess.run(cmd, cwd=wav2lip_dir, capture_output=True, text=True, env=w2l_env, timeout=600)
+            result = subprocess.run(cmd, cwd=wav2lip_dir, capture_output=True, text=True, env=w2l_env, timeout=1800)
             print(f"Wav2Lip STDOUT: {result.stdout[-500:] if result.stdout else '(empty)'}")
             print(f"Wav2Lip STDERR: {result.stderr[-500:] if result.stderr else '(empty)'}")
             if result.returncode != 0:
