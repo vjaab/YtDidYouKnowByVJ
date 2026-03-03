@@ -285,6 +285,7 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
     output_temp_avatar = os.path.join(OUTPUT_DIR, "temp_avatar.mp4")
     
     if not os.path.exists(avatar_img_path):
+        print(f"No avatar image found. Skipping avatar generation.")
         return None
 
     success = False
