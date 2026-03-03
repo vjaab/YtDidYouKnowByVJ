@@ -745,10 +745,7 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
     img = Image.new('RGBA', (frame_width, header_h), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
-    # 1. Solid dark strip behind title for maximum contrast (Rich Black / Dark Grey #0F0F0F)
-    draw.rectangle([0, 0, frame_width, header_h], fill=(15, 15, 15, 255))
-    
-    # 2. Typography: Roboto-Bold (similar to YouTube Sans) per user spec
+    # Typography: Roboto-Bold (similar to YouTube Sans) per user spec
     f_title = ImageFont.truetype('assets/fonts/Roboto-Bold.ttf', 55)
     
     # Check width
@@ -756,26 +753,23 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
     if tw > 800: title = title[:40] + "..."
     tw = draw.textlength(title, font=f_title)
     
-    # YouTube Logo/Prefix dimensions
-    icon_w, icon_h = 50, 44
-    gap = 20
-    total_w = icon_w + gap + tw
-    start_x = (frame_width - total_w) // 2
+    # Center text
+    padding_x = 40
+    padding_y = 20
+    box_w = tw + padding_x * 2
+    box_h = 55 + padding_y * 2
+    start_x = (frame_width - box_w) // 2
     
-    # Move title little bit up: Y=55
-    start_y = 55
-    text_y_offset = -6 # Vertically center text vs icon
+    # Move title little bit up: Y=50
+    start_y = 50
+    text_y_offset = -8
     
-    # 3. Shorts / YouTube style Icon Background (YouTube Red #FF0000)
-    draw.rounded_rectangle([start_x, start_y, start_x+icon_w, start_y+icon_h], radius=12, fill=(255, 0, 0, 255))
+    # 1. Solid dark strip behind title for maximum contrast 
+    # (Rich Black pill, centered, wrapping only the text)
+    draw.rounded_rectangle([start_x, start_y, start_x+box_w, start_y+box_h], radius=15, fill=(15, 15, 15, 255))
     
-    # White Play Triangle inside icon
-    tx = start_x + 18
-    ty = start_y + 12
-    draw.polygon([(tx, ty), (tx, ty+20), (tx+15, ty+10)], fill=(255, 255, 255, 255))
-    
-    # 4. Wordmark lockup in Pure White #FFFFFF
-    draw.text((start_x + icon_w + gap, start_y + text_y_offset), title, font=f_title, fill=(255, 255, 255, 255))
+    # 2. Wordmark lockup in Pure White #FFFFFF
+    draw.text((start_x + padding_x, start_y + padding_y + text_y_offset), title, font=f_title, fill=(255, 255, 255, 255))
     
     return img
 
@@ -1106,20 +1100,13 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     final = final.with_audio(audio)
 
     # ── INTRO / OUTRO ────────────────────────────────────────────────────────
-    # 2026 Strategy: Infinite Loops need SEAMLESS transition (no intro/outro)
-    is_infinite_loop = script_json.get("loop_score", 0) >= 8
-    
-    if is_infinite_loop:
-        print("INFINITE LOOP DETECTED: Skipping intro/outro for seamless scaling.")
-        final_video = final
-    else:
-        intro = _intro_clip(2.0, accent_color)
-        outro = _outro_clip(3.0, accent_color)
-        final_video = concatenate_videoclips([intro, final, outro])
+    # The user requested no intro so the avatar video starts immediately at 0.0s
+    final_video = final
     
     final_duration = final_video.duration
 
     # ── LAYER 15: BGM ─────────────────────────────────────────────────────────
+    is_infinite_loop = script_json.get("loop_score", 0) >= 8
     music_files = [f for f in os.listdir(MUSIC_DIR) if f.endswith(".mp3")]
     if music_files:
         bg_music = random.choice(music_files)
