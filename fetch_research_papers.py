@@ -2,7 +2,7 @@ import re
 import requests
 import feedparser
 from datetime import datetime, timedelta, timezone
-from config import TWITTER_BEARER_TOKEN, NEWS_API_KEY
+from config import NEWS_API_KEY
 
 # ── RESEARCH SOURCES ──────────────────────────────────────────────────────────
 RSS_FEEDS = [

@@ -2,7 +2,7 @@ import os
 import requests
 from io import BytesIO
 from PIL import Image
-from config import TWITTER_BEARER_TOKEN, OUTPUT_DIR
+from config import OUTPUT_DIR
 from pexels_fetcher import _search_pexels_photos, _download_photo
 
 def _save_image_from_url(url, output_path, is_logo=False):
@@ -33,22 +33,6 @@ def fetch_person_photo(person):
     if os.path.exists(output_path):
         return output_path
 
-    # PRIORITY 1: Twitter Profile Picture
-    if twitter_handle and TWITTER_BEARER_TOKEN:
-        try:
-            url = f"https://api.twitter.com/2/users/by/username/{twitter_handle.replace('@', '')}?user.fields=profile_image_url"
-            headers = {"Authorization": f"Bearer {TWITTER_BEARER_TOKEN}"}
-            r = requests.get(url, headers=headers, timeout=10)
-            if r.status_code == 200:
-                data = r.json()
-                if "data" in data and "profile_image_url" in data["data"]:
-                    img_url = data["data"]["profile_image_url"].replace("_normal", "_400x400")
-                    path = _save_image_from_url(img_url, output_path)
-                    if path:
-                        print(f"  -> Found Twitter photo for {name}")
-                        return path
-        except Exception as e:
-            print(f"  Twitter API fetch failed: {e}")
 
     # PRIORITY 2: Wikipedia API
     try:
