@@ -68,10 +68,12 @@ def upload_video(video_path, title, description, tags, category_id="28"):
 
     body = {
         "snippet": {
-            "title":       title[:100],
-            "description": description[:5000],
-            "tags":        tags[:15],
-            "categoryId":  category_id,
+            "title":                title[:100],
+            "description":          description[:5000],
+            "tags":                 tags[:15],
+            "categoryId":           category_id,
+            "defaultLanguage":      "en",
+            "defaultAudioLanguage": "en",
         },
         "status": {
             "privacyStatus":          "public",
