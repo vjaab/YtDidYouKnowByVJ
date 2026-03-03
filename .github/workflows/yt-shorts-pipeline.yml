@@ -6,13 +6,7 @@ on:
     - cron: '30 5 * * *'
     # 11:30 UTC = 17:00 PM IST (afternoon slot)
     - cron: '30 11 * * *'
-  workflow_dispatch:
-    inputs:
-      test_avatar:
-        description: 'Run only Wav2Lip Avatar Test?'
-        required: false
-        default: 'false'
-        type: boolean
+  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
 
 jobs:
   run-pipeline:
@@ -79,17 +73,10 @@ jobs:
 
       - name: Run Pipeline
         # Run main.py --now to trigger the video pipeline immediately
-        # OR run the avatar test if manually requested
         env:
           PYTHONHASHSEED: 0
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: |
-          if [ "${{ github.event.inputs.test_avatar }}" == "true" ]; then
-            echo "MANUAL TEST: Running Wav2Lip Avatar Test..."
-            python test_avatar_only.py
-          else
-            python main.py --now
-          fi
+        run: python main.py --now
         
       - name: Commit Updated Tracking File (news_log.json)
         # Always run this step to save the log, preventing duplicate topics tomorrow
