@@ -745,10 +745,8 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
     img = Image.new('RGBA', (frame_width, header_h), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
-    # Gradient fade-in from top for header
-    for y in range(header_h):
-        alpha = int(220 * (1 - y/header_h))
-        draw.line([(0, y), (frame_width, y)], fill=(0, 0, 0, alpha))
+    # Solid dark strip behind title for maximum contrast
+    draw.rectangle([0, 0, frame_width, header_h], fill=(0, 0, 0, 240))
     
     # Main Title
     f_title = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 55)
@@ -830,9 +828,7 @@ def _intro_clip(duration, accent_color):
 def _outro_clip(duration, accent_color):
     """Create a brief outro segment showing the telegram CTA."""
     bg = ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=duration)
-    cta_img = render_telegram_cta(accent_color, FRAME_W)
-    cta_clip = ImageClip(np.array(cta_img)).with_duration(duration).with_position(("center", "center"))
-    return CompositeVideoClip([bg, cta_clip], size=(FRAME_W, FRAME_H)).with_duration(duration)
+    return bg.with_duration(duration)
 
 def apply_pattern_interrupts(frame_np, t, cues):
     """Applies visual disruption effects based on retention cues (glitches, zooms, shakes)."""
@@ -889,13 +885,7 @@ def composite_frame(background_frame, timestamp, header_img, subtitle_img, cta_i
     if subtitle_img is not None:
         frame.alpha_composite(subtitle_img, dest=(0,0))
         
-    # 3. CTA slides up at the end
-    if timestamp >= video_duration - 6:
-        progress = min((timestamp-(video_duration-6))/0.4, 1.0)
-        # Power easing
-        progress = 1-(1-progress)**3
-        cta_y = int(FRAME_H - (240 * progress))
-        frame.alpha_composite(cta_img, dest=(0, cta_y))
+    # 3. CTA removed as per request (Tele/LinkedIn/WhatsApp only in description)
         
     return np.array(frame.convert('RGB'))
 
