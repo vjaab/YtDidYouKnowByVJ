@@ -952,7 +952,7 @@ def render_subtitle_frame(text, current_words, bg_frame=None, accent_color=(255,
     
     line_h = 130
     total_h = len(lines) * line_h
-    start_y = 1450 # Standard lower-third position
+    start_y = 1100 # Chest position
     
     word_idx = 0
     for i, line in enumerate(lines):
