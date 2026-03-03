@@ -1043,8 +1043,8 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         else:
             base = _dynamic_tech_background(audio_duration, accent_color)
 
-    # ── LAYER 2: Avatar (Bypassed as requested - use raw video instead) ───────
-    avatar = None
+    # ── LAYER 2: Avatar (Wav2Lip Re-enabled) ──────────────────────────────────
+    avatar = _dynamic_avatar_clip(audio_duration, audio_path, accent_color)
     
     # ── LAYER 3: Tint ─────────────────────────────────────────────────────────
     tint = ColorClip(size=(FRAME_W, FRAME_H), color=accent_color, duration=audio_duration).with_opacity(0.02)
@@ -1052,8 +1052,8 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     # ── LAYER 4: Gradient ─────────────────────────────────────────────────────
     gradient = _gradient_clip(audio_duration)
 
-    # ── LAYER 5: Particles (Subtle) ───────────────────────────────────────────
-    particle_clips = [_ambient_particles(audio_duration, accent_color)]
+    # ── LAYER 5: Particles (Removed by request) ───────────────────────────────
+    particle_clips = []
 
     # ── Hook banner removed ──────────────────────────────────────────────────
 
