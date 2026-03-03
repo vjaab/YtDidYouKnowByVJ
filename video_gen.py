@@ -1003,12 +1003,38 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     key_stat_ts    = float(script_json.get("key_stat_timestamp", 0))
     shock_ts       = float(script_json.get("shocking_moment_timestamp", 0))
 
-    # ── LAYER 1: Dynamic Background ───────────────────────────────────────────
-    print("Building dynamic minimalist background...")
-    base = _dynamic_tech_background(audio_duration, accent_color)
+    # ── LAYER 1: Main Video Background (Firefly v2) ───────────────────────────
+    print("Building main video background from Firefly_video_2.mp4...")
+    bg_path = os.path.join(ASSETS_DIR, "Firefly_video_2.mp4")
+    if os.path.exists(bg_path):
+        base = VideoFileClip(bg_path)
+        # Handle looping if video is shorter than audio
+        if base.duration < audio_duration:
+            base = base.with_effects([vfx.Loop(duration=audio_duration)])
+        else:
+            base = base.subclipped(0, audio_duration)
+            
+        # Resize/Crop to fill 1080x1920 (Portrait)
+        w, h = base.size
+        target_ratio = FRAME_W / FRAME_H
+        current_ratio = w / h
+        
+        if abs(current_ratio - target_ratio) > 0.01:
+            if current_ratio > target_ratio:
+                # Too wide, crop sides
+                new_w = int(h * target_ratio)
+                base = base.cropped(x_center=w/2, width=new_w)
+            else:
+                # Too tall, crop top/bottom
+                new_h = int(w / target_ratio)
+                base = base.cropped(y_center=h/2, height=new_h)
+            
+        base = base.resized(width=FRAME_W, height=FRAME_H)
+    else:
+        base = _dynamic_tech_background(audio_duration, accent_color)
 
-    # ── LAYER 2: Avatar & Identity ────────────────────────────────────────────
-    avatar = _dynamic_avatar_clip(audio_duration, audio_path, accent_color)
+    # ── LAYER 2: Avatar (Bypassed as requested - use raw video instead) ───────
+    avatar = None
     
     # ── LAYER 3: Tint ─────────────────────────────────────────────────────────
     tint = ColorClip(size=(FRAME_W, FRAME_H), color=accent_color, duration=audio_duration).with_opacity(0.02)
