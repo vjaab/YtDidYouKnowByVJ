@@ -280,7 +280,7 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
     import math
     import subprocess
     # Primary preference: Video (for motion) -> YouTube Pic -> Original Profile
-    avatar_face_path = os.path.join(ASSETS_DIR, "Firefly_video.mp4")
+    avatar_face_path = os.path.join(ASSETS_DIR, "Firefly_video_2.mp4")
     if not os.path.exists(avatar_face_path):
         avatar_face_path = os.path.join(ASSETS_DIR, "youtube_pic.png")
     if not os.path.exists(avatar_face_path):
