@@ -128,7 +128,7 @@ def generate_thumbnail(script_json):
     COMPOSITION: 
     - Subject/Emoji on the left side.
     - Text on the right side.
-    - Dark bottom bar with "t.me/technewsbyvj | linkedin.com/in/vijayakumar-j/" in small white font.
+    - Dark bottom bar with "t.me/technewsbyvj | linkedin.com/in/vijayakumar-j/ | wa.link/vj-wa" in small white font.
     - Vibrant colors, high saturation, 8k quality, sharp focus.
     """
 
@@ -221,7 +221,7 @@ def _fallback_generate_thumbnail(script_json, output_path):
     bar_y = THUMB_H - 60
     draw.rectangle([0, bar_y, THUMB_W, THUMB_H], fill=(0, 0, 0, 210))
     bf2 = gf(24)
-    cta = "t.me/technewsbyvj  |  linkedin.com/in/vijayakumar-j/"
+    cta = "t.me/technewsbyvj  |  linkedin.com/in/vj  |  wa.link/vj-wa"
     cw, _ = ts(cta, bf2)
     draw.text(((THUMB_W - cw) // 2, bar_y + 18), cta, font=bf2, fill=(255, 255, 255))
 

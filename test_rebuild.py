@@ -161,31 +161,41 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
     return img
 
 def render_telegram_cta(accent_color, frame_width=1080):
-    """Minimalist Telegram & LinkedIn CTA banner."""
-    card_height = 320
+    """Minimalist Telegram, LinkedIn & WhatsApp CTA banner for test."""
+    card_height = 420
     img = Image.new('RGBA', (frame_width, card_height), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
     draw.rectangle([0,0,frame_width,card_height], fill=(8,8,8,250))
     draw.line([(0,0),(frame_width,0)], fill=(*accent_color,255), width=4)
     
-    f1_cta = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 52)
+    f1_cta = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 48)
     t1 = "t.me/technewsbyvj"
-    t2 = "linkedin.com/in/vijayakumar-j/"
+    t2 = "linkedin.com/in/vj"
+    t3 = "WhatsApp: t.ly/vj-wa"
     
     try:
-        tg_icon = Image.open('assets/icons/telegram_logo.png').convert("RGBA").resize((70, 70), Image.LANCZOS)
-        li_icon = Image.open('assets/icons/linkedin_logo.png').convert("RGBA").resize((70, 70), Image.LANCZOS)
+        tg_icon = Image.open('assets/icons/telegram_logo.png').convert("RGBA").resize((60, 60), Image.LANCZOS)
+        li_icon = Image.open('assets/icons/linkedin_logo.png').convert("RGBA").resize((60, 60), Image.LANCZOS)
+        wa_icon = Image.open('assets/icons/whatsapp_logo.png').convert("RGBA").resize((60, 60), Image.LANCZOS)
         
         # TG Row
-        x1 = (frame_width - (draw.textlength(t1, font=f1_cta) + 85)) // 2
+        w1 = draw.textlength(t1, font=f1_cta)
+        x1 = (frame_width - (w1 + 80)) // 2
         img.paste(tg_icon, (int(x1), 60), tg_icon)
-        draw.text((x1 + 85, 65), t1, font=f1_cta, fill=(*accent_color, 255))
+        draw.text((x1 + 80, 65), t1, font=f1_cta, fill=(*accent_color, 255))
         
         # LI Row
-        x2 = (frame_width - (draw.textlength(t2, font=f1_cta) + 85)) // 2
-        img.paste(li_icon, (int(x2), 165), li_icon)
-        draw.text((x2 + 85, 170), t2, font=f1_cta, fill=(*accent_color, 255))
+        w2 = draw.textlength(t2, font=f1_cta)
+        x2 = (frame_width - (w2 + 80)) // 2
+        img.paste(li_icon, (int(x2), 160), li_icon)
+        draw.text((x2 + 80, 165), t2, font=f1_cta, fill=(*accent_color, 255))
+
+        # WA Row
+        w3 = draw.textlength(t3, font=f1_cta)
+        x3 = (frame_width - (w3 + 80)) // 2
+        img.paste(wa_icon, (int(x3), 260), wa_icon)
+        draw.text((x3 + 80, 265), t3, font=f1_cta, fill=(*accent_color, 255))
     except:
         x1 = (frame_width - draw.textlength(t1, font=f1_cta))//2
         draw.text((x1, 90), t1, font=f1_cta, fill=(*accent_color,255))
