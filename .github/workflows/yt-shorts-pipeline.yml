@@ -76,12 +76,6 @@ jobs:
           if [ ! -f face_detection/detection/sfd/s3fd.pth ]; then
             wget -q -O face_detection/detection/sfd/s3fd.pth https://huggingface.co/camenduru/Wav2Lip/resolve/main/face_detection/detection/sfd/s3fd.pth
           fi
-          # Patch Wav2Lip for modern librosa versions (fixes TypeError and AttributeError on inference)
-          sed -i "s/librosa.filters.mel(hp.sample_rate, hp.n_fft,/librosa.filters.mel(sr=hp.sample_rate, n_fft=hp.n_fft,/g" audio.py
-          sed -i "s/librosa.core.load(path, sr=sr)/librosa.load(path, sr=sr)/g" audio.py
-          # Replace deleted librosa.output with scipy's wavfile writer
-          sed -i "s/import librosa/import librosa, scipy.io.wavfile as wavfile/g" audio.py
-          sed -i "s/librosa.output.write_wav(path, wav, sr=sr)/wavfile.write(path, sr, (wav * 32767).astype('int16'))/g" audio.py
 
       - name: Run Pipeline
         # Run main.py --now to trigger the video pipeline immediately
