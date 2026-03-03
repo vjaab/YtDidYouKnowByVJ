@@ -14,9 +14,9 @@ ASSETS_DIR = os.path.join(BASE_DIR, "assets")
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-FACE_IMG = os.path.join(ASSETS_DIR, "Firefly_video_2.mp4")
+FACE_IMG = os.path.join(ASSETS_DIR, "Firefly_video_final.mp4")
 if not os.path.exists(FACE_IMG):
-    FACE_IMG = os.path.join(ASSETS_DIR, "youtube_pic.png")
+    FACE_IMG = os.path.join(ASSETS_DIR, "gemini_img_without_logo.png")
 if not os.path.exists(FACE_IMG):
     FACE_IMG = os.path.join(ASSETS_DIR, "vj_profile.jpg")
 AUDIO_FILE = os.path.join(BASE_DIR, "vj.wav")
