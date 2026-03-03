@@ -27,11 +27,14 @@
         "Why Your AI is Getting Stupider",
         "Building specialized AI without sacrificing intelligence: Nova Forge data mixing in action",
         "The Death of the Chatbot",
-        "Build a serverless conversational AI agent using Claude with LangGraph and managed MLflow on Amazon SageMaker AI"
+        "Build a serverless conversational AI agent using Claude with LangGraph and managed MLflow on Amazon SageMaker AI",
+        "Ditching ChatGPT: Switch to Claude?",
+        "ChatGPT uninstalls surged by 295% after DoD deal"
     ],
     "used_keywords": [
         "MCP",
         "Performance",
+        "Uninstalls",
         "venture capital",
         "local AI",
         "Open Source",
@@ -40,11 +43,12 @@
         "AI market",
         "C++",
         "Gaming Quality",
-        "Sam Altman",
         "tech disruption",
+        "Sam Altman",
         "LLM Benchmarks",
         "India AI",
         "Inference",
+        "Privacy",
         "synthetic biology",
         "Microsoft Gaming",
         "Claude 3.5 Sonnet",
@@ -90,13 +94,14 @@
         "Cognitive Debt",
         "Indus AI",
         "self-synthesis",
+        "DoD",
         "energy consumption",
         "fMRI"
     ],
     "used_companies": {
         "Sarvam": 1,
-        "OpenAI": 6,
-        "ChatGPT": 1,
+        "OpenAI": 7,
+        "ChatGPT": 2,
         "Microsoft": 1,
         "Google": 4,
         "Origami Robotics": 1,
@@ -105,7 +110,9 @@
         "Anthropic": 3,
         "Neuralink": 1,
         "Ollama": 1,
-        "Python": 1
+        "Python": 1,
+        "Claude": 1,
+        "DoD": 1
     },
     "used_subcategories": {
         "AI": 3,
@@ -113,18 +120,18 @@
         "Robotics": 1,
         "AI/Machine Learning/Robotics/NLP/Computer Vision": 1,
         "AI Philosophy": 1,
-        "AI/Machine Learning": 5,
+        "AI/Machine Learning": 6,
         "AI/Software Engineering": 1,
         "AI/Neuroscience": 1
     },
     "last_7_days_stories": [
-        "Qwen3.5 122B and 35B models offer Sonnet 4.5 performance on local computers",
         "MCP server that reduces Claude Code context consumption by 98%",
         "Switch to Claude without starting over",
         "Evolving descriptive text of mental content from human brain activity",
         "Show HN: Timber \u2013 Ollama for classical ML models, 336x faster than Python",
         "Building specialized AI without sacrificing intelligence: Nova Forge data mixing in action",
-        "Build a serverless conversational AI agent using Claude with LangGraph and managed MLflow on Amazon SageMaker AI"
+        "Build a serverless conversational AI agent using Claude with LangGraph and managed MLflow on Amazon SageMaker AI",
+        "ChatGPT uninstalls surged by 295% after DoD deal"
     ],
     "last_3_days_subcategories": [
         "AI/Machine Learning",
@@ -132,13 +139,13 @@
         "AI/Machine Learning"
     ],
     "last_3_days_companies": [
+        "Python",
+        "ChatGPT",
+        "Claude",
         "OpenAI",
-        "Google",
-        "Neuralink",
-        "Ollama",
-        "Python"
+        "DoD"
     ],
-    "total_uploaded": 14,
+    "total_uploaded": 15,
     "last_upload": "2026-03-03",
     "history": [
         {
@@ -418,6 +425,30 @@
             "voice_used": null,
             "youtube_url": "https://youtu.be/OPGUF-d2HDE",
             "news_source_url": "https://aws.amazon.com/blogs/machine-learning/build-a-serverless-conversational-ai-agent-using-claude-with-langgraph-and-managed-mlflow-on-amazon-sagemaker-ai/"
+        },
+        {
+            "date": "2026-03-03",
+            "title": "Ditching ChatGPT: Switch to Claude?",
+            "news_headline": "ChatGPT uninstalls surged by 295% after DoD deal",
+            "sub_category": "AI/Machine Learning",
+            "companies": [
+                "ChatGPT",
+                "Claude",
+                "OpenAI",
+                "DoD"
+            ],
+            "keywords": [
+                "ChatGPT",
+                "Claude",
+                "AI",
+                "Privacy",
+                "DoD",
+                "Uninstalls"
+            ],
+            "breaking_news_level": 9,
+            "voice_used": null,
+            "youtube_url": "https://youtu.be/fkEgidxcdYY",
+            "news_source_url": "https://techcrunch.com/2026/03/02/chatgpt-uninstalls-surged-by-295-after-dod-deal/"
         }
     ]
 }
