@@ -279,9 +279,7 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
     from pydub import AudioSegment
     import math
     import subprocess
-    import glob
-    
-    avatar_img_path = os.path.join(ASSETS_DIR, "vj_profile.jpg")
+    avatar_img_path = os.path.join(ASSETS_DIR, "youtube_pic.png")
     output_temp_avatar = os.path.join(OUTPUT_DIR, "temp_avatar.mp4")
     
     if not os.path.exists(avatar_img_path):
