@@ -44,6 +44,7 @@ jobs:
           echo "PEXELS_API_KEY=${{ secrets.PEXELS_API_KEY }}" >> .env
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env
           echo "TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}" >> .env
+          echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> .env
           
       - name: Setup YouTube Auth Files
         # We restore the JSON files from GitHub Secrets
@@ -80,6 +81,7 @@ jobs:
         # Run main.py --now to trigger the video pipeline immediately
         env:
           PYTHONHASHSEED: 0
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: python main.py --now
         
       - name: Commit Updated Tracking File (news_log.json)
