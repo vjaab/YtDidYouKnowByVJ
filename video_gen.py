@@ -438,35 +438,8 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
         return None
 
 
-# ── LAYER 5: Hook banner ──────────────────────────────────────────────────────
-def _hook_banner(hook_text, accent_color, total_dur):
-    banner_h, dur = 120, 2.2
 
-    def _render():
-        img = Image.new("RGBA", (FRAME_W, banner_h), (0,0,0,0))
-        draw = ImageDraw.Draw(img)
-        draw.rectangle([0,0,FRAME_W,banner_h], fill=(*accent_color, 204))
-        f = gf(52)
-        w, h = ts(hook_text[:60], f)
-        draw.text(((FRAME_W-w)//2, (banner_h-h)//2), hook_text[:60], font=f, fill=(255,255,255,255))
-        return img
-
-    img_arr  = np.array(_render().convert("RGB"))
-    mask_arr = np.array(_render().split()[3]).astype(float) / 255.0
-
-    def banner_y(t):
-        if t < 0.25:
-            return int(-banner_h + (banner_h) * (t/0.25))
-        elif t < 1.7:
-            return 0
-        else:
-            return int(0 - (banner_h) * ((t - 1.7) / 0.5))
-
-    clip = VideoClip(lambda t: img_arr, duration=dur)
-    mask = VideoClip(lambda t: mask_arr, is_mask=True, duration=dur)
-    clip = clip.with_mask(mask)
-    clip = clip.with_position(lambda t: (0, banner_y(t)))
-    return clip
+# ── LAYER 6: Animated logo ─────────────────────────────────────────────────────
 
 
 # ── LAYER 6: Animated logo ─────────────────────────────────────────────────────
@@ -1011,7 +984,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     accent_color   = tuple(int(accent_hex[i:i+2], 16) for i in (0, 2, 4))
     sub_category   = script_json.get("sub_category", "AI")
     emoji          = script_json.get("relevant_emoji", "")
-    hook_text      = script_json.get("hook_banner_text", script_json.get("hook", ""))
+    # ── Hook text removed ──────────────────────────────────────────────────────
     key_stat       = script_json.get("key_stat", "")
     key_stat_ts    = float(script_json.get("key_stat_timestamp", 0))
     shock_ts       = float(script_json.get("shocking_moment_timestamp", 0))
@@ -1032,10 +1005,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     # ── LAYER 5: Particles (Subtle) ───────────────────────────────────────────
     particle_clips = [_ambient_particles(audio_duration, accent_color)]
 
-    # ── LAYER 6: Hook banner ──────────────────────────────────────────────────
-    hook_clips = []
-    if hook_text:
-        hook_clips.append(_hook_banner(hook_text, accent_color, audio_duration))
+    # ── Hook banner removed ──────────────────────────────────────────────────
 
     # ── LAYER 7: Animated logo (Removed VJ Branding) ──────────────────────────
     logo_clips = []
@@ -1050,7 +1020,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     reminder_clips = []
 
     # ── LAYER 11: Main Composite Base ─────────────────────────────────────────
-    base_layers = [base, tint, gradient] + particle_clips + hook_clips + logo_clips + fact_clips + burst_clips + reminder_clips
+    base_layers = [base, tint, gradient] + particle_clips + logo_clips + fact_clips + burst_clips + reminder_clips
     if avatar:
         base_layers.append(avatar)
     

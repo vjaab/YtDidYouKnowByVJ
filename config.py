@@ -6,7 +6,6 @@ load_dotenv()
 # API Keys
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 NEWS_API_KEY = os.getenv("NEWS_API_KEY", "")
-TWITTER_BEARER_TOKEN = os.getenv("TWITTER_BEARER_TOKEN", "")
 YOUTUBE_CLIENT_SECRET_FILE = os.getenv("YOUTUBE_CLIENT_SECRET_FILE", "client_secret.json")
 
 # Directory Paths
