@@ -745,18 +745,37 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
     img = Image.new('RGBA', (frame_width, header_h), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
-    # Solid dark strip behind title for maximum contrast
-    draw.rectangle([0, 0, frame_width, header_h], fill=(0, 0, 0, 240))
+    # 1. Solid dark strip behind title for maximum contrast (Rich Black / Dark Grey #0F0F0F)
+    draw.rectangle([0, 0, frame_width, header_h], fill=(15, 15, 15, 255))
     
-    # Main Title
-    f_title = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 55)
+    # 2. Typography: Roboto-Bold (similar to YouTube Sans) per user spec
+    f_title = ImageFont.truetype('assets/fonts/Roboto-Bold.ttf', 55)
+    
+    # Check width
     tw = draw.textlength(title, font=f_title)
-    if tw > 900: title = title[:45] + "..."
+    if tw > 800: title = title[:40] + "..."
     tw = draw.textlength(title, font=f_title)
     
-    # Draw title shadow
-    draw.text(((frame_width-tw)//2 + 4, 94), title, font=f_title, fill=(0,0,0,150))
-    draw.text(((frame_width-tw)//2, 90), title, font=f_title, fill=(255,255,255,255))
+    # YouTube Logo/Prefix dimensions
+    icon_w, icon_h = 50, 44
+    gap = 20
+    total_w = icon_w + gap + tw
+    start_x = (frame_width - total_w) // 2
+    
+    # Move title little bit up: Y=55
+    start_y = 55
+    text_y_offset = -6 # Vertically center text vs icon
+    
+    # 3. Shorts / YouTube style Icon Background (YouTube Red #FF0000)
+    draw.rounded_rectangle([start_x, start_y, start_x+icon_w, start_y+icon_h], radius=12, fill=(255, 0, 0, 255))
+    
+    # White Play Triangle inside icon
+    tx = start_x + 18
+    ty = start_y + 12
+    draw.polygon([(tx, ty), (tx, ty+20), (tx+15, ty+10)], fill=(255, 255, 255, 255))
+    
+    # 4. Wordmark lockup in Pure White #FFFFFF
+    draw.text((start_x + icon_w + gap, start_y + text_y_offset), title, font=f_title, fill=(255, 255, 255, 255))
     
     return img
 
@@ -1002,29 +1021,20 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     print("Building main video background from Firefly_video_2.mp4...")
     bg_path = os.path.join(ASSETS_DIR, "Firefly_video_2.mp4")
     if os.path.exists(bg_path):
-        base = VideoFileClip(bg_path)
+        vid_clip = VideoFileClip(bg_path)
         # Handle looping if video is shorter than audio
-        if base.duration < audio_duration:
-            base = base.with_effects([vfx.Loop(duration=audio_duration)])
+        if vid_clip.duration < audio_duration:
+            vid_clip = vid_clip.with_effects([vfx.Loop(duration=audio_duration)])
         else:
-            base = base.subclipped(0, audio_duration)
+            vid_clip = vid_clip.subclipped(0, audio_duration)
             
-        # Resize/Crop to fill 1080x1920 (Portrait)
-        w, h = base.size
-        target_ratio = FRAME_W / FRAME_H
-        current_ratio = w / h
+        # AVATAR UN-CROPPING RULE: Avoid cropping at all costs. 
+        # Resize to fit horizontally width=1080 (maintaining aspect ratio).
+        vid_clip = vid_clip.resized(width=FRAME_W)
         
-        if abs(current_ratio - target_ratio) > 0.01:
-            if current_ratio > target_ratio:
-                # Too wide, crop sides
-                new_w = int(h * target_ratio)
-                base = base.cropped(x_center=w/2, width=new_w)
-            else:
-                # Too tall, crop top/bottom
-                new_h = int(w / target_ratio)
-                base = base.cropped(y_center=h/2, height=new_h)
-            
-        base = base.resized(width=FRAME_W, height=FRAME_H)
+        # We need a 1080x1920 base to avoid black boundaries out-of-bounds.
+        bg_color = _dynamic_tech_background(audio_duration, accent_color)
+        base = CompositeVideoClip([bg_color, vid_clip.with_position("center")], size=(FRAME_W, FRAME_H)).with_duration(audio_duration)
     else:
         base = _dynamic_tech_background(audio_duration, accent_color)
 
