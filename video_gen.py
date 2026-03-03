@@ -19,6 +19,7 @@ LAYER 15: Background music (vol 0.06)
 """
 
 import os
+import sys
 import io
 import math
 import random
@@ -292,8 +293,19 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
     # 1. Try Wav2Lip (Primary AI Engine)
     if os.path.exists(wav2lip_dir):
         print(f"Wav2Lip detected at {wav2lip_dir}. Attempting avatar generation...")
+        
+        # PYTHONHASHSEED must be an integer or "random". We'll ensure it's "0" or just inherit correctly.
+        # Sometimes GitHub Actions environment can pass weird values, so we sanitize.
+        w2l_env = os.environ.copy()
+        if "PYTHONHASHSEED" in w2l_env:
+            # If it's an empty string or invalid, force it to "0"
+            try:
+                int(w2l_env["PYTHONHASHSEED"])
+            except:
+                w2l_env["PYTHONHASHSEED"] = "0"
+
         cmd = [
-            "python", "inference.py",
+            sys.executable, "inference.py",
             "--checkpoint_path", "checkpoints/wav2lip_gan.pth",
             "--face", avatar_img_path,
             "--audio", audio_path,
@@ -303,7 +315,7 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
             "--wav2lip_batch_size", "16"
         ]
         try:
-            result = subprocess.run(cmd, cwd=wav2lip_dir, capture_output=True, text=True)
+            result = subprocess.run(cmd, cwd=wav2lip_dir, capture_output=True, text=True, env=w2l_env)
             if result.returncode != 0:
                 print(f"Wav2Lip STDOUT: {result.stdout}")
                 print(f"Wav2Lip STDERR: {result.stderr}")
@@ -754,26 +766,36 @@ def render_telegram_cta(accent_color, frame_width=1080):
     t3 = "WhatsApp: t.ly/vj-wa" # Shorter display link
     
     try:
-        tg_icon = Image.open(os.path.join(ASSETS_DIR, "icons", "telegram_logo.png")).convert("RGBA").resize((60, 60), Image.LANCZOS)
-        li_icon = Image.open(os.path.join(ASSETS_DIR, "icons", "linkedin_logo.png")).convert("RGBA").resize((60, 60), Image.LANCZOS)
-        wa_icon = Image.open(os.path.join(ASSETS_DIR, "icons", "whatsapp_logo.png")).convert("RGBA").resize((60, 60), Image.LANCZOS)
+        tg_path = os.path.join(ASSETS_DIR, "icons", "telegram_logo.png")
+        li_path = os.path.join(ASSETS_DIR, "icons", "linkedin_logo.png")
+        wa_path = os.path.join(ASSETS_DIR, "icons", "whatsapp_logo.png")
+        
+        # Robust icon loading
+        def load_icon(path, size=(60,60)):
+            if os.path.exists(path):
+                return Image.open(path).convert("RGBA").resize(size, Image.LANCZOS)
+            return None
+
+        tg_icon = load_icon(tg_path)
+        li_icon = load_icon(li_path)
+        wa_icon = load_icon(wa_path)
         
         # TG Row
         w1 = draw.textlength(t1, font=f1)
         x1 = (frame_width - (w1 + 80)) // 2
-        img.paste(tg_icon, (int(x1), 60), tg_icon)
+        if tg_icon: img.paste(tg_icon, (int(x1), 60), tg_icon)
         draw.text((x1 + 80, 65), t1, font=f1, fill=(*accent_color, 255))
         
         # LI Row
         w2 = draw.textlength(t2, font=f1)
         x2 = (frame_width - (w2 + 80)) // 2
-        img.paste(li_icon, (int(x2), 160), li_icon)
+        if li_icon: img.paste(li_icon, (int(x2), 160), li_icon)
         draw.text((x2 + 80, 165), t2, font=f1, fill=(*accent_color, 255))
 
         # WA Row
         w3 = draw.textlength(t3, font=f1)
         x3 = (frame_width - (w3 + 80)) // 2
-        img.paste(wa_icon, (int(x3), 260), wa_icon)
+        if wa_icon: img.paste(wa_icon, (int(x3), 260), wa_icon)
         draw.text((x3 + 80, 265), t3, font=f1, fill=(*accent_color, 255))
 
     except Exception as e:

@@ -74,7 +74,6 @@ jobs:
       - name: Run Pipeline
         # Run main.py --now to trigger the video pipeline immediately
         env:
-          PYTHONHASHSEED: 0
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: python main.py --now
         
