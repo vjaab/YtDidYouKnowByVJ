@@ -279,11 +279,17 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
     from pydub import AudioSegment
     import math
     import subprocess
-    avatar_img_path = os.path.join(ASSETS_DIR, "youtube_pic.png")
+    # Primary preference: Video (for motion) -> YouTube Pic -> Original Profile
+    avatar_face_path = os.path.join(ASSETS_DIR, "vj_video.mp4")
+    if not os.path.exists(avatar_face_path):
+        avatar_face_path = os.path.join(ASSETS_DIR, "youtube_pic.png")
+    if not os.path.exists(avatar_face_path):
+        avatar_face_path = os.path.join(ASSETS_DIR, "vj_profile.jpg")
+        
     output_temp_avatar = os.path.join(OUTPUT_DIR, "temp_avatar.mp4")
     
-    if not os.path.exists(avatar_img_path):
-        print(f"No avatar image found. Skipping avatar generation.")
+    if not os.path.exists(avatar_face_path):
+        print(f"No avatar source (video or image) found in assets. Skipping avatar generation.")
         return None
 
     success = False
@@ -304,7 +310,7 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
         cmd = [
             sys.executable, "inference.py",
             "--checkpoint_path", "checkpoints/wav2lip_gan.pth",
-            "--face", avatar_img_path,
+            "--face", avatar_face_path,
             "--audio", audio_path,
             "--outfile", output_temp_avatar,
             "--pads", "0", "20", "0", "0",
