@@ -272,7 +272,18 @@ def fetch_chunk_visual(chunk, script_data):
                 print(f"Chunk {cid} -> STEP B (Company Match): 10/10")
                 return chunk
 
-    # ── STEP C: Pexels VIDEOS ────────────────────────────────────────────
+    # ── STEP C: Nanobanana (Imagen 3) ────────────────────────────────────
+    print(f"Chunk {cid} -> STEP C: Nanobanana (Imagen 3) generation")
+    path = _generate_imagen3(text, photo_out)
+    if path:
+        chunk["visual_path"] = path
+        chunk["visual_type"] = "photo"
+        chunk["relevance_score"] = 10
+        chunk["source"] = "Step C: Nanobanana (Imagen 3)"
+        print(f"Chunk {cid} -> Nanobanana Image Generated: 10/10")
+        return chunk
+
+    # ── STEP D: Pexels VIDEOS (Fallback) ─────────────────────────────────
     for query in [primary_q, fallback_q]:
         videos = _search_pexels_videos(query, dur)
         best_vid = None
@@ -293,11 +304,11 @@ def fetch_chunk_visual(chunk, script_data):
                 chunk["visual_path"] = path
                 chunk["visual_type"] = "video"
                 chunk["relevance_score"] = best_score
-                chunk["source"] = f"Step C: Pexels Video ({query})"
-                print(f"Chunk {cid} -> STEP C (Pexels Video): {best_score}/10")
+                chunk["source"] = f"Step D: Pexels Video ({query})"
+                print(f"Chunk {cid} -> STEP D (Pexels Video): {best_score}/10")
                 return chunk
 
-    # ── STEP D: Pexels PHOTOS ────────────────────────────────────────────
+    # ── STEP E: Pexels PHOTOS (Ultimate Fallback) ────────────────────────
     for query in [primary_q, fallback_q]:
         photos = _search_pexels_photos(query)
         best_photo = None
@@ -318,19 +329,9 @@ def fetch_chunk_visual(chunk, script_data):
                 chunk["visual_path"] = path
                 chunk["visual_type"] = "photo"
                 chunk["relevance_score"] = best_score
-                chunk["source"] = f"Step D: Pexels Photo ({query})"
-                print(f"Chunk {cid} -> STEP D (Pexels Photo): {best_score}/10")
+                chunk["source"] = f"Step E: Pexels Photo ({query})"
+                print(f"Chunk {cid} -> STEP E (Pexels Photo): {best_score}/10")
                 return chunk
-
-    # ── STEP E: Imagen 3 ─────────────────────────────────────────────────
-    print(f"Chunk {cid} -> STEP E: Fallback to Imagen 3")
-    path = _generate_imagen3(text, photo_out)
-    if path:
-        chunk["visual_path"] = path
-        chunk["visual_type"] = "photo"
-        chunk["relevance_score"] = 9
-        chunk["source"] = "Step E: Imagen 3"
-        return chunk
         
     chunk["visual_path"] = None
     chunk["visual_type"] = None

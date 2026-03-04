@@ -1327,8 +1327,55 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     # ── LAYER 10: Like reminder - REMOVED for minimalist style ────────────────
     reminder_clips = []
 
-    # ── LAYER 11: Main Composite Base ─────────────────────────────────────────
-    base_layers = [base, tint, gradient] + particle_clips + logo_clips + fact_clips + burst_clips + reminder_clips
+    # ── LAYER 11: Main Composite Base (with B-roll overlays) ──────────────────
+    chunk_clips = []
+    # To avoid having B-roll cover the entire video, show each visual for max 2.5s
+    # and only if there's no visual in the immediately preceding 1.0s
+    last_broll_end = -10.0
+    
+    for chunk in chunks:
+        vpath = chunk.get("visual_path")
+        if vpath and os.path.exists(vpath):
+            start_t = chunk["start"]
+            dur = chunk["duration"]
+            
+            # Avoid showing B-roll if we just showed one, to let the human face breathe
+            if start_t - last_broll_end < 1.0:
+                continue
+
+            try:
+                if chunk.get("visual_type") == "video":
+                    c_clip = VideoFileClip(vpath)
+                    if c_clip.duration < dur:
+                        c_clip = c_clip.with_effects([vfx.Loop(duration=dur)])
+                    else:
+                        c_clip = c_clip.subclipped(0, dur)
+                else:
+                    c_clip = ImageClip(vpath).with_duration(dur)
+                
+                # Full 9:16 crop to match shorts format
+                w, h = c_clip.size
+                target_h = int(w * 16 / 9)
+                if target_h <= h:
+                    y1 = (h - target_h) // 2
+                    c_clip = c_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h)
+                else:
+                    target_w = int(h * 9 / 16)
+                    x1 = (w - target_w) // 2
+                    c_clip = c_clip.cropped(x1=x1, y1=0, x2=x1 + target_w, y2=h)
+                    
+                c_clip = c_clip.resized((FRAME_W, FRAME_H))
+                
+                # Show B-roll for max 2.5s, then cut back to the talking head
+                broll_dur = min(dur, 2.5) 
+                c_clip = c_clip.subclipped(0, broll_dur).with_start(start_t)
+                
+                chunk_clips.append(c_clip)
+                last_broll_end = start_t + broll_dur
+            except Exception as e:
+                print(f"Failed to process B-roll visual {vpath}: {e}")
+
+    base_layers = [base, tint, gradient] + particle_clips + logo_clips + fact_clips + burst_clips + reminder_clips + chunk_clips
     
     progress = ColorClip(size=(FRAME_W, 6), color=accent_color, duration=audio_duration)
     progress = progress.with_position(lambda t: (int((t / max(audio_duration, 0.01)) * FRAME_W) - FRAME_W, FRAME_H - 6))

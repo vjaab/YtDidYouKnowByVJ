@@ -19,13 +19,13 @@ def get_slot_info():
     # Schedule Matrix
     # (Day, Slot A Category, Slot B Category)
     matrix = {
-        "Mon": ("AI News", "AI Tool"),
-        "Tue": ("AI Concepts", "AI Hands-on"),
+        "Mon": ("AI News", "AI Money"),
+        "Tue": ("AI vs AI", "AI Hands-on"),
         "Wed": ("AI Quiz", "AI Tool"),
-        "Thu": ("AI News", "AI Quiz"),
-        "Fri": ("AI Concepts", "AI Hands-on"),
-        "Sat": ("AI Quiz", "AI Tool"),
-        "Sun": ("AI News", "AI Hands-on")
+        "Thu": ("AI Predictions", "AI Career"),
+        "Fri": ("AI Concepts", "AI Fails"),
+        "Sat": ("AI vs AI", "AI Tool"),
+        "Sun": ("AI News", "AI Money")
     }
     
     categories = matrix.get(day_name, ("AI News", "AI Tool"))
@@ -71,6 +71,36 @@ def get_category_prompt_enhancement(category, slot):
             GOAL: 'AI or Real?' or 'Predict the Prompt'. Ask high-contrast questions.
             HOOK: 'Is this video real or generated? Comment your guess now!'
             COMMENT BAITING: NEVER reveal the answer until the last 3-5 seconds. Explicitly tell users to 'Pause and comment your guess now!'
+        """,
+        "AI vs AI": f"""
+            CATEGORY: AI vs AI (Head-to-Head Comparison).
+            STRATEGY: {base_discovery}
+            GOAL: Compare two major AI models or tools directly (e.g., ChatGPT vs Gemini, Midjourney vs DALL-E). Focus on who wins and why.
+            HOOK: '[Model A] just destroyed [Model B] in the ultimate test. Here is the proof.'
+        """,
+        "AI Money": f"""
+            CATEGORY: AI Money (Monetization & Side Hustles).
+            STRATEGY: {base_discovery}
+            GOAL: Break down realistic ways people are making money with AI tools today.
+            HOOK: 'This simple AI workflow is printing money for creators in 2026. Here is how it works.'
+        """,
+        "AI Fails": f"""
+            CATEGORY: AI Fails (Humor & Limitations).
+            STRATEGY: {base_discovery}
+            GOAL: Highlight hilarious or consequential mistakes made by AI models. Keep it light but informative.
+            HOOK: 'I asked AI to do [Task] and it completely lost its mind. Watch this disaster.'
+        """,
+        "AI Predictions": f"""
+            CATEGORY: AI Predictions (Futurism).
+            STRATEGY: {base_utility}
+            GOAL: Discuss what AI might look like in 6 months to 5 years. Focus on AGI, agentic behaviors, or hardware.
+            HOOK: 'If you think AI is crazy now, wait until you see what happens in [Year].'
+        """,
+        "AI Career": f"""
+            CATEGORY: AI Career (Future of Work).
+            STRATEGY: {base_utility}
+            GOAL: Discuss jobs, skills to learn, and how to survive the AI boom without being replaced.
+            HOOK: 'These 5 jobs will be gone by next year because of AI. Are you on the list?'
         """
     }
     
