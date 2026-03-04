@@ -943,40 +943,17 @@ def _render_comment_bait(comment_text, width, height):
         print(f"Comment bait error: {e}")
         return None
 
-def composite_frame(background_frame, timestamp, header_img, subtitle_img, cta_img, video_duration, cues=None, hook_text="", comment_hook=""):
-    """Final assembly of minimalist layers with retention boosters."""
-    # Apply visual effects to the base background/avatar frame first
-    if cues:
-        background_frame = apply_pattern_interrupts(background_frame, timestamp, cues)
-        
+def composite_frame(background_frame, timestamp, header_img, subtitle_img):
+    """Clean talking-head composite: header + subtitles only."""
     frame = Image.fromarray(background_frame).convert('RGBA')
     
-    # 1. Header is always at top
-    frame.alpha_composite(header_img, dest=(0,0))
+    # 1. Header at top
+    frame.alpha_composite(header_img, dest=(0, 0))
     
-    # 2. Subtitles on top
+    # 2. Subtitles
     if subtitle_img is not None:
-        frame.alpha_composite(subtitle_img, dest=(0,0))
+        frame.alpha_composite(subtitle_img, dest=(0, 0))
     
-    # 3. HOOK TEXT FLASH (first 1.5 seconds) — grabs attention immediately
-    if timestamp < 1.5 and hook_text:
-        hook_img = _render_hook_overlay(hook_text, FRAME_W, FRAME_H, timestamp)
-        if hook_img:
-            frame.alpha_composite(hook_img, dest=(0, 0))
-    
-    # 4. SUBSCRIBE REMINDER (at 75-85% of video)
-    progress_pct = timestamp / max(video_duration, 0.01)
-    if 0.72 <= progress_pct <= 0.82:
-        sub_img = _render_subscribe_reminder(FRAME_W, FRAME_H)
-        if sub_img:
-            frame.alpha_composite(sub_img, dest=(0, 0))
-    
-    # 5. COMMENT BAIT (last 3 seconds)
-    if timestamp >= video_duration - 3.0 and comment_hook:
-        comment_img = _render_comment_bait(comment_hook, FRAME_W, FRAME_H)
-        if comment_img:
-            frame.alpha_composite(comment_img, dest=(0, 0))
-        
     return np.array(frame.convert('RGB'))
 
 def verify_text_visibility(frame_array, zone_name, y_start, y_end):
@@ -1359,13 +1336,8 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     
     base_comp = CompositeVideoClip(base_layers, size=(FRAME_W, FRAME_H)).with_duration(audio_duration)
 
-    # Pre-render custom composite assets
+    # Pre-render header (only persistent overlay)
     header_img = render_header_bar(title, sub_category, accent_color, FRAME_W)
-    cta_img = render_telegram_cta(accent_color, FRAME_W)
-    
-    # Retention booster data from script
-    hook_text = script_json.get("hook", "")[:40]
-    comment_hook = script_json.get("comment_hook", "Comment your thoughts below! 👇")
 
     def make_final_frame(t):
         bg_frame = base_comp.get_frame(t)
@@ -1388,9 +1360,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                     )
                 break
                 
-        return composite_frame(bg_frame, t, header_img, subtitle_img, cta_img, audio_duration, 
-                               cues=script_json.get("retention_cues", []),
-                               hook_text=hook_text, comment_hook=comment_hook)
+        return composite_frame(bg_frame, t, header_img, subtitle_img)
 
     final = VideoClip(make_final_frame, duration=audio_duration)
     final = final.with_audio(audio)
@@ -1401,24 +1371,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     
     final_duration = final_video.duration
 
-    # ── LAYER 15: BGM ─────────────────────────────────────────────────────────
-    is_infinite_loop = script_json.get("loop_score", 0) >= 8
-    music_files = [f for f in os.listdir(MUSIC_DIR) if f.endswith(".mp3")]
-    if music_files:
-        bg_music = random.choice(music_files)
-        bgm = AudioFileClip(os.path.join(MUSIC_DIR, bg_music)).with_volume_scaled(BGM_VOLUME)
-        if bgm.duration < final_duration:
-            bgm = bgm.with_effects([afx.AudioLoop(duration=final_duration)])
-        else:
-            bgm = bgm.subclipped(0, final_duration)
-            
-        # If it's a loop, we might want to fade the BGM or keep it constant
-        if is_infinite_loop:
-            # Subtle volume dip at the very end to avoid pop
-            bgm = bgm.with_effects([afx.AudioFadeOut(0.1)])
-            
-        final_video = final_video.with_audio(CompositeAudioClip([final_video.audio, bgm]))
-
+    # ── BGM removed for clean talking-head format ─────────────────────────────
     final = final_video
 
     print(f"Exporting {final_duration:.1f}s → {output_path}")
