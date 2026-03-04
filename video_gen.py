@@ -1050,6 +1050,9 @@ def _enhance_with_gfpgan(input_video_path):
     Extracts frames → runs GFPGAN on each → reassembles video with ffmpeg.
     Returns the path to the enhanced video, or the original path if enhancement fails.
     """
+    if os.getenv('GITHUB_ACTIONS'):
+        print("GFPGAN: Running in GitHub CI (No GPU). Skipping face enhancement to prevent hours-long CPU processing timeout.")
+        return input_video_path
     import subprocess
     import shutil
 
