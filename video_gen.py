@@ -992,8 +992,10 @@ def render_subtitle_frame(text, current_words, bg_frame=None, accent_color=(255,
     f_main = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 85)
     f_pop = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 95)
     
-    words = text.split()
-    current_word_list = current_words.get('current', [])
+    # UPPERCASE all text for punchier look
+    words = [w.upper() for w in text.split()]
+    current_word_list = [w.upper() for w in current_words.get('current', [])]
+    spoken_word_list = [w.upper() for w in current_words.get('spoken', [])]
     
     word_widths = []
     fake_draw = ImageDraw.Draw(Image.new("RGBA", (1,1)))
@@ -1006,7 +1008,7 @@ def render_subtitle_frame(text, current_words, bg_frame=None, accent_color=(255,
     
     line_h = 130
     total_h = len(lines) * line_h
-    start_y = 1100 # Chest position
+    start_y = 1000 # Chest/neck position (closer to mouth)
     
     word_idx = 0
     for i, line in enumerate(lines):
@@ -1020,19 +1022,23 @@ def render_subtitle_frame(text, current_words, bg_frame=None, accent_color=(255,
             
             # Colors
             if is_active:
-                color = (255, 255, 0, 255)
-            elif word in current_words.get('spoken', []):
+                color = (*accent_color, 255) # Use dynamic theme color instead of hardcoded yellow
+            elif word in spoken_word_list:
                 color = (180, 180, 180, 255)
             else:
                 color = (255, 255, 255, 255)
                 
-            # Heavy stroke
+            # Heavy stroke using Pillow native 
             s_w = 8 if is_active else 5
-            for dx in range(-s_w, s_w+1, 2):
-                for dy in range(-s_w, s_w+1, 2):
-                    draw.text((cur_x+dx, line_y+dy), word, font=f, fill=(0,0,0,255))
+            draw.text(
+                (cur_x, line_y), 
+                word, 
+                font=f, 
+                fill=color,
+                stroke_width=s_w,
+                stroke_fill=(0, 0, 0, 255)
+            )
             
-            draw.text((cur_x, line_y), word, font=f, fill=color)
             cur_x += word_widths[word_idx] + 12
             word_idx += 1
             
