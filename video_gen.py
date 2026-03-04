@@ -272,8 +272,7 @@ def _dynamic_tech_background(duration, accent_color):
 def _dynamic_avatar_clip(duration, audio_path, accent_color):
     """
     Attempts to generate an avatar video using Wav2Lip if the directory exists.
-    If it fails or is absent, falls back to an audio visualizer centered 
-    around the avatar image.
+    If it fails or is absent, returns None to skip the avatar layer entirely.
     """
     import numpy as np
     from pydub import AudioSegment
@@ -1062,6 +1061,60 @@ def render_subtitle_frame(text, current_words, bg_frame=None, accent_color=(255,
             
     return img
 
+def _generate_lipsync_video(audio_path):
+    """
+    Runs Wav2Lip on Firefly_video_final.mp4 to produce a full lip-synced video.
+    Returns the output file path if successful, None otherwise.
+    """
+    import subprocess
+
+    face_path = os.path.join(ASSETS_DIR, "Firefly_video_final.mp4")
+    if not os.path.exists(face_path):
+        print("Firefly_video_final.mp4 not found in assets. Skipping lip sync.")
+        return None
+
+    output_path = os.path.join(OUTPUT_DIR, "temp_lipsync.mp4")
+    wav2lip_dir = os.path.join(BASE_DIR, "Wav2Lip")
+
+    if not os.path.exists(wav2lip_dir):
+        print("Wav2Lip directory not found. Skipping lip sync.")
+        return None
+
+    print(f"Wav2Lip detected at {wav2lip_dir}. Attempting lip sync on Firefly video...")
+
+    w2l_env = os.environ.copy()
+    w2l_env["PYTHONHASHSEED"] = "0"
+    print(f"Wav2Lip env PYTHONHASHSEED forced to: '{w2l_env.get('PYTHONHASHSEED')}'")
+
+    cmd = [
+        sys.executable, "inference.py",
+        "--checkpoint_path", "checkpoints/wav2lip_gan.pth",
+        "--face", os.path.abspath(face_path),
+        "--audio", os.path.abspath(audio_path),
+        "--outfile", output_path,
+        "--pads", "0", "20", "0", "0",
+        "--face_det_batch_size", "2",
+        "--wav2lip_batch_size", "16"
+    ]
+    print(f"Wav2Lip CMD: {' '.join(str(c) for c in cmd)}")
+
+    try:
+        result = subprocess.run(cmd, cwd=wav2lip_dir, capture_output=True, text=True, env=w2l_env, timeout=1800)
+        print(f"Wav2Lip STDOUT: {result.stdout[-500:] if result.stdout else '(empty)'}")
+        print(f"Wav2Lip STDERR: {result.stderr[-500:] if result.stderr else '(empty)'}")
+        if result.returncode != 0:
+            raise Exception(f"Wav2Lip process returned {result.returncode}")
+        if os.path.exists(output_path):
+            print(f"Lip sync successful: {output_path}")
+            return output_path
+    except subprocess.TimeoutExpired:
+        print("Wav2Lip generation timed out after 1800s.")
+    except Exception as e:
+        print(f"Wav2Lip generation failed: {e}")
+
+    return None
+
+
 def create_video(audio_path, script_json, chunks, output_path=None):
     global _kb_idx
     today = datetime.now().strftime("%Y-%m-%d")
@@ -1089,40 +1142,44 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     key_stat_ts    = float(script_json.get("key_stat_timestamp", 0))
     shock_ts       = float(script_json.get("shocking_moment_timestamp", 0))
 
-    # ── LAYER 1: Main Video Background (Firefly v2) ───────────────────────────
-    print("Building main video background from Firefly_video_final.mp4...")
-    bg_path = os.path.join(ASSETS_DIR, "Firefly_video_final.mp4")
-    if os.path.exists(bg_path):
-        vid_clip = VideoFileClip(bg_path)
-        # Handle looping if video is shorter than audio
+    # ── LAYER 1: Full-Frame Firefly Background with Wav2Lip Lip Sync ──────────
+    print("Preparing main video background (Firefly + Wav2Lip lip sync)...")
+
+    # Step 1: Try to generate a lip-synced version of the Firefly video
+    lipsync_path = _generate_lipsync_video(audio_path)
+
+    # Step 2: Use lip-synced video if available, otherwise fall back to original
+    firefly_path = os.path.join(ASSETS_DIR, "Firefly_video_final.mp4")
+    bg_video_path = lipsync_path if lipsync_path else firefly_path
+
+    if os.path.exists(bg_video_path):
+        vid_clip = VideoFileClip(bg_video_path)
+        # Loop or trim to match audio duration
         if vid_clip.duration < audio_duration:
             vid_clip = vid_clip.with_effects([vfx.Loop(duration=audio_duration)])
         else:
             vid_clip = vid_clip.subclipped(0, audio_duration)
-            
-        # AVATAR UN-CROPPING RULE: Avoid cropping at all costs. 
-        # Resize to fit horizontally width=1080 (maintaining aspect ratio).
-        vid_clip = vid_clip.resized(width=FRAME_W)
-        
-        # We need a 1080x1920 base to avoid black boundaries out-of-bounds.
-        # Check for user-provided static background image, else fallback to dynamic tech background
-        bg_image_path = os.path.join(ASSETS_DIR, "gemini_img_without_logo.png")
-        if os.path.exists(bg_image_path):
-            bg_base = ImageClip(bg_image_path).resized(width=FRAME_W, height=FRAME_H).with_duration(audio_duration)
-        else:
-            bg_base = _dynamic_tech_background(audio_duration, accent_color)
-            
-        base = CompositeVideoClip([bg_base, vid_clip.with_position("center")], size=(FRAME_W, FRAME_H)).with_duration(audio_duration)
-    else:
-        # Fallback completely if no video is present
-        bg_image_path = os.path.join(ASSETS_DIR, "gemini_img_without_logo.png")
-        if os.path.exists(bg_image_path):
-            base = ImageClip(bg_image_path).resized(width=FRAME_W, height=FRAME_H).with_duration(audio_duration)
-        else:
-            base = _dynamic_tech_background(audio_duration, accent_color)
 
-    # ── LAYER 2: Avatar (Wav2Lip Re-enabled) ──────────────────────────────────
-    avatar = _dynamic_avatar_clip(audio_duration, audio_path, accent_color)
+        # Crop to fill the entire 1080x1920 frame (no gaps / no filler background)
+        w, h = vid_clip.size
+        target_h = int(w * 16 / 9)
+        if target_h <= h:
+            y1 = (h - target_h) // 2
+            vid_clip = vid_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h)
+        else:
+            target_w = int(h * 9 / 16)
+            x1 = (w - target_w) // 2
+            vid_clip = vid_clip.cropped(x1=x1, y1=0, x2=x1 + target_w, y2=h)
+
+        base = vid_clip.resized((FRAME_W, FRAME_H)).without_audio()
+        if lipsync_path:
+            print("Using Wav2Lip lip-synced Firefly video as full-frame background.")
+        else:
+            print("Wav2Lip unavailable — using original Firefly video without lip sync.")
+    else:
+        # Ultimate fallback: solid dark background
+        print("No Firefly video found. Using solid dark background.")
+        base = ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=audio_duration)
     
     # ── LAYER 3: Tint ─────────────────────────────────────────────────────────
     tint = ColorClip(size=(FRAME_W, FRAME_H), color=accent_color, duration=audio_duration).with_opacity(0.02)
@@ -1149,8 +1206,6 @@ def create_video(audio_path, script_json, chunks, output_path=None):
 
     # ── LAYER 11: Main Composite Base ─────────────────────────────────────────
     base_layers = [base, tint, gradient] + particle_clips + logo_clips + fact_clips + burst_clips + reminder_clips
-    if avatar:
-        base_layers.append(avatar)
     
     progress = ColorClip(size=(FRAME_W, 6), color=accent_color, duration=audio_duration)
     progress = progress.with_position(lambda t: (int((t / max(audio_duration, 0.01)) * FRAME_W) - FRAME_W, FRAME_H - 6))
