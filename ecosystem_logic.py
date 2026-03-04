@@ -21,11 +21,11 @@ def get_slot_info():
     matrix = {
         "Mon": ("AI News", "AI Money"),
         "Tue": ("AI vs AI", "AI Hands-on"),
-        "Wed": ("AI Quiz", "AI Tool"),
-        "Thu": ("AI Predictions", "AI Career"),
-        "Fri": ("AI Concepts", "AI Fails"),
-        "Sat": ("AI vs AI", "AI Tool"),
-        "Sun": ("AI News", "AI Money")
+        "Wed": ("AI Concepts", "AI Fails"),       # Fails mid-week for virality
+        "Thu": ("AI Predictions", "AI Ethics"),   # Adds human angle
+        "Fri": ("AI Quiz", "AI Career"),
+        "Sat": ("AI Build", "AI Tool"),            # Project continuity on weekends
+        "Sun": ("AI News", "AI Fails")             # Fails again — strong Sunday closer
     }
     
     categories = matrix.get(day_name, ("AI News", "AI Tool"))
@@ -101,6 +101,18 @@ def get_category_prompt_enhancement(category, slot):
             STRATEGY: {base_utility}
             GOAL: Discuss jobs, skills to learn, and how to survive the AI boom without being replaced.
             HOOK: 'These 5 jobs will be gone by next year because of AI. Are you on the list?'
+        """,
+        "AI Ethics": f"""
+            CATEGORY: AI Ethics (Human Angle).
+            STRATEGY: {base_discovery}
+            GOAL: Highlight the moral, legal, or societal implications of a new AI development.
+            HOOK: 'AI just crossed a line we can never go back from. Here is what happened.'
+        """,
+        "AI Build": f"""
+            CATEGORY: AI Build (Project/Code).
+            STRATEGY: {base_utility}
+            GOAL: Show a tangible project being built with AI. Focus on actionable insights for developers or creators.
+            HOOK: 'I built a fully functional [App/Tool] in 5 minutes using AI. Watch how.'
         """
     }
     
