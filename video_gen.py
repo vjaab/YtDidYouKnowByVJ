@@ -1071,10 +1071,19 @@ def _enhance_with_gfpgan(input_video_path):
     import shutil
 
     try:
+        # Compatibility shim: newer torchvision removed functional_tensor module
+        # but basicsr (GFPGAN dependency) still tries to import from it.
+        import sys as _sys
+        import types as _types
+        if 'torchvision.transforms.functional_tensor' not in _sys.modules:
+            import torchvision.transforms.functional as _F
+            _compat = _types.ModuleType('torchvision.transforms.functional_tensor')
+            _compat.rgb_to_grayscale = _F.rgb_to_grayscale
+            _sys.modules['torchvision.transforms.functional_tensor'] = _compat
+
         from gfpgan import GFPGANer
-        from basicsr.archs.rrdbnet_arch import RRDBNet
-    except ImportError:
-        print("GFPGAN not installed. Skipping face enhancement.")
+    except (ImportError, Exception) as e:
+        print(f"GFPGAN not available: {e}. Skipping face enhancement.")
         return input_video_path
 
     enhanced_path = input_video_path.replace(".mp4", "_enhanced.mp4")
