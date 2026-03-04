@@ -1117,8 +1117,9 @@ def _enhance_with_gfpgan(input_video_path):
         # Step 3: Process each frame
         total = len(frame_files)
         for i, fname in enumerate(frame_files):
-            if (i + 1) % 50 == 0 or i == 0:
-                print(f"GFPGAN: Processing frame {i+1}/{total}...")
+            if (i + 1) % 20 == 0 or i == 0 or (i + 1) == total:
+                percent = ((i + 1) / total) * 100
+                print(f"GFPGAN: Processing frame {i+1}/{total} ({percent:.1f}%)...", flush=True)
 
             frame_path = os.path.join(frames_dir, fname)
             img = cv2.imread(frame_path)
