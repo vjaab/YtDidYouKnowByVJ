@@ -1061,9 +1061,144 @@ def render_subtitle_frame(text, current_words, bg_frame=None, accent_color=(255,
             
     return img
 
+def _enhance_with_gfpgan(input_video_path):
+    """
+    Enhances faces in a video using GFPGAN face restoration.
+    Extracts frames → runs GFPGAN on each → reassembles video with ffmpeg.
+    Returns the path to the enhanced video, or the original path if enhancement fails.
+    """
+    import subprocess
+    import shutil
+
+    try:
+        from gfpgan import GFPGANer
+        from basicsr.archs.rrdbnet_arch import RRDBNet
+    except ImportError:
+        print("GFPGAN not installed. Skipping face enhancement.")
+        return input_video_path
+
+    enhanced_path = input_video_path.replace(".mp4", "_enhanced.mp4")
+    frames_dir = os.path.join(OUTPUT_DIR, "gfpgan_frames")
+    enhanced_frames_dir = os.path.join(OUTPUT_DIR, "gfpgan_enhanced")
+
+    try:
+        # Clean up any previous run
+        for d in [frames_dir, enhanced_frames_dir]:
+            if os.path.exists(d):
+                shutil.rmtree(d)
+            os.makedirs(d, exist_ok=True)
+
+        # Step 1: Extract frames from video
+        print("GFPGAN: Extracting frames from Wav2Lip output...")
+        ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+        extract_cmd = [
+            ffmpeg_exe, "-i", input_video_path,
+            "-qscale:v", "2",
+            os.path.join(frames_dir, "frame_%06d.png")
+        ]
+        subprocess.run(extract_cmd, capture_output=True, text=True, check=True)
+
+        frame_files = sorted([f for f in os.listdir(frames_dir) if f.endswith(".png")])
+        if not frame_files:
+            print("GFPGAN: No frames extracted. Skipping enhancement.")
+            return input_video_path
+
+        print(f"GFPGAN: Extracted {len(frame_files)} frames. Running face restoration...")
+
+        # Step 2: Initialize GFPGAN model
+        # Download the pre-trained model weight if not present
+        model_path = os.path.join(OUTPUT_DIR, "GFPGANv1.4.pth")
+        if not os.path.exists(model_path):
+            print("GFPGAN: Downloading model weights...")
+            import urllib.request
+            url = "https://github.com/TencentARC/GFPGAN/releases/download/v1.3.0/GFPGANv1.4.pth"
+            urllib.request.urlretrieve(url, model_path)
+
+        restorer = GFPGANer(
+            model_path=model_path,
+            upscale=1,          # Keep original resolution (no upscale)
+            arch='clean',
+            channel_multiplier=2,
+            bg_upsampler=None   # Skip background upscaling for speed
+        )
+
+        # Step 3: Process each frame
+        total = len(frame_files)
+        for i, fname in enumerate(frame_files):
+            if (i + 1) % 50 == 0 or i == 0:
+                print(f"GFPGAN: Processing frame {i+1}/{total}...")
+
+            frame_path = os.path.join(frames_dir, fname)
+            img = cv2.imread(frame_path)
+            if img is None:
+                continue
+
+            # Run GFPGAN restoration
+            _, _, restored_img = restorer.enhance(
+                img,
+                has_aligned=False,
+                only_center_face=True,  # Focus on the main face only
+                paste_back=True         # Paste the enhanced face back into original frame
+            )
+
+            if restored_img is not None:
+                cv2.imwrite(os.path.join(enhanced_frames_dir, fname), restored_img)
+            else:
+                # If enhancement fails for a frame, keep the original
+                cv2.imwrite(os.path.join(enhanced_frames_dir, fname), img)
+
+        # Step 4: Get original video FPS for reassembly
+        probe_cmd = [
+            ffmpeg_exe, "-i", input_video_path
+        ]
+        probe_result = subprocess.run(probe_cmd, capture_output=True, text=True)
+        # Parse FPS from ffmpeg output (default to 25 if parsing fails)
+        fps = 25
+        import re
+        fps_match = re.search(r'(\d+(?:\.\d+)?)\s*fps', probe_result.stderr)
+        if fps_match:
+            fps = float(fps_match.group(1))
+
+        # Step 5: Reassemble enhanced frames into video
+        print(f"GFPGAN: Reassembling {total} enhanced frames at {fps} fps...")
+        assemble_cmd = [
+            ffmpeg_exe,
+            "-y",
+            "-framerate", str(fps),
+            "-i", os.path.join(enhanced_frames_dir, "frame_%06d.png"),
+            "-i", input_video_path,      # Copy audio from original
+            "-map", "0:v",               # Video from enhanced frames
+            "-map", "1:a?",              # Audio from original (if exists)
+            "-c:v", "libx264",
+            "-preset", "ultrafast",
+            "-pix_fmt", "yuv420p",
+            "-c:a", "copy",
+            enhanced_path
+        ]
+        subprocess.run(assemble_cmd, capture_output=True, text=True, check=True)
+
+        if os.path.exists(enhanced_path):
+            print(f"GFPGAN: Face enhancement complete → {enhanced_path}")
+            # Clean up temp directories
+            shutil.rmtree(frames_dir, ignore_errors=True)
+            shutil.rmtree(enhanced_frames_dir, ignore_errors=True)
+            return enhanced_path
+
+    except Exception as e:
+        print(f"GFPGAN enhancement failed: {e}. Using unenhanced Wav2Lip output.")
+        # Clean up on failure
+        import shutil
+        for d in [frames_dir, enhanced_frames_dir]:
+            if os.path.exists(d):
+                shutil.rmtree(d, ignore_errors=True)
+
+    return input_video_path
+
+
 def _generate_lipsync_video(audio_path):
     """
-    Runs Wav2Lip on Firefly_video_final.mp4 to produce a full lip-synced video.
+    Runs Wav2Lip on Firefly_video_final.mp4 to produce a full lip-synced video,
+    then enhances face quality with GFPGAN.
     Returns the output file path if successful, None otherwise.
     """
     import subprocess
@@ -1106,7 +1241,9 @@ def _generate_lipsync_video(audio_path):
             raise Exception(f"Wav2Lip process returned {result.returncode}")
         if os.path.exists(output_path):
             print(f"Lip sync successful: {output_path}")
-            return output_path
+            # Post-process: Enhance face quality with GFPGAN
+            enhanced_path = _enhance_with_gfpgan(output_path)
+            return enhanced_path
     except subprocess.TimeoutExpired:
         print("Wav2Lip generation timed out after 1800s.")
     except Exception as e:

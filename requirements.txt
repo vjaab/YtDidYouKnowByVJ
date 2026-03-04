@@ -103,3 +103,5 @@ setuptools
 accelerate
 vocos
 pydub
+gfpgan
+basicsr
