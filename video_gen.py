@@ -268,122 +268,7 @@ def _dynamic_tech_background(duration, accent_color):
 
     return VideoClip(make_frame, duration=duration)
 
-# ── PROFILE PICTURE LAYER ─────────────────────────────────────────────────────
-def _dynamic_avatar_clip(duration, audio_path, accent_color):
-    """
-    Attempts to generate an avatar video using Wav2Lip if the directory exists.
-    If it fails or is absent, returns None to skip the avatar layer entirely.
-    """
-    import numpy as np
-    from pydub import AudioSegment
-    import math
-    import subprocess
-    # Primary preference: Video (for motion) -> YouTube Pic -> Original Profile
-    avatar_face_path = os.path.join(ASSETS_DIR, "Firefly_video_final.mp4")
-    if not os.path.exists(avatar_face_path):
-        avatar_face_path = os.path.join(ASSETS_DIR, "gemini_img_without_logo.png")
-    if not os.path.exists(avatar_face_path):
-        avatar_face_path = os.path.join(ASSETS_DIR, "vj_profile.jpg")
-        
-    output_temp_avatar = os.path.join(OUTPUT_DIR, "temp_avatar.mp4")
-    
-    if not os.path.exists(avatar_face_path):
-        print(f"No avatar source (video or image) found in assets. Skipping avatar generation.")
-        return None
 
-    success = False
-    wav2lip_dir = os.path.join(BASE_DIR, "Wav2Lip")
-
-    # 1. Try Wav2Lip (Primary AI Engine)
-    if os.path.exists(wav2lip_dir):
-        if os.getenv('GITHUB_ACTIONS'):
-            print("Wav2Lip: Running in GitHub CI. Skipping avatar generation.")
-            return None
-        print(f"Wav2Lip detected at {wav2lip_dir}. Attempting avatar generation...")
-        
-        # Build a CLEAN environment for the Wav2Lip subprocess.
-        # The 'Fatal Python error: config_init_hash_seed' crash happens when
-        # PYTHONHASHSEED is missing, empty, or has a non-integer value.
-        # We ALWAYS force it to '0' to guarantee a valid state.
-        w2l_env = os.environ.copy()
-        w2l_env["PYTHONHASHSEED"] = "0"
-        print(f"Wav2Lip env PYTHONHASHSEED forced to: '{w2l_env.get('PYTHONHASHSEED')}'")
-
-        cmd = [
-            sys.executable, "inference.py",
-            "--checkpoint_path", "checkpoints/wav2lip_gan.pth",
-            "--face", os.path.abspath(avatar_face_path),
-            "--audio", os.path.abspath(audio_path),
-            "--outfile", output_temp_avatar,
-            "--pads", "0", "20", "0", "0",
-            "--face_det_batch_size", "2",
-            "--wav2lip_batch_size", "16"
-        ]
-        print(f"Wav2Lip CMD: {' '.join(str(c) for c in cmd)}")
-        try:
-            result = subprocess.run(cmd, cwd=wav2lip_dir, capture_output=True, text=True, env=w2l_env, timeout=1800)
-            print(f"Wav2Lip STDOUT: {result.stdout[-500:] if result.stdout else '(empty)'}")
-            print(f"Wav2Lip STDERR: {result.stderr[-500:] if result.stderr else '(empty)'}")
-            if result.returncode != 0:
-                raise Exception(f"Wav2Lip process returned {result.returncode}")
-                
-            if os.path.exists(output_temp_avatar):
-                success = True
-                print(f"Wav2Lip output file created: {output_temp_avatar}")
-        except subprocess.TimeoutExpired:
-            print("Wav2Lip generation timed out after 600s.")
-        except Exception as e:
-            print(f"Wav2Lip generation failed: {e}")
-
-    # 3. Handle successful deep learning avatar
-    if success and os.path.exists(output_temp_avatar):
-        print(f"Avatar successfully generated via AI. Path: {output_temp_avatar}")
-        try:
-            av_clip = VideoFileClip(output_temp_avatar).subclipped(0, duration)
-            
-            # Upscale if the output is too small for modern displays (e.g. 96x96 -> 500x500)
-            target_h = 500
-            if av_clip.h < target_h:
-                print(f"Upscaling generated avatar from {av_clip.h}px to {target_h}px for clarity.")
-                av_clip = av_clip.resized(height=target_h)
-
-            vw, vh = av_clip.size
-            size = min(vw, vh)
-            
-            # Create a High-Quality Soft Mask (Feathered Edge)
-            mask_img = np.zeros((vh, vw), dtype=np.uint8)
-            cv2.circle(mask_img, (vw//2, vh//2), size//2 - 2, 255, -1)
-            # Apply Gaussian Blur to the binary mask for soft alpha transitions (premium look)
-            mask_img = cv2.GaussianBlur(mask_img, (15, 15), 0)
-            
-            mask_clip = VideoClip(lambda t: mask_img.astype(float) / 255.0, is_mask=True, duration=duration)
-            av_clip = av_clip.with_mask(mask_clip)
-
-            # Create a Glowing Border Ring behind the avatar
-            border_size = size + 20
-            def make_border_frame(t):
-                # Extra small pulse to make the avatar feel alive
-                pulse = 1.0 + 0.02 * math.sin(t * 2.0)
-                cur_r = int((border_size // 2) * pulse)
-                
-                img = np.zeros((border_size + 40, border_size + 40, 3), dtype=np.uint8)
-                center = (img.shape[1]//2, img.shape[0]//2)
-                # Outer glow
-                cv2.circle(img, center, cur_r, accent_color, 4)
-                img = cv2.GaussianBlur(img, (11, 11), 0)
-                return img
-
-            border_clip = VideoClip(make_border_frame, duration=duration).with_position(("center", 800))
-            
-            # Position avatar slightly above center (800px from top) to avoid overlapping with captions at 1200px
-            return CompositeVideoClip([border_clip, av_clip.with_position(("center", 800))], size=(FRAME_W, FRAME_H))
-        except Exception as e:
-            print(f"Failed to load generated avatar video: {e}")
-            success = False # Proceed to fallback if loading fails
-    
-    # 4. Fallback: Skip avatar, use raw video file as-is
-    print("Wav2Lip unavailable — using raw video file without lip sync.")
-    return None
 
 
 
@@ -1047,165 +932,13 @@ def render_subtitle_frame(text, current_words, bg_frame=None, accent_color=(255,
             
     return img
 
-def _enhance_with_gfpgan(input_video_path):
-    """
-    Enhances faces in a video using GFPGAN face restoration.
-    Extracts frames → runs GFPGAN on each → reassembles video with ffmpeg.
-    Returns the path to the enhanced video, or the original path if enhancement fails.
-    """
-    import os
-    if os.getenv('GITHUB_ACTIONS'):
-        print("GFPGAN: Running in GitHub CI (No GPU). Skipping face enhancement to prevent hours-long CPU processing timeout.")
-        return input_video_path
-    import subprocess
-    import shutil
-
-    try:
-        # Compatibility shim: newer torchvision removed functional_tensor module
-        # but basicsr (GFPGAN dependency) still tries to import from it.
-        import sys as _sys
-        import types as _types
-        if 'torchvision.transforms.functional_tensor' not in _sys.modules:
-            import torchvision.transforms.functional as _F
-            _compat = _types.ModuleType('torchvision.transforms.functional_tensor')
-            _compat.rgb_to_grayscale = _F.rgb_to_grayscale
-            _sys.modules['torchvision.transforms.functional_tensor'] = _compat
-
-        from gfpgan import GFPGANer
-    except (ImportError, Exception) as e:
-        print(f"GFPGAN not available: {e}. Skipping face enhancement.")
-        return input_video_path
-
-    enhanced_path = input_video_path.replace(".mp4", "_enhanced.mp4")
-    frames_dir = os.path.join(OUTPUT_DIR, "gfpgan_frames")
-    enhanced_frames_dir = os.path.join(OUTPUT_DIR, "gfpgan_enhanced")
-
-    try:
-        # Clean up any previous run
-        for d in [frames_dir, enhanced_frames_dir]:
-            if os.path.exists(d):
-                shutil.rmtree(d)
-            os.makedirs(d, exist_ok=True)
-
-        # Step 1: Extract frames from video
-        print("GFPGAN: Extracting frames from Wav2Lip output...")
-        ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
-        extract_cmd = [
-            ffmpeg_exe, "-i", input_video_path,
-            "-qscale:v", "2",
-            os.path.join(frames_dir, "frame_%06d.png")
-        ]
-        subprocess.run(extract_cmd, capture_output=True, text=True, check=True)
-
-        frame_files = sorted([f for f in os.listdir(frames_dir) if f.endswith(".png")])
-        if not frame_files:
-            print("GFPGAN: No frames extracted. Skipping enhancement.")
-            return input_video_path
-
-        print(f"GFPGAN: Extracted {len(frame_files)} frames. Running face restoration...")
-
-        # Step 2: Initialize GFPGAN model
-        # Download the pre-trained model weight if not present
-        model_path = os.path.join(OUTPUT_DIR, "GFPGANv1.4.pth")
-        if not os.path.exists(model_path):
-            print("GFPGAN: Downloading model weights...")
-            import urllib.request
-            url = "https://github.com/TencentARC/GFPGAN/releases/download/v1.3.0/GFPGANv1.4.pth"
-            urllib.request.urlretrieve(url, model_path)
-
-        restorer = GFPGANer(
-            model_path=model_path,
-            upscale=1,          # Keep original resolution (no upscale)
-            arch='clean',
-            channel_multiplier=2,
-            bg_upsampler=None   # Skip background upscaling for speed
-        )
-
-        # Step 3: Process each frame
-        total = len(frame_files)
-        for i, fname in enumerate(frame_files):
-            if (i + 1) % 20 == 0 or i == 0 or (i + 1) == total:
-                percent = ((i + 1) / total) * 100
-                print(f"GFPGAN: Processing frame {i+1}/{total} ({percent:.1f}%)...", flush=True)
-
-            frame_path = os.path.join(frames_dir, fname)
-            img = cv2.imread(frame_path)
-            if img is None:
-                continue
-
-            # Run GFPGAN restoration
-            _, _, restored_img = restorer.enhance(
-                img,
-                has_aligned=False,
-                only_center_face=True,  # Focus on the main face only
-                paste_back=True         # Paste the enhanced face back into original frame
-            )
-
-            if restored_img is not None:
-                cv2.imwrite(os.path.join(enhanced_frames_dir, fname), restored_img)
-            else:
-                # If enhancement fails for a frame, keep the original
-                cv2.imwrite(os.path.join(enhanced_frames_dir, fname), img)
-
-        # Step 4: Get original video FPS for reassembly
-        probe_cmd = [
-            ffmpeg_exe, "-i", input_video_path
-        ]
-        probe_result = subprocess.run(probe_cmd, capture_output=True, text=True)
-        # Parse FPS from ffmpeg output (default to 25 if parsing fails)
-        fps = 25
-        import re
-        fps_match = re.search(r'(\d+(?:\.\d+)?)\s*fps', probe_result.stderr)
-        if fps_match:
-            fps = float(fps_match.group(1))
-
-        # Step 5: Reassemble enhanced frames into video
-        print(f"GFPGAN: Reassembling {total} enhanced frames at {fps} fps...")
-        assemble_cmd = [
-            ffmpeg_exe,
-            "-y",
-            "-framerate", str(fps),
-            "-i", os.path.join(enhanced_frames_dir, "frame_%06d.png"),
-            "-i", input_video_path,      # Copy audio from original
-            "-map", "0:v",               # Video from enhanced frames
-            "-map", "1:a?",              # Audio from original (if exists)
-            "-c:v", "libx264",
-            "-preset", "ultrafast",
-            "-pix_fmt", "yuv420p",
-            "-c:a", "copy",
-            enhanced_path
-        ]
-        subprocess.run(assemble_cmd, capture_output=True, text=True, check=True)
-
-        if os.path.exists(enhanced_path):
-            print(f"GFPGAN: Face enhancement complete → {enhanced_path}")
-            # Clean up temp directories
-            shutil.rmtree(frames_dir, ignore_errors=True)
-            shutil.rmtree(enhanced_frames_dir, ignore_errors=True)
-            return enhanced_path
-
-    except Exception as e:
-        print(f"GFPGAN enhancement failed: {e}. Using unenhanced Wav2Lip output.")
-        # Clean up on failure
-        import shutil
-        for d in [frames_dir, enhanced_frames_dir]:
-            if os.path.exists(d):
-                shutil.rmtree(d, ignore_errors=True)
-
-    return input_video_path
-
-
 def _generate_lipsync_video(audio_path):
     """
-    Runs Wav2Lip on Firefly_video_final.mp4 to produce a full lip-synced video,
-    then enhances face quality with GFPGAN.
+    Generates a lip-synced version of Firefly_video_final.mp4 using
+    the best available engine (MuseTalk local → fal.ai cloud).
     Returns the output file path if successful, None otherwise.
     """
-    import os
-    if os.getenv('GITHUB_ACTIONS'):
-        print("Wav2Lip: Running in GitHub CI. Skipping lip sync generation.")
-        return None
-    import subprocess
+    from lip_sync import generate_lip_sync, get_available_engine
 
     face_path = os.path.join(ASSETS_DIR, "Firefly_video_final.mp4")
     if not os.path.exists(face_path):
@@ -1213,46 +946,21 @@ def _generate_lipsync_video(audio_path):
         return None
 
     output_path = os.path.join(OUTPUT_DIR, "temp_lipsync.mp4")
-    wav2lip_dir = os.path.join(BASE_DIR, "Wav2Lip")
 
-    if not os.path.exists(wav2lip_dir):
-        print("Wav2Lip directory not found. Skipping lip sync.")
-        return None
+    engine = get_available_engine()
+    print(f"🎭 Lip-sync engine: {engine or 'None available'}")
 
-    print(f"Wav2Lip detected at {wav2lip_dir}. Attempting lip sync on Firefly video...")
+    result = generate_lip_sync(
+        face_path=face_path,
+        audio_path=audio_path,
+        output_path=output_path,
+    )
 
-    w2l_env = os.environ.copy()
-    w2l_env["PYTHONHASHSEED"] = "0"
-    print(f"Wav2Lip env PYTHONHASHSEED forced to: '{w2l_env.get('PYTHONHASHSEED')}'")
+    if result and os.path.exists(result):
+        print(f"🎭 Lip-sync successful: {result}")
+        return result
 
-    cmd = [
-        sys.executable, "inference.py",
-        "--checkpoint_path", "checkpoints/wav2lip_gan.pth",
-        "--face", os.path.abspath(face_path),
-        "--audio", os.path.abspath(audio_path),
-        "--outfile", output_path,
-        "--pads", "0", "20", "0", "0",
-        "--face_det_batch_size", "2",
-        "--wav2lip_batch_size", "16"
-    ]
-    print(f"Wav2Lip CMD: {' '.join(str(c) for c in cmd)}")
-
-    try:
-        result = subprocess.run(cmd, cwd=wav2lip_dir, capture_output=True, text=True, env=w2l_env, timeout=1800)
-        print(f"Wav2Lip STDOUT: {result.stdout[-500:] if result.stdout else '(empty)'}")
-        print(f"Wav2Lip STDERR: {result.stderr[-500:] if result.stderr else '(empty)'}")
-        if result.returncode != 0:
-            raise Exception(f"Wav2Lip process returned {result.returncode}")
-        if os.path.exists(output_path):
-            print(f"Lip sync successful: {output_path}")
-            # Post-process: Enhance face quality with GFPGAN
-            enhanced_path = _enhance_with_gfpgan(output_path)
-            return enhanced_path
-    except subprocess.TimeoutExpired:
-        print("Wav2Lip generation timed out after 1800s.")
-    except Exception as e:
-        print(f"Wav2Lip generation failed: {e}")
-
+    print("🎭 Lip-sync generation failed or unavailable.")
     return None
 
 
@@ -1283,8 +991,8 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     key_stat_ts    = float(script_json.get("key_stat_timestamp", 0))
     shock_ts       = float(script_json.get("shocking_moment_timestamp", 0))
 
-    # ── LAYER 1: Full-Frame Firefly Background with Wav2Lip Lip Sync ──────────
-    print("Preparing main video background (Firefly + Wav2Lip lip sync)...")
+    # ── LAYER 1: Full-Frame Firefly Background with Lip Sync ───────────────────
+    print("Preparing main video background (Firefly + lip sync)...")
 
     # Step 1: Try to generate a lip-synced version of the Firefly video
     lipsync_path = _generate_lipsync_video(audio_path)
@@ -1314,9 +1022,9 @@ def create_video(audio_path, script_json, chunks, output_path=None):
 
         base = vid_clip.resized((FRAME_W, FRAME_H)).without_audio()
         if lipsync_path:
-            print("Using Wav2Lip lip-synced Firefly video as full-frame background.")
+            print("Using lip-synced Firefly video as full-frame background.")
         else:
-            print("Wav2Lip unavailable — using original Firefly video without lip sync.")
+            print("Lip-sync unavailable — using original Firefly video without lip sync.")
     else:
         # Ultimate fallback: solid dark background
         print("No Firefly video found. Using solid dark background.")

@@ -45,6 +45,7 @@ jobs:
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env
           echo "TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}" >> .env
           echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> .env
+          echo "FAL_KEY=${{ secrets.FAL_KEY }}" >> .env
           
       - name: Setup YouTube Auth Files
         # We restore the JSON files from GitHub Secrets
@@ -52,29 +53,10 @@ jobs:
           echo '${{ secrets.CLIENT_SECRET_JSON }}' > client_secret.json
           echo '${{ secrets.TOKEN_JSON }}' > token.json
           
-      # - name: Install Wav2Lip (Avatar Generation Engine)
-      #   run: |
-      #     if [ ! -d Wav2Lip ]; then
-      #       git clone https://github.com/Rudrabha/Wav2Lip.git Wav2Lip
-      #     fi
-      #     cd Wav2Lip
-      #     # Install critical dependencies for Wav2Lip inference
-      #     pip install face_alignment==1.3.1 scipy==1.11.1
-      #     # Ensure directories exist for weights
-      #     mkdir -p checkpoints
-      #     mkdir -p face_detection/detection/sfd/
-      #     # Download pre-trained GAN and face detection weights from HuggingFace mirror
-      #     if [ ! -f checkpoints/wav2lip_gan.pth ]; then
-      #       wget -q -O checkpoints/wav2lip_gan.pth https://huggingface.co/camenduru/Wav2Lip/resolve/main/checkpoints/wav2lip_gan.pth
-      #     fi
-      #     if [ ! -f face_detection/detection/sfd/s3fd.pth ]; then
-      #       wget -q -O face_detection/detection/sfd/s3fd.pth https://huggingface.co/camenduru/Wav2Lip/resolve/main/face_detection/detection/sfd/s3fd.pth
-      #     fi
-
       - name: Run Pipeline
-        # Run main.py --now to trigger the video pipeline immediately
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          FAL_KEY: ${{ secrets.FAL_KEY }}
         run: python main.py --now
         
       - name: Commit Updated Tracking File (news_log.json)
