@@ -296,6 +296,9 @@ def _dynamic_avatar_clip(duration, audio_path, accent_color):
 
     # 1. Try Wav2Lip (Primary AI Engine)
     if os.path.exists(wav2lip_dir):
+        if os.getenv('GITHUB_ACTIONS'):
+            print("Wav2Lip: Running in GitHub CI. Skipping avatar generation.")
+            return None
         print(f"Wav2Lip detected at {wav2lip_dir}. Attempting avatar generation...")
         
         # Build a CLEAN environment for the Wav2Lip subprocess.
@@ -1050,6 +1053,10 @@ def _enhance_with_gfpgan(input_video_path):
     Extracts frames → runs GFPGAN on each → reassembles video with ffmpeg.
     Returns the path to the enhanced video, or the original path if enhancement fails.
     """
+    import os
+    if os.getenv('GITHUB_ACTIONS'):
+        print("GFPGAN: Running in GitHub CI (No GPU). Skipping face enhancement to prevent hours-long CPU processing timeout.")
+        return input_video_path
     import subprocess
     import shutil
 
@@ -1194,6 +1201,10 @@ def _generate_lipsync_video(audio_path):
     then enhances face quality with GFPGAN.
     Returns the output file path if successful, None otherwise.
     """
+    import os
+    if os.getenv('GITHUB_ACTIONS'):
+        print("Wav2Lip: Running in GitHub CI. Skipping lip sync generation.")
+        return None
     import subprocess
 
     face_path = os.path.join(ASSETS_DIR, "Firefly_video_final.mp4")
@@ -1425,9 +1436,25 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     
     final_duration = final_video.duration
 
-    # ── BGM removed for clean talking-head format ─────────────────────────────
-    final = final_video
+    # ── LAYER 15: BGM ─────────────────────────────────────────────────────────
+    is_infinite_loop = script_json.get("loop_score", 0) >= 8
+    music_files = [f for f in os.listdir(MUSIC_DIR) if f.endswith(".mp3")]
+    if music_files:
+        bg_music = random.choice(music_files)
+        bgm = AudioFileClip(os.path.join(MUSIC_DIR, bg_music)).with_volume_scaled(BGM_VOLUME)
+        if bgm.duration < final_duration:
+            bgm = bgm.with_effects([afx.AudioLoop(duration=final_duration)])
+        else:
+            bgm = bgm.subclipped(0, final_duration)
+            
+        # If it's a loop, we might want to fade the BGM or keep it constant
+        if is_infinite_loop:
+            # Subtle volume dip at the very end to avoid pop
+            bgm = bgm.with_effects([afx.AudioFadeOut(0.1)])
+            
+        final_video = final_video.with_audio(CompositeAudioClip([final_video.audio, bgm]))
 
+    final = final_video
     print(f"Exporting {final_duration:.1f}s → {output_path}")
     
     # ── TEXT VISIBILITY EXPORT CHECK ──
