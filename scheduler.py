@@ -10,9 +10,9 @@ def check_time_and_run():
     current_hhmm = ist_now.strftime("%H:%M")
     
     if current_hhmm in UPLOAD_TIMES:
-        if current_hhmm == "11:00":
+        if current_hhmm == "04:00":
             topic_type = "research"
-        elif current_hhmm == "17:00":
+        elif current_hhmm == "16:00":
             topic_type = "tools"
         else:
             topic_type = "tools"
