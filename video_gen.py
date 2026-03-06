@@ -653,6 +653,25 @@ def render_entity_tags(entities, accent_color, frame_width=1080):
         
     return img
 
+def _sweep_clip(duration, accent_color, frame_width=1080):
+    """Creates a moving highlights 'sweep' for entity tags."""
+    sweep_w = 150
+    def make_frame(t):
+        # Moving diagonal gradient
+        img = Image.new('RGBA', (frame_width, 400), (0,0,0,0))
+        draw = ImageDraw.Draw(img)
+        progress = (t / duration) * (frame_width + sweep_w*2)
+        x_pos = progress - sweep_w
+        
+        # Draw a slanted semi-transparent white beam
+        draw.polygon([
+            (x_pos, 0), (x_pos + sweep_w, 0), 
+            (x_pos + sweep_w - 50, 400), (x_pos - 50, 400)
+        ], fill=(255, 255, 255, 30))
+        return np.array(img)
+    
+    return VideoClip(make_frame, duration=duration).with_opacity(0.4)
+
 def render_telegram_cta(accent_color, frame_width=1080):
     """Minimalist Telegram, LinkedIn & WhatsApp CTA banner."""
     card_h = 420
@@ -944,16 +963,23 @@ def render_subtitle_frame(text, current_words, bg_frame=None, accent_color=(255,
         cur_x = (frame_width - line_w) // 2
         
         for word in line:
+            # SHOUTING DETECTION: If word is ALL CAPS and > 1 char, it's a 'shouting' word
+            is_shouting = word.isupper() and len(word) > 1
             is_active = word in current_word_list
+            
             f = f_pop if is_active else f_main
             
-            # Colors
+            # Colors: POP emphasized words in accent color
+            c_fill = (255, 255, 255, 255) # Default White
             if is_active:
-                color = (*accent_color, 255) # Use dynamic theme color instead of hardcoded yellow
+                c_fill = (*accent_color, 255) # Golden/Accent for current
+            elif is_shouting:
+                # Even if not active, shouting words get a subtle tint or highlight
+                c_fill = (*accent_color, 180) 
             elif word in spoken_word_list:
-                color = (180, 180, 180, 255)
+                c_fill = (180, 180, 180, 255)
             else:
-                color = (255, 255, 255, 255)
+                c_fill = (255, 255, 255, 255)
                 
             # Heavy stroke using Pillow native 
             s_w = 8 if is_active else 5
@@ -973,7 +999,7 @@ def render_subtitle_frame(text, current_words, bg_frame=None, accent_color=(255,
                 (cur_x, line_y), 
                 word, 
                 font=f, 
-                fill=color,
+                fill=c_fill,
                 stroke_width=s_w,
                 stroke_fill=(0, 0, 0, 255)
             )
@@ -1081,6 +1107,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                 else:
                     c_clip = ImageClip(vp).with_duration(clip_dur)
                     
+                # ── Aspect Ratio Crop to 9:16 ───────────────────────────────
                 w, h = c_clip.size
                 target_h = int(w * 16 / 9)
                 if target_h <= h:
@@ -1090,8 +1117,15 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                     target_w = int(h * 9 / 16)
                     x1 = (w - target_w) // 2
                     c_clip = c_clip.cropped(x1=x1, y1=0, x2=x1 + target_w, y2=h)
+
+                # ── Resizing and Ken Burns (Subtle Zoom) ───────────────────
+                c_clip = c_clip.resized((FRAME_W, FRAME_H))
+                
+                scale_factor = 1.0 + random.uniform(0.05, 0.12)
+                # Apply the zoom as a dynamic transformation
+                c_clip = c_clip.resized(lambda t: 1.0 + (scale_factor - 1.0) * (t / clip_dur))
                     
-                c_clip = c_clip.resized((FRAME_W, FRAME_H)).with_start(current_start)
+                c_clip = c_clip.with_start(current_start)
                 
                 if i > 0:
                     c_clip = c_clip.with_effects([vfx.CrossFadeIn(crossfade)])
@@ -1176,8 +1210,20 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     
     # Entity Tags Layer (Companies/Tools/Models on left side)
     tags_img = render_entity_tags(key_entities, accent_color, FRAME_W)
-    tags_clip = ImageClip(np.array(tags_img)).with_duration(audio_duration).with_position((0, 320))
-    logo_clips.append(tags_clip)
+    
+    # 3. Slide-In and Sweep Animation for Tags
+    def tag_pos(t):
+        if t < 0.5: # 0.5s Slide from left
+            # Start further back to ensure it's completely off-screen
+            return (-500 + int(500 * (t/0.5)), 320)
+        return (0, 320)
+        
+    tags_clip = ImageClip(np.array(tags_img)).with_duration(audio_duration).with_position(tag_pos)
+    
+    # Add a looping 'Sweep' effect over the tags every 5 seconds
+    sweep = _sweep_clip(5.0, accent_color, FRAME_W).with_effects([vfx.Loop(duration=audio_duration)]).with_position((0, 320))
+    
+    logo_clips.extend([tags_clip, sweep])
 
     fact_clips = []
     burst_clips = []
@@ -1191,6 +1237,14 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     progress = progress.with_position(lambda t: (int((t / max(audio_duration, 0.01)) * FRAME_W) - FRAME_W, FRAME_H - 6))
     base_layers.append(progress)
     
+    # ── INFINITE LOOP VISUAL SYNC ─────────────────────────────────────────────
+    # If the script is a loop, we force the last 0.5s to crossfade into the first frame
+    if script_json.get("loop_score", 0) >= 8:
+        print("Enabling Infinite Loop Visual Sync...")
+        first_frame = bg_layer_clips[0].get_frame(0)
+        finish_img = ImageClip(first_frame).with_duration(0.5).with_start(audio_duration - 0.5).with_effects([vfx.CrossFadeIn(0.4)])
+        base_layers.append(finish_img)
+
     base_comp = CompositeVideoClip(base_layers, size=(FRAME_W, FRAME_H)).with_duration(audio_duration)
 
     # Pre-render header (only persistent overlay)
