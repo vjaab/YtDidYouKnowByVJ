@@ -653,6 +653,30 @@ def render_entity_tags(entities, accent_color, frame_width=1080):
         
     return img
 
+def render_emoji_popup(emoji, frame_width=1080):
+    """Renders a single large 3D-styled emoji for a popup."""
+    img = Image.new('RGBA', (400, 400), (0,0,0,0))
+    draw = ImageDraw.Draw(img)
+    # Using a large font for the emoji
+    try:
+        f = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 200)
+    except:
+        f = ImageFont.load_default()
+        
+    # Draw centered emoji
+    draw.text((200, 200), emoji, font=f, fill=(255,255,255,255), anchor="mm")
+    return img
+
+def insert_easter_egg(frame_width=1080, frame_height=1920):
+    """Creates a 1-frame high-contrast tech glitch for retention hacking."""
+    img = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
+    draw = ImageDraw.Draw(img)
+    # Neon glitch style
+    draw.rectangle([0, 0, frame_width, frame_height], fill=(0, 255, 100, 40))
+    f = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 60)
+    draw.text((frame_width//2, frame_height//2), "ALGORITHM DETECTED", font=f, fill=(255,255,255,255), anchor="mm")
+    return img
+
 def _sweep_clip(duration, accent_color, frame_width=1080):
     """Creates a moving highlights 'sweep' for entity tags."""
     sweep_w = 150
@@ -1121,6 +1145,20 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                 # ── Resizing and Ken Burns (Subtle Zoom) ───────────────────
                 c_clip = c_clip.resized((FRAME_W, FRAME_H))
                 
+                # SMART-SPLIT: 20% chance of split screen if news level is high
+                if script_json.get("breaking_news_level", 0) >= 8 and random.random() < 0.2:
+                    print(f"Applying Smart-Split Layout to chunk {i}...")
+                    # Bottom half is a secondary tech loop or satisfying visual
+                    split_h = FRAME_H // 2
+                    top_half = c_clip.cropped(y2=split_h)
+                    
+                    # Look for a satisfying loop in assets or use a blurred duplicate
+                    bottom_half = c_clip.cropped(y1=split_h).with_effects([vfx.MirrorX()])
+                    c_clip = CompositeVideoClip([
+                        top_half.with_position(("center", "top")),
+                        bottom_half.with_position(("center", "bottom"))
+                    ], size=(FRAME_W, FRAME_H))
+
                 scale_factor = 1.0 + random.uniform(0.05, 0.12)
                 # Apply the zoom as a dynamic transformation
                 c_clip = c_clip.resized(lambda t: 1.0 + (scale_factor - 1.0) * (t / clip_dur))
@@ -1245,8 +1283,45 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         finish_img = ImageClip(first_frame).with_duration(0.5).with_start(audio_duration - 0.5).with_effects([vfx.CrossFadeIn(0.4)])
         base_layers.append(finish_img)
 
+    # ── EMOJI POPUPS ─────────────────────────────────────────────────────────
+    emoji_popups = script_json.get("emoji_popups", [])
+    for ep in emoji_popups:
+        ts = float(ep.get("timestamp", 0))
+        if ts < audio_duration:
+            e_img = render_emoji_popup(ep.get("emoji", "🚀"))
+            e_clip = ImageClip(np.array(e_img)).with_duration(1.0).with_start(ts)
+            # Center-ish position with a little random offset
+            pos = (FRAME_W//2 - 200 + random.randint(-50, 50), FRAME_H//2 - 400)
+            e_clip = e_clip.with_position(pos).with_effects([vfx.CrossFadeIn(0.2)])
+            base_layers.append(e_clip)
+
+    # ── EASTER EGG FRAME (0.05s) ─────────────────────────────────────────────
+    egg_ts = random.uniform(audio_duration * 0.4, audio_duration * 0.7)
+    egg_img = insert_easter_egg()
+    egg_clip = ImageClip(np.array(egg_img)).with_duration(0.05).with_start(egg_ts)
+    base_layers.append(egg_clip)
+
     base_comp = CompositeVideoClip(base_layers, size=(FRAME_W, FRAME_H)).with_duration(audio_duration)
 
+    # ── KINETIC SFX DESIGN ───────────────────────────────────────────────────
+    final_audio_layers = [audio]
+    sfx_cues = script_json.get("sfx_cues", [])
+    for cue in sfx_cues:
+        ctype = cue.get("type", "woosh").lower()
+        ts = float(cue.get("timestamp", 0))
+        sfx_path = os.path.join(ASSETS_DIR, "sfx", f"{ctype}.wav")
+        if os.path.exists(sfx_path) and ts < audio_duration:
+            sfx_clip = AudioFileClip(sfx_path).with_start(ts).with_effects([afx.MultiplyVolume(0.4)])
+            final_audio_layers.append(sfx_clip)
+    
+    # Background Music
+    bgm_path = os.path.join(MUSIC_DIR, "background_music.mp3")
+    if os.path.exists(bgm_path):
+        bgm = AudioFileClip(bgm_path).with_duration(audio_duration).with_effects([afx.MultiplyVolume(BGM_VOLUME), afx.AudioFadeOut(2)])
+        final_audio_layers.append(bgm)
+
+    final_audio = CompositeAudioClip(final_audio_layers)
+    
     # Pre-render header (only persistent overlay)
     header_img = render_header_bar(title, sub_category, accent_color, FRAME_W)
 
@@ -1274,34 +1349,9 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         return composite_frame(bg_frame, t, header_img, subtitle_img)
 
     final = VideoClip(make_final_frame, duration=audio_duration)
-    final = final.with_audio(audio)
+    final = final.with_audio(final_audio)
 
-    # ── INTRO / OUTRO ────────────────────────────────────────────────────────
-    # The user requested no intro so the avatar video starts immediately at 0.0s
-    final_video = final
-    
-    final_duration = final_video.duration
-
-    # ── LAYER 15: BGM ─────────────────────────────────────────────────────────
-    is_infinite_loop = script_json.get("loop_score", 0) >= 8
-    music_files = [f for f in os.listdir(MUSIC_DIR) if f.endswith(".mp3")]
-    if music_files:
-        bg_music = random.choice(music_files)
-        bgm = AudioFileClip(os.path.join(MUSIC_DIR, bg_music)).with_volume_scaled(BGM_VOLUME)
-        if bgm.duration < final_duration:
-            bgm = bgm.with_effects([afx.AudioLoop(duration=final_duration)])
-        else:
-            bgm = bgm.subclipped(0, final_duration)
-            
-        # If it's a loop, we might want to fade the BGM or keep it constant
-        if is_infinite_loop:
-            # Subtle volume dip at the very end to avoid pop
-            bgm = bgm.with_effects([afx.AudioFadeOut(0.1)])
-            
-        final_video = final_video.with_audio(CompositeAudioClip([final_video.audio, bgm]))
-
-    final = final_video
-    print(f"Exporting {final_duration:.1f}s → {output_path}")
+    print(f"Exporting {audio_duration:.1f}s → {output_path}")
     
     # ── TEXT VISIBILITY EXPORT CHECK ──
     print("Extracting test frames for text visibility check...")

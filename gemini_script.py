@@ -178,6 +178,15 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
     {{"name": "Service Name", "type": "CLOUD"}},
     {{"name": "Company Name", "type": "COMPANY"}}
   ],
+  "sfx_cues": [
+    {{"timestamp": 0.2, "type": "woosh"}},
+    {{"timestamp": 12.5, "type": "glitch"}},
+    {{"timestamp": 18.3, "type": "pop"}}
+  ],
+  "emoji_popups": [
+    {{"timestamp": 5.0, "emoji": "🚀", "keyword": "launch"}},
+    {{"timestamp": 15.2, "emoji": "💡", "keyword": "idea"}}
+  ],
   "keywords": ["Keyword 1", "Keyword 2"],
   "comment_hook": "Would you use this? Drop your answer below! 👇",
   "end_question": "A thought-provoking question for the audience to comment on"
