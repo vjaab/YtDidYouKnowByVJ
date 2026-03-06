@@ -162,7 +162,13 @@ def run_pipeline(custom_topic=None, topic_type="research"):
 
     # ── STEP 5: Build Visual Chunks ───────────────────────────────────────────
     log_message("STEP 5: Grouping words into visual chunks...")
-    chunks = build_chunks(word_timestamps, script_data.get("subtitle_chunks", []))
+    from audio_gen import clean_tts_text
+    sub_chunks = script_data.get("subtitle_chunks", [])
+    for sc in sub_chunks:
+        if "text" in sc:
+            sc["text"] = clean_tts_text(sc["text"])
+            
+    chunks = build_chunks(word_timestamps, sub_chunks)
     chunks = redistribute_to_audio_duration(chunks, duration)
     log_message(f"Built {len(chunks)} visual chunks from {len(word_timestamps)} words.")
 

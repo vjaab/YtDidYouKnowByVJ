@@ -281,11 +281,31 @@ def _generate_kokoro(text, output_path):
 # ─────────────────────────────────────────────────────────────────────────────
 # PUBLIC ENTRY POINT
 # ─────────────────────────────────────────────────────────────────────────────
+def clean_tts_text(text):
+    """
+    Strips out AI meta-instructions like [pause], (silence), [intense music] etc.
+    while keeping the punctuation like ... and -- which creates the actual pause.
+    """
+    if not text: return ""
+    # Remove anything inside brackets [bra-ckets] or (paren-theses) if they contain 'pause', 'silence', 'music', 'sound'
+    # This specifically target instructions but keeps normal parentheses if they don't look like instructions.
+    cleaned = re.sub(r'\[[^\]]*(pause|silence|music|sound|breath)[^\]]*\]', '', text, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\([^)]*(pause|silence|music|sound|breath)[^)]*\)', '', cleaned, flags=re.IGNORECASE)
+    
+    # Also remove literal instances of " [pause] " or " (pause) " if for some reason they exist outside brackets
+    cleaned = re.sub(r'\s*\[pause\]\s*', ' ', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\s*\(pause\)\s*', ' ', cleaned, flags=re.IGNORECASE)
+    
+    # Clean up double spaces
+    cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+    return cleaned
+
 def generate_voiceover(text, voice_request="en-US-GuyNeural", emotion="excited"):
     """
     Returns: (audio_path, duration, word_timestamps)
     word_timestamps: [{"word": str, "start": float, "end": float}, ...]
     """
+    text = clean_tts_text(text)
     today     = datetime.now().strftime("%Y-%m-%d")
     mp3_path  = os.path.join(OUTPUT_DIR, f"audio_{today}.mp3")
     

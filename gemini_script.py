@@ -101,7 +101,8 @@ CRITICAL '2026 SCALE' RULES:
    Result: The viewer watches it 1.5 times before they realize it looped.
 2. PATTERN INTERRUPTS: Every 3 seconds, a change in visual state is MANDATORY (Zoom-in, Glitch transition, or Reaction Split-screen).
 3. COMMENT BAITING: If this is an AI QUIZ, NEVER reveal the answer until the last 5 seconds. Explicitly tell users to 'Pause and comment your guess now!'.
-4. VOCAL PACING & EMPHASIS: You must know exactly where to pause for dramatic effect. Constantly use ellipses (...) and em-dashes (—) to force the AI voice to pause. For the most important words that need audio emphasis, WRITE THEM IN ALL CAPS.
+4. VOCAL PACING & EMPHASIS: You must know exactly where to pause for dramatic effect. Constantly use ellipses (...) and em-dashes (—) to force the AI voice to pause. For the most important words that need audio emphasis, WRITE THEM IN ALL CAPS. 
+   CRITICAL: NEVER write bracketed instructions like '[pause]', '(silence)', or '[intense music]'. Do NOT write word descriptions of sounds. Only use punctuation (... or —) to create pauses.
 5. THE HUMAN-GLITCH: Include subtle breaths or conversational 'actually...' to trigger the 'Authenticity' flag. Avoid robotic lists.
 
 {selection_instruction}
@@ -173,6 +174,7 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
   "original_news_headline": "Exact headline",
   "original_news_url": "Exact url",
   "companies_mentioned": ["Company 1", "Company 2"],
+  "tools_mentioned": ["Tool 1", "Tool 2"],
   "keywords": ["Keyword 1", "Keyword 2"],
   "comment_hook": "Would you use this? Drop your answer below! 👇",
   "end_question": "A thought-provoking question for the audience to comment on"

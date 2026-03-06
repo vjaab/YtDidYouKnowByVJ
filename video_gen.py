@@ -614,6 +614,50 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
     
     return img
 
+def render_entity_tags(companies, tools, accent_color, frame_width=1080):
+    """Renders small floating tags for companies and tools on the side."""
+    tag_h = 400
+    img = Image.new('RGBA', (frame_width, tag_h), (0,0,0,0))
+    draw = ImageDraw.Draw(img)
+    
+    # Fonts
+    f_cat = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 24)
+    f_val = ImageFont.truetype('assets/fonts/Montserrat-Bold.ttf', 32)
+    
+    entities = []
+    for c in companies[:2]:
+        entities.append(("COMPANY", c))
+    for t in tools[:2]:
+        entities.append(("TOOL", t))
+        
+    if not entities:
+        return img
+        
+    curr_y = 10
+    start_x = 40 # Left side padding
+    
+    for cat, val in entities:
+        # Measure text
+        cat_w = draw.textlength(cat, font=f_cat)
+        val_w = draw.textlength(val, font=f_val)
+        
+        box_w = max(cat_w, val_w) + 30
+        box_h = 75
+        
+        # Rounded box with slight transparency
+        draw.rounded_rectangle([start_x, curr_y, start_x + box_w, curr_y + box_h], radius=10, fill=(15, 15, 15, 180))
+        
+        # Left accent line
+        draw.rectangle([start_x, curr_y + 10, start_x + 6, curr_y + box_h - 10], fill=accent_color)
+        
+        # Text
+        draw.text((start_x + 15, curr_y + 8), cat, font=f_cat, fill=accent_color)
+        draw.text((start_x + 15, curr_y + 35), val, font=f_val, fill=(255, 255, 255, 255))
+        
+        curr_y += box_h + 15
+        
+    return img
+
 def render_telegram_cta(accent_color, frame_width=1080):
     """Minimalist Telegram, LinkedIn & WhatsApp CTA banner."""
     card_h = 420
@@ -1003,6 +1047,9 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     key_stat_ts    = float(script_json.get("key_stat_timestamp", 0))
     shock_ts       = float(script_json.get("shocking_moment_timestamp", 0))
 
+    companies = script_json.get("companies_mentioned", [])
+    tools = script_json.get("tools_mentioned", [])
+
     # ── FULL SCREEN BACKGROUND: Cycling through imagery ─────────────
     print("Preparing full-screen background from generated images...")
     
@@ -1125,6 +1172,12 @@ def create_video(audio_path, script_json, chunks, output_path=None):
 
     particle_clips = []
     logo_clips = []
+    
+    # Entity Tags Layer (Companies/Tools on left side)
+    tags_img = render_entity_tags(companies, tools, accent_color, FRAME_W)
+    tags_clip = ImageClip(np.array(tags_img)).with_duration(audio_duration).with_position((0, 320))
+    logo_clips.append(tags_clip)
+
     fact_clips = []
     burst_clips = []
     reminder_clips = []
