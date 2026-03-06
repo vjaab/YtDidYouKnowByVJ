@@ -174,9 +174,9 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
   "original_news_headline": "Exact headline",
   "original_news_url": "Exact url",
   "key_entities": [
-    {"name": "Entity Name", "type": "MODEL"},
-    {"name": "Service Name", "type": "CLOUD"},
-    {"name": "Company Name", "type": "COMPANY"}
+    {{"name": "Entity Name", "type": "MODEL"}},
+    {{"name": "Service Name", "type": "CLOUD"}},
+    {{"name": "Company Name", "type": "COMPANY"}}
   ],
   "keywords": ["Keyword 1", "Keyword 2"],
   "comment_hook": "Would you use this? Drop your answer below! 👇",
