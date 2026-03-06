@@ -620,9 +620,8 @@ def render_entity_tags(entities, accent_color, frame_width=1080):
     img = Image.new('RGBA', (frame_width, tag_h), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
-    # Fonts
-    f_cat = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 20)
-    f_val = ImageFont.truetype('assets/fonts/Montserrat-Bold.ttf', 28)
+    # Font
+    f_val = ImageFont.truetype('assets/fonts/Montserrat-Bold.ttf', 32)
     
     if not entities:
         return img
@@ -630,29 +629,27 @@ def render_entity_tags(entities, accent_color, frame_width=1080):
     curr_y = 10
     start_x = 40 # Left side padding
     
-    # Limit to top 5 entities to avoid cluttering the whole screen
-    for ent in entities[:5]:
-        cat = ent.get("type", "TECH").upper()
+    # Limit to top 6 entities to avoid cluttering the whole screen
+    # Now that they are one-line, we can fit more or keep it clean
+    for ent in entities[:6]:
         val = ent.get("name", "Unknown")
         
         # Measure text
-        cat_w = draw.textlength(cat, font=f_cat)
         val_w = draw.textlength(val, font=f_val)
         
-        box_w = max(cat_w, val_w) + 36
-        box_h = 70
+        box_w = val_w + 40
+        box_h = 60
         
         # Rounded box with slight transparency
-        draw.rounded_rectangle([start_x, curr_y, start_x + box_w, curr_y + box_h], radius=10, fill=(15, 15, 15, 180))
+        draw.rounded_rectangle([start_x, curr_y, start_x + box_w, curr_y + box_h], radius=12, fill=(15, 15, 15, 200))
         
         # Left accent line
-        draw.rectangle([start_x, curr_y + 10, start_x + 6, curr_y + box_h - 10], fill=accent_color)
+        draw.rectangle([start_x, curr_y + 12, start_x + 6, curr_y + box_h - 12], fill=accent_color)
         
         # Text
-        draw.text((start_x + 18, curr_y + 8), cat, font=f_cat, fill=accent_color)
-        draw.text((start_x + 18, curr_y + 32), val, font=f_val, fill=(255, 255, 255, 255))
+        draw.text((start_x + 22, curr_y + 11), val, font=f_val, fill=(255, 255, 255, 255))
         
-        curr_y += box_h + 12
+        curr_y += box_h + 10
         
     return img
 
