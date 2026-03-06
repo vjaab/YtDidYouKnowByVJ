@@ -86,7 +86,7 @@ CONTENT HIERARCHY (Monetization & Retention Strategy):
 2. COMPARATIVE ANALYSIS (25%): Competitive landscape (e.g., AWS vs. OpenAI).
 3. THE DATA (20%): Extract specific numbers for the "Infographic" cards.
 4. VISUAL DIRECTION (10%): Specify "Pattern Interrupts" every 3-5 seconds (glitch, zoom, or split-screen).
-5. NARRATION (10%): Conversational, punchy tone. Use human fillers ('uhm', '...actually') sparingly as "Human-Glitch" hooks.
+5. NARRATION (10%): Humanized, Conversational tone (Gen-Z/Millennial "Vlog" style). Use human imperfections like ('...uhm', 'wait...', 'listen, honestly') to break the robot feel. These act as "Human-Glitch" hooks to grab attention. Avoid textbook grammar; use sentence fragments.
 
 NARRATIVE ARC CONFIGURATION:
 1. The 2026 Identity Hook (0-5s): A shocking human-voiced statement. If generating a QUIZ, do not reveal the answer yet.

@@ -677,6 +677,50 @@ def insert_easter_egg(frame_width=1080, frame_height=1920):
     draw.text((frame_width//2, frame_height//2), "ALGORITHM DETECTED", font=f, fill=(255,255,255,255), anchor="mm")
     return img
 
+def _apply_handheld_shake(clip):
+    """Adds a slow, subtle random drift to a clip."""
+    def shake(t):
+        # 1-2 pixel drift to simulate handheld camera
+        off_x = math.sin(t * 1.5) * 2 + math.cos(t * 0.8) * 1.5
+        off_y = math.cos(t * 1.2) * 2 + math.sin(t * 0.9) * 1.5
+        return (int(off_x), int(off_y))
+    return clip.with_position(shake)
+
+def _generate_film_grain(duration, frame_width=1080, frame_height=1920):
+    """Creates a procedural film grain overlay."""
+    def make_frame(t):
+        # Create a tiny noise texture
+        noise = np.random.randint(0, 30, (frame_height//4, frame_width//4, 3), dtype='uint8')
+        # Upscale it to get a 'gritty' feel
+        img = Image.fromarray(noise, 'RGB').resize((frame_width, frame_height), Image.NEAREST)
+        return np.array(img.convert('RGBA'))
+    
+    return VideoClip(make_frame, duration=duration).with_opacity(0.04)
+
+def _generate_lens_flare(duration, frame_width=1080):
+    """Procedural lens flare that drifts across the screen."""
+    def make_frame(t):
+        img = Image.new('RGBA', (frame_width, 800), (0,0,0,0))
+        draw = ImageDraw.Draw(img)
+        # Slow drift
+        x_pos = (t * 100) % (frame_width + 400) - 200
+        # Draw a soft glowing gradient circle
+        draw.ellipse([x_pos-150, 200, x_pos+150, 500], fill=(255, 255, 255, 30))
+        return np.array(img)
+    return VideoClip(make_frame, duration=duration).with_opacity(0.12).with_position(("center", 400))
+
+def _generate_room_tone(duration):
+    """Synthesizes a low-freq atmospheric 'room tone'."""
+    samples = np.random.normal(0, 0.01, int(44100 * duration))
+    # Low pass filter (moving average)
+    samples = np.convolve(samples, np.ones(100)/100, mode='same')
+    
+    # Save to temp and load or use a library
+    temp_path = "/tmp/room_tone.wav"
+    import soundfile as sf
+    sf.write(temp_path, samples, 44100)
+    return AudioFileClip(temp_path).with_effects([afx.MultiplyVolume(0.1)])
+
 def _sweep_clip(duration, accent_color, frame_width=1080):
     """Creates a moving highlights 'sweep' for entity tags."""
     sweep_w = 150
@@ -1163,6 +1207,9 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                 # Apply the zoom as a dynamic transformation
                 c_clip = c_clip.resized(lambda t: 1.0 + (scale_factor - 1.0) * (t / clip_dur))
                     
+                # HUMAN REALISM: Subtle handheld camera shake
+                c_clip = _apply_handheld_shake(c_clip)
+                
                 c_clip = c_clip.with_start(current_start)
                 
                 if i > 0:
@@ -1267,10 +1314,15 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     burst_clips = []
     reminder_clips = []
 
-    base_layers = bg_layer_clips + [tint, gradient] + particle_clips + logo_clips + fact_clips + burst_clips + reminder_clips
+    # ── HUMAN REALISM OVERLAYS ───────────────────────────────────────────────
+    grain_layer = _generate_film_grain(audio_duration, FRAME_W, FRAME_H)
+    flare_layer = _generate_lens_flare(audio_duration, FRAME_W)
+    
+    base_layers = bg_layer_clips + [tint, gradient] + particle_clips + logo_clips + fact_clips + burst_clips + reminder_clips + [grain_layer, flare_layer]
     if avatar_pip:
         base_layers.append(avatar_pip)
-    
+
+    # ── PROGRESS BAR ────────────────────────────────────────────────────────
     progress = ColorClip(size=(FRAME_W, 6), color=accent_color, duration=audio_duration)
     progress = progress.with_position(lambda t: (int((t / max(audio_duration, 0.01)) * FRAME_W) - FRAME_W, FRAME_H - 6))
     base_layers.append(progress)
@@ -1305,6 +1357,14 @@ def create_video(audio_path, script_json, chunks, output_path=None):
 
     # ── KINETIC SFX DESIGN ───────────────────────────────────────────────────
     final_audio_layers = [audio]
+    
+    # ── HUMAN REALISM: Environmental Room Tone (0.01 vol) ──────────────────
+    try:
+        room_tone = _generate_room_tone(audio_duration)
+        final_audio_layers.append(room_tone)
+    except Exception as e:
+        print(f"Room tone synthesis failed (non-fatal): {e}")
+
     sfx_cues = script_json.get("sfx_cues", [])
     for cue in sfx_cues:
         ctype = cue.get("type", "woosh").lower()
