@@ -101,7 +101,8 @@ CRITICAL '2026 SCALE' RULES:
    Result: The viewer watches it 1.5 times before they realize it looped.
 2. PATTERN INTERRUPTS: Every 3 seconds, a change in visual state is MANDATORY (Zoom-in, Glitch transition, or Reaction Split-screen).
 3. COMMENT BAITING: If this is an AI QUIZ, NEVER reveal the answer until the last 5 seconds. Explicitly tell users to 'Pause and comment your guess now!'.
-4. THE HUMAN-GLITCH: Include subtle breaths or conversational 'actually...' to trigger the 'Authenticity' flag. Avoid robotic lists.
+4. VOCAL PACING & EMPHASIS: You must know exactly where to pause for dramatic effect. Constantly use ellipses (...) and em-dashes (—) to force the AI voice to pause. For the most important words that need audio emphasis, WRITE THEM IN ALL CAPS.
+5. THE HUMAN-GLITCH: Include subtle breaths or conversational 'actually...' to trigger the 'Authenticity' flag. Avoid robotic lists.
 
 {selection_instruction}
 
@@ -109,7 +110,7 @@ RESEARCH PAPERS & BLOGS DATA:
 {news_context}
 
 NARRATIVE FLOW (FOR THE 'SCRIPT' FIELD):
-- Hook -> Disruptor -> So What? -> Visual Pivot -> Infinite Loop Connect -> Fact of the Day.
+- Hook -> Disruptor -> So What? -> Visual Pivot -> Infinite Loop Connect.
 
 {extra_instruction}
 
@@ -117,10 +118,9 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
 {{
   "title_options": ["Title idea 1", "Title idea 2", "Title idea 3"],
   "description": "Full 100+ word rich SEO description for youtube describing the video, including timestamps and credits.",
-  "fact_of_the_day": "Unrelated fact here",
   "quiz_tone": "Investigative",
   "title": "Punchy YouTube title max 60 chars",
-  "script": "Full voiceover script following the Arc (50-58 sec), ending with the fact_of_the_day. Ensure The Loop is implemented.",
+  "script": "Full voiceover script following the Arc (50-58 sec). Ensure The Loop is implemented.",
   "hook": "Matches the first sentence of the script",
   "summary": "One line summary",
   "sub_category": "AI/Machine Learning",

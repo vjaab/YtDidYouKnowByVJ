@@ -11,6 +11,7 @@ from PIL import Image
 from datetime import datetime
 from google import genai
 from config import GEMINI_API_KEY, OUTPUT_DIR
+import random
 
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")
 TODAY = datetime.now().strftime("%Y-%m-%d")
@@ -56,6 +57,72 @@ Return ONLY the raw integer (0-10)."""
             
     return 5  # Return middle score on total failure
 
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TOPIC DETECTION & IMAGEN TEMPLATES
+# ─────────────────────────────────────────────────────────────────────────────
+TOPIC_KEYWORDS = {
+    "ai_company": ["openai", "anthropic", "google", "meta", "microsoft", "nvidia", "apple", "amazon", "startup", "funding", "ipo", "acquisition"],
+    "semiconductor": ["chip", "gpu", "tpu", "semiconductor", "tsmc", "intel", "amd", "qualcomm", "arm", "wafer", "foundry"],
+    "robotics": ["robot", "humanoid", "boston dynamics", "figure", "tesla bot", "automation", "warehouse"],
+    "neural_network": ["neural", "llm", "model", "gpt", "claude", "gemini", "training", "parameters", "transformer"],
+    "data_center": ["data center", "server", "infrastructure", "cloud", "cooling", "energy", "power"],
+    "autonomous_vehicle": ["self-driving", "autonomous", "tesla", "waymo", "cruise", "lidar", "ev"],
+    "ai_policy": ["regulation", "law", "ban", "congress", "eu ai act", "government", "policy", "safety"],
+    "consumer_tech": ["smartphone", "wearable", "assistant", "alexa", "siri", "device", "product launch"]
+}
+
+TOPIC_PROMPT_TEMPLATES = {
+    "ai_company": [
+        "Futuristic AI company headquarters, glowing logo on glass skyscraper, night cityscape, cinematic",
+        "Silicon Valley style modern office interior with neural network digital art, bright and airy, minimalist",
+        "A sleek, minimalist brand logo glowing on a black polished marble surface, luxury tech aesthetic, cinematic"
+    ],
+    "semiconductor": [
+        "Extreme close-up of semiconductor chip, microscopic glowing circuit traces, dark background, dramatic studio lighting",
+        "A silicon wafer being processed in a high-tech cleanroom, orange neon accents, reflection on surface",
+        "Advanced microchip architecture visualization, complex 3D nanostructures, glowing electricity flowing through paths"
+    ],
+    "robotics": [
+        "Humanoid robot in modern factory, white silver design, blue ambient lighting, cinematic",
+        "Close-up on a robotic eye with glowing blue sensor, high precision mechanical parts, metallic finish",
+        "A dedicated robot arm working on a circuit board, sparks flying, high contrast, industrial cyberpunk style"
+    ],
+    "neural_network": [
+        "Abstract neural network visualization, glowing nodes and connections, deep blue purple palette",
+        "A digital brain composed of light particles and binary code, cosmic background, high energy",
+        "Complex web of synaptic connections glowing in the dark, representing artificial intelligence, ethereal glow"
+    ],
+    "data_center": [
+        "Massive AI data center, glowing server racks, cool blue lighting, foggy atmosphere, wide shot",
+        "Inside a server room with endless rows of blinking lights, symmetrical perspective, futuristic cloud infrastructure",
+        "A digital rendering of a global network hub connecting to a data center, glowing fiber optics, dark obsidian palette"
+    ],
+    "autonomous_vehicle": [
+        "Self-driving car on futuristic highway at night, sensor beams, neon city reflections",
+        "A sleek autonomous electric vehicle interior, no steering wheel, holographic dashboard display, luxury",
+        "Close-up on a LiDAR sensor unit on top of a car, emitting purple laser beams into the surrounding environment"
+    ],
+    "ai_policy": [
+        "Government building with holographic AI symbols, dramatic political atmosphere, editorial style",
+        "A gavel resting on a digital circuit board, representing AI regulation and law, high contrast lighting",
+        "A futuristic holographic bill of rights or legal document being reviewed by AI, serious tone, blue and gold"
+    ],
+    "consumer_tech": [
+        "Person using AI holographic smartphone interface, modern home, soft natural lighting",
+        "A wearable AI device on a person's wrist or ear, glowing softly, high-end lifestyle photography",
+        "A minimalist AI assistant speaker on a marble table, emitting a subtle blue pulse of light, clean home interior"
+    ]
+}
+
+def detect_topic(headline):
+    if not headline: return None
+    headline = headline.lower()
+    for topic, keywords in TOPIC_KEYWORDS.items():
+        for kw in keywords:
+            if kw in headline:
+                return topic
+    return None
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PEXELS SEARCH AND PARSE
@@ -176,28 +243,35 @@ def _download_photo(url, output_path):
 # ─────────────────────────────────────────────────────────────────────────────
 # STEP E: Imagen 3
 # ─────────────────────────────────────────────────────────────────────────────
-def _generate_imagen3(chunk_text, output_path):
-    # 1. Ask Gemini to craft the perfect Imagen prompt
-    prompt_builder = f"""Create a detailed Imagen 3 prompt for this text:
+def _generate_imagen3(chunk_text, output_path, topic_context=""):
+    topic = detect_topic(topic_context)
+    if topic:
+        variation = random.choice(TOPIC_PROMPT_TEMPLATES[topic])
+        best_prompt = f"{variation}, news editorial style, photorealistic, 8K, 9:16 vertical, cinematic lighting, ultra realistic"
+        print(f"  -> Detected Topic: {topic}. Using themed prompt.")
+    else:
+        # 1. Ask Gemini to craft the perfect Imagen prompt
+        topic_prompt = f"Topic Context: {topic_context}. The image MUST be highly relevant to this topic.\n" if topic_context else ""
+        prompt_builder = f"""Create a detailed Imagen 3 prompt for this text:
 '{chunk_text}'
-Requirements:
+{topic_prompt}Requirements:
 - Photorealistic, cinematic, 9:16 vertical
 - No text, no watermarks, no faces of real people
-- Directly shows what the text describes
+- Directly shows what the text describes, highly precise to the overall topic above
 - High detail, dramatic lighting"""
-    
-    best_prompt = chunk_text # Default
-    attempts = 0
-    while attempts < 3:
-        try:
-            target_model = "gemini-2.5-pro" if attempts < 2 else "gemini-2.5-flash"
-            resp = client.models.generate_content(model=target_model, contents=prompt_builder)
-            best_prompt = resp.text.strip()
-            break
-        except Exception as e:
-            print(f"Imagen prompt gen failed (att {attempts+1}): {e}")
-            attempts += 1
-            time.sleep(2)
+        
+        best_prompt = chunk_text # Default
+        attempts = 0
+        while attempts < 3:
+            try:
+                target_model = "gemini-2.5-pro" if attempts < 2 else "gemini-2.5-flash"
+                resp = client.models.generate_content(model=target_model, contents=prompt_builder)
+                best_prompt = resp.text.strip()
+                break
+            except Exception as e:
+                print(f"Imagen prompt gen failed (att {attempts+1}): {e}")
+                attempts += 1
+                time.sleep(2)
             
     print(f"  -> Generated Imagen prompt: {best_prompt[:60]}...")
         
@@ -205,7 +279,7 @@ Requirements:
     while attempts < 3:
         try:
             result = client.models.generate_images(
-                model="imagen-3.0-generate-002",
+                model="imagen-4.0-generate-001",
                 prompt=best_prompt,
                 config=genai.types.GenerateImagesConfig(
                     number_of_images=1, aspect_ratio="9:16", output_mime_type="image/jpeg"
@@ -223,7 +297,7 @@ Requirements:
             
     return None
 
-def fetch_chunk_visual(chunk, script_data):
+def fetch_chunk_visual(chunk, script_data, topic_context=""):
     """
     Executes the Visual Fetching Decision Tree (A -> B -> C -> D -> E)
     """
@@ -274,7 +348,7 @@ def fetch_chunk_visual(chunk, script_data):
 
     # ── STEP C: Nanobanana (Imagen 3) ────────────────────────────────────
     print(f"Chunk {cid} -> STEP C: Nanobanana (Imagen 3) generation")
-    path = _generate_imagen3(text, photo_out)
+    path = _generate_imagen3(text, photo_out, topic_context)
     if path:
         chunk["visual_path"] = path
         chunk["visual_type"] = "photo"
@@ -354,7 +428,7 @@ def fetch_all_chunk_visuals(chunks, topic_context="", script_data=None):
 
         print(f"  Processing chunk {i+1}/{len(chunks)}...")
         try:
-            fetch_chunk_visual(chunk, script_data)
+            fetch_chunk_visual(chunk, script_data, topic_context)
         except Exception as e:
             print(f"  Chunk {chunk.get('chunk_id')} failed: {e}")
             chunk["visual_path"] = None

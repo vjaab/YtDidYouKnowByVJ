@@ -918,6 +918,18 @@ def render_subtitle_frame(text, current_words, bg_frame=None, accent_color=(255,
                 
             # Heavy stroke using Pillow native 
             s_w = 8 if is_active else 5
+            
+            # Subtitle Background Box
+            bb = draw.textbbox((cur_x, line_y), word, font=f)
+            pad_x = 15
+            pad_y = 10
+            
+            # Draw semi-transparent black background
+            draw.rounded_rectangle(
+                [bb[0] - pad_x, bb[1] - pad_y, bb[2] + pad_x, bb[3] + pad_y], 
+                radius=12, fill=(0, 0, 0, 200)
+            )
+            
             draw.text(
                 (cur_x, line_y), 
                 word, 
@@ -934,10 +946,10 @@ def render_subtitle_frame(text, current_words, bg_frame=None, accent_color=(255,
 
 def _generate_lipsync_video(audio_path):
     """
-    Generates a lip-synced version of Firefly_video_final.mp4 using
-    the best available engine (MuseTalk local → fal.ai cloud).
-    Returns the output file path if successful, None otherwise.
+    Disabled lip sync per user request.
     """
+    return None
+
     from lip_sync import generate_lip_sync, get_available_engine
 
     face_path = os.path.join(ASSETS_DIR, "Firefly_video_final.mp4")
@@ -991,95 +1003,36 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     key_stat_ts    = float(script_json.get("key_stat_timestamp", 0))
     shock_ts       = float(script_json.get("shocking_moment_timestamp", 0))
 
-    # ── LAYER 1: Full-Frame Firefly Background with Lip Sync ───────────────────
-    print("Preparing main video background (Firefly + lip sync)...")
-
-    # Step 1: Try to generate a lip-synced version of the Firefly video
-    lipsync_path = _generate_lipsync_video(audio_path)
-
-    # Step 2: Use lip-synced video if available, otherwise fall back to original
-    firefly_path = os.path.join(ASSETS_DIR, "Firefly_video_final.mp4")
-    bg_video_path = lipsync_path if lipsync_path else firefly_path
-
-    if os.path.exists(bg_video_path):
-        vid_clip = VideoFileClip(bg_video_path)
-        # Loop or trim to match audio duration
-        if vid_clip.duration < audio_duration:
-            vid_clip = vid_clip.with_effects([vfx.Loop(duration=audio_duration)])
-        else:
-            vid_clip = vid_clip.subclipped(0, audio_duration)
-
-        # Crop to fill the entire 1080x1920 frame (no gaps / no filler background)
-        w, h = vid_clip.size
-        target_h = int(w * 16 / 9)
-        if target_h <= h:
-            y1 = (h - target_h) // 2
-            vid_clip = vid_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h)
-        else:
-            target_w = int(h * 9 / 16)
-            x1 = (w - target_w) // 2
-            vid_clip = vid_clip.cropped(x1=x1, y1=0, x2=x1 + target_w, y2=h)
-
-        base = vid_clip.resized((FRAME_W, FRAME_H)).without_audio()
-        if lipsync_path:
-            print("Using lip-synced Firefly video as full-frame background.")
-        else:
-            print("Lip-sync unavailable — using original Firefly video without lip sync.")
-    else:
-        # Ultimate fallback: solid dark background
-        print("No Firefly video found. Using solid dark background.")
-        base = ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=audio_duration)
+    # ── FULL SCREEN BACKGROUND: Cycling through imagery ─────────────
+    print("Preparing full-screen background from generated images...")
     
-    # ── LAYER 3: Tint ─────────────────────────────────────────────────────────
-    tint = ColorClip(size=(FRAME_W, FRAME_H), color=accent_color, duration=audio_duration).with_opacity(0.02)
-
-    # ── LAYER 4: Gradient ─────────────────────────────────────────────────────
-    gradient = _gradient_clip(audio_duration)
-
-    # ── LAYER 5: Particles (Removed by request) ───────────────────────────────
-    particle_clips = []
-
-    # ── Hook banner removed ──────────────────────────────────────────────────
-
-    # ── LAYER 7: Animated logo (Removed VJ Branding) ──────────────────────────
-    logo_clips = []
-
-    # ── LAYER 8: Fact highlight - REMOVED for minimalist style ────────────────
-    fact_clips = []
-
-    # ── LAYER 9: Emoji burst - REMOVED for minimalist style ───────────────────
-    burst_clips = []
-
-    # ── LAYER 10: Like reminder - REMOVED for minimalist style ────────────────
-    reminder_clips = []
-
-    # ── LAYER 11: Main Composite Base (with B-roll overlays) ──────────────────
-    chunk_clips = []
-    # To avoid having B-roll cover the entire video, show each visual for max 2.5s
-    # and only if there's no visual in the immediately preceding 1.0s
-    last_broll_end = -10.0
-    
+    visual_paths = []
     for chunk in chunks:
         vpath = chunk.get("visual_path")
-        if vpath and os.path.exists(vpath):
-            start_t = chunk["start"]
-            dur = chunk["duration"]
-            
-            # Avoid showing B-roll if we just showed one, to let the human face breathe
-            if start_t - last_broll_end < 1.0:
-                continue
+        if vpath and os.path.exists(vpath) and vpath not in visual_paths:
+            visual_paths.append(vpath)
 
+    bg_layer_clips = []
+    if not visual_paths:
+        print("No nanobanana images found. Using solid dark background.")
+        bg_layer_clips.append(ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=audio_duration))
+    else:
+        crossfade = 0.5
+        num_clips = len(visual_paths)
+        clip_dur = (audio_duration + (num_clips - 1) * crossfade) / num_clips
+        current_start = 0.0
+        
+        for i, vp in enumerate(visual_paths):
             try:
-                if chunk.get("visual_type") == "video":
-                    c_clip = VideoFileClip(vpath)
-                    if c_clip.duration < dur:
-                        c_clip = c_clip.with_effects([vfx.Loop(duration=dur)])
+                if vp.endswith(".mp4"):
+                    c_clip = VideoFileClip(vp)
+                    if c_clip.duration < clip_dur:
+                        c_clip = c_clip.with_effects([vfx.Loop(duration=clip_dur)])
                     else:
-                        c_clip = c_clip.subclipped(0, dur)
+                        c_clip = c_clip.subclipped(0, clip_dur)
                 else:
-                    c_clip = ImageClip(vpath).with_duration(dur)
-                
-                # Full 9:16 crop to match shorts format
+                    c_clip = ImageClip(vp).with_duration(clip_dur)
+                    
                 w, h = c_clip.size
                 target_h = int(w * 16 / 9)
                 if target_h <= h:
@@ -1090,18 +1043,95 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                     x1 = (w - target_w) // 2
                     c_clip = c_clip.cropped(x1=x1, y1=0, x2=x1 + target_w, y2=h)
                     
-                c_clip = c_clip.resized((FRAME_W, FRAME_H))
+                c_clip = c_clip.resized((FRAME_W, FRAME_H)).with_start(current_start)
                 
-                # Show B-roll for max 2.5s, then cut back to the talking head
-                broll_dur = min(dur, 2.5) 
-                c_clip = c_clip.subclipped(0, broll_dur).with_start(start_t)
+                if i > 0:
+                    c_clip = c_clip.with_effects([vfx.CrossFadeIn(crossfade)])
                 
-                chunk_clips.append(c_clip)
-                last_broll_end = start_t + broll_dur
+                bg_layer_clips.append(c_clip)
+                current_start += (clip_dur - crossfade)
             except Exception as e:
-                print(f"Failed to process B-roll visual {vpath}: {e}")
+                print(f"Failed to load background img {vp}: {e}")
+                
+        if not bg_layer_clips:
+            bg_layer_clips.append(ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=audio_duration))
 
-    base_layers = [base, tint, gradient] + particle_clips + logo_clips + fact_clips + burst_clips + reminder_clips + chunk_clips
+    # ── AVATAR VIDEO AS PiP (Picture-in-Picture) ──────────────────────────────
+    print("Preparing Avatar PiP...")
+    lipsync_path = _generate_lipsync_video(audio_path)
+    firefly_path = os.path.join(ASSETS_DIR, "Firefly_video_final.mp4")
+    avatar_video_path = lipsync_path if lipsync_path else firefly_path
+
+    avatar_pip = None
+    if os.path.exists(avatar_video_path):
+        vid_clip = VideoFileClip(avatar_video_path)
+        if vid_clip.duration < audio_duration:
+            vid_clip = vid_clip.with_effects([vfx.Loop(duration=audio_duration)])
+        else:
+            vid_clip = vid_clip.subclipped(0, audio_duration)
+
+        width_pip = 450
+        height_pip = 680
+        w, h = vid_clip.size
+        # central crop matching aspect ratio of width_pip/height_pip
+        target_aspect = width_pip / height_pip
+        source_aspect = w / h
+        if source_aspect > target_aspect:
+            # Source is wider, crop horizontally
+            new_w = int(h * target_aspect)
+            x1 = (w - new_w) // 2
+            vid_clip = vid_clip.cropped(x1=x1, y1=0, x2=x1+new_w, y2=h)
+        else:
+            # Source is taller, crop vertically
+            new_h = int(w / target_aspect)
+            y1 = (h - new_h) // 2
+            vid_clip = vid_clip.cropped(x1=0, y1=y1, x2=w, y2=y1+new_h)
+        
+        avatar_clip = vid_clip.resized((width_pip, height_pip)).without_audio()
+        
+        # Rounded rectangle mask for 480x620
+        a_mask_np = np.zeros((height_pip, width_pip), dtype=np.uint8)
+        import cv2
+        radius = 32
+        cv2.circle(a_mask_np, (radius, radius), radius, 255, -1)
+        cv2.circle(a_mask_np, (width_pip-radius, radius), radius, 255, -1)
+        cv2.circle(a_mask_np, (radius, height_pip-radius), radius, 255, -1)
+        cv2.circle(a_mask_np, (width_pip-radius, height_pip-radius), radius, 255, -1)
+        cv2.rectangle(a_mask_np, (radius, 0), (width_pip-radius, height_pip), 255, -1)
+        cv2.rectangle(a_mask_np, (0, radius), (width_pip, height_pip-radius), 255, -1)
+        a_mask_np = a_mask_np.astype(float) / 255.0
+
+        mclip = VideoClip(lambda t: a_mask_np, is_mask=True, duration=audio_duration)
+        
+        # Toggle PiP visibility: Optimized for audience retention
+        # Strong presence for first 5s (hook), then pattern interrupts: 4s hidden, 5s visible
+        def pip_position(t):
+            if t < 5.0:
+                return (FRAME_W - width_pip - 20, 260)
+            
+            cycle_time = (t - 5.0) % 9.0
+            if cycle_time < 4.0:
+                return (FRAME_W + 1000, 260) # Moves it completely off-screen (hidden)
+            else:
+                return (FRAME_W - width_pip - 20, 260) # Visible
+
+        avatar_pip = avatar_clip.with_mask(mclip).with_position(pip_position).with_start(0)
+
+    # ── LAYER 3: Tint ─────────────────────────────────────────────────────────
+    tint = ColorClip(size=(FRAME_W, FRAME_H), color=accent_color, duration=audio_duration).with_opacity(0.02)
+
+    # ── LAYER 4: Gradient ─────────────────────────────────────────────────────
+    gradient = _gradient_clip(audio_duration)
+
+    particle_clips = []
+    logo_clips = []
+    fact_clips = []
+    burst_clips = []
+    reminder_clips = []
+
+    base_layers = bg_layer_clips + [tint, gradient] + particle_clips + logo_clips + fact_clips + burst_clips + reminder_clips
+    if avatar_pip:
+        base_layers.append(avatar_pip)
     
     progress = ColorClip(size=(FRAME_W, 6), color=accent_color, duration=audio_duration)
     progress = progress.with_position(lambda t: (int((t / max(audio_duration, 0.01)) * FRAME_W) - FRAME_W, FRAME_H - 6))
