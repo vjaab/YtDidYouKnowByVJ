@@ -188,6 +188,7 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
     {{"timestamp": 15.2, "emoji": "💡", "keyword": "idea"}}
   ],
   "keywords": ["Keyword 1", "Keyword 2"],
+  "hashtags": ["#AI", "#TechNews", "#Future", "#Shorts"],
   "comment_hook": "Would you use this? Drop your answer below! 👇",
   "end_question": "A thought-provoking question for the audience to comment on"
 }}

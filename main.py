@@ -231,9 +231,16 @@ def run_pipeline(custom_topic=None, topic_type="research"):
     description = format_description(ai_desc, script, script_data.get("end_question", ""), hashtags)
     # Ensure variety in titles using the options if generated
     if script_data.get("title_options"):
-        import random
         title = random.choice(script_data["title_options"])
     
+    # Algorithm Optimization: Append primary hashtag to title for Shorts feed boost
+    if hashtags:
+        primary_tag = hashtags[0]
+        if primary_tag.lower() not in title.lower():
+            # Ensure we don't exceed 100 character limit
+            if len(title) + len(primary_tag) < 95:
+                title = f"{title} {primary_tag}"
+
     tags = list(set(keywords + companies + [t.replace("#", "") for t in hashtags]))[:15]
 
     success, result = upload_video(video_path, title, description, tags)
