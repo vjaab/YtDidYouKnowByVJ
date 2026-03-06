@@ -27,11 +27,15 @@ else:
     print("✅ Meta instructions STRIPPED.")
 
 print("\n--- Testing Entity Tags Rendering ---")
-companies = ["OpenAI", "Microsoft"]
-tools = ["ChatGPT", "DALL-E 3"]
+entities = [
+    {"name": "Claude 3.5 Sonnet", "type": "MODEL"},
+    {"name": "AWS Lambda", "type": "CLOUD"},
+    {"name": "Vertex AI", "type": "SERVICE"},
+    {"name": "Anthropic", "type": "COMPANY"}
+]
 accent_color = (0, 229, 255) # Cyan
 
-tags_img = render_entity_tags(companies, tools, accent_color)
+tags_img = render_entity_tags(entities, accent_color)
 tags_img.save("output/test_entity_tags.png")
 print("✅ Entity tags image saved to output/test_entity_tags.png")
 

@@ -173,8 +173,11 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
   "NOTE_subtitle_chunks": "CRITICAL: Generate 10-15 subtitle_chunks that together cover the ENTIRE script text. Each chunk should be 1-2 sentences (5-12 words). Every word of the script MUST appear in exactly one chunk. Chunks must not overlap and must cover the full duration.",
   "original_news_headline": "Exact headline",
   "original_news_url": "Exact url",
-  "companies_mentioned": ["Company 1", "Company 2"],
-  "tools_mentioned": ["Tool 1", "Tool 2"],
+  "key_entities": [
+    {"name": "Entity Name", "type": "MODEL"},
+    {"name": "Service Name", "type": "CLOUD"},
+    {"name": "Company Name", "type": "COMPANY"}
+  ],
   "keywords": ["Keyword 1", "Keyword 2"],
   "comment_hook": "Would you use this? Drop your answer below! 👇",
   "end_question": "A thought-provoking question for the audience to comment on"
