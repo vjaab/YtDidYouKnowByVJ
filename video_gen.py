@@ -201,7 +201,7 @@ def _gradient_clip(duration):
 
 # ── LAYER 4: Ambient "Obsidian" particles ──────────────────────────────────────
 # ── LAYER 4: Ambient "Obsidian" particles ──────────────────────────────────────
-def _ambient_particles(duration, accent_color):
+def _ambient_particles(duration, accent_color, particle_style="bokeh"):
     n = 35
     random.seed(42)
     particles = [(random.uniform(0, FRAME_W), random.uniform(0, FRAME_H),
@@ -212,16 +212,33 @@ def _ambient_particles(duration, accent_color):
         img = np.zeros((FRAME_H, FRAME_W, 3), dtype=np.uint8)
         for px, py, speed, offset, p_size in particles:
             y = (py - speed * t * 60 - offset) % FRAME_H
-            cv2.circle(img, (int(px), int(y)), int(p_size), accent_color, -1)
-        img = cv2.GaussianBlur(img, (75, 75), 0)
+            if particle_style == "digital":
+                # Digital blocks/lines
+                cv2.rectangle(img, (int(px), int(y)), (int(px+p_size), int(y+2)), accent_color, -1)
+            elif particle_style == "stars":
+                # Tiny sharp stars
+                cv2.circle(img, (int(px), int(y)), 2, (255, 255, 255), -1)
+            else:
+                # Default bokeh
+                cv2.circle(img, (int(px), int(y)), int(p_size), accent_color, -1)
+        
+        if particle_style != "stars":
+            blur_size = 75 if particle_style == "bokeh" else 15
+            img = cv2.GaussianBlur(img, (blur_size, blur_size), 0)
         return img
 
     def make_mask(t):
         mask = np.zeros((FRAME_H, FRAME_W), dtype=np.uint8)
         for px, py, speed, offset, p_size in particles:
             y = (py - speed * t * 60 - offset) % FRAME_H
-            cv2.circle(mask, (int(px), int(y)), int(p_size), 255, -1)
-        mask = cv2.GaussianBlur(mask, (75, 75), 0)
+            if particle_style == "digital":
+                cv2.rectangle(mask, (int(px), int(y)), (int(px+p_size), int(y+2)), 255, -1)
+            else:
+                cv2.circle(mask, (int(px), int(y)), int(p_size), 255, -1)
+        
+        if particle_style != "stars":
+            blur_size = 75 if particle_style == "bokeh" else 15
+            mask = cv2.GaussianBlur(mask, (blur_size, blur_size), 0)
         return (mask.astype(float) / 255.0) * 0.15 # 15% Opacity digital dust
 
     clip = VideoClip(make_frame, duration=duration)
@@ -229,7 +246,7 @@ def _ambient_particles(duration, accent_color):
     return clip.with_mask(mask)
 
 # ── LAYER 1: Dynamic Minimalist Background ────────────────────────────────────
-def _dynamic_tech_background(duration, accent_color):
+def _dynamic_tech_background(duration, accent_color, bg_base_color=(10, 10, 15)):
     """Generates a high-end, 0-cost local dark tech background (Obsidian style)."""
     # Create base grid and particles
     cols, rows = 12, 22
@@ -237,8 +254,8 @@ def _dynamic_tech_background(duration, accent_color):
     spacing_y = FRAME_H // rows
     
     def make_frame(t):
-        # Dark obsidian base
-        frame = np.full((FRAME_H, FRAME_W, 3), (10, 10, 15), dtype=np.uint8)
+        # Dark obsidian base (now randomized)
+        frame = np.full((FRAME_H, FRAME_W, 3), bg_base_color, dtype=np.uint8)
         
         # Draw moving grid lines
         grid_alpha = 0.08 + 0.02 * math.sin(t * 0.5)
@@ -614,7 +631,7 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
     
     return img
 
-def render_entity_tags(entities, accent_color, frame_width=1080):
+def render_entity_tags(entities, accent_color, frame_width=1080, on_right=False):
     """Renders small floating tags for various entities (Models, Clouds, Companies, etc.) on the side."""
     tag_h = 600
     img = Image.new('RGBA', (frame_width, tag_h), (0,0,0,0))
@@ -627,27 +644,29 @@ def render_entity_tags(entities, accent_color, frame_width=1080):
         return img
         
     curr_y = 10
-    start_x = 40 # Left side padding
     
     # Limit to top 6 entities to avoid cluttering the whole screen
-    # Now that they are one-line, we can fit more or keep it clean
     for ent in entities[:6]:
         val = ent.get("name", "Unknown")
-        
         # Measure text
         val_w = draw.textlength(val, font=f_val)
-        
         box_w = val_w + 40
         box_h = 60
+        
+        if on_right:
+            start_x = frame_width - box_w - 40
+        else:
+            start_x = 40 # Left side padding
         
         # Rounded box with slight transparency
         draw.rounded_rectangle([start_x, curr_y, start_x + box_w, curr_y + box_h], radius=12, fill=(15, 15, 15, 200))
         
-        # Left accent line
-        draw.rectangle([start_x, curr_y + 12, start_x + 6, curr_y + box_h - 12], fill=accent_color)
+        # Accent line position
+        acc_x = (start_x + box_w - 6) if on_right else start_x
+        draw.rectangle([acc_x, curr_y + 12, acc_x + 6, curr_y + box_h - 12], fill=accent_color)
         
-        # Text
-        draw.text((start_x + 22, curr_y + 11), val, font=f_val, fill=(255, 255, 255, 255))
+        # Text - FORCED WHITE per user request
+        draw.text((start_x + (15 if on_right else 22), curr_y + 11), val, font=f_val, fill=(255, 255, 255, 255))
         
         curr_y += box_h + 10
         
@@ -774,19 +793,20 @@ def render_telegram_cta(accent_color, frame_width=1080):
         w1 = draw.textlength(t1, font=f1)
         x1 = (frame_width - (w1 + 80)) // 2
         if tg_icon: img.paste(tg_icon, (int(x1), 60), tg_icon)
-        draw.text((x1 + 80, 65), t1, font=f1, fill=(*accent_color, 255))
+        # White font for entities/handles per user request
+        draw.text((x1 + 80, 65), t1, font=f1, fill=(255, 255, 255, 255))
         
         # LI Row
         w2 = draw.textlength(t2, font=f1)
         x2 = (frame_width - (w2 + 80)) // 2
         if li_icon: img.paste(li_icon, (int(x2), 160), li_icon)
-        draw.text((x2 + 80, 165), t2, font=f1, fill=(*accent_color, 255))
+        draw.text((x2 + 80, 165), t2, font=f1, fill=(255, 255, 255, 255))
 
         # WA Row
         w3 = draw.textlength(t3, font=f1)
         x3 = (frame_width - (w3 + 80)) // 2
         if wa_icon: img.paste(wa_icon, (int(x3), 260), wa_icon)
-        draw.text((x3 + 80, 265), t3, font=f1, fill=(*accent_color, 255))
+        draw.text((x3 + 80, 265), t3, font=f1, fill=(255, 255, 255, 255))
 
     except Exception as e:
         print(f"CTA Render Icons Error: {e}")
@@ -1347,17 +1367,29 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     # ── LAYER 4: Gradient ─────────────────────────────────────────────────────
     gradient = _gradient_clip(audio_duration)
 
-    particle_clips = []
-    logo_clips = []
+    # Layout & Visual Randomization for Variation
+    on_right = random.choice([True, False])
+    particle_style = random.choice(["bokeh", "digital", "stars"])
+    bg_hex = color_theme.get("background", "#0A0A0F").lstrip("#")
+    bg_base_color = tuple(int(bg_hex[i:i+2], 16) for i in (0, 2, 4))
+
+    # ── LAYER 4: Ambient particles ──────────────────────────────────────────
+    ambient = _ambient_particles(audio_duration, accent_color, particle_style=particle_style)
+    particle_clips.append(ambient)
+
+    # ── LAYER 1: Dynamic Tech Background ────────────────────────────────────
+    tech_bg = _dynamic_tech_background(audio_duration, accent_color, bg_base_color=bg_base_color)
+    bg_layer_clips.insert(0, tech_bg)
     
-    # Entity Tags Layer (Companies/Tools/Models on left side)
-    tags_img = render_entity_tags(key_entities, accent_color, FRAME_W)
+    # Entity Tags Layer (Companies/Tools/Models on left/right side)
+    tags_img = render_entity_tags(key_entities, accent_color, FRAME_W, on_right=on_right)
     
     # 3. Slide-In and Sweep Animation for Tags
     def tag_pos(t):
-        if t < 0.5: # 0.5s Slide from left
-            # Start further back to ensure it's completely off-screen
-            return (-500 + int(500 * (t/0.5)), 320)
+        if t < 0.5: # 0.5s Slide from side
+            offset = 500 if on_right else -500
+            start_x = (FRAME_W if on_right else -500)
+            return (offset - int(offset * (t/0.5)), 320)
         return (0, 320)
         
     tags_clip = ImageClip(np.array(tags_img)).with_duration(audio_duration).with_position(tag_pos)

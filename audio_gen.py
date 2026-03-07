@@ -87,10 +87,9 @@ KOKORO_MODEL = os.path.join(ASSETS_DIR, "kokoro-v1.0.onnx")
 KOKORO_VOICES = os.path.join(ASSETS_DIR, "voices-v1.0.bin")
 
 # ── F5-TTS Config ─────────────────────────────────────────────────────────────
-VJ_REF_WAV = os.path.join(ASSETS_DIR, "vj.wav")
+VJ_REF_WAV = os.path.join(ASSETS_DIR, "vj_voice.wav")
 VJ_REF_TEXT = (
-    "Welcome you are listening to your channel, we bring you the best insights, ideas and stories. "
-    "After just for you stay tuned and let's get started."
+    "US President Donald Trump has demanded Iran's unconditional surrender as the American and Israeli military continued to launch strikes."
 )
 
 _f5_instance = None
