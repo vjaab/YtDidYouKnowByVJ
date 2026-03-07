@@ -795,6 +795,63 @@ def render_telegram_cta(accent_color, frame_width=1080):
     
     return img
 
+# ── LAYER 16: Article Screenshot (New Layer) ──────────────────────────────────
+def _article_screenshot_clip(screenshot_path, duration):
+    if not screenshot_path or not os.path.exists(screenshot_path):
+        return None
+    try:
+        # Load and process the screenshot
+        img = Image.open(screenshot_path).convert("RGBA")
+        
+        # We want to show a portion of the article, but vertical!
+        # Mobile viewport was 1080x1920. Let's resize it to fit as a floating card.
+        card_w = 400
+        card_h = 711 # 9:16 aspect ratio
+        img = img.resize((card_w, card_h), Image.LANCZOS)
+        
+        # Add a nice white border and drop shadow
+        border_size = 10
+        canvas_w = card_w + border_size * 2
+        canvas_h = card_h + border_size * 2
+        canvas = Image.new("RGBA", (canvas_w, canvas_h), (0,0,0,0))
+        draw = ImageDraw.Draw(canvas)
+        
+        # Shadow (simulated)
+        shadow_offset = 15
+        shadow = Image.new("RGBA", (canvas_w, canvas_h), (0,0,0,0))
+        shadow_draw = ImageDraw.Draw(shadow)
+        shadow_draw.rounded_rectangle([shadow_offset, shadow_offset, canvas_w-1, canvas_h-1], radius=20, fill=(0,0,0,100))
+        shadow = shadow.filter(ImageFilter.GaussianBlur(10))
+        
+        canvas.paste(shadow, (0,0), shadow)
+        draw.rounded_rectangle([0, 0, canvas_w-shadow_offset, canvas_h-shadow_offset], radius=15, fill=(255,255,255,255))
+        canvas.paste(img, (border_size, border_size), img)
+        
+        # Wrap into MoviePy
+        arr = np.array(canvas.convert("RGB"))
+        mask = np.array(canvas.split()[3]).astype(float) / 255.0
+        
+        # Animation: Slide in from right at 10s mark, stay for 8s
+        start_ts = 10.0
+        display_dur = min(8.0, duration - start_ts)
+        if display_dur <= 0: return None
+        
+        def pos(t):
+            # Slide from right
+            slide_time = 0.6
+            if t < slide_time:
+                x = FRAME_W - (canvas_w + 40) * (t/slide_time)
+                return (int(x), 450)
+            return (FRAME_W - canvas_w - 40, 450)
+
+        clip = VideoClip(lambda t: arr, duration=display_dur)
+        mclip = VideoClip(lambda t: mask, is_mask=True, duration=display_dur)
+        return clip.with_mask(mclip).with_position(pos).with_start(start_ts)
+        
+    except Exception as e:
+        print(f"Article screenshot clip error: {e}")
+        return None
+
 def _intro_clip(duration, accent_color):
     """Create a brief intro segment showing the animated logo on a dark background."""
     logo = _animated_logo(duration)
@@ -1318,9 +1375,15 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     grain_layer = _generate_film_grain(audio_duration, FRAME_W, FRAME_H)
     flare_layer = _generate_lens_flare(audio_duration, FRAME_W)
     
+    # ── ARTICLE SCREENSHOT LAYER ─────────────────────────────────────────────
+    article_screenshot_path = script_json.get("screenshot_path")
+    screenshot_clip = _article_screenshot_clip(article_screenshot_path, audio_duration)
+    
     base_layers = bg_layer_clips + [tint, gradient] + particle_clips + logo_clips + fact_clips + burst_clips + reminder_clips + [grain_layer, flare_layer]
     if avatar_pip:
         base_layers.append(avatar_pip)
+    if screenshot_clip:
+        base_layers.append(screenshot_clip)
 
     # ── PROGRESS BAR ────────────────────────────────────────────────────────
     progress = ColorClip(size=(FRAME_W, 6), color=accent_color, duration=audio_duration)

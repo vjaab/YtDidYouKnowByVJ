@@ -15,6 +15,7 @@ from audio_gen import generate_voiceover
 from chunk_builder import build_chunks, redistribute_to_audio_duration
 from pexels_fetcher import fetch_all_chunk_visuals
 from video_gen import create_video
+from screenshot_gen import capture_article_screenshot
 from thumbnail_gen import generate_thumbnail
 from youtube_upload import upload_video
 from telegram_selector import notify_telegram
@@ -159,6 +160,20 @@ def run_pipeline(custom_topic=None, topic_type="research"):
     if not audio_path or not script_data or duration < min_dur:
         log_message("ERROR: Could not generate valid assets. Aborting.")
         return False
+
+    # ── STEP 4b: Capture Article Screenshot ──────────────────────────────────
+    log_message("STEP 4b: Capturing article screenshot...")
+    news_url = script_data.get("original_news_url")
+    if news_url:
+        screenshot_filename = f"screenshot_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+        screenshot_path = capture_article_screenshot(news_url, screenshot_filename)
+        if screenshot_path:
+            script_data["screenshot_path"] = screenshot_path
+            log_message(f"Screenshot captured: {screenshot_path}")
+        else:
+            log_message("Warning: Screenshot capture failed.")
+    else:
+        log_message("No article URL found for screenshot.")
 
     # ── STEP 5: Build Visual Chunks ───────────────────────────────────────────
     log_message("STEP 5: Grouping words into visual chunks...")
