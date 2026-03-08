@@ -316,6 +316,7 @@ def clean_tts_text(text, phonetic=True):
     
     # 3. Phonetic Cleanups for Clarity
     if phonetic:
+        cleaned = re.sub(r'\bonly\b', 'own-lee', cleaned, flags=re.IGNORECASE)
         cleaned = re.sub(r'\bincredible\b', 'in-cred-uh-bul', cleaned, flags=re.IGNORECASE)
         cleaned = re.sub(r'\bmillions\b', 'mil-yuns', cleaned, flags=re.IGNORECASE)
         cleaned = re.sub(r'\bbillions\b', 'bil-yuns', cleaned, flags=re.IGNORECASE)
@@ -343,7 +344,9 @@ def restore_original_words(word_timestamps, original_text):
         if i < len(original_words):
             # If the spoken word is a phonetic variant, replace it with the original word casing
             spoken_clean = re.sub(r'[^\w]', '', wt["word"].upper())
-            if spoken_clean == "INCREDUHBUL" and original_words_clean[i] == "INCREDIBLE":
+            if spoken_clean == "OWNLEE" and original_words_clean[i] == "ONLY":
+                wt["word"] = original_words[i]
+            elif spoken_clean == "INCREDUHBUL" and original_words_clean[i] == "INCREDIBLE":
                 wt["word"] = original_words[i]
             elif spoken_clean == "MILYUNS" and original_words_clean[i] == "MILLIONS":
                 wt["word"] = original_words[i]
