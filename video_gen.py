@@ -1232,6 +1232,11 @@ def create_video(audio_path, script_json, chunks, output_path=None):
             visual_paths.append(vpath)
 
     bg_layer_clips = []
+    particle_clips = []
+    logo_clips = []
+    fact_clips = []
+    burst_clips = []
+    reminder_clips = []
     if not visual_paths:
         print("No nanobanana images found. Using solid dark background.")
         bg_layer_clips.append(ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=audio_duration))
@@ -1399,9 +1404,6 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     
     logo_clips.extend([tags_clip, sweep])
 
-    fact_clips = []
-    burst_clips = []
-    reminder_clips = []
 
     # ── HUMAN REALISM OVERLAYS ───────────────────────────────────────────────
     grain_layer = _generate_film_grain(audio_duration, FRAME_W, FRAME_H)
