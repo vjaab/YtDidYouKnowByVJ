@@ -36,7 +36,7 @@ httpcore==1.0.9
 httplib2==0.31.2
 httpx==0.28.1
 idna==3.11
-ImageIO==2.37.2
+imageio==2.37.0
 imageio-ffmpeg==0.6.0
 isodate==0.7.2
 joblib==1.5.3

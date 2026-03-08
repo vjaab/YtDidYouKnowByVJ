@@ -33,11 +33,6 @@ jobs:
       - name: Verify FFmpeg Installation
         run: ffmpeg -version
           
-      - name: Install Python Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          
       - name: Setup SadTalker (CPU)
         run: |
           git clone https://github.com/OpenTalker/SadTalker.git
@@ -45,6 +40,13 @@ jobs:
           pip install gdown
           pip install -r requirements.txt
           bash scripts/download_models.sh
+          
+      - name: Install Project Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          # Explicitly fix potential imageio recursion by forcing latest imageio-ffmpeg last
+          pip install --upgrade imageio imageio-ffmpeg moviepy
           
       - name: Setup Environment Secrets (.env)
         run: |
