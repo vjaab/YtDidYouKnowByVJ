@@ -318,7 +318,7 @@ def _fact_box(key_stat, start_time, accent_color, total_dur):
     if not key_stat or start_time >= total_dur:
         return None
     dur = min(1.5, total_dur - start_time)
-    f = gf(90)
+    f = gf(110) # Increased from 90 for better readability
     w, h = ts(key_stat, f)
     pad = 20
     img = Image.new("RGBA", (w + pad*2 + 6, h + pad*2 + 6), (0,0,0,0))
@@ -637,8 +637,8 @@ def render_entity_tags(entities, accent_color, frame_width=1080, on_right=False)
     img = Image.new('RGBA', (frame_width, tag_h), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
-    # Font
-    f_val = ImageFont.truetype('assets/fonts/Montserrat-Bold.ttf', 32)
+    # Font (Increased from 32 for better readability)
+    f_val = ImageFont.truetype('assets/fonts/Montserrat-Bold.ttf', 44)
     
     if not entities:
         return img
@@ -669,7 +669,7 @@ def render_entity_tags(entities, accent_color, frame_width=1080, on_right=False)
             except Exception as e:
                 print(f"Failed to load logo {logo_path}: {e}")
                 
-        box_h = 60
+        box_h = 80 # Increased from 60 to accommodate larger font
         
         if on_right:
             start_x = frame_width - box_w - 40

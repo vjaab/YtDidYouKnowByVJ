@@ -133,12 +133,12 @@ def _render_stat_card(data, accent_color, progress=1.0):
     fi = _eb(80)
     _center_text(draw, icon, fi, cy + 35, (255, 255, 255, 255), cx, cw)
 
-    # Headline
-    fh = _eb(96)
+    # Headline (Increased from 96 for mobile)
+    fh = _eb(116)
     _center_text(draw, headline, fh, cy + 140, (*accent_color, 255), cx, cw)
 
-    # Subtext
-    fs = _bold(42)
+    # Subtext (Increased from 42 for clarity)
+    fs = _bold(52)
     _center_text(draw, subtext, fs, cy + 270, (255, 255, 255, 255), cx, cw)
 
     # Context
@@ -174,7 +174,7 @@ def _render_comparison_card(data, accent_color, progress=1.0):
     # Left column
     lx = cx + 20
     fn = _bold(36)
-    fv = _eb(52)
+    fv = _eb(72) # Increased from 52 for impact
     fl = _reg(28)
 
     l_name = left.get("name", "A")
@@ -233,8 +233,8 @@ def _render_timeline_card(data, accent_color, progress=1.0):
 
     _draw_card_bg(draw, cx, cy, cw, ch, accent_color)
 
-    fd = _bold(28)
-    ft = _reg(32)
+    fd = _bold(36) # Increased from 28
+    ft = _reg(38) # Increased from 32
     line_x = cx + 60
 
     # Vertical timeline line
@@ -303,8 +303,8 @@ def _render_definition_card(data, accent_color, progress=1.0):
     definition = data.get("definition", "")
     example = data.get("example", "")
 
-    # Term + icon (type-in effect via progress)
-    ft = _eb(52)
+    # Term + icon (Increased from 52 to 68)
+    ft = _eb(68)
     chars_to_show = max(1, int(len(term) * min(1.0, progress * 2)))
     display_term = term[:chars_to_show]
     term_line = f"{display_term}  {icon}"
@@ -389,11 +389,11 @@ def _render_ranking_card(data, accent_color, progress=1.0):
                 radius=12, fill=(*accent_color, int(40 * min(1.0, item_progress)))
             )
 
-        # Rank number
+        # Rank number (Increased from 40 to 50)
         rank = item.get("rank", i + 1)
         rank_text = f"#{rank}"
         rank_color = (*accent_color, alpha) if is_highlight else (180, 180, 180, alpha)
-        draw.text((cx + 30, ry + 20), rank_text, font=_eb(40), fill=rank_color)
+        draw.text((cx + 30, ry + 20), rank_text, font=_eb(50), fill=rank_color)
 
         # Name
         name = item.get("name", "")
@@ -439,8 +439,8 @@ def _render_growth_card(data, accent_color, progress=1.0):
     fa = _eb(100)
     _center_text(draw, arrow_symbol, fa, cy + 20, (*arrow_color[:3], arrow_alpha), cx, cw)
 
-    # Percentage (count up)
-    fp = _eb(96)
+    # Percentage (Increased from 96 to 116)
+    fp = _eb(116)
     # Extract number from percentage string
     num_match = re.search(r'[\d.]+', percentage)
     if num_match and progress < 0.8:
