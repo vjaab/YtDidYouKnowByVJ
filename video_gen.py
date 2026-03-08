@@ -1475,7 +1475,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         base_img[:, :] = color
         return base_img
         
-    progress = progress.fl(make_progress_frame)
+    progress = progress.with_effects([vfx.Transform(make_progress_frame)])
     progress = progress.with_position(lambda t: (int((t / max(audio_duration, 0.01)) * FRAME_W) - FRAME_W, FRAME_H - 6))
     base_layers.append(progress)
     

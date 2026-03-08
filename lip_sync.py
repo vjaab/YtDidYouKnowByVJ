@@ -176,6 +176,7 @@ def _run_sadtalker(face_path, audio_path, output_path, timeout=10800):
     print(f"   CMD: {' '.join(cmd)}")
     
     env = os.environ.copy()
+    env["PYTHONHASHSEED"] = "0" # Fix for SadTalker fatal hardware/hash seed error
     
     try:
         result = subprocess.run(
