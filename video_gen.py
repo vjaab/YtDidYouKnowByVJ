@@ -1155,10 +1155,6 @@ def render_subtitle_frame(text, current_words, bg_frame=None, accent_color=(255,
     return img
 
 def _generate_lipsync_video(audio_path):
-    """
-    Disabled lip sync per user request.
-    """
-    return None
 
     from lip_sync import generate_lip_sync, get_available_engine
 

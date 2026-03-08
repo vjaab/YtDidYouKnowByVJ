@@ -228,7 +228,21 @@ def _run_fal_cloud(face_path, audio_path, output_path, timeout=600):
         print("   ✗ FAL_KEY not set.")
         return False
 
-    print(f"🎭 fal.ai Cloud (MuseTalk): Starting lip-sync generation...")
+    # Determine endpoint based on input file type
+    # If the input is an image, we MUST use SadTalker. If it's a video, use MuseTalk.
+    ext = os.path.splitext(face_path)[1].lower()
+    if ext in [".png", ".jpg", ".jpeg"]:
+        engine_name = "SadTalker"
+        endpoint = "https://queue.fal.run/fal-ai/sadtalker"
+        source_key = "source_image_url"
+        audio_key = "driven_audio_url"
+    else:
+        engine_name = "MuseTalk"
+        endpoint = "https://queue.fal.run/fal-ai/musetalk"
+        source_key = "source_video_url"
+        audio_key = "audio_url"
+
+    print(f"🎭 fal.ai Cloud ({engine_name}): Starting lip-sync generation...")
     print(f"   Face: {face_path}")
     print(f"   Audio: {audio_path}")
 
@@ -249,11 +263,11 @@ def _run_fal_cloud(face_path, audio_path, output_path, timeout=600):
     print("   → Submitting to fal.ai queue...")
     try:
         submit_resp = requests.post(
-            "https://queue.fal.run/fal-ai/musetalk",
+            endpoint,
             headers=headers,
             json={
-                "source_video_url": face_url,
-                "audio_url": audio_url,
+                source_key: face_url,
+                audio_key: audio_url,
             },
             timeout=60,
         )
@@ -272,8 +286,8 @@ def _run_fal_cloud(face_path, audio_path, output_path, timeout=600):
         return False
 
     # Poll for completion
-    status_url = f"https://queue.fal.run/fal-ai/musetalk/requests/{request_id}/status"
-    result_url = f"https://queue.fal.run/fal-ai/musetalk/requests/{request_id}"
+    status_url = f"{endpoint}/requests/{request_id}/status"
+    result_url = f"{endpoint}/requests/{request_id}"
 
     start_time = time.time()
     while time.time() - start_time < timeout:
