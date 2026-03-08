@@ -11,6 +11,7 @@ on:
 jobs:
   run-pipeline:
     runs-on: ubuntu-latest
+    timeout-minutes: 240 # 4 hours to be safe for 3-hour inference
     
     steps:
       - name: Checkout Code

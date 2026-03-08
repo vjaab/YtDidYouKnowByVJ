@@ -150,7 +150,7 @@ def _is_sadtalker_ready():
     """Check if SadTalker is cloned."""
     return os.path.isdir(SADTALKER_DIR)
 
-def _run_sadtalker(face_path, audio_path, output_path, timeout=3600):
+def _run_sadtalker(face_path, audio_path, output_path, timeout=10800):
     """Run SadTalker inference on CPU."""
     print(f"🎭 SadTalker: Starting lip-sync generation (CPU mode, might take a while)...")
     print(f"   Face: {face_path}")
@@ -219,7 +219,7 @@ def _find_output_video(result_dir):
 # PUBLIC API
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def generate_lip_sync(face_path, audio_path, output_path, timeout=3600):
+def generate_lip_sync(face_path, audio_path, output_path, timeout=10800):
     """
     Generate a lip-synced video.
 
@@ -231,11 +231,7 @@ def generate_lip_sync(face_path, audio_path, output_path, timeout=3600):
         face_path:   Path to face video (.mp4) or image (.png/.jpg)
         audio_path:  Path to audio file (.wav/.mp3)
         output_path: Where the lip-synced video will be saved
-        timeout:     Max seconds to wait (default 3600)
-
-    Returns:
-        str: output_path on success
-        None: on failure
+        timeout:     Max seconds to wait (default 10800)
     """
     if not os.path.exists(face_path):
         print(f"🎭 Lip-sync: Face file not found: {face_path}")
