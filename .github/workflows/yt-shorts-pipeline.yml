@@ -47,8 +47,15 @@ jobs:
           pip install -r requirements.txt
           # Explicitly fix potential imageio recursion by forcing latest imageio-ffmpeg last
           pip install --upgrade imageio imageio-ffmpeg moviepy
-          # FIX: Patch basicsr for torchvision compatibility (functional_tensor -> functional)
-          python -c "import basicsr; import os; path=os.path.join(os.path.dirname(basicsr.__file__), 'data', 'degradations.py'); f=open(path, 'r'); c=f.read(); f.close(); f=open(path, 'w'); f.write(c.replace('functional_tensor', 'functional')); f.close()"
+          # FIX: Patch basicsr for torchvision compatibility without importing (prevents ModuleNotFoundError)
+          SITE_PKG=$(python -c "import site; print(site.getsitepackages()[0])")
+          FILE_TO_PATCH="$SITE_PKG/basicsr/data/degradations.py"
+          if [ -f "$FILE_TO_PATCH" ]; then
+            echo "Patching $FILE_TO_PATCH..."
+            sed -i 's/functional_tensor/functional/g' "$FILE_TO_PATCH"
+          else
+            echo "Warning: $FILE_TO_PATCH not found."
+          fi
           
       - name: Setup Environment Secrets (.env)
         run: |
@@ -78,6 +85,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main
           git add news_log.json facts_log.json
           git commit -m "[Bot] Auto-update news tracker logs" || echo "No changes to commit"
           git push origin main
