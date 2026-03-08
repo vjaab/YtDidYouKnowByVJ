@@ -299,6 +299,13 @@ def clean_tts_text(text):
     cleaned = re.sub(r'\s*\[pause\]\s*', ' ', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\s*\(pause\)\s*', ' ', cleaned, flags=re.IGNORECASE)
     
+    # Prevent TTS from saying 'strike', 'asterisk', or 'dash'
+    cleaned = cleaned.replace("—", "...") # Em-dash -> pause
+    cleaned = cleaned.replace("–", "...") # En-dash -> pause
+    cleaned = cleaned.replace("--", "...") # Double hyphen -> pause
+    cleaned = cleaned.replace("*", "")    # Remove asterisks
+    cleaned = cleaned.replace("~", "")    # Remove tildes
+    
     # Clean up double spaces
     cleaned = re.sub(r'\s+', ' ', cleaned).strip()
     return cleaned

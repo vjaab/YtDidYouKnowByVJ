@@ -132,4 +132,13 @@ def fetch_all_entities(script_data):
             else:
                 company["local_hq_path"] = path
 
+    for entity in script_data.get("key_entities", []):
+        # We can try to fetch logo for anything, clearbit is domain-based and cheap
+        path = fetch_company_logo(entity)
+        if path:
+            if path.endswith(".png"):
+                entity["local_logo_path"] = path
+            else:
+                entity["local_hq_path"] = path
+
     return script_data

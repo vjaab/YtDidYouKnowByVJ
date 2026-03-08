@@ -648,9 +648,27 @@ def render_entity_tags(entities, accent_color, frame_width=1080, on_right=False)
     # Limit to top 6 entities to avoid cluttering the whole screen
     for ent in entities[:6]:
         val = ent.get("name", "Unknown")
+        logo_path = ent.get("local_logo_path") or ent.get("local_hq_path")
+        
         # Measure text
         val_w = draw.textlength(val, font=f_val)
         box_w = val_w + 40
+        
+        # Load logo if available
+        logo_img = None
+        logo_w, logo_h = 0, 0
+        if logo_path and os.path.exists(logo_path):
+            try:
+                raw_logo = Image.open(logo_path).convert("RGBA")
+                # Scale logo to fit nicely within height of 40 (box is 60)
+                aspect = raw_logo.width / raw_logo.height
+                logo_h = 40
+                logo_w = int(logo_h * aspect)
+                logo_img = raw_logo.resize((logo_w, logo_h), Image.LANCZOS)
+                box_w += logo_w + 10 # Add space for logo + padding
+            except Exception as e:
+                print(f"Failed to load logo {logo_path}: {e}")
+                
         box_h = 60
         
         if on_right:
@@ -665,8 +683,20 @@ def render_entity_tags(entities, accent_color, frame_width=1080, on_right=False)
         acc_x = (start_x + box_w - 6) if on_right else start_x
         draw.rectangle([acc_x, curr_y + 12, acc_x + 6, curr_y + box_h - 12], fill=accent_color)
         
+        # Calculate content positions
+        content_x = start_x + (15 if on_right else 22)
+        
+        # Paste Logo
+        if logo_img:
+            # Calculate where to paste the logo
+            logo_x = int(content_x)
+            logo_y = int(curr_y + (box_h - logo_h) // 2)
+            img.paste(logo_img, (logo_x, logo_y), logo_img)
+            # Shift text over
+            content_x += logo_w + 10
+            
         # Text - FORCED WHITE per user request
-        draw.text((start_x + (15 if on_right else 22), curr_y + 11), val, font=f_val, fill=(255, 255, 255, 255))
+        draw.text((content_x, curr_y + 11), val, font=f_val, fill=(255, 255, 255, 255))
         
         curr_y += box_h + 10
         
@@ -1075,31 +1105,35 @@ def wrap_text_to_lines(words, word_widths, max_width, font):
         lines.append(current_line)
     return lines
 
-def render_subtitle_frame(text, current_words, bg_frame=None, accent_color=(255,214,0), frame_width=1080, frame_height=1920):
-    """Modern Hormozi-style minimalist captions."""
+def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), frame_width=1080, frame_height=1920):
+    """Modern Hormozi-style minimalist captions with Kinetic Word Pop."""
     img = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
-    f_main = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 85)
-    f_pop = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 95)
+    # Base fonts
+    base_size = 85
+    pop_size = 95
+    f_main = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', base_size)
     
-    # UPPERCASE all text for punchier look
-    words = [w.upper() for w in text.split()]
-    current_word_list = [w.upper() for w in current_words.get('current', [])]
-    spoken_word_list = [w.upper() for w in current_words.get('spoken', [])]
+    # word_data is a list of {"word": str, "is_active": bool, "is_spoken": bool, "scale": float}
+    words = [wd["word"].upper() for wd in word_data]
     
     word_widths = []
     fake_draw = ImageDraw.Draw(Image.new("RGBA", (1,1)))
-    for word in words:
-        f = f_pop if word in current_word_list else f_main
-        bbox = fake_draw.textbbox((0,0), word, font=f)
+    
+    for i, wd in enumerate(word_data):
+        # Dynamically calculate font size for this word based on its scale
+        s = pop_size if wd["is_active"] else base_size
+        s = int(s * wd["scale"])
+        f_current = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', s)
+        bbox = fake_draw.textbbox((0,0), words[i], font=f_current)
         word_widths.append(bbox[2]-bbox[0])
     
     lines = wrap_text_to_lines(words, word_widths, 900, f_main)
     
     line_h = 130
     total_h = len(lines) * line_h
-    start_y = 1000 # Chest/neck position (closer to mouth)
+    start_y = 1000 # Moved down to avoid overlapping with the Avatar PiP (which ends at Y=940)
     
     word_idx = 0
     for i, line in enumerate(lines):
@@ -1107,46 +1141,43 @@ def render_subtitle_frame(text, current_words, bg_frame=None, accent_color=(255,
         line_w = sum(word_widths[word_idx:word_idx+len(line)]) + 12 * (len(line)-1)
         cur_x = (frame_width - line_w) // 2
         
-        for word in line:
-            # SHOUTING DETECTION: If word is ALL CAPS and > 1 char, it's a 'shouting' word
-            is_shouting = word.isupper() and len(word) > 1
-            is_active = word in current_word_list
+        for word_text in line:
+            wd = word_data[word_idx]
+            is_shouting = word_text.isupper() and len(word_text) > 1
+            is_active = wd["is_active"]
             
-            f = f_pop if is_active else f_main
+            # Recalculate font with scale
+            s = pop_size if is_active else base_size
+            s = int(s * wd["scale"])
+            f = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', s)
             
-            # Colors: POP emphasized words in accent color
-            c_fill = (255, 255, 255, 255) # Default White
+            # Colors
+            c_fill = (255, 255, 255, 255)
             if is_active:
-                c_fill = (*accent_color, 255) # Golden/Accent for current
+                c_fill = (*accent_color, 255)
             elif is_shouting:
-                # Even if not active, shouting words get a subtle tint or highlight
                 c_fill = (*accent_color, 180) 
-            elif word in spoken_word_list:
+            elif wd["is_spoken"]:
                 c_fill = (180, 180, 180, 255)
-            else:
-                c_fill = (255, 255, 255, 255)
-                
-            # Heavy stroke using Pillow native 
-            s_w = 8 if is_active else 5
             
-            # Subtitle Background Box
-            bb = draw.textbbox((cur_x, line_y), word, font=f)
-            pad_x = 15
-            pad_y = 10
+            # Adjust Y for scaling (keep baseline consistent or center it)
+            # Center it vertically within the line_h
+            bbox = draw.textbbox((cur_x, line_y), word_text, font=f)
+            th = bbox[3] - bbox[1]
+            y_offset = (line_h - th) // 2 - 10
             
-            # Draw semi-transparent black background
-            draw.rounded_rectangle(
-                [bb[0] - pad_x, bb[1] - pad_y, bb[2] + pad_x, bb[3] + pad_y], 
-                radius=12, fill=(0, 0, 0, 200)
+            # Fireship style shadow
+            shadow_offset = 6 if is_active else 4
+            draw.text(
+                (cur_x + shadow_offset, line_y + y_offset + shadow_offset), 
+                word_text, font=f, fill=(0, 0, 0, 200)
             )
             
+            # Main text
             draw.text(
-                (cur_x, line_y), 
-                word, 
-                font=f, 
-                fill=c_fill,
-                stroke_width=s_w,
-                stroke_fill=(0, 0, 0, 255)
+                (cur_x, line_y + y_offset), 
+                word_text, font=f, fill=c_fill,
+                stroke_width=3, stroke_fill=(0, 0, 0, 255)
             )
             
             cur_x += word_widths[word_idx] + 12
@@ -1237,7 +1268,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         print("No nanobanana images found. Using solid dark background.")
         bg_layer_clips.append(ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=audio_duration))
     else:
-        crossfade = 0.5
+        crossfade = 0.1 # Minimal overlapping for hard, high-energy cuts
         num_clips = len(visual_paths)
         clip_dur = (audio_duration + (num_clips - 1) * crossfade) / num_clips
         current_start = 0.0
@@ -1291,7 +1322,10 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                 c_clip = c_clip.with_start(current_start)
                 
                 if i > 0:
-                    c_clip = c_clip.with_effects([vfx.CrossFadeIn(crossfade)])
+                    # Flash/Glitch Transition Overlay
+                    flash = ColorClip(size=(FRAME_W, FRAME_H), color=(255, 255, 255), duration=0.15).with_opacity(0.7)
+                    flash = flash.with_start(current_start).with_effects([vfx.CrossFadeOut(0.1)])
+                    logo_clips.append(flash)
                 
                 bg_layer_clips.append(c_clip)
                 current_start += (clip_dur - crossfade)
@@ -1348,17 +1382,25 @@ def create_video(audio_path, script_json, chunks, output_path=None):
 
         mclip = VideoClip(lambda t: a_mask_np, is_mask=True, duration=audio_duration)
         
-        # Toggle PiP visibility: Optimized for audience retention
-        # Strong presence for first 5s (hook), then pattern interrupts: 4s hidden, 5s visible
+        # Dramatic Camera Cuts: Enlarges avatar at shocking moment
+        shock_ts = float(script_json.get("shocking_moment_timestamp", -1))
+        
         def pip_position(t):
+            base_x = FRAME_W - width_pip - 20
+            base_y = 260
+            
+            # Apply hard cut (zoom in slightly by shifting position since mask doesn't scale easily dynamically in moviepy without a Transform)
+            # Instead of scaling the mask dynamically, we just simulate a "camera lunge" by bumping it slightly off-center
+            x_offset = -30 if t >= shock_ts and shock_ts > 0 else 0
+            
             if t < 5.0:
-                return (FRAME_W - width_pip - 20, 260)
+                return (base_x + x_offset, base_y)
             
             cycle_time = (t - 5.0) % 9.0
             if cycle_time < 4.0:
-                return (FRAME_W + 1000, 260) # Moves it completely off-screen (hidden)
+                return (FRAME_W + 1000, base_y) # Moves it completely off-screen (hidden)
             else:
-                return (FRAME_W - width_pip - 20, 260) # Visible
+                return (base_x + x_offset, base_y) # Visible
 
         avatar_pip = avatar_clip.with_mask(mclip).with_position(pip_position).with_start(0)
 
@@ -1369,7 +1411,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     gradient = _gradient_clip(audio_duration)
 
     # Layout & Visual Randomization for Variation
-    on_right = random.choice([True, False])
+    on_right = False
     particle_style = random.choice(["bokeh", "digital", "stars"])
     bg_hex = color_theme.get("background", "#0A0A0F").lstrip("#")
     bg_base_color = tuple(int(bg_hex[i:i+2], 16) for i in (0, 2, 4))
@@ -1416,7 +1458,24 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         base_layers.append(screenshot_clip)
 
     # ── PROGRESS BAR ────────────────────────────────────────────────────────
-    progress = ColorClip(size=(FRAME_W, 6), color=accent_color, duration=audio_duration)
+    def get_progress_color(t):
+        if audio_duration - t <= 10.0:
+            # Shift from accent to neon red in the last 10 seconds
+            ratio = max(0, min(1, (10 - (audio_duration - t)) / 10.0))
+            red_target = (255, 32, 32)
+            c = tuple(int(accent_color[i] + (red_target[i] - accent_color[i]) * ratio) for i in range(3))
+            return c
+        return accent_color
+
+    progress = ColorClip(size=(FRAME_W, 6), color=(255, 255, 255), duration=audio_duration)
+    # Applying dynamic color using image modification
+    def make_progress_frame(get_frame, t):
+        color = get_progress_color(t)
+        base_img = np.zeros((6, FRAME_W, 3), dtype=np.uint8)
+        base_img[:, :] = color
+        return base_img
+        
+    progress = progress.fl(make_progress_frame)
     progress = progress.with_position(lambda t: (int((t / max(audio_duration, 0.01)) * FRAME_W) - FRAME_W, FRAME_H - 6))
     base_layers.append(progress)
     
@@ -1467,10 +1526,32 @@ def create_video(audio_path, script_json, chunks, output_path=None):
             sfx_clip = AudioFileClip(sfx_path).with_start(ts).with_effects([afx.MultiplyVolume(0.4)])
             final_audio_layers.append(sfx_clip)
     
-    # Background Music
+    # Background Music with Auto-Ducking
     bgm_path = os.path.join(MUSIC_DIR, "background_music.mp3")
     if os.path.exists(bgm_path):
-        bgm = AudioFileClip(bgm_path).with_duration(audio_duration).with_effects([afx.MultiplyVolume(BGM_VOLUME), afx.AudioFadeOut(2)])
+        bgm = AudioFileClip(bgm_path)
+        if bgm.duration < audio_duration:
+            bgm = bgm.with_effects([vfx.Loop(duration=audio_duration)])
+        else:
+            bgm = bgm.subclipped(0, audio_duration)
+            
+        def ducking_volume(get_frame, t):
+            # Evaluate t which might be a scalar or an array (numpy)
+            # We must handle numpy arrays correctly for AudioClips.
+            if isinstance(t, np.ndarray):
+                vols = []
+                for time_t in t:
+                    is_speak = any(c["start"] - 0.2 <= time_t <= c["end"] + 0.2 for c in chunks)
+                    vols.append(BGM_VOLUME * 0.3 if is_speak else BGM_VOLUME)
+                multiplier = np.array(vols).reshape(-1, 1) # Make it column vector for [Left, Right] channel broadcast
+                return get_frame(t) * multiplier
+            else:
+                is_speak = any(c["start"] - 0.2 <= t <= c["end"] + 0.2 for c in chunks)
+                vol = BGM_VOLUME * 0.3 if is_speak else BGM_VOLUME
+                return get_frame(t) * vol
+                
+        bgm = bgm.fl(ducking_volume).with_effects([afx.AudioFadeOut(2)])
+        
         final_audio_layers.append(bgm)
 
     final_audio = CompositeAudioClip(final_audio_layers)
@@ -1485,16 +1566,32 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         subtitle_img = None
         for chunk in chunks:
             if chunk["start"] - 0.1 <= t <= chunk["end"] + 0.1:
-                curr_wds = {"current": [], "spoken": []}
+                word_status_list = []
                 for w in chunk.get("words", []):
-                    if w["start"] - 0.1 <= t <= w["end"] + 0.05:
-                        curr_wds["current"].append(w["word"])
-                    elif t > w["end"]:
-                        curr_wds["spoken"].append(w["word"])
-                ctext = " ".join([w["word"] for w in chunk.get("words", [])])
-                if ctext:
+                    # Kinetic Pop Logic: Scale up 1.25x for first 150ms of word
+                    scale = 1.0
+                    is_active = w["start"] - 0.05 <= t <= w["end"] + 0.05
+                    if is_active:
+                        # Pop peaks in first 20% of duration (or 0.15s) and settles
+                        word_dur = w["end"] - w["start"]
+                        p = (t - w["start"]) / max(word_dur, 0.01)
+                        if 0 <= p <= 0.2:
+                            scale = 1.0 + (0.25 * (p / 0.2))
+                        elif 0.2 < p <= 0.4:
+                            scale = 1.25 - (0.25 * ((p-0.2)/0.2))
+                        else:
+                            scale = 1.0
+
+                    word_status_list.append({
+                        "word": w["word"],
+                        "is_active": is_active,
+                        "is_spoken": t > w["end"],
+                        "scale": scale
+                    })
+
+                if word_status_list:
                     subtitle_img = render_subtitle_frame(
-                        ctext, curr_wds, bg_frame=bg_frame, 
+                        word_status_list, bg_frame=bg_frame, 
                         accent_color=accent_color, frame_width=FRAME_W, frame_height=FRAME_H
                     )
                 break

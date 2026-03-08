@@ -37,18 +37,10 @@ def format_description(ai_description, script, end_question, hashtags):
     if end_question:
         question_section = f"\n💬 {end_question}\n👇 Drop your answer in the comments!\n"
     
-    return f"""{ai_description}
-{question_section}
+    return f"""🤝 Suggestions & Feedback (WhatsApp) → https://wa.me/919585793939
 ━━━━━━━━━━━━━━━━━━━━━━
-🔥 AI TOOLS I USE & RECOMMEND:
-
-🤖 ChatGPT Plus → https://chat.openai.com
-🎨 Midjourney → https://midjourney.com
-🎬 Runway ML → https://runwayml.com
-✍️ Claude AI → https://claude.ai
-🧠 Google Gemini → https://gemini.google.com
-🔧 Cursor AI → https://cursor.sh
-
+{ai_description}
+{question_section}
 ━━━━━━━━━━━━━━━━━━━━━━
 💡 Every day you're not learning, someone else is getting ahead.
 
@@ -63,7 +55,8 @@ Don't miss out — join free today 👇
 
 🚀 Telegram → https://t.me/technewsbyvj
 💼 LinkedIn → https://www.linkedin.com/in/vijayakumar-j/
-💬 WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
+💬 WhatsApp Channel → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
+
 🔗 (Links also in Channel Header/Bio!)
 ━━━━━━━━━━━━━━━━━━━━━━
 

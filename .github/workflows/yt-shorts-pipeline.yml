@@ -37,6 +37,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           
+      - name: Setup SadTalker (CPU)
+        run: |
+          git clone https://github.com/OpenTalker/SadTalker.git
+          cd SadTalker
+          pip install gdown
+          pip install -r requirements.txt
+          bash scripts/download_models.sh
+          
       - name: Setup Environment Secrets (.env)
         run: |
           echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
