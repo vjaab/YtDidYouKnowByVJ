@@ -284,38 +284,81 @@ def _generate_kokoro(text, output_path):
 # ─────────────────────────────────────────────────────────────────────────────
 # PUBLIC ENTRY POINT
 # ─────────────────────────────────────────────────────────────────────────────
-def clean_tts_text(text):
+def clean_tts_text(text, phonetic=True):
     """
-    Strips out AI meta-instructions like [pause], (silence), [intense music] etc.
-    while keeping the punctuation like ... and -- which creates the actual pause.
+    Strips out AI meta-instructions and fixes pronunciation issues.
+    If phonetic=True, it replaces difficult words with phonetic spellings.
     """
     if not text: return ""
-    # Remove anything inside brackets [bra-ckets] or (paren-theses) if they contain 'pause', 'silence', 'music', 'sound'
-    # This specifically target instructions but keeps normal parentheses if they don't look like instructions.
+    
+    # 1. Remove bracketed instructions
     cleaned = re.sub(r'\[[^\]]*(pause|silence|music|sound|breath)[^\]]*\]', '', text, flags=re.IGNORECASE)
     cleaned = re.sub(r'\([^)]*(pause|silence|music|sound|breath)[^)]*\)', '', cleaned, flags=re.IGNORECASE)
-    
-    # Also remove literal instances of " [pause] " or " (pause) " if for some reason they exist outside brackets
     cleaned = re.sub(r'\s*\[pause\]\s*', ' ', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\s*\(pause\)\s*', ' ', cleaned, flags=re.IGNORECASE)
     
-    # Prevent TTS from saying 'strike', 'asterisk', or 'dash'
-    cleaned = cleaned.replace("—", "...") # Em-dash -> pause
-    cleaned = cleaned.replace("–", "...") # En-dash -> pause
-    cleaned = cleaned.replace("--", "...") # Double hyphen -> pause
-    cleaned = cleaned.replace("*", "")    # Remove asterisks
-    cleaned = cleaned.replace("~", "")    # Remove tildes
+    # 2. Fix pronunciation artifacts (The "Strike" issue)
+    # Characters that often trigger "strike", "dash", or "bullet" in TTS
+    cleaned = cleaned.replace("—", "...") # Em-dash
+    cleaned = cleaned.replace("–", "...") # En-dash
+    cleaned = cleaned.replace("--", "...") # Double hyphen
+    cleaned = cleaned.replace("*", " ")    # Asterisks
+    cleaned = cleaned.replace("•", " ")    # Bullet point
+    cleaned = cleaned.replace("·", " ")    # Middle dot
+    cleaned = cleaned.replace("⁃", " ")    # Hyphen bullet
+    cleaned = cleaned.replace("●", " ")    # Circle bullet
+    cleaned = cleaned.replace("▪", " ")    # Square bullet
+    cleaned = cleaned.replace("~", " ")    # Tilde
+    
+    # Standalone hyphens at start of lines or between spaces (often read as "strike" or "dash")
+    cleaned = re.sub(r'\n\s*-\s*', '\n ', cleaned)
+    cleaned = re.sub(r'\s+-\s+', ' ... ', cleaned)
+    
+    # 3. Phonetic Cleanups for Clarity
+    if phonetic:
+        # "Millions" and "Billions" can sound muffled or robotic
+        cleaned = re.sub(r'\bmillions\b', 'mil-yuns', cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r'\bbillions\b', 'bil-yuns', cleaned, flags=re.IGNORECASE)
+        # Gen-Z / Tech slang clarity
+        cleaned = re.sub(r'\bLLMs\b', 'L L M s', cleaned)
+        cleaned = re.sub(r'\bGPT\b', 'G P T', cleaned)
     
     # Clean up double spaces
     cleaned = re.sub(r'\s+', ' ', cleaned).strip()
     return cleaned
+
+def restore_original_words(word_timestamps, original_text):
+    """
+    Matches the phonetically spoke words back to the original script words 
+    to ensure subtitles look professional (e.g., 'mil-yuns' -> 'millions').
+    """
+    if not word_timestamps or not original_text:
+        return word_timestamps
+        
+    original_words = original_text.upper().split()
+    # Remove punctuation for matching
+    original_words_clean = [re.sub(r'[^\w]', '', w) for w in original_words]
+    
+    for i, wt in enumerate(word_timestamps):
+        if i < len(original_words):
+            # If the spoken word is a phonetic variant, replace it with the original word casing
+            spoken_clean = re.sub(r'[^\w]', '', wt["word"].upper())
+            if spoken_clean == "MILYUNS" and original_words_clean[i] == "MILLIONS":
+                wt["word"] = original_words[i]
+            elif spoken_clean == "BILYUNS" and original_words_clean[i] == "BILLIONS":
+                wt["word"] = original_words[i]
+            elif spoken_clean == "GPT" and original_words_clean[i] == "GPT":
+                wt["word"] = original_words[i]
+    return word_timestamps
 
 def generate_voiceover(text, voice_request="en-US-GuyNeural", emotion="excited"):
     """
     Returns: (audio_path, duration, word_timestamps)
     word_timestamps: [{"word": str, "start": float, "end": float}, ...]
     """
-    text = clean_tts_text(text)
+    original_raw_text = text
+    text_to_speak = clean_tts_text(text, phonetic=True)
+    
     today     = datetime.now().strftime("%Y-%m-%d")
     mp3_path  = os.path.join(OUTPUT_DIR, f"audio_{today}.mp3")
     
@@ -323,21 +366,25 @@ def generate_voiceover(text, voice_request="en-US-GuyNeural", emotion="excited")
     
     # 1. PRIMARY: F5-TTS Local Voice Cloning (Your Voice)
     try:
-        path, dur, word_timestamps = _generate_f5_clone(text, mp3_path)
+        path, dur, word_timestamps = _generate_f5_clone(text_to_speak, mp3_path)
     except Exception as e:
         print(f"⚠️ F5-TTS Cloning failed: {e}")
         # 2. SECONDARY: Kokoro TTS
         try:
-            path, dur, word_timestamps = _generate_kokoro(text, mp3_path)
+            path, dur, word_timestamps = _generate_kokoro(text_to_speak, mp3_path)
         except Exception as e2:
             print(f"⚠️ Kokoro failed: {e2}")
             # FALLBACK: Edge TTS
             try:
-                path, dur, word_timestamps = _generate_edge_tts(text, LOCKED_VOICE, mp3_path)
-                real_ts = _apply_stable_ts(path, text)
+                path, dur, word_timestamps = _generate_edge_tts(text_to_speak, LOCKED_VOICE, mp3_path)
+                real_ts = _apply_stable_ts(path, text_to_speak)
                 if real_ts: word_timestamps = real_ts
             except Exception as e3:
                 print(f"Edge TTS fallback failed: {e3}")
+
+    # Post-process: Restore original word spellings for subtitles
+    if word_timestamps:
+        word_timestamps = restore_original_words(word_timestamps, original_raw_text)
 
     # Post-process: Trim dead air at start/end to ensure 0-gap hook
     if path and word_timestamps:
