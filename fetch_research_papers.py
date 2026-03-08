@@ -22,7 +22,7 @@ TOOL_RSS_FEEDS = [
 
 def _fetch_rss(feed_urls, feed_type="research"):
     print(f"Fetching from {feed_type} blogs...")
-    articles = []
+    all_articles = []
     cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
 
     for feed_url in feed_urls:
@@ -43,9 +43,6 @@ def _fetch_rss(feed_urls, feed_type="research"):
                         except:
                             pass
                 
-                if pub_dt and pub_dt < cutoff:
-                    continue
-
                 # Parse image
                 image_url = ""
                 if hasattr(entry, 'media_content') and len(entry.media_content) > 0:
@@ -57,19 +54,35 @@ def _fetch_rss(feed_urls, feed_type="research"):
                     if m:
                         image_url = m.group(1)
 
-                articles.append({
+                all_articles.append({
                     "title": title,
                     "description": desc,
                     "source": {"name": getattr(feed.feed, 'title', 'Research Blog')},
                     "url": entry.link,
                     "urlToImage": image_url,
                     "publishedAt": pub_dt.isoformat() if pub_dt else "",
-                    "type": feed_type
+                    "type": feed_type,
+                    "_pub_dt": pub_dt or datetime(1970, 1, 1, tzinfo=timezone.utc)
                 })
         except Exception as e:
             print(f"Feed failed {feed_url}: {e}")
             
-    print(f"{feed_type.capitalize()} Blogs: Found {len(articles)} fresh articles.")
+    # Sort by date descending
+    all_articles.sort(key=lambda x: x["_pub_dt"], reverse=True)
+    
+    fresh_articles = [a for a in all_articles if a["_pub_dt"] >= cutoff]
+    
+    # Remove the internal temporary _pub_dt field
+    for a in all_articles:
+        del a["_pub_dt"]
+
+    if fresh_articles:
+        articles = fresh_articles
+        print(f"{feed_type.capitalize()} Blogs: Found {len(articles)} fresh articles in the last 24h.")
+    else:
+        articles = all_articles[:10]  # Take top 10 most recent if no fresh ones
+        print(f"{feed_type.capitalize()} Blogs: Found 0 fresh articles. Falling back to the {len(articles)} most recent ones.")
+
     return articles
 
 
