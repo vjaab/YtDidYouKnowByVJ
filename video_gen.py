@@ -1467,15 +1467,14 @@ def create_video(audio_path, script_json, chunks, output_path=None):
             return c
         return accent_color
 
-    progress = ColorClip(size=(FRAME_W, 6), color=(255, 255, 255), duration=audio_duration)
-    # Applying dynamic color using image modification
-    def make_progress_frame(get_frame, t):
+    # Applying dynamic color using simple VideoClip
+    def make_progress_frame(t):
         color = get_progress_color(t)
         base_img = np.zeros((6, FRAME_W, 3), dtype=np.uint8)
         base_img[:, :] = color
         return base_img
         
-    progress = progress.with_effects([vfx.Transform(make_progress_frame)])
+    progress = VideoClip(make_progress_frame, duration=audio_duration)
     progress = progress.with_position(lambda t: (int((t / max(audio_duration, 0.01)) * FRAME_W) - FRAME_W, FRAME_H - 6))
     base_layers.append(progress)
     
