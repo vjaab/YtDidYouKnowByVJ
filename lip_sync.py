@@ -170,7 +170,7 @@ def _run_sadtalker(face_path, audio_path, output_path, timeout=10800):
         "--still",
         "--preprocess", "full",
         "--enhancer", "gfpgan",
-        "--device", "cpu"
+        "--cpu"
     ]
     
     print(f"   CMD: {' '.join(cmd)}")
