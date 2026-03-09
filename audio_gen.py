@@ -89,7 +89,7 @@ KOKORO_VOICES = os.path.join(ASSETS_DIR, "voices-v1.0.bin")
 # ── F5-TTS Config ─────────────────────────────────────────────────────────────
 VJ_REF_WAV = os.path.join(ASSETS_DIR, "vj.wav")
 VJ_REF_TEXT = (
-    "Welcome you are listening to your channel, we bring you the best insights, ideas and stories. After just for you stay tuned and let's get started."
+    "Welcome you are listening to your channel, we bring you the best insights, ideas and stories. Drafted just for you stay tuned and let's get started."
 )
 
 _f5_instance = None
