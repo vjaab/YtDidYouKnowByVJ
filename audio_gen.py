@@ -334,7 +334,20 @@ def clean_tts_text(text, phonetic=True):
             r'\bbreakthrough\b': 'break-thrue',
             r'\bcapabilities\b': 'kay-puh-bil-uh-teez',
             r'\bautonomous\b': 'aw-ton-uh-mus',
-            r'\bgenerative\b': 'jen-er-uh-tiv'
+            r'\bgenerative\b': 'jen-er-uh-tiv',
+            r'\bLinux\b': 'Lin-icks',
+            r'\bSQL\b': 'See-kw-uhl',
+            r'\bNGINX\b': 'Engine-X',
+            r'\bPostgreSQL\b': 'Post-gres',
+            r'\bHuawei\b': 'Wah-way',
+            r'\bXiaomi\b': 'Shau-mee',
+            r'\bJavaScript\b': 'Jah-va-skript',
+            r'\bcache\b': 'kash',
+            r'\bmeme\b': 'meem',
+            r'\bGUI\b': 'Goo-ee',
+            r'\bRedis\b': 'Red-iss',
+            r'\bKubernetes\b': 'Koo-ber-net-eez',
+            r'\bPyTorch\b': 'Pie-Torch'
         }
         for pattern, replacement in phonetic_map.items():
             cleaned = re.sub(pattern, replacement, cleaned, flags=re.IGNORECASE)
@@ -371,7 +384,20 @@ def restore_original_words(word_timestamps, original_text):
         "BREAKTHRUE": "breakthrough",
         "KAYPUHBILUHTEEZ": "capabilities",
         "AWTONUHMUS": "autonomous",
-        "JENERUHTIV": "generative"
+        "JENERUHTIV": "generative",
+        "LINICKS": "Linux",
+        "SEEKWUHL": "SQL",
+        "ENGINEX": "NGINX",
+        "POSTGRES": "PostgreSQL",
+        "WAHWAY": "Huawei",
+        "SHAUMEE": "Xiaomi",
+        "JAHVASKRIPT": "JavaScript",
+        "KASH": "cache",
+        "MEEM": "meme",
+        "GOOEE": "GUI",
+        "REDISS": "Redis",
+        "KOOBERNETEEZ": "Kubernetes",
+        "PIETORCH": "PyTorch"
     }
     
     for i, wt in enumerate(word_timestamps):

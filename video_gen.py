@@ -861,9 +861,9 @@ def _article_screenshot_clip(screenshot_path, duration):
         mask = np.array(img.split()[3]).astype(float) / 255.0
         
         # Animation: Fade in and stay for a portion of the video
-        # Default: Show from 8s to 16s (8 seconds duration)
+        # Default: Show from 8s to 18s (10 seconds duration)
         start_ts = 8.0
-        display_dur = min(8.0, duration - start_ts)
+        display_dur = min(10.0, duration - start_ts)
         if display_dur <= 0: return None
         
         clip = ImageClip(arr, duration=display_dur)
