@@ -316,14 +316,28 @@ def clean_tts_text(text, phonetic=True):
     
     # 3. Phonetic Cleanups for Clarity
     if phonetic:
-        cleaned = re.sub(r'\binstantly\b', 'in-stunt-ly', cleaned, flags=re.IGNORECASE)
-        cleaned = re.sub(r'\bonly\b', 'own-lee', cleaned, flags=re.IGNORECASE)
-        cleaned = re.sub(r'\bincredible\b', 'in-cred-uh-bul', cleaned, flags=re.IGNORECASE)
-        cleaned = re.sub(r'\bmillions\b', 'mil-yuns', cleaned, flags=re.IGNORECASE)
-        cleaned = re.sub(r'\bbillions\b', 'bil-yuns', cleaned, flags=re.IGNORECASE)
-        # Gen-Z / Tech slang clarity
-        cleaned = re.sub(r'\bLLMs\b', 'L L M s', cleaned)
-        cleaned = re.sub(r'\bGPT\b', 'G P T', cleaned)
+        # Common mispronunciations in Tech/AI
+        phonetic_map = {
+            r'\binstantly\b': 'in-stunt-ly',
+            r'\bonly\b': 'own-lee',
+            r'\bincredible\b': 'in-cred-uh-bul',
+            r'\bmillions\b': 'mil-yuns',
+            r'\bbillions\b': 'bil-yuns',
+            r'\bAI\b': 'A.I.',
+            r'\bML\b': 'M.L.',
+            r'\bLLMs\b': 'L L M s',
+            r'\bGPT\b': 'G P T',
+            r'\bPexels\b': 'Pex-uls',
+            r'\bNVIDIA\b': 'En-vid-ee-uh',
+            r'\bDeepSeek\b': 'Deep-Seek',
+            r'\bHugging Face\b': 'Hug-ging Face',
+            r'\bbreakthrough\b': 'break-thrue',
+            r'\bcapabilities\b': 'kay-puh-bil-uh-teez',
+            r'\bautonomous\b': 'aw-ton-uh-mus',
+            r'\bgenerative\b': 'jen-er-uh-tiv'
+        }
+        for pattern, replacement in phonetic_map.items():
+            cleaned = re.sub(pattern, replacement, cleaned, flags=re.IGNORECASE)
     
     # Clean up double spaces
     cleaned = re.sub(r'\s+', ' ', cleaned).strip()
@@ -332,31 +346,46 @@ def clean_tts_text(text, phonetic=True):
 def restore_original_words(word_timestamps, original_text):
     """
     Matches the phonetically spoke words back to the original script words 
-    to ensure subtitles look professional (e.g., 'mil-yuns' -> 'millions').
+    to ensure subtitles look professional.
     """
     if not word_timestamps or not original_text:
         return word_timestamps
         
-    original_words = original_text.upper().split()
-    # Remove punctuation for matching
-    original_words_clean = [re.sub(r'[^\w]', '', w) for w in original_words]
+    original_words = original_text.split()
+    
+    # Subtitle Restoration Map (Key: Spoken-Normalized -> Value: Display-Original)
+    restore_map = {
+        "INSTUNTLY": "instantly",
+        "OWNLEE": "only",
+        "INCREDUHBUL": "incredible",
+        "MILYUNS": "millions",
+        "BILYUNS": "billions",
+        "AI": "AI",
+        "ML": "ML",
+        "LLMS": "LLMs",
+        "GPT": "GPT",
+        "PEXULS": "Pexels",
+        "ENVIDEEUH": "NVIDIA",
+        "DEEPSEEK": "DeepSeek",
+        "HUGGING": "Hugging",
+        "BREAKTHRUE": "breakthrough",
+        "KAYPUHBILUHTEEZ": "capabilities",
+        "AWTONUHMUS": "autonomous",
+        "JENERUHTIV": "generative"
+    }
     
     for i, wt in enumerate(word_timestamps):
         if i < len(original_words):
-            # If the spoken word is a phonetic variant, replace it with the original word casing
             spoken_clean = re.sub(r'[^\w]', '', wt["word"].upper())
-            if spoken_clean == "INSTUNTLY" and original_words_clean[i] == "INSTANTLY":
-                wt["word"] = original_words[i]
-            elif spoken_clean == "OWNLEE" and original_words_clean[i] == "ONLY":
-                wt["word"] = original_words[i]
-            elif spoken_clean == "INCREDUHBUL" and original_words_clean[i] == "INCREDIBLE":
-                wt["word"] = original_words[i]
-            elif spoken_clean == "MILYUNS" and original_words_clean[i] == "MILLIONS":
-                wt["word"] = original_words[i]
-            elif spoken_clean == "BILYUNS" and original_words_clean[i] == "BILLIONS":
-                wt["word"] = original_words[i]
-            elif spoken_clean == "GPT" and original_words_clean[i] == "GPT":
-                wt["word"] = original_words[i]
+            if spoken_clean in restore_map:
+                wt["word"] = restore_map[spoken_clean]
+            else:
+                # If not in map, just try to use the original casing if lengths match
+                if i < len(original_words):
+                    orig_clean = re.sub(r'[^\w]', '', original_words[i].upper())
+                    if spoken_clean == orig_clean:
+                        wt["word"] = original_words[i]
+                        
     return word_timestamps
 
 def generate_voiceover(text, voice_request="en-US-GuyNeural", emotion="excited"):
