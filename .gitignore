@@ -5,7 +5,6 @@ token.json
 client_secret.json
 output/
 logs/
-MuseTalk/
 
 # Ignore media/weights globally except in assets/
 *.mp4
