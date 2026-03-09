@@ -284,7 +284,7 @@ def _generate_kokoro(text, output_path):
 # ─────────────────────────────────────────────────────────────────────────────
 # PUBLIC ENTRY POINT
 # ─────────────────────────────────────────────────────────────────────────────
-def clean_tts_text(text, phonetic=True):
+def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
     """
     Strips out AI meta-instructions and fixes pronunciation issues.
     If phonetic=True, it replaces difficult words with phonetic spellings.
@@ -298,7 +298,6 @@ def clean_tts_text(text, phonetic=True):
     cleaned = re.sub(r'\s*\(pause\)\s*', ' ', cleaned, flags=re.IGNORECASE)
     
     # 2. Fix pronunciation artifacts (The "Strike" issue)
-    # Characters that often trigger "strike", "dash", or "bullet" in TTS
     cleaned = cleaned.replace("—", "...") # Em-dash
     cleaned = cleaned.replace("–", "...") # En-dash
     cleaned = cleaned.replace("--", "...") # Double hyphen
@@ -310,13 +309,13 @@ def clean_tts_text(text, phonetic=True):
     cleaned = cleaned.replace("▪", " ")    # Square bullet
     cleaned = cleaned.replace("~", " ")    # Tilde
     
-    # Standalone hyphens at start of lines or between spaces (often read as "strike" or "dash")
+    # Standalone hyphens
     cleaned = re.sub(r'\n\s*-\s*', '\n ', cleaned)
     cleaned = re.sub(r'\s+-\s+', ' ... ', cleaned)
     
     # 3. Phonetic Cleanups for Clarity
     if phonetic:
-        # Common mispronunciations in Tech/AI
+        # Static global tech dictionary
         phonetic_map = {
             r'\binstantly\b': 'in-stunt-ly',
             r'\bonly\b': 'own-lee',
@@ -349,6 +348,13 @@ def clean_tts_text(text, phonetic=True):
             r'\bKubernetes\b': 'Koo-ber-net-eez',
             r'\bPyTorch\b': 'Pie-Torch'
         }
+        
+        # Merge custom phonetic map from Gemini if provided
+        if custom_phonetic_map:
+            for word, phonetic_spelling in custom_phonetic_map.items():
+                pattern = r'\b' + re.escape(word) + r'\b'
+                phonetic_map[pattern] = phonetic_spelling
+
         for pattern, replacement in phonetic_map.items():
             cleaned = re.sub(pattern, replacement, cleaned, flags=re.IGNORECASE)
     
@@ -356,7 +362,7 @@ def clean_tts_text(text, phonetic=True):
     cleaned = re.sub(r'\s+', ' ', cleaned).strip()
     return cleaned
 
-def restore_original_words(word_timestamps, original_text):
+def restore_original_words(word_timestamps, original_text, custom_phonetic_map=None):
     """
     Matches the phonetically spoke words back to the original script words 
     to ensure subtitles look professional.
@@ -399,28 +405,32 @@ def restore_original_words(word_timestamps, original_text):
         "KOOBERNETEEZ": "Kubernetes",
         "PIETORCH": "PyTorch"
     }
+
+    # Merge custom map inverse for restoration
+    if custom_phonetic_map:
+        for orig_word, phonetic_spelling in custom_phonetic_map.items():
+            phonetic_clean = re.sub(r'[^\w]', '', phonetic_spelling.upper())
+            if phonetic_clean not in restore_map:
+                restore_map[phonetic_clean] = orig_word
     
     for i, wt in enumerate(word_timestamps):
-        if i < len(original_words):
-            spoken_clean = re.sub(r'[^\w]', '', wt["word"].upper())
-            if spoken_clean in restore_map:
-                wt["word"] = restore_map[spoken_clean]
-            else:
-                # If not in map, just try to use the original casing if lengths match
-                if i < len(original_words):
-                    orig_clean = re.sub(r'[^\w]', '', original_words[i].upper())
-                    if spoken_clean == orig_clean:
-                        wt["word"] = original_words[i]
+        spoken_clean = re.sub(r'[^\w]', '', wt["word"].upper())
+        if spoken_clean in restore_map:
+            wt["word"] = restore_map[spoken_clean]
+        else:
+            if i < len(original_words):
+                orig_clean = re.sub(r'[^\w]', '', original_words[i].upper())
+                if spoken_clean == orig_clean:
+                    wt["word"] = original_words[i]
                         
     return word_timestamps
 
-def generate_voiceover(text, voice_request="en-US-GuyNeural", emotion="excited"):
+def generate_voiceover(text, voice_request="en-US-GuyNeural", emotion="excited", custom_phonetic_map=None):
     """
     Returns: (audio_path, duration, word_timestamps)
-    word_timestamps: [{"word": str, "start": float, "end": float}, ...]
     """
     original_raw_text = text
-    text_to_speak = clean_tts_text(text, phonetic=True)
+    text_to_speak = clean_tts_text(text, phonetic=True, custom_phonetic_map=custom_phonetic_map)
     
     today     = datetime.now().strftime("%Y-%m-%d")
     mp3_path  = os.path.join(OUTPUT_DIR, f"audio_{today}.mp3")
@@ -447,9 +457,9 @@ def generate_voiceover(text, voice_request="en-US-GuyNeural", emotion="excited")
 
     # Post-process: Restore original word spellings for subtitles
     if word_timestamps:
-        word_timestamps = restore_original_words(word_timestamps, original_raw_text)
+        word_timestamps = restore_original_words(word_timestamps, original_raw_text, custom_phonetic_map=custom_phonetic_map)
 
-    # Post-process: Trim dead air at start/end to ensure 0-gap hook
+    # Post-process: Trim dead air at start/end
     if path and word_timestamps:
         dur, word_timestamps = trim_audio_silence(path, word_timestamps)
 

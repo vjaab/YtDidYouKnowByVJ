@@ -134,7 +134,8 @@ def run_pipeline(custom_topic=None, topic_type="research"):
 
         # ── STEP 4: Generate Audio + Word Timestamps ──────────────────────────
         log_message("STEP 4: Generating voiceover + word timestamps...")
-        audio_path, duration, word_timestamps = generate_voiceover(script, voice, emotion)
+        custom_map = script_data.get("phonetic_pronunciation_map", {})
+        audio_path, duration, word_timestamps = generate_voiceover(script, voice, emotion, custom_phonetic_map=custom_map)
 
         if not audio_path:
             log_message("ERROR: Audio generation failed.")
