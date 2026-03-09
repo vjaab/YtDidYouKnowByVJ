@@ -142,27 +142,45 @@ def generate_images(prompts, image_url=None, keywords=None):
     generated_paths = []
     previous_path   = None
 
+    models_to_try = ["imagen-4.0-fast-generate-001", "imagen-3.0-generate-001"]
+    
     for i, prompt in enumerate(prompts):
         out  = os.path.join(OUTPUT_DIR, f"frame_{i+1}_{TODAY}.png")
-        try:
-            print(f"Generating Imagen 4.0 image {i+1}/4...")
-            result = client.models.generate_images(
-                model="imagen-4.0-fast-generate-001",
-                prompt=prompt + style_suffix,
-                config=types.GenerateImagesConfig(
-                    number_of_images=1,
-                    aspect_ratio="9:16",
-                    output_mime_type="image/jpeg",
+        success = False
+        
+        for model_name in models_to_try:
+            try:
+                print(f"Generating image {i+1}/4 using {model_name}...")
+                result = client.models.generate_images(
+                    model=model_name,
+                    prompt=prompt + style_suffix,
+                    config=types.GenerateImagesConfig(
+                        number_of_images=1,
+                        aspect_ratio="9:16",
+                        output_mime_type="image/jpeg",
+                    )
                 )
-            )
-            for gen_img in result.generated_images:
-                with open(out, "wb") as f:
-                    f.write(gen_img.image.image_bytes)
+                for gen_img in result.generated_images:
+                    with open(out, "wb") as f:
+                        f.write(gen_img.image.image_bytes)
+                    break
+                    
+                generated_paths.append(out)
+                previous_path = out
+                success = True
+                break  # Break out of the models loop on success
+                
+            except Exception as e:
+                err_str = str(e).lower()
+                print(f"Imagen image {i+1} failed using {model_name}: {e}")
+                if "429" in err_str and ("quota" in err_str or "exhausted" in err_str):
+                    print(f"Quota exceeded for {model_name}. Switching to fallback model.")
+                    continue  # Try next model
+                
+                # If it's a different error, stop trying models and fall back to previous image
                 break
-            generated_paths.append(out)
-            previous_path = out
-        except Exception as e:
-            print(f"Imagen image {i+1} failed: {e}")
+                
+        if not success:
             if previous_path:
                 generated_paths.append(previous_path)
             else:

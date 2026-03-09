@@ -275,25 +275,35 @@ def _generate_imagen3(chunk_text, output_path, topic_context=""):
             
     print(f"  -> Generated Imagen prompt: {best_prompt[:60]}...")
         
-    attempts = 0
-    while attempts < 3:
-        try:
-            result = client.models.generate_images(
-                model="imagen-4.0-generate-001",
-                prompt=best_prompt,
-                config=genai.types.GenerateImagesConfig(
-                    number_of_images=1, aspect_ratio="9:16", output_mime_type="image/jpeg"
+    models_to_try = ["imagen-4.0-generate-001", "imagen-3.0-generate-001"]
+    for model_name in models_to_try:
+        attempts = 0
+        while attempts < 3:
+            try:
+                result = client.models.generate_images(
+                    model=model_name,
+                    prompt=best_prompt,
+                    config=genai.types.GenerateImagesConfig(
+                        number_of_images=1, aspect_ratio="9:16", output_mime_type="image/jpeg"
+                    )
                 )
-            )
-            for gi in result.generated_images:
-                with open(output_path, "wb") as f:
-                    f.write(gi.image.image_bytes)
-                return output_path
-        except Exception as e:
-            wait_time = (2 ** attempts) + 3
-            print(f"Imagen3 generation failed (att {attempts+1}): {e}. Retrying in {wait_time}s...")
-            attempts += 1
-            time.sleep(wait_time)
+                for gi in result.generated_images:
+                    with open(output_path, "wb") as f:
+                        f.write(gi.image.image_bytes)
+                    return output_path
+            except Exception as e:
+                err_str = str(e).lower()
+                wait_time = (2 ** attempts) + 3
+                print(f"Imagen generation failed ({model_name}, att {attempts+1}): {e}")
+                
+                if "429" in err_str and ("quota" in err_str or "exhausted" in err_str):
+                    print(f"Quota exceeded for {model_name}. Switching to fallback model.")
+                    break  # Break out of the attempts loop to try the next model
+                    
+                attempts += 1
+                if attempts < 3:
+                    print(f"Retrying in {wait_time}s...")
+                    time.sleep(wait_time)
             
     return None
 
