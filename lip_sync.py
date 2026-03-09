@@ -65,6 +65,8 @@ def _run_sadtalker(face_path, audio_path, output_path, timeout=10800):
         "--still",
         "--preprocess", "full",
         "--enhancer", "gfpgan",
+        "--size", "512",
+        "--batch_size", "1",
         "--cpu"
     ]
     
