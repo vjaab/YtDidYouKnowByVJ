@@ -57,6 +57,9 @@ jobs:
             echo "Warning: $FILE_TO_PATCH not found."
           fi
           
+      - name: Install Playwright Browsers
+        run: npx -y playwright install --with-deps chromium
+
       - name: Setup Environment Secrets (.env)
         run: |
           echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env

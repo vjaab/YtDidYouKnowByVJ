@@ -11,6 +11,7 @@ def capture_article_screenshot(url, output_filename):
         return None
     
     output_path = os.path.join(ASSETS_DIR, "screenshots", output_filename)
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     
     # We'll use a vertical viewport for mobile-friendly look
     # viewport: 1080x1920
