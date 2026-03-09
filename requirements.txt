@@ -103,4 +103,10 @@ vocos
 pydub
 basicsr
 gfpgan
+kornia
+face-alignment
+yacs
+ninja
+resampy
+facexlib
 tqdm
