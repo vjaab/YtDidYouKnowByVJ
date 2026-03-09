@@ -27,6 +27,18 @@ MUSETALK_DIR = os.path.join(BASE_DIR, "MuseTalk")
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# UTILS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _get_python_exe():
+    """Find the best python executable (prefers project venv)."""
+    # Check for venv in the project root
+    venv_py = os.path.join(BASE_DIR, "venv", "bin", "python3")
+    if os.path.exists(venv_py):
+        return venv_py
+    return sys.executable
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # ENGINE DETECTION
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -95,7 +107,7 @@ def _run_musetalk(face_path, audio_path, output_path, timeout=1800):
         unet_config = os.path.join("models", "musetalk", "musetalk.json")
 
     cmd = [
-        sys.executable, "-m", "scripts.inference",
+        _get_python_exe(), "-m", "scripts.inference",
         "--inference_config", config_path,
         "--result_dir", result_dir,
         "--unet_model_path", unet_path,
@@ -163,7 +175,7 @@ def _run_sadtalker(face_path, audio_path, output_path, timeout=10800):
     os.makedirs(result_dir, exist_ok=True)
     
     cmd = [
-        sys.executable, "inference.py",
+        _get_python_exe(), "inference.py",
         "--driven_audio", audio_path,
         "--source_image", face_path,
         "--result_dir", result_dir,
@@ -254,7 +266,7 @@ def generate_lip_sync(face_path, audio_path, output_path, timeout=10800):
         print("   ⚠ MuseTalk local failed.")
 
     # ── Engine 2: SadTalker Local (CPU) ───────────────────────────────────────
-    elif _is_sadtalker_ready():
+    if _is_sadtalker_ready():
         success = _run_sadtalker(face_path, audio_path, output_path, timeout)
         if success and os.path.exists(output_path):
             return output_path
