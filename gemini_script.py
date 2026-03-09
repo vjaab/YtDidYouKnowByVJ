@@ -122,12 +122,12 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
   "quiz_tone": "Investigative",
   "title": "Punchy YouTube title max 60 chars",
   "script": "Full voiceover script following the Arc (50-58 sec). Ensure The Loop is implemented.",
-  "phonetic_pronunciation_map": {
+  "phonetic_pronunciation_map": {{
     "AI": "A.I.",
     "NVIDIA": "en-vid-ee-uh",
     "LLM": "L L M",
     "Pexels": "Peks-uls"
-  },
+  }},
   "NOTE_phonetic_pronunciation_map": "Identify EVERY word in your script that might be mispronounced (tech terms, ambiguous English words, names). Provide a phonetic respelling that a standard TTS model will pronounce perfectly. Use this to correct pronunciations for any complex English words.",
   "hook": "Matches the first sentence of the script",
   "summary": "One line summary",
