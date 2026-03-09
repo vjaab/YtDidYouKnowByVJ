@@ -1273,8 +1273,8 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                 # ── Resizing and Ken Burns (Subtle Zoom) ───────────────────
                 c_clip = c_clip.resized((FRAME_W, FRAME_H))
                 
-                # SMART-SPLIT: 20% chance of split screen if news level is high
-                if script_json.get("breaking_news_level", 0) >= 8 and random.random() < 0.2:
+                # SMART-SPLIT: 45% chance of split screen if news level is high (2026 Engagement Strategy)
+                if script_json.get("breaking_news_level", 0) >= 8 and random.random() < 0.45:
                     print(f"Applying Smart-Split Layout to chunk {i}...")
                     # Bottom half is a secondary tech loop or satisfying visual
                     split_h = FRAME_H // 2

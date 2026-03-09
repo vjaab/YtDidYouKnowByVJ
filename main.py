@@ -35,14 +35,15 @@ def format_description(ai_description, script, end_question, hashtags):
     # Build engagement question section
     question_section = ""
     if end_question:
-        question_section = f"\n💬 {end_question}\n👇 Drop your answer in the comments!\n"
+        question_section = f"\n💬 {end_question}\n👇 CHALLENGE: 90% get this wrong. Comment your guess!\n"
     
-    return f"""🤝 Suggestions & Feedback (WhatsApp) → https://wa.me/919585793939
+    return f"""🚀 JOIN THE INNER CIRCLE (WhatsApp) → https://wa.me/919585793939
+🔥 Get leaked AI tools & research daily before the masses.
 ━━━━━━━━━━━━━━━━━━━━━━
 {ai_description}
 {question_section}
 ━━━━━━━━━━━━━━━━━━━━━━
-💡 Every day you're not learning, someone else is getting ahead.
+💡 In 2026, you're either the one using AI, or the one being replaced by it.
 
 I share what top devs & AI engineers are reading right now:
 

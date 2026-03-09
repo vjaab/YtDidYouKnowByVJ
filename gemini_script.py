@@ -86,24 +86,24 @@ CONTENT HIERARCHY (Monetization & Retention Strategy):
 2. COMPARATIVE ANALYSIS (25%): Competitive landscape (e.g., AWS vs. OpenAI).
 3. THE DATA (20%): Extract specific numbers for the "Infographic" cards.
 4. VISUAL DIRECTION (10%): Specify "Pattern Interrupts" every 3-5 seconds (glitch, zoom, or split-screen).
-5. NARRATION (10%): Humanized, Conversational tone (Gen-Z/Millennial "Vlog" style). Use human imperfections like ('...uhm', 'wait...', 'listen, honestly') to break the robot feel. These act as "Human-Glitch" hooks to grab attention. Avoid textbook grammar; use sentence fragments.
+5. NARRATION (10%): Humanized, Conversational tone (Gen-Z/Millennial "Vlog" style). Include "VJ's Perspective" — 1-2 sentences of personal opinion, skepticism, or excitement (e.g., 'Honestly, I didn't see this coming...', 'Wait, is this actually legal?'). Use human imperfections like ('...uhm', 'wait...', 'listen, honestly') as "Human-Glitch" hooks to grab attention. Avoid textbook grammar.
 
 NARRATIVE ARC CONFIGURATION:
-1. The 2026 Identity Hook (0-5s): A shocking human-voiced statement. If generating a QUIZ, do not reveal the answer yet.
+1. The 2026 Identity Hook (0-5s): A shocking human-voiced statement. If generating a QUIZ, use AGGRESSIVE COMMENT BAITING: "90% of people get this wrong—pause and comment your guess NOW before the reveal."
 2. The Disruptor (5-15s): The news leak or tool reveal.
-3. The 'So What?' (15-35s): The analytical core. Why is this a game changer?
-4. The Visual Pivot (35-45s): A sudden shift in the script tone/visuals to reset the viewer's attention.
-5. The Prediction & The Infinite Loop (45-55s): Since Shorts loop, the last 3 words must logically or phonetically FLOW back to the first 3 words of the script.
+3. The 'So What?' (15-35s): The analytical core. Include a "Hot Take" from VJ.
+4. The Visual Pivot (35-45s): A sudden shift in tone/visuals to reset the viewer's attention.
+5. The Prediction & The Infinite Loop (45-55s): Since Shorts loop, the final 3 words must phonetically and logically FEED BACK into the first 3 words of the script (e.g., if script starts with "AI is crazy", end with "and that's why...").
 
 CRITICAL '2026 SCALE' RULES:
-1. THE INFINITE LOOP: {{"end_fragment": "and that's why...", "start_fragment": "...AI news is moving fast."}}
-   You MUST write the final sentence of the script so it leads perfectly back to the first sentence of the Hook. 
-   Result: The viewer watches it 1.5 times before they realize it looped.
-2. PATTERN INTERRUPTS: Every 3 seconds, a change in visual state is MANDATORY (Zoom-in, Glitch transition, or Reaction Split-screen).
-3. COMMENT BAITING: If this is an AI QUIZ, NEVER reveal the answer until the last 5 seconds. Explicitly tell users to 'Pause and comment your guess now!'.
-4. VOCAL PACING & EMPHASIS: You must know exactly where to pause for dramatic effect. Constantly use ellipses (...) and em-dashes (—) to force the AI voice to pause. For the most important words that need audio emphasis, WRITE THEM IN ALL CAPS. 
-   CRITICAL: NEVER write bracketed instructions like '[pause]', '(silence)', or '[intense music]'. Do NOT write word descriptions of sounds. Only use punctuation (... or —) to create pauses.
-5. THE HUMAN-GLITCH: Include subtle breaths or conversational 'actually...' to trigger the 'Authenticity' flag. Avoid robotic lists.
+1. THE INFINITE LOOP: You MUST design the script as a seamless circle. The transition from the last word to the first word must be invisible.
+2. PATTERN INTERRUPTS: Every 3 seconds, a change in visual state is MANDATORY.
+3. EGO-DRIVEN COMMENT BAITING: Challenge the audience. Use phrases like "If you knew this already, you're in the top 1%" or "Bet you can't guess what happens next."
+4. VOCAL PACING & EMPHASIS: Use ellipses (...) and em-dashes (—) to force dramatic pauses. WRITE EMPHASIZED WORDS IN ALL CAPS. 
+   CRITICAL: NEVER write bracketed instructions like '[pause]'.
+5. AUTHENTICITY FLAG: We are optimizing for YouTube's 2026 "Human Originality" score. Ensure the script sounds like a specific person (VJ) sharing a secret, not a generic news bot.
+6. WHATSAPP CTA: Explicitly mention in the script to "Check the link in the description to join our inner circle on WhatsApp" at least once.
+7. DISCLOSURE COMPLIANCE: Assume this content will be labeled as "Altered/Synthetic" — lean into the 'AI-Journalist' persona rather than trying to hide it.
 
 {selection_instruction}
 
