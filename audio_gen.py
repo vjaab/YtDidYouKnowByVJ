@@ -64,8 +64,8 @@ def trim_audio_silence(path, word_timestamps):
     duration = len(audio)
     trimmed_audio = audio[start_trim:duration-end_trim]
     
-    # Boost volume by 4 decibels for better clarity
-    trimmed_audio = trimmed_audio + 4
+    # Boost volume by 8 decibels for better clarity (increased for presence)
+    trimmed_audio = trimmed_audio + 8
     
     trimmed_audio.export(path, format="wav" if path.endswith(".wav") else "mp3")
     
