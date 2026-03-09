@@ -37,6 +37,7 @@ jobs:
         run: |
           git clone https://github.com/OpenTalker/SadTalker.git
           cd SadTalker
+          python -c "import sys, re; f=sys.argv[1]; open(f, 'w').write(re.sub(r'np\.float(?!\w)', 'float', open(f).read()))" src/face3d/util/my_awing_arch.py
           pip install gdown
           pip install -r requirements.txt
           bash scripts/download_models.sh
