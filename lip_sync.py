@@ -45,9 +45,10 @@ def _is_sadtalker_ready():
     """Check if SadTalker is cloned."""
     return os.path.isdir(SADTALKER_DIR)
 
-def _run_sadtalker(face_path, audio_path, output_path, timeout=10800):
+def _run_sadtalker(face_path, audio_path, output_path, enhancer=None, timeout=10800):
     """Run SadTalker inference on CPU."""
-    print(f"🎭 SadTalker: Starting lip-sync generation (CPU mode, might take a while)...")
+    mode_str = "LITE" if not enhancer else "FULL"
+    print(f"🎭 SadTalker [{mode_str}]: Starting lip-sync generation (CPU mode)...")
     print(f"   Face: {face_path}")
     print(f"   Audio: {audio_path}")
     
@@ -64,11 +65,13 @@ def _run_sadtalker(face_path, audio_path, output_path, timeout=10800):
         "--result_dir", result_dir,
         "--still",
         "--preprocess", "full",
-        "--enhancer", "gfpgan",
-        "--size", "512",
-        "--batch_size", "1",
+        "--size", "256",
+        "--batch_size", "2",
         "--cpu"
     ]
+    
+    if enhancer:
+        cmd.extend(["--enhancer", enhancer])
     
     print(f"   CMD: {' '.join(cmd)}")
     
@@ -117,7 +120,7 @@ def _find_output_video(result_dir):
 # PUBLIC API
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def generate_lip_sync(face_path, audio_path, output_path, timeout=10800):
+def generate_lip_sync(face_path, audio_path, output_path, enhancer=None, timeout=10800):
     """
     Generate a lip-synced video using SadTalker.
 
@@ -125,6 +128,7 @@ def generate_lip_sync(face_path, audio_path, output_path, timeout=10800):
         face_path:   Path to face video (.mp4) or image (.png/.jpg)
         audio_path:  Path to audio file (.wav/.mp3)
         output_path: Where the lip-synced video will be saved
+        enhancer:    None, 'gfpgan', or 'RestoreFormer'
         timeout:     Max seconds to wait (default 10800)
     """
     if not os.path.exists(face_path):
@@ -141,7 +145,7 @@ def generate_lip_sync(face_path, audio_path, output_path, timeout=10800):
 
     # ── Engine: SadTalker Local (CPU) ───────────────────────────────────────
     if _is_sadtalker_ready():
-        success = _run_sadtalker(face_path, audio_path, output_path, timeout)
+        success = _run_sadtalker(face_path, audio_path, output_path, enhancer, timeout)
         if success and os.path.exists(output_path):
             return output_path
         print("   ⚠ SadTalker failed.")
