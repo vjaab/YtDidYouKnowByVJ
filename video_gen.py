@@ -847,35 +847,94 @@ def render_telegram_cta(accent_color, frame_width=1080):
 
 # ── LAYER 16: Article Screenshot (New Layer) ──────────────────────────────────
 def _article_screenshot_clip(screenshot_path, duration):
+    """
+    Transformative PiP logic: Shows the source article as a cited piece of evidence
+    instead of just a background, which satisfies YouTube's 'Fair Use' commentary policy.
+    """
     if not screenshot_path or not os.path.exists(screenshot_path):
         return None
     try:
-        # Load and process the screenshot
         img = Image.open(screenshot_path).convert("RGBA")
         
-        # User wants it FULL SCREEN (mobile viewport was 1080x1920)
-        img = img.resize((FRAME_W, FRAME_H), Image.LANCZOS)
+        # Citation Size: 800x1200 (mobile portrait aspect)
+        cite_w = 720
+        cite_h = 1080
+        img = img.resize((cite_w, cite_h), Image.LANCZOS)
         
-        # Wrap into MoviePy
+        # Add a white 'Citation Border' to prove it's an external source
+        border = 10
+        bordered = Image.new("RGBA", (cite_w + border*2, cite_h + border*2), (255, 255, 255, 255))
+        bordered.paste(img, (border, border))
+        img = bordered
+        
         arr = np.array(img.convert("RGB"))
         mask = np.array(img.split()[3]).astype(float) / 255.0
         
-        # Animation: Fade in and stay for a portion of the video
-        # Default: Show from 8s to 18s (10 seconds duration)
-        start_ts = 8.0
-        display_dur = min(10.0, duration - start_ts)
+        # Animation: Slide in from right at 12s (Deep Dive phase)
+        start_ts = 12.0
+        display_dur = min(8.0, duration - start_ts)
         if display_dur <= 0: return None
         
         clip = ImageClip(arr, duration=display_dur)
-        # Apply a very subtle zoom-in for dynamic feel
-        clip = clip.resized(lambda t: 1.0 + 0.04 * (t / display_dur))
-        
         mclip = VideoClip(lambda t: mask, is_mask=True, duration=display_dur)
-        return clip.with_mask(mclip).with_position(("center", "center")).with_start(start_ts).with_effects([vfx.CrossFadeIn(0.6), vfx.CrossFadeOut(0.6)])
+        
+        def pos(t):
+            if t < 0.6: # 0.6s Slide in
+                return (FRAME_W - int((FRAME_W - (FRAME_W - cite_w - 40)) * (t/0.6)), 200)
+            return (FRAME_W - cite_w - 40, 200)
+
+        # Subtle rotation for 'Depth'
+        clip = clip.with_mask(mclip).with_position(pos).with_start(start_ts)
+        clip = clip.with_effects([vfx.CrossFadeIn(0.4), vfx.CrossFadeOut(0.4)])
+        return clip
         
     except Exception as e:
         print(f"Article screenshot clip error: {e}")
         return None
+
+
+def _ai_disclosure_overlay(duration):
+    """
+    Mandatory AI Disclosure for Monetization Compliance (Realistic Synthetic content).
+    """
+    h, w = 60, 800
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    # Translucent black capsule
+    draw.rounded_rectangle([0, 0, w, h], radius=30, fill=(0, 0, 0, 160))
+    
+    txt = "Visual/Audio generated with AI to enhance reporting."
+    font = gf(28)
+    draw.text((w//2, h//2), txt, font=font, fill=(200, 200, 200, 255), anchor="mm")
+    
+    arr = np.array(img.convert("RGB"))
+    mask = np.array(img.split()[3]).astype(float) / 255.0
+    
+    clip_dur = 5.0 # Show for 5 seconds
+    clip = ImageClip(arr, duration=clip_dur)
+    mclip = VideoClip(lambda t: mask, is_mask=True, duration=clip_dur)
+    
+    return clip.with_mask(mclip).with_position(("center", 40)).with_start(1.0).with_effects([vfx.CrossFadeIn(0.5), vfx.CrossFadeOut(0.5)])
+
+
+def _brand_watermark(duration):
+    """
+    Fixed Brand Identity to prevent 'Reused Content' flags.
+    """
+    w, h = 180, 80
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    # Neon Box for VJ
+    draw.rectangle([0, 0, w, h], outline=(255, 64, 64, 120), width=4)
+    draw.text((w//2, h//2), "VJ AI NEWS", font=gf(22), fill=(255, 255, 255, 120), anchor="mm")
+    
+    arr = np.array(img.convert("RGB"))
+    mask = np.array(img.split()[3]).astype(float) / 255.0
+    
+    clip = ImageClip(arr, duration=duration)
+    mclip = VideoClip(lambda t: mask, is_mask=True, duration=duration)
+    
+    return clip.with_mask(mclip).with_position((FRAME_W - w - 40, FRAME_H - h - 100)).with_start(0).with_opacity(0.6)
 
 def _intro_clip(duration, accent_color):
     """Create a brief intro segment showing the animated logo on a dark background."""
@@ -1422,14 +1481,15 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     grain_layer = _generate_film_grain(audio_duration, FRAME_W, FRAME_H)
     flare_layer = _generate_lens_flare(audio_duration, FRAME_W)
     
-    # ── ARTICLE SCREENSHOT LAYER ─────────────────────────────────────────────
-    article_screenshot_path = script_json.get("screenshot_path")
-    screenshot_clip = _article_screenshot_clip(article_screenshot_path, audio_duration)
+    # ── COMPLIANCE & BRANDING ────────────────────────────────────────────────
+    disclosure = _ai_disclosure_overlay(audio_duration)
+    watermark = _brand_watermark(audio_duration)
     
-    base_layers = bg_layer_clips + [tint, gradient] + particle_clips + logo_clips + fact_clips + burst_clips + reminder_clips + [grain_layer, flare_layer]
+    base_layers = bg_layer_clips + [tint, gradient] + particle_clips + logo_clips + fact_clips + burst_clips + reminder_clips + [grain_layer, flare_layer, disclosure, watermark]
     if avatar_pip:
         base_layers.append(avatar_pip)
     if screenshot_clip:
+        # We place the citation over the avatar if it overlaps
         base_layers.append(screenshot_clip)
 
     # ── PROGRESS BAR ────────────────────────────────────────────────────────
