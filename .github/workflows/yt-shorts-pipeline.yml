@@ -33,14 +33,28 @@ jobs:
       - name: Verify FFmpeg Installation
         run: ffmpeg -version
           
+      - name: Cache SadTalker Models
+        uses: actions/cache@v4
+        id: cache-sadtalker
+        with:
+          path: SadTalker/checkpoints
+          key: ${{ runner.os }}-sadtalker-v1
+
       - name: Setup SadTalker (CPU)
         run: |
-          git clone https://github.com/OpenTalker/SadTalker.git
+          if [ ! -d "SadTalker" ]; then
+            git clone https://github.com/OpenTalker/SadTalker.git
+          fi
           cd SadTalker
-          python -c "import sys, re; f=sys.argv[1]; open(f, 'w').write(re.sub(r'np\.float(?!\w)', 'float', open(f).read()))" src/face3d/util/my_awing_arch.py
+          # FIX 1: np.float patch (with read-buffer to prevent file truncation)
+          python -c "import sys, re; f=sys.argv[1]; c=open(f).read(); open(f, 'w').write(re.sub(r'np\.float(?!\w)', 'float', c))" src/face3d/util/my_awing_arch.py
+          # FIX 2: align_img inhomogenous shape error patch
+          python -c "import sys, re; f=sys.argv[1]; c=open(f).read(); open(f, 'w').write(re.sub(r'trans_params = np\.array\(\[w0, h0, s, t\[0\], t\[1\]\]\)', 'trans_params = np.array([w0, h0, s, t[0], t[1]], dtype=object).astype(float)', c))" src/face3d/util/preprocess.py
           pip install gdown
           pip install -r requirements.txt
-          bash scripts/download_models.sh
+          if [ "${{ steps.cache-sadtalker.outputs.cache-hit }}" != "true" ]; then
+            bash scripts/download_models.sh
+          fi
           
       - name: Install Project Python Dependencies
         run: |
