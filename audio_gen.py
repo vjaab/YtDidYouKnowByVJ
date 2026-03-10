@@ -15,10 +15,9 @@ import imageio_ffmpeg
 from pydub import AudioSegment
 AudioSegment.converter = imageio_ffmpeg.get_ffmpeg_exe()
 
-# F5-TTS Imports (Local Voice Cloning)
-import torch
+# F5-TTS Imports are delayed to _get_f5_model to prevent CI crashes
 import soundfile as sf
-from f5_tts.api import F5TTS
+
 
 def _apply_stable_ts(audio_path, text):
     try:
@@ -97,6 +96,9 @@ _f5_instance = None
 def _get_f5_model():
     global _f5_instance
     if _f5_instance is None:
+        import torch
+        from f5_tts.api import F5TTS
+
         device = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
         print(f"Initialising F5-TTS (Local Voice Cloning) on {device}...")
         _f5_instance = F5TTS(device=device)
