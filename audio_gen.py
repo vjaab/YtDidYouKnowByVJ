@@ -435,36 +435,12 @@ def generate_voiceover(text, voice_request="en-US-GuyNeural", emotion="excited",
     today     = datetime.now().strftime("%Y-%m-%d")
     mp3_path  = os.path.join(OUTPUT_DIR, f"audio_{today}.mp3")
     
-    is_ci = os.environ.get("GITHUB_ACTIONS") == "true"
+    path, dur, word_timestamps = None, 0, []
     
     # ── ENGINE PRIORITY ──────────────────────────────────────────────────────
-    # 1. In CI: Prioritize Edge TTS (Cloud/Instant) or Kokoro (Fast CPU)
-    # 2. Local: Prioritize F5-TTS (High Quality Cloning)
-    
-    if is_ci:
-        print("🚀 Running in GitHub Actions: Prioritizing fast TTS engines...")
-        # Try Edge TTS First (Fastest, includes timestamps)
-        try:
-            path, dur, word_timestamps = _generate_edge_tts(text_to_speak, LOCKED_VOICE, mp3_path)
-            if path: return path, dur, word_timestamps
-        except Exception as e:
-            print(f"⚠️ Edge TTS failed in CI: {e}")
-            
-        # Try Kokoro Second (Local, Fast)
-        try:
-            path, dur, word_timestamps = _generate_kokoro(text_to_speak, mp3_path)
-            if path: return path, dur, word_timestamps
-        except Exception as e:
-            print(f"⚠️ Kokoro failed in CI: {e}")
-            
-    # ── PRIMARY (Local) or Fallback (CI) ────────────────────────────────────
-    # 1. PRIMARY: F5-TTS Local Voice Cloning
+    # 1. PRIMARY: F5-TTS Local Voice Cloning (Your Voice) - HI PRIORITY
     try:
-        # Skip F5-TTS in CI because it takes ~10 mins per sentence on CPU
-        if not is_ci:
-            path, dur, word_timestamps = _generate_f5_clone(text_to_speak, mp3_path)
-        else:
-             print("⏭️ Skipping F5-TTS in CI due to performance limits.")
+        path, dur, word_timestamps = _generate_f5_clone(text_to_speak, mp3_path)
     except Exception as e:
         print(f"⚠️ F5-TTS Cloning failed: {e}")
         # 2. SECONDARY: Kokoro TTS
@@ -475,10 +451,8 @@ def generate_voiceover(text, voice_request="en-US-GuyNeural", emotion="excited",
             # FALLBACK: Edge TTS
             try:
                 path, dur, word_timestamps = _generate_edge_tts(text_to_speak, LOCKED_VOICE, mp3_path)
-                # Only use stable-ts if we're local (too slow for CI)
-                if not is_ci:
-                    real_ts = _apply_stable_ts(path, text_to_speak)
-                    if real_ts: word_timestamps = real_ts
+                real_ts = _apply_stable_ts(path, text_to_speak)
+                if real_ts: word_timestamps = real_ts
             except Exception as e3:
                 print(f"Edge TTS fallback failed: {e3}")
 
