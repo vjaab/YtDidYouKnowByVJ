@@ -49,7 +49,18 @@ def setup_project():
         run_cmd(["git", "clone", "-q", "https://github.com/vjaab/YtDidYouKnowByVJ.git"])
     
     run_cmd(["pip", "install", "-q", "-r", "requirements.txt"], cwd="YtDidYouKnowByVJ")
-    run_cmd(["pip", "install", "-q", "f5-tts", "stable-ts", "torch", "torchvision<0.17.0", "torchaudio", "--index-url", "https://download.pytorch.org/whl/cu118"])
+    run_cmd(["pip", "install", "-q", "f5-tts", "stable-ts", "torch", "torchvision", "torchaudio", "--index-url", "https://download.pytorch.org/whl/cu118"])
+
+    print("🛠️ Patching basicsr for modern torchvision compatibility...")
+    import site
+    site_pkg = site.getsitepackages()[0]
+    degradations_file = os.path.join(site_pkg, "basicsr", "data", "degradations.py")
+    if os.path.exists(degradations_file):
+        with open(degradations_file, "r") as f:
+            content = f.read()
+        content = content.replace("functional_tensor", "functional")
+        with open(degradations_file, "w") as f:
+            f.write(content)
 
 def process_job():
     print("🎬 Starting GPU Job...")
