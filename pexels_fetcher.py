@@ -32,7 +32,8 @@ def score_relevance(chunk_text, visual_desc):
     attempts = 0
     while attempts < 3:
         try:
-            target_model = "gemini-2.5-pro" if attempts < 2 else "gemini-2.5-flash"
+            # Use 2.0-flash for high speed and stability
+            target_model = "gemini-2.0-flash" 
             prompt = f"""Rate relevance 0-10 between technical text and visual description.
 Chunk text: '{chunk_text}'
 Visual description: '{visual_desc}'
@@ -258,15 +259,19 @@ def _generate_imagen3(chunk_text, output_path, topic_context=""):
 - Photorealistic, cinematic, 9:16 vertical
 - No text, no watermarks, no faces of real people
 - Directly shows what the text describes, highly precise to the overall topic above
-- High detail, dramatic lighting"""
+- High detail, dramatic lighting
+- RETURN ONLY the prompt text. No introductory sentence like "Here is a prompt" or "Of course"."""
         
         best_prompt = chunk_text # Default
         attempts = 0
         while attempts < 3:
             try:
-                target_model = "gemini-2.5-pro" if attempts < 2 else "gemini-2.5-flash"
+                target_model = "gemini-2.0-flash"
                 resp = client.models.generate_content(model=target_model, contents=prompt_builder)
                 best_prompt = resp.text.strip()
+                # Clean up any lingering intro text if Gemini ignores instructions
+                if best_prompt.lower().startswith("here is") or "prompt:" in best_prompt.lower()[:20]:
+                    best_prompt = best_prompt.split("\n")[-1]
                 break
             except Exception as e:
                 print(f"Imagen prompt gen failed (att {attempts+1}): {e}")
@@ -275,17 +280,18 @@ def _generate_imagen3(chunk_text, output_path, topic_context=""):
             
     print(f"  -> Generated Imagen prompt: {best_prompt[:60]}...")
         
-    # Use a wider variety of models to avoid individual quota/not-found issues
-    # Note: Added 'fast' variant which is often more available
+    # Updated to 4.0 models as 3.0 is missing from the API in this environment
     models_to_try = [
-        "imagen-3.0-fast-generate-001", 
-        "imagen-3.0-generate-001", 
-        "imagen-4.0-generate-001", # High quality but high quota risk
-        "imagen-2.0-generate-001"
+        "imagen-4.0-fast-generate-001",
+        "imagen-4.0-generate-001", 
+        "imagen-4.0-ultra-generate-001"
     ]
     for model_name in models_to_try:
+        if os.environ.get("IMAGEN_QUOTA_EXHAUSTED"):
+             break
+             
         attempts = 0
-        while attempts < 3:
+        while attempts < 2: # Reduced attempts to save quota
             try:
                 result = client.models.generate_images(
                     model=model_name,
@@ -304,7 +310,8 @@ def _generate_imagen3(chunk_text, output_path, topic_context=""):
                 print(f"Imagen generation failed ({model_name}, att {attempts+1}): {e}")
                 
                 if "429" in err_str and ("quota" in err_str or "exhausted" in err_str):
-                    print(f"Quota exceeded for {model_name}. Switching to fallback model.")
+                    print(f"Quota exceeded for {model_name}. Marking Global Quota Exhausted.")
+                    os.environ["IMAGEN_QUOTA_EXHAUSTED"] = "1"
                     break  # Break out of the attempts loop to try the next model
                     
                 attempts += 1

@@ -136,19 +136,17 @@ def generate_images(prompts, image_url=None, keywords=None):
     style_suffix = (
         ", photorealistic, cinematic lighting, dramatic atmosphere, "
         "hyper detailed, professional photography, no text, no watermarks, "
-        "no logos, no people's faces"
+        "no logos, no people's faces. RETURN ONLY the prompt text, no intro."
     )
 
     generated_paths = []
     previous_path   = None
 
-    # Use a wider variety of models to avoid individual quota/not-found issues
+    # Updated to 4.0 models as 3.0 is missing from the API in this environment
     models_to_try = [
-        "imagen-3.0-fast-generate-001",
-        "imagen-3.0-generate-001",
         "imagen-4.0-fast-generate-001",
         "imagen-4.0-generate-001",
-        "imagen-2.0-generate-001"
+        "imagen-4.0-ultra-generate-001"
     ]
     
     for i, prompt in enumerate(prompts):
