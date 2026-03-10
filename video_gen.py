@@ -1452,6 +1452,10 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                 return (base_x + x_offset, base_y) # Visible
 
         avatar_pip = avatar_clip.with_mask(mclip).with_position(pip_position).with_start(0)
+        
+    # ── LAYER 2.5: Source Article Screenshot ──────────────────────────────────
+    screenshot_path = script_json.get("screenshot_path")
+    screenshot_clip = _article_screenshot_clip(screenshot_path, audio_duration)
 
     # ── LAYER 3: Tint ─────────────────────────────────────────────────────────
     tint = ColorClip(size=(FRAME_W, FRAME_H), color=accent_color, duration=audio_duration).with_opacity(0.02)
