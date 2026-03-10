@@ -11,7 +11,7 @@ on:
 jobs:
   run-pipeline:
     runs-on: ubuntu-latest
-    timeout-minutes: 600 # 10 hours to accommodate F5-TTS and SadTalker on CPU
+    timeout-minutes: 90 # F5-TTS on CPU might still take some time
     
     steps:
       - name: Checkout Code
@@ -33,42 +33,7 @@ jobs:
       - name: Verify FFmpeg Installation
         run: ffmpeg -version
           
-      - name: Cache SadTalker Models
-        uses: actions/cache@v4
-        id: cache-sadtalker
-        with:
-          path: SadTalker/checkpoints
-          key: ${{ runner.os }}-sadtalker-v1
 
-      - name: Setup SadTalker (CPU)
-        run: |
-          if [ ! -d "SadTalker" ]; then
-            git clone https://github.com/OpenTalker/SadTalker.git
-          fi
-          cd SadTalker
-          
-          # FIX 1: face3d patches (np.float, inhomogeneous shape, VisibleDeprecationWarning, .item() logic)
-          python -c "import sys, re; f=sys.argv[1]; c=open(f).read(); c=re.sub(r'np\.float(?!\w)', 'float', c); open(f, 'w').write(c)" src/face3d/util/my_awing_arch.py
-          python -c "import sys, re; f=sys.argv[1]; c=open(f).read(); \
-            c=re.sub(r'trans_params = np\.array\(\[w0, h0, s, t\[0\], t\[1\]\]\)', 'trans_params = np.array([w0, h0, s, t[0].item(), t[1].item()])', c); \
-            c=re.sub(r'warnings.filterwarnings\(\"ignore\", category=np.VisibleDeprecationWarning\)', '# ignore', c); \
-            c=c.replace('.astype(np.int32)', '.astype(int)'); \
-            c=re.sub(r'float\(\(t\[0\] - w0/2\)\*s\)', '((t[0] - w0/2)*s).item()', c); \
-            c=re.sub(r'float\(\(h0/2 - t\[1\]\)\*s\)', '((h0/2 - t[1])*s).item()', c); \
-            open(f, 'w').write(c)" src/face3d/util/preprocess.py
-          
-          # FIX 2: SadTalker main utils patch
-          python -c "import sys, re; f=sys.argv[1]; c=open(f).read(); c=c.replace('float(item)', 'float(item.item())'); open(f, 'w').write(c)" src/utils/preprocess.py
-          
-          pip install gdown kornia face_alignment yacs ninja resampy facexlib basicsr
-          pip install -r requirements.txt
-          
-          if [ "${{ steps.cache-sadtalker.outputs.cache-hit }}" != "true" ]; then
-            # Fix wget -nc potentially returning 1
-            mkdir -p checkpoints
-            sed -i 's/mkdir \.\/checkpoints/mkdir -p \.\/checkpoints/g' scripts/download_models.sh
-            bash scripts/download_models.sh || true
-          fi
           
       - name: Install Project Python Dependencies
         run: |
