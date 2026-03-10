@@ -13,7 +13,10 @@ def trigger_kaggle_gpu_job(script_data, voice, emotion, custom_map):
     scripts_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts")
     job_file = os.path.join(scripts_dir, "job_data.json")
     
-    # 1. Prepare Job Data
+    import pkgutil
+    import inspect
+    
+    # 1. Inject Job Data directly into the script
     job_payload = {
         "script": script_data.get("script"),
         "voice": voice,
@@ -21,9 +24,26 @@ def trigger_kaggle_gpu_job(script_data, voice, emotion, custom_map):
         "custom_map": custom_map
     }
     
-    with open(job_file, "w") as f:
-        json.dump(job_payload, f)
+    worker_script_path = os.path.join(scripts_dir, "kaggle_worker.py")
+    with open(worker_script_path, "r") as f:
+        worker_code = f.read()
     
+    # We replace a specific string or inject at the top
+    injection = f"\nJOB_PAYLOAD = {json.dumps(job_payload)}\n"
+    
+    # Let's write a temporary execution file that Kaggle will upload
+    temp_script_path = os.path.join(scripts_dir, "ytdidyouknowbyvj_gpu_worker.py")
+    with open(temp_script_path, "w") as f:
+        f.write(injection + worker_code)
+        
+    # Update Metadata to point to the temp script
+    meta_path = os.path.join(scripts_dir, "kernel-metadata.json")
+    with open(meta_path, "r") as f:
+        meta = json.load(f)
+    meta["code_file"] = "ytdidyouknowbyvj_gpu_worker.py"
+    with open(meta_path, "w") as f:
+        json.dump(meta, f, indent=4)
+        
     # 2. Push Kernel
     print("📤 Pushing kernel to Kaggle...")
     try:

@@ -53,16 +53,18 @@ def process_job():
     print("🎬 Starting GPU Job...")
     
     # Kaggle-specific execution:
-    # We expect a 'job_data.json' in the current directory if triggered by the pipeline
-    job_file = "job_data.json"
-    if not os.path.exists(job_file):
-        print(f"⚠ {job_file} not found. Running default demo mode.")
+    # `JOB_PAYLOAD` is injected at the top of the file by `kaggle_handover.py` before push
+    import json
+    
+    if "JOB_PAYLOAD" in globals():
+        job_data = globals()["JOB_PAYLOAD"]
+    elif os.path.exists("job_data.json"):
+        with open("job_data.json", 'r') as f:
+            job_data = json.load(f)
+    else:
+        print(f"⚠ Job Data not found. Running default demo mode.")
         # Default fallback/demo logic
         return
-
-    import json
-    with open(job_file, 'r') as f:
-        job_data = json.load(f)
 
     # Reconstruct the script/audio state
     # On Kaggle, we want to run the heavy steps:
