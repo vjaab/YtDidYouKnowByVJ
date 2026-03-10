@@ -45,7 +45,7 @@ def setup_project():
         run_cmd(["git", "clone", "https://github.com/vjaab/YtDidYouKnowByVJ.git"])
     
     run_cmd(["pip", "install", "-r", "requirements.txt"], cwd="YtDidYouKnowByVJ")
-    run_cmd(["pip", "install", "torch", "torchvision", "torchaudio", "--index-url", "https://download.pytorch.org/whl/cu118"])
+    run_cmd(["pip", "install", "torch", "torchvision<0.17.0", "torchaudio", "--index-url", "https://download.pytorch.org/whl/cu118"])
 
 def process_job():
     print("🎬 Starting GPU Job...")
