@@ -8,7 +8,7 @@ from topic_tracker import load_tracker, check_story_uniqueness, check_cooldowns
 from ecosystem_logic import get_slot_info, get_category_prompt_enhancement
 
 def pick_and_generate_script(articles, extra_instruction="", forced_article=None, topic_type="research"):
-    client = genai.Client(api_key=GEMINI_API_KEY, http_options={'timeout': 300.0})
+    client = genai.Client(api_key=GEMINI_API_KEY)
     
     # ── Pre-filter articles (Unique against history AND against each other) ──
     filtered_articles = []
