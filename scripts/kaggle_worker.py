@@ -52,15 +52,21 @@ def setup_project():
     run_cmd(["pip", "install", "-q", "f5-tts", "stable-ts", "torch", "torchvision", "torchaudio", "facexlib", "gfpgan", "basicsr", "--extra-index-url", "https://download.pytorch.org/whl/cu118"])
 
     print("🛠️ Patching basicsr for modern torchvision compatibility...")
-    import basicsr
-    basicsr_path = os.path.dirname(basicsr.__file__)
-    degradations_file = os.path.join(basicsr_path, "data", "degradations.py")
-    if os.path.exists(degradations_file):
-        with open(degradations_file, "r") as f:
-            content = f.read()
-        content = content.replace("functional_tensor", "functional")
-        with open(degradations_file, "w") as f:
-            f.write(content)
+    import site
+    packages = site.getsitepackages()
+    # Try all possible package locations
+    for pkg_dir in packages:
+        degradations_file = os.path.join(pkg_dir, "basicsr", "data", "degradations.py")
+        if os.path.exists(degradations_file):
+            print(f"Found and patching: {degradations_file}")
+            with open(degradations_file, "r") as f:
+                content = f.read()
+            content = content.replace("functional_tensor", "functional")
+            with open(degradations_file, "w") as f:
+                f.write(content)
+            break
+    else:
+        print("⚠ Could not find basicsr/data/degradations.py to patch.")
 
 def process_job():
     print("🎬 Starting GPU Job...")
