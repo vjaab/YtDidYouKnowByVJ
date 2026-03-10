@@ -1229,6 +1229,15 @@ def _generate_lipsync_video(audio_path):
         return None
 
     output_path = os.path.join(OUTPUT_DIR, "temp_lipsync.mp4")
+    
+    # If Kaggle was enabled but failed to return a lipsync (e.g., crashed), do NOT fall back to local MPS/CPU 
+    # to avoid extremely long 30+ min processing times.
+    has_kaggle = os.path.exists(os.path.expanduser("~/.kaggle/kaggle.json"))
+    use_local_only = os.environ.get("USE_LOCAL_ONLY") == "true"
+    
+    if has_kaggle and not use_local_only:
+        print("⚠️ Kaggle GPU was enabled but no lip-sync received. Skipping slow local fallback.")
+        return None
 
     engine = get_available_engine()
     print(f"🎭 Lip-sync engine: {engine or 'None available'}")
@@ -1372,6 +1381,9 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     # ── AVATAR VIDEO AS PiP (Picture-in-Picture) ──────────────────────────────
     print("Preparing Avatar PiP...")
     lipsync_path = script_json.get("kaggle_lipsync_path")
+    
+    # Only fall back to _generate_lipsync_video for standard local usage. 
+    # If the file from Kaggle doesn't exist, we trust _generate_lipsync_video's logic to skip it if Kaggle was active.
     if not lipsync_path or not os.path.exists(lipsync_path):
         lipsync_path = _generate_lipsync_video(audio_path)
         
