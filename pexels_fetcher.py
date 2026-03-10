@@ -49,10 +49,17 @@ Return ONLY the raw integer (0-10)."""
             if match:
                  score = int(match.group())
                  return min(10, max(0, score))
-            return 5 # Default if no number found
+            return 5
         except Exception as e:
-            wait_time = (2 ** attempts) + 2
-            print(f"Gemini scoring failed (att {attempts+1}): {e}. Retrying in {wait_time}s...")
+            err_str = str(e).lower()
+            # If rate limited, wait longer (60s) for the minute to reset
+            if "429" in err_str or "resource_exhausted" in err_str:
+                wait_time = 60
+                print(f"⚠️ Gemini Rate Limit Hit (429). Waiting {wait_time}s...")
+            else:
+                wait_time = (2 ** attempts) + 5
+                print(f"Gemini scoring failed (att {attempts+1}): {e}. Retrying in {wait_time}s...")
+            
             attempts += 1
             time.sleep(wait_time)
             
@@ -280,6 +287,10 @@ def _generate_imagen3(chunk_text, output_path, topic_context=""):
             
     print(f"  -> Generated Imagen prompt: {best_prompt[:60]}...")
         
+    # Early exit if we already know Imagen is exhausted for this run
+    if os.environ.get("IMAGEN_QUOTA_EXHAUSTED"):
+         return None
+
     # Updated to 4.0 models as 3.0 is missing from the API in this environment
     models_to_try = [
         "imagen-4.0-fast-generate-001",
@@ -287,11 +298,8 @@ def _generate_imagen3(chunk_text, output_path, topic_context=""):
         "imagen-4.0-ultra-generate-001"
     ]
     for model_name in models_to_try:
-        if os.environ.get("IMAGEN_QUOTA_EXHAUSTED"):
-             break
-             
         attempts = 0
-        while attempts < 2: # Reduced attempts to save quota
+        while attempts < 2: 
             try:
                 result = client.models.generate_images(
                     model=model_name,
@@ -460,9 +468,10 @@ def fetch_all_chunk_visuals(chunks, topic_context="", script_data=None):
             chunk["relevance_score"] = 0
             chunk["source"] = "Failed"
         
-        # Small delay between chunks to avoid API rate limiting
+        # Substantial delay between chunks to stay under 10 RPM (Images) / 15 RPM (Gemini)
         if i < len(chunks) - 1:
-            time.sleep(1)
+            print(f"  -> Cooling down for 10s to respect API Rate Limits...")
+            time.sleep(10)
 
     # Fill any failed chunks with the previous chunk's visual
     last_path = None
