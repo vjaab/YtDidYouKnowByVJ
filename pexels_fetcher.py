@@ -275,7 +275,14 @@ def _generate_imagen3(chunk_text, output_path, topic_context=""):
             
     print(f"  -> Generated Imagen prompt: {best_prompt[:60]}...")
         
-    models_to_try = ["imagen-4.0-generate-001", "imagen-3.0-generate-001"]
+    # Use a wider variety of models to avoid individual quota/not-found issues
+    # Note: Added 'fast' variant which is often more available
+    models_to_try = [
+        "imagen-3.0-fast-generate-001", 
+        "imagen-3.0-generate-001", 
+        "imagen-4.0-generate-001", # High quality but high quota risk
+        "imagen-2.0-generate-001"
+    ]
     for model_name in models_to_try:
         attempts = 0
         while attempts < 3:

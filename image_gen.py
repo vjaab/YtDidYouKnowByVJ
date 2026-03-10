@@ -142,7 +142,14 @@ def generate_images(prompts, image_url=None, keywords=None):
     generated_paths = []
     previous_path   = None
 
-    models_to_try = ["imagen-4.0-fast-generate-001", "imagen-3.0-generate-001"]
+    # Use a wider variety of models to avoid individual quota/not-found issues
+    models_to_try = [
+        "imagen-3.0-fast-generate-001",
+        "imagen-3.0-generate-001",
+        "imagen-4.0-fast-generate-001",
+        "imagen-4.0-generate-001",
+        "imagen-2.0-generate-001"
+    ]
     
     for i, prompt in enumerate(prompts):
         out  = os.path.join(OUTPUT_DIR, f"frame_{i+1}_{TODAY}.png")
