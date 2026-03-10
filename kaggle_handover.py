@@ -94,11 +94,11 @@ def trigger_kaggle_gpu_job(script_data, voice, emotion, custom_map):
             with open(results_file, "r") as f:
                 results = json.load(f)
             
-            # Map downloaded basenames back to local 'output/' path
+            # Map downloaded basenames back to local 'output/' path as absolute paths
             if results.get("audio_path"):
-                results["audio_path"] = os.path.join(output_dir, results["audio_path"])
+                results["audio_path"] = os.path.abspath(os.path.join(output_dir, results["audio_path"]))
             if results.get("lipsync_path"):
-                results["lipsync_path"] = os.path.join(output_dir, results["lipsync_path"])
+                results["lipsync_path"] = os.path.abspath(os.path.join(output_dir, results["lipsync_path"]))
                 
             return results
     except Exception as e:
