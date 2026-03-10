@@ -98,6 +98,8 @@ jobs:
           echo "TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}" >> .env
           echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> .env
           echo "FAL_KEY=${{ secrets.FAL_KEY }}" >> .env
+          echo "KAGGLE_USERNAME=${{ secrets.KAGGLE_USERNAME }}" >> .env
+          echo "KAGGLE_KEY=${{ secrets.KAGGLE_KEY }}" >> .env
           
       - name: Setup YouTube Auth Files
         # We restore the JSON files from GitHub Secrets
@@ -105,11 +107,21 @@ jobs:
           echo '${{ secrets.CLIENT_SECRET_JSON }}' > client_secret.json
           echo '${{ secrets.TOKEN_JSON }}' > token.json
           
-      - name: Run Pipeline
+      - name: Setup Kaggle Credentials
+        run: |
+          mkdir -p ~/.kaggle
+          echo '{"username":"${{ secrets.KAGGLE_USERNAME }}","key":"${{ secrets.KAGGLE_KEY }}"}' > ~/.kaggle/kaggle.json
+          chmod 600 ~/.kaggle/kaggle.json
+          
+      - name: Run Pipeline (Kaggle GPU Priority)
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           FAL_KEY: ${{ secrets.FAL_KEY }}
-        run: python main.py --now
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          # The main.py will now detect Kaggle credentials and push heavy tasks to GPU
+          python main.py --now
         
       - name: Commit Updated Tracking File (news_log.json)
         # Always run this step to save the log, preventing duplicate topics tomorrow
