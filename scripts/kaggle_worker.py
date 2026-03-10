@@ -7,14 +7,18 @@ import time
 # 🚀 KAGGLE GPU WORKER FOR YtDidYouKnowByVJ
 # Designed to run on Kaggle T4 x2 or P100
 
-def run_cmd(cmd, cwd=None):
-    print(f"Executing: {' '.join(cmd)}")
-    subprocess.run(cmd, cwd=cwd, check=True)
+def run_cmd(cmd, cwd=None, quiet=False):
+    if quiet:
+        print(f"Executing (Quietly): {' '.join(cmd)}")
+        subprocess.run(cmd, cwd=cwd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    else:
+        print(f"Executing: {' '.join(cmd)}")
+        subprocess.run(cmd, cwd=cwd, check=True)
 
 def setup_sadtalker():
     if not os.path.isdir("SadTalker"):
         print("📥 Cloning SadTalker...")
-        run_cmd(["git", "clone", "https://github.com/OpenTalker/SadTalker.git"])
+        run_cmd(["git", "clone", "-q", "https://github.com/OpenTalker/SadTalker.git"])
         
         # Apply patches
         print("🛠️ Patching SadTalker for modern environments...")
@@ -37,15 +41,15 @@ def setup_sadtalker():
         print("📥 Downloading SadTalker Weights...")
         os.makedirs("SadTalker/checkpoints", exist_ok=True)
         # Using a faster mirror or direct download if possible
-        run_cmd(["bash", "scripts/download_models.sh"], cwd="SadTalker")
+        run_cmd(["bash", "scripts/download_models.sh"], cwd="SadTalker", quiet=True)
 
 def setup_project():
     if not os.path.isdir("YtDidYouKnowByVJ"):
         print("📥 Cloning Project Repository...")
-        run_cmd(["git", "clone", "https://github.com/vjaab/YtDidYouKnowByVJ.git"])
+        run_cmd(["git", "clone", "-q", "https://github.com/vjaab/YtDidYouKnowByVJ.git"])
     
-    run_cmd(["pip", "install", "-r", "requirements.txt"], cwd="YtDidYouKnowByVJ")
-    run_cmd(["pip", "install", "f5-tts", "stable-ts", "torch", "torchvision<0.17.0", "torchaudio", "--index-url", "https://download.pytorch.org/whl/cu118"])
+    run_cmd(["pip", "install", "-q", "-r", "requirements.txt"], cwd="YtDidYouKnowByVJ")
+    run_cmd(["pip", "install", "-q", "f5-tts", "stable-ts", "torch", "torchvision<0.17.0", "torchaudio", "--index-url", "https://download.pytorch.org/whl/cu118"])
 
 def process_job():
     print("🎬 Starting GPU Job...")
