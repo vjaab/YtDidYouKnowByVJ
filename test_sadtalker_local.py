@@ -108,12 +108,12 @@ env["PATH"] = os.path.abspath("venv/bin") + os.pathsep + env["PATH"]
 
 from lip_sync import generate_lip_sync
 
-# We'll use a longer timeout for local CPU/GPU rendering
+# We'll use a 30-minute timeout for local test to avoid long hangs
 result = generate_lip_sync(
     face_path=face_path,
     audio_path=audio_path,
     output_path=output_path,
-    timeout=10800
+    timeout=1800 # 30 mins
 )
 
 if result and os.path.exists(result):
