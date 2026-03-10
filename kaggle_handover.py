@@ -94,10 +94,14 @@ def trigger_kaggle_gpu_job(script_data, voice, emotion, custom_map):
             with open(results_file, "r") as f:
                 results = json.load(f)
             
-            # Map paths back to local project structure
-            # Kaggle might save as './audio_...wav', we need to ensure they match expectations
+            # Map downloaded basenames back to local 'output/' path
+            if results.get("audio_path"):
+                results["audio_path"] = os.path.join(output_dir, results["audio_path"])
+            if results.get("lipsync_path"):
+                results["lipsync_path"] = os.path.join(output_dir, results["lipsync_path"])
+                
             return results
     except Exception as e:
-        print(f"❌ Failed to download Kaggle results: {e}")
+        print(f"❌ Failed to download/process Kaggle results: {e}")
         
     return None

@@ -42,11 +42,9 @@ def setup_sadtalker():
 def setup_project():
     if not os.path.isdir("YtDidYouKnowByVJ"):
         print("📥 Cloning Project Repository...")
-        # Note: We might need a token if it's private, but assuming public for now
         run_cmd(["git", "clone", "https://github.com/vjaab/YtDidYouKnowByVJ.git"])
     
-    run_cmd(["pip", "install", "-r", "YtDidYouKnowByVJ/requirements.txt"])
-    # Force GPU torch
+    run_cmd(["pip", "install", "-r", "requirements.txt"], cwd="YtDidYouKnowByVJ")
     run_cmd(["pip", "install", "torch", "torchvision", "torchaudio", "--index-url", "https://download.pytorch.org/whl/cu118"])
 
 def process_job():
@@ -71,7 +69,7 @@ def process_job():
     # 1. generate_voiceover (via F5-TTS with GPU)
     # 2. generate_lip_sync (via SadTalker with GPU)
     
-    sys.path.append(os.path.abspath("YtDidYouKnowByVJ"))
+    sys.path.append(os.getcwd())
     from audio_gen import generate_voiceover
     from lip_sync import generate_lip_sync
     
@@ -86,7 +84,7 @@ def process_job():
     )
     
     # 2. GPU Lip-Sync
-    face_path = "YtDidYouKnowByVJ/assets/Firefly_video_final.mp4"
+    face_path = "assets/Firefly_video_final.mp4"
     lipsync_out = "kaggle_lipsync.mp4"
     
     lipsync_path = generate_lip_sync(
@@ -95,22 +93,30 @@ def process_job():
         output_path=lipsync_out
     )
     
-    # 3. Save Results for Pipeline Retrieval
+    # 3. Save Results for Pipeline Retrieval (Placing results.json in the kaggle root)
     results = {
-        "audio_path": audio_path,
+        "audio_path": os.path.basename(audio_path),
         "duration": duration,
         "word_timestamps": word_timestamps,
-        "lipsync_path": lipsync_path
+        "lipsync_path": os.path.basename(lipsync_path) if lipsync_path else None
     }
+    
+    # Move outputs to /kaggle/working/ so the CLI correctly downloads them raw
+    os.chdir("..")
+    shutil.copy(os.path.join("YtDidYouKnowByVJ", audio_path), ".")
+    if lipsync_path and os.path.exists(os.path.join("YtDidYouKnowByVJ", lipsync_path)):
+        shutil.copy(os.path.join("YtDidYouKnowByVJ", lipsync_path), ".")
+        
     with open("results.json", "w") as f:
         json.dump(results, f)
     
     print("✅ GPU Processing Complete.")
-    # Output files will be in /kaggle/working/ and downloadable via API
 
 if __name__ == "__main__":
     print("--- Kaggle Worker Initiated ---")
     setup_project()
+    # Change into the project directory so all relative paths align perfectly for lip_sync.py and Kaggle CLI
+    os.chdir("YtDidYouKnowByVJ") 
     setup_sadtalker()
     process_job()
     print("--- Job Finished ---")
