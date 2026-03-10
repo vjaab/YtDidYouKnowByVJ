@@ -103,9 +103,22 @@ def process_job():
     
     # Move outputs to /kaggle/working/ so the CLI correctly downloads them raw
     os.chdir("..")
-    shutil.copy(os.path.join("YtDidYouKnowByVJ", audio_path), ".")
+    
+    # Copy assets before nuking the folders
+    # Note: audio_path comes as absolute from output/, so we extract the relative path from YtDidYouKnowByVJ 
+    rel_audio_path = audio_path.split("YtDidYouKnowByVJ/")[-1] 
+    
+    shutil.copy(os.path.join("YtDidYouKnowByVJ", rel_audio_path), ".")
     if lipsync_path and os.path.exists(os.path.join("YtDidYouKnowByVJ", lipsync_path)):
         shutil.copy(os.path.join("YtDidYouKnowByVJ", lipsync_path), ".")
+        
+    # HUGE OPTIMIZATION: Kaggle downloads EVERYTHING in /kaggle/working/
+    # We must wipe the repo and heavy model weights to prevent downloading ~3GB of files locally
+    print("🧹 Cleaning up repositories and models to speed up download...")
+    if os.path.isdir("YtDidYouKnowByVJ"):
+        shutil.rmtree("YtDidYouKnowByVJ", ignore_errors=True)
+    if os.path.isdir("SadTalker"):
+        shutil.rmtree("SadTalker", ignore_errors=True)
         
     with open("results.json", "w") as f:
         json.dump(results, f)
