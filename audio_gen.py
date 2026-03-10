@@ -97,8 +97,9 @@ _f5_instance = None
 def _get_f5_model():
     global _f5_instance
     if _f5_instance is None:
-        print("Initialising F5-TTS (Local Voice Cloning)...")
-        _f5_instance = F5TTS()
+        device = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
+        print(f"Initialising F5-TTS (Local Voice Cloning) on {device}...")
+        _f5_instance = F5TTS(device=device)
     return _f5_instance
 
 # Edge TTS offset is in 100-nanosecond units → divide by 10_000_000 for seconds
