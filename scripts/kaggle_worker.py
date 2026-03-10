@@ -1,4 +1,5 @@
 import os
+os.environ["PYTHONHASHSEED"] = "0"
 import subprocess
 import shutil
 import sys
@@ -49,7 +50,7 @@ def setup_project():
         run_cmd(["git", "clone", "-q", "https://github.com/vjaab/YtDidYouKnowByVJ.git"])
     
     run_cmd(["pip", "install", "-q", "-r", "requirements.txt"], cwd="YtDidYouKnowByVJ")
-    run_cmd(["pip", "install", "-q", "f5-tts", "stable-ts", "torch", "torchvision", "torchaudio", "facexlib", "gfpgan", "basicsr", "--extra-index-url", "https://download.pytorch.org/whl/cu118"])
+    run_cmd(["pip", "install", "-q", "f5-tts", "stable-ts", "torch", "torchvision", "torchaudio", "facexlib", "gfpgan", "basicsr", "av", "--extra-index-url", "https://download.pytorch.org/whl/cu118"])
 
     print("🛠️ Patching basicsr for modern torchvision compatibility...")
     import site

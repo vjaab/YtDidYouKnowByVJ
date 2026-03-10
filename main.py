@@ -1,4 +1,5 @@
 import os
+os.environ["PYTHONHASHSEED"] = "0"
 import argparse
 import subprocess
 import time
