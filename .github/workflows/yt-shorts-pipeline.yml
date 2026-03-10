@@ -11,7 +11,7 @@ on:
 jobs:
   run-pipeline:
     runs-on: ubuntu-latest
-    timeout-minutes: 360 # 6 hours to be safe for 3-hour inference + other steps
+    timeout-minutes: 600 # 10 hours to accommodate F5-TTS and SadTalker on CPU
     
     steps:
       - name: Checkout Code
