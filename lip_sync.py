@@ -58,17 +58,31 @@ def _run_sadtalker(face_path, audio_path, output_path, enhancer=None, timeout=10
     
     os.makedirs(result_dir, exist_ok=True)
     
+    is_ci = os.environ.get("GITHUB_ACTIONS") == "true"
+    
     cmd = [
         _get_python_exe(), "inference.py",
         "--driven_audio", audio_path,
         "--source_image", face_path,
         "--result_dir", result_dir,
         "--still",
-        "--preprocess", "full",
-        "--size", "256",
-        "--batch_size", "2",
-        "--cpu"
+        "--preprocess", "full"
     ]
+    
+    # 🏎️ Device & Quality Logic
+    import torch
+    has_gpu = torch.cuda.is_available() or torch.backends.mps.is_available()
+    
+    if is_ci or not has_gpu:
+        cmd.append("--cpu")
+        cmd.extend(["--size", "256", "--batch_size", "2"])
+        print(f"   Mode: CPU (CI/No-GPU) -> Using LITE settings (256px)")
+    else:
+        # High-End Settings for Kaggle GPU / Local Mac GPU
+        cmd.extend(["--size", "512", "--batch_size", "16"])
+        if not enhancer:
+            enhancer = "gfpgan" # Enable high-end face enhancement by default on GPU
+        print(f"   Mode: GPU/MPS -> Using HIGH-END settings (512px + Enhancer)")
     
     if enhancer:
         cmd.extend(["--enhancer", enhancer])
