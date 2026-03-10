@@ -110,3 +110,4 @@ ninja
 resampy
 facexlib
 tqdm
+kaggle

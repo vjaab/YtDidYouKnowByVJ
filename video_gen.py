@@ -1371,7 +1371,10 @@ def create_video(audio_path, script_json, chunks, output_path=None):
 
     # ── AVATAR VIDEO AS PiP (Picture-in-Picture) ──────────────────────────────
     print("Preparing Avatar PiP...")
-    lipsync_path = _generate_lipsync_video(audio_path)
+    lipsync_path = script_json.get("kaggle_lipsync_path")
+    if not lipsync_path or not os.path.exists(lipsync_path):
+        lipsync_path = _generate_lipsync_video(audio_path)
+        
     firefly_path = os.path.join(ASSETS_DIR, "Firefly_video_final.mp4")
     avatar_video_path = lipsync_path if lipsync_path else firefly_path
 

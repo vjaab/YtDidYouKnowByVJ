@@ -136,7 +136,25 @@ def run_pipeline(custom_topic=None, topic_type="research"):
         # ── STEP 4: Generate Audio + Word Timestamps ──────────────────────────
         log_message("STEP 4: Generating voiceover + word timestamps...")
         custom_map = script_data.get("phonetic_pronunciation_map", {})
-        audio_path, duration, word_timestamps = generate_voiceover(script, voice, emotion, custom_phonetic_map=custom_map)
+        
+        is_ci = os.environ.get("GITHUB_ACTIONS") == "true"
+        has_kaggle = os.path.exists(os.path.expanduser("~/.kaggle/kaggle.json"))
+        
+        if is_ci and has_kaggle:
+            from kaggle_handover import trigger_kaggle_gpu_job
+            results = trigger_kaggle_gpu_job(script_data, voice, emotion, custom_map)
+            if results:
+                audio_path = results.get("audio_path")
+                duration = results.get("duration")
+                word_timestamps = results.get("word_timestamps")
+                # Store the lipsync path so we don't regenerate it later
+                script_data["kaggle_lipsync_path"] = results.get("lipsync_path")
+                log_message("✅ Recieved Audio and Lip-Sync from Kaggle GPU!")
+            else:
+                log_message("⚠️ Kaggle Handover failed. Falling back to local generation.")
+                audio_path, duration, word_timestamps = generate_voiceover(script, voice, emotion, custom_phonetic_map=custom_map)
+        else:
+            audio_path, duration, word_timestamps = generate_voiceover(script, voice, emotion, custom_phonetic_map=custom_map)
 
         if not audio_path:
             log_message("ERROR: Audio generation failed.")
