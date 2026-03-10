@@ -49,12 +49,12 @@ def setup_project():
         run_cmd(["git", "clone", "-q", "https://github.com/vjaab/YtDidYouKnowByVJ.git"])
     
     run_cmd(["pip", "install", "-q", "-r", "requirements.txt"], cwd="YtDidYouKnowByVJ")
-    run_cmd(["pip", "install", "-q", "f5-tts", "stable-ts", "torch", "torchvision", "torchaudio", "--extra-index-url", "https://download.pytorch.org/whl/cu118"])
+    run_cmd(["pip", "install", "-q", "f5-tts", "stable-ts", "torch", "torchvision", "torchaudio", "facexlib", "gfpgan", "basicsr", "--extra-index-url", "https://download.pytorch.org/whl/cu118"])
 
     print("🛠️ Patching basicsr for modern torchvision compatibility...")
-    import site
-    site_pkg = site.getsitepackages()[0]
-    degradations_file = os.path.join(site_pkg, "basicsr", "data", "degradations.py")
+    import basicsr
+    basicsr_path = os.path.dirname(basicsr.__file__)
+    degradations_file = os.path.join(basicsr_path, "data", "degradations.py")
     if os.path.exists(degradations_file):
         with open(degradations_file, "r") as f:
             content = f.read()
