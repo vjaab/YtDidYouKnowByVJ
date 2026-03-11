@@ -1093,14 +1093,40 @@ def _render_comment_bait(comment_text, width, height):
         print(f"Comment bait error: {e}")
         return None
 
-def composite_frame(background_frame, timestamp, header_img, subtitle_img):
+def build_transparency_watermark(width, height):
+    """Creates a subtle, high-end transparency watermark for 2026 compliance."""
+    img = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    
+    # Text: "AI HUMAN-IN-THE-LOOP PRODUCTION"
+    text = "AI HUMAN-IN-THE-LOOP PRODUCTION"
+    font = gf(24) # Small, elite typography
+    tw, th = ts(text, font)
+    
+    # Position: Top Right, slightly below the header bar (which is at y=50 usually)
+    x, y = width - tw - 40, 160
+    
+    # Glassmorphism backing
+    rect = [x - 15, y - 8, x + tw + 15, y + th + 8]
+    d.rounded_rectangle(rect, radius=8, fill=(0, 0, 0, 80), outline=(255, 255, 255, 40), width=1)
+    
+    # Semi-transparent text
+    d.text((x, y), text, font=font, fill=(255, 255, 255, 140))
+    
+    return img
+
+def composite_frame(background_frame, timestamp, header_img, subtitle_img, transparency_img=None):
     """Clean talking-head composite: header + subtitles only."""
     frame = Image.fromarray(background_frame).convert('RGBA')
     
     # 1. Header at top
     frame.alpha_composite(header_img, dest=(0, 0))
     
-    # 2. Subtitles
+    # 2. Transparency Watermark (2026 Compliance)
+    if transparency_img is not None:
+        frame.alpha_composite(transparency_img, dest=(0, 0))
+    
+    # 3. Subtitles
     if subtitle_img is not None:
         frame.alpha_composite(subtitle_img, dest=(0, 0))
     
@@ -1606,6 +1632,9 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     
     # Pre-render header (only persistent overlay)
     header_img = render_header_bar(title, sub_category, accent_color, FRAME_W)
+    
+    # Pre-render 2026 Compliance Watermark
+    transparency_img = build_transparency_watermark(FRAME_W, FRAME_H)
 
     def make_final_frame(t):
         bg_frame = base_comp.get_frame(t)
@@ -1644,7 +1673,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                     )
                 break
                 
-        return composite_frame(bg_frame, t, header_img, subtitle_img)
+        return composite_frame(bg_frame, t, header_img, subtitle_img, transparency_img)
 
     final = VideoClip(make_final_frame, duration=audio_duration)
     final = final.with_audio(final_audio)
