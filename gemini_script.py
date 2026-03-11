@@ -66,8 +66,9 @@ def pick_and_generate_script(articles, extra_instruction="", forced_article=None
         )
     else:
         selection_instruction = (
-            f"Analyze the following {content_desc} and pick the SINGLE most engaging one to convert into a 60-second YouTube Short script.\n"
+            f"Analyze the following {content_desc} and pick the SINGLE most engaging one to convert into a 50-52 second YouTube Short script.\n"
             "Choose based on deep technological importance and resonance with everyday moments, avoiding generic tech news. Focus on the core AI breakthrough.\n"
+            "CRITICAL: The final video MUST be under 60 seconds. Target a script length of ~135 words.\n"
         )
 
     day_name, slot, category = get_slot_info()
@@ -95,10 +96,10 @@ NARRATION STYLE:
 
 NARRATIVE ARC CONFIGURATION:
 1. The "Human First" Hook (0-5s): Start with a personal reaction or a direct question to the viewer's life. (e.g., "I think we just lost the war on deepfakes, listen to this...")
-2. The "VJ's Take" (5-20s): The news itself, but filtered through your skepticism or excitement.
-3. The Deep-Dive Analysis (20-40s): Why this is a "Black Swan" event or a predictable corporate move.
+2. The "VJ's Take" (5-15s): The news itself, but filtered through your skepticism or excitement.
+3. The Deep-Dive Analysis (15-40s): Why this is a "Black Swan" event or a predictable corporate move.
 4. The Visual Reset (40-45s): A sudden punchy sentence to wake up the lurkers.
-5. The Infinite Loop (45-58s): Design the ending so the last 3 words logically and phonetically CRASH back into the first sentence. The loop must be "God-Tier" seamless for high retention scores.
+5. The Infinite Loop (45-52s): Design the ending so the last 3 words logically and phonetically CRASH back into the first sentence. The loop must be "God-Tier" seamless for high retention scores.
 
 CRITICAL '2026 SCALE' RULES:
 1. MONETIZATION PROTECTION: YouTube flags "Reused Content." To avoid this, your SCRIPT must contain 3+ sentences of purely original analysis/opinion that isn't in the source text.
@@ -123,7 +124,7 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
   "description": "Full 100+ word rich SEO description for youtube describing the video, including timestamps and credits.",
   "quiz_tone": "Investigative",
   "title": "Punchy YouTube title max 60 chars",
-  "script": "Full voiceover script following the Arc (50-58 sec). Ensure The Loop is implemented.",
+  "script": "Full voiceover script following the Arc (50-52 sec). Aim for 130-140 words max. Ensure The Loop is implemented.",
   "phonetic_pronunciation_map": {{
     "AI": "A.I.",
     "NVIDIA": "en-vid-ee-uh",

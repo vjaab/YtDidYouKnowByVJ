@@ -243,7 +243,7 @@ def _generate_f5_clone(text, output_path):
             ref_text=VJ_REF_TEXT,
             gen_text=chunk,
             file_wave=seg_path,
-            speed=0.95
+            speed=1.02 # Slightly increased speed to ensure strict <60s enforcement
         )
         segment_paths.append(seg_path)
         
