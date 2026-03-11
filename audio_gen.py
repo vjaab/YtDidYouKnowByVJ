@@ -123,6 +123,53 @@ def unload_f5_model():
             torch.cuda.empty_cache()
             torch.cuda.ipc_collect()
 
+# ── Global Phonetic Dictionary (Source of Truth for Audio & Subtitles) ────────
+PHONETIC_DICT = {
+    "instantly": "in-stunt-ly",
+    "only": "own-lee",
+    "incredible": "in-cred-uh-bul",
+    "millions": "mil-yuns",
+    "billions": "bil-yuns",
+    "AI": "A-I",
+    "ML": "M-L",
+    "LLMs": "L-L-M-s",
+    "GPT": "G-P-T",
+    "Pexels": "Pex-uls",
+    "NVIDIA": "En-vid-ee-uh",
+    "DeepSeek": "Deep-Seek",
+    "Hugging": "Hug-ging",
+    "breakthrough": "break-thrue",
+    "capabilities": "kay-puh-bil-uh-teez",
+    "autonomous": "aw-ton-uh-mus",
+    "generative": "jen-er-uh-tiv",
+    "Linux": "Lin-icks",
+    "SQL": "See-kw-uhl",
+    "NGINX": "Engine-X",
+    "PostgreSQL": "Post-gres",
+    "Huawei": "Wah-way",
+    "Xiaomi": "Shau-mee",
+    "JavaScript": "Jah-va-skript",
+    "cache": "kash",
+    "meme": "meem",
+    "GUI": "Goo-ee",
+    "Redis": "Red-iss",
+    "Kubernetes": "Koo-ber-net-eez",
+    "PyTorch": "Pie-Torch",
+    "Meta": "Meh-tah",
+    "SambaNova": "Sam-ba-Noh-vah",
+    "Groq": "Grok",
+    "Mistral": "Miss-trahl",
+    "Mixtral": "Mix-trahl",
+    "Anthropic": "An-throp-ick",
+    "Claude": "Clod",
+    "OpenAI": "Open-A-I",
+    "Stability": "Stah-bil-ih-tee",
+    "Midjourney": "Mid-jur-nee",
+    "Runway": "Run-way",
+    "ElevenLabs": "Eleven-Labs",
+    "Kokoro": "Koh-koh-roh"
+}
+
 # Edge TTS offset is in 100-nanosecond units → divide by 10_000_000 for seconds
 _NS100_PER_SEC = 10_000_000
 
@@ -343,60 +390,13 @@ def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
     
     # 3. Phonetic Cleanups for Clarity
     if phonetic:
-        # Static global tech dictionary
-        phonetic_map = {
-            r'\binstantly\b': 'in-stunt-ly',
-            r'\bonly\b': 'own-lee',
-            r'\bincredible\b': 'in-cred-uh-bul',
-            r'\bmillions\b': 'mil-yuns',
-            r'\bbillions\b': 'bil-yuns',
-            r'\bAI\b': 'A.I.',
-            r'\bML\b': 'M.L.',
-            r'\bLLMs\b': 'L L M s',
-            r'\bGPT\b': 'G P T',
-            r'\bPexels\b': 'Pex-uls',
-            r'\bNVIDIA\b': 'En-vid-ee-uh',
-            r'\bDeepSeek\b': 'Deep-Seek',
-            r'\bHugging Face\b': 'Hug-ging Face',
-            r'\bbreakthrough\b': 'break-thrue',
-            r'\bcapabilities\b': 'kay-puh-bil-uh-teez',
-            r'\bautonomous\b': 'aw-ton-uh-mus',
-            r'\bgenerative\b': 'jen-er-uh-tiv',
-            r'\bLinux\b': 'Lin-icks',
-            r'\bSQL\b': 'See-kw-uhl',
-            r'\bNGINX\b': 'Engine-X',
-            r'\bPostgreSQL\b': 'Post-gres',
-            r'\bHuawei\b': 'Wah-way',
-            r'\bXiaomi\b': 'Shau-mee',
-            r'\bJavaScript\b': 'Jah-va-skript',
-            r'\bcache\b': 'kash',
-            r'\bmeme\b': 'meem',
-            r'\bGUI\b': 'Goo-ee',
-            r'\bRedis\b': 'Red-iss',
-            r'\bKubernetes\b': 'Koo-ber-net-eez',
-            r'\bPyTorch\b': 'Pie-Torch',
-            r'\bMeta\b': 'Meh-tah',
-            r'\bSambaNova\b': 'Sam-ba Noh-vah',
-            r'\bGroq\b': 'Grok',
-            r'\bMistral\b': 'Miss-trahl',
-            r'\bMixtral\b': 'Mix-trahl',
-            r'\bAnthropic\b': 'An-throp-ick',
-            r'\bClaude\b': 'Clod',
-            r'\bOpenAI\b': 'Open A.I.',
-            r'\bStability\b': 'Stah-bil-ih-tee',
-            r'\bMidjourney\b': 'Mid-jur-nee',
-            r'\bRunway\b': 'Run-way',
-            r'\bElevenLabs\b': 'Eleven-Labs',
-            r'\bKokoro\b': 'Koh-koh-roh'
-        }
-        
-        # Merge custom phonetic map from Gemini if provided
+        # Merge global dictionary and custom Gemini map
+        full_map = PHONETIC_DICT.copy()
         if custom_phonetic_map:
-            for word, phonetic_spelling in custom_phonetic_map.items():
-                pattern = r'\b' + re.escape(word) + r'\b'
-                phonetic_map[pattern] = phonetic_spelling
+            full_map.update(custom_phonetic_map)
 
-        for pattern, replacement in phonetic_map.items():
+        for word, replacement in full_map.items():
+            pattern = r'\b' + re.escape(word) + r'\b'
             cleaned = re.sub(pattern, replacement, cleaned, flags=re.IGNORECASE)
     
     # Clean up double spaces
@@ -414,53 +414,29 @@ def restore_original_words(word_timestamps, original_text, custom_phonetic_map=N
     original_words = original_text.split()
     
     # Subtitle Restoration Map (Key: Spoken-Normalized -> Value: Display-Original)
-    restore_map = {
-        "INSTUNTLY": "instantly",
-        "OWNLEE": "only",
-        "INCREDUHBUL": "incredible",
-        "MILYUNS": "millions",
-        "BILYUNS": "billions",
-        "AI": "AI",
-        "ML": "ML",
-        "LLMS": "LLMs",
-        "GPT": "GPT",
-        "PEXULS": "Pexels",
-        "ENVIDEEUH": "NVIDIA",
-        "DEEPSEEK": "DeepSeek",
-        "HUGGING": "Hugging",
-        "BREAKTHRUE": "breakthrough",
-        "KAYPUHBILUHTEEZ": "capabilities",
-        "AWTONUHMUS": "autonomous",
-        "JENERUHTIV": "generative",
-        "LINICKS": "Linux",
-        "SEEKWUHL": "SQL",
-        "ENGINEX": "NGINX",
-        "POSTGRES": "PostgreSQL",
-        "WAHWAY": "Huawei",
-        "SHAUMEE": "Xiaomi",
-        "JAHVASKRIPT": "JavaScript",
-        "KASH": "cache",
-        "MEEM": "meme",
-        "GOOEE": "GUI",
-        "REDISS": "Redis",
-        "KOOBERNETEEZ": "Kubernetes",
-        "PIETORCH": "PyTorch"
-    }
-
-    # Merge custom map inverse for restoration
-    if custom_phonetic_map:
-        for orig_word, phonetic_spelling in custom_phonetic_map.items():
-            phonetic_clean = re.sub(r'[^\w]', '', phonetic_spelling.upper())
-            if phonetic_clean not in restore_map:
-                restore_map[phonetic_clean] = orig_word
+    # Automatically build from global and custom dictionaries
+    restore_map = {}
     
+    # helper to normalize a phonetic string for comparison
+    def norm_key(s): return re.sub(r'[^\w]', '', s.upper())
+    
+    # 1. Add global constants
+    for orig, phonetic in PHONETIC_DICT.items():
+        restore_map[norm_key(phonetic)] = orig
+            
+    # 2. Add custom Gemini map
+    if custom_phonetic_map:
+        for orig, phonetic in custom_phonetic_map.items():
+            restore_map[norm_key(phonetic)] = orig
+
     for i, wt in enumerate(word_timestamps):
-        spoken_clean = re.sub(r'[^\w]', '', wt["word"].upper())
+        spoken_clean = norm_key(wt["word"])
         if spoken_clean in restore_map:
             wt["word"] = restore_map[spoken_clean]
         else:
+            # Fallback: check if it matches the original word directly
             if i < len(original_words):
-                orig_clean = re.sub(r'[^\w]', '', original_words[i].upper())
+                orig_clean = norm_key(original_words[i])
                 if spoken_clean == orig_clean:
                     wt["word"] = original_words[i]
                         
