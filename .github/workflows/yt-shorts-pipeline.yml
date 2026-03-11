@@ -37,14 +37,13 @@ jobs:
           
       - name: Install Project Python Dependencies
         run: |
-          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install --upgrade pip setuptools==69.5.1 wheel
           pip install -r requirements.txt
-          # MuseTalk MMLab dependencies - explicitly install build tools for MMCV source build
-          pip install setuptools==69.5.1 wheel openmim
-          # We use --no-build-isolation because MMCV's setup.py needs pkg_resources (from setuptools)
-          # which is often missing in isolated build environments.
+          # MuseTalk MMLab dependencies - explicitly install build tools
+          pip install setuptools==69.5.1 wheel openmim chumpy
+          # We use mim install to leverage pre-built wheels for mmcv
           mim install mmengine
-          pip install mmcv>=2.1.0 --no-build-isolation
+          mim install "mmcv>=2.1.0"
           mim install "mmdet>=3.1.0" "mmpose>=1.1.0"
           # Explicitly fix potential imageio recursion by forcing latest imageio-ffmpeg last
           pip install --upgrade imageio imageio-ffmpeg moviepy
