@@ -134,10 +134,10 @@ def process_job():
         # 🏅 TIER 1: MuseTalk (Best Quality + Gestures)
         import gc
         import torch
-        gc.collect()
-        torch.cuda.empty_cache()
         
         try:
+            gc.collect()
+            torch.cuda.empty_cache()
             lipsync_path = generate_musetalk(
                 face_path=optimized_face,
                 audio_path=audio_path,
@@ -145,13 +145,16 @@ def process_job():
             )
         except Exception as e:
             print(f"   ⚠ MuseTalk failed: {e}")
+        finally:
+            gc.collect()
+            torch.cuda.empty_cache()
 
         # 🥈 TIER 2: SadTalker Fallback
         if not lipsync_path:
             print("   ↳ Falling back to SadTalker...")
-            gc.collect()
-            torch.cuda.empty_cache()
             try:
+                gc.collect()
+                torch.cuda.empty_cache()
                 lipsync_path = generate_lip_sync(
                     face_path=optimized_face,
                     audio_path=audio_path,
@@ -159,6 +162,9 @@ def process_job():
                 )
             except Exception as e:
                 print(f"   ⚠ SadTalker failed: {e}")
+            finally:
+                gc.collect()
+                torch.cuda.empty_cache()
 
         # 🥉 TIER 3: Raw Fallback (Audio + Original Video)
         if not lipsync_path:
