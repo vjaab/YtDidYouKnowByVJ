@@ -83,8 +83,25 @@ def generate_musetalk(face_path, audio_path, output_path, timeout=10800):
     start_time = time.time()
     try:
         env = os.environ.copy()
-        env["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
-        subprocess.run(cmd, cwd=musetalk_dir, check=True, timeout=timeout, env=env)
+        env["PYTORCH_ALLOC_CONF"] = "expandable_segments:True"
+        
+        result = subprocess.run(
+            cmd, cwd=musetalk_dir, capture_output=True, text=True,
+            timeout=timeout, env=env
+        )
+        
+        if result.returncode != 0:
+            print(f"   ✗ MuseTalk inference exited with code {result.returncode}")
+            if result.stderr:
+                # Print last 2000 chars of stderr for debugging
+                print(f"   STDERR (last 2000 chars):\n{result.stderr[-2000:]}")
+            if result.stdout:
+                print(f"   STDOUT (last 500 chars):\n{result.stdout[-500:]}")
+            return None
+        
+        # Print stdout for progress visibility
+        if result.stdout:
+            print(f"   {result.stdout[-500:]}")
 
         # MuseTalk saves output inside result_dir — find the generated mp4
         generated = _find_musetalk_output(result_dir)
@@ -109,6 +126,8 @@ def generate_musetalk(face_path, audio_path, output_path, timeout=10800):
         return None
     except Exception as e:
         print(f"   ✗ MuseTalk failed: {e}")
+        import traceback
+        traceback.print_exc()
         return None
     finally:
         # Clean up reference frame
