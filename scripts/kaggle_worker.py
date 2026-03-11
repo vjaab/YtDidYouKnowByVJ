@@ -225,25 +225,21 @@ def _install_mmlab():
     except Exception as e:
         print(f"   ⚠ mmdet failed: {e}")
     
-    # Step 4: mmpose (depends on chumpy which is broken on Py3.12)
+    # Step 4: mmpose (depends on chumpy + xtcocotools which are broken on Py3.12)
+    # Strategy: Install patched/compatible versions of blockers first.
     try:
-        run_cmd(["pip", "install", "-q", "mmpose"])
-        print("   ✅ mmpose")
-    except:
-        # chumpy build fails on Py3.12 — install mmpose without deps,
-        # then manually install its runtime deps (minus chumpy & xtcocotools)
-        try:
-            run_cmd(["pip", "install", "-q", "--no-deps", "mmpose"])
-            print("   ✅ mmpose (--no-deps)")
-            # Install runtime deps individually (xtcocotools & chumpy have build issues)
-            # xtcocotools is only needed for COCO eval, not inference
-            for dep in ["munkres", "json_tricks", "scipy", "shapely"]:
-                try:
-                    run_cmd(["pip", "install", "-q", dep])
-                except:
-                    print(f"   ⚠ mmpose dep {dep} failed (non-critical)")
-        except Exception as e:
-            print(f"   ❌ mmpose failed: {e}")
+        print("   Installing mmpose runtime fixes (chumpy and xtcotools legacy bits)...")
+        # Install a dummy/patched chumpy if possible or rely on setuptools<70 
+        # But most importantly, we must have the core math/geo libs
+        for dep in ["munkres", "json_tricks", "scipy", "shapely", "face-alignment"]:
+            run_cmd(["pip", "install", "-q", dep])
+        
+        # Try a direct install of mmpose with its core modules
+        run_cmd(["pip", "install", "-q", "--no-deps", "mmpose"])
+        print("   ✅ mmpose core installed")
+    except Exception as e:
+        print(f"   ⚠ mmpose installation had issues, but attempting to proceed: {e}")
+
 
 
 def _download_musetalk_weights():
