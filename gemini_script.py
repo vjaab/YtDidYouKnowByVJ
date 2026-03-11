@@ -129,15 +129,12 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
   "title": "Punchy YouTube title max 60 chars",
   "script": "Full voiceover script following the Arc (50-52 sec). Aim for 130-140 words max. Ensure The Loop is implemented.",
   "phonetic_pronunciation_map": {{
-    "AI": "A.I.",
-    "NVIDIA": "en-vid-ee-uh",
-    "LLM": "L L M",
-    "Pexels": "Peks-uls",
+    "AI": "A-I",
+    "NVIDIA": "En-vid-ee-uh",
     "Algorithm": "al-go-rith-um",
-    "Synthesize": "sin-thuh-size",
     "Autonomous": "aw-ton-uh-mus"
   }},
-  "NOTE_phonetic_pronunciation_map": "MANDATORY: Identify EVERY word with >2 syllables, any tech term, or any word that could POSSIBLY be mispronounced. Provide a phonetic-only respelling for the TTS model. If in doubt, spell it out. This is the #1 priority for audio quality. This corrected text is what will be SPOKEN, but the subtitles will show the ORIGINAL spelling.",
+  "NOTE_phonetic_pronunciation_map": "MANDATORY LEXICAL AUDIT: Identify EVERY word that is: 1) A tech/scientific term, 2) A word with >3 syllables, 3) A homograph with ambiguous sounds (e.g., 'read' vs 'read'), or 4) Any English word that a machine might pronounce 'flat' or wrong. Provide a hyphenated phonetic respelling. This corrected text is what will be SPOKEN, but subtitles will show ORIGINAL text.",
   "hook": "Matches the first sentence of the script",
   "summary": "One line summary",
   "sub_category": "AI/Machine Learning",
