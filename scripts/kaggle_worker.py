@@ -240,57 +240,122 @@ def _install_mmlab():
 
 def _download_musetalk_weights():
     """
-    Download MuseTalk model weights via huggingface_hub.
+    Download MuseTalk model weights from multiple HuggingFace repos.
     
-    IMPORTANT: The HF repo has files like:
-      models/musetalkV15/unet.pth
-      models/sd-vae-ft-mse/diffusion_pytorch_model.bin  
-      models/whisper/tiny.pt
-      models/dwpose/dw-ll_ucoco_384.pth
+    The TMElyralab/MuseTalk HF repo has files at ROOT (no models/ prefix):
+      musetalk/musetalk.json, musetalk/pytorch_model.bin
+      musetalkV15/musetalk.json, musetalkV15/unet.pth
     
-    Our code checks: MuseTalk/models/musetalkV15/unet.pth
-    So we download into MuseTalk/ (NOT MuseTalk/models/) because
-    the repo already has the models/ prefix in its file paths.
+    Other weights come from separate repos:
+      stabilityai/sd-vae-ft-mse  → models/sd-vae/
+      openai/whisper-tiny        → models/whisper/
+      yzd-v/DWPose               → models/dwpose/
     """
     print("📥 Downloading MuseTalk model weights...")
     
+    models_dir = os.path.join("MuseTalk", "models")
+    os.makedirs(models_dir, exist_ok=True)
+    
     try:
-        from huggingface_hub import snapshot_download
+        from huggingface_hub import snapshot_download, hf_hub_download
         
-        # Download into MuseTalk/ root — repo files already have models/ prefix
+        # ── 1. MuseTalk core model (v1.0 + v1.5) ────────────────────────
+        # Repo has files like: musetalkV15/unet.pth (NO models/ prefix)
+        # Download into MuseTalk/models/ so path becomes models/musetalkV15/unet.pth
+        print("   [1/5] Downloading MuseTalk model weights...")
         snapshot_download(
             repo_id='TMElyralab/MuseTalk',
-            local_dir='MuseTalk',
-            allow_patterns=[
-                'models/musetalk/*',
-                'models/musetalkV15/*', 
-                'models/dwpose/*',
-                'models/sd-vae-ft-mse/*',
-                'models/whisper/*',
-                'models/face-parse-bisent/*',
-            ]
+            local_dir=models_dir,
+            allow_patterns=['musetalk/*', 'musetalkV15/*']
+        )
+
+        # ── 2. SD-VAE (Stable Diffusion VAE) ─────────────────────────────
+        # MuseTalk's load_all_model() uses vae_type="sd-vae" → models/sd-vae/
+        print("   [2/5] Downloading SD-VAE weights...")
+        sd_vae_dir = os.path.join(models_dir, "sd-vae")
+        os.makedirs(sd_vae_dir, exist_ok=True)
+        snapshot_download(
+            repo_id='stabilityai/sd-vae-ft-mse',
+            local_dir=sd_vae_dir,
+            allow_patterns=['config.json', 'diffusion_pytorch_model.bin', 'diffusion_pytorch_model.safetensors']
         )
         
-        # Verify critical files exist
-        critical_files = [
-            "MuseTalk/models/musetalkV15/unet.pth",
-            "MuseTalk/models/sd-vae-ft-mse/diffusion_pytorch_model.bin",
-        ]
-        for f in critical_files:
-            if os.path.exists(f):
-                size_mb = os.path.getsize(f) / (1024*1024)
-                print(f"   ✅ {f} ({size_mb:.1f}MB)")
-            else:
-                print(f"   ⚠ MISSING: {f}")
+        # ── 3. Whisper (audio encoder) ───────────────────────────────────
+        print("   [3/5] Downloading Whisper weights...")
+        whisper_dir = os.path.join(models_dir, "whisper")
+        os.makedirs(whisper_dir, exist_ok=True)
+        snapshot_download(
+            repo_id='openai/whisper-tiny',
+            local_dir=whisper_dir,
+            allow_patterns=['config.json', 'pytorch_model.bin', 'preprocessor_config.json',
+                          'model.safetensors', 'tokenizer.json', 'vocab.json', 'merges.txt',
+                          'normalizer.json', 'special_tokens_map.json', 'added_tokens.json']
+        )
         
-        print("   ✅ Weight download complete.")
-    except Exception as e:
-        print(f"   ❌ HF download failed: {e}")
-        # Last resort: bash script
+        # ── 4. DWPose (body pose estimation) ─────────────────────────────
+        print("   [4/5] Downloading DWPose weights...")
+        dwpose_dir = os.path.join(models_dir, "dwpose")
+        os.makedirs(dwpose_dir, exist_ok=True)
         try:
-            run_cmd(["bash", "download_weights.sh"], cwd="MuseTalk")
+            hf_hub_download(
+                repo_id='yzd-v/DWPose',
+                filename='dw-ll_ucoco_384.pth',
+                local_dir=dwpose_dir
+            )
+        except Exception as e:
+            print(f"   ⚠ DWPose download failed: {e}")
+        
+        # ── 5. Face Parse BiSeNet ────────────────────────────────────────
+        print("   [5/5] Downloading Face Parse weights...")
+        face_parse_dir = os.path.join(models_dir, "face-parse-bisent")
+        os.makedirs(face_parse_dir, exist_ok=True)
+        try:
+            # gdown for Google Drive file
+            run_cmd([
+                "gdown", "--id", "154JgKpzCPW82qINcVieuPH3fZ2e0P812",
+                "-O", os.path.join(face_parse_dir, "79999_iter.pth")
+            ])
         except:
-            print("   ❌ Weight download completely failed.")
+            print("   ⚠ Face parse gdown failed")
+        try:
+            run_cmd([
+                "curl", "-sL",
+                "https://download.pytorch.org/models/resnet18-5c106cde.pth",
+                "-o", os.path.join(face_parse_dir, "resnet18-5c106cde.pth")
+            ])
+        except:
+            print("   ⚠ ResNet18 download failed")
+        
+        # ── Verify critical files ────────────────────────────────────────
+        critical = {
+            "MuseTalk UNet v1.5": os.path.join(models_dir, "musetalkV15", "unet.pth"),
+            "SD-VAE": os.path.join(models_dir, "sd-vae", "diffusion_pytorch_model.bin"),
+            "Whisper": os.path.join(models_dir, "whisper", "pytorch_model.bin"),
+            "DWPose": os.path.join(models_dir, "dwpose", "dw-ll_ucoco_384.pth"),
+        }
+        all_ok = True
+        for name, path in critical.items():
+            # Also check for safetensors variant
+            alt_path = path.replace('.bin', '.safetensors')
+            if os.path.exists(path):
+                size_mb = os.path.getsize(path) / (1024*1024)
+                print(f"   ✅ {name}: {size_mb:.1f}MB")
+            elif os.path.exists(alt_path):
+                size_mb = os.path.getsize(alt_path) / (1024*1024)
+                print(f"   ✅ {name}: {size_mb:.1f}MB (safetensors)")
+            else:
+                print(f"   ❌ MISSING: {name} ({path})")
+                all_ok = False
+        
+        if all_ok:
+            print("   ✅ All weights verified.")
+        else:
+            print("   ⚠ Some weights missing — MuseTalk may fall back to SadTalker.")
+            
+    except Exception as e:
+        print(f"   ❌ Weight download failed: {e}")
+        import traceback
+        traceback.print_exc()
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
