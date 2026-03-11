@@ -97,3 +97,6 @@ tqdm
 kaggle
 stable-ts
 torch
+diffusers
+transformers
+accelerate

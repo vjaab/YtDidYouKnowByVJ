@@ -16,33 +16,34 @@ def run_cmd(cmd, cwd=None, quiet=False):
         print(f"Executing: {' '.join(cmd)}")
         subprocess.run(cmd, cwd=cwd, check=True)
 
+def setup_musetalk():
+    if not os.path.isdir("MuseTalk"):
+        print("📥 Cloning MuseTalk...")
+        run_cmd(["git", "clone", "-q", "https://github.com/TMElyralab/MuseTalk.git"])
+        
+        # MuseTalk Dependencies
+        print("📦 Installing MuseTalk Environment (MMCV, MMPose)...")
+        run_cmd(["pip", "install", "-q", "-U", "openmim"])
+        run_cmd(["mim", "install", "mmcv>=2.0.1"])
+        run_cmd(["mim", "install", "mmengine"])
+        run_cmd(["mim", "install", "mmpose>=1.1.0"])
+        
 def setup_sadtalker():
     if not os.path.isdir("SadTalker"):
         print("📥 Cloning SadTalker...")
-        run_cmd(["git", "clone", "-q", "https://github.com/OpenTalker/SadTalker.git"])
+        run_cmd(["git", "-C", ".", "clone", "-q", "https://github.com/OpenTalker/SadTalker.git"])
         
         # Apply patches
         print("🛠️ Patching SadTalker for modern environments...")
-        # (Same patches as used in GitHub Actions)
-        arch_file = "SadTalker/src/face3d/util/my_awing_arch.py"
-        if os.path.exists(arch_file):
-            with open(arch_file, 'r') as f: content = f.read()
-            with open(arch_file, 'w') as f: f.write(content.replace("np.float", "float"))
-            
         prep_file = "SadTalker/src/face3d/util/preprocess.py"
         if os.path.exists(prep_file):
             with open(prep_file, 'r') as f: content = f.read()
             import re
-            content = re.sub(r'trans_params = np\.array\(\[w0, h0, s, t\[0\], t\[1\]\]\)', 
-                            'trans_params = np.array([w0, h0, s, t[0].item(), t[1].item()])', content)
-            content = content.replace('.astype(np.int32)', '.astype(int)')
-            content = content.replace('np.VisibleDeprecationWarning', 'Warning') # Patch for NumPy 2.0+
+            content = content.replace('np.VisibleDeprecationWarning', 'Warning')
             with open(prep_file, 'w') as f: f.write(content)
 
-        # Download weight (Efficiently)
         print("📥 Downloading SadTalker Weights...")
         os.makedirs("SadTalker/checkpoints", exist_ok=True)
-        # Using a faster mirror or direct download if possible
         run_cmd(["bash", "scripts/download_models.sh"], cwd="SadTalker", quiet=True)
 
 def setup_project():
@@ -59,6 +60,7 @@ def setup_project():
         "facexlib", "gfpgan", "basicsr", "av", "yacs", "kornia", 
         "librosa", "resampy", "imageio-ffmpeg", "pyyaml", "joblib", 
         "scikit-image", "safetensors", "trimesh", "face-alignment",
+        "diffusers", "transformers", "accelerate",
         "--extra-index-url", "https://download.pytorch.org/whl/cu118"])
 
     print("🛠️ Patching basicsr for modern torchvision compatibility...")
@@ -96,32 +98,31 @@ def process_job():
         return
 
     try:
-        # Reconstruct the script/audio state
         sys.path.append(os.getcwd())
-        from audio_gen import generate_voiceover
+        from audio_gen import generate_voiceover, unload_f5_model
         from lip_sync import generate_lip_sync
+        from musetalk_sync import generate_musetalk
         
         script = job_data.get("script")
         voice = job_data.get("voice")
         emotion = job_data.get("emotion")
         custom_map = job_data.get("custom_map")
         
-        # 1. GPU Audio
+        # 🟢 STEP 1: GPU Audio (F5-TTS)
         audio_path, duration, word_timestamps = generate_voiceover(
             script, voice, emotion, custom_phonetic_map=custom_map
         )
         
-        # 🔓 Unload F5-TTS to free up GPU for SadTalker
-        from audio_gen import unload_f5_model
+        # 🔓 Unload F5-TTS
         unload_f5_model()
         
-        # 2. GPU Lip-Sync
+        # 🟢 STEP 2: Prep Assets & Optimize
         face_path = "assets/Firefly_video_final.mp4"
         optimized_face = "assets/Firefly_video_optimized.mp4"
         lipsync_out = "kaggle_lipsync.mp4"
+        lipsync_path = None
         
-        # 🏎️ Resize template to 512px width to prevent System RAM OOM on Kaggle
-        print("🏎️ Optimizing template resolution for RAM safety...")
+        print("🏎️ Optimizing template resolution (512px) for RAM safety...")
         run_cmd([
             "ffmpeg", "-y", "-i", face_path, 
             "-vf", "scale=512:-1", 
@@ -129,25 +130,46 @@ def process_job():
             optimized_face
         ])
         
-        lipsync_path = generate_lip_sync(
-            face_path=optimized_face,
-            audio_path=audio_path,
-            output_path=lipsync_out
-        )
+        # 🏅 TIER 1: MuseTalk (Best Quality + Gestures)
+        try:
+            lipsync_path = generate_musetalk(
+                face_path=optimized_face,
+                audio_path=audio_path,
+                output_path=lipsync_out
+            )
+        except Exception as e:
+            print(f"   ⚠ MuseTalk failed: {e}")
+
+        # 🥈 TIER 2: SadTalker Fallback
+        if not lipsync_path:
+            print("   ↳ Falling back to SadTalker...")
+            try:
+                lipsync_path = generate_lip_sync(
+                    face_path=optimized_face,
+                    audio_path=audio_path,
+                    output_path=lipsync_out
+                )
+            except Exception as e:
+                print(f"   ⚠ SadTalker failed: {e}")
+
+        # 🥉 TIER 3: Raw Fallback (Audio + Original Video)
+        if not lipsync_path:
+            print("   ↳ ⚠ ALL AI Engines Failed. Falling back to RAW video...")
+            shutil.copy(face_path, lipsync_out)
+            lipsync_path = lipsync_out
         
-        # 3. Save Results for Pipeline Retrieval
+        # 🟢 STEP 3: Save Results
         results = {
             "audio_path": os.path.basename(audio_path),
             "duration": duration,
             "word_timestamps": word_timestamps,
-            "lipsync_path": os.path.basename(lipsync_path) if lipsync_path else None
+            "lipsync_path": os.path.basename(lipsync_path)
         }
         
-        # Copy outputs to /kaggle/working/
+        # Final Output Transfer
         rel_audio_path = audio_path.split("YtDidYouKnowByVJ/")[-1] 
         shutil.copy(os.path.join(os.getcwd(), rel_audio_path), "..")
-        if lipsync_path and os.path.exists(os.path.join(os.getcwd(), lipsync_path)):
-            shutil.copy(os.path.join(os.getcwd(), lipsync_path), "..")
+        shutil.copy(os.path.join(os.getcwd(), lipsync_out), "..")
             
         with open("../results.json", "w") as f:
             json.dump(results, f)
@@ -162,12 +184,14 @@ def process_job():
             shutil.rmtree("YtDidYouKnowByVJ", ignore_errors=True)
         if os.path.isdir("SadTalker"):
             shutil.rmtree("SadTalker", ignore_errors=True)
+        if os.path.isdir("MuseTalk"):
+            shutil.rmtree("MuseTalk", ignore_errors=True)
 
 if __name__ == "__main__":
     print("--- Kaggle Worker Initiated ---")
     setup_project()
-    # Change into the project directory so all relative paths align perfectly for lip_sync.py and Kaggle CLI
     os.chdir("YtDidYouKnowByVJ") 
+    setup_musetalk()
     setup_sadtalker()
     process_job()
     print("--- Job Finished ---")
