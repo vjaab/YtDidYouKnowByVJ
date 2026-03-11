@@ -111,6 +111,10 @@ def process_job():
         script, voice, emotion, custom_phonetic_map=custom_map
     )
     
+    # 🔓 Unload F5-TTS to free up GPU for SadTalker
+    from audio_gen import unload_f5_model
+    unload_f5_model()
+    
     # 2. GPU Lip-Sync
     face_path = "assets/Firefly_video_final.mp4"
     lipsync_out = "kaggle_lipsync.mp4"

@@ -79,7 +79,8 @@ def _run_sadtalker(face_path, audio_path, output_path, enhancer=None, timeout=10
         print(f"   Mode: CPU (CI/No-GPU) -> Using LITE settings (256px)")
     else:
         # High-End Settings for Kaggle GPU / Local Mac GPU
-        cmd.extend(["--size", "512", "--batch_size", "16"])
+        # Reduced batch_size from 16 to 4 to prevent OOM on T4 GPUs
+        cmd.extend(["--size", "512", "--batch_size", "4"])
         if not enhancer:
             enhancer = "gfpgan" # Enable high-end face enhancement by default on GPU
         print(f"   Mode: GPU/MPS -> Using HIGH-END settings (512px + Enhancer)")
@@ -91,6 +92,8 @@ def _run_sadtalker(face_path, audio_path, output_path, enhancer=None, timeout=10
     
     env = os.environ.copy()
     env["PYTHONHASHSEED"] = "0" # Fix for SadTalker fatal hardware/hash seed error
+    # Prevents fragmentation in limited memory environments
+    env["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
     
     try:
         result = subprocess.run(

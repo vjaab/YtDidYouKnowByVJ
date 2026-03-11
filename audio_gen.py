@@ -104,6 +104,19 @@ def _get_f5_model():
         _f5_instance = F5TTS(device=device)
     return _f5_instance
 
+def unload_f5_model():
+    """Explicitly unload F5-TTS model from GPU to free up memory."""
+    global _f5_instance
+    if _f5_instance is not None:
+        import torch
+        import gc
+        print("🧹 Unloading F5-TTS model and clearing CUDA cache...")
+        _f5_instance = None
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            torch.cuda.ipc_collect()
+
 # Edge TTS offset is in 100-nanosecond units → divide by 10_000_000 for seconds
 _NS100_PER_SEC = 10_000_000
 
