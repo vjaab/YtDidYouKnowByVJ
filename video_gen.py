@@ -1393,8 +1393,8 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         else:
             vid_clip = vid_clip.subclipped(0, audio_duration)
 
-        width_pip = 450
-        height_pip = 680
+        width_pip = 414
+        height_pip = 736
         w, h = vid_clip.size
         # central crop matching aspect ratio of width_pip/height_pip
         target_aspect = width_pip / height_pip
