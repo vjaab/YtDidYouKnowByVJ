@@ -39,6 +39,12 @@ def _apply_stable_ts(audio_path, text):
                     })
         if word_timestamps:
             print(f"stable-ts extracted {len(word_timestamps)} real word timestamps.")
+            # Explicitly cleanup model to free VRAM
+            del model
+            import gc
+            gc.collect()
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
             return word_timestamps
     except Exception as e:
         print(f"stable-ts unavailable or failed: {e}")
@@ -294,6 +300,12 @@ def _generate_kokoro(text, output_path):
         word_timestamps = _estimate_timestamps(text, duration)
         
     print(f"Kokoro done: {duration:.2f}s | {len(word_timestamps)} word timestamps")
+    
+    # Explicitly cleanup Kokoro to free memory
+    del kokoro
+    import gc
+    gc.collect()
+    
     return wav_path, duration, word_timestamps
 
 
