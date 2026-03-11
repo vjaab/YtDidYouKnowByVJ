@@ -60,13 +60,24 @@ def _run_sadtalker(face_path, audio_path, output_path, enhancer=None, timeout=10
     
     is_ci = os.environ.get("GITHUB_ACTIONS") == "true"
     
+    preprocess = "full"
+    # LONG-FORM RAM OPTIMIZATION: If audio > 60s, use "crop" instead of "full" 
+    # to avoid massive system RAM consumption during seamlessClone.
+    try:
+        from audio_gen import get_audio_duration
+        duration = get_audio_duration(audio_path)
+        if duration > 60:
+            print(f"   ⚠️ Long-form detected ({duration:.1f}s). Switching to 'crop' mode to save RAM.")
+            preprocess = "crop"
+    except: pass
+    
     cmd = [
         _get_python_exe(), "inference.py",
         "--driven_audio", audio_path,
         "--source_image", face_path,
         "--result_dir", result_dir,
         "--still",
-        "--preprocess", "full"
+        "--preprocess", preprocess
     ]
     
     # 🏎️ Device & Quality Logic
@@ -74,16 +85,26 @@ def _run_sadtalker(face_path, audio_path, output_path, enhancer=None, timeout=10
     has_gpu = torch.cuda.is_available() or torch.backends.mps.is_available()
     
     if is_ci or not has_gpu:
-        cmd.append("--cpu")
-        cmd.extend(["--size", "256", "--batch_size", "2"])
+        cmd.extend(["--cpu", "--size", "256", "--batch_size", "2"])
         print(f"   Mode: CPU (CI/No-GPU) -> Using LITE settings (256px)")
     else:
         # High-End Settings for Kaggle GPU / Local Mac GPU
-        # Reduced batch_size from 16 to 4 to prevent OOM on T4 GPUs
-        cmd.extend(["--size", "512", "--batch_size", "4"])
+        # Reduced batch_size further from 4 to 2 to minimize RAM overhead for stitching
+        cmd.extend(["--size", "512", "--batch_size", "2"])
+        
+        # Disable enhancer for long videos to prevent RAM OOM during final stitching
+        try:
+            from audio_gen import get_audio_duration
+            if get_audio_duration(audio_path) > 60:
+                print(f"   ⚠️ Long-form detected. Disabling enhancer to prevent System RAM OOM.")
+                enhancer = None
+        except: pass
+
         if not enhancer:
-            enhancer = "gfpgan" # Enable high-end face enhancement by default on GPU
-        print(f"   Mode: GPU/MPS -> Using HIGH-END settings (512px + Enhancer)")
+            pass # No enhancer
+        else:
+            if not enhancer: enhancer = "gfpgan"
+            print(f"   Mode: GPU/MPS -> Using HIGH-END settings (512px + Enhancer)")
     
     if enhancer:
         cmd.extend(["--enhancer", enhancer])
