@@ -21,76 +21,104 @@ def setup_musetalk():
         print("📥 Cloning MuseTalk...")
         run_cmd(["git", "clone", "-q", "https://github.com/TMElyralab/MuseTalk.git"])
         
-        # MuseTalk's own Python dependencies — but we MUST filter out packages
-        # that conflict with Kaggle's pre-installed versions
-        print("📦 Installing MuseTalk requirements (filtered)...")
-        skip_packages = {
-            "numpy", "opencv-python", "opencv-contrib-python", 
-            "torch", "torchvision", "torchaudio", 
-            "g2p-en", "g2p_en",
-            "tensorflow", "tensorflow-gpu", "tf-keras", "keras",
-            "tensorboard", "tensorboard-data-server",
-        }
-        musetalk_req = os.path.join("MuseTalk", "requirements.txt")
-        if os.path.exists(musetalk_req):
-            with open(musetalk_req, "r") as f:
-                lines = f.readlines()
-            filtered = []
-            for line in lines:
-                line_stripped = line.strip()
-                if not line_stripped or line_stripped.startswith("#"):
-                    continue
-                # Extract package name (before any version specifier)
-                pkg_name = line_stripped.split(">=")[0].split("<=")[0].split("==")[0].split("<")[0].split(">")[0].split("[")[0].strip()
-                if pkg_name.lower().replace("-", "_") in {p.replace("-", "_") for p in skip_packages}:
-                    print(f"   ⏭️  Skipping '{line_stripped}' (already installed on Kaggle)")
-                    continue
-                # Strip exact version pins (==X.Y.Z) — Kaggle's Python 3.12 needs newer versions
-                import re as _re
-                cleaned_line = _re.sub(r'==[\d.]+', '', line_stripped)
-                filtered.append(cleaned_line)
-            
-            # Write filtered requirements to a temp file
-            filtered_req = os.path.join("MuseTalk", "requirements_filtered.txt")
-            with open(filtered_req, "w") as f:
-                f.write("\n".join(filtered))
-            
-            print(f"   Filtered requirements ({len(filtered)} packages):")
-            for pkg in filtered[:10]:
-                print(f"     → {pkg}")
-            if len(filtered) > 10:
-                print(f"     ... and {len(filtered) - 10} more")
-            
-            # Non-fatal install — MuseTalk deps shouldn't crash the pipeline
-            try:
-                run_cmd(["pip", "install", "-q", "-r", filtered_req], cwd=".")
-            except Exception as e:
-                print(f"   ⚠ Some MuseTalk deps failed (non-fatal): {e}")
+        # ═══════════════════════════════════════════════════════════════════
+        # BYPASS MuseTalk's broken requirements.txt entirely.
+        # It pins ancient versions (tensorflow==2.12.0, numpy==1.23.5, etc.)
+        # that don't exist on Kaggle's Python 3.12.
+        #
+        # Instead, we install EXACTLY what MuseTalk inference needs at runtime:
+        #   scripts/inference.py → imports from musetalk.utils.*
+        #   musetalk/utils/* → imports diffusers, transformers, mmpose, etc.
+        # ═══════════════════════════════════════════════════════════════════
+        print("📦 Installing MuseTalk runtime dependencies (curated list)...")
         
-        # MMLab Dependencies — non-fatal (mmcv build frequently fails)
-        print("📦 Installing MMLab stack (mmcv, mmpose)...")
-        for mmlab_cmd in [
-            ["pip", "install", "-q", "-U", "openmim", "setuptools", "wheel"],
-            ["pip", "install", "-q", "chumpy", "--no-build-isolation"],
-            ["mim", "install", "mmengine"],
-            ["pip", "install", "-q", "mmcv>=2.0.1", "--no-build-isolation"],
-            ["mim", "install", "mmdet>=3.1.0"],
-            ["mim", "install", "mmpose>=1.1.0"],
-        ]:
-            try:
-                run_cmd(mmlab_cmd)
-            except Exception as e:
-                print(f"   ⚠ MMLab install failed (non-fatal): {' '.join(mmlab_cmd)} → {e}")
+        # Core ML deps that MuseTalk actually imports (Kaggle already has torch/numpy/opencv)
+        musetalk_deps = [
+            "diffusers",           # UNet, VAE decoder
+            "accelerate",          # HuggingFace model loading
+            "transformers",        # Whisper audio features
+            "huggingface_hub",     # Model downloads
+            "einops",              # Tensor reshaping in UNet
+            "omegaconf",           # Config parsing
+            "soundfile",           # Audio I/O
+            "librosa",             # Audio feature extraction
+            "gradio",              # (may be imported but not used for inference)
+            "gdown",               # Weight downloads
+            "ffmpeg-python",       # Video processing
+            "moviepy",             # Video composition
+            "imageio[ffmpeg]",     # Frame I/O
+        ]
         
-        # Download model weights
+        # Install all deps in a single pip call for efficiency
+        try:
+            run_cmd(["pip", "install", "-q"] + musetalk_deps)
+            print("   ✅ MuseTalk core deps installed")
+        except Exception as e:
+            print(f"   ⚠ Some MuseTalk deps failed: {e}")
+            # Fallback: install one-by-one so partial failures don't block
+            for dep in musetalk_deps:
+                try:
+                    run_cmd(["pip", "install", "-q", dep])
+                except Exception:
+                    print(f"   ⚠ Skipping {dep}")
+        
+        # ── MMLab Stack (mmcv + mmpose + mmdet) ──────────────────────────
+        # These are the hardest packages. Use pre-built wheels where possible.
+        print("📦 Installing MMLab stack...")
+        mmlab_steps = [
+            (["pip", "install", "-q", "-U", "openmim", "setuptools", "wheel"], "openmim"),
+            (["mim", "install", "mmengine"], "mmengine"),
+            (["pip", "install", "-q", "mmcv>=2.0.1", "--no-build-isolation"], "mmcv"),
+            (["mim", "install", "mmdet>=3.1.0"], "mmdet"),
+            (["mim", "install", "mmpose>=1.1.0"], "mmpose"),
+        ]
+        
+        mmlab_ok = True
+        for cmd, name in mmlab_steps:
+            try:
+                run_cmd(cmd)
+                print(f"   ✅ {name}")
+            except Exception as e:
+                print(f"   ❌ {name} failed: {e}")
+                mmlab_ok = False
+        
+        if not mmlab_ok:
+            print("   ⚠ MMLab stack incomplete — MuseTalk may fall back to SadTalker")
+        
+        # ── Download MuseTalk model weights ──────────────────────────────
         print("📥 Downloading MuseTalk model weights...")
         weight_script = os.path.join("MuseTalk", "download_weights.sh")
         if os.path.exists(weight_script):
-            run_cmd(["bash", "download_weights.sh"], cwd="MuseTalk")
+            try:
+                run_cmd(["bash", "download_weights.sh"], cwd="MuseTalk")
+            except Exception as e:
+                print(f"   ⚠ Weight download failed: {e}")
+                print("   Attempting manual weight download via Python...")
+                _download_musetalk_weights_manual()
         else:
-            print("   ⚠ download_weights.sh not found, weights must be manually placed.")
+            print("   ⚠ download_weights.sh not found, attempting manual download...")
+            _download_musetalk_weights_manual()
     else:
         print("✓ MuseTalk already set up.")
+
+
+def _download_musetalk_weights_manual():
+    """Fallback weight download if download_weights.sh fails."""
+    import subprocess
+    models_dir = os.path.join("MuseTalk", "models")
+    os.makedirs(models_dir, exist_ok=True)
+    
+    # Download via huggingface_hub if available
+    try:
+        run_cmd([
+            "python3", "-c",
+            "from huggingface_hub import snapshot_download; "
+            "snapshot_download('TMElyralab/MuseTalk', local_dir='MuseTalk/models', "
+            "allow_patterns=['musetalk/*', 'musetalkV15/*', 'dwpose/*', 'sd-vae-ft-mse/*', 'whisper/*'])"
+        ])
+        print("   ✅ Weights downloaded via huggingface_hub")
+    except Exception as e:
+        print(f"   ⚠ Manual weight download failed: {e}")
 
         
 def setup_sadtalker():
