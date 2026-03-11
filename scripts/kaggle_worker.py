@@ -226,19 +226,28 @@ def _install_mmlab():
         print(f"   ⚠ mmdet failed: {e}")
     
     # Step 4: mmpose (depends on chumpy + xtcocotools which are broken on Py3.12)
-    # Strategy: Install patched/compatible versions of blockers first.
+    def _mock_chumpy():
+        import sys
+        from unittest.mock import MagicMock
+        mock = MagicMock()
+        # Some versions check for __version__ or specific attributes
+        mock.__version__ = "0.70"
+        sys.modules["chumpy"] = mock
+        print("   ✅ Mocked 'chumpy' for Python 3.12 compatibility")
+
     try:
-        print("   Installing mmpose runtime fixes (chumpy and xtcotools legacy bits)...")
-        # Install a dummy/patched chumpy if possible or rely on setuptools<70 
-        # But most importantly, we must have the core math/geo libs
+        print("   Configuring mmpose and runtime fixes...")
+        _mock_chumpy()
+        # Install secondary deps individually (skipping broken xtcocotools)
         for dep in ["munkres", "json_tricks", "scipy", "shapely", "face-alignment"]:
             run_cmd(["pip", "install", "-q", dep])
         
-        # Try a direct install of mmpose with its core modules
+        # Install mmpose core
         run_cmd(["pip", "install", "-q", "--no-deps", "mmpose"])
-        print("   ✅ mmpose core installed")
+        print("   ✅ mmpose core installed and mocked")
     except Exception as e:
-        print(f"   ⚠ mmpose installation had issues, but attempting to proceed: {e}")
+        print(f"   ⚠ mmpose setup had issues: {e}")
+
 
 
 
