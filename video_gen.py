@@ -848,44 +848,39 @@ def render_telegram_cta(accent_color, frame_width=1080):
 # ── LAYER 16: Article Screenshot (New Layer) ──────────────────────────────────
 def _article_screenshot_clip(screenshot_path, duration):
     """
-    Transformative PiP logic: Shows the source article as a cited piece of evidence
-    instead of just a background, which satisfies YouTube's 'Fair Use' commentary policy.
+    Transformative Fullscreen logic: Shows the source article as the main visual for a segment
+    to prove it's an external source and satisfy YouTube's 'Fair Use' commentary policy.
     """
     if not screenshot_path or not os.path.exists(screenshot_path):
         return None
     try:
+        # Load and verify image
         img = Image.open(screenshot_path).convert("RGBA")
         
-        # Citation Size: 800x1200 (mobile portrait aspect)
-        cite_w = 720
-        cite_h = 1080
-        img = img.resize((cite_w, cite_h), Image.LANCZOS)
-        
-        # Add a white 'Citation Border' to prove it's an external source
-        border = 10
-        bordered = Image.new("RGBA", (cite_w + border*2, cite_h + border*2), (255, 255, 255, 255))
-        bordered.paste(img, (border, border))
-        img = bordered
+        # Fullscreen Resize: 1080x1920
+        img = img.resize((FRAME_W, FRAME_H), Image.LANCZOS)
         
         arr = np.array(img.convert("RGB"))
         mask = np.array(img.split()[3]).astype(float) / 255.0
         
-        # Animation: Slide in from right at 12s (Deep Dive phase)
+        # Timing: Start at 12s (Deep Dive phase)
         start_ts = 12.0
-        display_dur = min(8.0, duration - start_ts)
+        display_dur = min(12.0, duration - start_ts)
         if display_dur <= 0: return None
         
+        # Create base clip
         clip = ImageClip(arr, duration=display_dur)
         mclip = VideoClip(lambda t: mask, is_mask=True, duration=display_dur)
         
-        def pos(t):
-            if t < 0.6: # 0.6s Slide in
-                return (FRAME_W - int((FRAME_W - (FRAME_W - cite_w - 40)) * (t/0.6)), 200)
-            return (FRAME_W - cite_w - 40, 200)
-
-        # Subtle rotation for 'Depth'
-        clip = clip.with_mask(mclip).with_position(pos).with_start(start_ts)
-        clip = clip.with_effects([vfx.CrossFadeIn(0.4), vfx.CrossFadeOut(0.4)])
+        # Animation: Fade in + Subtle Zoom (Ken Burns) for high-end look
+        clip = clip.resized(lambda t: 1.0 + 0.04 * (t / display_dur))
+        
+        # Positioning: Fullscreen centered
+        clip = clip.with_mask(mclip).with_position(("center", "center")).with_start(start_ts)
+        
+        # Transitions
+        clip = clip.with_effects([vfx.CrossFadeIn(0.5), vfx.CrossFadeOut(0.5)])
+        
         return clip
         
     except Exception as e:
