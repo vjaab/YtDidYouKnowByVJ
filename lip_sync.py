@@ -163,14 +163,7 @@ def _postprocess_sadtalker(input_path, output_path):
 
 def generate_lip_sync(face_path, audio_path, output_path, enhancer=None, timeout=10800):
     """
-    Generate a lip-synced video using SadTalker.
-
-    Args:
-        face_path:   Path to face video (.mp4) or image (.png/.jpg)
-        audio_path:  Path to audio file (.wav/.mp3)
-        output_path: Where the lip-synced video will be saved
-        enhancer:    None, 'gfpgan', or 'RestoreFormer'
-        timeout:     Max seconds to wait (default 10800)
+    Generate a lip-synced video. Primary: MuseTalk (GPU), Fallback: SadTalker (CPU).
     """
     if not os.path.exists(face_path):
         print(f"🎭 Lip-sync: Face file not found: {face_path}")
@@ -180,16 +173,27 @@ def generate_lip_sync(face_path, audio_path, output_path, enhancer=None, timeout
         print(f"🎭 Lip-sync: Audio file not found: {audio_path}")
         return None
 
-    # Clean up previous output
-    if os.path.exists(output_path):
-        os.remove(output_path)
+    # Try MuseTalk first (High quality, requires GPU)
+    try:
+        from musetalk_sync import generate_musetalk_sync, is_musetalk_available
+        if is_musetalk_available():
+            print("🎭 Engine: MuseTalk (Primary)")
+            musetalk_out = generate_musetalk_sync(face_path, audio_path, output_path, timeout=timeout)
+            if musetalk_out and os.path.exists(musetalk_out):
+                return musetalk_out
+            print("   ⚠ MuseTalk failed. Falling back to SadTalker...")
+    except ImportError:
+        pass
+    except Exception as e:
+        print(f"   ⚠ MuseTalk error: {e}. Falling back...")
 
-    # ── Engine: SadTalker Local ──────────────────────────────────────────
+    # Fallback to SadTalker (CPU-friendly)
     if _is_sadtalker_ready():
+        print("🎭 Engine: SadTalker (Fallback)")
         raw_output = output_path + ".raw.mp4"
         success = _run_sadtalker(face_path, audio_path, raw_output, enhancer, timeout)
         if success and os.path.exists(raw_output):
-            # Post-process for quality parity with MuseTalk
+            # Post-process for quality
             enhanced = _postprocess_sadtalker(raw_output, output_path)
             if enhanced and os.path.exists(enhanced):
                 try: os.remove(raw_output)
@@ -201,13 +205,19 @@ def generate_lip_sync(face_path, audio_path, output_path, enhancer=None, timeout
         print("   ⚠ SadTalker failed.")
 
     # ── No engine succeeded ───────────────────────────────────────────────────
-    print("🎭 Lip-sync engine unavailable or failed. Lip sync will be skipped.")
+    print("🎭 Lip-sync engine unavailable or failed.")
     return None
 
 
 def get_available_engine():
     """Report which lip-sync engine will be used."""
+    try:
+        from musetalk_sync import is_musetalk_available
+        if is_musetalk_available():
+            return "MuseTalk (GPU)"
+    except:
+        pass
+        
     if _is_sadtalker_ready():
         return "SadTalker (CPU)"
-    else:
-        return None
+    return None
