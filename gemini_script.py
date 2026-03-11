@@ -132,9 +132,12 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
     "AI": "A.I.",
     "NVIDIA": "en-vid-ee-uh",
     "LLM": "L L M",
-    "Pexels": "Peks-uls"
+    "Pexels": "Peks-uls",
+    "Algorithm": "al-go-rith-um",
+    "Synthesize": "sin-thuh-size",
+    "Autonomous": "aw-ton-uh-mus"
   }},
-  "NOTE_phonetic_pronunciation_map": "Identify EVERY word in your script that might be mispronounced (tech terms, ambiguous English words, names). Provide a phonetic respelling that a standard TTS model will pronounce perfectly. Use this to correct pronunciations for any complex English words.",
+  "NOTE_phonetic_pronunciation_map": "MANDATORY: Identify EVERY word with >2 syllables, any tech term, or any word that could POSSIBLY be mispronounced. Provide a phonetic-only respelling for the TTS model. If in doubt, spell it out. This is the #1 priority for audio quality. This corrected text is what will be SPOKEN, but the subtitles will show the ORIGINAL spelling.",
   "hook": "Matches the first sentence of the script",
   "summary": "One line summary",
   "sub_category": "AI/Machine Learning",

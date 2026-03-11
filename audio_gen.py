@@ -374,7 +374,20 @@ def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
             r'\bGUI\b': 'Goo-ee',
             r'\bRedis\b': 'Red-iss',
             r'\bKubernetes\b': 'Koo-ber-net-eez',
-            r'\bPyTorch\b': 'Pie-Torch'
+            r'\bPyTorch\b': 'Pie-Torch',
+            r'\bMeta\b': 'Meh-tah',
+            r'\bSambaNova\b': 'Sam-ba Noh-vah',
+            r'\bGroq\b': 'Grok',
+            r'\bMistral\b': 'Miss-trahl',
+            r'\bMixtral\b': 'Mix-trahl',
+            r'\bAnthropic\b': 'An-throp-ick',
+            r'\bClaude\b': 'Clod',
+            r'\bOpenAI\b': 'Open A.I.',
+            r'\bStability\b': 'Stah-bil-ih-tee',
+            r'\bMidjourney\b': 'Mid-jur-nee',
+            r'\bRunway\b': 'Run-way',
+            r'\bElevenLabs\b': 'Eleven-Labs',
+            r'\bKokoro\b': 'Koh-koh-roh'
         }
         
         # Merge custom phonetic map from Gemini if provided
