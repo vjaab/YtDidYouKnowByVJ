@@ -48,7 +48,7 @@ def _is_sadtalker_ready():
 def _run_sadtalker(face_path, audio_path, output_path, enhancer=None, timeout=10800):
     """Run SadTalker inference on CPU."""
     mode_str = "LITE" if not enhancer else "FULL"
-    print(f"🎭 SadTalker [{mode_str}]: Starting lip-sync generation (CPU mode)...")
+    print(f"🎭 SadTalker [{mode_str}]: Starting lip-sync generation...")
     print(f"   Face: {face_path}")
     print(f"   Audio: {audio_path}")
     

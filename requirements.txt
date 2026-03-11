@@ -95,3 +95,5 @@ yarl==1.22.0
 pydub
 tqdm
 kaggle
+stable-ts
+torch

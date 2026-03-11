@@ -46,9 +46,12 @@ def setup_sadtalker():
         run_cmd(["bash", "scripts/download_models.sh"], cwd="SadTalker", quiet=True)
 
 def setup_project():
-    if not os.path.isdir("YtDidYouKnowByVJ"):
-        print("📥 Cloning Project Repository...")
-        run_cmd(["git", "clone", "-q", "https://github.com/vjaab/YtDidYouKnowByVJ.git"])
+    if os.path.isdir("YtDidYouKnowByVJ"):
+        print("🧹 Removing stale repository for fresh clone...")
+        shutil.rmtree("YtDidYouKnowByVJ", ignore_errors=True)
+        
+    print("📥 Cloning Project Repository...")
+    run_cmd(["git", "clone", "-q", "https://github.com/vjaab/YtDidYouKnowByVJ.git"])
     
     run_cmd(["pip", "install", "-q", "-r", "requirements.txt"], cwd="YtDidYouKnowByVJ")
     run_cmd(["pip", "install", "-q", 
@@ -92,80 +95,73 @@ def process_job():
         # Default fallback/demo logic
         return
 
-    # Reconstruct the script/audio state
-    # On Kaggle, we want to run the heavy steps:
-    # 1. generate_voiceover (via F5-TTS with GPU)
-    # 2. generate_lip_sync (via SadTalker with GPU)
-    
-    sys.path.append(os.getcwd())
-    from audio_gen import generate_voiceover
-    from lip_sync import generate_lip_sync
-    
-    script = job_data.get("script")
-    voice = job_data.get("voice")
-    emotion = job_data.get("emotion")
-    custom_map = job_data.get("custom_map")
-    
-    # 1. GPU Audio
-    audio_path, duration, word_timestamps = generate_voiceover(
-        script, voice, emotion, custom_phonetic_map=custom_map
-    )
-    
-    # 🔓 Unload F5-TTS to free up GPU for SadTalker
-    from audio_gen import unload_f5_model
-    unload_f5_model()
-    
-    # 2. GPU Lip-Sync
-    face_path = "assets/Firefly_video_final.mp4"
-    optimized_face = "assets/Firefly_video_optimized.mp4"
-    
-    # 🏎️ Resize template to 512px width to prevent System RAM OOM on Kaggle
-    # SadTalker's max res is 512px anyway, so this preserves quality while saving 4x RAM
-    print("🏎️ Optimizing template resolution for RAM safety...")
-    run_cmd([
-        "ffmpeg", "-y", "-i", face_path, 
-        "-vf", "scale=512:-1", 
-        "-c:v", "libx264", "-crf", "23", "-preset", "veryfast",
-        optimized_face
-    ])
-    
-    lipsync_path = generate_lip_sync(
-        face_path=optimized_face,
-        audio_path=audio_path,
-        output_path=lipsync_out
-    )
-    
-    # 3. Save Results for Pipeline Retrieval (Placing results.json in the kaggle root)
-    results = {
-        "audio_path": os.path.basename(audio_path),
-        "duration": duration,
-        "word_timestamps": word_timestamps,
-        "lipsync_path": os.path.basename(lipsync_path) if lipsync_path else None
-    }
-    
-    # Move outputs to /kaggle/working/ so the CLI correctly downloads them raw
-    os.chdir("..")
-    
-    # Copy assets before nuking the folders
-    # Note: audio_path comes as absolute from output/, so we extract the relative path from YtDidYouKnowByVJ 
-    rel_audio_path = audio_path.split("YtDidYouKnowByVJ/")[-1] 
-    
-    shutil.copy(os.path.join("YtDidYouKnowByVJ", rel_audio_path), ".")
-    if lipsync_path and os.path.exists(os.path.join("YtDidYouKnowByVJ", lipsync_path)):
-        shutil.copy(os.path.join("YtDidYouKnowByVJ", lipsync_path), ".")
+    try:
+        # Reconstruct the script/audio state
+        sys.path.append(os.getcwd())
+        from audio_gen import generate_voiceover
+        from lip_sync import generate_lip_sync
         
-    # HUGE OPTIMIZATION: Kaggle downloads EVERYTHING in /kaggle/working/
-    # We must wipe the repo and heavy model weights to prevent downloading ~3GB of files locally
-    print("🧹 Cleaning up repositories and models to speed up download...")
-    if os.path.isdir("YtDidYouKnowByVJ"):
-        shutil.rmtree("YtDidYouKnowByVJ", ignore_errors=True)
-    if os.path.isdir("SadTalker"):
-        shutil.rmtree("SadTalker", ignore_errors=True)
+        script = job_data.get("script")
+        voice = job_data.get("voice")
+        emotion = job_data.get("emotion")
+        custom_map = job_data.get("custom_map")
         
-    with open("results.json", "w") as f:
-        json.dump(results, f)
-    
-    print("✅ GPU Processing Complete.")
+        # 1. GPU Audio
+        audio_path, duration, word_timestamps = generate_voiceover(
+            script, voice, emotion, custom_phonetic_map=custom_map
+        )
+        
+        # 🔓 Unload F5-TTS to free up GPU for SadTalker
+        from audio_gen import unload_f5_model
+        unload_f5_model()
+        
+        # 2. GPU Lip-Sync
+        face_path = "assets/Firefly_video_final.mp4"
+        optimized_face = "assets/Firefly_video_optimized.mp4"
+        lipsync_out = "kaggle_lipsync.mp4"
+        
+        # 🏎️ Resize template to 512px width to prevent System RAM OOM on Kaggle
+        print("🏎️ Optimizing template resolution for RAM safety...")
+        run_cmd([
+            "ffmpeg", "-y", "-i", face_path, 
+            "-vf", "scale=512:-1", 
+            "-c:v", "libx264", "-crf", "23", "-preset", "veryfast",
+            optimized_face
+        ])
+        
+        lipsync_path = generate_lip_sync(
+            face_path=optimized_face,
+            audio_path=audio_path,
+            output_path=lipsync_out
+        )
+        
+        # 3. Save Results for Pipeline Retrieval
+        results = {
+            "audio_path": os.path.basename(audio_path),
+            "duration": duration,
+            "word_timestamps": word_timestamps,
+            "lipsync_path": os.path.basename(lipsync_path) if lipsync_path else None
+        }
+        
+        # Copy outputs to /kaggle/working/
+        rel_audio_path = audio_path.split("YtDidYouKnowByVJ/")[-1] 
+        shutil.copy(os.path.join(os.getcwd(), rel_audio_path), "..")
+        if lipsync_path and os.path.exists(os.path.join(os.getcwd(), lipsync_path)):
+            shutil.copy(os.path.join(os.getcwd(), lipsync_path), "..")
+            
+        with open("../results.json", "w") as f:
+            json.dump(results, f)
+            
+        print("✅ GPU Processing Complete.")
+
+    finally:
+        # HUGE OPTIMIZATION: Ensure cleanup happens even on failure
+        print("🧹 Cleaning up repositories and models to speed up download...")
+        os.chdir("..")
+        if os.path.isdir("YtDidYouKnowByVJ"):
+            shutil.rmtree("YtDidYouKnowByVJ", ignore_errors=True)
+        if os.path.isdir("SadTalker"):
+            shutil.rmtree("SadTalker", ignore_errors=True)
 
 if __name__ == "__main__":
     print("--- Kaggle Worker Initiated ---")
