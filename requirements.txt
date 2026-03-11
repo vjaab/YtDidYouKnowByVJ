@@ -107,3 +107,16 @@ mmengine
 espeakng-loader
 onnxruntime
 # onnxruntime-gpu # Uncomment on GPU environments
+facexlib
+gfpgan
+basicsr
+av
+yacs
+kornia
+resampy
+imageio-ffmpeg
+pyyaml
+scikit-image
+safetensors
+trimesh
+face-alignment

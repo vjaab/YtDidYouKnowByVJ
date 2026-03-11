@@ -23,16 +23,16 @@ def setup_musetalk():
         
         # MuseTalk Dependencies
         print("📦 Installing MuseTalk Environment (MMCV, MMPose)...")
-        run_cmd(["pip", "install", "-q", "-U", "openmim"])
-        run_cmd(["mim", "install", "mmcv>=2.0.1"])
+        run_cmd(["pip", "install", "-q", "-U", "openmim", "setuptools", "wheel"])
         run_cmd(["mim", "install", "mmengine"])
+        run_cmd(["mim", "install", "mmcv>=2.0.1"])
         run_cmd(["mim", "install", "mmdet>=3.1.0"])
         run_cmd(["mim", "install", "mmpose>=1.1.0"])
         
 def setup_sadtalker():
     if not os.path.isdir("SadTalker"):
         print("📥 Cloning SadTalker...")
-        run_cmd(["git", "-C", ".", "clone", "-q", "https://github.com/OpenTalker/SadTalker.git"])
+        run_cmd(["git", "clone", "-q", "https://github.com/OpenTalker/SadTalker.git"])
         
         # Apply patches
         print("🛠️ Patching SadTalker for modern environments...")
@@ -48,6 +48,15 @@ def setup_sadtalker():
         run_cmd(["bash", "scripts/download_models.sh"], cwd="SadTalker", quiet=True)
 
 def setup_project():
+    # ── SYSTEM DEPENDENCIES (Kaggle Linux) ──────────────────────────────────
+    print("🖥️ Installing System Dependencies (espeak-ng, ffmpeg)...")
+    try:
+        # In Kaggle, apt-get usually works without sudo if run as a subprocess
+        subprocess.run(["apt-get", "update"], check=False)
+        subprocess.run(["apt-get", "install", "-y", "espeak-ng", "ffmpeg"], check=False)
+    except:
+        print("⚠️ System dependency installation skipped (non-critical).")
+
     if os.path.isdir("YtDidYouKnowByVJ"):
         print("🧹 Removing stale repository for fresh clone...")
         shutil.rmtree("YtDidYouKnowByVJ", ignore_errors=True)
@@ -55,8 +64,14 @@ def setup_project():
     print("📥 Cloning Project Repository...")
     run_cmd(["git", "clone", "-q", "https://github.com/vjaab/YtDidYouKnowByVJ.git"])
     
+    # ── PYTHON DEPENDENCIES ────────────────────────────────────────────────
+    print("📦 Installing Python Dependencies...")
+    run_cmd(["pip", "install", "-q", "-U", "pip", "setuptools", "wheel"])
     run_cmd(["pip", "install", "-q", "-r", "requirements.txt"], cwd="YtDidYouKnowByVJ")
+    
+    # Force GPU specific backends for Kokoro and Audio
     run_cmd(["pip", "install", "-q", 
+        "onnxruntime-gpu", "espeakng-loader",
         "f5-tts", "stable-ts", "torch", "torchvision", "torchaudio", 
         "facexlib", "gfpgan", "basicsr", "av", "yacs", "kornia", 
         "librosa", "resampy", "imageio-ffmpeg", "pyyaml", "joblib", 
