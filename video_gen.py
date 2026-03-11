@@ -1723,25 +1723,56 @@ def create_video(audio_path, script_json, chunks, output_path=None):
 
         mclip = VideoClip(lambda t: a_mask_np, is_mask=True, duration=audio_duration)
         
-        # Dramatic Camera Cuts: Enlarges avatar at shocking moment
+        # ── REALISTIC BODY MOVEMENT SYSTEM ────────────────────────────────
         shock_ts = float(script_json.get("shocking_moment_timestamp", -1))
+        key_stat_ts_val = float(script_json.get("key_stat_timestamp", -1))
         
         def pip_position(t):
             base_x = FRAME_W - width_pip - 20
             base_y = 260
             
-            # Apply hard cut (zoom in slightly by shifting position since mask doesn't scale easily dynamically in moviepy without a Transform)
-            # Instead of scaling the mask dynamically, we just simulate a "camera lunge" by bumping it slightly off-center
-            x_offset = -30 if t >= shock_ts and shock_ts > 0 else 0
+            # 1. Natural head sway (multi-frequency sinusoids for organic feel)
+            # Slow drift (0.3Hz) + micro-nod (1.2Hz) + tiny jitter (2.5Hz)
+            head_sway_y = (
+                math.sin(t * 0.3 * 2 * math.pi) * 3.0 +   # Slow body sway (±3px)
+                math.sin(t * 1.2 * 2 * math.pi) * 1.5 +   # Micro-nodding (±1.5px)
+                math.sin(t * 2.5 * 2 * math.pi) * 0.5      # Tiny jitter (±0.5px)
+            )
             
-            if t < 5.0:
-                return (base_x + x_offset, base_y)
+            # 2. Subtle lateral drift (very slow, ±2px)
+            head_sway_x = (
+                math.sin(t * 0.2 * 2 * math.pi) * 2.0 +
+                math.cos(t * 0.7 * 2 * math.pi) * 1.0
+            )
             
-            cycle_time = (t - 5.0) % 9.0
+            # 3. Breathing simulation (slow 4-second cycle, ±1px vertical)
+            breathing = math.sin(t * 0.25 * 2 * math.pi) * 1.0
+            
+            # 4. Emphasis gesture — slight forward "lean" during key moments
+            emphasis_offset_x = 0
+            emphasis_offset_y = 0
+            if shock_ts > 0 and abs(t - shock_ts) < 1.5:
+                # "Lean forward" during shocking moment
+                lean_progress = 1.0 - abs(t - shock_ts) / 1.5
+                emphasis_offset_x = int(-15 * lean_progress)  # Move left (toward center)
+                emphasis_offset_y = int(-8 * lean_progress)   # Move up slightly
+            elif key_stat_ts_val > 0 and abs(t - key_stat_ts_val) < 1.0:
+                # Subtle nod during key stat
+                nod_progress = 1.0 - abs(t - key_stat_ts_val) / 1.0
+                emphasis_offset_y = int(5 * math.sin(nod_progress * math.pi))
+            
+            final_x = base_x + int(head_sway_x) + emphasis_offset_x
+            final_y = base_y + int(head_sway_y + breathing) + emphasis_offset_y
+            
+            # 5. Show/hide cycle (visible more than hidden for presence)
+            if t < 6.0:
+                return (final_x, final_y)  # Always visible during hook
+            
+            cycle_time = (t - 6.0) % 11.0
             if cycle_time < 4.0:
-                return (FRAME_W + 1000, base_y) # Moves it completely off-screen (hidden)
+                return (FRAME_W + 1000, base_y)  # Hidden (4s)
             else:
-                return (base_x + x_offset, base_y) # Visible
+                return (final_x, final_y)  # Visible (7s)
 
         avatar_pip = avatar_clip.with_mask(mclip).with_position(pip_position).with_start(0)
         

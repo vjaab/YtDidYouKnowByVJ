@@ -224,31 +224,104 @@ def _generate_edge_tts(text, voice, output_path):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# PRIMARY: F5-TTS (0 Rs / Local Voice Cloning)
+# PRIMARY: F5-TTS (0 Rs / Local Voice Cloning) — High-Quality Pipeline
 # ─────────────────────────────────────────────────────────────────────────────
-def _generate_f5_clone(text, output_path):
-    print(f"F5-TTS → Cloning VJ's Voice (0 Rs)...")
-    
-    # Run inference via the high-level API
-    wav_path = output_path.replace(".mp3", ".wav")
-    
-    # Pre-splitting into smaller chunks to avoid the "Audio over 12s clipping" warning
-    # We split by common sentence delimiters but keep chunks under ~200 chars
+
+def _smart_split_sentences(text, max_chars=120):
+    """
+    Split text into natural sentence-boundary chunks for F5-TTS.
+    Keeps chunks under max_chars to prevent the 12s clipping issue.
+    Splits at sentence boundaries (.?!) then at clause boundaries (,;:—) as fallback.
+    """
     import re
-    sentences = re.split(r'([.?!]+)', text)
+    # First split into sentences
+    parts = re.split(r'(?<=[.!?])\s+', text)
     chunks = []
     current = ""
-    for i in range(0, len(sentences), 2):
-        s = sentences[i]
-        p = sentences[i+1] if i+1 < len(sentences) else ""
-        if len(current + s + p) < 180:
-            current += s + p
+    for part in parts:
+        if len(current + " " + part) < max_chars:
+            current = (current + " " + part).strip()
         else:
-            if current: chunks.append(current.strip())
-            current = s + p
-    if current: chunks.append(current.strip())
+            if current:
+                chunks.append(current.strip())
+            # If a single sentence is still too long, split at clause boundaries
+            if len(part) > max_chars:
+                clause_parts = re.split(r'(?<=[,;:\—])\s+', part)
+                sub_current = ""
+                for cp in clause_parts:
+                    if len(sub_current + " " + cp) < max_chars:
+                        sub_current = (sub_current + " " + cp).strip()
+                    else:
+                        if sub_current:
+                            chunks.append(sub_current.strip())
+                        sub_current = cp
+                current = sub_current
+            else:
+                current = part
+    if current:
+        chunks.append(current.strip())
+    return [c for c in chunks if c]
+
+
+def _postprocess_voice_audio(wav_path):
+    """
+    Post-processing chain to polish F5-TTS output:
+    1. Gentle high-pass filter at 80Hz to remove low-frequency rumble
+    2. Normalize to -1dB for consistent loudness
+    3. Add 2ms fade-in/out to prevent click artifacts
+    """
+    try:
+        audio = AudioSegment.from_wav(wav_path)
+        
+        # 1. High-pass filter (remove rumble below 80Hz)
+        # Simple implementation: apply a 2-pass moving average subtraction
+        import numpy as np
+        samples = np.array(audio.get_array_of_samples(), dtype=np.float64)
+        sr = audio.frame_rate
+        channels = audio.channels
+        
+        # Rolling average with window ~ 1/80Hz = 12.5ms
+        window = max(1, int(sr * 0.0125))
+        if len(samples) > window * 2:
+            # Subtract the low-frequency component
+            low_freq = np.convolve(samples, np.ones(window)/window, mode='same')
+            samples = samples - low_freq * 0.7  # Subtract 70% of rumble (gentle)
+        
+        # 2. Normalize to -1dB peak
+        peak = np.max(np.abs(samples))
+        if peak > 0:
+            target = 10 ** (-1.0 / 20) * 32767  # -1dB in 16-bit
+            samples = samples * (target / peak)
+        
+        samples = np.clip(samples, -32768, 32767).astype(np.int16)
+        
+        # Reconstruct AudioSegment
+        processed = AudioSegment(
+            samples.tobytes(),
+            frame_rate=sr,
+            sample_width=2,
+            channels=channels
+        )
+        
+        # 3. Fade in/out to prevent clicks
+        processed = processed.fade_in(2).fade_out(2)
+        
+        processed.export(wav_path, format="wav")
+        print(f"   🎙️ Audio post-processed: high-pass 80Hz, normalized to -1dB")
+    except Exception as e:
+        print(f"   ⚠ Audio post-processing skipped: {e}")
+
+
+def _generate_f5_clone(text, output_path):
+    print(f"F5-TTS → Cloning VJ's Voice (High-Quality Pipeline)...")
     
-    # Generate
+    wav_path = output_path.replace(".mp3", ".wav")
+    
+    # Smart sentence-boundary splitting (120 chars max per chunk)
+    chunks = _smart_split_sentences(text, max_chars=120)
+    print(f"   Split into {len(chunks)} voice segments")
+    
+    # Generate each segment with F5-TTS
     f5 = _get_f5_model()
     segment_paths = []
     for i, chunk in enumerate(chunks):
@@ -258,18 +331,27 @@ def _generate_f5_clone(text, output_path):
             ref_text=VJ_REF_TEXT,
             gen_text=chunk,
             file_wave=seg_path,
-            speed=1.02 # Slightly increased speed to ensure strict <60s enforcement
+            speed=1.0  # Natural speed for best quality (enforcement handled by script length)
         )
         segment_paths.append(seg_path)
         
-    # Combine segments
-    combined = AudioSegment.empty()
+    # Combine segments with 30ms cross-fade for seamless joins
+    CROSSFADE_MS = 30
+    combined = AudioSegment.from_wav(segment_paths[0]) if segment_paths else AudioSegment.empty()
+    for sp in segment_paths[1:]:
+        seg = AudioSegment.from_wav(sp)
+        combined = combined.append(seg, crossfade=CROSSFADE_MS)
+    
+    # Clean up segment files
     for sp in segment_paths:
-        combined += AudioSegment.from_wav(sp)
-        try: os.remove(sp) # Clean up partial segments
+        try: os.remove(sp)
         except: pass
         
     combined.export(wav_path, format="wav")
+    
+    # Post-process for professional voice quality
+    _postprocess_voice_audio(wav_path)
+    
     duration = get_audio_duration(wav_path)
     
     # Word timestamps via stable-ts

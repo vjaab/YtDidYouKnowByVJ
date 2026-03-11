@@ -60,7 +60,8 @@ def _run_sadtalker(face_path, audio_path, output_path, enhancer=None, timeout=10
     
     is_ci = os.environ.get("GITHUB_ACTIONS") == "true"
     
-    preprocess = "full"
+    preprocess = "crop"  # 'crop' gives tighter face isolation = more accurate lip-sync
+    expression_scale = 1.2  # Slightly amplify facial expressions for realism
     
     cmd = [
         _get_python_exe(), "inference.py",
@@ -68,7 +69,8 @@ def _run_sadtalker(face_path, audio_path, output_path, enhancer=None, timeout=10
         "--source_image", face_path,
         "--result_dir", result_dir,
         "--still",
-        "--preprocess", preprocess
+        "--preprocess", preprocess,
+        "--expression_scale", str(expression_scale),
     ]
     
     # 🏎️ Device & Quality Logic
@@ -76,15 +78,16 @@ def _run_sadtalker(face_path, audio_path, output_path, enhancer=None, timeout=10
     has_gpu = torch.cuda.is_available() or torch.backends.mps.is_available()
     
     if is_ci or not has_gpu:
-        cmd.extend(["--cpu", "--size", "256", "--batch_size", "2"])
-        print(f"   Mode: CPU (CI/No-GPU) -> Using LITE settings (256px)")
+        cmd.extend(["--cpu", "--size", "512", "--batch_size", "2"])
+        if not enhancer:
+            enhancer = "gfpgan"  # Always enhance for better face quality
+        print(f"   Mode: CPU (CI/No-GPU) → Using settings (512px + GFPGAN)")
     else:
         # High-End Settings for Kaggle GPU / Local Mac GPU
-        # We keep batch_size=2 for stability, but always use high-end enhancer/size
-        cmd.extend(["--size", "512", "--batch_size", "2"])
+        cmd.extend(["--size", "512", "--batch_size", "4"])
         if not enhancer:
-            enhancer = "gfpgan" # Enable high-end face enhancement by default on GPU
-        print(f"   Mode: GPU/MPS -> Using HIGH-END settings (512px + Enhancer)")
+            enhancer = "gfpgan"  # Enable high-end face enhancement by default
+        print(f"   Mode: GPU/MPS → Using HIGH-END settings (512px + GFPGAN)")
     
     if enhancer:
         cmd.extend(["--enhancer", enhancer])
@@ -134,6 +137,28 @@ def _find_output_video(result_dir):
     return None
 
 
+def _postprocess_sadtalker(input_path, output_path):
+    """Post-process SadTalker output for consistency with MuseTalk quality."""
+    try:
+        cmd = [
+            "ffmpeg", "-y", "-i", input_path,
+            "-vf", ",".join([
+                "unsharp=3:3:0.4:3:3:0.0",  # Gentle sharpen
+                "eq=contrast=1.02:brightness=0.01:saturation=1.04",  # Subtle color correction
+            ]),
+            "-c:v", "libx264",
+            "-crf", "18",
+            "-preset", "medium",
+            "-c:a", "copy",
+            output_path
+        ]
+        subprocess.run(cmd, check=True, capture_output=True, timeout=120)
+        return output_path
+    except Exception as e:
+        print(f"   ⚠ SadTalker post-processing skipped: {e}")
+        return None
+
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # PUBLIC API
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -161,10 +186,19 @@ def generate_lip_sync(face_path, audio_path, output_path, enhancer=None, timeout
     if os.path.exists(output_path):
         os.remove(output_path)
 
-    # ── Engine: SadTalker Local (CPU) ───────────────────────────────────────
+    # ── Engine: SadTalker Local ──────────────────────────────────────────
     if _is_sadtalker_ready():
-        success = _run_sadtalker(face_path, audio_path, output_path, enhancer, timeout)
-        if success and os.path.exists(output_path):
+        raw_output = output_path + ".raw.mp4"
+        success = _run_sadtalker(face_path, audio_path, raw_output, enhancer, timeout)
+        if success and os.path.exists(raw_output):
+            # Post-process for quality parity with MuseTalk
+            enhanced = _postprocess_sadtalker(raw_output, output_path)
+            if enhanced and os.path.exists(enhanced):
+                try: os.remove(raw_output)
+                except: pass
+                return output_path
+            # Fallback to raw
+            shutil.move(raw_output, output_path)
             return output_path
         print("   ⚠ SadTalker failed.")
 

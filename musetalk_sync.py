@@ -7,9 +7,9 @@ import yaml
 
 def generate_musetalk(face_path, audio_path, output_path, timeout=10800):
     """
-    Standard interface for MuseTalk lip-sync.
+    High-quality MuseTalk lip-sync pipeline.
     Uses the official `python -m scripts.inference` command.
-    Requires MuseTalk to be cloned and weights downloaded.
+    Includes pre/post-processing for maximum realism.
     """
     print(f"🎤 MuseTalk [P1]: Starting high-end lip-sync...")
     print(f"   Face: {face_path}")
@@ -26,11 +26,24 @@ def generate_musetalk(face_path, audio_path, output_path, timeout=10800):
     result_dir = os.path.join(os.path.abspath(musetalk_dir), "results", "pipeline_run")
     os.makedirs(result_dir, exist_ok=True)
 
-    # ── Create a temporary YAML config for this run ──────────────────────
+    # ── Pre-process: Extract a high-quality reference frame ──────────────
+    ref_frame_path = os.path.join(os.path.dirname(output_path_abs), "musetalk_ref_frame.png")
+    try:
+        subprocess.run([
+            "ffmpeg", "-y", "-i", face_path,
+            "-vframes", "1", "-q:v", "1",
+            ref_frame_path
+        ], check=True, capture_output=True)
+        print(f"   Extracted reference frame: {ref_frame_path}")
+    except Exception as e:
+        print(f"   ⚠ Reference frame extraction failed: {e}")
+        ref_frame_path = None
+
+    # ── Create YAML config with quality-optimized settings ────────────────
     config_content = {
         "video_path": face_path,
         "audio_path": audio_path,
-        "bbox_shift": 0,
+        "bbox_shift": 5,  # Positive shift = more jaw movement during speech (more natural)
     }
     config_path = os.path.join(os.path.abspath(musetalk_dir), "configs", "inference", "_pipeline_run.yaml")
     os.makedirs(os.path.dirname(config_path), exist_ok=True)
@@ -45,7 +58,7 @@ def generate_musetalk(face_path, audio_path, output_path, timeout=10800):
         unet_model_path = os.path.join("models", "musetalkV15", "unet.pth")
         unet_config = os.path.join("models", "musetalkV15", "musetalk.json")
         version_arg = "v15"
-        print("   Using MuseTalk v1.5 (recommended)")
+        print("   Using MuseTalk v1.5 (highest quality)")
     elif os.path.exists(v10_path):
         unet_model_path = os.path.join("models", "musetalk", "pytorch_model.bin")
         unet_config = os.path.join("models", "musetalk", "musetalk.json")
@@ -55,7 +68,7 @@ def generate_musetalk(face_path, audio_path, output_path, timeout=10800):
         print("   ✗ MuseTalk model weights not found. Run download_weights.sh first.")
         return None
 
-    # ── Build the official inference command ──────────────────────────────
+    # ── Build the official inference command with quality flags ────────────
     cmd = [
         "python3", "-m", "scripts.inference",
         "--inference_config", config_path,
@@ -63,6 +76,7 @@ def generate_musetalk(face_path, audio_path, output_path, timeout=10800):
         "--unet_model_path", unet_model_path,
         "--unet_config", unet_config,
         "--version", version_arg,
+        "--batch_size", "8",  # Higher batch = faster on GPU (Kaggle T4 can handle 8)
     ]
 
     print(f"   CMD: {' '.join(cmd)}")
@@ -76,9 +90,17 @@ def generate_musetalk(face_path, audio_path, output_path, timeout=10800):
         # MuseTalk saves output inside result_dir — find the generated mp4
         generated = _find_musetalk_output(result_dir)
         if generated:
+            # ── Post-process: Enhance face quality ────────────────────────
+            enhanced_path = _postprocess_lipsync(generated, output_path_abs)
+            if enhanced_path:
+                duration = time.time() - start_time
+                print(f"✅ MuseTalk done in {duration:.1f}s → {enhanced_path}")
+                return enhanced_path
+
+            # Fallback to raw output if post-processing fails
             shutil.copy2(generated, output_path_abs)
             duration = time.time() - start_time
-            print(f"✅ MuseTalk done in {duration:.1f}s -> {output_path_abs}")
+            print(f"✅ MuseTalk done in {duration:.1f}s → {output_path_abs}")
             return output_path_abs
 
         print("   ✗ MuseTalk output not found in results directory.")
@@ -88,6 +110,40 @@ def generate_musetalk(face_path, audio_path, output_path, timeout=10800):
         return None
     except Exception as e:
         print(f"   ✗ MuseTalk failed: {e}")
+        return None
+    finally:
+        # Clean up reference frame
+        if ref_frame_path and os.path.exists(ref_frame_path):
+            try: os.remove(ref_frame_path)
+            except: pass
+
+
+def _postprocess_lipsync(input_path, output_path):
+    """
+    Post-process lip-synced video for realism:
+    1. Upscale to 512px width if smaller
+    2. Sharpen slightly for face definition
+    3. Subtle color correction for natural skin tones
+    """
+    try:
+        cmd = [
+            "ffmpeg", "-y", "-i", input_path,
+            "-vf", ",".join([
+                "scale=512:-1:flags=lanczos",       # Upscale with high-quality Lanczos filter
+                "unsharp=3:3:0.5:3:3:0.0",          # Gentle sharpen (luma only, no chroma)
+                "eq=contrast=1.03:brightness=0.01:saturation=1.05",  # Subtle warmth + contrast
+            ]),
+            "-c:v", "libx264",
+            "-crf", "18",       # High quality (lower = better, 18 is visually lossless)
+            "-preset", "slow",  # Better compression for same quality
+            "-c:a", "copy",     # Keep audio untouched
+            output_path
+        ]
+        subprocess.run(cmd, check=True, capture_output=True, timeout=120)
+        print(f"   🎨 Post-processed: upscaled+sharpened+color-corrected → {output_path}")
+        return output_path
+    except Exception as e:
+        print(f"   ⚠ Post-processing failed: {e}")
         return None
 
 
