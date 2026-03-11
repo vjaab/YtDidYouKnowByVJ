@@ -414,11 +414,14 @@ def setup_project():
         
     print("📥 Cloning Project Repository...")
     run_cmd(["git", "clone", "-q", "https://github.com/vjaab/YtDidYouKnowByVJ.git"])
+    os.chdir("YtDidYouKnowByVJ")
+    print(f"🏠 Working directory: {os.getcwd()}")
+
     
     # ── PYTHON DEPENDENCIES ────────────────────────────────────────────────
     print("📦 Installing Python Dependencies...")
     run_cmd(["pip", "install", "-q", "-U", "pip", "setuptools<70", "wheel", "packaging"])
-    run_cmd(["pip", "install", "-q", "-r", "requirements.txt"], cwd="YtDidYouKnowByVJ")
+    run_cmd(["pip", "install", "-q", "-r", "requirements.txt"])
     
     # Force GPU-specific backends
     run_cmd(["pip", "install", "-q", 
