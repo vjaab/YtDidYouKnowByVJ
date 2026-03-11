@@ -413,9 +413,14 @@ def setup_project():
         shutil.rmtree("YtDidYouKnowByVJ", ignore_errors=True)
         
     print("📥 Cloning Project Repository...")
-    run_cmd(["git", "clone", "-q", "https://github.com/vjaab/YtDidYouKnowByVJ.git"])
-    os.chdir("YtDidYouKnowByVJ")
-    print(f"🏠 Working directory: {os.getcwd()}")
+    if not os.path.exists("YtDidYouKnowByVJ"):
+        run_cmd(["git", "clone", "-q", "https://github.com/vjaab/YtDidYouKnowByVJ.git"])
+    
+    if os.path.isdir("YtDidYouKnowByVJ"):
+        os.chdir("YtDidYouKnowByVJ")
+        print(f"🏠 Switched to project directory: {os.getcwd()}")
+    else:
+        print("⚠️ Warning: Could not find project directory 'YtDidYouKnowByVJ' after clone.")
 
     
     # ── PYTHON DEPENDENCIES ────────────────────────────────────────────────
