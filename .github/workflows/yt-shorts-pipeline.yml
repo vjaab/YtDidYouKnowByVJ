@@ -37,15 +37,14 @@ jobs:
           
       - name: Install Project Python Dependencies
         run: |
-          python -m pip install --upgrade pip setuptools==69.5.1 wheel
+          python -m pip install --upgrade pip setuptools wheel
+          # We pin torch here to ensure pre-built wheels are found for mmcv
+          pip install torch==2.1.2 torchvision==0.16.2 torchaudio==2.1.2 --index-url https://download.pytorch.org/whl/cpu
           pip install -r requirements.txt
-          # MuseTalk MMLab dependencies - explicitly install build tools
-          pip install setuptools==69.5.1 wheel openmim
-          # Chumpy 0.70's setup.py imports pip, which fails in isolated build envs
-          pip install chumpy --no-build-isolation
-          # We use mim install to leverage pre-built wheels for mmcv
+          # MuseTalk MMLab dependencies - install mmcv from official wheel index
+          pip install openmim chumpy
           mim install mmengine
-          mim install "mmcv>=2.1.0"
+          pip install mmcv==2.1.0 -f https://download.openmmlab.com/mmcv/dist/cpu/torch2.1/index.html
           mim install "mmdet>=3.1.0" "mmpose>=1.1.0"
           # Explicitly fix potential imageio recursion by forcing latest imageio-ffmpeg last
           pip install --upgrade imageio imageio-ffmpeg moviepy
