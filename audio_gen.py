@@ -86,9 +86,9 @@ KOKORO_MODEL = os.path.join(ASSETS_DIR, "kokoro-v1.0.onnx")
 KOKORO_VOICES = os.path.join(ASSETS_DIR, "voices-v1.0.bin")
 
 # ── F5-TTS Config ─────────────────────────────────────────────────────────────
-VJ_REF_WAV = os.path.join(ASSETS_DIR, "vj.wav")
+VJ_REF_WAV = os.path.join(ASSETS_DIR, "vj_voice_new.wav")
 VJ_REF_TEXT = (
-    "Welcome you are listening to your channel, we bring you the best insights, ideas and stories. Drafted just for you stay tuned and let's get started."
+    "A student of Punjab University fell off the fourth floor of a paying-guest accommodation in 2013 and suffered a serious injuries. He was put on a life support since then he has been confined to a bed."
 )
 
 _f5_instance = None

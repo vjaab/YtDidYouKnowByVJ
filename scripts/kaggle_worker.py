@@ -36,6 +36,7 @@ def setup_sadtalker():
             content = re.sub(r'trans_params = np\.array\(\[w0, h0, s, t\[0\], t\[1\]\]\)', 
                             'trans_params = np.array([w0, h0, s, t[0].item(), t[1].item()])', content)
             content = content.replace('.astype(np.int32)', '.astype(int)')
+            content = content.replace('np.VisibleDeprecationWarning', 'Warning') # Patch for NumPy 2.0+
             with open(prep_file, 'w') as f: f.write(content)
 
         # Download weight (Efficiently)
