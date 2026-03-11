@@ -22,10 +22,15 @@ def setup_musetalk():
         run_cmd(["git", "clone", "-q", "https://github.com/TMElyralab/MuseTalk.git"])
         
         # MuseTalk's own Python dependencies — but we MUST filter out packages
-        # that conflict with Kaggle's pre-installed versions (numpy, torch, opencv, g2p_en)
+        # that conflict with Kaggle's pre-installed versions
         print("📦 Installing MuseTalk requirements (filtered)...")
-        skip_packages = {"numpy", "opencv-python", "opencv-contrib-python", 
-                         "torch", "torchvision", "torchaudio", "g2p-en", "g2p_en"}
+        skip_packages = {
+            "numpy", "opencv-python", "opencv-contrib-python", 
+            "torch", "torchvision", "torchaudio", 
+            "g2p-en", "g2p_en",
+            "tensorflow", "tensorflow-gpu", "tf-keras", "keras",
+            "tensorboard", "tensorboard-data-server",
+        }
         musetalk_req = os.path.join("MuseTalk", "requirements.txt")
         if os.path.exists(musetalk_req):
             with open(musetalk_req, "r") as f:
@@ -37,26 +42,45 @@ def setup_musetalk():
                     continue
                 # Extract package name (before any version specifier)
                 pkg_name = line_stripped.split(">=")[0].split("<=")[0].split("==")[0].split("<")[0].split(">")[0].split("[")[0].strip()
-                if pkg_name.lower() in skip_packages:
+                if pkg_name.lower().replace("-", "_") in {p.replace("-", "_") for p in skip_packages}:
                     print(f"   ⏭️  Skipping '{line_stripped}' (already installed on Kaggle)")
                     continue
-                filtered.append(line_stripped)
+                # Strip exact version pins (==X.Y.Z) — Kaggle's Python 3.12 needs newer versions
+                import re as _re
+                cleaned_line = _re.sub(r'==[\d.]+', '', line_stripped)
+                filtered.append(cleaned_line)
             
             # Write filtered requirements to a temp file
             filtered_req = os.path.join("MuseTalk", "requirements_filtered.txt")
             with open(filtered_req, "w") as f:
                 f.write("\n".join(filtered))
             
-            run_cmd(["pip", "install", "-q", "-r", filtered_req], cwd=".")
+            print(f"   Filtered requirements ({len(filtered)} packages):")
+            for pkg in filtered[:10]:
+                print(f"     → {pkg}")
+            if len(filtered) > 10:
+                print(f"     ... and {len(filtered) - 10} more")
+            
+            # Non-fatal install — MuseTalk deps shouldn't crash the pipeline
+            try:
+                run_cmd(["pip", "install", "-q", "-r", filtered_req], cwd=".")
+            except Exception as e:
+                print(f"   ⚠ Some MuseTalk deps failed (non-fatal): {e}")
         
-        # MMLab Dependencies (same --no-build-isolation fix as GHA)
+        # MMLab Dependencies — non-fatal (mmcv build frequently fails)
         print("📦 Installing MMLab stack (mmcv, mmpose)...")
-        run_cmd(["pip", "install", "-q", "-U", "openmim", "setuptools", "wheel"])
-        run_cmd(["pip", "install", "-q", "chumpy", "--no-build-isolation"])
-        run_cmd(["mim", "install", "mmengine"])
-        run_cmd(["pip", "install", "-q", "mmcv>=2.0.1", "--no-build-isolation"])
-        run_cmd(["mim", "install", "mmdet>=3.1.0"])
-        run_cmd(["mim", "install", "mmpose>=1.1.0"])
+        for mmlab_cmd in [
+            ["pip", "install", "-q", "-U", "openmim", "setuptools", "wheel"],
+            ["pip", "install", "-q", "chumpy", "--no-build-isolation"],
+            ["mim", "install", "mmengine"],
+            ["pip", "install", "-q", "mmcv>=2.0.1", "--no-build-isolation"],
+            ["mim", "install", "mmdet>=3.1.0"],
+            ["mim", "install", "mmpose>=1.1.0"],
+        ]:
+            try:
+                run_cmd(mmlab_cmd)
+            except Exception as e:
+                print(f"   ⚠ MMLab install failed (non-fatal): {' '.join(mmlab_cmd)} → {e}")
         
         # Download model weights
         print("📥 Downloading MuseTalk model weights...")
