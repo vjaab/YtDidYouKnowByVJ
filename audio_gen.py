@@ -128,83 +128,9 @@ def unload_f5_model():
             torch.cuda.ipc_collect()
 
 # ── Global Phonetic Dictionary (Source of Truth for Audio & Subtitles) ────────
-PHONETIC_DICT = {
-    "instantly": "in-stunt-ly",
-    "only": "own-lee",
-    "incredible": "in-cred-uh-bul",
-    "incredibly": "in-cred-uh-blee",
-    "million": "mil-yun",
-    "millions": "mil-yuns",
-    "billion": "bil-yun",
-    "billions": "bil-yuns",
-    "trillion": "tril-yun",
-    "trillions": "tril-yuns",
-    "AI": "A-I",
-    "ML": "M-L",
-    "LLM": "L-L-M",
-    "LLMs": "L-L-M-s",
-    "GPT": "G-P-T",
-    "Pexels": "Pex-uls",
-    "NVIDIA": "En-vid-ee-uh",
-    "DeepSeek": "Deep-Seek",
-    "Hugging": "Hug-ging",
-    "breakthrough": "break-thrue",
-    "capabilities": "kay-puh-bil-uh-teez",
-    "autonomous": "aw-ton-uh-mus",
-    "generative": "jen-er-uh-tiv",
-    "Linux": "Lin-icks",
-    "SQL": "See-kw-uhl",
-    "NGINX": "Engine-X",
-    "PostgreSQL": "Post-gres",
-    "Huawei": "Wah-way",
-    "Xiaomi": "Shau-mee",
-    "JavaScript": "Jah-va-skript",
-    "cache": "kash",
-    "meme": "meem",
-    "GUI": "Goo-ee",
-    "Redis": "Red-iss",
-    "Kubernetes": "Koo-ber-net-eez",
-    "PyTorch": "Pie-Torch",
-    "Meta": "Meh-tah",
-    "SambaNova": "Sam-ba-Noh-vah",
-    "Groq": "Grok",
-    "Mistral": "Miss-trahl",
-    "Mixtral": "Mix-trahl",
-    "Anthropic": "An-throp-ick",
-    "Claude": "Clod",
-    "OpenAI": "Open-A-I",
-    "Stability": "Stah-bil-ih-tee",
-    "Midjourney": "Mid-jur-nee",
-    "Runway": "Run-way",
-    "ElevenLabs": "Eleven-Labs",
-    "Kokoro": "Koh-koh-roh",
-    # English Traps
-    "says": "sez",
-    "said": "sed",
-    "iron": "i-ern",
-    "chaos": "kay-oss",
-    "queue": "kyew",
-    "recipe": "res-ih-pee",
-    "debacle": "duh-bah-kul",
-    "epitome": "ih-pit-uh-mee",
-    "hyperbole": "hy-per-buh-lee",
-    "subtle": "sut-ul",
-    "colonel": "ker-nel",
-    "island": "eye-land",
-    "archives": "ar-kives",
-    "archive": "ar-kive",
-    "gigabyte": "gig-uh-bite",
-    "megabyte": "meg-uh-bite",
-    "terabyte": "terr-uh-bite",
-    "Wednesday": "Wenz-day",
-    "February": "Feb-roo-air-ee",
-    "comfortable": "kum-fert-uh-bul",
-    "entrepreneur": "on-truh-pruh-ner",
-    "ubiquitous": "yoo-bik-wih-tus",
-    "phenomenon": "fuh-nom-uh-non",
-    "anonymity": "an-uh-nim-ih-tee",
-    "vulnerability": "vul-ner-uh-bil-ih-tee"
-}
+# Comprehensive dictionary in separate module (350+ words + g2p_en auto-detection)
+from phonetic_dict import PHONETIC_DICT, auto_detect_hard_words
+
 
 # Edge TTS offset is in 100-nanosecond units → divide by 10_000_000 for seconds
 _NS100_PER_SEC = 10_000_000
@@ -434,6 +360,15 @@ def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
         for word, replacement in full_map.items():
             pattern = r'\b' + re.escape(word) + r'\b'
             cleaned = re.sub(pattern, replacement, cleaned, flags=re.IGNORECASE)
+
+        # 4. Auto-detect remaining hard words via g2p_en (neural G2P fallback)
+        try:
+            auto_corrections = auto_detect_hard_words(cleaned)
+            for word, respelling in auto_corrections.items():
+                pattern = r'\b' + re.escape(word) + r'\b'
+                cleaned = re.sub(pattern, respelling, cleaned, flags=re.IGNORECASE)
+        except Exception as e:
+            print(f"g2p_en auto-detection skipped: {e}")
     
     # Clean up double spaces
     cleaned = re.sub(r'\s+', ' ', cleaned).strip()
