@@ -21,13 +21,29 @@ def setup_musetalk():
         print("📥 Cloning MuseTalk...")
         run_cmd(["git", "clone", "-q", "https://github.com/TMElyralab/MuseTalk.git"])
         
-        # MuseTalk Dependencies
-        print("📦 Installing MuseTalk Environment (MMCV, MMPose)...")
+        # MuseTalk's own Python dependencies
+        print("📦 Installing MuseTalk requirements...")
+        run_cmd(["pip", "install", "-q", "-r", "requirements.txt"], cwd="MuseTalk")
+        
+        # MMLab Dependencies (same --no-build-isolation fix as GHA)
+        print("📦 Installing MMLab stack (mmcv, mmpose)...")
         run_cmd(["pip", "install", "-q", "-U", "openmim", "setuptools", "wheel"])
+        run_cmd(["pip", "install", "-q", "chumpy", "--no-build-isolation"])
         run_cmd(["mim", "install", "mmengine"])
-        run_cmd(["mim", "install", "mmcv>=2.0.1"])
+        run_cmd(["pip", "install", "-q", "mmcv>=2.0.1", "--no-build-isolation"])
         run_cmd(["mim", "install", "mmdet>=3.1.0"])
         run_cmd(["mim", "install", "mmpose>=1.1.0"])
+        
+        # Download model weights
+        print("📥 Downloading MuseTalk model weights...")
+        weight_script = os.path.join("MuseTalk", "download_weights.sh")
+        if os.path.exists(weight_script):
+            run_cmd(["bash", "download_weights.sh"], cwd="MuseTalk")
+        else:
+            print("   ⚠ download_weights.sh not found, weights must be manually placed.")
+    else:
+        print("✓ MuseTalk already set up.")
+
         
 def setup_sadtalker():
     if not os.path.isdir("SadTalker"):

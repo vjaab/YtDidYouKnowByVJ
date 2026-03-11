@@ -122,3 +122,8 @@ scikit-image
 safetensors
 trimesh
 face-alignment
+# MuseTalk-specific deps
+einops
+omegaconf
+ffmpeg-python
+gdown
