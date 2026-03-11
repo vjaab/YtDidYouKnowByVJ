@@ -101,3 +101,5 @@ diffusers
 transformers
 accelerate
 openai-whisper
+librosa
+scipy

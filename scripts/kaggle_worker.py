@@ -26,6 +26,7 @@ def setup_musetalk():
         run_cmd(["pip", "install", "-q", "-U", "openmim"])
         run_cmd(["mim", "install", "mmcv>=2.0.1"])
         run_cmd(["mim", "install", "mmengine"])
+        run_cmd(["mim", "install", "mmdet>=3.1.0"])
         run_cmd(["mim", "install", "mmpose>=1.1.0"])
         
 def setup_sadtalker():
@@ -131,6 +132,11 @@ def process_job():
         ])
         
         # 🏅 TIER 1: MuseTalk (Best Quality + Gestures)
+        import gc
+        import torch
+        gc.collect()
+        torch.cuda.empty_cache()
+        
         try:
             lipsync_path = generate_musetalk(
                 face_path=optimized_face,
@@ -143,6 +149,8 @@ def process_job():
         # 🥈 TIER 2: SadTalker Fallback
         if not lipsync_path:
             print("   ↳ Falling back to SadTalker...")
+            gc.collect()
+            torch.cuda.empty_cache()
             try:
                 lipsync_path = generate_lip_sync(
                     face_path=optimized_face,

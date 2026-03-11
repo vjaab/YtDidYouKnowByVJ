@@ -30,7 +30,8 @@ def generate_musetalk(face_path, audio_path, output_path, timeout=10800):
         "--audio_path", audio_path,
         "--output_path", output_path,
         "--fps", "24",
-        "--batch_size", "8" # MuseTalk is quite memory efficient
+        "--batch_size", "8", # MuseTalk is quite memory efficient
+        "--fp16" # Enable half-precision for T4 GPUs
     ]
 
     start_time = time.time()
