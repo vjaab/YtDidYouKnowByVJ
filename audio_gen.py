@@ -43,8 +43,12 @@ def _apply_stable_ts(audio_path, text):
             del model
             import gc
             gc.collect()
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
+            try:
+                import torch
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+            except ImportError:
+                pass
             return word_timestamps
     except Exception as e:
         print(f"stable-ts unavailable or failed: {e}")

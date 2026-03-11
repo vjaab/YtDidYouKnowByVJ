@@ -13,9 +13,6 @@ def trigger_kaggle_gpu_job(script_data, voice, emotion, custom_map):
     scripts_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts")
     job_file = os.path.join(scripts_dir, "job_data.json")
     
-    import pkgutil
-    import inspect
-    
     # 1. Inject Job Data directly into the script
     job_payload = {
         "script": script_data.get("script"),
