@@ -63,70 +63,107 @@ def setup_musetalk():
                     print(f"   ⚠ Skipping {dep}")
         
         # ── MMLab Stack (mmcv + mmpose + mmdet) ──────────────────────────
-        # These are the hardest packages. Use pre-built wheels where possible.
         print("📦 Installing MMLab stack...")
-        mmlab_steps = [
-            (["pip", "install", "-q", "-U", "openmim", "setuptools", "wheel"], "openmim"),
+        # Direct URLs for Python 3.12/CUDA 12.1 (typical for Kaggle)
+        # We try mim first, then fallback to direct pip URL
+        mm_index = "https://download.openmmlab.com/mmcv/dist/cu121/torch2.1/index.html"
+        
+        steps = [
+            (["pip", "install", "-q", "-U", "openmim", "setuptools<70", "wheel", "packaging"], "mim-core"),
             (["mim", "install", "mmengine"], "mmengine"),
-            (["pip", "install", "-q", "mmcv>=2.0.1", "--no-build-isolation"], "mmcv"),
+            (["pip", "install", "-q", "mmcv>=2.1.0", "-f", mm_index], "mmcv"),
             (["mim", "install", "mmdet>=3.1.0"], "mmdet"),
             (["mim", "install", "mmpose>=1.1.0"], "mmpose"),
         ]
         
         mmlab_ok = True
-        for cmd, name in mmlab_steps:
+        for cmd, name in steps:
             try:
                 run_cmd(cmd)
                 print(f"   ✅ {name}")
             except Exception as e:
-                print(f"   ❌ {name} failed: {e}")
-                mmlab_ok = False
+                print(f"   ⚠ {name} failed via primary: {e}")
+                # Secondary fallback for mmdet/mmpose if mim failed
+                if name in ["mmdet", "mmpose"]:
+                    try:
+                        print(f"   Trying direct pip for {name}...")
+                        run_cmd(["pip", "install", "-q", name])
+                        print(f"   ✅ {name} (via direct pip)")
+                    except:
+                        print(f"   ❌ {name} total failure.")
+                        mmlab_ok = False
+                else:
+                    mmlab_ok = False
         
         if not mmlab_ok:
             print("   ⚠ MMLab stack incomplete — MuseTalk may fall back to SadTalker")
         
         # ── Download MuseTalk model weights ──────────────────────────────
         print("📥 Downloading MuseTalk model weights...")
-        weight_script = os.path.join("MuseTalk", "download_weights.sh")
-        if os.path.exists(weight_script):
-            try:
-                run_cmd(["bash", "download_weights.sh"], cwd="MuseTalk")
-            except Exception as e:
-                print(f"   ⚠ Weight download failed: {e}")
-                print("   Attempting manual weight download via Python...")
-                _download_musetalk_weights_manual()
-        else:
-            print("   ⚠ download_weights.sh not found, attempting manual download...")
-            _download_musetalk_weights_manual()
+        # Skip the shell script (which lacks huggingface-cli in path) and use Python directly
+        _download_musetalk_weights_manual()
     else:
         print("✓ MuseTalk already set up.")
 
 
 def _download_musetalk_weights_manual():
-    """Fallback weight download if download_weights.sh fails."""
+    """Download weights via huggingface_hub API."""
     import subprocess
     models_dir = os.path.join("MuseTalk", "models")
     os.makedirs(models_dir, exist_ok=True)
     
-    # Download via huggingface_hub if available
+    print("   Using huggingface_hub snapshot_download...")
     try:
-        run_cmd([
-            "python3", "-c",
-            "from huggingface_hub import snapshot_download; "
-            "snapshot_download('TMElyralab/MuseTalk', local_dir='MuseTalk/models', "
-            "allow_patterns=['musetalk/*', 'musetalkV15/*', 'dwpose/*', 'sd-vae-ft-mse/*', 'whisper/*'])"
-        ])
-        print("   ✅ Weights downloaded via huggingface_hub")
+        # We use a python -c call to ensure it runs in a clean environment if needed
+        # but calling it directly inside the script is fine too.
+        from huggingface_hub import snapshot_download
+        snapshot_download(
+            repo_id='TMElyralab/MuseTalk', 
+            local_dir=models_dir, 
+            allow_patterns=['musetalk/*', 'musetalkV15/*', 'dwpose/*', 'sd-vae-ft-mse/*', 'whisper/*']
+        )
+        print("   ✅ Weights downloaded successfully.")
     except Exception as e:
-        print(f"   ⚠ Manual weight download failed: {e}")
+        print(f"   ❌ Weight download failed: {e}")
+        # Last resort: try the shell script if it exists
+        print("   Trying bash download_weights.sh as last resort...")
+        try:
+            run_cmd(["bash", "download_weights.sh"], cwd="MuseTalk")
+        except:
+            print("   ❌ Bash download also failed.")
 
         
+def _patch_basicsr():
+    """Basicsr patch for Python 3.12 (LooseVersion is gone) and modern torchvision."""
+    print("🛠️ Patching basicsr for modern environments...")
+    try:
+        import basicsr
+        path = os.path.dirname(basicsr.__file__)
+        # Fix 1: functional_tensor -> functional
+        deg_file = os.path.join(path, "data", "degradations.py")
+        if os.path.exists(deg_file):
+            with open(deg_file, 'r') as f: content = f.read()
+            content = content.replace("from torchvision.transforms.functional_tensor import rgb_to_grayscale", 
+                                      "from torchvision.transforms.functional import rgb_to_grayscale")
+            with open(deg_file, 'w') as f: f.write(content)
+        
+        # Fix 2: distutils.version -> packaging.version
+        arch_util = os.path.join(path, "archs", "arch_util.py")
+        if os.path.exists(arch_util):
+            with open(arch_util, 'r') as f: content = f.read()
+            content = content.replace("from distutils.version import LooseVersion", "from packaging.version import parse as LooseVersion")
+            with open(arch_util, 'w') as f: f.write(content)
+        print("   ✅ Basicsr patched.")
+    except Exception as e:
+        print(f"   ⚠ Basicsr patch failed: {e}")
+
+
 def setup_sadtalker():
     if not os.path.isdir("SadTalker"):
         print("📥 Cloning SadTalker...")
         run_cmd(["git", "clone", "-q", "https://github.com/OpenTalker/SadTalker.git"])
         
-        # Apply patches
+        # Apply patches for SadTalker itself
         print("🛠️ Patching SadTalker for modern environments...")
         prep_file = "SadTalker/src/face3d/util/preprocess.py"
         if os.path.exists(prep_file):
@@ -171,22 +208,8 @@ def setup_project():
         "diffusers", "transformers", "accelerate", "g2p_en",
         "--extra-index-url", "https://download.pytorch.org/whl/cu118"])
 
-    print("🛠️ Patching basicsr for modern torchvision compatibility...")
-    import site
-    packages = site.getsitepackages()
-    # Try all possible package locations
-    for pkg_dir in packages:
-        degradations_file = os.path.join(pkg_dir, "basicsr", "data", "degradations.py")
-        if os.path.exists(degradations_file):
-            print(f"Found and patching: {degradations_file}")
-            with open(degradations_file, "r") as f:
-                content = f.read()
-            content = content.replace("functional_tensor", "functional")
-            with open(degradations_file, "w") as f:
-                f.write(content)
-            break
-    else:
-        print("⚠ Could not find basicsr/data/degradations.py to patch.")
+    print("�️ Applying environment patches...")
+    _patch_basicsr()
 
 def process_job():
     print("🎬 Starting GPU Job...")
