@@ -64,9 +64,17 @@ def setup_musetalk():
         
         # ── MMLab Stack (mmcv + mmpose + mmdet) ──────────────────────────
         print("📦 Installing MMLab stack...")
-        # Direct URLs for Python 3.12/CUDA 12.1 (typical for Kaggle)
-        # We try mim first, then fallback to direct pip URL
-        mm_index = "https://download.openmmlab.com/mmcv/dist/cu121/torch2.1/index.html"
+        
+        # Detect torch version for correct wheel index
+        try:
+            import torch as _torch
+            torch_ver = _torch.__version__.split('+')[0]
+            # Map torch version to index (e.g. 2.4.0 -> 2.4)
+            torch_short = '.'.join(torch_ver.split('.')[:2])
+            mm_index = f"https://download.openmmlab.com/mmcv/dist/cu121/torch{torch_short}/index.html"
+            print(f"   Using MMLab index for torch {torch_short} and cu121...")
+        except:
+            mm_index = "https://download.openmmlab.com/mmcv/dist/cu121/torch2.1/index.html"
         
         steps = [
             (["pip", "install", "-q", "-U", "openmim", "setuptools<70", "wheel", "packaging"], "mim-core"),
@@ -84,7 +92,7 @@ def setup_musetalk():
             except Exception as e:
                 print(f"   ⚠ {name} failed via primary: {e}")
                 # Secondary fallback for mmdet/mmpose if mim failed
-                if name in ["mmdet", "mmpose"]:
+                if name in ["mmengine", "mmdet", "mmpose"]:
                     try:
                         print(f"   Trying direct pip for {name}...")
                         run_cmd(["pip", "install", "-q", name])
@@ -136,11 +144,23 @@ def _download_musetalk_weights_manual():
 def _patch_basicsr():
     """Basicsr patch for Python 3.12 (LooseVersion is gone) and modern torchvision."""
     print("🛠️ Patching basicsr for modern environments...")
+    import site
     try:
-        import basicsr
-        path = os.path.dirname(basicsr.__file__)
+        # Find basicsr path without importing it
+        target_dirs = site.getsitepackages()
+        basicsr_dir = None
+        for d in target_dirs:
+            potential = os.path.join(d, "basicsr")
+            if os.path.isdir(potential):
+                basicsr_dir = potential
+                break
+        
+        if not basicsr_dir:
+            print("   ⚠ Could not find basicsr directory via site-packages.")
+            return
+
         # Fix 1: functional_tensor -> functional
-        deg_file = os.path.join(path, "data", "degradations.py")
+        deg_file = os.path.join(basicsr_dir, "data", "degradations.py")
         if os.path.exists(deg_file):
             with open(deg_file, 'r') as f: content = f.read()
             content = content.replace("from torchvision.transforms.functional_tensor import rgb_to_grayscale", 
@@ -148,12 +168,12 @@ def _patch_basicsr():
             with open(deg_file, 'w') as f: f.write(content)
         
         # Fix 2: distutils.version -> packaging.version
-        arch_util = os.path.join(path, "archs", "arch_util.py")
+        arch_util = os.path.join(basicsr_dir, "archs", "arch_util.py")
         if os.path.exists(arch_util):
             with open(arch_util, 'r') as f: content = f.read()
             content = content.replace("from distutils.version import LooseVersion", "from packaging.version import parse as LooseVersion")
             with open(arch_util, 'w') as f: f.write(content)
-        print("   ✅ Basicsr patched.")
+        print("   ✅ Basicsr patched manually.")
     except Exception as e:
         print(f"   ⚠ Basicsr patch failed: {e}")
 
@@ -206,7 +226,7 @@ def setup_project():
         "librosa", "resampy", "imageio-ffmpeg", "pyyaml", "joblib", 
         "scikit-image", "safetensors", "trimesh", "face-alignment",
         "diffusers", "transformers", "accelerate", "g2p_en",
-        "--extra-index-url", "https://download.pytorch.org/whl/cu118"])
+        "--extra-index-url", "https://download.pytorch.org/whl/cu121"])
 
     print("�️ Applying environment patches...")
     _patch_basicsr()
