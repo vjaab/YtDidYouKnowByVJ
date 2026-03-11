@@ -37,10 +37,10 @@ jobs:
           
       - name: Install Project Python Dependencies
         run: |
-          python -m pip install --upgrade pip
+          python -m pip install --upgrade pip setuptools wheel
           pip install -r requirements.txt
-          # MuseTalk MMLab dependencies
-          pip install openmim
+          # MuseTalk MMLab dependencies - explicitly install setuptools again just in case
+          pip install setuptools wheel openmim
           mim install "mmcv>=2.0.1" "mmdet>=3.1.0" "mmpose>=1.1.0"
           # Explicitly fix potential imageio recursion by forcing latest imageio-ffmpeg last
           pip install --upgrade imageio imageio-ffmpeg moviepy
