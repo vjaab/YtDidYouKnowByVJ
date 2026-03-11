@@ -22,10 +22,10 @@ def setup_musetalk():
         run_cmd(["git", "clone", "-q", "https://github.com/TMElyralab/MuseTalk.git"])
         
         # MuseTalk's own Python dependencies — but we MUST filter out packages
-        # that conflict with Kaggle's pre-installed versions (numpy, torch, opencv)
+        # that conflict with Kaggle's pre-installed versions (numpy, torch, opencv, g2p_en)
         print("📦 Installing MuseTalk requirements (filtered)...")
         skip_packages = {"numpy", "opencv-python", "opencv-contrib-python", 
-                         "torch", "torchvision", "torchaudio"}
+                         "torch", "torchvision", "torchaudio", "g2p-en", "g2p_en"}
         musetalk_req = os.path.join("MuseTalk", "requirements.txt")
         if os.path.exists(musetalk_req):
             with open(musetalk_req, "r") as f:
@@ -47,7 +47,7 @@ def setup_musetalk():
             with open(filtered_req, "w") as f:
                 f.write("\n".join(filtered))
             
-            run_cmd(["pip", "install", "-q", "--no-deps", "-r", filtered_req], cwd=".")
+            run_cmd(["pip", "install", "-q", "-r", filtered_req], cwd=".")
         
         # MMLab Dependencies (same --no-build-isolation fix as GHA)
         print("📦 Installing MMLab stack (mmcv, mmpose)...")
@@ -116,7 +116,7 @@ def setup_project():
         "facexlib", "gfpgan", "basicsr", "av", "yacs", "kornia", 
         "librosa", "resampy", "imageio-ffmpeg", "pyyaml", "joblib", 
         "scikit-image", "safetensors", "trimesh", "face-alignment",
-        "diffusers", "transformers", "accelerate",
+        "diffusers", "transformers", "accelerate", "g2p_en",
         "--extra-index-url", "https://download.pytorch.org/whl/cu118"])
 
     print("🛠️ Patching basicsr for modern torchvision compatibility...")

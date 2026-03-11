@@ -76,7 +76,6 @@ def generate_musetalk(face_path, audio_path, output_path, timeout=10800):
         "--unet_model_path", unet_model_path,
         "--unet_config", unet_config,
         "--version", version_arg,
-        "--batch_size", "8",  # Higher batch = faster on GPU (Kaggle T4 can handle 8)
     ]
 
     print(f"   CMD: {' '.join(cmd)}")

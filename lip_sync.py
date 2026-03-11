@@ -61,7 +61,6 @@ def _run_sadtalker(face_path, audio_path, output_path, enhancer=None, timeout=10
     is_ci = os.environ.get("GITHUB_ACTIONS") == "true"
     
     preprocess = "crop"  # 'crop' gives tighter face isolation = more accurate lip-sync
-    expression_scale = 1.2  # Slightly amplify facial expressions for realism
     
     cmd = [
         _get_python_exe(), "inference.py",
@@ -70,7 +69,6 @@ def _run_sadtalker(face_path, audio_path, output_path, enhancer=None, timeout=10
         "--result_dir", result_dir,
         "--still",
         "--preprocess", preprocess,
-        "--expression_scale", str(expression_scale),
     ]
     
     # 🏎️ Device & Quality Logic
