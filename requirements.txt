@@ -103,3 +103,7 @@ accelerate
 openai-whisper
 librosa
 scipy
+mmengine
+espeakng-loader
+onnxruntime
+# onnxruntime-gpu # Uncomment on GPU environments
