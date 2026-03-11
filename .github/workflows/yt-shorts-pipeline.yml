@@ -11,7 +11,7 @@ on:
 jobs:
   run-pipeline:
     runs-on: ubuntu-latest
-    timeout-minutes: 120 # Falls back to Kokoro or Edge-TTS locally, Kaggle handles heavy lifting
+    timeout-minutes: 240 # Accommodate heavy MuseTalk processing and potential cloud fallbacks
     
     steps:
       - name: Checkout Code
