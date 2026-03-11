@@ -99,9 +99,32 @@ jobs:
         # Always run this step to save the log, preventing duplicate topics tomorrow
         if: always()
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add news_log.json facts_log.json
-          git commit -m "[Bot] Auto-update news tracker logs" || echo "No changes to commit"
-          git pull --rebase origin main
-          git push origin main
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Pull latest changes first to minimize rebase complexity
+          git pull origin main --rebase || echo "Pull failed, proceeding anyway"
+          
+          # Add all potential tracking files
+          git add news_log.json facts_log.json || echo "No log files found to add"
+          
+          # Only commit if there are actual changes
+          if ! git diff --cached --quiet; then
+            git commit -m "[Bot] Auto-update news tracker logs"
+            
+            # Retry push up to 5 times for robustness against concurrent runs
+            for i in {1..5}; do
+              echo "Attempt $i to push changes..."
+              if git push origin main; then
+                echo "✅ Successfully pushed logs."
+                exit 0
+              fi
+              echo "⚠️ Push failed, syncing and retrying..."
+              sleep 10
+              git pull origin main --rebase
+            done
+            echo "❌ Failed to push logs after 5 attempts."
+            # We don't exit 1 here to keep the overall job status "Success" if generation worked
+          else
+            echo "✅ No changes to logs detected."
+          fi
