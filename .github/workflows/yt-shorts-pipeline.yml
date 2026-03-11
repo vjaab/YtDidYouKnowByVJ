@@ -39,17 +39,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip setuptools wheel
           pip install -r requirements.txt
-          # MuseTalk MMLab dependencies
-          pip install openmim
-          # Both chumpy and mmcv fail in pip's isolated build envs:
-          #   chumpy: setup.py imports pip -> ModuleNotFoundError
-          #   mmcv:   setup.py imports pkg_resources -> ModuleNotFoundError
-          # No pre-built mmcv wheels exist for torch2.10+cu128 yet.
-          # --no-build-isolation lets them use the main env's setuptools/pip.
-          pip install chumpy --no-build-isolation
-          mim install mmengine
-          pip install "mmcv>=2.1.0" --no-build-isolation
-          mim install "mmdet>=3.1.0" "mmpose>=1.1.0"
+          # MuseTalk MMLab dependencies (non-fatal — lip-sync runs on Kaggle GPU)
+          # If mmcv fails to build, the pipeline still works by offloading to Kaggle
+          pip install openmim || true
+          pip install chumpy --no-build-isolation || true
+          mim install mmengine || true
+          pip install "mmcv>=2.1.0" --no-build-isolation || true
+          mim install "mmdet>=3.1.0" "mmpose>=1.1.0" || true
           # Explicitly fix potential imageio recursion by forcing latest imageio-ffmpeg last
           pip install --upgrade imageio imageio-ffmpeg moviepy
           # FIX: Patch basicsr for torchvision compatibility without importing (prevents ModuleNotFoundError)

@@ -155,12 +155,14 @@ def run_pipeline(custom_topic=None, topic_type="research"):
                 ls_received = ls_path and os.path.exists(ls_path)
                 audio_received = audio_path and os.path.exists(audio_path)
                 
-                if ls_received:
+                if audio_received and ls_received:
                     log_message("✅ Received Audio and Lip-Sync from Kaggle GPU!")
                 elif audio_received:
                     log_message("✅ Received Audio from Kaggle GPU! (Lip-Sync was missing/failed)")
                 else:
-                    log_message("⚠️ Kaggle job finished but results were not found locally.")
+                    # CRITICAL: Audio not on disk — must regenerate locally
+                    log_message("⚠️ Kaggle job finished but audio not found. Falling back to local generation.")
+                    audio_path, duration, word_timestamps = generate_voiceover(script, voice, emotion, custom_phonetic_map=custom_map)
             else:
                 log_message("⚠️ Kaggle Handover failed. Falling back to local generation.")
                 audio_path, duration, word_timestamps = generate_voiceover(script, voice, emotion, custom_phonetic_map=custom_map)

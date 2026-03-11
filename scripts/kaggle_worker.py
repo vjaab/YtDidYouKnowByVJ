@@ -228,19 +228,37 @@ def process_job():
             lipsync_path = lipsync_out
         
         # 🟢 STEP 3: Save Results
+        # IMPORTANT: Copy files FIRST, before any cleanup can happen
+        # Kaggle outputs from /kaggle/working/ — copy to that dir
+        output_root = os.path.join(os.getcwd(), "..")
+        
         results = {
             "audio_path": os.path.basename(audio_path),
             "duration": duration,
             "word_timestamps": word_timestamps,
-            "lipsync_path": os.path.basename(lipsync_path)
+            "lipsync_path": os.path.basename(lipsync_path) if lipsync_path else None
         }
         
-        # Final Output Transfer
-        rel_audio_path = audio_path.split("YtDidYouKnowByVJ/")[-1] 
-        shutil.copy(os.path.join(os.getcwd(), rel_audio_path), "..")
-        shutil.copy(os.path.join(os.getcwd(), lipsync_out), "..")
+        # Final Output Transfer — copy to Kaggle's /kaggle/working/ for download
+        try:
+            rel_audio_path = audio_path.split("YtDidYouKnowByVJ/")[-1] 
+            audio_src = os.path.join(os.getcwd(), rel_audio_path)
+            if os.path.exists(audio_src):
+                shutil.copy(audio_src, output_root)
+                print(f"   Copied audio: {audio_src} → {output_root}")
+            else:
+                print(f"   ⚠ Audio file not found at: {audio_src}")
             
-        with open("../results.json", "w") as f:
+            lipsync_src = os.path.join(os.getcwd(), lipsync_out)
+            if os.path.exists(lipsync_src):
+                shutil.copy(lipsync_src, output_root)
+                print(f"   Copied lipsync: {lipsync_src} → {output_root}")
+            else:
+                print(f"   ⚠ Lipsync file not found at: {lipsync_src}")
+        except Exception as copy_err:
+            print(f"   ⚠ File copy failed: {copy_err}")
+            
+        with open(os.path.join(output_root, "results.json"), "w") as f:
             json.dump(results, f)
             
         print("✅ GPU Processing Complete.")
