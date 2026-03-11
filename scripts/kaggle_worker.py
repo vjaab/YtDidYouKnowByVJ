@@ -21,9 +21,33 @@ def setup_musetalk():
         print("📥 Cloning MuseTalk...")
         run_cmd(["git", "clone", "-q", "https://github.com/TMElyralab/MuseTalk.git"])
         
-        # MuseTalk's own Python dependencies
-        print("📦 Installing MuseTalk requirements...")
-        run_cmd(["pip", "install", "-q", "-r", "requirements.txt"], cwd="MuseTalk")
+        # MuseTalk's own Python dependencies — but we MUST filter out packages
+        # that conflict with Kaggle's pre-installed versions (numpy, torch, opencv)
+        print("📦 Installing MuseTalk requirements (filtered)...")
+        skip_packages = {"numpy", "opencv-python", "opencv-contrib-python", 
+                         "torch", "torchvision", "torchaudio"}
+        musetalk_req = os.path.join("MuseTalk", "requirements.txt")
+        if os.path.exists(musetalk_req):
+            with open(musetalk_req, "r") as f:
+                lines = f.readlines()
+            filtered = []
+            for line in lines:
+                line_stripped = line.strip()
+                if not line_stripped or line_stripped.startswith("#"):
+                    continue
+                # Extract package name (before any version specifier)
+                pkg_name = line_stripped.split(">=")[0].split("<=")[0].split("==")[0].split("<")[0].split(">")[0].split("[")[0].strip()
+                if pkg_name.lower() in skip_packages:
+                    print(f"   ⏭️  Skipping '{line_stripped}' (already installed on Kaggle)")
+                    continue
+                filtered.append(line_stripped)
+            
+            # Write filtered requirements to a temp file
+            filtered_req = os.path.join("MuseTalk", "requirements_filtered.txt")
+            with open(filtered_req, "w") as f:
+                f.write("\n".join(filtered))
+            
+            run_cmd(["pip", "install", "-q", "--no-deps", "-r", filtered_req], cwd=".")
         
         # MMLab Dependencies (same --no-build-isolation fix as GHA)
         print("📦 Installing MMLab stack (mmcv, mmpose)...")
