@@ -575,6 +575,277 @@ def _subscribe_clip(total_dur):
     return clip.with_start(start)
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+# ENGAGEMENT LAYERS (Retention Boosters)
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ── LAYER E1: Pattern Interrupt Flash (Stop the Scroll) ───────────────────────
+def _pattern_interrupt_flash(accent_color, total_dur):
+    """A 0.3s color flash at the very start to pattern-interrupt the feed scroll."""
+    dur = min(0.3, total_dur)
+    def make_frame(t):
+        # Bright flash that fades to black in 0.3s
+        intensity = max(0, 1.0 - (t / dur))
+        frame = np.full((FRAME_H, FRAME_W, 3), 0, dtype=np.uint8)
+        # Mix accent color with white for a punchy flash
+        flash_color = tuple(min(255, int(c + (255 - c) * intensity * 0.7)) for c in accent_color)
+        frame[:, :] = flash_color
+        return frame
+
+    def make_mask(t):
+        intensity = max(0, 1.0 - (t / dur)) * 0.85
+        return np.full((FRAME_H, FRAME_W), intensity, dtype=np.float64)
+
+    clip = VideoClip(make_frame, duration=dur)
+    mask = VideoClip(make_mask, is_mask=True, duration=dur)
+    return clip.with_mask(mask).with_start(0)
+
+
+# ── LAYER E2: Giant Hook Text (First 1.5s) ────────────────────────────────────
+def _hook_text_overlay(hook_text, accent_color, total_dur):
+    """Displays giant hook text in the first 1.5 seconds to stop the scroll."""
+    if not hook_text:
+        return None
+    dur = min(1.8, total_dur)
+    f = gf(72)
+    max_w = FRAME_W - 100
+
+    # Word-wrap the hook text
+    words = hook_text.split()
+    lines, cur = [], []
+    for w in words:
+        test = " ".join(cur + [w])
+        if ts(test, f)[0] > max_w and cur:
+            lines.append(" ".join(cur))
+            cur = [w]
+        else:
+            cur.append(w)
+    if cur:
+        lines.append(" ".join(cur))
+    lines = lines[:3]  # Max 3 lines
+
+    lh = ts("Ag", f)[1]
+    lsp = int(lh * 1.4)
+    total_h = lh + (len(lines) - 1) * lsp
+    canvas_h = total_h + 80
+    canvas = Image.new("RGBA", (FRAME_W, canvas_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(canvas)
+    # Semi-transparent dark backdrop
+    draw.rounded_rectangle([30, 10, FRAME_W - 30, canvas_h - 10], radius=20, fill=(0, 0, 0, 180))
+
+    for i, line in enumerate(lines):
+        lw, _ = ts(line, f)
+        tx = (FRAME_W - lw) // 2
+        ty = 40 + i * lsp
+        # Text shadow
+        for dx, dy in [(-3, 0), (3, 0), (0, -3), (0, 3)]:
+            draw.text((tx + dx, ty + dy), line, font=f, fill=(0, 0, 0, 200))
+        draw.text((tx, ty), line, font=f, fill=(*accent_color, 255))
+
+    arr = np.array(canvas.convert("RGB"))
+    mask = np.array(canvas.split()[3]).astype(float) / 255.0
+
+    def opacity_fn(t):
+        if t < 0.15:
+            return t / 0.15  # Fade in
+        elif t > dur - 0.4:
+            return max(0, (dur - t) / 0.4)  # Fade out
+        return 1.0
+
+    clip = VideoClip(lambda t: arr, duration=dur)
+    mclip = VideoClip(lambda t: mask * opacity_fn(t), is_mask=True, duration=dur)
+    y_pos = int(FRAME_H * 0.35)
+    return clip.with_mask(mclip).with_position(("center", y_pos)).with_start(0)
+
+
+# ── LAYER E3: Micro-Cliffhanger Captions ──────────────────────────────────────
+def _micro_cliffhanger_overlay(cliffhangers, accent_color, total_dur):
+    """Animated teaser text overlays that appear every ~10 seconds."""
+    clips = []
+    if not cliffhangers:
+        return clips
+
+    for ch in cliffhangers:
+        ch_ts = float(ch.get("timestamp", 0))
+        ch_text = ch.get("text", "")
+        if not ch_text or ch_ts >= total_dur - 1:
+            continue
+
+        dur = min(2.0, total_dur - ch_ts)
+        f = gf(32)
+        w, h = ts(ch_text, f)
+        pad_x, pad_y = 24, 14
+        img = Image.new("RGBA", (w + pad_x * 2, h + pad_y * 2), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        # Accent-colored pill with glow
+        draw.rounded_rectangle([0, 0, w + pad_x * 2, h + pad_y * 2], radius=20, fill=(*accent_color, 200))
+        draw.text((pad_x, pad_y), ch_text, font=f, fill=(255, 255, 255, 255))
+        arr = np.array(img.convert("RGB"))
+        mask_arr = np.array(img.split()[3]).astype(float) / 255.0
+
+        def make_opacity(t, _dur=dur):
+            if t < 0.2:
+                return t / 0.2
+            elif t > _dur - 0.3:
+                return max(0, (_dur - t) / 0.3)
+            return 1.0
+
+        # Slide in from right
+        def make_pos(t, _dur=dur):
+            slide = min(t / 0.3, 1.0)
+            x = int(FRAME_W - (FRAME_W * 0.9) * slide)
+            return (min(x, FRAME_W - 50), int(FRAME_H * 0.28))
+
+        clip = VideoClip(lambda t: arr, duration=dur)
+        mclip = VideoClip(lambda t, _dur=dur: mask_arr * make_opacity(t, _dur), is_mask=True, duration=dur)
+        clips.append(clip.with_mask(mclip).with_position(make_pos).with_start(ch_ts))
+
+    return clips
+
+
+# ── LAYER E4: Interactive Challenge Banner ────────────────────────────────────
+def _interactive_challenge_overlay(challenge_data, accent_color, total_dur):
+    """A comment/challenge prompt with pulsing border."""
+    if not challenge_data:
+        return None
+    ch_ts = float(challenge_data.get("timestamp", 0))
+    ch_text = challenge_data.get("text", "")
+    if not ch_text or ch_ts >= total_dur - 2:
+        return None
+
+    dur = min(3.0, total_dur - ch_ts)
+    f = gf(36)
+    w, h = ts(ch_text, f)
+    pad_x, pad_y = 30, 20
+    box_w = w + pad_x * 2 + 8
+    box_h = h + pad_y * 2 + 8
+
+    def make_frame(t):
+        img = Image.new("RGBA", (box_w, box_h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        # Pulsing border
+        pulse = 1.0 + 0.15 * math.sin(t * 8)
+        border_w = max(2, int(3 * pulse))
+        draw.rounded_rectangle([0, 0, box_w - 1, box_h - 1], radius=16, fill=(0, 0, 0, 200), outline=(*accent_color, 255), width=border_w)
+        # Icon
+        icon_f = gf(30)
+        draw.text((pad_x - 10, pad_y - 2), "💬", font=icon_f)
+        draw.text((pad_x + 30, pad_y), ch_text, font=f, fill=(255, 255, 255, 255))
+        return np.array(img.convert("RGB"))
+
+    def make_mask(t):
+        img = Image.new("RGBA", (box_w, box_h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        pulse = 1.0 + 0.15 * math.sin(t * 8)
+        border_w = max(2, int(3 * pulse))
+        draw.rounded_rectangle([0, 0, box_w - 1, box_h - 1], radius=16, fill=(255, 255, 255, 220), outline=(255, 255, 255, 255), width=border_w)
+        opacity = 1.0
+        if t < 0.3:
+            opacity = t / 0.3
+        elif t > dur - 0.5:
+            opacity = max(0, (dur - t) / 0.5)
+        return np.array(img.split()[3]).astype(float) / 255.0 * opacity
+
+    clip = VideoClip(make_frame, duration=dur)
+    mclip = VideoClip(make_mask, is_mask=True, duration=dur)
+    x_pos = (FRAME_W - box_w) // 2
+    y_pos = int(FRAME_H * 0.55)
+    return clip.with_mask(mclip).with_position((x_pos, y_pos)).with_start(ch_ts)
+
+
+# ── LAYER E5: Identity CTA Card (Last 5s) ────────────────────────────────────
+def _identity_cta_overlay(identity_text, accent_color, total_dur):
+    """Identity-based CTA that replaces generic 'subscribe' messaging."""
+    if not identity_text:
+        return None
+    dur = min(4.5, total_dur * 0.12)
+    start = total_dur - dur - 1.0  # Appears just before subscribe button
+    if start < 0:
+        return None
+
+    f = gf(34)
+    max_w = FRAME_W - 120
+    words = identity_text.split()
+    lines, cur = [], []
+    for w in words:
+        test = " ".join(cur + [w])
+        if ts(test, f)[0] > max_w and cur:
+            lines.append(" ".join(cur))
+            cur = [w]
+        else:
+            cur.append(w)
+    if cur:
+        lines.append(" ".join(cur))
+
+    lh = ts("Ag", f)[1]
+    lsp = int(lh * 1.3)
+    total_h = lh + (len(lines) - 1) * lsp
+    box_h = total_h + 50
+    box_w = FRAME_W - 80
+
+    img = Image.new("RGBA", (box_w, box_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    # Glassmorphism card
+    draw.rounded_rectangle([0, 0, box_w - 1, box_h - 1], radius=18, fill=(0, 0, 0, 160))
+    # Accent top bar
+    draw.rectangle([0, 0, box_w, 4], fill=(*accent_color, 255))
+
+    for i, line in enumerate(lines):
+        lw, _ = ts(line, f)
+        tx = (box_w - lw) // 2
+        ty = 25 + i * lsp
+        draw.text((tx, ty), line, font=f, fill=(255, 255, 255, 230))
+
+    arr = np.array(img.convert("RGB"))
+    mask_arr = np.array(img.split()[3]).astype(float) / 255.0
+
+    def opacity_fn(t):
+        if t < 0.4:
+            return t / 0.4
+        elif t > dur - 0.5:
+            return max(0, (dur - t) / 0.5)
+        return 1.0
+
+    clip = VideoClip(lambda t: arr, duration=dur)
+    mclip = VideoClip(lambda t: mask_arr * opacity_fn(t), is_mask=True, duration=dur)
+    x_pos = 40
+    y_pos = int(FRAME_H - TITLE_BOTTOM_GAP - box_h - 280)
+    return clip.with_mask(mclip).with_position((x_pos, y_pos)).with_start(start)
+
+
+# ── LAYER E6: Curiosity Timer ("Wait for it...") ─────────────────────────────
+def _curiosity_timer(total_dur):
+    """A 'Wait for it...' countdown in the first 5-8 seconds to keep early viewers."""
+    start = 2.0
+    dur = min(4.0, total_dur - start - 1)
+    if dur <= 0:
+        return None
+
+    f = gf(24)
+    text = "⏳ Wait for it..."
+    w, h = ts(text, f)
+    pad_x, pad_y = 16, 8
+    img = Image.new("RGBA", (w + pad_x * 2, h + pad_y * 2), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    draw.rounded_rectangle([0, 0, w + pad_x * 2, h + pad_y * 2], radius=14, fill=(255, 255, 255, 30))
+    draw.text((pad_x, pad_y), text, font=f, fill=(255, 255, 255, 200))
+    arr = np.array(img.convert("RGB"))
+    mask_arr = np.array(img.split()[3]).astype(float) / 255.0
+
+    def opacity_fn(t):
+        # Pulsing opacity
+        base = 0.7 + 0.3 * math.sin(t * 3)
+        if t < 0.3:
+            return base * (t / 0.3)
+        elif t > dur - 0.5:
+            return base * max(0, (dur - t) / 0.5)
+        return base
+
+    clip = VideoClip(lambda t: arr, duration=dur)
+    mclip = VideoClip(lambda t: mask_arr * opacity_fn(t), is_mask=True, duration=dur)
+    return clip.with_mask(mclip).with_position((FRAME_W - w - pad_x * 2 - 20, 170)).with_start(start)
+
+
 # ── Sync checks ───────────────────────────────────────────────────────────────
 def _sync_checks(chunks, audio_duration):
     issues = []
@@ -1525,7 +1796,42 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     disclosure = _ai_disclosure_overlay(audio_duration)
     watermark = _brand_watermark(audio_duration)
     
-    base_layers = bg_layer_clips + [tint, gradient] + particle_clips + logo_clips + fact_clips + burst_clips + reminder_clips + [grain_layer, flare_layer, disclosure, watermark]
+    # ── ENGAGEMENT LAYERS (Retention Boosters) ────────────────────────────────
+    engagement_clips = []
+    
+    # E1: Pattern Interrupt Flash (0.3s accent flash at start)
+    pi_flash = _pattern_interrupt_flash(accent_color, audio_duration)
+    if pi_flash:
+        engagement_clips.append(pi_flash)
+    
+    # E2: Giant Hook Text (first 1.5s)
+    hook_text = script_json.get("hook_text", "")
+    hook_overlay = _hook_text_overlay(hook_text, accent_color, audio_duration)
+    if hook_overlay:
+        engagement_clips.append(hook_overlay)
+    
+    # E3: Micro-Cliffhanger Captions (every ~10s)
+    cliffhangers = script_json.get("micro_cliffhangers", [])
+    engagement_clips.extend(_micro_cliffhanger_overlay(cliffhangers, accent_color, audio_duration))
+    
+    # E4: Interactive Challenge Banner
+    challenge = script_json.get("interactive_challenge")
+    challenge_clip = _interactive_challenge_overlay(challenge, accent_color, audio_duration)
+    if challenge_clip:
+        engagement_clips.append(challenge_clip)
+    
+    # E5: Identity CTA Card (last ~5s)
+    identity_cta = script_json.get("identity_cta", "")
+    identity_clip = _identity_cta_overlay(identity_cta, accent_color, audio_duration)
+    if identity_clip:
+        engagement_clips.append(identity_clip)
+    
+    # E6: Curiosity Timer ("Wait for it..." in first 5-8s)
+    curiosity = _curiosity_timer(audio_duration)
+    if curiosity:
+        engagement_clips.append(curiosity)
+    
+    base_layers = bg_layer_clips + [tint, gradient] + particle_clips + logo_clips + fact_clips + burst_clips + reminder_clips + engagement_clips + [grain_layer, flare_layer, disclosure, watermark]
     if avatar_pip:
         base_layers.append(avatar_pip)
     if screenshot_clip:
