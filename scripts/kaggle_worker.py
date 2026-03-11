@@ -117,10 +117,20 @@ def process_job():
     
     # 2. GPU Lip-Sync
     face_path = "assets/Firefly_video_final.mp4"
-    lipsync_out = "kaggle_lipsync.mp4"
+    optimized_face = "assets/Firefly_video_optimized.mp4"
+    
+    # 🏎️ Resize template to 512px width to prevent System RAM OOM on Kaggle
+    # SadTalker's max res is 512px anyway, so this preserves quality while saving 4x RAM
+    print("🏎️ Optimizing template resolution for RAM safety...")
+    run_cmd([
+        "ffmpeg", "-y", "-i", face_path, 
+        "-vf", "scale=512:-1", 
+        "-c:v", "libx264", "-crf", "23", "-preset", "veryfast",
+        optimized_face
+    ])
     
     lipsync_path = generate_lip_sync(
-        face_path=face_path,
+        face_path=optimized_face,
         audio_path=audio_path,
         output_path=lipsync_out
     )
