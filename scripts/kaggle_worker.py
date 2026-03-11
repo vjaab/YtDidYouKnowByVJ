@@ -231,14 +231,17 @@ def _install_mmlab():
         print("   ✅ mmpose")
     except:
         # chumpy build fails on Py3.12 — install mmpose without deps,
-        # then manually install its runtime deps (minus chumpy)
+        # then manually install its runtime deps (minus chumpy & xtcocotools)
         try:
             run_cmd(["pip", "install", "-q", "--no-deps", "mmpose"])
-            # Install mmpose's actual runtime dependencies (chumpy excluded)
-            run_cmd(["pip", "install", "-q", 
-                     "xtcocotools", "munkres", "json_tricks", 
-                     "scipy", "shapely"])
-            print("   ✅ mmpose (--no-deps + manual deps)")
+            print("   ✅ mmpose (--no-deps)")
+            # Install runtime deps individually (xtcocotools & chumpy have build issues)
+            # xtcocotools is only needed for COCO eval, not inference
+            for dep in ["munkres", "json_tricks", "scipy", "shapely"]:
+                try:
+                    run_cmd(["pip", "install", "-q", dep])
+                except:
+                    print(f"   ⚠ mmpose dep {dep} failed (non-critical)")
         except Exception as e:
             print(f"   ❌ mmpose failed: {e}")
 
