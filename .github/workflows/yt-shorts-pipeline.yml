@@ -94,7 +94,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin main
           git add news_log.json facts_log.json
           git commit -m "[Bot] Auto-update news tracker logs" || echo "No changes to commit"
+          git pull --rebase origin main
           git push origin main
