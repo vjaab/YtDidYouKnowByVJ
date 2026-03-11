@@ -25,10 +25,10 @@ jobs:
           
       - name: Install System Dependencies
         # ffmpeg is needed by moviepy for video rendering
-        # fonts-roboto ensures we don't end up with pixelated default fonts
+        # MuseTalk requires libglib2.0-0 libsm6 libxext6 libxrender1 for OpenCV
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg fonts-roboto
+          sudo apt-get install -y ffmpeg fonts-roboto libglib2.0-0 libsm6 libxext6 libxrender1
           
       - name: Verify FFmpeg Installation
         run: ffmpeg -version
@@ -39,6 +39,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          # MuseTalk MMLab dependencies
+          pip install openmim
+          mim install "mmcv>=2.0.1" "mmdet>=3.1.0" "mmpose>=1.1.0"
           # Explicitly fix potential imageio recursion by forcing latest imageio-ffmpeg last
           pip install --upgrade imageio imageio-ffmpeg moviepy
           # FIX: Patch basicsr for torchvision compatibility without importing (prevents ModuleNotFoundError)
