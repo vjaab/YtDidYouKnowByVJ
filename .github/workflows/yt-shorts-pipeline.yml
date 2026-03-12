@@ -65,15 +65,6 @@ jobs:
           # Skip local MMLab stack to save disk space (offloaded to Kaggle)
           # Explicitly fix potential imageio recursion by forcing latest imageio-ffmpeg last
           pip install --upgrade imageio imageio-ffmpeg moviepy
-          # FIX: Patch basicsr for torchvision compatibility without importing (prevents ModuleNotFoundError)
-          SITE_PKG=$(python -c "import site; print(site.getsitepackages()[0])")
-          FILE_TO_PATCH="$SITE_PKG/basicsr/data/degradations.py"
-          if [ -f "$FILE_TO_PATCH" ]; then
-            echo "Patching $FILE_TO_PATCH..."
-            sed -i 's/functional_tensor/functional/g' "$FILE_TO_PATCH"
-          else
-            echo "Warning: $FILE_TO_PATCH not found."
-          fi
           
       - name: Install Playwright Browsers
         run: npx -y playwright install --with-deps chromium

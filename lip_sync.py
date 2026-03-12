@@ -2,7 +2,6 @@
 lip_sync.py — Unified lip-sync engine abstraction.
 
 Now strictly focused on MuseTalk (High-quality GPU pipeline).
-Fallback engines (SadTalker) have been removed for maximum quality consistency.
 """
 
 import os

@@ -5,7 +5,17 @@ import time
 import tempfile
 import yaml
 
-def generate_musetalk(face_path, audio_path, output_path, timeout=10800):
+def is_musetalk_available():
+    """Check if MuseTalk directory and weights exist."""
+    musetalk_dir = "MuseTalk"
+    if not os.path.isdir(musetalk_dir):
+        return False
+    # Check for at least one UNet variant
+    v15_path = os.path.join(musetalk_dir, "models", "musetalkV15", "unet.pth")
+    v10_path = os.path.join(musetalk_dir, "models", "musetalk", "pytorch_model.bin")
+    return os.path.exists(v15_path) or os.path.exists(v10_path)
+
+def generate_musetalk_sync(face_path, audio_path, output_path, timeout=10800):
     """
     High-quality MuseTalk lip-sync pipeline.
     Uses the official `python -m scripts.inference` command.

@@ -553,7 +553,7 @@ def process_job():
 
         from audio_gen import generate_voiceover, unload_f5_model
         from lip_sync import generate_lip_sync
-        from musetalk_sync import generate_musetalk
+        from musetalk_sync import generate_musetalk_sync
         
         script = job_data.get("script")
         custom_map = job_data.get("custom_map")
@@ -618,7 +618,7 @@ def process_job():
         try:
             gc.collect()
             torch.cuda.empty_cache()
-            lipsync_path = generate_musetalk(
+            lipsync_path = generate_musetalk_sync(
                 face_path=optimized_face,
                 audio_path=audio_path,
                 output_path=lipsync_out

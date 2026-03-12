@@ -22,7 +22,6 @@ logs/
 !assets/icons/*.png
 !assets/fonts/*.ttf
 assets/kokoro-v1.0.onnx
-SadTalker/
 kaggle.json
 job_data.json
 ytdidyouknowbyvj_gpu_worker.py
