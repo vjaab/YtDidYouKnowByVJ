@@ -203,18 +203,46 @@ def _install_mmlab():
     except:
         print("   ⚠ Global stubs setup failed")
     
-    # Step 1: Uninstall everything first to ensure clean state
+    # Step 1: Clean start (except mmcv which we might want to keep if wheels are rare)
     try:
-        run_cmd(["pip", "uninstall", "-y", "mmcv", "mmdet", "mmpose", "mmengine", "mmcv-lite"])
+        run_cmd(["pip", "uninstall", "-y", "mmdet", "mmpose", "mmengine"])
     except:
         pass
 
-    # Step 2: mmengine (Forced 0.10.4 for Py3.12 compatibility)
+    # Step 2: mmengine (Forced 0.10.4 for Py3.12 compatibility) 
     try:
         run_cmd(["pip", "install", "-q", "mmengine==0.10.4", "--force-reinstall"])
         print("   ✅ mmengine==0.10.4 (forced)")
+        
+        # ── EXPERT PATCH: Physical Disk Patch for Adafactor KeyError ──────
+        import site
+        sp = site.getsitepackages()[0]
+        builder_path = os.path.join(sp, "mmengine", "optim", "optimizer", "builder.py")
+        if os.path.exists(builder_path):
+            with open(builder_path, "r") as f:
+                content = f.read()
+            
+            old_pattern = "    OPTIMIZERS.register_module(name='Adafactor', module=Adafactor)"
+            new_pattern = """    try:
+        OPTIMIZERS.register_module(name='Adafactor', module=Adafactor)
+    except KeyError:
+        pass  # Already registered by PyTorch 2.2+, skip"""
+            
+            if old_pattern in content and "except KeyError" not in content:
+                content = content.replace(old_pattern, new_pattern)
+                with open(builder_path, "w") as f:
+                    f.write(content)
+                print("   ✅ Physical Adafactor patch applied to builder.py")
+                
+                # Clear bytecode cache
+                pyc_path = os.path.join(sp, "mmengine", "optim", "optimizer", "__pycache__", "builder.cpython-312.pyc")
+                if os.path.exists(pyc_path):
+                    os.remove(pyc_path)
+                    print("   ✅ Cleared mmengine pyc cache")
+            else:
+                print("   ⚠ builder.py already patched or pattern not found")
     except Exception as e:
-        print(f"   ❌ mmengine failed: {e}")
+        print(f"   ❌ mmengine setup/patch failed: {e}")
     
     # Step 2: mmcv (needs CUDA ops — use pre-built wheels)
     import torch
@@ -233,22 +261,35 @@ def _install_mmlab():
     
     mmcv_installed = False
     
-    # Strategy: Try the OpenMMLab index first with various torch version tags.
-    # Kaggle might have Torch 2.5, but indexes usually stop at 2.1/2.2/2.3/2.4.
-    # We try them in descending order of recency.
-    for trial_v in [torch_v_simple, "2.4.0", "2.3.0", "2.2.0", "2.1.0"]:
-        # Also try common CUDA tags if exact tag fails (e.g. cu121 often works on cu124)
-        for trial_cuda in [cuda_tag, "cu121", "cu118"]:
-            try:
-                mm_index = f"https://download.openmmlab.com/mmcv/dist/{trial_cuda}/torch{trial_v}/index.html"
-                print(f"   Checking: {mm_index}")
-                run_cmd(["pip", "install", "-q", "mmcv==2.1.0", "-f", mm_index])
-                mmcv_installed = True
-                print(f"   ✅ mmcv==2.1.0 (via {trial_cuda}/torch{trial_v})")
-                break
-            except:
-                continue
-        if mmcv_installed: break
+    # Check if mmcv is already installed (Kaggle often pre-installs compatible versions)
+    try:
+        import mmcv
+        print(f"   ✓ Existing mmcv {mmcv.__version__} detected")
+        mmcv_installed = True
+    except:
+        pass
+
+    if not mmcv_installed or int(torch_v_simple.split('.')[0]) < 2 or int(torch_v_simple.split('.')[1]) < 9:
+        # Only try re-installing mmcv if missing or on older Torch versions where wheels exist
+        if int(torch_v_simple.split('.')[0]) >= 2 and int(torch_v_simple.split('.')[1]) >= 9:
+            print("   ⚠️ Torch 2.9+ detected. Skipping mmcv reinstall (no prebuilt wheels yet).")
+        else:
+            # Strategy: Try the OpenMMLab index first with various torch version tags.
+            # Kaggle might have Torch 2.5, but indexes usually stop at 2.1/2.2/2.3/2.4.
+            # We try them in descending order of recency.
+            for trial_v in [torch_v_simple, "2.4.0", "2.3.0", "2.2.0", "2.1.0"]:
+                # Also try common CUDA tags if exact tag fails (e.g. cu121 often works on cu124)
+                for trial_cuda in [cuda_tag, "cu121", "cu118"]:
+                    try:
+                        mm_index = f"https://download.openmmlab.com/mmcv/dist/{trial_cuda}/torch{trial_v}/index.html"
+                        print(f"   Checking: {mm_index}")
+                        run_cmd(["pip", "install", "-q", "mmcv==2.1.0", "-f", mm_index])
+                        mmcv_installed = True
+                        print(f"   ✅ mmcv==2.1.0 (via {trial_cuda}/torch{trial_v})")
+                        break
+                    except:
+                        continue
+                if mmcv_installed: break
 
     # Try MiroPsota pre-built wheels if OpenMMLab fails
     if not mmcv_installed:
