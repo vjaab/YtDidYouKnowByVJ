@@ -628,6 +628,13 @@ def process_job():
         
         # 🔓 Unload F5-TTS
         unload_f5_model()
+
+        # 🔄 Final Audio Format Check: Ensure .wav for MuseTalk
+        if audio_path and audio_path.endswith(".mp3"):
+            print("🔄 Converting Edge TTS mp3 to wav for MuseTalk compatibility...")
+            wav_path = audio_path.replace(".mp3", ".wav")
+            run_cmd(["ffmpeg", "-y", "-i", audio_path, wav_path])
+            audio_path = wav_path
         
         # 🟢 STEP 2: Prep Assets & Optimize
         face_path = "assets/Firefly_video_final.mp4"
