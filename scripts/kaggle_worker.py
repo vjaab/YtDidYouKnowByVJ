@@ -30,7 +30,7 @@ def _patch_mmengine():
         # Check if already patched physically
         import inspect
         source = inspect.getsource(builder.register_transformers_optimizers)
-        if "except KeyError" in source:
+        if "force=True" in source or "except KeyError" in source:
             print("   ✅ mmengine already patched physically, skipping monkey-patch")
             return
 
@@ -145,18 +145,15 @@ def _install_mmlab():
                 content = f.read()
             
             old_pattern = "    OPTIMIZERS.register_module(name='Adafactor', module=Adafactor)"
-            new_pattern = """    try:
-        OPTIMIZERS.register_module(name='Adafactor', module=Adafactor)
-    except KeyError:
-        pass  # Already registered by PyTorch 2.2+, skip"""
+            new_pattern = "    OPTIMIZERS.register_module(name='Adafactor', module=Adafactor, force=True)"
             
-            if "except KeyError" in content:
-                print("   ✅ builder.py already patched, skipping")
+            if "force=True" in content:
+                print("   ✅ builder.py already patched (force=True), skipping")
             elif old_pattern in content:
                 content = content.replace(old_pattern, new_pattern)
                 with open(builder_path, "w") as f:
                     f.write(content)
-                print("   ✅ Physical Adafactor patch applied to builder.py")
+                print("   ✅ Physical Adafactor patch applied (force=True) to builder.py")
                 
                 # Clear bytecode cache
                 pyc_path = os.path.join(sp, "mmengine", "optim", "optimizer", "__pycache__", "builder.cpython-312.pyc")
@@ -508,7 +505,7 @@ def setup_project():
     
     # CRITICAL: Re-pin numpy AFTER torch and other heavy deps (Torch 2.9 pulls numpy 2.4+)
     print("🔁 Re-pinning numpy to <2.0 for F5-TTS/Numba compatibility...")
-    run_cmd(["pip", "install", "-q", "numpy==1.26.4", "--force-reinstall"])
+    run_cmd(["pip", "install", "-q", "numpy==1.26.4", "--force-reinstall", "--no-deps"])
     try:
         import numpy as np
         print(f"   ✅ numpy verified: {np.__version__}")
