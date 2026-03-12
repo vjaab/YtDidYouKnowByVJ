@@ -1883,16 +1883,16 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     # ── EMOJI POPUPS ─────────────────────────────────────────────────────────
     emoji_popups = script_json.get("emoji_popups", [])
     for ep in emoji_popups:
-        ts = float(ep.get("timestamp", 0))
-        if ts < audio_duration:
+        ep_ts = float(ep.get("timestamp", 0))
+        if ep_ts < audio_duration:
             e_img = render_emoji_popup(ep.get("emoji", "🚀"))
-            e_clip = ImageClip(np.array(e_img)).with_duration(1.0).with_start(ts)
+            e_clip = ImageClip(np.array(e_img)).with_duration(1.0).with_start(ep_ts)
             # Center-ish position with a little random offset
             pos = (FRAME_W//2 - 200 + random.randint(-50, 50), FRAME_H//2 - 400)
             e_clip = e_clip.with_position(pos).with_effects([vfx.CrossFadeIn(0.2)])
             base_layers.append(e_clip)
 
-    # ── EASTER EGG FRAME (0.05s) ─────────────────────────────────────────────
+   # ── EASTER EGG FRAME (0.05s) ─────────────────────────────────────────────
     egg_ts = random.uniform(audio_duration * 0.4, audio_duration * 0.7)
     egg_img = insert_easter_egg()
     egg_clip = ImageClip(np.array(egg_img)).with_duration(0.05).with_start(egg_ts)
@@ -1913,10 +1913,10 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     sfx_cues = script_json.get("sfx_cues", [])
     for cue in sfx_cues:
         ctype = cue.get("type", "woosh").lower()
-        ts = float(cue.get("timestamp", 0))
+        cue_ts = float(cue.get("timestamp", 0))
         sfx_path = os.path.join(ASSETS_DIR, "sfx", f"{ctype}.wav")
-        if os.path.exists(sfx_path) and ts < audio_duration:
-            sfx_clip = AudioFileClip(sfx_path).with_start(ts).with_effects([afx.MultiplyVolume(0.4)])
+        if os.path.exists(sfx_path) and cue_ts < audio_duration:
+            sfx_clip = AudioFileClip(sfx_path).with_start(cue_ts).with_effects([afx.MultiplyVolume(0.4)])
             final_audio_layers.append(sfx_clip)
     
     # Background Music with Auto-Ducking
