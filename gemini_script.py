@@ -8,7 +8,7 @@ from config import GEMINI_API_KEY, LOGS_DIR
 from topic_tracker import load_tracker, check_story_uniqueness, check_cooldowns
 from ecosystem_logic import get_slot_info, get_category_prompt_enhancement
 
-def pick_and_generate_script(articles=None, extra_instruction="", forced_article=None, topic_type="research", force_run=False):
+def pick_and_generate_script(articles=None, extra_instruction="", forced_article=None, topic_type="research"):
     client = genai.Client(api_key=GEMINI_API_KEY)
     
     day_name, slot, category = get_slot_info()
@@ -16,38 +16,34 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
 
     # ── STEP 0: GEMINI SEARCH (If no articles provided) ─────────────────────
     if not articles:
-        if forced_article:
-            print(f"🎯 STEP 0: Using Forced Topic -> {forced_article}")
-            news_context = f"FORCED TOPIC TO COVER:\n{forced_article}\n"
-        else:
-            print(f"🔍 STEP 0: Using Gemini Search for {topic_type} ({category})...")
-            search_query = f"Latest groundbreaking {topic_type} news and research about {category} from the last 24 hours. Focus on technical breakthroughs and company launches."
-            
-            try:
-                search_response = client.models.generate_content(
-                    model='gemini-2.0-flash', # Use stable flash for tools
-                    contents=search_query,
-                    config=types.GenerateContentConfig(
-                        tools=[{'google_search': {}}]
-                    )
+        print(f"🔍 STEP 0: Using Gemini Search for {topic_type} ({category})...")
+        search_query = f"Latest groundbreaking {topic_type} news and research about {category} from the last 24 hours. Focus on technical breakthroughs and company launches."
+        
+        try:
+            search_response = client.models.generate_content(
+                model='gemini-2.0-flash', # Use stable flash for tools
+                contents=search_query,
+                config=types.GenerateContentConfig(
+                    tools=[{'google_search': {}}]
                 )
-                
-                # Extract URLs from grounding metadata to ensure we have real links for screenshots
-                grounding_links = []
-                if search_response.candidates and search_response.candidates[0].grounding_metadata:
-                    gm = search_response.candidates[0].grounding_metadata
-                    if hasattr(gm, 'grounding_chunks'):
-                        for chunk in gm.grounding_chunks:
-                            if hasattr(chunk, 'web') and chunk.web.uri:
-                                grounding_links.append(f"{chunk.web.title}: {chunk.web.uri}")
-                
-                links_str = "\n".join(grounding_links)
-                # Use the grounded response to build a context
-                news_context = f"GEMINI SEARCH RESULTS (Grounded):\n{search_response.text}\n\nSOURCES FOUND:\n{links_str}\n"
-                print(f"✅ Gemini Search completed with {len(grounding_links)} sources.")
-            except Exception as e:
-                print(f"⚠️ Gemini Search failed: {e}. Falling back to empty context.")
-                news_context = "No news articles found."
+            )
+            
+            # Extract URLs from grounding metadata to ensure we have real links for screenshots
+            grounding_links = []
+            if search_response.candidates and search_response.candidates[0].grounding_metadata:
+                gm = search_response.candidates[0].grounding_metadata
+                if hasattr(gm, 'grounding_chunks'):
+                    for chunk in gm.grounding_chunks:
+                        if hasattr(chunk, 'web') and chunk.web.uri:
+                            grounding_links.append(f"{chunk.web.title}: {chunk.web.uri}")
+            
+            links_str = "\n".join(grounding_links)
+            # Use the grounded response to build a context
+            news_context = f"GEMINI SEARCH RESULTS (Grounded):\n{search_response.text}\n\nSOURCES FOUND:\n{links_str}\n"
+            print(f"✅ Gemini Search completed with {len(grounding_links)} sources.")
+        except Exception as e:
+            print(f"⚠️ Gemini Search failed: {e}. Falling back to empty context.")
+            news_context = "No news articles found."
     else:
         # ── Pre-filter articles (Unique against history AND against each other) ──
         filtered_articles = []
@@ -59,7 +55,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
             
             # 1. Check against long-term history
             is_unique, _ = check_story_uniqueness(title, url)
-            if not is_unique and not force_run:
+            if not is_unique:
                 continue
                 
             # 2. Check against other articles in this same feed batch
@@ -290,7 +286,7 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
             headline = script_data.get("original_news_headline", "")
             news_url = script_data.get("original_news_url", "")
             is_unique, msg = check_story_uniqueness(headline, news_url)
-            if not is_unique and not force_run:
+            if not is_unique:
                 print(f"Duplicate story detected: {msg}")
                 extra_instruction += f"\nNote: You MUST skip the story titled '{headline}'. It was already covered!"
                 attempts += 1
@@ -301,7 +297,7 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
             comps = script_data.get("companies_mentioned", [])
             subcat = script_data.get("sub_category", "")
             cooldown_ok, cool_msg = check_cooldowns(comps, subcat)
-            if not cooldown_ok and script_data.get("breaking_news_level", 0) < 8 and not force_run:
+            if not cooldown_ok and script_data.get("breaking_news_level", 0) < 8:
                 print(f"Cooldown warning: {cool_msg} (Attempting to skip since not breaking)")
                 extra_instruction += f"\nNote: Try to avoid mentioning '{comps}' or category '{subcat}' as they are overused recently, unless the story is hugely breaking."
                 attempts += 1
