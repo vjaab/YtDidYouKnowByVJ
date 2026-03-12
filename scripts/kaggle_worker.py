@@ -540,47 +540,13 @@ def _download_musetalk_weights():
         if all_ok:
             print("   ✅ All weights verified.")
         else:
-            print("   ⚠ Some weights missing — MuseTalk may fall back to SadTalker.")
+            print("   ⚠ Some MuseTalk weights missing.")
             
     except Exception as e:
         print(f"   ❌ Weight download failed: {e}")
         import traceback
         traceback.print_exc()
 
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# SADTALKER SETUP
-# ═══════════════════════════════════════════════════════════════════════════════
-
-def setup_sadtalker():
-    if not os.path.isdir("SadTalker"):
-        print("📥 Cloning SadTalker...")
-        run_cmd(["git", "clone", "-q", "https://github.com/OpenTalker/SadTalker.git"])
-        
-        # SadTalker-specific patches
-        print("🛠️ Patching SadTalker for modern environments...")
-        prep_file = "SadTalker/src/face3d/util/preprocess.py"
-        if os.path.exists(prep_file):
-            with open(prep_file, 'r') as f:
-                content = f.read()
-            content = content.replace('np.VisibleDeprecationWarning', 'Warning')
-            with open(prep_file, 'w') as f:
-                f.write(content)
-        
-        # FIX: np.float attribute error in modern numpy
-        awing_file = "SadTalker/src/face3d/util/my_awing_arch.py"
-        if os.path.exists(awing_file):
-            with open(awing_file, 'r') as f:
-                content = f.read()
-            if "np.float" in content:
-                content = content.replace("np.float", "float")
-                with open(awing_file, 'w') as f:
-                    f.write(content)
-                print("   ✅ Patched SadTalker my_awing_arch.py (np.float → float)")
-
-        print("📥 Downloading SadTalker Weights...")
-        os.makedirs("SadTalker/checkpoints", exist_ok=True)
-        run_cmd(["bash", "scripts/download_models.sh"], cwd="SadTalker", quiet=True)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -795,8 +761,6 @@ def process_job():
         os.chdir("..")
         if os.path.isdir("YtDidYouKnowByVJ"):
             shutil.rmtree("YtDidYouKnowByVJ", ignore_errors=True)
-        if os.path.isdir("SadTalker"):
-            shutil.rmtree("SadTalker", ignore_errors=True)
         if os.path.isdir("MuseTalk"):
             shutil.rmtree("MuseTalk", ignore_errors=True)
 
@@ -804,6 +768,5 @@ if __name__ == "__main__":
     print("--- Kaggle Worker Initiated ---")
     setup_project()
     setup_musetalk()
-    # setup_sadtalker()
     process_job()
     print("--- Job Finished ---")
