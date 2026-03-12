@@ -1,8 +1,5 @@
 """
-audio_gen.py — Audio generation with word-level timestamps.
-
-PRIMARY PATH: Edge TTS stream() captures WordBoundary events → exact timestamps.
-FALLBACK 2:   Kokoro local TTS (no timestamps → estimated from duration).
+PRIMARY PATH: F5-TTS Local Voice Cloning (Your Voice).
 """
 
 import os
@@ -159,9 +156,6 @@ def get_audio_duration(path):
             return 0
 
 
-# Edge TTS and Kokoro fallbacks removed to ensure 100% voice cloning authenticity.
-
-
 # ─────────────────────────────────────────────────────────────────────────────
 # PRIMARY: F5-TTS (0 Rs / Local Voice Cloning) — High-Quality Pipeline
 # ─────────────────────────────────────────────────────────────────────────────
@@ -303,12 +297,6 @@ def _generate_f5_clone(text, output_path):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# PRIMARY: Kokoro (Local Open Source / 100% Free)
-# ─────────────────────────────────────────────────────────────────────────────
-# Kokoro implementation removed.
-
-
-# ─────────────────────────────────────────────────────────────────────────────
 # PUBLIC ENTRY POINT
 # ─────────────────────────────────────────────────────────────────────────────
 def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
@@ -403,7 +391,7 @@ def restore_original_words(word_timestamps, original_text, custom_phonetic_map=N
                         
     return word_timestamps
 
-def generate_voiceover(text, voice_request="en-US-BrianNeural", emotion="excited", custom_phonetic_map=None):
+def generate_voiceover(text, custom_phonetic_map=None):
     """
     Returns: (audio_path, duration, word_timestamps)
     """

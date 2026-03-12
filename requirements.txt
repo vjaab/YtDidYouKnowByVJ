@@ -13,7 +13,6 @@ cryptography==46.0.5
 csvw==3.7.0
 decorator==5.2.1
 distro==1.9.0
-edge-tts==7.2.7
 elevenlabs==2.36.1
 feedparser==6.0.12
 flatbuffers==25.12.19
@@ -40,7 +39,6 @@ isodate==0.7.2
 joblib==1.5.3
 jsonschema==4.26.0
 jsonschema-specifications==2025.9.1
-kokoro-onnx
 language-tags==1.2.0
 moviepy==2.2.1
 mpmath==1.3.0

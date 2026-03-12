@@ -679,8 +679,6 @@ def process_job():
         from musetalk_sync import generate_musetalk
         
         script = job_data.get("script")
-        voice = job_data.get("voice")
-        emotion = job_data.get("emotion")
         custom_map = job_data.get("custom_map")
         
         # 🖼️ Reference Frame Sanity Check
@@ -706,7 +704,7 @@ def process_job():
             import numpy as np
             print(f"🔍 NumPy at runtime: {np.__version__}")
             audio_path, duration, word_timestamps = generate_voiceover(
-                script, voice, emotion, custom_phonetic_map=custom_map
+                script, custom_phonetic_map=custom_map
             )
         except Exception as e:
             print(f"❌ F5-TTS Voice Cloning FAILED: {e}")

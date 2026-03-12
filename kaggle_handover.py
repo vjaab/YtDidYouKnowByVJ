@@ -4,7 +4,7 @@ import time
 import subprocess
 import shutil
 
-def trigger_kaggle_gpu_job(script_data, voice, emotion, custom_map):
+def trigger_kaggle_gpu_job(script_data, custom_map):
     """
     Saves job data, pushes to Kaggle, waits for completion, and downloads results.
     """
@@ -16,8 +16,6 @@ def trigger_kaggle_gpu_job(script_data, voice, emotion, custom_map):
     # 1. Inject Job Data directly into the script
     job_payload = {
         "script": script_data.get("script"),
-        "voice": voice,
-        "emotion": emotion,
         "custom_map": custom_map
     }
     

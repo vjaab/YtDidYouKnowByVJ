@@ -129,8 +129,6 @@ def run_pipeline(custom_topic=None, topic_type="research"):
 
         title  = script_data.get("title", "Tech News!")
         script = script_data.get("script", "")
-        voice  = script_data.get("edge_tts_voice", "en-US-BrianNeural")
-        emotion = script_data.get("edge_tts_emotion", "calm")
         log_message(f"Story: {script_data.get('original_news_headline')}")
         log_message(f"Breaking Level: {script_data.get('breaking_news_level')}")
 
@@ -143,7 +141,7 @@ def run_pipeline(custom_topic=None, topic_type="research"):
         
         if has_kaggle and not use_local_only:
             from kaggle_handover import trigger_kaggle_gpu_job
-            results = trigger_kaggle_gpu_job(script_data, voice, emotion, custom_map)
+            results = trigger_kaggle_gpu_job(script_data, custom_map)
             if results:
                 audio_path = results.get("audio_path")
                 duration = results.get("duration")
@@ -162,12 +160,12 @@ def run_pipeline(custom_topic=None, topic_type="research"):
                 else:
                     # CRITICAL: Audio not on disk — must regenerate locally
                     log_message("⚠️ Kaggle job finished but audio not found. Falling back to local generation.")
-                    audio_path, duration, word_timestamps = generate_voiceover(script, voice, emotion, custom_phonetic_map=custom_map)
+                    audio_path, duration, word_timestamps = generate_voiceover(script, custom_phonetic_map=custom_map)
             else:
                 log_message("⚠️ Kaggle Handover failed. Falling back to local generation.")
-                audio_path, duration, word_timestamps = generate_voiceover(script, voice, emotion, custom_phonetic_map=custom_map)
+                audio_path, duration, word_timestamps = generate_voiceover(script, custom_phonetic_map=custom_map)
         else:
-            audio_path, duration, word_timestamps = generate_voiceover(script, voice, emotion, custom_phonetic_map=custom_map)
+            audio_path, duration, word_timestamps = generate_voiceover(script, custom_phonetic_map=custom_map)
         
 
         if not audio_path:
