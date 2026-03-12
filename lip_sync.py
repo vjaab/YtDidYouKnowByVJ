@@ -93,7 +93,7 @@ def _run_sadtalker(face_path, audio_path, output_path, enhancer=None, timeout=10
     print(f"   CMD: {' '.join(cmd)}")
     
     env = os.environ.copy()
-    env["PYTHONHASHSEED"] = "0" # Fix for SadTalker fatal hardware/hash seed error
+    env["PYTHONHASHSEED"] = "random" # Fix for SadTalker/MuseTalk fatal hardware/hash seed error
     # Prevents fragmentation in limited memory environments
     env["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
     
@@ -187,22 +187,22 @@ def generate_lip_sync(face_path, audio_path, output_path, enhancer=None, timeout
     except Exception as e:
         print(f"   ⚠ MuseTalk error: {e}. Falling back...")
 
-    # Fallback to SadTalker (CPU-friendly)
-    if _is_sadtalker_ready():
-        print("🎭 Engine: SadTalker (Fallback)")
-        raw_output = output_path + ".raw.mp4"
-        success = _run_sadtalker(face_path, audio_path, raw_output, enhancer, timeout)
-        if success and os.path.exists(raw_output):
-            # Post-process for quality
-            enhanced = _postprocess_sadtalker(raw_output, output_path)
-            if enhanced and os.path.exists(enhanced):
-                try: os.remove(raw_output)
-                except: pass
-                return output_path
-            # Fallback to raw
-            shutil.move(raw_output, output_path)
-            return output_path
-        print("   ⚠ SadTalker failed.")
+    # Fallback to SadTalker (DISABLED)
+    # if _is_sadtalker_ready():
+    #     print("🎭 Engine: SadTalker (Fallback)")
+    #     raw_output = output_path + ".raw.mp4"
+    #     success = _run_sadtalker(face_path, audio_path, raw_output, enhancer, timeout)
+    #     if success and os.path.exists(raw_output):
+    #         # Post-process for quality
+    #         enhanced = _postprocess_sadtalker(raw_output, output_path)
+    #         if enhanced and os.path.exists(enhanced):
+    #             try: os.remove(raw_output)
+    #             except: pass
+    #             return output_path
+    #         # Fallback to raw
+    #         shutil.move(raw_output, output_path)
+    #         return output_path
+    #     print("   ⚠ SadTalker failed.")
 
     # ── No engine succeeded ───────────────────────────────────────────────────
     print("🎭 Lip-sync engine unavailable or failed.")

@@ -84,6 +84,7 @@ def generate_musetalk(face_path, audio_path, output_path, timeout=10800):
     try:
         env = os.environ.copy()
         env["PYTORCH_ALLOC_CONF"] = "expandable_segments:True"
+        env["PYTHONHASHSEED"] = "random"
         
         result = subprocess.run(
             cmd, cwd=musetalk_dir, capture_output=True, text=True,

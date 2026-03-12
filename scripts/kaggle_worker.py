@@ -1,5 +1,5 @@
 import os
-os.environ["PYTHONHASHSEED"] = "0"
+os.environ["PYTHONHASHSEED"] = "random"
 import subprocess
 import shutil
 import sys
@@ -161,8 +161,8 @@ def _install_mmlab():
     
     # Step 0: Ensure packaging tools are compatible
     try:
-        run_cmd(["pip", "install", "-q", "setuptools<70", "packaging", "wheel"])
-        print("   ✅ setuptools/packaging ready")
+        run_cmd(["pip", "install", "-q", "numpy<2.0", "setuptools<70", "packaging", "wheel"])
+        print("   ✅ numpy/setuptools/packaging ready")
     except:
         print("   ⚠ setuptools fix failed")
     
@@ -329,7 +329,14 @@ def _download_musetalk_weights():
                 "-O", os.path.join(face_parse_dir, "79999_iter.pth")
             ])
         except:
-            print("   ⚠ Face parse gdown failed")
+            # Fallback for newer gdown versions
+            try:
+                run_cmd([
+                    "gdown", "154JgKpzCPW82qINcVieuPH3fZ2e0P812",
+                    "-O", os.path.join(face_parse_dir, "79999_iter.pth")
+                ])
+            except:
+                print("   ⚠ Face parse gdown failed")
         try:
             run_cmd([
                 "curl", "-sL",
@@ -389,6 +396,17 @@ def setup_sadtalker():
             content = content.replace('np.VisibleDeprecationWarning', 'Warning')
             with open(prep_file, 'w') as f:
                 f.write(content)
+        
+        # FIX: np.float attribute error in modern numpy
+        awing_file = "SadTalker/src/face3d/util/my_awing_arch.py"
+        if os.path.exists(awing_file):
+            with open(awing_file, 'r') as f:
+                content = f.read()
+            if "np.float" in content:
+                content = content.replace("np.float", "float")
+                with open(awing_file, 'w') as f:
+                    f.write(content)
+                print("   ✅ Patched SadTalker my_awing_arch.py (np.float → float)")
 
         print("📥 Downloading SadTalker Weights...")
         os.makedirs("SadTalker/checkpoints", exist_ok=True)
@@ -425,7 +443,8 @@ def setup_project():
     
     # ── PYTHON DEPENDENCIES ────────────────────────────────────────────────
     print("📦 Installing Python Dependencies...")
-    run_cmd(["pip", "install", "-q", "-U", "pip", "setuptools<70", "wheel", "packaging"])
+    run_cmd(["pip", "install", "-q", "-U", "pip", "numpy<2.0", "setuptools<70", "wheel", "packaging"])
+    run_cmd(["pip", "install", "-q", "grpcio==1.62.2"]) # Fix for yanked versions
     run_cmd(["pip", "install", "-q", "-r", "requirements.txt"])
     
     # Force GPU-specific backends
@@ -511,22 +530,22 @@ def process_job():
             gc.collect()
             torch.cuda.empty_cache()
 
-        # 🥈 TIER 2: SadTalker Fallback
-        if not lipsync_path:
-            print("   ↳ Falling back to SadTalker...")
-            try:
-                gc.collect()
-                torch.cuda.empty_cache()
-                lipsync_path = generate_lip_sync(
-                    face_path=optimized_face,
-                    audio_path=audio_path,
-                    output_path=lipsync_out
-                )
-            except Exception as e:
-                print(f"   ⚠ SadTalker failed: {e}")
-            finally:
-                gc.collect()
-                torch.cuda.empty_cache()
+        # 🥈 TIER 2: SadTalker Fallback (DISABLED)
+        # if not lipsync_path:
+        #     print("   ↳ Falling back to SadTalker...")
+        #     try:
+        #         gc.collect()
+        #         torch.cuda.empty_cache()
+        #         lipsync_path = generate_lip_sync(
+        #             face_path=optimized_face,
+        #             audio_path=audio_path,
+        #             output_path=lipsync_out
+        #         )
+        #     except Exception as e:
+        #         print(f"   ⚠ SadTalker failed: {e}")
+        #     finally:
+        #         gc.collect()
+        #         torch.cuda.empty_cache()
 
         # 🥉 TIER 3: Raw Fallback (Audio + Original Video)
         if not lipsync_path:
@@ -583,6 +602,6 @@ if __name__ == "__main__":
     setup_project()
     os.chdir("YtDidYouKnowByVJ") 
     setup_musetalk()
-    setup_sadtalker()
+    # setup_sadtalker()
     process_job()
     print("--- Job Finished ---")
