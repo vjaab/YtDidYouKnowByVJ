@@ -676,5 +676,11 @@ if __name__ == "__main__":
     print("--- Kaggle Worker Initiated ---")
     setup_project()
     setup_musetalk()
+    
+    # 🔁 FINAL CRITICAL RE-PIN: Ensure numpy 1.26.4 is the last word
+    # This fixes corruption from mmengine/torch upgrades during MMLab setup
+    print("🔁 Finalizing environment: Locking numpy==1.26.4...")
+    run_cmd(["pip", "install", "-q", "numpy==1.26.4", "--force-reinstall", "--no-deps"])
+    
     process_job()
     print("--- Job Finished ---")
