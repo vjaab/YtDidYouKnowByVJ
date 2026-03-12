@@ -111,6 +111,10 @@ def _patch_mmengine():
     """
     print("🛠️ Patching mmengine registry for Adafactor compatibility...")
     try:
+        import importlib
+        import mmengine
+        importlib.reload(mmengine)
+        
         import mmengine.optim.optimizer.builder as builder
         if hasattr(builder, 'register_transformers_optimizers'):
             orig_reg = builder.register_transformers_optimizers
@@ -120,7 +124,9 @@ def _patch_mmengine():
                 except KeyError:
                     pass # Already registered
             builder.register_transformers_optimizers = safe_register
-            print("   ✅ mmengine Adafactor patch applied")
+            # Force run it now to claim the territory
+            safe_register()
+            print("   ✅ mmengine Adafactor patch applied & reloaded")
     except Exception as e:
         print(f"   ⚠ Could not patch mmengine: {e}")
 
@@ -203,10 +209,10 @@ def _install_mmlab():
     except:
         pass
 
-    # Step 2: mmengine (Pinned to 0.10.4 for stability)
+    # Step 2: mmengine (Forced 0.10.4 for Py3.12 compatibility)
     try:
-        run_cmd(["pip", "install", "-q", "mmengine==0.10.4"])
-        print("   ✅ mmengine==0.10.4")
+        run_cmd(["pip", "install", "-q", "mmengine==0.10.4", "--force-reinstall"])
+        print("   ✅ mmengine==0.10.4 (forced)")
     except Exception as e:
         print(f"   ❌ mmengine failed: {e}")
     
@@ -595,9 +601,19 @@ def process_job():
     try:
         sys.path.append(os.getcwd())
         
-        # Apply runtime patches before imports
+        # 🛡️ Apply Expert Runtime Patches
         _patch_mmengine()
+        os.environ["DWPOSE_DEVICE"] = "cuda" # Force DWPose to GPU
         
+        # 🔍 Print Stack Versions for Debugging
+        import torch
+        print(f"🔍 System Check: PyTorch {torch.__version__} | CUDA: {torch.cuda.is_available()}")
+        try:
+            import mmengine; print(f"🔍 mmengine: {mmengine.__version__}")
+            import mmpose;   print(f"🔍 mmpose:   {mmpose.__version__}")
+        except:
+            print("🔍 MMLab imports failed — checking stubs...")
+
         from audio_gen import generate_voiceover, unload_f5_model
         from lip_sync import generate_lip_sync
         from musetalk_sync import generate_musetalk
@@ -606,6 +622,23 @@ def process_job():
         voice = job_data.get("voice")
         emotion = job_data.get("emotion")
         custom_map = job_data.get("custom_map")
+        
+        # 🖼️ Reference Frame Sanity Check
+        face_path = "assets/Firefly_video_final.mp4"
+        if not os.path.exists(face_path):
+            print(f"❌ Face template missing: {face_path}")
+            raise RuntimeError("Face template missing.")
+        
+        import cv2
+        cap = cv2.VideoCapture(face_path)
+        ret, frame = cap.read()
+        cap.release()
+        if not ret or frame is None:
+            raise RuntimeError("Could not read reference frame from template video.")
+        h, w = frame.shape[:2]
+        print(f"✅ Template Video: {w}x{h} (OpenCV verified)")
+        if h < 100 or w < 100:
+            raise RuntimeError(f"Template video resolution too low ({w}x{h}). Face detection will fail.")
         
         # 🟢 STEP 1: GPU Audio (F5-TTS) — HARD REQUIREMENT
         audio_path, duration, word_timestamps = None, 0, []
