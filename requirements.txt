@@ -121,3 +121,4 @@ omegaconf
 ffmpeg-python
 gdown
 g2p_en
+edge-tts

@@ -297,6 +297,32 @@ def _generate_f5_clone(text, output_path):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# FALLBACK: Edge TTS (Cloud-based, very reliable)
+# ─────────────────────────────────────────────────────────────────────────────
+async def _async_generate_edge_tts(text, output_path):
+    import edge_tts
+    # High-quality voice for tech/research content
+    VOICE = "en-US-AndrewNeural" 
+    communicate = edge_tts.Communicate(text, VOICE, rate="+5%")
+    await communicate.save(output_path)
+
+def _generate_edge_tts(text, output_path):
+    print(f"📡 Falling back to Edge TTS (Cloud)...")
+    try:
+        asyncio.run(_async_generate_edge_tts(text, output_path))
+        duration = get_audio_duration(output_path)
+        # For Edge TTS, estimate timestamps as stable-ts might be overkill/slow on cloud output
+        # unless user strictly wants real timestamps. Let's try stable-ts first.
+        word_timestamps = _apply_stable_ts(output_path, text)
+        if not word_timestamps:
+            word_timestamps = _estimate_timestamps(text, duration)
+        return output_path, duration, word_timestamps
+    except Exception as e:
+        print(f"❌ Edge TTS also failed: {e}")
+        return None, 0, []
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # PUBLIC ENTRY POINT
 # ─────────────────────────────────────────────────────────────────────────────
 def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
@@ -408,8 +434,9 @@ def generate_voiceover(text, custom_phonetic_map=None):
     try:
         path, dur, word_timestamps = _generate_f5_clone(text_to_speak, mp3_path)
     except Exception as e:
-        print(f"❌ F5-TTS Cloning failed: {e}")
-        return None, 0, []
+        print(f"❌ F5-TTS Cloning failed (possibly NumPy/VRAM): {e}")
+        # 2. FALLBACK: Edge TTS
+        path, dur, word_timestamps = _generate_edge_tts(text_to_speak, mp3_path)
 
     # Post-process: Restore original word spellings for subtitles
     if word_timestamps:

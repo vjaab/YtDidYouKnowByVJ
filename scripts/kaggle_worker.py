@@ -503,14 +503,21 @@ def setup_project():
         "diffusers", "transformers", "accelerate", "g2p_en",
         "--extra-index-url", "https://download.pytorch.org/whl/cu121"])
     
-    # CRITICAL: Re-pin numpy AFTER torch and other heavy deps (Torch 2.9 pulls numpy 2.4+)
-    print("🔁 Re-pinning numpy to <2.0 for F5-TTS/Numba compatibility...")
-    run_cmd(["pip", "install", "-q", "numpy==1.26.4", "--force-reinstall", "--no-deps"])
+    # CRITICAL: Clean swap of numpy to 1.26.4
+    # This ensures C extensions are rebuilt correctly for Python 3.12/F5-TTS
+    print("🔁 Performing clean swap of numpy to 1.26.4...")
     try:
-        import numpy as np
-        print(f"   ✅ numpy verified: {np.__version__}")
-    except:
-        pass
+        subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "numpy"], check=True)
+        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "numpy==1.26.4"], check=True)
+        
+        # Verify
+        import importlib, numpy
+        importlib.reload(numpy)
+        print(f"   ✅ numpy: {numpy.__version__}")
+        import numpy.core._multiarray_umath
+        print("   ✅ numpy C extensions OK")
+    except Exception as e:
+        print(f"   ⚠ Numpy swap verification failed: {e}")
 
 
 
@@ -581,15 +588,12 @@ def process_job():
                 script, custom_phonetic_map=custom_map
             )
         except Exception as e:
-            print(f"❌ F5-TTS Voice Cloning FAILED: {e}")
-            import traceback
-            traceback.print_exc()
-            raise RuntimeError(f"Pipeline aborted: F5-TTS voice cloning failed — {e}")
+            print(f"⚠️ GPU Voiceover generation had issues: {e}")
         
         if not audio_path or not os.path.exists(audio_path):
-            raise RuntimeError("Pipeline aborted: F5-TTS produced no audio output.")
+            raise RuntimeError("Pipeline aborted: Both F5-TTS and fallback produced no audio output.")
         
-        print(f"✅ F5-TTS succeeded: {audio_path} ({duration:.1f}s, {len(word_timestamps)} words)")
+        print(f"✅ Audio generation complete: {audio_path} ({duration:.1f}s, {len(word_timestamps)} words)")
         
         # 🔓 Unload F5-TTS
         unload_f5_model()
@@ -678,9 +682,18 @@ if __name__ == "__main__":
     setup_musetalk()
     
     # 🔁 FINAL CRITICAL RE-PIN: Ensure numpy 1.26.4 is the last word
-    # This fixes corruption from mmengine/torch upgrades during MMLab setup
-    print("🔁 Finalizing environment: Locking numpy==1.26.4...")
-    run_cmd(["pip", "install", "-q", "numpy==1.26.4", "--force-reinstall", "--no-deps"])
+    # Clean swap again to fix any corruption from MMLab setup
+    print("🔁 Finalizing environment: Locking numpy==1.26.4 (Clean Swap)...")
+    try:
+        subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "numpy"], check=True)
+        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "numpy==1.26.4"], check=True)
+        
+        import importlib, numpy
+        importlib.reload(numpy)
+        import numpy.core._multiarray_umath
+        print(f"   ✅ Final numpy lock established: {numpy.__version__}")
+    except Exception as e:
+        print(f"   ⚠ Final numpy lock failed: {e}")
     
     process_job()
     print("--- Job Finished ---")
