@@ -1570,7 +1570,6 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     accent_color   = tuple(int(accent_hex[i:i+2], 16) for i in (0, 2, 4))
     sub_category   = script_json.get("sub_category", "AI")
     emoji          = script_json.get("relevant_emoji", "")
-    # ── Hook text removed ──────────────────────────────────────────────────────
     key_stat       = script_json.get("key_stat", "")
     key_stat_ts    = float(script_json.get("key_stat_timestamp", 0))
     shock_ts       = float(script_json.get("shocking_moment_timestamp", 0))
@@ -1578,15 +1577,12 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     companies = script_json.get("companies_mentioned", [])
     tools = script_json.get("tools_mentioned", [])
     key_entities = script_json.get("key_entities", [])
-    
-    # Fallback if AI hasn't updated key_entities yet but has legacy fields
     if not key_entities:
         for c in companies: key_entities.append({"name": c, "type": "COMPANY"})
         for t in tools: key_entities.append({"name": t, "type": "TOOL"})
 
-    # ── FULL SCREEN BACKGROUND: Cycling through imagery ─────────────
-    print("Preparing full-screen background from generated images...")
-    
+    # ── FULL SCREEN BACKGROUND ───────────────────────────────────────────
+    print("Preparing full-screen background...")
     visual_paths = []
     for chunk in chunks:
         vpath = chunk.get("visual_path")
@@ -1599,15 +1595,14 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     fact_clips = []
     burst_clips = []
     reminder_clips = []
+    
     if not visual_paths:
-        print("No nanobanana images found. Using solid dark background.")
         bg_layer_clips.append(ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=audio_duration))
     else:
-        crossfade = 0.1 # Minimal overlapping for hard, high-energy cuts
+        crossfade = 0.1
         num_clips = len(visual_paths)
         clip_dur = (audio_duration + (num_clips - 1) * crossfade) / num_clips
         current_start = 0.0
-        
         for i, vp in enumerate(visual_paths):
             try:
                 if vp.endswith(".mp4"):
@@ -1618,8 +1613,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                         c_clip = c_clip.subclipped(0, clip_dur)
                 else:
                     c_clip = ImageClip(vp).with_duration(clip_dur)
-                    
-                # ── Aspect Ratio Crop to 9:16 ───────────────────────────────
+                
                 w, h = c_clip.size
                 target_h = int(w * 16 / 9)
                 if target_h <= h:
@@ -1630,17 +1624,11 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                     x1 = (w - target_w) // 2
                     c_clip = c_clip.cropped(x1=x1, y1=0, x2=x1 + target_w, y2=h)
 
-                # ── Resizing and Ken Burns (Subtle Zoom) ───────────────────
                 c_clip = c_clip.resized((FRAME_W, FRAME_H))
                 
-                # SMART-SPLIT: 45% chance of split screen if news level is high (2026 Engagement Strategy)
                 if script_json.get("breaking_news_level", 0) >= 8 and random.random() < 0.45:
-                    print(f"Applying Smart-Split Layout to chunk {i}...")
-                    # Bottom half is a secondary tech loop or satisfying visual
                     split_h = FRAME_H // 2
                     top_half = c_clip.cropped(y2=split_h)
-                    
-                    # Look for a satisfying loop in assets or use a blurred duplicate
                     bottom_half = c_clip.cropped(y1=split_h).with_effects([vfx.MirrorX()])
                     c_clip = CompositeVideoClip([
                         top_half.with_position(("center", "top")),
@@ -1648,16 +1636,11 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                     ], size=(FRAME_W, FRAME_H))
 
                 scale_factor = 1.0 + random.uniform(0.05, 0.12)
-                # Apply the zoom as a dynamic transformation
                 c_clip = c_clip.resized(lambda t: 1.0 + (scale_factor - 1.0) * (t / clip_dur))
-                    
-                # HUMAN REALISM: Subtle handheld camera shake
                 c_clip = _apply_handheld_shake(c_clip)
-                
                 c_clip = c_clip.with_start(current_start)
                 
                 if i > 0:
-                    # Flash/Glitch Transition Overlay
                     flash = ColorClip(size=(FRAME_W, FRAME_H), color=(255, 255, 255), duration=0.15).with_opacity(0.7)
                     flash = flash.with_start(current_start).with_effects([vfx.CrossFadeOut(0.1)])
                     logo_clips.append(flash)
@@ -1666,16 +1649,10 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                 current_start += (clip_dur - crossfade)
             except Exception as e:
                 print(f"Failed to load background img {vp}: {e}")
-                
-        if not bg_layer_clips:
-            bg_layer_clips.append(ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=audio_duration))
 
-    # ── AVATAR VIDEO AS PiP (Picture-in-Picture) ──────────────────────────────
-    print("Preparing Avatar PiP...")
+    # ── AVATAR VIDEO PiP ──────────────────────────────────────────────────
+    print("Preparing Dimension Avatar PiP...")
     lipsync_path = script_json.get("kaggle_lipsync_path")
-    
-    # Only fall back to _generate_lipsync_video for standard local usage. 
-    # If the file from Kaggle doesn't exist, we trust _generate_lipsync_video's logic to skip it if Kaggle was active.
     if not lipsync_path or not os.path.exists(lipsync_path):
         lipsync_path = _generate_lipsync_video(audio_path)
         
@@ -1690,28 +1667,23 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         else:
             vid_clip = vid_clip.subclipped(0, audio_duration)
 
-        width_pip = 450
-        height_pip = 680
+        width_pip, height_pip = 450, 680
         w, h = vid_clip.size
-        # central crop matching aspect ratio of width_pip/height_pip
+        # Crop to target aspect ratio
         target_aspect = width_pip / height_pip
-        source_aspect = w / h
-        if source_aspect > target_aspect:
-            # Source is wider, crop horizontally
+        if w/h > target_aspect:
             new_w = int(h * target_aspect)
             x1 = (w - new_w) // 2
             vid_clip = vid_clip.cropped(x1=x1, y1=0, x2=x1+new_w, y2=h)
         else:
-            # Source is taller, crop vertically
             new_h = int(w / target_aspect)
             y1 = (h - new_h) // 2
             vid_clip = vid_clip.cropped(x1=0, y1=y1, x2=w, y2=y1+new_h)
         
         avatar_clip = vid_clip.resized((width_pip, height_pip)).without_audio()
         
-        # Rounded rectangle mask for 480x620
+        # Rounded Mask
         a_mask_np = np.zeros((height_pip, width_pip), dtype=np.uint8)
-        import cv2
         radius = 32
         cv2.circle(a_mask_np, (radius, radius), radius, 255, -1)
         cv2.circle(a_mask_np, (width_pip-radius, radius), radius, 255, -1)
@@ -1719,103 +1691,113 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         cv2.circle(a_mask_np, (width_pip-radius, height_pip-radius), radius, 255, -1)
         cv2.rectangle(a_mask_np, (radius, 0), (width_pip-radius, height_pip), 255, -1)
         cv2.rectangle(a_mask_np, (0, radius), (width_pip, height_pip-radius), 255, -1)
-        a_mask_np = a_mask_np.astype(float) / 255.0
+        mclip = VideoClip(lambda t: a_mask_np.astype(float)/255.0, is_mask=True, duration=audio_duration)
+        avatar_clip = avatar_clip.with_mask(mclip)
 
-        mclip = VideoClip(lambda t: a_mask_np, is_mask=True, duration=audio_duration)
-        
-        # ── REALISTIC BODY MOVEMENT SYSTEM ────────────────────────────────
-        shock_ts = float(script_json.get("shocking_moment_timestamp", -1))
-        key_stat_ts_val = float(script_json.get("key_stat_timestamp", -1))
-        
+        # ── Movement & Scaling Logic ──
         def pip_position(t):
-            base_x = FRAME_W - width_pip - 20
-            base_y = 260
+            base_x, base_y = FRAME_W - width_pip - 20, 260
+            sway_y = math.sin(t * 0.3 * 2 * math.pi) * 3 + math.sin(t * 1.2 * 2 * math.pi) * 1.5
+            sway_x = math.sin(t * 0.2 * 2 * math.pi) * 2 + math.cos(t * 0.7 * 2 * math.pi) * 1
+            breathing = math.sin(t * 0.25 * 2 * math.pi) * 1
             
-            # 1. Natural head sway (multi-frequency sinusoids for organic feel)
-            # Slow drift (0.3Hz) + micro-nod (1.2Hz) + tiny jitter (2.5Hz)
-            head_sway_y = (
-                math.sin(t * 0.3 * 2 * math.pi) * 3.0 +   # Slow body sway (±3px)
-                math.sin(t * 1.2 * 2 * math.pi) * 1.5 +   # Micro-nodding (±1.5px)
-                math.sin(t * 2.5 * 2 * math.pi) * 0.5      # Tiny jitter (±0.5px)
-            )
-            
-            # 2. Subtle lateral drift (very slow, ±2px)
-            head_sway_x = (
-                math.sin(t * 0.2 * 2 * math.pi) * 2.0 +
-                math.cos(t * 0.7 * 2 * math.pi) * 1.0
-            )
-            
-            # 3. Breathing simulation (slow 4-second cycle, ±1px vertical)
-            breathing = math.sin(t * 0.25 * 2 * math.pi) * 1.0
-            
-            # 4. Emphasis gesture — slight forward "lean" during key moments
-            emphasis_offset_x = 0
-            emphasis_offset_y = 0
+            e_x, e_y = 0, 0
             if shock_ts > 0 and abs(t - shock_ts) < 1.5:
-                # "Lean forward" during shocking moment
-                lean_progress = 1.0 - abs(t - shock_ts) / 1.5
-                emphasis_offset_x = int(-15 * lean_progress)  # Move left (toward center)
-                emphasis_offset_y = int(-8 * lean_progress)   # Move up slightly
-            elif key_stat_ts_val > 0 and abs(t - key_stat_ts_val) < 1.0:
-                # Subtle nod during key stat
-                nod_progress = 1.0 - abs(t - key_stat_ts_val) / 1.0
-                emphasis_offset_y = int(5 * math.sin(nod_progress * math.pi))
+                p = 1.0 - abs(t - shock_ts) / 1.5
+                e_x, e_y = int(-15 * p), int(-8 * p)
+            elif key_stat_ts > 0 and abs(t - key_stat_ts) < 1.0:
+                p = 1.0 - abs(t - key_stat_ts) / 1.0
+                e_y = int(5 * math.sin(p * math.pi))
             
-            final_x = base_x + int(head_sway_x) + emphasis_offset_x
-            final_y = base_y + int(head_sway_y + breathing) + emphasis_offset_y
-            
-            # 5. Show/hide cycle (visible more than hidden for presence)
-            if t < 6.0:
-                return (final_x, final_y)  # Always visible during hook
-            
-            cycle_time = (t - 6.0) % 11.0
-            if cycle_time < 4.0:
-                return (FRAME_W + 1000, base_y)  # Hidden (4s)
-            else:
-                return (final_x, final_y)  # Visible (7s)
+            if t < 6.0: return (base_x + int(sway_x) + e_x, base_y + int(sway_y + breathing) + e_y)
+            cycle = (t - 6.0) % 11.0
+            if cycle < 4.0: return (FRAME_W + 1000, base_y)
+            return (base_x + int(sway_x) + e_x, base_y + int(sway_y + breathing) + e_y)
 
-        avatar_pip = avatar_clip.with_mask(mclip).with_position(pip_position).with_start(0)
+        def avatar_scale(t):
+            base = 1.0
+            if shock_ts > 0 and abs(t - shock_ts) < 1.0:
+                p = 1.0 - abs(t - shock_ts) / 1.0
+                base = 1.0 + 0.12 * math.sin(p * math.pi)
+            elif key_stat_ts > 0 and abs(t - key_stat_ts) < 0.8:
+                p = 1.0 - abs(t - key_stat_ts) / 0.8
+                base = 1.0 + 0.08 * math.sin(p * math.pi)
+            return base
+
+        avatar_clip = avatar_clip.with_effects([vfx.Resize(avatar_scale)])
+
+        # ── Glassmorphism HUD Pane ──
+        def _hud_pane(duration, accent):
+            pw, ph = width_pip + 40, height_pip + 40
+            img = Image.new("RGBA", (pw, ph), (0, 0, 0, 0))
+            draw = ImageDraw.Draw(img)
+            draw.rounded_rectangle([0, 0, pw, ph], radius=40, fill=(20, 20, 30, 160))
+            draw.rounded_rectangle([5, 5, pw-5, ph-5], radius=35, outline=(*accent, 80), width=2)
+            return _pil_clip(img, duration)
+
+        # ── Neon Glow Border ──
+        def _neon_border(duration, accent):
+            bw, bh = width_pip + 10, height_pip + 10
+            def mf(t):
+                img = Image.new("RGBA", (bw, bh), (0, 0, 0, 0))
+                p = (math.sin(t * 8) + 1) / 2
+                ImageDraw.Draw(img).rounded_rectangle([0, 0, bw, bh], radius=36, outline=(*accent, int(120+135*p)), width=4)
+                return np.array(img.filter(ImageFilter.GaussianBlur(radius=3*p)).convert("RGB"))
+            def mm(t):
+                img = Image.new("L", (bw, bh), 0)
+                p = (math.sin(t * 8) + 1) / 2
+                ImageDraw.Draw(img).rounded_rectangle([0, 0, bw, bh], radius=36, outline=255, width=6)
+                return np.array(img.filter(ImageFilter.GaussianBlur(radius=3*p))).astype(float)/255.0
+            return VideoClip(mf, duration=duration).with_mask(VideoClip(mm, is_mask=True, duration=duration))
+
+        pane = _hud_pane(audio_duration, accent_color)
+        border = _neon_border(audio_duration, accent_color)
         
-    # ── LAYER 2.5: Source Article Screenshot ──────────────────────────────────
+        avatar_pip = CompositeVideoClip([
+            pane.with_position((-20, -20)),
+            border.with_position((-5, -5)),
+            avatar_clip.with_position((0, 0))
+        ], size=(width_pip + 60, height_pip + 60), is_mask=False).with_position(pip_position).with_start(0)
+
+        # ── Avatar-Relative Callouts ──
+        top_kws = sorted(script_json.get("keywords", []), key=len, reverse=True)[:3]
+        for i, kw in enumerate(top_kws):
+            t_kw = (i + 1) * (audio_duration / 4)
+            if t_kw > audio_duration - 2: continue
+            skw = Image.new("RGBA", (ts(kw, gf(28))[0] + 30, 50), (0, 0, 0, 0))
+            ImageDraw.Draw(skw).rounded_rectangle([0, 0, skw.width, 50], radius=15, fill=(*accent_color, 220))
+            ImageDraw.Draw(skw).text((15, 10), kw, font=gf(28), fill=(255, 255, 255))
+            def kpos(t, _ts=t_kw):
+                rel = t - _ts
+                if rel < 0 or rel > 2.0: return (FRAME_W + 100, 0)
+                bx, by = pip_position(t)
+                return (bx - 40 + int(rel*40), by - 60 - int(rel*40))
+            logo_clips.append(_pil_clip(skw, 2.0, start=t_kw).with_position(kpos))
+
+    # ── LAYERS ───────────────────────────────────────────────────────────
     screenshot_path = script_json.get("screenshot_path")
     screenshot_clip = _article_screenshot_clip(screenshot_path, audio_duration)
-
-    # ── LAYER 3: Tint ─────────────────────────────────────────────────────────
     tint = ColorClip(size=(FRAME_W, FRAME_H), color=accent_color, duration=audio_duration).with_opacity(0.02)
-
-    # ── LAYER 4: Gradient ─────────────────────────────────────────────────────
     gradient = _gradient_clip(audio_duration)
-
-    # Layout & Visual Randomization for Variation
-    on_right = False
-    particle_style = random.choice(["bokeh", "digital", "stars"])
-    bg_hex = color_theme.get("background", "#0A0A0F").lstrip("#")
-    bg_base_color = tuple(int(bg_hex[i:i+2], 16) for i in (0, 2, 4))
-
-    # ── LAYER 4: Ambient particles ──────────────────────────────────────────
-    ambient = _ambient_particles(audio_duration, accent_color, particle_style=particle_style)
+    
+    sub_cat_low = sub_category.lower()
+    p_style = "digital" if any(x in sub_cat_low for x in ["tool", "hands", "code"]) else \
+              "stars" if any(x in sub_cat_low for x in ["research", "news", "predict"]) else "bokeh"
+    
+    bg_h = color_theme.get("background", "#0A0A0F").lstrip("#")
+    bg_base = tuple(int(bg_h[i:i+2], 16) for i in (0, 2, 4))
+    
+    ambient = _ambient_particles(audio_duration, accent_color, particle_style=p_style)
     particle_clips.append(ambient)
-
-    # ── LAYER 1: Dynamic Tech Background ────────────────────────────────────
-    tech_bg = _dynamic_tech_background(audio_duration, accent_color, bg_base_color=bg_base_color)
+    tech_bg = _dynamic_tech_background(audio_duration, accent_color, bg_base_color=bg_base)
     bg_layer_clips.insert(0, tech_bg)
     
-    # Entity Tags Layer (Companies/Tools/Models on left/right side)
-    tags_img = render_entity_tags(key_entities, accent_color, FRAME_W, on_right=on_right)
-    
-    # 3. Slide-In and Sweep Animation for Tags
+    tags_img = render_entity_tags(key_entities, accent_color, FRAME_W, on_right=False)
     def tag_pos(t):
-        if t < 0.5: # 0.5s Slide from side
-            offset = 500 if on_right else -500
-            start_x = (FRAME_W if on_right else -500)
-            return (offset - int(offset * (t/0.5)), 320)
+        if t < 0.5: return (-500 + int(500 * (t/0.5)), 320)
         return (0, 320)
-        
     tags_clip = ImageClip(np.array(tags_img)).with_duration(audio_duration).with_position(tag_pos)
-    
-    # Add a looping 'Sweep' effect over the tags every 5 seconds
     sweep = _sweep_clip(5.0, accent_color, FRAME_W).with_effects([vfx.Loop(duration=audio_duration)]).with_position((0, 320))
-    
     logo_clips.extend([tags_clip, sweep])
 
 
