@@ -36,8 +36,12 @@ def pick_and_generate_script(articles, extra_instruction="", forced_article=None
             seen_titles_in_this_batch.append(title)
     
     if not filtered_articles and not forced_article:
-        print("No unique articles remaining to process.")
-        return None
+        if os.environ.get("FORCE_RUN") == "true" and articles:
+            print("⚠️ No unique articles, but FORCE_RUN is true. Proceeding with latest article for testing.")
+            filtered_articles = [articles[0]]
+        else:
+            print("No unique articles remaining to process.")
+            return None
         
     articles = filtered_articles # Use the filtered list
     

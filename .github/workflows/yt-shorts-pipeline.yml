@@ -7,6 +7,16 @@ on:
     # 10:30 UTC = 16:00 PM IST (afternoon slot)
     - cron: '30 10 * * *'
   workflow_dispatch: # Allows manual trigger from GitHub Actions UI
+    inputs:
+      custom_topic:
+        description: 'Force a specific topic (skips RSS fetch)'
+        required: false
+        default: ''
+      force_run:
+        description: 'Force run even if no new news is found'
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   run-pipeline:
@@ -96,8 +106,17 @@ jobs:
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
         run: |
-          # The main.py will now detect Kaggle credentials and push heavy tasks to GPU
-          python main.py --now
+          # Use custom topic or force run if provided via workflow_dispatch
+          CMD="python main.py --now"
+          if [ -n "${{ github.event.inputs.custom_topic }}" ]; then
+            CMD="$CMD --topic \"${{ github.event.inputs.custom_topic }}\""
+          fi
+          
+          if [ "${{ github.event.inputs.force_run }}" = "true" ]; then
+            export FORCE_RUN=true
+          fi
+          
+          eval $CMD
         
       - name: Commit Updated Tracking File (news_log.json)
         # Always run this step to save the log, preventing duplicate topics tomorrow
