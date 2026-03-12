@@ -197,18 +197,28 @@ def _install_mmlab():
                     misc_content = f.read()
                 
                 if "except (ImportError, ValueError):" not in misc_content:
-                    if "except ImportError:" in misc_content:
+                    old_find = "ext_loader = pkgutil.find_loader('mmcv._ext')"
+                    new_find = """try:
+            ext_loader = pkgutil.find_loader('mmcv._ext')
+        except (ImportError, ValueError):
+            ext_loader = None"""
+                    if old_find in misc_content:
+                        misc_content = misc_content.replace(old_find, new_find)
+                        with open(misc_path, "w") as f:
+                            f.write(misc_content)
+                        print("   ✅ Physical misc.py patch applied (ValueError wrap)")
+                    elif "except ImportError:" in misc_content:
                         misc_content = misc_content.replace("except ImportError:", "except (ImportError, ValueError):")
                         with open(misc_path, "w") as f:
                             f.write(misc_content)
                         print("   ✅ Physical misc.py patch applied (ValueError fix)")
-                        
-                        # Clear cache
-                        import glob
-                        for pyc in glob.glob(os.path.join(sp, "mmengine", "utils", "dl_utils", "__pycache__", "misc*.pyc")):
-                            os.remove(pyc)
                     else:
                         print("   ⚠ misc.py pattern not found")
+                    
+                    # Clear cache
+                    import glob
+                    for pyc in glob.glob(os.path.join(sp, "mmengine", "utils", "dl_utils", "__pycache__", "misc*.pyc")):
+                        os.remove(pyc)
                 else:
                     print("   ✅ misc.py already patched, skipping")
             else:
