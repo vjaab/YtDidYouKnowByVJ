@@ -249,10 +249,20 @@ def _install_mmlab():
         
         # Install xtcocotools
         try:
-            run_cmd(["pip", "install", "-q", "xtcocotools"])
+            run_cmd(["pip", "install", "-q", "Cython"])
+            run_cmd(["pip", "install", "-q", "--no-build-isolation", "xtcocotools"])
             print("   ✅ xtcocotools")
         except:
-            print("   ⚠ xtcocotools failed (non-critical for inference)")
+            print("   ⚠ xtcocotools failed, creating stub package for subprocess compatibility...")
+            import site
+            sp = site.getsitepackages()[0]
+            xtcoco_dir = os.path.join(sp, "xtcocotools")
+            os.makedirs(xtcoco_dir, exist_ok=True)
+            with open(os.path.join(xtcoco_dir, "__init__.py"), "w") as f:
+                f.write("# Stub xtcocotools package\n")
+            with open(os.path.join(xtcoco_dir, "coco.py"), "w") as f:
+                f.write("class COCO:\n    pass\n")
+            print("   ✅ xtcocotools stub package created")
         
         # Install mmpose core
         run_cmd(["pip", "install", "-q", "--no-deps", "mmpose"])
