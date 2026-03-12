@@ -1,4 +1,5 @@
 from google import genai
+from google.genai import types
 import json
 import os
 from datetime import datetime
@@ -7,52 +8,70 @@ from config import GEMINI_API_KEY, LOGS_DIR
 from topic_tracker import load_tracker, check_story_uniqueness, check_cooldowns
 from ecosystem_logic import get_slot_info, get_category_prompt_enhancement
 
-def pick_and_generate_script(articles, extra_instruction="", forced_article=None, topic_type="research"):
+def pick_and_generate_script(articles=None, extra_instruction="", forced_article=None, topic_type="research"):
     client = genai.Client(api_key=GEMINI_API_KEY)
     
-    # ── Pre-filter articles (Unique against history AND against each other) ──
-    filtered_articles = []
-    seen_titles_in_this_batch = []
-    
-    for art in articles:
-        title = art.get('title', '')
-        url = art.get('url', '')
+    day_name, slot, category = get_slot_info()
+    strategy_enhancement = get_category_prompt_enhancement(category, slot)
+
+    # ── STEP 0: GEMINI SEARCH (If no articles provided) ─────────────────────
+    if not articles:
+        print(f"🔍 STEP 0: Using Gemini Search for {topic_type} ({category})...")
+        search_query = f"Latest groundbreaking {topic_type} news and research about {category} from the last 24 hours. Focus on technical breakthroughs and company launches."
         
-        # 1. Check against long-term history
-        is_unique, _ = check_story_uniqueness(title, url)
-        if not is_unique:
-            continue
+        try:
+            search_response = client.models.generate_content(
+                model='gemini-2.0-flash', # Use stable flash for tools
+                contents=search_query,
+                config=types.GenerateContentConfig(
+                    tools=[{'google_search': {}}]
+                )
+            )
+            # Use the grounded response to build a context
+            news_context = f"GEMINI SEARCH RESULTS (Grounded):\n{search_response.text}\n"
+            print("✅ Gemini Search completed.")
+        except Exception as e:
+            print(f"⚠️ Gemini Search failed: {e}. Falling back to empty context.")
+            news_context = "No news articles found."
+    else:
+        # ── Pre-filter articles (Unique against history AND against each other) ──
+        filtered_articles = []
+        seen_titles_in_this_batch = []
+        
+        for art in articles:
+            title = art.get('title', '')
+            url = art.get('url', '')
             
-        # 2. Check against other articles in this same feed batch
-        is_internally_unique = True
-        from rapidfuzz import fuzz # In case it's not imported here
-        for seen_title in seen_titles_in_this_batch:
-            if fuzz.token_set_ratio(title.lower(), seen_title.lower()) > 80:
-                is_internally_unique = False
-                break
+            # 1. Check against long-term history
+            is_unique, _ = check_story_uniqueness(title, url)
+            if not is_unique:
+                continue
+                
+            # 2. Check against other articles in this same feed batch
+            is_internally_unique = True
+            from rapidfuzz import fuzz 
+            for seen_title in seen_titles_in_this_batch:
+                if fuzz.token_set_ratio(title.lower(), seen_title.lower()) > 80:
+                    is_internally_unique = False
+                    break
+            
+            if is_internally_unique:
+                filtered_articles.append(art)
+                seen_titles_in_this_batch.append(title)
         
-        if is_internally_unique:
-            filtered_articles.append(art)
-            seen_titles_in_this_batch.append(title)
-    
-    if not filtered_articles and not forced_article:
-        if os.environ.get("FORCE_RUN") == "true" and articles:
-            print("⚠️ No unique articles, but FORCE_RUN is true. Proceeding with latest article for testing.")
-            filtered_articles = [articles[0]]
-        else:
+        if not filtered_articles:
             print("No unique articles remaining to process.")
             return None
+            
+        articles = filtered_articles 
         
-    articles = filtered_articles # Use the filtered list
-    
-    news_context = ""
-    for idx, art in enumerate(articles[:20]):
-        title = art.get('title', '')
-        desc = art.get('description', '')
-        source = art.get('source', {}).get('name', '')
-        url = art.get('url', '')
-        image_url = art.get('urlToImage', '')
-        news_context += f"\n[{idx+1}] Title: {title}\nDescription: {desc}\nSource: {source}\nURL: {url}\nImage URL: {image_url}\n"
+        news_context = ""
+        for idx, art in enumerate(articles[:20]):
+            title = art.get('title', '')
+            desc = art.get('description', '')
+            source = art.get('source', {}).get('name', '')
+            url = art.get('url', '')
+            news_context += f"\n[{idx+1}] Title: {title}\nDescription: {desc}\nSource: {source}\nURL: {url}\n"
 
     # Build the story selection instruction
     if topic_type == "tools":
@@ -60,20 +79,11 @@ def pick_and_generate_script(articles, extra_instruction="", forced_article=None
     else:
         content_desc = "research papers and engineering blogs"
 
-    if forced_article:
-        forced_title = forced_article.get('title', '')
-        forced_url   = forced_article.get('url', '')
-        selection_instruction = (
-            f"The user has MANUALLY SELECTED this specific story — you MUST write the script about it:\n"
-            f"Title: {forced_title}\nURL: {forced_url}\n"
-            f"Do NOT pick a different story. Skip the selection process entirely."
-        )
-    else:
-        selection_instruction = (
-            f"Analyze the following {content_desc} and pick the SINGLE most engaging one to convert into a 50-52 second YouTube Short script.\n"
-            "Choose based on deep technological importance and resonance with everyday moments, avoiding generic tech news. Focus on the core AI breakthrough.\n"
-            "CRITICAL: The final video MUST be under 60 seconds. Target a script length of ~135 words.\n"
-        )
+    selection_instruction = (
+        f"Analyze the following {content_desc} and pick the SINGLE most engaging one to convert into a 50-52 second YouTube Short script.\n"
+        "Choose based on deep technological importance and resonance with everyday moments, avoiding generic tech news. Focus on the core AI breakthrough.\n"
+        "CRITICAL: The final video MUST be under 60 seconds. Target a script length of ~135 words.\n"
+    )
 
     day_name, slot, category = get_slot_info()
     strategy_enhancement = get_category_prompt_enhancement(category, slot)

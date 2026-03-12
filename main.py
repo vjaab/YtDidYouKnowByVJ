@@ -8,7 +8,7 @@ from datetime import datetime
 
 import glob
 from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR
-from fetch_research_papers import fetch_tech_news, fetch_ai_tools
+# from fetch_research_papers import fetch_tech_news, fetch_ai_tools
 from topic_tracker import record_story
 from gemini_script import pick_and_generate_script
 from ecosystem_logic import get_slot_info
@@ -66,7 +66,7 @@ Don't miss out — join free today 👇
 #airesearch #shorts #machinelearning #ai #youtubeshorts #dailyfacts"""
 
 
-def run_pipeline(custom_topic=None, topic_type="research"):
+def run_pipeline(topic_type="research"):
     log_message(f"=== STARTING DAILY AI PIPIELINE ({topic_type.upper()}) ===")
 
     # ── Clean output folder before starting ───────────────────────────────────
@@ -79,33 +79,13 @@ def run_pipeline(custom_topic=None, topic_type="research"):
                 pass
         log_message(f"Output folder cleaned: {OUTPUT_DIR}")
 
-    # ── STEP 1: Fetch News ────────────────────────────────────────────────────
-    if custom_topic:
-        log_message("STEP 1: Using Custom Topic...")
-        news_articles = [{"title": "Custom Topic", "description": custom_topic, "url": "", "source": {"name": "User Input"}}]
-    else:
-        day_name, slot, category = get_slot_info()
-        log_message(f"STEP 1: Content Ecosystem Check -> Day: {day_name}, Slot: {slot}, Category: {category}")
-        
-        log_message(f"STEP 1: Fetching Latest {topic_type.capitalize()} (Strategy: {category})...")
-        # Logic: If category is Tool or Hands-on, fetch tools. Otherwise fetch research/news.
-        if "Tool" in category or "Hands-on" in category:
-            news_articles = fetch_ai_tools()
-        else:
-            news_articles = fetch_tech_news()
-        
-    if not news_articles:
-        log_message("ERROR: No articles fetched. Aborting.")
-        return False
-    log_message(f"Fetched {len(news_articles)} articles.")
-
-    # ── STEP 2: Auto-select Topic (Telegram interaction removed) ─────────────
-    if custom_topic:
-        log_message("STEP 2: Using Custom Topic...")
-        chosen_article = news_articles[0]
-    else:
-        log_message("STEP 2: Telegram selection disabled — Gemini will auto-pick the best story.")
-        chosen_article = None
+    # ── STEP 1: Content Ecosystem Check ───────────────────────────────────────
+    day_name, slot, category = get_slot_info()
+    log_message(f"STEP 1: Content Ecosystem Check -> Day: {day_name}, Slot: {slot}, Category: {category}")
+    
+    # ── STEP 2: Selection Strategy ───────────────────────────────────────────
+    log_message("STEP 2: Gemini will search and auto-pick the best story.")
+    chosen_article = None
 
     # ── STEP 3: Script Generation (with retry) ────────────────────────────────
     attempts = 0
@@ -117,9 +97,9 @@ def run_pipeline(custom_topic=None, topic_type="research"):
     min_dur, max_dur = TARGET_AUDIO_DURATION
 
     while attempts < MAX_RETRY_ATTEMPTS:
-        log_message(f"STEP 3 (Attempt {attempts+1}): Generating Script...")
+        log_message(f"STEP 3 (Attempt {attempts+1}): Gemini Searching & Generating Script...")
         script_data = pick_and_generate_script(
-            news_articles, extra_instruction, forced_article=chosen_article, topic_type=topic_type
+            articles=None, extra_instruction=extra_instruction, forced_article=None, topic_type=topic_type
         )
 
         if not script_data:
@@ -317,9 +297,9 @@ def run_pipeline(custom_topic=None, topic_type="research"):
     return True
 
 
-def run_local(custom_topic=None, topic_type="research"):
+def run_local(topic_type="research"):
     # XTTS server launch removed. Calling pipeline directly.
-    success = run_pipeline(custom_topic, topic_type=topic_type)
+    success = run_pipeline(topic_type=topic_type)
     if not success:
         import sys
         print("❌ Pipeline failed. Exiting with error code.")
@@ -329,12 +309,11 @@ def run_local(custom_topic=None, topic_type="research"):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--now", action="store_true", help="Run pipeline immediately.")
-    parser.add_argument("--topic", type=str, help="Run pipeline with a specific custom topic.", default=None)
     parser.add_argument("--type", type=str, choices=["research", "tools"], default="research", help="Content type mapped to the schedule")
     args = parser.parse_args()
 
-    if args.now or args.topic:
-        run_local(args.topic, topic_type=args.type)
+    if args.now:
+        run_local(topic_type=args.type)
     else:
         print("Usage: python main.py --now")
         print("For scheduled runs: python scheduler.py")
