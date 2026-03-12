@@ -273,7 +273,8 @@ def _install_mmlab():
     # Step 4: mmpose (Pinned to 1.3.2)
     try:
         run_cmd(["pip", "install", "-q", "--no-deps", "mmpose==1.3.2"])
-        print("   ✅ mmpose==1.3.2")
+        run_cmd(["pip", "install", "-q", "xtcocotools"])
+        print("   ✅ mmpose==1.3.2 + xtcocotools")
     except Exception as e:
         print(f"   ⚠ mmpose failed: {e}")
         # Install secondary deps individually (skipping broken xtcocotools build)
@@ -503,21 +504,24 @@ def setup_project():
         "diffusers", "transformers", "accelerate", "g2p_en",
         "--extra-index-url", "https://download.pytorch.org/whl/cu121"])
     
-    # CRITICAL: Clean swap of numpy to 1.26.4
-    # This ensures C extensions are rebuilt correctly for Python 3.12/F5-TTS
-    print("🔁 Performing clean swap of numpy to 1.26.4...")
+    # CRITICAL: Clean swap of numpy and numba
+    # This ensures F5-TTS (via Numba) and MuseTalk (via OpenCV) are using consistent C extensions
+    print("🔁 Performing clean swap of numba and numpy for Python 3.12 compatibility...")
     try:
-        subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "numpy"], check=True)
-        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "numpy==1.26.4"], check=True)
+        # Clean uninstall first
+        subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "numba", "numpy"], check=True)
+        # Fresh install with known compatible versions
+        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "numba==0.59.1", "numpy==1.26.4"], check=True)
         
         # Verify
-        import importlib, numpy
+        import importlib, numpy, numba
         importlib.reload(numpy)
-        print(f"   ✅ numpy: {numpy.__version__}")
+        importlib.reload(numba)
+        print(f"   ✅ numpy: {numpy.__version__} | numba: {numba.__version__}")
         import numpy.core._multiarray_umath
         print("   ✅ numpy C extensions OK")
     except Exception as e:
-        print(f"   ⚠ Numpy swap verification failed: {e}")
+        print(f"   ⚠ Numpy/Numba swap verification failed: {e}")
 
 
 
@@ -681,19 +685,20 @@ if __name__ == "__main__":
     setup_project()
     setup_musetalk()
     
-    # 🔁 FINAL CRITICAL RE-PIN: Ensure numpy 1.26.4 is the last word
-    # Clean swap again to fix any corruption from MMLab setup
-    print("🔁 Finalizing environment: Locking numpy==1.26.4 (Clean Swap)...")
+    # 🔁 FINAL CRITICAL LOCK: Ensure both numba and numpy are downgraded
+    # This fixes corruption from mmengine/torch upgrades during MMLab setup
+    print("🔁 Finalizing environment: Locking numba==0.59.1 and numpy==1.26.4 (Clean Swap)...")
     try:
-        subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "numpy"], check=True)
-        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "numpy==1.26.4"], check=True)
+        subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "numba", "numpy"], check=True)
+        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "numba==0.59.1", "numpy==1.26.4"], check=True)
         
-        import importlib, numpy
+        import importlib, numpy, numba
         importlib.reload(numpy)
+        importlib.reload(numba)
         import numpy.core._multiarray_umath
-        print(f"   ✅ Final numpy lock established: {numpy.__version__}")
+        print(f"   ✅ Final environment lock established: numpy {numpy.__version__} | numba {numba.__version__}")
     except Exception as e:
-        print(f"   ⚠ Final numpy lock failed: {e}")
+        print(f"   ⚠ Final environment lock failed: {e}")
     
     process_job()
     print("--- Job Finished ---")
