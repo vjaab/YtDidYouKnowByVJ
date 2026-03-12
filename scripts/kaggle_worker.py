@@ -576,6 +576,12 @@ def process_job():
         _patch_mmengine()
         os.environ["DWPOSE_DEVICE"] = "cuda" # Force DWPose to GPU
         
+        # 🛡️ Environment Lock Assertion
+        import numpy as np, numba
+        print(f"🔍 Core Stack: numpy {np.__version__} | numba {numba.__version__}")
+        assert np.__version__ == "2.0.2", f"❌ Environment Drift detected! numpy version {np.__version__} (expected 2.0.2). Pin was likely clobbered."
+        assert numba.__version__ == "0.60.0", f"❌ Environment Drift detected! numba version {numba.__version__} (expected 0.60.0). Pin was likely clobbered."
+        
         # 🔍 Print Stack Versions for Debugging
         import torch
         print(f"🔍 System Check: PyTorch {torch.__version__} | CUDA: {torch.cuda.is_available()}")
