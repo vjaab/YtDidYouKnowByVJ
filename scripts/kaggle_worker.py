@@ -444,7 +444,7 @@ def setup_project():
     # ── PYTHON DEPENDENCIES ────────────────────────────────────────────────
     print("📦 Installing Python Dependencies...")
     run_cmd(["pip", "install", "-q", "-U", "pip", "numpy<2.0", "setuptools<70", "wheel", "packaging"])
-    run_cmd(["pip", "install", "-q", "grpcio==1.62.2"]) # Fix for yanked versions
+    run_cmd(["pip", "install", "-q", "grpcio==1.62.2", "grpcio-status==1.62.2"]) # Fix for yanked versions
     run_cmd(["pip", "install", "-q", "-r", "requirements.txt"])
     
     # Force GPU-specific backends
@@ -600,7 +600,6 @@ def process_job():
 if __name__ == "__main__":
     print("--- Kaggle Worker Initiated ---")
     setup_project()
-    os.chdir("YtDidYouKnowByVJ") 
     setup_musetalk()
     # setup_sadtalker()
     process_job()
