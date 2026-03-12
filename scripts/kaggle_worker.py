@@ -190,45 +190,40 @@ def _install_mmlab():
         print(f"   ❌ mmengine failed: {e}")
     
     # Step 2: mmcv (needs CUDA ops — use pre-built wheels)
-    # Detect torch version for correct wheel index
-    torch_ver = "2.5"
-    try:
-        import torch as _t
-        torch_ver = '.'.join(_t.__version__.split('+')[0].split('.')[:2])
-    except:
-        pass
+    import torch
+    torch_v_full = torch.__version__
+    torch_v_simple = torch_v_full.split('+')[0]
+    cuda_v = torch.version.cuda
+    
+    print(f"🔍 Environment Check:")
+    print(f"   PyTorch: {torch_v_full}")
+    print(f"   CUDA: {cuda_v}")
+    
+    if cuda_v:
+        cuda_tag = "cu" + cuda_v.replace(".", "")
+    else:
+        cuda_tag = "cpu"
     
     mmcv_installed = False
     
-    # Try 1: OpenMMLab official index with detected versions
-    # We try cu121, cu118 etc. based on torch detection
-    import torch
-    torch_v = torch.__version__.split('+')[0]
-    cuda_v = torch.version.cuda
-    if cuda_v:
-        cuda_v = "cu" + cuda_v.replace(".", "")
-    else:
-        cuda_v = "cpu"
-    
-    print(f"   Detected Torch: {torch_v}, CUDA: {cuda_v}")
-    
-    # Map torch version to matching OpenMMLab index (they often only have 2.1.0 or 2.2.0)
-    # If we have 2.5.0, we try to use the latest compatible index
-    torch_index_v = torch_v
-    if int(torch_v.split('.')[0]) >= 2:
-        # OpenMMLab usually trails behind torch versions. 
-        # For torch 2.4/2.5, the 2.1.0 or 2.2.0 wheels often work.
-        for trial_v in [torch_v, "2.1.0", "2.2.0"]:
+    # Strategy: Try the OpenMMLab index first with various torch version tags.
+    # Kaggle might have Torch 2.5, but indexes usually stop at 2.1/2.2/2.3/2.4.
+    # We try them in descending order of recency.
+    for trial_v in [torch_v_simple, "2.4.0", "2.3.0", "2.2.0", "2.1.0"]:
+        # Also try common CUDA tags if exact tag fails (e.g. cu121 often works on cu124)
+        for trial_cuda in [cuda_tag, "cu121", "cu118"]:
             try:
-                mm_index = f"https://download.openmmlab.com/mmcv/dist/{cuda_v}/torch{trial_v}/index.html"
+                mm_index = f"https://download.openmmlab.com/mmcv/dist/{trial_cuda}/torch{trial_v}/index.html"
+                print(f"   Checking: {mm_index}")
                 run_cmd(["pip", "install", "-q", "mmcv==2.1.0", "-f", mm_index])
                 mmcv_installed = True
-                print(f"   ✅ mmcv==2.1.0 (via OpenMMLab {cuda_v}/torch{trial_v})")
+                print(f"   ✅ mmcv==2.1.0 (via {trial_cuda}/torch{trial_v})")
                 break
             except:
                 continue
+        if mmcv_installed: break
 
-    # Try 2: MiroPsota pre-built wheels (excellent for Py3.12)
+    # Try MiroPsota pre-built wheels if OpenMMLab fails
     if not mmcv_installed:
         try:
             run_cmd([
