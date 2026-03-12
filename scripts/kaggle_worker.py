@@ -49,9 +49,9 @@ def _apply_physical_patches():
         },
         {
             "path": os.path.join(sp, "mmengine", "runner", "checkpoint.py"),
-            "old": re.compile(r"^(\s*)checkpoint = torch\.load\(filename, map_location=map_location\)", re.MULTILINE),
-            "new": r"\1checkpoint = torch.load(filename, map_location=map_location, weights_only=False)",
-            "name": "checkpoint.py weights_only=False"
+            "old": re.compile(r"^(\s*)checkpoint = torch\.load\(([^,)]+,\s*[^)]+)\)(?!.*weights_only)", re.MULTILINE),
+            "new": r"\1checkpoint = torch.load(\2, weights_only=False)",
+            "name": "checkpoint.py weights_only=False (broad)"
         }
     ]
     
