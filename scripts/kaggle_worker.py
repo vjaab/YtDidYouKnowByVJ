@@ -228,7 +228,9 @@ def _install_mmlab():
     except KeyError:
         pass  # Already registered by PyTorch 2.2+, skip"""
             
-            if old_pattern in content and "except KeyError" not in content:
+            if "except KeyError" in content:
+                print("   ✅ builder.py already patched, skipping")
+            elif old_pattern in content:
                 content = content.replace(old_pattern, new_pattern)
                 with open(builder_path, "w") as f:
                     f.write(content)
@@ -603,7 +605,7 @@ def setup_project():
     
     # ── PYTHON DEPENDENCIES ────────────────────────────────────────────────
     print("📦 Installing Python Dependencies...")
-    run_cmd(["pip", "install", "-q", "-U", "pip", "numpy<2.0", "setuptools<70", "wheel", "packaging"])
+    run_cmd(["pip", "install", "-q", "-U", "pip", "setuptools<70", "wheel", "packaging"])
     run_cmd(["pip", "install", "-q", "grpcio==1.62.2", "grpcio-status==1.62.2"]) # Fix for yanked versions
     run_cmd(["pip", "install", "-q", "-r", "requirements.txt"])
     
@@ -616,6 +618,15 @@ def setup_project():
         "scikit-image", "safetensors", "trimesh", "face-alignment",
         "diffusers", "transformers", "accelerate", "g2p_en",
         "--extra-index-url", "https://download.pytorch.org/whl/cu121"])
+    
+    # CRITICAL: Re-pin numpy AFTER torch and other heavy deps (Torch 2.9 pulls numpy 2.4+)
+    print("🔁 Re-pinning numpy to <2.0 for F5-TTS/Numba compatibility...")
+    run_cmd(["pip", "install", "-q", "numpy==1.26.4", "--force-reinstall"])
+    try:
+        import numpy as np
+        print(f"   ✅ numpy verified: {np.__version__}")
+    except:
+        pass
 
     # ── CRITICAL: Patch basicsr BEFORE any engine imports ──────────────────
     _patch_basicsr()
