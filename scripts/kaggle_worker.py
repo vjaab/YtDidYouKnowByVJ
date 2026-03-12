@@ -703,6 +703,8 @@ def process_job():
         # 🟢 STEP 1: GPU Audio (F5-TTS) — HARD REQUIREMENT
         audio_path, duration, word_timestamps = None, 0, []
         try:
+            import numpy as np
+            print(f"🔍 NumPy at runtime: {np.__version__}")
             audio_path, duration, word_timestamps = generate_voiceover(
                 script, voice, emotion, custom_phonetic_map=custom_map
             )
