@@ -158,12 +158,12 @@ def run_pipeline(custom_topic=None, topic_type="research"):
                 elif audio_received:
                     log_message("✅ Received Audio from Kaggle GPU! (Lip-Sync was missing/failed)")
                 else:
-                    # CRITICAL: Audio not on disk — must regenerate locally
-                    log_message("⚠️ Kaggle job finished but audio not found. Falling back to local generation.")
-                    audio_path, duration, word_timestamps = generate_voiceover(script, custom_phonetic_map=custom_map)
+                    # CRITICAL: Kaggle results missing audio — pipeline failure
+                    log_message("❌ Kaggle job finished but critical audio output is missing.")
+                    return False
             else:
-                log_message("⚠️ Kaggle Handover failed. Falling back to local generation.")
-                audio_path, duration, word_timestamps = generate_voiceover(script, custom_phonetic_map=custom_map)
+                log_message("❌ Kaggle Handover failed or job reported an error.")
+                return False
         else:
             audio_path, duration, word_timestamps = generate_voiceover(script, custom_phonetic_map=custom_map)
         
@@ -319,7 +319,11 @@ def run_pipeline(custom_topic=None, topic_type="research"):
 
 def run_local(custom_topic=None, topic_type="research"):
     # XTTS server launch removed. Calling pipeline directly.
-    run_pipeline(custom_topic, topic_type=topic_type)
+    success = run_pipeline(custom_topic, topic_type=topic_type)
+    if not success:
+        import sys
+        print("❌ Pipeline failed. Exiting with error code.")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
