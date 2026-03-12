@@ -27,9 +27,19 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
                     tools=[{'google_search': {}}]
                 )
             )
+            # Extract URLs from grounding metadata to ensure we have real links for screenshots
+            grounding_links = []
+            if search_response.candidates and search_response.candidates[0].grounding_metadata:
+                gm = search_response.candidates[0].grounding_metadata
+                if hasattr(gm, 'grounding_chunks'):
+                    for chunk in gm.grounding_chunks:
+                        if hasattr(chunk, 'web') and chunk.web.uri:
+                            grounding_links.append(f"{chunk.web.title}: {chunk.web.uri}")
+            
+            links_str = "\n".join(grounding_links)
             # Use the grounded response to build a context
-            news_context = f"GEMINI SEARCH RESULTS (Grounded):\n{search_response.text}\n"
-            print("✅ Gemini Search completed.")
+            news_context = f"GEMINI SEARCH RESULTS (Grounded):\n{search_response.text}\n\nSOURCES FOUND:\n{links_str}\n"
+            print(f"✅ Gemini Search completed with {len(grounding_links)} sources.")
         except Exception as e:
             print(f"⚠️ Gemini Search failed: {e}. Falling back to empty context.")
             news_context = "No news articles found."
@@ -220,7 +230,7 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
   ],
   "NOTE_subtitle_chunks": "CRITICAL: Generate 10-15 subtitle_chunks that together cover the ENTIRE script text. Each chunk should be 1-2 sentences (5-12 words). Every word of the script MUST appear in exactly one chunk. Chunks must not overlap and must cover the full duration.",
   "original_news_headline": "Exact headline",
-  "original_news_url": "Exact url",
+  "original_news_url": "MANDATORY: Pick the most relevant full URL from the SOURCES FOUND section (e.g. https://domain.com/path). DO NOT leave as placeholder.",
   "key_entities": [
     {{"name": "Entity Name", "type": "MODEL"}},
     {{"name": "Service Name", "type": "CLOUD"}},
