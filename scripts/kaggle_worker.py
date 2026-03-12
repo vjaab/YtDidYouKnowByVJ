@@ -717,10 +717,6 @@ def process_job():
         if not audio_path or not os.path.exists(audio_path):
             raise RuntimeError("Pipeline aborted: F5-TTS produced no audio output.")
         
-        # Verify the audio is actually from F5-TTS (WAV) not an Edge TTS fallback (MP3)
-        if audio_path.endswith(".mp3"):
-            raise RuntimeError("Pipeline aborted: F5-TTS failed silently — got MP3 fallback instead of WAV.")
-        
         print(f"✅ F5-TTS succeeded: {audio_path} ({duration:.1f}s, {len(word_timestamps)} words)")
         
         # 🔓 Unload F5-TTS

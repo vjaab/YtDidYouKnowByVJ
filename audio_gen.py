@@ -91,9 +91,8 @@ def trim_audio_silence(path, word_timestamps):
     new_dur = len(trimmed_audio) / 1000.0
     print(f"Audio trimmed: -{shift_sec:.2f}s from start. New duration: {new_dur:.2f}s")
     return new_dur, new_ts
+# F5-TTS Paths
 ASSETS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
-KOKORO_MODEL = os.path.join(ASSETS_DIR, "kokoro-v1.0.onnx")
-KOKORO_VOICES = os.path.join(ASSETS_DIR, "voices-v1.0.bin")
 
 # ── F5-TTS Config ─────────────────────────────────────────────────────────────
 VJ_REF_WAV = os.path.join(ASSETS_DIR, "vj_voice_new.wav")
@@ -132,8 +131,7 @@ def unload_f5_model():
 from phonetic_dict import PHONETIC_DICT, auto_detect_hard_words
 
 
-# Edge TTS offset is in 100-nanosecond units → divide by 10_000_000 for seconds
-_NS100_PER_SEC = 10_000_000
+# Nanosecond conversion removed.
 
 
 def _estimate_timestamps(text, duration):
@@ -161,66 +159,7 @@ def get_audio_duration(path):
             return 0
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# PRIMARY: Edge TTS — stream() gives us word boundary events (exact timestamps)
-# ─────────────────────────────────────────────────────────────────────────────
-async def _edge_tts_stream(text, voice, output_path):
-    import edge_tts
-    # Decreasing the rate to match the slow and deliberate pace
-    communicate = edge_tts.Communicate(text, voice, rate="-10%")
-    sentence_events = []
-    audio_data = bytearray()
-
-    async for chunk in communicate.stream():
-        if chunk["type"] == "audio":
-            audio_data.extend(chunk["data"])
-        elif chunk["type"] in ("SentenceBoundary", "WordBoundary"):
-            sentence_events.append({
-                "text":  chunk.get("text", ""),
-                "start": chunk["offset"] / _NS100_PER_SEC,
-                "dur":   chunk["duration"] / _NS100_PER_SEC,
-            })
-
-    with open(output_path, "wb") as f:
-        f.write(bytes(audio_data))
-
-    if not sentence_events:
-        return []  # fallback handles this
-
-    # Distribute word timestamps within each sentence proportionally by char count
-    word_timestamps = []
-    for evt in sentence_events:
-        sent_start = evt["start"]
-        sent_dur   = evt["dur"]
-        sent_text  = evt["text"].strip()
-        words      = sent_text.split()
-        if not words:
-            continue
-
-        total_chars = sum(len(w) for w in words)
-        cursor = sent_start
-        for w in words:
-            fraction = len(w) / max(total_chars, 1)
-            w_dur    = fraction * sent_dur
-            word_timestamps.append({
-                "word":  w,
-                "start": round(cursor, 3),
-                "end":   round(cursor + w_dur, 3),
-            })
-            cursor += w_dur
-
-    return word_timestamps
-
-
-LOCKED_VOICE = "en-US-BrianNeural"
-
-def _generate_edge_tts(text, voice, output_path):
-    voice = LOCKED_VOICE  # Always use BrianNeural — warm, confident, authentic
-    print(f"Edge TTS → {voice} (with word timestamps)...")
-    word_timestamps = asyncio.run(_edge_tts_stream(text, voice, output_path))
-    duration = get_audio_duration(output_path)
-    print(f"Edge TTS done: {duration:.2f}s | {len(word_timestamps)} word timestamps")
-    return output_path, duration, word_timestamps
+# Edge TTS and Kokoro fallbacks removed to ensure 100% voice cloning authenticity.
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -366,38 +305,7 @@ def _generate_f5_clone(text, output_path):
 # ─────────────────────────────────────────────────────────────────────────────
 # PRIMARY: Kokoro (Local Open Source / 100% Free)
 # ─────────────────────────────────────────────────────────────────────────────
-def _generate_kokoro(text, output_path):
-    import soundfile as sf
-    from kokoro_onnx import Kokoro
-
-    if not os.path.exists(KOKORO_MODEL) or not os.path.exists(KOKORO_VOICES):
-        raise FileNotFoundError("Kokoro ONNX model or voice bin missing from assets folder.")
-
-    print("Kokoro TTS → am_echo (Local CPU)...")
-    kokoro  = Kokoro(KOKORO_MODEL, KOKORO_VOICES)
-    
-    # 2026 Monetization Strategy: Unique Pitching/Speed
-    import random
-    unique_speed = 1.1 + random.uniform(-0.05, 0.05)
-    
-    samples, sr = kokoro.create(text, voice="am_echo", speed=unique_speed, lang="en-us")
-    wav_path = output_path.replace(".mp3", ".wav")
-    sf.write(wav_path, samples, sr)
-    duration = len(samples) / sr
-    
-    # Run stable-ts to get actual timestamps from the generated audio
-    word_timestamps = _apply_stable_ts(wav_path, text)
-    if not word_timestamps:
-        word_timestamps = _estimate_timestamps(text, duration)
-        
-    print(f"Kokoro done: {duration:.2f}s | {len(word_timestamps)} word timestamps")
-    
-    # Explicitly cleanup Kokoro to free memory
-    del kokoro
-    import gc
-    gc.collect()
-    
-    return wav_path, duration, word_timestamps
+# Kokoro implementation removed.
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -508,23 +416,12 @@ def generate_voiceover(text, voice_request="en-US-BrianNeural", emotion="excited
     path, dur, word_timestamps = None, 0, []
     
     # ── ENGINE PRIORITY ──────────────────────────────────────────────────────
-    # 1. PRIMARY: F5-TTS Local Voice Cloning (Your Voice) - HI PRIORITY
+    # 1. PRIMARY: F5-TTS Local Voice Cloning (Your Voice) - ONLY ENGINE
     try:
         path, dur, word_timestamps = _generate_f5_clone(text_to_speak, mp3_path)
     except Exception as e:
-        print(f"⚠️ F5-TTS Cloning failed: {e}")
-        # 2. SECONDARY: Kokoro TTS
-        try:
-            path, dur, word_timestamps = _generate_kokoro(text_to_speak, mp3_path)
-        except Exception as e2:
-            print(f"⚠️ Kokoro failed: {e2}")
-            # FALLBACK: Edge TTS
-            try:
-                path, dur, word_timestamps = _generate_edge_tts(text_to_speak, LOCKED_VOICE, mp3_path)
-                real_ts = _apply_stable_ts(path, text_to_speak)
-                if real_ts: word_timestamps = real_ts
-            except Exception as e3:
-                print(f"Edge TTS fallback failed: {e3}")
+        print(f"❌ F5-TTS Cloning failed: {e}")
+        return None, 0, []
 
     # Post-process: Restore original word spellings for subtitles
     if word_timestamps:
