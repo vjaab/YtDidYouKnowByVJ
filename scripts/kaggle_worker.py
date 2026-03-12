@@ -58,10 +58,39 @@ def _apply_physical_patches():
             "old": re.compile(r"^(\s*)state_dict = torch\.load\(model_path\)", re.MULTILINE),
             "new": r"\1state_dict = torch.load(model_path, weights_only=False)",
             "name": "MuseTalk resnet.py legacy load"
+        },
+        {
+            "path": "MuseTalk",
+            "is_dir": True,
+            "old": re.compile(r"torch\.load\(([^,)]+)\)(?!.*weights_only)"),
+            "new": r"torch.load(\1, weights_only=False)",
+            "name": "MuseTalk recursive torch.load protection"
         }
     ]
     
     for patch in patches:
+        if patch.get("is_dir"):
+            if not os.path.exists(patch["path"]): continue
+            print(f"   📂 Patching directory: {patch['path']} ({patch['name']})")
+            for root, _, files in os.walk(patch["path"]):
+                for file in files:
+                    if file.endswith(".py"):
+                        fpath = os.path.join(root, file)
+                        with open(fpath, "r") as f: content = f.read()
+                        
+                        modified = False
+                        # Targeted regex: find torch.load calls without weights_only inside
+                        new_content = re.sub(
+                            r"torch\.load\(((?:(?!weights_only).)*?)\)",
+                            r"torch.load(\1, weights_only=False)",
+                            content,
+                            flags=re.DOTALL
+                        )
+                        if new_content != content:
+                            with open(fpath, "w") as f: f.write(new_content)
+                            print(f"      ✅ Patched {file}")
+            continue
+
         if not os.path.exists(patch["path"]):
             continue
         with open(patch["path"], "r") as f:
