@@ -231,7 +231,7 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
   "end_question": "A thought-provoking question for the audience to comment on"
 }}
 
-IMPORTANT: voice is ALWAYS en-US-AndrewNeural, which is a warm male voice. Do not suggest any other voice.
+IMPORTANT: voice is ALWAYS en-US-BrianNeural, which is a warm male voice. Do not suggest any other voice.
 """
 
     attempts = 0

@@ -212,10 +212,10 @@ async def _edge_tts_stream(text, voice, output_path):
     return word_timestamps
 
 
-LOCKED_VOICE = "en-US-AndrewNeural"
+LOCKED_VOICE = "en-US-BrianNeural"
 
 def _generate_edge_tts(text, voice, output_path):
-    voice = LOCKED_VOICE  # Always use AndrewNeural — warm, confident, authentic
+    voice = LOCKED_VOICE  # Always use BrianNeural — warm, confident, authentic
     print(f"Edge TTS → {voice} (with word timestamps)...")
     word_timestamps = asyncio.run(_edge_tts_stream(text, voice, output_path))
     duration = get_audio_duration(output_path)
@@ -495,7 +495,7 @@ def restore_original_words(word_timestamps, original_text, custom_phonetic_map=N
                         
     return word_timestamps
 
-def generate_voiceover(text, voice_request="en-US-GuyNeural", emotion="excited", custom_phonetic_map=None):
+def generate_voiceover(text, voice_request="en-US-BrianNeural", emotion="excited", custom_phonetic_map=None):
     """
     Returns: (audio_path, duration, word_timestamps)
     """

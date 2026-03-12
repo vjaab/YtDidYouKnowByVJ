@@ -129,7 +129,7 @@ def run_pipeline(custom_topic=None, topic_type="research"):
 
         title  = script_data.get("title", "Tech News!")
         script = script_data.get("script", "")
-        voice  = script_data.get("edge_tts_voice", "en-US-AndrewNeural")
+        voice  = script_data.get("edge_tts_voice", "en-US-BrianNeural")
         emotion = script_data.get("edge_tts_emotion", "calm")
         log_message(f"Story: {script_data.get('original_news_headline')}")
         log_message(f"Breaking Level: {script_data.get('breaking_news_level')}")
