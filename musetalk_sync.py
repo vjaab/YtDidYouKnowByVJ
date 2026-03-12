@@ -68,6 +68,32 @@ def generate_musetalk(face_path, audio_path, output_path, timeout=10800):
         print("   ✗ MuseTalk model weights not found. Run download_weights.sh first.")
         return None
 
+    # ── Pre-flight checks ─────────────────────────────────────────────────
+    print("   🔍 Pre-flight checks...")
+    # Verify all critical weight files exist
+    critical_weights = {
+        "UNet": os.path.join(musetalk_dir, unet_model_path),
+        "UNet Config": os.path.join(musetalk_dir, unet_config),
+        "SD-VAE": os.path.join(musetalk_dir, "models", "sd-vae", "config.json"),
+        "Whisper": os.path.join(musetalk_dir, "models", "whisper", "config.json"),
+        "DWPose": os.path.join(musetalk_dir, "models", "dwpose", "dw-ll_ucoco_384.pth"),
+    }
+    all_weights_ok = True
+    for name, path in critical_weights.items():
+        if os.path.exists(path):
+            print(f"      ✅ {name}: {path}")
+        else:
+            print(f"      ❌ MISSING: {name}: {path}")
+            all_weights_ok = False
+    
+    if not all_weights_ok:
+        print("   ✗ Critical model weights missing. MuseTalk cannot proceed.")
+        return None
+
+    # Verify YAML config was written correctly
+    with open(config_path, "r") as f:
+        print(f"      ✅ Config: {config_path} ({len(f.read())} bytes)")
+
     # ── Build the official inference command with quality flags ────────────
     cmd = [
         "python3", "-m", "scripts.inference",
@@ -85,6 +111,8 @@ def generate_musetalk(face_path, audio_path, output_path, timeout=10800):
         env = os.environ.copy()
         env["PYTORCH_ALLOC_CONF"] = "expandable_segments:True"
         env["PYTHONHASHSEED"] = "random"
+        # Remove any stale PYTORCH_CUDA_ALLOC_CONF to avoid deprecation warning
+        env.pop("PYTORCH_CUDA_ALLOC_CONF", None)
         
         result = subprocess.run(
             cmd, cwd=musetalk_dir, capture_output=True, text=True,
@@ -94,10 +122,9 @@ def generate_musetalk(face_path, audio_path, output_path, timeout=10800):
         if result.returncode != 0:
             print(f"   ✗ MuseTalk inference exited with code {result.returncode}")
             if result.stderr:
-                # Print last 2000 chars of stderr for debugging
-                print(f"   STDERR (last 2000 chars):\n{result.stderr[-2000:]}")
+                print(f"   STDERR (last 3000 chars):\n{result.stderr[-3000:]}")
             if result.stdout:
-                print(f"   STDOUT (last 500 chars):\n{result.stdout[-500:]}")
+                print(f"   STDOUT (last 1000 chars):\n{result.stdout[-1000:]}")
             return None
         
         # Print stdout for progress visibility

@@ -226,25 +226,37 @@ def _install_mmlab():
         print(f"   ⚠ mmdet failed: {e}")
     
     # Step 4: mmpose (depends on chumpy + xtcocotools which are broken on Py3.12)
-    def _mock_chumpy():
-        import sys
-        from unittest.mock import MagicMock
-        mock = MagicMock()
-        # Some versions check for __version__ or specific attributes
-        mock.__version__ = "0.70"
-        sys.modules["chumpy"] = mock
-        print("   ✅ Mocked 'chumpy' for Python 3.12 compatibility")
-
     try:
         print("   Configuring mmpose and runtime fixes...")
-        _mock_chumpy()
-        # Install secondary deps individually (skipping broken xtcocotools)
+        # Install secondary deps individually (skipping broken xtcocotools build)
         for dep in ["munkres", "json_tricks", "scipy", "shapely", "face-alignment"]:
             run_cmd(["pip", "install", "-q", dep])
         
+        # Install chumpy with relaxed build isolation (needed by mmpose in subprocesses)
+        try:
+            run_cmd(["pip", "install", "-q", "--no-build-isolation", "chumpy"])
+            print("   ✅ chumpy installed")
+        except:
+            # Create a stub chumpy package so import doesn't crash in subprocesses
+            import site
+            sp = site.getsitepackages()[0]
+            chumpy_dir = os.path.join(sp, "chumpy")
+            os.makedirs(chumpy_dir, exist_ok=True)
+            with open(os.path.join(chumpy_dir, "__init__.py"), "w") as f:
+                f.write("# Stub chumpy package for Python 3.12 compatibility\n")
+                f.write("__version__ = '0.70'\n")
+            print("   ✅ chumpy stub package created for subprocess compatibility")
+        
+        # Install xtcocotools
+        try:
+            run_cmd(["pip", "install", "-q", "xtcocotools"])
+            print("   ✅ xtcocotools")
+        except:
+            print("   ⚠ xtcocotools failed (non-critical for inference)")
+        
         # Install mmpose core
         run_cmd(["pip", "install", "-q", "--no-deps", "mmpose"])
-        print("   ✅ mmpose core installed and mocked")
+        print("   ✅ mmpose core installed")
     except Exception as e:
         print(f"   ⚠ mmpose setup had issues: {e}")
 
@@ -491,16 +503,23 @@ def process_job():
         custom_map = job_data.get("custom_map")
         
         # 🟢 STEP 1: GPU Audio (F5-TTS) — HARD REQUIREMENT
+        audio_path, duration, word_timestamps = None, 0, []
         try:
             audio_path, duration, word_timestamps = generate_voiceover(
                 script, voice, emotion, custom_phonetic_map=custom_map
             )
         except Exception as e:
             print(f"❌ F5-TTS Voice Cloning FAILED: {e}")
+            import traceback
+            traceback.print_exc()
             raise RuntimeError(f"Pipeline aborted: F5-TTS voice cloning failed — {e}")
         
         if not audio_path or not os.path.exists(audio_path):
             raise RuntimeError("Pipeline aborted: F5-TTS produced no audio output.")
+        
+        # Verify the audio is actually from F5-TTS (WAV) not an Edge TTS fallback (MP3)
+        if audio_path.endswith(".mp3"):
+            raise RuntimeError("Pipeline aborted: F5-TTS failed silently — got MP3 fallback instead of WAV.")
         
         print(f"✅ F5-TTS succeeded: {audio_path} ({duration:.1f}s, {len(word_timestamps)} words)")
         
