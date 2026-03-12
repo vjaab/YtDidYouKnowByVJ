@@ -209,7 +209,6 @@ def _install_mmlab():
             except:
                 continue
     
-    # Try 3: mmcv-lite (no CUDA ops, but still functional for inference)
     if not mmcv_installed:
         try:
             run_cmd(["pip", "install", "-q", "mmcv-lite>=2.0.1,<2.2.0"])
@@ -217,6 +216,29 @@ def _install_mmlab():
             print("   ✅ mmcv-lite (fallback, no CUDA ops)")
         except:
             print("   ❌ mmcv completely failed — MuseTalk will not work")
+            
+    # CRITICAL: If we have mmcv (lite or full) but _ext is missing, stub it.
+    # mmpose imports everything in .heads, including transformer heads that need _ext.
+    # As long as we don't actually EXECUTe those heads, a stub prevents the import crash.
+    try:
+        import site
+        sp = site.getsitepackages()[0]
+        mmcv_path = os.path.join(sp, "mmcv")
+        if os.path.exists(mmcv_path):
+            ext_file = os.path.join(mmcv_path, "_ext.py")
+            if not os.path.exists(ext_file):
+                print("   🛠️ Stubbing mmcv._ext to prevent import crash...")
+                with open(ext_file, "w") as f:
+                    f.write("# Physical stub for mmcv._ext to allow imports on Py3.12\n")
+                    f.write("import sys\n")
+                    f.write("from types import ModuleType\n\n")
+                    f.write("class StubModule(ModuleType):\n")
+                    f.write("    def __getattr__(self, name):\n")
+                    f.write("        return lambda *args, **kwargs: None\n\n")
+                    f.write("sys.modules['mmcv._ext'] = StubModule('mmcv._ext')\n")
+                print("   ✅ mmcv._ext stub created")
+    except Exception as e:
+        print(f"   ⚠ Failed to stub mmcv._ext: {e}")
     
     # Step 3: mmdet
     try:
