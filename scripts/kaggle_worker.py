@@ -159,12 +159,22 @@ def _install_mmlab():
     """
     print("📦 Installing MMLab stack (bypassing broken mim)...")
     
-    # Step 0: Ensure packaging tools are compatible
+    # Step 0: Ensure packaging tools and global stubs are ready
     try:
-        run_cmd(["pip", "install", "-q", "numpy<2.0", "setuptools<70", "packaging", "wheel"])
-        print("   ✅ numpy/setuptools/packaging ready")
+        run_cmd(["pip", "install", "-q", "numpy<2.0", "setuptools<70", "packaging", "wheel", "yapf==0.40.1"])
+        
+        # 🛡️ Global distutils stub for Python 3.12
+        import site
+        sp = site.getsitepackages()[0]
+        dist_dir = os.path.join(sp, "distutils")
+        os.makedirs(dist_dir, exist_ok=True)
+        with open(os.path.join(dist_dir, "__init__.py"), "w") as f:
+            f.write("# Global distutils stub\n")
+        with open(os.path.join(dist_dir, "version.py"), "w") as f:
+            f.write("from packaging.version import parse as LooseVersion\n")
+        print("   ✅ Global distutils/version.py stub created")
     except:
-        print("   ⚠ setuptools fix failed")
+        print("   ⚠ Global stubs setup failed")
     
     # Step 1: mmengine (pure Python, no CUDA ops)
     try:
@@ -218,25 +228,31 @@ def _install_mmlab():
             print("   ❌ mmcv completely failed — MuseTalk will not work")
             
     # CRITICAL: If we have mmcv (lite or full) but _ext is missing, stub it.
-    # mmpose imports everything in .heads, including transformer heads that need _ext.
-    # As long as we don't actually EXECUTe those heads, a stub prevents the import crash.
     try:
         import site
         sp = site.getsitepackages()[0]
         mmcv_path = os.path.join(sp, "mmcv")
         if os.path.exists(mmcv_path):
             ext_file = os.path.join(mmcv_path, "_ext.py")
-            if not os.path.exists(ext_file):
-                print("   🛠️ Stubbing mmcv._ext to prevent import crash...")
-                with open(ext_file, "w") as f:
-                    f.write("# Physical stub for mmcv._ext to allow imports on Py3.12\n")
-                    f.write("import sys\n")
-                    f.write("from types import ModuleType\n\n")
-                    f.write("class StubModule(ModuleType):\n")
-                    f.write("    def __getattr__(self, name):\n")
-                    f.write("        return lambda *args, **kwargs: None\n\n")
-                    f.write("sys.modules['mmcv._ext'] = StubModule('mmcv._ext')\n")
-                print("   ✅ mmcv._ext stub created")
+            # Create a more robust stub that allows importing submodules
+            print("   🛠️ Hardening mmcv._ext to prevent import crash...")
+            with open(ext_file, "w") as f:
+                f.write("# Robust physical stub for mmcv._ext\n")
+                f.write("import sys\n")
+                f.write("from types import ModuleType\n\n")
+                f.write("class StubModule(ModuleType):\n")
+                f.write("    def __getattr__(self, name):\n")
+                f.write("        if name == '__path__': return []\n")
+                f.write("        if name == '__all__': return []\n")
+                f.write("        return lambda *args, **kwargs: None\n\n")
+                f.write("sys.modules['mmcv._ext'] = StubModule('mmcv._ext')\n")
+                # Also stub the ops submodule which is often checked
+                ops_dir = os.path.join(mmcv_path, "ops")
+                os.makedirs(ops_dir, exist_ok=True)
+                with open(os.path.join(ops_dir, "__init__.py"), "a") as f_ops:
+                    f_ops.write("\n# Subprocess Import Protection\n")
+                    f_ops.write("try:\n    from . import _ext\nexcept:\n    pass\n")
+            print("   ✅ mmcv._ext hardened")
     except Exception as e:
         print(f"   ⚠ Failed to stub mmcv._ext: {e}")
     
@@ -251,7 +267,7 @@ def _install_mmlab():
     try:
         print("   Configuring mmpose and runtime fixes...")
         # Install secondary deps individually (skipping broken xtcocotools build)
-        for dep in ["munkres", "json_tricks", "scipy", "shapely", "face-alignment"]:
+        for dep in ["munkres", "json_tricks", "scipy", "shapely", "face-alignment", "pycocotools"]:
             run_cmd(["pip", "install", "-q", dep])
         
         # Install chumpy with relaxed build isolation (needed by mmpose in subprocesses)
@@ -259,15 +275,21 @@ def _install_mmlab():
             run_cmd(["pip", "install", "-q", "--no-build-isolation", "chumpy"])
             print("   ✅ chumpy installed")
         except:
-            # Create a stub chumpy package so import doesn't crash in subprocesses
+            # Create a more generous stub for chumpy to avoid AttributeErrors
             import site
             sp = site.getsitepackages()[0]
             chumpy_dir = os.path.join(sp, "chumpy")
             os.makedirs(chumpy_dir, exist_ok=True)
             with open(os.path.join(chumpy_dir, "__init__.py"), "w") as f:
-                f.write("# Stub chumpy package for Python 3.12 compatibility\n")
+                f.write("# Robust stub for chumpy\n")
                 f.write("__version__ = '0.70'\n")
-            print("   ✅ chumpy stub package created for subprocess compatibility")
+                f.write("import sys\n")
+                f.write("from types import ModuleType\n\n")
+                f.write("class Stub(ModuleType):\n")
+                f.write("    def __getattr__(self, name): return lambda *a, **k: Stub(name)\n")
+                f.write("    def __call__(self, *a, **k): return Stub('call')\n")
+                f.write("sys.modules['chumpy'] = Stub('chumpy')\n")
+            print("   ✅ chumpy robust stub created")
         
         # Install xtcocotools
         try:
@@ -275,16 +297,18 @@ def _install_mmlab():
             run_cmd(["pip", "install", "-q", "--no-build-isolation", "xtcocotools"])
             print("   ✅ xtcocotools")
         except:
-            print("   ⚠ xtcocotools failed, creating stub package for subprocess compatibility...")
+            print("   ⚠ xtcocotools failed, creating robust stub package...")
             import site
             sp = site.getsitepackages()[0]
             xtcoco_dir = os.path.join(sp, "xtcocotools")
             os.makedirs(xtcoco_dir, exist_ok=True)
             with open(os.path.join(xtcoco_dir, "__init__.py"), "w") as f:
-                f.write("# Stub xtcocotools package\n")
+                f.write("# Robust stub for xtcocotools\n")
             with open(os.path.join(xtcoco_dir, "coco.py"), "w") as f:
-                f.write("class COCO:\n    pass\n")
-            print("   ✅ xtcocotools stub package created")
+                f.write("class COCO:\n")
+                f.write("    def __init__(self, *a, **k): pass\n")
+                f.write("    def __getattr__(self, name): return lambda *a, **k: []\n")
+            print("   ✅ xtcocotools robust stub created")
         
         # Install mmpose core
         run_cmd(["pip", "install", "-q", "--no-deps", "mmpose"])
