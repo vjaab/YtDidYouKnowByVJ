@@ -176,10 +176,16 @@ def _install_mmlab():
     except:
         print("   ⚠ Global stubs setup failed")
     
-    # Step 1: mmengine (pure Python, no CUDA ops)
+    # Step 1: Uninstall everything first to ensure clean state
     try:
-        run_cmd(["pip", "install", "-q", "mmengine"])
-        print("   ✅ mmengine")
+        run_cmd(["pip", "uninstall", "-y", "mmcv", "mmdet", "mmpose", "mmengine", "mmcv-lite"])
+    except:
+        pass
+
+    # Step 2: mmengine (Pinned to 0.10.4 for stability)
+    try:
+        run_cmd(["pip", "install", "-q", "mmengine==0.10.4"])
+        print("   ✅ mmengine==0.10.4")
     except Exception as e:
         print(f"   ❌ mmengine failed: {e}")
     
@@ -194,38 +200,54 @@ def _install_mmlab():
     
     mmcv_installed = False
     
-    # Try 1: MiroPsota pre-built wheels (most reliable for Py3.12)
-    print(f"   Installing mmcv for torch {torch_ver}...")
-    try:
-        run_cmd([
-            "pip", "install", "-q",
-            "--extra-index-url", "https://miropsota.github.io/torch_packages_builder",
-            "mmcv>=2.0.1,<2.2.0"
-        ])
-        mmcv_installed = True
-        print("   ✅ mmcv (via MiroPsota wheels)")
-    except:
-        pass
+    # Try 1: OpenMMLab official index with detected versions
+    # We try cu121, cu118 etc. based on torch detection
+    import torch
+    torch_v = torch.__version__.split('+')[0]
+    cuda_v = torch.version.cuda
+    if cuda_v:
+        cuda_v = "cu" + cuda_v.replace(".", "")
+    else:
+        cuda_v = "cpu"
     
-    # Try 2: OpenMMLab official index
-    if not mmcv_installed:
-        for cuda_ver in ["cu121", "cu124", "cu118"]:
+    print(f"   Detected Torch: {torch_v}, CUDA: {cuda_v}")
+    
+    # Map torch version to matching OpenMMLab index (they often only have 2.1.0 or 2.2.0)
+    # If we have 2.5.0, we try to use the latest compatible index
+    torch_index_v = torch_v
+    if int(torch_v.split('.')[0]) >= 2:
+        # OpenMMLab usually trails behind torch versions. 
+        # For torch 2.4/2.5, the 2.1.0 or 2.2.0 wheels often work.
+        for trial_v in [torch_v, "2.1.0", "2.2.0"]:
             try:
-                mm_index = f"https://download.openmmlab.com/mmcv/dist/{cuda_ver}/torch{torch_ver}/index.html"
-                run_cmd(["pip", "install", "-q", "mmcv>=2.0.1,<2.2.0", "-f", mm_index])
+                mm_index = f"https://download.openmmlab.com/mmcv/dist/{cuda_v}/torch{trial_v}/index.html"
+                run_cmd(["pip", "install", "-q", "mmcv==2.1.0", "-f", mm_index])
                 mmcv_installed = True
-                print(f"   ✅ mmcv (via OpenMMLab {cuda_ver}/torch{torch_ver})")
+                print(f"   ✅ mmcv==2.1.0 (via OpenMMLab {cuda_v}/torch{trial_v})")
                 break
             except:
                 continue
+
+    # Try 2: MiroPsota pre-built wheels (excellent for Py3.12)
+    if not mmcv_installed:
+        try:
+            run_cmd([
+                "pip", "install", "-q",
+                "--extra-index-url", "https://miropsota.github.io/torch_packages_builder",
+                "mmcv>=2.1.0,<2.2.0"
+            ])
+            mmcv_installed = True
+            print("   ✅ mmcv (via MiroPsota wheels)")
+        except:
+            pass
     
     if not mmcv_installed:
         try:
-            run_cmd(["pip", "install", "-q", "mmcv-lite>=2.0.1,<2.2.0"])
+            run_cmd(["pip", "install", "-q", "mmcv-lite>=2.1.0,<2.2.0"])
             mmcv_installed = True
-            print("   ✅ mmcv-lite (fallback, no CUDA ops)")
+            print("   ✅ mmcv-lite (fallback)")
         except:
-            print("   ❌ mmcv completely failed — MuseTalk will not work")
+            print("   ❌ mmcv completely failed")
             
     # CRITICAL: If we have mmcv (lite or full) but _ext is missing, stub it.
     try:
@@ -257,16 +279,19 @@ def _install_mmlab():
     except Exception as e:
         print(f"   ⚠ Failed to stub mmcv._ext: {e}")
     
-    # Step 3: mmdet
+    # Step 3: mmdet (Pinned to 3.3.0)
     try:
-        run_cmd(["pip", "install", "-q", "mmdet"])
-        print("   ✅ mmdet")
+        run_cmd(["pip", "install", "-q", "mmdet==3.3.0"])
+        print("   ✅ mmdet==3.3.0")
     except Exception as e:
         print(f"   ⚠ mmdet failed: {e}")
     
-    # Step 4: mmpose (depends on chumpy + xtcocotools which are broken on Py3.12)
+    # Step 4: mmpose (Pinned to 1.3.2)
     try:
-        print("   Configuring mmpose and runtime fixes...")
+        run_cmd(["pip", "install", "-q", "--no-deps", "mmpose==1.3.2"])
+        print("   ✅ mmpose==1.3.2")
+    except Exception as e:
+        print(f"   ⚠ mmpose failed: {e}")
         # Install secondary deps individually (skipping broken xtcocotools build)
         for dep in ["munkres", "json_tricks", "scipy", "shapely", "face-alignment", "pycocotools"]:
             run_cmd(["pip", "install", "-q", dep])
