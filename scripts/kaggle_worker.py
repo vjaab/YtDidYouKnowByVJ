@@ -65,6 +65,12 @@ def _apply_physical_patches():
             "old": re.compile(r"torch\.load\(([^,)]+)\)(?!.*weights_only)"),
             "new": r"torch.load(\1, weights_only=False)",
             "name": "MuseTalk recursive torch.load protection"
+        },
+        {
+            "path": "MuseTalk/scripts/inference.py",
+            "old": re.compile(r"^(\s*)inference_config = OmegaConf\.load\(args\.inference_config\)", re.MULTILINE),
+            "new": r"\1inference_config = OmegaConf.load(args.inference_config)\n\1inference_config = OmegaConf.to_container(inference_config, resolve=True)",
+            "name": "MuseTalk inference.py OmegaConf to_container"
         }
     ]
     
