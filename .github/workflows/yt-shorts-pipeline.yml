@@ -12,6 +12,8 @@ jobs:
   run-pipeline:
     runs-on: ubuntu-latest
     timeout-minutes: 240 # Accommodate heavy MuseTalk processing and potential cloud fallbacks
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     
     steps:
       - name: Checkout Code
