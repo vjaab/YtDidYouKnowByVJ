@@ -15,7 +15,7 @@ LAYER 11: Static title box (192px from bottom, entire video)
 LAYER 12: Telegram CTA card (last 6 seconds, slides up)
 LAYER 13: Subscribe animation (last 3 seconds, pulse)
 LAYER 14: Progress bar (6px at very bottom)
-LAYER 15: Background music (vol 0.06)
+LAYER 15: Background music (vol 0.045)
 """
 
 import os
