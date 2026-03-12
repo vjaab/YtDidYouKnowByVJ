@@ -29,6 +29,15 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         
+      - name: Free Disk Space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          df -h
+        
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -53,13 +62,7 @@ jobs:
           pip install "numpy<2.0"
           pip install "grpcio==1.62.2"
           pip install -r requirements.txt
-          # MuseTalk MMLab dependencies (non-fatal — lip-sync runs on Kaggle GPU)
-          # If mmcv fails to build, the pipeline still works by offloading to Kaggle
-          pip install openmim || true
-          pip install chumpy --no-build-isolation || true
-          mim install mmengine || true
-          pip install "mmcv>=2.1.0" --no-build-isolation || true
-          mim install "mmdet>=3.1.0" "mmpose>=1.1.0" || true
+          # Skip local MMLab stack to save disk space (offloaded to Kaggle)
           # Explicitly fix potential imageio recursion by forcing latest imageio-ffmpeg last
           pip install --upgrade imageio imageio-ffmpeg moviepy
           # FIX: Patch basicsr for torchvision compatibility without importing (prevents ModuleNotFoundError)
