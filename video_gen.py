@@ -1442,7 +1442,7 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     f_main = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', base_size)
     
     # word_data is a list of {"word": str, "is_active": bool, "is_spoken": bool, "scale": float}
-    words = [wd["word"].upper() for wd in word_data]
+    words = [wd["word"] for wd in word_data]
     
     word_widths = []
     fake_draw = ImageDraw.Draw(Image.new("RGBA", (1,1)))
