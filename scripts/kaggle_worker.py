@@ -111,11 +111,19 @@ def _patch_mmengine():
     """
     print("🛠️ Patching mmengine registry for Adafactor compatibility...")
     try:
+        import mmengine.optim.optimizer.builder as builder
+        
+        # Check if already patched physically
+        import inspect
+        source = inspect.getsource(builder.register_transformers_optimizers)
+        if "except KeyError" in source:
+            print("   ✅ mmengine already patched physically, skipping monkey-patch")
+            return
+
         import importlib
         import mmengine
         importlib.reload(mmengine)
         
-        import mmengine.optim.optimizer.builder as builder
         if hasattr(builder, 'register_transformers_optimizers'):
             orig_reg = builder.register_transformers_optimizers
             def safe_register():
@@ -126,7 +134,7 @@ def _patch_mmengine():
             builder.register_transformers_optimizers = safe_register
             # Force run it now to claim the territory
             safe_register()
-            print("   ✅ mmengine Adafactor patch applied & reloaded")
+            print("   ✅ mmengine Adafactor monkey-patch applied")
     except Exception as e:
         print(f"   ⚠ Could not patch mmengine: {e}")
 
