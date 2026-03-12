@@ -49,16 +49,18 @@ def generate_musetalk_sync(face_path, audio_path, output_path, timeout=10800):
         print(f"   ⚠ Reference frame extraction failed: {e}")
         ref_frame_path = None
 
-    # ── Create YAML config with quality-optimized settings ────────────────
-    config_content = {
-        "video_path": face_path,
-        "audio_path": audio_path,
-        "bbox_shift": 5,  # Positive shift = more jaw movement during speech (more natural)
+    # ── Create YAML config with tasks (dictionary of tasks expected by MuseTalk) ──
+    config_tasks = {
+        "main_task": {
+            "video_path": face_path,
+            "audio_path": audio_path,
+            "bbox_shift": 5,
+        }
     }
     config_path = os.path.join(os.path.abspath(musetalk_dir), "configs", "inference", "_pipeline_run.yaml")
     os.makedirs(os.path.dirname(config_path), exist_ok=True)
     with open(config_path, "w") as f:
-        yaml.dump([config_content], f)
+        yaml.dump(config_tasks, f)
 
     # ── Determine model version (prefer v1.5 if available) ───────────────
     v15_path = os.path.join(musetalk_dir, "models", "musetalkV15", "unet.pth")
