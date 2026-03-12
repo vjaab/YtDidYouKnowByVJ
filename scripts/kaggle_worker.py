@@ -189,6 +189,30 @@ def _install_mmlab():
                     print("   ✅ registry.py already patched, skipping")
             else:
                 print("   ⚠ registry.py not found")
+
+            # ── EXPERT PATCH: mmcv_full_available ValueError Fix ──────
+            misc_path = os.path.join(sp, "mmengine", "utils", "dl_utils", "misc.py")
+            if os.path.exists(misc_path):
+                with open(misc_path, "r") as f:
+                    misc_content = f.read()
+                
+                if "except (ImportError, ValueError):" not in misc_content:
+                    if "except ImportError:" in misc_content:
+                        misc_content = misc_content.replace("except ImportError:", "except (ImportError, ValueError):")
+                        with open(misc_path, "w") as f:
+                            f.write(misc_content)
+                        print("   ✅ Physical misc.py patch applied (ValueError fix)")
+                        
+                        # Clear cache
+                        import glob
+                        for pyc in glob.glob(os.path.join(sp, "mmengine", "utils", "dl_utils", "__pycache__", "misc*.pyc")):
+                            os.remove(pyc)
+                    else:
+                        print("   ⚠ misc.py pattern not found")
+                else:
+                    print("   ✅ misc.py already patched, skipping")
+            else:
+                print("   ⚠ misc.py not found")
     except Exception as e:
         print(f"   ❌ mmengine setup/patch failed: {e}")
     
