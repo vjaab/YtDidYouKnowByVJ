@@ -104,6 +104,27 @@ def _patch_basicsr():
         print(f"   ⚠ Basicsr patch error: {e}")
 
 
+def _patch_mmengine():
+    """
+    Monkey-patch mmengine to prevent KeyError: 'Adafactor is already registered'
+    This happens when mmengine and modern torch (2.2+) both try to register Adafactor.
+    """
+    print("🛠️ Patching mmengine registry for Adafactor compatibility...")
+    try:
+        import mmengine.optim.optimizer.builder as builder
+        if hasattr(builder, 'register_transformers_optimizers'):
+            orig_reg = builder.register_transformers_optimizers
+            def safe_register():
+                try:
+                    orig_reg()
+                except KeyError:
+                    pass # Already registered
+            builder.register_transformers_optimizers = safe_register
+            print("   ✅ mmengine Adafactor patch applied")
+    except Exception as e:
+        print(f"   ⚠ Could not patch mmengine: {e}")
+
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # MUSETALK SETUP
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -573,6 +594,10 @@ def process_job():
 
     try:
         sys.path.append(os.getcwd())
+        
+        # Apply runtime patches before imports
+        _patch_mmengine()
+        
         from audio_gen import generate_voiceover, unload_f5_model
         from lip_sync import generate_lip_sync
         from musetalk_sync import generate_musetalk
