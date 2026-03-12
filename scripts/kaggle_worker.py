@@ -46,6 +46,12 @@ def _apply_physical_patches():
             "old": re.compile(r"^(\s*)ext_loader = pkgutil\.find_loader\('mmcv\._ext'\)", re.MULTILINE),
             "new": r"\1try:\n\1    ext_loader = pkgutil.find_loader('mmcv._ext')\n\1except (ImportError, ValueError):\n\1    ext_loader = None",
             "name": "mmcv_full_available ValueError"
+        },
+        {
+            "path": os.path.join(sp, "mmengine", "runner", "checkpoint.py"),
+            "old": re.compile(r"^(\s*)checkpoint = torch\.load\(filename, map_location=map_location\)", re.MULTILINE),
+            "new": r"\1checkpoint = torch.load(filename, map_location=map_location, weights_only=False)",
+            "name": "checkpoint.py weights_only=False"
         }
     ]
     
@@ -55,7 +61,7 @@ def _apply_physical_patches():
         with open(patch["path"], "r") as f:
             content = f.read()
         
-        unique_check = "except (ImportError, ValueError):" if "misc.py" in patch["path"] else ("force=True" if "builder.py" in patch["path"] else "except TypeError:")
+        unique_check = "except (ImportError, ValueError):" if "misc.py" in patch["path"] else ("force=True" if "builder.py" in patch["path"] else ("weights_only=False" if "checkpoint.py" in patch["path"] else "except TypeError:"))
         if unique_check in content:
             print(f"   ✅ {patch['name']} already patched")
             continue
