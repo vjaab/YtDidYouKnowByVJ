@@ -159,9 +159,36 @@ def _install_mmlab():
                 pyc_path = os.path.join(sp, "mmengine", "optim", "optimizer", "__pycache__", "builder.cpython-312.pyc")
                 if os.path.exists(pyc_path):
                     os.remove(pyc_path)
-                    print("   ✅ Cleared mmengine pyc cache")
+                    print("   ✅ Cleared mmengine builder pyc cache")
+            
+            # ── EXPERT PATCH: Registry infer_scope TypeError Fix ──────
+            registry_path = os.path.join(sp, "mmengine", "registry", "registry.py")
+            if os.path.exists(registry_path):
+                with open(registry_path, "r") as f:
+                    reg_content = f.read()
+                
+                if "except TypeError" not in reg_content:
+                    old_reg = "module = inspect.getmodule(sys._getframe(2))"
+                    new_reg = """try:
+            module = inspect.getmodule(sys._getframe(2))
+        except TypeError:
+            module = None"""
+                    if old_reg in reg_content:
+                        reg_content = reg_content.replace(old_reg, new_reg)
+                        with open(registry_path, "w") as f:
+                            f.write(reg_content)
+                        print("   ✅ Physical registry.py patch applied (infer_scope fix)")
+                        
+                        # Clear cache
+                        import glob
+                        for pyc in glob.glob(os.path.join(sp, "mmengine", "registry", "__pycache__", "registry*.pyc")):
+                            os.remove(pyc)
+                    else:
+                        print("   ⚠ registry.py pattern not found")
+                else:
+                    print("   ✅ registry.py already patched, skipping")
             else:
-                print("   ⚠ builder.py already patched or pattern not found")
+                print("   ⚠ registry.py not found")
     except Exception as e:
         print(f"   ❌ mmengine setup/patch failed: {e}")
     
@@ -505,13 +532,13 @@ def setup_project():
         "--extra-index-url", "https://download.pytorch.org/whl/cu121"])
     
     # CRITICAL: Clean swap of numpy and numba
-    # This ensures F5-TTS (via Numba) and MuseTalk (via OpenCV) are using consistent C extensions
-    print("🔁 Performing clean swap of numba and numpy for Python 3.12 compatibility...")
+    # Standardizing on numpy 2.0.2 and numba 0.60.0 for F5-TTS / Python 3.12 compatibility
+    print("🔁 Performing clean swap of numba and numpy (v2.x compatible)...")
     try:
         # Clean uninstall first
         subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "numba", "numpy"], check=True)
         # Fresh install with known compatible versions
-        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "numba==0.59.1", "numpy==1.26.4"], check=True)
+        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "numba==0.60.0", "numpy==2.0.2"], check=True)
         
         # Verify
         import importlib, numpy, numba
@@ -685,12 +712,12 @@ if __name__ == "__main__":
     setup_project()
     setup_musetalk()
     
-    # 🔁 FINAL CRITICAL LOCK: Ensure both numba and numpy are downgraded
+    # 🔁 FINAL CRITICAL LOCK: Ensure both numba and numpy are standardized
     # This fixes corruption from mmengine/torch upgrades during MMLab setup
-    print("🔁 Finalizing environment: Locking numba==0.59.1 and numpy==1.26.4 (Clean Swap)...")
+    print("🔁 Finalizing environment: Locking numba==0.60.0 and numpy==2.0.2 (Clean Swap)...")
     try:
         subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "numba", "numpy"], check=True)
-        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "numba==0.59.1", "numpy==1.26.4"], check=True)
+        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "numba==0.60.0", "numpy==2.0.2"], check=True)
         
         import importlib, numpy, numba
         importlib.reload(numpy)
