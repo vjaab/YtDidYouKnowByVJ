@@ -142,7 +142,7 @@ CRITICAL '2026 SCALE' RULES:
 1. MONETIZATION PROTECTION: If the script is >50% factual summary, it will be flagged as "Reused Content." PUSH THE OPINION.
 2. AGGRESSIVE ENGAGEMENT: Use "Bait & Switch" questions. Start a sentence, pause, and say "Actually, tell me in the comments first: do you think this is ethical? Now look at this..."
 3. NO REPETITION: Never repeat a word or phrase within 10 seconds.
-4. WHATSAPP & TELEGRAM CTA: You MUST give a 1-second pause (...) before the end. Speak the CTA fully: "Join the inner circle on my WhatsApp and Telegram (links in bio) for the raw data I can't post here... See you in the next one."
+4. WHATSAPP & TELEGRAM CTA: You MUST give a 1-second pause (...) before the end. Speak the CTA fully: "Send your suggestions and feedback on my WhatsApp and Telegram (links in bio), I read everything... See you in the next one."
 5. AI DISCLOSURE: Embrace the "AI-Journalist" persona. Mention your neural nets or analytical processing to build the brand.
 
 {selection_instruction}
