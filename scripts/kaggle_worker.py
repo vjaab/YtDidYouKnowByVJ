@@ -1,9 +1,10 @@
 import os
-os.environ["PYTHONHASHSEED"] = "random"
+os.environ["PYTHONHASHSEED"] = "0"
 import subprocess
 import shutil
 import sys
 import time
+import re
 
 # 🚀 KAGGLE GPU WORKER FOR YtDidYouKnowByVJ
 # Designed to run on Kaggle T4 x2 or P100
@@ -18,39 +19,88 @@ def run_cmd(cmd, cwd=None, quiet=False):
 
 
 
+def _apply_physical_patches():
+    """
+    Applies regex-based physical patches to mmengine files on disk.
+    This ensures compatibility across subprocesses on Python 3.12.
+    """
+    print("🛠️ Applying robust physical patches to mmengine...")
+    import site
+    sp = site.getsitepackages()[0]
+    
+    patches = [
+        {
+            "path": os.path.join(sp, "mmengine", "optim", "optimizer", "builder.py"),
+            "old": re.compile(r"^(\s*)OPTIMIZERS\.register_module\(name='Adafactor', module=Adafactor\)", re.MULTILINE),
+            "new": r"\1OPTIMIZERS.register_module(name='Adafactor', module=Adafactor, force=True)",
+            "name": "Adafactor force=True"
+        },
+        {
+            "path": os.path.join(sp, "mmengine", "registry", "registry.py"),
+            "old": re.compile(r"^(\s*)module = inspect\.getmodule\(sys\._getframe\(2\)\)", re.MULTILINE),
+            "new": r"\1try:\n\1    module = inspect.getmodule(sys._getframe(2))\n\1except TypeError:\n\1    module = None",
+            "name": "Registry infer_scope TypeError"
+        },
+        {
+            "path": os.path.join(sp, "mmengine", "utils", "dl_utils", "misc.py"),
+            "old": re.compile(r"^(\s*)ext_loader = pkgutil\.find_loader\('mmcv\._ext'\)", re.MULTILINE),
+            "new": r"\1try:\n\1    ext_loader = pkgutil.find_loader('mmcv._ext')\n\1except (ImportError, ValueError):\n\1    ext_loader = None",
+            "name": "mmcv_full_available ValueError"
+        }
+    ]
+    
+    for patch in patches:
+        if not os.path.exists(patch["path"]):
+            continue
+        with open(patch["path"], "r") as f:
+            content = f.read()
+        
+        unique_check = "except (ImportError, ValueError):" if "misc.py" in patch["path"] else ("force=True" if "builder.py" in patch["path"] else "except TypeError:")
+        if unique_check in content:
+            print(f"   ✅ {patch['name']} already patched")
+            continue
+            
+        new_content, count = patch["old"].subn(patch["new"], content)
+        if count > 0:
+            with open(patch["path"], "w") as f:
+                f.write(new_content)
+            print(f"   ✅ {patch['name']} patch applied ({count} matches)")
+            
+            try:
+                base_dir = os.path.dirname(patch["path"])
+                subprocess.run(["find", base_dir, "-name", "*.pyc", "-delete"], check=False)
+            except:
+                pass
+        else:
+            print(f"   ⚠️ {patch['name']} pattern not found")
+
 def _patch_mmengine():
     """
-    Monkey-patch mmengine to prevent KeyError: 'Adafactor is already registered'
-    This happens when mmengine and modern torch (2.2+) both try to register Adafactor.
+    Ensure all physical patches are applied and provides a runtime monkey-patch fallback.
     """
-    print("🛠️ Patching mmengine registry for Adafactor compatibility...")
+    _apply_physical_patches()
+    
+    print("🛠️ Verifying mmengine registry for Adafactor...")
     try:
         import mmengine.optim.optimizer.builder as builder
-        
-        # Check if already patched physically
         import inspect
         source = inspect.getsource(builder.register_transformers_optimizers)
         if "force=True" in source or "except KeyError" in source:
-            print("   ✅ mmengine already patched physically, skipping monkey-patch")
+            print("   ✅ mmengine Adafactor patch verified (source)")
             return
 
-        import importlib
-        import mmengine
+        import importlib, mmengine
         importlib.reload(mmengine)
-        
         if hasattr(builder, 'register_transformers_optimizers'):
             orig_reg = builder.register_transformers_optimizers
             def safe_register():
-                try:
-                    orig_reg()
-                except KeyError:
-                    pass # Already registered
+                try: orig_reg()
+                except KeyError: pass
             builder.register_transformers_optimizers = safe_register
-            # Force run it now to claim the territory
             safe_register()
             print("   ✅ mmengine Adafactor monkey-patch applied")
     except Exception as e:
-        print(f"   ⚠ Could not patch mmengine: {e}")
+        print(f"   ⚠ Adafactor monkey-patch fallback: {e}")
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -136,93 +186,8 @@ def _install_mmlab():
         run_cmd(["pip", "install", "-q", "mmengine==0.10.4", "--force-reinstall"])
         print("   ✅ mmengine==0.10.4 (forced)")
         
-        # ── EXPERT PATCH: Physical Disk Patch for Adafactor KeyError ──────
-        import site
-        sp = site.getsitepackages()[0]
-        builder_path = os.path.join(sp, "mmengine", "optim", "optimizer", "builder.py")
-        if os.path.exists(builder_path):
-            with open(builder_path, "r") as f:
-                content = f.read()
-            
-            old_pattern = "    OPTIMIZERS.register_module(name='Adafactor', module=Adafactor)"
-            new_pattern = "    OPTIMIZERS.register_module(name='Adafactor', module=Adafactor, force=True)"
-            
-            if "force=True" in content:
-                print("   ✅ builder.py already patched (force=True), skipping")
-            elif old_pattern in content:
-                content = content.replace(old_pattern, new_pattern)
-                with open(builder_path, "w") as f:
-                    f.write(content)
-                print("   ✅ Physical Adafactor patch applied (force=True) to builder.py")
-                
-                # Clear bytecode cache
-                pyc_path = os.path.join(sp, "mmengine", "optim", "optimizer", "__pycache__", "builder.cpython-312.pyc")
-                if os.path.exists(pyc_path):
-                    os.remove(pyc_path)
-                    print("   ✅ Cleared mmengine builder pyc cache")
-            
-            # ── EXPERT PATCH: Registry infer_scope TypeError Fix ──────
-            registry_path = os.path.join(sp, "mmengine", "registry", "registry.py")
-            if os.path.exists(registry_path):
-                with open(registry_path, "r") as f:
-                    reg_content = f.read()
-                
-                if "except TypeError" not in reg_content:
-                    old_reg = "module = inspect.getmodule(sys._getframe(2))"
-                    new_reg = """try:
-            module = inspect.getmodule(sys._getframe(2))
-        except TypeError:
-            module = None"""
-                    if old_reg in reg_content:
-                        reg_content = reg_content.replace(old_reg, new_reg)
-                        with open(registry_path, "w") as f:
-                            f.write(reg_content)
-                        print("   ✅ Physical registry.py patch applied (infer_scope fix)")
-                        
-                        # Clear cache
-                        import glob
-                        for pyc in glob.glob(os.path.join(sp, "mmengine", "registry", "__pycache__", "registry*.pyc")):
-                            os.remove(pyc)
-                    else:
-                        print("   ⚠ registry.py pattern not found")
-                else:
-                    print("   ✅ registry.py already patched, skipping")
-            else:
-                print("   ⚠ registry.py not found")
-
-            # ── EXPERT PATCH: mmcv_full_available ValueError Fix ──────
-            misc_path = os.path.join(sp, "mmengine", "utils", "dl_utils", "misc.py")
-            if os.path.exists(misc_path):
-                with open(misc_path, "r") as f:
-                    misc_content = f.read()
-                
-                if "except (ImportError, ValueError):" not in misc_content:
-                    old_find = "ext_loader = pkgutil.find_loader('mmcv._ext')"
-                    new_find = """try:
-            ext_loader = pkgutil.find_loader('mmcv._ext')
-        except (ImportError, ValueError):
-            ext_loader = None"""
-                    if old_find in misc_content:
-                        misc_content = misc_content.replace(old_find, new_find)
-                        with open(misc_path, "w") as f:
-                            f.write(misc_content)
-                        print("   ✅ Physical misc.py patch applied (ValueError wrap)")
-                    elif "except ImportError:" in misc_content:
-                        misc_content = misc_content.replace("except ImportError:", "except (ImportError, ValueError):")
-                        with open(misc_path, "w") as f:
-                            f.write(misc_content)
-                        print("   ✅ Physical misc.py patch applied (ValueError fix)")
-                    else:
-                        print("   ⚠ misc.py pattern not found")
-                    
-                    # Clear cache
-                    import glob
-                    for pyc in glob.glob(os.path.join(sp, "mmengine", "utils", "dl_utils", "__pycache__", "misc*.pyc")):
-                        os.remove(pyc)
-                else:
-                    print("   ✅ misc.py already patched, skipping")
-            else:
-                print("   ⚠ misc.py not found")
+        # ── EXPERT PATCH ──────────────────────────────────────────────────
+        _apply_physical_patches()
     except Exception as e:
         print(f"   ❌ mmengine setup/patch failed: {e}")
     
