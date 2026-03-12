@@ -353,7 +353,7 @@ def _emoji_burst(start_time, total_dur):
     for i, emoji in enumerate(burst_emojis[:5]):
         angle = (i / 5) * math.pi * 2
         tx = int(FRAME_W//2 + 220 * math.cos(angle))
-        ty = int(FRAME_H//2 + 300 * math.sin(angle))
+        ty = int(FRAME_H * 0.38 + 300 * math.sin(angle)) # Center burst higher up
         f = gf(80)
         img = Image.new("RGBA", (120, 120), (0,0,0,0))
         ImageDraw.Draw(img).text((10, 10), emoji, font=f)
@@ -654,7 +654,7 @@ def _hook_text_overlay(hook_text, accent_color, total_dur):
 
     clip = VideoClip(lambda t: arr, duration=dur)
     mclip = VideoClip(lambda t: mask * opacity_fn(t), is_mask=True, duration=dur)
-    y_pos = int(FRAME_H * 0.35)
+    y_pos = int(FRAME_H * 0.32) # Moved up slightly
     return clip.with_mask(mclip).with_position(("center", y_pos)).with_start(0)
 
 
@@ -749,7 +749,7 @@ def _interactive_challenge_overlay(challenge_data, accent_color, total_dur):
     clip = VideoClip(make_frame, duration=dur)
     mclip = VideoClip(make_mask, is_mask=True, duration=dur)
     x_pos = (FRAME_W - box_w) // 2
-    y_pos = int(FRAME_H * 0.55)
+    y_pos = int(FRAME_H * 0.72) # Moved significantly down to clear subtitles
     return clip.with_mask(mclip).with_position((x_pos, y_pos)).with_start(ch_ts)
 
 
