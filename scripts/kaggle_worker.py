@@ -490,10 +490,19 @@ def process_job():
         emotion = job_data.get("emotion")
         custom_map = job_data.get("custom_map")
         
-        # 🟢 STEP 1: GPU Audio (F5-TTS)
-        audio_path, duration, word_timestamps = generate_voiceover(
-            script, voice, emotion, custom_phonetic_map=custom_map
-        )
+        # 🟢 STEP 1: GPU Audio (F5-TTS) — HARD REQUIREMENT
+        try:
+            audio_path, duration, word_timestamps = generate_voiceover(
+                script, voice, emotion, custom_phonetic_map=custom_map
+            )
+        except Exception as e:
+            print(f"❌ F5-TTS Voice Cloning FAILED: {e}")
+            raise RuntimeError(f"Pipeline aborted: F5-TTS voice cloning failed — {e}")
+        
+        if not audio_path or not os.path.exists(audio_path):
+            raise RuntimeError("Pipeline aborted: F5-TTS produced no audio output.")
+        
+        print(f"✅ F5-TTS succeeded: {audio_path} ({duration:.1f}s, {len(word_timestamps)} words)")
         
         # 🔓 Unload F5-TTS
         unload_f5_model()
@@ -502,7 +511,6 @@ def process_job():
         face_path = "assets/Firefly_video_final.mp4"
         optimized_face = "assets/Firefly_video_optimized.mp4"
         lipsync_out = "kaggle_lipsync.mp4"
-        lipsync_path = None
         
         print("🏎️ Optimizing template resolution (512px) for RAM safety...")
         run_cmd([
@@ -512,10 +520,11 @@ def process_job():
             optimized_face
         ])
         
-        # 🏅 TIER 1: MuseTalk (Best Quality + Gestures)
+        # 🏅 MuseTalk Lip-Sync — HARD REQUIREMENT
         import gc
         import torch
         
+        lipsync_path = None
         try:
             gc.collect()
             torch.cuda.empty_cache()
@@ -525,33 +534,14 @@ def process_job():
                 output_path=lipsync_out
             )
         except Exception as e:
-            print(f"   ⚠ MuseTalk failed: {e}")
+            print(f"❌ MuseTalk Lip-Sync FAILED: {e}")
+            raise RuntimeError(f"Pipeline aborted: MuseTalk lip-sync failed — {e}")
         finally:
             gc.collect()
             torch.cuda.empty_cache()
 
-        # 🥈 TIER 2: SadTalker Fallback (DISABLED)
-        # if not lipsync_path:
-        #     print("   ↳ Falling back to SadTalker...")
-        #     try:
-        #         gc.collect()
-        #         torch.cuda.empty_cache()
-        #         lipsync_path = generate_lip_sync(
-        #             face_path=optimized_face,
-        #             audio_path=audio_path,
-        #             output_path=lipsync_out
-        #         )
-        #     except Exception as e:
-        #         print(f"   ⚠ SadTalker failed: {e}")
-        #     finally:
-        #         gc.collect()
-        #         torch.cuda.empty_cache()
-
-        # 🥉 TIER 3: Raw Fallback (Audio + Original Video)
-        if not lipsync_path:
-            print("   ↳ ⚠ ALL AI Engines Failed. Falling back to RAW video...")
-            shutil.copy(face_path, lipsync_out)
-            lipsync_path = lipsync_out
+        if not lipsync_path or not os.path.exists(lipsync_path):
+            raise RuntimeError("Pipeline aborted: MuseTalk produced no lip-sync output.")
         
         # 🟢 STEP 3: Save Results
         output_root = os.path.join(os.getcwd(), "..")
