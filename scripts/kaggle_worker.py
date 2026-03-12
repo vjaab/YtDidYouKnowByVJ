@@ -190,7 +190,7 @@ def _install_mmlab():
         run_cmd([
             "pip", "install", "-q",
             "--extra-index-url", "https://miropsota.github.io/torch_packages_builder",
-            "mmcv"
+            "mmcv>=2.0.1,<2.2.0"
         ])
         mmcv_installed = True
         print("   ✅ mmcv (via MiroPsota wheels)")
@@ -202,7 +202,7 @@ def _install_mmlab():
         for cuda_ver in ["cu121", "cu124", "cu118"]:
             try:
                 mm_index = f"https://download.openmmlab.com/mmcv/dist/{cuda_ver}/torch{torch_ver}/index.html"
-                run_cmd(["pip", "install", "-q", "mmcv>=2.0.1", "-f", mm_index])
+                run_cmd(["pip", "install", "-q", "mmcv>=2.0.1,<2.2.0", "-f", mm_index])
                 mmcv_installed = True
                 print(f"   ✅ mmcv (via OpenMMLab {cuda_ver}/torch{torch_ver})")
                 break
@@ -212,7 +212,7 @@ def _install_mmlab():
     # Try 3: mmcv-lite (no CUDA ops, but still functional for inference)
     if not mmcv_installed:
         try:
-            run_cmd(["pip", "install", "-q", "mmcv-lite"])
+            run_cmd(["pip", "install", "-q", "mmcv-lite>=2.0.1,<2.2.0"])
             mmcv_installed = True
             print("   ✅ mmcv-lite (fallback, no CUDA ops)")
         except:
