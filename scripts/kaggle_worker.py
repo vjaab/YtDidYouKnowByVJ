@@ -16,92 +16,6 @@ def run_cmd(cmd, cwd=None, quiet=False):
         print(f"Executing: {' '.join(cmd)}")
         subprocess.run(cmd, cwd=cwd, check=True)
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# BASICSR PATCH — Must run BEFORE any import of basicsr/gfpgan/facexlib
-# ═══════════════════════════════════════════════════════════════════════════════
-
-def _patch_basicsr():
-    """
-    Patch basicsr for Python 3.12 compatibility.
-    MUST use file-path scanning (not `import basicsr`) because importing
-    basicsr triggers the very crash we're trying to fix.
-    
-    Fixes:
-    1. torchvision.transforms.functional_tensor → functional (removed in torchvision 0.18+)
-    2. distutils.version.LooseVersion → packaging.version.parse (removed in Python 3.12)
-    """
-    print("🛠️ Patching basicsr for Python 3.12 compatibility...")
-    import site
-    try:
-        # Find basicsr WITHOUT importing it
-        basicsr_dir = None
-        for d in site.getsitepackages():
-            candidate = os.path.join(d, "basicsr")
-            if os.path.isdir(candidate):
-                basicsr_dir = candidate
-                break
-        
-        if not basicsr_dir:
-            # Try common Kaggle path directly
-            fallback = "/usr/local/lib/python3.12/dist-packages/basicsr"
-            if os.path.isdir(fallback):
-                basicsr_dir = fallback
-        
-        if not basicsr_dir:
-            print("   ⚠ basicsr not found in site-packages.")
-            return
-
-        patched = False
-
-        # Patch 1: functional_tensor → functional
-        deg_file = os.path.join(basicsr_dir, "data", "degradations.py")
-        if os.path.exists(deg_file):
-            with open(deg_file, 'r') as f:
-                content = f.read()
-            if "functional_tensor" in content:
-                content = content.replace(
-                    "from torchvision.transforms.functional_tensor import rgb_to_grayscale",
-                    "from torchvision.transforms.functional import rgb_to_grayscale"
-                )
-                with open(deg_file, 'w') as f:
-                    f.write(content)
-                patched = True
-                print("   ✅ Patched degradations.py (functional_tensor → functional)")
-
-        # Patch 2: distutils.version → packaging.version  
-        arch_util = os.path.join(basicsr_dir, "archs", "arch_util.py")
-        if os.path.exists(arch_util):
-            with open(arch_util, 'r') as f:
-                content = f.read()
-            if "from distutils.version import LooseVersion" in content:
-                content = content.replace(
-                    "from distutils.version import LooseVersion",
-                    "from packaging.version import parse as LooseVersion"
-                )
-                with open(arch_util, 'w') as f:
-                    f.write(content)
-                patched = True
-                print("   ✅ Patched arch_util.py (distutils → packaging)")
-        
-        # Patch 3: Also check __init__.py for any distutils imports
-        init_file = os.path.join(basicsr_dir, "__init__.py")
-        if os.path.exists(init_file):
-            with open(init_file, 'r') as f:
-                content = f.read()
-            if "distutils" in content:
-                content = content.replace(
-                    "from distutils.version import LooseVersion",
-                    "from packaging.version import parse as LooseVersion"
-                )
-                with open(init_file, 'w') as f:
-                    f.write(content)
-                patched = True
-
-        if not patched:
-            print("   ✓ basicsr already patched or no patches needed.")
-        
-    except Exception as e:
-        print(f"   ⚠ Basicsr patch error: {e}")
 
 
 def _patch_mmengine():
@@ -587,8 +501,7 @@ def setup_project():
     run_cmd(["pip", "install", "-q", 
         "onnxruntime-gpu", "espeakng-loader",
         "f5-tts", "stable-ts", "torch", "torchvision", "torchaudio", 
-        "facexlib", "gfpgan", "basicsr", "av", "yacs", "kornia", 
-        "librosa", "resampy", "imageio-ffmpeg", "pyyaml", "joblib", 
+        "av", "imageio-ffmpeg", "pyyaml", "joblib", 
         "scikit-image", "safetensors", "trimesh", "face-alignment",
         "diffusers", "transformers", "accelerate", "g2p_en",
         "--extra-index-url", "https://download.pytorch.org/whl/cu121"])
@@ -602,8 +515,6 @@ def setup_project():
     except:
         pass
 
-    # ── CRITICAL: Patch basicsr BEFORE any engine imports ──────────────────
-    _patch_basicsr()
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
