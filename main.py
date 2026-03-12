@@ -66,8 +66,10 @@ Don't miss out — join free today 👇
 #airesearch #shorts #machinelearning #ai #youtubeshorts #dailyfacts"""
 
 
-def run_pipeline(topic_type="research"):
+def run_pipeline(topic_type="research", forced_topic=None, force_run=False):
     log_message(f"=== STARTING DAILY AI PIPIELINE ({topic_type.upper()}) ===")
+    if forced_topic:
+        log_message(f"COMMAND OVERRIDE: Forcing topic -> {forced_topic}")
 
     # ── Clean output folder before starting ───────────────────────────────────
     if os.path.exists(OUTPUT_DIR):
@@ -98,8 +100,13 @@ def run_pipeline(topic_type="research"):
 
     while attempts < MAX_RETRY_ATTEMPTS:
         log_message(f"STEP 3 (Attempt {attempts+1}): Gemini Searching & Generating Script...")
+        
+        # If forced_topic is provided, we pass it as an extra instruction to focus purely on that
+        topic_instruction = f"FOCUS EXCLUSIVELY ON THIS TOPIC: {forced_topic}" if forced_topic else ""
+        combined_instruction = f"{topic_instruction}\n{extra_instruction}".strip()
+        
         script_data = pick_and_generate_script(
-            articles=None, extra_instruction=extra_instruction, forced_article=None, topic_type=topic_type
+            articles=None, extra_instruction=combined_instruction, forced_article=forced_topic, topic_type=topic_type, force_run=force_run
         )
 
         if not script_data:
@@ -297,9 +304,9 @@ def run_pipeline(topic_type="research"):
     return True
 
 
-def run_local(topic_type="research"):
+def run_local(topic_type="research", forced_topic=None, force_run=False):
     # XTTS server launch removed. Calling pipeline directly.
-    success = run_pipeline(topic_type=topic_type)
+    success = run_pipeline(topic_type=topic_type, forced_topic=forced_topic, force_run=force_run)
     if not success:
         import sys
         print("❌ Pipeline failed. Exiting with error code.")
@@ -310,10 +317,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--now", action="store_true", help="Run pipeline immediately.")
     parser.add_argument("--type", type=str, choices=["research", "tools"], default="research", help="Content type mapped to the schedule")
+    parser.add_argument("--topic", type=str, help="Force a specific topic (skips RSS/Search fetch)")
+    parser.add_argument("--force", action="store_true", help="Force run even if no new news is found (skips uniqueness check)")
     args = parser.parse_args()
 
     if args.now:
-        run_local(topic_type=args.type)
+        run_local(topic_type=args.type, forced_topic=args.topic, force_run=args.force)
     else:
         print("Usage: python main.py --now")
         print("For scheduled runs: python scheduler.py")
