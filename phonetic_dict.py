@@ -602,8 +602,8 @@ def auto_detect_hard_words(text):
             vowel_count = sum(1 for p in real_phonemes
                             if ''.join(c for c in p if not c.isdigit()) in _ARPA_TO_READABLE)
 
-            # Only auto-correct words with 3+ syllables
-            if vowel_count >= 3:
+            # Only auto-correct words with 2+ syllables (more aggressive than 3)
+            if vowel_count >= 2:
                 respelling = _phonemes_to_respelling(real_phonemes)
                 if respelling and respelling != lower:
                     auto_map[word] = respelling

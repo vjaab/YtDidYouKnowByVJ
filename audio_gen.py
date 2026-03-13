@@ -332,16 +332,22 @@ def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
     """
     if not text: return ""
     
-    # 1. Remove bracketed instructions
-    cleaned = re.sub(r'\[[^\]]*(pause|silence|music|sound|breath)[^\]]*\]', '', text, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\([^)]*(pause|silence|music|sound|breath)[^)]*\)', '', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\s*\[pause\]\s*', ' ', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\s*\(pause\)\s*', ' ', cleaned, flags=re.IGNORECASE)
+    # 1. Remove bracketed instructions and literal stage directions
+    # Catch [pause], (pause), [silence], etc. and also standalone words like "PAUSE." or "SILENCE." 
+    # if they are on their own line or follow a period.
+    cleaned = re.sub(r'\[[^\]]*?(pause|silence|music|sound|breath|background)[^\]]*?\]', ' ', text, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\([^)]*?(pause|silence|music|sound|breath|background)[^)]*?\)', ' ', cleaned, flags=re.IGNORECASE)
+    
+    # Aggressively catch literal words "PAUSE" or "SILENCE" that might be injected as instructions
+    # only if surrounded by punctuation or starts of lines to avoid hitting words like "paused"
+    cleaned = re.sub(r'\b(PAUSE|SILENCE|BREATH|SOUND EFFECT|SFX)\b', ' ', cleaned, flags=re.IGNORECASE)
     
     # 2. Fix pronunciation artifacts (The "Strike" issue)
-    cleaned = cleaned.replace("—", "...") # Em-dash
-    cleaned = cleaned.replace("–", "...") # En-dash
-    cleaned = cleaned.replace("--", "...") # Double hyphen
+    # Convert dashes to ellipses which F5-TTS handles better as natural pauses
+    cleaned = cleaned.replace("—", " ... ") # Em-dash
+    cleaned = cleaned.replace("–", " ... ") # En-dash
+    cleaned = cleaned.replace("--", " ... ") # Double hyphen
+    cleaned = cleaned.replace("...", " ... ") # Ensure space around ellipses
     cleaned = cleaned.replace("*", " ")    # Asterisks
     cleaned = cleaned.replace("•", " ")    # Bullet point
     cleaned = cleaned.replace("·", " ")    # Middle dot

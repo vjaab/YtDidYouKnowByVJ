@@ -155,6 +155,7 @@ CRITICAL '2026 SCALE' RULES:
 3. NO REPETITION: Never repeat a word or phrase within 10 seconds.
 4. WHATSAPP & TELEGRAM CTA: You MUST give a 1-second pause (...) before the end. Speak the CTA fully: "Send your suggestions and feedback on my WhatsApp and Telegram (links in bio), I read everything... See you in the next one."
 5. AI DISCLOSURE: Embrace the "AI-Journalist" persona. Mention your neural nets or analytical processing to build the brand.
+6. NO LITERAL DIRECTIONS: NEVER include the word "[pause]" or "(pause)" or just "pause" in the script text. The script field MUST only contain words you want SPOKEN. Use "..." for breathing space.
 
 {selection_instruction}
 
@@ -191,7 +192,7 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
     "Algorithm": "al-go-rith-um",
     "Autonomous": "aw-ton-uh-mus"
   }},
-  "NOTE_phonetic_pronunciation_map": "MANDATORY LEXICAL AUDIT: Identify EVERY word that is: 1) A tech/scientific term, 2) A word with >3 syllables, 3) A homograph with ambiguous sounds (e.g., 'read' vs 'read'), or 4) Any English word that a machine might pronounce 'flat' or wrong. Provide a hyphenated phonetic respelling. This corrected text is what will be SPOKEN, but subtitles will show ORIGINAL text.",
+  "NOTE_phonetic_pronunciation_map": "EXTREME LEXICAL AUDIT: Identify EVERY SINGLE word that is: 1) A tech/scientific term (e.g. 'Transformer', 'Quantization'), 2) A brand name or model (e.g. 'Llama', 'NVIDIA'), 3) A word with 2+ syllables that isn't extremely common, or 4) Any word where AI might trip up. Provide a hyphenated phonetic respelling (e.g. 'pro-nun-see-ay-shun'). This is critical for high-quality voice cloning. If empty, the video will fail.",
   "hook": "Matches the first sentence of the script",
   "summary": "One line summary",
   "sub_category": "AI/Machine Learning",
