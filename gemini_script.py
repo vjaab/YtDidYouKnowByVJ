@@ -35,7 +35,11 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
                 if hasattr(gm, 'grounding_chunks'):
                     for chunk in gm.grounding_chunks:
                         if hasattr(chunk, 'web') and chunk.web.uri:
-                            grounding_links.append(f"{chunk.web.title}: {chunk.web.uri}")
+                            uri = chunk.web.uri
+                            # Filter out common dead-ends or search redirects
+                            if any(x in uri.lower() for x in ["google.com/search", "bing.com/search", "search?", "click?"]):
+                                continue
+                            grounding_links.append(f"{chunk.web.title}: {uri}")
             
             links_str = "\n".join(grounding_links)
             # Use the grounded response to build a context
@@ -231,7 +235,7 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
   ],
   "NOTE_subtitle_chunks": "CRITICAL: Generate 10-15 subtitle_chunks that together cover the ENTIRE script text. Each chunk should be 1-2 sentences (5-12 words). Every word of the script MUST appear in exactly one chunk. Chunks must not overlap and must cover the full duration.",
   "original_news_headline": "Exact headline",
-  "original_news_url": "MANDATORY: Pick the most relevant full URL from the SOURCES FOUND section (e.g. https://domain.com/path). DO NOT leave as placeholder.",
+  "original_news_url": "MANDATORY: Pick the most stable, direct article URL from the SOURCES FOUND section. DO NOT use search results, PDF links, or internal citations. Must be a direct link to the news article for screenshotting.",
   "key_entities": [
     {{"name": "Entity Name", "type": "MODEL"}},
     {{"name": "Service Name", "type": "CLOUD"}},

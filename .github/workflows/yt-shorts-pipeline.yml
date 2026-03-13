@@ -92,7 +92,7 @@ jobs:
         run: |
           python main.py --now
         
-      - name: Commit Updated Tracking File (news_log.json)
+      - name: Commit Updated Tracking File & Logs
         # Always run this step to save the log, preventing duplicate topics tomorrow
         if: always()
         run: |
@@ -102,8 +102,8 @@ jobs:
           # Pull latest changes first to minimize rebase complexity
           git pull origin main --rebase || echo "Pull failed, proceeding anyway"
           
-          # Add all potential tracking files
-          git add news_log.json facts_log.json || echo "No log files found to add"
+          # Add all potential tracking files and technical logs
+          git add news_log.json facts_log.json logs/*.txt logs/*.json || echo "No log files found to add"
           
           # Only commit if there are actual changes
           if ! git diff --cached --quiet; then

@@ -19,6 +19,7 @@ def capture_article_screenshot(url, output_filename):
     cmd = [
         "npx", "-y", "playwright", "screenshot",
         "--viewport-size=1080,1920",
+        "--wait-for-timeout=3000",
         url,
         output_path
     ]
