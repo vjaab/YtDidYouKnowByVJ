@@ -1459,7 +1459,7 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     
     line_h = 130
     total_h = len(lines) * line_h
-    start_y = 1000 # Moved down to avoid overlapping with the Avatar PiP (which ends at Y=940)
+    start_y = 950 # Moved up slightly more (Avatar PiP ends at 940) to clear the footer CTA
     
     word_idx = 0
     for i, line in enumerate(lines):
@@ -1961,6 +1961,12 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         subtitle_img = None
         for chunk in chunks:
             if chunk["start"] - 0.1 <= t <= chunk["end"] + 0.1:
+                # REQUEST: Subtitles should disappear for the final feedback CTA
+                text_low = chunk.get("text", "").lower()
+                cta_keywords = ["suggestions", "feedback", "whatsapp", "telegram", "bio"]
+                if any(kw in text_low for kw in cta_keywords) and t > audio_duration - 10:
+                    break
+                    
                 word_status_list = []
                 for w in chunk.get("words", []):
                     # Kinetic Pop Logic: Scale up 1.25x for first 150ms of word
