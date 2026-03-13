@@ -1732,7 +1732,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
             img = Image.new("RGBA", (pw, ph), (0, 0, 0, 0))
             draw = ImageDraw.Draw(img)
             draw.rounded_rectangle([0, 0, pw, ph], radius=40, fill=(20, 20, 30, 160))
-            draw.rounded_rectangle([5, 5, pw-5, ph-5], radius=35, outline=(*accent, 80), width=2)
+            # Border removed as per user request
             return _pil_clip(img, duration)
 
         # ── Neon Glow Border ──
@@ -1755,7 +1755,6 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         
         avatar_pip = CompositeVideoClip([
             pane.with_position((-20, -20)),
-            border.with_position((-5, -5)),
             avatar_clip.with_position((0, 0))
         ], size=(width_pip + 60, height_pip + 60), is_mask=False).with_position(pip_position).with_start(0)
 
