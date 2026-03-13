@@ -332,11 +332,10 @@ def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
     """
     if not text: return ""
     
-    # 1. Remove bracketed instructions
-    cleaned = re.sub(r'\[[^\]]*(pause|silence|music|sound|breath)[^\]]*\]', '', text, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\([^)]*(pause|silence|music|sound|breath)[^)]*\)', '', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\s*\[pause\]\s*', ' ', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\s*\(pause\)\s*', ' ', cleaned, flags=re.IGNORECASE)
+    # 1. Broadly remove ALL bracketed and parenthesized meta-instructions/timestamps
+    # This prevents the TTS from speaking things like [0.0], [14.0], (pause), [glitch], etc.
+    cleaned = re.sub(r'\[[^\]]*\]', ' ', text)
+    cleaned = re.sub(r'\([^)]*\)', ' ', cleaned)
     
     # 2. Fix pronunciation artifacts (The "Strike" issue)
     cleaned = cleaned.replace("—", "...") # Em-dash
