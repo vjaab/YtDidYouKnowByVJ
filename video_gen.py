@@ -1119,50 +1119,57 @@ def render_telegram_cta(accent_color, frame_width=1080):
 # ── LAYER 16: Article Screenshot (New Layer) ──────────────────────────────────
 def _article_screenshot_clip(screenshot_path, duration):
     """
-    Transformative Fullscreen logic: Shows the source article as the main visual for a segment
-    to prove it's an external source and satisfy YouTube's 'Fair Use' commentary policy.
+    Transformative Fullscreen logic: Shows the source article as the main visual.
+    Anchored to (0,0) to ensure top/left edges don't go outside during zoom.
+    Displayed twice for maximum impact.
     """
     if not screenshot_path or not os.path.exists(screenshot_path):
-        return None
+        return []
     try:
         # Load and verify image
         img = Image.open(screenshot_path).convert("RGBA")
         
-        # Fullscreen Resize: 1080x1920
+        # Fullscreen Resize: 1080x1920 (Force fullscreen fit)
         img = img.resize((FRAME_W, FRAME_H), Image.LANCZOS)
         
         arr = np.array(img.convert("RGB"))
         mask = np.array(img.split()[3]).astype(float) / 255.0
         
-        # Timing: Start at 12s (Deep Dive phase)
-        start_ts = 12.0
-        display_dur = min(12.0, duration - start_ts)
-        if display_dur <= 0: return None
+        clips = []
         
-        # Create base clip
-        clip = ImageClip(arr, duration=display_dur)
-        mclip = VideoClip(lambda t: mask, is_mask=True, duration=display_dur)
-        
-        # Animation: Dynamic Headline Zoom (Ken Burns)
-        # We zoom from 1.0x to 1.3x over the duration to make the headline pop
-        clip = clip.resized(lambda t: 1.0 + 0.30 * (t / display_dur))
-        
-        # Positioning: Start centered but slightly shifted up to focus on the headline
-        # As we zoom, we do a subtle vertical "scan" down
-        def pos_logic(t):
-            y_offset = -100 + (t / display_dur) * 150 # Subtle downward drift
-            return ("center", y_offset)
-        
-        clip = clip.with_mask(mclip).with_position(pos_logic).with_start(start_ts)
-        
-        # Transitions
-        clip = clip.with_effects([vfx.CrossFadeIn(0.5), vfx.CrossFadeOut(0.5)])
-        
-        return clip
+        # --- FIRST APPEARANCE: Evidence/Hook Phase ---
+        # Show briefly early on to establish source credibility
+        start1 = 3.5
+        dur1 = 2.5
+        if duration > start1 + dur1:
+            clip1 = ImageClip(arr, duration=dur1)
+            mclip1 = VideoClip(lambda t: mask, is_mask=True, duration=dur1)
+            # Subtle zoom: 1.0 to 1.10
+            # Anchor at (0,0) so top and left stay fixed
+            clip1 = clip1.resized(lambda t: 1.0 + 0.10 * (t / dur1))
+            clip1 = clip1.with_mask(mclip1).with_position((0, 0)).with_start(start1)
+            clip1 = clip1.with_effects([vfx.CrossFadeIn(0.4), vfx.CrossFadeOut(0.4)])
+            clips.append(clip1)
+
+        # --- SECOND APPEARANCE: Deep Dive Phase ---
+        # Full Headline Zoom for detailed commentary phase
+        start2 = 12.0
+        dur2 = min(12.0, duration - start2)
+        if dur2 > 0:
+            clip2 = ImageClip(arr, duration=dur2)
+            mclip2 = VideoClip(lambda t: mask, is_mask=True, duration=dur2)
+            # Deep Zoom: 1.0 to 1.30
+            # Anchor at (0,0) to keep headline and logo in view
+            clip2 = clip2.resized(lambda t: 1.0 + 0.30 * (t / dur2))
+            clip2 = clip2.with_mask(mclip2).with_position((0, 0)).with_start(start2)
+            clip2 = clip2.with_effects([vfx.CrossFadeIn(0.5), vfx.CrossFadeOut(0.5)])
+            clips.append(clip2)
+            
+        return clips
         
     except Exception as e:
         print(f"Article screenshot clip error: {e}")
-        return None
+        return []
 
 
 def _ai_disclosure_overlay(duration):
@@ -1781,7 +1788,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
 
     # ── LAYERS ───────────────────────────────────────────────────────────
     screenshot_path = script_json.get("screenshot_path")
-    screenshot_clip = _article_screenshot_clip(screenshot_path, audio_duration)
+    screenshot_clips = _article_screenshot_clip(screenshot_path, audio_duration)
     tint = ColorClip(size=(FRAME_W, FRAME_H), color=accent_color, duration=audio_duration).with_opacity(0.02)
     gradient = _gradient_clip(audio_duration)
     
@@ -1852,9 +1859,9 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     base_layers = bg_layer_clips + [tint, gradient] + particle_clips + logo_clips + fact_clips + burst_clips + reminder_clips + engagement_clips + [grain_layer, flare_layer, disclosure, watermark]
     if avatar_pip:
         base_layers.append(avatar_pip)
-    if screenshot_clip:
-        # We place the citation over the avatar if it overlaps
-        base_layers.append(screenshot_clip)
+    if screenshot_clips:
+        # We place the citations over the avatar if it overlaps
+        base_layers.extend(screenshot_clips)
 
     # ── PROGRESS BAR ────────────────────────────────────────────────────────
     def get_progress_color(t):
@@ -1969,7 +1976,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
             if chunk["start"] - 0.1 <= t <= chunk["end"] + 0.1:
                 # REQUEST: Subtitles should disappear for the final feedback CTA
                 text_low = chunk.get("text", "").lower()
-                cta_keywords = ["suggestions", "feedback", "whatsapp", "telegram", "bio"]
+                cta_keywords = ["follow", "updates", "suggestions", "feedback", "whatsapp", "telegram", "bio"]
                 if any(kw in text_low for kw in cta_keywords) and t > audio_duration - 10:
                     break
                     

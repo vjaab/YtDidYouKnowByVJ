@@ -38,8 +38,8 @@ def format_description(ai_description, script, end_question, hashtags):
     if end_question:
         question_section = f"\n💬 {end_question}\n👇 CHALLENGE: 90% get this wrong. Comment your guess!\n"
     
-    return f"""🚀 SUGGESTIONS & FEEDBACK (WhatsApp) → https://wa.me/919585793939
-🔥 Have a topic idea or feedback? Message me directly!
+    return f"""🚀 FOLLOW FOR MORE UPDATES (WhatsApp) → https://wa.me/919585793939
+🔥 Stay ahead of the curve — join my channel!
 ━━━━━━━━━━━━━━━━━━━━━━
 {ai_description}
 {question_section}
