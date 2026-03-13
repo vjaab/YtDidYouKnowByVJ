@@ -14,79 +14,86 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
     day_name, slot, category = get_slot_info()
     strategy_enhancement = get_category_prompt_enhancement(category, slot)
 
-    # ── STEP 0: GEMINI SEARCH (If no articles provided) ─────────────────────
-    if not articles:
-        print(f"🔍 STEP 0: Using Gemini Search for {topic_type} ({category})...")
-        search_query = f"Latest groundbreaking {topic_type} news and research about {category} from the last 24 hours. Focus on technical breakthroughs and company launches."
-        
-        try:
-            search_response = client.models.generate_content(
-                model='gemini-2.0-flash', # Use stable flash for tools
-                contents=search_query,
-                config=types.GenerateContentConfig(
-                    tools=[{'google_search': {}}]
-                )
-            )
-            
-            # Extract URLs from grounding metadata to ensure we have real links for screenshots
-            grounding_links = []
-            if search_response.candidates and search_response.candidates[0].grounding_metadata:
-                gm = search_response.candidates[0].grounding_metadata
-                if hasattr(gm, 'grounding_chunks'):
-                    for chunk in gm.grounding_chunks:
-                        if hasattr(chunk, 'web') and chunk.web.uri:
-                            uri = chunk.web.uri
-                            # Filter out common dead-ends or search redirects
-                            if any(x in uri.lower() for x in ["google.com/search", "bing.com/search", "search?", "click?"]):
-                                continue
-                            grounding_links.append(f"{chunk.web.title}: {uri}")
-            
-            links_str = "\n".join(grounding_links)
-            # Use the grounded response to build a context
-            news_context = f"GEMINI SEARCH RESULTS (Grounded):\n{search_response.text}\n\nSOURCES FOUND:\n{links_str}\n"
-            print(f"✅ Gemini Search completed with {len(grounding_links)} sources.")
-        except Exception as e:
-            print(f"⚠️ Gemini Search failed: {e}. Falling back to empty context.")
-            news_context = "No news articles found."
+    # ── STEP -1: FORCED TOPIC OVERRIDE ──────────────────────────────────────
+    news_context = ""
+    if forced_article:
+        print(f"🎯 STEP -1: Using Forced Topic -> {forced_article}")
+        news_context = f"FORCED TOPIC TO COVER:\n{forced_article}\n"
     else:
-        # ── Pre-filter articles (Unique against history AND against each other) ──
+        # ── STEP 0: FETCH & FILTER ARTICLES ─────────────────────────────────────
         filtered_articles = []
-        seen_titles_in_this_batch = []
-        
-        for art in articles:
-            title = art.get('title', '')
-            url = art.get('url', '')
-            
-            # 1. Check against long-term history
-            is_unique, _ = check_story_uniqueness(title, url)
-            if not is_unique:
-                continue
+        if articles:
+            print(f"📡 STEP 0: Filtering {len(articles)} RSS/Source articles...")
+            seen_titles_in_this_batch = []
+            for art in articles:
+                title = art.get('title', '')
+                url = art.get('url', '')
                 
-            # 2. Check against other articles in this same feed batch
-            is_internally_unique = True
-            from rapidfuzz import fuzz 
-            for seen_title in seen_titles_in_this_batch:
-                if fuzz.token_set_ratio(title.lower(), seen_title.lower()) > 80:
-                    is_internally_unique = False
-                    break
+                # 1. Check against long-term history
+                is_unique, _ = check_story_uniqueness(title, url)
+                if not is_unique:
+                    continue
+                    
+                # 2. Check against other articles in this same feed batch
+                is_internally_unique = True
+                from rapidfuzz import fuzz 
+                for seen_title in seen_titles_in_this_batch:
+                    if fuzz.token_set_ratio(title.lower(), seen_title.lower()) > 80:
+                        is_internally_unique = False
+                        break
+                
+                if is_internally_unique:
+                    filtered_articles.append(art)
+                    seen_titles_in_this_batch.append(title)
             
-            if is_internally_unique:
-                filtered_articles.append(art)
-                seen_titles_in_this_batch.append(title)
-        
-        if not filtered_articles:
-            print("No unique articles remaining to process.")
-            return None
+            if not filtered_articles:
+                print("⚠️ No unique articles in RSS batch. Falling back to Gemini Search...")
+                articles = None # Trigger search below
+            else:
+                print(f"✅ Found {len(filtered_articles)} unique articles in RSS batch.")
+                articles = filtered_articles
+
+        # ── STEP 1: ARTICLE CONTEXT BUILDING ────────────────────────────────────
+        if not articles:
+            print(f"🔍 STEP 1: Using Gemini Search for {topic_type} ({category})...")
+            search_query = f"Latest groundbreaking {topic_type} news and research about {category} from the last 24 hours. Focus on technical breakthroughs and company launches."
             
-        articles = filtered_articles 
-        
-        news_context = ""
-        for idx, art in enumerate(articles[:20]):
-            title = art.get('title', '')
-            desc = art.get('description', '')
-            source = art.get('source', {}).get('name', '')
-            url = art.get('url', '')
-            news_context += f"\n[{idx+1}] Title: {title}\nDescription: {desc}\nSource: {source}\nURL: {url}\n"
+            try:
+                search_response = client.models.generate_content(
+                    model='gemini-2.0-flash', # Use stable flash for tools
+                    contents=search_query,
+                    config=types.GenerateContentConfig(
+                        tools=[{'google_search': {}}]
+                    )
+                )
+                
+                # Extract URLs from grounding metadata to ensure we have real links for screenshots
+                grounding_links = []
+                if search_response.candidates and search_response.candidates[0].grounding_metadata:
+                    gm = search_response.candidates[0].grounding_metadata
+                    if hasattr(gm, 'grounding_chunks'):
+                        for chunk in gm.grounding_chunks:
+                            if hasattr(chunk, 'web') and chunk.web.uri:
+                                uri = chunk.web.uri
+                                # Filter out common dead-ends or search redirects
+                                if any(x in uri.lower() for x in ["google.com/search", "bing.com/search", "search?", "click?"]):
+                                    continue
+                                grounding_links.append(f"{chunk.web.title}: {uri}")
+                
+                links_str = "\n".join(grounding_links)
+                # Use the grounded response to build a context
+                news_context = f"GEMINI SEARCH RESULTS (Grounded):\n{search_response.text}\n\nSOURCES FOUND:\n{links_str}\n"
+                print(f"✅ Gemini Search completed with {len(grounding_links)} sources.")
+            except Exception as e:
+                print(f"⚠️ Gemini Search failed: {e}. Falling back to empty context.")
+                news_context = "No news articles found."
+        else:
+            for idx, art in enumerate(articles[:20]):
+                title = art.get('title', '')
+                desc = art.get('description', '')
+                source = art.get('source', {}).get('name', '')
+                url = art.get('url', '')
+                news_context += f"\n[{idx+1}] Title: {title}\nDescription: {desc}\nSource: {source}\nURL: {url}\n"
 
     # Build the story selection instruction
     if topic_type == "tools":

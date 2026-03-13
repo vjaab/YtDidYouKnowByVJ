@@ -8,7 +8,7 @@ from datetime import datetime
 
 import glob
 from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR
-# from fetch_research_papers import fetch_tech_news, fetch_ai_tools
+from fetch_research_papers import fetch_tech_news, fetch_ai_tools
 from topic_tracker import record_story
 from gemini_script import pick_and_generate_script
 from ecosystem_logic import get_slot_info
@@ -83,9 +83,19 @@ def run_pipeline(topic_type="research"):
     day_name, slot, category = get_slot_info()
     log_message(f"STEP 1: Content Ecosystem Check -> Day: {day_name}, Slot: {slot}, Category: {category}")
     
-    # ── STEP 2: Selection Strategy ───────────────────────────────────────────
-    log_message("STEP 2: Gemini will search and auto-pick the best story.")
-    chosen_article = None
+    # ── STEP 2: Selection Strategy (RSS Fetch) ────────────────────────────────
+    log_message(f"STEP 2: Fetching RSS articles for {topic_type}...")
+    rss_articles = []
+    try:
+        if topic_type == "research":
+            rss_articles = fetch_tech_news()
+        else:
+            rss_articles = fetch_ai_tools()
+            
+        if not rss_articles:
+            log_message("⚠️ RSS feeds returned 0 articles.")
+    except Exception as e:
+        log_message(f"⚠️ RSS Fetch failed: {e}")
 
     # ── STEP 3: Script Generation (with retry) ────────────────────────────────
     attempts = 0
@@ -100,7 +110,7 @@ def run_pipeline(topic_type="research"):
         log_message(f"STEP 3 (Attempt {attempts+1}): Gemini Searching & Generating Script...")
         
         script_data = pick_and_generate_script(
-            articles=None, extra_instruction=extra_instruction, forced_article=None, topic_type=topic_type
+            articles=rss_articles, extra_instruction=extra_instruction, forced_article=None, topic_type=topic_type
         )
 
         if not script_data:
