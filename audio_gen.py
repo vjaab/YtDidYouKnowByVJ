@@ -198,49 +198,33 @@ def _smart_split_sentences(text, max_chars=120):
 
 def _postprocess_voice_audio(wav_path):
     """
-    Post-processing chain to polish F5-TTS output:
-    1. Gentle high-pass filter at 80Hz to remove low-frequency rumble
-    2. Normalize to -1dB for consistent loudness
-    3. Add 2ms fade-in/out to prevent click artifacts
+    Professional post-processing chain to enhance clarity and presence:
+    1. High-pass filter at 100Hz to remove low-end "mud" and rumble.
+    2. Dynamic Range Compression to level out the voice and make it "pop".
+    3. Final normalization to -1dB for consistent loudness.
+    4. Subtle fade-in/out to prevent clicks.
     """
     try:
+        from pydub import AudioSegment
+        from pydub.effects import normalize, compress_dynamic_range
+        
         audio = AudioSegment.from_wav(wav_path)
         
-        # 1. High-pass filter (remove rumble below 80Hz)
-        # Simple implementation: apply a 2-pass moving average subtraction
-        import numpy as np
-        samples = np.array(audio.get_array_of_samples(), dtype=np.float64)
-        sr = audio.frame_rate
-        channels = audio.channels
+        # 1. High-pass filter (100Hz) - Removes low-frequency energy that masks speech clarity
+        audio = audio.high_pass_filter(100)
         
-        # Rolling average with window ~ 1/80Hz = 12.5ms
-        window = max(1, int(sr * 0.0125))
-        if len(samples) > window * 2:
-            # Subtract the low-frequency component
-            low_freq = np.convolve(samples, np.ones(window)/window, mode='same')
-            samples = samples - low_freq * 0.7  # Subtract 70% of rumble (gentle)
+        # 2. Dynamic Compression - Makes the voice sound more authoritative
+        # Threshold -20dB, Ratio 3:1, Attack 5ms, Release 50ms
+        audio = compress_dynamic_range(audio, threshold=-20.0, ratio=3.0, attack=5.0, release=50.0)
         
-        # 2. Normalize to -1dB peak
-        peak = np.max(np.abs(samples))
-        if peak > 0:
-            target = 10 ** (-1.0 / 20) * 32767  # -1dB in 16-bit
-            samples = samples * (target / peak)
+        # 3. Final Normalization
+        audio = normalize(audio, headroom=1.0)
         
-        samples = np.clip(samples, -32768, 32767).astype(np.int16)
+        # 4. Prevent click artifacts
+        audio = audio.fade_in(5).fade_out(5)
         
-        # Reconstruct AudioSegment
-        processed = AudioSegment(
-            samples.tobytes(),
-            frame_rate=sr,
-            sample_width=2,
-            channels=channels
-        )
-        
-        # 3. Fade in/out to prevent clicks
-        processed = processed.fade_in(2).fade_out(2)
-        
-        processed.export(wav_path, format="wav")
-        print(f"   🎙️ Audio post-processed: high-pass 80Hz, normalized to -1dB")
+        audio.export(wav_path, format="wav")
+        print(f"   🎙️ Audio enhanced: 100Hz HPF, dynamic compression, normalized to -1dB")
     except Exception as e:
         print(f"   ⚠ Audio post-processing skipped: {e}")
 
@@ -264,7 +248,9 @@ def _generate_f5_clone(text, output_path):
             ref_text=VJ_REF_TEXT,
             gen_text=chunk,
             file_wave=seg_path,
-            speed=1.0  # Natural speed for best quality (enforcement handled by script length)
+            nfe_step=64,      # Increased from 32 for higher audio fidelity and clarity
+            remove_silence=True, # Cleanup of chunk edges
+            speed=1.0
         )
         segment_paths.append(seg_path)
         
