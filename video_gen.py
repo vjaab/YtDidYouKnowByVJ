@@ -1673,6 +1673,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     avatar_video_path = lipsync_path if lipsync_path else firefly_path
 
     avatar_pip = None
+    subscribe_pip = None
     if os.path.exists(avatar_video_path):
         vid_clip = VideoFileClip(avatar_video_path)
         if vid_clip.duration < audio_duration:
@@ -1764,8 +1765,31 @@ def create_video(audio_path, script_json, chunks, output_path=None):
             return VideoClip(mf, duration=duration).with_mask(VideoClip(mm, is_mask=True, duration=duration))
 
         pane = _hud_pane(audio_duration, accent_color)
-        border = _neon_border(audio_duration, accent_color)
         
+        def sub_pip_position(t):
+            base_x, base_y = FRAME_W - width_pip - 20, 260
+            if t < 6.0: return (FRAME_W + 1000, base_y)
+            cycle = (t - 6.0) % 11.0
+            if cycle < 4.0:
+                sway_y = math.sin(t * 0.3 * 2 * math.pi) * 3 + math.sin(t * 1.2 * 2 * math.pi) * 1.5
+                sway_x = math.sin(t * 0.2 * 2 * math.pi) * 2 + math.cos(t * 0.7 * 2 * math.pi) * 1
+                breathing = math.sin(t * 0.25 * 2 * math.pi) * 1
+                return (base_x + int(sway_x), base_y + int(sway_y + breathing))
+            return (FRAME_W + 1000, base_y)
+
+        # ── Subscribe Placeholder ──
+        sub_pane_img = Image.new("RGBA", (width_pip + 40, height_pip + 40), (0, 0, 0, 0))
+        s_draw = ImageDraw.Draw(sub_pane_img)
+        s_draw.rounded_rectangle([0, 0, width_pip + 40, height_pip + 40], radius=40, fill=(220, 20, 20, 240))
+        s_font = gf(65)
+        s_text = "SUBSCRIBE"
+        stw, sth = ts(s_text, s_font)
+        s_draw.text(((width_pip + 40 - stw) // 2, (height_pip + 40 - sth) // 2), s_text, font=s_font, fill=(255, 255, 255, 255))
+        
+        subscribe_pip = CompositeVideoClip([
+            _pil_clip(sub_pane_img, audio_duration).with_position((-20, -20))
+        ], size=(width_pip + 60, height_pip + 60), is_mask=False).with_position(sub_pip_position).with_start(0)
+
         avatar_pip = CompositeVideoClip([
             pane.with_position((-20, -20)),
             avatar_clip.with_position((0, 0))
@@ -1854,6 +1878,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     
     base_layers = bg_layer_clips + [tint, gradient] + particle_clips + logo_clips + fact_clips + burst_clips + reminder_clips + engagement_clips + [grain_layer, flare_layer, disclosure, watermark]
     if avatar_pip:
+        base_layers.append(subscribe_pip)
         base_layers.append(avatar_pip)
     if screenshot_clips:
         # We place the citations over the avatar if it overlaps
