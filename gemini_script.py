@@ -118,11 +118,17 @@ Day: {day_name}
 Slot: {slot}
 {strategy_enhancement}
 
-CONTENT HIERARCHY (Anti-Repetitive & Monetization Compliance):
-1. TRANSFORMATIVE COMMENTARY (50%): This is the absolute law for 2026 monetization. Pure reporting is DEAD. You must spend half the script on YOUR analysis. Include "Hot Takes", "Unpopular Opinions", or "Why this looks like a corporate cover-up." 
-2. UNIQUE PERSPECTIVE (20%): Connect this to a 2026 world problem. (e.g., "This isn't just about a model; it's about the future of cognitive labor...").
-3. THE NARRATIVE ARC (20%): Structure it as a "Personal Leak" or an "Internal Investigation" vibe.
-4. HUMAN IMPERFECTIONS (10%): Use the persona (VJ). Use stutter-starts: "Wait, hold on...", "Actually...", "Believe it or not...". This "Proves" human authorship to AI detection algorithms.
+CONTENT HIERARCHY (Technical Depth & Monetization Balance):
+1. CORE TECHNICAL BREAKTHROUGH (40%): Deliver the actual meat of the article. Explain the "HOW" and the technical complexity that makes this different.
+2. TRANSFORMATIVE ANALYTICAL COMMENTARY (30%): Provide your synthesis. Why is this a paradigm shift? Move away from pure reporting into expert prediction.
+3. SOCIO-TECHNICAL IMPACT (20%): Connect this to real-world 2026 problems—future of labor, cognitive overhead, or industrial shifts.
+4. VJ's SIGNATURE STYLE (10%): Use human-like starts: "Wait, hold on...", "Actually...". This proves human authorship to detection models.
+
+🏆 FACTUAL INTEGRITY & ACCURACY (STRICT):
+- NO GENERIC FLUFF: Do not use vague terms like "revolutionary" without explaining the specific mechanism that makes it so.
+- GROUNDED IN SOURCE: Every technical claim must be traceable to the provided RSS/Research data. If the article mentions "10x speedup via sparse attention", mention "sparse attention".
+- DEPTH OVER DRAMA: While the tone is provocative, the foundation must be high-level engineering or scientific facts.
+
 
 🏆 2026 COMPLIANCE CHECK: 
 - TRANSFORMATION SCORE: At least 4 sentences MUST be purely your original synthesis/prediction.
@@ -150,11 +156,12 @@ NARRATIVE ARC CONFIGURATION:
 6. The IDENTITY CTA + Infinite Loop (44-52s): Identity-based subscribe CTA, then bridge the final sentence back to the hook for max replay rate.
 
 CRITICAL '2026 SCALE' RULES:
-1. MONETIZATION PROTECTION: If the script is >50% factual summary, it will be flagged as "Reused Content." PUSH THE OPINION.
-2. AGGRESSIVE ENGAGEMENT: Use "Bait & Switch" questions. Start a sentence, pause, and say "Actually, tell me in the comments first: do you think this is ethical? Now look at this..."
+1. TECHNICAL MONETIZATION: Avoid "Top 10" style generic lists. YouTube 2026 prioritizes "Niche Expert" status. Prove your expertise by citing the specific architecture or methodology from the article.
+2. PRONUNCIATION HYPER-FOCUS: Identify EVERY niche tech term or complex word. If you're unsure, provide a phonetic respelling in the map.
 3. NO REPETITION: Never repeat a word or phrase within 10 seconds.
 4. WHATSAPP & TELEGRAM CTA: You MUST give a 1-second pause (...) before the end. Speak the CTA fully: "Follow for more updates on my WhatsApp and Telegram (links in bio)."
-5. AI DISCLOSURE: Embrace the "AI-Journalist" persona. Mention your neural nets or analytical processing to build the brand.
+5. AI-ASSISTED JOURNALISM: Reference "my neural processing" or "the data logs" to lean into the AI whistleblower brand.
+
 
 {selection_instruction}
 
@@ -187,7 +194,8 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
     "Algorithm": "al-go-rith-um",
     "Autonomous": "aw-ton-uh-mus"
   }},
-  "NOTE_phonetic_pronunciation_map": "MANDATORY LEXICAL AUDIT: Identify EVERY word that is: 1) A tech/scientific term, 2) A word with >3 syllables, 3) A homograph with ambiguous sounds (e.g., 'read' vs 'read'), or 4) Any English word that a machine might pronounce 'flat' or wrong. Provide a hyphenated phonetic respelling. This corrected text is what will be SPOKEN, but subtitles will show ORIGINAL text.",
+  "NOTE_phonetic_pronunciation_map": "MANDATORY LEXICAL AUDIT: Identify EVERY word that is: 1) A tech/scientific term (e.g., 'Transformer', 'Quantization'), 2) A company or model name, 3) A word with >3 syllables, or 4) Any word where the machine might sound flat. Provide a hyphenated phonetic respelling (e.g., 'Trans-for-mer'). This map ensures what is SPOKEN sounds human and correct, while subtitles remain original.",
+
   "hook": "Matches the first sentence of the script",
   "summary": "One line summary",
   "sub_category": "AI/Machine Learning",

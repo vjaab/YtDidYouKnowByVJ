@@ -169,6 +169,18 @@ PHONETIC_DICT = {
     "synapse": "sin-aps",
     "cognitive": "kog-nih-tiv",
     "heuristic": "hew-ris-tick",
+    "latency": "lay-ten-see",
+    "scaling": "skay-ling",
+    "throughput": "thru-put",
+    "quantize": "kwan-tize",
+    "tokenize": "toh-ken-eye-ze",
+    "decoder": "dee-koh-der",
+    "encoder": "en-koh-der",
+    "recursive": "ree-kur-siv",
+    "iterative": "it-er-uh-tiv",
+    "substrate": "sub-strayt",
+    "lithography": "ih-thog-ruh-fee",
+    "microprocessor": "my-kroh-prah-ses-er",
 
     # ─── SOFTWARE / DEVTOOLS ──────────────────────────────────────────────────
     "JavaScript": "Jah-va-skript",
@@ -602,8 +614,8 @@ def auto_detect_hard_words(text):
             vowel_count = sum(1 for p in real_phonemes
                             if ''.join(c for c in p if not c.isdigit()) in _ARPA_TO_READABLE)
 
-            # Only auto-correct words with 3+ syllables
-            if vowel_count >= 3:
+            # Only auto-correct words with 2+ syllables (changed from 3 to catch more tech terms)
+            if vowel_count >= 2:
                 respelling = _phonemes_to_respelling(real_phonemes)
                 if respelling and respelling != lower:
                     auto_map[word] = respelling
