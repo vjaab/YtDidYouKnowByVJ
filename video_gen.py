@@ -1839,11 +1839,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     cliffhangers = script_json.get("micro_cliffhangers", [])
     engagement_clips.extend(_micro_cliffhanger_overlay(cliffhangers, accent_color, audio_duration))
     
-    # E4: Interactive Challenge Banner
-    challenge = script_json.get("interactive_challenge")
-    challenge_clip = _interactive_challenge_overlay(challenge, accent_color, audio_duration)
-    if challenge_clip:
-        engagement_clips.append(challenge_clip)
+
     
     # E5: Identity CTA Card (last ~5s)
     identity_cta = script_json.get("identity_cta", "")

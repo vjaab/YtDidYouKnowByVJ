@@ -30,19 +30,13 @@ def log_message(msg):
     print(msg)
 
 
-def format_description(ai_description, script, end_question, hashtags):
+def format_description(ai_description, script, hashtags):
     hashtag_str = " ".join(hashtags) if hashtags else ""
-    
-    # Build engagement question section
-    question_section = ""
-    if end_question:
-        question_section = f"\n💬 {end_question}\n👇 CHALLENGE: 90% get this wrong. Comment your guess!\n"
     
     return f"""🚀 FOLLOW FOR MORE UPDATES (WhatsApp) → https://wa.me/919585793939
 🔥 Stay ahead of the curve — join my channel!
 ━━━━━━━━━━━━━━━━━━━━━━
 {ai_description}
-{question_section}
 ━━━━━━━━━━━━━━━━━━━━━━
 💡 In 2026, you're either the one using AI, or the one being replaced by it.
 
@@ -259,7 +253,7 @@ def run_pipeline(topic_type="research"):
     # ── STEP 10: YouTube Upload ───────────────────────────────────────────────
     log_message("STEP 10: Uploading to YouTube...")
     ai_desc = script_data.get("description", "")
-    description = format_description(ai_desc, script, script_data.get("end_question", ""), hashtags)
+    description = format_description(ai_desc, script, hashtags)
     # Ensure variety in titles using the options if generated
     if script_data.get("title_options"):
         title = random.choice(script_data["title_options"])

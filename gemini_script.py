@@ -132,7 +132,7 @@ CONTENT HIERARCHY (Anti-Repetitive & Monetization Compliance):
 1. PATTERN INTERRUPT (First 0.5s): The FIRST SENTENCE must be a shocking claim, contradiction, or provocative question. NEVER start with greetings, "Hey guys", or "Did you know". Start MID-THOUGHT as if the viewer walked into a conversation already happening. Examples: "Google just killed passwords. Forever.", "This AI writes code 10x faster than you.", "90% of developers don't know this exists."
 2. CURIOSITY GAP (2-8s): After the hook, OPEN AN INFORMATION LOOP the brain NEEDS to close. Use phrases like: "but here's what nobody is talking about...", "and the reason will surprise you...", "but wait until you see WHY..."
 3. MICRO-CLIFFHANGERS (Every 10s): Plant 3-4 teasers throughout the script to prevent mid-video swipe. Examples: "But that's not even the craziest part...", "And here's where it gets really interesting...", "Now pay attention to this next part..."
-4. INTERACTIVE CHALLENGE: Include ONE moment where you challenge the viewer: "Pause and guess...", "Comment your prediction...", "90% get this wrong — are you in the 10%?"
+
 5. IDENTITY-BASED CTA (Last 5s): Do NOT say "Subscribe for more." Instead, make subscribing feel like joining an identity: "If you're the kind of person who wants to know about AI before everyone else... you know what to do." or "Follow if you want to stay ahead of the curve."
 6. REPLAY TRIGGER: Reference something from the first 2 seconds in the last 5 seconds. This creates an infinite loop and boosts replay rate (the #1 algorithm signal).
 
@@ -145,7 +145,7 @@ NARRATIVE ARC CONFIGURATION:
 1. The PATTERN INTERRUPT Hook (0-2s): A punchy, mid-thought statement that stops the scroll. NO warmup.
 2. The CURIOSITY GAP (2-8s): Open an information loop. Tease the payoff without revealing it.
 3. The "VJ's Take" (8-20s): Breaking the news through a lens of skepticism or extreme hype.
-4. The Deep-Dive Analysis (20-38s): The "So What?" for the viewer's wallet or brain. Include the INTERACTIVE CHALLENGE here.
+4. The Deep-Dive Analysis (20-38s): The "So What?" for the viewer's wallet or brain. Focus on the most unique technical detail or societal impact here.
 5. The Visual Reset (38-44s): An abrupt micro-cliffhanger to wake up the lurkers.
 6. The IDENTITY CTA + Infinite Loop (44-52s): Identity-based subscribe CTA, then bridge the final sentence back to the hook for max replay rate.
 
@@ -162,7 +162,7 @@ RESEARCH PAPERS & BLOGS DATA:
 {news_context}
 
 NARRATIVE FLOW (FOR THE 'SCRIPT' FIELD):
-- Pattern Interrupt -> Curiosity Gap -> VJ's Take -> Deep-Dive + Challenge -> Visual Reset -> Identity CTA + Loop Connect.
+- Pattern Interrupt -> Curiosity Gap -> VJ's Take -> Deep-Dive Analysis -> Visual Reset -> Identity CTA + Loop Connect.
 
 {extra_instruction}
 
@@ -170,7 +170,7 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
 {{
   "title_options": ["Title idea 1", "Title idea 2", "Title idea 3"],
   "description": "Full 100+ word rich SEO description for youtube describing the video, including timestamps and credits.",
-  "quiz_tone": "Investigative",
+
   "title": "Punchy YouTube title max 60 chars",
   "script": "Full voiceover script following the Arc (50-52 sec). Aim for 130-140 words max. Ensure The Loop and Pattern Interrupt are implemented.",
   "hook_text": "The exact first 5-8 words of the script. This will appear as giant text on screen in the first 1.5 seconds to STOP THE SCROLL.",
@@ -179,11 +179,7 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
     {{"timestamp": 22.0, "text": "And this is where it gets wild..."}},
     {{"timestamp": 35.0, "text": "Now watch what happens next..."}}
   ],
-  "interactive_challenge": {{
-    "timestamp": 25.0,
-    "text": "90% get this wrong — comment your guess!",
-    "type": "comment_challenge"
-  }},
+
   "identity_cta": "If you're serious about AI, you know what to do.",
   "phonetic_pronunciation_map": {{
     "AI": "A-I",
@@ -259,8 +255,7 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
   ],
   "keywords": ["Keyword 1", "Keyword 2"],
   "hashtags": ["#AI", "#TechNews", "#Future", "#Shorts"],
-  "comment_hook": "Would you use this? Drop your answer below! 👇",
-  "end_question": "A thought-provoking question for the audience to comment on"
+  "comment_hook": "Would you use this? Drop your answer below! 👇"
 }}
 
 """
