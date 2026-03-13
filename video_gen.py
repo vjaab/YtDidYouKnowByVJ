@@ -1919,7 +1919,14 @@ def create_video(audio_path, script_json, chunks, output_path=None):
             final_audio_layers.append(sfx_clip)
     
     # Background Music with Auto-Ducking
-    bgm_path = os.path.join(MUSIC_DIR, "background_music.mp3")
+    import glob
+    possible_bgms = glob.glob(os.path.join(MUSIC_DIR, "*.mp3"))
+    bgm_path = os.path.join(MUSIC_DIR, "background_music.mp3") # Preferred
+    
+    if not os.path.exists(bgm_path) and possible_bgms:
+        bgm_path = possible_bgms[0]
+        print(f"🎵 Using fallback BGM: {os.path.basename(bgm_path)}")
+
     if os.path.exists(bgm_path):
         bgm = AudioFileClip(bgm_path)
         if bgm.duration < audio_duration:
