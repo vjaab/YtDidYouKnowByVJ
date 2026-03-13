@@ -1942,7 +1942,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                 vol = BGM_VOLUME * 0.3 if is_speak else BGM_VOLUME
                 return get_frame(t) * vol
                 
-        bgm = bgm.fl(ducking_volume).with_effects([afx.AudioFadeOut(2)])
+        bgm = bgm.transform(ducking_volume).with_effects([afx.AudioFadeOut(2)])
         
         final_audio_layers.append(bgm)
 
