@@ -1200,7 +1200,7 @@ def _brand_watermark(duration):
     clip = ImageClip(arr, duration=duration)
     mclip = VideoClip(lambda t: mask, is_mask=True, duration=duration)
     
-    return clip.with_mask(mclip).with_position((FRAME_W - w - 40, FRAME_H - h - 100)).with_start(0).with_opacity(0.6)
+    return clip.with_mask(mclip).with_position((FRAME_W - w - 40, FRAME_H - h - 300)).with_start(0).with_opacity(0.6)
 
 def _intro_clip(duration, accent_color):
     """Create a brief intro segment showing the animated logo on a dark background."""
