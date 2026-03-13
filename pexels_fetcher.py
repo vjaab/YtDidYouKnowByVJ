@@ -67,6 +67,35 @@ Return ONLY the raw integer (0-10)."""
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# GLOBAL VISUAL CONTINUITY
+# ─────────────────────────────────────────────────────────────────────────────
+def generate_visual_style_guide(headline):
+    """
+    Asks Gemini to define a consistent visual 'vibe' for the whole video.
+    This ensures all AI-generated images share a palette and lighting style.
+    """
+    print("🎨 Designing Global Visual Style Guide...")
+    try:
+        target_model = "gemini-2.0-flash"
+        prompt = f"""Based on this news headline: '{headline}', define a cohesive visual style for a 9:16 vertical cinematic video.
+Return a short string (max 40 words) describing the lighting, color palette, and camera style.
+Example Output: 'Dark tech-noir aesthetic, cyan and deep purple neon lighting, shot on 35mm lens, high contrast, anamorphic lens flares, unreal engine 5 style.'
+Return ONLY the description."""
+        
+        response = client.models.generate_content(
+            model=target_model, 
+            contents=prompt,
+            config=genai.types.GenerateContentConfig(temperature=0.7)
+        )
+        style = response.text.strip()
+        print(f"   ✨ Global Vibe: {style}")
+        return style
+    except Exception as e:
+        print(f"   ⚠️ Style guide failed: {e}. Using default.")
+        return "Cinematic lighting, professional photography, high detail, photorealistic, 8k."
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # TOPIC DETECTION & IMAGEN TEMPLATES
 # ─────────────────────────────────────────────────────────────────────────────
 TOPIC_KEYWORDS = {
@@ -251,11 +280,14 @@ def _download_photo(url, output_path):
 # ─────────────────────────────────────────────────────────────────────────────
 # STEP E: Imagen 3
 # ─────────────────────────────────────────────────────────────────────────────
-def _generate_imagen3(chunk_text, output_path, topic_context=""):
+def _generate_imagen3(chunk_text, output_path, topic_context="", global_style_guide=""):
     topic = detect_topic(topic_context)
+    
+    style_suffix = f", {global_style_guide}" if global_style_guide else ", cinematic lighting, professional photography, 8k, photorealistic"
+    
     if topic:
         variation = random.choice(TOPIC_PROMPT_TEMPLATES[topic])
-        best_prompt = f"{variation}, news editorial style, photorealistic, 8K, 9:16 vertical, cinematic lighting, ultra realistic"
+        best_prompt = f"{variation}, {style_suffix}, news editorial style, 9:16 vertical, ultra realistic, no text"
         print(f"  -> Detected Topic: {topic}. Using themed prompt.")
     else:
         # 1. Ask Gemini to craft the perfect Imagen prompt
@@ -264,10 +296,11 @@ def _generate_imagen3(chunk_text, output_path, topic_context=""):
 '{chunk_text}'
 {topic_prompt}Requirements:
 - Photorealistic, cinematic, 9:16 vertical
+- Style guide to follow: {global_style_guide}
 - No text, no watermarks, no faces of real people
 - Directly shows what the text describes, highly precise to the overall topic above
 - High detail, dramatic lighting
-- RETURN ONLY the prompt text. No introductory sentence like "Here is a prompt" or "Of course"."""
+- RETURN ONLY the prompt text. No introductory sentence."""
         
         best_prompt = chunk_text # Default
         attempts = 0
@@ -276,7 +309,7 @@ def _generate_imagen3(chunk_text, output_path, topic_context=""):
                 target_model = "gemini-2.0-flash"
                 resp = client.models.generate_content(model=target_model, contents=prompt_builder)
                 best_prompt = resp.text.strip()
-                # Clean up any lingering intro text if Gemini ignores instructions
+                # Clean up any lingering intro text
                 if best_prompt.lower().startswith("here is") or "prompt:" in best_prompt.lower()[:20]:
                     best_prompt = best_prompt.split("\n")[-1]
                 break
@@ -285,7 +318,7 @@ def _generate_imagen3(chunk_text, output_path, topic_context=""):
                 attempts += 1
                 time.sleep(2)
             
-    print(f"  -> Generated Imagen prompt: {best_prompt[:60]}...")
+    print(f"  -> Generated Imagen prompt: {best_prompt[:80]}...")
         
     # Early exit if we already know Imagen is exhausted for this run
     if os.environ.get("IMAGEN_QUOTA_EXHAUSTED"):
@@ -329,7 +362,7 @@ def _generate_imagen3(chunk_text, output_path, topic_context=""):
             
     return None
 
-def fetch_chunk_visual(chunk, script_data, topic_context=""):
+def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=""):
     """
     Executes the Visual Fetching Decision Tree (A -> B -> C -> D -> E)
     """
@@ -380,7 +413,7 @@ def fetch_chunk_visual(chunk, script_data, topic_context=""):
 
     # ── STEP C: Nanobanana (Imagen 3) ────────────────────────────────────
     print(f"Chunk {cid} -> STEP C: Nanobanana (Imagen 3) generation")
-    path = _generate_imagen3(text, photo_out, topic_context)
+    path = _generate_imagen3(text, photo_out, topic_context, global_style_guide)
     if path:
         chunk["visual_path"] = path
         chunk["visual_type"] = "photo"
@@ -450,17 +483,19 @@ def fetch_all_chunk_visuals(chunks, topic_context="", script_data=None):
     if script_data is None:
         script_data = {}
         
-    print(f"Running Decision Tree for {len(chunks)} chunks (sequential with delay)...")
+    # 1. Generate Global Style Guide for visual continuity
+    global_style = generate_visual_style_guide(topic_context)
+        
+    print(f"Running Decision Tree for {len(chunks)} chunks (with Smart Throttling)...")
     
     for i, chunk in enumerate(chunks):
-        # Pexels fallback/primary might not be there if we skipped the older Gemini step
         if "pexels_primary" not in chunk:
             chunk["pexels_primary"] = " ".join(chunk["text"].split()[:3])
             chunk["pexels_fallback"] = "technology"
 
         print(f"  Processing chunk {i+1}/{len(chunks)}...")
         try:
-            fetch_chunk_visual(chunk, script_data, topic_context)
+            fetch_chunk_visual(chunk, script_data, topic_context, global_style)
         except Exception as e:
             print(f"  Chunk {chunk.get('chunk_id')} failed: {e}")
             chunk["visual_path"] = None
@@ -468,10 +503,20 @@ def fetch_all_chunk_visuals(chunks, topic_context="", script_data=None):
             chunk["relevance_score"] = 0
             chunk["source"] = "Failed"
         
-        # Substantial delay between chunks to stay under 10 RPM (Images) / 15 RPM (Gemini)
+        # ── SMART THROTTLING ──────────────────────────────────────────────────
+        # Only sleep if we used an API limited source (Steps C, D, or E)
+        api_sources = [
+            "Step C: Nanobanana (Imagen 3)", 
+            "Step D: Pexels Video", 
+            "Step E: Pexels Photo"
+        ]
+        
         if i < len(chunks) - 1:
-            print(f"  -> Cooling down for 10s to respect API Rate Limits...")
-            time.sleep(10)
+            if chunk.get("source") in api_sources:
+                print(f"  -> AI/Search used. Cooling down for 10s to respect API Rate Limits...")
+                time.sleep(10)
+            else:
+                print(f"  -> Local/Cached asset. Skipping cooldown.")
 
     # Fill any failed chunks with the previous chunk's visual
     last_path = None
