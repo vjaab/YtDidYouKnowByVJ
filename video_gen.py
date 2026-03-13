@@ -1143,11 +1143,17 @@ def _article_screenshot_clip(screenshot_path, duration):
         clip = ImageClip(arr, duration=display_dur)
         mclip = VideoClip(lambda t: mask, is_mask=True, duration=display_dur)
         
-        # Animation: Fade in + Subtle Zoom (Ken Burns) for high-end look
-        clip = clip.resized(lambda t: 1.0 + 0.04 * (t / display_dur))
+        # Animation: Dynamic Headline Zoom (Ken Burns)
+        # We zoom from 1.0x to 1.3x over the duration to make the headline pop
+        clip = clip.resized(lambda t: 1.0 + 0.30 * (t / display_dur))
         
-        # Positioning: Fullscreen centered
-        clip = clip.with_mask(mclip).with_position(("center", "center")).with_start(start_ts)
+        # Positioning: Start centered but slightly shifted up to focus on the headline
+        # As we zoom, we do a subtle vertical "scan" down
+        def pos_logic(t):
+            y_offset = -100 + (t / display_dur) * 150 # Subtle downward drift
+            return ("center", y_offset)
+        
+        clip = clip.with_mask(mclip).with_position(pos_logic).with_start(start_ts)
         
         # Transitions
         clip = clip.with_effects([vfx.CrossFadeIn(0.5), vfx.CrossFadeOut(0.5)])
