@@ -190,11 +190,11 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
   "identity_cta": "If you're here for the deep technical edge, you've found your tribe.",
   "phonetic_pronunciation_map": {{
     "AI": "A-I",
-    "NVIDIA": "En-vid-ee-uh",
-    "Algorithm": "al-go-rith-um",
-    "Autonomous": "aw-ton-uh-mus"
+    "NVIDIA": "In-vid-yah",
+    "cognitive": "kogni-tiv",
+    "Autonomous": "aw-tonn-uh-muss"
   }},
-  "NOTE_phonetic_pronunciation_map": "MANDATORY LEXICAL AUDIT: Identify EVERY word that is: 1) A tech/scientific term (e.g., 'Transformer', 'Quantization'), 2) A company or model name, 3) A word with >3 syllables, or 4) Any word where the machine might sound flat. Provide a hyphenated phonetic respelling (e.g., 'Trans-for-mer'). This map ensures what is SPOKEN sounds human and correct, while subtitles remain original.",
+  "NOTE_phonetic_pronunciation_map": "MANDATORY LEXICAL AUDIT: Identify tech terms, names, or long words. Provide a NATURAL phonetic respelling (e.g., 'Trans-for-mer' or 'In-vidy-uh'). Avoid over-hyphenating as it slows down the voice; use hyphens only for natural syllable breaks.",
 
   "hook": "Matches the first sentence of the script",
   "summary": "One line summary",
