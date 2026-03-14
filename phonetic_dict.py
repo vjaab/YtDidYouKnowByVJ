@@ -305,7 +305,7 @@ PHONETIC_DICT = {
     "particularly": "par-tik-yoo-lar-lee",
     "temporarily": "tem-puh-rair-uh-lee",
     "extraordinary": "ek-stror-din-air-ee",
-    "simultaneously": "sy-mul-tay-nee-us-lee",
+    "simultaneously": "sih-mul-tay-nee-us-lee",
     "hierarchy": "hy-rahr-kee",
     "paradigm": "par-uh-dime",
     "paradigms": "par-uh-dimes",

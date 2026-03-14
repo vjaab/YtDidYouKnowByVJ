@@ -365,42 +365,69 @@ def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
 
 def restore_original_words(word_timestamps, original_text, custom_phonetic_map=None):
     """
-    Matches the phonetically spoke words back to the original script words 
-    to ensure subtitles look professional.
+    Matches the phonetically spoken words back to the original script words 
+    to ensure subtitles look professional (reserving case and punctuation).
     """
     if not word_timestamps or not original_text:
         return word_timestamps
         
-    original_words = original_text.split()
+    # 1. Prepare display tokens (original words that are NOT meta-instructions)
+    raw_tokens = original_text.split()
+    display_tokens = []
+    for t in raw_tokens:
+        # Check if the token is JUST a meta-instruction like [1.0] or (pause)
+        if not re.fullmatch(r'\[[^\]]*\]|\([^)]*\)', t):
+            display_tokens.append(t)
     
-    # Subtitle Restoration Map (Key: Spoken-Normalized -> Value: Display-Original)
-    # Automatically build from global and custom dictionaries
-    restore_map = {}
+    # 2. Build canonical map from dictionaries
+    # (Mapping Spoken-Normalized-Phonetic -> Canonical-Original-Word)
+    phonetic_to_canonical = {}
+    def norm_key(s): return re.sub(r'[^\w]', '', s.upper()) if s else ""
     
-    # helper to normalize a phonetic string for comparison
-    def norm_key(s): return re.sub(r'[^\w]', '', s.upper())
-    
-    # 1. Add global constants
     for orig, phonetic in PHONETIC_DICT.items():
-        restore_map[norm_key(phonetic)] = orig
+        phonetic_to_canonical[norm_key(phonetic)] = orig
             
-    # 2. Add custom Gemini map
     if custom_phonetic_map:
         for orig, phonetic in custom_phonetic_map.items():
-            restore_map[norm_key(phonetic)] = orig
+            phonetic_to_canonical[norm_key(phonetic)] = orig
 
-    for i, wt in enumerate(word_timestamps):
+    # 3. Synchronized Alignment
+    orig_idx = 0
+    new_timestamps = []
+    
+    for wt in word_timestamps:
         spoken_clean = norm_key(wt["word"])
-        if spoken_clean in restore_map:
-            wt["word"] = restore_map[spoken_clean]
-        else:
-            # Fallback: check if it matches the original word directly
-            if i < len(original_words):
-                orig_clean = norm_key(original_words[i])
-                if spoken_clean == orig_clean:
-                    wt["word"] = original_words[i]
+        if not spoken_clean:
+            new_timestamps.append(wt)
+            continue
+            
+        found_match = False
+        # Lookahead 10 words to stay robust against script/audio drift
+        for j in range(orig_idx, min(orig_idx + 10, len(display_tokens))):
+            target_token = display_tokens[j]
+            target_clean = norm_key(target_token)
+            
+            # Case A: Spoken word is a phonetic respelling of this target
+            # e.g. Spoken: "SYMULTAYNEEUSLEE" maps to "SIMULTANEOUSLY" (canonical)
+            # which matches "Simultaneously," (target_clean = "SIMULTANEOUSLY")
+            if spoken_clean in phonetic_to_canonical:
+                canonical_word = phonetic_to_canonical[spoken_clean]
+                if norm_key(canonical_word) == target_clean:
+                    wt["word"] = target_token
+                    orig_idx = j + 1
+                    found_match = True
+                    break
+            
+            # Case B: Direct match (no respelling or model "heard" through it)
+            if spoken_clean == target_clean:
+                wt["word"] = target_token
+                orig_idx = j + 1
+                found_match = True
+                break
+                
+        new_timestamps.append(wt)
                         
-    return word_timestamps
+    return new_timestamps
 
 def generate_voiceover(text, custom_phonetic_map=None):
     """
