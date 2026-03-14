@@ -139,7 +139,7 @@ CONTENT HIERARCHY (Technical Depth & Monetization Balance):
 2. CURIOSITY GAP (2-8s): After the hook, OPEN AN INFORMATION LOOP the brain NEEDS to close. Use phrases like: "but here's what nobody is talking about...", "and the reason will surprise you...", "but wait until you see WHY..."
 3. MICRO-CLIFFHANGERS (Every 10s): Plant 3-4 teasers throughout the script to prevent mid-video swipe. Examples: "But that's not even the craziest part...", "And here's where it gets really interesting...", "Now pay attention to this next part..."
 
-5. IDENTITY-BASED CTA (Last 5s): Do NOT say "Subscribe for more." Instead, make subscribing feel like joining an elite circle: "If you prioritize signal over noise, you're in the right place." or "Join the few who actually understand where this is heading."
+5. IDENTITY-BASED CTA (Last 4s): Do NOT say "Subscribe for more." Instead, make subscribing feel like joining an elite circle. Keep it ultra-brief (max 8 words). Example: "If you prioritize signal over noise, follow me."
 6. REPLAY TRIGGER: Reference something from the first 2 seconds in the last 5 seconds. This creates an infinite loop and boosts replay rate (the #1 algorithm signal).
 
 NARRATION STYLE: 
@@ -151,15 +151,15 @@ NARRATIVE ARC CONFIGURATION:
 1. The PATTERN INTERRUPT Hook (0-2s): A punchy, mid-thought statement that stops the scroll. NO warmup.
 2. The CURIOSITY GAP (2-8s): Open an information loop. Tease the payoff without revealing it.
 3. The "VJ's Take" (8-20s): Breaking the news through a lens of skepticism or extreme hype.
-4. The Deep-Dive Analysis (20-38s): The "So What?" for the viewer's wallet or brain. Focus on the most unique technical detail or societal impact here.
-5. The Visual Reset (38-44s): An abrupt micro-cliffhanger to wake up the lurkers.
-6. The IDENTITY CTA + Infinite Loop (44-52s): Identity-based subscribe CTA, then bridge the final sentence back to the hook for max replay rate.
+4. The Deep-Dive Analysis (20-44s): The "So What?" for the viewer. Focus on the most unique technical detail. This is the core engine of the video.
+5. The Visual Reset (44-48s): An abrupt micro-cliffhanger to keep them until the very last second.
+6. The IDENTITY CTA + Infinite Loop (48-52s): ULTRA-CONCISE Identity CTA (max 4s) followed immediately by the bridge back to the hook.
 
 CRITICAL '2026 SCALE' RULES:
 1. TECHNICAL MONETIZATION: Avoid "Top 10" style generic lists. YouTube 2026 prioritizes "Niche Expert" status. Prove your expertise by citing the specific architecture or methodology from the article.
 2. PRONUNCIATION HYPER-FOCUS: Identify EVERY niche tech term or complex word. If you're unsure, provide a phonetic respelling in the map.
 3. NO REPETITION: Never repeat a word or phrase within 10 seconds.
-4. WHATSAPP & TELEGRAM CTA: You MUST give a 1-second pause (...) before the end. Speak the CTA fully: "Follow for more updates on my WhatsApp and Telegram (links in bio)."
+4. WHATSAPP & TELEGRAM CTA: You MUST give a 0.5-second pause (...) before the end. Keep it fast: "Links in bio for tech updates." atau "Check my bio for the full logs." (Max 5 words).
 5. AI-ASSISTED JOURNALISM: Reference "my neural processing" or "the data logs" to lean into the AI whistleblower brand.
 
 

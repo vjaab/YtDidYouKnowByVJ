@@ -469,7 +469,7 @@ def _title_clip(title, duration):
 
 # ── LAYER 12: Telegram CTA card ───────────────────────────────────────────────
 def _telegram_cta(accent_color, total_dur):
-    cta_dur = min(6.0, total_dur * 0.18)
+    cta_dur = min(3.5, total_dur * 0.10)
     start   = total_dur - cta_dur
     card_h  = int(FRAME_H * 0.38)
     dest_y  = FRAME_H - card_h
@@ -722,7 +722,7 @@ def _identity_cta_overlay(identity_text, accent_color, total_dur):
     """Identity-based CTA for the final moments of the video."""
     if not identity_text:
         return None
-    dur = min(4.5, total_dur * 0.12)
+    dur = min(3.0, total_dur * 0.08)
     start = total_dur - dur - 1.0  # Appears just before the end
     if start < 0:
         return None
