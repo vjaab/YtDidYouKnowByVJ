@@ -75,8 +75,8 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
                         for chunk in gm.grounding_chunks:
                             if hasattr(chunk, 'web') and chunk.web.uri:
                                 uri = chunk.web.uri
-                                # Filter out common dead-ends or search redirects
-                                if any(x in uri.lower() for x in ["google.com/search", "bing.com/search", "search?", "click?"]):
+                                # Filter out common dead-ends, search redirects, or unsupported formats (PDF)
+                                if any(x in uri.lower() for x in ["google.com/search", "bing.com/search", "search?", "click?", ".pdf"]):
                                     continue
                                 grounding_links.append(f"{chunk.web.title}: {uri}")
                 
