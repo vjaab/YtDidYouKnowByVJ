@@ -160,7 +160,8 @@ CRITICAL '2026 SCALE' RULES:
 2. PRONUNCIATION HYPER-FOCUS: Identify EVERY niche tech term or complex word. If you're unsure, provide a phonetic respelling in the map.
 3. NO REPETITION: Never repeat a word or phrase within 10 seconds.
 4. WHATSAPP & TELEGRAM CTA: You MUST give a 0.5-second pause (...) before the end. Keep it fast: "Links in bio for tech updates." atau "Check my bio for the full logs." (Max 5 words).
-5. AI-ASSISTED JOURNALISM: Reference "my neural processing" or "the data logs" to lean into the AI whistleblower brand.
+5. CLOSING PHRASE: The script MUST end with the EXACT phrase "follow for more updates" (all lowercase is fine). This is mandatory for brand consistency.
+6. AI-ASSISTED JOURNALISM: Reference "my neural processing" or "the data logs" to lean into the AI whistleblower brand.
 
 
 {selection_instruction}

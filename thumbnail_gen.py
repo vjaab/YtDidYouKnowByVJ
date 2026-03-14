@@ -195,17 +195,58 @@ def generate_thumbnail(script_json):
         final_img = Image.alpha_composite(canvas_img, grad)
         draw = ImageDraw.Draw(final_img)
         
+        # ── 5. ADD AVATAR ─────────────────────────────────────────────────────
+        avatar_path = os.path.join(ASSETS_DIR, "gemini_img_without_logo.png")
+        if os.path.exists(avatar_path):
+            try:
+                avatar = Image.open(avatar_path).convert("RGBA")
+                
+                # Determine size based on canvas (Shorts vs YT)
+                if width > height:
+                    # YouTube Thumbnail (1280x720) - Avatar on bottom left
+                    av_size = 350
+                    avatar = avatar.resize((av_size, av_size), Image.LANCZOS)
+                    
+                    # Create circular mask
+                    mask = Image.new("L", (av_size, av_size), 0)
+                    mask_draw = ImageDraw.Draw(mask)
+                    mask_draw.ellipse((0, 0, av_size, av_size), fill=255)
+                    
+                    # Apply circular mask
+                    avatar.putalpha(mask)
+                    
+                    # Position: Bottom Left with padding
+                    pos_x, pos_y = 50, height - av_size - 50
+                    final_img.paste(avatar, (pos_x, pos_y), avatar)
+                    
+                    # Add a white/accent border to the avatar
+                    draw.ellipse([pos_x-4, pos_y-4, pos_x+av_size+4, pos_y+av_size+4], outline=(255, 255, 255), width=8)
+                else:
+                    # Shorts Thumbnail (1080x1920) - Avatar in middle lower
+                    av_size = 500
+                    avatar = avatar.resize((av_size, av_size), Image.LANCZOS)
+                    
+                    mask = Image.new("L", (av_size, av_size), 0)
+                    mask_draw = ImageDraw.Draw(mask)
+                    mask_draw.ellipse((0, 0, av_size, av_size), fill=255)
+                    avatar.putalpha(mask)
+                    
+                    # Position: Center Bottom
+                    pos_x, pos_y = (width - av_size) // 2, height - av_size - 150
+                    final_img.paste(avatar, (pos_x, pos_y), avatar)
+                    draw.ellipse([pos_x-5, pos_y-5, pos_x+av_size+5, pos_y+av_size+5], outline=(255, 255, 255), width=10)
+            except Exception as e:
+                print(f"Warning: Could not add avatar to thumbnail: {e}")
+        
         # ── 2. & 3. FONT SETUP & SIZING ───────────────────────────────────────
         topic_text = topic.upper()
-        font_path = os.path.join(ASSETS_DIR, "fonts", "NanumBarunGothic.ttf")
+        font_path = os.path.join(ASSETS_DIR, "fonts", "Montserrat-Bold.ttf")
         if not os.path.exists(font_path):
             font_path = "/System/Library/Fonts/Supplemental/Arial Black.ttf"
-            if not os.path.exists(font_path):
-                font_path = "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf"
                 
-        # Auto-scale font size (between 80 and 150)
-        target_size = 150
-        max_width = width - 80 # 40px padding each side
+        # Auto-scale font size (between 100 and 180 for maximum impact)
+        target_size = 180
+        max_width = width - 100 # 50px padding each side
         
         try:
             font = ImageFont.truetype(font_path, target_size)
@@ -215,9 +256,9 @@ def generate_thumbnail(script_json):
         # Wrap text into lines
         lines = wrap_text(topic_text, font, max_width)
         
-        # If text overflows container width too much, scale down but floor at 80
-        while len(lines) > 3 and target_size > 80:
-            target_size -= 5
+        # If text overflows container width too much, scale down but floor at 100
+        while len(lines) > 2 and target_size > 100: # Limit to 2 lines if possible for clarity
+            target_size -= 10
             try:
                 font = ImageFont.truetype(font_path, target_size)
             except:
