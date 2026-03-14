@@ -537,42 +537,6 @@ def _telegram_cta(accent_color, total_dur):
     return clip.with_mask(mclip).with_position(pos).with_start(start)
 
 
-# ── LAYER 13: Subscribe animation ─────────────────────────────────────────────
-def _subscribe_clip(total_dur):
-    dur   = min(3.0, total_dur * 0.1)
-    start = total_dur - dur
-    f = gf(44)
-    text = "SUBSCRIBE 🔔"
-    w, h = ts(text, f)
-    pad_x, pad_y = 30, 16
-    img = Image.new("RGBA", (w + pad_x*2, h + pad_y*2), (0,0,0,0))
-    draw = ImageDraw.Draw(img)
-    draw.rounded_rectangle([0,0,w+pad_x*2,h+pad_y*2], radius=30, fill=(220,0,0,230))
-    draw.text((pad_x, pad_y), text, font=f, fill=(255,255,255,255))
-
-    arr  = np.array(img.convert("RGB"))
-    mask = np.array(img.split()[3]).astype(float) / 255.0
-    bpos = int(FRAME_H - TITLE_BOTTOM_GAP - (h+pad_y*2) - 230)
-
-    def scale_fn(t):
-        return 1.0 + 0.06 * math.sin(t * 10)
-
-    def make_frame(t):
-        s = scale_fn(t)
-        scaled = Image.fromarray(arr).resize((int(arr.shape[1]*s), int(arr.shape[0]*s)), Image.LANCZOS)
-        return np.array(scaled)
-
-    def make_mask(t):
-        s = scale_fn(t)
-        orig_mask = Image.fromarray((mask * 255).astype(np.uint8))
-        scaled = orig_mask.resize((int(orig_mask.width*s), int(orig_mask.height*s)), Image.LANCZOS)
-        return np.array(scaled).astype(float) / 255.0
-
-    clip = VideoClip(make_frame, duration=dur)
-    mclip = VideoClip(make_mask, is_mask=True, duration=dur)
-    clip = clip.with_mask(mclip)
-    clip = clip.with_position(lambda t: ("center", bpos))
-    return clip.with_start(start)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -755,11 +719,11 @@ def _interactive_challenge_overlay(challenge_data, accent_color, total_dur):
 
 # ── LAYER E5: Identity CTA Card (Last 5s) ────────────────────────────────────
 def _identity_cta_overlay(identity_text, accent_color, total_dur):
-    """Identity-based CTA that replaces generic 'subscribe' messaging."""
+    """Identity-based CTA for the final moments of the video."""
     if not identity_text:
         return None
     dur = min(4.5, total_dur * 0.12)
-    start = total_dur - dur - 1.0  # Appears just before subscribe button
+    start = total_dur - dur - 1.0  # Appears just before the end
     if start < 0:
         return None
 
@@ -1154,7 +1118,7 @@ def _article_screenshot_clip(screenshot_path, duration):
         # --- SECOND APPEARANCE: Deep Dive Phase ---
         # Full Headline Zoom for detailed commentary phase
         start2 = 12.0
-        dur2 = min(12.0, duration - start2)
+        dur2 = min(36.0, duration - start2)
         if dur2 > 0:
             clip2 = ImageClip(arr, duration=dur2)
             mclip2 = VideoClip(lambda t: mask, is_mask=True, duration=dur2)
@@ -1314,39 +1278,6 @@ def _render_hook_overlay(hook_text, width, height, timestamp):
         print(f"Hook overlay error: {e}")
         return None
 
-def _render_subscribe_reminder(width, height):
-    """Subtle subscribe pill that appears at ~75% of video duration."""
-    try:
-        img = Image.new('RGBA', (width, height), (0, 0, 0, 0))
-        draw = ImageDraw.Draw(img)
-        
-        # Red pill badge
-        pill_w, pill_h = 420, 60
-        pill_x = (width - pill_w) // 2
-        pill_y = height - 280
-        
-        draw.rounded_rectangle(
-            [(pill_x, pill_y), (pill_x + pill_w, pill_y + pill_h)],
-            radius=30, fill=(255, 0, 0, 220)
-        )
-        
-        try:
-            font = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 28)
-        except:
-            font = ImageFont.load_default()
-        
-        text = "🔔 SUBSCRIBE FOR MORE"
-        bb = draw.textbbox((0, 0), text, font=font)
-        tw = bb[2] - bb[0]
-        tx = (width - tw) // 2
-        ty = pill_y + 14
-        
-        draw.text((tx, ty), text, font=font, fill=(255, 255, 255, 255))
-        
-        return img
-    except Exception as e:
-        print(f"Subscribe reminder error: {e}")
-        return None
 
 def _render_comment_bait(comment_text, width, height):
     """Comment engagement prompt at the bottom in the last 3 seconds."""
@@ -1673,7 +1604,6 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     avatar_video_path = lipsync_path if lipsync_path else firefly_path
 
     avatar_pip = None
-    subscribe_pip = None
     if os.path.exists(avatar_video_path):
         vid_clip = VideoFileClip(avatar_video_path)
         if vid_clip.duration < audio_duration:
@@ -1766,29 +1696,6 @@ def create_video(audio_path, script_json, chunks, output_path=None):
 
         pane = _hud_pane(audio_duration, accent_color)
         
-        def sub_pip_position(t):
-            base_x, base_y = FRAME_W - width_pip - 20, 260
-            if t < 6.0: return (FRAME_W + 1000, base_y)
-            cycle = (t - 6.0) % 11.0
-            if cycle < 4.0:
-                sway_y = math.sin(t * 0.3 * 2 * math.pi) * 3 + math.sin(t * 1.2 * 2 * math.pi) * 1.5
-                sway_x = math.sin(t * 0.2 * 2 * math.pi) * 2 + math.cos(t * 0.7 * 2 * math.pi) * 1
-                breathing = math.sin(t * 0.25 * 2 * math.pi) * 1
-                return (base_x + int(sway_x), base_y + int(sway_y + breathing))
-            return (FRAME_W + 1000, base_y)
-
-        # ── Subscribe Placeholder ──
-        sub_pane_img = Image.new("RGBA", (width_pip + 40, height_pip + 40), (0, 0, 0, 0))
-        s_draw = ImageDraw.Draw(sub_pane_img)
-        s_draw.rounded_rectangle([0, 0, width_pip + 40, height_pip + 40], radius=40, fill=(220, 20, 20, 240))
-        s_font = gf(65)
-        s_text = "SUBSCRIBE"
-        stw, sth = ts(s_text, s_font)
-        s_draw.text(((width_pip + 40 - stw) // 2, (height_pip + 40 - sth) // 2), s_text, font=s_font, fill=(255, 255, 255, 255))
-        
-        subscribe_pip = CompositeVideoClip([
-            _pil_clip(sub_pane_img, audio_duration).with_position((-20, -20))
-        ], size=(width_pip + 60, height_pip + 60), is_mask=False).with_position(sub_pip_position).with_start(0)
 
         avatar_pip = CompositeVideoClip([
             pane.with_position((-20, -20)),
@@ -1878,7 +1785,6 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     
     base_layers = bg_layer_clips + [tint, gradient] + particle_clips + logo_clips + fact_clips + burst_clips + reminder_clips + engagement_clips + [grain_layer, flare_layer, disclosure, watermark]
     if avatar_pip:
-        base_layers.append(subscribe_pip)
         base_layers.append(avatar_pip)
     if screenshot_clips:
         # We place the citations over the avatar if it overlaps
