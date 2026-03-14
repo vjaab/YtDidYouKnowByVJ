@@ -857,12 +857,11 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
     start_y = 50
     text_y_offset = -8
     
-    # 1. Solid dark strip behind title for maximum contrast 
-    # (Rich Black pill, centered, wrapping only the text)
-    draw.rounded_rectangle([start_x, start_y, start_x+box_w, start_y+box_h], radius=15, fill=(15, 15, 15, 255))
+    # 1. High-contrast pill for header
+    draw.rounded_rectangle([start_x, start_y, start_x+box_w, start_y+box_h], radius=15, fill=(245, 245, 245, 255))
     
-    # 2. Wordmark lockup in Pure White #FFFFFF
-    draw.text((start_x + padding_x, start_y + padding_y + text_y_offset), title, font=f_title, fill=(255, 255, 255, 255))
+    # 2. Wordmark lockup in Dark Grey for readability
+    draw.text((start_x + padding_x, start_y + padding_y + text_y_offset), title, font=f_title, fill=(10, 10, 10, 255))
     
     return img
 
@@ -911,8 +910,8 @@ def render_entity_tags(entities, accent_color, frame_width=1080, on_right=False)
         else:
             start_x = 40 # Left side padding
         
-        # Rounded box with slight transparency
-        draw.rounded_rectangle([start_x, curr_y, start_x + box_w, curr_y + box_h], radius=12, fill=(15, 15, 15, 200))
+        # High-visibility Rounded box (Light/White theme)
+        draw.rounded_rectangle([start_x, curr_y, start_x + box_w, curr_y + box_h], radius=12, fill=(240, 240, 240, 255), outline=(255, 255, 255, 255), width=2)
         
         # Accent line position
         acc_x = (start_x + box_w - 6) if on_right else start_x
@@ -930,8 +929,8 @@ def render_entity_tags(entities, accent_color, frame_width=1080, on_right=False)
             # Shift text over
             content_x += logo_w + 10
             
-        # Text - FORCED WHITE per user request
-        draw.text((content_x, curr_y + 11), val, font=f_val, fill=(255, 255, 255, 255))
+        # Text - High Contrast DARK on LIGHT
+        draw.text((content_x, curr_y + 11), val, font=f_val, fill=(5, 5, 5, 255))
         
         curr_y += box_h + 10
         
