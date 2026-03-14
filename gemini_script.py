@@ -138,8 +138,7 @@ CONTENT HIERARCHY (Technical Depth & Monetization Balance):
 1. PATTERN INTERRUPT (First 0.5s): The FIRST SENTENCE must be a shocking claim, contradiction, or provocative question. NEVER start with greetings, "Hey guys", or "Did you know". Start MID-THOUGHT as if the viewer walked into a conversation already happening. Examples: "Google just killed passwords. Forever.", "This AI writes code 10x faster than you.", "90% of developers don't know this exists."
 2. CURIOSITY GAP (2-8s): After the hook, OPEN AN INFORMATION LOOP the brain NEEDS to close. Use phrases like: "but here's what nobody is talking about...", "and the reason will surprise you...", "but wait until you see WHY..."
 3. MICRO-CLIFFHANGERS (Every 10s): Plant 3-4 teasers throughout the script to prevent mid-video swipe. Examples: "But that's not even the craziest part...", "And here's where it gets really interesting...", "Now pay attention to this next part..."
-
-5. IDENTITY-BASED CTA (Last 4s): Do NOT say "Subscribe for more." Instead, make subscribing feel like joining an elite circle. Keep it ultra-brief (max 8 words). Example: "If you prioritize signal over noise, follow me."
+5. IDENTITY-BASED CTA (Last 4s): Do NOT say "Subscribe for more." Instead, make subscribing feel like joining an elite circle. Keep it ultra-brief (max 8 words). Create a unique variation every time that focuses on technical depth or insider knowledge. Example: "Join the top 1% who actually understand this." or "Follow to stay at the engineering edge."
 6. REPLAY TRIGGER: Reference something from the first 2 seconds in the last 5 seconds. This creates an infinite loop and boosts replay rate (the #1 algorithm signal).
 
 NARRATION STYLE: 
@@ -188,7 +187,7 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
     {{"timestamp": 35.0, "text": "Now watch what happens next..."}}
   ],
 
-  "identity_cta": "If you're here for the deep technical edge, you've found your tribe.",
+  "identity_cta": "A unique, elite CTA (max 8 words) like 'Join the elite builders.'",
   "phonetic_pronunciation_map": {{
     "AI": "A-I",
     "NVIDIA": "In-vid-yah",
