@@ -127,6 +127,8 @@ PHONETIC_DICT = {
     "transformers": "trans-for-mers",
     "tokenizer": "toh-ken-eye-zer",
     "tokenization": "toh-ken-eye-zay-shun",
+    "token": "toh-ken",
+    "tokens": "toh-kenz",
     "embeddings": "em-bed-dings",
     "multimodal": "mul-tee-moh-dul",
     "reinforcement": "ree-in-fors-ment",
