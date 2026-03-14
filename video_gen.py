@@ -468,73 +468,7 @@ def _title_clip(title, duration):
 
 
 # ── LAYER 12: Telegram CTA card ───────────────────────────────────────────────
-def _telegram_cta(accent_color, total_dur):
-    cta_dur = min(3.5, total_dur * 0.10)
-    start   = total_dur - cta_dur
-    card_h  = int(FRAME_H * 0.38)
-    dest_y  = FRAME_H - card_h
 
-    img = Image.new("RGBA", (FRAME_W, card_h), (0,0,0,0))
-    draw = ImageDraw.Draw(img)
-    # Dark gradient fill
-    for y in range(card_h):
-        a = int(217 * (y / card_h) ** 0.5)
-        draw.line([(0,y),(FRAME_W,y)], fill=(0,0,0,a))
-    # Top accent line
-    draw.rectangle([0,0,FRAME_W,4], fill=(*accent_color, 255))
-    
-    f1, f2, f3 = gf(36), gf(44), gf(26)
-
-    l1 = "📲 Join for daily tech intel"
-    l2_t = "t.me/technewsbyvj"
-    l2_l = "linkedin.com/in/vijayakumar-j/"
-    l3 = "Free  •  Daily  •  Exclusive"
-    
-    # Render line 1
-    w1, h1 = ts(l1, f1)
-    draw.text(((FRAME_W-w1)//2, 30), l1, font=f1, fill=(255,255,255,255))
-    
-    # Load and Render Icons for line 2
-    try:
-        tg_icon = Image.open(os.path.join(ASSETS_DIR, "icons", "telegram_logo.png")).convert("RGBA").resize((60, 60), Image.LANCZOS)
-        li_icon = Image.open(os.path.join(ASSETS_DIR, "icons", "linkedin_logo.png")).convert("RGBA").resize((60, 60), Image.LANCZOS)
-        
-        # Telegram Row
-        tw_t, th_t = ts(l2_t, f2)
-        tx_t = (FRAME_W - (tw_t + 70)) // 2
-        img.paste(tg_icon, (tx_t, 110), tg_icon)
-        draw.text((tx_t + 75, 110), l2_t, font=f2, fill=(*accent_color, 255))
-        
-        # LinkedIn Row
-        tw_l, th_l = ts(l2_l, f2)
-        tx_l = (FRAME_W - (tw_l + 70)) // 2
-        img.paste(li_icon, (tx_l, 195), li_icon)
-        draw.text((tx_l + 75, 195), l2_l, font=f2, fill=(*accent_color, 255))
-        
-        # Line 3 (Shifted down)
-        w3, h3 = ts(l3, f3)
-        draw.text(((FRAME_W-w3)//2, 285), l3, font=f3, fill=(180,180,180,255))
-    except Exception as e:
-        print(f"Icon render failed: {e}")
-        # Simple text fallback if icons missing
-        l2 = f"{l2_t} | {l2_l}"
-        w, h = ts(l2, f2)
-        draw.text(((FRAME_W-w)//2, 120), l2, font=f2, fill=(*accent_color, 255))
-        w3, h3 = ts(l3, f3)
-        draw.text(((FRAME_W-w3)//2, 210), l3, font=f3, fill=(180,180,180,255))
-
-    arr  = np.array(img.convert("RGB"))
-    mask = np.array(img.split()[3]).astype(float) / 255.0
-
-    def pos(t):
-        slide = min(t / 0.4, 1.0)
-        slide = slide * slide * (3 - 2 * slide)
-        y = int(FRAME_H - card_h * slide)
-        return (0, y)
-
-    clip = VideoClip(lambda t: arr, duration=cta_dur)
-    mclip = VideoClip(lambda t: mask, is_mask=True, duration=cta_dur)
-    return clip.with_mask(mclip).with_position(pos).with_start(start)
 
 
 
@@ -658,7 +592,7 @@ def _micro_cliffhanger_overlay(cliffhangers, accent_color, total_dur):
         def make_pos(t, _dur=dur):
             slide = min(t / 0.3, 1.0)
             x = int(FRAME_W - (FRAME_W * 0.9) * slide)
-            return (min(x, FRAME_W - 50), int(FRAME_H * 0.28))
+            return (min(x, FRAME_W - 50), int(FRAME_H * 0.45))
 
         clip = VideoClip(lambda t: arr, duration=dur)
         mclip = VideoClip(lambda t, _dur=dur: mask_arr * make_opacity(t, _dur), is_mask=True, duration=dur)
@@ -722,8 +656,8 @@ def _identity_cta_overlay(identity_text, accent_color, total_dur):
     """Identity-based CTA for the final moments of the video."""
     if not identity_text:
         return None
-    dur = min(3.0, total_dur * 0.08)
-    start = total_dur - dur - 1.0  # Appears just before the end
+    dur = 2.0
+    start = total_dur - dur  # Exactly in the last 4 seconds
     if start < 0:
         return None
 
@@ -1023,61 +957,7 @@ def _sweep_clip(duration, accent_color, frame_width=1080):
     
     return VideoClip(make_frame, duration=duration).with_opacity(0.4)
 
-def render_telegram_cta(accent_color, frame_width=1080):
-    """Minimalist Telegram, LinkedIn & WhatsApp CTA banner."""
-    card_h = 420
-    img = Image.new("RGBA", (frame_width, card_h), (0,0,0,0))
-    draw = ImageDraw.Draw(img)
-    
-    # Translucent dark base
-    draw.rectangle([0,0,frame_width,card_h], fill=(10,10,15,230))
-    draw.line([(0,0),(frame_width,0)], fill=(*accent_color,255), width=4)
-    
-    f1 = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 48)
-    t1 = "t.me/technewsbyvj"
-    t2 = "linkedin.com/in/vijayakumar-j/"
-    t3 = "WhatsApp: t.ly/vj-wa" # Shorter display link
-    
-    try:
-        tg_path = os.path.join(ASSETS_DIR, "icons", "telegram_logo.png")
-        li_path = os.path.join(ASSETS_DIR, "icons", "linkedin_logo.png")
-        wa_path = os.path.join(ASSETS_DIR, "icons", "whatsapp_logo.png")
-        
-        # Robust icon loading
-        def load_icon(path, size=(60,60)):
-            if os.path.exists(path):
-                return Image.open(path).convert("RGBA").resize(size, Image.LANCZOS)
-            return None
 
-        tg_icon = load_icon(tg_path)
-        li_icon = load_icon(li_path)
-        wa_icon = load_icon(wa_path)
-        
-        # TG Row
-        w1 = draw.textlength(t1, font=f1)
-        x1 = (frame_width - (w1 + 80)) // 2
-        if tg_icon: img.paste(tg_icon, (int(x1), 60), tg_icon)
-        # White font for entities/handles per user request
-        draw.text((x1 + 80, 65), t1, font=f1, fill=(255, 255, 255, 255))
-        
-        # LI Row
-        w2 = draw.textlength(t2, font=f1)
-        x2 = (frame_width - (w2 + 80)) // 2
-        if li_icon: img.paste(li_icon, (int(x2), 160), li_icon)
-        draw.text((x2 + 80, 165), t2, font=f1, fill=(255, 255, 255, 255))
-
-        # WA Row
-        w3 = draw.textlength(t3, font=f1)
-        x3 = (frame_width - (w3 + 80)) // 2
-        if wa_icon: img.paste(wa_icon, (int(x3), 260), wa_icon)
-        draw.text((x3 + 80, 265), t3, font=f1, fill=(255, 255, 255, 255))
-
-    except Exception as e:
-        print(f"CTA Render Icons Error: {e}")
-        x1 = (frame_width - draw.textlength(t1, font=f1))//2
-        draw.text((x1, 75), t1, font=f1, fill=(*accent_color,255))
-    
-    return img
 
 # ── LAYER 16: Article Screenshot (New Layer) ──────────────────────────────────
 def _article_screenshot_clip(screenshot_path, duration):
@@ -1903,7 +1783,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                 # REQUEST: Subtitles should disappear for the final feedback CTA
                 text_low = chunk.get("text", "").lower()
                 cta_keywords = ["follow", "updates", "suggestions", "feedback", "whatsapp", "telegram", "bio"]
-                if any(kw in text_low for kw in cta_keywords) and t > audio_duration - 10:
+                if any(kw in text_low for kw in cta_keywords) and t > audio_duration - 2.5:
                     break
                     
                 word_status_list = []

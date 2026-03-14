@@ -289,6 +289,9 @@ PHONETIC_DICT = {
     "almond": "ah-mund",
     "Wednesday": "Wenz-day",
     "February": "Feb-roo-air-ee",
+    "month": "munth",
+    "months": "munths",
+
     "comfortable": "kum-fert-uh-bul",
     "vegetable": "vej-tuh-bul",
     "chocolate": "chok-lit",

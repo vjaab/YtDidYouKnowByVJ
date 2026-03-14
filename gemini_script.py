@@ -108,7 +108,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
     selection_instruction = (
         f"Analyze the following {content_desc} and pick the SINGLE most engaging one to convert into a 50-52 second YouTube Short script.\n"
         "Choose based on deep technological importance and resonance with everyday moments, avoiding generic tech news. Focus on the core AI breakthrough.\n"
-        "CRITICAL: The final video MUST be under 60 seconds. Target a script length of ~135 words.\n"
+    "CRITICAL: The final video MUST be exactly ~52 seconds. Target a script length of ~145 words. Allocation: 50 seconds for CONTENT, and exactly 2 seconds for saying 'follow for more updates'.\n"
     )
 
     day_name, slot, category = get_slot_info()
@@ -142,7 +142,7 @@ CONTENT HIERARCHY (Technical Depth & Monetization Balance):
 1. PATTERN INTERRUPT (First 0.5s): The FIRST SENTENCE must be a shocking claim, contradiction, or provocative question. NEVER start with greetings, "Hey guys", or "Did you know". Start MID-THOUGHT as if the viewer walked into a conversation already happening. Examples: "Google just killed passwords. Forever.", "This AI writes code 10x faster than you.", "90% of developers don't know this exists."
 2. CURIOSITY GAP (2-8s): After the hook, OPEN AN INFORMATION LOOP the brain NEEDS to close. Use phrases like: "but here's what nobody is talking about...", "and the reason will surprise you...", "but wait until you see WHY..."
 3. MICRO-CLIFFHANGERS (Every 10s): Plant 3-4 teasers throughout the script to prevent mid-video swipe. Examples: "But that's not even the craziest part...", "And here's where it gets really interesting...", "Now pay attention to this next part..."
-5. IDENTITY-BASED CTA (Last 4s): Do NOT say "Subscribe for more." Instead, make subscribing feel like joining an elite circle. Keep it ultra-brief (max 8 words). Create a unique variation every time that focuses on technical depth or insider knowledge. Example: "Join the top 1% who actually understand this." or "Follow to stay at the engineering edge."
+5. IDENTITY-BASED CTA (Last 2s): Do NOT say "Subscribe for more." Instead, make subscribing feel like joining an elite circle. Keep it ultra-brief (max 8 words). Create a unique variation every time that focuses on technical depth or insider knowledge. Example: "Join the top 1% who actually understand this." or "Follow to stay at the engineering edge."
 6. REPLAY TRIGGER: Reference something from the first 2 seconds in the last 5 seconds. This creates an infinite loop and boosts replay rate (the #1 algorithm signal).
 
 NARRATION STYLE: 
@@ -156,14 +156,13 @@ NARRATIVE ARC CONFIGURATION:
 3. The "VJ's Take" (8-20s): Breaking the news through a lens of skepticism or extreme hype.
 4. The Deep-Dive Analysis (20-44s): The "So What?" for the viewer. Focus on the most unique technical detail. This is the core engine of the video.
 5. The Visual Reset (44-48s): An abrupt micro-cliffhanger to keep them until the very last second.
-6. The IDENTITY CTA + Infinite Loop (48-52s): ULTRA-CONCISE Identity CTA (max 4s) followed immediately by the bridge back to the hook.
+6. THE LOOP + CTA (50-52s): ULTRA-CONCISE Identity CTA (max 2s) followed immediately by the bridge back to the hook.
 
 CRITICAL '2026 SCALE' RULES:
 1. TECHNICAL MONETIZATION: Avoid "Top 10" style generic lists. YouTube 2026 prioritizes "Niche Expert" status. Prove your expertise by citing the specific architecture or methodology from the article.
 2. PRONUNCIATION HYPER-FOCUS: Identify EVERY niche tech term or complex word. If you're unsure, provide a phonetic respelling in the map.
 3. NO REPETITION: Never repeat a word or phrase within 10 seconds.
-4. WHATSAPP & TELEGRAM CTA: You MUST give a 0.5-second pause (...) before the end. Keep it fast: "Links in bio for tech updates." atau "Check my bio for the full logs." (Max 5 words).
-5. CLOSING PHRASE: The script MUST end with the EXACT phrase "follow for more updates" (all lowercase is fine). This is mandatory for brand consistency.
+5. CLOSING PHRASE: The script MUST end with the EXACT phrase "follow for more updates". This phrase MUST be spoken in the FINAL 2 SECONDS ONLY. The remainder of the ~52-second video MUST be dense technical content.
 6. AI-ASSISTED JOURNALISM: Reference "my neural processing" or "the data logs" to lean into the AI whistleblower brand.
 
 
