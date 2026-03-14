@@ -13,8 +13,12 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
     
     day_name, slot, category = get_slot_info()
     strategy_enhancement = get_category_prompt_enhancement(category, slot)
-
-    # ── STEP -1: FORCED TOPIC OVERRIDE ──────────────────────────────────────
+    
+    # ── STEP -2: REPETITION AVOIDANCE ────────────────────────────────────────
+    tracker = load_tracker()
+    recent_history = tracker.get("history", [])[-15:]
+    avoid_list = "\n".join([f"- {h.get('news_headline', h.get('title'))}" for h in recent_history])
+    avoid_instruction = f"RECENTLY COVERED STORIES (DO NOT REPEAT):\n{avoid_list}\n\n" if avoid_list else ""
     news_context = ""
     if forced_article:
         print(f"🎯 STEP -1: Using Forced Topic -> {forced_article}")
@@ -165,7 +169,7 @@ CRITICAL '2026 SCALE' RULES:
 
 {selection_instruction}
 
-RESEARCH PAPERS & BLOGS DATA:
+{avoid_instruction}RESEARCH PAPERS & BLOGS DATA:
 {news_context}
 
 NARRATIVE FLOW (FOR THE 'SCRIPT' FIELD):
