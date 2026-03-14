@@ -127,6 +127,7 @@ PHONETIC_DICT = {
     "transformers": "trans-for-mers",
     "tokenizer": "toh-ken-eye-zer",
     "tokenization": "toh-ken-eye-zay-shun",
+    "token by token": "toh-ken by toh-ken",
     "token": "toh-ken",
     "tokens": "toh-kenz",
     "embeddings": "em-bed-dings",
