@@ -503,7 +503,7 @@ PHONETIC_DICT = {
     "prioritize": "pry-or-ih-tyze",
     "analysis": "uh-nal-ih-sis",
     "strategy": "strat-uh-jee",
-    "development": "deh-vel-up-ment",
+    "development": "de-vel-up-ment",
     "industry": "in-dus-tree",
     "innovation": "in-noh-vay-shun",
     "successfully": "suk-sess-ful-lee",
