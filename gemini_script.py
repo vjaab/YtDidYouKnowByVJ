@@ -139,7 +139,7 @@ CONTENT HIERARCHY (Technical Depth & Monetization Balance):
 2. CURIOSITY GAP (2-8s): After the hook, OPEN AN INFORMATION LOOP the brain NEEDS to close. Use phrases like: "but here's what nobody is talking about...", "and the reason will surprise you...", "but wait until you see WHY..."
 3. MICRO-CLIFFHANGERS (Every 10s): Plant 3-4 teasers throughout the script to prevent mid-video swipe. Examples: "But that's not even the craziest part...", "And here's where it gets really interesting...", "Now pay attention to this next part..."
 
-5. IDENTITY-BASED CTA (Last 5s): Do NOT say "Subscribe for more." Instead, make subscribing feel like joining an identity: "If you're the kind of person who wants to know about AI before everyone else... you know what to do." or "Follow if you want to stay ahead of the curve."
+5. IDENTITY-BASED CTA (Last 5s): Do NOT say "Subscribe for more." Instead, make subscribing feel like joining an identity: "If you're the kind of person who wants the edge on the AI curve, stay connected." or "Follow if you want to stay ahead of the curve."
 6. REPLAY TRIGGER: Reference something from the first 2 seconds in the last 5 seconds. This creates an infinite loop and boosts replay rate (the #1 algorithm signal).
 
 NARRATION STYLE: 
@@ -187,7 +187,7 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
     {{"timestamp": 35.0, "text": "Now watch what happens next..."}}
   ],
 
-  "identity_cta": "If you're serious about AI, you know what to do.",
+  "identity_cta": "If you're serious about AI, you're exactly where you need to be.",
   "phonetic_pronunciation_map": {{
     "AI": "A-I",
     "NVIDIA": "En-vid-ee-uh",
