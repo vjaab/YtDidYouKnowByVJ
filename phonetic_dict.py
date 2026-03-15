@@ -740,6 +740,8 @@ PHONETIC_DICT = {
     "visualization": "vizh-oo-ul-eye-zay-shun",
     "experimentation": "ek-sper-ih-men-tay-shun",
     "democratization": "deh-mok-ruh-tih-zay-shun",
+    "reconciliation": "reck-un-sil-ee-ay-shun",
+    "Reconciliation": "Reck-un-sil-ee-ay-shun",
 
     # ─── ARCHIVES / MISC ─────────────────────────────────────────────────────
     "archives": "ar-kives",
