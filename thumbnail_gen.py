@@ -87,7 +87,7 @@ def _vignette(img):
         alpha = int(180 * (i / 80) ** 1.5)
         draw.rectangle([i, i, w-i, h-i], outline=(0, 0, 0, alpha))
     result = Image.alpha_composite(img.convert("RGBA"), vign)
-    return result.convert("RGB")
+    return result  # Keep RGBA for further compositing
 
 
 def _draw_star_burst(draw, cx, cy, r_outer, r_inner, points, color):
