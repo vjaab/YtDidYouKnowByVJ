@@ -266,10 +266,24 @@ def generate_thumbnail(script_json):
         accent_hex = script_json.get("color_theme", {}).get("accent", "#FFD600").lstrip("#")
         accent_color = tuple(int(accent_hex[i:i+2], 16) for i in (0, 2, 4))
         
-        # Position at the "Chest Area" (approx 55% of screen height)
-        start_y = int(height * 0.55) 
-        # Fine-tune y to center the block vertically in that area if it's multiple lines
+        # Position at the "Lower Chest / Stomach Area" (approx 70% of screen height)
+        start_y = int(height * 0.70) 
+        # Fine-tune y to center the block vertically in that area
         start_y -= total_text_h // 2        
+        
+        # ── 7. CONTRAST BACKGROUND (Obsidian Block) ────────────────────────
+        # Render a single background box for the entire text block to avoid overlaps
+        bg_pad_x, bg_pad_y = 50, 40
+        # Calculate full block bounds
+        max_line_w = max([ts(l, font)[0] for l in lines])
+        block_x_start = (width - max_line_w) // 2
+        
+        # Draw the main block background
+        draw.rounded_rectangle(
+            [block_x_start - bg_pad_x, start_y - bg_pad_y, block_x_start + max_line_w + bg_pad_x, start_y + total_text_h + bg_pad_y],
+            radius=25,
+            fill=(0, 0, 0, 210) # Darker obsidian for maximum contrast
+        )
         # Power Words to highlight in accent color
         power_keywords = ["SCARY", "KILLER", "FREE", "VIRAL", "DEAD", "GOD", "SECRET", "LEVEL", "10X", "100X", "CRAZY"]
         if topic_text.split():
@@ -283,13 +297,8 @@ def generate_thumbnail(script_json):
             line_h = bb[3] - bb[1]
             x = (width - line_w) // 2
             
-            # ── 7. CONTRAST BACKGROUND (Obsidian Box) ────────────────────────
-            bg_pad_x, bg_pad_y = 40, 20
-            draw.rounded_rectangle(
-                [x - bg_pad_x, current_y - bg_pad_y, x + line_w + bg_pad_x, current_y + line_h + bg_pad_y],
-                radius=15,
-                fill=(0, 0, 0, 180) # Semi-transparent black for high contrast
-            )
+            # Background box removed from here (now a single block above)
+            pass
             
             # Drop shadow (reduced for cleaner look in the box)
             shadow_offset = 3
