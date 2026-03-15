@@ -167,6 +167,13 @@ def generate_thumbnail(script_json):
         top = (new_h - 720) // 2
         bg_yt = resized.crop((0, top, 1280, top + 720))
 
+    # Apply Hyper-Vibrant Grading to background
+    bg_yt = ImageEnhance.Contrast(bg_yt).enhance(1.4)
+    bg_yt = ImageEnhance.Color(bg_yt).enhance(1.5)
+    bg_yt = ImageEnhance.Brightness(bg_yt).enhance(0.9)
+    # Add subtle Vignette to focus center
+    bg_yt = _vignette(bg_yt)
+
     # Create the 1080x1920 (9:16) canvas for Shorts
     shorts_target_ratio = 1080 / 1920
     if img_ratio > shorts_target_ratio:
@@ -179,6 +186,11 @@ def generate_thumbnail(script_json):
         resized = base_img.resize((1080, new_h), Image.LANCZOS)
         top = (new_h - 1920) // 2
         bg_shorts = resized.crop((0, top, 1080, top + 1920))
+        
+    # Grading for Shorts
+    bg_shorts = ImageEnhance.Contrast(bg_shorts).enhance(1.3)
+    bg_shorts = ImageEnhance.Color(bg_shorts).enhance(1.4)
+    bg_shorts = _vignette(bg_shorts)
 
     # Helper function to render text on a given canvas
     def apply_branding(canvas_img, width, height):
@@ -280,10 +292,19 @@ def generate_thumbnail(script_json):
             
         total_text_h = sum(line_heights) + int((len(lines) - 1) * target_size * (line_spacing - 1))
         
-        # Position at Top 30% of image height
-        start_y = int(height * 0.15) 
+        # Capture accent color for word highlighting
+        accent_hex = script_json.get("color_theme", {}).get("accent", "#FFD600").lstrip("#")
+        accent_color = tuple(int(accent_hex[i:i+2], 16) for i in (0, 2, 4))
         
-        # ── 4. DRAW TEXT WITH SHADOW & STROKE ─────────────────────────────────
+        # Position at Top 30% of image height
+        start_y = int(height * 0.12) 
+        
+        # Power Words to highlight in accent color
+        power_keywords = ["SCARY", "KILLER", "FREE", "VIRAL", "DEAD", "GOD", "SECRET", "LEVEL", "10X", "100X", "CRAZY"]
+        if topic_text.split():
+            # If no power word in topic, just pick the longest word to highlight
+            longest_word = max(topic_text.split(), key=len)
+            power_keywords.append(longest_word)
         current_y = start_y
         for i, line in enumerate(lines):
             bb = font.getbbox(line)
@@ -313,16 +334,39 @@ def generate_thumbnail(script_json):
             )
             
             # Main bold text with black stroke
-            draw.text(
-                (x, current_y), 
-                line, 
-                font=font, 
-                fill=(255, 255, 255, 255),
-                stroke_width=6,
-                stroke_fill=(0, 0, 0, 255)
-            )
+            words_in_line = line.split()
+            cursor_x = x
+            
+            for word in words_in_line:
+                w_bb = font.getbbox(word)
+                w_width = w_bb[2] - w_bb[0]
+                
+                # Highlight if it's a power word
+                is_power = any(pk in word for pk in power_keywords)
+                fill_color = accent_color if is_power else (255, 255, 255, 255)
+                
+                draw.text(
+                    (cursor_x, current_y), 
+                    word, 
+                    font=font, 
+                    fill=fill_color,
+                    stroke_width=8,
+                    stroke_fill=(0, 0, 0, 255)
+                )
+                
+                # Advance cursor (add space width)
+                space_bb = font.getbbox(" ")
+                cursor_x += w_width + (space_bb[2] - space_bb[0])
             
             current_y += line_h + int(target_size * (line_spacing - 1))
+            
+        # ── 6. VIBRANT SHOCK BORDER (Shorts only) ─────────────────────────────
+        if width < height:
+            border_thickness = 25
+            # Draw a thick glowing border around the frame
+            for i in range(3): # Multi-layer glow
+                alpha = int(255 / (i + 1))
+                draw.rectangle([i*2, i*2, width-i*2, height-i*2], outline=accent_color + (alpha,), width=border_thickness - i*4)
             
         return final_img
 

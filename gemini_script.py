@@ -108,7 +108,8 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
     selection_instruction = (
         f"Analyze the following {content_desc} and pick the SINGLE most engaging one to convert into a 50-52 second YouTube Short script.\n"
         "Choose based on deep technological importance and resonance with everyday moments, avoiding generic tech news. Focus on the core AI breakthrough.\n"
-    "CRITICAL: The final video MUST be exactly ~52 seconds. Target a script length of ~145 words. Allocation: 50 seconds for CONTENT, and exactly 2 seconds for saying 'follow for more updates'.\n"
+        "CRITICAL: The final video MUST be exactly ~52 seconds. Target a script length of ~145-155 words. Allocation: 50 seconds for CONTENT, and exactly 2 seconds for saying 'follow for more updates'.\n"
+        "VIRAL GOAL: Make the viewer feel like they've discovered a secret. Use a tone of 'insider leak' rather than 'corporate update'.\n"
     )
 
     day_name, slot, category = get_slot_info()
@@ -138,32 +139,33 @@ CONTENT HIERARCHY (Technical Depth & Monetization Balance):
 - TRANSFORMATION SCORE: At least 4 sentences MUST be purely your original synthesis/prediction.
 - AUTHENTICITY SCORE: Use 1st person pronouns ("I", "Me", "My take").
 
-🎯 VIEWER RETENTION RULES (CRITICAL — These decide if viewers swipe or stay):
-1. PATTERN INTERRUPT (First 0.5s): The FIRST SENTENCE must be a shocking claim, contradiction, or provocative question. NEVER start with greetings, "Hey guys", or "Did you know". Start MID-THOUGHT as if the viewer walked into a conversation already happening. Examples: "Google just killed passwords. Forever.", "This AI writes code 10x faster than you.", "90% of developers don't know this exists."
-2. CURIOSITY GAP (2-8s): After the hook, OPEN AN INFORMATION LOOP the brain NEEDS to close. Use phrases like: "but here's what nobody is talking about...", "and the reason will surprise you...", "but wait until you see WHY..."
-3. MICRO-CLIFFHANGERS (Every 10s): Plant 3-4 teasers throughout the script to prevent mid-video swipe. Examples: "But that's not even the craziest part...", "And here's where it gets really interesting...", "Now pay attention to this next part..."
-5. IDENTITY-BASED CTA (Last 2s): Do NOT say "Subscribe for more." Instead, make subscribing feel like joining an elite circle. Keep it ultra-brief (max 8 words). Create a unique variation every time that focuses on technical depth or insider knowledge. Example: "Join the top 1% who actually understand this." or "Follow to stay at the engineering edge."
-6. REPLAY TRIGGER: Reference something from the first 2 seconds in the last 5 seconds. This creates an infinite loop and boosts replay rate (the #1 algorithm signal).
+    🎯 VIEWER RETENTION RULES (VIRAL ARCHITECTURE):
+    1. PATTERN INTERRUPT (First 0.5s): The FIRST SENTENCE must be a shocking claim, contradiction, or provocative question. NEVER start with greetings, "Hey guys", or "Did you know". Start MID-THOUGHT with high-energy words like "Stop.", "Look.", "Listen.", or a direct punch: "Nvidia just replaced 10,000 engineers."
+    2. CURIOSITY GAP (2-8s): Within 5 seconds, establish a "Payoff promise". Use: "But what's happening behind the scenes is terrifying...", "The data logs show something else entirely...", "Here's the engineering secret they aren't telling you."
+    3. MICRO-CLIFFHANGERS (Every 10s): Every 8-12 seconds, drop a verbal 'anchor' to reset attention. Examples: "But that's not even the craziest part...", "Here's where it goes completely off the rails...", "Pay attention to this next detail."
+    4. TECHNICAL BUZZWORDS: Sprinkle in high-authority terms like 'Neural Lattice', 'Sparse Transformers', 'Quantized Weights', or 'Inference Latency' to build elite status.
+    5. IDENTITY-BASED CTA (Last 2s): Do NOT say "Subscribe for more." Make subscribing feel like an IQ test or an elite club entry. Example: "Join the top 1% building the future."
+    6. THE PERFECT INFINITE LOOP: The VERY LAST word of the script must linguistically bridge back to the VERY FIRST word. If the first word is "Stop", the last phrase should be "And before you...". This tricks the brain into watching twice.
 
-NARRATION STYLE: 
-- Tone: Provocative, sharp, and highly opinionated. 
-- Personality (VJ): You are a high-level lead analyst. Don't be "AI Assistant-y." Be the "Tech Whistleblower."
-- Use Dramatic Pacing: ... for 0.4s pause. -- for 0.2s breath. ALL CAPS for emphasis.
+    NARRATION STYLE: 
+    - Tone: Provocative, sharp, and highly opinionated. 
+    - Personality (VJ): You are a high-level lead analyst. Don't be "AI Assistant-y." Be the "Tech Whistleblower."
+    - Use Dramatic Pacing: ... for 0.4s pause. -- for 0.2s breath. ALL CAPS for emphasis.
 
-NARRATIVE ARC CONFIGURATION:
-1. The PATTERN INTERRUPT Hook (0-2s): A punchy, mid-thought statement that stops the scroll. NO warmup.
-2. The CURIOSITY GAP (2-8s): Open an information loop. Tease the payoff without revealing it.
-3. The "VJ's Take" (8-20s): Breaking the news through a lens of skepticism or extreme hype.
-4. The Deep-Dive Analysis (20-44s): The "So What?" for the viewer. Focus on the most unique technical detail. This is the core engine of the video.
-5. The Visual Reset (44-48s): An abrupt micro-cliffhanger to keep them until the very last second.
-6. THE LOOP + CTA (50-52s): ULTRA-CONCISE Identity CTA (max 2s) followed immediately by the bridge back to the hook.
+    NARRATIVE ARC CONFIGURATION:
+    1. The PATTERN INTERRUPT Hook (0-2s): A punchy, mid-thought statement that stops the scroll. NO warmup.
+    2. The CURIOSITY GAP (2-8s): Open an information loop. Tease the payoff without revealing it.
+    3. The "VJ's Take" (8-20s): Breaking the news through a lens of skepticism or extreme hype.
+    4. The Deep-Dive Analysis (20-44s): The "So What?" for the viewer. Focus on the most unique technical detail. This is the core engine of the video.
+    5. The Visual Reset (44-48s): An abrupt micro-cliffhanger to keep them until the very last second.
+    6. THE LOOP + CTA (50-52s): ULTRA-CONCISE Identity CTA (max 2s) followed immediately by the bridge back to the hook.
 
-CRITICAL '2026 SCALE' RULES:
-1. TECHNICAL MONETIZATION: Avoid "Top 10" style generic lists. YouTube 2026 prioritizes "Niche Expert" status. Prove your expertise by citing the specific architecture or methodology from the article.
-2. PRONUNCIATION HYPER-FOCUS: Identify EVERY niche tech term or complex word. If you're unsure, provide a phonetic respelling in the map.
-3. NO REPETITION: Never repeat a word or phrase within 10 seconds.
-5. CLOSING PHRASE: The script MUST end with the EXACT phrase "follow for more updates". This phrase MUST be spoken in the FINAL 2 SECONDS ONLY. The remainder of the ~52-second video MUST be dense technical content.
-6. AI-ASSISTED JOURNALISM: Reference "my neural processing" or "the data logs" to lean into the AI whistleblower brand.
+    CRITICAL '2026 SCALE' RULES:
+    1. TECHNICAL MONETIZATION: Avoid "Top 10" style generic lists. YouTube 2026 prioritizes "Niche Expert" status. Prove your expertise by citing the specific architecture or methodology from the article.
+    2. PRONUNCIATION HYPER-FOCUS: Identify EVERY niche tech term or complex word. If you're unsure, provide a phonetic respelling in the map.
+    3. NO REPETITION: Never repeat a word or phrase within 10 seconds.
+    4. CLOSING PHRASE: The script MUST end with the EXACT phrase "follow for more updates". This phrase MUST be spoken in the FINAL 2 SECONDS ONLY. The remainder of the ~52-second video MUST be dense technical content.
+    5. AI-ASSISTED JOURNALISM: Reference "my neural processing" or "the data logs" to lean into the AI whistleblower brand.
 
 
 {selection_instruction}

@@ -903,6 +903,21 @@ def _apply_handheld_shake(clip):
         return (int(off_x), int(off_y))
     return clip.with_position(shake)
 
+def _apply_intensive_glitch(frame, intensity=0.1):
+    """Procedurally shifts color channels for a digital glitch effect."""
+    if random.random() > intensity:
+        return frame
+    
+    h, w, c = frame.shape
+    shift = random.randint(5, 15)
+    new_frame = frame.copy()
+    # Shift R channel
+    new_frame[:, shift:, 0] = frame[:, :w-shift, 0]
+    # Shift B channel
+    new_frame[:, :w-shift, 2] = frame[:, shift:, 2]
+    return new_frame
+
+
 def _generate_film_grain(duration, frame_width=1080, frame_height=1920):
     """Creates a procedural film grain overlay."""
     def make_frame(t):
@@ -1816,7 +1831,38 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                     )
                 break
                 
+        # ── VIRAL FX: SFX REACTIVITY & SHOCK FLICKER ─────────────────────────
+        # 1. Shock Flicker (Red/Accent flash on breaking news)
+        if abs(t - shock_ts) < 0.15:
+            # Shift frame towards accent color
+            bg_frame = bg_frame.astype(np.float32)
+            bg_frame[:, :, 0] = np.clip(bg_frame[:, :, 0] + accent_color[0] * 0.4, 0, 255)
+            bg_frame[:, :, 1] = np.clip(bg_frame[:, :, 1] + accent_color[1] * 0.4, 0, 255)
+            bg_frame[:, :, 2] = np.clip(bg_frame[:, :, 2] + accent_color[2] * 0.4, 0, 255)
+            bg_frame = bg_frame.astype(np.uint8)
+
+        # 2. SFX Digital Glitch
+        for cue in sfx_cues:
+            if cue.get("type") == "glitch" and abs(t - float(cue.get("timestamp", 0))) < 0.25:
+                bg_frame = _apply_intensive_glitch(bg_frame, intensity=0.8)
+                # Random camera shake during glitch
+                shift_x = random.randint(-8, 8)
+                shift_y = random.randint(-8, 8)
+                bg_frame = np.roll(bg_frame, (shift_x, shift_y), axis=(0, 1))
+
+        # 3. Energy Vibration on Woosh
+        for cue in sfx_cues:
+            if cue.get("type") == "woosh" and abs(t - float(cue.get("timestamp", 0))) < 0.2:
+                # Zoom in slightly (simulated)
+                h, w = bg_frame.shape[:2]
+                zoom = 1.05
+                nh, nw = int(h / zoom), int(w / zoom)
+                top, left = (h - nh) // 2, (w - nw) // 2
+                cropped = bg_frame[top:top+nh, left:left+nw]
+                bg_frame = cv2.resize(cropped, (w, h))
+
         return composite_frame(bg_frame, t, header_img, subtitle_img, transparency_img)
+
 
     final = VideoClip(make_final_frame, duration=audio_duration)
     final = final.with_audio(final_audio)
