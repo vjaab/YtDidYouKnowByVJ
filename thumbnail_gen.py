@@ -246,8 +246,8 @@ def generate_thumbnail(script_json):
                     mask_draw.ellipse((0, 0, av_size, av_size), fill=255)
                     avatar.putalpha(mask)
                     
-                    # Position: Center Bottom
-                    pos_x, pos_y = (width - av_size) // 2, height - av_size - 250
+                    # Position: Center Bottom - Moved slightly lower to avoid text
+                    pos_x, pos_y = (width - av_size) // 2, height - av_size - 100
                     final_img.paste(avatar, (pos_x, pos_y), avatar)
                     draw.ellipse([pos_x-10, pos_y-10, pos_x+av_size+10, pos_y+av_size+10], outline=(255, 255, 255), width=15)
             except Exception as e:
@@ -272,13 +272,25 @@ def generate_thumbnail(script_json):
         lines = wrap_text(topic_text, font, max_width)
         
         # If text overflows container width too much, scale down but floor at 100
-        while len(lines) > 2 and target_size > 100: # Limit to 2 lines if possible for clarity
+        while target_size > 100:
+            lines = wrap_text(topic_text, font, max_width)
+            
+            # Safety Check: Total height of text block vs screen space
+            line_heights = []
+            for line in lines:
+                bb = font.getbbox(line)
+                line_heights.append(bb[3] - bb[1])
+            
+            total_text_h = sum(line_heights) + int((len(lines) - 1) * target_size * 0.2)
+            # We want text to end before the bottom 25% of the screen (where avatar/UI is)
+            if total_text_h < height * 0.4 and len(lines) <= 4:
+                break
+                
             target_size -= 10
             try:
                 font = ImageFont.truetype(font_path, target_size)
             except:
                 break
-            lines = wrap_text(topic_text, font, max_width)
             
         # Recalculate wrapping with final font size
         lines = wrap_text(topic_text, font, max_width)
