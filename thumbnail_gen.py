@@ -199,32 +199,35 @@ def generate_thumbnail(script_json):
         avatar_path = os.path.join(ASSETS_DIR, "gemini_img_without_logo.png")
         if os.path.exists(avatar_path):
             try:
-                avatar = Image.open(avatar_path).convert("RGBA")
+                # Open avatar and ensure it's square
+                avatar_src = Image.open(avatar_path).convert("RGBA")
+                min_dim = min(avatar_src.width, avatar_src.height)
+                left = (avatar_src.width - min_dim) // 2
+                top = (avatar_src.height - min_dim) // 2
+                avatar_squ = avatar_src.crop((left, top, left + min_dim, top + min_dim))
                 
                 # Determine size based on canvas (Shorts vs YT)
                 if width > height:
                     # YouTube Thumbnail (1280x720) - Avatar on bottom left
-                    av_size = 350
-                    avatar = avatar.resize((av_size, av_size), Image.LANCZOS)
+                    av_size = 280
+                    avatar = avatar_squ.resize((av_size, av_size), Image.LANCZOS)
                     
                     # Create circular mask
                     mask = Image.new("L", (av_size, av_size), 0)
                     mask_draw = ImageDraw.Draw(mask)
                     mask_draw.ellipse((0, 0, av_size, av_size), fill=255)
-                    
-                    # Apply circular mask
                     avatar.putalpha(mask)
                     
                     # Position: Bottom Left with padding
-                    pos_x, pos_y = 50, height - av_size - 50
+                    pos_x, pos_y = 60, height - av_size - 60
                     final_img.paste(avatar, (pos_x, pos_y), avatar)
                     
                     # Add a white/accent border to the avatar
-                    draw.ellipse([pos_x-4, pos_y-4, pos_x+av_size+4, pos_y+av_size+4], outline=(255, 255, 255), width=8)
+                    draw.ellipse([pos_x-8, pos_y-8, pos_x+av_size+8, pos_y+av_size+8], outline=(255, 255, 255), width=12)
                 else:
                     # Shorts Thumbnail (1080x1920) - Avatar in middle lower
-                    av_size = 500
-                    avatar = avatar.resize((av_size, av_size), Image.LANCZOS)
+                    av_size = 400
+                    avatar = avatar_squ.resize((av_size, av_size), Image.LANCZOS)
                     
                     mask = Image.new("L", (av_size, av_size), 0)
                     mask_draw = ImageDraw.Draw(mask)
@@ -232,9 +235,9 @@ def generate_thumbnail(script_json):
                     avatar.putalpha(mask)
                     
                     # Position: Center Bottom
-                    pos_x, pos_y = (width - av_size) // 2, height - av_size - 150
+                    pos_x, pos_y = (width - av_size) // 2, height - av_size - 250
                     final_img.paste(avatar, (pos_x, pos_y), avatar)
-                    draw.ellipse([pos_x-5, pos_y-5, pos_x+av_size+5, pos_y+av_size+5], outline=(255, 255, 255), width=10)
+                    draw.ellipse([pos_x-10, pos_y-10, pos_x+av_size+10, pos_y+av_size+10], outline=(255, 255, 255), width=15)
             except Exception as e:
                 print(f"Warning: Could not add avatar to thumbnail: {e}")
         
