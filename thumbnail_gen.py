@@ -208,51 +208,8 @@ def generate_thumbnail(script_json):
         final_img = Image.alpha_composite(canvas_img, grad)
         draw = ImageDraw.Draw(final_img)
         
-        # ── 5. ADD AVATAR ─────────────────────────────────────────────────────
-        avatar_path = os.path.join(ASSETS_DIR, "gemini_img_without_logo.png")
-        if os.path.exists(avatar_path):
-            try:
-                # Open avatar and ensure it's square
-                avatar_src = Image.open(avatar_path).convert("RGBA")
-                min_dim = min(avatar_src.width, avatar_src.height)
-                left = (avatar_src.width - min_dim) // 2
-                top = (avatar_src.height - min_dim) // 2
-                avatar_squ = avatar_src.crop((left, top, left + min_dim, top + min_dim))
-                
-                # Determine size based on canvas (Shorts vs YT)
-                if width > height:
-                    # YouTube Thumbnail (1280x720) - Avatar on bottom left
-                    av_size = 280
-                    avatar = avatar_squ.resize((av_size, av_size), Image.LANCZOS)
-                    
-                    # Create circular mask
-                    mask = Image.new("L", (av_size, av_size), 0)
-                    mask_draw = ImageDraw.Draw(mask)
-                    mask_draw.ellipse((0, 0, av_size, av_size), fill=255)
-                    avatar.putalpha(mask)
-                    
-                    # Position: Bottom Left with padding
-                    pos_x, pos_y = 60, height - av_size - 60
-                    final_img.paste(avatar, (pos_x, pos_y), avatar)
-                    
-                    # Add a white/accent border to the avatar
-                    draw.ellipse([pos_x-8, pos_y-8, pos_x+av_size+8, pos_y+av_size+8], outline=(255, 255, 255), width=12)
-                else:
-                    # Shorts Thumbnail (1080x1920) - Avatar in middle lower
-                    av_size = 400
-                    avatar = avatar_squ.resize((av_size, av_size), Image.LANCZOS)
-                    
-                    mask = Image.new("L", (av_size, av_size), 0)
-                    mask_draw = ImageDraw.Draw(mask)
-                    mask_draw.ellipse((0, 0, av_size, av_size), fill=255)
-                    avatar.putalpha(mask)
-                    
-                    # Position: Extreme Bottom - Pushed as low as possible
-                    pos_x, pos_y = (width - av_size) // 2, height - av_size - 40
-                    final_img.paste(avatar, (pos_x, pos_y), avatar)
-                    draw.ellipse([pos_x-10, pos_y-10, pos_x+av_size+10, pos_y+av_size+10], outline=(255, 255, 255), width=15)
-            except Exception as e:
-                print(f"Warning: Could not add avatar to thumbnail: {e}")
+        # Avatar removed as per request to clear face area
+        pass
         
         # ── 2. & 3. FONT SETUP & SIZING ───────────────────────────────────────
         topic_text = topic.upper()
@@ -283,8 +240,8 @@ def generate_thumbnail(script_json):
                 line_heights.append(bb[3] - bb[1])
             
             total_text_h = sum(line_heights) + int((len(lines) - 1) * target_size * 0.2)
-            # 2026 Retention Rule: Keep text in the top 30% of the screen ONLY
-            if total_text_h < height * 0.30 and len(lines) <= 3:
+            # Chest Area constraint: Text should be punchy but fit in the middle-lower half
+            if total_text_h < height * 0.35:
                 break
                 
             target_size -= 10
@@ -309,9 +266,10 @@ def generate_thumbnail(script_json):
         accent_hex = script_json.get("color_theme", {}).get("accent", "#FFD600").lstrip("#")
         accent_color = tuple(int(accent_hex[i:i+2], 16) for i in (0, 2, 4))
         
-        # Position at the VERY TOP of the screen (5%) to clear faces
-        start_y = int(height * 0.05) 
-        
+        # Position at the "Chest Area" (approx 55% of screen height)
+        start_y = int(height * 0.55) 
+        # Fine-tune y to center the block vertically in that area if it's multiple lines
+        start_y -= total_text_h // 2        
         # Power Words to highlight in accent color
         power_keywords = ["SCARY", "KILLER", "FREE", "VIRAL", "DEAD", "GOD", "SECRET", "LEVEL", "10X", "100X", "CRAZY"]
         if topic_text.split():
@@ -325,8 +283,16 @@ def generate_thumbnail(script_json):
             line_h = bb[3] - bb[1]
             x = (width - line_w) // 2
             
-            # Drop shadow
-            shadow_offset = 4
+            # ── 7. CONTRAST BACKGROUND (Obsidian Box) ────────────────────────
+            bg_pad_x, bg_pad_y = 40, 20
+            draw.rounded_rectangle(
+                [x - bg_pad_x, current_y - bg_pad_y, x + line_w + bg_pad_x, current_y + line_h + bg_pad_y],
+                radius=15,
+                fill=(0, 0, 0, 180) # Semi-transparent black for high contrast
+            )
+            
+            # Drop shadow (reduced for cleaner look in the box)
+            shadow_offset = 3
             # Draw shadow multiple times slightly offset to simulate blur=8 effect
             for dx in range(-1, 2):
                 for dy in range(-1, 2):
