@@ -198,10 +198,11 @@ def generate_thumbnail(script_json):
         # Top 35% gradient overlay masking down for text visibility
         grad = Image.new("RGBA", (width, height), (0, 0, 0, 0))
         grad_draw = ImageDraw.Draw(grad)
-        end_y = int(height * 0.35)
+        # 2026 Engagement Gradient: Deeper at top for text separation
+        end_y = int(height * 0.45)
         for y in range(0, end_y):
-            # Fade from 0.55 alpha to transparent
-            alpha = int(255 * 0.55 * (1 - (y / end_y)))
+            # Fade from 0.7 alpha to transparent
+            alpha = int(255 * 0.70 * (1 - (y / end_y)))
             grad_draw.line([(0, y), (width, y)], fill=(0, 0, 0, alpha))
             
         final_img = Image.alpha_composite(canvas_img, grad)
@@ -246,8 +247,8 @@ def generate_thumbnail(script_json):
                     mask_draw.ellipse((0, 0, av_size, av_size), fill=255)
                     avatar.putalpha(mask)
                     
-                    # Position: Center Bottom - Moved slightly lower to avoid text
-                    pos_x, pos_y = (width - av_size) // 2, height - av_size - 100
+                    # Position: Extreme Bottom - Pushed as low as possible
+                    pos_x, pos_y = (width - av_size) // 2, height - av_size - 40
                     final_img.paste(avatar, (pos_x, pos_y), avatar)
                     draw.ellipse([pos_x-10, pos_y-10, pos_x+av_size+10, pos_y+av_size+10], outline=(255, 255, 255), width=15)
             except Exception as e:
@@ -282,8 +283,8 @@ def generate_thumbnail(script_json):
                 line_heights.append(bb[3] - bb[1])
             
             total_text_h = sum(line_heights) + int((len(lines) - 1) * target_size * 0.2)
-            # We want text to end before the bottom 25% of the screen (where avatar/UI is)
-            if total_text_h < height * 0.4 and len(lines) <= 4:
+            # 2026 Retention Rule: Keep text in the top 30% of the screen ONLY
+            if total_text_h < height * 0.30 and len(lines) <= 3:
                 break
                 
             target_size -= 10
@@ -308,8 +309,8 @@ def generate_thumbnail(script_json):
         accent_hex = script_json.get("color_theme", {}).get("accent", "#FFD600").lstrip("#")
         accent_color = tuple(int(accent_hex[i:i+2], 16) for i in (0, 2, 4))
         
-        # Position at Top 30% of image height
-        start_y = int(height * 0.12) 
+        # Position at the VERY TOP of the screen (5%) to clear faces
+        start_y = int(height * 0.05) 
         
         # Power Words to highlight in accent color
         power_keywords = ["SCARY", "KILLER", "FREE", "VIRAL", "DEAD", "GOD", "SECRET", "LEVEL", "10X", "100X", "CRAZY"]
