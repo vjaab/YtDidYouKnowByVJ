@@ -191,7 +191,7 @@ def run_pipeline(topic_type="research"):
     sub_chunks = script_data.get("subtitle_chunks", [])
     for sc in sub_chunks:
         if "text" in sc:
-            sc["text"] = clean_tts_text(sc["text"])
+            sc["text"] = clean_tts_text(sc["text"], phonetic=False)
             
     chunks = build_chunks(word_timestamps, sub_chunks)
     chunks = redistribute_to_audio_duration(chunks, duration)
