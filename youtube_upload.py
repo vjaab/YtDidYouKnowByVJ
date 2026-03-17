@@ -62,7 +62,7 @@ def get_authenticated_service():
         return None
 
 
-def upload_video(video_path, title, description, tags, category_id="28"):
+def upload_video(video_path, title, description, tags, thumbnail_path=None, category_id="28"):
     youtube = get_authenticated_service()
     if not youtube:
         return False, "Failed to authenticate with YouTube API"
@@ -93,7 +93,14 @@ def upload_video(video_path, title, description, tags, category_id="28"):
         video_id = response.get("id")
         print(f"Video uploaded: https://youtu.be/{video_id}")
 
-        # Post + pin comment immediately
+        # Step 2: Upload Thumbnail
+        if thumbnail_path and os.path.exists(thumbnail_path):
+            try:
+                set_thumbnail(youtube, video_id, thumbnail_path)
+            except Exception as e:
+                print(f"Thumbnail upload failed (non-fatal): {e}")
+
+        # Step 3: Post + pin comment immediately
         try:
             post_and_pin_comment(youtube, video_id, PINNED_COMMENT_TEXT)
         except Exception as e:
@@ -134,3 +141,15 @@ def post_and_pin_comment(youtube, video_id, comment_text):
 
     print(f"Comment pinned: {comment_id}")
     return comment_id
+
+
+def set_thumbnail(youtube, video_id, thumbnail_path):
+    """Uploads a custom thumbnail for the specified video."""
+    print(f"Uploading thumbnail: {thumbnail_path}...")
+    request = youtube.thumbnails().set(
+        videoId=video_id,
+        media_body=MediaFileUpload(thumbnail_path)
+    )
+    response = request.execute()
+    print(f"Thumbnail set successfully.")
+    return response
