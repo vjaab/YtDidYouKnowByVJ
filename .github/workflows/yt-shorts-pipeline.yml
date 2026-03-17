@@ -4,8 +4,8 @@ on:
   schedule:
     # 22:30 UTC = 04:00 AM IST (morning slot)
     - cron: '30 22 * * *'
-    # 10:30 UTC = 16:00 PM IST (afternoon slot)
-    - cron: '30 10 * * *'
+    # 08:00 UTC = 01:30 PM IST (afternoon slot)
+    - cron: '0 8 * * *'
   workflow_dispatch: # Allows manual trigger from GitHub Actions UI
 
 jobs:
