@@ -1029,6 +1029,49 @@ def _article_screenshot_clip(screenshot_path, duration):
         print(f"Article screenshot clip error: {e}")
         return []
 
+def _evidence_screenshot_clip(evidence_path, duration):
+    """
+    Shows a secondary 'Evidence' or 'Use Case' screenshot during the analytical section.
+    Appears typically between 25-35 seconds mark.
+    """
+    if not evidence_path or not os.path.exists(evidence_path):
+        return []
+    try:
+        img = Image.open(evidence_path).convert("RGBA")
+        img = img.resize((FRAME_W, FRAME_H), Image.LANCZOS)
+        arr = np.array(img.convert("RGB"))
+        mask = np.array(img.split()[3]).astype(float) / 255.0
+        
+        # Appearance window: Typically during the 'Deep-Dive' or 'Analytical Commentary'
+        start = 28.0 
+        dur = min(6.0, duration - start - 5.0)
+        
+        if dur > 1.0:
+            clip = ImageClip(arr, duration=dur)
+            mclip = VideoClip(lambda t: mask, is_mask=True, duration=dur)
+            # Subtle upward slide + zoom
+            clip = clip.resized(lambda t: 1.05 + 0.15 * (t / dur))
+            clip = clip.with_mask(mclip).with_position((0, 0)).with_start(start)
+            clip = clip.with_effects([vfx.CrossFadeIn(0.6), vfx.CrossFadeOut(0.6)])
+            
+            # Add a 'PROVEN EVIDENCE' label overlay
+            f = gf(40)
+            txt = "REAL-WORLD EVIDENCE"
+            tw, th = ts(txt, f)
+            label = Image.new("RGBA", (tw + 40, th + 20), (0,0,0,0))
+            draw = ImageDraw.Draw(label)
+            draw.rounded_rectangle([0, 0, label.width, label.height], radius=15, fill=(255, 214, 0, 230))
+            draw.text((20, 10), txt, font=f, fill=(0,0,0,255))
+            
+            l_clip = _pil_clip(label, dur, start=start).with_position(("center", 450))
+            l_clip = l_clip.with_effects([vfx.CrossFadeIn(0.8)])
+            
+            return [clip, l_clip]
+            
+    except Exception as e:
+        print(f"Evidence screenshot clip error: {e}")
+    return []
+
 
 def _ai_disclosure_overlay(duration):
     """
@@ -1683,6 +1726,12 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     if screenshot_clips:
         # We place the citations over the avatar if it overlaps
         base_layers.extend(screenshot_clips)
+        
+    # Add Evidence/Use Case screenshots (New Section)
+    evidence_path = script_json.get("evidence_screenshot_path")
+    evidence_clips = _evidence_screenshot_clip(evidence_path, audio_duration)
+    if evidence_clips:
+        base_layers.extend(evidence_clips)
 
     # ── PROGRESS BAR ────────────────────────────────────────────────────────
     def get_progress_color(t):

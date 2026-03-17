@@ -171,19 +171,26 @@ def run_pipeline(topic_type="research"):
         log_message("ERROR: Could not generate valid assets. Aborting.")
         return False
 
-    # ── STEP 4b: Capture Article Screenshot ──────────────────────────────────
-    log_message("STEP 4b: Capturing article screenshot...")
+    # ── STEP 4b: Capture Article & Evidence Screenshots ──────────────────────
+    log_message("STEP 4b: Capturing article and evidence screenshots...")
     news_url = script_data.get("original_news_url")
+    evidence_url = script_data.get("use_case_evidence_url")
+    
     if news_url:
         screenshot_filename = f"screenshot_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
         screenshot_path = capture_article_screenshot(news_url, screenshot_filename)
         if screenshot_path:
             script_data["screenshot_path"] = screenshot_path
-            log_message(f"Screenshot captured: {screenshot_path}")
-        else:
-            log_message("Warning: Screenshot capture failed.")
+            log_message(f"Main screenshot captured: {screenshot_path}")
+            
+    if evidence_url and "http" in evidence_url:
+        evidence_filename = f"evidence_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+        evidence_path = capture_article_screenshot(evidence_url, evidence_filename)
+        if evidence_path:
+            script_data["evidence_screenshot_path"] = evidence_path
+            log_message(f"Evidence screenshot captured: {evidence_path}")
     else:
-        log_message("No article URL found for screenshot.")
+        log_message("No valid evidence URL found for secondary screenshot.")
 
     # ── STEP 5: Build Visual Chunks ───────────────────────────────────────────
     log_message("STEP 5: Grouping words into visual chunks...")

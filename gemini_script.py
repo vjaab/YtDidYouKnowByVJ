@@ -182,9 +182,9 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
 {{
   "title_options": ["Title idea 1", "Title idea 2", "Title idea 3"],
   "description": "Full 100+ word rich SEO description for youtube describing the video, including timestamps and credits.",
-
+  "use_case_evidence_url": "MANDATORY: A direct URL to a real-world implementation, user case study, or tool documentation related to this tech. This will be shown as visual evidence.",
   "title": "Punchy YouTube title max 60 chars",
-  "script": "Full voiceover script following the Arc (50-52 sec). Aim for 130-140 words max. Ensure The Loop and Pattern Interrupt are implemented.",
+  "script": "Full voiceover script following the Arc (50-52 sec). Aim for 130-140 words max. Ensure The Loop and Pattern Interrupt are implemented. IMPORTANT: Include a section explicitly on 'Real World Use Cases' with specific examples.",
   "hook_text": "The exact first 5-8 words of the script. This will appear as giant text on screen in the first 1.5 seconds to STOP THE SCROLL.",
   "micro_cliffhangers": [
     {{"timestamp": 10.0, "text": "But here's what nobody's talking about..."}},
@@ -202,7 +202,7 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
   "NOTE_phonetic_pronunciation_map": "MANDATORY LEXICAL AUDIT: Identify tech terms, names, or long words. Provide a NATURAL phonetic respelling (e.g., 'Trans-for-mer' or 'In-vidy-uh'). Avoid over-hyphenating as it slows down the voice; use hyphens only for natural syllable breaks.",
 
   "hook": "Matches the first sentence of the script",
-  "summary": "One line summary",
+  "summary": "One line summary including the real-world impact",
   "sub_category": "AI/Machine Learning",
   "breaking_news_level": 9,
   "loop_score": 10,
