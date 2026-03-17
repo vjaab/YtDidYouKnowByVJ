@@ -358,6 +358,18 @@ def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
                 cleaned = re.sub(pattern, respelling, cleaned, flags=re.IGNORECASE)
         except Exception as e:
             print(f"g2p_en auto-detection skipped: {e}")
+    else:
+        # 3b. Non-phonetic (Subtitle) Spell Correction
+        # This handles cases where Gemini mispells words that should be caught
+        corrections = {
+            "parallesim": "parallelism",
+            "paralllesim": "parallelism",
+            "technolgies": "technologies",
+            "breakthru": "breakthrough"
+        }
+        for wrong, right in corrections.items():
+            pattern = r'\b' + re.escape(wrong) + r'\b'
+            cleaned = re.sub(pattern, right, cleaned, flags=re.IGNORECASE)
     
     # Clean up double spaces
     cleaned = re.sub(r'\s+', ' ', cleaned).strip()
