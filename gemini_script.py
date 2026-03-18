@@ -156,7 +156,7 @@ CONTENT HIERARCHY (Technical Depth & Monetization Balance):
     1. The PATTERN INTERRUPT Hook (0-2s): A punchy, mid-thought statement that stops the scroll. NO warmup.
     2. The CURIOSITY GAP (2-8s): Open an information loop. Tease the payoff without revealing it.
     3. The "VJ's Take" (8-20s): Breaking the news through a lens of skepticism or extreme hype.
-    4. The Deep-Dive Analysis (20-44s): The "So What?" for the viewer. Focus on the most unique technical detail. This is the core engine of the video.
+    4. The Deep-Dive Analysis & Competitive Comparison (20-44s): The "So What?". Focus on the unique technical detail and explicitly COMPARE it against the leading competitive feature or product. This is the core engine of the video.
     5. The Visual Reset (44-48s): An abrupt micro-cliffhanger to keep them until the very last second.
     6. THE LOOP + CTA (50-52s): ULTRA-CONCISE Identity CTA (max 2s) followed immediately by the bridge back to the hook.
 
@@ -174,7 +174,7 @@ CONTENT HIERARCHY (Technical Depth & Monetization Balance):
 {news_context}
 
 NARRATIVE FLOW (FOR THE 'SCRIPT' FIELD):
-- Pattern Interrupt -> Curiosity Gap -> VJ's Take -> Deep-Dive Analysis -> Visual Reset -> Identity CTA + Loop Connect.
+- Pattern Interrupt -> Curiosity Gap -> VJ's Take -> Deep-Dive Analysis & Competitive Comparison -> Visual Reset -> Identity CTA + Loop Connect.
 
 {extra_instruction}
 
@@ -182,9 +182,9 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
 {{
   "title_options": ["Title idea 1", "Title idea 2", "Title idea 3"],
   "description": "Full 100+ word rich SEO description for youtube describing the video, including timestamps and credits.",
-  "use_case_evidence_url": "MANDATORY: A direct URL to a real-world implementation, user case study, or tool documentation related to this tech. This will be shown as visual evidence.",
+  "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence. DO NOT hallucinate a URL. Pick the second best stable link if possible.",
   "title": "Punchy YouTube title max 60 chars",
-  "script": "Full voiceover script following the Arc (50-52 sec). Aim for 130-140 words max. Ensure The Loop and Pattern Interrupt are implemented. IMPORTANT: Include a section explicitly on 'Real World Use Cases' with specific examples.",
+  "script": "Full voiceover script following the Arc (50-52 sec). Aim for 130-140 words max. Ensure The Loop and Pattern Interrupt are implemented. IMPORTANT: Include a section explicitly comparing this to a corresponding competitive feature/product, and highlight 'Real World Use Cases'.",
   "hook_text": "The exact first 5-8 words of the script. This will appear as giant text on screen in the first 1.5 seconds to STOP THE SCROLL.",
   "micro_cliffhangers": [
     {{"timestamp": 10.0, "text": "But here's what nobody's talking about..."}},

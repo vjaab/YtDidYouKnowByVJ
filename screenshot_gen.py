@@ -11,28 +11,9 @@ def capture_article_screenshot(url, output_filename):
     if not url:
         return None
     
-    # ── Pre-flight Check: Ensure URL is valid and not a 404 ───────────────────
-    try:
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-        }
-        # Try HEAD first (faster), allowing redirects
-        response = requests.head(url, headers=headers, timeout=12, allow_redirects=True)
-        
-        # If HEAD not supported (405) or returns error (>=400), try GET
-        if response.status_code >= 400:
-            # Minimal download using stream=True
-            response = requests.get(url, headers=headers, timeout=12, stream=True, allow_redirects=True)
-            
-        if response.status_code >= 400:
-            print(f"⚠️ Skipping screenshot: URL returned {response.status_code} ({url})")
-            return None
-            
-    except Exception as e:
-        print(f"🔍 Pre-flight check warning for {url}: {e}")
-        # We continue to Playwright if it's just a timeout/connection issue, 
-        # as the headless browser might have more persistence or better headers.
-        pass
+    # ── Pre-flight Check Removed ────────────────────────────────────────────────
+    # Wait for playwright to do the job; requests is often blocked by Cloudflare.
+    pass
 
     output_path = os.path.join(ASSETS_DIR, "screenshots", output_filename)
     os.makedirs(os.path.dirname(output_path), exist_ok=True)

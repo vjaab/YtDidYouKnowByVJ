@@ -144,12 +144,26 @@ def post_and_pin_comment(youtube, video_id, comment_text):
 
 
 def set_thumbnail(youtube, video_id, thumbnail_path):
-    """Uploads a custom thumbnail for the specified video."""
+    """
+    Uploads a custom thumbnail for the specified video.
+    Includes a slight delay to ensure video is ready for thumbnail attachment.
+    """
+    import time
+    # YouTube backend sometimes needs a moment to 'register' the new video 
+    # before it can accept a thumbnail attachment.
+    print(f"⏳ Waiting 5s for YouTube to index video {video_id} before thumbnail...")
+    time.sleep(5) 
+    
     print(f"Uploading thumbnail: {thumbnail_path}...")
-    request = youtube.thumbnails().set(
-        videoId=video_id,
-        media_body=MediaFileUpload(thumbnail_path)
-    )
-    response = request.execute()
-    print(f"Thumbnail set successfully.")
-    return response
+    try:
+        request = youtube.thumbnails().set(
+            videoId=video_id,
+            media_body=MediaFileUpload(thumbnail_path, mimetype="image/jpeg", resumable=True)
+        )
+        response = request.execute()
+        print(f"✅ Thumbnail set successfully.")
+        return response
+    except Exception as e:
+        print(f"⚠ Critical Thumbnail Error: {e}")
+        raise e
+
