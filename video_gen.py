@@ -1576,6 +1576,9 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         avatar_clip = avatar_clip.with_mask(mclip)
 
         # ── Movement & Scaling Logic ──
+        _screenshot_path_check = script_json.get("screenshot_path")
+        _has_screenshot = bool(_screenshot_path_check and os.path.exists(_screenshot_path_check))
+
         def pip_position(t):
             base_x, base_y = FRAME_W - width_pip - 20, 260
             sway_y = math.sin(t * 0.3 * 2 * math.pi) * 3 + math.sin(t * 1.2 * 2 * math.pi) * 1.5
@@ -1590,6 +1593,9 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                 p = 1.0 - abs(t - key_stat_ts) / 1.0
                 e_y = int(5 * math.sin(p * math.pi))
             
+            if not _has_screenshot:
+                return (base_x + int(sway_x) + e_x, base_y + int(sway_y + breathing) + e_y)
+
             if t < 6.0: return (base_x + int(sway_x) + e_x, base_y + int(sway_y + breathing) + e_y)
             cycle = (t - 6.0) % 11.0
             if cycle < 4.0: return (FRAME_W + 1000, base_y)
