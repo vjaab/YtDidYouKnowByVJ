@@ -441,7 +441,7 @@ PHONETIC_DICT = {
     # ─── HETERONYMS (Same spelling, different pronunciation by meaning) ───────
     "read": "red",            # Past tense context
     "lead": "led",            # Metal context
-    "live": "liv",            # Adjective context
+    "live": "lyve",           # Adjective context
     "content": "con-tent",    # Adjective (satisfied) context
     "present": "prez-ent",    # Noun context
     "record": "rek-ord",      # Noun context
@@ -530,8 +530,10 @@ PHONETIC_DICT = {
     "availability": "uh-vay-luh-bil-ih-tee",
     "environment": "en-vy-run-ment",
     "government": "guv-ern-ment",
-    "experience": "ek-speer-ee-ents",
+    "experience": "ex-peer-ee-ens",
     "performance": "per-for-munts",
+    "protocol": "proh-tuh-kol",
+    "protocols": "proh-tuh-kolz",
     "efficiency": "ih-fish-un-see",
     "effective": "ih-fek-tiv",
     "effectively": "ih-fek-tiv-lee",
