@@ -130,9 +130,12 @@ CONTENT HIERARCHY (Technical Depth & Monetization Balance):
 4. VJ's SIGNATURE STYLE (10%): Use human-like starts: "Wait, hold on...", "Actually...". This proves human authorship to detection models.
 
 🏆 FACTUAL INTEGRITY & ACCURACY (STRICT):
-- NO GENERIC FLUFF: Do not use vague terms like "revolutionary" without explaining the specific mechanism that makes it so.
-- GROUNDED IN SOURCE: Every technical claim must be traceable to the provided RSS/Research data. If the article mentions "10x speedup via sparse attention", mention "sparse attention".
 - DEPTH OVER DRAMA: While the tone is provocative, the foundation must be high-level engineering or scientific facts.
+
+🏆 LINGUISTIC INTEGRITY (STRICT ERROR PREVENTION):
+- PERFECT SPELLING: Manually check every word. Do NOT use phonetic-style spelling like 'cog native' or 'manumental'. Use proper English: 'cognitive', 'monumental', 'period'.
+- NO PLACEHOLDERS: Do NOT use phrases like 'BRAND NAME' or 'AI COMPANY'. Use real names or describing nouns if names are unavailable.
+- NO HALLUCINATED URLs: Every link provided must exist in the 'SOURCES FOUND' section.
 
 
 🏆 2026 COMPLIANCE CHECK: 

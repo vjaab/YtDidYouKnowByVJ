@@ -1341,6 +1341,16 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     line_h = 130
     total_h = len(lines) * line_h
     start_y = 950 # Moved up slightly more (Avatar PiP ends at 940) to clear the footer CTA
+
+    # ── READABILITY BOOST: Dark vignette behind subtitles ──
+    # Draw a soft dark glow to ensure text pops against white/busy backgrounds
+    sub_bg_h = total_h + 100
+    sub_bg = Image.new('RGBA', (frame_width, sub_bg_h), (0,0,0,0))
+    sub_draw = ImageDraw.Draw(sub_bg)
+    # Gradient fade or semi-trans box
+    sub_draw.rectangle([0, 0, frame_width, sub_bg_h], fill=(0, 0, 0, 140))
+    # Paste with a mask if you want it feathered, but a simple alpha box works well
+    img.alpha_composite(sub_bg, dest=(0, start_y - 40))
     
     word_idx = 0
     for i, line in enumerate(lines):
@@ -1563,7 +1573,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         
         avatar_clip = vid_clip.resized((width_pip, height_pip)).without_audio()
         
-        # Rounded Mask
+        # Rounded & Feathered Mask for smoother edges
         a_mask_np = np.zeros((height_pip, width_pip), dtype=np.uint8)
         radius = 32
         cv2.circle(a_mask_np, (radius, radius), radius, 255, -1)
@@ -1572,7 +1582,14 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         cv2.circle(a_mask_np, (width_pip-radius, height_pip-radius), radius, 255, -1)
         cv2.rectangle(a_mask_np, (radius, 0), (width_pip-radius, height_pip), 255, -1)
         cv2.rectangle(a_mask_np, (0, radius), (width_pip, height_pip-radius), 255, -1)
-        mclip = VideoClip(lambda t: a_mask_np.astype(float)/255.0, is_mask=True, duration=audio_duration)
+        
+        # Feathering: Gaussian blur the mask to remove jagged edges
+        mask_img = Image.fromarray(a_mask_np)
+        from PIL import ImageFilter
+        mask_img = mask_img.filter(ImageFilter.GaussianBlur(radius=3))
+        a_mask_feathered = np.array(mask_img).astype(float) / 255.0
+        
+        mclip = VideoClip(lambda t: a_mask_feathered, is_mask=True, duration=audio_duration)
         avatar_clip = avatar_clip.with_mask(mclip)
 
         # ── Movement & Scaling Logic ──

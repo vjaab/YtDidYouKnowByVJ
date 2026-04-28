@@ -111,9 +111,9 @@ TOPIC_KEYWORDS = {
 
 TOPIC_PROMPT_TEMPLATES = {
     "ai_company": [
-        "Futuristic AI company headquarters, glowing logo on glass skyscraper, night cityscape, cinematic",
-        "Silicon Valley style modern office interior with neural network digital art, bright and airy, minimalist",
-        "A sleek, minimalist brand logo glowing on a black polished marble surface, luxury tech aesthetic, cinematic"
+        "Futuristic {name} headquarters, glowing logo on glass skyscraper, night cityscape, cinematic",
+        "Silicon Valley style modern office interior for {name} with neural network digital art, bright and airy, minimalist",
+        "A sleek, minimalist {name} logo glowing on a black polished marble surface, luxury tech aesthetic, cinematic"
     ],
     "semiconductor": [
         "Extreme close-up of semiconductor chip, microscopic glowing circuit traces, dark background, dramatic studio lighting",
@@ -286,9 +286,13 @@ def _generate_imagen3(chunk_text, output_path, topic_context="", global_style_gu
     style_suffix = f", {global_style_guide}" if global_style_guide else ", cinematic lighting, professional photography, 8k, photorealistic"
     
     if topic:
-        variation = random.choice(TOPIC_PROMPT_TEMPLATES[topic])
-        best_prompt = f"{variation}, {style_suffix}, news editorial style, 9:16 vertical, ultra realistic, no text"
-        print(f"  -> Detected Topic: {topic}. Using themed prompt.")
+        template = random.choice(TOPIC_PROMPT_TEMPLATES[topic])
+        # Try to find a name to inject
+        entity_name = topic_context or "AI Company"
+        # If it's a list or more complex, detect_topic might have been simple, 
+        # but let's try to extract the main subject.
+        best_prompt = f"{template.format(name=entity_name)}, {style_suffix}, news editorial style, 9:16 vertical, ultra realistic, no text"
+        print(f"  -> Detected Topic: {topic}. Using themed prompt for {entity_name}.")
     else:
         # 1. Ask Gemini to craft the perfect Imagen prompt
         topic_prompt = f"Topic Context: {topic_context}. The image MUST be highly relevant to this topic.\n" if topic_context else ""

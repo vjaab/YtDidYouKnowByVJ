@@ -176,7 +176,8 @@ PHONETIC_DICT = {
     "neural": "Nyoor-ul",
     "neurons": "Nyoor-onz",
     "synapse": "sin-aps",
-    "cognitive": "kogni-tiv",
+    "cognitive": "kog-ni-tiv",
+    "monumental": "mon-yoo-men-tul",
     "heuristic": "hew-ris-tick",
     "latency": "lay-ten-see",
     "scaling": "skay-ling",
@@ -304,7 +305,7 @@ PHONETIC_DICT = {
     "temperature": "tem-pruh-chur",
     "basically": "bay-sik-lee",
     "probably": "prob-ub-lee",
-    "actually": "Ak-choo-lee",
+    "actually": "Ak-chuh-lee",
     "naturally": "natch-ruh-lee",
     "generally": "jen-ruh-lee",
     "especially": "eh-spesh-uh-lee",
@@ -699,6 +700,7 @@ PHONETIC_DICT = {
     "average": "av-er-ij",
     "coverage": "kuv-er-ij",
     "mortgage": "mor-gij",
+    "period": "peer-ee-ud",
 
     # ─── SCIENCE & ACADEMIA ───────────────────────────────────────────────────
     "nuclear": "new-klee-er",
