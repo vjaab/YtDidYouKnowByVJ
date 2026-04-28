@@ -365,7 +365,10 @@ def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
             "parallesim": "parallelism",
             "paralllesim": "parallelism",
             "technolgies": "technologies",
-            "breakthru": "breakthrough"
+            "breakthru": "breakthrough",
+            "golden ore": "golden hour",
+            "LLT mode dull": "multimodal",
+            "Pew": "Popsa"
         }
         for wrong, right in corrections.items():
             pattern = r'\b' + re.escape(wrong) + r'\b'

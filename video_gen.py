@@ -1583,10 +1583,15 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         cv2.rectangle(a_mask_np, (radius, 0), (width_pip-radius, height_pip), 255, -1)
         cv2.rectangle(a_mask_np, (0, radius), (width_pip, height_pip-radius), 255, -1)
         
-        # Feathering: Gaussian blur the mask to remove jagged edges
-        mask_img = Image.fromarray(a_mask_np)
+        # Feathering: Erode slightly then Gaussian blur the mask to remove jagged edges and halos
+        mask_np = a_mask_np.copy()
+        kernel = np.ones((5, 5), np.uint8)
+        # Eroding by 2 iterations to shrink the mask away from potential halo edges
+        mask_np = cv2.erode(mask_np, kernel, iterations=1)
+        
+        mask_img = Image.fromarray(mask_np)
         from PIL import ImageFilter
-        mask_img = mask_img.filter(ImageFilter.GaussianBlur(radius=3))
+        mask_img = mask_img.filter(ImageFilter.GaussianBlur(radius=5))
         a_mask_feathered = np.array(mask_img).astype(float) / 255.0
         
         mclip = VideoClip(lambda t: a_mask_feathered, is_mask=True, duration=audio_duration)

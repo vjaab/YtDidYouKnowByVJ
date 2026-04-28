@@ -107,8 +107,23 @@ def generate_images(prompts, image_url=None, keywords=None):
             out = os.path.join(OUTPUT_DIR, f"news_bg_{TODAY}.jpg")
             path = _save_image_from_url(image_url, out)
             if path:
-                print(f"Using original news article image: {image_url[:60]}")
-                return [path] * 4
+                print(f"Using original news article image for first slots: {image_url[:60]}")
+                # We return it twice, but still try to get variety for the other 2 frames
+                article_paths = [path] * 2
+                
+                # ── 2a. Pexels fallback for remaining frames ──────────────────────
+                if PEXELS_API_KEY and keywords:
+                    pexels_urls = _search_pexels_multi(keywords, total=2)
+                    for i, p_url in enumerate(pexels_urls):
+                        out_p = os.path.join(OUTPUT_DIR, f"pexels_mixed_{i+1}_{TODAY}.jpg")
+                        p_path = _save_image_from_url(p_url, out_p)
+                        if p_path:
+                            article_paths.append(p_path)
+                
+                # Pad to 4
+                while len(article_paths) < 4:
+                    article_paths.append(path)
+                return article_paths[:4]
         except Exception as e:
             print(f"News image failed: {e}")
 

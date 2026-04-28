@@ -58,6 +58,7 @@ PHONETIC_DICT = {
 
     # ─── AI / MACHINE LEARNING ────────────────────────────────────────────────
     "AI": "A-I",
+    "Popsa": "Pop-sah",
     "ML": "M-L",
     "NLP": "N-L-P",
     "LLM": "L-L-M",
@@ -135,7 +136,7 @@ PHONETIC_DICT = {
     "token": "toh-ken",
     "tokens": "toh-kenz",
     "embeddings": "em-bed-dings",
-    "multimodal": "mul-tee-moh-dul",
+    "multimodal": "mul-tee-mode-ul",
     "reinforcement": "ree-in-fors-ment",
     "generative": "jen-er-uh-tiv",
     "discriminative": "dis-krim-in-uh-tiv",
@@ -546,6 +547,8 @@ PHONETIC_DICT = {
     "artificial": "ar-tih-fish-ul",
     "technique": "tek-neek",
     "techniques": "tek-neeks",
+    "recommendation": "rek-um-men-day-shun",
+    "recommendations": "rek-um-men-day-shuns",
     "disaggregated": "dis-ag-ruh-gay-ted",
     "disaggregate": "dis-ag-ruh-gayt",
     "intelligence": "in-tel-ih-junts",
