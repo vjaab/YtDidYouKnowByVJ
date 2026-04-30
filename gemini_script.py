@@ -107,9 +107,9 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
 
     selection_instruction = (
         f"Analyze the following {content_desc} and pick the SINGLE most engaging one to convert into a 50-52 second YouTube Short script.\n"
-        "Choose based on deep technological importance but prioritize 'Aha!' moments and PRACTICAL AI TOOL launches that viewers can use immediately. Avoid overly dry academic phrasing.\n"
+        "Choose based on deep technological importance but prioritize 'Aha!' moments and PRACTICAL AI TOOL launches or FUNDAMENTAL AI CONCEPTS (like RAG, RLHF, or Transformers) that need explaining.\n"
         "CRITICAL: The final video MUST be exactly ~52 seconds. Target a script length of ~145-155 words. Allocation: 50 seconds for CONTENT, and exactly 2 seconds for saying 'follow for more updates'.\n"
-        "TOOL BIAS: If a groundbreaking new AI tool or library is present in the list, prioritize it over incremental research papers.\n"
+        "CONCEPT BIAS: At least once every few videos, choose a story that allows for a 'Deep-Dive Concept Explanation' where you teach the viewer HOW a specific AI architecture works.\n"
     )
 
     day_name, slot, category = get_slot_info()
@@ -124,10 +124,10 @@ Slot: {slot}
 {strategy_enhancement}
 
 CONTENT HIERARCHY (Technical Depth & Monetization Balance):
-1. CORE TECHNICAL BREAKTHROUGH (40%): Deliver the actual meat of the article. Explain the "HOW" and the technical complexity that makes this different.
-2. TRANSFORMATIVE ANALYTICAL COMMENTARY (30%): Provide your synthesis. Why is this a paradigm shift? Move away from pure reporting into expert prediction.
-3. SOCIO-TECHNICAL IMPACT (20%): Connect this to real-world 2026 problems—future of labor, cognitive overhead, or industrial shifts.
-4. VJ's SIGNATURE STYLE (10%): Use human-like starts: "Wait, hold on...", "Actually...". This proves human authorship to detection models.
+1. CORE TECHNICAL BREAKTHROUGH & CONCEPTS (45%): Deliver the actual meat. Explain the "HOW" and the technical foundations (e.g., Transformers, Latent Space, weights) that make this possible.
+2. TRANSFORMATIVE ANALYTICAL COMMENTARY (25%): Why is this a paradigm shift? Move away from pure reporting into expert prediction.
+3. SOCIO-TECHNICAL IMPACT (20%): Connect this to real-world 2026 problems—future of labor or industrial shifts.
+4. VJ's SIGNATURE STYLE (10%): Human-like starts: "Wait, hold on...", "Actually...".
 
 🏆 CONCEPT CLARITY & EDUCATIONAL VALUE (SCALED FOR SHORTS):
 - HIGH-VELOCITY ANALOGIES: For every technical concept (e.g., 'Inference Latency'), use a 4-5 word real-world analogy (e.g., 'the brain's reaction time').
