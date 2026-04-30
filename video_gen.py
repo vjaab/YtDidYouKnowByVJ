@@ -39,7 +39,14 @@ import imageio_ffmpeg
 from pydub import AudioSegment
 AudioSegment.converter = imageio_ffmpeg.get_ffmpeg_exe()
 
-FRAME_W, FRAME_H = 1080, 1920
+FRAME_W, FRAME_H = 1080, 1920 # Default for Shorts
+def set_resolutions(is_longform=False):
+    global FRAME_W, FRAME_H
+    if is_longform:
+        FRAME_W, FRAME_H = 1920, 1080
+    else:
+        FRAME_W, FRAME_H = 1080, 1920
+
 TITLE_BOTTOM_GAP = 192
 
 import cv2
@@ -1489,7 +1496,10 @@ def _generate_lipsync_video(audio_path):
 
 
 def create_video(audio_path, script_json, chunks, output_path=None):
-    global _kb_idx
+    """Main assembly: 15-layer video compositor."""
+    is_longform = "Slot C" in script_json.get("slot", "")
+    set_resolutions(is_longform)
+    
     today = datetime.now().strftime("%Y-%m-%d")
     if output_path is None:
         output_path = os.path.join(OUTPUT_DIR, f"video_{today}.mp4")

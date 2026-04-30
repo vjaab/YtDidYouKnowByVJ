@@ -105,19 +105,30 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
     else:
         content_desc = "research papers and engineering blogs"
 
-    selection_instruction = (
-        f"Analyze the following {content_desc} and pick the SINGLE most impactful story to convert into a 38-44s YouTube Short script.\n"
-        "SELECTION FILTERS:\n"
-        "1. MUST be New, Useful, or Surprising (Absolute mandatory).\n"
-        "2. MUST be explainable in exactly <40s of dense technically-accurate speech.\n"
-        "3. MUST contain one concrete takeaway the viewer can use today.\n\n"
-        "CONTENT MIX (Algorithm Target):\n"
-        "- 40% Practical AI Tools (Automation, Dev tools, Productivity hacks).\n"
-        "- 40% Frontier AI Model Releases (OpenAI, Google DeepMind, Anthropic).\n"
-        "- 20% Core AI Concepts explained simply (RAG, Agents, Memory systems).\n\n"
-        "HOOK ALIGNMENT (DROP TEST):\n"
-        "If the topic doesn't produce a strong 'Winner' hook (Stat, Absolute Contradiction, or 'You are using this wrong'), DROP IT and pick another.\n"
-    )
+    is_longform = "Slot C" in slot
+    
+    if is_longform:
+        selection_instruction = (
+            f"Analyze the following {content_desc} and pick the SINGLE most foundational story for a 2-3 minute deep-dive.\n"
+            "SELECTION FILTERS:\n"
+            "1. MUST have deep technical complexity or 'Long-tail' consequences.\n"
+            "2. MUST be explainable in 120-180s of expert-level technical speech.\n"
+            "3. MUST contain 3 concrete takeaways or 'Mental Models' for the viewer.\n"
+        )
+    else:
+        selection_instruction = (
+            f"Analyze the following {content_desc} and pick the SINGLE most impactful story to convert into a 38-44s YouTube Short script.\n"
+            "SELECTION FILTERS:\n"
+            "1. MUST be New, Useful, or Surprising (Absolute mandatory).\n"
+            "2. MUST be explainable in exactly <40s of dense technically-accurate speech.\n"
+            "3. MUST contain one concrete takeaway the viewer can use today.\n\n"
+            "CONTENT MIX (Algorithm Target):\n"
+            "- 40% Practical AI Tools (Automation, Dev tools, Productivity hacks).\n"
+            "- 40% Frontier AI Model Releases (OpenAI, Google DeepMind, Anthropic).\n"
+            "- 20% Core AI Concepts explained simply (RAG, Agents, Memory systems).\n\n"
+            "HOOK ALIGNMENT (DROP TEST):\n"
+            "If the topic doesn't produce a strong 'Winner' hook (Stat, Absolute Contradiction, or 'You are using this wrong'), DROP IT and pick another.\n"
+        )
 
     day_name, slot, category = get_slot_info()
     strategy_enhancement = get_category_prompt_enhancement(category, slot)
@@ -186,9 +197,9 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
 {{
   "title_options": ["Title idea 1", "Title idea 2", "Title idea 3"],
   "description": "Full 100+ word rich SEO description for youtube describing the video, including timestamps and credits.",
-  "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence. DO NOT hallucinate a URL. Pick the second best stable link if possible.",
-  "title": "Punchy YouTube title max 60 chars",
-  "script": "Full voiceover script following the Arc (50-52 sec). Aim for 130-140 words max. Ensure The Loop and Pattern Interrupt are implemented. IMPORTANT: Include a section explicitly comparing this to a corresponding competitive feature/product, and highlight 'Real World Use Cases'.",
+  "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
+  "title": f"Punchy YouTube title max 60 chars ({'YouTube Video' if is_longform else 'Shorts'})",
+  "script": f"Full voiceover script following the Arc. Target duration: {'120-180 sec' if is_longform else '38-44 sec'}. Use {'350-500 words' if is_longform else '110-125 words'}. Ensure The Loop and Pattern Interrupt are implemented.",
   "hook_text": "The exact first 5-8 words of the script. This will appear as giant text on screen in the first 1.5 seconds to STOP THE SCROLL.",
   "micro_cliffhangers": [
     {{"timestamp": 10.0, "text": "But here's what nobody's talking about..."}},
@@ -221,7 +232,7 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
   }},
   "relevant_emoji": "🔍",
   "imagen_prompts": [
-     "High-contrast, Tech-noir style visuals, 9:16, cinematic"
+     f"High-contrast, Tech-noir style visuals, {'16:9' if is_longform else '9:16'}, cinematic"
   ],
   "hook_banner_text": "MAX 3-4 WORDS",
   "shocking_moment_timestamp": 12.5,

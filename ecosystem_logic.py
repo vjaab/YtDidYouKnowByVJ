@@ -13,8 +13,10 @@ def get_slot_info():
     # We'll use a threshold of 9:00 UTC to split A and B
     if hour < 9:
         slot = "Slot A (Discovery)"
-    else:
+    elif hour < 15:
         slot = "Slot B (Utility)"
+    else:
+        slot = "Slot C (Deep-Dive)"
         
     # Schedule Matrix
     # (Day, Slot A Category, Slot B Category)
@@ -28,8 +30,14 @@ def get_slot_info():
         "Sun": ("AI News", "AI Fails")             # Fails again — strong Sunday closer
     }
     
-    categories = matrix.get(day_name, ("AI News", "AI Tool"))
-    category = categories[0] if "Slot A" in slot else categories[1]
+    categories = matrix.get(day_name, ("AI News", "AI Tool", "AI Deep-Dive"))
+    
+    if "Slot A" in slot:
+        category = categories[0]
+    elif "Slot B" in slot:
+        category = categories[1]
+    else:
+        category = "AI Deep-Dive" # Dedicated Long-form slot
     
     return day_name, slot, category
 
@@ -113,7 +121,13 @@ def get_category_prompt_enhancement(category, slot):
             STRATEGY: {base_utility}
             GOAL: Show a tangible project being built with AI. Focus on actionable insights for developers or creators.
             HOOK: 'I built a fully functional [App/Tool] in 5 minutes using AI. Watch how.'
-        """
+            """,
+        "AI Deep-Dive": """
+            CATEGORY: AI Deep-Dive (Long-form Authority).
+            STRATEGY: FOCUS: Deep Authority. Use 16:9 aspect ratio. Target 120-180 seconds.
+            GOAL: Provide a comprehensive breakdown of a major AI movement or a weekly wrap-up. 
+            HOOK: 'In today's Deep-Dive, we're looking at why the current AI cycle is actually changing...'
+            """
     }
     
     return enhancements.get(category, "")

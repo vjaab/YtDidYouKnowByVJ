@@ -113,6 +113,9 @@ def run_pipeline(topic_type="research"):
             log_message("ERROR: Script generation failed.")
             attempts += 1
             continue
+            
+        # Store slot info for downstream rendering (e.g. aspect ratio)
+        script_data["slot"] = slot
 
         title  = script_data.get("title", "Tech News!")
         script = script_data.get("script", "")

@@ -24,7 +24,7 @@ for d in [OUTPUT_DIR, LOGS_DIR, FONTS_DIR, MUSIC_DIR]:
 
 # Application Settings
 TIMEZONE = "Asia/Kolkata"
-UPLOAD_TIMES = ["04:00", "13:30"]
+UPLOAD_TIMES = ["04:00", "13:30", "19:30"] # Slot A, B, and C (Long-form)
 MAX_RETRY_ATTEMPTS = 5
 SIMILARITY_THRESHOLD = 75
 CATEGORY_COOLDOWN_DAYS = 3
