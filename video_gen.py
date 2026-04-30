@@ -1384,14 +1384,14 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
             th = bbox[3] - bbox[1]
             y_offset = (line_h - th) // 2 - 10
             
-            # Fireship style shadow
-            shadow_offset = 6 if is_active else 4
-            draw.text(
-                (cur_x + shadow_offset, line_y + y_offset + shadow_offset), 
-                word_text, font=f, fill=(0, 0, 0, 200)
-            )
-            
-            # Main text
+            # Main text with Glow for active word
+            if is_active:
+                # Neon Glow
+                glow_img = Image.new('RGBA', (word_widths[word_idx] + 20, line_h), (0,0,0,0))
+                glow_draw = ImageDraw.Draw(glow_img)
+                glow_draw.text((10, y_offset), word_text, font=f, fill=(*accent_color, 80), stroke_width=9, stroke_fill=(*accent_color, 40))
+                img.alpha_composite(glow_img, dest=(cur_x - 10, line_y))
+
             draw.text(
                 (cur_x, line_y + y_offset), 
                 word_text, font=f, fill=c_fill,
@@ -1909,15 +1909,40 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                     )
                 break
                 
-        # ── VIRAL FX: SFX REACTIVITY & SHOCK FLICKER ─────────────────────────
-        # 1. Shock Flicker (Red/Accent flash on breaking news)
-        if abs(t - shock_ts) < 0.15:
-            # Shift frame towards accent color
-            bg_frame = bg_frame.astype(np.float32)
-            bg_frame[:, :, 0] = np.clip(bg_frame[:, :, 0] + accent_color[0] * 0.4, 0, 255)
-            bg_frame[:, :, 1] = np.clip(bg_frame[:, :, 1] + accent_color[1] * 0.4, 0, 255)
-            bg_frame[:, :, 2] = np.clip(bg_frame[:, :, 2] + accent_color[2] * 0.4, 0, 255)
-            bg_frame = bg_frame.astype(np.uint8)
+        # ── RETENTION LAYERS: Script-Driven Engagement Cues ──────────────────
+        retention_hooks = script_json.get("retention_cues", [])
+        for cue in retention_hooks:
+            cue_t = float(cue.get("timestamp", 0))
+            effect = cue.get("effect", "")
+            
+            # Use a slightly longer window for cues (0.4s)
+            if abs(t - cue_t) < 0.2:
+                # 1. SNAP ZOOM (Aggressive punch in)
+                if effect == "zoom_snap":
+                    h, w = bg_frame.shape[:2]
+                    zoom = 1.15 # 15% punch in
+                    nh, nw = int(h / zoom), int(w / zoom)
+                    top, left = (h - nh) // 2, (w - nw) // 2
+                    bg_frame = cv2.resize(bg_frame[top:top+nh, left:left+nw], (w, h))
+                
+                # 2. EPIC SHAKE (Attention reset)
+                elif effect == "shake_epic":
+                    shift_x = random.randint(-15, 15)
+                    shift_y = random.randint(-15, 15)
+                    bg_frame = np.roll(bg_frame, (shift_x, shift_y), axis=(0, 1))
+                
+                # 3. DIGITAL GLITCH (Technical reveal)
+                elif effect == "glitch_digital":
+                    bg_frame = _apply_intensive_glitch(bg_frame, intensity=0.9)
+                
+                # 4. ACCENT FLASH (Breaking/Important)
+                elif effect == "flash_accent":
+                    bg_frame = bg_frame.astype(np.float32)
+                    for i in range(3):
+                        bg_frame[:, :, i] = np.clip(bg_frame[:, :, i] + accent_color[i] * 0.6, 0, 255)
+                    bg_frame = bg_frame.astype(np.uint8)
+
+        # ── VIRAL FX: SFX REACTIVITY ─────────────────────────────────────────
 
         # 2. SFX Digital Glitch
         for cue in sfx_cues:
