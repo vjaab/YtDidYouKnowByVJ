@@ -1646,12 +1646,28 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         mclip = VideoClip(lambda t: a_mask_feathered, is_mask=True, duration=audio_duration)
         avatar_clip = avatar_clip.with_mask(mclip)
 
-        # ── Color Matching (Ambient Lighting) ──
+        # ── Color Matching (Ambient Lighting & Shirt Shifting) ──
         def apply_ambient_tint(get_frame, t):
             frame = get_frame(t).astype(np.float32)
-            # Apply 15% tint of the accent color to the avatar's lighting
+            
+            # 1. Base Ambient Tint (15% across the whole frame)
             tint = np.array(accent_color, dtype=np.float32)
-            frame = frame * 0.85 + tint * 0.15
+            
+            # 2. Targeted Shirt Color Shifting
+            # We target pixels that are likely the shirt (mid-to-high luminance, center-bottom area)
+            lum = (0.299 * frame[:,:,0] + 0.587 * frame[:,:,1] + 0.114 * frame[:,:,2])
+            
+            # Create a localized mask for the torso area (bottom 40%)
+            h, w = frame.shape[:2]
+            torso_mask = np.zeros((h, w), dtype=np.float32)
+            torso_mask[int(h*0.6):, :] = 1.0
+            
+            # Apply a stronger (25%) tint to the torso area specifically
+            shirt_tint_factor = 0.25 * torso_mask[:,:,np.newaxis]
+            
+            # Blend everything together
+            frame = frame * (1 - 0.15 - shirt_tint_factor) + tint * (0.15 + shirt_tint_factor)
+            
             return np.clip(frame, 0, 255).astype(np.uint8)
         
         avatar_clip = avatar_clip.transform(apply_ambient_tint)
