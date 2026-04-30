@@ -1317,9 +1317,10 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     img = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
-    # Base fonts
-    base_size = 85
-    pop_size = 95
+    # Base fonts (Relative scaling for robustness)
+    scale_ratio = frame_width / 1080.0
+    base_size = int(85 * scale_ratio)
+    pop_size = int(95 * scale_ratio)
     f_main = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', base_size)
     
     # word_data is a list of {"word": str, "is_active": bool, "is_spoken": bool, "scale": float}
@@ -1839,18 +1840,18 @@ def create_video(audio_path, script_json, chunks, output_path=None):
             bgm = bgm.subclipped(0, audio_duration)
             
         def ducking_volume(get_frame, t):
-            # Evaluate t which might be a scalar or an array (numpy)
-            # We must handle numpy arrays correctly for AudioClips.
             if isinstance(t, np.ndarray):
                 vols = []
                 for time_t in t:
-                    is_speak = any(c["start"] - 0.2 <= time_t <= c["end"] + 0.2 for c in chunks)
-                    vols.append(BGM_VOLUME * 0.3 if is_speak else BGM_VOLUME)
-                multiplier = np.array(vols).reshape(-1, 1) # Make it column vector for [Left, Right] channel broadcast
+                    is_speak = any(c["start"] - 0.1 <= time_t <= c["end"] + 0.1 for c in chunks)
+                    # Duck when speaking, boost when silent for 'energy'
+                    vol = BGM_VOLUME * 0.2 if is_speak else BGM_VOLUME * 1.3
+                    vols.append(vol)
+                multiplier = np.array(vols).reshape(-1, 1)
                 return get_frame(t) * multiplier
             else:
-                is_speak = any(c["start"] - 0.2 <= t <= c["end"] + 0.2 for c in chunks)
-                vol = BGM_VOLUME * 0.3 if is_speak else BGM_VOLUME
+                is_speak = any(c["start"] - 0.1 <= t <= c["end"] + 0.1 for c in chunks)
+                vol = BGM_VOLUME * 0.2 if is_speak else BGM_VOLUME * 1.3
                 return get_frame(t) * vol
                 
         bgm = bgm.transform(ducking_volume).with_effects([afx.AudioFadeOut(2)])

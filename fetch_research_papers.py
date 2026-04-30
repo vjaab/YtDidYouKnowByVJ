@@ -79,9 +79,37 @@ def _fetch_rss(feed_urls, feed_type="research"):
     if fresh_articles:
         articles = fresh_articles
         print(f"{feed_type.capitalize()} Blogs: Found {len(articles)} fresh articles in the last 24h.")
-    else:
+    elif all_articles:
         articles = all_articles[:10]  # Take top 10 most recent if no fresh ones
-        print(f"{feed_type.capitalize()} Blogs: Found 0 fresh articles. Falling back to the {len(articles)} most recent ones.")
+        print(f"{feed_type.capitalize()} Blogs: Found 0 fresh articles. Falling back to the {len(articles)} most recent ones from RSS.")
+    else:
+        # STEP 1.2: Historical Fallback from log check
+        print(f"{feed_type.capitalize()} Blogs: RSS FEEDS EMPTY. Checking historical facts_log.json...")
+        from config import TRACKER_FILE
+        import json
+        import os
+        if os.path.exists(TRACKER_FILE):
+             with open(TRACKER_FILE, 'r') as f:
+                 tracker = json.load(f)
+                 history = tracker.get("history", [])
+                 if history:
+                     # Filter by type if possible, or just take random recent ones
+                     backup = [h for h in history if h.get("sub_category") == feed_type or feed_type == "research"]
+                     articles = backup[-10:] if backup else history[-10:]
+                     print(f"✅ Loaded {len(articles)} historical articles from tracker as fallback.")
+                     # Reformat to match RSS article structure
+                     articles = [{
+                         "title": a.get("news_headline", a.get("title")),
+                         "description": "Historical coverage fallback.",
+                         "source": {"name": "Historical Cache"},
+                         "url": a.get("news_source_url", ""),
+                         "urlToImage": "",
+                         "publishedAt": a.get("date", ""),
+                         "type": feed_type
+                     } for a in articles]
+        
+        if not articles:
+            print("⚠️ Critical: No RSS or Historical data found.")
 
     return articles
 

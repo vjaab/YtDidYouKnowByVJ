@@ -126,17 +126,20 @@ def generate_musetalk_sync(face_path, audio_path, output_path, timeout=10800):
         # Remove any stale PYTORCH_CUDA_ALLOC_CONF to avoid deprecation warning
         env.pop("PYTORCH_CUDA_ALLOC_CONF", None)
         
+        # ── Execution with Guardrails ──
+        print(f"      🚀 Executing MuseTalk Engine (Timeout: {timeout}s)...")
         result = subprocess.run(
             cmd, cwd=musetalk_dir, capture_output=True, text=True,
             timeout=timeout, env=env
         )
         
-        if result.returncode != 0:
-            print(f"   ✗ MuseTalk inference exited with code {result.returncode}")
+        # Check for specific failure patterns (e.g. face mesh not found)
+        if result.returncode != 0 or "No face detected" in result.stderr:
+            print(f"   ✗ MuseTalk inference failed (Code {result.returncode})")
+            if "No face detected" in (result.stderr or ""):
+                print("      ⚠ FACE MESH SYNC ERROR: MuseTalk could not lock onto a face.")
             if result.stderr:
-                print(f"   STDERR (last 3000 chars):\n{result.stderr[-3000:]}")
-            if result.stdout:
-                print(f"   STDOUT (last 1000 chars):\n{result.stdout[-1000:]}")
+                print(f"   STDERR (last 1000 chars):\n{result.stderr[-1000:]}")
             return None
         
         # Print stdout for progress visibility

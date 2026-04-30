@@ -304,13 +304,16 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
             with open(log_path, 'w') as f:
                 json.dump(script_data, f, indent=4)
                 
-            # Perform uniqueness check
+            # Perform uniqueness check (Enhanced Batch Deduplication)
             headline = script_data.get("original_news_headline", "")
             news_url = script_data.get("original_news_url", "")
-            is_unique, msg = check_story_uniqueness(headline, news_url)
+            keywords = script_data.get("keywords", [])
+            title = script_data.get("title", "")
+            
+            is_unique, msg = check_story_uniqueness(title, headline, keywords, news_url)
             if not is_unique:
                 print(f"Duplicate story detected: {msg}")
-                extra_instruction += f"\nNote: You MUST skip the story titled '{headline}'. It was already covered!"
+                extra_instruction += f"\nCRITICAL: Do NOT cover the story about '{headline}'. It too similar to a recent video! Pick something else."
                 attempts += 1
                 prompt += extra_instruction
                 continue

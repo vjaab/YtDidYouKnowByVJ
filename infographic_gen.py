@@ -492,7 +492,30 @@ def render_infographic(infographic_type, infographic_data, accent_color, progres
     """
     Renders an infographic card frame.
     Returns a PIL RGBA Image (1080x1920).
+    Now includes dynamic parsing for unstructured data from Gemini.
     """
+    # STEP 2.2: Dynamic Data Injection Logic
+    if isinstance(infographic_data, str):
+        # Attempt to parse a string-based data point from the LLM
+        # Format: "Term: Definition | Example" or "Stat: 100M | Label"
+        try:
+            parts = infographic_data.split("|")
+            main = parts[0].split(":")
+            if infographic_type == "definition":
+                infographic_data = {
+                    "term": main[0].strip(),
+                    "definition": main[1].strip() if len(main)>1 else "",
+                    "example": parts[1].strip() if len(parts)>1 else ""
+                }
+            elif infographic_type == "stat":
+                infographic_data = {
+                    "headline": main[0].strip(),
+                    "subtext": main[1].strip() if len(main)>1 else "",
+                    "context": parts[1].strip() if len(parts)>1 else ""
+                }
+        except Exception:
+            pass # Fall back to using the string as a headline if parsing fails
+
     renderer = _TYPE_MAP.get(infographic_type, _render_stat_card)
     return renderer(infographic_data, accent_color, progress)
 
