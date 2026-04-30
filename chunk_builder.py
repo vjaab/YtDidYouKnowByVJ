@@ -41,8 +41,8 @@ def build_chunks(word_timestamps, subtitle_chunks):
             word_idx += 1
             
         if not chunk_words:
-            # If no words matched, use the Gemini provided timestamps as a deep fallback
-            # but usually shouldn't happen
+            # If no words matched, we might have a drift issue. 
+            # Skip this chunk but keep word_idx where it is.
             continue
             
         final_gc = dict(gc)  # Copy all Gemini properties (pexels_*, highlight_word, etc.)
@@ -54,6 +54,13 @@ def build_chunks(word_timestamps, subtitle_chunks):
         final_gc["duration"] = final_gc["end"] - final_gc["start"]
         
         final_chunks.append(final_gc)
+
+    # RECENT PRODUCTION FIX: If alignment failed for more than 50% of intended chunks,
+    # it means Gemini's template and the audio script diverged too much. 
+    # Fallback to pure audio-based chunking to avoid broken visual timing.
+    if len(final_chunks) < len(subtitle_chunks) * 0.5:
+        print(f"WARNING: Subtitle alignment poor ({len(final_chunks)}/{len(subtitle_chunks)}). Falling back to audio-based chunks.")
+        return _fallback_build_chunks(word_timestamps)
 
     # Now enforce the non-overlap rule: chunk[i].end <= chunk[i+1].start
     for i in range(len(final_chunks) - 1):

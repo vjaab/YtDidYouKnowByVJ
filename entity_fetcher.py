@@ -142,3 +142,17 @@ def fetch_all_entities(script_data):
                 entity["local_hq_path"] = path
 
     return script_data
+
+def get_retention_layers_config():
+    """
+    Coordination point for kinetic layers and pacing.
+    Called by main.py to ensure engagement triggers are active.
+    """
+    from config import ENABLE_KINETIC_CAPTIONS, ENABLE_AUDIO_DUCKING, ENABLE_PERIODIC_CUTS
+    
+    return {
+        "kinetic_captions": ENABLE_KINETIC_CAPTIONS,
+        "audio_ducking": ENABLE_AUDIO_DUCKING,
+        "camera_cuts": ENABLE_PERIODIC_CUTS,
+        "pacing_mode": "kinetic_high_energy"
+    }

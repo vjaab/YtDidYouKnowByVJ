@@ -206,8 +206,13 @@ def run_pipeline(topic_type="research"):
 
     # ── STEP 6: Fetch Entities (People/Companies) ─────────────────────────────
     log_message("STEP 6: Fetching entity photos and company logos...")
-    from entity_fetcher import fetch_all_entities
+    from entity_fetcher import fetch_all_entities, get_retention_layers_config
     script_data = fetch_all_entities(script_data)
+    
+    # Enable Kinetic Layers (Production Spec 2026)
+    retention_config = get_retention_layers_config()
+    script_data["retention_config"] = retention_config
+    log_message(f"Engagement Layers Active: {list(retention_config.keys())}")
 
     # ── STEP 7: Fetch Per-Chunk Visuals (Decision Tree) ───────────────────────
     log_message("STEP 7: Fetching per-chunk visuals from Pexels/Imagen...")
