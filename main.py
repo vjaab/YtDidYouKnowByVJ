@@ -78,16 +78,18 @@ def run_pipeline(topic_type="research"):
     log_message(f"STEP 1: Content Ecosystem Check -> Day: {day_name}, Slot: {slot}, Category: {category}")
     
     # ── STEP 2: Selection Strategy (RSS Fetch) ────────────────────────────────
-    log_message(f"STEP 2: Fetching RSS articles for {topic_type}...")
+    log_message(f"STEP 2: Fetching RSS articles (Research + Tools)...")
     rss_articles = []
     try:
-        if topic_type == "research":
-            rss_articles = fetch_tech_news()
-        else:
-            rss_articles = fetch_ai_tools()
+        # Fetch both to give Gemini more options
+        research_news = fetch_tech_news()
+        ai_tool_news = fetch_ai_tools()
+        rss_articles = research_news + ai_tool_news
             
         if not rss_articles:
-            log_message("⚠️ RSS feeds returned 0 articles.")
+            log_message("⚠️ All RSS feeds returned 0 articles.")
+        else:
+            log_message(f"✅ Fetched {len(rss_articles)} total articles ({len(research_news)} research, {len(ai_tool_news)} tools).")
     except Exception as e:
         log_message(f"⚠️ RSS Fetch failed: {e}")
 

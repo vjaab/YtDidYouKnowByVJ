@@ -107,9 +107,9 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
 
     selection_instruction = (
         f"Analyze the following {content_desc} and pick the SINGLE most engaging one to convert into a 50-52 second YouTube Short script.\n"
-        "Choose based on deep technological importance but prioritize 'Aha!' moments where a complex idea becomes suddenly clear. Avoid overly dry academic phrasing.\n"
+        "Choose based on deep technological importance but prioritize 'Aha!' moments and PRACTICAL AI TOOL launches that viewers can use immediately. Avoid overly dry academic phrasing.\n"
         "CRITICAL: The final video MUST be exactly ~52 seconds. Target a script length of ~145-155 words. Allocation: 50 seconds for CONTENT, and exactly 2 seconds for saying 'follow for more updates'.\n"
-        "CLARITY GOAL: Make the viewer feel smarter after watching. Use 25% simpler language in the technical section to ensure maximum comprehension while maintaining elite authority.\n"
+        "TOOL BIAS: If a groundbreaking new AI tool or library is present in the list, prioritize it over incremental research papers.\n"
     )
 
     day_name, slot, category = get_slot_info()
