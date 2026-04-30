@@ -6,6 +6,7 @@ load_dotenv()
 # API Keys
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 NEWS_API_KEY = os.getenv("NEWS_API_KEY", "")
+ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
 YOUTUBE_CLIENT_SECRET_FILE = os.getenv("YOUTUBE_CLIENT_SECRET_FILE", "client_secret.json")
 
 # Directory Paths
@@ -28,7 +29,7 @@ MAX_RETRY_ATTEMPTS = 5
 SIMILARITY_THRESHOLD = 75
 CATEGORY_COOLDOWN_DAYS = 3
 BGM_VOLUME = 0.07
-TARGET_AUDIO_DURATION = (40, 52) # min, max in seconds (Strict <60s Enforcement)
+TARGET_AUDIO_DURATION = (38, 44) # Optimized for replay-ability (Algorithmic Spec 2026)
 
 # Engagement & Retention Pillars (Production Spec 2026)
 ENABLE_KINETIC_CAPTIONS = True

@@ -106,10 +106,10 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
         content_desc = "research papers and engineering blogs"
 
     selection_instruction = (
-        f"Analyze the following {content_desc} and pick the SINGLE most engaging one to convert into a 50-52 second YouTube Short script.\n"
-        "Choose based on deep technological importance but prioritize 'Aha!' moments, SOTA AI MODEL releases (e.g., Llama 4, Claude 3.5, GPT-5 whispers), PRACTICAL AI TOOLS, or FUNDAMENTAL CONCEPTS.\n"
-        "CRITICAL: The final video MUST be exactly ~52 seconds. Target a script length of ~145-155 words. Allocation: 50 seconds for CONTENT, and exactly 2 seconds for saying 'follow for more updates'.\n"
-        "MODEL BIAS: If a new frontier model or an open-source SOTA weights release is in the list, prioritize it over everything else. Viewers care most about the 'New King' of benchmarks.\n"
+        f"Analyze the following {content_desc} and pick the SINGLE most engaging one to convert into a 38-44 second YouTube Short script.\n"
+        "Choose based on deep technological importance but prioritize 'Aha!' moments, SOTA AI MODEL releases, and counter-intuitive stats.\n"
+        "CRITICAL: Final video MUST be exactly ~42 seconds for maximum replay. Target a script length of ~115-125 words. Allocation: 40 seconds for CONTENT, and exactly 2 seconds for a loop bridge.\n"
+        "HOOK GOAL: Stop the scroll in 0.3s. Use 'Witness Framing' (e.g. 'I just saw Nvidia...') or 'Statistical Shock' (e.g. '98% of devs are wrong...').\n"
     )
 
     day_name, slot, category = get_slot_info()
@@ -140,11 +140,10 @@ CONTENT HIERARCHY (Technical Depth & Monetization Balance):
 - NO HALLUCINATED URLs: Every link provided must exist in the 'SOURCES FOUND' section.
 
     🎯 VIEWER RETENTION RULES (EXTREME HOOK ENGINEERING):
-    1. THE 0.3s PATTERN INTERRUPT: The very first word must be a "Stop-Your-Scroll" trigger. Use: "Wait.", "Look.", "Listen.", "Actually.", or "Stop." followed by a contradiction. NO greetings. NO context. Just the payoff promise.
-    2. THE CURIOSITY GAP (2-8s): Move the "Secret" or "Leak" to the second sentence. Make it feel like the viewer found a hidden file. Use terms like "Data logs", "Whispers in the SV corridors", "Internal Slack leaks".
-    3. EMOTIONAL ANCHORING: Evoke 'FOMO' (Fear of Missing Out) or 'Elite-Status'. Make the viewer feel like if they miss this, they are falling behind the 2026 AI shift.
-    4. MICRO-CLIFFHANGERS (Every 10s): Every 8-12 seconds, use a verbal 'Attention-Reset'. Examples: "But that's where things get dangerous...", "Here's the engineering secret they pulled from the repo...", "Pay attention to this next detail—it's everything."
-    5. THE PERFECT INFINITE LOOP: The VERY LAST word of the script must linguistically bridge back to the VERY FIRST word. Ensure the transition is seamless.
+    1. THE 0.3s PATTERN INTERRUPT: The very first word must be a "Stop-Your-Scroll" trigger. DO NOT use generic "Wait" or "Look". Use 'Witness Framing' ("I've been tracking...") or 'Absolute Contradiction' ("Everything we knew about... is gone.").
+    2. THE 3-WORD BANNER: The `hook_banner_text` MUST be max 3-4 words. e.g. "GPT-5 IS HERE" or "NVIDIA JUST WON".
+    3. THE 40-SECOND SNAP: The content must be dense. No fluff. Get to the technical meat within 5 seconds.
+    4. THE PERFECT INFINITE LOOP: The VERY LAST word of the script must linguistically bridge back to the VERY FIRST word. Ensure the transition is seamless.
     
     NARRATION STYLE (THE 'VJ' BRAND):
     - Tone: Sharp, high-authority, technical whistleblower.
@@ -152,11 +151,11 @@ CONTENT HIERARCHY (Technical Depth & Monetization Balance):
     - Use Dramatic Pacing: ... for 0.4s pause. -- for 0.2s breath. ALL CAPS for emphasis.
 
     NARRATIVE ARC CONFIGURATION:
-    1. THE HOOK (0-2s): Punchy, mid-thought statement. 
-    2. THE PAYOFF PROMISE (2-8s): Why they must watch until the end.
-    3. THE ANALYTICAL DEEP-DIVE (8-40s): Technical meat + Comparative Analysis (X vs Y).
-    4. THE 'WHISTLEBLOWER' SYNTHESIS (40-48s): Your original 2026 prediction.
-    5. THE LOOP + CTA (50-52s): "follow for more updates" bridge.
+    1. THE HOOK (0-2s): Punchy, witness/stat-based statement. 
+    2. THE PAYOFF PROMISE (2-5s): Why they must watch until the end.
+    3. THE ANALYTICAL DEEP-DIVE (5-35s): Technical meat + Comparative Analysis (X vs Y).
+    4. THE 'WHISTLEBLOWER' SYNTHESIS (35-40s): Your original 2026 prediction.
+    5. THE LOOP BRIDGE (40-42s): A short phrase bridging to the start.
 
     RETENTION CUE SPECIFICATION:
     - You MUST provide `retention_cues` that match the emotional peaks of the script. 
@@ -221,7 +220,7 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
   "imagen_prompts": [
      "High-contrast, Tech-noir style visuals, 9:16, cinematic"
   ],
-  "hook_banner_text": "First 8 words of script",
+  "hook_banner_text": "MAX 3-4 WORDS",
   "shocking_moment_timestamp": 12.5,
   "key_stat": "$1 Billion",
   "key_stat_timestamp": 18.3,

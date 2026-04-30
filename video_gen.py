@@ -1222,28 +1222,72 @@ def _render_comment_bait(comment_text, width, height):
         img = Image.new('RGBA', (width, height), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
         
-        # Dark strip at bottom
-        strip_y = height - 200
-        draw.rectangle([(0, strip_y), (width, strip_y + 120)], fill=(0, 0, 0, 180))
+        # 2026 Glassmorphism Bubble
+        bubble_y = height - 280
+        bubble_h = 100
+        padding = 60
         
         try:
-            font = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 32)
+            font = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 38)
         except:
             font = ImageFont.load_default()
         
         text = f"💬 {comment_text}"
         bb = draw.textbbox((0, 0), text, font=font)
         tw = bb[2] - bb[0]
-        x = (width - tw) // 2
-        y = strip_y + 40
         
-        draw.text((x, y), text, font=font, fill=(255, 255, 0, 255),
-                  stroke_width=2, stroke_fill=(0, 0, 0, 255))
+        # Bubble Background
+        rect = [(width - tw) // 2 - padding, bubble_y, (width + tw) // 2 + padding, bubble_y + bubble_h]
+        draw.rounded_rectangle(rect, radius=20, fill=(0, 0, 0, 220), outline=(0, 229, 255, 180), width=3)
+        
+        # Text
+        draw.text(((width - tw) // 2, bubble_y + 25), text, font=font, fill=(0, 229, 255, 255))
         
         return img
     except Exception as e:
         print(f"Comment bait error: {e}")
         return None
+
+def _render_animated_stat(stat_text, width, height, progress_ratio, accent_color):
+    """Animated stat counting up (0.0 to 1.0 ratio)."""
+    img = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    
+    # Parse number from stat_text (e.g. "$4.6B" or "98%")
+    # Simple heuristic: find numbers and symbols
+    parts = re.findall(r'(\$|[\d\.]+|[BMK%]+)', stat_text)
+    
+    display_text = ""
+    for p in parts:
+        if re.match(r'[\d\.]+', p):
+            val = float(p)
+            # Count up number
+            cur_val = val * progress_ratio
+            if "." in p:
+                display_text += f"{cur_val:.1f}"
+            else:
+                display_text += f"{int(cur_val)}"
+        else:
+            display_text += p
+            
+    try:
+        font = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 160)
+    except:
+        font = ImageFont.load_default()
+    
+    bb = draw.textbbox((0, 0), display_text, font=font)
+    tw = bb[2] - bb[0]
+    th = bb[3] - bb[1]
+    
+    x = (width - tw) // 2
+    y = (height - th) // 2 - 100
+    
+    # Shadow
+    draw.text((x+10, y+10), display_text, font=font, fill=(0,0,0,150))
+    # Main with neon accent
+    draw.text((x, y), display_text, font=font, fill=accent_color, stroke_width=6, stroke_fill=(255,255,255,255))
+    
+    return img
 
 def build_transparency_watermark(width, height):
     """Creates a subtle, high-end transparency watermark for 2026 compliance."""
@@ -1747,20 +1791,30 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     # E6: Curiosity Timer ("Wait for it..." in first 5-8s)
     curiosity = _curiosity_timer(audio_duration)
     if curiosity:
-        engagement_clips.append(curiosity)
+        base_layers.append(curiosity)
     
-    base_layers = bg_layer_clips + [tint, gradient] + particle_clips + logo_clips + fact_clips + burst_clips + reminder_clips + engagement_clips + [grain_layer, flare_layer, disclosure, watermark]
-    if avatar_pip:
-        base_layers.append(avatar_pip)
-    if screenshot_clips:
-        # We place the citations over the avatar if it overlaps
-        base_layers.extend(screenshot_clips)
-        
-    # Add Evidence/Use Case screenshots (New Section)
-    evidence_path = script_json.get("evidence_screenshot_path")
-    evidence_clips = _evidence_screenshot_clip(evidence_path, audio_duration)
-    if evidence_clips:
-        base_layers.extend(evidence_clips)
+    # ── KEY STAT COUNTER (Algorithmic Spec 2026) ───────────────────────────
+    key_stat = script_json.get("key_stat")
+    key_stat_ts = float(script_json.get("key_stat_timestamp", 0))
+    if key_stat and 0 < key_stat_ts < audio_duration:
+        stat_dur = 1.5
+        def make_stat_frame(t):
+            ratio = min(1.0, t / 0.8) # Full count up in 0.8s
+            img = _render_animated_stat(key_stat, FRAME_W, FRAME_H, ratio, accent_color)
+            return np.array(img)
+            
+        stat_clip = VideoClip(make_stat_frame, duration=stat_dur).with_start(key_stat_ts).with_effects([vfx.CrossFadeIn(0.2), vfx.CrossFadeOut(0.2)])
+        base_layers.append(stat_clip)
+
+    # ── COMMENT HOOK OVERLAY (Early Signal) ───────────────────────────────
+    comment_hook = script_json.get("comment_hook")
+    if comment_hook:
+        # Show early (e.g. at 6s) for 3s to trigger early comments
+        hook_start = min(6.0, audio_duration * 0.2)
+        hook_dur = 4.0
+        h_img = _render_comment_bait(comment_hook, FRAME_W, FRAME_H)
+        hook_overlay = ImageClip(np.array(h_img)).with_duration(hook_dur).with_start(hook_start).with_effects([vfx.CrossFadeIn(0.4), vfx.CrossFadeOut(0.4)])
+        base_layers.append(hook_overlay)
 
     # ── PROGRESS BAR ────────────────────────────────────────────────────────
     def get_progress_color(t):

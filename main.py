@@ -282,8 +282,11 @@ def run_pipeline(topic_type="research"):
 
     tags = list(set(keywords + companies + [t.replace("#", "") for t in hashtags]))[:15]
 
-    success, result = upload_video(video_path, title, description, tags, thumbnail_path=thumbnail_path)
-    if not success:
+    uploaded, result = upload_video(
+        video_path, title, description, tags, 
+        thumbnail_path=thumbnail_path, comment_hook=script_data.get("comment_hook")
+    )
+    if not uploaded:
         log_message(f"ERROR: YouTube upload failed: {result}")
         return False
 

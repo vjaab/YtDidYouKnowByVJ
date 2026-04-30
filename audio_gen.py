@@ -444,6 +444,51 @@ def restore_original_words(word_timestamps, original_text, custom_phonetic_map=N
                         
     return new_timestamps
 
+def _generate_elevenlabs(text, output_path):
+    print(f"📡 Using ElevenLabs Turbo v2.5 (High Quality Fallback)...")
+    from config import ELEVENLABS_API_KEY
+    if not ELEVENLABS_API_KEY:
+        print("   ✗ ElevenLabs API Key missing.")
+        return None, 0, []
+    
+    try:
+        import requests
+        # Voice ID for VJ-like tech persona
+        VOICE_ID = "EXAVITQu4vr4xnSDxMaL" # Bella or another high-quality Turbo voice
+        url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
+        
+        headers = {
+            "Accept": "audio/mpeg",
+            "Content-Type": "application/json",
+            "xi-api-key": ELEVENLABS_API_KEY
+        }
+        
+        data = {
+            "text": text,
+            "model_id": "eleven_turbo_v2_5",
+            "voice_settings": {
+                "stability": 0.5,
+                "similarity_boost": 0.75
+            }
+        }
+        
+        response = requests.post(url, json=data, headers=headers)
+        if response.status_code == 200:
+            with open(output_path, 'wb') as f:
+                f.write(response.content)
+            
+            duration = get_audio_duration(output_path)
+            word_timestamps = _apply_stable_ts(output_path, text)
+            if not word_timestamps:
+                word_timestamps = _estimate_timestamps(text, duration)
+            return output_path, duration, word_timestamps
+        else:
+            print(f"   ✗ ElevenLabs API error: {response.text}")
+            return None, 0, []
+    except Exception as e:
+        print(f"   ✗ ElevenLabs failed: {e}")
+        return None, 0, []
+
 def generate_voiceover(text, custom_phonetic_map=None):
     """
     Returns: (audio_path, duration, word_timestamps)
@@ -457,12 +502,18 @@ def generate_voiceover(text, custom_phonetic_map=None):
     path, dur, word_timestamps = None, 0, []
     
     # ── ENGINE PRIORITY ──────────────────────────────────────────────────────
-    # 1. PRIMARY: F5-TTS Local Voice Cloning (Your Voice) - ONLY ENGINE
+    # 1. PRIMARY: F5-TTS Local Voice Cloning
     try:
         path, dur, word_timestamps = _generate_f5_clone(text_to_speak, mp3_path)
     except Exception as e:
-        print(f"❌ F5-TTS Cloning failed (possibly NumPy/VRAM): {e}")
-        # 2. FALLBACK: Edge TTS
+        print(f"❌ F5-TTS failed: {e}")
+        
+    # 2. PRIORITY FALLBACK: ElevenLabs (Fast & High Quality)
+    if not path:
+        path, dur, word_timestamps = _generate_elevenlabs(text_to_speak, mp3_path)
+        
+    # 3. ABSOLUTE FALLBACK: Edge TTS
+    if not path:
         path, dur, word_timestamps = _generate_edge_tts(text_to_speak, mp3_path)
 
     # Post-process: Restore original word spellings for subtitles

@@ -19,11 +19,10 @@ I share what top devs & AI engineers are reading right now:
 🛠️ Dev tools & resources that save hours
 📰 Tech news that actually matters
 
-Don't miss out — join free today 👇
+Join early 👇
 🚀 Telegram → https://t.me/technewsbyvj
-💼 LinkedIn → https://www.linkedin.com/in/vijayakumar-j/
 💬 WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
-🔗 (Links also in Channel Header/Bio!)"""
+🔗 (Links in Header!)"""
 
 
 import os.path
@@ -62,7 +61,7 @@ def get_authenticated_service():
         return None
 
 
-def upload_video(video_path, title, description, tags, thumbnail_path=None, category_id="28"):
+def upload_video(video_path, title, description, tags, thumbnail_path=None, category_id="28", comment_hook=None):
     youtube = get_authenticated_service()
     if not youtube:
         return False, "Failed to authenticate with YouTube API"
@@ -102,7 +101,8 @@ def upload_video(video_path, title, description, tags, thumbnail_path=None, cate
 
         # Step 3: Post + pin comment immediately
         try:
-            post_and_pin_comment(youtube, video_id, PINNED_COMMENT_TEXT)
+            full_comment = f"{title}\n\n{comment_hook}\n\n{PINNED_COMMENT_TEXT}" if comment_hook else PINNED_COMMENT_TEXT
+            post_and_pin_comment(youtube, video_id, full_comment)
         except Exception as e:
             print(f"Pinned comment failed (non-fatal): {e}")
 
