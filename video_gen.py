@@ -1646,6 +1646,16 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         mclip = VideoClip(lambda t: a_mask_feathered, is_mask=True, duration=audio_duration)
         avatar_clip = avatar_clip.with_mask(mclip)
 
+        # ── Color Matching (Ambient Lighting) ──
+        def apply_ambient_tint(get_frame, t):
+            frame = get_frame(t).astype(np.float32)
+            # Apply 15% tint of the accent color to the avatar's lighting
+            tint = np.array(accent_color, dtype=np.float32)
+            frame = frame * 0.85 + tint * 0.15
+            return np.clip(frame, 0, 255).astype(np.uint8)
+        
+        avatar_clip = avatar_clip.transform(apply_ambient_tint)
+
         # ── Movement & Scaling Logic ──
         _screenshot_path_check = script_json.get("screenshot_path")
         _has_screenshot = bool(_screenshot_path_check and os.path.exists(_screenshot_path_check))
