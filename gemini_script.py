@@ -107,9 +107,9 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
 
     selection_instruction = (
         f"Analyze the following {content_desc} and pick the SINGLE most engaging one to convert into a 50-52 second YouTube Short script.\n"
-        "Choose based on deep technological importance and resonance with everyday moments, avoiding generic tech news. Focus on the core AI breakthrough.\n"
+        "Choose based on deep technological importance but prioritize 'Aha!' moments where a complex idea becomes suddenly clear. Avoid overly dry academic phrasing.\n"
         "CRITICAL: The final video MUST be exactly ~52 seconds. Target a script length of ~145-155 words. Allocation: 50 seconds for CONTENT, and exactly 2 seconds for saying 'follow for more updates'.\n"
-        "VIRAL GOAL: Make the viewer feel like they've discovered a secret. Use a tone of 'insider leak' rather than 'corporate update'.\n"
+        "CLARITY GOAL: Make the viewer feel smarter after watching. Use 25% simpler language in the technical section to ensure maximum comprehension while maintaining elite authority.\n"
     )
 
     day_name, slot, category = get_slot_info()
@@ -129,8 +129,10 @@ CONTENT HIERARCHY (Technical Depth & Monetization Balance):
 3. SOCIO-TECHNICAL IMPACT (20%): Connect this to real-world 2026 problems—future of labor, cognitive overhead, or industrial shifts.
 4. VJ's SIGNATURE STYLE (10%): Use human-like starts: "Wait, hold on...", "Actually...". This proves human authorship to detection models.
 
-🏆 FACTUAL INTEGRITY & ACCURACY (STRICT):
-- DEPTH OVER DRAMA: While the tone is provocative, the foundation must be high-level engineering or scientific facts.
+🏆 CONCEPT CLARITY & EDUCATIONAL VALUE (SCALED FOR SHORTS):
+- HIGH-VELOCITY ANALOGIES: For every technical concept (e.g., 'Inference Latency'), use a 4-5 word real-world analogy (e.g., 'the brain's reaction time').
+- SIMPLIFIED DEPTH: Explain the "HOW" using simple spatial logic. If it increases efficiency, don't just say 'efficiency'—say 'it bypasses the digital traffic jams'.
+- ANCHORING: Ensure the transition from the Hook to the Deep-Dive explicitly defines the Term of the Day.
 
 🏆 LINGUISTIC INTEGRITY (STRICT ERROR PREVENTION):
 - PERFECT SPELLING: Manually check every word. Do NOT use phonetic-style spelling like 'cog native' or 'manumental'. Use proper English: 'cognitive', 'monumental', 'period'.
@@ -249,7 +251,7 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
       "has_infographic": true
     }}
   ],
-  "NOTE_subtitle_chunks": "CRITICAL: Generate 10-15 subtitle_chunks that together cover the ENTIRE script text. Each chunk should be 1-2 sentences (5-12 words). Every word of the script MUST appear in exactly one chunk. Chunks must not overlap and must cover the full duration.",
+  "NOTE_subtitle_chunks": "CRITICAL: Generate 10-15 subtitle_chunks covering the ENTIRE script. You MUST set 'has_infographic': true for at least ONE chunk during the Deep-Dive (between 10-35s) and provide 'infographic_type': 'definition' or 'stat' with relevant 'infographic_data' to anchor the concept visually.",
   "original_news_headline": "Exact headline",
   "original_news_url": "MANDATORY: Pick the most stable, direct article URL from the SOURCES FOUND section. DO NOT use search results, PDF links, or internal citations. Must be a direct link to the news article for screenshotting.",
   "key_entities": [
