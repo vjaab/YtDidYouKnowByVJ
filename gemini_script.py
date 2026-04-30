@@ -106,10 +106,17 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
         content_desc = "research papers and engineering blogs"
 
     selection_instruction = (
-        f"Analyze the following {content_desc} and pick the SINGLE most engaging one to convert into a 38-44 second YouTube Short script.\n"
-        "Choose based on deep technological importance but prioritize 'Aha!' moments, SOTA AI MODEL releases, and counter-intuitive stats.\n"
-        "CRITICAL: Final video MUST be exactly ~42 seconds for maximum replay. Target a script length of ~115-125 words. Allocation: 40 seconds for CONTENT, and exactly 2 seconds for a loop bridge.\n"
-        "HOOK GOAL: Stop the scroll in 0.3s. Use 'Witness Framing' (e.g. 'I just saw Nvidia...') or 'Statistical Shock' (e.g. '98% of devs are wrong...').\n"
+        f"Analyze the following {content_desc} and pick the SINGLE most impactful story to convert into a 38-44s YouTube Short script.\n"
+        "SELECTION FILTERS:\n"
+        "1. MUST be New, Useful, or Surprising (Absolute mandatory).\n"
+        "2. MUST be explainable in exactly <40s of dense technically-accurate speech.\n"
+        "3. MUST contain one concrete takeaway the viewer can use today.\n\n"
+        "CONTENT MIX (Algorithm Target):\n"
+        "- 40% Practical AI Tools (Automation, Dev tools, Productivity hacks).\n"
+        "- 40% Frontier AI Model Releases (OpenAI, Google DeepMind, Anthropic).\n"
+        "- 20% Core AI Concepts explained simply (RAG, Agents, Memory systems).\n\n"
+        "HOOK ALIGNMENT (DROP TEST):\n"
+        "If the topic doesn't produce a strong 'Winner' hook (Stat, Absolute Contradiction, or 'You are using this wrong'), DROP IT and pick another.\n"
     )
 
     day_name, slot, category = get_slot_info()
@@ -124,9 +131,9 @@ Slot: {slot}
 {strategy_enhancement}
 
 CONTENT HIERARCHY (Technical Depth & Monetization Balance):
-1. CORE TECHNICAL BREAKTHROUGH & CONCEPTS (45%): Deliver the actual meat. Explain the "HOW" and the technical foundations (e.g., Transformers, Latent Space, weights) that make this possible.
-2. TRANSFORMATIVE ANALYTICAL COMMENTARY (25%): Why is this a paradigm shift? Move away from pure reporting into expert prediction.
-3. SOCIO-TECHNICAL IMPACT (20%): Connect this to real-world 2026 problems—future of labor or industrial shifts.
+1. CORE TECHNICAL BREAKTHROUGH & CONTRARIAN INSIGHT (50%): Deliver the actual meat but with a twist. Don't just report—explain why this matters less/more than people think.
+2. SIMPLIFIED CONCEPTUAL ANCHOR (30%): Explain the 'HOW' using high-velocity analogies (Under 5 words).
+3. ONE CONCRETE TAKEAWAY (20%): What should the viewer do right now with this information?
 4. VJ's SIGNATURE STYLE (10%): Human-like starts: "Wait, hold on...", "Actually...".
 
 🏆 CONCEPT CLARITY & EDUCATIONAL VALUE (SCALED FOR SHORTS):
@@ -150,12 +157,8 @@ CONTENT HIERARCHY (Technical Depth & Monetization Balance):
     - Personality: You aren't just reporting; you are synthesizing and predicting. Be the smartest person in the room. 
     - Use Dramatic Pacing: ... for 0.4s pause. -- for 0.2s breath. ALL CAPS for emphasis.
 
-    NARRATIVE ARC CONFIGURATION:
-    1. THE HOOK (0-2s): Punchy, witness/stat-based statement. 
-    2. THE PAYOFF PROMISE (2-5s): Why they must watch until the end.
-    3. THE ANALYTICAL DEEP-DIVE (5-35s): Technical meat + Comparative Analysis (X vs Y).
-    4. THE 'WHISTLEBLOWER' SYNTHESIS (35-40s): Your original 2026 prediction.
-    5. THE LOOP BRIDGE (40-42s): A short phrase bridging to the start.
+    NARRATIVE FLOW (FOR THE 'SCRIPT' FIELD):
+    - EXTREME HOOK (e.g. 'Most AI apps break because of this...') -> PAYOFF PROMISE -> CONTRARIAN DEEP-DIVE -> TAKEAWAY -> LOOP BRIDGE.
 
     RETENTION CUE SPECIFICATION:
     - You MUST provide `retention_cues` that match the emotional peaks of the script. 
