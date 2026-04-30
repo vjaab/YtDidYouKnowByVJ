@@ -61,8 +61,8 @@ def trim_audio_silence(path, word_timestamps):
 
     audio = AudioSegment.from_file(path)
     
-    # Detect start silence (using a conservative -50dBFS threshold)
-    start_trim = detect_leading_silence(audio, silence_threshold=-50.0)
+    # Detect start silence (using a very aggressive -60dBFS threshold for zero latency)
+    start_trim = detect_leading_silence(audio, silence_threshold=-60.0)
     # Detect end silence
     reversed_audio = audio.reverse()
     end_trim = detect_leading_silence(reversed_audio, silence_threshold=-50.0)

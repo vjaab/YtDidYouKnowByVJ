@@ -139,11 +139,11 @@ CONTENT HIERARCHY (Technical Depth & Monetization Balance):
 - NO PLACEHOLDERS: Do NOT use phrases like 'BRAND NAME' or 'AI COMPANY'. Use real names or describing nouns if names are unavailable.
 - NO HALLUCINATED URLs: Every link provided must exist in the 'SOURCES FOUND' section.
 
-    🎯 VIEWER RETENTION RULES (EXTREME HOOK ENGINEERING):
-    1. THE 0.3s PATTERN INTERRUPT: The very first word must be a "Stop-Your-Scroll" trigger. DO NOT use generic "Wait" or "Look". Use 'Witness Framing' ("I've been tracking...") or 'Absolute Contradiction' ("Everything we knew about... is gone.").
-    2. THE 3-WORD BANNER: The `hook_banner_text` MUST be max 3-4 words. e.g. "GPT-5 IS HERE" or "NVIDIA JUST WON".
-    3. THE 40-SECOND SNAP: The content must be dense. No fluff. Get to the technical meat within 5 seconds.
-    4. THE PERFECT INFINITE LOOP: The VERY LAST word of the script must linguistically bridge back to the VERY FIRST word. Ensure the transition is seamless.
+    🎯 VIEWER RETENTION RULES (EMERGENCY HOOK OVERHAUL):
+    1. THE 0.1s VISUAL SHOCK: The very first word must be a "Stop-Your-Scroll" trigger. Use 'Absolute Contradictions' ("This is NOT what it seems...") or 'Statistical Anomalies' ("98% of users are about to lose...").
+    2. THE LEAKED DATA ANGLE: Frame every story as a "leak" or "internal data breach". Use phrases like "The internal Slack logs just leaked...", "I found a hidden repository...", "The engineering data shows a total failure...".
+    3. THE 3-WORD BANNER: The `hook_banner_text` MUST be max 3 words. e.g. "GPT-5 LEAKED", "NVIDIA FAILURE", "THEY ARE REPLACING".
+    4. NO WARMUP: Start the audio at the absolute peak energy. No breathing room. No greetings. 
     
     NARRATION STYLE (THE 'VJ' BRAND):
     - Tone: Sharp, high-authority, technical whistleblower.

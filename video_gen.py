@@ -1193,9 +1193,9 @@ def _render_hook_overlay(hook_text, width, height, timestamp):
         draw.rectangle([(0, height // 2 - 120), (width, height // 2 + 120)], 
                        fill=(0, 0, 0, backdrop_alpha))
         
-        # Bold hook text
+        # Massive Bold hook text
         try:
-            font = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 72)
+            font = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 110)
         except:
             font = ImageFont.load_default()
         
@@ -1204,11 +1204,15 @@ def _render_hook_overlay(hook_text, width, height, timestamp):
         bb = draw.textbbox((0, 0), text, font=font)
         tw = bb[2] - bb[0]
         x = (width - tw) // 2
-        y = height // 2 - 36
+        y = height // 2 - 50
         
-        # White text with stroke
-        draw.text((x, y), text, font=font, fill=(255, 255, 255, alpha),
-                  stroke_width=4, stroke_fill=(0, 0, 0, alpha))
+        # Neon Accent Glow for Hook
+        glow_draw = ImageDraw.Draw(img)
+        glow_draw.text((x, y), text, font=font, fill=(0, 229, 255, 120), stroke_width=12, stroke_fill=(0, 229, 255, 60))
+
+        # Main white text
+        draw.text((x, y), text, font=font, fill=(255, 255, 255, 255),
+                  stroke_width=5, stroke_fill=(0, 0, 0, 255))
         
         return img
     except Exception as e:
@@ -2017,6 +2021,13 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                 top, left = (h - nh) // 2, (w - nw) // 2
                 cropped = bg_frame[top:top+nh, left:left+nw]
                 bg_frame = cv2.resize(cropped, (w, h))
+
+        # ── EMERGENCY: 0.1s VISUAL SHOCK (Intro Flash) ────────────────────
+        if t < 0.2:
+            # 200ms white flash intro to stop the scroll
+            bg_frame = bg_frame.astype(np.float32)
+            bg_frame += 100 # Brighten the whole frame
+            bg_frame = np.clip(bg_frame, 0, 255).astype(np.uint8)
 
         return composite_frame(bg_frame, t, header_img, subtitle_img, transparency_img)
 
