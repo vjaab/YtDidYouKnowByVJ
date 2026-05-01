@@ -7,7 +7,7 @@ import requests
 from datetime import datetime
 
 import glob
-from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR
+from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY
 from fetch_research_papers import fetch_tech_news, fetch_ai_tools
 from topic_tracker import record_story
 from gemini_script import pick_and_generate_script
@@ -194,7 +194,7 @@ def run_pipeline(topic_type="research"):
                 log_message("❌ Kaggle Handover failed or job reported an error.")
                 return False
         else:
-            audio_path, duration, word_timestamps = generate_voiceover(script, custom_phonetic_map=custom_map)
+            audio_path, duration, word_timestamps = generate_voiceover(script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY)
         
 
         if not audio_path:

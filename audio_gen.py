@@ -3,6 +3,7 @@ PRIMARY PATH: F5-TTS Local Voice Cloning (Your Voice).
 """
 
 import os
+import json
 import asyncio
 import re
 import random
@@ -12,7 +13,8 @@ import imageio_ffmpeg
 from pydub import AudioSegment
 AudioSegment.converter = imageio_ffmpeg.get_ffmpeg_exe()
 
-# F5-TTS Imports are delayed to _get_f5_model to prevent CI crashes
+from google import genai
+from google.genai import types
 import soundfile as sf
 
 
@@ -489,39 +491,103 @@ def _generate_elevenlabs(text, output_path):
         print(f"   ✗ ElevenLabs failed: {e}")
         return None, 0, []
 
-def generate_voiceover(text, custom_phonetic_map=None):
+class AudioAuditEngine:
+    def __init__(self, api_key):
+        self.client = genai.Client(api_key=api_key)
+
+    def _call_gemini_audio(self, audio_path, script_text):
+        try:
+            # Upload the audio file
+            with open(audio_path, 'rb') as f:
+                audio_data = f.read()
+            
+            # Requesting a technical audit of the audio
+            prompt = f"""AUDIT TASK: Compare this generated AI voiceover with the following technical script.
+            
+            TECHNICAL SCRIPT:
+            {script_text}
+            
+            CRITERIA:
+            1. Correct Pronunciation: Specifically check 'tiktoken', 'GGUF', 'vLLM', 'quantization', 'inference'.
+            2. Pacing: Is it too fast for complex concepts?
+            3. Persona: Does it sound like an authoritative Staff Engineer or a robotic news anchor?
+            
+            Return ONLY a JSON object:
+            {{
+              "score": 0.0-10.0,
+              "mispronunciations": ["word1", "word2"],
+              "critique": "Draft improvements here",
+              "fix_hints": {{"word": "new_phonetic_spelling"}}
+            }}"""
+
+            response = self.client.models.generate_content(
+                model='gemini-2.0-flash',
+                contents=[
+                    types.Part.from_bytes(data=audio_data, mime_type='audio/wav'),
+                    prompt
+                ]
+            )
+            raw = response.text.strip().lstrip("```json").lstrip("```").rstrip("```").strip()
+            return json.loads(raw)
+        except Exception as e:
+            print(f"⚠️ [AUDIO LOOP] Audit failed: {e}")
+            return None
+
+def generate_voiceover(text, custom_phonetic_map=None, api_key=None):
     """
-    Returns: (audio_path, duration, word_timestamps)
+    Agentic Loop for Voiceover: Plan -> Act -> Observe -> Critique -> Refine
     """
     original_raw_text = text
-    text_to_speak = clean_tts_text(text, phonetic=True, custom_phonetic_map=custom_phonetic_map)
+    current_phonetic_map = custom_phonetic_map.copy() if custom_phonetic_map else {}
     
-    today     = datetime.now().strftime("%Y-%m-%d")
-    mp3_path  = os.path.join(OUTPUT_DIR, f"audio_{today}.mp3")
+    today = datetime.now().strftime("%Y-%m-%d")
+    mp3_path = os.path.join(OUTPUT_DIR, f"audio_{today}.mp3")
     
-    path, dur, word_timestamps = None, 0, []
+    best_path, best_dur, best_ts = None, 0, []
     
-    # ── ENGINE PRIORITY ──────────────────────────────────────────────────────
-    # 1. PRIMARY: F5-TTS Local Voice Cloning
-    try:
-        path, dur, word_timestamps = _generate_f5_clone(text_to_speak, mp3_path)
-    except Exception as e:
-        print(f"❌ F5-TTS failed: {e}")
+    iterations = 0
+    max_iters = 1 # Start with 1 audit pass for production safety
+    
+    while iterations <= max_iters:
+        # 1. ACT: Generate Audio
+        text_to_speak = clean_tts_text(text, phonetic=True, custom_phonetic_map=current_phonetic_map)
+        print(f"🎙️ [AUDIO LOOP] Act: Generating iteration {iterations}...")
         
-    # 2. PRIORITY FALLBACK: ElevenLabs (Fast & High Quality)
-    if not path:
-        path, dur, word_timestamps = _generate_elevenlabs(text_to_speak, mp3_path)
+        path, dur, word_timestamps = None, 0, []
+        try:
+            path, dur, word_timestamps = _generate_f5_clone(text_to_speak, mp3_path)
+        except Exception as e:
+            print(f"❌ F5-TTS failed: {e}")
+            if not path:
+                path, dur, word_timestamps = _generate_edge_tts(text_to_speak, mp3_path)
+
+        if not path: break
         
-    # 3. ABSOLUTE FALLBACK: Edge TTS
-    if not path:
-        path, dur, word_timestamps = _generate_edge_tts(text_to_speak, mp3_path)
+        # Post-process for alignment check
+        if word_timestamps:
+            word_timestamps = restore_original_words(word_timestamps, original_raw_text, custom_phonetic_map=current_phonetic_map)
+        if path and word_timestamps:
+            dur, word_timestamps = trim_audio_silence(path, word_timestamps)
 
-    # Post-process: Restore original word spellings for subtitles
-    if word_timestamps:
-        word_timestamps = restore_original_words(word_timestamps, original_raw_text, custom_phonetic_map=custom_phonetic_map)
+        # 2. OBSERVE & CRITIQUE
+        if api_key and iterations < max_iters:
+            auditor = AudioAuditEngine(api_key)
+            feedback = auditor._call_gemini_audio(path, original_raw_text)
+            
+            if feedback and feedback.get("score", 0) < 9.0:
+                score = feedback.get("score", 0)
+                fixes = feedback.get("fix_hints", {})
+                print(f"🔄 [AUDIO LOOP] Quality: {score}/10. Refining based on: {feedback.get('mispronunciations', [])}")
+                
+                # 3. REFINE
+                if fixes:
+                    current_phonetic_map.update(fixes)
+                iterations += 1
+                continue
+            else:
+                print(f"⭐ [AUDIO LOOP] Quality Score: {feedback.get('score', 'N/A')}/10. Ready.")
+        
+        best_path, best_dur, best_ts = path, dur, word_timestamps
+        break
 
-    # Post-process: Trim dead air at start/end
-    if path and word_timestamps:
-        dur, word_timestamps = trim_audio_silence(path, word_timestamps)
-
-    return path, dur, word_timestamps
+    return best_path, best_dur, best_ts
