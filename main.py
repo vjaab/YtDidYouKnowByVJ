@@ -60,6 +60,18 @@ Don't miss out — join free today 👇
 #airesearch #shorts #machinelearning #ai #youtubeshorts #dailyfacts"""
 
 
+def generate_pinned_comment(script_data, next_series_slot):
+    from ecosystem_logic import get_series_identity
+    series = get_series_identity(next_series_slot)
+    tease  = script_data.get("next_video_tease", "something big tomorrow")
+    hook   = script_data.get("comment_hook", "What do you think?")
+
+    return (
+        f"🔔 {hook}\n\n"
+        f"Tomorrow on {series['name']}: {tease}\n\n"
+        f"👇 Drop your prediction below — let's see who gets it right."
+    )
+
 def run_pipeline(topic_type="research"):
     log_message(f"=== STARTING DAILY AI PIPIELINE ({topic_type.upper()}) ===")
 
@@ -295,6 +307,12 @@ def run_pipeline(topic_type="research"):
 
     youtube_url = f"https://youtu.be/{result}"
     log_message(f"SUCCESS: {youtube_url}")
+
+    # ── STEP 10b: Generate Pinned Comment ───────────────────────────────────
+    from ecosystem_logic import get_next_slot
+    next_slot = get_next_slot(slot)
+    pinned_comment = generate_pinned_comment(script_data, next_slot)
+    log_message(f"📌 PINNED COMMENT TEMPLATE:\n\n{pinned_comment}\n")
 
     # ── STEP 11: Update Tracker ───────────────────────────────────────────────
     log_message("STEP 11: Updating story tracker...")

@@ -251,6 +251,7 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
     {{"timestamp": 35.0, "text": "Now watch what happens next..."}}
   ],
 
+  "next_video_tease": "One sentence teasing what VJ will cover next (max 8 words, future tense).",
   "identity_cta": "A unique, elite CTA (max 8 words) like 'Join the elite builders.'",
   "phonetic_pronunciation_map": {{
     "AI": "A-I",

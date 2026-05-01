@@ -41,6 +41,23 @@ def get_slot_info():
     
     return day_name, slot, category
 
+SERIES_MAP = {
+    "Slot A": {"name": "⚡ TOOL DROP",     "tagline": "New AI tool. 60 seconds."},
+    "Slot B": {"name": "🔬 MODEL INTEL",   "tagline": "What the labs don't tell you."},
+    "Slot C": {"name": "🧠 DEEP DECODE",   "tagline": "One concept. Fully broken down."},
+}
+
+def get_series_identity(slot):
+    for key, val in SERIES_MAP.items():
+        if key in slot:
+            return val
+    return {"name": "VJ AI NEWS", "tagline": "Daily AI intelligence."}
+
+def get_next_slot(current_slot):
+    if "Slot A" in current_slot: return "Slot B"
+    if "Slot B" in current_slot: return "Slot C"
+    return "Slot A"
+
 def get_category_prompt_enhancement(category, slot):
     """
     Returns specific instructions and formatting for the given category/slot.

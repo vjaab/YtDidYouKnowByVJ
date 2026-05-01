@@ -959,6 +959,68 @@ def _infographic_card_clip(infographic_type, infographic_data,
                 .with_effects([vfx.CrossFadeOut(0.3)]))
 
 
+# ── SERIES IDENTITY: Persistent Badge ──────────────────────────────────────────
+
+def _series_badge(series_name, accent_color, duration):
+    """Top-left persistent series identifier."""
+    f = gf(26)
+    prefix = "▶ "
+    text = prefix + series_name
+    tw, th = ts(text, f)
+    pad_x, pad_y = 18, 10
+    img = Image.new("RGBA", (tw + pad_x*2, th + pad_y*2), (0,0,0,0))
+    draw = ImageDraw.Draw(img)
+    draw.rounded_rectangle([0, 0, img.width, img.height],
+                            radius=12, fill=(*accent_color, 220))
+    draw.text((pad_x, pad_y), text, font=f, fill=(255,255,255,255))
+    arr  = np.array(img.convert("RGB"))
+    mask = np.array(img.split()[3]).astype(float) / 255.0
+    clip = ImageClip(arr, duration=duration)
+    mclip = VideoClip(lambda t: mask, is_mask=True, duration=duration)
+    return clip.with_mask(mclip).with_position((24, 24))
+
+
+def _next_video_tease(tease_text, accent_color, total_dur):
+    """Last 3s teaser card for the next video."""
+    if not tease_text or total_dur < 4:
+        return None
+    dur = 3.0
+    start = total_dur - dur
+    f_label = gf(22)
+    f_tease = gf(36)
+    
+    lw, lh = ts("NEXT UP →", f_label)
+    # Clip text to fit
+    tease_text = tease_text[:40]
+    tw, th = ts(tease_text, f_tease)
+    box_w = max(lw, tw) + 60
+    box_h = lh + th + 50
+
+    img = Image.new("RGBA", (box_w, box_h), (0,0,0,0))
+    draw = ImageDraw.Draw(img)
+    draw.rounded_rectangle([0, 0, box_w, box_h], radius=18,
+                            fill=(0, 0, 0, 200))
+    draw.rectangle([0, 0, box_w, 4], fill=(*accent_color, 255))
+    draw.text((30, 14), "NEXT UP →", font=f_label,
+              fill=(*accent_color, 255))
+    draw.text((30, 14 + lh + 10), tease_text, font=f_tease,
+              fill=(255, 255, 255, 230))
+
+    arr  = np.array(img.convert("RGB"))
+    mask = np.array(img.split()[3]).astype(float) / 255.0
+
+    def opacity(t):
+        if t < 0.4: return t / 0.4
+        if t > dur - 0.4: return max(0, (dur - t) / 0.4)
+        return 1.0
+
+    clip  = ImageClip(arr, duration=dur)
+    mclip = VideoClip(lambda t: mask * opacity(t), is_mask=True, duration=dur)
+    x_pos = (FRAME_W - box_w) // 2
+    y_pos = int(FRAME_H - TITLE_BOTTOM_GAP - box_h - 20)
+    return clip.with_mask(mclip).with_position((x_pos, y_pos)).with_start(start)
+
+
 # ── LAYER E6: Curiosity Timer ("Wait for it...") ─────────────────────────────
 def _curiosity_timer(total_dur):
     """A 'Wait for it...' countdown in the first 5-8 seconds to keep early viewers."""
@@ -2076,6 +2138,12 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     if identity_clip:
         engagement_clips.append(identity_clip)
 
+    # E7: Next-Video Tease (Last 3s)
+    tease_text = script_json.get("next_video_tease", "")
+    tease_clip = _next_video_tease(tease_text, accent_color, audio_duration)
+    if tease_clip:
+        engagement_clips.append(tease_clip)
+
     # ── VISUAL UNDERSTANDING: Infographic Cards from subtitle_chunks ──────────
     subtitle_chunks = script_json.get("subtitle_chunks", [])
     for sch in subtitle_chunks:
@@ -2096,6 +2164,13 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     
     # E6: Curiosity Timer ("Wait for it..." in first 5-8s)
     base_layers = bg_layer_clips + particle_clips + logo_clips + screenshot_clips + engagement_clips
+    
+    # E8: Series Identity Badge
+    from ecosystem_logic import get_series_identity
+    series = get_series_identity(script_json.get("slot", ""))
+    series_badge = _series_badge(series["name"], accent_color, audio_duration)
+    base_layers.append(series_badge)
+
     if avatar_pip:
         base_layers.append(avatar_pip)
     base_layers.extend([tint, gradient, grain_layer, flare_layer, disclosure, watermark])
