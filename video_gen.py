@@ -1829,6 +1829,11 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         engagement_clips.append(identity_clip)
     
     # E6: Curiosity Timer ("Wait for it..." in first 5-8s)
+    base_layers = bg_layer_clips + particle_clips + logo_clips + screenshot_clips + engagement_clips
+    if avatar_pip:
+        base_layers.append(avatar_pip)
+    base_layers.extend([tint, gradient, grain_layer, flare_layer, disclosure, watermark])
+
     curiosity = _curiosity_timer(audio_duration)
     if curiosity:
         base_layers.append(curiosity)
@@ -1897,7 +1902,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
             e_clip = e_clip.with_position(pos).with_effects([vfx.CrossFadeIn(0.2)])
             base_layers.append(e_clip)
 
-   # ── EASTER EGG FRAME (0.05s) ─────────────────────────────────────────────
+    # ── EASTER EGG FRAME (0.05s) ─────────────────────────────────────────────
     egg_ts = random.uniform(audio_duration * 0.4, audio_duration * 0.7)
     egg_img = insert_easter_egg()
     egg_clip = ImageClip(np.array(egg_img)).with_duration(0.05).with_start(egg_ts)
