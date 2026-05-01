@@ -1660,24 +1660,31 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         # ── Color Matching (Ambient Lighting & Shirt Shifting) ──
         def apply_ambient_tint(get_frame, t):
             frame = get_frame(t).astype(np.float32)
-            
-            # 1. Base Ambient Tint (15% across the whole frame)
-            tint = np.array(accent_color, dtype=np.float32)
-            
-            # 2. Targeted Shirt Color Shifting
-            # We target pixels that are likely the shirt (mid-to-high luminance, center-bottom area)
-            lum = (0.299 * frame[:,:,0] + 0.587 * frame[:,:,1] + 0.114 * frame[:,:,2])
-            
-            # Create a localized mask for the torso area (bottom 40%)
             h, w = frame.shape[:2]
+            
+            # 1. Skin Tone Masking (Protect the face from excessive tinting)
+            hsv = cv2.cvtColor(frame.astype(np.uint8), cv2.COLOR_RGB2HSV)
+            # Skin range in HSV
+            skin_mask = cv2.inRange(hsv, (0, 20, 40), (25, 180, 255)).astype(np.float32) / 255.0
+            skin_mask = cv2.GaussianBlur(skin_mask, (31, 31), 0)
+            
+            # 2. Base Ambient Tint & Region Logic
+            tint = np.array(accent_color, dtype=np.float32)
             torso_mask = np.zeros((h, w), dtype=np.float32)
-            torso_mask[int(h*0.6):, :] = 1.0
+            torso_mask[int(h*0.58):, :] = 1.0 # Target the shirt area
+            torso_mask = cv2.GaussianBlur(torso_mask, (51, 51), 0)
             
-            # Apply a stronger (25%) tint to the torso area specifically
-            shirt_tint_factor = 0.25 * torso_mask[:,:,np.newaxis]
+            # 3. Apply Professional Grading
+            # Global ambient light (very subtle)
+            frame = frame * 0.96 + tint * 0.04
             
-            # Blend everything together
-            frame = frame * (1 - 0.15 - shirt_tint_factor) + tint * (0.15 + shirt_tint_factor)
+            # Targeted Shirt Shift (Bold, themed, but avoids the face)
+            shirt_tint_factor = 0.38 * torso_mask * (1.0 - skin_mask)
+            frame = frame * (1.0 - shirt_tint_factor[:,:,np.newaxis]) + tint * shirt_tint_factor[:,:,np.newaxis]
+            
+            # 4. Cinematic Finishing (Contrast & Pop)
+            # Lift the midtones and add a slight pop to the details
+            frame = 127 + 1.12 * (frame - 127) 
             
             return np.clip(frame, 0, 255).astype(np.uint8)
         
