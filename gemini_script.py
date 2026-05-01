@@ -8,12 +8,41 @@ from config import GEMINI_API_KEY, LOGS_DIR
 from topic_tracker import load_tracker, check_story_uniqueness, check_cooldowns
 from ecosystem_logic import get_slot_info, get_category_prompt_enhancement
 
+def get_hottest_tech_topic(client):
+    """Uses Gemini Search grounding to find today's single hottest tech topic."""
+    print("🔥 Fetching hottest tech topic for today...")
+    try:
+        response = client.models.generate_content(
+            model='gemini-2.0-flash',
+            contents=(
+                "What is the single most viral, trending technology or AI news story RIGHT NOW today? "
+                "Return ONLY a JSON object with two fields: "
+                "'topic' (3-6 word phrase, e.g. 'OpenAI GPT-5 launch') and "
+                "'keywords' (list of 4-6 search keywords). No markdown, no explanation."
+            ),
+            config=types.GenerateContentConfig(
+                tools=[{'google_search': {}}]
+            )
+        )
+        raw = response.text.strip().lstrip("```json").lstrip("```").rstrip("```").strip()
+        data = json.loads(raw)
+        print(f"🔥 Hottest Topic Today: {data['topic']}")
+        return data
+    except Exception as e:
+        print(f"⚠️ Could not fetch hot topic: {e}. Proceeding without it.")
+        return None
+
 def pick_and_generate_script(articles=None, extra_instruction="", forced_article=None, topic_type="research"):
     client = genai.Client(api_key=GEMINI_API_KEY)
     
     day_name, slot, category = get_slot_info()
     strategy_enhancement = get_category_prompt_enhancement(category, slot)
     
+    # ── STEP -1.5: FETCH HOTTEST TOPIC ──────────────────────────────────────────
+    hot_topic = get_hottest_tech_topic(client)
+    hot_keywords = [kw.lower() for kw in hot_topic.get("keywords", [])] if hot_topic else []
+    hot_topic_str = hot_topic.get("topic", "") if hot_topic else ""
+
     # ── STEP -2: REPETITION AVOIDANCE ────────────────────────────────────────
     tracker = load_tracker()
     recent_history = tracker.get("history", [])[-15:]
@@ -24,7 +53,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
         print(f"🎯 STEP -1: Using Forced Topic -> {forced_article}")
         news_context = f"FORCED TOPIC TO COVER:\n{forced_article}\n"
     else:
-        # ── STEP 0: FETCH & FILTER ARTICLES ─────────────────────────────────────
+        # ── STEP 0: FETCH & FILTER + RE-RANK BY HOT TOPIC ───────────────────────
         filtered_articles = []
         if articles:
             print(f"📡 STEP 0: Filtering {len(articles)} RSS/Source articles...")
@@ -47,20 +76,35 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
                         break
                 
                 if is_internally_unique:
+                    # ── Score article relevance to hot topic ────────────────────
+                    title_lower = title.lower()
+                    hot_score = sum(1 for kw in hot_keywords if kw in title_lower)
+                    art['_hot_score'] = hot_score
                     filtered_articles.append(art)
                     seen_titles_in_this_batch.append(title)
             
             if not filtered_articles:
                 print("⚠️ No unique articles in RSS batch. Falling back to Gemini Search...")
-                articles = None # Trigger search below
+                articles = None
             else:
+                # Sort: hot topic matches first, then rest
+                filtered_articles.sort(key=lambda x: x.get('_hot_score', 0), reverse=True)
+                top = filtered_articles[0]
+                if top.get('_hot_score', 0) > 0:
+                    print(f"🔥 Hot topic match found in RSS: '{top.get('title')}' (score: {top['_hot_score']})")
+                else:
+                    print(f"ℹ️ No RSS articles matched hot topic. Using top unique article.")
                 print(f"✅ Found {len(filtered_articles)} unique articles in RSS batch.")
                 articles = filtered_articles
 
-        # ── STEP 1: ARTICLE CONTEXT BUILDING ────────────────────────────────────
+        # ── STEP 1: GEMINI SEARCH FALLBACK (biased toward hot topic) ────────────
         if not articles:
-            print(f"🔍 STEP 1: Using Gemini Search for {topic_type} ({category})...")
-            search_query = f"Latest groundbreaking {topic_type} news and research about {category} from the last 24 hours. Focus on technical breakthroughs and company launches."
+            search_subject = hot_topic_str if hot_topic_str else f"{topic_type} about {category}"
+            print(f"🔍 STEP 1: Using Gemini Search for '{search_subject}'...")
+            search_query = (
+                f"Latest breaking news and technical details about: {search_subject}. "
+                f"Focus on announcements, benchmarks, or launches in the last 24 hours."
+            )
             
             try:
                 search_response = client.models.generate_content(
