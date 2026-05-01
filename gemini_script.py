@@ -308,7 +308,7 @@ Return ONLY this exact JSON (no markdown, no explanation) to securely match the 
       "has_infographic": true
     }}
   ],
-  "NOTE_subtitle_chunks": "CRITICAL: Generate 10-15 subtitle_chunks covering the ENTIRE script. You MUST set 'has_infographic': true for at least ONE chunk during the Deep-Dive (between 10-35s) and provide 'infographic_type': 'definition' or 'stat' with relevant 'infographic_data' to anchor the concept visually.",
+  "NOTE_subtitle_chunks": "CRITICAL: Generate 10-15 subtitle_chunks covering the ENTIRE script. You MUST set 'has_infographic': true for at least ONE chunk during the Deep-Dive (between 10-35s). For each infographic chunk, also provide 'infographic_type' (one of: 'definition', 'stat', 'comparison', 'process') AND 'infographic_data' matching the type shape: definition → {{\"term\": \"RAG\", \"definition\": \"Retrieves live data before generating answer\"}} | stat → {{\"value\": \"$4.6B\", \"label\": \"OpenAI 2025 Revenue\"}} | comparison → {{\"left_label\": \"Old\", \"left_val\": \"128K\", \"right_label\": \"New\", \"right_val\": \"1M\"}} | process → {{\"steps\": [\"Step 1\", \"Step 2\", \"Step 3\", \"Step 4\"]}} | Do NOT leave infographic_data empty on any chunk where has_infographic is true.",
   "original_news_headline": "Exact headline",
   "original_news_url": "MANDATORY: Pick the most stable, direct article URL from the SOURCES FOUND section. DO NOT use search results, PDF links, or internal citations. Must be a direct link to the news article for screenshotting.",
   "key_entities": [

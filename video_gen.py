@@ -719,6 +719,246 @@ def _identity_cta_overlay(identity_text, accent_color, total_dur):
     return clip.with_mask(mclip).with_position((x_pos, y_pos)).with_start(start)
 
 
+# ── VISUAL UNDERSTANDING LAYER: Infographic Cards ─────────────────────────────
+
+def _render_definition_card(term, definition, accent_color, width=900):
+    """Glassmorphism definition card: TERM + one-line explanation."""
+    f_term = gf(52)
+    f_def  = gf(34)
+
+    # Word-wrap definition
+    def_words = definition.split()
+    def_lines, cur = [], []
+    for w in def_words:
+        test = " ".join(cur + [w])
+        if ts(test, f_def)[0] > width - 80 and cur:
+            def_lines.append(" ".join(cur)); cur = [w]
+        else:
+            cur.append(w)
+    if cur: def_lines.append(" ".join(cur))
+
+    term_h  = ts("Ag", f_term)[1]
+    def_lh  = ts("Ag", f_def)[1]
+    total_h = 30 + term_h + 16 + len(def_lines) * int(def_lh * 1.4) + 30
+
+    img  = Image.new("RGBA", (width, total_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    # Card background
+    draw.rounded_rectangle([0, 0, width, total_h], radius=22,
+                            fill=(12, 12, 20, 220))
+    # Accent left bar
+    draw.rectangle([0, 0, 6, total_h], fill=(*accent_color, 255))
+    # Top accent label strip
+    draw.rounded_rectangle([12, 10, 160, 38], radius=10,
+                            fill=(*accent_color, 180))
+    draw.text((22, 12), "DEFINITION", font=gf(20), fill=(255, 255, 255, 255))
+
+    # Term (bold, accent)
+    draw.text((20, 44), term.upper(), font=f_term,
+              fill=(*accent_color, 255))
+
+    # Divider
+    div_y = 44 + term_h + 8
+    draw.line([(20, div_y), (width - 20, div_y)],
+              fill=(*accent_color, 60), width=1)
+
+    # Definition lines
+    for i, line in enumerate(def_lines):
+        draw.text((20, div_y + 10 + i * int(def_lh * 1.4)),
+                  line, font=f_def, fill=(220, 220, 220, 255))
+
+    return img
+
+
+def _render_comparison_card(left_label, left_val, right_label, right_val,
+                            accent_color, width=960):
+    """Side-by-side comparison card: X vs Y."""
+    f_label = gf(30)
+    f_val   = gf(52)
+
+    half = width // 2
+    h    = 180
+    img  = Image.new("RGBA", (width, h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    # Left panel (dark)
+    draw.rounded_rectangle([0, 0, half - 6, h], radius=18,
+                            fill=(20, 20, 30, 220))
+    # Right panel (accent tinted)
+    draw.rounded_rectangle([half + 6, 0, width, h], radius=18,
+                            fill=(*[min(255, c // 4) for c in accent_color], 220))
+
+    # VS divider
+    draw.ellipse([half - 28, h // 2 - 28, half + 28, h // 2 + 28],
+                 fill=(*accent_color, 255))
+    draw.text((half, h // 2), "VS", font=gf(26),
+              fill=(255, 255, 255, 255), anchor="mm")
+
+    # Left content
+    lw_l, _ = ts(left_label, f_label)
+    draw.text(((half - 6 - lw_l) // 2, 20), left_label,
+              font=f_label, fill=(160, 160, 180, 255))
+    lw_v, lh_v = ts(left_val, f_val)
+    draw.text(((half - 6 - lw_v) // 2, 70), left_val,
+              font=f_val, fill=(255, 255, 255, 255))
+
+    # Right content
+    rw_l, _ = ts(right_label, f_label)
+    draw.text((half + 6 + (half - 6 - rw_l) // 2, 20), right_label,
+              font=f_label, fill=(200, 200, 220, 255))
+    rw_v, _ = ts(right_val, f_val)
+    draw.text((half + 6 + (half - 6 - rw_v) // 2, 70), right_val,
+              font=f_val, fill=(255, 255, 255, 255))
+
+    return img
+
+
+def _render_process_steps(steps, accent_color, width=960):
+    """Numbered flow steps (up to 4) shown as a horizontal pill row."""
+    n     = min(len(steps), 4)
+    f     = gf(28)
+    pad   = 18
+    h     = 90
+    img   = Image.new("RGBA", (width, h), (0, 0, 0, 0))
+    draw  = ImageDraw.Draw(img)
+
+    col_w = width // n
+    for i, step in enumerate(steps[:n]):
+        x0 = i * col_w + 8
+        x1 = (i + 1) * col_w - 8
+        # Highlight current step darker
+        fill = (*accent_color, 200) if i == 0 else (25, 25, 40, 200)
+        draw.rounded_rectangle([x0, 0, x1, h], radius=16, fill=fill)
+
+        # Step number circle
+        cx = x0 + 30
+        draw.ellipse([cx - 18, h // 2 - 18, cx + 18, h // 2 + 18],
+                     fill=(255, 255, 255, 255))
+        draw.text((cx, h // 2), str(i + 1), font=gf(22),
+                  fill=(*accent_color, 255), anchor="mm")
+
+        # Step text
+        sw, _ = ts(step[:22], f)
+        draw.text((cx + 26, (h - ts("Ag", f)[1]) // 2),
+                  step[:22], font=f, fill=(255, 255, 255, 230))
+
+        # Arrow connector
+        if i < n - 1:
+            ax = x1 + 4
+            draw.polygon([(ax, h // 2 - 8), (ax + 8, h // 2),
+                           (ax, h // 2 + 8)],
+                          fill=(*accent_color, 180))
+
+    return img
+
+
+def _render_stat_card(stat_value, stat_label, accent_color, width=600):
+    """Standalone stat highlight card (bigger than fact box, more context)."""
+    f_val   = gf(100)
+    f_label = gf(32)
+
+    vw, vh = ts(stat_value, f_val)
+    lw, lh = ts(stat_label, f_label)
+    card_w  = max(vw, lw) + 80
+    card_h  = vh + lh + 60
+
+    img  = Image.new("RGBA", (card_w, card_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    draw.rounded_rectangle([0, 0, card_w, card_h], radius=24,
+                            fill=(10, 10, 18, 230))
+    draw.rectangle([0, 0, card_w, 5], fill=(*accent_color, 255))
+
+    # Value — centered
+    draw.text(((card_w - vw) // 2, 20), stat_value,
+              font=f_val, fill=(*accent_color, 255))
+    # Label — centered, dimmer
+    draw.text(((card_w - lw) // 2, 28 + vh), stat_label,
+              font=f_label, fill=(200, 200, 210, 200))
+
+    return img
+
+
+def _infographic_card_clip(infographic_type, infographic_data,
+                            accent_color, start_time, duration, audio_duration):
+    """
+    Dispatcher: reads infographic_type + infographic_data dict from a subtitle_chunk
+    and returns a positioned, animated MoviePy clip (or None).
+
+    Expected infographic_data shapes:
+      definition  → {"term": "RAG", "definition": "Retrieval-Augmented Generation..."}
+      stat        → {"value": "$4.6B", "label": "OpenAI 2025 Revenue"}
+      comparison  → {"left_label": "GPT-4", "left_val": "128K ctx",
+                     "right_label": "GPT-5", "right_val": "1M ctx"}
+      process     → {"steps": ["Fetch", "Embed", "Retrieve", "Generate"]}
+    """
+    if not infographic_data or start_time >= audio_duration:
+        return None
+
+    dur = min(duration + 0.5, audio_duration - start_time)
+    itype = (infographic_type or "").lower()
+
+    try:
+        if itype == "definition":
+            pil = _render_definition_card(
+                infographic_data.get("term", ""),
+                infographic_data.get("definition", ""),
+                accent_color
+            )
+        elif itype == "comparison":
+            pil = _render_comparison_card(
+                infographic_data.get("left_label", "A"),
+                infographic_data.get("left_val", "—"),
+                infographic_data.get("right_label", "B"),
+                infographic_data.get("right_val", "—"),
+                accent_color
+            )
+        elif itype == "process":
+            pil = _render_process_steps(
+                infographic_data.get("steps", []),
+                accent_color
+            )
+        elif itype == "stat":
+            pil = _render_stat_card(
+                infographic_data.get("value", ""),
+                infographic_data.get("label", ""),
+                accent_color
+            )
+        else:
+            return None
+    except Exception as e:
+        print(f"Infographic render error ({itype}): {e}")
+        return None
+
+    arr      = np.array(pil.convert("RGB"))
+    mask_arr = np.array(pil.split()[3]).astype(float) / 255.0
+
+    # Slide-up entrance + fade out
+    iw, ih = pil.size
+    x_pos   = (FRAME_W - iw) // 2
+
+    def opacity_fn(t):
+        if t < 0.25: return t / 0.25
+        if t > dur - 0.35: return max(0, (dur - t) / 0.35)
+        return 1.0
+
+    def y_pos_fn(t):
+        slide = min(t / 0.25, 1.0)
+        # Ease-out: starts 40px below final position
+        eased = 1 - (1 - slide) ** 2
+        return int(FRAME_H * 0.62 + 40 * (1 - eased))
+
+    clip  = VideoClip(lambda t: arr, duration=dur)
+    mclip = VideoClip(lambda t: mask_arr * opacity_fn(t),
+                      is_mask=True, duration=dur)
+
+    return (clip.with_mask(mclip)
+                .with_position(lambda t: (x_pos, y_pos_fn(t)))
+                .with_start(start_time)
+                .with_effects([vfx.CrossFadeOut(0.3)]))
+
+
 # ── LAYER E6: Curiosity Timer ("Wait for it...") ─────────────────────────────
 def _curiosity_timer(total_dur):
     """A 'Wait for it...' countdown in the first 5-8 seconds to keep early viewers."""
@@ -1835,6 +2075,24 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     identity_clip = _identity_cta_overlay(identity_cta, accent_color, audio_duration)
     if identity_clip:
         engagement_clips.append(identity_clip)
+
+    # ── VISUAL UNDERSTANDING: Infographic Cards from subtitle_chunks ──────────
+    subtitle_chunks = script_json.get("subtitle_chunks", [])
+    for sch in subtitle_chunks:
+        if not sch.get("has_infographic"):
+            continue
+        itype = sch.get("infographic_type", "")
+        idata = sch.get("infographic_data", {})
+        i_start = float(sch.get("start", 0))
+        i_dur   = float(sch.get("end", i_start + 3)) - i_start
+
+        card = _infographic_card_clip(
+            itype, idata, accent_color,
+            i_start, i_dur, audio_duration
+        )
+        if card:
+            engagement_clips.append(card)
+            print(f"  📊 Infographic [{itype}] @ {i_start:.1f}s: {list(idata.keys())}")
     
     # E6: Curiosity Timer ("Wait for it..." in first 5-8s)
     base_layers = bg_layer_clips + particle_clips + logo_clips + screenshot_clips + engagement_clips
