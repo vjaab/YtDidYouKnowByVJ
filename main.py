@@ -30,7 +30,7 @@ def log_message(msg):
     print(msg)
 
 
-def format_description(ai_description, script, hashtags, slot="Slot A", chunks=None):
+def format_description(ai_description, script, hashtags, slot="Slot A", chunks=None, relevant_links=[]):
     hashtag_str = " ".join(hashtags) if hashtags else ""
     
     # ── Action-Oriented Summary ──
@@ -55,15 +55,20 @@ def format_description(ai_description, script, hashtags, slot="Slot A", chunks=N
             timestamps_str += f"{ts} {label}\n"
         timestamps_str += "━━━━━━━━━━━━━━━━━━━━━━\n"
 
+    # ── Resources & Blueprints ──
+    links_str = ""
+    if relevant_links:
+        links_str = "\n".join([f"🔗 {link}" for link in relevant_links[:3]]) + "\n"
+
     return f"""🚀 ELITE AI ENGINEERING → https://wa.me/919585793939
 🔥 Automated Agentic Systems & Cost-Optimized AI.
 ━━━━━━━━━━━━━━━━━━━━━━
 💡 {clean_summary}
 {timestamps_str}
 ━━━━━━━━━━━━━━━━━━━━━━
-🛠️ IMPLEMENTATION BLUEPRINT:
+🛠️ IMPLEMENTATION BLUEPRINT & RESOURCES:
 
-🚀 SOTA AGENTIC LOOPS (Local & Cloud Hybrid)
+{links_str if links_str else "🚀 SOTA AGENTIC LOOPS (Local & Cloud Hybrid)"}
 💼 GPU INFRA & COST-OPTIMIZED SCALING
 🛠️ OPEN SOURCE SOVEREIGNTY (Llama, Kokoro, Whisper)
 📰 ARXIV-TO-PRODUCTION WORKFLOWS
@@ -86,11 +91,12 @@ def generate_pinned_comment(script_data, next_series_slot):
     series = get_series_identity(next_series_slot)
     tease  = script_data.get("next_video_tease", "something big tomorrow")
     hook   = script_data.get("comment_hook", "What do you think?")
+    cta    = script_data.get("identity_cta", "Join the elite builders.")
 
     return (
         f"🔔 {hook}\n\n"
         f"Tomorrow on {series['name']}: {tease}\n\n"
-        f"👇 Drop your prediction below — let's see who gets it right."
+        f"👇 {cta}"
     )
 
 def run_pipeline(topic_type="research"):
@@ -303,7 +309,9 @@ def run_pipeline(topic_type="research"):
     # ── STEP 10: YouTube Upload ───────────────────────────────────────────────
     log_message("STEP 10: Uploading to YouTube...")
     ai_desc = script_data.get("description", "")
-    description = format_description(ai_desc, script, hashtags, slot=slot, chunks=chunks)
+    # ── Output Metadata ──
+    relevant_links = script_data.get("relevant_links", [])
+    description = format_description(ai_desc, script, hashtags, slot=slot, chunks=chunks, relevant_links=relevant_links)
     # Ensure variety in titles using the options if generated
     if script_data.get("title_options"):
         title = random.choice(script_data["title_options"])

@@ -877,11 +877,55 @@ def _render_stat_card(stat_value, stat_label, accent_color, width=600):
     draw.text(((card_w - lw) // 2, 28 + vh), stat_label,
               font=f_label, fill=(200, 200, 210, 200))
 
+def _render_flowchart_card(steps, accent_color, width=900):
+    """Vertical architectural flowchart: Step 1 -> Step 2 -> Step 3."""
+    n = min(len(steps), 4)
+    if n == 0: return Image.new("RGBA", (width, 100), (0, 0, 0, 0))
+    
+    step_h = 100
+    gap = 40
+    total_h = n * step_h + (n-1) * gap + 60
+    
+    img = Image.new("RGBA", (width, total_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    f_step = gf(32)
+    f_num = gf(24)
+    
+    # Background glass
+    draw.rounded_rectangle([0, 0, width, total_h], radius=25, fill=(10, 10, 15, 200))
+    
+    for i, step in enumerate(steps[:n]):
+        y0 = 30 + i * (step_h + gap)
+        y1 = y0 + step_h
+        
+        # Step box
+        box_w = width - 100
+        bx0 = 50
+        bx1 = bx0 + box_w
+        
+        draw.rounded_rectangle([bx0, y0, bx1, y1], radius=15, outline=(*accent_color, 150), width=2, fill=(20, 20, 30, 240))
+        
+        # Number badge
+        draw.ellipse([bx0 - 20, y0 + step_h//2 - 20, bx0 + 20, y0 + step_h//2 + 20], fill=(*accent_color, 255))
+        draw.text((bx0, y0 + step_h//2), str(i+1), font=f_num, fill=(255,255,255), anchor="mm")
+        
+        # Step text (Monospace feel)
+        draw.text((bx0 + 40, y0 + step_h//2), step.upper(), font=f_step, fill=(255, 255, 255, 255), anchor="lm")
+        
+        # Connector Arrow
+        if i < n - 1:
+            ay_start = y1 + 5
+            ay_end = y1 + gap - 5
+            ax = bx0 + box_w // 2
+            draw.line([(ax, ay_start), (ax, ay_end)], fill=(*accent_color, 120), width=3)
+            # Arrow head
+            draw.polygon([(ax - 10, ay_end - 10), (ax + 10, ay_end - 10), (ax, ay_end)], fill=(*accent_color, 120))
+            
     return img
 
 
 def _infographic_card_clip(infographic_type, infographic_data,
-                            accent_color, start_time, duration, audio_duration):
+                           accent_color, start_time, duration, audio_duration):
     """
     Dispatcher: reads infographic_type + infographic_data dict from a subtitle_chunk
     and returns a positioned, animated MoviePy clip (or None).
@@ -892,6 +936,7 @@ def _infographic_card_clip(infographic_type, infographic_data,
       comparison  → {"left_label": "GPT-4", "left_val": "128K ctx",
                      "right_label": "GPT-5", "right_val": "1M ctx"}
       process     → {"steps": ["Fetch", "Embed", "Retrieve", "Generate"]}
+      flowchart   → {"steps": ["Step A", "Step B", "Step C"]}
     """
     if not infographic_data or start_time >= audio_duration:
         return None
@@ -923,6 +968,11 @@ def _infographic_card_clip(infographic_type, infographic_data,
             pil = _render_stat_card(
                 infographic_data.get("value", ""),
                 infographic_data.get("label", ""),
+                accent_color
+            )
+        elif itype == "flowchart":
+            pil = _render_flowchart_card(
+                infographic_data.get("steps", []),
                 accent_color
             )
         else:

@@ -210,8 +210,16 @@ CONTENT HIERARCHY (Elite Engineering & Authority):
 3. THE 5-SECOND HOOK: The first 5 seconds are CRITICAL. Start with a surprising statistic, a technical contradiction, or an 'undocumented' tip.
 4. SCANNABLE DEPTH: Use clear linguistic markers (First, Second, Finally) to ensure the technical information is digestible.
 5. EXPLICIT CTA: End every video by telling the viewer exactly what to do next (Check the pinned comment, Join the WhatsApp Dev Channel, etc.).
-- NO PLACEHOLDERS: Do NOT use phrases like 'BRAND NAME' or 'AI COMPANY'. Use real names or describing nouns if names are unavailable.
-- NO HALLUCINATED URLs: Every link provided must exist in the 'SOURCES FOUND' section.
+
+🧠 LINGUISTIC CALIBRATION & REFINEMENT:
+- TECHNICAL GLOSSARY (STRICT): Ensure these are spelled correctly: 'tiktoken', 'fiscal intelligence', 'monumental', 'period', 'LLM Gateway', 'quantization', 'inference'.
+- FILLER WORD BAN: Strictly NO 'basically', 'actually', 'you know', 'just', 'highly', 'very'. Use strong nouns and active verbs.
+- POLISHED NARRATION: Every sentence must be a 'Staff Engineer' level briefing. Disorganized phrasing or repetitive adjectives result in pipeline failure.
+
+🔬 SOURCE INTEGRITY & EVIDENCE:
+- NO VAGUE SOURCES: Do NOT cite 'internal logs' or 'Slack leaks' unless they are public.
+- PUBLIC DISCLOSURE: Prioritize Arxiv papers, official GitHub repos, and corporate engineering blogs (OpenAI, Google, Anthropic).
+- RELEVANT DOCUMENTATION: If the story mentions a library (e.g. LangGraph), provide the official documentation URL in the `sources` field.
 
     🎯 VIEWER RETENTION RULES (EMERGENCY HOOK OVERHAUL):
     1. THE 0.1s VISUAL SHOCK: The very first word must be a "Stop-Your-Scroll" trigger. Use 'Absolute Contradictions' ("This is NOT what it seems...") or 'Statistical Anomalies' ("98% of users are about to lose...").
