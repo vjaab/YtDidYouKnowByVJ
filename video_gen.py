@@ -1729,7 +1729,7 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     draw = ImageDraw.Draw(img)
     
     # Base fonts (Relative scaling for robustness)
-    scale_ratio = frame_width / 1080.0
+    scale_ratio = frame_width / 1080.0 if frame_width < frame_height else frame_width / 1920.0
     base_size = int(85 * scale_ratio)
     pop_size = int(95 * scale_ratio)
     f_main = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', base_size)
@@ -1748,11 +1748,17 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
         bbox = fake_draw.textbbox((0,0), words[i], font=f_current)
         word_widths.append(bbox[2]-bbox[0])
     
-    lines = wrap_text_to_lines(words, word_widths, 900, f_main)
+    max_sub_width = int(frame_width * 0.85)
+    lines = wrap_text_to_lines(words, word_widths, max_sub_width, f_main)
     
-    line_h = 130
+    line_h = int(130 * scale_ratio)
     total_h = len(lines) * line_h
-    start_y = 950 # Moved up slightly more (Avatar PiP ends at 940) to clear the footer CTA
+    
+    # Position: Lower-middle for vertical, bottom for horizontal
+    if frame_width < frame_height:
+        start_y = int(frame_height * 0.5) # Middle for vertical Shorts
+    else:
+        start_y = int(frame_height * 0.75) # Near bottom for longform
 
     # ── READABILITY BOOST: Dark vignette behind subtitles ──
     # Draw a soft dark glow to ensure text pops against white/busy backgrounds

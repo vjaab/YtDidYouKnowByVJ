@@ -261,7 +261,8 @@ def run_pipeline(topic_type="research"):
     # ── STEP 7: Fetch Per-Chunk Visuals (Decision Tree) ───────────────────────
     log_message("STEP 7: Fetching per-chunk visuals from Pexels/Imagen...")
     topic_context = script_data.get("original_news_headline", title)
-    chunks = fetch_all_chunk_visuals(chunks, topic_context=topic_context, script_data=script_data)
+    is_longform = slot == "C"
+    chunks = fetch_all_chunk_visuals(chunks, topic_context=topic_context, script_data=script_data, is_longform=is_longform)
 
     # ── STEP 8: Render Video ──────────────────────────────────────────────────
     log_message("STEP 8: Rendering final video with all engagement layers...")
