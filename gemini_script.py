@@ -26,7 +26,7 @@ NEWS CONTEXT:
 {news_context}
 
 Return ONLY a JSON list of objects:
-[{"angle": "Short title", "insight": "One sentence technical insight", "reason": "Why this matters for devs"}]"""
+[{{ "angle": "Short title", "insight": "One sentence technical insight", "reason": "Why this matters for devs" }}]"""
 
 CRITIQUE_TEMPLATE = """{persona}
 
@@ -251,8 +251,8 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "retention_cues": [{{"timestamp": 3.0, "effect": "zoom_in", "reason": "hook_impact"}}],
   "subtitle_chunks": [{{
       "chunk_id": 1, "text": "Sentence 1", "start": 0.00, "end": 3.50, 
-      "has_infographic": true, "infographic_type": "process", 
-      "infographic_data": {{"steps": ["Step 1", "Step 2"]}}
+      "has_infographic": true, "infographic_type": "process|slide", 
+      "infographic_data": {{"steps": ["Step 1", "Step 2"]}} // If slide: {{"title": "Architecture", "bullet_points": ["Point 1", "Point 2"]}}
   }}],
   "original_news_headline": "Exact headline",
   "original_news_url": "Direct article URL",

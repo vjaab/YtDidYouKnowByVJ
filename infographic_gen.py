@@ -19,7 +19,13 @@ from moviepy import VideoClip, ImageClip
 from config import ASSETS_DIR
 
 FRAME_W, FRAME_H = 1080, 1920
-VISUAL_CENTER_Y = 650  # Center of visual zone (200-1100)
+VISUAL_CENTER_Y = 650  # Center of visual zone for vertical (200-1100)
+VISUAL_CENTER_Y_LONGFORM = 540 # True center for 1080p
+
+def get_dimensions(is_longform):
+    if is_longform:
+        return 1920, 1080, VISUAL_CENTER_Y_LONGFORM
+    return 1080, 1920, VISUAL_CENTER_Y
 
 # ── Font helpers ──────────────────────────────────────────────────────────────
 _FONT_EXTRA_BOLD = os.path.join(ASSETS_DIR, "fonts", "Montserrat-ExtraBold.ttf")
@@ -476,6 +482,68 @@ def _render_growth_card(data, accent_color, progress=1.0):
 # ═══════════════════════════════════════════════════════════════════════════════
 # DISPATCHER — Routes to correct card type
 # ═══════════════════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════════════════════
+# TYPE 7 — SLIDE CARD
+# ═══════════════════════════════════════════════════════════════════════════════
+def _render_slide_card(data, accent_color, progress=1.0, is_longform=False):
+    fw, fh, fcy = get_dimensions(is_longform)
+    canvas = Image.new("RGBA", (fw, fh), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(canvas)
+
+    cw, ch = (1400, 700) if is_longform else (920, 600)
+    cx = (fw - cw) // 2
+    cy = fcy - ch // 2
+
+    _draw_card_bg(draw, cx, cy, cw, ch, accent_color)
+
+    title = data.get("title", "Technical Architecture")
+    bullets = data.get("bullet_points", [])
+
+    # Title
+    ft = _eb(60 if is_longform else 50)
+    _center_text(draw, title, ft, cy + 40, (*accent_color, 255), cx, cw)
+    
+    # Divider line
+    line_w = int((cw - 80) * progress)
+    if line_w > 0:
+        draw.line([(cx + 40, cy + 130), (cx + 40 + line_w, cy + 130)], fill=(*accent_color, 200), width=3)
+
+    # Bullets (progressive reveal)
+    fb = _bold(40 if is_longform else 34)
+    start_y = cy + 180
+    for i, bullet in enumerate(bullets):
+        bullet_progress = min(1.0, progress * (len(bullets) + 1) - i)
+        if bullet_progress <= 0:
+            continue
+            
+        alpha = int(255 * min(1.0, bullet_progress * 2))
+        
+        # Draw dot
+        dot_y = start_y + i * 80 + (25 if is_longform else 20)
+        draw.ellipse([cx + 60, dot_y - 8, cx + 76, dot_y + 8], fill=(*accent_color, alpha))
+        
+        # Word wrap bullet
+        max_bw = cw - 160
+        words = str(bullet).split()
+        lines = []
+        cur = []
+        for w in words:
+            test = " ".join(cur + [w])
+            if _ts(test, fb)[0] > max_bw and cur:
+                lines.append(" ".join(cur))
+                cur = [w]
+            else:
+                cur.append(w)
+        if cur:
+            lines.append(" ".join(cur))
+            
+        by = start_y + i * 80
+        for b_line in lines:
+            draw.text((cx + 100, by), b_line, font=fb, fill=(255, 255, 255, alpha))
+            by += 45
+
+    return canvas
+
 _TYPE_MAP = {
     "stat": _render_stat_card,
     "funding_stat": _render_stat_card,
@@ -485,13 +553,14 @@ _TYPE_MAP = {
     "ranking": _render_ranking_card,
     "growth": _render_growth_card,
     "percentage": _render_growth_card,
+    "slide": _render_slide_card,
 }
 
 
-def render_infographic(infographic_type, infographic_data, accent_color, progress=1.0):
+def render_infographic(infographic_type, infographic_data, accent_color, progress=1.0, is_longform=False):
     """
     Renders an infographic card frame.
-    Returns a PIL RGBA Image (1080x1920).
+    Returns a PIL RGBA Image.
     Now includes dynamic parsing for unstructured data from Gemini.
     """
     # STEP 2.2: Dynamic Data Injection Logic
@@ -517,13 +586,22 @@ def render_infographic(infographic_type, infographic_data, accent_color, progres
             pass # Fall back to using the string as a headline if parsing fails
 
     renderer = _TYPE_MAP.get(infographic_type, _render_stat_card)
-    return renderer(infographic_data, accent_color, progress)
+    
+    # We pass is_longform to slide renderer only for now, or adapt others later.
+    import inspect
+    sig = inspect.signature(renderer)
+    if "is_longform" in sig.parameters:
+        return renderer(infographic_data, accent_color, progress, is_longform=is_longform)
+    else:
+        # Fallback to overriding global for older renderers inside their scope
+        # It's better to just pass it in or accept they render at 1080x1920 center.
+        return renderer(infographic_data, accent_color, progress)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # MoviePy clip builder — builds animated clip for a chunk
 # ═══════════════════════════════════════════════════════════════════════════════
-def build_infographic_clip(chunk, accent_color):
+def build_infographic_clip(chunk, accent_color, is_longform=False):
     """
     Builds a MoviePy clip for an infographic card with:
       - Entry: scale 0.85→1.0 + fade in (0.3s)
@@ -539,6 +617,7 @@ def build_infographic_clip(chunk, accent_color):
     if dur < 0.2:
         return None, None
 
+    fw, fh, fcy = get_dimensions(is_longform)
     fade_in = 0.3
     fade_out = 0.2
     count_dur = min(1.5, dur * 0.6)  # Count-up animation duration
@@ -546,12 +625,12 @@ def build_infographic_clip(chunk, accent_color):
     def make_frame(t):
         # Progress for count-up animation
         progress = min(1.0, t / count_dur) if count_dur > 0 else 1.0
-        img = render_infographic(info_type, info, accent_color, progress)
+        img = render_infographic(info_type, info, accent_color, progress, is_longform=is_longform)
         return np.array(img.convert("RGB"))
 
     def make_mask(t):
         progress = min(1.0, t / count_dur) if count_dur > 0 else 1.0
-        img = render_infographic(info_type, info, accent_color, progress)
+        img = render_infographic(info_type, info, accent_color, progress, is_longform=is_longform)
         mask_arr = np.array(img.split()[3]).astype(float) / 255.0
 
         # Fade in
@@ -568,15 +647,15 @@ def build_infographic_clip(chunk, accent_color):
     card_clip = card_clip.with_mask(card_mask).with_start(start)
 
     # Dark overlay behind card (0.75 opacity)
-    overlay_arr = np.zeros((FRAME_H, FRAME_W, 3), dtype=np.uint8)
+    overlay_arr = np.zeros((fh, fw, 3), dtype=np.uint8)
 
     def overlay_mask(t):
         base = 0.75
         if t < fade_in:
-            return np.full((FRAME_H, FRAME_W), base * (t / fade_in))
+            return np.full((fh, fw), base * (t / fade_in))
         if dur - t < fade_out:
-            return np.full((FRAME_H, FRAME_W), base * max(0, (dur - t) / fade_out))
-        return np.full((FRAME_H, FRAME_W), base)
+            return np.full((fh, fw), base * max(0, (dur - t) / fade_out))
+        return np.full((fh, fw), base)
 
     overlay_clip = VideoClip(lambda t: overlay_arr, duration=dur)
     overlay_mask_clip = VideoClip(overlay_mask, is_mask=True, duration=dur)

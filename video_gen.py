@@ -926,6 +926,40 @@ def _render_flowchart_card(steps, accent_color, width=900):
             
     return img
 
+def _render_slide_card(title, bullets, accent_color, is_longform=False):
+    h = 600 if not is_longform else 800
+    w = 900 if not is_longform else 1500
+    pil = Image.new("RGBA", (w, h), (0,0,0,0))
+    d = ImageDraw.Draw(pil)
+    bg = (20,20,30,235)
+    d.rounded_rectangle([0,0,w,h], 40, fill=bg, outline=accent_color, width=4)
+    
+    cx = w // 2
+    f_title = gf(50 if not is_longform else 70)
+    
+    # Title
+    ttw, tth = ts(title, f_title)
+    d.text((cx - ttw//2, 40), title, fill=(*accent_color, 255), font=f_title)
+    
+    # Divider
+    d.line([(40, 130), (w - 40, 130)], fill=(*accent_color, 200), width=3)
+    
+    # Bullets
+    f_bullet = gf(35 if not is_longform else 50)
+    start_y = 180
+    by = start_y
+    for i, bullet in enumerate(bullets):
+        dot_y = by + (20 if not is_longform else 30)
+        d.ellipse([60, dot_y - 8, 76, dot_y + 8], fill=(*accent_color, 255))
+        
+        b_lines = wrap_text_to_lines(str(bullet).split(), [ts(wd, f_bullet)[0] for wd in str(bullet).split()], w - 160, f_bullet)
+        for line_words in b_lines:
+            d.text((100, by), " ".join(line_words), font=f_bullet, fill=(255,255,255,255))
+            by += 45 if not is_longform else 65
+        by += 20
+            
+    return pil
+
 
 def _infographic_card_clip(infographic_type, infographic_data,
                            accent_color, start_time, duration, audio_duration):
@@ -977,6 +1011,15 @@ def _infographic_card_clip(infographic_type, infographic_data,
             pil = _render_flowchart_card(
                 infographic_data.get("steps", []),
                 accent_color
+            )
+        elif itype == "slide":
+            # Slide uses is_longform from FRAME_W constant check
+            is_longform = FRAME_W == 1920
+            pil = _render_slide_card(
+                infographic_data.get("title", "Architecture"),
+                infographic_data.get("bullet_points", []),
+                accent_color,
+                is_longform=is_longform
             )
         else:
             return None
@@ -2181,7 +2224,22 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         engagement_clips.append(hook_overlay)
 
     # ── COMPOSITING ──
-    base_layers = bg_layer_clips + screenshot_clips + [tint, gradient] + particle_clips + logo_clips
+    # Collect infographics logic
+    infographic_clips = []
+    for chunk in chunks:
+        if chunk.get("has_infographic") and chunk.get("infographic_type"):
+            iclip = _infographic_card_clip(
+                chunk.get("infographic_type"),
+                chunk.get("infographic_data", {}),
+                accent_color,
+                chunk.get("start", 0),
+                chunk.get("duration", 2),
+                audio_duration
+            )
+            if iclip:
+                infographic_clips.append(iclip)
+
+    base_layers = bg_layer_clips + screenshot_clips + [tint, gradient] + particle_clips + logo_clips + infographic_clips
     if flare_layer: base_layers.append(flare_layer)
     if grain_layer: base_layers.append(grain_layer)
     if avatar_pip: base_layers.append(avatar_pip)
