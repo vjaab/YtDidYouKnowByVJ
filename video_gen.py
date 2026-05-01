@@ -960,6 +960,48 @@ def _render_slide_card(title, bullets, accent_color, is_longform=False):
             
     return pil
 
+class InfographicAuditEngine:
+    """Gemini Vision UI/UX Auditor. Critiques generated infographics and text layout."""
+    def __init__(self, api_key):
+        self.api_key = api_key
+        
+    def audit_infographic(self, pil_image, expected_data, infographic_type):
+        if not self.api_key: return {"score": 10, "needs_refinement": False, "refined_data": expected_data}
+        print(f"👁️ [INFO LOOP] Gemini Vision is auditing the '{infographic_type}' layout...")
+        try:
+            from google import genai
+            import io, json
+            
+            client = genai.Client(api_key=self.api_key)
+            img_byte_arr = io.BytesIO()
+            pil_image.save(img_byte_arr, format='PNG')
+            img_bytes = img_byte_arr.getvalue()
+            
+            prompt = (
+                f"You are a Senior UX/UI Designer. An automated pipeline generated this '{infographic_type}' slide.\n"
+                f"Original Data Sent: {json.dumps(expected_data)}\n"
+                "CRITICAL TASK:\n"
+                "1. Does the text physically overflow its visual bounding box, run off-screen, or overlap other elements poorly?\n"
+                "2. Is the text so dense that it is illegible in a fast-paced 40-second video format?\n"
+                "If YES to either: set 'needs_refinement': true, and drastically abbreviate/summarize the text in 'refined_data' so it will fit beautifully in the next render pass.\n"
+                "If PERFECT: set 'needs_refinement': false and return the original data.\n\n"
+                "Return EXACTLY this JSON:\n"
+                "{\n"
+                "  \"score\": 1-10,\n"
+                "  \"issues\": \"Short diagnosis of visual overlap/density\",\n"
+                "  \"needs_refinement\": true,\n"
+                "  \"refined_data\": { ... shortened data structured EXACTLY like Original Data Sent ... }\n"
+                "}"
+            )
+            response = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=[{'mime_type': 'image/png', 'data': img_bytes}, prompt]
+            )
+            raw = response.text.strip().lstrip("```json").lstrip("```").rstrip("```").strip()
+            return json.loads(raw)
+        except Exception as e:
+            print(f"⚠️ Infographic Audit Failed: {e}")
+            return {"score": 10, "needs_refinement": False, "refined_data": expected_data}
 
 def _infographic_card_clip(infographic_type, infographic_data,
                            accent_color, start_time, duration, audio_duration):
@@ -982,47 +1024,68 @@ def _infographic_card_clip(infographic_type, infographic_data,
     itype = (infographic_type or "").lower()
 
     try:
-        if itype == "definition":
-            pil = _render_definition_card(
-                infographic_data.get("term", ""),
-                infographic_data.get("definition", ""),
-                accent_color
-            )
-        elif itype == "comparison":
-            pil = _render_comparison_card(
-                infographic_data.get("left_label", "A"),
-                infographic_data.get("left_val", "—"),
-                infographic_data.get("right_label", "B"),
-                infographic_data.get("right_val", "—"),
-                accent_color
-            )
-        elif itype == "process":
-            pil = _render_process_steps(
-                infographic_data.get("steps", []),
-                accent_color
-            )
-        elif itype == "stat":
-            pil = _render_stat_card(
-                infographic_data.get("value", ""),
-                infographic_data.get("label", ""),
-                accent_color
-            )
-        elif itype == "flowchart":
-            pil = _render_flowchart_card(
-                infographic_data.get("steps", []),
-                accent_color
-            )
-        elif itype == "slide":
-            # Slide uses is_longform from FRAME_W constant check
-            is_longform = FRAME_W == 1920
-            pil = _render_slide_card(
-                infographic_data.get("title", "Architecture"),
-                infographic_data.get("bullet_points", []),
-                accent_color,
-                is_longform=is_longform
-            )
-        else:
-            return None
+        current_data = infographic_data
+        max_iters = 1
+        pil = None
+        
+        for i in range(max_iters + 1):
+            if itype == "definition":
+                pil = _render_definition_card(
+                    current_data.get("term", ""),
+                    current_data.get("definition", ""),
+                    accent_color
+                )
+            elif itype == "comparison":
+                pil = _render_comparison_card(
+                    current_data.get("left_label", "A"),
+                    current_data.get("left_val", "—"),
+                    current_data.get("right_label", "B"),
+                    current_data.get("right_val", "—"),
+                    accent_color
+                )
+            elif itype == "process":
+                pil = _render_process_steps(
+                    current_data.get("steps", []),
+                    accent_color
+                )
+            elif itype == "stat":
+                pil = _render_stat_card(
+                    current_data.get("value", ""),
+                    current_data.get("label", ""),
+                    accent_color
+                )
+            elif itype == "flowchart":
+                pil = _render_flowchart_card(
+                    current_data.get("steps", []),
+                    accent_color
+                )
+            elif itype == "slide":
+                is_longform = FRAME_W == 1920
+                pil = _render_slide_card(
+                    current_data.get("title", "Architecture"),
+                    current_data.get("bullet_points", []),
+                    accent_color,
+                    is_longform=is_longform
+                )
+            else:
+                return None
+                
+            # Act Loop: Evaluate with Auditor
+            if isinstance(pil, Image.Image):
+                auditor = InfographicAuditEngine(GEMINI_API_KEY)
+                feedback = auditor.audit_infographic(pil, current_data, itype)
+                
+                if feedback.get("needs_refinement", False) and i < max_iters:
+                    print(f"🔄 [INFO LOOP] Refining {itype}: {feedback.get('issues')}")
+                    current_data = feedback.get("refined_data", current_data)
+                    continue
+                else:
+                    if "score" in feedback:
+                        print(f"⭐ [INFO LOOP] {itype} approved (Score: {feedback.get('score', 10)})")
+                    break
+            else:
+                return None
+                
     except Exception as e:
         print(f"Infographic render error ({itype}): {e}")
         return None
