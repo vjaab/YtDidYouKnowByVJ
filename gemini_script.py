@@ -158,6 +158,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
             "1. MUST have deep technical complexity or 'Long-tail' consequences.\n"
             "2. MUST be explainable in 120-180s of expert-level technical speech.\n"
             "3. MUST contain 3 concrete takeaways or 'Mental Models' for the viewer.\n"
+            "4. PRIORITIZE: Documentation 'Easter Eggs' or undocumented engineering tips that provide extreme utility.\n"
         )
     else:
         selection_instruction = (
@@ -165,11 +166,13 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
             "SELECTION FILTERS:\n"
             "1. MUST be New, Useful, or Surprising (Absolute mandatory).\n"
             "2. MUST be explainable in exactly <40s of dense technically-accurate speech.\n"
-            "3. MUST contain one concrete takeaway the viewer can use today.\n\n"
+            "3. MUST contain one concrete takeaway or engineering tip the viewer can use today.\n"
+            "4. PRIORITIZE: Optimization tips, cost-saving architecture, or workflow 'unfair advantages'.\n\n"
             "CONTENT MIX (Algorithm Target):\n"
-            "- 40% Practical AI Tools (Automation, Dev tools, Productivity hacks).\n"
-            "- 40% Frontier AI Model Releases (OpenAI, Google DeepMind, Anthropic).\n"
-            "- 20% Core AI Concepts explained simply (RAG, Agents, Memory systems).\n\n"
+            "- 30% Practical AI Tools (Automation, Dev tools, SDKs).\n"
+            "- 40% Frontier AI Model Releases (OpenAI, DeepMind, Anthropic benchmarks).\n"
+            "- 15% Core AI Concepts (RAG, Agents, LLM architecture).\n"
+            "- 15% AI Dev Tips (Best practices, optimization, debugging, & engineering hacks).\n\n"
             "HOOK ALIGNMENT (DROP TEST):\n"
             "If the topic doesn't produce a strong 'Winner' hook (Stat, Absolute Contradiction, or 'You are using this wrong'), DROP IT and pick another.\n"
         )
