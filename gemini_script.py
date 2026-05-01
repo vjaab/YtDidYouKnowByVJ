@@ -177,19 +177,20 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
     day_name, slot, category = get_slot_info()
     strategy_enhancement = get_category_prompt_enhancement(category, slot)
     
-    prompt = f"""Act as a Senior AI Investigative Journalist & Creative Director for a 2026 YouTube Content Ecosystem. 
-Your goal is to transform technical RSS/Research data into a "Deep-Dive" YouTube Short that balances analytical rigor with high-retention visual storytelling.
+    prompt = f"""Act as a Staff AI Engineer and Technical Architect for an elite AI research channel. 
+Your goal is to transform technical RSS/Research data into high-density insights for software developers and AI engineers. 
+Balance implementation logic with architectural depth. Stop doing 'generic tech news' and start providing 'technical utility'.
 
 TODAY'S STRATEGY: 
 Day: {day_name}
 Slot: {slot}
 {strategy_enhancement}
 
-CONTENT HIERARCHY (Technical Depth & Monetization Balance):
-1. CORE TECHNICAL BREAKTHROUGH & CONTRARIAN INSIGHT (50%): Deliver the actual meat but with a twist. Don't just report—explain why this matters less/more than people think.
-2. SIMPLIFIED CONCEPTUAL ANCHOR (30%): Explain the 'HOW' using high-velocity analogies (Under 5 words).
-3. ONE CONCRETE TAKEAWAY (20%): What should the viewer do right now with this information?
-4. VJ's SIGNATURE STYLE (10%): Human-like starts: "Wait, hold on...", "Actually...".
+CONTENT HIERARCHY (Technical Utility & Dev Focus):
+1. TECHNICAL PROOF & ARCHITECTURAL INSIGHT (50%): Deliver the actual engineering 'how'. Focus on benchmarks, library specifics, or specific logic shifts.
+2. IMPLEMENTATION ANCHOR (30%): Explain the 'HOW' through the lens of a developer's workflow. 
+3. ACTUAL TAKEAWAY (20%): Provide a specific library, command, or architectural pattern the viewer can use in their code today.
+4. VJ's EXPERT TONE (10%): Start like a peer-to-peer dev briefing: "Look at the logic here...", "The implementation is actually quite simple..."
 
 🏆 CONCEPT CLARITY & EDUCATIONAL VALUE (SCALED FOR SHORTS):
 - HIGH-VELOCITY ANALOGIES: For every technical concept (e.g., 'Inference Latency'), use a 4-5 word real-world analogy (e.g., 'the brain's reaction time').

@@ -33,31 +33,31 @@ def log_message(msg):
 def format_description(ai_description, script, hashtags):
     hashtag_str = " ".join(hashtags) if hashtags else ""
     
-    return f"""🚀 FOLLOW FOR MORE UPDATES (WhatsApp) → https://wa.me/919585793939
-🔥 Stay ahead of the curve — join my channel!
+    return f"""🚀 LEVEL UP YOUR AI DEV STEACK → https://wa.me/919585793939
+🔥 Practical AI implementation & engineering insights.
 ━━━━━━━━━━━━━━━━━━━━━━
 {ai_description}
 ━━━━━━━━━━━━━━━━━━━━━━
-💡 In 2026, you're either the one using AI, or the one being replaced by it.
+💡 In 2026, the best engineers aren't just coding—they're orchestrating.
 
-I share what top devs & AI engineers are reading right now:
+I share the technical blueprints top AI labs use:
 
-🚀 Hottest AI research (before it goes viral)
-💼 High-paying jobs & hiring alerts
-🛠️ Dev tools & resources that save hours
-📰 Deep tech research that actually matters
+🚀 SOTA Model Benchmarks (Real data, no hype)
+💼 AI Infrastructure & GPU orchestration
+🛠️ Dev tools that actually speed up your workflow
+📰 Arxiv paper breakdowns for working devs
 
-Don't miss out — join free today 👇
+Join the elite build community 👇
 
 🚀 Telegram → https://t.me/technewsbyvj
 💼 LinkedIn → https://www.linkedin.com/in/vijayakumar-j/
-💬 WhatsApp Channel → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
+💬 WhatsApp Dev Channel → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
 
-🔗 (Links also in Channel Header/Bio!)
+🔗 (Engineering resources in Bio!)
 ━━━━━━━━━━━━━━━━━━━━━━
 
 {hashtag_str}
-#airesearch #shorts #machinelearning #ai #youtubeshorts #dailyfacts"""
+#aidev #softwareengineering #machinelearning #python #aiarchitecture #shorts"""
 
 
 def generate_pinned_comment(script_data, next_series_slot):
