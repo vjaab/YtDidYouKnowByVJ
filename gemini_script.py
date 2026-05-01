@@ -202,6 +202,14 @@ CONTENT HIERARCHY (Technical Utility & Dev Focus):
 
 🏆 LINGUISTIC INTEGRITY (STRICT ERROR PREVENTION):
 - PERFECT SPELLING: Manually check every word. Do NOT use phonetic-style spelling like 'cog native' or 'manumental'. Use proper English: 'cognitive', 'monumental', 'period'.
+- DENSE PACING: No filler words. Every sentence must drive a new technical insight.
+
+🥇 CONTENT CREATION FRAMEWORK (THE GOLD STANDARD):
+1. DEFINE CLEAR GOAL: Every script must primarily EDUCATE and INSPIRE.
+2. AUDIENCE PAIN POINTS: Address the specific interests and preferences of software developers.
+3. THE 5-SECOND HOOK: The first 5 seconds are CRITICAL. Start with a surprising statistic, a technical contradiction, or an 'undocumented' tip.
+4. SCANNABLE DEPTH: Use clear linguistic markers (First, Second, Finally) to ensure the technical information is digestible.
+5. EXPLICIT CTA: End every video by telling the viewer exactly what to do next (Check the pinned comment, Join the WhatsApp Dev Channel, etc.).
 - NO PLACEHOLDERS: Do NOT use phrases like 'BRAND NAME' or 'AI COMPANY'. Use real names or describing nouns if names are unavailable.
 - NO HALLUCINATED URLs: Every link provided must exist in the 'SOURCES FOUND' section.
 
