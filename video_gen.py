@@ -2023,6 +2023,10 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                 return np.array(img.filter(ImageFilter.GaussianBlur(radius=3*p))).astype(float)/255.0
             return VideoClip(mf, duration=duration).with_mask(VideoClip(mm, is_mask=True, duration=duration))
 
+        # ── COMPLIANCE & BRANDING (Simplified for Elite Aesthetic) ────────────────
+        # Watermarks and disclosures removed to ensure clean professional look
+        disclosure = None
+        watermark = None
         pane = _hud_pane(audio_duration, accent_color)
         
 
@@ -2142,7 +2146,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
 
     if avatar_pip:
         base_layers.append(avatar_pip)
-    base_layers.extend([tint, gradient, grain_layer, flare_layer, disclosure, watermark])
+    base_layers.extend([tint, gradient, grain_layer, flare_layer]) # Watermark/Disclosure removed
 
     curiosity = _curiosity_timer(audio_duration)
     if curiosity:

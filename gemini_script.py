@@ -167,7 +167,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
             "1. MUST be New, Useful, or Surprising (Absolute mandatory).\n"
             "2. MUST be explainable in exactly <40s of dense technically-accurate speech.\n"
             "3. MUST contain one concrete takeaway or engineering tip the viewer can use today.\n"
-            "4. PRIORITIZE: Optimization tips, cost-saving architecture, or workflow 'unfair advantages'.\n\n"
+            "4. PRIORITIZE: Documentation 'Easter Eggs', cost-saving architecture (Local models), or workflow 'unfair advantages' (Agentic loops).\n\n"
             "CONTENT MIX (Algorithm Target):\n"
             "- 30% Practical AI Tools (Automation, Dev tools, SDKs).\n"
             "- 40% Frontier AI Model Releases (OpenAI, DeepMind, Anthropic benchmarks).\n"
@@ -180,20 +180,20 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
     day_name, slot, category = get_slot_info()
     strategy_enhancement = get_category_prompt_enhancement(category, slot)
     
-    prompt = f"""Act as a Staff AI Engineer and Technical Architect for an elite AI research channel. 
-Your goal is to transform technical RSS/Research data into high-density insights for software developers and AI engineers. 
-Balance implementation logic with architectural depth. Stop doing 'generic tech news' and start providing 'technical utility'.
+    prompt = f"""Act as a Staff AI Engineer and Technical Architect specializing in Hybrid Architectures and Agentic Design. 
+Your goal is to build high-authority technical insights that help developers move from 'generic AI prompts' to 'scalable, cost-optimized agentic systems'.
+Prioritize local open-source models (LMMs), hybrid cloud-local routing, and architectural blueprints that replace recurring API costs.
 
 TODAY'S STRATEGY: 
 Day: {day_name}
 Slot: {slot}
 {strategy_enhancement}
 
-CONTENT HIERARCHY (Technical Utility & Dev Focus):
-1. TECHNICAL PROOF & ARCHITECTURAL INSIGHT (50%): Deliver the actual engineering 'how'. Focus on benchmarks, library specifics, or specific logic shifts.
-2. IMPLEMENTATION ANCHOR (30%): Explain the 'HOW' through the lens of a developer's workflow. 
-3. ACTUAL TAKEAWAY (20%): Provide a specific library, command, or architectural pattern the viewer can use in their code today.
-4. VJ's EXPERT TONE (10%): Start like a peer-to-peer dev briefing: "Look at the logic here...", "The implementation is actually quite simple..."
+CONTENT HIERARCHY (Elite Engineering & Authority):
+1. HYBRID ARCHITECTURE & COST-OPTIMIZATION (50%): Deliver the actual engineering 'how' for dropping API costs or running local weights (GGUF, vLLM).
+2. AGENTIC SYSTEM DESIGN (30%): Explain self-correcting loops, multi-agent orchestration, and tool-use logic. 
+3. REDUCING OPERATIONAL NOISE (20%): Provide a specific library, local model (e.g. Kokoro TTS), or pattern to replace a paid service.
+4. VJ's ARCHITECT TONE (10%): Pe-to-peer technical briefing: "The hybrid logic here is key...", "If you're still paying for [API], look at this local alternative..."
 
 🏆 CONCEPT CLARITY & EDUCATIONAL VALUE (SCALED FOR SHORTS):
 - HIGH-VELOCITY ANALOGIES: For every technical concept (e.g., 'Inference Latency'), use a 4-5 word real-world analogy (e.g., 'the brain's reaction time').

@@ -21,12 +21,12 @@ def get_slot_info():
     # Schedule Matrix
     # (Day, Slot A Category, Slot B Category)
     matrix = {
-        "Mon": ("Model Benchmarks", "Prompt Engineering"),
-        "Tue": ("Dev Tooling", "Workflow Optimization"),
-        "Wed": ("Architecture Patterns", "AI Infrastructure"),
-        "Thu": ("Library Spotlight", "API Deep-Dive"),
-        "Fri": ("Paper Breakdown", "SOTA Analysis"),
-        "Sat": ("AI Build", "Open Source Focus"),
+        "Mon": ("Model Benchmarks", "Agentic System Design"),
+        "Tue": ("Cost-Optimized AI", "Local LMM Apps"),
+        "Wed": ("Research-to-Production", "AI Infrastructure"),
+        "Thu": ("Hybrid Architectures", "API Deep-Dive"),
+        "Fri": ("SOTA Benchmarking", "Agentic Orchestration"),
+        "Sat": ("Open Source Focus", "Build-with-VJ"),
         "Sun": ("Weekly Recap (Dev)", "Future Roadmap")
     }
     
@@ -42,9 +42,9 @@ def get_slot_info():
     return day_name, slot, category
 
 SERIES_MAP = {
-    "Slot A": {"name": "⚡ DEV STACK",      "tagline": "Tooling the future of AI."},
-    "Slot B": {"name": "🔬 ENGINE ROOM",    "tagline": "How the models actually work."},
-    "Slot C": {"name": "🧠 ARCHITECTURE",   "tagline": "Deep-dives for systems engineers."},
+    "Slot A": {"name": "⚡ AGENTIC OPS",     "tagline": "Architecting autonomous systems."},
+    "Slot B": {"name": "🔬 HYBRID AI",       "tagline": "Local models. Production scale."},
+    "Slot C": {"name": "🧠 SYSTEM DESIGN",   "tagline": "High-level deep dives for architects."},
 }
 
 def get_series_identity(slot):
@@ -66,77 +66,59 @@ def get_category_prompt_enhancement(category, slot):
     base_utility = "FOCUS: Retention/Value. Use specific 'how-to' or interactive content. Target deep utility and subscriber loyalty."
     
     enhancements = {
-        "Model Benchmarks": f"""
-            CATEGORY: Model Benchmarks (The Truth Layer).
+        "Agentic System Design": f"""
+            CATEGORY: Agentic System Design (The New Standard).
             STRATEGY: {base_discovery}
-            GOAL: Break down new model performance. Forget the marketing; focus on token speed, reasoning accuracy, and code-gen reliability.
-            HOOK: 'Everyone is hype about [Model], but here's how it actually handles a real-world edge case.'
+            GOAL: Focus on autonomous loops, self-correction, and tool-use architecture.
+            HOOK: 'Static prompts are dead. Agentic loops are how you actually build production AI.'
         """,
-        "Prompt Engineering": f"""
-            CATEGORY: Prompt Engineering (The Interface).
+        "Cost-Optimized AI": f"""
+            CATEGORY: Cost-Optimized AI (The Margin Layer).
             STRATEGY: {base_utility}
-            GOAL: Share a specific advanced prompting technique like Chain-of-Thought, Metaprompting, or XML-structured inputs.
-            HOOK: 'Stop using basic prompts. This structural change boosted my AI's accuracy by 40%.'
+            GOAL: Show how to drop API costs by 80% using local quantization (vLLM, Ollama, GGUF).
+            HOOK: 'Your Claude bill is too high. Here is the local stack that matches its performance for $0.'
         """,
-        "Dev Tooling": f"""
-            CATEGORY: Dev Tooling (The Workbench).
+        "Local LMM Apps": f"""
+            CATEGORY: Local LMM Apps (Privacy & Speed).
             STRATEGY: {base_utility}
-            GOAL: Spotlight a specific IDE extension, CLI tool, or SDK that speeds up AI-assisted development.
-            HOOK: 'I found the missing link in my dev stack. Every AI engineer needs [Tool].'
+            GOAL: Showcase Kokoro TTS, Whisper local, or Llama.cpp implementations.
+            HOOK: 'SOTA performance with zero latency and total privacy. Let\'s build [App] locally.'
         """,
-        "Workflow Optimization": f"""
-            CATEGORY: Workflow Optimization (Scale).
+        "Research-to-Production": f"""
+            CATEGORY: Research-to-Production (Theory to Code).
             STRATEGY: {base_discovery}
-            GOAL: Discuss how to integrate AI agents into CI/CD, testing, or documentation pipelines.
-            HOOK: 'Don't just use AI to write code. Here is how I automated my entire [Workflow].'
+            GOAL: Summarize a new Arxiv paper and show the exact Python class needed to implement it.
+            HOOK: 'This [Lab] paper just solved [Problem]. Here is the 10-line implementation.'
         """,
-        "Architecture Patterns": f"""
-            CATEGORY: Architecture Patterns (The Blueprint).
+        "Hybrid Architectures": f"""
+            CATEGORY: Hybrid Architectures (Professional Scale).
             STRATEGY: {base_discovery}
-            GOAL: Explain deep patterns like RAG, Agentic Orchestration, or Vector Database sharding.
-            HOOK: 'Retrieval is easy. RAG at scale is hard. Here's how top labs solve [Problem].'
+            GOAL: Explain combining local small models with frontier cloud models for efficiency.
+            HOOK: 'Stop sending everything to GPT-4. This hybrid routing logic saves thousands.'
         """,
-        "AI Infrastructure": f"""
-            CATEGORY: AI Infrastructure (The Metal).
+        "SOTA Benchmarking": f"""
+            CATEGORY: SOTA Benchmarking (Data-Driven).
             STRATEGY: {base_utility}
-            GOAL: Discuss GPU orchestration, serverless inference, or cost-optimization strategies for LLMs.
-            HOOK: 'Your inference costs are killing your margins. Use this [Strategy] to save 70%.'
+            GOAL: Comparative analysis of the latest models on MMLU, HumanEval, and real-world dev tasks.
+            HOOK: 'The benchmarks lie. Here is the real-world coding performance of [Model].'
         """,
-        "Library Spotlight": f"""
-            CATEGORY: Library Spotlight (The Building Blocks).
-            STRATEGY: {base_utility}
-            GOAL: Quick-fire breakdown of a new Python/JS library that every developer should know about.
-            HOOK: 'If you're not using [Library] for your AI apps, you're building them the hard way.'
-        """,
-        "API Deep-Dive": f"""
-            CATEGORY: API Deep-Dive (Integration).
+        "Agentic Orchestration": f"""
+            CATEGORY: Agentic Orchestration (Multi-Agent).
             STRATEGY: {base_discovery}
-            GOAL: Real-world integration guide for major APIs (OpenAI, Anthropic, Gemini). Focus on rate limits and error handling.
-            HOOK: 'Most devs ignore [API Feature]. Here's how to use it to build [App Type].'
+            GOAL: Focus on LangGraph, AutoGen, or CrewAI patterns for complex task solving.
+            HOOK: 'One agent isn\'t enough. Here\'s how to choreograph a team of AI experts.'
         """,
-        "Paper Breakdown": f"""
-            CATEGORY: Paper Breakdown (The Foundation).
-            STRATEGY: {base_discovery}
-            GOAL: Translate a complex Arxiv paper into 3 actionable takeaways for working developers.
-            HOOK: 'This new research from [Lab] just made [Previous Tech] obsolete. Here's what changed.'
-        """,
-        "SOTA Analysis": f"""
-            CATEGORY: SOTA Analysis (Edge).
+        "Build-with-VJ": f"""
+            CATEGORY: Build-with-VJ (Implementation).
             STRATEGY: {base_utility}
-            GOAL: State-of-the-art analysis on specific domains: Vision, Audio, or Multi-modal models.
-            HOOK: 'We just hit a new ceiling in [Domain]. Here is the benchmark that proves it.'
-        """,
-        "AI Build": f"""
-            CATEGORY: AI Build (The Grind).
-            STRATEGY: {base_utility}
-            GOAL: Show a tangible project being built with AI. Focus on the actual implementation steps.
-            HOOK: 'I built a [Project] using [Stack] in just 10 minutes. Watch the full build.'
+            GOAL: Rapid-fire coding session. Deploying a GitHub Action or a Python automated factory.
+            HOOK: 'Let\'s build an automated [System] in under 60 seconds. Code in the bio.'
         """,
         "Open Source Focus": f"""
-            CATEGORY: Open Source Focus (Community).
+            CATEGORY: Open Source Focus (Freedom).
             STRATEGY: {base_discovery}
-            GOAL: Highlight major movements in the open-source AI world (Llama, Mistral, ComfyUI).
-            HOOK: 'Open source just caught up to [Proprietary Model]. Here is how you can run it locally.'
+            GOAL: Highlighting local model sovereignty and community-lead breakthroughs.
+            HOOK: 'Open source just passed a new milestone. You can now run [Model] on a laptop.'
         """,
         "Weekly Recap (Dev)": """
             CATEGORY: Weekly Recap (The Wrap-up).

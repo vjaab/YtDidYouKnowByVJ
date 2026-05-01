@@ -30,34 +30,55 @@ def log_message(msg):
     print(msg)
 
 
-def format_description(ai_description, script, hashtags):
+def format_description(ai_description, script, hashtags, slot="Slot A", chunks=None):
     hashtag_str = " ".join(hashtags) if hashtags else ""
     
-    return f"""🚀 LEVEL UP YOUR AI DEV STEACK → https://wa.me/919585793939
-🔥 Practical AI implementation & engineering insights.
+    # ── Action-Oriented Summary ──
+    # Ensure the summary is crisp and lacks large blocks of text
+    clean_summary = ai_description.split(". ")[0] + "." # Just the first hard-hitting line for the summary
+    if len(clean_summary) > 150: clean_summary = clean_summary[:147] + "..."
+
+    # ── Timestamp Logic (for Slot C / Long-form) ──
+    timestamps_str = ""
+    if "Slot C" in slot and chunks:
+        timestamps_str = "\n📌 TECHNICAL BREAKDOWN:\n"
+        # Pick 3-5 key points to cite
+        step = max(1, len(chunks) // 4)
+        for i in range(0, len(chunks), step):
+            if i >= len(chunks): break
+            chunk = chunks[i]
+            t = chunk["start"]
+            m, s = divmod(int(t), 60)
+            h, m = divmod(m, 60)
+            ts = f"[{h:02d}:{m:02d}:{s:02d}]"
+            label = chunk["text"].split(".")[0][:40] + "..."
+            timestamps_str += f"{ts} {label}\n"
+        timestamps_str += "━━━━━━━━━━━━━━━━━━━━━━\n"
+
+    return f"""🚀 ELITE AI ENGINEERING → https://wa.me/919585793939
+🔥 Automated Agentic Systems & Cost-Optimized AI.
 ━━━━━━━━━━━━━━━━━━━━━━
-{ai_description}
+💡 {clean_summary}
+{timestamps_str}
 ━━━━━━━━━━━━━━━━━━━━━━
-💡 In 2026, the best engineers aren't just coding—they're orchestrating.
+🛠️ IMPLEMENTATION BLUEPRINT:
 
-I share the technical blueprints top AI labs use:
+🚀 SOTA AGENTIC LOOPS (Local & Cloud Hybrid)
+💼 GPU INFRA & COST-OPTIMIZED SCALING
+🛠️ OPEN SOURCE SOVEREIGNTY (Llama, Kokoro, Whisper)
+📰 ARXIV-TO-PRODUCTION WORKFLOWS
 
-🚀 SOTA Model Benchmarks (Real data, no hype)
-💼 AI Infrastructure & GPU orchestration
-🛠️ Dev tools that actually speed up your workflow
-📰 Arxiv paper breakdowns for working devs
-
-Join the elite build community 👇
+Join the 1% building the future 👇
 
 🚀 Telegram → https://t.me/technewsbyvj
 💼 LinkedIn → https://www.linkedin.com/in/vijayakumar-j/
 💬 WhatsApp Dev Channel → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
 
-🔗 (Engineering resources in Bio!)
+🔗 (Blueprints & SDKs in Bio!)
 ━━━━━━━━━━━━━━━━━━━━━━
 
 {hashtag_str}
-#aidev #softwareengineering #machinelearning #python #aiarchitecture #shorts"""
+#agenticai #llmops #python #machinelearning #aiarchitecture #shorts"""
 
 
 def generate_pinned_comment(script_data, next_series_slot):
@@ -282,7 +303,7 @@ def run_pipeline(topic_type="research"):
     # ── STEP 10: YouTube Upload ───────────────────────────────────────────────
     log_message("STEP 10: Uploading to YouTube...")
     ai_desc = script_data.get("description", "")
-    description = format_description(ai_desc, script, hashtags)
+    description = format_description(ai_desc, script, hashtags, slot=slot, chunks=chunks)
     # Ensure variety in titles using the options if generated
     if script_data.get("title_options"):
         title = random.choice(script_data["title_options"])
