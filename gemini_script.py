@@ -4,9 +4,65 @@ import json
 import os
 from datetime import datetime
 import time
+import random
 from config import GEMINI_API_KEY, LOGS_DIR
 from topic_tracker import load_tracker, check_story_uniqueness, check_cooldowns
 from ecosystem_logic import get_slot_info, get_category_prompt_enhancement
+
+# ── PROMPT TEMPLATES (AGENTIC LOOP) ────────────────────────────────────────
+
+SYSTEM_PERSONA = """Act as a Staff AI Engineer and Technical Architect specializing in Hybrid Architectures and Agentic Design. 
+Your goal is to build high-authority technical insights that help developers move from 'generic AI prompts' to 'scalable, cost-optimized agentic systems'.
+Prioritize local open-source models (LMMs), hybrid cloud-local routing, and architectural blueprints that replace recurring API costs."""
+
+PLANNING_TEMPLATE = """{persona}
+
+ANALYZER TASK:
+Review the following technical news and search context. 
+Identify 3-4 distinct 'Technical Angles' or 'Architectural Blueprints' that would be highly valuable for a Staff Engineer.
+Consider: Cost-optimization, Local model replacement of APIs, or Agentic Loop efficiency.
+
+NEWS CONTEXT:
+{news_context}
+
+Return ONLY a JSON list of objects:
+[{"angle": "Short title", "insight": "One sentence technical insight", "reason": "Why this matters for devs"}]"""
+
+CRITIQUE_TEMPLATE = """{persona}
+
+CRITIQUE TASK:
+Evaluate the following AI Video Script draft for a professional developer audience.
+Identify:
+1. TECHNICAL SHALLOW SPOTS: Where did the script remain too generic?
+2. FILLER WORDS: Did it use forbidden words (basically, actually, just, etc.)?
+3. HOOK VELOCITY: Is the 5-second hook a 'Stop-Your-Scroll' trigger?
+4. PERSONA ALIGNMENT: Does it sound like a technical peer briefing or a news reporter?
+
+SCRIPT DRAFT:
+{script_json}
+
+Return ONLY a JSON object:
+{{
+  "score": 0.0-10.0,
+  "technical_critique": "Draft improvements here",
+  "persona_critique": "Draft improvements here",
+  "specific_fixes": ["List of exact changes to make"]
+}}"""
+
+REFINEMENT_TEMPLATE = """{persona}
+
+REFINEMENT TASK:
+Rewrite the script draft based on the following critique. 
+Ensure ALL technical glossary terms are correct (tiktoken, etc.) and ALL filler words are removed.
+Increase the 'Staff Engineer' authority.
+
+CRITIQUE:
+{critique_json}
+
+ORIGINAL DRAFT:
+{original_draft}
+
+Return the FINAL corrected JSON matching the original schema. No explanation."""
 
 def get_hottest_tech_topic(client):
     """Uses Gemini Search grounding to find today's single hottest tech topic."""
@@ -177,241 +233,135 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
             "If the topic doesn't produce a strong 'Winner' hook (Stat, Absolute Contradiction, or 'You are using this wrong'), DROP IT and pick another.\n"
         )
 
-    day_name, slot, category = get_slot_info()
-    strategy_enhancement = get_category_prompt_enhancement(category, slot)
-    
-    prompt = f"""Act as a Staff AI Engineer and Technical Architect specializing in Hybrid Architectures and Agentic Design. 
-Your goal is to build high-authority technical insights that help developers move from 'generic AI prompts' to 'scalable, cost-optimized agentic systems'.
-Prioritize local open-source models (LMMs), hybrid cloud-local routing, and architectural blueprints that replace recurring API costs.
-
-TODAY'S STRATEGY: 
-Day: {day_name}
-Slot: {slot}
-{strategy_enhancement}
-
-CONTENT HIERARCHY (Elite Engineering & Authority):
-1. HYBRID ARCHITECTURE & COST-OPTIMIZATION (50%): Deliver the actual engineering 'how' for dropping API costs or running local weights (GGUF, vLLM).
-2. AGENTIC SYSTEM DESIGN (30%): Explain self-correcting loops, multi-agent orchestration, and tool-use logic. 
-3. REDUCING OPERATIONAL NOISE (20%): Provide a specific library, local model (e.g. Kokoro TTS), or pattern to replace a paid service.
-4. VJ's ARCHITECT TONE (10%): Pe-to-peer technical briefing: "The hybrid logic here is key...", "If you're still paying for [API], look at this local alternative..."
-
-🏆 CONCEPT CLARITY & EDUCATIONAL VALUE (SCALED FOR SHORTS):
-- HIGH-VELOCITY ANALOGIES: For every technical concept (e.g., 'Inference Latency'), use a 4-5 word real-world analogy (e.g., 'the brain's reaction time').
-- SIMPLIFIED DEPTH: Explain the "HOW" using simple spatial logic. If it increases efficiency, don't just say 'efficiency'—say 'it bypasses the digital traffic jams'.
-- ANCHORING: Ensure the transition from the Hook to the Deep-Dive explicitly defines the Term of the Day.
-
-🏆 LINGUISTIC INTEGRITY (STRICT ERROR PREVENTION):
-- PERFECT SPELLING: Manually check every word. Do NOT use phonetic-style spelling like 'cog native' or 'manumental'. Use proper English: 'cognitive', 'monumental', 'period'.
-- DENSE PACING: No filler words. Every sentence must drive a new technical insight.
-
-🥇 CONTENT CREATION FRAMEWORK (THE GOLD STANDARD):
-1. DEFINE CLEAR GOAL: Every script must primarily EDUCATE and INSPIRE.
-2. AUDIENCE PAIN POINTS: Address the specific interests and preferences of software developers.
-3. THE 5-SECOND HOOK: The first 5 seconds are CRITICAL. Start with a surprising statistic, a technical contradiction, or an 'undocumented' tip.
-4. SCANNABLE DEPTH: Use clear linguistic markers (First, Second, Finally) to ensure the technical information is digestible.
-5. EXPLICIT CTA: End every video by telling the viewer exactly what to do next (Check the pinned comment, Join the WhatsApp Dev Channel, etc.).
-
-🧠 LINGUISTIC CALIBRATION & REFINEMENT:
-- TECHNICAL GLOSSARY (STRICT): Ensure these are spelled correctly: 'tiktoken', 'fiscal intelligence', 'monumental', 'period', 'LLM Gateway', 'quantization', 'inference'.
-- FILLER WORD BAN: Strictly NO 'basically', 'actually', 'you know', 'just', 'highly', 'very'. Use strong nouns and active verbs.
-- POLISHED NARRATION: Every sentence must be a 'Staff Engineer' level briefing. Disorganized phrasing or repetitive adjectives result in pipeline failure.
-
-🔬 SOURCE INTEGRITY & EVIDENCE:
-- NO VAGUE SOURCES: Do NOT cite 'internal logs' or 'Slack leaks' unless they are public.
-- PUBLIC DISCLOSURE: Prioritize Arxiv papers, official GitHub repos, and corporate engineering blogs (OpenAI, Google, Anthropic).
-- RELEVANT DOCUMENTATION: If the story mentions a library (e.g. LangGraph), provide the official documentation URL in the `sources` field.
-
-    🎯 VIEWER RETENTION RULES (EMERGENCY HOOK OVERHAUL):
-    1. THE 0.1s VISUAL SHOCK: The very first word must be a "Stop-Your-Scroll" trigger. Use 'Absolute Contradictions' ("This is NOT what it seems...") or 'Statistical Anomalies' ("98% of users are about to lose...").
-    2. THE LEAKED DATA ANGLE: Frame every story as a "leak" or "internal data breach". Use phrases like "The internal Slack logs just leaked...", "I found a hidden repository...", "The engineering data shows a total failure...".
-    3. THE 3-WORD BANNER: The `hook_banner_text` MUST be max 3 words. e.g. "GPT-5 LEAKED", "NVIDIA FAILURE", "THEY ARE REPLACING".
-    4. NO WARMUP: Start the audio at the absolute peak energy. No breathing room. No greetings. 
-    
-    NARRATION STYLE (THE 'VJ' BRAND):
-    - Tone: Sharp, high-authority, technical whistleblower.
-    - Personality: You aren't just reporting; you are synthesizing and predicting. Be the smartest person in the room. 
-    - Use Dramatic Pacing: ... for 0.4s pause. -- for 0.2s breath. ALL CAPS for emphasis.
-
-    NARRATIVE FLOW (FOR THE 'SCRIPT' FIELD):
-    - EXTREME HOOK (e.g. 'Most AI apps break because of this...') -> PAYOFF PROMISE -> CONTRARIAN DEEP-DIVE -> TAKEAWAY -> LOOP BRIDGE.
-
-    RETENTION CUE SPECIFICATION:
-    - You MUST provide `retention_cues` that match the emotional peaks of the script. 
-    - Use: `zoom_snap`, `shake_epic`, `glitch_digital`, `flash_accent`.
-
-    CRITICAL '2026 SCALE' RULES:
-    1. TECHNICAL MONETIZATION: Avoid "Top 10" style generic lists. YouTube 2026 prioritizes "Niche Expert" status. Prove your expertise by citing the specific architecture or methodology from the article.
-    2. PRONUNCIATION HYPER-FOCUS: Identify EVERY niche tech term or complex word. If you're unsure, provide a phonetic respelling in the map.
-    3. NO REPETITION: Never repeat a word or phrase within 10 seconds.
-    4. CLOSING PHRASE: The script MUST end with the EXACT phrase "follow for more updates". This phrase MUST be spoken in the FINAL 2 SECONDS ONLY. The remainder of the ~52-second video MUST be dense technical content.
-    5. AI-ASSISTED JOURNALISM: Reference "my neural processing" or "the data logs" to lean into the AI whistleblower brand.
-
-
-{selection_instruction}
-
-{avoid_instruction}RESEARCH PAPERS & BLOGS DATA:
-{news_context}
-
-NARRATIVE FLOW (FOR THE 'SCRIPT' FIELD):
-- Pattern Interrupt -> Curiosity Gap -> VJ's Take -> Deep-Dive Analysis & Competitive Comparison -> Visual Reset -> Identity CTA + Loop Connect.
-
-{extra_instruction}
-
-Return ONLY this exact JSON (no markdown, no explanation) to securely match the automation pipeline:
+    # ── STEP 2: BUILD PROMPT REQUIREMENTS (SCHEMA) ───────────────────────────
+    prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
 {{
   "title_options": ["Title idea 1", "Title idea 2", "Title idea 3"],
   "description": "Full 100+ word rich SEO description for youtube describing the video, including timestamps and credits.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
-  "title": f"Punchy YouTube title max 60 chars ({'YouTube Video' if is_longform else 'Shorts'})",
-  "script": f"Full voiceover script following the Arc. Target duration: {'120-180 sec' if is_longform else '38-44 sec'}. Use {'350-500 words' if is_longform else '110-125 words'}. Ensure The Loop and Pattern Interrupt are implemented.",
-  "hook_text": "The exact first 5-8 words of the script. This will appear as giant text on screen in the first 1.5 seconds to STOP THE SCROLL.",
-  "micro_cliffhangers": [
-    {{"timestamp": 10.0, "text": "But here's what nobody's talking about..."}},
-    {{"timestamp": 22.0, "text": "And this is where it gets wild..."}},
-    {{"timestamp": 35.0, "text": "Now watch what happens next..."}}
-  ],
-
-  "next_video_tease": "One sentence teasing what VJ will cover next (max 8 words, future tense).",
-  "identity_cta": "A unique, elite CTA (max 8 words) like 'Join the elite builders.'",
-  "phonetic_pronunciation_map": {{
-    "AI": "A-I",
-    "NVIDIA": "In-vid-yah",
-    "cognitive": "kogni-tiv",
-    "Autonomous": "aw-tonn-uh-muss"
-  }},
-  "NOTE_phonetic_pronunciation_map": "MANDATORY LEXICAL AUDIT: Identify tech terms, names, or long words. Provide a NATURAL phonetic respelling (e.g., 'Trans-for-mer' or 'In-vidy-uh'). Avoid over-hyphenating as it slows down the voice; use hyphens only for natural syllable breaks.",
-
+  "title": "Punchy YouTube title max 60 chars",
+  "script": "Full voiceover script. Target duration: {'120-180 sec' if is_longform else '38-44 sec'}.",
+  "hook_text": "The exact first 5-8 words of the script.",
+  "relevant_links": ["https://github.com/...", "https://arxiv.org/abs/..."],
+  "phonetic_pronunciation_map": {{"NVIDIA": "In-vid-yah"}},
   "hook": "Matches the first sentence of the script",
-  "summary": "One line summary including the real-world impact",
+  "summary": "One line summary",
   "sub_category": "AI/Machine Learning",
   "breaking_news_level": 9,
-  "loop_score": 10,
-  "retention_cues": [
-    {{"timestamp": 3.0, "effect": "zoom_in", "reason": "hook_impact"}},
-    {{"timestamp": 6.0, "effect": "glitch", "reason": "disruptor_reveal"}}
-  ],
-  "color_theme": {{
-     "background": "#0f0f0f",
-     "accent": "#ff4444",
-     "text": "#ffffff"
-  }},
-  "relevant_emoji": "🔍",
-  "imagen_prompts": [
-     f"High-contrast, Tech-noir style visuals, {'16:9' if is_longform else '9:16'}, cinematic"
-  ],
-  "hook_banner_text": "MAX 3-4 WORDS",
-  "shocking_moment_timestamp": 12.5,
-  "key_stat": "$1 Billion",
-  "key_stat_timestamp": 18.3,
-  "subtitle_chunks": [
-    {{
-      "chunk_id": 1,
-      "text": "First sentence of script here",
-      "start": 0.00,
-      "end": 3.50,
-      "highlight_word": "First",
-      "has_infographic": false
-    }},
-    {{
-      "chunk_id": 2,
-      "text": "Second phrase or sentence",
-      "start": 3.50,
-      "end": 7.00,
-      "highlight_word": "phrase",
-      "has_infographic": false
-    }},
-    {{
-      "chunk_id": 3,
-      "text": "Third sentence continues the story",
-      "start": 7.00,
-      "end": 11.50,
-      "highlight_word": "story",
-      "has_infographic": true
-    }}
-  ],
-  "NOTE_subtitle_chunks": "CRITICAL: Generate 10-15 subtitle_chunks covering the ENTIRE script. You MUST set 'has_infographic': true for at least ONE chunk during the Deep-Dive (between 10-35s). For each infographic chunk, also provide 'infographic_type' (one of: 'definition', 'stat', 'comparison', 'process') AND 'infographic_data' matching the type shape: definition → {{\"term\": \"RAG\", \"definition\": \"Retrieves live data before generating answer\"}} | stat → {{\"value\": \"$4.6B\", \"label\": \"OpenAI 2025 Revenue\"}} | comparison → {{\"left_label\": \"Old\", \"left_val\": \"128K\", \"right_label\": \"New\", \"right_val\": \"1M\"}} | process → {{\"steps\": [\"Step 1\", \"Step 2\", \"Step 3\", \"Step 4\"]}} | Do NOT leave infographic_data empty on any chunk where has_infographic is true.",
+  "retention_cues": [{{"timestamp": 3.0, "effect": "zoom_in", "reason": "hook_impact"}}],
+  "subtitle_chunks": [{{
+      "chunk_id": 1, "text": "Sentence 1", "start": 0.00, "end": 3.50, 
+      "has_infographic": true, "infographic_type": "process", 
+      "infographic_data": {{"steps": ["Step 1", "Step 2"]}}
+  }}],
   "original_news_headline": "Exact headline",
-  "original_news_url": "MANDATORY: Pick the most stable, direct article URL from the SOURCES FOUND section. DO NOT use search results, PDF links, or internal citations. Must be a direct link to the news article for screenshotting.",
-  "key_entities": [
-    {{"name": "Entity Name", "type": "MODEL"}},
-    {{"name": "Service Name", "type": "CLOUD"}},
-    {{"name": "Company Name", "type": "COMPANY"}}
-  ],
-  "sfx_cues": [
-    {{"timestamp": 0.2, "type": "woosh"}},
-    {{"timestamp": 12.5, "type": "glitch"}},
-    {{"timestamp": 18.3, "type": "pop"}}
-  ],
-  "emoji_popups": [
-    {{"timestamp": 5.0, "emoji": "🚀", "keyword": "launch"}},
-    {{"timestamp": 15.2, "emoji": "💡", "keyword": "idea"}}
-  ],
-  "keywords": ["Keyword 1", "Keyword 2"],
-  "hashtags": ["#AI", "#TechNews", "#Future", "#Shorts"],
-  "comment_hook": "Would you use this? Drop your answer below! 👇"
-}}
+  "original_news_url": "Direct article URL",
+  "keywords": ["AI"],
+  "hashtags": ["#AI"],
+  "comment_hook": "Would you use this?"
+}}"""
 
-"""
+    engine = AgenticGenerationEngine(client, news_context, slot, category, strategy_enhancement, is_longform)
+    script_data = engine.execute(selection_instruction, prompt_requirements)
+    
+    if script_data:
+        # Perform uniqueness check (Final safeguard)
+        headline = script_data.get("original_news_headline", "")
+        news_url = script_data.get("original_news_url", "")
+        keywords = script_data.get("keywords", [])
+        title = script_data.get("title", "")
+        
+        is_unique, msg = check_story_uniqueness(title, headline, keywords, news_url)
+        if not is_unique:
+            print(f"⚠️ [LOOP] Safeguard: Post-loop uniqueness check failed: {msg}")
+            return None
+            
+    return script_data
 
-    attempts = 0
-    while attempts < 5:
-        try:
-            # Use gemini-2.5-pro as primary, fallback to flash if overloaded
-            target_model = 'gemini-2.5-pro' if attempts < 3 else 'gemini-2.5-flash'
-            
-            response = client.models.generate_content(
-                model=target_model,
-                contents=prompt,
-                config=genai.types.GenerateContentConfig(temperature=0.9),
-            )
-            raw_text = response.text.strip()
-            
-            if raw_text.startswith("```json"):
-                raw_text = raw_text[7:]
-            if raw_text.startswith("```"):
-                raw_text = raw_text[3:]
-            if raw_text.endswith("```"):
-                raw_text = raw_text[:-3]
+class AgenticGenerationEngine:
+    def __init__(self, client, context, slot, category, strategy_enhancement, is_longform):
+        self.client = client
+        self.context = context
+        self.slot = slot
+        self.category = category
+        self.strategy_enhancement = strategy_enhancement
+        self.is_longform = is_longform
+
+    def _call_gemini(self, prompt, model='gemini-2.0-flash'):
+        attempts = 0
+        while attempts < 3:
+            try:
+                response = self.client.models.generate_content(
+                    model=model,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(temperature=0.8)
+                )
+                raw = response.text.strip()
+                if "```json" in raw:
+                    raw = raw.split("```json")[1].split("```")[0].strip()
+                elif "```" in raw:
+                    raw = raw.split("```")[1].split("```")[0].strip()
                 
-            script_data = json.loads(raw_text.strip())
-            
-            # Save raw to logs
-            today = datetime.now().strftime("%Y-%m-%d")
-            log_path = os.path.join(LOGS_DIR, f"script_raw_{today}_att_{attempts}.json")
-            with open(log_path, 'w') as f:
-                json.dump(script_data, f, indent=4)
-                
-            # Perform uniqueness check (Enhanced Batch Deduplication)
-            headline = script_data.get("original_news_headline", "")
-            news_url = script_data.get("original_news_url", "")
-            keywords = script_data.get("keywords", [])
-            title = script_data.get("title", "")
-            
-            is_unique, msg = check_story_uniqueness(title, headline, keywords, news_url)
-            if not is_unique:
-                print(f"Duplicate story detected: {msg}")
-                extra_instruction += f"\nCRITICAL: Do NOT cover the story about '{headline}'. It too similar to a recent video! Pick something else."
+                return json.loads(raw)
+            except Exception as e:
+                print(f"⚠️ [LOOP] Call failed ({model}): {e}. Retrying...")
                 attempts += 1
-                prompt += extra_instruction
-                continue
-                
-            # Perform cooldown check
-            comps = script_data.get("companies_mentioned", [])
-            subcat = script_data.get("sub_category", "")
-            cooldown_ok, cool_msg = check_cooldowns(comps, subcat)
-            if not cooldown_ok and script_data.get("breaking_news_level", 0) < 8:
-                print(f"Cooldown warning: {cool_msg} (Attempting to skip since not breaking)")
-                extra_instruction += f"\nNote: Try to avoid mentioning '{comps}' or category '{subcat}' as they are overused recently, unless the story is hugely breaking."
-                attempts += 1
-                prompt += extra_instruction
-                continue
-                
-            return script_data
+                time.sleep(2)
+        return None
+
+    def plan(self):
+        print("🔍 [LOOP] Phase 1: Planning Technical Angles...")
+        prompt = PLANNING_TEMPLATE.format(
+            persona=SYSTEM_PERSONA,
+            news_context=self.context
+        )
+        return self._call_gemini(prompt)
+
+    def generate_draft(self, plan, selection_instruction, prompt_requirements):
+        print("✍️ [LOOP] Phase 2: Generating Initial Draft...")
+        full_prompt = f"{SYSTEM_PERSONA}\n\nPLAN SELECTED: {json.dumps(plan)}\n\n{selection_instruction}\n\nDATA:\n{self.context}\n\n{prompt_requirements}"
+        return self._call_gemini(full_prompt, model='gemini-2.5-pro')
+
+    def critique(self, draft):
+        print("🧐 [LOOP] Phase 3: Critiquing Technical Depth...")
+        prompt = CRITIQUE_TEMPLATE.format(
+            persona=SYSTEM_PERSONA,
+            script_json=json.dumps(draft)
+        )
+        return self._call_gemini(prompt)
+
+    def refine(self, draft, critique, requirements):
+        print("🛠️ [LOOP] Phase 4: Refining & Polishing...")
+        prompt = REFINEMENT_TEMPLATE.format(
+            persona=SYSTEM_PERSONA,
+            critique_json=json.dumps(critique),
+            original_draft=json.dumps(draft),
+            schema_requirements=requirements
+        )
+        return self._call_gemini(prompt, model='gemini-2.5-pro')
+
+    def execute(self, selection_instruction, prompt_requirements):
+        plan_angles = self.plan()
+        selected_angle = plan_angles[0] if (plan_angles and isinstance(plan_angles, list)) else {}
+
+        draft = self.generate_draft(selected_angle, selection_instruction, prompt_requirements)
+        if not draft: return None
+
+        iterations = 0
+        max_iters = 1 
+        while iterations < max_iters:
+            feedback = self.critique(draft)
+            if not feedback: break
             
-        except Exception as e:
-            wait_time = (2 ** attempts) + 5 # Exponential backoff: 6, 7, 9, 13, 21...
-            print(f"Gemini generation error: {e}. Retrying in {wait_time}s...")
-            attempts += 1
-            time.sleep(wait_time)
+            score = feedback.get("score", 0)
+            if score >= 9.2:
+                print(f"⭐ [LOOP] Quality Score: {score}/10. Ready.")
+                break
             
-    return None
+            print(f"🔄 [LOOP] Quality Score: {score}/10. Iterating ({iterations+1}/{max_iters})...")
+            refined = self.refine(draft, feedback, prompt_requirements)
+            if refined:
+                draft = refined
+            iterations += 1
+            
+        return draft
