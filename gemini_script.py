@@ -211,11 +211,45 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
         selection_instruction = (
             f"Analyze the following {content_desc} and pick the SINGLE most foundational story for a 2-3 minute deep-dive.\n"
             "SELECTION FILTERS:\n"
-            "1. MUST have deep technical complexity or 'Long-tail' consequences.\n"
-            "2. MUST be explainable in 120-180s of expert-level technical speech.\n"
-            "3. MUST contain 3 concrete takeaways or 'Mental Models' for the viewer.\n"
-            "4. PRIORITIZE: Documentation 'Easter Eggs' or undocumented engineering tips that provide extreme utility.\n"
+            "1. MUST be a topic that can be broken down into 3 to 5 actionable tools, techniques, or architectural principles.\n"
+            "2. MUST be explainable in 120-180s of expert-level technical speech (approx 350-450 words total).\n"
+            "3. MUST contain a highly relatable Hook, a Workflow demonstration, and a strong Conceptual Warning (The Caveat).\n"
+            "4. PRIORITIZE: Documentation 'Easter Eggs', optimization hacks, or workflow structures that provide extreme utility.\n"
+            "FORMAT: You MUST follow the strict 6-part structure: Hook -> Why It Matters -> Core Content (3-5 items) -> Workflow -> Caveat -> Starting Point -> Outro.\n"
         )
+        prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
+{{
+  "title_options": ["Title idea 1", "Title idea 2", "Title idea 3"],
+  "description": "Full 100+ word rich SEO description for youtube describing the video, including timestamps and credits.",
+  "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
+  "title": "Punchy YouTube title max 60 chars",
+  "hook_script": "30-second personal story / problem setup (approx 60 words). Stark contrast, direct eye contact feel.",
+  "section_1_why_it_matters": "Context, data point, and common mistake (approx 60 words).",
+  "section_2_core_content": "Break down 3-5 specific tools, architectural principles, or tips based on the topic. Give specific prompts/formulas for each (approx 150 words).",
+  "section_3_workflow": "A step-by-step chaining of the core content on a real problem. Fast paced (approx 70 words).",
+  "section_4_caveat": "The critical mistake to avoid. Serious tone (approx 40 words).",
+  "section_5_starting_point": "One immediate action to take today (approx 30 words).",
+  "outro_cta": "Subscribe and comment prompt.",
+  "script": "The FULL unified voiceover script seamlessly concatenating hook_script, section_1, section_2, section_3, section_4, section_5, and outro_cta into ONE single flowing text block. Target total word count: 350-450 words.",
+  "hook_text": "The exact first 5-8 words of the script.",
+  "relevant_links": ["https://github.com/...", "https://arxiv.org/abs/..."],
+  "phonetic_pronunciation_map": {{"NVIDIA": "In-vid-yah"}},
+  "hook": "Matches the first sentence of the script",
+  "summary": "One line summary",
+  "sub_category": "AI/Machine Learning",
+  "breaking_news_level": 9,
+  "retention_cues": [{{"timestamp": 3.0, "effect": "zoom_in", "reason": "hook_impact"}}],
+  "subtitle_chunks": [{{
+      "chunk_id": 1, "text": "Sentence 1", "start": 0.00, "end": 3.50, 
+      "has_infographic": true, "infographic_type": "process|slide", 
+      "infographic_data": {{"steps": ["Step 1", "Step 2"]}}
+  }}],
+  "original_news_headline": "Exact headline",
+  "original_news_url": "Direct article URL",
+  "keywords": ["AI"],
+  "hashtags": ["#AI"],
+  "comment_hook": "Would you use this?"
+}}"""
     else:
         selection_instruction = (
             f"Analyze the following {content_desc} and pick the SINGLE most impactful story to convert into a 38-44s YouTube Short script.\n"
@@ -232,15 +266,13 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
             "HOOK ALIGNMENT (DROP TEST):\n"
             "If the topic doesn't produce a strong 'Winner' hook (Stat, Absolute Contradiction, or 'You are using this wrong'), DROP IT and pick another.\n"
         )
-
-    # ── STEP 2: BUILD PROMPT REQUIREMENTS (SCHEMA) ───────────────────────────
-    prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
+        prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
 {{
   "title_options": ["Title idea 1", "Title idea 2", "Title idea 3"],
   "description": "Full 100+ word rich SEO description for youtube describing the video, including timestamps and credits.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
   "title": "Punchy YouTube title max 60 chars",
-  "script": "Full voiceover script. Target duration: {'120-180 sec' if is_longform else '38-44 sec'}.",
+  "script": "Full voiceover script. Target duration: 38-44 sec.",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://github.com/...", "https://arxiv.org/abs/..."],
   "phonetic_pronunciation_map": {{"NVIDIA": "In-vid-yah"}},
