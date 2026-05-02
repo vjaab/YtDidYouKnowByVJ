@@ -91,6 +91,23 @@ def ts(text, font):
     bb = font.getbbox(text)
     return bb[2] - bb[0], bb[3] - bb[1]
 
+def get_cinematic_font(size, italic=False):
+    paths = [
+        '/System/Library/Fonts/Supplemental/Georgia Italic.ttf' if italic else '/System/Library/Fonts/Supplemental/Georgia.ttf',
+        '/System/Library/Fonts/Supplemental/Times New Roman Italic.ttf' if italic else '/System/Library/Fonts/Supplemental/Times New Roman.ttf',
+        '/usr/share/fonts/truetype/msttcorefonts/Georgia_Italic.ttf' if italic else '/usr/share/fonts/truetype/msttcorefonts/Georgia.ttf',
+        '/usr/share/fonts/truetype/freefont/FreeSerifItalic.ttf' if italic else '/usr/share/fonts/truetype/freefont/FreeSerif.ttf',
+        '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf' if italic else '/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf',
+        '/System/Library/Fonts/Supplemental/Arial Italic.ttf' if italic else '/System/Library/Fonts/Supplemental/Arial.ttf'
+    ]
+    for p in paths:
+        if os.path.exists(p):
+            try:
+                return ImageFont.truetype(p, size)
+            except Exception:
+                pass
+    return gf(size)
+
 
 # ── Ken Burns ─────────────────────────────────────────────────────────────────
 _kb_idx = 0
@@ -995,7 +1012,10 @@ class InfographicAuditEngine:
             )
             response = client.models.generate_content(
                 model='gemini-2.5-flash',
-                contents=[{'mime_type': 'image/png', 'data': img_bytes}, prompt]
+                contents=[
+                    types.Part.from_bytes(data=img_bytes, mime_type='image/png'),
+                    prompt
+                ]
             )
             raw = response.text.strip().lstrip("```json").lstrip("```").rstrip("```").strip()
             return json.loads(raw)
@@ -1240,19 +1260,13 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
     img = Image.new('RGBA', (frame_width, FRAME_H), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
-    # Typography: Georgia Italic
-    font_path = '/System/Library/Fonts/Supplemental/Georgia Italic.ttf'
-    if not os.path.exists(font_path):
-        font_path = '/System/Library/Fonts/Supplemental/Georgia.ttf' # fallback
-    if not os.path.exists(font_path):
-        font_path = '/System/Library/Fonts/Supplemental/Arial Italic.ttf'
-        
-    f_title = ImageFont.truetype(font_path, 80)
+    # Typography: Cinematic Serif
+    f_title = get_cinematic_font(80, italic=True)
     
     # Check width
     tw = draw.textlength(title, font=f_title)
     if tw > 800:
-        f_title = ImageFont.truetype(font_path, 60)
+        f_title = get_cinematic_font(60, italic=True)
         tw = draw.textlength(title, font=f_title)
         if tw > 800:
             title = title[:40] + "..."
@@ -1843,16 +1857,8 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     scale_ratio = frame_width / 1080.0 if frame_width < frame_height else frame_width / 1920.0
     base_size = int(45 * scale_ratio)
     
-    font_path = '/System/Library/Fonts/Supplemental/Georgia.ttf'
-    if not os.path.exists(font_path):
-        font_path = '/System/Library/Fonts/Supplemental/Arial.ttf'
-        
-    font_italic_path = '/System/Library/Fonts/Supplemental/Georgia Italic.ttf'
-    if not os.path.exists(font_italic_path):
-        font_italic_path = '/System/Library/Fonts/Supplemental/Arial Italic.ttf'
-        
-    f_main = ImageFont.truetype(font_path, base_size)
-    f_active = ImageFont.truetype(font_italic_path, base_size)
+    f_main = get_cinematic_font(base_size, italic=False)
+    f_active = get_cinematic_font(base_size, italic=True)
     
     words = [wd["word"] for wd in word_data]
     
