@@ -1992,21 +1992,26 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         
         if not video_path: break
         
-        # 1. OBSERVE & CRITIQUE
+        # 1. OBSERVE & CRITIQUE (VisualAuditEngine — optional, may not be implemented yet)
         if api_key and iterations < max_iters:
-            auditor = VisualAuditEngine(api_key)
-            feedback = auditor.audit(video_path, script_json.get("script", ""))
-            
-            if feedback and feedback.get("score", 0) < 8.5:
-                print(f"🔄 [VIDEO LOOP] Quality: {feedback.get('score')}/10. Issues: {feedback.get('issues')}")
-                # 2. REFINE
-                refinements = feedback.get("refinement_commands", {})
-                if refinements:
-                    dynamic_params.update(refinements)
-                    iterations += 1
-                    continue
-            else:
-                print(f"⭐ [VIDEO LOOP] Visual Quality Score: {feedback.get('score', 'N/A')}/10. Approved.")
+            try:
+                auditor = VisualAuditEngine(api_key)
+                feedback = auditor.audit(video_path, script_json.get("script", ""))
+                
+                if feedback and feedback.get("score", 0) < 8.5:
+                    print(f"🔄 [VIDEO LOOP] Quality: {feedback.get('score')}/10. Issues: {feedback.get('issues')}")
+                    # 2. REFINE
+                    refinements = feedback.get("refinement_commands", {})
+                    if refinements:
+                        dynamic_params.update(refinements)
+                        iterations += 1
+                        continue
+                else:
+                    print(f"⭐ [VIDEO LOOP] Visual Quality Score: {feedback.get('score', 'N/A')}/10. Approved.")
+            except NameError:
+                print("⚠️ [VIDEO LOOP] VisualAuditEngine not available, skipping quality audit.")
+            except Exception as e:
+                print(f"⚠️ [VIDEO LOOP] Visual audit failed (non-fatal): {e}")
         
         best_video_path = video_path
         break
