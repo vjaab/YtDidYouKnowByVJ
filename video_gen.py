@@ -28,7 +28,7 @@ import json
 import threading
 import numpy as np
 import cv2
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageOps
 from datetime import datetime
 from google import genai
 from google.genai import types
@@ -112,7 +112,7 @@ def build_ken_burns(img_path, duration, pattern_idx):
     pw, ph = FRAME_W + pad*2, FRAME_H + pad*2
     
     # Pre-scale to the padded resolution once so we aren't doing heavy lifting in the loop
-    base_img = img.resize((pw, ph), Image.LANCZOS)
+    base_img = ImageOps.fit(img, (pw, ph), Image.LANCZOS)
     
     def make_frame(t):
         progress = min(t / max(duration, 0.01), 1.0)
@@ -1236,35 +1236,36 @@ def _sync_checks(chunks, audio_duration):
 # ── MINIMALIST TECH UI COMPONENTS ─────────────────────────────────────────────
 
 def render_header_bar(title, category, accent_color, frame_width=1080):
-    """Sleek minimalist header with floating badge."""
-    header_h = 240
-    img = Image.new('RGBA', (frame_width, header_h), (0,0,0,0))
+    """Cinematic elegant title."""
+    img = Image.new('RGBA', (frame_width, FRAME_H), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
-    # Typography: Roboto-Bold (similar to YouTube Sans) per user spec
-    f_title = ImageFont.truetype('assets/fonts/Roboto-Bold.ttf', 55)
+    # Typography: Georgia Italic
+    font_path = '/System/Library/Fonts/Supplemental/Georgia Italic.ttf'
+    if not os.path.exists(font_path):
+        font_path = '/System/Library/Fonts/Supplemental/Georgia.ttf' # fallback
+    if not os.path.exists(font_path):
+        font_path = '/System/Library/Fonts/Supplemental/Arial Italic.ttf'
+        
+    f_title = ImageFont.truetype(font_path, 80)
     
     # Check width
     tw = draw.textlength(title, font=f_title)
-    if tw > 800: title = title[:40] + "..."
-    tw = draw.textlength(title, font=f_title)
+    if tw > 800:
+        f_title = ImageFont.truetype(font_path, 60)
+        tw = draw.textlength(title, font=f_title)
+        if tw > 800:
+            title = title[:40] + "..."
+            tw = draw.textlength(title, font=f_title)
+        
+    start_x = (frame_width - tw) // 2
+    start_y = int(FRAME_H * 0.45) # Center-ish
     
-    # Center text
-    padding_x = 40
-    padding_y = 20
-    box_w = tw + padding_x * 2
-    box_h = 55 + padding_y * 2
-    start_x = (frame_width - box_w) // 2
-    
-    # Move title little bit up: Y=50
-    start_y = 50
-    text_y_offset = -8
-    
-    # 1. High-contrast pill for header
-    draw.rounded_rectangle([start_x, start_y, start_x+box_w, start_y+box_h], radius=15, fill=(245, 245, 245, 255))
-    
-    # 2. Wordmark lockup in Dark Grey for readability
-    draw.text((start_x + padding_x, start_y + padding_y + text_y_offset), title, font=f_title, fill=(10, 10, 10, 255))
+    # Text shadow/glow
+    for dx, dy in [(-2,0), (2,0), (0,-2), (0,2)]:
+        draw.text((start_x + dx, start_y + dy), title, font=f_title, fill=(0, 0, 0, 150))
+        
+    draw.text((start_x, start_y), title, font=f_title, fill=(255, 255, 255, 255))
     
     return img
 
@@ -1461,8 +1462,8 @@ def _article_screenshot_clip(screenshot_path, duration):
         # Load and verify image
         img = Image.open(screenshot_path).convert("RGBA")
         
-        # Fullscreen Resize: 1080x1920 (Force fullscreen fit)
-        img = img.resize((FRAME_W, FRAME_H), Image.LANCZOS)
+        # Fullscreen Fit: 1080x1920 (Force fullscreen fit without distortion)
+        img = ImageOps.fit(img, (FRAME_W, FRAME_H), Image.LANCZOS)
         
         arr = np.array(img.convert("RGB"))
         mask = np.array(img.split()[3]).astype(float) / 255.0
@@ -1835,51 +1836,43 @@ def wrap_text_to_lines(words, word_widths, max_width, font):
     return lines
 
 def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), frame_width=1080, frame_height=1920):
-    """Modern Hormozi-style minimalist captions with Kinetic Word Pop."""
+    """Cinematic elegant captions."""
     img = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
-    # Base fonts (Relative scaling for robustness)
     scale_ratio = frame_width / 1080.0 if frame_width < frame_height else frame_width / 1920.0
-    base_size = int(85 * scale_ratio)
-    pop_size = int(95 * scale_ratio)
-    f_main = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', base_size)
+    base_size = int(45 * scale_ratio)
     
-    # word_data is a list of {"word": str, "is_active": bool, "is_spoken": bool, "scale": float}
+    font_path = '/System/Library/Fonts/Supplemental/Georgia.ttf'
+    if not os.path.exists(font_path):
+        font_path = '/System/Library/Fonts/Supplemental/Arial.ttf'
+        
+    font_italic_path = '/System/Library/Fonts/Supplemental/Georgia Italic.ttf'
+    if not os.path.exists(font_italic_path):
+        font_italic_path = '/System/Library/Fonts/Supplemental/Arial Italic.ttf'
+        
+    f_main = ImageFont.truetype(font_path, base_size)
+    f_active = ImageFont.truetype(font_italic_path, base_size)
+    
     words = [wd["word"] for wd in word_data]
     
     word_widths = []
     fake_draw = ImageDraw.Draw(Image.new("RGBA", (1,1)))
     
     for i, wd in enumerate(word_data):
-        # Dynamically calculate font size for this word based on its scale
-        s = pop_size if wd["is_active"] else base_size
-        s = int(s * wd["scale"])
-        f_current = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', s)
+        f_current = f_active if wd["is_active"] else f_main
         bbox = fake_draw.textbbox((0,0), words[i], font=f_current)
         word_widths.append(bbox[2]-bbox[0])
     
     max_sub_width = int(frame_width * 0.85)
     lines = wrap_text_to_lines(words, word_widths, max_sub_width, f_main)
     
-    line_h = int(130 * scale_ratio)
-    total_h = len(lines) * line_h
+    line_h = int(70 * scale_ratio)
     
-    # Position: Lower-middle for vertical, bottom for horizontal
     if frame_width < frame_height:
-        start_y = int(frame_height * 0.5) # Middle for vertical Shorts
+        start_y = int(frame_height * 0.70) # Lower third
     else:
-        start_y = int(frame_height * 0.75) # Near bottom for longform
-
-    # ── READABILITY BOOST: Dark vignette behind subtitles ──
-    # Draw a soft dark glow to ensure text pops against white/busy backgrounds
-    sub_bg_h = total_h + 100
-    sub_bg = Image.new('RGBA', (frame_width, sub_bg_h), (0,0,0,0))
-    sub_draw = ImageDraw.Draw(sub_bg)
-    # Gradient fade or semi-trans box
-    sub_draw.rectangle([0, 0, frame_width, sub_bg_h], fill=(0, 0, 0, 140))
-    # Paste with a mask if you want it feathered, but a simple alpha box works well
-    img.alpha_composite(sub_bg, dest=(0, start_y - 40))
+        start_y = int(frame_height * 0.75)
     
     word_idx = 0
     for i, line in enumerate(lines):
@@ -1889,42 +1882,23 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
         
         for word_text in line:
             wd = word_data[word_idx]
-            is_shouting = word_text.isupper() and len(word_text) > 1
             is_active = wd["is_active"]
             
-            # Recalculate font with scale
-            s = pop_size if is_active else base_size
-            s = int(s * wd["scale"])
-            f = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', s)
+            f = f_active if is_active else f_main
             
-            # Colors
             c_fill = (255, 255, 255, 255)
             if is_active:
                 c_fill = (*accent_color, 255)
-            elif is_shouting:
-                c_fill = (*accent_color, 180) 
             elif wd["is_spoken"]:
                 c_fill = (180, 180, 180, 255)
             
-            # Adjust Y for scaling (keep baseline consistent or center it)
-            # Center it vertically within the line_h
             bbox = draw.textbbox((cur_x, line_y), word_text, font=f)
             th = bbox[3] - bbox[1]
-            y_offset = (line_h - th) // 2 - 10
+            y_offset = (line_h - th) // 2
             
-            # Main text with Glow for active word
-            if is_active:
-                # Neon Glow
-                glow_img = Image.new('RGBA', (word_widths[word_idx] + 20, line_h), (0,0,0,0))
-                glow_draw = ImageDraw.Draw(glow_img)
-                glow_draw.text((10, y_offset), word_text, font=f, fill=(*accent_color, 80), stroke_width=9, stroke_fill=(*accent_color, 40))
-                img.alpha_composite(glow_img, dest=(cur_x - 10, line_y))
-
-            draw.text(
-                (cur_x, line_y + y_offset), 
-                word_text, font=f, fill=c_fill,
-                stroke_width=3, stroke_fill=(0, 0, 0, 255)
-            )
+            # Subtle drop shadow
+            draw.text((cur_x + 2, line_y + y_offset + 2), word_text, font=f, fill=(0, 0, 0, 150))
+            draw.text((cur_x, line_y + y_offset), word_text, font=f, fill=c_fill)
             
             cur_x += word_widths[word_idx] + 12
             word_idx += 1
@@ -2181,7 +2155,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     avatar_scale_mult = dynamic_params.get("avatar_scale_mult", 1.0)
     subtitle_y_shift = dynamic_params.get("subtitle_y_shift", 0)
 
-    is_longform = "Slot C" in script_json.get("slot", "")
+    # is_longform = "Slot C" in script_json.get("slot", "")
+    is_longform = False
     set_resolutions(is_longform)
     
     today = datetime.now().strftime("%Y-%m-%d")
@@ -2350,12 +2325,9 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         _has_screenshot = bool(_screenshot_path_check and os.path.exists(_screenshot_path_check))
 
         def pip_position(t):
-            base_x, base_y = FRAME_W - cur_w - 20, 260
+            base_x = (FRAME_W - cur_w) // 2
+            base_y = FRAME_H - cur_h
             base_y += subtitle_y_shift # Apply feedback shift
-            
-            sway_y = math.sin(t * 0.3 * 2 * math.pi) * 3 + math.sin(t * 1.2 * 2 * math.pi) * 1.5
-            sway_x = math.sin(t * 0.2 * 2 * math.pi) * 2 + math.cos(t * 0.7 * 2 * math.pi) * 1
-            breathing = math.sin(t * 0.25 * 2 * math.pi) * 1
             
             e_x, e_y = 0, 0
             if shock_ts > 0 and abs(t - shock_ts) < 1.5:
@@ -2366,12 +2338,12 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 e_y = int(5 * math.sin(p * math.pi))
             
             if not _has_screenshot:
-                return (base_x + int(sway_x) + e_x, base_y + int(sway_y + breathing) + e_y)
+                return (base_x + e_x, base_y + e_y)
 
-            if t < 6.0: return (base_x + int(sway_x) + e_x, base_y + int(sway_y + breathing) + e_y)
+            if t < 6.0: return (base_x + e_x, base_y + e_y)
             cycle = (t - 6.0) % 11.0
             if cycle < 4.0: return (FRAME_W + 1000, base_y)
-            return (base_x + int(sway_x) + e_x, base_y + int(sway_y + breathing) + e_y)
+            return (base_x + e_x, base_y + e_y)
 
         def avatar_scale(t):
             base = 1.0
@@ -2385,19 +2357,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
         avatar_clip = avatar_clip.with_effects([vfx.Resize(avatar_scale)])
 
-        def _hud_pane(duration, accent):
-            pw, ph = cur_w + 40, cur_h + 40
-            img = Image.new("RGBA", (pw, ph), (0, 0, 0, 0))
-            draw = ImageDraw.Draw(img)
-            draw.rounded_rectangle([0, 0, pw, ph], radius=40, fill=(20, 20, 30, 160))
-            return _pil_clip(img, duration)
-
-        pane = _hud_pane(audio_duration, accent_color)
-
-        avatar_pip = CompositeVideoClip([
-            pane.with_position((-20, -20)),
-            avatar_clip.with_position((0, 0))
-        ], size=(cur_w + 60, cur_h + 60), is_mask=False).with_position(pip_position).with_start(0)
+        avatar_pip = avatar_clip.with_position(pip_position).with_start(0)
 
         # ── Avatar-Relative Callouts ──
         top_kws = sorted(script_json.get("keywords", []), key=len, reverse=True)[:3]
@@ -2419,26 +2379,6 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     screenshot_clips = _article_screenshot_clip(screenshot_path, audio_duration)
     tint = ColorClip(size=(FRAME_W, FRAME_H), color=accent_color, duration=audio_duration).with_opacity(0.02)
     gradient = _gradient_clip(audio_duration)
-    
-    sub_cat_low = sub_category.lower()
-    p_style = "digital" if any(x in sub_cat_low for x in ["tool", "hands", "code"]) else \
-              "stars" if any(x in sub_cat_low for x in ["research", "news", "predict"]) else "bokeh"
-    
-    bg_h = color_theme.get("background", "#0A0A0F").lstrip("#")
-    bg_base = tuple(int(bg_h[i:i+2], 16) for i in (0, 2, 4))
-    
-    ambient = _ambient_particles(audio_duration, accent_color, particle_style=p_style)
-    particle_clips.append(ambient)
-    tech_bg = _dynamic_tech_background(audio_duration, accent_color, bg_base_color=bg_base)
-    bg_layer_clips.insert(0, tech_bg)
-    
-    tags_img = render_entity_tags(key_entities, accent_color, FRAME_W, on_right=False)
-    def tag_pos(t):
-        if t < 0.5: return (-500 + int(500 * (t/0.5)), 320)
-        return (0, 320)
-    tags_clip = ImageClip(np.array(tags_img)).with_duration(audio_duration).with_position(tag_pos)
-    sweep = _sweep_clip(5.0, accent_color, FRAME_W).with_effects([vfx.Loop(duration=audio_duration)]).with_position((0, 320))
-    logo_clips.extend([tags_clip, sweep])
 
     # ── HUMAN REALISM OVERLAYS ───────────────────────────────────────────────
     grain_layer = _generate_film_grain(audio_duration, FRAME_W, FRAME_H)
