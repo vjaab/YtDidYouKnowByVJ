@@ -1412,6 +1412,7 @@ def _generate_lens_flare(duration, frame_width=1080):
 
 def _generate_room_tone(duration):
     """Synthesizes a low-freq atmospheric 'room tone'."""
+    duration = max(0.1, duration)  # Guard against zero/negative duration
     samples = np.random.normal(0, 0.01, int(44100 * duration))
     # Low pass filter (moving average)
     samples = np.convolve(samples, np.ones(100)/100, mode='same')
@@ -1420,7 +1421,11 @@ def _generate_room_tone(duration):
     temp_path = "/tmp/room_tone.wav"
     import soundfile as sf
     sf.write(temp_path, samples, 44100)
-    return AudioFileClip(temp_path).with_effects([afx.MultiplyVolume(0.1)])
+    clip = AudioFileClip(temp_path)
+    # Clamp to requested duration to avoid out-of-bounds audio reads
+    if clip.duration and clip.duration > duration:
+        clip = clip.subclipped(0, duration)
+    return clip.with_effects([afx.MultiplyVolume(0.1)])
 
 def _sweep_clip(duration, accent_color, frame_width=1080):
     """Creates a moving highlights 'sweep' for entity tags."""
@@ -2022,8 +2027,18 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     if output_path is None:
         output_path = os.path.join(OUTPUT_DIR, f"video_{today}.mp4")
 
+    # ── AUDIO VALIDATION ─────────────────────────────────────────────────
+    if not os.path.exists(audio_path) or os.path.getsize(audio_path) == 0:
+        print(f"ERROR: Audio file is missing or empty: {audio_path}")
+        return None
+
     audio          = AudioFileClip(audio_path)
     audio_duration = audio.duration
+
+    if audio_duration is None or audio_duration <= 0:
+        print(f"ERROR: Audio clip has no valid duration: {audio_path}")
+        return None
+    print(f"Audio validated: {audio_duration:.2f}s from {os.path.basename(audio_path)}")
 
     if not chunks:
         print("ERROR: no chunks")
@@ -2376,39 +2391,55 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         ctype = cue.get("type", "woosh").lower()
         cue_ts = float(cue.get("timestamp", 0))
         sfx_path = os.path.join(ASSETS_DIR, "sfx", f"{ctype}.wav")
-        if os.path.exists(sfx_path) and cue_ts < audio_duration:
-            sfx_clip = AudioFileClip(sfx_path).with_start(cue_ts).with_effects([afx.MultiplyVolume(0.4)])
-            final_audio_layers.append(sfx_clip)
+        if os.path.exists(sfx_path) and os.path.getsize(sfx_path) > 0 and cue_ts < audio_duration:
+            try:
+                sfx_clip = AudioFileClip(sfx_path)
+                # Clamp SFX so it doesn't extend past audio_duration
+                max_sfx_dur = audio_duration - cue_ts
+                if sfx_clip.duration and sfx_clip.duration > max_sfx_dur:
+                    sfx_clip = sfx_clip.subclipped(0, max_sfx_dur)
+                sfx_clip = sfx_clip.with_start(cue_ts).with_effects([afx.MultiplyVolume(0.4)])
+                final_audio_layers.append(sfx_clip)
+            except Exception as e:
+                print(f"SFX load failed for {ctype} (non-fatal): {e}")
     
     # Background Music with Auto-Ducking
     bgm_path = os.path.join(MUSIC_DIR, "modern_tech.mp3")
-    if os.path.exists(bgm_path):
-        bgm = AudioFileClip(bgm_path)
-        if bgm.duration < audio_duration:
-            bgm = bgm.with_effects([vfx.Loop(duration=audio_duration)])
-        else:
-            bgm = bgm.subclipped(0, audio_duration)
-            
-        def ducking_volume(get_frame, t):
-            if isinstance(t, np.ndarray):
-                vols = []
-                for time_t in t:
-                    is_speak = any(c["start"] - 0.1 <= time_t <= c["end"] + 0.1 for c in chunks)
-                    # Duck when speaking, boost when silent for 'energy'
-                    vol = BGM_VOLUME * 0.2 if is_speak else BGM_VOLUME * 1.3
-                    vols.append(vol)
-                multiplier = np.array(vols).reshape(-1, 1)
-                return get_frame(t) * multiplier
+    if os.path.exists(bgm_path) and os.path.getsize(bgm_path) > 0:
+        try:
+            bgm = AudioFileClip(bgm_path)
+            if bgm.duration is None or bgm.duration <= 0:
+                print(f"WARNING: BGM has no valid duration, skipping.")
             else:
-                is_speak = any(c["start"] - 0.1 <= t <= c["end"] + 0.1 for c in chunks)
-                vol = BGM_VOLUME * 0.2 if is_speak else BGM_VOLUME * 1.3
-                return get_frame(t) * vol
+                if bgm.duration < audio_duration:
+                    # Use afx.AudioLoop (NOT vfx.Loop which is video-only and causes
+                    # out-of-bounds audio reads — the root cause of the IndexError crash)
+                    bgm = bgm.with_effects([afx.AudioLoop(duration=audio_duration)])
+                else:
+                    bgm = bgm.subclipped(0, audio_duration)
                 
-        bgm = bgm.transform(ducking_volume).with_effects([afx.AudioFadeOut(2)])
-        
-        final_audio_layers.append(bgm)
+                def ducking_volume(get_frame, t):
+                    if isinstance(t, np.ndarray):
+                        vols = []
+                        for time_t in t:
+                            is_speak = any(c["start"] - 0.1 <= time_t <= c["end"] + 0.1 for c in chunks)
+                            # Duck when speaking, boost when silent for 'energy'
+                            vol = BGM_VOLUME * 0.2 if is_speak else BGM_VOLUME * 1.3
+                            vols.append(vol)
+                        multiplier = np.array(vols).reshape(-1, 1)
+                        return get_frame(t) * multiplier
+                    else:
+                        is_speak = any(c["start"] - 0.1 <= t <= c["end"] + 0.1 for c in chunks)
+                        vol = BGM_VOLUME * 0.2 if is_speak else BGM_VOLUME * 1.3
+                        return get_frame(t) * vol
+                    
+                bgm = bgm.transform(ducking_volume).with_effects([afx.AudioFadeOut(2)])
+                
+                final_audio_layers.append(bgm)
+        except Exception as e:
+            print(f"BGM loading failed (non-fatal): {e}")
 
-    final_audio = CompositeAudioClip(final_audio_layers)
+    final_audio = CompositeAudioClip(final_audio_layers).with_duration(audio_duration)
     
     # Pre-render header (only persistent overlay)
     header_img = render_header_bar(title, sub_category, accent_color, FRAME_W)
