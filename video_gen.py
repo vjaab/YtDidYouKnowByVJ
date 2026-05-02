@@ -1967,6 +1967,164 @@ def _generate_lipsync_video(audio_path):
     print("🎭 Lip-sync generation failed or unavailable.")
     return None
 
+
+# ══════════════════════════════════════════════════════════════════════════════
+# VISUAL AUDIT ENGINE — Agentic Observe & Critique for Video Rendering
+# ══════════════════════════════════════════════════════════════════════════════
+
+class VisualAuditEngine:
+    """Gemini Vision auditor for rendered videos.
+    
+    Extracts sample frames → sends to Gemini Vision → returns structured
+    refinement commands that feed back into the render loop.
+    
+    Agentic Loop: Plan → Act → **Observe → Critique** → Refine
+    """
+    
+    # Refinable parameters and their safe ranges
+    PARAM_RANGES = {
+        "avatar_scale_mult": (0.6, 1.4),
+        "subtitle_y_shift": (-80, 80),
+    }
+
+    def __init__(self, api_key):
+        self.api_key = api_key
+
+    def _extract_frames(self, video_path, num_frames=4):
+        """Extract sample frames at key timestamps from the rendered video."""
+        frames = []
+        try:
+            clip = VideoFileClip(video_path)
+            dur = clip.duration
+            if dur is None or dur <= 0:
+                return frames
+            
+            # Sample at 10%, 30%, 60%, 90% of the video
+            fractions = [0.10, 0.30, 0.60, 0.90]
+            for frac in fractions[:num_frames]:
+                t = dur * frac
+                frame = clip.get_frame(t)
+                pil_img = Image.fromarray(frame)
+                frames.append((frac, pil_img))
+            clip.close()
+        except Exception as e:
+            print(f"⚠️ [AUDIT] Frame extraction failed: {e}")
+        return frames
+
+    def _frames_to_bytes(self, frames):
+        """Convert PIL frames to PNG bytes for Gemini Vision."""
+        parts = []
+        for frac, pil_img in frames:
+            # Downscale for API efficiency (max 720px wide)
+            w, h = pil_img.size
+            if w > 720:
+                scale = 720 / w
+                pil_img = pil_img.resize((720, int(h * scale)), Image.LANCZOS)
+            buf = io.BytesIO()
+            pil_img.save(buf, format='JPEG', quality=80)
+            parts.append({
+                'mime_type': 'image/jpeg',
+                'data': buf.getvalue()
+            })
+        return parts
+
+    def _clamp_refinements(self, refinements):
+        """Clamp refinement values to safe ranges so Gemini can't break the render."""
+        clamped = {}
+        for key, (lo, hi) in self.PARAM_RANGES.items():
+            if key in refinements:
+                try:
+                    val = float(refinements[key])
+                    clamped[key] = max(lo, min(hi, val))
+                except (ValueError, TypeError):
+                    pass
+        return clamped
+
+    def audit(self, video_path, script_text=""):
+        """Run Gemini Vision audit on the rendered video.
+        
+        Returns:
+            dict with keys: score (float), issues (str), refinement_commands (dict)
+            Returns None on failure.
+        """
+        if not self.api_key:
+            print("⚠️ [AUDIT] No API key, skipping visual audit.")
+            return None
+
+        frames = self._extract_frames(video_path)
+        if not frames:
+            print("⚠️ [AUDIT] No frames extracted, skipping audit.")
+            return None
+
+        print(f"👁️ [AUDIT] Sending {len(frames)} sample frames to Gemini Vision...")
+
+        try:
+            from google import genai
+
+            client = genai.Client(api_key=self.api_key)
+            image_parts = self._frames_to_bytes(frames)
+
+            param_desc = json.dumps({k: f"range {v}" for k, v in self.PARAM_RANGES.items()})
+
+            prompt = (
+                "You are a Senior Video Production QA Engineer reviewing a YouTube Shorts / tech news video.\n"
+                f"Script Summary (for context): {script_text[:300]}...\n\n"
+                f"You are shown {len(frames)} frames sampled at 10%, 30%, 60%, 90% of the video.\n\n"
+                "CRITICAL EVALUATION CRITERIA:\n"
+                "1. SUBTITLE READABILITY: Are subtitles clearly visible, properly positioned, not overlapping with the avatar or other UI elements?\n"
+                "2. AVATAR POSITIONING: Is the avatar (talking head PiP) appropriately sized and positioned without blocking important content?\n"
+                "3. TEXT OVERLAP: Do any text elements (title, header, captions, CTA cards) overlap each other or get cut off?\n"
+                "4. VISUAL HIERARCHY: Is the overall layout clean, professional, and suitable for a fast-paced tech news short?\n"
+                "5. CONTRAST & LEGIBILITY: Can all text be read against the background at a glance?\n\n"
+                f"AVAILABLE REFINEMENT PARAMETERS: {param_desc}\n"
+                "- avatar_scale_mult: Scale multiplier for the avatar PiP (1.0 = current size, 0.8 = smaller, 1.2 = bigger)\n"
+                "- subtitle_y_shift: Vertical pixel shift for subtitles (negative = move up, positive = move down)\n\n"
+                "Return EXACTLY this JSON (no markdown fencing):\n"
+                '{\n'
+                '  "score": <1.0 to 10.0>,\n'
+                '  "issues": "<concise 1-2 sentence diagnosis>",\n'
+                '  "refinement_commands": {\n'
+                '    "avatar_scale_mult": <float or omit if fine>,\n'
+                '    "subtitle_y_shift": <int or omit if fine>\n'
+                '  }\n'
+                '}\n'
+                'If everything looks great (score >= 8.5), return an empty refinement_commands: {}'
+            )
+
+            # Build content: images first, then prompt text
+            contents = image_parts + [prompt]
+
+            response = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=contents
+            )
+
+            raw = response.text.strip()
+            # Strip markdown code fence if present
+            if raw.startswith("```"):
+                raw = raw.split("\n", 1)[-1]  # Remove first line (```json)
+                raw = raw.rsplit("```", 1)[0]  # Remove trailing ```
+            raw = raw.strip()
+
+            result = json.loads(raw)
+
+            # Sanitize: clamp refinement values to safe ranges
+            if "refinement_commands" in result:
+                result["refinement_commands"] = self._clamp_refinements(result["refinement_commands"])
+
+            score = result.get("score", "?")
+            issues = result.get("issues", "No issues reported")
+            print(f"👁️ [AUDIT] Score: {score}/10 | {issues}")
+            return result
+
+        except json.JSONDecodeError as e:
+            print(f"⚠️ [AUDIT] Failed to parse Gemini response: {e}")
+            return None
+        except Exception as e:
+            print(f"⚠️ [AUDIT] Gemini Vision audit failed: {e}")
+            return None
+
+
 def create_video(audio_path, script_json, chunks, output_path=None):
     """
     Agentic Loop for Video: Plan -> Act -> Observe -> Critique -> Refine
@@ -1992,7 +2150,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         
         if not video_path: break
         
-        # 1. OBSERVE & CRITIQUE (VisualAuditEngine — optional, may not be implemented yet)
+        # 1. OBSERVE & CRITIQUE
         if api_key and iterations < max_iters:
             try:
                 auditor = VisualAuditEngine(api_key)
@@ -2008,8 +2166,6 @@ def create_video(audio_path, script_json, chunks, output_path=None):
                         continue
                 else:
                     print(f"⭐ [VIDEO LOOP] Visual Quality Score: {feedback.get('score', 'N/A')}/10. Approved.")
-            except NameError:
-                print("⚠️ [VIDEO LOOP] VisualAuditEngine not available, skipping quality audit.")
             except Exception as e:
                 print(f"⚠️ [VIDEO LOOP] Visual audit failed (non-fatal): {e}")
         
