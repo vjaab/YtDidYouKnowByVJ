@@ -255,9 +255,10 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
             f"Analyze the following {content_desc} and pick the SINGLE most impactful story to convert into a 38-44s YouTube Short script.\n"
             "SELECTION FILTERS:\n"
             "1. MUST be New, Useful, or Surprising (Absolute mandatory).\n"
-            "2. MUST be explainable in exactly <40s of dense technically-accurate speech.\n"
+            "2. MUST be explainable in exactly <40s of dense technically-accurate speech (approx 120-140 words total).\n"
             "3. MUST contain one concrete takeaway or engineering tip the viewer can use today.\n"
             "4. PRIORITIZE: Documentation 'Easter Eggs', cost-saving architecture (Local models), or workflow 'unfair advantages' (Agentic loops).\n\n"
+            "FORMAT: You MUST follow the strict 6-part structure: Hook -> Why It Matters -> Core Content (1-2 items) -> Workflow -> Caveat -> Starting Point -> Outro.\n\n"
             "CONTENT MIX (Algorithm Target):\n"
             "- 30% Practical AI Tools (Automation, Dev tools, SDKs).\n"
             "- 40% Frontier AI Model Releases (OpenAI, DeepMind, Anthropic benchmarks).\n"
@@ -272,7 +273,14 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "description": "Full 100+ word rich SEO description for youtube describing the video, including timestamps and credits.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
   "title": "Punchy YouTube title max 60 chars",
-  "script": "Full voiceover script. Target duration: 38-44 sec.",
+  "hook_script": "5-second personal story / problem setup (approx 15 words). Stark contrast, direct eye contact feel.",
+  "section_1_why_it_matters": "Context, data point, and common mistake (approx 15 words).",
+  "section_2_core_content": "Break down 1-2 specific tools, architectural principles, or tips. Give specific prompts/formulas for each (approx 40 words).",
+  "section_3_workflow": "A step-by-step chaining of the core content on a real problem. Fast paced (approx 20 words).",
+  "section_4_caveat": "The critical mistake to avoid. Serious tone (approx 10 words).",
+  "section_5_starting_point": "One immediate action to take today (approx 10 words).",
+  "outro_cta": "Subscribe and comment prompt.",
+  "script": "The FULL unified voiceover script seamlessly concatenating hook_script, section_1, section_2, section_3, section_4, section_5, and outro_cta into ONE single flowing text block. Target total duration: 38-44 sec (approx 120-140 words).",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://github.com/...", "https://arxiv.org/abs/..."],
   "phonetic_pronunciation_map": {{"NVIDIA": "In-vid-yah"}},
