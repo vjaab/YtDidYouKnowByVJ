@@ -33,8 +33,8 @@ from datetime import datetime
 from google import genai
 from google.genai import types
 from moviepy import (
-    VideoClip, ImageClip, VideoFileClip, AudioFileClip,
-    CompositeVideoClip, ColorClip, CompositeAudioClip, concatenate_videoclips
+    VideoClip, ImageClip, VideoFileClip, AudioFileClip, AudioClip,
+    CompositeVideoClip, ColorClip, CompositeAudioClip, concatenate_videoclips, concatenate_audioclips
 )
 import moviepy.video.fx as vfx
 import moviepy.audio.fx as afx

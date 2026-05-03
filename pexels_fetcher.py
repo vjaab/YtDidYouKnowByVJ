@@ -340,7 +340,8 @@ def _generate_imagen3(chunk_text, output_path, topic_context="", global_style_gu
     if os.environ.get("IMAGEN_QUOTA_EXHAUSTED"):
          return None
 
-    # Updated to 4.0 models as 3.0 is missing from the API in this envirodef fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide="", is_longform=False):
+    # Updated to 4.0 models as 3.0 is missing from the API in this environment
+def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide="", is_longform=False):
     """
     Executes the Visual Fetching Decision Tree (A -> B -> C -> D -> E)
     """
