@@ -2161,8 +2161,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     avatar_scale_mult = dynamic_params.get("avatar_scale_mult", 1.0)
     subtitle_y_shift = dynamic_params.get("subtitle_y_shift", 0)
 
-    # is_longform = "Slot C" in script_json.get("slot", "")
-    is_longform = False
+    is_longform = "Slot C" in script_json.get("slot", "")
     set_resolutions(is_longform)
     
     today = datetime.now().strftime("%Y-%m-%d")
