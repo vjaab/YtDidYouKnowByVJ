@@ -834,7 +834,7 @@ def _render_comparison_card(left_label, left_val, right_label, right_val,
     return img
 
 
-def _render_process_steps(steps, accent_color, width=960):
+def _render_process_steps(steps, accent_color, width=960, active_step=None):
     """Numbered flow steps (up to 4) shown as a horizontal pill row."""
     n     = min(len(steps), 4)
     f     = gf(28)
@@ -845,6 +845,9 @@ def _render_process_steps(steps, accent_color, width=960):
 
     col_w = width // n
     for i, step in enumerate(steps[:n]):
+        if active_step is not None and i > active_step:
+            break
+            
         x0 = i * col_w + 8
         x1 = (i + 1) * col_w - 8
         # Highlight current step darker
@@ -897,7 +900,7 @@ def _render_stat_card(stat_value, stat_label, accent_color, width=600):
     draw.text(((card_w - lw) // 2, 28 + vh), stat_label,
               font=f_label, fill=(200, 200, 210, 200))
 
-def _render_flowchart_card(steps, accent_color, width=900):
+def _render_flowchart_card(steps, accent_color, width=900, active_step=None):
     """Vertical architectural flowchart: Step 1 -> Step 2 -> Step 3."""
     n = min(len(steps), 4)
     if n == 0: return Image.new("RGBA", (width, 100), (0, 0, 0, 0))
@@ -915,6 +918,9 @@ def _render_flowchart_card(steps, accent_color, width=900):
     draw.rounded_rectangle([0, 0, width, total_h], radius=25, fill=(10, 10, 15, 200))
     
     for i, step in enumerate(steps[:n]):
+        if active_step is not None and i > active_step:
+            break
+            
         y0 = 30 + i * (step_h + gap)
         y1 = y0 + step_h
         
@@ -943,7 +949,7 @@ def _render_flowchart_card(steps, accent_color, width=900):
             
     return img
 
-def _render_slide_card(title, bullets, accent_color, is_longform=False):
+def _render_slide_card(title, bullets, accent_color, is_longform=False, active_step=None):
     h = 600 if not is_longform else 800
     w = 900 if not is_longform else 1500
     pil = Image.new("RGBA", (w, h), (0,0,0,0))
@@ -966,6 +972,9 @@ def _render_slide_card(title, bullets, accent_color, is_longform=False):
     start_y = 180
     by = start_y
     for i, bullet in enumerate(bullets):
+        if active_step is not None and i > active_step:
+            break
+            
         dot_y = by + (20 if not is_longform else 30)
         d.ellipse([60, dot_y - 8, 76, dot_y + 8], fill=(*accent_color, 255))
         
@@ -1110,10 +1119,28 @@ def _infographic_card_clip(infographic_type, infographic_data,
         print(f"Infographic render error ({itype}): {e}")
         return None
 
-    arr      = np.array(pil.convert("RGB"))
-    mask_arr = np.array(pil.split()[3]).astype(float) / 255.0
+    num_steps = 1
+    if itype == "slide":
+        num_steps = len(current_data.get("bullet_points", []))
+    elif itype == "process":
+        num_steps = min(len(current_data.get("steps", [])), 4)
+    elif itype == "flowchart":
+        num_steps = min(len(current_data.get("steps", [])), 4)
 
-    # Slide-up entrance + fade out
+    def get_arr_mask(step_idx=None):
+        if step_idx is None:
+            return np.array(pil.convert("RGB")), np.array(pil.split()[3]).astype(float) / 255.0
+            
+        if itype == "slide":
+            step_pil = _render_slide_card(current_data.get("title", ""), current_data.get("bullet_points", []), accent_color, is_longform=FRAME_W==1920, active_step=step_idx)
+        elif itype == "process":
+            step_pil = _render_process_steps(current_data.get("steps", []), accent_color, active_step=step_idx)
+        elif itype == "flowchart":
+            step_pil = _render_flowchart_card(current_data.get("steps", []), accent_color, active_step=step_idx)
+        else:
+            step_pil = pil
+        return np.array(step_pil.convert("RGB")), np.array(step_pil.split()[3]).astype(float) / 255.0
+
     iw, ih = pil.size
     x_pos   = (FRAME_W - iw) // 2
 
@@ -1124,13 +1151,28 @@ def _infographic_card_clip(infographic_type, infographic_data,
 
     def y_pos_fn(t):
         slide = min(t / 0.25, 1.0)
-        # Ease-out: starts 40px below final position
         eased = 1 - (1 - slide) ** 2
-        return int(FRAME_H * 0.62 + 40 * (1 - eased))
+        base_y = int(FRAME_H * 0.15) if FRAME_H > FRAME_W else int(FRAME_H * 0.10)
+        return int(base_y + 40 * (1 - eased))
 
-    clip  = VideoClip(lambda t: arr, duration=dur)
-    mclip = VideoClip(lambda t: mask_arr * opacity_fn(t),
-                      is_mask=True, duration=dur)
+    if num_steps <= 1:
+        arr, mask_arr = get_arr_mask()
+        clip  = VideoClip(lambda t: arr, duration=dur)
+        mclip = VideoClip(lambda t: mask_arr * opacity_fn(t), is_mask=True, duration=dur)
+    else:
+        step_dur = dur / max(num_steps, 1)
+        step_data = [get_arr_mask(i) for i in range(num_steps)]
+        
+        def make_frame(t):
+            idx = min(int(t / step_dur), num_steps - 1)
+            return step_data[idx][0]
+            
+        def make_mask(t):
+            idx = min(int(t / step_dur), num_steps - 1)
+            return step_data[idx][1] * opacity_fn(t)
+            
+        clip = VideoClip(make_frame, duration=dur)
+        mclip = VideoClip(make_mask, is_mask=True, duration=dur)
 
     return (clip.with_mask(mclip)
                 .with_position(lambda t: (x_pos, y_pos_fn(t)))
@@ -1491,9 +1533,9 @@ def _article_screenshot_clip(screenshot_path, duration):
         if duration > start1 + dur1:
             clip1 = ImageClip(arr, duration=dur1)
             mclip1 = VideoClip(lambda t: mask, is_mask=True, duration=dur1)
-            # Subtle zoom: 1.0 to 1.10
+            # Subtle zoom: 1.0 to 1.15
             # Anchor at (0,0) so top and left stay fixed
-            clip1 = clip1.resized(lambda t: 1.0 + 0.10 * (t / dur1))
+            clip1 = clip1.resized(lambda t: 1.0 + 0.15 * (t / dur1))
             clip1 = clip1.with_mask(mclip1).with_position((0, 0)).with_start(start1)
             clip1 = clip1.with_effects([vfx.CrossFadeIn(0.4), vfx.CrossFadeOut(0.4)])
             clips.append(clip1)
@@ -1505,9 +1547,9 @@ def _article_screenshot_clip(screenshot_path, duration):
         if dur2 > 0:
             clip2 = ImageClip(arr, duration=dur2)
             mclip2 = VideoClip(lambda t: mask, is_mask=True, duration=dur2)
-            # Deep Zoom: 1.0 to 1.30
+            # Deep Zoom: 1.0 to 1.40
             # Anchor at (0,0) to keep headline and logo in view
-            clip2 = clip2.resized(lambda t: 1.0 + 0.30 * (t / dur2))
+            clip2 = clip2.resized(lambda t: 1.0 + 0.40 * (t / dur2))
             clip2 = clip2.with_mask(mclip2).with_position((0, 0)).with_start(start2)
             clip2 = clip2.with_effects([vfx.CrossFadeIn(0.5), vfx.CrossFadeOut(0.5)])
             clips.append(clip2)
@@ -2500,7 +2542,6 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         if os.path.exists(sfx_path) and os.path.getsize(sfx_path) > 0 and cue_ts < audio_duration:
             try:
                 sfx_clip = AudioFileClip(sfx_path)
-                # Clamp SFX so it doesn't extend past audio_duration
                 max_sfx_dur = audio_duration - cue_ts
                 if sfx_clip.duration and sfx_clip.duration > max_sfx_dur:
                     sfx_clip = sfx_clip.subclipped(0, max_sfx_dur)
@@ -2508,6 +2549,22 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 final_audio_layers.append(sfx_clip)
             except Exception as e:
                 print(f"SFX load failed for {ctype} (non-fatal): {e}")
+                
+    # Auto-inject SFX for infographics
+    for chunk in chunks:
+        if chunk.get("has_infographic"):
+            cue_ts = chunk["start"]
+            sfx_path = os.path.join(ASSETS_DIR, "sfx", "woosh.wav")
+            if os.path.exists(sfx_path) and cue_ts < audio_duration:
+                try:
+                    sfx_clip = AudioFileClip(sfx_path)
+                    max_sfx_dur = audio_duration - cue_ts
+                    if sfx_clip.duration and sfx_clip.duration > max_sfx_dur:
+                        sfx_clip = sfx_clip.subclipped(0, max_sfx_dur)
+                    sfx_clip = sfx_clip.with_start(cue_ts).with_effects([afx.MultiplyVolume(0.4)])
+                    final_audio_layers.append(sfx_clip)
+                except Exception as e:
+                    pass
     
     # Background Music with Auto-Ducking
     bgm_path = os.path.join(MUSIC_DIR, "modern_tech.mp3")
@@ -2558,43 +2615,44 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         
         # Subtitle logic map for the exact current timestamp
         subtitle_img = None
+        
+        # Find active chunk or hold the last one if t is past the end
+        active_chunk = None
         for chunk in chunks:
             if chunk["start"] - 0.1 <= t <= chunk["end"] + 0.1:
-                # REQUEST: Subtitles should disappear for the final feedback CTA
-                text_low = chunk.get("text", "").lower()
-                cta_keywords = ["follow", "updates", "suggestions", "feedback", "whatsapp", "telegram", "bio"]
-                if any(kw in text_low for kw in cta_keywords) and t > audio_duration - 2.5:
-                    break
-                    
-                word_status_list = []
-                for w in chunk.get("words", []):
-                    # Kinetic Pop Logic: Scale up 1.25x for first 150ms of word
-                    scale = 1.0
-                    is_active = w["start"] - 0.05 <= t <= w["end"] + 0.05
-                    if is_active:
-                        # Pop peaks in first 20% of duration (or 0.15s) and settles
-                        word_dur = w["end"] - w["start"]
-                        p = (t - w["start"]) / max(word_dur, 0.01)
-                        if 0 <= p <= 0.2:
-                            scale = 1.0 + (0.25 * (p / 0.2))
-                        elif 0.2 < p <= 0.4:
-                            scale = 1.25 - (0.25 * ((p-0.2)/0.2))
-                        else:
-                            scale = 1.0
-
-                    word_status_list.append({
-                        "word": w["word"],
-                        "is_active": is_active,
-                        "is_spoken": t > w["end"],
-                        "scale": scale
-                    })
-
-                if word_status_list:
-                    subtitle_img = render_subtitle_frame(
-                        word_status_list, bg_frame=bg_frame, 
-                        accent_color=accent_color, frame_width=FRAME_W, frame_height=FRAME_H
-                    )
+                active_chunk = chunk
                 break
+                
+        if not active_chunk and chunks and t > chunks[-1]["end"]:
+            active_chunk = chunks[-1]
+            
+        if active_chunk:
+            word_status_list = []
+            for w in active_chunk.get("words", []):
+                scale = 1.0
+                is_active = w["start"] - 0.05 <= t <= w["end"] + 0.05
+                if is_active:
+                    word_dur = w["end"] - w["start"]
+                    p = (t - w["start"]) / max(word_dur, 0.01)
+                    if 0 <= p <= 0.2:
+                        scale = 1.0 + (0.25 * (p / 0.2))
+                    elif 0.2 < p <= 0.4:
+                        scale = 1.25 - (0.25 * ((p-0.2)/0.2))
+                    else:
+                        scale = 1.0
+
+                word_status_list.append({
+                    "word": w["word"],
+                    "is_active": is_active,
+                    "is_spoken": t > w["end"],
+                    "scale": scale
+                })
+
+            if word_status_list:
+                subtitle_img = render_subtitle_frame(
+                    word_status_list, bg_frame=bg_frame, 
+                    accent_color=accent_color, frame_width=FRAME_W, frame_height=FRAME_H
+                )
                 
         # ── RETENTION LAYERS: Script-Driven Engagement Cues ──────────────────
         retention_hooks = script_json.get("retention_cues", [])
@@ -2663,6 +2721,36 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
     final = VideoClip(make_final_frame, duration=audio_duration)
     final = final.with_audio(final_audio)
+
+    # ── END-SCREEN CTA ───────────────────────────────────────────
+    cta_duration = 3.0
+    cta_img = Image.new("RGBA", (FRAME_W, FRAME_H), (15, 15, 20, 255))
+    cta_d = ImageDraw.Draw(cta_img)
+    f_cta_title = gf(90 if FRAME_W == 1080 else 140)
+    f_cta_sub = gf(50 if FRAME_W == 1080 else 80)
+    
+    title_text = "Subscribe & Comment Below"
+    sub_text = "For more AI engineering insights."
+    
+    tw, th = ts(title_text, f_cta_title)
+    sw, sh = ts(sub_text, f_cta_sub)
+    
+    cx, cy = FRAME_W // 2, FRAME_H // 2
+    cta_d.text((cx - tw//2, cy - th - 20), title_text, fill=(*accent_color, 255), font=f_cta_title)
+    cta_d.text((cx - sw//2, cy + 20), sub_text, fill=(200, 200, 210, 255), font=f_cta_sub)
+    
+    cta_clip = ImageClip(np.array(cta_img.convert("RGB"))).with_duration(cta_duration)
+    
+    # SFX at CTA
+    sfx_path = os.path.join(ASSETS_DIR, "sfx", "pop.wav")
+    if os.path.exists(sfx_path):
+        cta_audio = AudioFileClip(sfx_path).with_effects([afx.MultiplyVolume(0.5)])
+        # Pad CTA audio to match cta_clip duration to avoid silence issues
+        silence = AudioClip(lambda t: [0,0], duration=max(0.1, cta_duration - cta_audio.duration))
+        cta_audio = concatenate_audioclips([cta_audio, silence])
+        cta_clip = cta_clip.with_audio(cta_audio)
+        
+    final = concatenate_videoclips([final, cta_clip], method="compose")
 
     print(f"Exporting {audio_duration:.1f}s → {output_path}")
     

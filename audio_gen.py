@@ -212,12 +212,12 @@ def _postprocess_voice_audio(wav_path):
         
         audio = AudioSegment.from_wav(wav_path)
         
-        # 1. High-pass filter (100Hz) - Removes low-frequency energy that masks speech clarity
-        audio = audio.high_pass_filter(100)
+        # 1. High-pass filter (130Hz) - Removes low-frequency energy (AC hum) that masks speech clarity
+        audio = audio.high_pass_filter(130)
         
         # 2. Dynamic Compression - Makes the voice sound more authoritative
-        # Threshold -20dB, Ratio 3:1, Attack 5ms, Release 50ms
-        audio = compress_dynamic_range(audio, threshold=-20.0, ratio=3.0, attack=5.0, release=50.0)
+        # Threshold -15dB, Ratio 3:1, Attack 5ms, Release 50ms (higher threshold prevents noise floor pumping)
+        audio = compress_dynamic_range(audio, threshold=-15.0, ratio=3.0, attack=5.0, release=50.0)
         
         # 3. Final Normalization
         audio = normalize(audio, headroom=1.0)
@@ -226,7 +226,7 @@ def _postprocess_voice_audio(wav_path):
         audio = audio.fade_in(5).fade_out(5)
         
         audio.export(wav_path, format="wav")
-        print(f"   🎙️ Audio enhanced: 100Hz HPF, dynamic compression, normalized to -1dB")
+        print(f"   🎙️ Audio enhanced: 130Hz HPF, dynamic compression, normalized to -1dB")
     except Exception as e:
         print(f"   ⚠ Audio post-processing skipped: {e}")
 

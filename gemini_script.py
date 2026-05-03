@@ -215,6 +215,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
             "2. MUST be explainable in 120-180s of expert-level technical speech (approx 350-450 words total).\n"
             "3. MUST contain a highly relatable Hook, a Workflow demonstration, and a strong Conceptual Warning (The Caveat).\n"
             "4. PRIORITIZE: Documentation 'Easter Eggs', optimization hacks, or workflow structures that provide extreme utility.\n"
+            "5. VOCAL DYNAMICS: You MUST use heavy punctuation (commas, ellipses '...', exclamation marks, italics, ALL CAPS) around key technical terms and transitions. The TTS engine relies entirely on punctuation to vary pitch and emphasis. Never use plain unpunctuated sentences for important points.\n"
             "FORMAT: You MUST follow the strict 6-part structure: Hook -> Why It Matters -> Core Content (3-5 items) -> Workflow -> Caveat -> Starting Point -> Outro.\n"
         )
         prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
@@ -257,7 +258,8 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
             "1. MUST be New, Useful, or Surprising (Absolute mandatory).\n"
             "2. MUST be explainable in exactly <40s of dense technically-accurate speech (approx 120-140 words total).\n"
             "3. MUST contain one concrete takeaway or engineering tip the viewer can use today.\n"
-            "4. PRIORITIZE: Documentation 'Easter Eggs', cost-saving architecture (Local models), or workflow 'unfair advantages' (Agentic loops).\n\n"
+            "4. PRIORITIZE: Documentation 'Easter Eggs', cost-saving architecture (Local models), or workflow 'unfair advantages' (Agentic loops).\n"
+            "5. VOCAL DYNAMICS: You MUST use heavy punctuation (commas, ellipses '...', exclamation marks, italics, ALL CAPS) around key technical terms and transitions. The TTS engine relies entirely on punctuation to vary pitch and emphasis. Never use plain unpunctuated sentences for important points.\n\n"
             "FORMAT: You MUST follow the strict 6-part structure: Hook -> Why It Matters -> Core Content (1-2 items) -> Workflow -> Caveat -> Starting Point -> Outro.\n\n"
             "CONTENT MIX (Algorithm Target):\n"
             "- 30% Practical AI Tools (Automation, Dev tools, SDKs).\n"
