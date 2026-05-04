@@ -2375,19 +2375,31 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         cur_h = int(height_pip * avatar_scale_mult)
         avatar_clip = vid_clip.resized((cur_w, cur_h)).without_audio()
         
-        # Rounded & Feathered Mask
-        a_mask_np = np.zeros((cur_h, cur_w), dtype=np.uint8)
-        radius = int(32 * avatar_scale_mult)
-        cv2.circle(a_mask_np, (radius, radius), radius, 255, -1)
-        cv2.circle(a_mask_np, (cur_w-radius, radius), radius, 255, -1)
-        cv2.circle(a_mask_np, (radius, cur_h-radius), radius, 255, -1)
-        cv2.circle(a_mask_np, (cur_w-radius, cur_h-radius), radius, 255, -1)
-        cv2.rectangle(a_mask_np, (radius, 0), (cur_w-radius, cur_h), 255, -1)
-        cv2.rectangle(a_mask_np, (0, radius), (cur_w, cur_h-radius), 255, -1)
+        # Softly Blended Mask for Seamless Integration
+        a_mask_np = np.ones((cur_h, cur_w), dtype=np.float32)
         
-        mask_img = Image.fromarray(a_mask_np)
-        mask_img = mask_img.filter(ImageFilter.GaussianBlur(radius=5))
-        a_mask_feathered = np.array(mask_img).astype(float) / 255.0
+        fade_x = int(cur_w * 0.3)
+        fade_y = int(cur_h * 0.25)
+        
+        for x in range(cur_w):
+            if x < fade_x:
+                alpha_x = (math.sin((x / fade_x) * math.pi - math.pi/2) + 1) / 2
+            elif x > cur_w - fade_x:
+                alpha_x = (math.sin(((cur_w - x) / fade_x) * math.pi - math.pi/2) + 1) / 2
+            else:
+                alpha_x = 1.0
+            a_mask_np[:, x] *= alpha_x
+            
+        for y in range(cur_h):
+            if y < fade_y:
+                alpha_y = (math.sin((y / fade_y) * math.pi - math.pi/2) + 1) / 2
+            elif y > cur_h - fade_y:
+                alpha_y = (math.sin(((cur_h - y) / fade_y) * math.pi - math.pi/2) + 1) / 2
+            else:
+                alpha_y = 1.0
+            a_mask_np[y, :] *= alpha_y
+            
+        a_mask_feathered = a_mask_np
         
         mclip = VideoClip(lambda t: a_mask_feathered, is_mask=True, duration=audio_duration)
         avatar_clip = avatar_clip.with_mask(mclip)
@@ -2395,10 +2407,24 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         _screenshot_path_check = script_json.get("screenshot_path")
         _has_screenshot = bool(_screenshot_path_check and os.path.exists(_screenshot_path_check))
 
+        def avatar_scale(t):
+            base = 1.0
+            if shock_ts > 0 and abs(t - shock_ts) < 1.0:
+                p = 1.0 - abs(t - shock_ts) / 1.0
+                base = 1.0 + 0.12 * math.sin(p * math.pi)
+            elif key_stat_ts > 0 and abs(t - key_stat_ts) < 0.8:
+                p = 1.0 - abs(t - key_stat_ts) / 0.8
+                base = 1.0 + 0.08 * math.sin(p * math.pi)
+            return base
+
         def pip_position(t):
-            base_x = (FRAME_W - cur_w) // 2
-            base_y = FRAME_H - cur_h
-            base_y += subtitle_y_shift # Apply feedback shift
+            # Position at bottom-right corner, blending seamlessly into the frame
+            scale = avatar_scale(t)
+            scaled_w = int(cur_w * scale)
+            scaled_h = int(cur_h * scale)
+            
+            base_x = 0
+            base_y = FRAME_H - scaled_h
             
             e_x, e_y = 0, 0
             if shock_ts > 0 and abs(t - shock_ts) < 1.5:
@@ -2416,16 +2442,6 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             if cycle < 4.0: return (FRAME_W + 1000, base_y)
             return (base_x + e_x, base_y + e_y)
 
-        def avatar_scale(t):
-            base = 1.0
-            if shock_ts > 0 and abs(t - shock_ts) < 1.0:
-                p = 1.0 - abs(t - shock_ts) / 1.0
-                base = 1.0 + 0.12 * math.sin(p * math.pi)
-            elif key_stat_ts > 0 and abs(t - key_stat_ts) < 0.8:
-                p = 1.0 - abs(t - key_stat_ts) / 0.8
-                base = 1.0 + 0.08 * math.sin(p * math.pi)
-            return base
-
         avatar_clip = avatar_clip.with_effects([vfx.Resize(avatar_scale)])
 
         avatar_pip = avatar_clip.with_position(pip_position).with_start(0)
@@ -2442,7 +2458,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 rel = t - _ts
                 if rel < 0 or rel > 2.0: return (FRAME_W + 100, 0)
                 bx, by = pip_position(t)
-                return (bx - 40 + int(rel*40), by - 60 - int(rel*40))
+                return (bx + 20 + int(rel*40), by - 60 - int(rel*40))
             logo_clips.append(_pil_clip(skw, 2.0, start=t_kw).with_position(kpos))
 
     # ── LAYERS ───────────────────────────────────────────────────────────
