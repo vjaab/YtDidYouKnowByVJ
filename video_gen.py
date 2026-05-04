@@ -954,8 +954,8 @@ def _render_slide_card(title, bullets, accent_color, is_longform=False, active_s
     w = 980 if not is_longform else 1500
     pil = Image.new("RGBA", (w, h), (0,0,0,0))
     d = ImageDraw.Draw(pil)
-    # Fully opaque solid background for maximum readability
-    bg = (15, 15, 20, 255)
+    # Semi-transparent background for a modern glassmorphism effect, revealing the screenshot behind
+    bg = (15, 15, 20, 220)
     d.rounded_rectangle([0,0,w,h], 40, fill=bg, outline=accent_color, width=8)
     
     cx = w // 2
@@ -1127,6 +1127,11 @@ def _infographic_card_clip(infographic_type, infographic_data,
         num_steps = min(len(current_data.get("steps", [])), 4)
     elif itype == "flowchart":
         num_steps = min(len(current_data.get("steps", [])), 4)
+
+    # Prevent ANY infographic from staying on screen for too long (applies to both shortform and longform)
+    # We allocate ~3.5 seconds per step, but cap it at a reasonable maximum so it doesn't just sit there.
+    max_dur = max(4.5, num_steps * 3.5)
+    dur = min(dur, max_dur)
 
     def get_arr_mask(step_idx=None):
         if step_idx is None:
