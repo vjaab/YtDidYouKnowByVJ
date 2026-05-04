@@ -900,22 +900,22 @@ def _render_stat_card(stat_value, stat_label, accent_color, width=600):
     draw.text(((card_w - lw) // 2, 28 + vh), stat_label,
               font=f_label, fill=(200, 200, 210, 200))
 
-def _render_flowchart_card(steps, accent_color, width=900, active_step=None):
+def _render_flowchart_card(steps, accent_color, width=980, active_step=None):
     """Vertical architectural flowchart: Step 1 -> Step 2 -> Step 3."""
     n = min(len(steps), 4)
     if n == 0: return Image.new("RGBA", (width, 100), (0, 0, 0, 0))
     
-    step_h = 100
+    step_h = 120
     gap = 40
     total_h = n * step_h + (n-1) * gap + 60
     
     img = Image.new("RGBA", (width, total_h), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
-    f_step = gf(32)
-    f_num = gf(24)
+    f_step = gf(40)
+    f_num = gf(30)
     
-    # Background glass
-    draw.rounded_rectangle([0, 0, width, total_h], radius=25, fill=(10, 10, 15, 200))
+    # Background glass (fully opaque for readability)
+    draw.rounded_rectangle([0, 0, width, total_h], radius=30, fill=(15, 15, 20, 255), outline=accent_color, width=6)
     
     for i, step in enumerate(steps[:n]):
         if active_step is not None and i > active_step:
@@ -925,64 +925,65 @@ def _render_flowchart_card(steps, accent_color, width=900, active_step=None):
         y1 = y0 + step_h
         
         # Step box
-        box_w = width - 100
-        bx0 = 50
+        box_w = width - 80
+        bx0 = 40
         bx1 = bx0 + box_w
         
-        draw.rounded_rectangle([bx0, y0, bx1, y1], radius=15, outline=(*accent_color, 150), width=2, fill=(20, 20, 30, 240))
+        draw.rounded_rectangle([bx0, y0, bx1, y1], radius=20, outline=(*accent_color, 255), width=4, fill=(30, 30, 45, 255))
         
         # Number badge
-        draw.ellipse([bx0 - 20, y0 + step_h//2 - 20, bx0 + 20, y0 + step_h//2 + 20], fill=(*accent_color, 255))
-        draw.text((bx0, y0 + step_h//2), str(i+1), font=f_num, fill=(255,255,255), anchor="mm")
+        draw.ellipse([bx0 - 25, y0 + step_h//2 - 25, bx0 + 25, y0 + step_h//2 + 25], fill=(*accent_color, 255))
+        draw.text((bx0, y0 + step_h//2), str(i+1), font=f_num, fill=(0,0,0), anchor="mm")
         
         # Step text (Monospace feel)
-        draw.text((bx0 + 40, y0 + step_h//2), step.upper(), font=f_step, fill=(255, 255, 255, 255), anchor="lm")
+        draw.text((bx0 + 50, y0 + step_h//2), step.upper(), font=f_step, fill=(255, 255, 255, 255), anchor="lm")
         
         # Connector Arrow
         if i < n - 1:
             ay_start = y1 + 5
             ay_end = y1 + gap - 5
             ax = bx0 + box_w // 2
-            draw.line([(ax, ay_start), (ax, ay_end)], fill=(*accent_color, 120), width=3)
+            draw.line([(ax, ay_start), (ax, ay_end)], fill=(*accent_color, 255), width=6)
             # Arrow head
-            draw.polygon([(ax - 10, ay_end - 10), (ax + 10, ay_end - 10), (ax, ay_end)], fill=(*accent_color, 120))
+            draw.polygon([(ax - 15, ay_end - 15), (ax + 15, ay_end - 15), (ax, ay_end)], fill=(*accent_color, 255))
             
     return img
 
 def _render_slide_card(title, bullets, accent_color, is_longform=False, active_step=None):
-    h = 600 if not is_longform else 800
-    w = 900 if not is_longform else 1500
+    h = 700 if not is_longform else 800
+    w = 980 if not is_longform else 1500
     pil = Image.new("RGBA", (w, h), (0,0,0,0))
     d = ImageDraw.Draw(pil)
-    bg = (20,20,30,235)
-    d.rounded_rectangle([0,0,w,h], 40, fill=bg, outline=accent_color, width=4)
+    # Fully opaque solid background for maximum readability
+    bg = (15, 15, 20, 255)
+    d.rounded_rectangle([0,0,w,h], 40, fill=bg, outline=accent_color, width=8)
     
     cx = w // 2
-    f_title = gf(50 if not is_longform else 70)
+    f_title = gf(65 if not is_longform else 80)
     
     # Title
     ttw, tth = ts(title, f_title)
-    d.text((cx - ttw//2, 40), title, fill=(*accent_color, 255), font=f_title)
+    d.text((cx - ttw//2, 50), title, fill=(*accent_color, 255), font=f_title)
     
     # Divider
-    d.line([(40, 130), (w - 40, 130)], fill=(*accent_color, 200), width=3)
+    d.line([(50, 150), (w - 50, 150)], fill=(*accent_color, 255), width=4)
     
     # Bullets
-    f_bullet = gf(35 if not is_longform else 50)
-    start_y = 180
+    f_bullet = gf(42 if not is_longform else 55)
+    start_y = 200
     by = start_y
     for i, bullet in enumerate(bullets):
         if active_step is not None and i > active_step:
             break
             
-        dot_y = by + (20 if not is_longform else 30)
-        d.ellipse([60, dot_y - 8, 76, dot_y + 8], fill=(*accent_color, 255))
+        dot_y = by + (25 if not is_longform else 35)
+        d.ellipse([60, dot_y - 12, 84, dot_y + 12], fill=(*accent_color, 255))
         
-        b_lines = wrap_text_to_lines(str(bullet).split(), [ts(wd, f_bullet)[0] for wd in str(bullet).split()], w - 160, f_bullet)
+        b_lines = wrap_text_to_lines(str(bullet).split(), [ts(wd, f_bullet)[0] for wd in str(bullet).split()], w - 180, f_bullet)
         for line_words in b_lines:
-            d.text((100, by), " ".join(line_words), font=f_bullet, fill=(255,255,255,255))
-            by += 45 if not is_longform else 65
-        by += 20
+            d.text((110, by), " ".join(line_words), font=f_bullet, fill=(255,255,255,255))
+            by += 55 if not is_longform else 75
+        by += 25
             
     return pil
 
@@ -1508,48 +1509,71 @@ def _sweep_clip(duration, accent_color, frame_width=1080):
 # ── LAYER 16: Article Screenshot (New Layer) ──────────────────────────────────
 def _article_screenshot_clip(screenshot_path, duration):
     """
-    Transformative Fullscreen logic: Shows the source article as the main visual.
-    Anchored to (0,0) to ensure top/left edges don't go outside during zoom.
+    Transformative logic: Shows the source article with a smooth vertical scroll.
     Displayed twice for maximum impact.
     """
     if not screenshot_path or not os.path.exists(screenshot_path):
         return []
     try:
-        # Load and verify image
         img = Image.open(screenshot_path).convert("RGBA")
         
-        # Fullscreen Fit: 1080x1920 (Force fullscreen fit without distortion)
-        img = ImageOps.fit(img, (FRAME_W, FRAME_H), Image.LANCZOS)
+        # Resize image so it fits the screen width exactly
+        w, h = img.size
+        new_w = FRAME_W
+        new_h = int(h * (FRAME_W / float(w)))
+        img = img.resize((new_w, new_h), Image.LANCZOS)
         
+        # If the image is shorter than the frame, pad or center it
+        if new_h < FRAME_H:
+            img = ImageOps.fit(img, (FRAME_W, FRAME_H), Image.LANCZOS)
+            new_h = FRAME_H
+            
         arr = np.array(img.convert("RGB"))
         mask = np.array(img.split()[3]).astype(float) / 255.0
         
         clips = []
+        max_scroll = max(0, new_h - FRAME_H)
         
         # --- FIRST APPEARANCE: Evidence/Hook Phase ---
-        # Show briefly early on to establish source credibility
         start1 = 3.5
         dur1 = 2.5
         if duration > start1 + dur1:
-            clip1 = ImageClip(arr, duration=dur1)
-            mclip1 = VideoClip(lambda t: mask, is_mask=True, duration=dur1)
-            # Subtle zoom: 1.0 to 1.15
-            # Anchor at (0,0) so top and left stay fixed
-            clip1 = clip1.resized(lambda t: 1.0 + 0.15 * (t / dur1))
+            def make_frame1(t):
+                # scroll down slightly (10%)
+                y = int((t / dur1) * (max_scroll * 0.1))
+                y = min(y, max_scroll)
+                return arr[y:y+FRAME_H, :]
+                
+            def make_mask1(t):
+                y = int((t / dur1) * (max_scroll * 0.1))
+                y = min(y, max_scroll)
+                return mask[y:y+FRAME_H, :]
+                
+            clip1 = VideoClip(make_frame1, duration=dur1)
+            mclip1 = VideoClip(make_mask1, is_mask=True, duration=dur1)
             clip1 = clip1.with_mask(mclip1).with_position((0, 0)).with_start(start1)
             clip1 = clip1.with_effects([vfx.CrossFadeIn(0.4), vfx.CrossFadeOut(0.4)])
             clips.append(clip1)
 
         # --- SECOND APPEARANCE: Deep Dive Phase ---
-        # Full Headline Zoom for detailed commentary phase
         start2 = 12.0
-        dur2 = min(36.0, duration - start2)
+        dur2 = duration - start2
         if dur2 > 0:
-            clip2 = ImageClip(arr, duration=dur2)
-            mclip2 = VideoClip(lambda t: mask, is_mask=True, duration=dur2)
-            # Deep Zoom: 1.0 to 1.40
-            # Anchor at (0,0) to keep headline and logo in view
-            clip2 = clip2.resized(lambda t: 1.0 + 0.40 * (t / dur2))
+            def make_frame2(t):
+                # scroll down the rest of the page (from 10% to 90%)
+                start_y = int(max_scroll * 0.1)
+                y = start_y + int((t / dur2) * (max_scroll * 0.8))
+                y = min(y, max_scroll)
+                return arr[y:y+FRAME_H, :]
+                
+            def make_mask2(t):
+                start_y = int(max_scroll * 0.1)
+                y = start_y + int((t / dur2) * (max_scroll * 0.8))
+                y = min(y, max_scroll)
+                return mask[y:y+FRAME_H, :]
+                
+            clip2 = VideoClip(make_frame2, duration=dur2)
+            mclip2 = VideoClip(make_mask2, is_mask=True, duration=dur2)
             clip2 = clip2.with_mask(mclip2).with_position((0, 0)).with_start(start2)
             clip2 = clip2.with_effects([vfx.CrossFadeIn(0.5), vfx.CrossFadeOut(0.5)])
             clips.append(clip2)
@@ -1625,7 +1649,7 @@ def _ai_disclosure_overlay(duration):
     clip = ImageClip(arr, duration=clip_dur)
     mclip = VideoClip(lambda t: mask, is_mask=True, duration=clip_dur)
     
-    return clip.with_mask(mclip).with_position(("center", 40)).with_start(1.0).with_effects([vfx.CrossFadeIn(0.5), vfx.CrossFadeOut(0.5)])
+    return clip.with_mask(mclip).with_position(("center", 40)).with_start(0.0).with_effects([vfx.CrossFadeIn(0.3), vfx.CrossFadeOut(0.5)])
 
 
 def _brand_watermark(duration):
@@ -2232,7 +2256,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     # Meta
     title          = script_json.get("title", "Tech News")
     color_theme    = script_json.get("color_theme", {})
-    accent_hex     = color_theme.get("accent", "#ff4444").lstrip("#")
+    accent_hex     = color_theme.get("accent", "#FFD700").lstrip("#")
     accent_color   = tuple(int(accent_hex[i:i+2], 16) for i in (0, 2, 4))
     sub_category   = script_json.get("sub_category", "AI")
     emoji          = script_json.get("relevant_emoji", "")
