@@ -989,112 +989,95 @@ def _render_flowchart_card(steps, accent_color, width=980, active_step=None):
     return img
 
 def _render_slide_card(title, bullets, accent_color, is_longform=False, active_step=None):
-    import os
-    from PIL import ImageOps
+    import math
     
     h = 700 if not is_longform else 800
     w = 980 if not is_longform else 1500
-    pil = Image.new("RGBA", (w, h), (0,0,0,0))
     
-    bg_path = os.path.join(ASSETS_DIR, "slide_bg.png")
-    has_bg = os.path.exists(bg_path)
+    # Create the base background image
+    bg_img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    cdraw = ImageDraw.Draw(bg_img)
     
-    if has_bg:
-        try:
-            bg_img = Image.open(bg_path).convert("RGBA")
-            # Crop the left 45% of the image to remove the baked-in template text
-            ow, oh = bg_img.size
-            bg_img = bg_img.crop((0, 0, int(ow * 0.45), oh))
-            bg_img = ImageOps.fit(bg_img, (w, h), Image.LANCZOS)
-            
-            # Apply rounded corners mask
-            mask = Image.new("L", (w, h), 0)
-            ImageDraw.Draw(mask).rounded_rectangle([0, 0, w, h], 40, fill=255)
-            pil.paste(bg_img, (0, 0), mask)
-            
-            # Add a subtle dark gradient to the right side to ensure white text readability
-            grad = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-            grad_d = ImageDraw.Draw(grad)
-            for x in range(w):
-                alpha = int(160 * (x / w)) # Gradient getting darker on the right
-                grad_d.line([(x, 0), (x, h)], fill=(0, 0, 40, alpha))
-            pil = Image.alpha_composite(pil, grad)
-            
-            # Draw border
-            ImageDraw.Draw(pil).rounded_rectangle([0,0,w,h], 40, outline=accent_color, width=8)
-        except Exception as e:
-            print(f"Failed to load custom slide background: {e}")
-            has_bg = False
-            
-    if not has_bg:
-        d = ImageDraw.Draw(pil)
-        bg = (15, 15, 20, 220)
-        d.rounded_rectangle([0,0,w,h], 40, fill=bg, outline=accent_color, width=8)
+    # Base dark blue gradient simulation
+    cdraw.rectangle([0, 0, w, h], fill=(0, 40, 120, 255))
+    
+    # Glowing cyan blobs for the light effect
+    cdraw.ellipse([w*0.3, h*0.1, w*1.2, h*1.5], fill=(0, 150, 255, 90))
+    cdraw.ellipse([w*0.5, h*0.3, w*1.0, h*1.0], fill=(0, 200, 255, 120))
+    
+    # Cyber sweeping arcs
+    cdraw.arc([-w*0.2, -h*0.2, w*0.8, h*1.2], 270, 360, fill=(150, 220, 255, 100), width=6)
+    cdraw.arc([-w*0.1, -h*0.1, w*0.6, h*1.0], 270, 360, fill=(150, 220, 255, 60), width=3)
+    
+    # Hex grid on the left
+    hex_size = 30 if not is_longform else 45
+    for row in range(int(h / (hex_size*1.5)) + 1):
+        for col in range(7):
+            cx = 40 + col * hex_size * 1.5
+            cy = 40 + row * hex_size * math.sqrt(3)
+            if col % 2 == 1:
+                cy += hex_size * math.sqrt(3) / 2
+                
+            points = []
+            for i in range(6):
+                angle_rad = math.pi / 3 * i
+                points.append((cx + hex_size * math.cos(angle_rad), cy + hex_size * math.sin(angle_rad)))
+            cdraw.polygon(points, outline=(0, 200, 255, 50), width=3)
 
-    d = ImageDraw.Draw(pil)
+    # Dark gradient on right for text readability
+    for x in range(w):
+        alpha = int(160 * (x / w))
+        cdraw.line([(x, 0), (x, h)], fill=(0, 10, 40, alpha))
+            
+    # Apply rounded corner mask to the entire generated background
+    mask = Image.new("L", (w, h), 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, w, h], 40, fill=255)
     
+    pil = Image.new("RGBA", (w, h), (0,0,0,0))
+    pil.paste(bg_img, (0, 0), mask)
+    
+    # Draw border
+    d = ImageDraw.Draw(pil)
+    d.rounded_rectangle([0,0,w,h], 40, outline=accent_color, width=8)
+
     f_title = gf(65 if not is_longform else 80)
     
     # Title
     ttw, tth = ts(title, f_title)
     
-    if has_bg:
-        # Tech style layout (Right aligned text for this specific image style)
-        title_x = w - ttw - 50
-        title_y = 50
-        # Draw text with subtle shadow
-        d.text((title_x+3, title_y+3), title, fill=(0,0,0,200), font=f_title)
-        d.text((title_x, title_y), title, fill=(255, 255, 255, 255), font=f_title)
-        
-        # Divider line
-        d.line([(w // 2, 140), (w - 50, 140)], fill=(*accent_color, 255), width=4)
-        
-        # Bullets
-        f_bullet = gf(42 if not is_longform else 55)
-        start_y = 180
-        by = start_y
-        for i, bullet in enumerate(bullets):
-            if active_step is not None and i > active_step:
-                break
-                
-            b_lines = wrap_text_to_lines(str(bullet).split(), [ts(wd, f_bullet)[0] for wd in str(bullet).split()], w // 2 - 20, f_bullet)
-            for line_words in b_lines:
-                line_text = " ".join(line_words)
-                lw, lh = ts(line_text, f_bullet)
-                line_x = w - lw - 50
-                
-                # Draw dot
-                if line_words == b_lines[0]:
-                    dot_y = by + (25 if not is_longform else 35)
-                    d.ellipse([line_x - 30, dot_y - 10, line_x - 10, dot_y + 10], fill=(*accent_color, 255))
-                
-                d.text((line_x+2, by+2), line_text, font=f_bullet, fill=(0,0,0,150))
-                d.text((line_x, by), line_text, font=f_bullet, fill=(230, 240, 255, 255))
-                by += 55 if not is_longform else 75
-            by += 25
-    else:
-        cx = w // 2
-        d.text((cx - ttw//2, 50), title, fill=(*accent_color, 255), font=f_title)
-        
-        # Divider
-        d.line([(50, 150), (w - 50, 150)], fill=(*accent_color, 255), width=4)
-        
-        # Bullets
-        f_bullet = gf(42 if not is_longform else 55)
-        start_y = 200
-        by = start_y
-        for i, bullet in enumerate(bullets):
-            if active_step is not None and i > active_step:
-                break
-                
-            dot_y = by + (25 if not is_longform else 35)
-            d.ellipse([60, dot_y - 12, 84, dot_y + 12], fill=(*accent_color, 255))
+    # Tech style layout (Right aligned text)
+    title_x = w - ttw - 50
+    title_y = 50
+    # Draw text with subtle shadow
+    d.text((title_x+3, title_y+3), title, fill=(0,0,0,200), font=f_title)
+    d.text((title_x, title_y), title, fill=(255, 255, 255, 255), font=f_title)
+    
+    # Divider line
+    d.line([(w // 2, 140), (w - 50, 140)], fill=(*accent_color, 255), width=4)
+    
+    # Bullets
+    f_bullet = gf(42 if not is_longform else 55)
+    start_y = 180
+    by = start_y
+    for i, bullet in enumerate(bullets):
+        if active_step is not None and i > active_step:
+            break
             
-            b_lines = wrap_text_to_lines(str(bullet).split(), [ts(wd, f_bullet)[0] for wd in str(bullet).split()], w - 180, f_bullet)
-            for line_words in b_lines:
-                d.text((110, by), " ".join(line_words), font=f_bullet, fill=(255,255,255,255))
-                by += 55 if not is_longform else 75
-            by += 25
+        b_lines = wrap_text_to_lines(str(bullet).split(), [ts(wd, f_bullet)[0] for wd in str(bullet).split()], w // 2 - 20, f_bullet)
+        for line_words in b_lines:
+            line_text = " ".join(line_words)
+            lw, lh = ts(line_text, f_bullet)
+            line_x = w - lw - 50
+            
+            # Draw dot
+            if line_words == b_lines[0]:
+                dot_y = by + (25 if not is_longform else 35)
+                d.ellipse([line_x - 30, dot_y - 10, line_x - 10, dot_y + 10], fill=(*accent_color, 255))
+            
+            d.text((line_x+2, by+2), line_text, font=f_bullet, fill=(0,0,0,150))
+            d.text((line_x, by), line_text, font=f_bullet, fill=(230, 240, 255, 255))
+            by += 55 if not is_longform else 75
+        by += 25
             
     return pil
 

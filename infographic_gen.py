@@ -486,8 +486,7 @@ def _render_growth_card(data, accent_color, progress=1.0):
 # TYPE 7 — SLIDE CARD
 # ═══════════════════════════════════════════════════════════════════════════════
 def _render_slide_card(data, accent_color, progress=1.0, is_longform=False):
-    import os
-    from PIL import ImageOps
+    import math
     
     fw, fh, fcy = get_dimensions(is_longform)
     canvas = Image.new("RGBA", (fw, fh), (0, 0, 0, 0))
@@ -496,40 +495,50 @@ def _render_slide_card(data, accent_color, progress=1.0, is_longform=False):
     cx = (fw - cw) // 2
     cy = fcy - ch // 2
 
-    bg_path = os.path.join(ASSETS_DIR, "slide_bg.png")
-    has_bg = os.path.exists(bg_path)
+    # Create the base background image
+    bg_img = Image.new("RGBA", (cw, ch), (0, 0, 0, 0))
+    cdraw = ImageDraw.Draw(bg_img)
     
-    if has_bg:
-        try:
-            bg_img = Image.open(bg_path).convert("RGBA")
-            # Crop the left 45% of the image to remove the baked-in template text
-            ow, oh = bg_img.size
-            bg_img = bg_img.crop((0, 0, int(ow * 0.45), oh))
-            bg_img = ImageOps.fit(bg_img, (cw, ch), Image.LANCZOS)
-            
-            mask = Image.new("L", (cw, ch), 0)
-            ImageDraw.Draw(mask).rounded_rectangle([0, 0, cw, ch], 40, fill=255)
-            
-            card_layer = Image.new("RGBA", (fw, fh), (0,0,0,0))
-            card_layer.paste(bg_img, (cx, cy), mask)
-            
-            grad = Image.new("RGBA", (cw, ch), (0, 0, 0, 0))
-            grad_d = ImageDraw.Draw(grad)
-            for x in range(cw):
-                alpha = int(160 * (x / cw))
-                grad_d.line([(x, 0), (x, ch)], fill=(0, 0, 40, alpha))
-            
-            card_layer.paste(grad, (cx, cy), mask)
-            
-            ImageDraw.Draw(card_layer).rounded_rectangle([cx, cy, cx+cw, cy+ch], 40, outline=accent_color, width=8)
-            canvas = Image.alpha_composite(canvas, card_layer)
-        except Exception as e:
-            print(f"Failed to load custom slide bg in infographic_gen: {e}")
-            has_bg = False
+    # Base dark blue gradient simulation
+    cdraw.rectangle([0, 0, cw, ch], fill=(0, 40, 120, 255))
+    
+    # Glowing cyan blobs for the light effect
+    cdraw.ellipse([cw*0.3, ch*0.1, cw*1.2, ch*1.5], fill=(0, 150, 255, 90))
+    cdraw.ellipse([cw*0.5, ch*0.3, cw*1.0, ch*1.0], fill=(0, 200, 255, 120))
+    
+    # Cyber sweeping arcs
+    cdraw.arc([-cw*0.2, -ch*0.2, cw*0.8, ch*1.2], 270, 360, fill=(150, 220, 255, 100), width=6)
+    cdraw.arc([-cw*0.1, -ch*0.1, cw*0.6, ch*1.0], 270, 360, fill=(150, 220, 255, 60), width=3)
+    
+    # Hex grid on the left
+    hex_size = 30 if not is_longform else 45
+    for row in range(int(ch / (hex_size*1.5)) + 1):
+        for col in range(7):
+            hcx = 40 + col * hex_size * 1.5
+            hcy = 40 + row * hex_size * math.sqrt(3)
+            if col % 2 == 1:
+                hcy += hex_size * math.sqrt(3) / 2
+                
+            points = []
+            for i in range(6):
+                angle_rad = math.pi / 3 * i
+                points.append((hcx + hex_size * math.cos(angle_rad), hcy + hex_size * math.sin(angle_rad)))
+            cdraw.polygon(points, outline=(0, 200, 255, 50), width=3)
 
-    if not has_bg:
-        draw = ImageDraw.Draw(canvas)
-        _draw_card_bg(draw, cx, cy, cw, ch, accent_color)
+    # Dark gradient on right for text readability
+    for x in range(cw):
+        alpha = int(160 * (x / cw))
+        cdraw.line([(x, 0), (x, ch)], fill=(0, 10, 40, alpha))
+            
+    # Apply rounded corner mask to the entire generated background
+    mask = Image.new("L", (cw, ch), 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, cw, ch], 40, fill=255)
+    
+    card_layer = Image.new("RGBA", (fw, fh), (0,0,0,0))
+    card_layer.paste(bg_img, (cx, cy), mask)
+    
+    ImageDraw.Draw(card_layer).rounded_rectangle([cx, cy, cx+cw, cy+ch], 40, outline=accent_color, width=8)
+    canvas = Image.alpha_composite(canvas, card_layer)
 
     draw = ImageDraw.Draw(canvas)
     
@@ -539,88 +548,50 @@ def _render_slide_card(data, accent_color, progress=1.0, is_longform=False):
     ft = _eb(60 if is_longform else 50)
     ttw, tth = _ts(title, ft)
     
-    if has_bg:
-        title_x = cx + cw - ttw - 50
-        title_y = cy + 50
-        draw.text((title_x+3, title_y+3), title, fill=(0,0,0,200), font=ft)
-        draw.text((title_x, title_y), title, fill=(255, 255, 255, 255), font=ft)
+    title_x = cx + cw - ttw - 50
+    title_y = cy + 50
+    draw.text((title_x+3, title_y+3), title, fill=(0,0,0,200), font=ft)
+    draw.text((title_x, title_y), title, fill=(255, 255, 255, 255), font=ft)
+    
+    line_w = int((cw // 2 - 40) * progress)
+    if line_w > 0:
+        draw.line([(cx + cw // 2 + 20, cy + 140), (cx + cw // 2 + 20 + line_w, cy + 140)], fill=(*accent_color, 255), width=4)
         
-        line_w = int((cw // 2 - 40) * progress)
-        if line_w > 0:
-            draw.line([(cx + cw // 2 + 20, cy + 140), (cx + cw // 2 + 20 + line_w, cy + 140)], fill=(*accent_color, 255), width=4)
+    fb = _bold(40 if is_longform else 34)
+    start_y = cy + 180
+    for i, bullet in enumerate(bullets):
+        bullet_progress = min(1.0, progress * (len(bullets) + 1) - i)
+        if bullet_progress <= 0:
+            continue
             
-        fb = _bold(40 if is_longform else 34)
-        start_y = cy + 180
-        for i, bullet in enumerate(bullets):
-            bullet_progress = min(1.0, progress * (len(bullets) + 1) - i)
-            if bullet_progress <= 0:
-                continue
-                
-            alpha = int(255 * min(1.0, bullet_progress * 2))
-            
-            max_bw = cw // 2 - 40
-            words = str(bullet).split()
-            lines = []
-            cur = []
-            for w_word in words:
-                test = " ".join(cur + [w_word])
-                if _ts(test, fb)[0] > max_bw and cur:
-                    lines.append(" ".join(cur))
-                    cur = [w_word]
-                else:
-                    cur.append(w_word)
-            if cur:
-                lines.append(" ".join(cur))
-                
-            by = start_y + i * 80
-            for j, b_line in enumerate(lines):
-                lw, lh = _ts(b_line, fb)
-                line_x = cx + cw - lw - 50
-                
-                if j == 0:
-                    dot_y = by + (25 if is_longform else 20)
-                    draw.ellipse([line_x - 30, dot_y - 8, line_x - 14, dot_y + 8], fill=(*accent_color, alpha))
-                
-                draw.text((line_x+2, by+2), b_line, font=fb, fill=(0,0,0,int(150*(alpha/255))))
-                draw.text((line_x, by), b_line, font=fb, fill=(230, 240, 255, alpha))
-                by += 45
-    else:
-        _center_text(draw, title, ft, cy + 40, (*accent_color, 255), cx, cw)
+        alpha = int(255 * min(1.0, bullet_progress * 2))
         
-        line_w = int((cw - 80) * progress)
-        if line_w > 0:
-            draw.line([(cx + 40, cy + 130), (cx + 40 + line_w, cy + 130)], fill=(*accent_color, 200), width=3)
-
-        fb = _bold(40 if is_longform else 34)
-        start_y = cy + 180
-        for i, bullet in enumerate(bullets):
-            bullet_progress = min(1.0, progress * (len(bullets) + 1) - i)
-            if bullet_progress <= 0:
-                continue
-                
-            alpha = int(255 * min(1.0, bullet_progress * 2))
-            
-            dot_y = start_y + i * 80 + (25 if is_longform else 20)
-            draw.ellipse([cx + 60, dot_y - 8, cx + 76, dot_y + 8], fill=(*accent_color, alpha))
-            
-            max_bw = cw - 160
-            words = str(bullet).split()
-            lines = []
-            cur = []
-            for w_word in words:
-                test = " ".join(cur + [w_word])
-                if _ts(test, fb)[0] > max_bw and cur:
-                    lines.append(" ".join(cur))
-                    cur = [w_word]
-                else:
-                    cur.append(w_word)
-            if cur:
+        max_bw = cw // 2 - 40
+        words = str(bullet).split()
+        lines = []
+        cur = []
+        for w_word in words:
+            test = " ".join(cur + [w_word])
+            if _ts(test, fb)[0] > max_bw and cur:
                 lines.append(" ".join(cur))
-                
-            by = start_y + i * 80
-            for b_line in lines:
-                draw.text((cx + 100, by), b_line, font=fb, fill=(255, 255, 255, alpha))
-                by += 45
+                cur = [w_word]
+            else:
+                cur.append(w_word)
+        if cur:
+            lines.append(" ".join(cur))
+            
+        by = start_y + i * 80
+        for j, b_line in enumerate(lines):
+            lw, lh = _ts(b_line, fb)
+            line_x = cx + cw - lw - 50
+            
+            if j == 0:
+                dot_y = by + (25 if is_longform else 20)
+                draw.ellipse([line_x - 30, dot_y - 8, line_x - 14, dot_y + 8], fill=(*accent_color, alpha))
+            
+            draw.text((line_x+2, by+2), b_line, font=fb, fill=(0,0,0,int(150*(alpha/255))))
+            draw.text((line_x, by), b_line, font=fb, fill=(230, 240, 255, alpha))
+            by += 45
 
     return canvas
 
