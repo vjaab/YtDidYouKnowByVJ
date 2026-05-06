@@ -643,6 +643,12 @@ def process_job():
         except:
             print("🔍 MMLab imports failed — checking stubs...")
 
+        # Inject ElevenLabs credentials into the environment BEFORE importing audio_gen
+        if job_data.get("elevenlabs_api_key"):
+            os.environ["ELEVENLABS_API_KEY"] = job_data.get("elevenlabs_api_key")
+        if job_data.get("elevenlabs_voice_id"):
+            os.environ["ELEVENLABS_VOICE_ID"] = job_data.get("elevenlabs_voice_id")
+
         from audio_gen import generate_voiceover, unload_f5_model
         from lip_sync import generate_lip_sync
         from musetalk_sync import generate_musetalk_sync

@@ -14,9 +14,12 @@ def trigger_kaggle_gpu_job(script_data, custom_map):
     job_file = os.path.join(scripts_dir, "job_data.json")
     
     # 1. Inject Job Data directly into the script
+    from config import ELEVENLABS_API_KEY, ELEVENLABS_VOICE_ID
     job_payload = {
         "script": script_data.get("script"),
-        "custom_map": custom_map
+        "custom_map": custom_map,
+        "elevenlabs_api_key": ELEVENLABS_API_KEY,
+        "elevenlabs_voice_id": ELEVENLABS_VOICE_ID
     }
     
     worker_script_path = os.path.join(scripts_dir, "kaggle_worker.py")
