@@ -1321,7 +1321,7 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
             tw = draw.textlength(title, font=f_title)
         
     start_x = (frame_width - tw) // 2
-    start_y = int(FRAME_H * 0.45) # Center-ish
+    start_y = int(FRAME_H * 0.62) # Safely below slides (which end ~1150) and above subtitles (which start ~1344)
     
     # Text shadow/glow
     for dx, dy in [(-2,0), (2,0), (0,-2), (0,2)]:
@@ -1880,8 +1880,8 @@ def build_transparency_watermark(width, height):
     font = gf(24) # Small, elite typography
     tw, th = ts(text, font)
     
-    # Position: Top Right, slightly below the header bar (which is at y=50 usually)
-    x, y = width - tw - 40, 160
+    # Position: Very Top Right corner
+    x, y = width - tw - 40, 40
     
     # Glassmorphism backing
     rect = [x - 15, y - 8, x + tw + 15, y + th + 8]
