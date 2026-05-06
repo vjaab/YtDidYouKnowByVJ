@@ -448,15 +448,15 @@ def restore_original_words(word_timestamps, original_text, custom_phonetic_map=N
 
 def _generate_elevenlabs(text, output_path):
     print(f"📡 Using ElevenLabs Turbo v2.5 (High Quality Fallback)...")
-    from config import ELEVENLABS_API_KEY
+    from config import ELEVENLABS_API_KEY, ELEVENLABS_VOICE_ID
     if not ELEVENLABS_API_KEY:
         print("   ✗ ElevenLabs API Key missing.")
         return None, 0, []
     
     try:
         import requests
-        # Voice ID for VJ-like tech persona
-        VOICE_ID = "EXAVITQu4vr4xnSDxMaL" # Bella or another high-quality Turbo voice
+        # Voice ID for VJ-like tech persona or custom voice ID from config
+        VOICE_ID = ELEVENLABS_VOICE_ID if ELEVENLABS_VOICE_ID else "EXAVITQu4vr4xnSDxMaL"
         url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
         
         headers = {
@@ -555,9 +555,9 @@ def generate_voiceover(text, custom_phonetic_map=None, api_key=None):
         
         path, dur, word_timestamps = None, 0, []
         try:
-            path, dur, word_timestamps = _generate_f5_clone(text_to_speak, mp3_path)
+            path, dur, word_timestamps = _generate_elevenlabs(text_to_speak, mp3_path)
         except Exception as e:
-            print(f"❌ F5-TTS failed: {e}")
+            print(f"❌ ElevenLabs failed: {e}")
             if not path:
                 path, dur, word_timestamps = _generate_edge_tts(text_to_speak, mp3_path)
 
