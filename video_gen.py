@@ -902,6 +902,34 @@ def _render_stat_card(stat_value, stat_label, accent_color, width=600):
 
 def _render_flowchart_card(steps, accent_color, width=980, active_step=None):
     """Vertical architectural flowchart: Step 1 -> Step 2 -> Step 3."""
+    custom_path = os.path.join(ASSETS_DIR, "flowchart.png")
+    if os.path.exists(custom_path):
+        try:
+            img = Image.open(custom_path).convert("RGBA")
+            
+            max_h = 800
+            w, h = img.size
+            
+            target_w = width - 40
+            scale_w = target_w / w
+            scale_h = max_h / h
+            scale = min(scale_w, scale_h)
+            
+            new_w = int(w * scale)
+            new_h = int(h * scale)
+            
+            img = img.resize((new_w, new_h), Image.LANCZOS)
+            
+            total_h = new_h + 40
+            canvas = Image.new("RGBA", (width, total_h), (0, 0, 0, 0))
+            draw = ImageDraw.Draw(canvas)
+            draw.rounded_rectangle([0, 0, width, total_h], radius=30, fill=(245, 245, 245, 245), outline=accent_color, width=6)
+            
+            canvas.paste(img, ((width - new_w) // 2, 20), img)
+            return canvas
+        except Exception as e:
+            print(f"Failed to load custom flowchart: {e}")
+
     n = min(len(steps), 4)
     if n == 0: return Image.new("RGBA", (width, 100), (0, 0, 0, 0))
     
