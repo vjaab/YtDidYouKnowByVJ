@@ -2419,6 +2419,28 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         _screenshot_path_check = script_json.get("screenshot_path")
         _has_screenshot = bool(_screenshot_path_check and os.path.exists(_screenshot_path_check))
 
+        # Determine infographic time windows to hide avatar
+        info_windows = []
+        for chunk in chunks:
+            if chunk.get("has_infographic") and chunk.get("infographic_type"):
+                c_start = chunk.get("start", 0)
+                c_dur = chunk.get("duration", 2)
+                
+                dur = min(c_dur + 0.5, audio_duration - c_start)
+                itype = chunk.get("infographic_type", "").lower()
+                c_data = chunk.get("infographic_data", {})
+                
+                num_steps = 1
+                if itype == "slide":
+                    num_steps = len(c_data.get("bullet_points", []))
+                elif itype in ["process", "flowchart"]:
+                    num_steps = min(len(c_data.get("steps", [])), 4)
+                
+                max_dur = max(4.5, num_steps * 3.5)
+                actual_dur = min(dur, max_dur)
+                
+                info_windows.append((c_start, c_start + actual_dur))
+
         def avatar_scale(t):
             base = 1.0
             if shock_ts > 0 and abs(t - shock_ts) < 1.0:
@@ -2439,6 +2461,17 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             margin_y = 120
             base_x = FRAME_W - scaled_w - margin_x
             base_y = margin_y
+            
+            # Slide out for infographics
+            for (start_t, end_t) in info_windows:
+                if start_t <= t <= end_t:
+                    return (FRAME_W + 1000, base_y)
+                if start_t - 0.3 < t < start_t:
+                    p = (t - (start_t - 0.3)) / 0.3
+                    return (int(base_x + 1000 * (p**2)), base_y)
+                if end_t < t < end_t + 0.3:
+                    p = (t - end_t) / 0.3
+                    return (int(base_x + 1000 * ((1-p)**2)), base_y)
             
             e_x, e_y = 0, 0
             if shock_ts > 0 and abs(t - shock_ts) < 1.5:
