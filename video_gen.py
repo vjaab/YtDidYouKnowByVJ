@@ -2495,7 +2495,6 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     
     # ── COMPLIANCE & BRANDING ────────────────────────────────────────────────
     disclosure = _ai_disclosure_overlay(audio_duration)
-    watermark = _brand_watermark(audio_duration)
     
     # ── ENGAGEMENT LAYERS (Retention Boosters) ────────────────────────────────
     engagement_clips = []
@@ -2532,7 +2531,6 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     if grain_layer: base_layers.append(grain_layer)
     if avatar_pip: base_layers.append(avatar_pip)
     base_layers.append(disclosure)
-    base_layers.append(watermark)
     base_layers.extend(engagement_clips)
 
     # ... rest of the original create_video logic continues ...
