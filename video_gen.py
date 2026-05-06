@@ -2379,7 +2379,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         else:
             vid_clip = vid_clip.subclipped(0, audio_duration)
 
-        width_pip, height_pip = 450, 680
+        width_pip, height_pip = 350, 350
         w, h = vid_clip.size
         # Crop to target aspect ratio
         target_aspect = width_pip / height_pip
@@ -2397,29 +2397,19 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         cur_h = int(height_pip * avatar_scale_mult)
         avatar_clip = vid_clip.resized((cur_w, cur_h)).without_audio()
         
-        # Softly Blended Mask for Seamless Integration
-        a_mask_np = np.ones((cur_h, cur_w), dtype=np.float32)
+        # Circular Mask for Seamless Integration
+        Y, X = np.ogrid[:cur_h, :cur_w]
+        cy, cx = cur_h / 2, cur_w / 2
+        dist = np.sqrt((X - cx)**2 + (Y - cy)**2)
+        radius = min(cur_w, cur_h) / 2
+        fade_thickness = radius * 0.1
         
-        fade_x = int(cur_w * 0.3)
-        fade_y = int(cur_h * 0.25)
+        inner_radius = radius - fade_thickness
+        fade_mask = (radius - dist) / max(fade_thickness, 1.0)
+        fade_mask = np.clip(fade_mask, 0.0, 1.0)
         
-        for x in range(cur_w):
-            if x < fade_x:
-                alpha_x = (math.sin((x / fade_x) * math.pi - math.pi/2) + 1) / 2
-            elif x > cur_w - fade_x:
-                alpha_x = (math.sin(((cur_w - x) / fade_x) * math.pi - math.pi/2) + 1) / 2
-            else:
-                alpha_x = 1.0
-            a_mask_np[:, x] *= alpha_x
-            
-        for y in range(cur_h):
-            if y < fade_y:
-                alpha_y = (math.sin((y / fade_y) * math.pi - math.pi/2) + 1) / 2
-            elif y > cur_h - fade_y:
-                alpha_y = (math.sin(((cur_h - y) / fade_y) * math.pi - math.pi/2) + 1) / 2
-            else:
-                alpha_y = 1.0
-            a_mask_np[y, :] *= alpha_y
+        a_mask_np = np.where(dist > inner_radius, fade_mask, 1.0)
+        a_mask_np = np.where(dist > radius, 0.0, a_mask_np).astype(np.float32)
             
         a_mask_feathered = a_mask_np
         
@@ -2440,13 +2430,15 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             return base
 
         def pip_position(t):
-            # Position at bottom-right corner, blending seamlessly into the frame
+            # Position at top-right corner, blending seamlessly into the frame
             scale = avatar_scale(t)
             scaled_w = int(cur_w * scale)
             scaled_h = int(cur_h * scale)
             
-            base_x = 0
-            base_y = FRAME_H - scaled_h
+            margin_x = 40
+            margin_y = 120
+            base_x = FRAME_W - scaled_w - margin_x
+            base_y = margin_y
             
             e_x, e_y = 0, 0
             if shock_ts > 0 and abs(t - shock_ts) < 1.5:
@@ -2480,7 +2472,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 rel = t - _ts
                 if rel < 0 or rel > 2.0: return (FRAME_W + 100, 0)
                 bx, by = pip_position(t)
-                return (bx + 20 + int(rel*40), by - 60 - int(rel*40))
+                scaled_h = int(cur_h * avatar_scale(t))
+                return (bx - 40 - int(rel*20), by + scaled_h + 20 + int(rel*30))
             logo_clips.append(_pil_clip(skw, 2.0, start=t_kw).with_position(kpos))
 
     # ── LAYERS ───────────────────────────────────────────────────────────
