@@ -1538,19 +1538,19 @@ def _article_screenshot_clip(screenshot_path, duration):
         
         clips = []
         max_scroll = max(0, new_h - FRAME_H)
+        speed = 80 # px/s (Slow, readable scroll)
         
         # --- FIRST APPEARANCE: Evidence/Hook Phase ---
         start1 = 3.5
         dur1 = 2.5
         if duration > start1 + dur1:
             def make_frame1(t):
-                # scroll down slightly (10%)
-                y = int((t / dur1) * (max_scroll * 0.1))
+                y = int(t * speed)
                 y = min(y, max_scroll)
                 return arr[y:y+FRAME_H, :]
                 
             def make_mask1(t):
-                y = int((t / dur1) * (max_scroll * 0.1))
+                y = int(t * speed)
                 y = min(y, max_scroll)
                 return mask[y:y+FRAME_H, :]
                 
@@ -1565,15 +1565,12 @@ def _article_screenshot_clip(screenshot_path, duration):
         dur2 = duration - start2
         if dur2 > 0:
             def make_frame2(t):
-                # scroll down the rest of the page (from 10% to 90%)
-                start_y = int(max_scroll * 0.1)
-                y = start_y + int((t / dur2) * (max_scroll * 0.8))
+                y = int((dur1 + t) * speed)
                 y = min(y, max_scroll)
                 return arr[y:y+FRAME_H, :]
                 
             def make_mask2(t):
-                start_y = int(max_scroll * 0.1)
-                y = start_y + int((t / dur2) * (max_scroll * 0.8))
+                y = int((dur1 + t) * speed)
                 y = min(y, max_scroll)
                 return mask[y:y+FRAME_H, :]
                 
@@ -1598,19 +1595,39 @@ def _evidence_screenshot_clip(evidence_path, duration):
         return []
     try:
         img = Image.open(evidence_path).convert("RGBA")
-        img = img.resize((FRAME_W, FRAME_H), Image.LANCZOS)
+        
+        # Preserve aspect ratio like the article screenshot
+        w, h = img.size
+        new_w = FRAME_W
+        new_h = int(h * (FRAME_W / float(w)))
+        img = img.resize((new_w, new_h), Image.LANCZOS)
+        
+        if new_h < FRAME_H:
+            img = ImageOps.fit(img, (FRAME_W, FRAME_H), Image.LANCZOS)
+            new_h = FRAME_H
+            
         arr = np.array(img.convert("RGB"))
         mask = np.array(img.split()[3]).astype(float) / 255.0
+        max_scroll = max(0, new_h - FRAME_H)
+        speed = 80 # px/s (Slow, readable scroll)
         
         # Appearance window: Typically during the 'Deep-Dive' or 'Analytical Commentary'
         start = 28.0 
         dur = min(6.0, duration - start - 5.0)
         
         if dur > 1.0:
-            clip = ImageClip(arr, duration=dur)
-            mclip = VideoClip(lambda t: mask, is_mask=True, duration=dur)
-            # Subtle upward slide + zoom
-            clip = clip.resized(lambda t: 1.05 + 0.15 * (t / dur))
+            def make_frame(t):
+                y = int(t * speed)
+                y = min(y, max_scroll)
+                return arr[y:y+FRAME_H, :]
+                
+            def make_mask(t):
+                y = int(t * speed)
+                y = min(y, max_scroll)
+                return mask[y:y+FRAME_H, :]
+                
+            clip = VideoClip(make_frame, duration=dur)
+            mclip = VideoClip(make_mask, is_mask=True, duration=dur)
             clip = clip.with_mask(mclip).with_position((0, 0)).with_start(start)
             clip = clip.with_effects([vfx.CrossFadeIn(0.6), vfx.CrossFadeOut(0.6)])
             
