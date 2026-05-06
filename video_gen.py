@@ -1002,6 +1002,9 @@ def _render_slide_card(title, bullets, accent_color, is_longform=False, active_s
     if has_bg:
         try:
             bg_img = Image.open(bg_path).convert("RGBA")
+            # Crop the left 45% of the image to remove the baked-in template text
+            ow, oh = bg_img.size
+            bg_img = bg_img.crop((0, 0, int(ow * 0.45), oh))
             bg_img = ImageOps.fit(bg_img, (w, h), Image.LANCZOS)
             
             # Apply rounded corners mask

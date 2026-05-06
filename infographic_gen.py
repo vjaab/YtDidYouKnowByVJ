@@ -502,6 +502,9 @@ def _render_slide_card(data, accent_color, progress=1.0, is_longform=False):
     if has_bg:
         try:
             bg_img = Image.open(bg_path).convert("RGBA")
+            # Crop the left 45% of the image to remove the baked-in template text
+            ow, oh = bg_img.size
+            bg_img = bg_img.crop((0, 0, int(ow * 0.45), oh))
             bg_img = ImageOps.fit(bg_img, (cw, ch), Image.LANCZOS)
             
             mask = Image.new("L", (cw, ch), 0)
