@@ -8,15 +8,12 @@ def get_slot_info():
     day_name = now.strftime("%a") # Mon, Tue, etc.
     hour = now.hour
     
-    # Slot A: Morning (approx 5:30 UTC)
-    # Slot B: Evening (approx 11:30 UTC)
-    # We'll use a threshold of 9:00 UTC to split A and B
-    if hour < 9:
+    # 04:00 IST (22:30 UTC) -> Slot A
+    # 13:30 IST (08:00 UTC) -> Slot B
+    if hour >= 12:
         slot = "Slot A (Discovery)"
-    elif hour < 15:
-        slot = "Slot B (Utility)"
     else:
-        slot = "Slot C (Deep-Dive)"
+        slot = "Slot B (Utility)"
         
     # Schedule Matrix
     # (Day, Slot A Category, Slot B Category)
@@ -30,21 +27,18 @@ def get_slot_info():
         "Sun": ("Weekly Recap (Dev)", "Future Roadmap")
     }
     
-    categories = matrix.get(day_name, ("AI News", "AI Tool", "AI Deep-Dive"))
+    categories = matrix.get(day_name, ("AI News", "AI Tool"))
     
     if "Slot A" in slot:
         category = categories[0]
-    elif "Slot B" in slot:
-        category = categories[1]
     else:
-        category = "AI Deep-Dive" # Dedicated Long-form slot
+        category = categories[1]
     
     return day_name, slot, category
 
 SERIES_MAP = {
     "Slot A": {"name": "⚡ AGENTIC OPS",     "tagline": "Architecting autonomous systems."},
     "Slot B": {"name": "🔬 HYBRID AI",       "tagline": "Local models. Production scale."},
-    "Slot C": {"name": "🧠 SYSTEM DESIGN",   "tagline": "High-level deep dives for architects."},
 }
 
 def get_series_identity(slot):
@@ -55,7 +49,6 @@ def get_series_identity(slot):
 
 def get_next_slot(current_slot):
     if "Slot A" in current_slot: return "Slot B"
-    if "Slot B" in current_slot: return "Slot C"
     return "Slot A"
 
 def get_category_prompt_enhancement(category, slot):
