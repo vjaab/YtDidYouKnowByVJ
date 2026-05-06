@@ -901,79 +901,90 @@ def _render_stat_card(stat_value, stat_label, accent_color, width=600):
               font=f_label, fill=(200, 200, 210, 200))
 
 def _render_flowchart_card(steps, accent_color, width=980, active_step=None):
-    """Vertical architectural flowchart: Step 1 -> Step 2 -> Step 3."""
-    custom_path = os.path.join(ASSETS_DIR, "flowchart.png")
-    if os.path.exists(custom_path):
-        try:
-            img = Image.open(custom_path).convert("RGBA")
-            
-            max_h = 800
-            w, h = img.size
-            
-            target_w = width - 40
-            scale_w = target_w / w
-            scale_h = max_h / h
-            scale = min(scale_w, scale_h)
-            
-            new_w = int(w * scale)
-            new_h = int(h * scale)
-            
-            img = img.resize((new_w, new_h), Image.LANCZOS)
-            
-            total_h = new_h + 40
-            canvas = Image.new("RGBA", (width, total_h), (0, 0, 0, 0))
-            draw = ImageDraw.Draw(canvas)
-            draw.rounded_rectangle([0, 0, width, total_h], radius=30, fill=(245, 245, 245, 245), outline=accent_color, width=6)
-            
-            canvas.paste(img, ((width - new_w) // 2, 20), img)
-            return canvas
-        except Exception as e:
-            print(f"Failed to load custom flowchart: {e}")
-
+    """Vertical architectural flowchart styled like a cloud diagram."""
     n = min(len(steps), 4)
     if n == 0: return Image.new("RGBA", (width, 100), (0, 0, 0, 0))
     
-    step_h = 120
-    gap = 40
-    total_h = n * step_h + (n-1) * gap + 60
+    # Image style parameters
+    bg_color = (250, 250, 250, 245) # White glass
+    box_outline = (0, 0, 0, 255)
+    text_color = (0, 0, 0, 255)
+    arrow_color = (0, 0, 0, 255)
+    
+    step_h = 130
+    gap = 70
+    total_h = n * step_h + (n-1) * gap + 80
     
     img = Image.new("RGBA", (width, total_h), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
-    f_step = gf(40)
-    f_num = gf(30)
+    f_step = gf(40) # slightly larger
     
-    # Background glass (fully opaque for readability)
-    draw.rounded_rectangle([0, 0, width, total_h], radius=30, fill=(15, 15, 20, 255), outline=accent_color, width=6)
+    # Background glass
+    draw.rounded_rectangle([0, 0, width, total_h], radius=30, fill=bg_color, outline=accent_color, width=4)
     
     for i, step in enumerate(steps[:n]):
         if active_step is not None and i > active_step:
             break
             
-        y0 = 30 + i * (step_h + gap)
+        y0 = 40 + i * (step_h + gap)
         y1 = y0 + step_h
         
-        # Step box
-        box_w = width - 80
-        bx0 = 40
+        box_w = width - 160
+        bx0 = 80
         bx1 = bx0 + box_w
         
-        draw.rounded_rectangle([bx0, y0, bx1, y1], radius=20, outline=(*accent_color, 255), width=4, fill=(30, 30, 45, 255))
+        step_lower = step.lower()
         
-        # Number badge
-        draw.ellipse([bx0 - 25, y0 + step_h//2 - 25, bx0 + 25, y0 + step_h//2 + 25], fill=(*accent_color, 255))
-        draw.text((bx0, y0 + step_h//2), str(i+1), font=f_num, fill=(0,0,0), anchor="mm")
+        # Decide shape and color based on keywords
+        is_db = any(k in step_lower for k in ["db", "database", "storage", "cache", "data", "meta"])
+        is_network = any(k in step_lower for k in ["cdn", "network", "internet", "gateway", "balancer"])
+        is_client = any(k in step_lower for k in ["viewer", "creator", "user", "client", "browser", "camera"])
         
-        # Step text (Monospace feel)
-        draw.text((bx0 + 50, y0 + step_h//2), step.upper(), font=f_step, fill=(255, 255, 255, 255), anchor="lm")
+        box_fill = (218, 213, 255, 255) # Default purple (Services)
+        if is_db:
+            box_fill = (14, 161, 255, 255) # Blue
+        elif is_network:
+            box_fill = (255, 170, 0, 255) # Orange
+        elif is_client:
+            box_fill = (200, 200, 200, 255) # Grayish
         
-        # Connector Arrow
+        # Drop shadow
+        draw.rounded_rectangle([bx0 + 5, y0 + 5, bx1 + 5, y1 + 5], radius=20, fill=(0, 0, 0, 40))
+        
+        if is_db:
+            # Draw cylinder
+            curve = 20
+            # main body
+            draw.rectangle([bx0, y0 + curve, bx1, y1 - curve], fill=box_fill)
+            # body lines
+            draw.line([(bx0, y0 + curve), (bx0, y1 - curve)], fill=box_outline, width=4)
+            draw.line([(bx1, y0 + curve), (bx1, y1 - curve)], fill=box_outline, width=4)
+            # bottom ellipse
+            draw.ellipse([bx0, y1 - 2*curve, bx1, y1], fill=box_fill, outline=box_outline, width=4)
+            # top ellipse
+            draw.ellipse([bx0, y0, bx1, y0 + 2*curve], fill=box_fill, outline=box_outline, width=4)
+        elif is_network:
+            # Pill shape
+            draw.rounded_rectangle([bx0, y0, bx1, y1], radius=step_h//2, outline=box_outline, width=4, fill=box_fill)
+        else:
+            # Rounded rectangle
+            draw.rounded_rectangle([bx0, y0, bx1, y1], radius=20, outline=box_outline, width=4, fill=box_fill)
+        
+        # Step text (Centered)
+        t_color = (255, 255, 255, 255) if is_db else text_color
+        tw, th = ts(step, f_step)
+        draw.text((bx0 + box_w//2 - tw//2, y0 + step_h//2 - th//2 - 5), step, font=f_step, fill=t_color)
+        
+        # Connector Arrow (Curve or straight down)
         if i < n - 1:
-            ay_start = y1 + 5
-            ay_end = y1 + gap - 5
+            ay_start = y1 + 4
+            ay_end = y1 + gap - 10
             ax = bx0 + box_w // 2
-            draw.line([(ax, ay_start), (ax, ay_end)], fill=(*accent_color, 255), width=6)
+            
+            # Draw line
+            draw.line([(ax, ay_start), (ax, ay_end)], fill=arrow_color, width=4)
             # Arrow head
-            draw.polygon([(ax - 15, ay_end - 15), (ax + 15, ay_end - 15), (ax, ay_end)], fill=(*accent_color, 255))
+            draw.polygon([(ax - 12, ay_end - 15), (ax + 12, ay_end - 15), (ax, ay_end)], fill=arrow_color)
             
     return img
 
