@@ -1616,27 +1616,44 @@ def _article_screenshot_clip(screenshot_path, duration):
     try:
         img = Image.open(screenshot_path).convert("RGBA")
         
-        # Resize image so it fits the screen width exactly
+        # 1. Base resize to fit screen width
         w, h = img.size
         new_w = FRAME_W
         new_h = int(h * (FRAME_W / float(w)))
-        img = img.resize((new_w, new_h), Image.LANCZOS)
         
-        # If the image is shorter than the frame, pad or center it
-        if new_h < FRAME_H:
-            img = ImageOps.fit(img, (FRAME_W, FRAME_H), Image.LANCZOS)
-            new_h = FRAME_H
+        # 2. Guarantee scroll room (minimum 600px of scrolling content)
+        min_scroll = 600
+        if new_h < FRAME_H + min_scroll:
+            target_h = FRAME_H + min_scroll
+            target_w = int(w * (target_h / float(h)))
+            img = img.resize((target_w, target_h), Image.LANCZOS)
+            
+            # Center crop horizontally if we scaled width beyond the frame
+            if target_w > FRAME_W:
+                left = (target_w - FRAME_W) // 2
+                img = img.crop((left, 0, left + FRAME_W, target_h))
+            new_h = target_h
+        else:
+            img = img.resize((new_w, new_h), Image.LANCZOS)
             
         arr = np.array(img.convert("RGB"))
         mask = np.array(img.split()[3]).astype(float) / 255.0
         
         clips = []
         max_scroll = max(0, new_h - FRAME_H)
-        speed = 80 # px/s (Slow, readable scroll)
         
         # --- FIRST APPEARANCE: Evidence/Hook Phase ---
         start1 = 3.5
         dur1 = 2.5
+        
+        # --- SECOND APPEARANCE: Deep Dive Phase ---
+        start2 = 12.0
+        dur2 = duration - start2
+        
+        # 3. Dynamically calculate speed so the scroll ends exactly when the video ends
+        total_scroll_time = dur1 + max(0, dur2)
+        speed = (max_scroll / total_scroll_time) if total_scroll_time > 0 else 0
+        
         if duration > start1 + dur1:
             def make_frame1(t):
                 y = int(t * speed)
@@ -1654,9 +1671,6 @@ def _article_screenshot_clip(screenshot_path, duration):
             clip1 = clip1.with_effects([vfx.CrossFadeIn(0.4), vfx.CrossFadeOut(0.4)])
             clips.append(clip1)
 
-        # --- SECOND APPEARANCE: Deep Dive Phase ---
-        start2 = 12.0
-        dur2 = duration - start2
         if dur2 > 0:
             def make_frame2(t):
                 y = int((dur1 + t) * speed)
