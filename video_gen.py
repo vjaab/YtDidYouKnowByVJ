@@ -2473,10 +2473,10 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         else:
             vid_clip = vid_clip.subclipped(0, audio_duration)
 
-        width_pip, height_pip = 350, 350
         w, h = vid_clip.size
-        # Crop to target aspect ratio
-        target_aspect = width_pip / height_pip
+        
+        # Crop to portrait aspect ratio (9:16) to focus on the character and fit naturally in Shorts
+        target_aspect = 9 / 16
         if w/h > target_aspect:
             new_w = int(h * target_aspect)
             x1 = (w - new_w) // 2
@@ -2485,30 +2485,53 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             new_h = int(w / target_aspect)
             y1 = (h - new_h) // 2
             vid_clip = vid_clip.cropped(x1=0, y1=y1, x2=w, y2=y1+new_h)
+            
+        w, h = vid_clip.size
+        
+        # Make the avatar occupy a reasonable vertical portion of the screen (e.g. ~35% height)
+        height_pip = int(FRAME_H * 0.35)
+        width_pip = int(height_pip * (w / h))
         
         # Apply refinements from dynamic_params
         cur_w = int(width_pip * avatar_scale_mult)
         cur_h = int(height_pip * avatar_scale_mult)
         avatar_clip = vid_clip.resized((cur_w, cur_h)).without_audio()
         
-        # Circular Mask for Seamless Integration
-        Y, X = np.ogrid[:cur_h, :cur_w]
-        cy, cx = cur_h / 2, cur_w / 2
-        dist = np.sqrt((X - cx)**2 + (Y - cy)**2)
-        radius = min(cur_w, cur_h) / 2
-        fade_thickness = radius * 0.1
-        
-        inner_radius = radius - fade_thickness
-        fade_mask = (radius - dist) / max(fade_thickness, 1.0)
-        fade_mask = np.clip(fade_mask, 0.0, 1.0)
-        
-        a_mask_np = np.where(dist > inner_radius, fade_mask, 1.0)
-        a_mask_np = np.where(dist > radius, 0.0, a_mask_np).astype(np.float32)
+        try:
+            from rembg import remove, new_session
+            print("Using rembg for clean AI background removal...")
+            # u2net_human_seg is optimized for human boundaries (head and body extraction)
+            _rembg_session = new_session("u2net_human_seg")
+            _rembg_cache = {"t": -1.0, "rgba": None}
             
-        a_mask_feathered = a_mask_np
-        
-        mclip = VideoClip(lambda t: a_mask_feathered, is_mask=True, duration=audio_duration)
-        avatar_clip = avatar_clip.with_mask(mclip)
+            def get_rgba_frame(t, get_frame):
+                if abs(t - _rembg_cache["t"]) < 0.001 and _rembg_cache["rgba"] is not None:
+                    return _rembg_cache["rgba"]
+                frame_rgb = get_frame(t)
+                rgba = remove(frame_rgb, session=_rembg_session)
+                _rembg_cache["t"] = t
+                _rembg_cache["rgba"] = rgba
+                return rgba
+
+            avatar_rgb = avatar_clip.fl(lambda gf, t: get_rgba_frame(t, gf)[..., :3])
+            mclip = VideoClip(lambda t: (get_rgba_frame(t, avatar_clip.get_frame)[..., 3] / 255.0).astype(np.float32), 
+                              is_mask=True, duration=audio_duration)
+            avatar_clip = avatar_rgb.with_mask(mclip)
+            
+        except Exception as e:
+            print(f"rembg background removal failed or not installed: {e}")
+            # Fallback: Rectangular mask with subtle feathered edges
+            Y, X = np.ogrid[:cur_h, :cur_w]
+            fade_thickness = int(min(cur_w, cur_h) * 0.06)
+            
+            dist_x = np.minimum(X, cur_w - 1 - X)
+            dist_y = np.minimum(Y, cur_h - 1 - Y)
+            dist_edge = np.minimum(dist_x, dist_y)
+            
+            a_mask_np = np.clip(dist_edge / fade_thickness, 0.0, 1.0).astype(np.float32)
+            
+            mclip = VideoClip(lambda t: a_mask_np, is_mask=True, duration=audio_duration)
+            avatar_clip = avatar_clip.with_mask(mclip)
 
         _screenshot_path_check = script_json.get("screenshot_path")
         _has_screenshot = bool(_screenshot_path_check and os.path.exists(_screenshot_path_check))
