@@ -217,10 +217,11 @@ def _pil_clip(pil_img, duration, pos=("center", "center"), start=0, opacity=1.0)
 
 # ── LAYER 3: Gradient ─────────────────────────────────────────────────────────
 def _gradient_clip(duration):
-    h = int(FRAME_H * 0.50)
+    # Strong dark gradient covering bottom 45% — blends avatar into B-roll
+    h = int(FRAME_H * 0.45)
     arr = np.zeros((h, FRAME_W, 3), dtype=np.uint8)
     mask_arr = np.array(
-        [(int(200 * (y/h)**0.7),) * FRAME_W for y in range(h)],
+        [(int(255 * (y/h)**0.5),) * FRAME_W for y in range(h)],
         dtype=float) / 255.0
     clip = ImageClip(arr, duration=duration)
     mask = VideoClip(lambda t: mask_arr, is_mask=True, duration=duration)
@@ -529,12 +530,12 @@ def _pattern_interrupt_flash(accent_color, total_dur):
 
 # ── LAYER E2: Giant Hook Text (First 1.5s) ────────────────────────────────────
 def _hook_text_overlay(hook_text, accent_color, total_dur):
-    """Displays giant hook text in the first 1.5 seconds to stop the scroll."""
+    """Displays giant hook text — clean white serif, no background box (reference style)."""
     if not hook_text:
         return None
-    dur = min(1.8, total_dur)
-    f = gf(72)
-    max_w = FRAME_W - 100
+    dur = min(2.5, total_dur)
+    f = get_cinematic_font(68, italic=True)
+    max_w = FRAME_W - 120
 
     # Word-wrap the hook text
     words = hook_text.split()
@@ -548,39 +549,36 @@ def _hook_text_overlay(hook_text, accent_color, total_dur):
             cur.append(w)
     if cur:
         lines.append(" ".join(cur))
-    lines = lines[:3]  # Max 3 lines
+    lines = lines[:3]
 
     lh = ts("Ag", f)[1]
-    lsp = int(lh * 1.4)
+    lsp = int(lh * 1.5)
     total_h = lh + (len(lines) - 1) * lsp
-    canvas_h = total_h + 80
+    canvas_h = total_h + 60
     canvas = Image.new("RGBA", (FRAME_W, canvas_h), (0, 0, 0, 0))
     draw = ImageDraw.Draw(canvas)
-    # Semi-transparent dark backdrop
-    draw.rounded_rectangle([30, 10, FRAME_W - 30, canvas_h - 10], radius=20, fill=(0, 0, 0, 180))
 
     for i, line in enumerate(lines):
         lw, _ = ts(line, f)
         tx = (FRAME_W - lw) // 2
-        ty = 40 + i * lsp
-        # Text shadow
-        for dx, dy in [(-3, 0), (3, 0), (0, -3), (0, 3)]:
+        ty = 30 + i * lsp
+        for dx, dy in [(-3, -3), (3, -3), (-3, 3), (3, 3), (-2, 0), (2, 0), (0, -2), (0, 2)]:
             draw.text((tx + dx, ty + dy), line, font=f, fill=(0, 0, 0, 200))
-        draw.text((tx, ty), line, font=f, fill=(*accent_color, 255))
+        draw.text((tx, ty), line, font=f, fill=(255, 255, 255, 255))
 
     arr = np.array(canvas.convert("RGB"))
     mask = np.array(canvas.split()[3]).astype(float) / 255.0
 
     def opacity_fn(t):
-        if t < 0.15:
-            return t / 0.15  # Fade in
-        elif t > dur - 0.4:
-            return max(0, (dur - t) / 0.4)  # Fade out
+        if t < 0.2:
+            return t / 0.2
+        elif t > dur - 0.5:
+            return max(0, (dur - t) / 0.5)
         return 1.0
 
     clip = VideoClip(lambda t: arr, duration=dur)
     mclip = VideoClip(lambda t: mask * opacity_fn(t), is_mask=True, duration=dur)
-    y_pos = int(FRAME_H * 0.32) # Moved up slightly
+    y_pos = int(FRAME_H * 0.38)
     return clip.with_mask(mclip).with_position(("center", y_pos)).with_start(0)
 
 
@@ -2586,26 +2584,13 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
         avatar_pip = avatar_clip.with_position(pip_position).with_start(0)
 
-        # ── Avatar-Relative Callouts ──
-        top_kws = sorted(script_json.get("keywords", []), key=len, reverse=True)[:3]
-        for i, kw in enumerate(top_kws):
-            t_kw = (i + 1) * (audio_duration / 4)
-            if t_kw > audio_duration - 2: continue
-            skw = Image.new("RGBA", (ts(kw, gf(28))[0] + 30, 50), (0, 0, 0, 0))
-            ImageDraw.Draw(skw).rounded_rectangle([0, 0, skw.width, 50], radius=15, fill=(*accent_color, 220))
-            ImageDraw.Draw(skw).text((15, 10), kw, font=gf(28), fill=(255, 255, 255))
-            def kpos(t, _ts=t_kw):
-                rel = t - _ts
-                if rel < 0 or rel > 2.0: return (FRAME_W + 100, 0)
-                bx, by = pip_position(t)
-                # Hover directly above the avatar's head, floating upward
-                return (bx + 20, by - 60 - int(rel*20))
-            logo_clips.append(_pil_clip(skw, 2.0, start=t_kw).with_position(kpos))
+        # ── Avatar-Relative Callouts (DISABLED — reference style) ──
+        pass
 
     # ── LAYERS ───────────────────────────────────────────────────────────
     screenshot_path = script_json.get("screenshot_path")
     screenshot_clips = _article_screenshot_clip(screenshot_path, audio_duration)
-    tint = ColorClip(size=(FRAME_W, FRAME_H), color=accent_color, duration=audio_duration).with_opacity(0.02)
+    # Tint removed — reference uses pure black background
     gradient = _gradient_clip(audio_duration)
 
     # ── HUMAN REALISM OVERLAYS ───────────────────────────────────────────────
@@ -2618,12 +2603,9 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     # ── ENGAGEMENT LAYERS (Retention Boosters) ────────────────────────────────
     engagement_clips = []
     
-    # E1: Pattern Interrupt Flash (0.3s accent flash at start)
-    pi_flash = _pattern_interrupt_flash(accent_color, audio_duration)
-    if pi_flash:
-        engagement_clips.append(pi_flash)
+    # E1: Pattern Interrupt Flash — DISABLED (reference style)
     
-    # E2: Giant Hook Text (first 1.5s)
+    # E2: Giant Hook Text
     hook_text = script_json.get("hook_text", "")
     hook_overlay = _hook_text_overlay(hook_text, accent_color, audio_duration)
     if hook_overlay:
@@ -2645,7 +2627,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             if iclip:
                 infographic_clips.append(iclip)
 
-    base_layers = bg_layer_clips + screenshot_clips + [tint, gradient] + particle_clips + logo_clips + infographic_clips
+    base_layers = bg_layer_clips + screenshot_clips + [gradient] + logo_clips + infographic_clips
     if flare_layer: base_layers.append(flare_layer)
     if grain_layer: base_layers.append(grain_layer)
     if avatar_pip: base_layers.append(avatar_pip)
@@ -2783,8 +2765,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
     final_audio = CompositeAudioClip(final_audio_layers).with_duration(audio_duration)
     
-    # Pre-render header (only persistent overlay)
-    header_img = render_header_bar(title, sub_category, accent_color, FRAME_W)
+    # Header bar DISABLED — reference style has no persistent title
+    header_img = Image.new('RGBA', (FRAME_W, FRAME_H), (0, 0, 0, 0))
     
     # Pre-render 2026 Compliance Watermark
     transparency_img = build_transparency_watermark(FRAME_W, FRAME_H)
@@ -2888,12 +2870,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 cropped = bg_frame[top:top+nh, left:left+nw]
                 bg_frame = cv2.resize(cropped, (w, h))
 
-        # ── EMERGENCY: 0.1s VISUAL SHOCK (Intro Flash) ────────────────────
-        if t < 0.2:
-            # 200ms white flash intro to stop the scroll
-            bg_frame = bg_frame.astype(np.float32)
-            bg_frame += 100 # Brighten the whole frame
-            bg_frame = np.clip(bg_frame, 0, 255).astype(np.uint8)
+        # Intro flash DISABLED — reference style
+        pass
 
         return composite_frame(bg_frame, t, header_img, subtitle_img, transparency_img)
 
