@@ -11,58 +11,107 @@ from ecosystem_logic import get_slot_info, get_category_prompt_enhancement
 
 # ── PROMPT TEMPLATES (AGENTIC LOOP) ────────────────────────────────────────
 
-SYSTEM_PERSONA = """Act as a Staff AI Engineer and Technical Architect specializing in Hybrid Architectures and Agentic Design. 
-Your goal is to build high-authority technical insights that help developers move from 'generic AI prompts' to 'scalable, cost-optimized agentic systems'.
-Prioritize local open-source models (LMMs), hybrid cloud-local routing, and architectural blueprints that replace recurring API costs."""
+SYSTEM_PERSONA = """Act as an elite Tech Content Creator and Architect.
+Your goal is to build high-retention technical insights.
+Style: conversational, fast pacing, curiosity-driven, no corporate tone, no filler, every sentence must increase curiosity.
+Avoid: greetings, introductions, 'today we will', buzzword overload, generic summaries.
+Biggest Retention Secret: Most viral Shorts are not informational. They are tension-release systems. The viewer keeps watching because the script continuously creates unanswered questions."""
 
-PLANNING_TEMPLATE = """{persona}
+RESEARCH_AGENT_TEMPLATE = """{persona}
 
-ANALYZER TASK:
-Review the following technical news and search context. 
-Identify 3-4 distinct 'Technical Angles' or 'Architectural Blueprints' that would be highly valuable for a Staff Engineer.
-Consider: Cost-optimization, Local model replacement of APIs, or Agentic Loop efficiency.
+RESEARCH AGENT TASK:
+Review the following technical news and search context.
+Extract the raw facts, announcements, tweets, controversies, and implications.
+Do NOT write a script. Just extract the core narrative elements.
 
 NEWS CONTEXT:
 {news_context}
 
-Return ONLY a JSON list of objects:
-[{{ "angle": "Short title", "insight": "One sentence technical insight", "reason": "Why this matters for devs" }}]"""
+Return ONLY a JSON object:
+{{
+  "facts": ["Fact 1", "Fact 2"],
+  "controversies": ["Controversy 1"],
+  "implications": ["Implication 1"],
+  "core_narrative": "A one paragraph summary of the raw narrative"
+}}"""
 
-CRITIQUE_TEMPLATE = """{persona}
+HOOK_AGENT_TEMPLATE = """{persona}
 
-CRITIQUE TASK:
-Evaluate the following AI Video Script draft for a professional developer audience.
-Identify:
-1. TECHNICAL SHALLOW SPOTS: Where did the script remain too generic?
-2. FILLER WORDS: Did it use forbidden words (basically, actually, just, etc.)?
-3. HOOK VELOCITY: Is the 5-second hook a 'Stop-Your-Scroll' trigger?
-4. PERSONA ALIGNMENT: Does it sound like a technical peer briefing or a news reporter?
+HOOK AGENT TASK:
+Based on the following research, generate 10 potential YouTube Shorts hooks (0-3s).
+Hooks MUST create surprise, contradiction, urgency, or curiosity. No greetings. No generic statements.
 
-SCRIPT DRAFT:
-{script_json}
+RESEARCH:
+{research_json}
 
 Return ONLY a JSON object:
 {{
-  "score": 0.0-10.0,
-  "technical_critique": "Draft improvements here",
-  "persona_critique": "Draft improvements here",
-  "specific_fixes": ["List of exact changes to make"]
+  "hooks": [
+    {{
+      "text": "Hook text",
+      "curiosity_score": 1-10,
+      "emotional_trigger_score": 1-10,
+      "reason": "Why it works"
+    }}
+  ]
 }}"""
 
-REFINEMENT_TEMPLATE = """{persona}
+NARRATIVE_AGENT_TEMPLATE = """{persona}
 
-REFINEMENT TASK:
-Rewrite the script draft based on the following critique. 
-Ensure ALL technical glossary terms are correct (tiktoken, etc.) and ALL filler words are removed.
-Increase the 'Staff Engineer' authority.
+NARRATIVE AGENT TASK:
+Using the selected hook and research, create a short storytelling flow and escalating structure.
+Include:
+1. Hook (The selected hook)
+2. Context (3-10s) - Who, What, Why it matters quickly.
+3. Escalation (10-25s) - Implications, consequences, future impact.
+4. Insight (25-40s) - One memorable twist/insight.
+5. Open Loop (40-50s) - Lingering thought.
 
-CRITIQUE:
-{critique_json}
+RESEARCH:
+{research_json}
 
-ORIGINAL DRAFT:
-{original_draft}
+SELECTED HOOK:
+{selected_hook}
 
-Return the FINAL corrected JSON matching the original schema. No explanation."""
+{selection_instruction}
+
+Return ONLY a JSON object representing the narrative draft (not the final schema yet, just the content parts):
+{{
+  "hook": "...",
+  "context": "...",
+  "escalation": "...",
+  "insight": "...",
+  "open_loop": "..."
+}}"""
+
+RETENTION_OPTIMIZER_TEMPLATE = """{persona}
+
+RETENTION OPTIMIZER TASK:
+Rewrite the narrative draft to remove fluff, shorten sentences, add pacing breaks, and increase curiosity density.
+Fast sentence pacing. No filler. The viewer must keep watching because the script continuously creates unanswered questions (tension-release).
+
+NARRATIVE DRAFT:
+{narrative_json}
+
+Return ONLY a JSON object:
+{{
+  "optimized_script": "The full rewritten text combining all parts into a fast-paced script."
+}}"""
+
+HUMANIZER_AGENT_TEMPLATE = """{persona}
+
+HUMANIZER AGENT TASK:
+This is the final step. Fix robotic phrasing, repetitive AI wording, over-explanation, and "In conclusion" style endings.
+Add contractions, punchier cadence, and conversational flow.
+Format the output EXACTLY matching the required schema below.
+
+OPTIMIZED SCRIPT:
+{optimized_script}
+
+SCHEMA REQUIREMENTS:
+{schema_requirements}
+
+Return ONLY the final JSON object matching the schema. No markdown wrapping unless inside the string values. No explanations."""
 
 def get_hottest_tech_topic(client):
     """Uses Gemini Search grounding to find today's single hottest tech topic."""
@@ -303,7 +352,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "comment_hook": "Would you use this?"
 }}"""
 
-    engine = AgenticGenerationEngine(client, news_context, slot, category, strategy_enhancement, is_longform)
+    engine = MultiAgentGenerationEngine(client, news_context, slot, category, strategy_enhancement, is_longform)
     script_data = engine.execute(selection_instruction, prompt_requirements)
     
     if script_data:
@@ -320,7 +369,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
             
     return script_data
 
-class AgenticGenerationEngine:
+class MultiAgentGenerationEngine:
     def __init__(self, client, context, slot, category, strategy_enhancement, is_longform):
         self.client = client
         self.context = context
@@ -351,59 +400,53 @@ class AgenticGenerationEngine:
                 time.sleep(2)
         return None
 
-    def plan(self):
-        print("🔍 [LOOP] Phase 1: Planning Technical Angles...")
-        prompt = PLANNING_TEMPLATE.format(
+    def execute(self, selection_instruction, prompt_requirements):
+        print("🕵️ [AGENT 1] Research Agent: Extracting narrative elements...")
+        research_prompt = RESEARCH_AGENT_TEMPLATE.format(
             persona=SYSTEM_PERSONA,
             news_context=self.context
         )
-        return self._call_gemini(prompt)
+        research = self._call_gemini(research_prompt)
+        if not research: return None
 
-    def generate_draft(self, plan, selection_instruction, prompt_requirements):
-        print("✍️ [LOOP] Phase 2: Generating Initial Draft...")
-        full_prompt = f"{SYSTEM_PERSONA}\n\nPLAN SELECTED: {json.dumps(plan)}\n\n{selection_instruction}\n\nDATA:\n{self.context}\n\n{prompt_requirements}"
-        return self._call_gemini(full_prompt, model='gemini-2.5-pro')
-
-    def critique(self, draft):
-        print("🧐 [LOOP] Phase 3: Critiquing Technical Depth...")
-        prompt = CRITIQUE_TEMPLATE.format(
+        print("🪝 [AGENT 2] Hook Agent: Generating high-retention hooks...")
+        hook_prompt = HOOK_AGENT_TEMPLATE.format(
             persona=SYSTEM_PERSONA,
-            script_json=json.dumps(draft)
+            research_json=json.dumps(research)
         )
-        return self._call_gemini(prompt)
+        hooks_data = self._call_gemini(hook_prompt)
+        if not hooks_data or "hooks" not in hooks_data: return None
+        
+        # Pick best hook (highest combined score)
+        best_hook = max(hooks_data["hooks"], key=lambda h: h.get("curiosity_score", 0) + h.get("emotional_trigger_score", 0))
+        print(f"🎯 Selected Hook: {best_hook.get('text')}")
 
-    def refine(self, draft, critique, requirements):
-        print("🛠️ [LOOP] Phase 4: Refining & Polishing...")
-        prompt = REFINEMENT_TEMPLATE.format(
+        print("📖 [AGENT 3] Narrative Agent: Building escalating structure...")
+        narrative_prompt = NARRATIVE_AGENT_TEMPLATE.format(
             persona=SYSTEM_PERSONA,
-            critique_json=json.dumps(critique),
-            original_draft=json.dumps(draft),
-            schema_requirements=requirements
+            research_json=json.dumps(research),
+            selected_hook=best_hook.get("text"),
+            selection_instruction=selection_instruction
         )
-        return self._call_gemini(prompt, model='gemini-2.5-pro')
+        narrative = self._call_gemini(narrative_prompt, model='gemini-2.5-pro')
+        if not narrative: return None
 
-    def execute(self, selection_instruction, prompt_requirements):
-        plan_angles = self.plan()
-        selected_angle = plan_angles[0] if (plan_angles and isinstance(plan_angles, list)) else {}
+        print("⚡ [AGENT 4] Retention Optimizer: Maximizing pacing and curiosity density...")
+        retention_prompt = RETENTION_OPTIMIZER_TEMPLATE.format(
+            persona=SYSTEM_PERSONA,
+            narrative_json=json.dumps(narrative)
+        )
+        optimized = self._call_gemini(retention_prompt, model='gemini-2.5-pro')
+        if not optimized: return None
 
-        draft = self.generate_draft(selected_angle, selection_instruction, prompt_requirements)
-        if not draft: return None
-
-        iterations = 0
-        max_iters = 1 
-        while iterations < max_iters:
-            feedback = self.critique(draft)
-            if not feedback: break
-            
-            score = feedback.get("score", 0)
-            if score >= 9.2:
-                print(f"⭐ [LOOP] Quality Score: {score}/10. Ready.")
-                break
-            
-            print(f"🔄 [LOOP] Quality Score: {score}/10. Iterating ({iterations+1}/{max_iters})...")
-            refined = self.refine(draft, feedback, prompt_requirements)
-            if refined:
-                draft = refined
-            iterations += 1
-            
-        return draft
+        print("🗣️ [AGENT 5] Humanizer Agent: Fixing AI cadence and returning final schema...")
+        humanizer_prompt = HUMANIZER_AGENT_TEMPLATE.format(
+            persona=SYSTEM_PERSONA,
+            optimized_script=optimized.get("optimized_script", ""),
+            schema_requirements=prompt_requirements
+        )
+        final_script = self._call_gemini(humanizer_prompt, model='gemini-2.5-pro')
+        
+        if final_script:
+            print("⭐ [PIPELINE] Multi-Agent script generation completed successfully.")
+        return final_script
