@@ -2046,7 +2046,7 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     line_h = int(70 * scale_ratio)
     
     if frame_width < frame_height:
-        start_y = int(frame_height * 0.54)  # Positioned exactly in the middle overlay, above the avatar
+        start_y = int(frame_height * 0.48)  # Above the avatar (avatar starts at ~60%)
     else:
         start_y = int(frame_height * 0.75)
     
