@@ -122,3 +122,4 @@ ffmpeg-python
 gdown
 g2p_en
 edge-tts
+rembg<2.0.60
