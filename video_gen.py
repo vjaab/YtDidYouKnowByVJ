@@ -2495,9 +2495,16 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 _rembg_cache["rgba"] = rgba
                 return rgba
 
-            avatar_rgb = avatar_clip.fl(lambda gf, t: get_rgba_frame(t, gf)[..., :3])
-            mclip = VideoClip(lambda t: (get_rgba_frame(t, avatar_clip.get_frame)[..., 3] / 255.0).astype(np.float32), 
-                              is_mask=True, duration=audio_duration)
+            # MoviePy v2: use VideoClip with make_frame instead of deprecated .fl()
+            _avatar_get_frame = avatar_clip.get_frame
+            avatar_rgb = VideoClip(
+                lambda t: get_rgba_frame(t, _avatar_get_frame)[..., :3],
+                duration=audio_duration
+            ).resized((cur_w, cur_h))
+            mclip = VideoClip(
+                lambda t: (get_rgba_frame(t, _avatar_get_frame)[..., 3] / 255.0).astype(np.float32),
+                is_mask=True, duration=audio_duration
+            )
             avatar_clip = avatar_rgb.with_mask(mclip)
             
         except Exception as e:
