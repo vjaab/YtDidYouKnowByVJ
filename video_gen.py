@@ -2495,6 +2495,20 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                     return _rembg_cache["rgba"]
                 frame_rgb = get_frame(t)
                 rgba = remove(frame_rgb, session=_rembg_session)
+                
+                # Feather the alpha mask edges with Gaussian blur for seamless blending
+                alpha = rgba[..., 3].astype(np.float32)
+                alpha = cv2.GaussianBlur(alpha, (15, 15), 0)
+                
+                # Add bottom-fade gradient so avatar dissolves into the video naturally
+                fade_h = int(alpha.shape[0] * 0.15)  # Bottom 15% fades out
+                if fade_h > 0:
+                    for y in range(alpha.shape[0] - fade_h, alpha.shape[0]):
+                        ratio = 1.0 - ((y - (alpha.shape[0] - fade_h)) / fade_h)
+                        alpha[y, :] *= ratio
+                
+                rgba[..., 3] = np.clip(alpha, 0, 255).astype(np.uint8)
+                
                 _rembg_cache["t"] = t
                 _rembg_cache["rgba"] = rgba
                 return rgba
@@ -2513,15 +2527,22 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             
         except Exception as e:
             print(f"rembg background removal failed or not installed: {e}")
-            # Fallback: Rectangular mask with subtle feathered edges
+            # Fallback: Soft oval/portrait mask that blends edges smoothly
             Y, X = np.ogrid[:cur_h, :cur_w]
-            fade_thickness = int(min(cur_w, cur_h) * 0.06)
+            # Larger feather for smoother blend
+            fade_thickness = int(min(cur_w, cur_h) * 0.12)
             
             dist_x = np.minimum(X, cur_w - 1 - X)
             dist_y = np.minimum(Y, cur_h - 1 - Y)
             dist_edge = np.minimum(dist_x, dist_y)
             
             a_mask_np = np.clip(dist_edge / fade_thickness, 0.0, 1.0).astype(np.float32)
+            
+            # Add bottom-fade gradient for seamless blending
+            fade_h = int(cur_h * 0.15)
+            for y in range(cur_h - fade_h, cur_h):
+                ratio = 1.0 - ((y - (cur_h - fade_h)) / fade_h)
+                a_mask_np[y, :] *= ratio
             
             mclip = VideoClip(lambda t: a_mask_np, is_mask=True, duration=audio_duration)
             avatar_clip = avatar_clip.with_mask(mclip)
