@@ -1415,7 +1415,7 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
             tw = draw.textlength(title, font=f_title)
         
     start_x = (frame_width - tw) // 2
-    start_y = int(FRAME_H * 0.62) # Safely below slides (which end ~1150) and above subtitles (which start ~1344)
+    start_y = int(FRAME_H * 0.50) # Positioned just above the subtitles, bridging the B-Roll and Avatar
     
     # Text shadow/glow
     for dx, dy in [(-2,0), (2,0), (0,-2), (0,2)]:
@@ -1616,31 +1616,14 @@ def _article_screenshot_clip(screenshot_path, duration):
     try:
         img = Image.open(screenshot_path).convert("RGBA")
         
-        # 1. Base resize to fit screen width
-        w, h = img.size
-        new_w = FRAME_W
-        new_h = int(h * (FRAME_W / float(w)))
+        # Target top 60% of screen
+        target_h = int(FRAME_H * 0.60)
+        img = ImageOps.fit(img, (FRAME_W, target_h), Image.LANCZOS)
         
-        # 2. Guarantee scroll room (minimum 600px of scrolling content)
-        min_scroll = 600
-        if new_h < FRAME_H + min_scroll:
-            target_h = FRAME_H + min_scroll
-            target_w = int(w * (target_h / float(h)))
-            img = img.resize((target_w, target_h), Image.LANCZOS)
-            
-            # Center crop horizontally if we scaled width beyond the frame
-            if target_w > FRAME_W:
-                left = (target_w - FRAME_W) // 2
-                img = img.crop((left, 0, left + FRAME_W, target_h))
-            new_h = target_h
-        else:
-            img = img.resize((new_w, new_h), Image.LANCZOS)
-            
         arr = np.array(img.convert("RGB"))
         mask = np.array(img.split()[3]).astype(float) / 255.0
         
         clips = []
-        max_scroll = max(0, new_h - FRAME_H)
         
         # --- FIRST APPEARANCE: Evidence/Hook Phase ---
         start1 = 3.5
@@ -1650,41 +1633,29 @@ def _article_screenshot_clip(screenshot_path, duration):
         start2 = 12.0
         dur2 = duration - start2
         
-        # 3. Dynamically calculate speed so the scroll ends exactly when the video ends
-        total_scroll_time = dur1 + max(0, dur2)
-        speed = (max_scroll / total_scroll_time) if total_scroll_time > 0 else 0
-        
         if duration > start1 + dur1:
-            def make_frame1(t):
-                y = int(t * speed)
-                y = min(y, max_scroll)
-                return arr[y:y+FRAME_H, :]
+            def zoom_effect1(t):
+                return 1.0 + 0.1 * (t / dur1)
                 
-            def make_mask1(t):
-                y = int(t * speed)
-                y = min(y, max_scroll)
-                return mask[y:y+FRAME_H, :]
-                
-            clip1 = VideoClip(make_frame1, duration=dur1)
-            mclip1 = VideoClip(make_mask1, is_mask=True, duration=dur1)
-            clip1 = clip1.with_mask(mclip1).with_position((0, 0)).with_start(start1)
+            clip1 = VideoClip(lambda t: arr, duration=dur1)
+            mclip1 = VideoClip(lambda t: mask, is_mask=True, duration=dur1)
+            clip1 = clip1.with_mask(mclip1)
+            clip1 = clip1.with_effects([vfx.Resize(zoom_effect1)])
+            clip1 = clip1.cropped(width=FRAME_W, height=target_h, x_center=FRAME_W/2, y_center=target_h/2)
+            clip1 = clip1.with_position((0, 0)).with_start(start1)
             clip1 = clip1.with_effects([vfx.CrossFadeIn(0.4), vfx.CrossFadeOut(0.4)])
             clips.append(clip1)
 
         if dur2 > 0:
-            def make_frame2(t):
-                y = int((dur1 + t) * speed)
-                y = min(y, max_scroll)
-                return arr[y:y+FRAME_H, :]
+            def zoom_effect2(t):
+                return 1.0 + 0.1 * (t / dur2)
                 
-            def make_mask2(t):
-                y = int((dur1 + t) * speed)
-                y = min(y, max_scroll)
-                return mask[y:y+FRAME_H, :]
-                
-            clip2 = VideoClip(make_frame2, duration=dur2)
-            mclip2 = VideoClip(make_mask2, is_mask=True, duration=dur2)
-            clip2 = clip2.with_mask(mclip2).with_position((0, 0)).with_start(start2)
+            clip2 = VideoClip(lambda t: arr, duration=dur2)
+            mclip2 = VideoClip(lambda t: mask, is_mask=True, duration=dur2)
+            clip2 = clip2.with_mask(mclip2)
+            clip2 = clip2.with_effects([vfx.Resize(zoom_effect2)])
+            clip2 = clip2.cropped(width=FRAME_W, height=target_h, x_center=FRAME_W/2, y_center=target_h/2)
+            clip2 = clip2.with_position((0, 0)).with_start(start2)
             clip2 = clip2.with_effects([vfx.CrossFadeIn(0.5), vfx.CrossFadeOut(0.5)])
             clips.append(clip2)
             
@@ -1704,39 +1675,26 @@ def _evidence_screenshot_clip(evidence_path, duration):
     try:
         img = Image.open(evidence_path).convert("RGBA")
         
-        # Preserve aspect ratio like the article screenshot
-        w, h = img.size
-        new_w = FRAME_W
-        new_h = int(h * (FRAME_W / float(w)))
-        img = img.resize((new_w, new_h), Image.LANCZOS)
+        # Target top 60% of screen
+        target_h = int(FRAME_H * 0.60)
+        img = ImageOps.fit(img, (FRAME_W, target_h), Image.LANCZOS)
         
-        if new_h < FRAME_H:
-            img = ImageOps.fit(img, (FRAME_W, FRAME_H), Image.LANCZOS)
-            new_h = FRAME_H
-            
         arr = np.array(img.convert("RGB"))
         mask = np.array(img.split()[3]).astype(float) / 255.0
-        max_scroll = max(0, new_h - FRAME_H)
-        speed = 80 # px/s (Slow, readable scroll)
         
-        # Appearance window: Typically during the 'Deep-Dive' or 'Analytical Commentary'
         start = 28.0 
         dur = min(6.0, duration - start - 5.0)
         
         if dur > 1.0:
-            def make_frame(t):
-                y = int(t * speed)
-                y = min(y, max_scroll)
-                return arr[y:y+FRAME_H, :]
+            def zoom_effect(t):
+                return 1.0 + 0.1 * (t / dur)
                 
-            def make_mask(t):
-                y = int(t * speed)
-                y = min(y, max_scroll)
-                return mask[y:y+FRAME_H, :]
-                
-            clip = VideoClip(make_frame, duration=dur)
-            mclip = VideoClip(make_mask, is_mask=True, duration=dur)
-            clip = clip.with_mask(mclip).with_position((0, 0)).with_start(start)
+            clip = VideoClip(lambda t: arr, duration=dur)
+            mclip = VideoClip(lambda t: mask, is_mask=True, duration=dur)
+            clip = clip.with_mask(mclip)
+            clip = clip.with_effects([vfx.Resize(zoom_effect)])
+            clip = clip.cropped(width=FRAME_W, height=target_h, x_center=FRAME_W/2, y_center=target_h/2)
+            clip = clip.with_position((0, 0)).with_start(start)
             clip = clip.with_effects([vfx.CrossFadeIn(0.6), vfx.CrossFadeOut(0.6)])
             
             # Add a 'PROVEN EVIDENCE' label overlay
@@ -2072,7 +2030,7 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     line_h = int(70 * scale_ratio)
     
     if frame_width < frame_height:
-        start_y = int(frame_height * 0.70) # Lower third
+        start_y = int(frame_height * 0.54) # Positioned exactly in the middle overlay, above the avatar
     else:
         start_y = int(frame_height * 0.75)
     
@@ -2502,8 +2460,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             
         w, h = vid_clip.size
         
-        # Make the avatar occupy a reasonable vertical portion of the screen (e.g. ~35% height)
-        height_pip = int(FRAME_H * 0.35)
+        # Make the avatar occupy exactly the bottom 40% of the screen
+        height_pip = int(FRAME_H * 0.40)
         width_pip = int(height_pip * (w / h))
         
         # Apply refinements from dynamic_params
@@ -2583,26 +2541,13 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             return base
 
         def pip_position(t):
-            # Position at top-right corner, blending seamlessly into the frame
+            # Permanently center at the bottom of the screen (Bottom 40%)
             scale = avatar_scale(t)
             scaled_w = int(cur_w * scale)
             scaled_h = int(cur_h * scale)
             
-            margin_x = 40
-            margin_y = 120
-            base_x = FRAME_W - scaled_w - margin_x
-            base_y = margin_y
-            
-            # Slide out for infographics
-            for (start_t, end_t) in info_windows:
-                if start_t <= t <= end_t:
-                    return (FRAME_W + 1000, base_y)
-                if start_t - 0.3 < t < start_t:
-                    p = (t - (start_t - 0.3)) / 0.3
-                    return (int(base_x + 1000 * (p**2)), base_y)
-                if end_t < t < end_t + 0.3:
-                    p = (t - end_t) / 0.3
-                    return (int(base_x + 1000 * ((1-p)**2)), base_y)
+            base_x = (FRAME_W - scaled_w) // 2
+            base_y = FRAME_H - scaled_h
             
             e_x, e_y = 0, 0
             if shock_ts > 0 and abs(t - shock_ts) < 1.5:
@@ -2612,12 +2557,6 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 p = 1.0 - abs(t - key_stat_ts) / 1.0
                 e_y = int(5 * math.sin(p * math.pi))
             
-            if not _has_screenshot:
-                return (base_x + e_x, base_y + e_y)
-
-            if t < 6.0: return (base_x + e_x, base_y + e_y)
-            cycle = (t - 6.0) % 11.0
-            if cycle < 4.0: return (FRAME_W + 1000, base_y)
             return (base_x + e_x, base_y + e_y)
 
         avatar_clip = avatar_clip.with_effects([vfx.Resize(avatar_scale)])
@@ -2636,8 +2575,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 rel = t - _ts
                 if rel < 0 or rel > 2.0: return (FRAME_W + 100, 0)
                 bx, by = pip_position(t)
-                scaled_h = int(cur_h * avatar_scale(t))
-                return (bx - 40 - int(rel*20), by + scaled_h + 20 + int(rel*30))
+                # Hover directly above the avatar's head, floating upward
+                return (bx + 20, by - 60 - int(rel*20))
             logo_clips.append(_pil_clip(skw, 2.0, start=t_kw).with_position(kpos))
 
     # ── LAYERS ───────────────────────────────────────────────────────────

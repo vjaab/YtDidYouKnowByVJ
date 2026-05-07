@@ -490,75 +490,28 @@ def _render_slide_card(data, accent_color, progress=1.0, is_longform=False):
     
     fw, fh, fcy = get_dimensions(is_longform)
     canvas = Image.new("RGBA", (fw, fh), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(canvas)
     
-    cw, ch = (1400, 700) if is_longform else (920, 600)
+    bullets = data.get("bullet_points", [])
+    cw = 920 if not is_longform else 1200
+    ch = min(len(bullets) * 110 + 160, 600)
     cx = (fw - cw) // 2
     cy = fcy - ch // 2
 
-    # Create the base background image
-    bg_img = Image.new("RGBA", (cw, ch), (0, 0, 0, 0))
-    cdraw = ImageDraw.Draw(bg_img)
-    
-    # Base dark blue gradient simulation
-    cdraw.rectangle([0, 0, cw, ch], fill=(0, 40, 120, 255))
-    
-    # Glowing cyan blobs for the light effect
-    cdraw.ellipse([cw*0.3, ch*0.1, cw*1.2, ch*1.5], fill=(0, 150, 255, 90))
-    cdraw.ellipse([cw*0.5, ch*0.3, cw*1.0, ch*1.0], fill=(0, 200, 255, 120))
-    
-    # Cyber sweeping arcs
-    cdraw.arc([-cw*0.2, -ch*0.2, cw*0.8, ch*1.2], 270, 360, fill=(150, 220, 255, 100), width=6)
-    cdraw.arc([-cw*0.1, -ch*0.1, cw*0.6, ch*1.0], 270, 360, fill=(150, 220, 255, 60), width=3)
-    
-    # Hex grid on the left
-    hex_size = 30 if not is_longform else 45
-    for row in range(int(ch / (hex_size*1.5)) + 1):
-        for col in range(7):
-            hcx = 40 + col * hex_size * 1.5
-            hcy = 40 + row * hex_size * math.sqrt(3)
-            if col % 2 == 1:
-                hcy += hex_size * math.sqrt(3) / 2
-                
-            points = []
-            for i in range(6):
-                angle_rad = math.pi / 3 * i
-                points.append((hcx + hex_size * math.cos(angle_rad), hcy + hex_size * math.sin(angle_rad)))
-            cdraw.polygon(points, outline=(0, 200, 255, 50), width=3)
-
-    # Dark gradient on right for text readability
-    for x in range(cw):
-        alpha = int(160 * (x / cw))
-        cdraw.line([(x, 0), (x, ch)], fill=(0, 10, 40, alpha))
-            
-    # Apply rounded corner mask to the entire generated background
-    mask = Image.new("L", (cw, ch), 0)
-    ImageDraw.Draw(mask).rounded_rectangle([0, 0, cw, ch], 40, fill=255)
-    
-    card_layer = Image.new("RGBA", (fw, fh), (0,0,0,0))
-    card_layer.paste(bg_img, (cx, cy), mask)
-    
-    ImageDraw.Draw(card_layer).rounded_rectangle([cx, cy, cx+cw, cy+ch], 40, outline=accent_color, width=8)
-    canvas = Image.alpha_composite(canvas, card_layer)
-
-    draw = ImageDraw.Draw(canvas)
+    _draw_card_bg(draw, cx, cy, cw, ch, accent_color)
     
     title = data.get("title", "Technical Architecture")
-    bullets = data.get("bullet_points", [])
 
-    ft = _eb(60 if is_longform else 50)
-    ttw, tth = _ts(title, ft)
+    ft = _eb(56 if is_longform else 48)
+    _center_text(draw, title, ft, cy + 40, (255, 255, 255, 255), cx, cw)
     
-    title_x = cx + cw - ttw - 50
-    title_y = cy + 50
-    draw.text((title_x+3, title_y+3), title, fill=(0,0,0,200), font=ft)
-    draw.text((title_x, title_y), title, fill=(255, 255, 255, 255), font=ft)
-    
-    line_w = int((cw // 2 - 40) * progress)
+    line_w = int((cw - 100) * progress)
     if line_w > 0:
-        draw.line([(cx + cw // 2 + 20, cy + 140), (cx + cw // 2 + 20 + line_w, cy + 140)], fill=(*accent_color, 255), width=4)
+        draw.line([(cx + 50, cy + 110), (cx + 50 + line_w, cy + 110)], fill=(*accent_color, 255), width=4)
         
-    fb = _bold(40 if is_longform else 34)
-    start_y = cy + 180
+    fb = _bold(44 if is_longform else 38)
+    start_y = cy + 140
+    
     for i, bullet in enumerate(bullets):
         bullet_progress = min(1.0, progress * (len(bullets) + 1) - i)
         if bullet_progress <= 0:
@@ -566,7 +519,8 @@ def _render_slide_card(data, accent_color, progress=1.0, is_longform=False):
             
         alpha = int(255 * min(1.0, bullet_progress * 2))
         
-        max_bw = cw // 2 - 40
+        # Word wrap text for full width
+        max_bw = cw - 160
         words = str(bullet).split()
         lines = []
         cur = []
@@ -580,19 +534,64 @@ def _render_slide_card(data, accent_color, progress=1.0, is_longform=False):
         if cur:
             lines.append(" ".join(cur))
             
-        by = start_y + i * 80
+        by = start_y
         for j, b_line in enumerate(lines):
-            lw, lh = _ts(b_line, fb)
-            line_x = cx + cw - lw - 50
+            line_x = cx + 100
             
             if j == 0:
-                dot_y = by + (25 if is_longform else 20)
+                # Draw bullet point dot
+                dot_y = by + 22
                 draw.ellipse([line_x - 30, dot_y - 8, line_x - 14, dot_y + 8], fill=(*accent_color, alpha))
             
             draw.text((line_x+2, by+2), b_line, font=fb, fill=(0,0,0,int(150*(alpha/255))))
-            draw.text((line_x, by), b_line, font=fb, fill=(230, 240, 255, alpha))
-            by += 45
+            draw.text((line_x, by), b_line, font=fb, fill=(240, 240, 240, alpha))
+            by += 50
+        start_y = by + 30 # Space between bullets
 
+    return canvas
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TYPE 8 — PROCESS / FLOWCHART CARD
+# ═══════════════════════════════════════════════════════════════════════════════
+def _render_process_card(data, accent_color, progress=1.0, is_longform=False):
+    fw, fh, fcy = get_dimensions(is_longform)
+    canvas = Image.new("RGBA", (fw, fh), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(canvas)
+
+    steps = data.get("steps", [])
+    cw = 920 if not is_longform else 1200
+    row_h = 110
+    ch = min(len(steps) * row_h + 120, 600)
+    cx = (fw - cw) // 2
+    cy = fcy - ch // 2
+
+    _draw_card_bg(draw, cx, cy, cw, ch, accent_color)
+    
+    title = data.get("title", "Process Flow")
+    _center_text(draw, title, _eb(48 if not is_longform else 56), cy + 30, (255, 255, 255, 255), cx, cw)
+    
+    start_y = cy + 120
+    fn = _bold(38 if not is_longform else 44)
+    
+    for i, step in enumerate(steps):
+        step_progress = min(1.0, progress * (len(steps) + 1) - i)
+        if step_progress <= 0:
+            continue
+            
+        alpha = int(255 * min(1.0, step_progress))
+        ry = start_y + i * row_h
+        
+        # Draw step number circle
+        draw.ellipse([cx + 50, ry, cx + 110, ry + 60], fill=(*accent_color, alpha))
+        draw.text((cx + 68, ry + 8), str(i+1), font=_eb(36), fill=(255, 255, 255, alpha))
+        
+        # Draw line to next step
+        if i < len(steps) - 1 and step_progress > 0.5:
+            draw.line([(cx + 80, ry + 60), (cx + 80, ry + row_h)], fill=(*accent_color, int(alpha*0.5)), width=4)
+            
+        # Draw step text
+        draw.text((cx + 140, ry + 12), str(step), font=fn, fill=(240, 240, 240, alpha))
+        
     return canvas
 
 _TYPE_MAP = {
@@ -605,6 +604,8 @@ _TYPE_MAP = {
     "growth": _render_growth_card,
     "percentage": _render_growth_card,
     "slide": _render_slide_card,
+    "process": _render_process_card,
+    "flowchart": _render_process_card,
 }
 
 
