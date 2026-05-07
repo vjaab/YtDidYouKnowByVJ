@@ -2020,15 +2020,15 @@ def wrap_text_to_lines(words, word_widths, max_width, font):
     return lines
 
 def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), frame_width=1080, frame_height=1920):
-    """Clean white sans-serif captions — matching reference video style."""
+    """Cinematic elegant captions with karaoke-style highlighting."""
     img = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
     scale_ratio = frame_width / 1080.0 if frame_width < frame_height else frame_width / 1920.0
-    base_size = int(52 * scale_ratio)  # Larger for impact
+    base_size = int(45 * scale_ratio)
     
-    # Sans-serif bold font — matches the reference's clean modern look
-    f_main = gf(base_size)
+    f_main = get_cinematic_font(base_size, italic=False)
+    f_active = get_cinematic_font(base_size, italic=True)
     
     words = [wd["word"] for wd in word_data]
     
@@ -2036,7 +2036,8 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     fake_draw = ImageDraw.Draw(Image.new("RGBA", (1,1)))
     
     for i, wd in enumerate(word_data):
-        bbox = fake_draw.textbbox((0,0), words[i], font=f_main)
+        f_current = f_active if wd["is_active"] else f_main
+        bbox = fake_draw.textbbox((0,0), words[i], font=f_current)
         word_widths.append(bbox[2]-bbox[0])
     
     max_sub_width = int(frame_width * 0.85)
@@ -2045,7 +2046,7 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     line_h = int(70 * scale_ratio)
     
     if frame_width < frame_height:
-        start_y = int(frame_height * 0.62)  # At the boundary between B-roll and avatar
+        start_y = int(frame_height * 0.54)  # Positioned exactly in the middle overlay, above the avatar
     else:
         start_y = int(frame_height * 0.75)
     
@@ -2057,18 +2058,23 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
         
         for word_text in line:
             wd = word_data[word_idx]
+            is_active = wd["is_active"]
             
-            # All words are pure white — no color highlighting (reference style)
+            f = f_active if is_active else f_main
+            
             c_fill = (255, 255, 255, 255)
+            if is_active:
+                c_fill = (*accent_color, 255)
+            elif wd["is_spoken"]:
+                c_fill = (180, 180, 180, 255)
             
-            bbox = draw.textbbox((cur_x, line_y), word_text, font=f_main)
+            bbox = draw.textbbox((cur_x, line_y), word_text, font=f)
             th = bbox[3] - bbox[1]
             y_offset = (line_h - th) // 2
             
-            # Strong drop shadow for readability over B-roll
-            for dx, dy in [(-2,-2), (2,-2), (-2,2), (2,2)]:
-                draw.text((cur_x + dx, line_y + y_offset + dy), word_text, font=f_main, fill=(0, 0, 0, 180))
-            draw.text((cur_x, line_y + y_offset), word_text, font=f_main, fill=c_fill)
+            # Subtle drop shadow
+            draw.text((cur_x + 2, line_y + y_offset + 2), word_text, font=f, fill=(0, 0, 0, 150))
+            draw.text((cur_x, line_y + y_offset), word_text, font=f, fill=c_fill)
             
             cur_x += word_widths[word_idx] + 12
             word_idx += 1
