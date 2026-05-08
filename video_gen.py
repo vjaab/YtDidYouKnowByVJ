@@ -92,20 +92,8 @@ def ts(text, font):
     return bb[2] - bb[0], bb[3] - bb[1]
 
 def get_cinematic_font(size, italic=False):
-    paths = [
-        '/System/Library/Fonts/Supplemental/Georgia Italic.ttf' if italic else '/System/Library/Fonts/Supplemental/Georgia.ttf',
-        '/System/Library/Fonts/Supplemental/Times New Roman Italic.ttf' if italic else '/System/Library/Fonts/Supplemental/Times New Roman.ttf',
-        '/usr/share/fonts/truetype/msttcorefonts/Georgia_Italic.ttf' if italic else '/usr/share/fonts/truetype/msttcorefonts/Georgia.ttf',
-        '/usr/share/fonts/truetype/freefont/FreeSerifItalic.ttf' if italic else '/usr/share/fonts/truetype/freefont/FreeSerif.ttf',
-        '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf' if italic else '/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf',
-        '/System/Library/Fonts/Supplemental/Arial Italic.ttf' if italic else '/System/Library/Fonts/Supplemental/Arial.ttf'
-    ]
-    for p in paths:
-        if os.path.exists(p):
-            try:
-                return ImageFont.truetype(p, size)
-            except Exception:
-                pass
+    # Premium 2026 Spec: Stick to Bold Sans-Serif for high authority/retention.
+    # Avoiding Serif fonts as they look dated in tech content.
     return gf(size)
 
 
@@ -2046,63 +2034,64 @@ def wrap_text_to_lines(words, word_widths, max_width, font):
     return lines
 
 def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), frame_width=1080, frame_height=1920):
-    """Cinematic elegant captions with karaoke-style highlighting."""
+    """Premium 'Obsidian' captions: Bold Sans-Serif on dark blocks."""
     img = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
     scale_ratio = frame_width / 1080.0 if frame_width < frame_height else frame_width / 1920.0
-    base_size = int(45 * scale_ratio)
+    base_size = int(60 * scale_ratio) # Larger, bolder text
     
-    f_main = get_cinematic_font(base_size, italic=False)
-    f_active = get_cinematic_font(base_size, italic=True)
+    f_main = gf(base_size)
     
     words = [wd["word"] for wd in word_data]
-    
     word_widths = []
     fake_draw = ImageDraw.Draw(Image.new("RGBA", (1,1)))
     
     for i, wd in enumerate(word_data):
-        f_current = f_active if wd["is_active"] else f_main
-        bbox = fake_draw.textbbox((0,0), words[i], font=f_current)
-        word_widths.append(bbox[2]-bbox[0])
+        word_widths.append(fake_draw.textbbox((0,0), words[i], font=f_main)[2] - fake_draw.textbbox((0,0), words[i], font=f_main)[0])
     
-    max_sub_width = int(frame_width * 0.85)
+    max_sub_width = int(frame_width * 0.92)
     lines = wrap_text_to_lines(words, word_widths, max_sub_width, f_main)
     
-    line_h = int(70 * scale_ratio)
+    line_h = int(95 * scale_ratio)
     
+    # 2026 Positioning: Centered vertically in the upper-mid region to avoid avatar overlap
     if frame_width < frame_height:
-        start_y = int(frame_height * 0.48)  # Above the avatar (avatar starts at ~60%)
+        start_y = int(frame_height * 0.50)
     else:
-        start_y = int(frame_height * 0.75)
+        start_y = int(frame_height * 0.70)
     
     word_idx = 0
     for i, line in enumerate(lines):
         line_y = start_y + i * line_h
-        line_w = sum(word_widths[word_idx:word_idx+len(line)]) + 12 * (len(line)-1)
+        line_w = sum(word_widths[word_idx:word_idx+len(line)]) + 18 * (len(line)-1)
         cur_x = (frame_width - line_w) // 2
         
+        # ── OBSIDIAN BLOCK (Background) ──
+        # Draw a single unified background pill for the entire line
+        bg_pad_x, bg_pad_y = 35, 12
+        draw.rounded_rectangle(
+            [cur_x - bg_pad_x, line_y - bg_pad_y, cur_x + line_w + bg_pad_x, line_y + line_h - 10], 
+            radius=15, 
+            fill=(0, 0, 0, 200) # Deep obsidian black with glass opacity
+        )
+
         for word_text in line:
             wd = word_data[word_idx]
             is_active = wd["is_active"]
             
-            f = f_active if is_active else f_main
-            
             c_fill = (255, 255, 255, 255)
             if is_active:
                 c_fill = (*accent_color, 255)
+                # Subtle glow for active word
+                for dx, dy in [(-2,0),(2,0),(0,-2),(0,2)]:
+                    draw.text((cur_x+dx, line_y+2+dy), word_text, font=f_main, fill=(*accent_color, 100))
             elif wd["is_spoken"]:
-                c_fill = (180, 180, 180, 255)
+                c_fill = (200, 200, 200, 255)
             
-            bbox = draw.textbbox((cur_x, line_y), word_text, font=f)
-            th = bbox[3] - bbox[1]
-            y_offset = (line_h - th) // 2
+            draw.text((cur_x, line_y + 2), word_text, font=f_main, fill=c_fill)
             
-            # Subtle drop shadow
-            draw.text((cur_x + 2, line_y + y_offset + 2), word_text, font=f, fill=(0, 0, 0, 150))
-            draw.text((cur_x, line_y + y_offset), word_text, font=f, fill=c_fill)
-            
-            cur_x += word_widths[word_idx] + 12
+            cur_x += word_widths[word_idx] + 18
             word_idx += 1
             
     return img
@@ -2455,7 +2444,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                         bottom_half.with_position(("center", "bottom"))
                     ], size=(FRAME_W, FRAME_H))
 
-                scale_factor = 1.0 + random.uniform(0.05, 0.12)
+                # Increased Ken Burns effect for article/screenshot backgrounds (12% to 22% zoom)
+                scale_factor = 1.0 + random.uniform(0.15, 0.22)
                 c_clip = c_clip.resized(lambda t: 1.0 + (scale_factor - 1.0) * (t / clip_dur))
                 c_clip = _apply_handheld_shake(c_clip)
                 c_clip = c_clip.with_start(current_start)
@@ -2527,32 +2517,25 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 alpha = rgba[..., 3].astype(np.float32)
                 
                 # Step 1: Erode the mask to cut off fringe/halo pixels from original background
-                # This removes the 2-3px ring of blue/green that rembg leaves at edges
-                erode_kernel = np.ones((5, 5), np.uint8)
+                # Increased erosion iteration for even tighter edges against blue halos
+                erode_kernel = np.ones((7, 7), np.uint8)
                 alpha_u8 = np.clip(alpha, 0, 255).astype(np.uint8)
                 alpha_u8 = cv2.erode(alpha_u8, erode_kernel, iterations=1)
                 alpha = alpha_u8.astype(np.float32)
                 
-                # Step 2: Gentle feathering with a SMALLER blur (was 15x15, now 7x7)
-                # Smaller kernel = tighter edges, less halo spread
-                alpha = cv2.GaussianBlur(alpha, (7, 7), 0)
+                # Step 2: Tighter feathering (5x5 instead of 7x7)
+                alpha = cv2.GaussianBlur(alpha, (5, 5), 0)
                 
-                # Step 3: Color decontamination — neutralize colored fringe at edges
-                # For semi-transparent edge pixels, pull RGB toward neutral to remove blue/green bleed
-                edge_mask = (alpha > 20) & (alpha < 240)
+                # Step 3: Aggressive color decontamination
+                edge_mask = (alpha > 5) & (alpha < 250)
                 if np.any(edge_mask):
-                    # Calculate how much the pixel is "edge" (0=fully inside, 1=fully edge)
+                    # More aggressive pull (0.8 instead of 0.6)
                     edge_strength = 1.0 - np.abs(alpha[edge_mask] - 128.0) / 128.0
                     for c in range(3):
                         channel = rgba[..., c].astype(np.float32)
-                        # Blend edge pixels toward the average color of nearby solid pixels
-                        solid_mask = alpha > 240
-                        if np.any(solid_mask):
-                            avg_color = np.mean(channel[solid_mask])
-                        else:
-                            avg_color = 128.0
-                        # Pull edge colors toward the solid interior color
-                        channel[edge_mask] = channel[edge_mask] * (1.0 - edge_strength * 0.6) + avg_color * (edge_strength * 0.6)
+                        solid_mask = alpha > 250
+                        avg_color = np.mean(channel[solid_mask]) if np.any(solid_mask) else 128.0
+                        channel[edge_mask] = channel[edge_mask] * (1.0 - edge_strength * 0.8) + avg_color * (edge_strength * 0.8)
                         rgba[..., c] = np.clip(channel, 0, 255).astype(np.uint8)
                 
                 # Step 4: Bottom-fade gradient so avatar dissolves naturally
@@ -2707,6 +2690,42 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     if flare_layer: base_layers.append(flare_layer)
     if grain_layer: base_layers.append(grain_layer)
     if avatar_pip: base_layers.append(avatar_pip)
+    # ── LOGO BRANDING OVERLAY ──────────────────────────────────────────
+    # Place company logo in the top-right corner if available
+    branding_added = False
+    for ent_list_key in ["companies", "key_entities"]:
+        for ent in script_json.get(ent_list_key, []):
+            lp = ent.get("local_logo_path")
+            if lp and os.path.exists(lp):
+                try:
+                    logo_img = Image.open(lp).convert("RGBA")
+                    # Clearbit logos are often centered on white, so we wrap in a premium card
+                    card_size = 180
+                    # Standardize logo size within the card
+                    lw, lh = logo_img.size
+                    max_dim = max(lw, lh)
+                    scale = (card_size - 60) / max_dim
+                    logo_img = logo_img.resize((int(lw * scale), int(lh * scale)), Image.LANCZOS)
+                    
+                    canvas = Image.new("RGBA", (card_size, card_size), (0,0,0,0))
+                    draw = ImageDraw.Draw(canvas)
+                    # Premium white glass card
+                    draw.rounded_rectangle([0, 0, card_size, card_size], radius=35, fill=(255,255,255,235))
+                    # Center the logo in the card
+                    lx = (card_size - logo_img.width) // 2
+                    ly = (card_size - logo_img.height) // 2
+                    canvas.paste(logo_img, (lx, ly), logo_img if logo_img.mode == 'RGBA' else None)
+                    
+                    branding_clip = ImageClip(np.array(canvas)).with_duration(audio_duration)
+                    branding_clip = branding_clip.with_position((FRAME_W - card_size - 50, 70))
+                    branding_clip = branding_clip.with_effects([vfx.CrossFadeIn(0.6)])
+                    base_layers.append(branding_clip)
+                    branding_added = True
+                    break
+                except Exception as e:
+                    print(f"Branding overlay failed for {ent.get('name')}: {e}")
+        if branding_added: break
+
     base_layers.append(disclosure)
     base_layers.extend(engagement_clips)
 
