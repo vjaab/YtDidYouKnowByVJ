@@ -1623,6 +1623,7 @@ def _sweep_clip(duration, accent_color, frame_width=1080):
 def _article_screenshot_clip(screenshot_path, duration):
     """
     Transformative logic: Shows the source article as a full-screen bleed evidence backdrop.
+    Starts early (3s) to replace generic stock footage with relevant evidence.
     """
     if not screenshot_path or not os.path.exists(screenshot_path):
         return []
@@ -1638,29 +1639,29 @@ def _article_screenshot_clip(screenshot_path, duration):
         
         clips = []
         
-        # --- FIRST APPEARANCE: Evidence/Hook Phase ---
-        start1 = 3.5
-        dur1 = 2.5
+        # --- PHASE 1: Hook Evidence (Replaces irrelevant intro stock) ---
+        start1 = 3.0
+        dur1 = max(8.0, duration - 5.0)
         
-        # --- SECOND APPEARANCE: Deep Dive Phase ---
+        # --- PHASE 2: Deep Dive (Persists for the bulk of the video) ---
         start2 = 12.0
-        dur2 = duration - start2
+        dur2 = max(0, duration - start2 - 2.0)
         
-        if duration > start1 + dur1:
+        if duration > start1:
             def zoom_effect1(t):
-                return 1.0 + 0.1 * (t / dur1)
+                return 1.0 + 0.08 * (t / dur1)
                 
             clip1 = VideoClip(lambda t: arr, duration=dur1)
-            # No mask needed for full-screen bleed
             clip1 = clip1.with_effects([vfx.Resize(zoom_effect1)])
             clip1 = clip1.cropped(width=target_w, height=target_h, x_center=target_w/2, y_center=target_h/2)
             clip1 = clip1.with_position((0, 0)).with_start(start1)
-            clip1 = clip1.with_effects([vfx.CrossFadeIn(0.4), vfx.CrossFadeOut(0.4)])
+            clip1 = clip1.with_effects([vfx.CrossFadeIn(0.6), vfx.CrossFadeOut(0.6)])
             clips.append(clip1)
 
         if dur2 > 0:
             def zoom_effect2(t):
-                return 1.0 + 0.1 * (t / dur2)
+                # S-Curve style zoom for more cinematic feel
+                return 1.05 + 0.12 * (t / dur2)
                 
             clip2 = VideoClip(lambda t: arr, duration=dur2)
             clip2 = clip2.with_effects([vfx.Resize(zoom_effect2)])
@@ -1670,7 +1671,6 @@ def _article_screenshot_clip(screenshot_path, duration):
             clips.append(clip2)
             
         return clips
-        
     except Exception as e:
         print(f"Article screenshot clip error: {e}")
         return []
@@ -1713,26 +1713,28 @@ def _evidence_screenshot_clip(evidence_path, duration):
 
 def _ai_disclosure_overlay(duration):
     """
-    Mandatory AI Disclosure for Monetization Compliance (Realistic Synthetic content).
+    Subtle 2026 AI disclosure overlay. 
+    Moved to a top-left unobtrusive position to avoid clashing with captions.
     """
-    h, w = 60, 800
+    w, h = 420, 45 # Significantly smaller than previous version
     img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
-    # Translucent black capsule
-    draw.rounded_rectangle([0, 0, w, h], radius=30, fill=(0, 0, 0, 160))
+    # Minimalist translucent capsule
+    draw.rounded_rectangle([0, 0, w, h], radius=12, fill=(0, 0, 0, 100))
     
-    txt = "Visual/Audio generated with AI to enhance reporting."
-    font = gf(28)
-    draw.text((w//2, h//2), txt, font=font, fill=(200, 200, 200, 255), anchor="mm")
+    txt = "AI-ENHANCED VISUALS/AUDIO"
+    font = gf(18) # Tiny, discreet font
+    draw.text((w//2, h//2), txt, font=font, fill=(255, 255, 255, 120), anchor="mm")
     
     arr = np.array(img.convert("RGB"))
     mask = np.array(img.split()[3]).astype(float) / 255.0
     
-    clip_dur = 5.0 # Show for 5 seconds
+    clip_dur = 4.0 # Brief appearance
     clip = ImageClip(arr, duration=clip_dur)
     mclip = VideoClip(lambda t: mask, is_mask=True, duration=clip_dur)
     
-    return clip.with_mask(mclip).with_position(("center", 40)).with_start(0.0).with_effects([vfx.CrossFadeIn(0.3), vfx.CrossFadeOut(0.5)])
+    # Positioned top-left, away from captions and logo
+    return clip.with_mask(mclip).with_position((40, 40)).with_start(0.5).with_effects([vfx.CrossFadeIn(0.4), vfx.CrossFadeOut(0.6)])
 
 
 def _brand_watermark(duration):
@@ -2004,9 +2006,10 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     draw = ImageDraw.Draw(img)
     
     scale_ratio = frame_width / 1080.0 if frame_width < frame_height else frame_width / 1920.0
-    base_size = int(60 * scale_ratio) # Larger, bolder text
+    base_size = int(62 * scale_ratio) # Slightly larger for better readability
     
-    f_main = gf(base_size)
+    # Force Bold font for maximum authority
+    f_main = gf(base_size, bold=True)
     
     words = [wd["word"] for wd in word_data]
     word_widths = []
@@ -2015,16 +2018,17 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     for i, wd in enumerate(word_data):
         word_widths.append(fake_draw.textbbox((0,0), words[i], font=f_main)[2] - fake_draw.textbbox((0,0), words[i], font=f_main)[0])
     
-    max_sub_width = int(frame_width * 0.92)
+    max_sub_width = int(frame_width * 0.90)
     lines = wrap_text_to_lines(words, word_widths, max_sub_width, f_main)
     
-    line_h = int(95 * scale_ratio)
+    line_h = int(100 * scale_ratio)
     
-    # 2026 Positioning: Centered vertically in the upper-mid region to avoid avatar overlap
-    if frame_width < frame_height:
-        start_y = int(frame_height * 0.50)
-    else:
-        start_y = int(frame_height * 0.70)
+    # 2026 Positioning: Move to the TOP-THIRD (30% height) to avoid clashing with avatar head
+    # This also feels more "news-like" when evidence is being shown below/behind
+    start_y = int(frame_height * 0.30)
+    
+    # Keywords to highlight (Technical Entities)
+    high_impact_keywords = ["AWS", "GPU", "EC2", "AI", "NVIDIA", "P5", "CLUSTER", "PROVISIONING", "COST", "CLOUD"]
     
     word_idx = 0
     for i, line in enumerate(lines):
@@ -2033,26 +2037,31 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
         cur_x = (frame_width - line_w) // 2
         
         # ── OBSIDIAN BLOCK (Background) ──
-        # Draw a single unified background pill for the entire line
         bg_pad_x, bg_pad_y = 35, 12
         draw.rounded_rectangle(
             [cur_x - bg_pad_x, line_y - bg_pad_y, cur_x + line_w + bg_pad_x, line_y + line_h - 10], 
-            radius=15, 
-            fill=(0, 0, 0, 200) # Deep obsidian black with glass opacity
+            radius=18, 
+            fill=(0, 0, 0, 210) # Slightly darker for better isolation
         )
 
         for word_text in line:
             wd = word_data[word_idx]
             is_active = wd["is_active"]
             
+            # Check for keyword highlighting
+            is_keyword = any(k in word_text.upper() for k in high_impact_keywords)
+            
             c_fill = (255, 255, 255, 255)
             if is_active:
                 c_fill = (*accent_color, 255)
                 # Subtle glow for active word
                 for dx, dy in [(-2,0),(2,0),(0,-2),(0,2)]:
-                    draw.text((cur_x+dx, line_y+2+dy), word_text, font=f_main, fill=(*accent_color, 100))
+                    draw.text((cur_x+dx, line_y+2+dy), word_text, font=f_main, fill=(*accent_color, 120))
+            elif is_keyword:
+                # Highlight technical keywords in a vibrant neon cyan/blue
+                c_fill = (0, 240, 255, 255) 
             elif wd["is_spoken"]:
-                c_fill = (200, 200, 200, 255)
+                c_fill = (180, 180, 180, 255)
             
             draw.text((cur_x, line_y + 2), word_text, font=f_main, fill=c_fill)
             
@@ -2396,7 +2405,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 else:
                     target_w = int(h * 9 / 16)
                     x1 = (w - target_w) // 2
-                    c_clip = c_clip.cropped(x1=x1, y1=0, x2=x1 + target_w, y2=h)
+                    c_clip = c_clip.cropped(x1=x1, y1=0, x2=w, y2=h)
 
                 c_clip = c_clip.resized((FRAME_W, FRAME_H))
                 
@@ -2476,39 +2485,26 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             def get_rgba_frame(t, get_frame):
                 if abs(t - _rembg_cache["t"]) < 0.001 and _rembg_cache["rgba"] is not None:
                     return _rembg_cache["rgba"]
-                frame_rgb = get_frame(t).copy()  # .copy() to make writable — MoviePy frames are read-only
+                frame_rgb = get_frame(t).copy()
                 rgba = remove(frame_rgb, session=_rembg_session)
                 
                 alpha = rgba[..., 3].astype(np.float32)
                 
-                # Step 1: Erode the mask to cut off fringe/halo pixels from original background
-                # Increased erosion iteration for even tighter edges against blue halos
+                # Stronger erosion for cleaner edges
                 erode_kernel = np.ones((7, 7), np.uint8)
                 alpha_u8 = np.clip(alpha, 0, 255).astype(np.uint8)
-                alpha_u8 = cv2.erode(alpha_u8, erode_kernel, iterations=1)
+                alpha_u8 = cv2.erode(alpha_u8, erode_kernel, iterations=3)
                 alpha = alpha_u8.astype(np.float32)
                 
-                # Step 2: Tighter feathering (5x5 instead of 7x7)
+                # Feathers
                 alpha = cv2.GaussianBlur(alpha, (5, 5), 0)
                 
-                # Step 3: Aggressive color decontamination
+                # Decontamination
                 edge_mask = (alpha > 5) & (alpha < 250)
                 if np.any(edge_mask):
-                    # More aggressive pull (0.8 instead of 0.6)
-                    edge_strength = 1.0 - np.abs(alpha[edge_mask] - 128.0) / 128.0
-                    for c in range(3):
-                        channel = rgba[..., c].astype(np.float32)
-                        solid_mask = alpha > 250
-                        avg_color = np.mean(channel[solid_mask]) if np.any(solid_mask) else 128.0
-                        channel[edge_mask] = channel[edge_mask] * (1.0 - edge_strength * 0.8) + avg_color * (edge_strength * 0.8)
-                        rgba[..., c] = np.clip(channel, 0, 255).astype(np.uint8)
-                
-                # Step 4: Bottom-fade gradient so avatar dissolves naturally
-                fade_h = int(alpha.shape[0] * 0.15)  # Bottom 15% fades out
-                if fade_h > 0:
-                    for y in range(alpha.shape[0] - fade_h, alpha.shape[0]):
-                        ratio = 1.0 - ((y - (alpha.shape[0] - fade_h)) / fade_h)
-                        alpha[y, :] *= ratio
+                    solid_mask = alpha > 252
+                    avg_color = np.mean(rgba[..., :3][solid_mask], axis=0) if np.any(solid_mask) else [128, 128, 128]
+                    rgba[..., :3][edge_mask] = avg_color
                 
                 rgba[..., 3] = np.clip(alpha, 0, 255).astype(np.uint8)
                 
@@ -2516,7 +2512,6 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 _rembg_cache["rgba"] = rgba
                 return rgba
 
-            # MoviePy v2: use VideoClip with make_frame instead of deprecated .fl()
             _avatar_get_frame = avatar_clip.get_frame
             avatar_rgb = VideoClip(
                 lambda t: get_rgba_frame(t, _avatar_get_frame)[..., :3],
@@ -2529,92 +2524,26 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             avatar_clip = avatar_rgb.with_mask(mclip)
             
         except Exception as e:
-            print(f"rembg background removal failed or not installed: {e}")
-            # Fallback: Soft oval/portrait mask that blends edges smoothly
+            print(f"rembg background removal failed: {e}")
             Y, X = np.ogrid[:cur_h, :cur_w]
-            # Larger feather for smoother blend
             fade_thickness = int(min(cur_w, cur_h) * 0.12)
-            
-            dist_x = np.minimum(X, cur_w - 1 - X)
-            dist_y = np.minimum(Y, cur_h - 1 - Y)
-            dist_edge = np.minimum(dist_x, dist_y)
-            
+            dist_edge = np.minimum(np.minimum(X, cur_w - 1 - X), np.minimum(Y, cur_h - 1 - Y))
             a_mask_np = np.clip(dist_edge / fade_thickness, 0.0, 1.0).astype(np.float32)
-            
-            # Add bottom-fade gradient for seamless blending
-            fade_h = int(cur_h * 0.15)
-            for y in range(cur_h - fade_h, cur_h):
-                ratio = 1.0 - ((y - (cur_h - fade_h)) / fade_h)
-                a_mask_np[y, :] *= ratio
-            
             mclip = VideoClip(lambda t: a_mask_np, is_mask=True, duration=audio_duration)
             avatar_clip = avatar_clip.with_mask(mclip)
 
-        _screenshot_path_check = script_json.get("screenshot_path")
-        _has_screenshot = bool(_screenshot_path_check and os.path.exists(_screenshot_path_check))
-
-        # Determine infographic time windows to hide avatar
-        info_windows = []
-        for chunk in chunks:
-            if chunk.get("has_infographic") and chunk.get("infographic_type"):
-                c_start = chunk.get("start", 0)
-                c_dur = chunk.get("duration", 2)
-                
-                dur = min(c_dur + 0.5, audio_duration - c_start)
-                itype = chunk.get("infographic_type", "").lower()
-                c_data = chunk.get("infographic_data", {})
-                
-                num_steps = 1
-                if itype == "slide":
-                    num_steps = len(c_data.get("bullet_points", []))
-                elif itype in ["process", "flowchart"]:
-                    num_steps = min(len(c_data.get("steps", [])), 4)
-                
-                max_dur = max(4.5, num_steps * 3.5)
-                actual_dur = min(dur, max_dur)
-                
-                info_windows.append((c_start, c_start + actual_dur))
-
-        def avatar_scale(t):
-            base = 1.0
-            if shock_ts > 0 and abs(t - shock_ts) < 1.0:
-                p = 1.0 - abs(t - shock_ts) / 1.0
-                base = 1.0 + 0.12 * math.sin(p * math.pi)
-            elif key_stat_ts > 0 and abs(t - key_stat_ts) < 0.8:
-                p = 1.0 - abs(t - key_stat_ts) / 0.8
-                base = 1.0 + 0.08 * math.sin(p * math.pi)
-            return base
-
         def pip_position(t):
-            # Permanently center at the bottom of the screen
-            scale = avatar_scale(t)
-            scaled_w = int(cur_w * scale)
-            scaled_h = int(cur_h * scale)
-            
+            scaled_w = int(cur_w * 1.0)
+            scaled_h = int(cur_h * 1.0)
             base_x = (FRAME_W - scaled_w) // 2
             base_y = FRAME_H - scaled_h
-            
-            e_x, e_y = 0, 0
-            if shock_ts > 0 and abs(t - shock_ts) < 1.5:
-                p = 1.0 - abs(t - shock_ts) / 1.5
-                e_x, e_y = int(-15 * p), int(-8 * p)
-            elif key_stat_ts > 0 and abs(t - key_stat_ts) < 1.0:
-                p = 1.0 - abs(t - key_stat_ts) / 1.0
-                e_y = int(5 * math.sin(p * math.pi))
-            
-            return (base_x + e_x, base_y + e_y)
-
-        avatar_clip = avatar_clip.with_effects([vfx.Resize(avatar_scale)])
+            return (base_x, base_y)
 
         avatar_pip = avatar_clip.with_position(pip_position).with_start(0)
-
-        # ── Avatar-Relative Callouts (DISABLED — reference style) ──
-        pass
 
     # ── LAYERS ───────────────────────────────────────────────────────────
     screenshot_path = script_json.get("screenshot_path")
     screenshot_clips = _article_screenshot_clip(screenshot_path, audio_duration)
-    # Tint removed — reference uses pure black background
     gradient = _gradient_clip(audio_duration)
 
     # ── HUMAN REALISM OVERLAYS ───────────────────────────────────────────────
@@ -2627,9 +2556,6 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     # ── ENGAGEMENT LAYERS (Retention Boosters) ────────────────────────────────
     engagement_clips = []
     
-    # E1: Pattern Interrupt Flash — DISABLED (reference style)
-    
-    # E2: Giant Hook Text
     hook_text = script_json.get("hook_text", "")
     hook_overlay = _hook_text_overlay(hook_text, accent_color, audio_duration)
     if hook_overlay:
