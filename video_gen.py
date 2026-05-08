@@ -2020,9 +2020,8 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     
     line_h = int(100 * scale_ratio)
     
-    # 2026 Positioning: Move to the TOP-THIRD (30% height) to avoid clashing with avatar head
-    # This also feels more "news-like" when evidence is being shown below/behind
-    start_y = int(frame_height * 0.30)
+    # 2026 Positioning: Centered vertically (50% height) to match the reference Short style
+    start_y = int(frame_height * 0.50)
     
     # Keywords to highlight (Technical Entities)
     high_impact_keywords = ["AWS", "GPU", "EC2", "AI", "NVIDIA", "P5", "CLUSTER", "PROVISIONING", "COST", "CLOUD"]
