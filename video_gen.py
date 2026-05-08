@@ -916,6 +916,7 @@ def _render_flowchart_card(steps, accent_color, width=980, active_step=None):
     img = Image.new("RGBA", (width, total_h), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     f_step = gf(40) # slightly larger
+    f_step_sm = gf(32) # smaller fallback for long labels
     
     # Background glass
     draw.rounded_rectangle([0, 0, width, total_h], radius=30, fill=bg_color, outline=accent_color, width=4)
@@ -968,10 +969,27 @@ def _render_flowchart_card(steps, accent_color, width=980, active_step=None):
             # Rounded rectangle
             draw.rounded_rectangle([bx0, y0, bx1, y1], radius=20, outline=box_outline, width=4, fill=box_fill)
         
-        # Step text (Centered)
+        # Step text (Centered) — auto-shrink and truncate for long labels
         t_color = text_color
-        tw, th = ts(step, f_step)
-        draw.text((bx0 + box_w//2 - tw//2, y0 + step_h//2 - th//2 - 5), step, font=f_step, fill=t_color)
+        max_text_w = box_w - 40  # 20px padding on each side
+        display_text = step
+        font_to_use = f_step
+        tw, th = ts(display_text, font_to_use)
+        
+        # If text overflows, try smaller font
+        if tw > max_text_w:
+            font_to_use = f_step_sm
+            tw, th = ts(display_text, font_to_use)
+        
+        # If still overflows, truncate with ellipsis
+        if tw > max_text_w:
+            while tw > max_text_w and len(display_text) > 5:
+                display_text = display_text[:-2]
+                tw, th = ts(display_text + "…", font_to_use)
+            display_text = display_text + "…"
+            tw, th = ts(display_text, font_to_use)
+        
+        draw.text((bx0 + box_w//2 - tw//2, y0 + step_h//2 - th//2 - 5), display_text, font=font_to_use, fill=t_color)
         
         # Connector Arrow (Curve or straight down)
         if i < n - 1:
@@ -1394,7 +1412,7 @@ def _sync_checks(chunks, audio_duration):
 # ── MINIMALIST TECH UI COMPONENTS ─────────────────────────────────────────────
 
 def render_header_bar(title, category, accent_color, frame_width=1080):
-    """Cinematic elegant title."""
+    """Cinematic elegant title with dark gradient backing for contrast."""
     img = Image.new('RGBA', (frame_width, FRAME_H), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
@@ -1412,6 +1430,18 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
         
     start_x = (frame_width - tw) // 2
     start_y = int(FRAME_H * 0.50) # Positioned just above the subtitles, bridging the B-Roll and Avatar
+    
+    # Dark gradient backing behind header text for contrast
+    # Covers a band around the title so text is always readable
+    band_top = start_y - 30
+    band_bot = start_y + 120
+    for y in range(band_top, band_bot):
+        # Fade in at top, solid in middle, fade out at bottom
+        dist_top = y - band_top
+        dist_bot = band_bot - y
+        fade = min(dist_top, dist_bot) / 30.0
+        alpha = int(min(1.0, fade) * 140)
+        draw.line([(0, y), (frame_width, y)], fill=(0, 0, 0, alpha))
     
     # Text shadow/glow
     for dx, dy in [(-2,0), (2,0), (0,-2), (0,2)]:
@@ -2491,7 +2521,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             def get_rgba_frame(t, get_frame):
                 if abs(t - _rembg_cache["t"]) < 0.001 and _rembg_cache["rgba"] is not None:
                     return _rembg_cache["rgba"]
-                frame_rgb = get_frame(t)
+                frame_rgb = get_frame(t).copy()  # .copy() to make writable — MoviePy frames are read-only
                 rgba = remove(frame_rgb, session=_rembg_session)
                 
                 # Feather the alpha mask edges with Gaussian blur for seamless blending
