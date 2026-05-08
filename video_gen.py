@@ -2023,8 +2023,6 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     # 2026 Positioning: Centered vertically (50% height) to match the reference Short style
     start_y = int(frame_height * 0.50)
     
-    # Keywords to highlight (Technical Entities)
-    high_impact_keywords = ["AWS", "GPU", "EC2", "AI", "NVIDIA", "P5", "CLUSTER", "PROVISIONING", "COST", "CLOUD"]
     
     word_idx = 0
     for i, line in enumerate(lines):
@@ -2044,20 +2042,15 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
             wd = word_data[word_idx]
             is_active = wd["is_active"]
             
-            # Check for keyword highlighting
-            is_keyword = any(k in word_text.upper() for k in high_impact_keywords)
-            
-            c_fill = (255, 255, 255, 255)
+            # ── DYNAMIC COLORING (Hormozi Style) ──
             if is_active:
                 c_fill = (*accent_color, 255)
                 # Subtle glow for active word
                 for dx, dy in [(-2,0),(2,0),(0,-2),(0,2)]:
-                    draw.text((cur_x+dx, line_y+2+dy), word_text, font=f_main, fill=(*accent_color, 120))
-            elif is_keyword:
-                # Highlight technical keywords in a vibrant neon cyan/blue
-                c_fill = (0, 240, 255, 255) 
-            elif wd["is_spoken"]:
-                c_fill = (180, 180, 180, 255)
+                    draw.text((cur_x+dx, line_y+2+dy), word_text, font=f_main, fill=(*accent_color, 150))
+            else:
+                # All non-active words are pure white for maximum readability
+                c_fill = (255, 255, 255, 255)
             
             draw.text((cur_x, line_y + 2), word_text, font=f_main, fill=c_fill)
             
