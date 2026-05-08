@@ -2524,11 +2524,38 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 frame_rgb = get_frame(t).copy()  # .copy() to make writable — MoviePy frames are read-only
                 rgba = remove(frame_rgb, session=_rembg_session)
                 
-                # Feather the alpha mask edges with Gaussian blur for seamless blending
                 alpha = rgba[..., 3].astype(np.float32)
-                alpha = cv2.GaussianBlur(alpha, (15, 15), 0)
                 
-                # Add bottom-fade gradient so avatar dissolves into the video naturally
+                # Step 1: Erode the mask to cut off fringe/halo pixels from original background
+                # This removes the 2-3px ring of blue/green that rembg leaves at edges
+                erode_kernel = np.ones((5, 5), np.uint8)
+                alpha_u8 = np.clip(alpha, 0, 255).astype(np.uint8)
+                alpha_u8 = cv2.erode(alpha_u8, erode_kernel, iterations=1)
+                alpha = alpha_u8.astype(np.float32)
+                
+                # Step 2: Gentle feathering with a SMALLER blur (was 15x15, now 7x7)
+                # Smaller kernel = tighter edges, less halo spread
+                alpha = cv2.GaussianBlur(alpha, (7, 7), 0)
+                
+                # Step 3: Color decontamination — neutralize colored fringe at edges
+                # For semi-transparent edge pixels, pull RGB toward neutral to remove blue/green bleed
+                edge_mask = (alpha > 20) & (alpha < 240)
+                if np.any(edge_mask):
+                    # Calculate how much the pixel is "edge" (0=fully inside, 1=fully edge)
+                    edge_strength = 1.0 - np.abs(alpha[edge_mask] - 128.0) / 128.0
+                    for c in range(3):
+                        channel = rgba[..., c].astype(np.float32)
+                        # Blend edge pixels toward the average color of nearby solid pixels
+                        solid_mask = alpha > 240
+                        if np.any(solid_mask):
+                            avg_color = np.mean(channel[solid_mask])
+                        else:
+                            avg_color = 128.0
+                        # Pull edge colors toward the solid interior color
+                        channel[edge_mask] = channel[edge_mask] * (1.0 - edge_strength * 0.6) + avg_color * (edge_strength * 0.6)
+                        rgba[..., c] = np.clip(channel, 0, 255).astype(np.uint8)
+                
+                # Step 4: Bottom-fade gradient so avatar dissolves naturally
                 fade_h = int(alpha.shape[0] * 0.15)  # Bottom 15% fades out
                 if fade_h > 0:
                     for y in range(alpha.shape[0] - fade_h, alpha.shape[0]):
