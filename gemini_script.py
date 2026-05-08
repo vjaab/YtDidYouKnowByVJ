@@ -134,17 +134,18 @@ SCHEMA REQUIREMENTS:
 Return ONLY the final JSON object matching the schema. No markdown wrapping unless inside the string values. No explanations."""
 
 def get_hottest_tech_topic(client):
-    """Uses Gemini Search grounding to find today's single most VIRAL AI news story."""
-    print("🔥 Fetching hottest AI tech topic for today (Trend Hunter)...")
+    """Uses Gemini Search grounding to find today's single most VIRAL AI news story from Google Trends."""
+    print("🔥 Fetching hottest AI tech topic for today (Google Trends Analysis)...")
     try:
         response = client.models.generate_content(
             model='gemini-2.0-flash',
             contents=(
-                "What is the single most viral, trending, or breaking AI news story in the last 24 hours? "
-                "Look for: model releases (GPT, Claude, Gemini, Llama), major leaks, massive benchmarks, or 'internet-breaking' AI controversies. "
+                "Analyze today's Google Trends and viral tech news. "
+                "What is the single most trending AI search topic, breakout term, or breaking news story in the last 24 hours? "
+                "Look for: high search volume spikes on Google Trends related to AI, LLMs, or new model launches. "
                 "Return ONLY a JSON object with two fields: "
-                "'topic' (3-6 word phrase, e.g. 'OpenAI Sora public release leak') and "
-                "'keywords' (list of 6-8 specific search keywords). No markdown, no explanation."
+                "'topic' (3-6 word phrase, e.g. 'Google Gemini 1.5 Pro breakout trend') and "
+                "'keywords' (list of 6-8 specific Google Trends search keywords). No markdown, no explanation."
             ),
             config=types.GenerateContentConfig(
                 tools=[{'google_search': {}}]
@@ -152,10 +153,10 @@ def get_hottest_tech_topic(client):
         )
         raw = response.text.strip().lstrip("```json").lstrip("```").rstrip("```").strip()
         data = json.loads(raw)
-        print(f"🔥 Daily Hot Topic Identified: {data['topic']}")
+        print(f"📈 Google Trends Hot Topic: {data['topic']}")
         return data
     except Exception as e:
-        print(f"⚠️ Could not fetch hot topic: {e}. Proceeding with RSS only.")
+        print(f"⚠️ Could not fetch Google Trends topic: {e}. Proceeding with RSS only.")
         return None
 
 def pick_and_generate_script(articles=None, extra_instruction="", forced_article=None, topic_type="research"):
