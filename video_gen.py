@@ -1622,34 +1622,21 @@ def _sweep_clip(duration, accent_color, frame_width=1080):
 # ── LAYER 16: Article Screenshot (New Layer) ──────────────────────────────────
 def _article_screenshot_clip(screenshot_path, duration):
     """
-    Transformative logic: Shows the source article with a smooth vertical scroll.
-    Displayed twice for maximum impact.
+    Transformative logic: Shows the source article as a full-screen bleed evidence backdrop.
     """
     if not screenshot_path or not os.path.exists(screenshot_path):
         return []
     try:
-        img = Image.open(screenshot_path).convert("RGBA")
+        img = Image.open(screenshot_path).convert("RGB")
         
-        # Premium 2026 Layout: Taller card that extends BEHIND the avatar
-        pad = 40  # Horizontal padding from edges
-        # Increased to 90% height so it sits behind the avatar at the bottom
-        target_h = int(FRAME_H * 0.90) 
-        target_w = FRAME_W - (pad * 2)
+        # Premium 2026 Full-Bleed: Occupies 100% of the screen behind the avatar
+        target_h = FRAME_H
+        target_w = FRAME_W
         img = ImageOps.fit(img, (target_w, target_h), Image.LANCZOS)
         
-        # Apply rounded corners for the 'card' aesthetic
-        corner_radius = 35
-        rounded_mask = Image.new('L', (target_w, target_h), 0)
-        ImageDraw.Draw(rounded_mask).rounded_rectangle([0, 0, target_w, target_h], corner_radius, fill=255)
-        img.putalpha(rounded_mask)
-        
-        arr = np.array(img.convert("RGB"))
-        mask = np.array(img.split()[3]).astype(float) / 255.0
+        arr = np.array(img)
         
         clips = []
-        
-        # Position centered vertically so it covers the area behind the avatar
-        y_pos = (FRAME_H - target_h) // 2
         
         # --- FIRST APPEARANCE: Evidence/Hook Phase ---
         start1 = 3.5
@@ -1664,11 +1651,10 @@ def _article_screenshot_clip(screenshot_path, duration):
                 return 1.0 + 0.1 * (t / dur1)
                 
             clip1 = VideoClip(lambda t: arr, duration=dur1)
-            mclip1 = VideoClip(lambda t: mask, is_mask=True, duration=dur1)
-            clip1 = clip1.with_mask(mclip1)
+            # No mask needed for full-screen bleed
             clip1 = clip1.with_effects([vfx.Resize(zoom_effect1)])
             clip1 = clip1.cropped(width=target_w, height=target_h, x_center=target_w/2, y_center=target_h/2)
-            clip1 = clip1.with_position((pad, y_pos)).with_start(start1)
+            clip1 = clip1.with_position((0, 0)).with_start(start1)
             clip1 = clip1.with_effects([vfx.CrossFadeIn(0.4), vfx.CrossFadeOut(0.4)])
             clips.append(clip1)
 
@@ -1677,11 +1663,9 @@ def _article_screenshot_clip(screenshot_path, duration):
                 return 1.0 + 0.1 * (t / dur2)
                 
             clip2 = VideoClip(lambda t: arr, duration=dur2)
-            mclip2 = VideoClip(lambda t: mask, is_mask=True, duration=dur2)
-            clip2 = clip2.with_mask(mclip2)
             clip2 = clip2.with_effects([vfx.Resize(zoom_effect2)])
             clip2 = clip2.cropped(width=target_w, height=target_h, x_center=target_w/2, y_center=target_h/2)
-            clip2 = clip2.with_position((pad, y_pos)).with_start(start2)
+            clip2 = clip2.with_position((0, 0)).with_start(start2)
             clip2 = clip2.with_effects([vfx.CrossFadeIn(0.5), vfx.CrossFadeOut(0.5)])
             clips.append(clip2)
             
@@ -1694,27 +1678,18 @@ def _article_screenshot_clip(screenshot_path, duration):
 def _evidence_screenshot_clip(evidence_path, duration):
     """
     Shows a secondary 'Evidence' or 'Use Case' screenshot during the analytical section.
-    Appears typically between 25-35 seconds mark.
     """
     if not evidence_path or not os.path.exists(evidence_path):
         return []
     try:
-        img = Image.open(evidence_path).convert("RGBA")
+        img = Image.open(evidence_path).convert("RGB")
         
-        # Target top 60% of screen with padding for rounded card look
-        pad = 40
-        target_h = int(FRAME_H * 0.58)
-        target_w = FRAME_W - (pad * 2)
+        # Full screen bleed for secondary evidence
+        target_h = FRAME_H
+        target_w = FRAME_W
         img = ImageOps.fit(img, (target_w, target_h), Image.LANCZOS)
         
-        # Apply rounded corners
-        corner_radius = 30
-        rounded_mask = Image.new('L', (target_w, target_h), 0)
-        ImageDraw.Draw(rounded_mask).rounded_rectangle([0, 0, target_w, target_h], corner_radius, fill=255)
-        img.putalpha(rounded_mask)
-        
-        arr = np.array(img.convert("RGB"))
-        mask = np.array(img.split()[3]).astype(float) / 255.0
+        arr = np.array(img)
         
         start = 28.0 
         dur = min(6.0, duration - start - 5.0)
@@ -1724,30 +1699,16 @@ def _evidence_screenshot_clip(evidence_path, duration):
                 return 1.0 + 0.1 * (t / dur)
                 
             clip = VideoClip(lambda t: arr, duration=dur)
-            mclip = VideoClip(lambda t: mask, is_mask=True, duration=dur)
-            clip = clip.with_mask(mclip)
             clip = clip.with_effects([vfx.Resize(zoom_effect)])
             clip = clip.cropped(width=target_w, height=target_h, x_center=target_w/2, y_center=target_h/2)
-            clip = clip.with_position((pad, 30)).with_start(start)  # Padded from edges + top margin
+            clip = clip.with_position((0, 0)).with_start(start)
             clip = clip.with_effects([vfx.CrossFadeIn(0.6), vfx.CrossFadeOut(0.6)])
+            return [clip]
             
-            # Add a 'PROVEN EVIDENCE' label overlay
-            f = gf(40)
-            txt = "REAL-WORLD EVIDENCE"
-            tw, th = ts(txt, f)
-            label = Image.new("RGBA", (tw + 40, th + 20), (0,0,0,0))
-            draw = ImageDraw.Draw(label)
-            draw.rounded_rectangle([0, 0, label.width, label.height], radius=15, fill=(255, 214, 0, 230))
-            draw.text((20, 10), txt, font=f, fill=(0,0,0,255))
-            
-            l_clip = _pil_clip(label, dur, start=start).with_position(("center", 450))
-            l_clip = l_clip.with_effects([vfx.CrossFadeIn(0.8)])
-            
-            return [clip, l_clip]
-            
+        return []
     except Exception as e:
         print(f"Evidence screenshot clip error: {e}")
-    return []
+        return []
 
 
 def _ai_disclosure_overlay(duration):
