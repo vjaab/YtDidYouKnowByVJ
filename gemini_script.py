@@ -102,7 +102,10 @@ Return ONLY a JSON object:
 SELECTOR_AGENT_TEMPLATE = """{persona}
 
 SELECTOR AGENT TASK:
-Analyze the following tech news context and pick the SINGLE most impactful and high-retention story for a 60-second video.
+Analyze the following tech news context and pick the SINGLE most impactful, surprising, and high-retention story for a 60-second video.
+PRIORITIZE: Major model releases, benchmarks that destroy previous records, massive AI leaks, or engineering breakthroughs that change the industry.
+AVOID: Minor software updates, corporate partnership fluff, or generic 'AI is growing' articles.
+
 {selection_instruction}
 
 NEWS CONTEXT:
@@ -112,7 +115,7 @@ Return ONLY a JSON object:
 {{
   "selected_headline": "The exact headline or title",
   "selected_url": "The exact URL",
-  "reason": "Briefly why this was picked"
+  "reason": "Briefly why this was picked (focus on viral potential)"
 }}"""
 
 HUMANIZER_AGENT_TEMPLATE = """{persona}
@@ -131,16 +134,17 @@ SCHEMA REQUIREMENTS:
 Return ONLY the final JSON object matching the schema. No markdown wrapping unless inside the string values. No explanations."""
 
 def get_hottest_tech_topic(client):
-    """Uses Gemini Search grounding to find today's single hottest tech topic."""
-    print("🔥 Fetching hottest tech topic for today...")
+    """Uses Gemini Search grounding to find today's single most VIRAL AI news story."""
+    print("🔥 Fetching hottest AI tech topic for today (Trend Hunter)...")
     try:
         response = client.models.generate_content(
             model='gemini-2.0-flash',
             contents=(
-                "What is the single most viral, trending technology or AI news story RIGHT NOW today? "
+                "What is the single most viral, trending, or breaking AI news story in the last 24 hours? "
+                "Look for: model releases (GPT, Claude, Gemini, Llama), major leaks, massive benchmarks, or 'internet-breaking' AI controversies. "
                 "Return ONLY a JSON object with two fields: "
-                "'topic' (3-6 word phrase, e.g. 'OpenAI GPT-5 launch') and "
-                "'keywords' (list of 4-6 search keywords). No markdown, no explanation."
+                "'topic' (3-6 word phrase, e.g. 'OpenAI Sora public release leak') and "
+                "'keywords' (list of 6-8 specific search keywords). No markdown, no explanation."
             ),
             config=types.GenerateContentConfig(
                 tools=[{'google_search': {}}]
@@ -148,10 +152,10 @@ def get_hottest_tech_topic(client):
         )
         raw = response.text.strip().lstrip("```json").lstrip("```").rstrip("```").strip()
         data = json.loads(raw)
-        print(f"🔥 Hottest Topic Today: {data['topic']}")
+        print(f"🔥 Daily Hot Topic Identified: {data['topic']}")
         return data
     except Exception as e:
-        print(f"⚠️ Could not fetch hot topic: {e}. Proceeding without it.")
+        print(f"⚠️ Could not fetch hot topic: {e}. Proceeding with RSS only.")
         return None
 
 def pick_and_generate_script(articles=None, extra_instruction="", forced_article=None, topic_type="research"):
@@ -175,48 +179,55 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
         print(f"🎯 STEP -1: Using Forced Topic -> {forced_article}")
         news_context = f"FORCED TOPIC TO COVER:\n{forced_article}\n"
     else:
-        # ── STEP 0: FETCH & FILTER + RE-RANK BY HOT TOPIC ───────────────────────
-        filtered_articles = []
+        # ── STEP 0: FETCH & FILTER + RE-RANK BY VIRAL POTENTIAL ───────────────────────
         if articles:
-            print(f"📡 STEP 0: Filtering {len(articles)} RSS/Source articles...")
+            print(f"📡 STEP 0: Scoring {len(articles)} articles for viral potential...")
+            
+            # Fetch global trending articles from NewsAPI as an additional boost
+            from fetch_research_papers import fetch_trending_from_newsapi
+            trending_boost = fetch_trending_from_newsapi()
+            articles += trending_boost
+            
             seen_titles_in_this_batch = []
+            filtered_articles = []
+            
             for art in articles:
                 title = art.get('title', '')
                 url = art.get('url', '')
                 
-                # 1. Check against long-term history
+                # 1. Uniqueness check
                 is_unique, _ = check_story_uniqueness(title, url)
-                if not is_unique:
+                if not is_unique: continue
+                
+                # 2. Internal batch uniqueness
+                from rapidfuzz import fuzz
+                if any(fuzz.token_set_ratio(title.lower(), s.lower()) > 80 for s in seen_titles_in_this_batch):
                     continue
                     
-                # 2. Check against other articles in this same feed batch
-                is_internally_unique = True
-                from rapidfuzz import fuzz 
-                for seen_title in seen_titles_in_this_batch:
-                    if fuzz.token_set_ratio(title.lower(), seen_title.lower()) > 80:
-                        is_internally_unique = False
-                        break
+                # 3. Viral Potential Scoring
+                title_lower = title.lower()
+                hot_score = sum(15 for kw in hot_keywords if kw in title_lower)
                 
-                if is_internally_unique:
-                    # ── Score article relevance to hot topic ────────────────────
-                    title_lower = title.lower()
-                    hot_score = sum(1 for kw in hot_keywords if kw in title_lower)
-                    art['_hot_score'] = hot_score
-                    filtered_articles.append(art)
-                    seen_titles_in_this_batch.append(title)
+                # Additional weight for 'Trending' type from NewsAPI
+                if art.get("type") == "trending":
+                    hot_score += 20
+                
+                # Keyword density for "Breaking" signals
+                breaking_keywords = ["launch", "release", "leak", "breakthrough", "benchmark", "announces", "unveils", "shuts down"]
+                hot_score += sum(10 for kw in breaking_keywords if kw in title_lower)
+                
+                art['_hot_score'] = hot_score
+                filtered_articles.append(art)
+                seen_titles_in_this_batch.append(title)
             
             if not filtered_articles:
-                print("⚠️ No unique articles in RSS batch. Falling back to Gemini Search...")
+                print("⚠️ No unique viral articles. Falling back to Search...")
                 articles = None
             else:
-                # Sort: hot topic matches first, then rest
+                # Rank by viral score
                 filtered_articles.sort(key=lambda x: x.get('_hot_score', 0), reverse=True)
                 top = filtered_articles[0]
-                if top.get('_hot_score', 0) > 0:
-                    print(f"🔥 Hot topic match found in RSS: '{top.get('title')}' (score: {top['_hot_score']})")
-                else:
-                    print(f"ℹ️ No RSS articles matched hot topic. Using top unique article.")
-                print(f"✅ Found {len(filtered_articles)} unique articles in RSS batch.")
+                print(f"🏆 Top Viral Candidate: '{top.get('title')}' (Score: {top['_hot_score']})")
                 articles = filtered_articles
 
         # ── STEP 1: GEMINI SEARCH FALLBACK (biased toward hot topic) ────────────

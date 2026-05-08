@@ -11,6 +11,8 @@ RSS_FEEDS = [
     "https://www.anthropic.com/rss",
     "https://huggingface.co/blog/feed.xml",
     "https://aws.amazon.com/blogs/machine-learning/feed/",
+    "https://arstechnica.com/tag/ai/feed/",
+    "https://decrypt.co/news/technology/ai/rss",
 ]
 
 TOOL_RSS_FEEDS = [
@@ -18,7 +20,50 @@ TOOL_RSS_FEEDS = [
     "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml",
     "https://venturebeat.com/category/ai/feed/",
     "https://news.ycombinator.com/rss", 
+    "https://mashable.com/category/artificial-intelligence/rss",
 ]
+
+def fetch_trending_from_newsapi():
+    """Fetches global trending AI news using NewsAPI.org sorted by popularity."""
+    if not NEWS_API_KEY:
+        print("⚠️ NewsAPI key missing. Skipping global trend fetch.")
+        return []
+    
+    print("📡 Fetching global trending AI news from NewsAPI...")
+    try:
+        # Query for AI breakthroughs, model releases, and leaks in the last 24h
+        url = (
+            f"https://newsapi.org/v2/everything?"
+            f"q=(AI OR \"Artificial Intelligence\" OR LLM OR \"Generative AI\" OR \"OpenAI\" OR \"DeepMind\")&"
+            f"sortBy=popularity&"
+            f"language=en&"
+            f"pageSize=20&"
+            f"apiKey={NEWS_API_KEY}"
+        )
+        response = requests.get(url)
+        data = response.json()
+        
+        if data.get("status") != "ok":
+            print(f"⚠️ NewsAPI Error: {data.get('message')}")
+            return []
+            
+        articles = data.get("articles", [])
+        print(f"✅ NewsAPI: Found {len(articles)} trending articles.")
+        
+        # Reformat to match internal structure
+        return [{
+            "title": a.get("title"),
+            "description": a.get("description"),
+            "source": {"name": a.get("source", {}).get("name")},
+            "url": a.get("url"),
+            "urlToImage": a.get("urlToImage"),
+            "publishedAt": a.get("publishedAt"),
+            "type": "trending"
+        } for a in articles]
+        
+    except Exception as e:
+        print(f"⚠️ NewsAPI Fetch failed: {e}")
+        return []
 
 def _fetch_rss(feed_urls, feed_type="research"):
     print(f"Fetching from {feed_type} blogs...")
@@ -74,7 +119,7 @@ def _fetch_rss(feed_urls, feed_type="research"):
     
     # Remove the internal temporary _pub_dt field
     for a in all_articles:
-        del a["_pub_dt"]
+        if "_pub_dt" in a: del a["_pub_dt"]
 
     if fresh_articles:
         articles = fresh_articles
