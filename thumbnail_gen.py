@@ -1,18 +1,22 @@
 """
-thumbnail_gen.py — High-CTR thumbnail generator (1280x720).
+thumbnail_gen.py — High-Authority Split-Screen Thumbnail Generator.
 
-Layout:
-  LEFT 40%:  Large emoji + star burst  
-  RIGHT 60%: Category badge | Headline (with highlighted word) | Teaser
-  TOP RIGHT: Red "TODAY" circle
-  BOTTOM:    Dark bar with Telegram link + subscribe bell
+Design Philosophy (Inspired by premium creator thumbnails):
+  - Split-screen: LEFT = Bold curiosity-gap hook text on dark bg
+  - RIGHT = High-quality topic-relevant image
+  - Zero clutter: No emojis, arrows, or busy graphics
+  - Premium typography: Montserrat ExtraBold, high contrast
+  - Curiosity gap: Headline ends with "..." to force clicks
+  
+Generates:
+  - 1280x720 (16:9) YouTube thumbnail
+  - 1080x1920 (9:16) Shorts thumbnail
 """
 
 import os
 import io
 import math
-import random
-import numpy as np
+import textwrap
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 from datetime import datetime
 from google import genai
@@ -20,351 +24,405 @@ from google.genai import types
 from config import OUTPUT_DIR, ASSETS_DIR, GEMINI_API_KEY
 
 THUMB_W, THUMB_H = 1280, 720
+SHORTS_W, SHORTS_H = 1080, 1920
 
-FONT_PATHS = [
-    os.path.join(ASSETS_DIR, "fonts", "Montserrat-Bold.ttf"),
-    os.path.join(ASSETS_DIR, "fonts", "Roboto-Bold.ttf"),
+# ─────────────────────────────────────────────────────────────────────────────
+# FONT LOADING
+# ─────────────────────────────────────────────────────────────────────────────
+FONT_EXTRABOLD = os.path.join(ASSETS_DIR, "fonts", "Montserrat-ExtraBold.ttf")
+FONT_BOLD = os.path.join(ASSETS_DIR, "fonts", "Montserrat-Bold.ttf")
+FONT_BLACK = os.path.join(ASSETS_DIR, "fonts", "Montserrat-Black.ttf")
+
+FALLBACKS = [
     "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
     "/usr/share/fonts/truetype/roboto/hinted/Roboto-Bold.ttf",
     "/usr/share/fonts/truetype/roboto/Roboto-Bold.ttf",
 ]
+
 _fcache = {}
 
-def gf(size):
-    if size not in _fcache:
-        for p in FONT_PATHS:
+def _load_font(size, weight="extrabold"):
+    """Load font with fallback chain."""
+    key = (size, weight)
+    if key not in _fcache:
+        paths = {
+            "extrabold": [FONT_EXTRABOLD, FONT_BLACK, FONT_BOLD],
+            "bold": [FONT_BOLD, FONT_EXTRABOLD],
+            "black": [FONT_BLACK, FONT_EXTRABOLD, FONT_BOLD],
+        }
+        candidates = paths.get(weight, [FONT_BOLD]) + FALLBACKS
+        for p in candidates:
             if os.path.exists(p):
                 try:
-                    _fcache[size] = ImageFont.truetype(p, size)
+                    _fcache[key] = ImageFont.truetype(p, size)
                     break
                 except Exception:
                     continue
-        if size not in _fcache:
-            _fcache[size] = ImageFont.load_default()
-    return _fcache[size]
+        if key not in _fcache:
+            _fcache[key] = ImageFont.load_default()
+    return _fcache[key]
 
-def ts(text, font):
+
+def _text_size(text, font):
     bb = font.getbbox(text)
     return bb[2] - bb[0], bb[3] - bb[1]
 
 
-def _load_background(script_json):
-    """Load best available background image, apply grading."""
-    # Try first chunk's visual if available
+# ─────────────────────────────────────────────────────────────────────────────
+# GEMINI: GENERATE CURIOSITY-GAP HOOK
+# ─────────────────────────────────────────────────────────────────────────────
+def _generate_hook_text(title):
+    """Use Gemini to generate a short, punchy curiosity-gap hook for the thumbnail."""
+    try:
+        client = genai.Client(api_key=GEMINI_API_KEY)
+        prompt = f"""You are a YouTube thumbnail copywriter. Generate a SHORT, punchy hook for this video topic.
+
+TOPIC: "{title}"
+
+RULES:
+1. Maximum 8 words total
+2. Use a "curiosity gap" — make the viewer NEED to click to find out the rest
+3. Use simple, emotional language (not technical jargon)
+4. End with "..." to create incompleteness
+5. Use line breaks for visual impact (each phrase on its own line, max 3 lines)
+6. Style: "You're losing because..." or "This changes everything..." or "Nobody is talking about..."
+
+EXAMPLES:
+- "You're losing\\nbecause the system\\nwas never..."
+- "This is why\\nOpenAI is\\nterrified..."
+- "Nobody will\\ntell you\\nthis..."
+- "The real reason\\nGoogle is\\npanicking..."
+
+Return ONLY the hook text with \\n for line breaks. No quotes, no explanation."""
+
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=prompt,
+            config=genai.types.GenerateContentConfig(temperature=0.8)
+        )
+        hook = response.text.strip().strip('"').strip("'")
+        # Clean up and enforce line break format
+        if "\\n" in hook:
+            hook = hook.replace("\\n", "\n")
+        # Enforce max 3 lines
+        lines = hook.split("\n")[:3]
+        return "\n".join(lines)
+    except Exception as e:
+        print(f"  ⚠️ Hook generation failed: {e}")
+        # Fallback: use first 6 words of title
+        words = title.split()[:6]
+        return " ".join(words[:3]) + "\n" + " ".join(words[3:]) + "..."
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# LOAD TOPIC-RELEVANT IMAGE (right side of split)
+# ─────────────────────────────────────────────────────────────────────────────
+def _load_topic_image(script_json):
+    """Load the best available topic-relevant image for the right panel."""
     today = datetime.now().strftime("%Y-%m-%d")
-    for i in range(1, 5):
-        for ext in ["jpg", "png", "mp4"]:
+
+    # Priority 1: Screenshot (article evidence)
+    screenshot = script_json.get("screenshot_path")
+    if screenshot and os.path.exists(screenshot):
+        try:
+            return Image.open(screenshot).convert("RGB")
+        except Exception:
+            pass
+
+    # Priority 2: Imagen-generated chunk visual
+    for i in range(1, 6):
+        for ext in ["jpg", "png"]:
             p = os.path.join(OUTPUT_DIR, f"chunk_{i}_{today}.{ext}")
-            if os.path.exists(p) and ext != "mp4":
+            if os.path.exists(p):
                 try:
-                    img = Image.open(p).convert("RGB").resize((THUMB_W, THUMB_H), Image.LANCZOS)
-                    # Boost contrast + saturation
-                    img = ImageEnhance.Contrast(img).enhance(1.25)
-                    img = ImageEnhance.Color(img).enhance(1.30)
-                    return img
+                    return Image.open(p).convert("RGB")
                 except Exception:
                     continue
 
-    # Solid dark fallback
-    accent_hex = script_json.get("color_theme", {}).get("accent", "#ff4444").lstrip("#")
-    acc = tuple(int(accent_hex[i:i+2], 16) for i in (0, 2, 4))
-    img = Image.new("RGB", (THUMB_W, THUMB_H), (15, 15, 20))
-    # Subtle gradient from accent on left
-    for x in range(THUMB_W // 2):
-        alpha = int(60 * (1 - x / (THUMB_W // 2)))
-        for y in range(THUMB_H):
-            px = img.getpixel((x, y))
-            blended = tuple(min(255, px[c] + acc[c] * alpha // 255) for c in range(3))
-            img.putpixel((x, y), blended)
-    return img
+    # Priority 3: Lipsync avatar frame
+    lipsync = script_json.get("kaggle_lipsync_path")
+    if lipsync and os.path.exists(lipsync):
+        try:
+            from moviepy import VideoFileClip
+            clip = VideoFileClip(lipsync)
+            frame = clip.get_frame(1.0)  # Get frame at 1 second
+            clip.close()
+            return Image.fromarray(frame)
+        except Exception:
+            pass
+
+    return None
 
 
-def _vignette(img):
-    vign = Image.new("RGBA", img.size, (0, 0, 0, 0))
-    draw = ImageDraw.Draw(vign)
-    w, h = img.size
-    for i in range(80):
-        alpha = int(180 * (i / 80) ** 1.5)
-        draw.rectangle([i, i, w-i, h-i], outline=(0, 0, 0, alpha))
-    result = Image.alpha_composite(img.convert("RGBA"), vign)
-    return result  # Keep RGBA for further compositing
+# ─────────────────────────────────────────────────────────────────────────────
+# RENDER: SPLIT-SCREEN THUMBNAIL (16:9)
+# ─────────────────────────────────────────────────────────────────────────────
+def _render_split_thumbnail(hook_text, topic_img, accent_color, width=1280, height=720):
+    """
+    Renders the High-Authority split-screen thumbnail.
+    LEFT: Dark background + bold hook text
+    RIGHT: Topic-relevant image
+    """
+    canvas = Image.new("RGB", (width, height), (12, 12, 16))
+    draw = ImageDraw.Draw(canvas)
 
+    split_x = int(width * 0.42)  # 42% left, 58% right
 
-def _draw_star_burst(draw, cx, cy, r_outer, r_inner, points, color):
-    pts = []
-    for i in range(points * 2):
-        angle = math.pi * i / points - math.pi / 2
-        r = r_outer if i % 2 == 0 else r_inner
-        pts.append((cx + r * math.cos(angle), cy + r * math.sin(angle)))
-    draw.polygon(pts, fill=color)
+    # ── LEFT PANEL: Dark textured background with hook text ──────────────
+    # Subtle noise texture on the dark side
+    for y in range(height):
+        for x in range(0, split_x, 4):
+            noise = int(12 + (hash((x, y)) % 8))
+            draw.point((x, y), fill=(noise, noise, noise + 2))
 
+    # Subtle accent glow from the right edge of the left panel
+    glow_width = 80
+    for x in range(split_x - glow_width, split_x):
+        progress = (x - (split_x - glow_width)) / glow_width
+        alpha = int(25 * progress)
+        r = min(255, accent_color[0] + alpha)
+        g = min(255, accent_color[1] + alpha)
+        b = min(255, accent_color[2] + alpha)
+        for y in range(height):
+            base = canvas.getpixel((x, y))
+            blended = (
+                min(255, base[0] + int(r * progress * 0.15)),
+                min(255, base[1] + int(g * progress * 0.15)),
+                min(255, base[2] + int(b * progress * 0.15)),
+            )
+            canvas.putpixel((x, y), blended)
 
-def wrap_text(text, font, max_width, max_chars_per_line=15):
-    words = text.split()
-    lines = []
-    current_line = []
-    
-    for word in words:
-        # Check char count constraint
-        test_line_words = current_line + [word]
-        test_text = " ".join(test_line_words)
-        
-        bb = font.getbbox(test_text)
-        w = bb[2] - bb[0]
-        
-        if w > max_width or len(test_text) > max_chars_per_line:
-            if not current_line:
-                 # Single word is too long itself, force it anyway
-                 current_line = [word]
-            else:
-                 lines.append(" ".join(current_line))
-                 current_line = [word]
+    # ── RIGHT PANEL: Topic image ─────────────────────────────────────────
+    right_w = width - split_x
+    if topic_img:
+        img_w, img_h = topic_img.size
+        # Crop to fill the right panel
+        target_ratio = right_w / height
+        img_ratio = img_w / img_h
+
+        if img_ratio > target_ratio:
+            new_w = int(img_h * target_ratio)
+            left = (img_w - new_w) // 2
+            cropped = topic_img.crop((left, 0, left + new_w, img_h))
         else:
-            current_line.append(word)
-            
-    if current_line:
-        lines.append(" ".join(current_line))
-        
-    return lines[:3] # Max 3 lines
+            new_h = int(img_w / target_ratio)
+            top = (img_h - new_h) // 2
+            cropped = topic_img.crop((0, top, img_w, top + new_h))
 
+        resized = cropped.resize((right_w, height), Image.LANCZOS)
+
+        # Boost contrast slightly
+        resized = ImageEnhance.Contrast(resized).enhance(1.15)
+        resized = ImageEnhance.Color(resized).enhance(1.1)
+
+        canvas.paste(resized, (split_x, 0))
+
+        # Gradient blend from left panel into right panel
+        blend_w = 60
+        for x in range(blend_w):
+            alpha = 1.0 - (x / blend_w)
+            for y in range(height):
+                px = canvas.getpixel((split_x + x, y))
+                dark = (12, 12, 16)
+                blended = tuple(int(dark[c] * alpha + px[c] * (1 - alpha)) for c in range(3))
+                canvas.putpixel((split_x + x, y), blended)
+    else:
+        # Fallback: dark gradient on right side too
+        for x in range(split_x, width):
+            progress = (x - split_x) / right_w
+            shade = int(15 + 10 * progress)
+            for y in range(height):
+                canvas.putpixel((x, y), (shade, shade, shade + 3))
+
+    # ── HOOK TEXT (Left Panel) ───────────────────────────────────────────
+    lines = hook_text.split("\n")
+    max_text_w = split_x - 80  # 40px padding on each side
+
+    # Auto-scale font size
+    font_size = 78
+    font = _load_font(font_size, "extrabold")
+
+    # Check if text fits, scale down if needed
+    while font_size > 40:
+        all_fit = True
+        for line in lines:
+            lw, _ = _text_size(line, font)
+            if lw > max_text_w:
+                all_fit = False
+                break
+        if all_fit:
+            break
+        font_size -= 4
+        font = _load_font(font_size, "extrabold")
+
+    # Calculate total text block height
+    line_gap = int(font_size * 0.3)
+    line_heights = []
+    for line in lines:
+        _, lh = _text_size(line, font)
+        line_heights.append(lh)
+    total_h = sum(line_heights) + line_gap * (len(lines) - 1)
+
+    # Center vertically in left panel
+    start_y = (height - total_h) // 2
+    text_x = 40  # Left-aligned with padding
+
+    for i, line in enumerate(lines):
+        lw, lh = _text_size(line, font)
+        y = start_y + sum(line_heights[:i]) + line_gap * i
+
+        # Strong drop shadow
+        for dx in range(-2, 3):
+            for dy in range(-2, 3):
+                draw.text((text_x + dx, y + dy), line, font=font, fill=(0, 0, 0))
+
+        # Main text: pure white
+        draw.text((text_x, y), line, font=font, fill=(255, 255, 255))
+
+    # ── SUBTLE ACCENT LINE (vertical divider) ────────────────────────────
+    line_y1 = int(height * 0.15)
+    line_y2 = int(height * 0.85)
+    draw.line([(split_x - 2, line_y1), (split_x - 2, line_y2)],
+              fill=accent_color, width=3)
+
+    return canvas
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# RENDER: SHORTS THUMBNAIL (9:16)
+# ─────────────────────────────────────────────────────────────────────────────
+def _render_shorts_thumbnail(hook_text, topic_img, accent_color, width=1080, height=1920):
+    """
+    Renders a vertical Shorts thumbnail.
+    TOP 55%: Topic-relevant image
+    BOTTOM 45%: Dark panel with bold hook text
+    """
+    canvas = Image.new("RGB", (width, height), (12, 12, 16))
+    draw = ImageDraw.Draw(canvas)
+
+    split_y = int(height * 0.55)
+
+    # ── TOP: Topic image ─────────────────────────────────────────────────
+    if topic_img:
+        img_w, img_h = topic_img.size
+        top_h = split_y
+        target_ratio = width / top_h
+        img_ratio = img_w / img_h
+
+        if img_ratio > target_ratio:
+            new_w = int(img_h * target_ratio)
+            left = (img_w - new_w) // 2
+            cropped = topic_img.crop((left, 0, left + new_w, img_h))
+        else:
+            new_h = int(img_w / target_ratio)
+            top = (img_h - new_h) // 2
+            cropped = topic_img.crop((0, top, img_w, top + new_h))
+
+        resized = cropped.resize((width, top_h), Image.LANCZOS)
+        resized = ImageEnhance.Contrast(resized).enhance(1.15)
+        canvas.paste(resized, (0, 0))
+
+        # Gradient blend from image into dark panel
+        blend_h = 80
+        for y in range(blend_h):
+            alpha = y / blend_h
+            for x in range(width):
+                px = canvas.getpixel((x, split_y - blend_h + y))
+                dark = (12, 12, 16)
+                blended = tuple(int(px[c] * (1 - alpha) + dark[c] * alpha) for c in range(3))
+                canvas.putpixel((x, split_y - blend_h + y), blended)
+
+    # ── BOTTOM: Hook text ────────────────────────────────────────────────
+    lines = hook_text.split("\n")
+    max_text_w = width - 100
+
+    font_size = 90
+    font = _load_font(font_size, "extrabold")
+
+    while font_size > 48:
+        all_fit = True
+        for line in lines:
+            lw, _ = _text_size(line, font)
+            if lw > max_text_w:
+                all_fit = False
+                break
+        if all_fit:
+            break
+        font_size -= 4
+        font = _load_font(font_size, "extrabold")
+
+    line_gap = int(font_size * 0.35)
+    line_heights = []
+    for line in lines:
+        _, lh = _text_size(line, font)
+        line_heights.append(lh)
+    total_h = sum(line_heights) + line_gap * (len(lines) - 1)
+
+    bottom_h = height - split_y
+    start_y = split_y + (bottom_h - total_h) // 2
+    text_x = 50
+
+    for i, line in enumerate(lines):
+        lw, lh = _text_size(line, font)
+        y = start_y + sum(line_heights[:i]) + line_gap * i
+
+        # Drop shadow
+        for dx in range(-2, 3):
+            for dy in range(-2, 3):
+                draw.text((text_x + dx, y + dy), line, font=font, fill=(0, 0, 0))
+
+        draw.text((text_x, y), line, font=font, fill=(255, 255, 255))
+
+    # Horizontal accent line divider
+    line_x1 = 50
+    line_x2 = width - 50
+    draw.line([(line_x1, split_y + 10), (line_x2, split_y + 10)],
+              fill=accent_color, width=3)
+
+    # Accent border (bottom and sides only)
+    border_t = 6
+    draw.rectangle([0, height - border_t, width, height], fill=accent_color)
+
+    return canvas
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PUBLIC API
+# ─────────────────────────────────────────────────────────────────────────────
 def generate_thumbnail(script_json):
     """
-    Generates a 1280x720 YouTube thumbnail and a 1080x1920 Shorts thumbnail
-    using specific branding requested by the user.
+    Generates both 1280x720 YouTube and 1080x1920 Shorts thumbnails
+    using the High-Authority Split-Screen design.
     """
     date_str = datetime.now().strftime("%Y-%m-%d")
     output_path_yt = os.path.join(OUTPUT_DIR, f"thumbnail_{date_str}.jpg")
     output_path_shorts = os.path.join(OUTPUT_DIR, f"thumbnail_shorts_{date_str}.jpg")
-    
-    # Extract topic from script
-    topic = script_json.get("title", "Tech News")
-    
-    # ── 1. BACKGROUND IMAGE ───────────────────────────────────────────────────
-    bg_path = os.path.join(ASSETS_DIR, "gemini_img_without_logo.png")
-    if os.path.exists(bg_path):
-        base_img = Image.open(bg_path).convert("RGBA")
+
+    title = script_json.get("title", "Tech News")
+    accent_hex = script_json.get("color_theme", {}).get("accent", "#FFD600").lstrip("#")
+    accent_color = tuple(int(accent_hex[i:i+2], 16) for i in (0, 2, 4))
+
+    # 1. Generate curiosity-gap hook text
+    print("🎨 Generating thumbnail hook text...")
+    hook_text = _generate_hook_text(title)
+    print(f"   Hook: {repr(hook_text)}")
+
+    # 2. Load topic-relevant image
+    print("🖼️  Loading topic image for thumbnail...")
+    topic_img = _load_topic_image(script_json)
+    if topic_img:
+        print(f"   ✅ Topic image loaded: {topic_img.size}")
     else:
-        print("Warning: gemini_img_without_logo.png not found, using solid fallback.")
-        base_img = Image.new("RGBA", (1080, 1920), (30, 30, 40, 255))
-        
-    # Create the 1280x720 (16:9) canvas
-    # We will crop/resize the background to fill the frame
-    img_ratio = base_img.width / base_img.height
-    target_ratio = 1280 / 720
-    
-    if img_ratio > target_ratio:
-        # Image is wider than target
-        new_w = int(720 * img_ratio)
-        resized = base_img.resize((new_w, 720), Image.LANCZOS)
-        # Crop center
-        left = (new_w - 1280) // 2
-        bg_yt = resized.crop((left, 0, left + 1280, 720))
-    else:
-        # Image is taller than target
-        new_h = int(1280 / img_ratio)
-        resized = base_img.resize((1280, new_h), Image.LANCZOS)
-        # Crop center
-        top = (new_h - 720) // 2
-        bg_yt = resized.crop((0, top, 1280, top + 720))
+        print("   ⚠️ No topic image found, using dark fallback.")
 
-    # Apply Hyper-Vibrant Grading to background
-    bg_yt = ImageEnhance.Contrast(bg_yt).enhance(1.4)
-    bg_yt = ImageEnhance.Color(bg_yt).enhance(1.5)
-    bg_yt = ImageEnhance.Brightness(bg_yt).enhance(0.9)
-    # Add subtle Vignette to focus center
-    bg_yt = _vignette(bg_yt)
-
-    # Create the 1080x1920 (9:16) canvas for Shorts
-    shorts_target_ratio = 1080 / 1920
-    if img_ratio > shorts_target_ratio:
-        new_w = int(1920 * img_ratio)
-        resized = base_img.resize((new_w, 1920), Image.LANCZOS)
-        left = (new_w - 1080) // 2
-        bg_shorts = resized.crop((left, 0, left + 1080, 1920))
-    else:
-        new_h = int(1080 / img_ratio)
-        resized = base_img.resize((1080, new_h), Image.LANCZOS)
-        top = (new_h - 1920) // 2
-        bg_shorts = resized.crop((0, top, 1080, top + 1920))
-        
-    # Grading for Shorts
-    bg_shorts = ImageEnhance.Contrast(bg_shorts).enhance(1.3)
-    bg_shorts = ImageEnhance.Color(bg_shorts).enhance(1.4)
-    bg_shorts = _vignette(bg_shorts)
-
-    # Helper function to render text on a given canvas
-    def apply_branding(canvas_img, width, height):
-        # ── 4. SUBTLE DARK GRADIENT ───────────────────────────────────────────
-        # Top 35% gradient overlay masking down for text visibility
-        grad = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-        grad_draw = ImageDraw.Draw(grad)
-        # 2026 Engagement Gradient: Deeper at top for text separation
-        end_y = int(height * 0.45)
-        for y in range(0, end_y):
-            # Fade from 0.7 alpha to transparent
-            alpha = int(255 * 0.70 * (1 - (y / end_y)))
-            grad_draw.line([(0, y), (width, y)], fill=(0, 0, 0, alpha))
-            
-        final_img = Image.alpha_composite(canvas_img, grad)
-        draw = ImageDraw.Draw(final_img)
-        
-        # Avatar removed as per request to clear face area
-        pass
-        
-        # ── 2. & 3. FONT SETUP & SIZING ───────────────────────────────────────
-        topic_text = topic.upper()
-        font_path = os.path.join(ASSETS_DIR, "fonts", "Montserrat-Bold.ttf")
-        if not os.path.exists(font_path):
-            font_path = "/System/Library/Fonts/Supplemental/Arial Black.ttf"
-                
-        # Auto-scale font size (between 100 and 180 for maximum impact)
-        target_size = 180
-        max_width = width - 100 # 50px padding each side
-        
-        try:
-            font = ImageFont.truetype(font_path, target_size)
-        except:
-            font = ImageFont.load_default()
-            
-        # Wrap text into lines
-        lines = wrap_text(topic_text, font, max_width)
-        
-        # If text overflows container width too much, scale down but floor at 100
-        while target_size > 100:
-            lines = wrap_text(topic_text, font, max_width)
-            
-            # Safety Check: Total height of text block vs screen space
-            line_heights = []
-            for line in lines:
-                bb = font.getbbox(line)
-                line_heights.append(bb[3] - bb[1])
-            
-            total_text_h = sum(line_heights) + int((len(lines) - 1) * target_size * 0.2)
-            # Chest Area constraint: Text should be punchy but fit in the middle-lower half
-            if total_text_h < height * 0.35:
-                break
-                
-            target_size -= 10
-            try:
-                font = ImageFont.truetype(font_path, target_size)
-            except:
-                break
-            
-        # Recalculate wrapping with final font size
-        lines = wrap_text(topic_text, font, max_width)
-            
-        # Calculate text block height
-        line_spacing = 1.2
-        line_heights = []
-        for line in lines:
-            bb = font.getbbox(line)
-            line_heights.append(bb[3] - bb[1])
-            
-        total_text_h = sum(line_heights) + int((len(lines) - 1) * target_size * (line_spacing - 1))
-        
-        # Capture accent color for word highlighting
-        accent_hex = script_json.get("color_theme", {}).get("accent", "#FFD600").lstrip("#")
-        accent_color = tuple(int(accent_hex[i:i+2], 16) for i in (0, 2, 4))
-        
-        # Position at the "Lower Chest / Stomach Area" (approx 70% of screen height)
-        start_y = int(height * 0.70) 
-        # Fine-tune y to center the block vertically in that area
-        start_y -= total_text_h // 2        
-        
-        # ── 7. CONTRAST BACKGROUND (Obsidian Block) ────────────────────────
-        # Render a single background box for the entire text block to avoid overlaps
-        bg_pad_x, bg_pad_y = 50, 40
-        # Calculate full block bounds
-        max_line_w = max([ts(l, font)[0] for l in lines])
-        block_x_start = (width - max_line_w) // 2
-        
-        # Draw the main block background
-        draw.rounded_rectangle(
-            [block_x_start - bg_pad_x, start_y - bg_pad_y, block_x_start + max_line_w + bg_pad_x, start_y + total_text_h + bg_pad_y],
-            radius=25,
-            fill=(0, 0, 0, 210) # Darker obsidian for maximum contrast
-        )
-        # Power Words to highlight in accent color
-        power_keywords = ["SCARY", "KILLER", "FREE", "VIRAL", "DEAD", "GOD", "SECRET", "LEVEL", "10X", "100X", "CRAZY"]
-        if topic_text.split():
-            # If no power word in topic, just pick the longest word to highlight
-            longest_word = max(topic_text.split(), key=len)
-            power_keywords.append(longest_word)
-        current_y = start_y
-        for i, line in enumerate(lines):
-            bb = font.getbbox(line)
-            line_w = bb[2] - bb[0]
-            line_h = bb[3] - bb[1]
-            x = (width - line_w) // 2
-            
-            # Background box removed from here (now a single block above)
-            pass
-            
-            # Drop shadow (reduced for cleaner look in the box)
-            shadow_offset = 3
-            # Draw shadow multiple times slightly offset to simulate blur=8 effect
-            for dx in range(-1, 2):
-                for dy in range(-1, 2):
-                    if dx == 0 and dy == 0: continue
-                    draw.text(
-                        (x + shadow_offset + (dx*2), current_y + shadow_offset + (dy*2)), 
-                        line, 
-                        font=font, 
-                        fill=(0, 0, 0, int(255 * 0.3)),
-                        stroke_width=0
-                    )
-            draw.text(
-                (x + shadow_offset, current_y + shadow_offset), 
-                line, 
-                font=font, 
-                fill=(0, 0, 0, int(255 * 0.8)),
-                stroke_width=0
-            )
-            
-            # Main bold text with black stroke
-            words_in_line = line.split()
-            cursor_x = x
-            
-            for word in words_in_line:
-                w_bb = font.getbbox(word)
-                w_width = w_bb[2] - w_bb[0]
-                
-                # Highlight if it's a power word
-                is_power = any(pk in word for pk in power_keywords)
-                fill_color = accent_color if is_power else (255, 255, 255, 255)
-                
-                draw.text(
-                    (cursor_x, current_y), 
-                    word, 
-                    font=font, 
-                    fill=fill_color,
-                    stroke_width=8,
-                    stroke_fill=(0, 0, 0, 255)
-                )
-                
-                # Advance cursor (add space width)
-                space_bb = font.getbbox(" ")
-                cursor_x += w_width + (space_bb[2] - space_bb[0])
-            
-            current_y += line_h + int(target_size * (line_spacing - 1))
-            
-        # ── 6. VIBRANT SHOCK BORDER (Shorts only) ─────────────────────────────
-        if width < height:
-            border_thickness = 25
-            # Draw a thick glowing border around the frame
-            for i in range(3): # Multi-layer glow
-                alpha = int(255 / (i + 1))
-                draw.rectangle([i*2, i*2, width-i*2, height-i*2], outline=accent_color + (alpha,), width=border_thickness - i*4)
-            
-        return final_img
-
-    # ── 5. EXPORT SPECS ───────────────────────────────────────────────────────
-    final_yt = apply_branding(bg_yt, 1280, 720).convert("RGB")
-    final_yt.save(output_path_yt, "JPEG", quality=95)
+    # 3. Render 16:9 YouTube thumbnail
+    yt_thumb = _render_split_thumbnail(hook_text, topic_img, accent_color, THUMB_W, THUMB_H)
+    yt_thumb.save(output_path_yt, "JPEG", quality=95)
     print(f"✅ Generated YouTube Thumbnail: {output_path_yt}")
-    
-    final_shorts = apply_branding(bg_shorts, 1080, 1920).convert("RGB")
-    final_shorts.save(output_path_shorts, "JPEG", quality=95)
+
+    # 4. Render 9:16 Shorts thumbnail
+    shorts_thumb = _render_shorts_thumbnail(hook_text, topic_img, accent_color, SHORTS_W, SHORTS_H)
+    shorts_thumb.save(output_path_shorts, "JPEG", quality=95)
     print(f"✅ Generated Shorts Thumbnail: {output_path_shorts}")
-    
+
     return output_path_yt
