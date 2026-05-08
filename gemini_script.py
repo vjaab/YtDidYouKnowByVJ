@@ -98,6 +98,22 @@ Return ONLY a JSON object:
   "optimized_script": "The full rewritten text combining all parts into a fast-paced script."
 }}"""
 
+SELECTOR_AGENT_TEMPLATE = """{persona}
+
+SELECTOR AGENT TASK:
+Analyze the following tech news context and pick the SINGLE most impactful and high-retention story for a 60-second video.
+{selection_instruction}
+
+NEWS CONTEXT:
+{news_context}
+
+Return ONLY a JSON object:
+{{
+  "selected_headline": "The exact headline or title",
+  "selected_url": "The exact URL",
+  "reason": "Briefly why this was picked"
+}}"""
+
 HUMANIZER_AGENT_TEMPLATE = """{persona}
 
 HUMANIZER AGENT TASK:
@@ -384,10 +400,11 @@ class MultiAgentGenerationEngine:
 
     def _call_gemini(self, prompt, model='gemini-2.0-flash'):
         attempts = 0
+        current_model = model
         while attempts < 3:
             try:
                 response = self.client.models.generate_content(
-                    model=model,
+                    model=current_model,
                     contents=prompt,
                     config=types.GenerateContentConfig(temperature=0.8)
                 )
@@ -399,16 +416,47 @@ class MultiAgentGenerationEngine:
                 
                 return json.loads(raw)
             except Exception as e:
-                print(f"⚠️ [LOOP] Call failed ({model}): {e}. Retrying...")
+                err_str = str(e).upper()
+                if "503" in err_str or "UNAVAILABLE" in err_str or "RESOURCE_EXHAUSTED" in err_str:
+                    # Fallback Logic: If 2.5-pro is down, use 2.0-flash
+                    if current_model != 'gemini-2.0-flash':
+                        print(f"⚠️ [LOOP] Model {current_model} is UNAVAILABLE. Falling back to gemini-2.0-flash...")
+                        current_model = 'gemini-2.0-flash'
+                        # Don't increment attempts for a fallback switch, just retry immediately with the new model
+                        continue
+                    
+                    wait_time = (2 ** attempts) + random.uniform(1, 3)
+                    print(f"⚠️ [LOOP] Call failed ({current_model}): 503/Overloaded. Retrying in {wait_time:.1f}s...")
+                    time.sleep(wait_time)
+                else:
+                    print(f"⚠️ [LOOP] Call failed ({current_model}): {e}. Retrying...")
+                    time.sleep(2)
                 attempts += 1
-                time.sleep(2)
         return None
 
     def execute(self, selection_instruction, prompt_requirements):
+        print("🎯 [AGENT 0] Selector Agent: Picking the single best story...")
+        selector_prompt = SELECTOR_AGENT_TEMPLATE.format(
+            persona=SYSTEM_PERSONA,
+            selection_instruction=selection_instruction,
+            news_context=self.context
+        )
+        selection = self._call_gemini(selector_prompt)
+        if not selection or "selected_headline" not in selection:
+            print("⚠️ Selector Agent failed. Using raw context fallback.")
+            selected_context = self.context
+            selected_headline = "Tech News Update"
+            selected_url = ""
+        else:
+            selected_headline = selection["selected_headline"]
+            selected_url = selection["selected_url"]
+            selected_context = f"SELECTED STORY: {selected_headline}\nSOURCE: {selected_url}\n\nORIGINAL CONTEXT:\n{self.context}"
+            print(f"✅ Selected Story: {selected_headline}")
+
         print("🕵️ [AGENT 1] Research Agent: Extracting narrative elements...")
         research_prompt = RESEARCH_AGENT_TEMPLATE.format(
             persona=SYSTEM_PERSONA,
-            news_context=self.context
+            news_context=selected_context
         )
         research = self._call_gemini(research_prompt)
         if not research: return None
@@ -444,13 +492,26 @@ class MultiAgentGenerationEngine:
         if not optimized: return None
 
         print("🗣️ [AGENT 5] Humanizer Agent: Fixing AI cadence and returning final schema...")
+        # Inject the selected headline and URL back into the requirements if they are missing
+        refined_requirements = prompt_requirements
+        if "original_news_headline" in refined_requirements:
+            refined_requirements = refined_requirements.replace('"original_news_headline": "Exact headline"', f'"original_news_headline": "{selected_headline}"')
+        if "original_news_url" in refined_requirements:
+            refined_requirements = refined_requirements.replace('"original_news_url": "Direct article URL"', f'"original_news_url": "{selected_url}"')
+
         humanizer_prompt = HUMANIZER_AGENT_TEMPLATE.format(
             persona=SYSTEM_PERSONA,
             optimized_script=optimized.get("optimized_script", ""),
-            schema_requirements=prompt_requirements
+            schema_requirements=refined_requirements
         )
         final_script = self._call_gemini(humanizer_prompt, model='gemini-2.5-pro')
         
         if final_script:
+            # Final safety check: ensure the headline/url are set correctly in the final object
+            if not final_script.get("original_news_headline") or final_script.get("original_news_headline") == "Exact headline":
+                final_script["original_news_headline"] = selected_headline
+            if not final_script.get("original_news_url") or final_script.get("original_news_url") == "Direct article URL":
+                final_script["original_news_url"] = selected_url
+            
             print("⭐ [PIPELINE] Multi-Agent script generation completed successfully.")
         return final_script
