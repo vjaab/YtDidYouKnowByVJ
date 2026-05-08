@@ -71,15 +71,21 @@ Return ONLY the raw integer (0-10)."""
 # ─────────────────────────────────────────────────────────────────────────────
 def generate_visual_style_guide(headline):
     """
-    Asks Gemini to define a consistent visual 'vibe' for the whole video.
-    This ensures all AI-generated images share a palette and lighting style.
+    Asks Gemini to define a consistent, HEADLINE-SPECIFIC visual 'vibe' for the whole video.
+    This ensures all AI-generated images share a palette, lighting style, and are relevant to the story.
     """
     print("🎨 Designing Global Visual Style Guide...")
     try:
         target_model = "gemini-2.0-flash"
         prompt = f"""Based on this news headline: '{headline}', define a cohesive visual style for a 9:16 vertical cinematic video.
-Return a short string (max 40 words) describing the lighting, color palette, and camera style.
-Example Output: 'Dark tech-noir aesthetic, cyan and deep purple neon lighting, shot on 35mm lens, high contrast, anamorphic lens flares, unreal engine 5 style.'
+
+CRITICAL: The style MUST be tailored to this specific story. Include:
+1. Color palette that matches the mood/entities (e.g., OpenAI = green/white, Google = blue/red/yellow/green, cybersecurity = dark/neon)
+2. Lighting style that fits the story tone (e.g., lawsuit = dramatic/contrasty, product launch = bright/clean)
+3. Visual motifs related to the entities mentioned (e.g., tech company logos as glowing elements, relevant product imagery)
+
+Return a short string (max 50 words) describing the lighting, color palette, camera style, AND relevant visual motifs.
+Example: 'Dark courtroom drama aesthetic, OpenAI green and Tesla silver palette, dramatic split-lighting, gavel imagery, digital contract visuals, shot on 35mm lens, high contrast, editorial news photography style.'
 Return ONLY the description."""
         
         response = client.models.generate_content(
@@ -292,33 +298,66 @@ def _download_photo(url, output_path, is_longform=False):
 # ─────────────────────────────────────────────────────────────────────────────
 # STEP E: Imagen 3
 # ─────────────────────────────────────────────────────────────────────────────
+def _extract_visual_subject(headline):
+    """Use Gemini to extract the primary visual subject/entity from a headline."""
+    try:
+        target_model = "gemini-2.0-flash"
+        prompt = f"""From this news headline, extract the PRIMARY visual subject that should appear in a background image.
+Return ONLY the short subject name (1-5 words). Examples:
+- "Elon Musk sues OpenAI" → "OpenAI vs Elon Musk"
+- "Google launches Gemini 2.0" → "Google Gemini"
+- "NVIDIA stock hits record high" → "NVIDIA"
+- "New self-driving car regulation passed" → "Autonomous Vehicles"
+
+Headline: "{headline}"
+Return ONLY the subject:"""
+        
+        resp = client.models.generate_content(
+            model=target_model, contents=prompt,
+            config=genai.types.GenerateContentConfig(temperature=0.0)
+        )
+        subject = resp.text.strip().strip('"').strip("'")
+        if subject and len(subject) < 60:
+            return subject
+    except Exception as e:
+        print(f"  ⚠️ Entity extraction failed: {e}")
+    
+    # Fallback: use first 4 meaningful words from headline
+    words = [w for w in (headline or "").split() if len(w) > 2][:4]
+    return " ".join(words) if words else "AI Technology"
+
+
 def _generate_imagen3(chunk_text, output_path, topic_context="", global_style_guide=""):
     topic = detect_topic(topic_context)
     
     style_suffix = f", {global_style_guide}" if global_style_guide else ", cinematic lighting, professional photography, 8k, photorealistic"
     
+    # Extract the actual visual subject from the headline (not the full headline)
+    visual_subject = _extract_visual_subject(topic_context)
+    print(f"  -> Visual Subject Extracted: '{visual_subject}'")
+    
     if topic:
         template = random.choice(TOPIC_PROMPT_TEMPLATES[topic])
-        # Try to find a name to inject
-        entity_name = topic_context or "AI Company"
-        # If it's a list or more complex, detect_topic might have been simple, 
-        # but let's try to extract the main subject.
-        best_prompt = f"{template.format(name=entity_name)}, {style_suffix}, news editorial style, 9:16 vertical, ultra realistic, no text"
-        print(f"  -> Detected Topic: {topic}. Using themed prompt for {entity_name}.")
+        best_prompt = f"{template.format(name=visual_subject)}, {style_suffix}, news editorial style, 9:16 vertical, ultra realistic, no text"
+        print(f"  -> Detected Topic: {topic}. Using themed prompt for {visual_subject}.")
     else:
-        # 1. Ask Gemini to craft the perfect Imagen prompt
-        topic_prompt = f"Topic Context: {topic_context}. The image MUST be highly relevant to this topic.\n" if topic_context else ""
-        prompt_builder = f"""Create a detailed Imagen 3 prompt for this text:
-'{chunk_text}'
+        # Ask Gemini to craft a headline-specific Imagen prompt
+        topic_prompt = f"Topic Context: {topic_context}. The image MUST be highly relevant to this specific story.\n" if topic_context else ""
+        prompt_builder = f"""Create a detailed Imagen 3 prompt for a YouTube Shorts background image.
+
+NEWS HEADLINE: '{topic_context}'
+CURRENT CHUNK TEXT: '{chunk_text}'
+
 {topic_prompt}Requirements:
 - Photorealistic, cinematic, 9:16 vertical
 - Style guide to follow: {global_style_guide}
+- The image MUST visually represent the specific topic/entities in the headline above
+- Include relevant logos, products, or symbolic imagery that viewers will immediately associate with the story
 - No text, no watermarks, no faces of real people
-- Directly shows what the text describes, highly precise to the overall topic above
-- High detail, dramatic lighting
+- High detail, dramatic lighting, news editorial style
 - RETURN ONLY the prompt text. No introductory sentence."""
         
-        best_prompt = chunk_text # Default
+        best_prompt = chunk_text  # Default
         attempts = 0
         while attempts < 3:
             try:
