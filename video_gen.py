@@ -1620,36 +1620,30 @@ def _sweep_clip(duration, accent_color, frame_width=1080):
 
 
 # ── LAYER 16: Article Screenshot (New Layer) ──────────────────────────────────
+def easeInOutQuad(t):
+    return 2*t*t if t < 0.5 else 1 - pow(-2*t + 2, 2) / 2
+
 def _article_screenshot_clip(screenshot_path, duration):
     """
     Transformative logic: Shows the source article as a full-screen bleed evidence backdrop.
-    Starts early (3s) to replace generic stock footage with relevant evidence.
+    Uses S-Curve easing for cinematic motion.
     """
     if not screenshot_path or not os.path.exists(screenshot_path):
         return []
     try:
         img = Image.open(screenshot_path).convert("RGB")
-        
-        # Premium 2026 Full-Bleed: Occupies 100% of the screen behind the avatar
-        target_h = FRAME_H
-        target_w = FRAME_W
+        target_h, target_w = FRAME_H, FRAME_W
         img = ImageOps.fit(img, (target_w, target_h), Image.LANCZOS)
-        
         arr = np.array(img)
-        
         clips = []
         
-        # --- PHASE 1: Hook Evidence (Replaces irrelevant intro stock) ---
-        start1 = 3.0
-        dur1 = max(8.0, duration - 5.0)
-        
-        # --- PHASE 2: Deep Dive (Persists for the bulk of the video) ---
-        start2 = 12.0
-        dur2 = max(0, duration - start2 - 2.0)
-        
+        # --- PHASE 1: Hook Evidence ---
+        start1, dur1 = 3.0, 8.0
         if duration > start1:
             def zoom_effect1(t):
-                return 1.0 + 0.08 * (t / dur1)
+                # Apply Ease-In-Out to the zoom factor
+                progress = easeInOutQuad(min(1.0, t / dur1))
+                return 1.0 + 0.10 * progress
                 
             clip1 = VideoClip(lambda t: arr, duration=dur1)
             clip1 = clip1.with_effects([vfx.Resize(zoom_effect1)])
@@ -1658,10 +1652,13 @@ def _article_screenshot_clip(screenshot_path, duration):
             clip1 = clip1.with_effects([vfx.CrossFadeIn(0.6), vfx.CrossFadeOut(0.6)])
             clips.append(clip1)
 
+        # --- PHASE 2: Deep Dive ---
+        start2 = 12.0
+        dur2 = max(0, duration - start2 - 1.5)
         if dur2 > 0:
             def zoom_effect2(t):
-                # S-Curve style zoom for more cinematic feel
-                return 1.05 + 0.12 * (t / dur2)
+                progress = easeInOutQuad(min(1.0, t / dur2))
+                return 1.05 + 0.15 * progress
                 
             clip2 = VideoClip(lambda t: arr, duration=dur2)
             clip2 = clip2.with_effects([vfx.Resize(zoom_effect2)])
@@ -2490,21 +2487,20 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 
                 alpha = rgba[..., 3].astype(np.float32)
                 
-                # Stronger erosion for cleaner edges
-                erode_kernel = np.ones((7, 7), np.uint8)
-                alpha_u8 = np.clip(alpha, 0, 255).astype(np.uint8)
-                alpha_u8 = cv2.erode(alpha_u8, erode_kernel, iterations=3)
-                alpha = alpha_u8.astype(np.float32)
-                
-                # Feathers
-                alpha = cv2.GaussianBlur(alpha, (5, 5), 0)
-                
-                # Decontamination
-                edge_mask = (alpha > 5) & (alpha < 250)
+                # Step 3: Local Color Decontamination
+                # Neutralize fringes by pulling local neighborhood colors from the avatar interior
+                edge_mask = (alpha > 5) & (alpha < 245)
                 if np.any(edge_mask):
-                    solid_mask = alpha > 252
-                    avg_color = np.mean(rgba[..., :3][solid_mask], axis=0) if np.any(solid_mask) else [128, 128, 128]
-                    rgba[..., :3][edge_mask] = avg_color
+                    # Use a dilated solid core to find the "safe" interior colors
+                    core_mask = (alpha > 250)
+                    if np.any(core_mask):
+                        # Simple local neighborhood pull: use the mean of the solid core
+                        # For high-performance, we use the global core mean but biased 
+                        # to remove the specific blue/white background contamination
+                        avg_subject_color = np.mean(rgba[..., :3][core_mask], axis=0)
+                        
+                        # Apply local correction to edge pixels
+                        rgba[..., :3][edge_mask] = rgba[..., :3][edge_mask] * 0.1 + avg_subject_color * 0.9
                 
                 rgba[..., 3] = np.clip(alpha, 0, 255).astype(np.uint8)
                 
@@ -2793,6 +2789,36 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                     accent_color=accent_color, frame_width=FRAME_W, frame_height=FRAME_H
                 )
                 
+                # ── SENTENCE POP ANIMATION ──
+                # Scale up briefly (1.05) when a new subtitle block starts
+                chunk_start = active_chunk["start"]
+                if 0 <= (t - chunk_start) <= 0.4:
+                    pop_p = (t - chunk_start) / 0.4
+                    # Scale curve: 1.0 -> 1.05 -> 1.0
+                    sub_scale = 1.0 + 0.05 * math.sin(pop_p * math.pi)
+                    
+                    sub_img_pil = Image.fromarray(np.array(subtitle_img))
+                    sw, sh = sub_img_pil.size
+                    new_w, new_h = int(sw * sub_scale), int(sh * sub_scale)
+                    sub_img_pil = sub_img_pil.resize((new_w, new_h), Image.LANCZOS)
+                    
+                    # Canvas to keep original size but centered scaled text
+                    canvas = Image.new("RGBA", (sw, sh), (0,0,0,0))
+                    offset_x = (sw - new_w) // 2
+                    offset_y = (sh - new_h) // 2
+                    canvas.paste(sub_img_pil, (offset_x, offset_y))
+                    subtitle_img = canvas
+
+        # ── HOOK TRANSITION BURST ──────────────────────────────────────────
+        # Inject high-impact transition exactly when the hook text fades (usually around 4s)
+        hook_end_time = 4.2 
+        if abs(t - hook_end_time) < 0.25:
+            # 1. Intense Glitch
+            bg_frame = _apply_intensive_glitch(bg_frame, intensity=1.2)
+            # 2. Flash Burst
+            bg_frame = bg_frame.astype(np.float32)
+            bg_frame = np.clip(bg_frame + 60, 0, 255).astype(np.uint8)
+            
         # ── RETENTION LAYERS: Script-Driven Engagement Cues ──────────────────
         retention_hooks = script_json.get("retention_cues", [])
         for cue in retention_hooks:
