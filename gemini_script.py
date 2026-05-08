@@ -15,7 +15,8 @@ SYSTEM_PERSONA = """Act as an elite Tech Content Creator and Architect.
 Your goal is to build high-retention technical insights.
 Style: conversational, fast pacing, curiosity-driven, no corporate tone, no filler, every sentence must increase curiosity.
 Avoid: greetings, introductions, 'today we will', buzzword overload, generic summaries.
-Biggest Retention Secret: Most viral Shorts are not informational. They are tension-release systems. The viewer keeps watching because the script continuously creates unanswered questions."""
+NO INFOGRAPHICS: Do not include infographics, flowcharts, or slides in the script structure.
+Biggest Retention Secret: Most viral Shorts are not informational. They are tension-release systems. The viewer keeps watching because the script continuously creates unanswered questions. """
 
 RESEARCH_AGENT_TEMPLATE = """{persona}
 
@@ -357,9 +358,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "breaking_news_level": 9,
   "retention_cues": [{{"timestamp": 3.0, "effect": "zoom_in", "reason": "hook_impact"}}],
   "subtitle_chunks": [{{
-      "chunk_id": 1, "text": "Sentence 1", "start": 0.00, "end": 3.50, 
-      "has_infographic": true, "infographic_type": "process|slide", 
-      "infographic_data": {{"steps": ["Step 1", "Step 2"]}} // If slide: {{"title": "Architecture", "bullet_points": ["Point 1", "Point 2"]}}
+      "chunk_id": 1, "text": "Sentence 1", "start": 0.00, "end": 3.50
   }}],
   "original_news_headline": "Exact headline",
   "original_news_url": "Direct article URL",

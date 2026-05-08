@@ -1630,14 +1630,15 @@ def _article_screenshot_clip(screenshot_path, duration):
     try:
         img = Image.open(screenshot_path).convert("RGBA")
         
-        # Target top 60% of screen with padding for rounded card look
+        # Premium 2026 Layout: Taller card that extends BEHIND the avatar
         pad = 40  # Horizontal padding from edges
-        target_h = int(FRAME_H * 0.58)
+        # Increased to 90% height so it sits behind the avatar at the bottom
+        target_h = int(FRAME_H * 0.90) 
         target_w = FRAME_W - (pad * 2)
         img = ImageOps.fit(img, (target_w, target_h), Image.LANCZOS)
         
-        # Apply rounded corners
-        corner_radius = 30
+        # Apply rounded corners for the 'card' aesthetic
+        corner_radius = 35
         rounded_mask = Image.new('L', (target_w, target_h), 0)
         ImageDraw.Draw(rounded_mask).rounded_rectangle([0, 0, target_w, target_h], corner_radius, fill=255)
         img.putalpha(rounded_mask)
@@ -1646,6 +1647,9 @@ def _article_screenshot_clip(screenshot_path, duration):
         mask = np.array(img.split()[3]).astype(float) / 255.0
         
         clips = []
+        
+        # Position centered vertically so it covers the area behind the avatar
+        y_pos = (FRAME_H - target_h) // 2
         
         # --- FIRST APPEARANCE: Evidence/Hook Phase ---
         start1 = 3.5
@@ -1664,7 +1668,7 @@ def _article_screenshot_clip(screenshot_path, duration):
             clip1 = clip1.with_mask(mclip1)
             clip1 = clip1.with_effects([vfx.Resize(zoom_effect1)])
             clip1 = clip1.cropped(width=target_w, height=target_h, x_center=target_w/2, y_center=target_h/2)
-            clip1 = clip1.with_position((pad, 30)).with_start(start1)  # Padded from edges + top margin
+            clip1 = clip1.with_position((pad, y_pos)).with_start(start1)
             clip1 = clip1.with_effects([vfx.CrossFadeIn(0.4), vfx.CrossFadeOut(0.4)])
             clips.append(clip1)
 
@@ -1677,7 +1681,7 @@ def _article_screenshot_clip(screenshot_path, duration):
             clip2 = clip2.with_mask(mclip2)
             clip2 = clip2.with_effects([vfx.Resize(zoom_effect2)])
             clip2 = clip2.cropped(width=target_w, height=target_h, x_center=target_w/2, y_center=target_h/2)
-            clip2 = clip2.with_position((pad, 30)).with_start(start2)  # Padded from edges + top margin
+            clip2 = clip2.with_position((pad, y_pos)).with_start(start2)
             clip2 = clip2.with_effects([vfx.CrossFadeIn(0.5), vfx.CrossFadeOut(0.5)])
             clips.append(clip2)
             
@@ -2671,22 +2675,14 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         engagement_clips.append(hook_overlay)
 
     # ── COMPOSITING ──
-    # Collect infographics logic
+    # Collect infographics logic — DISABLED (user requested removal)
     infographic_clips = []
-    for chunk in chunks:
-        if chunk.get("has_infographic") and chunk.get("infographic_type"):
-            iclip = _infographic_card_clip(
-                chunk.get("infographic_type"),
-                chunk.get("infographic_data", {}),
-                accent_color,
-                chunk.get("start", 0),
-                chunk.get("duration", 2),
-                audio_duration
-            )
-            if iclip:
-                infographic_clips.append(iclip)
+    # for chunk in chunks:
+    #     if chunk.get("has_infographic") and chunk.get("infographic_type"):
+    #         iclip = _infographic_card_clip(...)
+    #         if iclip: infographic_clips.append(iclip)
 
-    base_layers = bg_layer_clips + screenshot_clips + [gradient] + logo_clips + infographic_clips
+    base_layers = bg_layer_clips + screenshot_clips + [gradient] + logo_clips
     if flare_layer: base_layers.append(flare_layer)
     if grain_layer: base_layers.append(grain_layer)
     if avatar_pip: base_layers.append(avatar_pip)
