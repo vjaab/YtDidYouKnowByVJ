@@ -80,7 +80,7 @@ def _center_text(draw, text, font, y, color, card_x, card_w):
 
 
 # ── Common card frame ─────────────────────────────────────────────────────────
-def _draw_card_bg(draw, cx, cy, cw, ch, accent_color, border=2, radius=24):
+def _draw_card_bg(draw, cx, cy, cw, ch, accent_color, border=2, radius=24, fill=(15, 15, 15, 242)):
     """Draws the dark card background with accent border and shadow."""
     # Shadow
     draw.rounded_rectangle(
@@ -95,7 +95,7 @@ def _draw_card_bg(draw, cx, cy, cw, ch, accent_color, border=2, radius=24):
     # Inner fill
     draw.rounded_rectangle(
         [cx, cy, cx + cw, cy + ch],
-        radius=radius, fill=(15, 15, 15, 242)
+        radius=radius, fill=fill
     )
 
 
@@ -498,12 +498,12 @@ def _render_slide_card(data, accent_color, progress=1.0, is_longform=False):
     cx = (fw - cw) // 2
     cy = fcy - ch // 2
 
-    _draw_card_bg(draw, cx, cy, cw, ch, accent_color)
+    _draw_card_bg(draw, cx, cy, cw, ch, accent_color, fill=(240, 242, 248, 245))
     
     title = data.get("title", "Technical Architecture")
 
     ft = _eb(56 if is_longform else 48)
-    _center_text(draw, title, ft, cy + 40, (255, 255, 255, 255), cx, cw)
+    _center_text(draw, title, ft, cy + 40, (0, 0, 0, 255), cx, cw)
     
     line_w = int((cw - 100) * progress)
     if line_w > 0:
@@ -543,8 +543,7 @@ def _render_slide_card(data, accent_color, progress=1.0, is_longform=False):
                 dot_y = by + 22
                 draw.ellipse([line_x - 30, dot_y - 8, line_x - 14, dot_y + 8], fill=(*accent_color, alpha))
             
-            draw.text((line_x+2, by+2), b_line, font=fb, fill=(0,0,0,int(150*(alpha/255))))
-            draw.text((line_x, by), b_line, font=fb, fill=(240, 240, 240, alpha))
+            draw.text((line_x, by), b_line, font=fb, fill=(0, 0, 0, alpha))
             by += 50
         start_y = by + 30 # Space between bullets
 
@@ -565,10 +564,10 @@ def _render_process_card(data, accent_color, progress=1.0, is_longform=False):
     cx = (fw - cw) // 2
     cy = fcy - ch // 2
 
-    _draw_card_bg(draw, cx, cy, cw, ch, accent_color)
+    _draw_card_bg(draw, cx, cy, cw, ch, accent_color, fill=(240, 242, 248, 245))
     
     title = data.get("title", "Process Flow")
-    _center_text(draw, title, _eb(48 if not is_longform else 56), cy + 30, (255, 255, 255, 255), cx, cw)
+    _center_text(draw, title, _eb(48 if not is_longform else 56), cy + 30, (0, 0, 0, 255), cx, cw)
     
     start_y = cy + 120
     fn = _bold(38 if not is_longform else 44)
@@ -590,7 +589,7 @@ def _render_process_card(data, accent_color, progress=1.0, is_longform=False):
             draw.line([(cx + 80, ry + 60), (cx + 80, ry + row_h)], fill=(*accent_color, int(alpha*0.5)), width=4)
             
         # Draw step text
-        draw.text((cx + 140, ry + 12), str(step), font=fn, fill=(240, 240, 240, alpha))
+        draw.text((cx + 140, ry + 12), str(step), font=fn, fill=(0, 0, 0, alpha))
         
     return canvas
 

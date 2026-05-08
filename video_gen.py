@@ -969,7 +969,7 @@ def _render_flowchart_card(steps, accent_color, width=980, active_step=None):
             draw.rounded_rectangle([bx0, y0, bx1, y1], radius=20, outline=box_outline, width=4, fill=box_fill)
         
         # Step text (Centered)
-        t_color = (255, 255, 255, 255) if is_db else text_color
+        t_color = text_color
         tw, th = ts(step, f_step)
         draw.text((bx0 + box_w//2 - tw//2, y0 + step_h//2 - th//2 - 5), step, font=f_step, fill=t_color)
         
@@ -996,18 +996,18 @@ def _render_slide_card(title, bullets, accent_color, is_longform=False, active_s
     bg_img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     cdraw = ImageDraw.Draw(bg_img)
     
-    # Base dark blue gradient simulation
-    cdraw.rectangle([0, 0, w, h], fill=(0, 40, 120, 255))
+    # Base light 'tech-glass' background
+    cdraw.rectangle([0, 0, w, h], fill=(240, 242, 248, 255))
     
-    # Glowing cyan blobs for the light effect
-    cdraw.ellipse([w*0.3, h*0.1, w*1.2, h*1.5], fill=(0, 150, 255, 90))
-    cdraw.ellipse([w*0.5, h*0.3, w*1.0, h*1.0], fill=(0, 200, 255, 120))
+    # Glowing subtle blobs
+    cdraw.ellipse([w*0.3, h*0.1, w*1.2, h*1.5], fill=(200, 230, 255, 100))
+    cdraw.ellipse([w*0.5, h*0.3, w*1.0, h*1.0], fill=(220, 240, 255, 130))
     
-    # Cyber sweeping arcs
-    cdraw.arc([-w*0.2, -h*0.2, w*0.8, h*1.2], 270, 360, fill=(150, 220, 255, 100), width=6)
-    cdraw.arc([-w*0.1, -h*0.1, w*0.6, h*1.0], 270, 360, fill=(150, 220, 255, 60), width=3)
+    # Cyber sweeping arcs (Subtle gray-blue)
+    cdraw.arc([-w*0.2, -h*0.2, w*0.8, h*1.2], 270, 360, fill=(180, 200, 220, 80), width=6)
+    cdraw.arc([-w*0.1, -h*0.1, w*0.6, h*1.0], 270, 360, fill=(180, 200, 220, 50), width=3)
     
-    # Hex grid on the left
+    # Hex grid on the left (Subtle)
     hex_size = 30 if not is_longform else 45
     for row in range(int(h / (hex_size*1.5)) + 1):
         for col in range(7):
@@ -1020,12 +1020,12 @@ def _render_slide_card(title, bullets, accent_color, is_longform=False, active_s
             for i in range(6):
                 angle_rad = math.pi / 3 * i
                 points.append((cx + hex_size * math.cos(angle_rad), cy + hex_size * math.sin(angle_rad)))
-            cdraw.polygon(points, outline=(0, 200, 255, 50), width=3)
+            cdraw.polygon(points, outline=(180, 200, 255, 40), width=3)
 
-    # Dark gradient on right for text readability
+    # Gradient for text readability (Light to darker-light)
     for x in range(w):
-        alpha = int(160 * (x / w))
-        cdraw.line([(x, 0), (x, h)], fill=(0, 10, 40, alpha))
+        alpha = int(40 * (x / w))
+        cdraw.line([(x, 0), (x, h)], fill=(200, 210, 230, alpha))
             
     # Apply rounded corner mask to the entire generated background
     mask = Image.new("L", (w, h), 0)
@@ -1046,9 +1046,8 @@ def _render_slide_card(title, bullets, accent_color, is_longform=False, active_s
     # Tech style layout (Right aligned text)
     title_x = w - ttw - 50
     title_y = 50
-    # Draw text with subtle shadow
-    d.text((title_x+3, title_y+3), title, fill=(0,0,0,200), font=f_title)
-    d.text((title_x, title_y), title, fill=(255, 255, 255, 255), font=f_title)
+    # Draw text
+    d.text((title_x, title_y), title, fill=(0, 0, 0, 255), font=f_title)
     
     # Divider line
     d.line([(w // 2, 140), (w - 50, 140)], fill=(*accent_color, 255), width=4)
@@ -1072,8 +1071,7 @@ def _render_slide_card(title, bullets, accent_color, is_longform=False, active_s
                 dot_y = by + (25 if not is_longform else 35)
                 d.ellipse([line_x - 30, dot_y - 10, line_x - 10, dot_y + 10], fill=(*accent_color, 255))
             
-            d.text((line_x+2, by+2), line_text, font=f_bullet, fill=(0,0,0,150))
-            d.text((line_x, by), line_text, font=f_bullet, fill=(230, 240, 255, 255))
+            d.text((line_x, by), line_text, font=f_bullet, fill=(5, 5, 5, 255))
             by += 55 if not is_longform else 75
         by += 25
             
