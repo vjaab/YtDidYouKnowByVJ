@@ -352,6 +352,10 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "comment_hook": "Would you use this?"
 }}"""
 
+    # Inject any extra instructions (e.g. screenshot avoidance, length adjustments) into context
+    if extra_instruction:
+        news_context += f"\n\nADDITIONAL INSTRUCTIONS:\n{extra_instruction}\n"
+
     engine = MultiAgentGenerationEngine(client, news_context, slot, category, strategy_enhancement, is_longform)
     script_data = engine.execute(selection_instruction, prompt_requirements)
     

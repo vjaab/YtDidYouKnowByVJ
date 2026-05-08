@@ -133,6 +133,7 @@ def run_pipeline(topic_type="research"):
         log_message(f"⚠️ RSS Fetch failed: {e}")
 
     # ── STEP 3: Script Generation (with retry) ────────────────────────────────
+    # Screenshot is MANDATORY — if we can't capture it, we reject the topic and retry.
     attempts = 0
     script_data = None
     audio_path  = None
@@ -140,12 +141,24 @@ def run_pipeline(topic_type="research"):
     duration    = 0
     extra_instruction = ""
     min_dur, max_dur = TARGET_AUDIO_DURATION
+    failed_topics = []  # Track topics whose screenshots failed so Gemini avoids them
 
     while attempts < MAX_RETRY_ATTEMPTS:
-        log_message(f"STEP 3 (Attempt {attempts+1}): Gemini Searching & Generating Script...")
+        log_message(f"STEP 3 (Attempt {attempts+1}/{MAX_RETRY_ATTEMPTS}): Gemini Searching & Generating Script...")
+        
+        # Build avoidance instruction from failed screenshot topics
+        screenshot_avoid = ""
+        if failed_topics:
+            avoid_lines = "\n".join([f"- {t}" for t in failed_topics])
+            screenshot_avoid = (
+                f"\n\nCRITICAL: The following topics/URLs were REJECTED because their article screenshot could not be captured. "
+                f"DO NOT pick these again. Choose a DIFFERENT story:\n{avoid_lines}\n"
+            )
+        
+        combined_instruction = extra_instruction + screenshot_avoid
         
         script_data = pick_and_generate_script(
-            articles=rss_articles, extra_instruction=extra_instruction, forced_article=None, topic_type=topic_type
+            articles=rss_articles, extra_instruction=combined_instruction, forced_article=None, topic_type=topic_type
         )
 
         if not script_data:
@@ -160,6 +173,45 @@ def run_pipeline(topic_type="research"):
         script = script_data.get("script", "")
         log_message(f"Story: {script_data.get('original_news_headline')}")
         log_message(f"Breaking Level: {script_data.get('breaking_news_level')}")
+
+        # ── STEP 3b: Capture Article Screenshot FIRST (MANDATORY) ────────────
+        # Capture screenshot BEFORE audio to fail fast and avoid wasting API costs.
+        log_message("STEP 3b: Capturing article screenshot (MANDATORY — before audio)...")
+        news_url = script_data.get("original_news_url")
+        screenshot_captured = False
+        
+        if news_url:
+            screenshot_filename = f"screenshot_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            screenshot_path = capture_article_screenshot(news_url, screenshot_filename)
+            if screenshot_path:
+                script_data["screenshot_path"] = screenshot_path
+                log_message(f"✅ Main screenshot captured: {screenshot_path}")
+                screenshot_captured = True
+        
+        if not screenshot_captured:
+            # Screenshot is MANDATORY — reject this topic and try another
+            failed_headline = script_data.get("original_news_headline", title)
+            failed_url = news_url or "unknown"
+            failed_topics.append(f"{failed_headline} (URL: {failed_url})")
+            log_message(f"❌ Article screenshot FAILED for: {failed_headline}")
+            log_message(f"   URL was: {failed_url}")
+            log_message(f"   Rejecting this topic and picking a different one... ({len(failed_topics)} topics rejected so far)")
+            
+            # Reset — skip audio generation entirely for this topic
+            script_data = None
+            attempts += 1
+            continue
+
+        # ── STEP 3c: Capture Evidence Screenshot (optional) ──────────────────
+        evidence_url = script_data.get("use_case_evidence_url")
+        if evidence_url and "http" in evidence_url:
+            evidence_filename = f"evidence_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            evidence_path = capture_article_screenshot(evidence_url, evidence_filename)
+            if evidence_path:
+                script_data["evidence_screenshot_path"] = evidence_path
+                log_message(f"Evidence screenshot captured: {evidence_path}")
+        else:
+            log_message("No valid evidence URL found for secondary screenshot.")
 
         # ── STEP 4: Generate Audio + Word Timestamps ──────────────────────────
         log_message("STEP 4: Generating voiceover + word timestamps...")
@@ -209,32 +261,16 @@ def run_pipeline(topic_type="research"):
             continue
 
         log_message(f"Audio OK: {duration:.1f}s | {len(word_timestamps)} word timestamps")
-        break   # ← success
+        
+        break   # ← full success (script + screenshot + audio all OK)
 
     if not audio_path or not script_data or duration < min_dur:
         log_message("ERROR: Could not generate valid assets. Aborting.")
         return False
-
-    # ── STEP 4b: Capture Article & Evidence Screenshots ──────────────────────
-    log_message("STEP 4b: Capturing article and evidence screenshots...")
-    news_url = script_data.get("original_news_url")
-    evidence_url = script_data.get("use_case_evidence_url")
     
-    if news_url:
-        screenshot_filename = f"screenshot_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-        screenshot_path = capture_article_screenshot(news_url, screenshot_filename)
-        if screenshot_path:
-            script_data["screenshot_path"] = screenshot_path
-            log_message(f"Main screenshot captured: {screenshot_path}")
-            
-    if evidence_url and "http" in evidence_url:
-        evidence_filename = f"evidence_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-        evidence_path = capture_article_screenshot(evidence_url, evidence_filename)
-        if evidence_path:
-            script_data["evidence_screenshot_path"] = evidence_path
-            log_message(f"Evidence screenshot captured: {evidence_path}")
-    else:
-        log_message("No valid evidence URL found for secondary screenshot.")
+    if not script_data.get("screenshot_path"):
+        log_message("ERROR: Could not capture article screenshot after all retries. Aborting.")
+        return False
 
     # ── STEP 5: Build Visual Chunks ───────────────────────────────────────────
     log_message("STEP 5: Grouping words into visual chunks...")
