@@ -10,7 +10,7 @@ import requests
 from PIL import Image
 from datetime import datetime
 from google import genai
-from config import GEMINI_API_KEY, OUTPUT_DIR
+from config import GEMINI_API_KEY, OUTPUT_DIR, VEO_MODEL_ID
 import random
 
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")
@@ -167,133 +167,51 @@ def detect_topic(headline):
                 return topic
     return None
 
-def _search_pexels_videos(query, chunk_duration, dynamic_params=None):
-    if dynamic_params is None: dynamic_params = {}
-    if not PEXELS_API_KEY:
-        return []
+def _generate_veo_video(prompt, output_path, aspect_ratio="9:16"):
+    """Generates a video using Google Veo (async polling)."""
+    print(f"🎬 Generating Veo Video: {prompt[:80]}...")
     try:
-        orientation = dynamic_params.get("orientation", "portrait")
-        r = requests.get(
-            "https://api.pexels.com/videos/search",
-            headers={"Authorization": PEXELS_API_KEY},
-            params={"query": query, "per_page": 5, "orientation": orientation},
-            timeout=15
+        operation = client.models.generate_videos(
+            model=VEO_MODEL_ID,
+            prompt=prompt,
+            config=genai.types.GenerateVideosConfig(
+                aspect_ratio=aspect_ratio,
+            )
         )
-        if r.status_code != 200:
-            return []
         
-        results = []
-        for v in r.json().get("videos", []):
-            vid_id = v.get("id")
-            if vid_id in _used_media:
-                continue
-                
-            dur = v.get("duration", 0)
-            if dur < max(1.0, chunk_duration - 1.0):
-                continue
-                
-            # Extract title/description from URL
-            url_slug = v.get("url", "").split("/")[-2] if "pexels.com/video/" in v.get("url", "") else query
-            title = url_slug.replace("-", " ")
-            
-            # Find portrait link
-            files = v.get("video_files", [])
-            portrait_files = [f for f in files if f.get("width", 0) < f.get("height", 1) and f.get("height", 0) >= 720]
-            if not portrait_files:
-                portrait_files = sorted(files, key=lambda f: f.get("height", 0), reverse=True)
-                
-            if portrait_files:
-                results.append({
-                    "id": vid_id, 
-                    "link": portrait_files[0]["link"], 
-                    "desc": title, 
-                    "type": "video"
-                })
-        return results
-    except Exception as e:
-        print(f"Pexels video search error: {e}")
-    return []
+        attempts = 0
+        while not operation.done and attempts < 120: # Max 20 mins
+            time.sleep(10)
+            operation = client.operations.get(operation)
+            attempts += 1
+            if attempts % 6 == 0:
+                print(f"   ...still generating Veo video ({attempts*10}s)")
 
-def _search_pexels_photos(query, orientation="portrait"):
-    if not PEXELS_API_KEY:
-        return []
-    try:
-        r = requests.get(
-            "https://api.pexels.com/v1/search",
-            headers={"Authorization": PEXELS_API_KEY},
-            params={"query": query, "per_page": 5, "orientation": orientation},
-            timeout=15
-        )
-        if r.status_code != 200:
-            return []
-            
-        results = []
-        for p in r.json().get("photos", []):
-            pid = p.get("id")
-            if pid in _used_media:
-                continue
-            
-            alt = p.get("alt", query)
-            url = p.get("src", {}).get("large2x") or p.get("src", {}).get("large")
-            if url:
-                results.append({
-                    "id": pid,
-                    "link": url,
-                    "desc": alt,
-                    "type": "photo"
-                })
-        return results
-    except Exception as e:
-        print(f"Pexels photo search error: {e}")
-    return []
+        if operation.error:
+            print(f"❌ Veo Operation Failed: {operation.error}")
+            return None
 
-def _download_video(url, output_path):
-    try:
-        r = requests.get(url, timeout=60, stream=True)
-        if r.status_code == 200:
-            with open(output_path, "wb") as f:
-                for chunk in r.iter_content(65536):
-                    f.write(chunk)
-            return output_path
-        return None
+        if operation.result and hasattr(operation.result, 'generated_videos') and operation.result.generated_videos:
+            gen_video = operation.result.generated_videos[0]
+            video = gen_video.video if hasattr(gen_video, 'video') else gen_video
+            
+            if hasattr(video, 'video_bytes') and video.video_bytes:
+                with open(output_path, "wb") as f:
+                    f.write(video.video_bytes)
+                return output_path
+            elif hasattr(video, 'uri') and video.uri:
+                # If it's a URI, we need to download it with the API key
+                r = requests.get(video.uri, headers={"x-goog-api-key": GEMINI_API_KEY})
+                if r.status_code == 200:
+                    with open(output_path, "wb") as f:
+                        f.write(r.content)
+                    return output_path
+        print(f"⚠️ Veo operation finished but no video found. Result: {operation.result}")
     except Exception as e:
-        print(f"Video download err: {e}")
-        return None
+        print(f"⚠️ Veo generation failed: {e}")
+    return None
 
-def _download_photo(url, output_path, is_longform=False):
-    try:
-        r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=20)
-        if r.status_code == 200:
-            img = Image.open(io.BytesIO(r.content)).convert("RGB")
-            w, h = img.size
-            if is_longform:
-                # Target 16:9 landscape
-                target_w = int(h * 16 / 9)
-                if target_w <= w:
-                    left = (w - target_w) // 2
-                    img = img.crop((left, 0, left + target_w, h))
-                else:
-                    target_h = int(w * 9 / 16)
-                    top = (h - target_h) // 2
-                    img = img.crop((0, top, w, top + target_h))
-                img = img.resize((1920, 1080))
-            else:
-                # Target 9:16 portrait
-                target_h = int(w * 16 / 9)
-                if target_h <= h:
-                    top = (h - target_h) // 2
-                    img = img.crop((0, top, w, top + target_h))
-                else:
-                    target_w = int(h * 9 / 16)
-                    left = (w - target_w) // 2
-                    img = img.crop((left, 0, left + target_w, h))
-                img = img.resize((1080, 1920))
-            img.save(output_path, "JPEG", quality=90)
-            return output_path
-        return None
-    except Exception as e:
-        print(f"Photo download err: {e}")
-        return None
+# Pexels Stock Footage functions removed in favor of Generative AI.
 
 # ─────────────────────────────────────────────────────────────────────────────
 # STEP E: Imagen 3
@@ -411,55 +329,32 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
         print(f"Chunk {cid} -> Nanobanana Image Generated: 10/10")
         return chunk
 
-    # ── STEP D: Pexels VIDEOS (Fallback) ─────────────────────────────────
-    for query in [primary_q, fallback_q]:
-        videos = _search_pexels_videos(query, dur, dynamic_params={"orientation": orientation})
-        best_vid = None
-        best_score = -1
-        
-        for v in videos[:3]:  # Limit to top 3 to reduce API calls
-            score = score_relevance(text, v["desc"])
-            if score >= 5:  # Lowered threshold to avoid excessive retries
-                if score > best_score:
-                    best_score = score
-                    best_vid = v
-        
-        if best_vid:
-            path = _download_video(best_vid["link"], video_out)
-            if path:
-                with _download_lock:
-                    _used_media.add(best_vid["id"])
-                chunk["visual_path"] = path
-                chunk["visual_type"] = "video"
-                chunk["relevance_score"] = best_score
-                chunk["source"] = f"Step D: Pexels Video ({query})"
-                print(f"Chunk {cid} -> STEP D (Pexels Video): {best_score}/10")
-                return chunk
+    # ── STEP D: Google VEO Video ─────────────────────────────────────────
+    print(f"Chunk {cid} -> STEP D: Google Veo Video generation")
+    
+    # Craft a cinematic prompt for Veo
+    veo_prompt = f"""Cinematic 9:16 vertical video of {text}. 
+    Style: {global_style_guide}. 
+    High detail, 4k, professional lighting, news editorial vibe, no text, no watermarks."""
+    
+    path = _generate_veo_video(veo_prompt, video_out, aspect_ratio=orientation)
+    if path:
+        chunk["visual_path"] = path
+        chunk["visual_type"] = "video"
+        chunk["relevance_score"] = 10
+        chunk["source"] = "Step D: Google Veo"
+        return chunk
 
-    # ── STEP E: Pexels PHOTOS (Ultimate Fallback) ────────────────────────
-    for query in [primary_q, fallback_q]:
-        photos = _search_pexels_photos(query, orientation=orientation)
-        best_photo = None
-        best_score = -1
-        
-        for p in photos[:3]:  # Limit to top 3 to reduce API calls
-            score = score_relevance(text, p["desc"])
-            if score >= 5:  # Lowered threshold
-                if score > best_score:
-                    best_score = score
-                    best_photo = p
-                    
-        if best_photo:
-            path = _download_photo(best_photo["link"], photo_out, is_longform=is_longform)
-            if path:
-                with _download_lock:
-                    _used_media.add(best_photo["id"])
-                chunk["visual_path"] = path
-                chunk["visual_type"] = "photo"
-                chunk["relevance_score"] = best_score
-                chunk["source"] = f"Step E: Pexels Photo ({query})"
-                print(f"Chunk {cid} -> STEP E (Pexels Photo): {best_score}/10")
-                return chunk
+    # ── STEP E: Imagen 3 Ultimate Fallback ───────────────────────────────
+    print(f"Chunk {cid} -> STEP E: Imagen 3 Ultimate Fallback")
+    img_prompt = f"Professional technical studio photography of {text}. {global_style_guide}."
+    path = _generate_imagen3(text, photo_out, topic_context, global_style_guide)
+    if path:
+        chunk["visual_path"] = path
+        chunk["visual_type"] = "photo"
+        chunk["relevance_score"] = 7
+        chunk["source"] = "Step E: Imagen 3 Fallback"
+        return chunk
         
     chunk["visual_path"] = None
     chunk["visual_type"] = None

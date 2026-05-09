@@ -9,6 +9,8 @@ NEWS_API_KEY = os.getenv("NEWS_API_KEY", "")
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
 ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "")
 YOUTUBE_CLIENT_SECRET_FILE = os.getenv("YOUTUBE_CLIENT_SECRET_FILE", "client_secret.json")
+VEO_MODEL_ID = "veo-3.1-generate-preview"
+
 
 # Directory Paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
