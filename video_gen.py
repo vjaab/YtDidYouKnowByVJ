@@ -74,18 +74,33 @@ FONT_PATHS = [
 ]
 _fc = {}
 
-def gf(size):
-    if size not in _fc:
+def gf(size, bold=False, italic=False):
+    key = (size, bold, italic)
+    if key not in _fc:
+        # Prioritize specific fonts for bold/italic if available
+        search_paths = []
+        if italic:
+            search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Montserrat-Italic.ttf"))
+        if bold:
+            search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Montserrat-ExtraBold.ttf"))
+            search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Montserrat-Bold.ttf"))
+        
+        # Add the rest of the default paths
         for p in FONT_PATHS:
+            if p not in search_paths:
+                search_paths.append(p)
+                
+        for p in search_paths:
             if os.path.exists(p):
                 try:
-                    _fc[size] = ImageFont.truetype(p, size)
+                    _fc[key] = ImageFont.truetype(p, size)
                     break
                 except Exception:
                     pass
-        if size not in _fc:
-            _fc[size] = ImageFont.load_default()
-    return _fc[size]
+        
+        if key not in _fc:
+            _fc[key] = ImageFont.load_default()
+    return _fc[key]
 
 def ts(text, font):
     bb = font.getbbox(text)
