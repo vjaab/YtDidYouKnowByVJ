@@ -2058,7 +2058,8 @@ def wrap_text_to_lines(words, word_widths, max_width, font):
     current_w = 0
     space_w = 12
     for word, w in zip(words, word_widths):
-        if not current_line or current_w + w <= max_width:
+        # Enforce max 2 words per line (High-Velocity Captions)
+        if not current_line or (current_w + w <= max_width and len(current_line) < 2):
             current_line.append(word)
             current_w += w + space_w
         else:
@@ -2116,6 +2117,11 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
             is_active = wd["is_active"]
             scale = wd.get("scale", 1.0)
             
+            # ── PROGRAMMATIC COLOR CODING (Keyword Highlighting) ──
+            clean_word = word_text.lower().strip(".,!?\"'")
+            tech_keywords = {"model", "speed", "cost", "nvidia", "agent", "llm", "rag", "ai", "fast", "cheaper"}
+            is_keyword = clean_word in tech_keywords
+            
             # ── DYNAMIC COLORING & POP (Hormozi Style) ──
             if is_active:
                 c_fill = (*accent_color, 255)
@@ -2143,8 +2149,11 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
                 img.alpha_composite(rotated_word, dest=(cur_x - (rotated_word.width - word_widths[word_idx])//2, 
                                                        line_y - (rotated_word.height - line_h)//2))
             else:
-                # All non-active words are pure white for maximum readability
-                c_fill = (255, 255, 255, 255)
+                # All non-active words are pure white, EXCEPT keywords which get Neon Green/Yellow
+                if is_keyword:
+                    c_fill = (0, 255, 127, 255) # Neon Green
+                else:
+                    c_fill = (255, 255, 255, 255)
                 draw.text((cur_x, line_y + 2), word_text, font=f_main, fill=c_fill)
             
             cur_x += word_widths[word_idx] + 18

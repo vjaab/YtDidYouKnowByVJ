@@ -11,15 +11,17 @@ from ecosystem_logic import get_slot_info, get_category_prompt_enhancement
 
 # ── PROMPT TEMPLATES (AGENTIC LOOP) ────────────────────────────────────────
 
-SYSTEM_PERSONA = """Act as an elite Tech Content Creator and Architect.
-Your goal is to build high-retention technical insights.
-Style: conversational, fast pacing, curiosity-driven, no corporate tone, every sentence must increase curiosity.
-Avoid: greetings, introductions, 'today we will', buzzword overload, generic summaries.
-NO INFOGRAPHICS: Do not include infographics, flowcharts, or slides in the script structure.
+SYSTEM_PERSONA = """Role: You are an expert AI Research Content Creator specialized in viral, high-retention YouTube Shorts.
+Your goal is to convert complex engineering papers into "snackable" scripts that hit 1k+ views by maximizing "Swipe-to-Watch" ratios.
+Tone: "Discipline beats motivation" — focus on technical utility and efficiency. Professional but high-energy.
+Constraint Checklist:
+- No Fluff: Remove "In this video," "Hello everyone," or "Today we explore."
+- NO INFOGRAPHICS: Do not include infographics, flowcharts, or slides in the script structure.
+- VOCAL DYNAMICS: You MUST use heavy punctuation (commas, ellipses '...', exclamation marks, italics, ALL CAPS) around key technical terms and transitions. The TTS engine relies entirely on punctuation to vary pitch and emphasis. Never use plain unpunctuated sentences for important points.
 SUCCESS PATTERNS (2026): 
-- HOOKS: Focus on "Fear of Privacy Leaks" or "Shadow AI" dangers. This is your highest-retention hook style.
-- ANALOGIES: Use sharp analogies (e.g., 'Scalpel vs. Sledgehammer') at the 40s mark to reset the viewer's attention span.
-- CTAs: Must be provocative or high-tension questions to drive comments. Avoid generic "What do you think?". """
+- HOOKS: Focus on "Fear of Privacy Leaks" or "Shadow AI" dangers. Start with a "Result-First" statement.
+- ANALOGIES: Use sharp analogies to explain complex breakthroughs.
+- CTAs: Must be provocative or high-tension questions to drive comments. """
 
 RESEARCH_AGENT_TEMPLATE = """{persona}
 
@@ -342,8 +344,8 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
             "2. MUST be explainable in exactly <40s of dense technically-accurate speech (approx 120-140 words total).\n"
             "3. MUST contain one concrete takeaway or engineering tip the viewer can use today.\n"
             "4. PRIORITIZE: Documentation 'Easter Eggs', cost-saving architecture (Local models), or workflow 'unfair advantages' (Agentic loops).\n"
-            "5. VOCAL DYNAMICS: You MUST use heavy punctuation (commas, ellipses '...', exclamation marks, italics, ALL CAPS) around key technical terms and transitions. The TTS engine relies entirely on punctuation to vary pitch and emphasis. Never use plain unpunctuated sentences for important points.\n\n"
-            "FORMAT: You MUST follow the strict 6-part structure: Hook -> Why It Matters -> Core Content (1-2 items) -> Workflow -> Caveat -> Starting Point -> Outro.\n\n"
+            "5. PACING: Keep sentences short (under 12 words) for better TTS pacing and Micro-Cut boundaries.\n\n"
+            "FORMAT: You MUST follow the strict 5-part structure: Hook -> Problem -> Solution -> Retention Loop -> Call to Action.\n\n"
             "CONTENT MIX (Algorithm Target):\n"
             "- 30% Practical AI Tools (Automation, Dev tools, SDKs).\n"
             "- 40% Frontier AI Model Releases (OpenAI, DeepMind, Anthropic benchmarks).\n"
@@ -354,18 +356,16 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
         )
         prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
 {{
-  "title_options": ["Title idea 1", "Title idea 2", "Title idea 3"],
+  "title_options": ["Title Case + Emoji + Curiosity Gap 1", "Title Case + Emoji + Curiosity Gap 2"],
   "description": "Full 100+ word rich SEO description for youtube describing the video, including timestamps and credits.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
   "title": "Punchy YouTube title max 60 chars",
-  "hook_script": "5-second personal story / problem setup (approx 15 words). Stark contrast, direct eye contact feel.",
-  "section_1_why_it_matters": "Context, data point, and common mistake (approx 15 words).",
-  "section_2_core_content": "Break down 1-2 specific tools, architectural principles, or tips. Give specific prompts/formulas for each (approx 40 words).",
-  "section_3_workflow": "A step-by-step chaining of the core content on a real problem. Fast paced (approx 20 words).",
-  "section_4_caveat": "The critical mistake to avoid. Serious tone (approx 10 words).",
-  "section_5_starting_point": "One immediate action to take today (approx 10 words).",
-  "outro_cta": "Subscribe and comment prompt.",
-  "script": "The FULL unified voiceover script seamlessly concatenating hook_script, section_1, section_2, section_3, section_4, section_5, and outro_cta into ONE single flowing text block. Target total duration: 38-44 sec (approx 120-140 words).",
+  "hook_script": "The Hook (0-3s): Start with a Result-First statement. Do not introduce the paper title immediately. Focus on impact (e.g., '90% cheaper', '10x faster'). Approx 10 words.",
+  "problem_context": "The Problem (3-10s): Briefly state the bottleneck this research solves. Approx 20 words.",
+  "solution_tech": "The Solution (10-45s): Explain the core technical breakthrough using analogies. Keep sentences UNDER 12 words. Approx 80 words.",
+  "retention_loop": "The Retention Loop (45-55s): End with a cliffhanger or a seamless bridge that leads back to the start of the video. Approx 15 words.",
+  "outro_cta": "Call to Action: Include one engagement trigger (e.g., 'Check the pinned repo' or 'Drop a comment if you'd use this'). Approx 10 words.",
+  "script": "The FULL unified voiceover script seamlessly concatenating hook_script, problem_context, solution_tech, retention_loop, and outro_cta into ONE single flowing text block. Target total duration: 38-44 sec (approx 120-140 words).",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://github.com/...", "https://arxiv.org/abs/..."],
   "phonetic_pronunciation_map": {{"NVIDIA": "In-vid-yah"}},
@@ -375,13 +375,13 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "breaking_news_level": 9,
   "retention_cues": [{{"timestamp": 3.0, "effect": "zoom_in", "reason": "hook_impact"}}],
   "subtitle_chunks": [{{
-      "chunk_id": 1, "text": "Sentence 1", "start": 0.00, "end": 3.50
+      "chunk_id": 1, "text": "Sentence 1", "start": 0.00, "end": 2.50
   }}],
   "original_news_headline": "Exact headline",
   "original_news_url": "Direct article URL",
   "keywords": ["AI"],
-  "hashtags": ["#AI", "#CyberSecurity", "#DataPrivacy", "#TechNews"],
-  "comment_hook": "Provocative question to drive engagement (e.g. 'Which department at your job is leaking the most data?')"
+  "hashtags": ["#AI", "#Tech", "#MachineLearning", "#Python", "#OpenAI"],
+  "comment_hook": "A custom question targeting the seed audience: 'Which part of this architecture surprised you most? Let's discuss! 👇'"
 }}"""
 
     # Inject any extra instructions (e.g. screenshot avoidance, length adjustments) into context

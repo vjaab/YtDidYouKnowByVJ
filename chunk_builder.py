@@ -72,9 +72,9 @@ def build_chunks(word_timestamps, subtitle_chunks):
     return final_chunks
 
 def _fallback_build_chunks(word_timestamps):
-    MIN_DURATION  = 2.0
-    MAX_DURATION  = 7.0
-    TARGET_WORDS  = 5
+    MIN_DURATION  = 1.0
+    MAX_DURATION  = 2.5
+    TARGET_WORDS  = 2
 
     chunks = []
     current_words = []
