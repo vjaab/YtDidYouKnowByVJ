@@ -75,21 +75,28 @@ FONT_PATHS = [
 _fc = {}
 
 def gf(size, bold=False, italic=False):
+    """
+    Global Font Loader with caching and fallback weights.
+    Ensures that 'bold=True' requests actually return a bold font variant.
+    """
     key = (size, bold, italic)
     if key not in _fc:
-        # Prioritize specific fonts for bold/italic if available
         search_paths = []
+        
+        # 1. Prioritize specific fonts for bold/italic if available in assets
         if italic:
             search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Montserrat-Italic.ttf"))
         if bold:
+            # Try ExtraBold first, then standard Bold
             search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Montserrat-ExtraBold.ttf"))
             search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Montserrat-Bold.ttf"))
         
-        # Add the rest of the default paths
+        # 2. Add the rest of the system/default paths
         for p in FONT_PATHS:
             if p not in search_paths:
                 search_paths.append(p)
                 
+        # 3. Load first available
         for p in search_paths:
             if os.path.exists(p):
                 try:
@@ -98,18 +105,22 @@ def gf(size, bold=False, italic=False):
                 except Exception:
                     pass
         
+        # 4. Final Fallback
         if key not in _fc:
             _fc[key] = ImageFont.load_default()
+            
     return _fc[key]
 
 def ts(text, font):
     bb = font.getbbox(text)
     return bb[2] - bb[0], bb[3] - bb[1]
 
-def get_cinematic_font(size, italic=False):
-    # Premium 2026 Spec: Stick to Bold Sans-Serif for high authority/retention.
-    # Avoiding Serif fonts as they look dated in tech content.
-    return gf(size)
+def get_cinematic_font(size, bold=True, italic=False):
+    """
+    Premium 2026 Spec: High-authority Sans-Serif.
+    Defaults to bold=True for impact.
+    """
+    return gf(size, bold=bold, italic=italic)
 
 
 # ── Ken Burns ─────────────────────────────────────────────────────────────────
@@ -2012,7 +2023,7 @@ def wrap_text_to_lines(words, word_widths, max_width, font):
         lines.append(current_line)
     return lines
 
-def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), frame_width=1080, frame_height=1920):
+def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), frame_width=1080, frame_height=1920, y_shift=0):
     """Premium 'Obsidian' captions: Bold Sans-Serif on dark blocks."""
     img = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
     draw = ImageDraw.Draw(img)
@@ -2036,7 +2047,8 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     line_h = int(100 * scale_ratio)
     
     # 2026 Positioning: Centered vertically (50% height) to match the reference Short style
-    start_y = int(frame_height * 0.50)
+    # Apply y_shift from audit feedback
+    start_y = int(frame_height * 0.50) + y_shift
     
     
     word_idx = 0
@@ -2793,7 +2805,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             if word_status_list:
                 subtitle_img = render_subtitle_frame(
                     word_status_list, bg_frame=bg_frame, 
-                    accent_color=accent_color, frame_width=FRAME_W, frame_height=FRAME_H
+                    accent_color=accent_color, frame_width=FRAME_W, frame_height=FRAME_H,
+                    y_shift=subtitle_y_shift
                 )
                 
                 # ── SENTENCE POP ANIMATION ──
