@@ -115,6 +115,52 @@ def ts(text, font):
     bb = font.getbbox(text)
     return bb[2] - bb[0], bb[3] - bb[1]
 
+def _prepare_screenshot_canvas(img, target_w, target_h):
+    """
+    Creates a premium 'Blurred Backdrop' canvas for wide screenshots.
+    Ensures the original image is fully visible (contained) in the center.
+    """
+    # 1. Create heavily blurred background (scaled to fill)
+    bg = ImageOps.fit(img, (target_w, target_h), Image.LANCZOS)
+    bg = bg.filter(ImageFilter.GaussianBlur(radius=45))
+    bg = bg.point(lambda p: p * 0.45) # Darken backdrop
+    
+    # 2. Prepare foreground (scaled to fit)
+    iw, ih = img.size
+    scale = min(target_w / iw, target_h / ih) * 0.92 # Slightly smaller for breathing room
+    fw, fh = int(iw * scale), int(ih * scale)
+    fg = img.resize((fw, fh), Image.LANCZOS).convert("RGBA")
+    
+    # 3. Add premium drop shadow/glow to foreground
+    shadow_pad = 20
+    shadow_img = Image.new("RGBA", (fw + shadow_pad*2, fh + shadow_pad*2), (0,0,0,0))
+    s_draw = ImageDraw.Draw(shadow_img)
+    s_draw.rectangle([shadow_pad, shadow_pad, fw+shadow_pad, fh+shadow_pad], fill=(0,0,0,180))
+    shadow_img = shadow_img.filter(ImageFilter.GaussianBlur(radius=15))
+    
+    # 4. Composite
+    canvas = bg.convert("RGBA")
+    canvas.paste(shadow_img, ((target_w - shadow_img.width)//2, (target_h - shadow_img.height)//2), shadow_img)
+    canvas.paste(fg, ((target_w - fw)//2, (target_h - fh)//2), fg)
+    
+    return canvas.convert("RGB")
+
+def _crop_to_circle(img, border_color=(255, 214, 0), border_width=4):
+    """Crops an image into a circle with a premium border."""
+    img = img.convert("RGBA")
+    w, h = img.size
+    mask = Image.new("L", (w, h), 0)
+    draw = ImageDraw.Draw(mask)
+    draw.ellipse((0, 0, w, h), fill=255)
+    
+    result = Image.new("RGBA", (w, h), (0,0,0,0))
+    result.paste(img, (0, 0), mask=mask)
+    
+    # Add border
+    draw_result = ImageDraw.Draw(result)
+    draw_result.ellipse((0, 0, w, h), outline=border_color, width=border_width)
+    return result
+
 def get_cinematic_font(size, bold=True, italic=False):
     """
     Premium 2026 Spec: High-authority Sans-Serif.
@@ -1651,23 +1697,24 @@ def easeInOutQuad(t):
 
 def _article_screenshot_clip(screenshot_path, duration):
     """
-    Transformative logic: Shows the source article as a full-screen bleed evidence backdrop.
-    Uses S-Curve easing for cinematic motion.
+    Transformative logic: Shows the source article as a full-screen backdrop.
+    Now uses a blurred canvas to ensure the entire article is visible without edge clipping.
     """
     if not screenshot_path or not os.path.exists(screenshot_path):
         return []
     try:
         img = Image.open(screenshot_path).convert("RGB")
         target_h, target_w = FRAME_H, FRAME_W
-        img = ImageOps.fit(img, (target_w, target_h), Image.LANCZOS)
-        arr = np.array(img)
+        
+        # Use our new premium canvas helper
+        canvas = _prepare_screenshot_canvas(img, target_w, target_h)
+        arr = np.array(canvas)
         clips = []
         
         # --- PHASE 1: Hook Evidence ---
         start1, dur1 = 3.0, 8.0
         if duration > start1:
             def zoom_effect1(t):
-                # Apply Ease-In-Out to the zoom factor
                 progress = easeInOutQuad(min(1.0, t / dur1))
                 return 1.0 + 0.10 * progress
                 
@@ -1701,18 +1748,17 @@ def _article_screenshot_clip(screenshot_path, duration):
 def _evidence_screenshot_clip(evidence_path, duration):
     """
     Shows a secondary 'Evidence' or 'Use Case' screenshot during the analytical section.
+    Ensures entire image is visible via blurred backdrop.
     """
     if not evidence_path or not os.path.exists(evidence_path):
         return []
     try:
         img = Image.open(evidence_path).convert("RGB")
+        target_h, target_w = FRAME_H, FRAME_W
         
-        # Full screen bleed for secondary evidence
-        target_h = FRAME_H
-        target_w = FRAME_W
-        img = ImageOps.fit(img, (target_w, target_h), Image.LANCZOS)
-        
-        arr = np.array(img)
+        # Use the premium canvas helper
+        canvas = _prepare_screenshot_canvas(img, target_w, target_h)
+        arr = np.array(canvas)
         
         start = 28.0 
         dur = min(6.0, duration - start - 5.0)
@@ -2068,18 +2114,38 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
         for word_text in line:
             wd = word_data[word_idx]
             is_active = wd["is_active"]
+            scale = wd.get("scale", 1.0)
             
-            # ── DYNAMIC COLORING (Hormozi Style) ──
+            # ── DYNAMIC COLORING & POP (Hormozi Style) ──
             if is_active:
                 c_fill = (*accent_color, 255)
-                # Subtle glow for active word
-                for dx, dy in [(-2,0),(2,0),(0,-2),(0,2)]:
-                    draw.text((cur_x+dx, line_y+2+dy), word_text, font=f_main, fill=(*accent_color, 150))
+                # Use scaled font for the active "pop" word
+                f_active = gf(int(base_size * scale), bold=True)
+                
+                # Active word gets a slight random tilt for energy
+                word_img = Image.new("RGBA", (int(word_widths[word_idx] * 2), int(line_h * 2)), (0,0,0,0))
+                w_draw = ImageDraw.Draw(word_img)
+                
+                # Center point for rotation
+                center = (word_widths[word_idx], line_h)
+                
+                # Draw with glow
+                import time
+                for dx, dy in [(-3,0),(3,0),(0,-3),(0,3)]:
+                    w_draw.text((center[0]+dx, center[1]+dy), word_text, font=f_active, fill=(*accent_color, 100), anchor="mm")
+                w_draw.text(center, word_text, font=f_active, fill=c_fill, anchor="mm")
+                
+                # Random tilt between -3 and 3 degrees
+                tilt = math.sin(time.time() * 10 + word_idx) * 3 
+                rotated_word = word_img.rotate(tilt, resample=Image.BICUBIC, expand=True)
+                
+                # Paste onto main image
+                img.alpha_composite(rotated_word, dest=(cur_x - (rotated_word.width - word_widths[word_idx])//2, 
+                                                       line_y - (rotated_word.height - line_h)//2))
             else:
                 # All non-active words are pure white for maximum readability
                 c_fill = (255, 255, 255, 255)
-            
-            draw.text((cur_x, line_y + 2), word_text, font=f_main, fill=c_fill)
+                draw.text((cur_x, line_y + 2), word_text, font=f_main, fill=c_fill)
             
             cur_x += word_widths[word_idx] + 18
             word_idx += 1
@@ -2588,41 +2654,50 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     if flare_layer: base_layers.append(flare_layer)
     if grain_layer: base_layers.append(grain_layer)
     if avatar_pip: base_layers.append(avatar_pip)
-    # ── LOGO BRANDING OVERLAY ──────────────────────────────────────────
-    # Place company logo in the top-right corner if available
-    branding_added = False
-    for ent_list_key in ["companies", "key_entities"]:
+    # ── LOGO BRANDING OVERLAY STACK ────────────────────────────────────
+    # Place multiple logos/photos in the top-right corner
+    branding_entities = []
+    # Collect up to 4 entities to avoid overcrowding
+    for ent_list_key in ["people", "companies", "key_entities"]:
         for ent in script_json.get(ent_list_key, []):
-            lp = ent.get("local_logo_path")
+            if len(branding_entities) >= 4: break
+            
+            lp = ent.get("local_logo_path") or ent.get("local_image_path")
             if lp and os.path.exists(lp):
-                try:
-                    logo_img = Image.open(lp).convert("RGBA")
-                    # Clearbit logos are often centered on white, so we wrap in a premium card
-                    card_size = 180
-                    # Standardize logo size within the card
-                    lw, lh = logo_img.size
-                    max_dim = max(lw, lh)
-                    scale = (card_size - 60) / max_dim
-                    logo_img = logo_img.resize((int(lw * scale), int(lh * scale)), Image.LANCZOS)
-                    
-                    canvas = Image.new("RGBA", (card_size, card_size), (0,0,0,0))
-                    draw = ImageDraw.Draw(canvas)
-                    # Premium white glass card
-                    draw.rounded_rectangle([0, 0, card_size, card_size], radius=35, fill=(255,255,255,235))
-                    # Center the logo in the card
-                    lx = (card_size - logo_img.width) // 2
-                    ly = (card_size - logo_img.height) // 2
-                    canvas.paste(logo_img, (lx, ly), logo_img if logo_img.mode == 'RGBA' else None)
-                    
-                    branding_clip = ImageClip(np.array(canvas)).with_duration(audio_duration)
-                    branding_clip = branding_clip.with_position((FRAME_W - card_size - 50, 70))
-                    branding_clip = branding_clip.with_effects([vfx.CrossFadeIn(0.6)])
-                    base_layers.append(branding_clip)
-                    branding_added = True
-                    break
-                except Exception as e:
-                    print(f"Branding overlay failed for {ent.get('name')}: {e}")
-        if branding_added: break
+                branding_entities.append((ent.get("name", "Entity"), lp, ent_list_key == "people"))
+    
+    card_size = 130 # Slightly smaller for stack
+    margin = 30
+    current_y = 80
+    
+    for i, (name, path, is_person) in enumerate(branding_entities):
+        try:
+            img = Image.open(path).convert("RGBA")
+            if is_person:
+                # Circular crop for people
+                img = ImageOps.fit(img, (card_size, card_size), Image.LANCZOS)
+                img = _crop_to_circle(img, border_color=accent_color)
+            else:
+                # Rounded card for companies/models
+                lw, lh = img.size
+                scale = (card_size - 40) / max(lw, lh)
+                img = img.resize((int(lw * scale), int(lh * scale)), Image.LANCZOS)
+                canvas = Image.new("RGBA", (card_size, card_size), (0,0,0,0))
+                draw = ImageDraw.Draw(canvas)
+                draw.rounded_rectangle([0, 0, card_size, card_size], radius=25, fill=(255,255,255,230))
+                canvas.paste(img, ((card_size - img.width)//2, (card_size - img.height)//2), img if img.mode == 'RGBA' else None)
+                img = canvas
+            
+            b_clip = ImageClip(np.array(img)).with_duration(audio_duration)
+            # Staggered entry (0.5s apart)
+            entry_delay = 0.5 + (i * 0.5)
+            b_clip = b_clip.with_position((FRAME_W - card_size - 50, current_y)).with_start(entry_delay)
+            b_clip = b_clip.with_effects([vfx.CrossFadeIn(0.5)])
+            base_layers.append(b_clip)
+            
+            current_y += card_size + margin
+        except Exception as e:
+            print(f"Branding failed for {name}: {e}")
 
     base_layers.append(disclosure)
     base_layers.extend(engagement_clips)
@@ -2704,21 +2779,21 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             except Exception as e:
                 print(f"SFX load failed for {ctype} (non-fatal): {e}")
                 
-    # Auto-inject SFX for infographics
+    # Auto-inject SFX for infographics and subtitle transitions
     for chunk in chunks:
-        if chunk.get("has_infographic"):
-            cue_ts = chunk["start"]
-            sfx_path = os.path.join(ASSETS_DIR, "sfx", "woosh.wav")
-            if os.path.exists(sfx_path) and cue_ts < audio_duration:
-                try:
-                    sfx_clip = AudioFileClip(sfx_path)
-                    max_sfx_dur = audio_duration - cue_ts
-                    if sfx_clip.duration and sfx_clip.duration > max_sfx_dur:
-                        sfx_clip = sfx_clip.subclipped(0, max_sfx_dur)
-                    sfx_clip = sfx_clip.with_start(cue_ts).with_effects([afx.MultiplyVolume(0.4)])
-                    final_audio_layers.append(sfx_clip)
-                except Exception as e:
-                    pass
+        # Trigger woosh on every chunk start for energy
+        cue_ts = chunk["start"]
+        sfx_path = os.path.join(ASSETS_DIR, "sfx", "woosh.wav")
+        if os.path.exists(sfx_path) and cue_ts < audio_duration:
+            try:
+                sfx_clip = AudioFileClip(sfx_path)
+                max_sfx_dur = audio_duration - cue_ts
+                if sfx_clip.duration and sfx_clip.duration > max_sfx_dur:
+                    sfx_clip = sfx_clip.subclipped(0, max_sfx_dur)
+                sfx_clip = sfx_clip.with_start(cue_ts).with_effects([afx.MultiplyVolume(0.3)])
+                final_audio_layers.append(sfx_clip)
+            except Exception as e:
+                pass
     
     # Background Music with Auto-Ducking
     bgm_path = os.path.join(MUSIC_DIR, "modern_tech.mp3")
