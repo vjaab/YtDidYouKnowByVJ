@@ -295,14 +295,14 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
     
     if is_longform:
         selection_instruction = (
-            f"Analyze the following {content_desc} and pick the SINGLE most foundational story for a 2-3 minute deep-dive.\n"
+            f"Analyze the following {content_desc} and pick 1 MAIN story for a deep-dive, and 3-5 RAPID news updates.\n"
             "SELECTION FILTERS:\n"
-            "1. MUST be a topic that can be broken down into 3 to 5 actionable tools, techniques, or architectural principles.\n"
-            "2. MUST be explainable in 120-180s of expert-level technical speech (approx 350-450 words total).\n"
-            "3. MUST contain a highly relatable Hook, a Workflow demonstration, and a strong Conceptual Warning (The Caveat).\n"
-            "4. PRIORITIZE: Documentation 'Easter Eggs', optimization hacks, or workflow structures that provide extreme utility.\n"
+            "1. MUST create a fast-paced 'News Roundup + Deep Dive' format (The Vaibhav Sisinty style).\n"
+            "2. MUST be explainable in 120-180s of extremely high-energy, fast-paced speech (approx 350-450 words total).\n"
+            "3. MUST contain a high-stakes Hook, a rapid-fire News Roundup (3-5 quick hits), and 1 Deep Dive Workflow.\n"
+            "4. PRIORITIZE: Major industry shifts, model benchmarks, or extreme utility for the deep dive.\n"
             "5. VOCAL DYNAMICS: You MUST use heavy punctuation (commas, ellipses '...', exclamation marks, italics, ALL CAPS) around key technical terms and transitions. The TTS engine relies entirely on punctuation to vary pitch and emphasis. Never use plain unpunctuated sentences for important points.\n"
-            "FORMAT: You MUST follow the strict 6-part structure: Hook -> Why It Matters -> Core Content (3-5 items) -> Workflow -> Caveat -> Starting Point -> Outro.\n"
+            "FORMAT: You MUST follow the strict 4-part structure: Hook -> News Roundup -> Deep Dive -> Outro.\n"
         )
         prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
 {{
@@ -310,14 +310,11 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "description": "Full 100+ word rich SEO description for youtube describing the video, including timestamps and credits.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
   "title": "Punchy YouTube title max 60 chars",
-  "hook_script": "30-second personal story / problem setup (approx 60 words). Stark contrast, direct eye contact feel.",
-  "section_1_why_it_matters": "Context, data point, and common mistake (approx 60 words).",
-  "section_2_core_content": "Break down 3-5 specific tools, architectural principles, or tips based on the topic. Give specific prompts/formulas for each (approx 150 words).",
-  "section_3_workflow": "A step-by-step chaining of the core content on a real problem. Fast paced (approx 70 words).",
-  "section_4_caveat": "The critical mistake to avoid. Serious tone (approx 40 words).",
-  "section_5_starting_point": "One immediate action to take today (approx 30 words).",
-  "outro_cta": "Subscribe and comment prompt.",
-  "script": "The FULL unified voiceover script seamlessly concatenating hook_script, section_1, section_2, section_3, section_4, section_5, and outro_cta into ONE single flowing text block. Target total word count: 350-450 words.",
+  "hook_script": "15-second high stakes intro (approx 30 words). Stark contrast, direct eye contact feel.",
+  "news_roundup": "Rapid-fire coverage of 3-5 news updates. Use bold transitions like 'UPDATE 1...' (approx 150 words).",
+  "deep_dive_tutorial": "A step-by-step breakdown or workflow of the main story/tool. Fast paced (approx 200 words).",
+  "outro_cta": "Subscribe and comment prompt (approx 30 words).",
+  "script": "The FULL unified voiceover script seamlessly concatenating hook_script, news_roundup, deep_dive_tutorial, and outro_cta into ONE single flowing text block. Target total word count: 350-450 words.",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://github.com/...", "https://arxiv.org/abs/..."],
   "phonetic_pronunciation_map": {{"NVIDIA": "In-vid-yah"}},
