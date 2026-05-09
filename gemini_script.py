@@ -13,10 +13,13 @@ from ecosystem_logic import get_slot_info, get_category_prompt_enhancement
 
 SYSTEM_PERSONA = """Act as an elite Tech Content Creator and Architect.
 Your goal is to build high-retention technical insights.
-Style: conversational, fast pacing, curiosity-driven, no corporate tone, no filler, every sentence must increase curiosity.
+Style: conversational, fast pacing, curiosity-driven, no corporate tone, every sentence must increase curiosity.
 Avoid: greetings, introductions, 'today we will', buzzword overload, generic summaries.
 NO INFOGRAPHICS: Do not include infographics, flowcharts, or slides in the script structure.
-Biggest Retention Secret: Most viral Shorts are not informational. They are tension-release systems. The viewer keeps watching because the script continuously creates unanswered questions. """
+SUCCESS PATTERNS (2026): 
+- HOOKS: Focus on "Fear of Privacy Leaks" or "Shadow AI" dangers. This is your highest-retention hook style.
+- ANALOGIES: Use sharp analogies (e.g., 'Scalpel vs. Sledgehammer') at the 40s mark to reset the viewer's attention span.
+- CTAs: Must be provocative or high-tension questions to drive comments. Avoid generic "What do you think?". """
 
 RESEARCH_AGENT_TEMPLATE = """{persona}
 
@@ -65,8 +68,8 @@ Include:
 1. Hook (The selected hook)
 2. Context (3-10s) - Who, What, Why it matters quickly.
 3. Escalation (10-25s) - Implications, consequences, future impact.
-4. Insight (25-40s) - One memorable twist/insight.
-5. Open Loop (40-50s) - Lingering thought.
+4. The Analogy (25-35s) - Use a high-impact analogy (like 'Scalpel vs Sledgehammer') to simplify a complex point.
+5. Open Loop (40-50s) - Lingering provocative thought to drive engagement.
 
 RESEARCH:
 {research_json}
@@ -331,8 +334,8 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "original_news_headline": "Exact headline",
   "original_news_url": "Direct article URL",
   "keywords": ["AI"],
-  "hashtags": ["#AI"],
-  "comment_hook": "Would you use this?"
+  "hashtags": ["#AI", "#CyberSecurity", "#DataPrivacy", "#TechNews"],
+  "comment_hook": "Provocative question to drive engagement (e.g. 'Which department at your job is leaking the most data?')"
 }}"""
     else:
         selection_instruction = (
@@ -380,8 +383,8 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "original_news_headline": "Exact headline",
   "original_news_url": "Direct article URL",
   "keywords": ["AI"],
-  "hashtags": ["#AI"],
-  "comment_hook": "Would you use this?"
+  "hashtags": ["#AI", "#CyberSecurity", "#DataPrivacy", "#TechNews"],
+  "comment_hook": "Provocative question to drive engagement (e.g. 'Which department at your job is leaking the most data?')"
 }}"""
 
     # Inject any extra instructions (e.g. screenshot avoidance, length adjustments) into context
