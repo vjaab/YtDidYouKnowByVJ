@@ -2568,7 +2568,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 if abs(t - _rembg_cache["t"]) < 0.001 and _rembg_cache["rgba"] is not None:
                     return _rembg_cache["rgba"]
                 frame_rgb = get_frame(t).copy()
-                rgba = remove(frame_rgb, session=_rembg_session)
+                rgba = remove(frame_rgb, session=_rembg_session).copy()
                 
                 alpha = rgba[..., 3].astype(np.float32)
                 

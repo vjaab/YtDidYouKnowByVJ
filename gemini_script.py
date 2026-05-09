@@ -148,10 +148,15 @@ def get_hottest_tech_topic(client):
                 "'keywords' (list of 6-8 specific Google Trends search keywords). No markdown, no explanation."
             ),
             config=types.GenerateContentConfig(
-                tools=[{'google_search': {}}]
+                tools=[{'google_search': {}}],
+                response_mime_type='application/json'
             )
         )
-        raw = response.text.strip().lstrip("```json").lstrip("```").rstrip("```").strip()
+        raw = response.text.strip()
+        # Robust extraction: find the first { and last }
+        if "{" in raw and "}" in raw:
+            raw = raw[raw.find("{"):raw.rfind("}")+1]
+        
         data = json.loads(raw)
         print(f"📈 Google Trends Hot Topic: {data['topic']}")
         return data
@@ -417,13 +422,14 @@ class MultiAgentGenerationEngine:
                 response = self.client.models.generate_content(
                     model=current_model,
                     contents=prompt,
-                    config=types.GenerateContentConfig(temperature=0.8)
+                    config=types.GenerateContentConfig(
+                        temperature=0.8,
+                        response_mime_type='application/json'
+                    )
                 )
                 raw = response.text.strip()
-                if "```json" in raw:
-                    raw = raw.split("```json")[1].split("```")[0].strip()
-                elif "```" in raw:
-                    raw = raw.split("```")[1].split("```")[0].strip()
+                if "{" in raw and "}" in raw:
+                    raw = raw[raw.find("{"):raw.rfind("}")+1]
                 
                 return json.loads(raw)
             except Exception as e:

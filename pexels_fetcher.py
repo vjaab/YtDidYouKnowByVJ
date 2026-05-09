@@ -276,7 +276,7 @@ def _download_photo(url, output_path, is_longform=False):
                     target_h = int(w * 9 / 16)
                     top = (h - target_h) // 2
                     img = img.crop((0, top, w, top + target_h))
-                img = img.resized((1920, 1080))
+                img = img.resize((1920, 1080))
             else:
                 # Target 9:16 portrait
                 target_h = int(w * 16 / 9)
@@ -287,7 +287,7 @@ def _download_photo(url, output_path, is_longform=False):
                     target_w = int(h * 9 / 16)
                     left = (w - target_w) // 2
                     img = img.crop((left, 0, left + target_w, h))
-                img = img.resized((1080, 1920))
+                img = img.resize((1080, 1920))
             img.save(output_path, "JPEG", quality=90)
             return output_path
         return None
