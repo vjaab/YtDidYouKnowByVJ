@@ -8,9 +8,14 @@ def get_slot_info():
     day_name = now.strftime("%a") # Mon, Tue, etc.
     hour = now.hour
     
-    # 04:00 IST (22:30 UTC) -> Slot A
-    # 13:30 IST (08:00 UTC) -> Slot B
-    if hour >= 12:
+    # Schedule:
+    # Shorts (Slot A) - 03:30 UTC -> 09:00 IST
+    # Shorts (Slot B) - 10:30 UTC -> 16:00 IST
+    # Longform (Slot C) - 22:30 UTC -> 04:00 IST (Next day)
+    
+    if hour >= 20:
+        slot = "Slot C (Longform)"
+    elif hour < 8:
         slot = "Slot A (Discovery)"
     else:
         slot = "Slot B (Utility)"

@@ -27,7 +27,7 @@ for d in [OUTPUT_DIR, LOGS_DIR, FONTS_DIR, MUSIC_DIR]:
 
 # Application Settings
 TIMEZONE = "Asia/Kolkata"
-UPLOAD_TIMES = ["04:00", "13:30"] # Slot A and B (Shorts only)
+UPLOAD_TIMES = ["09:00", "16:00", "04:00"] # 9 AM, 4 PM (Shorts), 4 AM Wed/Sat/Sun (Longform)
 MAX_RETRY_ATTEMPTS = 10
 SIMILARITY_THRESHOLD = 75
 CATEGORY_COOLDOWN_DAYS = 3

@@ -2,10 +2,12 @@ name: Daily Tech News Shorts Pipeline
 
 on:
   schedule:
-    # 22:30 UTC = 04:00 AM IST (morning slot)
-    - cron: '30 22 * * *'
-    # 08:00 UTC = 01:30 PM IST (afternoon slot)
-    - cron: '0 8 * * *'
+    # Shorts (Slot A): 03:30 UTC = 09:00 AM IST everyday
+    - cron: '30 3 * * *'
+    # Shorts (Slot B): 10:30 UTC = 04:00 PM IST everyday
+    - cron: '30 10 * * *'
+    # Long Form (Slot C): 22:30 UTC on Tue, Fri, Sat = 04:00 AM IST on Wed, Sat, Sun
+    - cron: '30 22 * * 2,5,6'
   workflow_dispatch: # Allows manual trigger from GitHub Actions UI
 
 jobs:
