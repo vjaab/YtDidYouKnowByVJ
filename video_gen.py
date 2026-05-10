@@ -558,16 +558,7 @@ def _title_clip(title, duration):
 
 # ── LAYER 12: Telegram CTA card ───────────────────────────────────────────────
 def _telegram_cta_overlay(total_dur):
-    """Creates an animated Telegram CTA card sliding up in the last 6 seconds."""
-    cta_dur = 6.0
-    if total_dur < cta_dur + 2:
-        return None
-        
-    start_t = total_dur - cta_dur
-    
-    # ── LAYER 12: Telegram CTA card ───────────────────────────────────────────────
-def _telegram_cta_overlay(total_dur):
-    """Creates a premium animated dual-card Telegram CTA using two authentic screenshots."""
+    """Shows the two Telegram screenshots sequentially in the last 6 seconds."""
     cta_dur = 6.0
     if total_dur < cta_dur + 2:
         return None
@@ -577,78 +568,34 @@ def _telegram_cta_overlay(total_dur):
         p1 = os.path.join(ASSETS_DIR, "branding", "tele_brand1.jpg")
         p2 = os.path.join(ASSETS_DIR, "branding", "tele_brand2.jpg")
         
-        # Use .png fallback if .jpg doesn't exist (flexible)
+        # Use .png fallback if .jpg doesn't exist
         if not os.path.exists(p1): p1 = p1.replace(".jpg", ".png")
         if not os.path.exists(p2): p2 = p2.replace(".jpg", ".png")
         
         if not os.path.exists(p1) or not os.path.exists(p2):
-            print("[WARNING] Missing tele_brand1 or tele_brand2 for Dual CTA.")
             return None
 
-        # Load both
-        img1 = Image.open(p1).convert("RGBA") # The "Community Feed" screenshot
-        img2 = Image.open(p2).convert("RGBA") # The "Profile" screenshot
-        
-        card_w = int(FRAME_W * 0.72) # Slightly narrower to allow stacking
-        
-        def process_card(im, w):
-            ratio = w / float(im.width)
-            # Crop 5% from top/bottom to remove status bars cleanly
-            crop_t = int(im.height * 0.04)
-            crop_b = int(im.height * 0.04)
-            im = im.crop((0, crop_t, im.width, im.height - crop_b))
+        def create_simple_clip(path, duration, start_offset):
+            img = Image.open(path).convert("RGB")
+            # Scale to fit width, maintaining aspect ratio
+            w = int(FRAME_W * 0.9)
+            ratio = w / float(img.width)
+            h = int(img.height * ratio)
+            img = img.resize((w, h), Image.Resampling.LANCZOS)
             
-            h = int(im.height * ratio)
-            im = im.resize((w, h), Image.Resampling.LANCZOS)
-            
-            mask = Image.new("L", (w, h), 0)
-            ImageDraw.Draw(mask).rounded_rectangle([0, 0, w, h], radius=45, fill=255)
-            im.putalpha(mask)
-            return im
-            
-        c1 = process_card(img1, card_w) # Back card
-        c2 = process_card(img2, card_w) # Front card
+            arr = np.array(img)
+            clip = ImageClip(arr, duration=duration)
+            return clip.with_position("center").with_start(start_t + start_offset)
+
+        # Show brand1 for 3s, then brand2 for 3s
+        c1 = create_simple_clip(p1, 3.0, 0)
+        c2 = create_simple_clip(p2, 3.0, 3.0)
         
-        # Composite Canvas
-        canvas_w = int(card_w * 1.15)
-        canvas_h = int(c2.height * 1.1)
-        canvas = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
-        draw = ImageDraw.Draw(canvas)
+        return [c1, c2] # Return list of clips to be added to engagement_clips
         
-        # Card 1 (Background - slightly offset to the right)
-        off_x = int(card_w * 0.12)
-        canvas.paste(c1, (off_x, 0), c1)
-        draw.rounded_rectangle([off_x, 0, off_x + card_w, c1.height], radius=45, outline=(255,215,0,80), width=4)
-        
-        # Card 2 (Foreground - primary profile view)
-        canvas.paste(c2, (0, 40), c2)
-        draw.rounded_rectangle([0, 40, card_w, 40 + c2.height], radius=45, outline=(255,215,0,230), width=8)
-        
-        # "Link in Bio" Text Anchor
-        f_cta = get_cinematic_font(52, bold=True)
-        txt = "Link in Bio ↗"
-        tw, th = ts(txt, f_cta)
-        # Shadow for text
-        draw.text(((canvas_w - tw)//2 + 3, canvas_h - th - 7), txt, font=f_cta, fill=(0,0,0,180))
-        draw.text(((canvas_w - tw)//2, canvas_h - th - 10), txt, font=f_cta, fill=(255, 215, 0, 255))
-        
-        arr = np.array(canvas.convert("RGB"))
-        alpha = np.array(canvas.split()[3]).astype(float) / 255.0
-        
-        clip = ImageClip(arr, duration=cta_dur)
-        mclip = VideoClip(lambda t: alpha, is_mask=True, duration=cta_dur)
-        
-        def pos_fn(t):
-            # Smooth cinematic slide-up with overshoot
-            progress = min(1.0, t / 0.7)
-            # Cubic ease out
-            ease = 1 - pow(1 - progress, 3)
-            final_y = FRAME_H // 2 - canvas_h // 2 + 80
-            start_y = FRAME_H + 200
-            y = start_y - (start_y - final_y) * ease
-            return ("center", int(y))
-            
-        return clip.with_mask(mclip).with_position(pos_fn).with_start(start_t)
+    except Exception as e:
+        print("Sequential CTA Error:", e)
+        return None
         
     except Exception as e:
         print("Dual Card CTA Error:", e)
@@ -2721,11 +2668,13 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     hook_overlay = _hook_text_overlay(hook_text, accent_color, audio_duration)
     if hook_overlay:
         engagement_clips.append(hook_overlay)
-        
     # ── LAYER 12: Telegram CTA card (Last 6 seconds) ──────────────────────────
     telegram_cta = _telegram_cta_overlay(audio_duration)
     if telegram_cta:
-        engagement_clips.append(telegram_cta)
+        if isinstance(telegram_cta, list):
+            engagement_clips.extend(telegram_cta)
+        else:
+            engagement_clips.append(telegram_cta)
 
     # ── COMPOSITING ──
     # Collect infographics logic — DISABLED (user requested removal)
