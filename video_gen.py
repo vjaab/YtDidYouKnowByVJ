@@ -567,7 +567,7 @@ def _telegram_cta_overlay(total_dur):
     
     # Dimensions for the CTA card
     card_w = int(FRAME_W * 0.85)
-    card_h = 450
+    card_h = 600
     
     # 1. Base Canvas
     canvas = Image.new("RGBA", (card_w, card_h), (0, 0, 0, 0))
@@ -575,16 +575,41 @@ def _telegram_cta_overlay(total_dur):
     
     # Dark gray Telegram-style background
     bg_color = (33, 45, 59, 240)
-    draw.rounded_rectangle([0, 50, card_w, card_h], radius=32, fill=bg_color, outline=(255,255,255,80), width=2)
+    draw.rounded_rectangle([0, 100, card_w, card_h], radius=32, fill=bg_color, outline=(255,255,255,80), width=2)
     
-    # Avatar
+    # Avatar (Elite, Face-prioritized)
     try:
+        av_size = 220
+        border_size = 8
         avatar = Image.open(os.path.join(ASSETS_DIR, "vj_profile.jpg")).convert("RGBA")
-        avatar = avatar.resize((140, 140), Image.Resampling.LANCZOS)
-        amask = Image.new("L", (140, 140), 0)
-        ImageDraw.Draw(amask).ellipse((0, 0, 140, 140), fill=255)
+        
+        w, h = avatar.size
+        min_dim = min(w, h)
+        # Zoom in slightly (15%) to make face highly prominent
+        zoom = int(min_dim * 0.15)
+        avatar = avatar.crop(((w-min_dim)//2 + zoom, (h-min_dim)//2 + zoom, (w+min_dim)//2 - zoom, (h+min_dim)//2 - zoom))
+        
+        avatar = avatar.resize((av_size, av_size), Image.Resampling.LANCZOS)
+        amask = Image.new("L", (av_size, av_size), 0)
+        ImageDraw.Draw(amask).ellipse((0, 0, av_size, av_size), fill=255)
         avatar.putalpha(amask)
-        canvas.paste(avatar, (card_w // 2 - 70, 0), avatar)
+        
+        total_av_size = av_size + (border_size * 2)
+        av_canvas = Image.new("RGBA", (total_av_size, total_av_size), (0, 0, 0, 0))
+        av_draw = ImageDraw.Draw(av_canvas)
+        
+        # Elite gold ring
+        ring_color = (255, 215, 0, 255)
+        av_draw.ellipse((0, 0, total_av_size, total_av_size), fill=ring_color)
+        
+        # Inner dark gap ring
+        av_draw.ellipse((4, 4, total_av_size-4, total_av_size-4), fill=bg_color)
+        
+        av_canvas.paste(avatar, (border_size, border_size), avatar)
+        
+        paste_x = card_w // 2 - total_av_size // 2
+        paste_y = 0
+        canvas.paste(av_canvas, (paste_x, paste_y), av_canvas)
     except Exception as e:
         print("Could not load CTA avatar", e)
     
@@ -597,17 +622,17 @@ def _telegram_cta_overlay(total_dur):
     # Title
     t1 = "Tech News & Job Openings by VJ"
     tw, th = ts(t1, f_title)
-    draw.text(((card_w - tw)//2, 160), t1, font=f_title, fill=(255,255,255,255))
+    draw.text(((card_w - tw)//2, 260), t1, font=f_title, fill=(255,255,255,255))
     
     # Subtitle
     t2 = "19 subscribers"
     tw2, th2 = ts(t2, f_sub)
-    draw.text(((card_w - tw2)//2, 210), t2, font=f_sub, fill=(150,165,180,255))
+    draw.text(((card_w - tw2)//2, 310), t2, font=f_sub, fill=(150,165,180,255))
     
     # Link Button
     btn_w = card_w - 100
     btn_h = 80
-    btn_y = 270
+    btn_y = 380
     draw.rounded_rectangle([50, btn_y, 50+btn_w, btn_y+btn_h], radius=20, fill=(43,82,120,255))
     t3 = "t.me/technewsbyvj"
     tw3, th3 = ts(t3, f_link)
@@ -616,11 +641,11 @@ def _telegram_cta_overlay(total_dur):
     # CTA Message
     t4 = "Join the free Telegram Community!"
     tw4, th4 = ts(t4, f_desc)
-    draw.text(((card_w - tw4)//2, 360), t4, font=f_desc, fill=(255,255,255,220))
+    draw.text(((card_w - tw4)//2, 490), t4, font=f_desc, fill=(255,255,255,220))
     
     t5 = "Link in Bio ↗"
     tw5, th5 = ts(t5, f_title)
-    draw.text(((card_w - tw5)//2, 400), t5, font=f_title, fill=(255,215,0,255)) # Yellow
+    draw.text(((card_w - tw5)//2, 540), t5, font=f_title, fill=(255,215,0,255)) # Yellow
     
     arr = np.array(canvas.convert("RGB"))
     mask = np.array(canvas.split()[3]).astype(float) / 255.0
