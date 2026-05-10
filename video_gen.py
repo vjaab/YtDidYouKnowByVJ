@@ -2787,14 +2787,15 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     if hook_overlay:
         engagement_clips.append(hook_overlay)
 
-    # ── 3x Article Evidence Scans (Top 50%) ──────────────────────────────────
+    # ── Phased Article Evidence Scans (Top 50%) ──────────────────────────────────
     screenshot_path = script_json.get("screenshot_path")
     if screenshot_path and os.path.exists(screenshot_path):
-        # High-impact timestamps from feedback: 12s, 28s, 45s
-        for t in [12.0, 28.0, 45.0]:
-            if t < audio_duration - 6:
-                scan = _article_scan_overlay(screenshot_path, t)
-                if scan: engagement_clips.append(scan)
+        # Trigger every 10 seconds for a 5-second duration
+        interval = 10.0
+        overlay_dur = 5.0
+        for t in np.arange(1.0, audio_duration - overlay_dur, interval):
+            scan = _article_scan_overlay(screenshot_path, t, duration=overlay_dur)
+            if scan: engagement_clips.append(scan)
     # ── LAYER 12: Telegram CTA card (Last 6 seconds) ──────────────────────────
     telegram_cta = _telegram_cta_overlay(audio_duration)
     if telegram_cta:
