@@ -363,7 +363,17 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
             return chunk
 
     elif visual_mode == "nano_evidence":
-        print(f"Chunk {cid} -> MODE: nano_evidence")
+        # Prefer REAL article screenshot if available in script_data
+        real_screenshot = script_data.get("screenshot_path")
+        if real_screenshot and os.path.exists(real_screenshot):
+            print(f"Chunk {cid} -> MODE: nano_evidence (Using REAL screenshot)")
+            chunk["visual_path"] = real_screenshot
+            chunk["visual_type"] = "photo"
+            chunk["relevance_score"] = 10
+            chunk["source"] = "Real Article Screenshot"
+            return chunk
+
+        print(f"Chunk {cid} -> MODE: nano_evidence (Using AI Macro Fallback)")
         path = _generate_imagen3(nano_evidence_prompt, photo_out, topic_context, global_style_guide)
         if path:
             chunk["visual_path"] = path
@@ -418,11 +428,14 @@ def fetch_all_chunk_visuals(chunks, topic_context="", script_data=None, is_longf
         if i == 0:
             v_mode = "nano_hook"
         elif i == 1:
-            v_mode = "nano_evidence"
+            v_mode = "nano_evidence" # The "Evidence Flash"
         elif i == total_chunks - 1:
             v_mode = "veo_cta"
+        elif i % 4 == 1:
+            # Every 4th chunk (starting from 5), switch back to Evidence
+            v_mode = "nano_evidence"
         else:
-            # Alternate concept loop
+            # Alternate concept loop for the rest
             v_mode = "veo_concept" if i % 2 == 0 else "nano_concept"
 
         print(f"  Processing chunk {i+1}/{len(chunks)} [{v_mode}]...")
@@ -438,7 +451,8 @@ def fetch_all_chunk_visuals(chunks, topic_context="", script_data=None, is_longf
         # ── SMART THROTTLING ──────────────────────────────────────────────────
         api_sources = [
             "Imagen (nano_hook)", "Imagen (nano_concept)", "Imagen (nano_evidence)",
-            "Veo (veo_concept)", "Veo (veo_cta)", "Imagen (fallback from veo)"
+            "Veo (veo_concept)", "Veo (veo_cta)", "Imagen (fallback from veo)",
+            "Real Article Screenshot"
         ]
         
         if i < len(chunks) - 1:

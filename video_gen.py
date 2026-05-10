@@ -2640,7 +2640,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     #         iclip = _infographic_card_clip(...)
     #         if iclip: infographic_clips.append(iclip)
 
-    base_layers = bg_layer_clips + screenshot_clips + [gradient] + logo_clips
+    base_layers = bg_layer_clips + [gradient] + logo_clips
     if flare_layer: base_layers.append(flare_layer)
     if grain_layer: base_layers.append(grain_layer)
     if avatar_pip: base_layers.append(avatar_pip)
