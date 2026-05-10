@@ -2096,19 +2096,33 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     # Position: Lower-middle third
     start_y = int(frame_height * 0.65) + y_shift
     
+    # Calculate dimensions for the unified background block
+    max_line_w = 0
+    temp_idx = 0
+    for line in lines:
+        w = sum(word_widths[temp_idx:temp_idx+len(line)]) + 18 * (len(line)-1)
+        if w > max_line_w:
+            max_line_w = w
+        temp_idx += len(line)
+        
+    # Draw unified background block behind all text
+    bg_pad_x, bg_pad_y = 35, 20
+    block_x1 = (frame_width - max_line_w) // 2 - bg_pad_x
+    block_x2 = (frame_width + max_line_w) // 2 + bg_pad_x
+    block_y1 = start_y - bg_pad_y
+    block_y2 = start_y + len(lines) * line_h - (line_h - base_size) + bg_pad_y
+    
+    draw.rounded_rectangle(
+        [block_x1, block_y1, block_x2, block_y2], 
+        radius=16, 
+        fill=(0, 0, 0, 165)
+    )
+
     word_idx = 0
     for i, line in enumerate(lines):
         line_y = start_y + i * line_h
         line_w = sum(word_widths[word_idx:word_idx+len(line)]) + 18 * (len(line)-1)
         cur_x = (frame_width - line_w) // 2
-        
-        # ── OBSIDIAN BLOCK (Background) ──
-        bg_pad_x, bg_pad_y = 30, 15
-        draw.rounded_rectangle(
-            [cur_x - bg_pad_x, line_y - bg_pad_y + 8, cur_x + line_w + bg_pad_x, line_y + line_h - 10], 
-            radius=12, 
-            fill=(0, 0, 0, 170)
-        )
 
         for word_text in line:
             wd = word_data[word_idx]
@@ -2120,9 +2134,7 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
             else:
                 c_fill = (255, 255, 255, 255)
             
-            # Slight text shadow for maximum legibility
-            for dx, dy in [(-2,0),(2,0),(0,-2),(0,2)]:
-                draw.text((cur_x+dx, line_y + 2 + dy), word_text, font=f_main, fill=(0,0,0,100))
+            # Clean text rendering (no stroke, relies entirely on the dark box)
             draw.text((cur_x, line_y + 2), word_text, font=f_main, fill=c_fill)
             
             cur_x += word_widths[word_idx] + 18
