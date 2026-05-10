@@ -2191,17 +2191,18 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     # Position: EXACT CENTER (Reference style)
     start_y = int(frame_height * 0.5) - (len(lines) * line_h // 2) + y_shift
     
-    # Calculate dimensions for the unified background block
-    max_line_w = 0
-    temp_idx = 0
-    for line in lines:
-        w = sum(word_widths[temp_idx:temp_idx+len(line)]) + 22 * (len(line)-1)
-        if w > max_line_w:
-            max_line_w = w
-        temp_idx += len(line)
-        
-    # Background block removed to declutter the middle as requested
-    pass
+    # Restore Obsidian Background Block (Reference Style)
+    bg_pad_x, bg_pad_y = 50, 35
+    block_x1 = (frame_width - max_line_w) // 2 - bg_pad_x
+    block_x2 = (frame_width + max_line_w) // 2 + bg_pad_x
+    block_y1 = start_y - bg_pad_y
+    block_y2 = start_y + len(lines) * line_h - (line_h - base_size) + bg_pad_y
+    
+    draw.rounded_rectangle(
+        [block_x1, block_y1, block_x2, block_y2], 
+        radius=30, 
+        fill=(0, 0, 0, 200) # ~78% opacity as per reference
+    )
 
     word_idx = 0
     for i, line in enumerate(lines):
@@ -2232,7 +2233,7 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
                 # Main Text
                 word_draw.text((30, 30), word_text, font=f_word, fill=c_fill)
                 
-                tilt = random.choice([-6, -4, 4, 6])
+                tilt = 0 # Reverted to no tilt as per reference
                 rotated = word_img.rotate(tilt, resample=Image.BICUBIC, expand=True)
                 
                 orig_w = word_widths[word_idx]
@@ -2930,16 +2931,16 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             except Exception as e:
                 print(f"SFX load failed for {ctype} (non-fatal): {e}")
                 
-    # Auto-inject SFX for subtitle transitions (new lines)
-    for chunk in chunks:
-        # 1. Woosh on every chunk (sentence) start
-        cue_ts = chunk["start"]
-        sfx_path_woosh = os.path.join(ASSETS_DIR, "sfx", "woosh.wav")
-        if os.path.exists(sfx_path_woosh) and cue_ts < audio_duration:
-            try:
-                sfx_clip = AudioFileClip(sfx_path_woosh).with_start(cue_ts).with_effects([afx.MultiplyVolume(0.3)])
-                final_audio_layers.append(sfx_clip)
-            except: pass
+    # Auto-inject SFX for subtitle transitions (new lines) - DISABLED as requested
+    # for chunk in chunks:
+    #     # 1. Woosh on every chunk (sentence) start
+    #     cue_ts = chunk["start"]
+    #     sfx_path_woosh = os.path.join(ASSETS_DIR, "sfx", "woosh.wav")
+    #     if os.path.exists(sfx_path_woosh) and cue_ts < audio_duration:
+    #         try:
+    #             sfx_clip = AudioFileClip(sfx_path_woosh).with_start(cue_ts).with_effects([afx.MultiplyVolume(0.3)])
+    #             final_audio_layers.append(sfx_clip)
+    #         except: pass
     
     # Background Music with Auto-Ducking
     bgm_path = os.path.join(MUSIC_DIR, "modern_tech.mp3")
