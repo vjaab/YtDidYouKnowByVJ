@@ -2907,39 +2907,15 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     try:
         from efficiency_engine import render_value_header, render_efficiency_scale, render_evidence_card
         
-        # 1. Zone A (0%-30%): Value Headers (Every chunk/sentence)
-        for chunk in chunks:
-            # Take first 50 chars for the headline
-            header_txt = chunk["text"].split(".")[0][:50]
-            if len(header_txt) > 5:
-                h_img = render_value_header(header_txt, FRAME_W, FRAME_H, gf(46, bold=True))
-                h_clip = ImageClip(np.array(h_img)).with_duration(chunk["end"] - chunk["start"]).with_start(chunk["start"])
-                h_clip = h_clip.with_effects([vfx.CrossFadeIn(0.2), vfx.CrossFadeOut(0.2)])
-                base_layers.append(h_clip)
+        # 1. Zone A (0%-30%): Value Headers (Every chunk/sentence) - DISABLED as requested
+        pass
         
-        # 2. Zone B (30%-50%): Evidence & Efficiency
-        # Evidence Pops every 15s
-        for i in range(int(audio_duration // 15)):
-            t_start = (i + 1) * 15 - 1.5
-            if t_start < audio_duration - 6:
-                ev_data = {"title": "Verified Logic", "value": f"{random.randint(92, 98)}% Accurate"}
-                ev_img = render_evidence_card(ev_data, FRAME_W, FRAME_H, gf(30), gf(60, bold=True))
-                ev_clip = ImageClip(np.array(ev_img)).with_duration(3.0).with_start(t_start)
-                ev_clip = ev_clip.with_effects([vfx.CrossFadeIn(0.4), vfx.CrossFadeOut(0.4)])
-                base_layers.append(ev_clip)
-
-        # Efficiency Scale on comparison keywords
-        p_path = os.path.join(ASSETS_DIR, "problem_weight_icon.png")
-        s_path = os.path.join(ASSETS_DIR, "solution_bolt_icon.png")
-        for chunk in chunks:
-            c_text = chunk["text"].lower()
-            if any(k in c_text for k in [" vs ", "alternative", "better than", "instead of"]):
-                dur = chunk["end"] - chunk["start"]
-                def make_scale_frame(t):
-                    img = render_efficiency_scale(t, dur, FRAME_W, FRAME_H, p_path, s_path)
-                    return np.array(img)
-                scale_clip = VideoClip(make_scale_frame, duration=dur).with_start(chunk["start"])
-                base_layers.append(scale_clip)
+        # 2. Zone B (30%-50%): Evidence & Efficiency - DISABLED as requested
+        # for i in range(int(audio_duration // 15)):
+        #     ...
+        # for chunk in chunks:
+        #     ...
+        pass
                 
     except Exception as e:
         print(f"HUD Overlay failed: {e}")
