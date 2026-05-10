@@ -2786,12 +2786,13 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             scan = _article_scan_overlay(screenshot_path, t, duration=overlay_dur)
             if scan: engagement_clips.append(scan)
     # ── LAYER 12: Telegram CTA card (Last 6 seconds) ──────────────────────────
-    telegram_cta = _telegram_cta_overlay(audio_duration)
-    if telegram_cta:
-        if isinstance(telegram_cta, list):
-            engagement_clips.extend(telegram_cta)
-        else:
-            engagement_clips.append(telegram_cta)
+    # Disabled full-screen sequential CTA as requested; keeping only the 3s cropped outro.
+    # telegram_cta = _telegram_cta_overlay(audio_duration)
+    # if telegram_cta:
+    #     if isinstance(telegram_cta, list):
+    #         engagement_clips.extend(telegram_cta)
+    #     else:
+    #         engagement_clips.append(telegram_cta)
 
     # ── COMPOSITING ──
     # Collect infographics logic — DISABLED (user requested removal)
