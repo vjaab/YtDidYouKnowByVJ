@@ -297,10 +297,39 @@ CURRENT CHUNK TEXT: '{chunk_text}'
     if os.environ.get("IMAGEN_QUOTA_EXHAUSTED"):
          return None
 
+    # Actually generate the image using Imagen 4.0
+    models_to_try = [
+        "imagen-4.0-fast-generate-001",
+        "imagen-4.0-generate-001",
+        "imagen-4.0-ultra-generate-001"
+    ]
+    
+    for model_name in models_to_try:
+        try:
+            result = client.models.generate_images(
+                model=model_name,
+                prompt=best_prompt,
+                config=genai.types.GenerateImagesConfig(
+                    number_of_images=1,
+                    aspect_ratio="9:16",
+                    output_mime_type="image/jpeg",
+                )
+            )
+            for gen_img in result.generated_images:
+                with open(output_path, "wb") as f:
+                    f.write(gen_img.image.image_bytes)
+                return output_path
+        except Exception as e:
+            err_str = str(e).lower()
+            if "429" in err_str and ("quota" in err_str or "exhausted" in err_str):
+                continue
+            break
+    return None
+
     # Updated to 4.0 models as 3.0 is missing from the API in this environment
-def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide="", is_longform=False):
+def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide="", is_longform=False, visual_mode="veo_concept"):
     """
-    Executes the Visual Fetching Decision Tree (A -> B -> C -> D -> E)
+    Executes the Visual Fetching Decision Tree with Switch-Back Logic
     """
     from entity_fetcher import fetch_person_photo, fetch_company_logo
     cid = chunk["chunk_id"]
@@ -309,53 +338,60 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
     
     orientation = "landscape" if is_longform else "portrait"
     
-    primary_q = chunk.get("pexels_primary", "technology")
-    fallback_q = chunk.get("pexels_fallback", "innovation")
-    
     video_out = os.path.join(OUTPUT_DIR, f"chunk_{cid}_{TODAY}.mp4")
     photo_out = os.path.join(OUTPUT_DIR, f"chunk_{cid}_{TODAY}.jpg")
     
-    # ── STEP A/B omitted for brevity, logic remains same ──
-    # ...
-    
-    # ── STEP C: Nanobanana (Imagen 3) ────────────────────────────────────
-    print(f"Chunk {cid} -> STEP C: Nanobanana (Imagen 3) generation")
-    path = _generate_imagen3(text, photo_out, topic_context, global_style_guide)
-    if path:
-        chunk["visual_path"] = path
-        chunk["visual_type"] = "photo"
-        chunk["relevance_score"] = 10
-        chunk["source"] = "Step C: Nanobanana (Imagen 3)"
-        print(f"Chunk {cid} -> Nanobanana Image Generated: 10/10")
-        return chunk
+    # ── SWITCH-BACK LOGIC ──────────────────────────────────────────────────
+    visual_subject = _extract_visual_subject(topic_context)
+    headline = topic_context if topic_context else "Scientific Research"
 
-    # ── STEP D: Google VEO Video ─────────────────────────────────────────
-    print(f"Chunk {cid} -> STEP D: Google Veo Video generation")
+    veo_broll_prompt = f"Cinematic, high-definition 4k video in a futuristic tech-docu style. Subject: {visual_subject}. Visuals should feature glowing neural networks, sleek 3D data visualizations, or professional laboratory settings with soft teal and orange lighting. Motion: Subtle camera track-in or slow pan. Style: Minimalist, clean, tech-evangelist aesthetic. No text in video. Video language: English."
     
-    # Craft a cinematic prompt for Veo
-    veo_prompt = f"""Cinematic 9:16 vertical video of {text}. 
-    Style: {global_style_guide}. 
-    High detail, 4k, professional lighting, news editorial vibe, no text, no watermarks."""
+    nano_evidence_prompt = f"A professional macro photograph of a scientific research paper titled '{headline}'. Shallow depth of field, focusing on a specific complex diagram or a paragraph of mathematical equations. Realistic paper texture with subtle digital overlays of scanning lines and data points. Lighting: Cool office morning light. Format: Vertical 9:16 for mobile."
     
-    path = _generate_veo_video(veo_prompt, video_out, aspect_ratio=orientation)
-    if path:
-        chunk["visual_path"] = path
-        chunk["visual_type"] = "video"
-        chunk["relevance_score"] = 10
-        chunk["source"] = "Step D: Google Veo"
-        return chunk
+    nano_concept_prompt = f"Cinematic, high-definition 9:16 vertical image in a futuristic tech-docu style. Subject: {visual_subject}. Visuals should feature glowing neural networks, sleek 3D data visualizations, or professional laboratory settings with soft teal and orange lighting. Style: Minimalist, clean, tech-evangelist aesthetic. No text."
 
-    # ── STEP E: Imagen 3 Ultimate Fallback ───────────────────────────────
-    print(f"Chunk {cid} -> STEP E: Imagen 3 Ultimate Fallback")
-    img_prompt = f"Professional technical studio photography of {text}. {global_style_guide}."
-    path = _generate_imagen3(text, photo_out, topic_context, global_style_guide)
-    if path:
-        chunk["visual_path"] = path
-        chunk["visual_type"] = "photo"
-        chunk["relevance_score"] = 7
-        chunk["source"] = "Step E: Imagen 3 Fallback"
-        return chunk
-        
+    if visual_mode == "nano_hook" or visual_mode == "nano_concept":
+        print(f"Chunk {cid} -> MODE: {visual_mode}")
+        prompt = nano_concept_prompt if visual_mode == "nano_concept" else nano_concept_prompt + " Dramatic hero shot."
+        path = _generate_imagen3(prompt, photo_out, topic_context, global_style_guide)
+        if path:
+            chunk["visual_path"] = path
+            chunk["visual_type"] = "photo"
+            chunk["relevance_score"] = 10
+            chunk["source"] = f"Imagen ({visual_mode})"
+            return chunk
+
+    elif visual_mode == "nano_evidence":
+        print(f"Chunk {cid} -> MODE: nano_evidence")
+        path = _generate_imagen3(nano_evidence_prompt, photo_out, topic_context, global_style_guide)
+        if path:
+            chunk["visual_path"] = path
+            chunk["visual_type"] = "photo"
+            chunk["relevance_score"] = 10
+            chunk["source"] = "Imagen (nano_evidence)"
+            return chunk
+
+    elif visual_mode == "veo_concept" or visual_mode == "veo_cta":
+        print(f"Chunk {cid} -> MODE: {visual_mode}")
+        path = _generate_veo_video(veo_broll_prompt, video_out, aspect_ratio=orientation)
+        if path:
+            chunk["visual_path"] = path
+            chunk["visual_type"] = "video"
+            chunk["relevance_score"] = 10
+            chunk["source"] = f"Veo ({visual_mode})"
+            return chunk
+            
+        # Fallback to Imagen if Veo fails
+        print(f"Chunk {cid} -> Veo failed, falling back to Imagen")
+        path = _generate_imagen3(nano_concept_prompt, photo_out, topic_context, global_style_guide)
+        if path:
+            chunk["visual_path"] = path
+            chunk["visual_type"] = "photo"
+            chunk["relevance_score"] = 8
+            chunk["source"] = "Imagen (fallback from veo)"
+            return chunk
+
     chunk["visual_path"] = None
     chunk["visual_type"] = None
     chunk["relevance_score"] = 0
@@ -377,9 +413,21 @@ def fetch_all_chunk_visuals(chunks, topic_context="", script_data=None, is_longf
             chunk["pexels_primary"] = " ".join(chunk["text"].split()[:3])
             chunk["pexels_fallback"] = "technology"
 
-        print(f"  Processing chunk {i+1}/{len(chunks)}...")
+        # Determine visual mode based on index
+        total_chunks = len(chunks)
+        if i == 0:
+            v_mode = "nano_hook"
+        elif i == 1:
+            v_mode = "nano_evidence"
+        elif i == total_chunks - 1:
+            v_mode = "veo_cta"
+        else:
+            # Alternate concept loop
+            v_mode = "veo_concept" if i % 2 == 0 else "nano_concept"
+
+        print(f"  Processing chunk {i+1}/{len(chunks)} [{v_mode}]...")
         try:
-            fetch_chunk_visual(chunk, script_data, topic_context, global_style, is_longform=is_longform)
+            fetch_chunk_visual(chunk, script_data, topic_context, global_style, is_longform=is_longform, visual_mode=v_mode)
         except Exception as e:
             print(f"  Chunk {chunk.get('chunk_id')} failed: {e}")
             chunk["visual_path"] = None
@@ -388,16 +436,14 @@ def fetch_all_chunk_visuals(chunks, topic_context="", script_data=None, is_longf
             chunk["source"] = "Failed"
         
         # ── SMART THROTTLING ──────────────────────────────────────────────────
-        # Only sleep if we used an API limited source (Steps C, D, or E)
         api_sources = [
-            "Step C: Nanobanana (Imagen 3)", 
-            "Step D: Pexels Video", 
-            "Step E: Pexels Photo"
+            "Imagen (nano_hook)", "Imagen (nano_concept)", "Imagen (nano_evidence)",
+            "Veo (veo_concept)", "Veo (veo_cta)", "Imagen (fallback from veo)"
         ]
         
         if i < len(chunks) - 1:
             if chunk.get("source") in api_sources:
-                print(f"  -> AI/Search used. Cooling down for 10s to respect API Rate Limits...")
+                print(f"  -> AI generated asset used. Cooling down for 10s to respect API Rate Limits...")
                 time.sleep(10)
             else:
                 print(f"  -> Local/Cached asset. Skipping cooldown.")
