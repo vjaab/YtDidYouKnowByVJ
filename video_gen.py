@@ -2981,7 +2981,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             except Exception as e:
                 print(f"SFX load failed for {ctype} (non-fatal): {e}")
                 
-    # Auto-inject SFX for infographics and subtitle transitions
+    # Auto-inject SFX for subtitle transitions (new lines)
     for chunk in chunks:
         # 1. Woosh on every chunk (sentence) start
         cue_ts = chunk["start"]
@@ -2991,34 +2991,6 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 sfx_clip = AudioFileClip(sfx_path_woosh).with_start(cue_ts).with_effects([afx.MultiplyVolume(0.3)])
                 final_audio_layers.append(sfx_clip)
             except: pass
-            
-        # 2. Pop on IMPORTANT word highlights
-        sfx_path_pop = os.path.join(ASSETS_DIR, "sfx", "pop.wav")
-        # Common filler words to ignore for SFX
-        filler_words = {"a", "an", "the", "and", "or", "but", "if", "then", "else", "when", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "is", "am", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "it", "its", "they", "them", "their", "this", "that", "those", "these"}
-        
-        if os.path.exists(sfx_path_pop):
-            for word_data in chunk.get("words", []):
-                orig_word = word_data["word"]
-                word_text = orig_word.strip(".,!?;:\"").lower()
-                
-                # Heuristic for "important":
-                # - Not a filler word
-                # - AND (Length >= 6 OR contains digits/symbols OR is ALL CAPS)
-                is_filler = word_text in filler_words
-                is_important = not is_filler and (
-                    len(word_text) >= 6 or 
-                    any(c.isdigit() or c in "$%#*@" for c in orig_word) or 
-                    (orig_word.isupper() and len(orig_word) > 1)
-                )
-                
-                if is_important:
-                    w_start = word_data["start"]
-                    if w_start < audio_duration:
-                        try:
-                            p_clip = AudioFileClip(sfx_path_pop).with_start(w_start).with_effects([afx.MultiplyVolume(0.5)])
-                            final_audio_layers.append(p_clip)
-                        except: pass
     
     # Background Music with Auto-Ducking
     bgm_path = os.path.join(MUSIC_DIR, "modern_tech.mp3")
