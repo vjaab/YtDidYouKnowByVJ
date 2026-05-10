@@ -23,7 +23,7 @@ Constraint Checklist:
 SUCCESS PATTERNS (2026): 
 - HOOKS: Focus on "Fear of Privacy Leaks" or "Shadow AI" dangers. Start with a "Result-First" statement.
 - ANALOGIES: Use sharp analogies to explain complex breakthroughs.
-- CTAs: At the very end of every script, you MUST explicitly say verbatim: "Join my telegram channel for updates like these, link in bio! And subscribe for more AI related videos." This is a hard requirement for the outro. """
+- CTAs: At the end of every script, you MUST first ask a highly provocative, open-ended question to the viewers about the topic to drive comments. THEN, immediately after the question, you MUST explicitly say verbatim: "Join my telegram channel for updates like these, link in bio! And subscribe for more AI related videos." This is a hard requirement for the outro. """
 
 RESEARCH_AGENT_TEMPLATE = """{persona}
 
