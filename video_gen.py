@@ -1825,9 +1825,9 @@ def _article_screenshot_clip(screenshot_path, duration):
         for start_t in np.arange(1.0, duration - display_dur, interval):
             current_dur = display_dur
             def zoom_effect(t):
-                # Subtle ease-in-out zoom for premium feel
+                # Enhanced zoom intensity for more impact (22% zoom)
                 progress = easeInOutQuad(min(1.0, t / current_dur))
-                return 1.0 + 0.12 * progress
+                return 1.0 + 0.22 * progress
                 
             clip = VideoClip(lambda t: arr, duration=current_dur)
             clip = clip.with_effects([vfx.Resize(zoom_effect)])
