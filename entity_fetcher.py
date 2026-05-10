@@ -3,7 +3,7 @@ import requests
 from io import BytesIO
 from PIL import Image
 from config import OUTPUT_DIR
-from pexels_fetcher import _search_pexels_photos, _download_photo
+from pexels_fetcher import _generate_imagen3
 
 def _save_image_from_url(url, output_path, is_logo=False):
     """Downloads and saves an image, ensuring proper formatting."""
@@ -51,13 +51,11 @@ def fetch_person_photo(person):
     except Exception as e:
         print(f"  Wikipedia API fetch failed: {e}")
 
-    # PRIORITY 4: Pexels fallback
-    print(f"  -> Falling back to Pexels for {name}...")
-    result = _search_pexels_photos(f"{name} portrait face")
-    if result:
-        path = _download_photo(result[0]["link"], output_path)
-        if path:
-            return path
+    # PRIORITY 4: Generative AI fallback (was Pexels)
+    print(f"  -> Falling back to Generative AI for {name}...")
+    path = _generate_imagen3(f"Professional portrait photo of {name}", output_path, topic_context=name)
+    if path:
+        return path
 
     print(f"  -> Could not find photo for {name}")
     return None
@@ -101,15 +99,13 @@ def fetch_company_logo(company):
     except Exception as e:
         print(f"  Wikipedia fetch failed: {e}")
 
-    # PRIORITY 3: Pexels fallback (as photo)
-    print(f"  -> Falling back to Pexels for {name}...")
-    pexels_out = os.path.join(OUTPUT_DIR, f"company_{name.replace(' ', '_')}_office.jpg")
+    # PRIORITY 3: Generative AI fallback (was Pexels)
+    print(f"  -> Falling back to Generative AI for {name}...")
+    imagen_out = os.path.join(OUTPUT_DIR, f"company_{name.replace(' ', '_')}_office.jpg")
     search_query = company.get("hq_pexels_search") or f"{name} office headquarters"
-    result = _search_pexels_photos(search_query)
-    if result:
-        path = _download_photo(result[0]["link"], pexels_out)
-        if path:
-            return path
+    path = _generate_imagen3(f"Professional corporate office headquarters for {search_query}", imagen_out, topic_context=name)
+    if path:
+        return path
 
     print(f"  -> Could not find logo/hq for {name}")
     return None
