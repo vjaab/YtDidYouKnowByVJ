@@ -2211,19 +2211,8 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
             max_line_w = w
         temp_idx += len(line)
         
-    # Draw unified background block behind all text
-    bg_pad_x, bg_pad_y = 50, 35
-    block_x1 = (frame_width - max_line_w) // 2 - bg_pad_x
-    block_x2 = (frame_width + max_line_w) // 2 + bg_pad_x
-    block_y1 = start_y - bg_pad_y
-    block_y2 = start_y + len(lines) * line_h - (line_h - base_size) + bg_pad_y
-    
-    # Obsidian Block: Highly contrasting, slightly more opaque (0.85)
-    draw.rounded_rectangle(
-        [block_x1, block_y1, block_x2, block_y2], 
-        radius=30, 
-        fill=(0, 0, 0, 217) 
-    )
+    # Background block removed to declutter the middle as requested
+    pass
 
     word_idx = 0
     for i, line in enumerate(lines):
@@ -2782,10 +2771,10 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     # ── ENGAGEMENT LAYERS (Retention Boosters) ────────────────────────────────
     engagement_clips = []
     
-    hook_text = script_json.get("hook_text", "")
-    hook_overlay = _hook_text_overlay(hook_text, accent_color, audio_duration)
-    if hook_overlay:
-        engagement_clips.append(hook_overlay)
+    # Hook overlay removed to declutter as requested
+    # hook_overlay = _hook_text_overlay(hook_text, accent_color, audio_duration)
+    # if hook_overlay:
+    #     engagement_clips.append(hook_overlay)
 
     # ── Phased Article Evidence Scans (Top 50%) ──────────────────────────────────
     screenshot_path = script_json.get("screenshot_path")
