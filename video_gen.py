@@ -840,7 +840,7 @@ def _interactive_challenge_overlay(challenge_data, accent_color, total_dur):
     clip = VideoClip(make_frame, duration=dur)
     mclip = VideoClip(make_mask, is_mask=True, duration=dur)
     x_pos = (FRAME_W - box_w) // 2
-    y_pos = int(FRAME_H * 0.72) # Moved significantly down to clear subtitles
+    y_pos = int(FRAME_H * 0.28) # Moved up to clear the new lower-third subtitles
     return clip.with_mask(mclip).with_position((x_pos, y_pos)).with_start(ch_ts)
 
 
@@ -2178,14 +2178,13 @@ def wrap_text_to_lines(words, word_widths, max_width, font):
     return lines
 
 def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), frame_width=1080, frame_height=1920, y_shift=0):
-    """Clean 'Shorts' captions: Bold Sans-Serif on dark blocks with yellow highlights."""
+    """Viral 'High Energy' captions: Large tilted words with pop sounds."""
     img = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
     scale_ratio = frame_width / 1080.0 if frame_width < frame_height else frame_width / 1920.0
-    base_size = int(64 * scale_ratio) # Slightly larger for better readability
+    base_size = int(72 * scale_ratio) # Larger base size for center focus
     
-    # Force Bold font for maximum authority
     f_main = gf(base_size, bold=True)
     
     words = [wd["word"] for wd in word_data]
@@ -2195,25 +2194,25 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     for i, wd in enumerate(word_data):
         word_widths.append(fake_draw.textbbox((0,0), words[i], font=f_main)[2] - fake_draw.textbbox((0,0), words[i], font=f_main)[0])
     
-    max_sub_width = int(frame_width * 0.85)
+    max_sub_width = int(frame_width * 0.80) # More narrow for punchy center focus
     lines = wrap_text_to_lines(words, word_widths, max_sub_width, f_main)
     
-    line_h = int(90 * scale_ratio)
+    line_h = int(110 * scale_ratio)
     
-    # Position: Top-middle third (to avoid covering avatar or being covered by UI)
-    start_y = int(frame_height * 0.42) + y_shift
+    # Position: EXACT CENTER (Reference style)
+    start_y = int(frame_height * 0.5) - (len(lines) * line_h // 2) + y_shift
     
     # Calculate dimensions for the unified background block
     max_line_w = 0
     temp_idx = 0
     for line in lines:
-        w = sum(word_widths[temp_idx:temp_idx+len(line)]) + 18 * (len(line)-1)
+        w = sum(word_widths[temp_idx:temp_idx+len(line)]) + 22 * (len(line)-1)
         if w > max_line_w:
             max_line_w = w
         temp_idx += len(line)
         
     # Draw unified background block behind all text
-    bg_pad_x, bg_pad_y = 35, 20
+    bg_pad_x, bg_pad_y = 45, 30
     block_x1 = (frame_width - max_line_w) // 2 - bg_pad_x
     block_x2 = (frame_width + max_line_w) // 2 + bg_pad_x
     block_y1 = start_y - bg_pad_y
@@ -2221,30 +2220,44 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     
     draw.rounded_rectangle(
         [block_x1, block_y1, block_x2, block_y2], 
-        radius=16, 
-        fill=(0, 0, 0, 165)
+        radius=25, 
+        fill=(0, 0, 0, 185)
     )
 
     word_idx = 0
     for i, line in enumerate(lines):
         line_y = start_y + i * line_h
-        line_w = sum(word_widths[word_idx:word_idx+len(line)]) + 18 * (len(line)-1)
+        line_w = sum(word_widths[word_idx:word_idx+len(line)]) + 22 * (len(line)-1)
         cur_x = (frame_width - line_w) // 2
 
         for word_text in line:
             wd = word_data[word_idx]
             is_active = wd["is_active"]
             
-            # Active word is Yellow, others are White
             if is_active:
-                c_fill = (255, 255, 0, 255) # Bright Yellow
+                c_fill = (204, 255, 0, 255) # Electric Yellow
+                # 1.4x scale + Tilt effect
+                f_word = gf(int(base_size * 1.4), bold=True)
+                # Create a small canvas for this word to rotate it
+                w_w, w_h = ts(word_text, f_word)
+                word_img = Image.new("RGBA", (w_w + 40, w_h + 40), (0,0,0,0))
+                word_draw = ImageDraw.Draw(word_img)
+                word_draw.text((20, 20), word_text, font=f_word, fill=c_fill)
+                
+                # Random slight tilt (-6 to +6 degrees)
+                tilt = random.choice([-6, -4, 4, 6])
+                rotated = word_img.rotate(tilt, resample=Image.BICUBIC, expand=True)
+                
+                # Paste rotated word centered on the line position
+                orig_w = word_widths[word_idx]
+                target_x = cur_x - (rotated.width - orig_w)//2
+                target_y = line_y - (rotated.height - base_size)//2 + 2
+                img.alpha_composite(rotated, (target_x, target_y))
             else:
                 c_fill = (255, 255, 255, 255)
+                draw.text((cur_x, line_y + 2), word_text, font=f_main, fill=c_fill)
             
-            # Clean text rendering (no stroke, relies entirely on the dark box)
-            draw.text((cur_x, line_y + 2), word_text, font=f_main, fill=c_fill)
-            
-            cur_x += word_widths[word_idx] + 18
+            cur_x += word_widths[word_idx] + 22
             word_idx += 1
             
     return img
@@ -2894,19 +2907,42 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 
     # Auto-inject SFX for infographics and subtitle transitions
     for chunk in chunks:
-        # Trigger woosh on every chunk start for energy
+        # 1. Woosh on every chunk (sentence) start
         cue_ts = chunk["start"]
-        sfx_path = os.path.join(ASSETS_DIR, "sfx", "woosh.wav")
-        if os.path.exists(sfx_path) and cue_ts < audio_duration:
+        sfx_path_woosh = os.path.join(ASSETS_DIR, "sfx", "woosh.wav")
+        if os.path.exists(sfx_path_woosh) and cue_ts < audio_duration:
             try:
-                sfx_clip = AudioFileClip(sfx_path)
-                max_sfx_dur = audio_duration - cue_ts
-                if sfx_clip.duration and sfx_clip.duration > max_sfx_dur:
-                    sfx_clip = sfx_clip.subclipped(0, max_sfx_dur)
-                sfx_clip = sfx_clip.with_start(cue_ts).with_effects([afx.MultiplyVolume(0.3)])
+                sfx_clip = AudioFileClip(sfx_path_woosh).with_start(cue_ts).with_effects([afx.MultiplyVolume(0.3)])
                 final_audio_layers.append(sfx_clip)
-            except Exception as e:
-                pass
+            except: pass
+            
+        # 2. Pop on IMPORTANT word highlights
+        sfx_path_pop = os.path.join(ASSETS_DIR, "sfx", "pop.wav")
+        # Common filler words to ignore for SFX
+        filler_words = {"a", "an", "the", "and", "or", "but", "if", "then", "else", "when", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "is", "am", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "it", "its", "they", "them", "their", "this", "that", "those", "these"}
+        
+        if os.path.exists(sfx_path_pop):
+            for word_data in chunk.get("words", []):
+                orig_word = word_data["word"]
+                word_text = orig_word.strip(".,!?;:\"").lower()
+                
+                # Heuristic for "important":
+                # - Not a filler word
+                # - AND (Length >= 6 OR contains digits/symbols OR is ALL CAPS)
+                is_filler = word_text in filler_words
+                is_important = not is_filler and (
+                    len(word_text) >= 6 or 
+                    any(c.isdigit() or c in "$%#*@" for c in orig_word) or 
+                    (orig_word.isupper() and len(orig_word) > 1)
+                )
+                
+                if is_important:
+                    w_start = word_data["start"]
+                    if w_start < audio_duration:
+                        try:
+                            p_clip = AudioFileClip(sfx_path_pop).with_start(w_start).with_effects([afx.MultiplyVolume(0.5)])
+                            final_audio_layers.append(p_clip)
+                        except: pass
     
     # Background Music with Auto-Ducking
     bgm_path = os.path.join(MUSIC_DIR, "modern_tech.mp3")
@@ -3091,30 +3127,78 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     final = VideoClip(make_final_frame, duration=audio_duration)
     final = final.with_audio(final_audio)
 
-    # ── END-SCREEN CTA ───────────────────────────────────────────
+    # ── TELEGRAM OUTRO CTA (Last 3s) ───────────────────────────────────────────
     cta_duration = 3.0
-    cta_img = Image.new("RGBA", (FRAME_W, FRAME_H), (15, 15, 20, 255))
+    cta_img = Image.new("RGBA", (FRAME_W, FRAME_H), (10, 10, 15, 255))
     cta_d = ImageDraw.Draw(cta_img)
-    f_cta_title = gf(90 if FRAME_W == 1080 else 140)
-    f_cta_sub = gf(50 if FRAME_W == 1080 else 80)
     
-    title_text = "Subscribe & Comment Below"
-    sub_text = "For more AI engineering insights."
+    # 1. Top Sub-header
+    f_small = gf(40)
+    txt1 = "Want to stay on top of the AI world?"
+    w1, h1 = ts(txt1, f_small)
+    cta_d.text(((FRAME_W - w1)//2, 200), txt1, fill=(255, 255, 255, 200), font=f_small)
     
-    tw, th = ts(title_text, f_cta_title)
-    sw, sh = ts(sub_text, f_cta_sub)
+    # 2. Main Header (Rich text simulation)
+    f_large = gf(68, bold=True)
+    f_large_italic = gf(68, bold=True, italic=True)
+    txt2_a, txt2_b, txt2_c = "Join the ", "free Telegram", " Community"
+    wa, _ = ts(txt2_a, f_large)
+    wb, _ = ts(txt2_b, f_large_italic)
+    wc, _ = ts(txt2_c, f_large)
+    curr_x = (FRAME_W - (wa + wb + wc)) // 2
+    cta_d.text((curr_x, 280), txt2_a, fill=(255, 255, 255, 255), font=f_large)
+    cta_d.text((curr_x + wa, 280), txt2_b, fill=(204, 255, 0, 255), font=f_large_italic)
+    cta_d.text((curr_x + wa + wb, 280), txt2_c, fill=(255, 255, 255, 255), font=f_large)
     
-    cx, cy = FRAME_W // 2, FRAME_H // 2
-    cta_d.text((cx - tw//2, cy - th - 20), title_text, fill=(*accent_color, 255), font=f_cta_title)
-    cta_d.text((cx - sw//2, cy + 20), sub_text, fill=(200, 200, 210, 255), font=f_cta_sub)
+    # 3. Pill Button
+    txt3 = "Link in Caption and Bio"
+    f_pill = gf(38, bold=True)
+    w3, h3 = ts(txt3, f_pill)
+    cta_d.rounded_rectangle([(FRAME_W - w3)//2 - 40, 390, (FRAME_W + w3)//2 + 40, 470], radius=40, outline=(204, 255, 0, 255), width=3)
+    cta_d.text(((FRAME_W - w3)//2, 405), txt3, fill=(204, 255, 0, 255), font=f_pill)
     
+    # 4. Mockup Area (Phone)
+    mock_w, mock_h = 750, 1200
+    mx1, my1 = (FRAME_W - mock_w)//2, 540
+    cta_d.rounded_rectangle([mx1, my1, mx1 + mock_w, my1 + mock_h], radius=60, fill=(255, 255, 255, 255))
+    
+    # 5. Telegram Brand Asset (tele_brand2.jpg) - Top 50% Crop
+    try:
+        brand_path = os.path.join(ASSETS_DIR, "branding", "tele_brand2.jpg")
+        if os.path.exists(brand_path):
+            brand_img = Image.open(brand_path).convert("RGBA")
+            # Crop top 50%
+            bw, bh = brand_img.size
+            brand_img = brand_img.crop((0, 0, bw, bh // 2))
+            # Resize to fit mock width
+            ratio = (mock_w - 40) / float(brand_img.width)
+            brand_img = brand_img.resize((int(brand_img.width * ratio), int(brand_img.height * ratio)), Image.LANCZOS)
+            # Paste into phone area
+            cta_img.alpha_composite(brand_img, (mx1 + 20, my1 + 250))
+            
+        # 6. Telegram Logo Overlay
+        tele_logo_path = os.path.join(ASSETS_DIR, "icons", "telegram_logo.png")
+        if os.path.exists(tele_logo_path):
+            tele_logo = Image.open(tele_logo_path).convert("RGBA").resize((100, 100), Image.LANCZOS)
+            cta_img.alpha_composite(tele_logo, (mx1 + 60, my1 + 80))
+    except Exception as e:
+        print(f"Telegram CTA branding failed: {e}")
+    
+    # Profile Info
+    cta_d.text((mx1 + 180, my1 + 110), "Telegram Community", fill=(30, 30, 30, 255), font=gf(34, bold=True))
+    
+    # Description
+    f_desc = gf(28)
+    txt_desc = "Get free source code & tools 🚀"
+    dw, _ = ts(txt_desc, f_desc)
+    cta_d.text((mx1 + (mock_w - dw)//2, my1 + 1050), txt_desc, fill=(50, 50, 50, 255), font=f_desc)
+
     cta_clip = ImageClip(np.array(cta_img.convert("RGB"))).with_duration(cta_duration)
     
     # SFX at CTA
     sfx_path = os.path.join(ASSETS_DIR, "sfx", "pop.wav")
     if os.path.exists(sfx_path):
         cta_audio = AudioFileClip(sfx_path).with_effects([afx.MultiplyVolume(0.5)])
-        # Pad CTA audio to match cta_clip duration to avoid silence issues
         silence = AudioClip(lambda t: [0,0], duration=max(0.1, cta_duration - cta_audio.duration))
         cta_audio = concatenate_audioclips([cta_audio, silence])
         cta_clip = cta_clip.with_audio(cta_audio)
