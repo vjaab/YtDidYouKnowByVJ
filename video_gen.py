@@ -2056,10 +2056,10 @@ def wrap_text_to_lines(words, word_widths, max_width, font):
     lines = []
     current_line = []
     current_w = 0
-    space_w = 12
+    space_w = 18
     for word, w in zip(words, word_widths):
-        # Enforce max 2 words per line (High-Velocity Captions)
-        if not current_line or (current_w + w <= max_width and len(current_line) < 2):
+        # Standard wrapping based on width
+        if not current_line or (current_w + w <= max_width):
             current_line.append(word)
             current_w += w + space_w
         else:
@@ -2071,12 +2071,12 @@ def wrap_text_to_lines(words, word_widths, max_width, font):
     return lines
 
 def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), frame_width=1080, frame_height=1920, y_shift=0):
-    """Premium 'Obsidian' captions: Bold Sans-Serif on dark blocks."""
+    """Clean 'Shorts' captions: Bold Sans-Serif on dark blocks with yellow highlights."""
     img = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
     scale_ratio = frame_width / 1080.0 if frame_width < frame_height else frame_width / 1920.0
-    base_size = int(62 * scale_ratio) # Slightly larger for better readability
+    base_size = int(64 * scale_ratio) # Slightly larger for better readability
     
     # Force Bold font for maximum authority
     f_main = gf(base_size, bold=True)
@@ -2088,15 +2088,13 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     for i, wd in enumerate(word_data):
         word_widths.append(fake_draw.textbbox((0,0), words[i], font=f_main)[2] - fake_draw.textbbox((0,0), words[i], font=f_main)[0])
     
-    max_sub_width = int(frame_width * 0.90)
+    max_sub_width = int(frame_width * 0.85)
     lines = wrap_text_to_lines(words, word_widths, max_sub_width, f_main)
     
-    line_h = int(100 * scale_ratio)
+    line_h = int(90 * scale_ratio)
     
-    # 2026 Positioning: Centered vertically (50% height) to match the reference Short style
-    # Apply y_shift from audit feedback
-    start_y = int(frame_height * 0.50) + y_shift
-    
+    # Position: Lower-middle third
+    start_y = int(frame_height * 0.65) + y_shift
     
     word_idx = 0
     for i, line in enumerate(lines):
@@ -2105,56 +2103,27 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
         cur_x = (frame_width - line_w) // 2
         
         # ── OBSIDIAN BLOCK (Background) ──
-        bg_pad_x, bg_pad_y = 35, 12
+        bg_pad_x, bg_pad_y = 30, 15
         draw.rounded_rectangle(
-            [cur_x - bg_pad_x, line_y - bg_pad_y, cur_x + line_w + bg_pad_x, line_y + line_h - 10], 
-            radius=18, 
-            fill=(0, 0, 0, 210) # Slightly darker for better isolation
+            [cur_x - bg_pad_x, line_y - bg_pad_y + 8, cur_x + line_w + bg_pad_x, line_y + line_h - 10], 
+            radius=12, 
+            fill=(0, 0, 0, 170)
         )
 
         for word_text in line:
             wd = word_data[word_idx]
             is_active = wd["is_active"]
-            scale = wd.get("scale", 1.0)
             
-            # ── PROGRAMMATIC COLOR CODING (Keyword Highlighting) ──
-            clean_word = word_text.lower().strip(".,!?\"'")
-            tech_keywords = {"model", "speed", "cost", "nvidia", "agent", "llm", "rag", "ai", "fast", "cheaper"}
-            is_keyword = clean_word in tech_keywords
-            
-            # ── DYNAMIC COLORING & POP (Hormozi Style) ──
+            # Active word is Yellow, others are White
             if is_active:
-                c_fill = (*accent_color, 255)
-                # Use scaled font for the active "pop" word
-                f_active = gf(int(base_size * scale), bold=True)
-                
-                # Active word gets a slight random tilt for energy
-                word_img = Image.new("RGBA", (int(word_widths[word_idx] * 2), int(line_h * 2)), (0,0,0,0))
-                w_draw = ImageDraw.Draw(word_img)
-                
-                # Center point for rotation
-                center = (word_widths[word_idx], line_h)
-                
-                # Draw with glow
-                import time
-                for dx, dy in [(-3,0),(3,0),(0,-3),(0,3)]:
-                    w_draw.text((center[0]+dx, center[1]+dy), word_text, font=f_active, fill=(*accent_color, 100), anchor="mm")
-                w_draw.text(center, word_text, font=f_active, fill=c_fill, anchor="mm")
-                
-                # Random tilt between -3 and 3 degrees
-                tilt = math.sin(time.time() * 10 + word_idx) * 3 
-                rotated_word = word_img.rotate(tilt, resample=Image.BICUBIC, expand=True)
-                
-                # Paste onto main image
-                img.alpha_composite(rotated_word, dest=(cur_x - (rotated_word.width - word_widths[word_idx])//2, 
-                                                       line_y - (rotated_word.height - line_h)//2))
+                c_fill = (255, 255, 0, 255) # Bright Yellow
             else:
-                # All non-active words are pure white, EXCEPT keywords which get Neon Green/Yellow
-                if is_keyword:
-                    c_fill = (0, 255, 127, 255) # Neon Green
-                else:
-                    c_fill = (255, 255, 255, 255)
-                draw.text((cur_x, line_y + 2), word_text, font=f_main, fill=c_fill)
+                c_fill = (255, 255, 255, 255)
+            
+            # Slight text shadow for maximum legibility
+            for dx, dy in [(-2,0),(2,0),(0,-2),(0,2)]:
+                draw.text((cur_x+dx, line_y + 2 + dy), word_text, font=f_main, fill=(0,0,0,100))
+            draw.text((cur_x, line_y + 2), word_text, font=f_main, fill=c_fill)
             
             cur_x += word_widths[word_idx] + 18
             word_idx += 1
