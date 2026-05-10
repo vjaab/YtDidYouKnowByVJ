@@ -1818,34 +1818,23 @@ def _article_screenshot_clip(screenshot_path, duration):
         arr = np.array(canvas)
         clips = []
         
-        # --- PHASE 1: Hook Evidence ---
-        start1, dur1 = 3.0, 8.0
-        if duration > start1:
-            def zoom_effect1(t):
-                progress = easeInOutQuad(min(1.0, t / dur1))
-                return 1.0 + 0.10 * progress
+        # --- PHASED LOOP: Every 10s for 5s (Full Screen Backdrop) ---
+        interval = 10.0
+        display_dur = 5.0
+        
+        for start_t in np.arange(1.0, duration - display_dur, interval):
+            current_dur = display_dur
+            def zoom_effect(t):
+                # Subtle ease-in-out zoom for premium feel
+                progress = easeInOutQuad(min(1.0, t / current_dur))
+                return 1.0 + 0.12 * progress
                 
-            clip1 = VideoClip(lambda t: arr, duration=dur1)
-            clip1 = clip1.with_effects([vfx.Resize(zoom_effect1)])
-            clip1 = clip1.cropped(width=target_w, height=target_h, x_center=target_w/2, y_center=target_h/2)
-            clip1 = clip1.with_position((0, 0)).with_start(start1)
-            clip1 = clip1.with_effects([vfx.CrossFadeIn(0.6), vfx.CrossFadeOut(0.6)])
-            clips.append(clip1)
-
-        # --- PHASE 2: Deep Dive ---
-        start2 = 12.0
-        dur2 = max(0, duration - start2 - 1.5)
-        if dur2 > 0:
-            def zoom_effect2(t):
-                progress = easeInOutQuad(min(1.0, t / dur2))
-                return 1.05 + 0.15 * progress
-                
-            clip2 = VideoClip(lambda t: arr, duration=dur2)
-            clip2 = clip2.with_effects([vfx.Resize(zoom_effect2)])
-            clip2 = clip2.cropped(width=target_w, height=target_h, x_center=target_w/2, y_center=target_h/2)
-            clip2 = clip2.with_position((0, 0)).with_start(start2)
-            clip2 = clip2.with_effects([vfx.CrossFadeIn(0.5), vfx.CrossFadeOut(0.5)])
-            clips.append(clip2)
+            clip = VideoClip(lambda t: arr, duration=current_dur)
+            clip = clip.with_effects([vfx.Resize(zoom_effect)])
+            clip = clip.cropped(width=target_w, height=target_h, x_center=target_w/2, y_center=target_h/2)
+            clip = clip.with_position((0, 0)).with_start(start_t)
+            clip = clip.with_effects([vfx.CrossFadeIn(0.6), vfx.CrossFadeOut(0.6)])
+            clips.append(clip)
             
         return clips
     except Exception as e:
@@ -2776,15 +2765,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     # if hook_overlay:
     #     engagement_clips.append(hook_overlay)
 
-    # ── Phased Article Evidence Scans (Top 50%) ──────────────────────────────────
-    screenshot_path = script_json.get("screenshot_path")
-    if screenshot_path and os.path.exists(screenshot_path):
-        # Trigger every 10 seconds for a 5-second duration
-        interval = 10.0
-        overlay_dur = 5.0
-        for t in np.arange(1.0, audio_duration - overlay_dur, interval):
-            scan = _article_scan_overlay(screenshot_path, t, duration=overlay_dur)
-            if scan: engagement_clips.append(scan)
+    # Phased scans removed in favor of full-screen loops as requested
+    pass
     # ── LAYER 12: Telegram CTA card (Last 6 seconds) ──────────────────────────
     # Disabled full-screen sequential CTA as requested; keeping only the 3s cropped outro.
     # telegram_cta = _telegram_cta_overlay(audio_duration)
@@ -2802,7 +2784,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     #         iclip = _infographic_card_clip(...)
     #         if iclip: infographic_clips.append(iclip)
 
-    base_layers = bg_layer_clips + [gradient] + logo_clips
+    base_layers = bg_layer_clips + screenshot_clips + [gradient] + logo_clips
     if flare_layer: base_layers.append(flare_layer)
     if grain_layer: base_layers.append(grain_layer)
     if avatar_pip: base_layers.append(avatar_pip)
