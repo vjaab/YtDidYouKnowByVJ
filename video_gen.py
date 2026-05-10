@@ -557,12 +557,87 @@ def _title_clip(title, duration):
 
 
 # ── LAYER 12: Telegram CTA card ───────────────────────────────────────────────
-
-
-
-
-
-# ══════════════════════════════════════════════════════════════════════════════
+def _telegram_cta_overlay(total_dur):
+    """Creates an animated Telegram CTA card sliding up in the last 6 seconds."""
+    cta_dur = 6.0
+    if total_dur < cta_dur + 2:
+        return None
+        
+    start_t = total_dur - cta_dur
+    
+    # Dimensions for the CTA card
+    card_w = int(FRAME_W * 0.85)
+    card_h = 450
+    
+    # 1. Base Canvas
+    canvas = Image.new("RGBA", (card_w, card_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(canvas)
+    
+    # Dark gray Telegram-style background
+    bg_color = (33, 45, 59, 240)
+    draw.rounded_rectangle([0, 50, card_w, card_h], radius=32, fill=bg_color, outline=(255,255,255,80), width=2)
+    
+    # Avatar
+    try:
+        avatar = Image.open(os.path.join(ASSETS_DIR, "vj_profile.jpg")).convert("RGBA")
+        avatar = avatar.resize((140, 140), Image.Resampling.LANCZOS)
+        amask = Image.new("L", (140, 140), 0)
+        ImageDraw.Draw(amask).ellipse((0, 0, 140, 140), fill=255)
+        avatar.putalpha(amask)
+        canvas.paste(avatar, (card_w // 2 - 70, 0), avatar)
+    except Exception as e:
+        print("Could not load CTA avatar", e)
+    
+    # 2. Texts
+    f_title = get_cinematic_font(42, bold=True)
+    f_sub = get_cinematic_font(32)
+    f_link = get_cinematic_font(36, bold=True)
+    f_desc = get_cinematic_font(34, italic=True)
+    
+    # Title
+    t1 = "Tech News & Job Openings by VJ"
+    tw, th = ts(t1, f_title)
+    draw.text(((card_w - tw)//2, 160), t1, font=f_title, fill=(255,255,255,255))
+    
+    # Subtitle
+    t2 = "19 subscribers"
+    tw2, th2 = ts(t2, f_sub)
+    draw.text(((card_w - tw2)//2, 210), t2, font=f_sub, fill=(150,165,180,255))
+    
+    # Link Button
+    btn_w = card_w - 100
+    btn_h = 80
+    btn_y = 270
+    draw.rounded_rectangle([50, btn_y, 50+btn_w, btn_y+btn_h], radius=20, fill=(43,82,120,255))
+    t3 = "t.me/technewsbyvj"
+    tw3, th3 = ts(t3, f_link)
+    draw.text(((card_w - tw3)//2, btn_y + (btn_h - th3)//2 - 5), t3, font=f_link, fill=(100,180,240,255)) # Light blue
+    
+    # CTA Message
+    t4 = "Join the free Telegram Community!"
+    tw4, th4 = ts(t4, f_desc)
+    draw.text(((card_w - tw4)//2, 360), t4, font=f_desc, fill=(255,255,255,220))
+    
+    t5 = "Link in Bio ↗"
+    tw5, th5 = ts(t5, f_title)
+    draw.text(((card_w - tw5)//2, 400), t5, font=f_title, fill=(255,215,0,255)) # Yellow
+    
+    arr = np.array(canvas.convert("RGB"))
+    mask = np.array(canvas.split()[3]).astype(float) / 255.0
+    
+    clip = ImageClip(arr, duration=cta_dur)
+    mclip = VideoClip(lambda t: mask, is_mask=True, duration=cta_dur)
+    
+    # Animation: Slide up from bottom
+    def pos_fn(t):
+        progress = min(1.0, t / 0.5) # slide up in 0.5s
+        ease = 1.0 - (1.0 - progress) * (1.0 - progress) # easeOutQuad
+        final_y = FRAME_H // 2 - card_h // 2 + 100 # slightly below center
+        start_y = FRAME_H + 100
+        y = start_y - (start_y - final_y) * ease
+        return ("center", int(y))
+        
+    return clip.with_mask(mclip).with_position(pos_fn).with_start(start_t)# ══════════════════════════════════════════════════════════════════════════════
 # ENGAGEMENT LAYERS (Retention Boosters)
 # ══════════════════════════════════════════════════════════════════════════════
 
@@ -2631,6 +2706,11 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     hook_overlay = _hook_text_overlay(hook_text, accent_color, audio_duration)
     if hook_overlay:
         engagement_clips.append(hook_overlay)
+        
+    # ── LAYER 12: Telegram CTA card (Last 6 seconds) ──────────────────────────
+    telegram_cta = _telegram_cta_overlay(audio_duration)
+    if telegram_cta:
+        engagement_clips.append(telegram_cta)
 
     # ── COMPOSITING ──
     # Collect infographics logic — DISABLED (user requested removal)
