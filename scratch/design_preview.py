@@ -1,52 +1,49 @@
 import os
 import sys
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 import random
 
 # Add parent dir to path
 sys.path.append(os.getcwd())
 
-from video_gen import render_subtitle_frame, gf, ts
-from efficiency_engine import render_value_header, render_efficiency_scale, render_evidence_card
+from video_gen import render_subtitle_frame, gf, ts, _prepare_screenshot_canvas
 
 FRAME_W, FRAME_H = 1080, 1920
 
 def create_preview():
-    # 1. Base Background (Zone C)
-    bg = Image.new("RGBA", (FRAME_W, FRAME_H), (15, 15, 25, 255))
-    draw = ImageDraw.Draw(bg)
-    # Mock subject
-    draw.ellipse([400, 1000, 680, 1280], fill=(50, 50, 100, 255))
+    # 1. Full Screen Article Screenshot Backdrop (Aggressive Zoom Simulation)
+    article_img = Image.new("RGB", (1200, 1600), (240, 240, 240))
+    d = ImageDraw.Draw(article_img)
+    for i in range(20):
+        d.rectangle([100, 100 + i*60, 1100, 130 + i*60], fill=(200, 200, 200))
+    d.text((150, 150), "ARTICLE EVIDENCE: 10X PERFORMANCE GAIN", fill=(50, 50, 50), font=gf(40, bold=True))
     
-    # 2. Zone A: Value Header
-    h_img = render_value_header("SQLite vs FST: The Speed Test", FRAME_W, FRAME_H, gf(48, bold=True))
-    bg.alpha_composite(h_img)
+    bg = _prepare_screenshot_canvas(article_img, FRAME_W, FRAME_H)
+    # Ensure RGBA
+    bg = bg.convert("RGBA")
     
-    # 3. Zone B: Efficiency Scale
-    p_path = "assets/problem_weight_icon.png"
-    s_path = "assets/solution_bolt_icon.png"
-    # Render at t=0.5 (mid-animation)
-    scale_img = render_efficiency_scale(0.5, 1.0, FRAME_W, FRAME_H, p_path, s_path)
-    bg.alpha_composite(scale_img)
+    # 2. Simulate the 35% zoom
+    zoom_factor = 1.35
+    zw, zh = int(FRAME_W * zoom_factor), int(FRAME_H * zoom_factor)
+    bg = bg.resize((zw, zh), Image.Resampling.LANCZOS)
+    bg = bg.crop(((zw - FRAME_W)//2, (zh - FRAME_H)//2, (zw + FRAME_W)//2, (zh + FRAME_H)//2))
     
-    # 4. Zone B: Evidence Card
-    ev_data = {"title": "Benchmark Results", "value": "10x Faster Processing"}
-    ev_img = render_evidence_card(ev_data, FRAME_W, FRAME_H, gf(32), gf(64, bold=True))
-    bg.alpha_composite(ev_img)
-    
-    # 5. Captions (Centered)
+    # 3. Captions
     word_data = [
-        {"word": "FST", "is_active": False},
-        {"word": "is", "is_active": False},
-        {"word": "10x", "is_active": True},
-        {"word": "Faster", "is_active": True},
+        {"word": "This", "is_active": False, "start": 0, "end": 0.5},
+        {"word": "Security", "is_active": False, "start": 0.5, "end": 1.0},
+        {"word": "Expert", "is_active": True, "start": 1.0, "end": 1.5},
+        {"word": "Lives", "is_active": True, "start": 1.5, "end": 2.0},
     ]
+    
     sub_img = render_subtitle_frame(word_data, frame_width=FRAME_W, frame_height=FRAME_H)
+    sub_img = sub_img.convert("RGBA")
+    
     bg.alpha_composite(sub_img)
     
-    # Save preview
-    out_path = "design_preview_universal.png"
+    # 4. Save preview
+    out_path = "design_preview_final.png"
     bg.convert("RGB").save(out_path)
     print(f"Preview saved to {out_path}")
 

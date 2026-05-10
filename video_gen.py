@@ -2191,6 +2191,15 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     # Position: EXACT CENTER (Reference style)
     start_y = int(frame_height * 0.5) - (len(lines) * line_h // 2) + y_shift
     
+    # Calculate dimensions for the unified background block
+    max_line_w = 0
+    temp_idx = 0
+    for line in lines:
+        line_w = sum(word_widths[temp_idx:temp_idx+len(line)]) + 22 * (len(line)-1)
+        if line_w > max_line_w:
+            max_line_w = line_w
+        temp_idx += len(line)
+    
     # Restore Obsidian Background Block (Reference Style)
     bg_pad_x, bg_pad_y = 50, 35
     block_x1 = (frame_width - max_line_w) // 2 - bg_pad_x
