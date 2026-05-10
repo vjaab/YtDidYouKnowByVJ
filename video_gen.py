@@ -565,104 +565,94 @@ def _telegram_cta_overlay(total_dur):
         
     start_t = total_dur - cta_dur
     
-    # Dimensions for the CTA card
-    card_w = int(FRAME_W * 0.85)
-    card_h = 600
-    
-    # 1. Base Canvas
-    canvas = Image.new("RGBA", (card_w, card_h), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(canvas)
-    
-    # Dark gray Telegram-style background
-    bg_color = (33, 45, 59, 240)
-    draw.rounded_rectangle([0, 100, card_w, card_h], radius=32, fill=bg_color, outline=(255,255,255,80), width=2)
-    
-    # Avatar (Elite, Face-prioritized)
+    # ── LAYER 12: Telegram CTA card ───────────────────────────────────────────────
+def _telegram_cta_overlay(total_dur):
+    """Creates a premium animated dual-card Telegram CTA using two authentic screenshots."""
+    cta_dur = 6.0
+    if total_dur < cta_dur + 2:
+        return None
+    start_t = total_dur - cta_dur
+
     try:
-        av_size = 220
-        border_size = 8
-        avatar = Image.open(os.path.join(ASSETS_DIR, "vj_profile.jpg")).convert("RGBA")
+        p1 = os.path.join(ASSETS_DIR, "branding", "tele_brand1.jpg")
+        p2 = os.path.join(ASSETS_DIR, "branding", "tele_brand2.jpg")
         
-        w, h = avatar.size
-        min_dim = min(w, h)
-        # Zoom in slightly (15%) to make face highly prominent
-        zoom = int(min_dim * 0.15)
-        avatar = avatar.crop(((w-min_dim)//2 + zoom, (h-min_dim)//2 + zoom, (w+min_dim)//2 - zoom, (h+min_dim)//2 - zoom))
+        # Use .png fallback if .jpg doesn't exist (flexible)
+        if not os.path.exists(p1): p1 = p1.replace(".jpg", ".png")
+        if not os.path.exists(p2): p2 = p2.replace(".jpg", ".png")
         
-        avatar = avatar.resize((av_size, av_size), Image.Resampling.LANCZOS)
-        amask = Image.new("L", (av_size, av_size), 0)
-        ImageDraw.Draw(amask).ellipse((0, 0, av_size, av_size), fill=255)
-        avatar.putalpha(amask)
+        if not os.path.exists(p1) or not os.path.exists(p2):
+            print("[WARNING] Missing tele_brand1 or tele_brand2 for Dual CTA.")
+            return None
+
+        # Load both
+        img1 = Image.open(p1).convert("RGBA") # The "Community Feed" screenshot
+        img2 = Image.open(p2).convert("RGBA") # The "Profile" screenshot
         
-        total_av_size = av_size + (border_size * 2)
-        av_canvas = Image.new("RGBA", (total_av_size, total_av_size), (0, 0, 0, 0))
-        av_draw = ImageDraw.Draw(av_canvas)
+        card_w = int(FRAME_W * 0.72) # Slightly narrower to allow stacking
         
-        # Elite gold ring
-        ring_color = (255, 215, 0, 255)
-        av_draw.ellipse((0, 0, total_av_size, total_av_size), fill=ring_color)
+        def process_card(im, w):
+            ratio = w / float(im.width)
+            # Crop 5% from top/bottom to remove status bars cleanly
+            crop_t = int(im.height * 0.04)
+            crop_b = int(im.height * 0.04)
+            im = im.crop((0, crop_t, im.width, im.height - crop_b))
+            
+            h = int(im.height * ratio)
+            im = im.resize((w, h), Image.Resampling.LANCZOS)
+            
+            mask = Image.new("L", (w, h), 0)
+            ImageDraw.Draw(mask).rounded_rectangle([0, 0, w, h], radius=45, fill=255)
+            im.putalpha(mask)
+            return im
+            
+        c1 = process_card(img1, card_w) # Back card
+        c2 = process_card(img2, card_w) # Front card
         
-        # Inner dark gap ring
-        av_draw.ellipse((4, 4, total_av_size-4, total_av_size-4), fill=bg_color)
+        # Composite Canvas
+        canvas_w = int(card_w * 1.15)
+        canvas_h = int(c2.height * 1.1)
+        canvas = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(canvas)
         
-        av_canvas.paste(avatar, (border_size, border_size), avatar)
+        # Card 1 (Background - slightly offset to the right)
+        off_x = int(card_w * 0.12)
+        canvas.paste(c1, (off_x, 0), c1)
+        draw.rounded_rectangle([off_x, 0, off_x + card_w, c1.height], radius=45, outline=(255,215,0,80), width=4)
         
-        paste_x = card_w // 2 - total_av_size // 2
-        paste_y = 0
-        canvas.paste(av_canvas, (paste_x, paste_y), av_canvas)
+        # Card 2 (Foreground - primary profile view)
+        canvas.paste(c2, (0, 40), c2)
+        draw.rounded_rectangle([0, 40, card_w, 40 + c2.height], radius=45, outline=(255,215,0,230), width=8)
+        
+        # "Link in Bio" Text Anchor
+        f_cta = get_cinematic_font(52, bold=True)
+        txt = "Link in Bio ↗"
+        tw, th = ts(txt, f_cta)
+        # Shadow for text
+        draw.text(((canvas_w - tw)//2 + 3, canvas_h - th - 7), txt, font=f_cta, fill=(0,0,0,180))
+        draw.text(((canvas_w - tw)//2, canvas_h - th - 10), txt, font=f_cta, fill=(255, 215, 0, 255))
+        
+        arr = np.array(canvas.convert("RGB"))
+        alpha = np.array(canvas.split()[3]).astype(float) / 255.0
+        
+        clip = ImageClip(arr, duration=cta_dur)
+        mclip = VideoClip(lambda t: alpha, is_mask=True, duration=cta_dur)
+        
+        def pos_fn(t):
+            # Smooth cinematic slide-up with overshoot
+            progress = min(1.0, t / 0.7)
+            # Cubic ease out
+            ease = 1 - pow(1 - progress, 3)
+            final_y = FRAME_H // 2 - canvas_h // 2 + 80
+            start_y = FRAME_H + 200
+            y = start_y - (start_y - final_y) * ease
+            return ("center", int(y))
+            
+        return clip.with_mask(mclip).with_position(pos_fn).with_start(start_t)
+        
     except Exception as e:
-        print("Could not load CTA avatar", e)
-    
-    # 2. Texts
-    f_title = get_cinematic_font(42, bold=True)
-    f_sub = get_cinematic_font(32)
-    f_link = get_cinematic_font(36, bold=True)
-    f_desc = get_cinematic_font(34, italic=True)
-    
-    # Title
-    t1 = "Tech News & Job Openings by VJ"
-    tw, th = ts(t1, f_title)
-    draw.text(((card_w - tw)//2, 260), t1, font=f_title, fill=(255,255,255,255))
-    
-    # Subtitle
-    t2 = "19 subscribers"
-    tw2, th2 = ts(t2, f_sub)
-    draw.text(((card_w - tw2)//2, 310), t2, font=f_sub, fill=(150,165,180,255))
-    
-    # Link Button
-    btn_w = card_w - 100
-    btn_h = 80
-    btn_y = 380
-    draw.rounded_rectangle([50, btn_y, 50+btn_w, btn_y+btn_h], radius=20, fill=(43,82,120,255))
-    t3 = "t.me/technewsbyvj"
-    tw3, th3 = ts(t3, f_link)
-    draw.text(((card_w - tw3)//2, btn_y + (btn_h - th3)//2 - 5), t3, font=f_link, fill=(100,180,240,255)) # Light blue
-    
-    # CTA Message
-    t4 = "Join the free Telegram Community!"
-    tw4, th4 = ts(t4, f_desc)
-    draw.text(((card_w - tw4)//2, 490), t4, font=f_desc, fill=(255,255,255,220))
-    
-    t5 = "Link in Bio ↗"
-    tw5, th5 = ts(t5, f_title)
-    draw.text(((card_w - tw5)//2, 540), t5, font=f_title, fill=(255,215,0,255)) # Yellow
-    
-    arr = np.array(canvas.convert("RGB"))
-    mask = np.array(canvas.split()[3]).astype(float) / 255.0
-    
-    clip = ImageClip(arr, duration=cta_dur)
-    mclip = VideoClip(lambda t: mask, is_mask=True, duration=cta_dur)
-    
-    # Animation: Slide up from bottom
-    def pos_fn(t):
-        progress = min(1.0, t / 0.5) # slide up in 0.5s
-        ease = 1.0 - (1.0 - progress) * (1.0 - progress) # easeOutQuad
-        final_y = FRAME_H // 2 - card_h // 2 + 100 # slightly below center
-        start_y = FRAME_H + 100
-        y = start_y - (start_y - final_y) * ease
-        return ("center", int(y))
-        
-    return clip.with_mask(mclip).with_position(pos_fn).with_start(start_t)# ══════════════════════════════════════════════════════════════════════════════
+        print("Dual Card CTA Error:", e)
+        return None# ══════════════════════════════════════════════════════════════════════════════
 # ENGAGEMENT LAYERS (Retention Boosters)
 # ══════════════════════════════════════════════════════════════════════════════
 
