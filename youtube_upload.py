@@ -61,7 +61,7 @@ def get_authenticated_service():
         return None
 
 
-def upload_video(video_path, title, description, tags, thumbnail_path=None, category_id="27", comment_hook=None):
+def upload_video(video_path, title, description, tags, thumbnail_path=None, category_id="28", comment_hook=None):
     youtube = get_authenticated_service()
     if not youtube:
         return False, "Failed to authenticate with YouTube API"
