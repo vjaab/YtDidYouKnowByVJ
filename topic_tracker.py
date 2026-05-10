@@ -125,3 +125,11 @@ def record_story(title, news_headline, subcategory, companies, keywords, breakin
     }
     tracker.setdefault("history", []).append(history_entry)
     save_tracker(tracker)
+
+def update_youtube_url(news_headline, youtube_url):
+    tracker = load_tracker()
+    for entry in tracker.get("history", []):
+        if entry.get("news_headline") == news_headline:
+            entry["youtube_url"] = youtube_url
+            break
+    save_tracker(tracker)

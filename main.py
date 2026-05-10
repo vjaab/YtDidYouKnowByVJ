@@ -272,6 +272,21 @@ def run_pipeline(topic_type="research"):
         log_message("ERROR: Could not capture article screenshot after all retries. Aborting.")
         return False
 
+    # ── STEP 4.5: Reserve Topic Early ─────────────────────────────────────────
+    log_message("STEP 4.5: Reserving topic in tracker to prevent reuse on failure...")
+    title  = script_data.get("title", "Tech News!")
+    subcat = script_data.get("sub_category", "")
+    companies   = script_data.get("companies_mentioned", [])
+    keywords    = script_data.get("keywords", [])
+    breaking_level = script_data.get("breaking_news_level", 0)
+    voice_used  = script_data.get("edge_tts_voice")
+    
+    record_story(
+        title, script_data.get("original_news_headline"),
+        subcat, companies, keywords, breaking_level,
+        voice_used, "pending_upload", script_data.get("original_news_url")
+    )
+
     # ── STEP 5: Build Visual Chunks ───────────────────────────────────────────
     log_message("STEP 5: Grouping words into visual chunks...")
     from audio_gen import clean_tts_text
@@ -381,12 +396,9 @@ def run_pipeline(topic_type="research"):
     log_message(f"📌 PINNED COMMENT TEMPLATE:\n\n{pinned_comment}\n")
 
     # ── STEP 11: Update Tracker ───────────────────────────────────────────────
-    log_message("STEP 11: Updating story tracker...")
-    record_story(
-        title, script_data.get("original_news_headline"),
-        subcat, companies, keywords, breaking_level,
-        voice_used, youtube_url, script_data.get("original_news_url")
-    )
+    log_message("STEP 11: Updating YouTube URL in tracker...")
+    from topic_tracker import update_youtube_url
+    update_youtube_url(script_data.get("original_news_headline"), youtube_url)
 
     # ── STEP 12: Cleanup Output Folder ────────────────────────────────────────
     log_message("STEP 12: Cleaning up output folder...")
