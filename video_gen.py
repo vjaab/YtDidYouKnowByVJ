@@ -2587,10 +2587,11 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     if not visual_paths:
         bg_layer_clips.append(ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=audio_duration))
     else:
-        crossfade = 0.1
+        crossfade = 0.4 # Increased for smoother motion transitions
         num_clips = len(visual_paths)
         clip_dur = (audio_duration + (num_clips - 1) * crossfade) / num_clips
         current_start = 0.0
+        
         for i, vp in enumerate(visual_paths):
             try:
                 if vp.endswith(".mp4"):
@@ -2602,6 +2603,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 else:
                     c_clip = ImageClip(vp).with_duration(clip_dur)
                 
+                # Standard Resize & Crop to 9:16
                 w, h = c_clip.size
                 target_h = int(w * 16 / 9)
                 if target_h <= h:
@@ -2614,25 +2616,45 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
                 c_clip = c_clip.resized((FRAME_W, FRAME_H))
                 
-                if script_json.get("breaking_news_level", 0) >= 8 and random.random() < 0.45:
-                    split_h = FRAME_H // 2
-                    top_half = c_clip.cropped(y2=split_h)
-                    bottom_half = c_clip.cropped(y1=split_h).with_effects([vfx.MirrorX()])
-                    c_clip = CompositeVideoClip([
-                        top_half.with_position(("center", "top")),
-                        bottom_half.with_position(("center", "bottom"))
-                    ], size=(FRAME_W, FRAME_H))
+                # ── CREATIVE TRANSITIONS ──
+                if i > 0:
+                    trans_type = random.choice(["zoom", "slide_r", "slide_l", "slide_t", "glitch"])
+                    
+                    if trans_type == "zoom":
+                        # Dramatic Zoom In
+                        c_clip = c_clip.with_effects([vfx.CrossFadeIn(crossfade)])
+                        c_clip = c_clip.resized(lambda t: 1.3 - (0.3 * min(1, t / crossfade)) if t < crossfade else 1.0)
+                    
+                    elif "slide" in trans_type:
+                        # Smooth Directional Slide
+                        c_clip = c_clip.with_effects([vfx.CrossFadeIn(crossfade * 0.5)])
+                        def slide_pos(t):
+                            if t > crossfade: return ("center", "center")
+                            prog = t / crossfade
+                            # Exponential ease out for 'smooth' feel
+                            prog = 1 - (1 - prog)**3 
+                            if trans_type == "slide_r": return (int(FRAME_W * (1 - prog)), "center")
+                            if trans_type == "slide_l": return (int(-FRAME_W * (1 - prog)), "center")
+                            if trans_type == "slide_t": return ("center", int(-FRAME_H * (1 - prog)))
+                            return ("center", "center")
+                        c_clip = c_clip.with_position(slide_pos)
+                    
+                    elif trans_type == "glitch":
+                        # Fast Glitch Cut
+                        c_clip = c_clip.with_effects([vfx.CrossFadeIn(0.1)])
+                        # (Glitch logic is handled per-frame in make_final_frame based on start time)
+                        pass
 
-                # Increased Ken Burns effect for article/screenshot backgrounds (12% to 22% zoom)
-                scale_factor = 1.0 + random.uniform(0.15, 0.22)
+                    # Impact Flash Sync
+                    flash = ColorClip(size=(FRAME_W, FRAME_H), color=(255, 255, 255), duration=0.2).with_opacity(0.6)
+                    flash = flash.with_start(current_start).with_effects([vfx.CrossFadeOut(0.15)])
+                    logo_clips.append(flash)
+
+                # ── CONTINUOUS MOTION ──
+                scale_factor = 1.0 + random.uniform(0.18, 0.25)
                 c_clip = c_clip.resized(lambda t: 1.0 + (scale_factor - 1.0) * (t / clip_dur))
                 c_clip = _apply_handheld_shake(c_clip)
                 c_clip = c_clip.with_start(current_start)
-                
-                if i > 0:
-                    flash = ColorClip(size=(FRAME_W, FRAME_H), color=(255, 255, 255), duration=0.15).with_opacity(0.7)
-                    flash = flash.with_start(current_start).with_effects([vfx.CrossFadeOut(0.1)])
-                    logo_clips.append(flash)
                 
                 bg_layer_clips.append(c_clip)
                 current_start += (clip_dur - crossfade)
