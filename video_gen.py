@@ -2212,16 +2212,17 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
         temp_idx += len(line)
         
     # Draw unified background block behind all text
-    bg_pad_x, bg_pad_y = 45, 30
+    bg_pad_x, bg_pad_y = 50, 35
     block_x1 = (frame_width - max_line_w) // 2 - bg_pad_x
     block_x2 = (frame_width + max_line_w) // 2 + bg_pad_x
     block_y1 = start_y - bg_pad_y
     block_y2 = start_y + len(lines) * line_h - (line_h - base_size) + bg_pad_y
     
+    # Obsidian Block: Highly contrasting, slightly more opaque (0.85)
     draw.rounded_rectangle(
         [block_x1, block_y1, block_x2, block_y2], 
-        radius=25, 
-        fill=(0, 0, 0, 185)
+        radius=30, 
+        fill=(0, 0, 0, 217) 
     )
 
     word_idx = 0
@@ -2236,25 +2237,37 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
             
             if is_active:
                 c_fill = (204, 255, 0, 255) # Electric Yellow
-                # 1.4x scale + Tilt effect
                 f_word = gf(int(base_size * 1.4), bold=True)
-                # Create a small canvas for this word to rotate it
                 w_w, w_h = ts(word_text, f_word)
-                word_img = Image.new("RGBA", (w_w + 40, w_h + 40), (0,0,0,0))
+                word_img = Image.new("RGBA", (w_w + 60, w_h + 60), (0,0,0,0))
                 word_draw = ImageDraw.Draw(word_img)
-                word_draw.text((20, 20), word_text, font=f_word, fill=c_fill)
                 
-                # Random slight tilt (-6 to +6 degrees)
+                # High-Contrast Edge: 3px black stroke simulation
+                stroke = 3
+                for dx in range(-stroke, stroke+1):
+                    for dy in range(-stroke, stroke+1):
+                        if dx*dx + dy*dy <= stroke*stroke:
+                            word_draw.text((30+dx, 30+dy), word_text, font=f_word, fill=(0,0,0,255))
+                
+                # 3D Depth: 4px offset shadow
+                word_draw.text((34, 34), word_text, font=f_word, fill=(0,0,0,180))
+                # Main Text
+                word_draw.text((30, 30), word_text, font=f_word, fill=c_fill)
+                
                 tilt = random.choice([-6, -4, 4, 6])
                 rotated = word_img.rotate(tilt, resample=Image.BICUBIC, expand=True)
                 
-                # Paste rotated word centered on the line position
                 orig_w = word_widths[word_idx]
                 target_x = cur_x - (rotated.width - orig_w)//2
                 target_y = line_y - (rotated.height - base_size)//2 + 2
                 img.alpha_composite(rotated, (target_x, target_y))
             else:
                 c_fill = (255, 255, 255, 255)
+                # Inactive words get a 2px stroke and offset shadow for readability
+                for dx in range(-2, 3):
+                    for dy in range(-2, 3):
+                        draw.text((cur_x+dx, line_y+2+dy), word_text, font=f_main, fill=(0,0,0,255))
+                draw.text((cur_x+2, line_y+4), word_text, font=f_main, fill=(0,0,0,160))
                 draw.text((cur_x, line_y + 2), word_text, font=f_main, fill=c_fill)
             
             cur_x += word_widths[word_idx] + 22
