@@ -558,9 +558,9 @@ def _title_clip(title, duration):
 
 # ── LAYER 12: Telegram CTA card ───────────────────────────────────────────────
 def _telegram_cta_overlay(total_dur):
-    """Shows the two Telegram screenshots sequentially in the last 6 seconds."""
-    cta_dur = 6.0
-    if total_dur < cta_dur + 2:
+    """Shows the two Telegram screenshots sequentially in the last 4 seconds."""
+    cta_dur = 4.0
+    if total_dur < cta_dur + 1:
         return None
     start_t = total_dur - cta_dur
 
@@ -587,11 +587,29 @@ def _telegram_cta_overlay(total_dur):
             clip = ImageClip(arr, duration=duration)
             return clip.with_position("center").with_start(start_t + start_offset)
 
-        # Show brand1 for 3s, then brand2 for 3s
-        c1 = create_simple_clip(p1, 3.0, 0)
-        c2 = create_simple_clip(p2, 3.0, 3.0)
+        # Show brand1 for 2s, then brand2 for 2s (Total 4s Blitz)
+        c1 = create_simple_clip(p1, 2.0, 0)
+        c2 = create_simple_clip(p2, 2.0, 2.0)
         
-        return [c1, c2] # Return list of clips to be added to engagement_clips
+        # Add "Source Code & Guide" overlay text in the top half
+        from moviepy.video.VideoClip import TextClip
+        f_cta = get_cinematic_font(48, bold=True)
+        txt = "Get the Full Resource Guide 📥\nLink in Bio"
+        
+        # We'll use a manual Text Overlay on a small canvas to avoid ImageMagick dependencies if possible,
+        # but since we already have ImageDraw logic elsewhere, let's stick to it.
+        def make_txt_overlay(t):
+            overlay = Image.new("RGBA", (FRAME_W, 200), (0,0,0,0))
+            d = ImageDraw.Draw(overlay)
+            tw, th = ts(txt, f_cta)
+            # Semi-transparent backing
+            d.rounded_rectangle([(FRAME_W-tw)//2-20, 20, (FRAME_W+tw)//2+20, 180], radius=20, fill=(0,0,0,180))
+            d.text(((FRAME_W-tw)//2, 50), txt, font=f_cta, fill=(255,215,0,255), align="center")
+            return np.array(overlay)
+
+        t_overlay = VideoClip(make_txt_overlay, duration=cta_dur).with_position(("center", 150)).with_start(start_t)
+        
+        return [c1, c2, t_overlay]
         
     except Exception as e:
         print("Sequential CTA Error:", e)
@@ -600,6 +618,58 @@ def _telegram_cta_overlay(total_dur):
     except Exception as e:
         print("Dual Card CTA Error:", e)
         return None# ══════════════════════════════════════════════════════════════════════════════
+# ── LAYER E2: Article Evidence Scan (Social Proof) ─────────────────────────────
+def _article_scan_overlay(image_path, start_t, duration=2.5):
+    """Slides an article snippet in from the side in the top 50% zone."""
+    try:
+        img = Image.open(image_path).convert("RGBA")
+        
+        # We want a "Snippet" feel, so we take the top-middle part of the article
+        w, h = img.size
+        # Crop a nice horizontal strip
+        snippet = img.crop((0, int(h*0.05), w, int(h*0.45)))
+        
+        # Scale to fit width
+        target_w = int(FRAME_W * 0.9)
+        ratio = target_w / float(snippet.width)
+        target_h = int(snippet.height * ratio)
+        snippet = snippet.resize((target_w, target_h), Image.Resampling.LANCZOS)
+        
+        # Add rounded corners and a glowy border
+        mask = Image.new("L", (target_w, target_h), 0)
+        ImageDraw.Draw(mask).rounded_rectangle([0, 0, target_w, target_h], radius=30, fill=255)
+        snippet.putalpha(mask)
+        
+        # Add "EVIDENCE" badge
+        draw = ImageDraw.Draw(snippet)
+        f_badge = get_cinematic_font(32, bold=True)
+        draw.rounded_rectangle([20, 20, 220, 70], radius=10, fill=(255, 0, 0, 230))
+        draw.text((45, 25), "EVIDENCE", font=f_badge, fill=(255,255,255,255))
+        
+        arr = np.array(snippet.convert("RGB"))
+        alpha = np.array(snippet.split()[3]).astype(float) / 255.0
+        
+        clip = ImageClip(arr, duration=duration)
+        mclip = VideoClip(lambda t: alpha, is_mask=True, duration=duration)
+        
+        def pos_fn(t):
+            # Slide in from right, pause, slide out to left
+            if t < 0.5:
+                # Slide in
+                x = FRAME_W - (FRAME_W - (FRAME_W - target_w)//2) * (t/0.5)
+            elif t > duration - 0.5:
+                # Slide out
+                x = (FRAME_W - target_w)//2 - (target_w + 100) * ((t - (duration-0.5))/0.5)
+            else:
+                x = (FRAME_W - target_w)//2
+            return (int(x), 280) # Top 50% zone
+            
+        return clip.with_mask(mclip).with_position(pos_fn).with_start(start_t)
+    except Exception as e:
+        print(f"Evidence Scan Error: {e}")
+        return None
+
+# ══════════════════════════════════════════════════════════════════════════════
 # ENGAGEMENT LAYERS (Retention Boosters)
 # ══════════════════════════════════════════════════════════════════════════════
 
@@ -2130,8 +2200,8 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     
     line_h = int(90 * scale_ratio)
     
-    # Position: Lower-middle third
-    start_y = int(frame_height * 0.65) + y_shift
+    # Position: Top-middle third (to avoid covering avatar or being covered by UI)
+    start_y = int(frame_height * 0.42) + y_shift
     
     # Calculate dimensions for the unified background block
     max_line_w = 0
@@ -2668,6 +2738,15 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     hook_overlay = _hook_text_overlay(hook_text, accent_color, audio_duration)
     if hook_overlay:
         engagement_clips.append(hook_overlay)
+
+    # ── 3x Article Evidence Scans (Top 50%) ──────────────────────────────────
+    screenshot_path = script_json.get("screenshot_path")
+    if screenshot_path and os.path.exists(screenshot_path):
+        # High-impact timestamps from feedback: 12s, 28s, 45s
+        for t in [12.0, 28.0, 45.0]:
+            if t < audio_duration - 6:
+                scan = _article_scan_overlay(screenshot_path, t)
+                if scan: engagement_clips.append(scan)
     # ── LAYER 12: Telegram CTA card (Last 6 seconds) ──────────────────────────
     telegram_cta = _telegram_cta_overlay(audio_duration)
     if telegram_cta:

@@ -23,7 +23,8 @@ Constraint Checklist:
 SUCCESS PATTERNS (2026): 
 - HOOKS: Focus on "Fear of Privacy Leaks" or "Shadow AI" dangers. Start with a "Result-First" statement.
 - ANALOGIES: Use sharp analogies to explain complex breakthroughs.
-- CTAs: At the end of every script, you MUST first ask a highly provocative, open-ended question to the viewers about the topic to drive comments. THEN, immediately after the question, you MUST explicitly say verbatim: "Join my telegram channel for updates like these, link in bio! And subscribe for more AI related videos." This is a hard requirement for the outro. """
+- 3x ARTICLE EVIDENCE: You MUST explicitly reference source articles, documentation, or code repositories at least 3 times during the script to build authority.
+- CTAs: At the end of every script, you MUST first ask a highly provocative, open-ended question to the viewers about the topic to drive comments. THEN, immediately after the question, you MUST explicitly say verbatim: "I just posted the full source code and guide on my Telegram. Grab it now—link in bio! And subscribe for more AI tech." This is a hard requirement for the outro. """
 
 RESEARCH_AGENT_TEMPLATE = """{persona}
 
@@ -71,9 +72,11 @@ Using the selected hook and research, create a short storytelling flow and escal
 Include:
 1. Hook (The selected hook)
 2. Context (3-10s) - Who, What, Why it matters quickly.
-3. Escalation (10-25s) - Implications, consequences, future impact.
-4. The Analogy (25-35s) - Use a high-impact analogy (like 'Scalpel vs Sledgehammer') to simplify a complex point.
-5. Open Loop (40-50s) - Lingering provocative thought to drive engagement.
+3. Escalation (10-25s) - Implications, consequences, future impact. Include ARTICLE EVIDENCE #1 here.
+4. The Analogy (25-35s) - Use a high-impact analogy to simplify a complex point. Include ARTICLE EVIDENCE #2 here.
+5. The Twist (35-45s) - A counter-intuitive technical fact. Include ARTICLE EVIDENCE #3 here.
+6. Open Loop (45-55s) - Lingering provocative thought to drive engagement.
+7. CTA (Last 4s) - Sequential Telegram promotion.
 
 RESEARCH:
 {research_json}
