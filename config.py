@@ -27,12 +27,15 @@ for d in [OUTPUT_DIR, LOGS_DIR, FONTS_DIR, MUSIC_DIR]:
 
 # Application Settings
 TIMEZONE = "Asia/Kolkata"
-UPLOAD_TIMES = ["09:00", "16:00", "04:00"] # 9 AM, 4 PM (Shorts), 4 AM Wed/Sat/Sun (Longform)
+UPLOAD_TIMES = ["09:00", "16:00", "04:00"] # 9 AM, 4 PM, 4 AM (All Shorts)
 MAX_RETRY_ATTEMPTS = 10
 SIMILARITY_THRESHOLD = 75
 CATEGORY_COOLDOWN_DAYS = 3
 BGM_VOLUME = 0.07
 TARGET_AUDIO_DURATION = (38, 44) # Optimized for replay-ability (Algorithmic Spec 2026)
+
+# Global Feature Flags
+ENABLE_LONGFORM = False
 
 # Engagement & Retention Pillars (Production Spec 2026)
 ENABLE_KINETIC_CAPTIONS = True

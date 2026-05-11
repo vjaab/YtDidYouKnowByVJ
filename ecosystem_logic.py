@@ -1,4 +1,5 @@
 import datetime
+from config import ENABLE_LONGFORM
 
 def get_slot_info():
     """
@@ -14,7 +15,10 @@ def get_slot_info():
     # Longform (Slot C) - 22:30 UTC -> 04:00 IST (Next day)
     
     if hour >= 20:
-        slot = "Slot C (Longform)"
+        if ENABLE_LONGFORM:
+            slot = "Slot C (Longform)"
+        else:
+            slot = "Slot A (Discovery)" # Fallback to Shorts during longform hours
     elif hour < 8:
         slot = "Slot A (Discovery)"
     else:
