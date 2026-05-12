@@ -30,7 +30,7 @@ def log_message(msg):
     print(msg)
 
 
-def format_description(ai_description, script, hashtags, slot="Slot A", chunks=None, relevant_links=[]):
+def format_description(ai_description, script, hashtags, slot="Slot A", chunks=None, relevant_links=[], source_url=""):
     hashtag_str = " ".join(hashtags) if hashtags else ""
     
     # ── Action-Oriented Summary ──
@@ -59,6 +59,8 @@ def format_description(ai_description, script, hashtags, slot="Slot A", chunks=N
     links_str = ""
     if relevant_links:
         links_str = "\n".join([f"🔗 {link}" for link in relevant_links[:3]]) + "\n"
+        
+    source_str = f"📰 SOURCE ARTICLE: {source_url}\n" if source_url else ""
 
     return f"""🚀 ELITE AI ENGINEERING → https://wa.me/919585793939
 🔥 Automated Agentic Systems & Cost-Optimized AI.
@@ -66,6 +68,7 @@ def format_description(ai_description, script, hashtags, slot="Slot A", chunks=N
 💡 {clean_summary}
 {timestamps_str}
 ━━━━━━━━━━━━━━━━━━━━━━
+{source_str}━━━━━━━━━━━━━━━━━━━━━━
 🛠️ IMPLEMENTATION BLUEPRINT & RESOURCES:
 
 {links_str if links_str else "🚀 SOTA AGENTIC LOOPS (Local & Cloud Hybrid)"}
@@ -367,7 +370,8 @@ def run_pipeline(topic_type="research"):
     ai_desc = script_data.get("description", "")
     # ── Output Metadata ──
     relevant_links = script_data.get("relevant_links", [])
-    description = format_description(ai_desc, script, hashtags, slot=slot, chunks=chunks, relevant_links=relevant_links)
+    source_url = script_data.get("original_news_url", "")
+    description = format_description(ai_desc, script, hashtags, slot=slot, chunks=chunks, relevant_links=relevant_links, source_url=source_url)
     # Ensure variety in titles using the options if generated
     if script_data.get("title_options"):
         title = random.choice(script_data["title_options"])
