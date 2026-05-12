@@ -19,10 +19,13 @@ LOGS_DIR = os.path.join(BASE_DIR, "logs")
 ASSETS_DIR = os.path.join(BASE_DIR, "assets")
 FONTS_DIR = os.path.join(ASSETS_DIR, "fonts")
 MUSIC_DIR = os.path.join(ASSETS_DIR, "music")
+INTROS_DIR = os.path.join(ASSETS_DIR, "intros")
+OUTROS_DIR = os.path.join(ASSETS_DIR, "outros")
+AVATARS_DIR = os.path.join(ASSETS_DIR, "avatars")
 TRACKER_FILE = os.path.join(BASE_DIR, "news_log.json")
 
 # Create required directories
-for d in [OUTPUT_DIR, LOGS_DIR, FONTS_DIR, MUSIC_DIR]:
+for d in [OUTPUT_DIR, LOGS_DIR, FONTS_DIR, MUSIC_DIR, INTROS_DIR, OUTROS_DIR, AVATARS_DIR]:
     os.makedirs(d, exist_ok=True)
 
 # Application Settings
