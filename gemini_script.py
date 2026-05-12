@@ -233,6 +233,15 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
                 breaking_keywords = ["launch", "release", "leak", "breakthrough", "benchmark", "announces", "unveils", "shuts down"]
                 hot_score += sum(10 for kw in breaking_keywords if kw in title_lower)
                 
+                # Recency Boost (Last 24h gets +15)
+                pub_at = art.get("publishedAt", "")
+                if pub_at:
+                    try:
+                        pub_dt = datetime.fromisoformat(pub_at.replace('Z', '+00:00'))
+                        if datetime.now(timezone.utc) - pub_dt < timedelta(hours=24):
+                            hot_score += 15
+                    except: pass
+
                 art['_hot_score'] = hot_score
                 filtered_articles.append(art)
                 seen_titles_in_this_batch.append(title)
@@ -345,18 +354,14 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
     else:
         selection_instruction = (
             f"Analyze the following {content_desc} and pick the SINGLE most impactful story to convert into a 38-44s YouTube Short script.\n"
+            f"PRIMARY CATEGORY: {category}\n"
             "SELECTION FILTERS:\n"
-            "1. MUST be New, Useful, or Surprising (Absolute mandatory).\n"
-            "2. MUST be explainable in exactly <40s of dense technically-accurate speech (approx 120-140 words total).\n"
-            "3. MUST contain one concrete takeaway or engineering tip the viewer can use today.\n"
-            "4. PRIORITIZE: Documentation 'Easter Eggs', cost-saving architecture (Local models), or workflow 'unfair advantages' (Agentic loops).\n"
+            f"1. PRIORITIZE: Stories related to '{category}'. However, if no high-impact story exists for this category today, you ARE AUTHORIZED to pick the single most viral/surprising AI story from any other category instead.\n"
+            "2. MUST be New, Useful, or Surprising (Absolute mandatory).\n"
+            "3. MUST be explainable in exactly <40s of dense technically-accurate speech (approx 120-140 words total).\n"
+            "4. MUST contain one concrete takeaway or engineering tip the viewer can use today.\n"
             "5. PACING: Keep sentences short (under 12 words) for better TTS pacing and Micro-Cut boundaries.\n\n"
             "FORMAT: You MUST follow the strict 5-part structure: Hook -> Problem -> Solution -> Retention Loop -> Call to Action.\n\n"
-            "CONTENT MIX (Algorithm Target):\n"
-            "- 30% Practical AI Tools (Automation, Dev tools, SDKs).\n"
-            "- 40% Frontier AI Model Releases (OpenAI, DeepMind, Anthropic benchmarks).\n"
-            "- 15% Core AI Concepts (RAG, Agents, LLM architecture).\n"
-            "- 15% AI Dev Tips (Best practices, optimization, debugging, & engineering hacks).\n\n"
             "HOOK ALIGNMENT (DROP TEST):\n"
             "If the topic doesn't produce a strong 'Winner' hook (Stat, Absolute Contradiction, or 'You are using this wrong'), DROP IT and pick another.\n"
         )
@@ -424,7 +429,7 @@ class MultiAgentGenerationEngine:
     def _call_gemini(self, prompt, model='gemini-2.0-flash'):
         attempts = 0
         current_model = model
-        while attempts < 3:
+        while attempts < 5:
             try:
                 response = self.client.models.generate_content(
                     model=current_model,
@@ -441,20 +446,25 @@ class MultiAgentGenerationEngine:
                 return json.loads(raw)
             except Exception as e:
                 err_str = str(e).upper()
-                if "503" in err_str or "UNAVAILABLE" in err_str or "RESOURCE_EXHAUSTED" in err_str:
-                    # Fallback Logic: If 2.5-pro is down, use 2.0-flash
-                    if current_model != 'gemini-2.0-flash':
+                # Handle Overloaded (503) or Resource Exhausted (429)
+                if any(x in err_str for x in ["503", "UNAVAILABLE", "RESOURCE_EXHAUSTED", "429"]):
+                    wait_time = (5 ** (attempts + 1)) + random.uniform(2, 5) # Progressive wait: 7s, 27s, 127s...
+                    
+                    # Model Fallback Logic
+                    if current_model == 'gemini-2.5-pro':
                         print(f"⚠️ [LOOP] Model {current_model} is UNAVAILABLE. Falling back to gemini-2.0-flash...")
                         current_model = 'gemini-2.0-flash'
-                        # Don't increment attempts for a fallback switch, just retry immediately with the new model
                         continue
-                    
-                    wait_time = (2 ** attempts) + random.uniform(1, 3)
-                    print(f"⚠️ [LOOP] Call failed ({current_model}): 503/Overloaded. Retrying in {wait_time:.1f}s...")
+                    elif current_model == 'gemini-2.0-flash' and attempts >= 1:
+                        print(f"⚠️ [LOOP] Model {current_model} is OVERLOADED. Falling back to gemini-1.5-flash...")
+                        current_model = 'gemini-1.5-flash'
+                        continue
+                        
+                    print(f"⚠️ [LOOP] Call failed ({current_model}): Rate Limit/Overload. Retrying in {wait_time:.1f}s...")
                     time.sleep(wait_time)
                 else:
                     print(f"⚠️ [LOOP] Call failed ({current_model}): {e}. Retrying...")
-                    time.sleep(2)
+                    time.sleep(3)
                 attempts += 1
         return None
 
@@ -468,9 +478,16 @@ class MultiAgentGenerationEngine:
         selection = self._call_gemini(selector_prompt)
         if not selection or "selected_headline" not in selection:
             print("⚠️ Selector Agent failed. Using raw context fallback.")
-            selected_context = self.context
-            selected_headline = "Tech News Update"
-            selected_url = ""
+            # If we have articles, pick the top one from raw_articles as fallback
+            if self.raw_articles and len(self.raw_articles) > 0:
+                top = self.raw_articles[0]
+                selected_headline = top.get("title", "AI Tech Breakthrough")
+                selected_url = top.get("url", "")
+                print(f"🔄 Fallback to Top Scored Article: {selected_headline}")
+            else:
+                selected_headline = "AI Tech Breakthrough"
+                selected_url = ""
+            selected_context = f"SELECTED STORY: {selected_headline}\nSOURCE: {selected_url}\n\nORIGINAL CONTEXT:\n{self.context}"
         else:
             selected_headline = selection["selected_headline"]
             selected_url = selection["selected_url"]

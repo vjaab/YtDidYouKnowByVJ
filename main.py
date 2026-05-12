@@ -164,6 +164,9 @@ def run_pipeline(topic_type="research"):
         if not script_data:
             log_message("ERROR: Script generation failed.")
             attempts += 1
+            if attempts % 3 == 0:
+                log_message("⏳ Gemini API potentially rate-limited. Sleeping 60s before next attempt...")
+                time.sleep(60)
             continue
             
         # Store slot info for downstream rendering (e.g. aspect ratio)

@@ -31,10 +31,12 @@ def fetch_trending_from_newsapi():
     
     print("📡 Fetching global trending AI news from NewsAPI...")
     try:
-        # Query for AI breakthroughs, model releases, and leaks in the last 24h
+        # Query for AI breakthroughs, model releases, and leaks in the last 48h
+        from_date = (datetime.now(timezone.utc) - timedelta(hours=48)).strftime("%Y-%m-%dT%H:%M:%SZ")
         url = (
             f"https://newsapi.org/v2/everything?"
             f"q=(AI OR \"Artificial Intelligence\" OR LLM OR \"Generative AI\" OR \"OpenAI\" OR \"DeepMind\")&"
+            f"from={from_date}&"
             f"sortBy=popularity&"
             f"language=en&"
             f"pageSize=20&"
@@ -115,7 +117,12 @@ def _fetch_rss(feed_urls, feed_type="research"):
     # Sort by date descending
     all_articles.sort(key=lambda x: x["_pub_dt"], reverse=True)
     
-    fresh_articles = [a for a in all_articles if a["_pub_dt"] >= cutoff]
+    # STRICT RECENCY FILTER: Only keep articles from the last 7 days.
+    # We never want to fallback to 2-year-old articles.
+    absolute_cutoff = datetime.now(timezone.utc) - timedelta(days=7)
+    valid_articles = [a for a in all_articles if a["_pub_dt"] >= absolute_cutoff]
+    
+    fresh_articles = [a for a in valid_articles if a["_pub_dt"] >= cutoff]
     
     # Remove the internal temporary _pub_dt field
     for a in all_articles:
@@ -124,12 +131,12 @@ def _fetch_rss(feed_urls, feed_type="research"):
     if fresh_articles:
         articles = fresh_articles
         print(f"{feed_type.capitalize()} Blogs: Found {len(articles)} fresh articles in the last 24h.")
-    elif all_articles:
-        articles = all_articles[:10]  # Take top 10 most recent if no fresh ones
-        print(f"{feed_type.capitalize()} Blogs: Found 0 fresh articles. Falling back to the {len(articles)} most recent ones from RSS.")
+    elif valid_articles:
+        articles = valid_articles[:10]  # Take top 10 most recent if no fresh ones (but within 7 days)
+        print(f"{feed_type.capitalize()} Blogs: Found 0 fresh articles. Falling back to {len(articles)} recent ones from this week.")
     else:
-        # STEP 1.2: Historical Fallback from log check
-        print(f"{feed_type.capitalize()} Blogs: RSS FEEDS EMPTY. Checking historical facts_log.json...")
+        # STEP 1.2: Historical Fallback from log check (ONLY if they are recent enough)
+        print(f"{feed_type.capitalize()} Blogs: RSS FEEDS EMPTY or STALE. Checking historical facts_log.json...")
         from config import TRACKER_FILE
         import json
         import os
