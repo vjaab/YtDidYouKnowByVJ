@@ -2,8 +2,8 @@ name: Daily Tech News Shorts Pipeline
 
 on:
   schedule:
-    # Shorts (Slot A): 13:30 UTC = 09:30 AM EST (US Morning)
-    - cron: '30 13 * * *'
+    # Shorts (Slot A): 09:30 UTC = 05:30 AM EST (US Early Morning)
+    - cron: '30 09 * * *'
     # Shorts (Slot B): 21:30 UTC = 05:30 PM EST (US Evening)
     - cron: '30 21 * * *'
     # Long Form (Slot C): 17:30 UTC on Tue, Fri, Sat = 01:30 PM EST (US Lunch/Afternoon)
