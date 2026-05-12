@@ -112,9 +112,10 @@ Return ONLY a JSON object:
 SELECTOR_AGENT_TEMPLATE = """{persona}
 
 SELECTOR AGENT TASK:
-Analyze the following tech news context and pick the SINGLE most impactful, surprising, and high-retention story for a 60-second video.
+Analyze the following tech news context and pick the SINGLE most impactful, surprising, and high-retention AI/Tech story for a 60-second video.
 PRIORITIZE: Major model releases, benchmarks that destroy previous records, massive AI leaks, or engineering breakthroughs that change the industry.
 AVOID: Minor software updates, corporate partnership fluff, or generic 'AI is growing' articles.
+CRITICAL: ONLY pick stories related to AI, LLMs, Software Engineering, or Robotics. DO NOT pick pure Science/Physics/Chemistry papers (e.g. arXiv physics) unless they are directly applied to AI training or architecture.
 
 {selection_instruction}
 
@@ -393,7 +394,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
     if extra_instruction:
         news_context += f"\n\nADDITIONAL INSTRUCTIONS:\n{extra_instruction}\n"
 
-    engine = MultiAgentGenerationEngine(client, news_context, slot, category, strategy_enhancement, is_longform)
+    engine = MultiAgentGenerationEngine(client, news_context, slot, category, strategy_enhancement, is_longform, raw_articles=articles)
     script_data = engine.execute(selection_instruction, prompt_requirements)
     
     if script_data:
@@ -411,13 +412,14 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
     return script_data
 
 class MultiAgentGenerationEngine:
-    def __init__(self, client, context, slot, category, strategy_enhancement, is_longform):
+    def __init__(self, client, context, slot, category, strategy_enhancement, is_longform, raw_articles=None):
         self.client = client
         self.context = context
         self.slot = slot
         self.category = category
         self.strategy_enhancement = strategy_enhancement
         self.is_longform = is_longform
+        self.raw_articles = raw_articles
 
     def _call_gemini(self, prompt, model='gemini-2.0-flash'):
         attempts = 0
@@ -472,8 +474,35 @@ class MultiAgentGenerationEngine:
         else:
             selected_headline = selection["selected_headline"]
             selected_url = selection["selected_url"]
-            selected_context = f"SELECTED STORY: {selected_headline}\nSOURCE: {selected_url}\n\nORIGINAL CONTEXT:\n{self.context}"
+            
+            # ── CONTEXT ISOLATION (Fixes topic-screenshot mismatch) ───────────
+            isolated_context = ""
+            if self.raw_articles:
+                # Find matching article in the original list to provide rich but isolated context
+                for art in self.raw_articles:
+                    if art.get("url") == selected_url or art.get("title") == selected_headline:
+                        isolated_context = (
+                            f"Title: {art.get('title')}\n"
+                            f"Description: {art.get('description')}\n"
+                            f"Source: {art.get('source', {}).get('name')}\n"
+                            f"URL: {art.get('url')}"
+                        )
+                        break
+            
+            if not isolated_context:
+                # Fallback if no match found (e.g. search fallback)
+                isolated_context = f"STORY: {selected_headline}\nSOURCE: {selected_url}"
+                if "GEMINI SEARCH RESULTS" in self.context:
+                    # If in search mode, we must include the grounded text but we'll instruct the agent to focus.
+                    isolated_context += f"\n\nSEARCH CONTEXT:\n{self.context}"
+
+            selected_context = (
+                f"STRICT INSTRUCTION: You MUST ONLY research and write about the following story. "
+                f"IGNORE all other news articles mentioned in any previous context.\n\n"
+                f"TARGET STORY:\n{isolated_context}"
+            )
             print(f"✅ Selected Story: {selected_headline}")
+            print(f"🔒 Isolated Context for downstream agents: {len(isolated_context)} chars")
 
         print("🕵️ [AGENT 1] Research Agent: Extracting narrative elements...")
         research_prompt = RESEARCH_AGENT_TEMPLATE.format(

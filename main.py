@@ -171,7 +171,8 @@ def run_pipeline(topic_type="research"):
 
         title  = script_data.get("title", "Tech News!")
         script = script_data.get("script", "")
-        log_message(f"Story: {script_data.get('original_news_headline')}")
+        log_message(f"Selected Headline: {script_data.get('original_news_headline')}")
+        log_message(f"Selected URL: {script_data.get('original_news_url')}")
         log_message(f"Breaking Level: {script_data.get('breaking_news_level')}")
 
         # ── STEP 3b: Capture Article Screenshot FIRST (MANDATORY) ────────────
