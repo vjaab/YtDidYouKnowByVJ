@@ -30,37 +30,6 @@ def log_message(msg):
     print(msg)
 
 
-def get_random_assets():
-    # ── Intro & Outro Assets (Dynamic Selection 2026) ─────────────────────
-    from config import INTROS_DIR, OUTROS_DIR
-    
-    intro_variations = [os.path.join(INTROS_DIR, f) for f in os.listdir(INTROS_DIR) if f.endswith(".mp4")]
-    if intro_variations:
-        intro_video = random.choice(intro_variations)
-        log_message(f"🎬 Dynamic Intro Selected: {os.path.basename(intro_video)}")
-    else:
-        intro_video = os.path.join(ASSETS_DIR, "intro_base.mp4")
-
-    outro_variations = [os.path.join(OUTROS_DIR, f) for f in os.listdir(OUTROS_DIR) if f.endswith(".mp4")]
-    if outro_variations:
-        outro_video = random.choice(outro_variations)
-        log_message(f"🎬 Dynamic Outro Selected: {os.path.basename(outro_video)}")
-    else:
-        outro_video = os.path.join(ASSETS_DIR, "outro_base.mp4")
-    
-    return intro_video, outro_video
-
-def get_random_avatar():
-    # ── Avatar Base Assets (Dynamic Selection 2026) ─────────────────────
-    from config import AVATARS_DIR
-    avatar_variations = [os.path.join(AVATARS_DIR, f) for f in os.listdir(AVATARS_DIR) if f.endswith(".mp4")]
-    if avatar_variations:
-        face_path = random.choice(avatar_variations)
-        log_message(f"🎭 Dynamic Avatar Base Selected: {os.path.basename(face_path)}")
-        return face_path
-    return os.path.join(ASSETS_DIR, "Firefly_video_final.mp4")
-
-
 def format_description(ai_description, script, hashtags, slot="Slot A", chunks=None, relevant_links=[], source_url=""):
     hashtag_str = " ".join(hashtags) if hashtags else ""
     
@@ -148,10 +117,6 @@ def run_pipeline(topic_type="research"):
 
     # ── STEP 1: Content Ecosystem Check ───────────────────────────────────────
     day_name, slot, category = get_slot_info()
-    
-    # ── STEP 1.1: Dynamic Asset Selection ─────────────────────────────────────
-    intro_video, outro_video = get_random_assets()
-    script_data_global = {"intro_video": intro_video, "outro_video": outro_video}
     log_message(f"STEP 1: Content Ecosystem Check -> Day: {day_name}, Slot: {slot}, Category: {category}")
     
     # ── STEP 2: Selection Strategy (RSS Fetch) ────────────────────────────────
@@ -341,24 +306,6 @@ def run_pipeline(topic_type="research"):
     chunks = redistribute_to_audio_duration(chunks, duration)
     log_message(f"Built {len(chunks)} visual chunks from {len(word_timestamps)} words.")
 
-    # ── STEP 5.5: Lip-sync Generation ─────────────────────────────────────────
-    # Check if Kaggle already provided a lipsync
-    kag_ls = script_data.get("kaggle_lipsync_path")
-    if kag_ls and os.path.exists(kag_ls):
-        log_message(f"Using pre-generated Kaggle Lip-sync: {kag_ls}")
-        script_data["lipsync_path"] = kag_ls
-    else:
-        log_message(f"Starting Local Lip-sync generation for {duration:.1f}s audio...")
-        from lip_sync import generate_lip_sync
-        face_path = get_random_avatar()
-        ls_output = os.path.join(OUTPUT_DIR, "lipsync_output.mp4")
-        final_ls = generate_lip_sync(face_path, audio_path, ls_output)
-        if final_ls:
-            script_data["lipsync_path"] = final_ls
-            log_message(f"✅ Local Lip-sync complete: {final_ls}")
-        else:
-            log_message("⚠️ Lip-sync failed. Video will render without avatar sync.")
-
     # ── STEP 6: Fetch Entities (People/Companies) ─────────────────────────────
     log_message("STEP 6: Fetching entity photos and company logos...")
     from entity_fetcher import fetch_all_entities, get_retention_layers_config
@@ -400,10 +347,6 @@ def run_pipeline(topic_type="research"):
         chosen_style = random.choice(visual_styles_palettes)
         # Override the AI's color theme with our explicit variety matrix
         script_data["color_theme"] = chosen_style
-
-        # Pass the dynamic intro/outro into script_data for create_video
-        script_data["intro_video"] = script_data_global["intro_video"]
-        script_data["outro_video"] = script_data_global["outro_video"]
 
         video_path = create_video(audio_path, script_data, chunks)
         if not video_path or not os.path.exists(video_path):
