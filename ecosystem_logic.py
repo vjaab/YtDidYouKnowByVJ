@@ -29,8 +29,8 @@ def get_slot_info():
     matrix = {
         "Mon": ("Model Benchmarks", "Agentic System Design"),
         "Tue": ("Cost-Optimized AI", "Local LMM Apps"),
-        "Wed": ("Research-to-Production", "AI Infrastructure"),
-        "Thu": ("Hybrid Architectures", "API Deep-Dive"),
+        "Wed": ("Research-to-Production", "Cloud GPU Infra"),
+        "Thu": ("Hybrid Architectures", "Cloud AI Architecture"),
         "Fri": ("SOTA Benchmarking", "Agentic Orchestration"),
         "Sat": ("Open Source Focus", "Build-with-VJ"),
         "Sun": ("Weekly Recap (Dev)", "Future Roadmap")
@@ -127,6 +127,18 @@ def get_category_prompt_enhancement(category, slot):
             STRATEGY: FOCUS: Deep Authority. Target 120-180 seconds.
             GOAL: Summarize the 3 biggest technical movements of the week for working developers.
             HOOK: 'If you missed the [Event] leak, you missed the biggest change in AI dev this year.'
+        """,
+        "Cloud GPU Infra": f"""
+            CATEGORY: Cloud GPU Infrastructure (H100/A100 Scaling).
+            STRATEGY: {base_utility}
+            GOAL: Focus on scaling clusters, spot instances, and cost-optimized training on AWS, GCP, or CoreWeave.
+            HOOK: 'Scaling H100s shouldn\'t burn your entire budget. Here is the architecture for cost-effective Cloud GPU clusters.'
+        """,
+        "Cloud AI Architecture": f"""
+            CATEGORY: Cloud AI Architecture (AWS Bedrock, GCP Vertex, Azure AI).
+            STRATEGY: {base_utility}
+            GOAL: Show how to deploy enterprise-grade AI using cloud providers. Focus on security, IAM, and scalability.
+            HOOK: 'Enterprise AI isn\'t just a prompt. Here is how to architect on [AWS/GCP/Azure] for 100% uptime and security.'
         """,
         "Future Roadmap": """
             CATEGORY: Future Roadmap (Roadmap).
