@@ -329,7 +329,8 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
     else:
         content_desc = "research papers and engineering blogs"
 
-    is_longform = "Slot C" in slot
+    from config import ENABLE_LONGFORM
+    is_longform = ("Slot C" in slot) and ENABLE_LONGFORM
     
     if is_longform:
         selection_instruction = (
