@@ -1583,36 +1583,34 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
     img = Image.new('RGBA', (frame_width, FRAME_H), (0,0,0,0))
     draw = ImageDraw.Draw(img)
     
-    # Typography: Cinematic Serif
-    f_title = get_cinematic_font(80, italic=True)
+    # Typography: Cinematic Serif (Increased size for visibility)
+    f_title = get_cinematic_font(100, bold=True, italic=True)
     
     # Check width
     tw = draw.textlength(title, font=f_title)
-    if tw > 800:
-        f_title = get_cinematic_font(60, italic=True)
+    if tw > 850:
+        f_title = get_cinematic_font(80, bold=True, italic=True)
         tw = draw.textlength(title, font=f_title)
-        if tw > 800:
-            title = title[:40] + "..."
+        if tw > 850:
+            title = title[:45] + "..."
             tw = draw.textlength(title, font=f_title)
         
     start_x = (frame_width - tw) // 2
     start_y = int(FRAME_H * 0.50) # Positioned just above the subtitles, bridging the B-Roll and Avatar
     
-    # Dark gradient backing behind header text for contrast
-    # Covers a band around the title so text is always readable
-    band_top = start_y - 30
-    band_bot = start_y + 120
+    # Dark gradient backing behind header text for contrast (Increased alpha)
+    band_top = start_y - 40
+    band_bot = start_y + 140
     for y in range(band_top, band_bot):
-        # Fade in at top, solid in middle, fade out at bottom
         dist_top = y - band_top
         dist_bot = band_bot - y
-        fade = min(dist_top, dist_bot) / 30.0
-        alpha = int(min(1.0, fade) * 140)
+        fade = min(dist_top, dist_bot) / 40.0
+        alpha = int(min(1.0, fade) * 190)
         draw.line([(0, y), (frame_width, y)], fill=(0, 0, 0, alpha))
     
     # Text shadow/glow
     for dx, dy in [(-2,0), (2,0), (0,-2), (0,2)]:
-        draw.text((start_x + dx, start_y + dy), title, font=f_title, fill=(0, 0, 0, 150))
+        draw.text((start_x + dx, start_y + dy), title, font=f_title, fill=(0, 0, 0, 180))
         
     draw.text((start_x, start_y), title, font=f_title, fill=(255, 255, 255, 255))
     
@@ -1824,14 +1822,45 @@ def _article_screenshot_clip(screenshot_path, duration):
         
         for start_t in np.arange(1.0, duration - display_dur, interval):
             current_dur = display_dur
-            def zoom_effect(t):
-                # Aggressive zoom intensity for maximum impact (35% zoom)
+            
+            # Ken Burns Effect: Pan AND Zoom
+            # Moves from slightly left/top to slightly right/bottom while zooming
+            def ken_burns(t):
+                # Zooming in (35% increase)
                 progress = easeInOutQuad(min(1.0, t / current_dur))
-                return 1.0 + 0.35 * progress
+                scale = 1.0 + 0.35 * progress
                 
+                # Dynamic Panning
+                pan_x = int(50 * progress) # Pan right by 50px
+                pan_y = int(30 * progress) # Pan down by 30px
+                
+                return {"scale": scale, "pan": (pan_x, pan_y)}
+
             clip = VideoClip(lambda t: arr, duration=current_dur)
-            clip = clip.with_effects([vfx.Resize(zoom_effect)])
-            clip = clip.cropped(width=target_w, height=target_h, x_center=target_w/2, y_center=target_h/2)
+            
+            # Implementation of the Ken Burns transform
+            def transform_frame(get_frame, t):
+                frame = get_frame(t)
+                kb = ken_burns(t)
+                # Apply zoom via Resize effect logic
+                # For simplicity in this pipeline, we use the Resize effect but wrap it to include pan
+                return frame # Placeholder if Resize effect is separate, but we'll use MoviePy's Resize below
+
+            clip = clip.with_effects([
+                vfx.Resize(lambda t: ken_burns(t)["scale"])
+            ])
+            
+            # Center cropping after resize to handle pan offset
+            def pan_crop(t):
+                kb = ken_burns(t)
+                px, py = kb["pan"]
+                return {"x_center": target_w/2 + px, "y_center": target_h/2 + py}
+            
+            # Apply dynamic cropping for panning
+            clip = clip.cropped(width=target_w, height=target_h, 
+                                x_center=lambda t: target_w/2 + (50 * easeInOutQuad(t/current_dur)), 
+                                y_center=lambda t: target_h/2 + (30 * easeInOutQuad(t/current_dur)))
+            
             clip = clip.with_position((0, 0)).with_start(start_t)
             clip = clip.with_effects([vfx.CrossFadeIn(0.6), vfx.CrossFadeOut(0.6)])
             clips.append(clip)
@@ -2200,8 +2229,8 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
             max_line_w = line_w
         temp_idx += len(line)
     
-    # Restore Obsidian Background Block (Reference Style)
-    bg_pad_x, bg_pad_y = 50, 35
+    # Tightened Obsidian Background Block (Improved Visibility for B-Roll)
+    bg_pad_x, bg_pad_y = 30, 18
     block_x1 = (frame_width - max_line_w) // 2 - bg_pad_x
     block_x2 = (frame_width + max_line_w) // 2 + bg_pad_x
     block_y1 = start_y - bg_pad_y
@@ -2209,8 +2238,8 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     
     draw.rounded_rectangle(
         [block_x1, block_y1, block_x2, block_y2], 
-        radius=30, 
-        fill=(0, 0, 0, 200) # ~78% opacity as per reference
+        radius=12, 
+        fill=(0, 0, 0, 160) # Slightly more transparent for better background diagram visibility
     )
 
     word_idx = 0
