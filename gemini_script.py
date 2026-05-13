@@ -147,33 +147,46 @@ Return ONLY the final JSON object matching the schema. No markdown wrapping unle
 def get_hottest_tech_topic(client):
     """Uses Gemini Search grounding to find today's single most VIRAL AI news story from Google Trends."""
     print("🔥 Fetching hottest AI tech topic for today (Google Trends Analysis)...")
-    try:
-        response = client.models.generate_content(
-            model='gemini-2.0-flash',
-            contents=(
-                "Analyze today's Google Trends and viral tech news. "
-                "What is the single most trending AI search topic, breakout term, or breaking news story in the last 24 hours? "
-                "Look for: high search volume spikes on Google Trends related to AI, LLMs, or new model launches. "
-                "Return ONLY a JSON object with two fields: "
-                "'topic' (3-6 word phrase, e.g. 'Google Gemini 1.5 Pro breakout trend') and "
-                "'keywords' (list of 6-8 specific Google Trends search keywords). No markdown, no explanation."
-            ),
-            config=types.GenerateContentConfig(
-                tools=[{'google_search': {}}],
-                response_mime_type='application/json'
+    
+    attempts = 0
+    while attempts < 3:
+        try:
+            response = client.models.generate_content(
+                model='gemini-2.0-flash',
+                contents=(
+                    "Analyze today's Google Trends and viral tech news. "
+                    "What is the single most trending AI search topic, breakout term, or breaking news story in the last 24 hours? "
+                    "Look for: high search volume spikes on Google Trends related to AI, LLMs, or new model launches. "
+                    "Return ONLY a JSON object with two fields: "
+                    "'topic' (3-6 word phrase, e.g. 'Google Gemini 1.5 Pro breakout trend') and "
+                    "'keywords' (list of 6-8 specific Google Trends search keywords). No markdown, no explanation."
+                ),
+                config=types.GenerateContentConfig(
+                    tools=[{'google_search': {}}],
+                    response_mime_type='application/json'
+                )
             )
-        )
-        raw = response.text.strip()
-        # Robust extraction: find the first { and last }
-        if "{" in raw and "}" in raw:
-            raw = raw[raw.find("{"):raw.rfind("}")+1]
-        
-        data = json.loads(raw)
-        print(f"📈 Google Trends Hot Topic: {data['topic']}")
-        return data
-    except Exception as e:
-        print(f"⚠️ Could not fetch Google Trends topic: {e}. Proceeding with RSS only.")
-        return None
+            raw = response.text.strip()
+            # Robust extraction: find the first { and last }
+            if "{" in raw and "}" in raw:
+                raw = raw[raw.find("{"):raw.rfind("}")+1]
+            
+            data = json.loads(raw)
+            print(f"📈 Google Trends Hot Topic: {data['topic']}")
+            return data
+        except Exception as e:
+            err_str = str(e).upper()
+            if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
+                wait = (attempts + 1) * 5
+                print(f"⚠️ Google Trends rate limited (429). Retrying in {wait}s... (Attempt {attempts+1}/3)")
+                time.sleep(wait)
+                attempts += 1
+                continue
+            print(f"⚠️ Could not fetch Google Trends topic: {e}. Proceeding with RSS only.")
+            return None
+    
+    print("⚠️ Google Trends exhausted after retries. Proceeding with RSS only.")
+    return None
 
 def pick_and_generate_script(articles=None, extra_instruction="", forced_article=None, topic_type="research"):
     client = genai.Client(api_key=GEMINI_API_KEY)
@@ -456,8 +469,9 @@ class MultiAgentGenerationEngine:
                         current_model = 'gemini-2.0-flash'
                         continue
                     elif current_model == 'gemini-2.0-flash' and attempts >= 1:
-                        print(f"⚠️ [LOOP] Model {current_model} is OVERLOADED. Falling back to gemini-1.5-flash...")
-                        current_model = 'gemini-1.5-flash'
+                        # Fallback to 2.5-flash (which is used in video_gen.py) instead of 1.5-flash (which 404s)
+                        print(f"⚠️ [LOOP] Model {current_model} is OVERLOADED. Falling back to gemini-2.5-flash...")
+                        current_model = 'gemini-2.5-flash'
                         continue
                         
                     print(f"⚠️ [LOOP] Call failed ({current_model}): Rate Limit/Overload. Retrying in {wait_time:.1f}s...")
