@@ -19,6 +19,8 @@ Constraint Checklist:
 - No Fluff: Remove "In this video," "Hello everyone," or "Today we explore."
 - NO INFOGRAPHICS: Do not include infographics, flowcharts, or slides in the script structure.
 - VOCAL DYNAMICS: You MUST use heavy punctuation (commas, ellipses '...', exclamation marks, italics, ALL CAPS) around key technical terms and transitions. The TTS engine relies entirely on punctuation to vary pitch and emphasis.
+- CLARITY OVER JARGON: Avoid jargon chains. If you use a complex term like 'Quantization', follow it immediately with a simple 3-word analogy (e.g., '...essentially data compression').
+- PERSONAL STAKES: You MUST explain why the viewer should care about this technical change in their daily life, job security, or digital privacy.
 - CRITICAL COMMENTARY (YPP COMPLIANCE): You MUST provide a unique, critical perspective. Do not just summarize facts. Inject your own thesis, expose potential flaws, or debate the long-term industry impact to ensure the content is highly transformative.
 SUCCESS PATTERNS (2026): 
 - HOOKS: Focus on "Fear of Privacy Leaks" or "Shadow AI" dangers. Start with a "Result-First" statement.
@@ -74,9 +76,10 @@ Include:
 2. Context (3-10s) - Who, What, Why it matters quickly.
 3. Escalation (10-25s) - Implications, consequences, future impact. Include ARTICLE EVIDENCE #1 here.
 4. The Analogy (25-35s) - Use a high-impact analogy to simplify a complex point. Include ARTICLE EVIDENCE #2 here.
-5. The Twist (35-45s) - A counter-intuitive technical fact. Include ARTICLE EVIDENCE #3 here.
-6. Open Loop (45-55s) - Lingering provocative thought to drive engagement.
-7. CTA (Last 4s) - Sequential Telegram promotion.
+5. The Twist (35-42s) - A counter-intuitive technical fact. Include ARTICLE EVIDENCE #3 here.
+6. Personal Stakes (42-50s) - Explicitly state how this affects the viewer's job, wallet, or daily life. Use "YOU" and "YOUR".
+7. Open Loop (50-56s) - Lingering provocative thought to drive engagement.
+8. CTA (Last 4s) - Sequential Telegram promotion.
 
 RESEARCH:
 {research_json}
@@ -92,6 +95,7 @@ Return ONLY a JSON object representing the narrative draft (not the final schema
   "context": "...",
   "escalation": "...",
   "insight": "...",
+  "personal_stakes": "...",
   "open_loop": "..."
 }}"""
 
@@ -100,6 +104,10 @@ RETENTION_OPTIMIZER_TEMPLATE = """{persona}
 RETENTION OPTIMIZER TASK:
 Rewrite the narrative draft to remove fluff, shorten sentences, add pacing breaks, and increase curiosity density.
 Fast sentence pacing. No filler. The viewer must keep watching because the script continuously creates unanswered questions (tension-release).
+
+CRITICAL PAGING: 
+- Add an ellipsis '...' after every technical term with 3+ syllables (e.g. 'Distributed... systems', 'Architecture...'). 
+- This forces the TTS to pause so viewers can process the complexity.
 
 NARRATIVE DRAFT:
 {narrative_json}
