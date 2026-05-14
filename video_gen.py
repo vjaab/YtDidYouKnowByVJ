@@ -1802,100 +1802,93 @@ def easeInOutQuad(t):
 
 def _article_screenshot_clip(screenshot_path, duration):
     """
-    Transformative logic: Shows the source article as a full-screen backdrop.
-    Now uses a blurred canvas to ensure the entire article is visible without edge clipping.
+    Shows the source article as a full-screen backdrop with a premium Ken Burns effect.
+    Ensures visibility every 10s for 7s throughout the video.
     """
     if not screenshot_path or not os.path.exists(screenshot_path):
         return []
     try:
+        # Load and prepare the canvas once
         img = Image.open(screenshot_path).convert("RGB")
         target_h, target_w = FRAME_H, FRAME_W
-        
-        # Use our new premium canvas helper
         canvas = _prepare_screenshot_canvas(img, target_w, target_h)
-        arr = np.array(canvas)
+        
+        # Prepare RGB and Mask arrays for explicit alpha handling in MoviePy
+        arr_rgba = np.array(canvas.convert("RGBA"))
+        arr_rgb = arr_rgba[:, :, :3]
+        arr_mask = (arr_rgba[:, :, 3] / 255.0).astype(float)
+        
         clips = []
-        
-        # --- PHASED LOOP: Every 10s for 5s (Full Screen Backdrop) ---
         interval = 10.0
-        display_dur = 5.0
+        display_dur = 7.0
         
-        for start_t in np.arange(1.0, duration - display_dur, interval):
-            current_dur = display_dur
+        # Loop throughout the entire duration
+        for start_t in np.arange(1.0, duration, interval):
+            # Clamp duration for the last clip if it would exceed total video length
+            current_dur = min(display_dur, duration - start_t)
+            if current_dur < 1.0:
+                continue
             
-            # Ken Burns Effect: Pan AND Zoom
-            # Moves from slightly left/top to slightly right/bottom while zooming
-            def ken_burns(t):
-                # Zooming in (35% increase)
-                progress = easeInOutQuad(min(1.0, t / current_dur))
-                scale = 1.0 + 0.35 * progress
-                
-                # Dynamic Panning
-                pan_x = int(50 * progress) # Pan right by 50px
-                pan_y = int(30 * progress) # Pan down by 30px
-                
-                return {"scale": scale, "pan": (pan_x, pan_y)}
-
-            clip = VideoClip(lambda t: arr, duration=current_dur)
+            # Create a static ImageClip first
+            clip = ImageClip(arr_rgb, duration=current_dur)
+            mclip = VideoClip(lambda t: arr_mask, is_mask=True, duration=current_dur)
+            clip = clip.with_mask(mclip)
             
-            # Implementation of the Ken Burns transform
-            def transform_frame(get_frame, t):
-                frame = get_frame(t)
-                kb = ken_burns(t)
-                # Apply zoom via Resize effect logic
-                # For simplicity in this pipeline, we use the Resize effect but wrap it to include pan
-                return frame # Placeholder if Resize effect is separate, but we'll use MoviePy's Resize below
-
+            # --- PREMIUM KEN BURNS EFFECT (Zoom + Pan) ---
+            # 1. Subtle Zoom-in (from 100% to 125%)
+            zoom_amt = 0.25
             clip = clip.with_effects([
-                vfx.Resize(lambda t: ken_burns(t)["scale"])
+                vfx.Resize(lambda t: 1.0 + zoom_amt * easeInOutQuad(t / current_dur))
             ])
             
-            # Center cropping after resize to handle pan offset
-            def pan_crop(t):
-                kb = ken_burns(t)
-                px, py = kb["pan"]
-                return {"x_center": target_w/2 + px, "y_center": target_h/2 + py}
-            
-            # Apply dynamic cropping for panning
-            clip = clip.cropped(width=target_w, height=target_h, 
-                                x_center=lambda t: target_w/2 + (50 * easeInOutQuad(t/current_dur)), 
-                                y_center=lambda t: target_h/2 + (30 * easeInOutQuad(t/current_dur)))
-            
-            clip = clip.with_position((0, 0)).with_start(start_t)
+            # 2. Dynamic Panning (Offsetting the zoomed image to stay centered or drift)
+            # Since the image is larger than the canvas after zoom, we move it to create a pan.
+            # Max offset at the end will be roughly (0.25 * 1080) = 270px wide, (0.25 * 1920) = 480px high.
+            def pan_fn(t):
+                prog = easeInOutQuad(t / current_dur)
+                # Drift slightly to the right and down
+                off_x = -int(60 * prog) 
+                off_y = -int(40 * prog)
+                return (off_x, off_y)
+
+            clip = clip.with_position(pan_fn).with_start(start_t)
             clip = clip.with_effects([vfx.CrossFadeIn(0.6), vfx.CrossFadeOut(0.6)])
             clips.append(clip)
             
+        print(f"🎬 Generated {len(clips)} article screenshot intervals.")
         return clips
     except Exception as e:
         print(f"Article screenshot clip error: {e}")
+        import traceback
+        traceback.print_exc()
         return []
 
 def _evidence_screenshot_clip(evidence_path, duration):
     """
     Shows a secondary 'Evidence' or 'Use Case' screenshot during the analytical section.
-    Ensures entire image is visible via blurred backdrop.
     """
     if not evidence_path or not os.path.exists(evidence_path):
         return []
     try:
         img = Image.open(evidence_path).convert("RGB")
         target_h, target_w = FRAME_H, FRAME_W
-        
-        # Use the premium canvas helper
         canvas = _prepare_screenshot_canvas(img, target_w, target_h)
-        arr = np.array(canvas)
+        
+        arr_rgba = np.array(canvas.convert("RGBA"))
+        arr_rgb = arr_rgba[:, :, :3]
+        arr_mask = (arr_rgba[:, :, 3] / 255.0).astype(float)
         
         start = 28.0 
         dur = min(6.0, duration - start - 5.0)
         
         if dur > 1.0:
-            def zoom_effect(t):
-                return 1.0 + 0.1 * (t / dur)
-                
-            clip = VideoClip(lambda t: arr, duration=dur)
-            clip = clip.with_effects([vfx.Resize(zoom_effect)])
-            clip = clip.cropped(width=target_w, height=target_h, x_center=target_w/2, y_center=target_h/2)
-            clip = clip.with_position((0, 0)).with_start(start)
+            clip = ImageClip(arr_rgb, duration=dur)
+            mclip = VideoClip(lambda t: arr_mask, is_mask=True, duration=dur)
+            clip = clip.with_mask(mclip)
+            
+            # Subtle zoom only for evidence
+            clip = clip.with_effects([vfx.Resize(lambda t: 1.0 + 0.12 * (t / dur))])
+            clip = clip.with_position("center").with_start(start)
             clip = clip.with_effects([vfx.CrossFadeIn(0.6), vfx.CrossFadeOut(0.6)])
             return [clip]
             
