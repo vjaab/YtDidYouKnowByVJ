@@ -225,17 +225,16 @@ def run_pipeline(topic_type="research"):
         custom_map = script_data.get("custom_map", {})
         
         # Select Intro Video for Lip-Sync (Rotation)
-        intro_videos = [
-            "assets/video/Firefly_video.mp4", 
-            "assets/video/Firefly_video_2.mp4", 
-            "assets/video/Firefly_video_final.mp4",
-            "assets/video/vj_news_anchor_base.mp4"
-        ]
+        import glob
+        intro_videos = glob.glob("assets/video/*.mp4")
+        if not intro_videos:
+            intro_videos = ["assets/video/Firefly_video_final.mp4"]
+            
         headline = script_data.get("original_news_headline", "")
         import hashlib
         video_idx = int(hashlib.md5(headline.encode()).hexdigest(), 16) % len(intro_videos)
         script_data["lipsync_face_path"] = intro_videos[video_idx]
-        log_message(f"Selected Lip-Sync Template: {intro_videos[video_idx]}")
+        log_message(f"Selected Lip-Sync Template: {intro_videos[video_idx]} (from {len(intro_videos)} options)")
         
         has_kaggle = os.path.exists(os.path.expanduser("~/.kaggle/kaggle.json"))
         use_local_only = os.environ.get("USE_LOCAL_ONLY") == "true"
