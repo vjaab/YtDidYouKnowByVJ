@@ -103,11 +103,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Pull latest changes first to minimize rebase complexity
-          git pull origin main --rebase || echo "Pull failed, proceeding anyway"
+          # Add all potential tracking files and technical logs first
+          git add news_log.json facts_log.json logs/*.txt logs/*.json || echo "Some log files missing, continuing..."
           
-          # Add all potential tracking files and technical logs
-          git add news_log.json facts_log.json logs/*.txt logs/*.json || echo "No log files found to add"
+          # Pull latest changes using rebase and autostash to handle concurrent updates
+          git pull origin main --rebase --autostash || echo "Pull failed, proceeding anyway"
           
           # Only commit if there are actual changes
           if ! git diff --cached --quiet; then
