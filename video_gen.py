@@ -2978,8 +2978,17 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     #             final_audio_layers.append(sfx_clip)
     #         except: pass
     
-    # Background Music with Auto-Ducking
-    bgm_path = os.path.join(MUSIC_DIR, "modern_tech.mp3")
+    # Background Music Selection (Rotating through available tracks)
+    music_files = sorted([f for f in os.listdir(MUSIC_DIR) if f.endswith(('.mp3', '.wav', '.m4a'))])
+    if music_files:
+        day_of_month = datetime.now().day
+        music_idx = (day_of_month - 1) % len(music_files)
+        bgm_filename = music_files[music_idx]
+        bgm_path = os.path.join(MUSIC_DIR, bgm_filename)
+        print(f"🎵 Day {day_of_month} BGM Selection: {bgm_filename} ({music_idx+1}/{len(music_files)})")
+    else:
+        bgm_path = os.path.join(MUSIC_DIR, "modern_tech.mp3")
+
     if os.path.exists(bgm_path) and os.path.getsize(bgm_path) > 0:
         try:
             bgm = AudioFileClip(bgm_path)
