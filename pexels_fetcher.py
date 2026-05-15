@@ -254,11 +254,19 @@ def _generate_veo_video(prompt, output_path, aspect_ratio="9:16"):
 # ─────────────────────────────────────────────────────────────────────────────
 # STEP E: Imagen 3
 # ─────────────────────────────────────────────────────────────────────────────
+_subject_cache = {}
+
 def _extract_visual_subject(headline):
-    """Use Gemini to extract the primary visual subject/entity from a headline."""
-    try:
-        target_model = "gemini-2.0-flash"
-        prompt = f"""From this news headline, extract the PRIMARY visual subject that should appear in a background image.
+    """Use Gemini to extract the primary visual subject/entity from a headline. Cached per headline."""
+    if not headline: return "AI Technology"
+    if headline in _subject_cache:
+        return _subject_cache[headline]
+
+    attempts = 0
+    while attempts < 3:
+        try:
+            target_model = "gemini-2.0-flash"
+            prompt = f"""From this news headline, extract the PRIMARY visual subject that should appear in a background image.
 Return ONLY the short subject name (1-5 words). Examples:
 - "Elon Musk sues OpenAI" → "OpenAI vs Elon Musk"
 - "Google launches Gemini 2.0" → "Google Gemini"
@@ -267,23 +275,35 @@ Return ONLY the short subject name (1-5 words). Examples:
 
 Headline: "{headline}"
 Return ONLY the subject:"""
-        
-        resp = client.models.generate_content(
-            model=target_model, contents=prompt,
-            config=genai.types.GenerateContentConfig(temperature=0.0)
-        )
-        subject = resp.text.strip().strip('"').strip("'")
-        if subject and len(subject) < 60:
-            return subject
-    except Exception as e:
-        print(f"  ⚠️ Entity extraction failed: {e}")
+            
+            resp = client.models.generate_content(
+                model=target_model, contents=prompt,
+                config=genai.types.GenerateContentConfig(temperature=0.0)
+            )
+            subject = resp.text.strip().strip('"').strip("'")
+            if subject and len(subject) < 60:
+                _subject_cache[headline] = subject
+                return subject
+            break # Exit on invalid subject
+        except Exception as e:
+            err_str = str(e).lower()
+            if "429" in err_str or "resource_exhausted" in err_str:
+                wait_time = 60
+                print(f"  ⚠️ Entity extraction rate limited. Waiting {wait_time}s...")
+                time.sleep(wait_time)
+            else:
+                print(f"  ⚠️ Entity extraction failed (att {attempts+1}): {e}")
+                time.sleep(2)
+            attempts += 1
     
     # Fallback: use first 4 meaningful words from headline
     words = [w for w in (headline or "").split() if len(w) > 2][:4]
-    return " ".join(words) if words else "AI Technology"
+    subject = " ".join(words) if words else "AI Technology"
+    _subject_cache[headline] = subject
+    return subject
 
 
-def _generate_imagen3(chunk_text, output_path, topic_context="", global_style_guide=""):
+def _generate_imagen3(chunk_text, output_path, topic_context="", global_style_guide="", visual_subject=None):
     topic = detect_topic(topic_context)
     
     # ── DAILY AESTHETIC ROTATION ──
@@ -292,9 +312,11 @@ def _generate_imagen3(chunk_text, output_path, topic_context="", global_style_gu
     
     style_suffix = f", {global_style_guide}" if global_style_guide else f", {daily_style['lighting']} lighting, {daily_style['mood']} style, 8k, photorealistic"
     
-    # Extract the actual visual subject from the headline (not the full headline)
-    visual_subject = _extract_visual_subject(topic_context)
-    print(f"  -> Visual Subject Extracted: '{visual_subject}'")
+    # Use passed subject or extract if missing
+    if not visual_subject:
+        visual_subject = _extract_visual_subject(topic_context)
+    
+    print(f"  -> Visual Subject: '{visual_subject}'")
     
     if topic:
         template = random.choice(TOPIC_PROMPT_TEMPLATES[topic])
@@ -369,7 +391,7 @@ CURRENT CHUNK TEXT: '{chunk_text}'
     return None
 
     # Updated to 4.0 models as 3.0 is missing from the API in this environment
-def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide="", is_longform=False, visual_mode="veo_concept"):
+def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide="", is_longform=False, visual_mode="veo_concept", visual_subject=None):
     """
     Executes the Visual Fetching Decision Tree with Switch-Back Logic
     """
@@ -384,7 +406,9 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
     photo_out = os.path.join(OUTPUT_DIR, f"chunk_{cid}_{TODAY}.jpg")
     
     # ── SWITCH-BACK LOGIC ──────────────────────────────────────────────────
-    visual_subject = _extract_visual_subject(topic_context)
+    if not visual_subject:
+        visual_subject = _extract_visual_subject(topic_context)
+    
     headline = topic_context if topic_context else "Scientific Research"
     
     # ── DAILY AESTHETIC ROTATION ──
@@ -413,7 +437,7 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
     if visual_mode == "nano_hook" or visual_mode == "nano_concept":
         print(f"Chunk {cid} -> MODE: {visual_mode}")
         prompt = nano_concept_prompt if visual_mode == "nano_concept" else nano_concept_prompt + " Dramatic hero shot."
-        path = _generate_imagen3(prompt, photo_out, topic_context, global_style_guide)
+        path = _generate_imagen3(prompt, photo_out, topic_context, global_style_guide, visual_subject=visual_subject)
         if path:
             chunk["visual_path"] = path
             chunk["visual_type"] = "photo"
@@ -453,7 +477,7 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
             
         # Fallback to Imagen if Veo fails
         print(f"Chunk {cid} -> Veo failed, falling back to Imagen")
-        path = _generate_imagen3(nano_concept_prompt, photo_out, topic_context, global_style_guide)
+        path = _generate_imagen3(nano_concept_prompt, photo_out, topic_context, global_style_guide, visual_subject=visual_subject)
         if path:
             chunk["visual_path"] = path
             chunk["visual_type"] = "photo"
@@ -474,6 +498,9 @@ def fetch_all_chunk_visuals(chunks, topic_context="", script_data=None, is_longf
         
     # 1. Generate Global Style Guide for visual continuity
     global_style = generate_visual_style_guide(topic_context)
+    
+    # 2. Extract Visual Subject once (to avoid 429 rate limits on redundant calls)
+    vis_subject = _extract_visual_subject(topic_context)
         
     print(f"Running Decision Tree for {len(chunks)} chunks (with Smart Throttling)...")
     
