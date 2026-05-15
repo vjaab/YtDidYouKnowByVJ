@@ -225,7 +225,12 @@ def run_pipeline(topic_type="research"):
         custom_map = script_data.get("custom_map", {})
         
         # Select Intro Video for Lip-Sync (Rotation)
-        intro_videos = ["assets/Firefly_video.mp4", "assets/Firefly_video_2.mp4", "assets/Firefly_video_final.mp4"]
+        intro_videos = [
+            "assets/Firefly_video.mp4", 
+            "assets/Firefly_video_2.mp4", 
+            "assets/Firefly_video_final.mp4",
+            "assets/vj_news_anchor_base.mp4"
+        ]
         headline = script_data.get("original_news_headline", "")
         import hashlib
         video_idx = int(hashlib.md5(headline.encode()).hexdigest(), 16) % len(intro_videos)
