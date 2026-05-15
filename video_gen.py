@@ -2192,7 +2192,7 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     draw = ImageDraw.Draw(img)
     
     scale_ratio = frame_width / 1080.0 if frame_width < frame_height else frame_width / 1920.0
-    base_size = int(58 * scale_ratio) # Reduced from 72 for cleaner look
+    base_size = int(68 * scale_ratio) # Increased from 58 for better mobile legibility
     
     f_main = gf(base_size, bold=True)
     
@@ -2206,7 +2206,7 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     max_sub_width = int(frame_width * 0.80) # More narrow for punchy center focus
     lines = wrap_text_to_lines(words, word_widths, max_sub_width, f_main)
     
-    line_h = int(90 * scale_ratio) # Reduced from 110 to match new font size
+    line_h = int(105 * scale_ratio) # Increased from 90 to match new font size
     
     # Position: EXACT CENTER (Reference style)
     start_y = int(frame_height * 0.5) - (len(lines) * line_h // 2) + y_shift
@@ -2230,7 +2230,7 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     draw.rounded_rectangle(
         [block_x1, block_y1, block_x2, block_y2], 
         radius=12, 
-        fill=(0, 0, 0, 160) # Slightly more transparent for better background diagram visibility
+        fill=(0, 0, 0, 215) # Increased opacity from 160 for guaranteed contrast
     )
 
     word_idx = 0
@@ -2250,8 +2250,8 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
                 word_img = Image.new("RGBA", (w_w + 60, w_h + 60), (0,0,0,0))
                 word_draw = ImageDraw.Draw(word_img)
                 
-                # High-Contrast Edge: 3px black stroke simulation
-                stroke = 3
+                # High-Contrast Edge: 5px black stroke simulation (Stronger for visibility)
+                stroke = 5
                 for dx in range(-stroke, stroke+1):
                     for dy in range(-stroke, stroke+1):
                         if dx*dx + dy*dy <= stroke*stroke:
@@ -2271,11 +2271,11 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
                 img.alpha_composite(rotated, (target_x, target_y))
             else:
                 c_fill = (255, 255, 255, 255)
-                # Inactive words get a 2px stroke and offset shadow for readability
-                for dx in range(-2, 3):
-                    for dy in range(-2, 3):
+                # Inactive words get a 3px stroke and offset shadow for readability
+                for dx in range(-3, 4):
+                    for dy in range(-3, 4):
                         draw.text((cur_x+dx, line_y+2+dy), word_text, font=f_main, fill=(0,0,0,255))
-                draw.text((cur_x+2, line_y+4), word_text, font=f_main, fill=(0,0,0,160))
+                draw.text((cur_x+3, line_y+5), word_text, font=f_main, fill=(0,0,0,160))
                 draw.text((cur_x, line_y + 2), word_text, font=f_main, fill=c_fill)
             
             cur_x += word_widths[word_idx] + 22
