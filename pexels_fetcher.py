@@ -158,6 +158,44 @@ TOPIC_PROMPT_TEMPLATES = {
     ]
 }
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 30-DAY VISUAL AESTHETIC MATRIX (Nano & Veo Variety)
+# ─────────────────────────────────────────────────────────────────────────────
+DAILY_AESTHETIC_MATRIX = [
+    {"lighting": "Soft teal and orange", "camera": "Subtle track-in", "mood": "futuristic tech-docu", "motif": "glowing neural networks"}, # Day 0 (Padding)
+    {"lighting": "Teal and Orange", "camera": "Slow Pan", "mood": "Futuristic Docu", "motif": "Neural Networks"},
+    {"lighting": "Golden Hour", "camera": "Drone Sweep", "mood": "Cinematic Tech", "motif": "Solar Arrays"},
+    {"lighting": "Neon Cyberpunk", "camera": "Static Glitch", "mood": "High-Energy", "motif": "Binary Code Streams"},
+    {"lighting": "Soft Minimalist", "camera": "Macro Focus", "mood": "Clean Lab", "motif": "Silicon Wafers"},
+    {"lighting": "Dramatic Chiaroscuro", "camera": "Low Angle", "mood": "Serious Corporate", "motif": "Glass Skyscrapers"},
+    {"lighting": "Ethereal Glow", "camera": "Dreamy Blur", "mood": "Conceptual AI", "motif": "Floating Light Particles"},
+    {"lighting": "Industrial Cold", "camera": "Handheld Shake", "mood": "Gritty Tech", "motif": "Robotic Limbs"},
+    {"lighting": "Hyper-Realistic", "camera": "Top Down", "mood": "Editorial News", "motif": "Printed Circuit Boards"},
+    {"lighting": "Midnight Blue", "camera": "Tracking Shot", "mood": "Deep Sea Tech", "motif": "Optical Fibers"},
+    {"lighting": "Sunset Warmth", "camera": "Rack Focus", "mood": "Human-Centric", "motif": "Biometric Sensors"},
+    {"lighting": "Monochrome Stark", "camera": "Zoom In", "mood": "Investigative", "motif": "Data Center Rows"},
+    {"lighting": "Pastel Digital", "camera": "Floating Cam", "mood": "Soft Software", "motif": "UI/UX Holograms"},
+    {"lighting": "Electric Purple", "camera": "High Speed", "mood": "Cybernetic", "motif": "Plasma Energy Gates"},
+    {"lighting": "Natural Sunlight", "camera": "Window Reflection", "mood": "Startup Vibe", "motif": "Modern Office Plants"},
+    {"lighting": "Infrared Vision", "camera": "Thermal Scan", "mood": "Surveillance", "motif": "Heat Map Visuals"},
+    {"lighting": "Retro CRT", "camera": "Interlaced Scan", "mood": "Nostalgic Tech", "motif": "Floppy Disks & Terminals"},
+    {"lighting": "Obsidian Black", "camera": "Reflection", "mood": "Luxury Tech", "motif": "Polished Carbon Fiber"},
+    {"lighting": "Forest Green", "camera": "Organic Motion", "mood": "Sustainable Tech", "motif": "Bio-engineered Leaves"},
+    {"lighting": "Volumetric Light", "camera": "God Rays", "mood": "Heroic Launch", "motif": "Satellite Dishes"},
+    {"lighting": "Microscopic", "camera": "Slow Drift", "mood": "Nanotech", "motif": "DNA Double Helix"},
+    {"lighting": "Blueprint Blue", "camera": "Line Art", "mood": "Engineering", "motif": "Technical Schematics"},
+    {"lighting": "Crimson Warning", "camera": "Fast Cuts", "mood": "Crisis Mode", "motif": "Server Overload Sparks"},
+    {"lighting": "Quartz White", "camera": "Crystal Clear", "mood": "Pure Science", "motif": "Prisms & Refractions"},
+    {"lighting": "Steampunk Brass", "camera": "Gear Motion", "mood": "Alt-History Tech", "motif": "Clockwork AI"},
+    {"lighting": "Arctic White", "camera": "Frosty Lens", "mood": "Cold Storage", "motif": "Liquid Nitrogen Cooling"},
+    {"lighting": "Holographic Rainbow", "camera": "Iridescent", "mood": "Web3 / NFT", "motif": "Shimmering Mesh Nets"},
+    {"lighting": "Deep Crimson", "camera": "Underlighting", "mood": "Secretive", "motif": "Underground Bunker Tech"},
+    {"lighting": "Morning Mist", "camera": "Soft Diffuse", "mood": "New Dawn", "motif": "Emerging AI Entities"},
+    {"lighting": "Cosmic Nebula", "camera": "Starfield", "mood": "Space Tech", "motif": "Orbital Station Views"},
+    {"lighting": "Graphite Grey", "camera": "Matte Finish", "mood": "Industrial Design", "motif": "Brushed Metal Textures"},
+    {"lighting": "Rainbow Spectrum", "camera": "Vibrant", "mood": "Inclusive Tech", "motif": "Diverse Humanoid Robots"}
+]
+
 def detect_topic(headline):
     if not headline: return None
     headline = headline.lower()
@@ -248,7 +286,11 @@ Return ONLY the subject:"""
 def _generate_imagen3(chunk_text, output_path, topic_context="", global_style_guide=""):
     topic = detect_topic(topic_context)
     
-    style_suffix = f", {global_style_guide}" if global_style_guide else ", cinematic lighting, professional photography, 8k, photorealistic"
+    # ── DAILY AESTHETIC ROTATION ──
+    day_idx = datetime.now().day
+    daily_style = DAILY_AESTHETIC_MATRIX[day_idx % len(DAILY_AESTHETIC_MATRIX)]
+    
+    style_suffix = f", {global_style_guide}" if global_style_guide else f", {daily_style['lighting']} lighting, {daily_style['mood']} style, 8k, photorealistic"
     
     # Extract the actual visual subject from the headline (not the full headline)
     visual_subject = _extract_visual_subject(topic_context)
@@ -256,8 +298,8 @@ def _generate_imagen3(chunk_text, output_path, topic_context="", global_style_gu
     
     if topic:
         template = random.choice(TOPIC_PROMPT_TEMPLATES[topic])
-        best_prompt = f"{template.format(name=visual_subject)}, {style_suffix}, news editorial style, 9:16 vertical, ultra realistic, no text"
-        print(f"  -> Detected Topic: {topic}. Using themed prompt for {visual_subject}.")
+        best_prompt = f"{template.format(name=visual_subject)}, {style_suffix}, {daily_style['motif']} elements, news editorial style, 9:16 vertical, ultra realistic, no text"
+        print(f"  -> Detected Topic: {topic}. Using themed prompt for {visual_subject} with Day {day_idx} style.")
     else:
         # Ask Gemini to craft a headline-specific Imagen prompt
         topic_prompt = f"Topic Context: {topic_context}. The image MUST be highly relevant to this specific story.\n" if topic_context else ""
@@ -344,12 +386,29 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
     # ── SWITCH-BACK LOGIC ──────────────────────────────────────────────────
     visual_subject = _extract_visual_subject(topic_context)
     headline = topic_context if topic_context else "Scientific Research"
+    
+    # ── DAILY AESTHETIC ROTATION ──
+    day_idx = datetime.now().day
+    style = DAILY_AESTHETIC_MATRIX[day_idx % len(DAILY_AESTHETIC_MATRIX)]
+    print(f"  📅 Day {day_idx} Aesthetic: {style['mood']} ({style['lighting']})")
 
-    veo_broll_prompt = f"Cinematic, high-definition 4k video in a futuristic tech-docu style. Subject: {visual_subject}. Visuals should feature glowing neural networks, sleek 3D data visualizations, or professional laboratory settings with soft teal and orange lighting. Motion: Subtle camera track-in or slow pan. Style: Minimalist, clean, tech-evangelist aesthetic. No text in video. Video language: English."
+    veo_broll_prompt = (
+        f"Cinematic, high-definition 4k video in a {style['mood']} style. "
+        f"Subject: {visual_subject}. Visuals should feature {style['motif']}, with {style['lighting']} lighting. "
+        f"Motion: {style['camera']}. Style: Minimalist, clean. No text in video. Video language: English."
+    )
     
-    nano_evidence_prompt = f"A professional macro photograph of a scientific research paper titled '{headline}'. Shallow depth of field, focusing on a specific complex diagram or a paragraph of mathematical equations. Realistic paper texture with subtle digital overlays of scanning lines and data points. Lighting: Cool office morning light. Format: Vertical 9:16 for mobile."
+    nano_evidence_prompt = (
+        f"A professional macro photograph of a scientific research paper titled '{headline}'. "
+        f"Style: {style['mood']}. Focus on a specific complex diagram or a paragraph of mathematical equations. "
+        f"Realistic paper texture with {style['lighting']} lighting. Format: Vertical 9:16 for mobile."
+    )
     
-    nano_concept_prompt = f"Cinematic, high-definition 9:16 vertical image in a futuristic tech-docu style. Subject: {visual_subject}. Visuals should feature glowing neural networks, sleek 3D data visualizations, or professional laboratory settings with soft teal and orange lighting. Style: Minimalist, clean, tech-evangelist aesthetic. No text."
+    nano_concept_prompt = (
+        f"Cinematic, high-definition 9:16 vertical image in a {style['mood']} style. "
+        f"Subject: {visual_subject}. Visuals should feature {style['motif']}, with {style['lighting']} lighting. "
+        f"Style: Minimalist, clean. No text."
+    )
 
     if visual_mode == "nano_hook" or visual_mode == "nano_concept":
         print(f"Chunk {cid} -> MODE: {visual_mode}")
