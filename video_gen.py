@@ -1838,13 +1838,14 @@ def _article_screenshot_clip(screenshot_path, duration):
             clip = ImageClip(arr_rgb, duration=current_dur)
             
             # --- PREMIUM KEN BURNS EFFECT (Zoom + Pan) ---
-            zoom_amt = 0.25
+            zoom_amt = 0.50 # Increased from 0.25 for more aggressive focus
             clip = clip.resized(lambda t, cd=current_dur: 1.0 + zoom_amt * easeInOutQuad(t / cd))
             
             def pan_fn(t, cd=current_dur):
                 prog = easeInOutQuad(t / cd)
-                off_x = -int(60 * prog) 
-                off_y = -int(40 * prog)
+                # Increased drift to match the extra zoom
+                off_x = -int(120 * prog) 
+                off_y = -int(80 * prog)
                 return (off_x, off_y)
 
             clip = clip.with_position(pan_fn).with_start(current_start)
