@@ -2192,7 +2192,7 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     draw = ImageDraw.Draw(img)
     
     scale_ratio = frame_width / 1080.0 if frame_width < frame_height else frame_width / 1920.0
-    base_size = int(68 * scale_ratio) # Increased from 58 for better mobile legibility
+    base_size = int(58 * scale_ratio) # Reverted to original as requested
     
     f_main = gf(base_size, bold=True)
     
@@ -2206,7 +2206,7 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     max_sub_width = int(frame_width * 0.80) # More narrow for punchy center focus
     lines = wrap_text_to_lines(words, word_widths, max_sub_width, f_main)
     
-    line_h = int(105 * scale_ratio) # Increased from 90 to match new font size
+    line_h = int(90 * scale_ratio) # Reverted to original
     
     # Position: EXACT CENTER (Reference style)
     start_y = int(frame_height * 0.5) - (len(lines) * line_h // 2) + y_shift
