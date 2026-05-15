@@ -2710,6 +2710,27 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         cur_h = max(1, int(height_pip * avatar_scale_mult))
         avatar_clip = vid_clip.resized((cur_w, cur_h)).without_audio()
         
+        # ── CINEMATIC "ALIVE" MOTION ──────────────────────────────────────
+        # Add a subtle breathing (scale) and head-bob (rotation) to prevent static feeling
+        import math
+        def alive_vfx(get_frame, t):
+            frame = get_frame(t)
+            # Breathing: 1% scale fluctuation at 0.5Hz
+            scale = 1.0 + 0.01 * math.sin(t * math.pi * 0.5)
+            # Head Bob: 0.5 degree rotation at 0.3Hz
+            angle = 0.5 * math.sin(t * math.pi * 0.3)
+            
+            # Simple implementation via resize/rotate would be slow per frame, 
+            # so we just return the frame here and let moviepy handle the transform if possible, 
+            # but for a "talking head" we'll use MoviePy's built-in effects instead for performance.
+            return frame
+
+        # Apply subtle breathing and rotation via MoviePy effects
+        avatar_clip = avatar_clip.with_effects([
+            vfx.Resize(lambda t: 1.0 + 0.008 * math.sin(t * 1.5)), # Breathing
+            vfx.Rotate(lambda t: 0.8 * math.sin(t * 1.2))          # Subtle Tilt/Nod
+        ])
+        
         try:
             from rembg import remove, new_session
             print("Using rembg for clean AI background removal...")
