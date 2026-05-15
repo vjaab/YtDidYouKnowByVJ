@@ -2978,14 +2978,19 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     #             final_audio_layers.append(sfx_clip)
     #         except: pass
     
-    # Background Music Selection (Rotating through available tracks)
+    # Background Music Selection (Topic-Aware: unique music per headline)
     music_files = sorted([f for f in os.listdir(MUSIC_DIR) if f.endswith(('.mp3', '.wav', '.m4a'))])
     if music_files:
-        day_of_month = datetime.now().day
-        music_idx = (day_of_month - 1) % len(music_files)
+        # Use a hash of the original news headline to select a track
+        # This ensures every unique topic gets a specific music track assigned to it
+        headline = script_json.get("original_news_headline", "")
+        import hashlib
+        music_hash = int(hashlib.md5(headline.encode()).hexdigest(), 16)
+        music_idx = music_hash % len(music_files)
+        
         bgm_filename = music_files[music_idx]
         bgm_path = os.path.join(MUSIC_DIR, bgm_filename)
-        print(f"🎵 Day {day_of_month} BGM Selection: {bgm_filename} ({music_idx+1}/{len(music_files)})")
+        print(f"🎵 Topic-Aware BGM Selection: {bgm_filename} (Hash-based index: {music_idx+1}/{len(music_files)})")
     else:
         bgm_path = os.path.join(MUSIC_DIR, "modern_tech.mp3")
 
