@@ -336,7 +336,7 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
     text = chunk["text"]
     dur = chunk["duration"]
     
-    orientation = "landscape" if is_longform else "portrait"
+    orientation = "16:9" if is_longform else "9:16"
     
     video_out = os.path.join(OUTPUT_DIR, f"chunk_{cid}_{TODAY}.mp4")
     photo_out = os.path.join(OUTPUT_DIR, f"chunk_{cid}_{TODAY}.jpg")

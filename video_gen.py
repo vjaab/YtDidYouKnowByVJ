@@ -1798,6 +1798,7 @@ def _sweep_clip(duration, accent_color, frame_width=1080):
 
 # ── LAYER 16: Article Screenshot (New Layer) ──────────────────────────────────
 def easeInOutQuad(t):
+    t = max(0.0, min(1.0, t))
     return 2*t*t if t < 0.5 else 1 - pow(-2*t + 2, 2) / 2
 
 def _article_screenshot_clip(screenshot_path, duration):
@@ -1831,21 +1832,19 @@ def _article_screenshot_clip(screenshot_path, duration):
             
             # Create a static ImageClip first
             clip = ImageClip(arr_rgb, duration=current_dur)
-            mclip = VideoClip(lambda t: arr_mask, is_mask=True, duration=current_dur)
+            # Explicitly capture current_dur in the lambda to avoid reference bugs
+            mclip = VideoClip(lambda t, cd=current_dur: arr_mask, is_mask=True, duration=current_dur, size=(FRAME_W, FRAME_H))
             clip = clip.with_mask(mclip)
             
             # --- PREMIUM KEN BURNS EFFECT (Zoom + Pan) ---
             # 1. Subtle Zoom-in (from 100% to 125%)
             zoom_amt = 0.25
-            clip = clip.with_effects([
-                vfx.Resize(lambda t: 1.0 + zoom_amt * easeInOutQuad(t / current_dur))
-            ])
+            # Using .resized() which is more consistent and capturing current_dur by value
+            clip = clip.resized(lambda t, cd=current_dur: 1.0 + zoom_amt * easeInOutQuad(t / cd))
             
             # 2. Dynamic Panning (Offsetting the zoomed image to stay centered or drift)
-            # Since the image is larger than the canvas after zoom, we move it to create a pan.
-            # Max offset at the end will be roughly (0.25 * 1080) = 270px wide, (0.25 * 1920) = 480px high.
-            def pan_fn(t):
-                prog = easeInOutQuad(t / current_dur)
+            def pan_fn(t, cd=current_dur):
+                prog = easeInOutQuad(t / cd)
                 # Drift slightly to the right and down
                 off_x = -int(60 * prog) 
                 off_y = -int(40 * prog)
@@ -1887,7 +1886,7 @@ def _evidence_screenshot_clip(evidence_path, duration):
             clip = clip.with_mask(mclip)
             
             # Subtle zoom only for evidence
-            clip = clip.with_effects([vfx.Resize(lambda t: 1.0 + 0.12 * (t / dur))])
+            clip = clip.resized(lambda t, d=dur: 1.0 + 0.12 * easeInOutQuad(t / d))
             clip = clip.with_position("center").with_start(start)
             clip = clip.with_effects([vfx.CrossFadeIn(0.6), vfx.CrossFadeOut(0.6)])
             return [clip]
@@ -2662,7 +2661,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
                 # ── CONTINUOUS MOTION ──
                 scale_factor = 1.0 + random.uniform(0.18, 0.25)
-                c_clip = c_clip.resized(lambda t: 1.0 + (scale_factor - 1.0) * (t / clip_dur))
+                # Capture scale_factor and clip_dur by value to avoid lambda-in-loop bugs
+                c_clip = c_clip.resized(lambda t, sf=scale_factor, cd=clip_dur: 1.0 + (sf - 1.0) * (t / cd))
                 c_clip = _apply_handheld_shake(c_clip)
                 c_clip = c_clip.with_start(current_start)
                 
@@ -2708,8 +2708,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         width_pip = int(height_pip * (w / h))
         
         # Apply refinements from dynamic_params
-        cur_w = int(width_pip * avatar_scale_mult)
-        cur_h = int(height_pip * avatar_scale_mult)
+        cur_w = max(1, int(width_pip * avatar_scale_mult))
+        cur_h = max(1, int(height_pip * avatar_scale_mult))
         avatar_clip = vid_clip.resized((cur_w, cur_h)).without_audio()
         
         try:
