@@ -222,7 +222,15 @@ def run_pipeline(topic_type="research"):
 
         # ── STEP 4: Generate Audio + Word Timestamps ──────────────────────────
         log_message("STEP 4: Generating voiceover + word timestamps...")
-        custom_map = script_data.get("phonetic_pronunciation_map", {})
+        custom_map = script_data.get("custom_map", {})
+        
+        # Select Intro Video for Lip-Sync (Rotation)
+        intro_videos = ["assets/Firefly_video.mp4", "assets/Firefly_video_2.mp4", "assets/Firefly_video_final.mp4"]
+        headline = script_data.get("original_news_headline", "")
+        import hashlib
+        video_idx = int(hashlib.md5(headline.encode()).hexdigest(), 16) % len(intro_videos)
+        script_data["lipsync_face_path"] = intro_videos[video_idx]
+        log_message(f"Selected Lip-Sync Template: {intro_videos[video_idx]}")
         
         has_kaggle = os.path.exists(os.path.expanduser("~/.kaggle/kaggle.json"))
         use_local_only = os.environ.get("USE_LOCAL_ONLY") == "true"
