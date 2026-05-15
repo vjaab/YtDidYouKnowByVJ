@@ -2285,7 +2285,7 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
 
 def _generate_lipsync_video(audio_path, face_path=None):
     if face_path is None:
-        face_path = os.path.join(ASSETS_DIR, "Firefly_video_final.mp4")
+        face_path = os.path.join(ASSETS_DIR, "video", "Firefly_video_final.mp4")
     if not os.path.exists(face_path):
         print(f"{os.path.basename(face_path)} not found in assets. Skipping lip sync.")
         return None
@@ -2671,7 +2671,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     # ── AVATAR VIDEO PiP ──────────────────────────────────────────────────
     print("Preparing Dimension Avatar PiP...")
     lipsync_path = script_json.get("kaggle_lipsync_path")
-    face_template = script_json.get("lipsync_face_path") or os.path.join(ASSETS_DIR, "Firefly_video_final.mp4")
+    face_template = script_json.get("lipsync_face_path") or os.path.join(ASSETS_DIR, "video", "Firefly_video_final.mp4")
     
     if not lipsync_path or not os.path.exists(lipsync_path):
         lipsync_path = _generate_lipsync_video(audio_path, face_template)

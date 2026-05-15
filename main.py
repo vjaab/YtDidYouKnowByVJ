@@ -226,10 +226,10 @@ def run_pipeline(topic_type="research"):
         
         # Select Intro Video for Lip-Sync (Rotation)
         intro_videos = [
-            "assets/Firefly_video.mp4", 
-            "assets/Firefly_video_2.mp4", 
-            "assets/Firefly_video_final.mp4",
-            "assets/vj_news_anchor_base.mp4"
+            "assets/video/Firefly_video.mp4", 
+            "assets/video/Firefly_video_2.mp4", 
+            "assets/video/Firefly_video_final.mp4",
+            "assets/video/vj_news_anchor_base.mp4"
         ]
         headline = script_data.get("original_news_headline", "")
         import hashlib

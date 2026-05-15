@@ -657,7 +657,7 @@ def process_job():
         custom_map = job_data.get("custom_map")
         
         # 🖼️ Reference Frame Sanity Check
-        face_path = job_data.get("face_path", "assets/Firefly_video_final.mp4")
+        face_path = job_data.get("face_path", "assets/video/Firefly_video_final.mp4")
         if not os.path.exists(face_path):
             print(f"❌ Face template missing: {face_path}")
             raise RuntimeError("Face template missing.")
@@ -700,7 +700,7 @@ def process_job():
             audio_path = wav_path
         
         # 🟢 STEP 2: Prep Assets & Optimize
-        face_path = job_data.get("face_path", "assets/Firefly_video_final.mp4")
+        face_path = job_data.get("face_path", "assets/video/Firefly_video_final.mp4")
         optimized_face = "assets/Firefly_video_optimized.mp4"
         lipsync_out = "kaggle_lipsync.mp4"
         

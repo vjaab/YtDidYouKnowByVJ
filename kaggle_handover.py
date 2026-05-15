@@ -20,7 +20,7 @@ def trigger_kaggle_gpu_job(script_data, custom_map):
         "custom_map": custom_map,
         "elevenlabs_api_key": ELEVENLABS_API_KEY,
         "elevenlabs_voice_id": ELEVENLABS_VOICE_ID,
-        "face_path": script_data.get("lipsync_face_path", "assets/Firefly_video_final.mp4")
+        "face_path": script_data.get("lipsync_face_path", "assets/video/Firefly_video_final.mp4")
     }
     
     worker_script_path = os.path.join(scripts_dir, "kaggle_worker.py")
