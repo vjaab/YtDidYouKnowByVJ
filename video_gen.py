@@ -2709,6 +2709,16 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         cur_w = max(1, int(width_pip * avatar_scale_mult))
         cur_h = max(1, int(height_pip * avatar_scale_mult))
         avatar_clip = vid_clip.resized((cur_w, cur_h)).without_audio()
+
+        # ── REFINED "ALIVE" MOTION (Head-Bob & Breathing) ────────────────
+        # Subtle non-linear movement to make static presenters feel natural
+        import math
+        avatar_clip = avatar_clip.with_effects([
+            # Micro-Breathing: 0.6% scale fluctuation
+            vfx.Resize(lambda t: 1.0 + 0.006 * math.sin(t * 1.8)), 
+            # Natural Head Tilt: Very subtle +/- 0.5 degree swing
+            vfx.Rotate(lambda t: 0.6 * math.sin(t * 1.4 + 0.5))
+        ])
         
         try:
             from rembg import remove, new_session
