@@ -2208,8 +2208,8 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     
     line_h = int(90 * scale_ratio) # Reverted to original
     
-    # Position: EXACT CENTER (Reference style)
-    start_y = int(frame_height * 0.5) - (len(lines) * line_h // 2) + y_shift
+    # Position: SHIFTED SLIGHTLY DOWN FROM CENTER (Improved composition)
+    start_y = int(frame_height * 0.54) - (len(lines) * line_h // 2) + y_shift
     
     # Calculate dimensions for the unified background block
     max_line_w = 0
