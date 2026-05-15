@@ -72,8 +72,8 @@ def upload_video(video_path, title, description, tags, thumbnail_path=None, cate
             "description":          description[:5000],
             "tags":                 tags[:15],
             "categoryId":           category_id,
-            "defaultLanguage":      "en-US",
-            "defaultAudioLanguage": "en-US",
+            "defaultLanguage":      "en",
+            "defaultAudioLanguage": "en",
         },
         "status": {
             "privacyStatus":          "public",
