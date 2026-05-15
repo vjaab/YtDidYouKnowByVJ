@@ -1806,7 +1806,9 @@ def _article_screenshot_clip(screenshot_path, duration):
     Shows the source article as a full-screen backdrop with a premium Ken Burns effect.
     Ensures visibility every 10s for 7s throughout the video.
     """
+    print(f"🔍 DEBUG: _article_screenshot_clip called with path: {screenshot_path}, dur: {duration}")
     if not screenshot_path or not os.path.exists(screenshot_path):
+        print(f"⚠️ DEBUG: Screenshot path missing or invalid: {screenshot_path}")
         return []
     try:
         # Load and prepare the canvas once
@@ -1823,38 +1825,35 @@ def _article_screenshot_clip(screenshot_path, duration):
         interval = 10.0
         display_dur = 7.0
         
-        # Loop throughout the entire duration
-        for start_t in np.arange(1.0, duration, interval):
+        # Start at 0.0 to ensure it appears immediately
+        current_start = 0.0
+        while current_start < duration:
             # Clamp duration for the last clip if it would exceed total video length
-            current_dur = min(display_dur, duration - start_t)
+            current_dur = min(display_dur, duration - current_start)
             if current_dur < 1.0:
-                continue
+                break
             
-            # Create a static ImageClip first
+            # Create a static ImageClip from the prepared canvas array
+            # ImageClip(arr_rgb) is faster than loading from disk every time in a loop
             clip = ImageClip(arr_rgb, duration=current_dur)
-            # Explicitly capture current_dur in the lambda to avoid reference bugs
-            mclip = VideoClip(lambda t, cd=current_dur: arr_mask, is_mask=True, duration=current_dur, size=(FRAME_W, FRAME_H))
-            clip = clip.with_mask(mclip)
             
             # --- PREMIUM KEN BURNS EFFECT (Zoom + Pan) ---
-            # 1. Subtle Zoom-in (from 100% to 125%)
             zoom_amt = 0.25
-            # Using .resized() which is more consistent and capturing current_dur by value
             clip = clip.resized(lambda t, cd=current_dur: 1.0 + zoom_amt * easeInOutQuad(t / cd))
             
-            # 2. Dynamic Panning (Offsetting the zoomed image to stay centered or drift)
             def pan_fn(t, cd=current_dur):
                 prog = easeInOutQuad(t / cd)
-                # Drift slightly to the right and down
                 off_x = -int(60 * prog) 
                 off_y = -int(40 * prog)
                 return (off_x, off_y)
 
-            clip = clip.with_position(pan_fn).with_start(start_t)
+            clip = clip.with_position(pan_fn).with_start(current_start)
             clip = clip.with_effects([vfx.CrossFadeIn(0.6), vfx.CrossFadeOut(0.6)])
             clips.append(clip)
             
-        print(f"🎬 Generated {len(clips)} article screenshot intervals.")
+            current_start += interval
+            
+        print(f"🎬 Generated {len(clips)} article screenshot intervals for path {os.path.basename(screenshot_path)}.")
         return clips
     except Exception as e:
         print(f"Article screenshot clip error: {e}")
@@ -2816,7 +2815,13 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     #         iclip = _infographic_card_clip(...)
     #         if iclip: infographic_clips.append(iclip)
 
-    base_layers = bg_layer_clips + screenshot_clips + [gradient] + logo_clips
+    # Stack background, then screenshot clips on top of background
+    base_layers = bg_layer_clips + screenshot_clips
+    
+    # Add overlays
+    base_layers.append(gradient)
+    base_layers.extend(logo_clips)
+    
     if flare_layer: base_layers.append(flare_layer)
     if grain_layer: base_layers.append(grain_layer)
     if avatar_pip: base_layers.append(avatar_pip)
