@@ -121,9 +121,9 @@ SELECTOR_AGENT_TEMPLATE = """{persona}
 
 SELECTOR AGENT TASK:
 Analyze the following tech news context and pick the SINGLE most impactful, surprising, and high-retention AI/Tech story for a 60-second video.
-PRIORITIZE: Major model releases, benchmarks that destroy previous records, massive AI leaks, or engineering breakthroughs that change the industry.
-AVOID: Minor software updates, corporate partnership fluff, or generic 'AI is growing' articles.
-CRITICAL: ONLY pick stories related to AI, LLMs, Software Engineering, or Robotics. DO NOT pick pure Science/Physics/Chemistry papers (e.g. arXiv physics) unless they are directly applied to AI training or architecture.
+
+CRITICAL AVOIDANCE RULE:
+You MUST NOT select any story that is semantically similar to the 'RECENTLY COVERED STORIES' listed in the context. If the hottest trending story matches a recently covered one, SKIP IT and pick the next best unique story.
 
 {selection_instruction}
 
@@ -134,7 +134,7 @@ Return ONLY a JSON object:
 {{
   "selected_headline": "The exact headline or title",
   "selected_url": "The exact URL",
-  "reason": "Briefly why this was picked (focus on viral potential)"
+  "reason": "Briefly why this was picked (focus on viral potential and uniqueness)"
 }}"""
 
 HUMANIZER_AGENT_TEMPLATE = """{persona}
@@ -152,9 +152,11 @@ SCHEMA REQUIREMENTS:
 
 Return ONLY the final JSON object matching the schema. No markdown wrapping unless inside the string values. No explanations."""
 
-def get_hottest_tech_topic(client):
+def get_hottest_tech_topic(client, avoid_list=""):
     """Uses Gemini Search grounding to find today's single most VIRAL AI news story from Google Trends."""
     print("🔥 Fetching hottest AI tech topic for today (Google Trends Analysis)...")
+    
+    avoid_prompt = f"\n\nCRITICAL: DO NOT pick any topics related to the following recently covered stories:\n{avoid_list}" if avoid_list else ""
     
     attempts = 0
     while attempts < 3:
@@ -165,6 +167,7 @@ def get_hottest_tech_topic(client):
                     "Analyze today's Google Trends and viral tech news. "
                     "What is the single most trending AI search topic, breakout term, or breaking news story in the last 24 hours? "
                     "Look for: high search volume spikes on Google Trends related to AI, LLMs, or new model launches. "
+                    f"{avoid_prompt}\n\n"
                     "Return ONLY a JSON object with two fields: "
                     "'topic' (3-6 word phrase, e.g. 'Google Gemini 1.5 Pro breakout trend') and "
                     "'keywords' (list of 6-8 specific Google Trends search keywords). No markdown, no explanation."
@@ -195,23 +198,33 @@ def get_hottest_tech_topic(client):
     print("⚠️ Google Trends exhausted after retries. Proceeding with RSS only.")
     return None
 
-def pick_and_generate_script(articles=None, extra_instruction="", forced_article=None, topic_type="research"):
+def pick_and_generate_script(articles=None, extra_instruction="", forced_article=None, topic_type="research", failed_topics=[]):
     client = genai.Client(api_key=GEMINI_API_KEY)
     
     day_name, slot, category = get_slot_info()
     strategy_enhancement = get_category_prompt_enhancement(category, slot)
     
+    # ── STEP -2: REPETITION AVOIDANCE (Moved Up) ────────────────────────────────────────
+    tracker = load_tracker()
+    recent_history = tracker.get("history", [])[-15:]
+    # Also include titles from the last 7 days list for better coverage
+    recent_titles = tracker.get("used_titles", [])[-30:]
+    
+    avoid_items = [h.get('news_headline', h.get('title')) for h in recent_history] + recent_titles
+    if failed_topics:
+        avoid_items += failed_topics
+        
+    combined_avoid = list(set(avoid_items))
+    
+    avoid_list_str = "\n".join([f"- {t}" for t in combined_avoid if t])
+    avoid_instruction = f"CRITICAL: RECENTLY COVERED STORIES (DO NOT REPEAT THESE TOPICS):\n{avoid_list_str}\n\n" if avoid_list_str else ""
+
     # ── STEP -1.5: FETCH HOTTEST TOPIC ──────────────────────────────────────────
-    hot_topic = get_hottest_tech_topic(client)
+    # Pass the avoid list to Google Trends fetcher
+    hot_topic = get_hottest_tech_topic(client, avoid_list=avoid_list_str)
     hot_keywords = [kw.lower() for kw in hot_topic.get("keywords", [])] if hot_topic else []
     hot_topic_str = hot_topic.get("topic", "") if hot_topic else ""
 
-    # ── STEP -2: REPETITION AVOIDANCE ────────────────────────────────────────
-    tracker = load_tracker()
-    recent_history = tracker.get("history", [])[-15:]
-    avoid_list = "\n".join([f"- {h.get('news_headline', h.get('title'))}" for h in recent_history])
-    avoid_instruction = f"CRITICAL: RECENTLY COVERED STORIES (DO NOT REPEAT THESE TOPICS):\n{avoid_list}\n\n" if avoid_list else ""
-    
     news_context = avoid_instruction
     if forced_article:
         print(f"🎯 STEP -1: Using Forced Topic -> {forced_article}")

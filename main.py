@@ -166,7 +166,7 @@ def run_pipeline(topic_type="research"):
         combined_instruction = extra_instruction + screenshot_avoid
         
         script_data = pick_and_generate_script(
-            articles=rss_articles, extra_instruction=combined_instruction, forced_article=None, topic_type=topic_type
+            articles=rss_articles, extra_instruction=combined_instruction, forced_article=None, topic_type=topic_type, failed_topics=failed_topics
         )
 
         if not script_data:
@@ -204,10 +204,12 @@ def run_pipeline(topic_type="research"):
             # Screenshot is MANDATORY — reject this topic and try another
             failed_headline = script_data.get("original_news_headline", title)
             failed_url = news_url or "unknown"
-            failed_topics.append(f"{failed_headline} (URL: {failed_url})")
+            failed_topics.append(failed_headline)
+            if failed_url != "unknown":
+                failed_topics.append(failed_url)
             log_message(f"❌ Article screenshot FAILED for: {failed_headline}")
             log_message(f"   URL was: {failed_url}")
-            log_message(f"   Rejecting this topic and picking a different one... ({len(failed_topics)} topics rejected so far)")
+            log_message(f"   Rejecting this topic and picking a different one... ({len(failed_topics)} items rejected so far)")
             
             # Reset — skip audio generation entirely for this topic
             script_data = None
@@ -272,12 +274,21 @@ def run_pipeline(topic_type="research"):
 
         if not audio_path:
             log_message("ERROR: Audio generation failed.")
+            failed_headline = script_data.get("original_news_headline", title)
+            failed_topics.append(failed_headline)
             attempts += 1
             continue
 
         if duration < min_dur:
             log_message(f"Audio too short ({duration:.1f}s < {min_dur}s). Retrying...")
-            extra_instruction = f"The previous script was too short at {duration:.0f}s. Make the script longer, aim for 65-70 seconds of speaking."
+            # If we've tried multiple times and it's still too short, maybe just skip this topic
+            if (attempts % 3 == 2):
+                failed_headline = script_data.get("original_news_headline", title)
+                failed_topics.append(failed_headline)
+                log_message(f"⚠️ Topic '{failed_headline}' repeatedly too short. Skipping.")
+                extra_instruction = ""
+            else:
+                extra_instruction = f"The previous script was too short at {duration:.0f}s. Make the script longer, aim for 65-70 seconds of speaking."
             attempts += 1
             continue
 

@@ -27,16 +27,19 @@ def save_tracker(tracker_data):
 
 def check_story_uniqueness(new_title, new_headline=None, new_keywords=None, new_url=None):
     tracker = load_tracker()
+    if not tracker:
+        return True, "Unique (Empty tracker)"
     
     # 1. Exact URL Check
     if new_url:
         for entry in tracker.get('history', []):
+            if not isinstance(entry, dict): continue
             if entry.get('news_source_url') == new_url:
                 return False, f"Exact URL already covered: {new_url}"
 
     # 2. Semantic Headline Check (Token Set Ratio handles reordering)
     from config import SIMILARITY_THRESHOLD
-    headlines_to_check = tracker.get('used_titles', []) + tracker.get('last_7_days_stories', [])
+    headlines_to_check = (tracker.get('used_titles', []) or []) + (tracker.get('last_7_days_stories', []) or [])
     
     search_titles = [new_title]
     if new_headline: search_titles.append(new_headline)
