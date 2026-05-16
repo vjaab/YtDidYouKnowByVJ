@@ -2362,7 +2362,8 @@ class VisualAuditEngine:
         return frames
 
     def _frames_to_bytes(self, frames):
-        """Convert PIL frames to PNG bytes for Gemini Vision."""
+        """Convert PIL frames to PNG bytes for Gemini Vision using new SDK Part objects."""
+        from google.genai import types
         parts = []
         for frac, pil_img in frames:
             # Downscale for API efficiency (max 720px wide)
@@ -2372,10 +2373,12 @@ class VisualAuditEngine:
                 pil_img = pil_img.resize((720, int(h * scale)), Image.LANCZOS)
             buf = io.BytesIO()
             pil_img.save(buf, format='JPEG', quality=80)
-            parts.append({
-                'mime_type': 'image/jpeg',
-                'data': buf.getvalue()
-            })
+            
+            # Use the SDK's direct method for building a Part from bytes
+            parts.append(types.Part.from_bytes(
+                data=buf.getvalue(),
+                mime_type='image/jpeg'
+            ))
         return parts
 
     def _clamp_refinements(self, refinements):
@@ -2410,13 +2413,15 @@ class VisualAuditEngine:
 
         try:
             from google import genai
+            from google.genai import types
 
             client = genai.Client(api_key=self.api_key)
             image_parts = self._frames_to_bytes(frames)
 
             param_desc = json.dumps({k: f"range {v}" for k, v in self.PARAM_RANGES.items()})
-
-            prompt = (
+            
+            # Use explicit Part for the text as well
+            text_part = types.Part.from_text(text=(
                 "You are a Senior Video Production QA Engineer reviewing a YouTube Shorts / tech news video.\n"
                 f"Script Summary (for context): {script_text[:300]}...\n\n"
                 f"You are shown {len(frames)} frames sampled at 10%, 30%, 60%, 90% of the video.\n\n"
@@ -2439,10 +2444,10 @@ class VisualAuditEngine:
                 '  }\n'
                 '}\n'
                 'If everything looks great (score >= 8.5), return an empty refinement_commands: {}'
-            )
+            ))
 
-            # Build content: images first, then prompt text
-            contents = image_parts + [prompt]
+            # Build contents as a list of Part objects
+            contents = image_parts + [text_part]
 
             response = client.models.generate_content(
                 model='gemini-2.5-flash',
@@ -2501,20 +2506,22 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         if not video_path: break
         
         # 1. OBSERVE & CRITIQUE
-        if api_key and iterations < max_iters:
+        if api_key and iterations < max_iters and script_json:
             try:
                 auditor = VisualAuditEngine(api_key)
                 feedback = auditor.audit(video_path, script_json.get("script", ""))
                 
                 if feedback and feedback.get("score", 0) < 8.5:
-                    print(f"🔄 [VIDEO LOOP] Quality: {feedback.get('score')}/10. Issues: {feedback.get('issues')}")
+                    score = feedback.get("score")
+                    issues = feedback.get("issues")
+                    print(f"🔄 [VIDEO LOOP] Quality: {score}/10. Issues: {issues}")
                     # 2. REFINE
                     refinements = feedback.get("refinement_commands", {})
                     if refinements:
                         dynamic_params.update(refinements)
                         iterations += 1
                         continue
-                else:
+                elif feedback:
                     print(f"⭐ [VIDEO LOOP] Visual Quality Score: {feedback.get('score', 'N/A')}/10. Approved.")
             except Exception as e:
                 print(f"⚠️ [VIDEO LOOP] Visual audit failed (non-fatal): {e}")

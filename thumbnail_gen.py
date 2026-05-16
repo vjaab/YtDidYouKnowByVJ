@@ -77,16 +77,16 @@ def _generate_imagen_background(title, client):
         "No text, no humans, clean composition. High contrast."
     )
     try:
-        response = client.models.generate_image(
+        response = client.models.generate_images(
             model='imagen-3.0-generate-001',
             prompt=prompt,
-            config=types.GenerateImageConfig(
+            config=types.GenerateImagesConfig(
                 number_of_images=1,
                 aspect_ratio='16:9',
                 add_watermark=False
             )
         )
-        img_bytes = response.generated_images[0].image_bytes
+        img_bytes = response.generated_images[0].image.image_bytes
         return Image.open(io.BytesIO(img_bytes)).convert("RGB")
     except Exception as e:
         print(f"⚠️ Imagen failed: {e}. Using dark fallback.")
