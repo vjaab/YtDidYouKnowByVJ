@@ -2608,7 +2608,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         for i, vp in enumerate(visual_paths):
             try:
                 if vp.endswith(".mp4"):
-                    c_clip = VideoFileClip(vp)
+                    c_clip = VideoFileClip(vp).without_audio()
                     if c_clip.duration < clip_dur:
                         c_clip = c_clip.with_effects([vfx.Loop(duration=clip_dur)])
                     else:

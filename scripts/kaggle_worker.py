@@ -710,9 +710,10 @@ def process_job():
         optimized_face = "assets/Firefly_video_optimized.mp4"
         lipsync_out = "kaggle_lipsync.mp4"
         
-        print("🏎️ Optimizing template resolution (512px) for RAM safety...")
+        print("🏎️ Optimizing template resolution (512px) and REMOVING audio for RAM safety...")
         run_cmd([
             "ffmpeg", "-y", "-i", face_path, 
+            "-an", # REMOVE original background music/audio from the reference video
             "-vf", "scale=512:-2", 
             "-c:v", "libx264", "-crf", "23", "-preset", "veryfast",
             optimized_face
