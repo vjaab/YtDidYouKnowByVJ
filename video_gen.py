@@ -2699,8 +2699,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
         w, h = vid_clip.size
         
-        # Crop to portrait aspect ratio (9:16) to focus on the character and fit naturally in Shorts
-        target_aspect = 9 / 16
+        # Crop to wider portrait aspect ratio (4:5) to show more shoulders and feel more 'present'
+        target_aspect = 4 / 5
         if w/h > target_aspect:
             new_w = int(h * target_aspect)
             x1 = (w - new_w) // 2
@@ -2712,8 +2712,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             
         w, h = vid_clip.size
         
-        # Make the avatar occupy exactly the bottom 40% of the screen
-        height_pip = int(FRAME_H * 0.40)
+        # Make the avatar occupy exactly the bottom 55% of the screen (Viral Production Spec 2026)
+        height_pip = int(FRAME_H * 0.55)
         width_pip = int(height_pip * (w / h))
         
         # Apply refinements from dynamic_params
@@ -2729,15 +2729,21 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             # on a CPU-only runner would take hours. Static mask is 1000x faster.
             print("👤 Generating clean AI background mask for avatar...")
             
-            # Use default session (usually more robust than human_seg on older models)
+            # Use alpha_matting for professional edge handling (hair/fine details)
             first_frame = avatar_clip.get_frame(0)
-            rgba = remove(first_frame).copy()
+            rgba = remove(
+                first_frame, 
+                alpha_matting=True, 
+                alpha_matting_foreground_threshold=240, 
+                alpha_matting_background_threshold=10, 
+                alpha_matting_erode_size=10
+            ).copy()
             
             alpha_np = (rgba[..., 3] / 255.0).astype(np.float32)
             
-            # Feather the edges for a professional blend
+            # Feather the edges for a professional blend (increased for smoother transition)
             mask_img = Image.fromarray((alpha_np * 255).astype(np.uint8))
-            mask_img = mask_img.filter(ImageFilter.GaussianBlur(radius=2))
+            mask_img = mask_img.filter(ImageFilter.GaussianBlur(radius=3))
             alpha_np = np.array(mask_img).astype(np.float32) / 255.0
             
             mclip = VideoClip(lambda t: alpha_np, is_mask=True, duration=audio_duration)
