@@ -210,11 +210,12 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
     tracker = load_tracker()
     recent_history = tracker.get("history", [])[-15:]
     avoid_list = "\n".join([f"- {h.get('news_headline', h.get('title'))}" for h in recent_history])
-    avoid_instruction = f"RECENTLY COVERED STORIES (DO NOT REPEAT):\n{avoid_list}\n\n" if avoid_list else ""
-    news_context = ""
+    avoid_instruction = f"CRITICAL: RECENTLY COVERED STORIES (DO NOT REPEAT THESE TOPICS):\n{avoid_list}\n\n" if avoid_list else ""
+    
+    news_context = avoid_instruction
     if forced_article:
         print(f"🎯 STEP -1: Using Forced Topic -> {forced_article}")
-        news_context = f"FORCED TOPIC TO COVER:\n{forced_article}\n"
+        news_context += f"FORCED TOPIC TO COVER:\n{forced_article}\n"
     else:
         # ── STEP 0: FETCH & FILTER + RE-RANK BY VIRAL POTENTIAL ───────────────────────
         if articles:
@@ -233,7 +234,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
                 url = art.get('url', '')
                 
                 # 1. Uniqueness check
-                is_unique, _ = check_story_uniqueness(title, url)
+                is_unique, _ = check_story_uniqueness(new_title=title, new_url=url)
                 if not is_unique: continue
                 
                 # 2. Internal batch uniqueness
@@ -309,7 +310,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
                 
                 links_str = "\n".join(grounding_links)
                 # Use the grounded response to build a context
-                news_context = f"GEMINI SEARCH RESULTS (Grounded):\n{search_response.text}\n\nSOURCES FOUND:\n{links_str}\n"
+                news_context += f"GEMINI SEARCH RESULTS (Grounded):\n{search_response.text}\n\nSOURCES FOUND:\n{links_str}\n"
                 print(f"✅ Gemini Search completed with {len(grounding_links)} sources.")
             except Exception as e:
                 print(f"⚠️ Gemini Search failed: {e}. Falling back to empty context.")
