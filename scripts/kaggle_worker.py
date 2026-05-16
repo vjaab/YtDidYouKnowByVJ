@@ -201,7 +201,7 @@ def _install_mmlab():
     
     # Step 0: Ensure packaging tools and global stubs are ready
     try:
-        run_cmd(["pip", "install", "-q", "numpy<2.0", "setuptools<70", "packaging", "wheel", "yapf==0.40.1"])
+        run_cmd(["pip", "install", "-q", "numpy==1.26.4", "setuptools<70", "packaging", "wheel", "yapf==0.40.1"])
         
         # 🛡️ Global distutils stub for Python 3.12
         import site
@@ -257,15 +257,17 @@ def _install_mmlab():
     except:
         pass
 
-    if not mmcv_installed or int(torch_v_simple.split('.')[0]) < 2 or int(torch_v_simple.split('.')[1]) < 9:
-        # Only try re-installing mmcv if missing or on older Torch versions where wheels exist
-        if int(torch_v_simple.split('.')[0]) >= 2 and int(torch_v_simple.split('.')[1]) >= 9:
-            print("   ⚠️ Torch 2.9+ detected. Skipping mmcv reinstall (no prebuilt wheels yet).")
+    if not mmcv_installed:
+        # Strategy: Try the OpenMMLab index first with various torch version tags.
+        # Kaggle might have Torch 2.5/2.6, but indexes usually stop at 2.4.
+        # We try them in descending order of recency.
+        trial_torch_versions = [torch_v_simple]
+        if "2.5" in torch_v_simple or "2.6" in torch_v_simple:
+            trial_torch_versions += ["2.4.0", "2.3.0"]
         else:
-            # Strategy: Try the OpenMMLab index first with various torch version tags.
-            # Kaggle might have Torch 2.5, but indexes usually stop at 2.1/2.2/2.3/2.4.
-            # We try them in descending order of recency.
-            for trial_v in [torch_v_simple, "2.4.0", "2.3.0", "2.2.0", "2.1.0"]:
+            trial_torch_versions += ["2.4.0", "2.3.0", "2.2.0", "2.1.0"]
+
+        for trial_v in trial_torch_versions:
                 # Also try common CUDA tags if exact tag fails (e.g. cu121 often works on cu124)
                 for trial_cuda in [cuda_tag, "cu121", "cu118"]:
                     try:
@@ -572,20 +574,24 @@ def setup_project():
         "--extra-index-url", "https://download.pytorch.org/whl/cu121"])
     
     # CRITICAL: Clean swap of numpy and numba
-    # Standardizing on numpy 2.0.2 and numba 0.60.0 for F5-TTS / Python 3.12 compatibility
-    print("🔁 Performing clean swap of numba and numpy (v2.x compatible)...")
+    # Standardizing on numpy 1.26.4 and numba 0.60.0 for MMLab / Python 3.12 compatibility
+    print("🔁 Performing clean swap of numba and numpy (v1.x for MMLab stability)...")
     try:
         # Clean uninstall first
         subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "numba", "numpy"], check=True)
         # Fresh install with known compatible versions
-        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "numba==0.60.0", "numpy==2.0.2"], check=True)
+        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "numba==0.60.0", "numpy==1.26.4"], check=True)
         
         # Verify
         import importlib, numpy, numba
         importlib.reload(numpy)
         importlib.reload(numba)
         print(f"   ✅ numpy: {numpy.__version__} | numba: {numba.__version__}")
-        import numpy.core._multiarray_umath
+        # Use a more robust check for numpy extensions
+        try:
+            import numpy.core._multiarray_umath
+        except ImportError:
+            import numpy._core._multiarray_umath
         print("   ✅ numpy C extensions OK")
     except Exception as e:
         print(f"   ⚠ Numpy/Numba swap verification failed: {e}")
@@ -631,7 +637,7 @@ def process_job():
         # 🛡️ Environment Lock Assertion
         import numpy as np, numba
         print(f"🔍 Core Stack: numpy {np.__version__} | numba {numba.__version__}")
-        assert np.__version__ == "2.0.2", f"❌ Environment Drift detected! numpy version {np.__version__} (expected 2.0.2). Pin was likely clobbered."
+        assert np.__version__ == "1.26.4", f"❌ Environment Drift detected! numpy version {np.__version__} (expected 1.26.4). Pin was likely clobbered."
         assert numba.__version__ == "0.60.0", f"❌ Environment Drift detected! numba version {numba.__version__} (expected 0.60.0). Pin was likely clobbered."
         
         # 🔍 Print Stack Versions for Debugging
@@ -778,24 +784,34 @@ def process_job():
             shutil.rmtree("MuseTalk", ignore_errors=True)
 
 if __name__ == "__main__":
-    print("--- Kaggle Worker Initiated ---")
-    setup_project()
-    setup_musetalk()
-    
-    # 🔁 FINAL CRITICAL LOCK: Ensure both numba and numpy are standardized
-    # This fixes corruption from mmengine/torch upgrades during MMLab setup
-    print("🔁 Finalizing environment: Locking numba==0.60.0 and numpy==2.0.2 (Clean Swap)...")
     try:
-        subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "numba", "numpy"], check=True)
-        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "numba==0.60.0", "numpy==2.0.2"], check=True)
+        print("--- Kaggle Worker Initiated ---")
+        setup_project()
+        setup_musetalk()
         
-        import importlib, numpy, numba
-        importlib.reload(numpy)
-        importlib.reload(numba)
-        import numpy.core._multiarray_umath
-        print(f"   ✅ Final environment lock established: numpy {numpy.__version__} | numba {numba.__version__}")
+        # 🔁 FINAL CRITICAL LOCK: Ensure both numba and numpy are standardized
+        # This fixes corruption from mmengine/torch upgrades during MMLab setup
+        print("🔁 Finalizing environment: Locking numba==0.60.0 and numpy==1.26.4 (Clean Swap)...")
+        try:
+            subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "numba", "numpy"], check=True)
+            subprocess.run([sys.executable, "-m", "pip", "install", "-q", "numba==0.60.0", "numpy==1.26.4"], check=True)
+            
+            import importlib, numpy, numba
+            importlib.reload(numpy)
+            importlib.reload(numba)
+            # Robust extension check
+            try:
+                import numpy.core._multiarray_umath
+            except ImportError:
+                import numpy._core._multiarray_umath
+            print(f"   ✅ Final environment lock established: numpy {numpy.__version__} | numba {numba.__version__}")
+        except Exception as e:
+            print(f"   ⚠ Final environment lock failed: {e}")
+        
+        process_job()
     except Exception as e:
-        print(f"   ⚠ Final environment lock failed: {e}")
-    
-    process_job()
+        print(f"❌ FATAL ERROR in Kaggle Worker: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
     print("--- Job Finished ---")

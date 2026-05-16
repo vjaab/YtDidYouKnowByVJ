@@ -170,8 +170,7 @@ def get_hottest_tech_topic(client):
                     "'keywords' (list of 6-8 specific Google Trends search keywords). No markdown, no explanation."
                 ),
                 config=types.GenerateContentConfig(
-                    tools=[{'google_search': {}}],
-                    response_mime_type='application/json'
+                    tools=[{'google_search': {}}]
                 )
             )
             raw = response.text.strip()
