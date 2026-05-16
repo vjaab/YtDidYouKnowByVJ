@@ -2245,7 +2245,7 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
             
             if is_active:
                 c_fill = (204, 255, 0, 255) # Electric Yellow
-                f_word = gf(int(base_size * 1.4), bold=True)
+                f_word = gf(base_size, bold=True) # Scale 1.0 (No zoom)
                 w_w, w_h = ts(word_text, f_word)
                 word_img = Image.new("RGBA", (w_w + 60, w_h + 60), (0,0,0,0))
                 word_draw = ImageDraw.Draw(word_img)
@@ -2266,8 +2266,8 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
                 rotated = word_img.rotate(tilt, resample=Image.BICUBIC, expand=True)
                 
                 orig_w = word_widths[word_idx]
-                target_x = cur_x - (rotated.width - orig_w)//2
-                target_y = line_y - (rotated.height - base_size)//2 + 2
+                target_x = int(cur_x - (rotated.width - orig_w)//2)
+                target_y = int(line_y - (rotated.height - base_size)//2 + 2)
                 img.alpha_composite(rotated, (target_x, target_y))
             else:
                 c_fill = (255, 255, 255, 255)
@@ -2388,7 +2388,11 @@ class VisualAuditEngine:
             if key in refinements:
                 try:
                     val = float(refinements[key])
-                    clamped[key] = max(lo, min(hi, val))
+                    clamped_val = max(lo, min(hi, val))
+                    if key == "subtitle_y_shift":
+                        clamped[key] = int(clamped_val)
+                    else:
+                        clamped[key] = clamped_val
                 except (ValueError, TypeError):
                     pass
         return clamped
@@ -3052,23 +3056,12 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         if active_chunk:
             word_status_list = []
             for w in active_chunk.get("words", []):
-                scale = 1.0
                 is_active = w["start"] - 0.05 <= t <= w["end"] + 0.05
-                if is_active:
-                    word_dur = w["end"] - w["start"]
-                    p = (t - w["start"]) / max(word_dur, 0.01)
-                    if 0 <= p <= 0.2:
-                        scale = 1.0 + (0.25 * (p / 0.2))
-                    elif 0.2 < p <= 0.4:
-                        scale = 1.25 - (0.25 * ((p-0.2)/0.2))
-                    else:
-                        scale = 1.0
-
                 word_status_list.append({
                     "word": w["word"],
                     "is_active": is_active,
                     "is_spoken": t > w["end"],
-                    "scale": scale
+                    "scale": 1.0 # No zoom
                 })
 
             if word_status_list:
@@ -3078,25 +3071,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                     y_shift=subtitle_y_shift
                 )
                 
-                # ── SENTENCE POP ANIMATION ──
-                # Scale up briefly (1.05) when a new subtitle block starts
-                chunk_start = active_chunk["start"]
-                if 0 <= (t - chunk_start) <= 0.4:
-                    pop_p = (t - chunk_start) / 0.4
-                    # Scale curve: 1.0 -> 1.05 -> 1.0
-                    sub_scale = 1.0 + 0.05 * math.sin(pop_p * math.pi)
-                    
-                    sub_img_pil = Image.fromarray(np.array(subtitle_img))
-                    sw, sh = sub_img_pil.size
-                    new_w, new_h = int(sw * sub_scale), int(sh * sub_scale)
-                    sub_img_pil = sub_img_pil.resize((new_w, new_h), Image.LANCZOS)
-                    
-                    # Canvas to keep original size but centered scaled text
-                    canvas = Image.new("RGBA", (sw, sh), (0,0,0,0))
-                    offset_x = (sw - new_w) // 2
-                    offset_y = (sh - new_h) // 2
-                    canvas.paste(sub_img_pil, (offset_x, offset_y))
-                    subtitle_img = canvas
+        # SENTENCE POP ANIMATION DISABLED (No zoom)
+        pass
 
         # ── HOOK TRANSITION BURST ──────────────────────────────────────────
         # Inject high-impact transition exactly when the hook text fades (usually around 4s)
