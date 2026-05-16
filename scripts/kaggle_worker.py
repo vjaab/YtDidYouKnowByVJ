@@ -713,7 +713,7 @@ def process_job():
         print("🏎️ Optimizing template resolution (512px) for RAM safety...")
         run_cmd([
             "ffmpeg", "-y", "-i", face_path, 
-            "-vf", "scale=512:-1", 
+            "-vf", "scale=512:-2", 
             "-c:v", "libx264", "-crf", "23", "-preset", "veryfast",
             optimized_face
         ])
