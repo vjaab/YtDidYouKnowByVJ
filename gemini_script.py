@@ -152,6 +152,24 @@ SCHEMA REQUIREMENTS:
 
 Return ONLY the final JSON object matching the schema. No markdown wrapping unless inside the string values. No explanations."""
 
+FACT_EXTRACTOR_TEMPLATE = """{persona}
+
+TASK: Extract ONLY the technical facts, data points, and narrative details for the specific story requested below. 
+IGNORE all other news stories or search results present in the context. Focus on providing the 'isolated truth' for this one story.
+
+TARGET STORY: {target_headline}
+
+CONTEXT:
+{context}
+
+Return ONLY a JSON object:
+{{
+  "facts": ["Fact 1", "Fact 2"],
+  "controversies": ["Controversy 1"],
+  "implications": ["Implication 1"],
+  "core_narrative": "A one paragraph summary focusing ONLY on this story."
+}}"""
+
 def get_hottest_tech_topic(client, avoid_list=""):
     """Uses Gemini Search grounding to find today's single most VIRAL AI news story from Google Trends."""
     print("🔥 Fetching hottest AI tech topic for today (Google Trends Analysis)...")
@@ -548,14 +566,35 @@ class MultiAgentGenerationEngine:
                 if "GEMINI SEARCH RESULTS" in self.context:
                     # If in search mode, we must include the grounded text but we'll instruct the agent to focus.
                     isolated_context += f"\n\nSEARCH CONTEXT:\n{self.context}"
+            
+            # ── CONTEXT SHARPENING (NEW) ──────────────────────────────────────
+            # If we don't have rich RSS metadata, we MUST sharpen the search context
+            # to prevent 'Hallucination Leakage' from other stories in the search result.
+            print("🔬 [AGENT 0.5] Context Sharpener: Isolating target story facts...")
+            sharpener_prompt = FACT_EXTRACTOR_TEMPLATE.format(
+                persona=SYSTEM_PERSONA,
+                target_headline=selected_headline,
+                context=isolated_context # Pass the messy context to be sharpened
+            )
+            sharpened_data = self._call_gemini(sharpener_prompt)
+            
+            if sharpened_data and "core_narrative" in sharpened_data:
+                isolated_context = (
+                    f"STORY: {selected_headline}\n"
+                    f"SOURCE: {selected_url}\n\n"
+                    f"ISOLATED FACTS:\n{json.dumps(sharpened_data, indent=2)}"
+                )
+                print(f"✨ Context sharpened successfully for: {selected_headline}")
+            else:
+                print("⚠️ Context Sharpener failed. Falling back to raw isolation.")
 
             selected_context = (
                 f"STRICT INSTRUCTION: You MUST ONLY research and write about the following story. "
                 f"IGNORE all other news articles mentioned in any previous context.\n\n"
                 f"TARGET STORY:\n{isolated_context}"
             )
-            print(f"✅ Selected Story: {selected_headline}")
             print(f"🔒 Isolated Context for downstream agents: {len(isolated_context)} chars")
+            print(f"✅ Selected Story: {selected_headline}")
 
         print("🕵️ [AGENT 1] Research Agent: Extracting narrative elements...")
         research_prompt = RESEARCH_AGENT_TEMPLATE.format(

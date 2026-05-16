@@ -103,11 +103,15 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Add all potential tracking files and technical logs first
-          git add news_log.json facts_log.json logs/*.txt logs/*.json || echo "Some log files missing, continuing..."
-          
-          # Pull latest changes using rebase and autostash to handle concurrent updates
+          # 1. Pull latest changes first using rebase and autostash
           git pull origin main --rebase --autostash || echo "Pull failed, proceeding anyway"
+          
+          # 2. Add tracking files and technical logs (more specific to avoid pathspec errors)
+          git add news_log.json facts_log.json || echo "Root logs missing"
+          if [ -d "logs" ]; then
+            git add logs/*.txt 2>/dev/null || echo "No txt logs"
+            git add logs/*.json 2>/dev/null || echo "No json logs"
+          fi
           
           # Only commit if there are actual changes
           if ! git diff --cached --quiet; then
