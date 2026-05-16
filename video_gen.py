@@ -2712,8 +2712,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             
         w, h = vid_clip.size
         
-        # Make the avatar occupy exactly the bottom 55% of the screen (Viral Production Spec 2026)
-        height_pip = int(FRAME_H * 0.55)
+        # Make the avatar occupy exactly the bottom 40% of the screen
+        height_pip = int(FRAME_H * 0.40)
         width_pip = int(height_pip * (w / h))
         
         # Apply refinements from dynamic_params
