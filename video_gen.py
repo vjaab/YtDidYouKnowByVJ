@@ -2721,34 +2721,33 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         cur_h = max(1, int(height_pip * avatar_scale_mult))
         avatar_clip = vid_clip.resized((cur_w, cur_h)).without_audio()
 
-        # ── AI BACKGROUND REMOVAL (Optimized for 2026 Spec) ────────────────
+        # ── AI BACKGROUND REMOVAL (Dynamic Per-Frame Mode) ────────────────
         try:
-            from rembg import remove
-            # Optimization: Extract a single high-quality static mask from the first frame.
-            # AI-generated avatars have static backgrounds; processing every frame (1500+) 
-            # on a CPU-only runner would take hours. Static mask is 1000x faster.
-            print("👤 Generating clean AI background mask for avatar...")
+            from rembg import remove, new_session
+            print("👤 Initializing Per-Frame AI Background Removal (Premium Mode)...")
             
-            # Use alpha_matting for professional edge handling (hair/fine details)
-            first_frame = avatar_clip.get_frame(0)
-            rgba = remove(
-                first_frame, 
-                alpha_matting=True, 
-                alpha_matting_foreground_threshold=240, 
-                alpha_matting_background_threshold=10, 
-                alpha_matting_erode_size=10
-            ).copy()
+            # Use a persistent session to optimize speed across frames
+            rembg_session = new_session()
             
-            alpha_np = (rgba[..., 3] / 255.0).astype(np.float32)
+            def get_dynamic_mask_frame(frame):
+                # This function is called for every frame during rendering
+                rgba = remove(
+                    frame,
+                    session=rembg_session,
+                    alpha_matting=True,
+                    alpha_matting_foreground_threshold=240,
+                    alpha_matting_background_threshold=10,
+                    alpha_matting_erode_size=10
+                )
+                alpha = (rgba[:, :, 3] / 255.0).astype(np.float32)
+                return alpha
+
+            # Create a mask clip by applying the transformation to every frame of the avatar
+            mclip = avatar_clip.image_transform(get_dynamic_mask_frame)
+            mclip.is_mask = True
             
-            # Feather the edges for a professional blend (increased for smoother transition)
-            mask_img = Image.fromarray((alpha_np * 255).astype(np.uint8))
-            mask_img = mask_img.filter(ImageFilter.GaussianBlur(radius=3))
-            alpha_np = np.array(mask_img).astype(np.float32) / 255.0
-            
-            mclip = VideoClip(lambda t: alpha_np, is_mask=True, duration=audio_duration)
             avatar_clip = avatar_clip.with_mask(mclip)
-            print("   ✅ Static AI mask applied.")
+            print("   ✅ Dynamic AI mask active (Processing every frame).")
             
         except Exception as e:
             print(f"⚠️ rembg failed: {e}. Falling back to Rounded Authority Card.")
