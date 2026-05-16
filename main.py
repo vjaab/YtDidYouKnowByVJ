@@ -3,16 +3,20 @@ os.environ["PYTHONHASHSEED"] = "0"
 import argparse
 import subprocess
 import time
+import sys
 import requests
+import glob
+import hashlib
+import random
+import traceback
 from datetime import datetime
 
-import glob
 from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY
 from fetch_research_papers import fetch_tech_news, fetch_ai_tools
-from topic_tracker import record_story
+from topic_tracker import record_story, update_youtube_url
 from gemini_script import pick_and_generate_script
-from ecosystem_logic import get_slot_info
-from audio_gen import generate_voiceover
+from ecosystem_logic import get_slot_info, get_series_identity, get_next_slot
+from audio_gen import generate_voiceover, clean_tts_text
 from chunk_builder import build_chunks, redistribute_to_audio_duration
 from pexels_fetcher import fetch_all_chunk_visuals
 from video_gen import create_video
@@ -20,6 +24,8 @@ from screenshot_gen import capture_article_screenshot
 from thumbnail_gen import generate_thumbnail
 from youtube_upload import upload_video
 from telegram_selector import notify_telegram
+from entity_fetcher import fetch_all_entities, get_retention_layers_config
+from kaggle_handover import trigger_kaggle_gpu_job
 
 
 def log_message(msg):
@@ -90,7 +96,6 @@ Join the 1% building the future 👇
 
 
 def generate_pinned_comment(script_data, next_series_slot):
-    from ecosystem_logic import get_series_identity
     series = get_series_identity(next_series_slot)
     tease  = script_data.get("next_video_tease", "something big tomorrow")
     hook   = script_data.get("comment_hook", "What do you think?")
@@ -225,13 +230,11 @@ def run_pipeline(topic_type="research"):
         custom_map = script_data.get("custom_map", {})
         
         # Select Intro Video for Lip-Sync (Rotation)
-        import glob
         intro_videos = glob.glob("assets/video/*.mp4")
         if not intro_videos:
             intro_videos = ["assets/video/Firefly_video_final.mp4"]
             
         headline = script_data.get("original_news_headline", "")
-        import hashlib
         video_idx = int(hashlib.md5(headline.encode()).hexdigest(), 16) % len(intro_videos)
         script_data["lipsync_face_path"] = intro_videos[video_idx]
         log_message(f"Selected Lip-Sync Template: {intro_videos[video_idx]} (from {len(intro_videos)} options)")
@@ -240,7 +243,6 @@ def run_pipeline(topic_type="research"):
         use_local_only = os.environ.get("USE_LOCAL_ONLY") == "true"
         
         if has_kaggle and not use_local_only:
-            from kaggle_handover import trigger_kaggle_gpu_job
             results = trigger_kaggle_gpu_job(script_data, custom_map)
             if results:
                 audio_path = results.get("audio_path")
@@ -308,7 +310,6 @@ def run_pipeline(topic_type="research"):
 
     # ── STEP 5: Build Visual Chunks ───────────────────────────────────────────
     log_message("STEP 5: Grouping words into visual chunks...")
-    from audio_gen import clean_tts_text
     sub_chunks = script_data.get("subtitle_chunks", [])
     for sc in sub_chunks:
         if "text" in sc:
@@ -320,7 +321,6 @@ def run_pipeline(topic_type="research"):
 
     # ── STEP 6: Fetch Entities (People/Companies) ─────────────────────────────
     log_message("STEP 6: Fetching entity photos and company logos...")
-    from entity_fetcher import fetch_all_entities, get_retention_layers_config
     script_data = fetch_all_entities(script_data)
     
     # Enable Kinetic Layers (Production Spec 2026)
@@ -347,7 +347,6 @@ def run_pipeline(topic_type="research"):
         voice_used  = script_data.get("edge_tts_voice")
 
         # Visual Variety Override for Anti-Bot Monetization
-        import random
         visual_styles_palettes = [
             {"background": "#121212", "accent": "#00E5FF", "text": "#ffffff"}, # Cyber Cyan
             {"background": "#0D0D1A", "accent": "#FFD700", "text": "#ffffff"}, # Dark Gold
@@ -364,7 +363,6 @@ def run_pipeline(topic_type="research"):
         if not video_path or not os.path.exists(video_path):
             raise Exception("Video file not created.")
     except Exception as e:
-        import traceback
         traceback.print_exc()
         log_message(f"ERROR: Video render failed: {e}")
         return False
@@ -410,14 +408,12 @@ def run_pipeline(topic_type="research"):
     log_message(f"SUCCESS: {youtube_url}")
 
     # ── STEP 10b: Generate Pinned Comment ───────────────────────────────────
-    from ecosystem_logic import get_next_slot
     next_slot = get_next_slot(slot)
     pinned_comment = generate_pinned_comment(script_data, next_slot)
     log_message(f"📌 PINNED COMMENT TEMPLATE:\n\n{pinned_comment}\n")
 
     # ── STEP 11: Update Tracker ───────────────────────────────────────────────
     log_message("STEP 11: Updating YouTube URL in tracker...")
-    from topic_tracker import update_youtube_url
     update_youtube_url(script_data.get("original_news_headline"), youtube_url)
 
     # ── STEP 12: Cleanup Output Folder ────────────────────────────────────────
@@ -442,7 +438,6 @@ def run_local(topic_type="research"):
     # XTTS server launch removed. Calling pipeline directly.
     success = run_pipeline(topic_type=topic_type)
     if not success:
-        import sys
         print("❌ Pipeline failed. Exiting with error code.")
         sys.exit(1)
 
