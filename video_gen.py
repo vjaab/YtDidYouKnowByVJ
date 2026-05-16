@@ -2699,8 +2699,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
         w, h = vid_clip.size
         
-        # Crop to wider portrait aspect ratio (4:5) to show more shoulders and feel more 'present'
-        target_aspect = 4 / 5
+        # Crop to portrait aspect ratio (9:16) to focus on the character and fit naturally in Shorts
+        target_aspect = 9 / 16
         if w/h > target_aspect:
             new_w = int(h * target_aspect)
             x1 = (w - new_w) // 2
