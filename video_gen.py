@@ -2717,8 +2717,45 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         cur_h = max(1, int(height_pip * avatar_scale_mult))
         avatar_clip = vid_clip.resized((cur_w, cur_h)).without_audio()
 
+        # ── AI BACKGROUND REMOVAL (Optimized for 2026 Spec) ────────────────
+        try:
+            from rembg import remove
+            # Optimization: Extract a single high-quality static mask from the first frame.
+            # AI-generated avatars have static backgrounds; processing every frame (1500+) 
+            # on a CPU-only runner would take hours. Static mask is 1000x faster.
+            print("👤 Generating clean AI background mask for avatar...")
+            
+            # Use default session (usually more robust than human_seg on older models)
+            first_frame = avatar_clip.get_frame(0)
+            rgba = remove(first_frame).copy()
+            
+            alpha_np = (rgba[..., 3] / 255.0).astype(np.float32)
+            
+            # Feather the edges for a professional blend
+            mask_img = Image.fromarray((alpha_np * 255).astype(np.uint8))
+            mask_img = mask_img.filter(ImageFilter.GaussianBlur(radius=2))
+            alpha_np = np.array(mask_img).astype(np.float32) / 255.0
+            
+            mclip = VideoClip(lambda t: alpha_np, is_mask=True, duration=audio_duration)
+            avatar_clip = avatar_clip.with_mask(mclip)
+            print("   ✅ Static AI mask applied.")
+            
+        except Exception as e:
+            print(f"⚠️ rembg failed: {e}. Falling back to Rounded Authority Card.")
+            # Fallback: Clean Rounded Card instead of a messy vignette
+            Y, X = np.ogrid[:cur_h, :cur_w]
+            rad = int(min(cur_w, cur_h) * 0.15)
+            mask = np.ones((cur_h, cur_w), dtype=np.float32)
+            for y, x in [(rad, rad), (rad, cur_w-rad), (cur_h-rad, rad), (cur_h-rad, cur_w-rad)]:
+                dist = np.sqrt((Y-y)**2 + (X-x)**2)
+                corner_mask = (dist > rad) & ( ( (Y<rad) if y==rad else (Y>cur_h-rad) ) & ( (X<rad) if x==rad else (X>cur_w-rad) ) )
+                mask[corner_mask] = 0
+            
+            mclip = VideoClip(lambda t: mask, is_mask=True, duration=audio_duration)
+            avatar_clip = avatar_clip.with_mask(mclip)
+
         # ── REFINED "ALIVE" MOTION (Head-Bob & Breathing) ────────────────
-        # Subtle non-linear movement to make static presenters feel natural
+        # Apply motion AFTER masking so the mask follows the head movement
         import math
         avatar_clip = avatar_clip.with_effects([
             # Micro-Breathing: 0.6% scale fluctuation
@@ -2726,62 +2763,6 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             # Natural Head Tilt: Very subtle +/- 0.5 degree swing
             vfx.Rotate(lambda t: 0.6 * math.sin(t * 1.4 + 0.5))
         ])
-        
-        try:
-            from rembg import remove, new_session
-            print("Using rembg for clean AI background removal...")
-            # u2net_human_seg is optimized for human boundaries (head and body extraction)
-            _rembg_session = new_session("u2net_human_seg")
-            _rembg_cache = {"t": -1.0, "rgba": None}
-            
-            def get_rgba_frame(t, get_frame):
-                if abs(t - _rembg_cache["t"]) < 0.001 and _rembg_cache["rgba"] is not None:
-                    return _rembg_cache["rgba"]
-                frame_rgb = get_frame(t).copy()
-                rgba = remove(frame_rgb, session=_rembg_session).copy()
-                
-                alpha = rgba[..., 3].astype(np.float32)
-                
-                # Step 3: Local Color Decontamination
-                # Neutralize fringes by pulling local neighborhood colors from the avatar interior
-                edge_mask = (alpha > 5) & (alpha < 245)
-                if np.any(edge_mask):
-                    # Use a dilated solid core to find the "safe" interior colors
-                    core_mask = (alpha > 250)
-                    if np.any(core_mask):
-                        # Simple local neighborhood pull: use the mean of the solid core
-                        # For high-performance, we use the global core mean but biased 
-                        # to remove the specific blue/white background contamination
-                        avg_subject_color = np.mean(rgba[..., :3][core_mask], axis=0)
-                        
-                        # Apply local correction to edge pixels
-                        rgba[..., :3][edge_mask] = rgba[..., :3][edge_mask] * 0.1 + avg_subject_color * 0.9
-                
-                rgba[..., 3] = np.clip(alpha, 0, 255).astype(np.uint8)
-                
-                _rembg_cache["t"] = t
-                _rembg_cache["rgba"] = rgba
-                return rgba
-
-            _avatar_get_frame = avatar_clip.get_frame
-            avatar_rgb = VideoClip(
-                lambda t: get_rgba_frame(t, _avatar_get_frame)[..., :3],
-                duration=audio_duration
-            ).resized((cur_w, cur_h))
-            mclip = VideoClip(
-                lambda t: (get_rgba_frame(t, _avatar_get_frame)[..., 3] / 255.0).astype(np.float32),
-                is_mask=True, duration=audio_duration
-            )
-            avatar_clip = avatar_rgb.with_mask(mclip)
-            
-        except Exception as e:
-            print(f"rembg background removal failed: {e}")
-            Y, X = np.ogrid[:cur_h, :cur_w]
-            fade_thickness = int(min(cur_w, cur_h) * 0.12)
-            dist_edge = np.minimum(np.minimum(X, cur_w - 1 - X), np.minimum(Y, cur_h - 1 - Y))
-            a_mask_np = np.clip(dist_edge / fade_thickness, 0.0, 1.0).astype(np.float32)
-            mclip = VideoClip(lambda t: a_mask_np, is_mask=True, duration=audio_duration)
-            avatar_clip = avatar_clip.with_mask(mclip)
 
         def pip_position(t):
             scaled_w = int(cur_w * 1.0)
