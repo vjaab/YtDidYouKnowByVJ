@@ -2,12 +2,18 @@ name: Daily Tech News Shorts Pipeline
 
 on:
   schedule:
-    # Optimized Shorts (Slot 1): 05:30 IST = 00:00 UTC
-    - cron: '0 0 * * *'
-    # Optimized Shorts (Slot 2): 18:30 IST = 13:00 UTC
-    - cron: '0 13 * * *'
-    # Optimized Shorts (Slot 3): 23:30 IST = 18:00 UTC
-    - cron: '0 18 * * *'
+    # ── 1 SHORT PER DAY, ROTATING UPLOAD TIMES ──
+    # Each day gets a different upload time for algorithmic diversity
+    # Mon 06:00 IST (00:30 UTC) | Tue 12:00 IST (06:30 UTC) | Wed 18:00 IST (12:30 UTC)
+    # Thu 08:30 IST (03:00 UTC) | Fri 20:00 IST (14:30 UTC) | Sat 10:00 IST (04:30 UTC)
+    # Sun 16:00 IST (10:30 UTC)
+    - cron: '30 0 * * 1'   # Monday    06:00 IST
+    - cron: '30 6 * * 2'   # Tuesday   12:00 IST
+    - cron: '30 12 * * 3'  # Wednesday 18:00 IST
+    - cron: '0 3 * * 4'    # Thursday  08:30 IST
+    - cron: '30 14 * * 5'  # Friday    20:00 IST
+    - cron: '30 4 * * 6'   # Saturday  10:00 IST
+    - cron: '30 10 * * 0'  # Sunday    16:00 IST
   workflow_dispatch: # Allows manual trigger from GitHub Actions UI
 
 jobs:

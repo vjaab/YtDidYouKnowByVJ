@@ -4,44 +4,26 @@ from config import ENABLE_LONGFORM
 def get_slot_info():
     """
     Returns (day_name, slot, category) based on current UTC time and the 2026 Ecosystem Strategy.
+    With 1 upload/day, we always use Slot A. Category rotates by weekday.
     """
     now = datetime.datetime.utcnow()
     day_name = now.strftime("%a") # Mon, Tue, etc.
-    hour = now.hour
     
-    # Schedule:
-    # Shorts (Slot A) - 03:30 UTC -> 09:00 IST
-    # Shorts (Slot B) - 10:30 UTC -> 16:00 IST
-    # Longform (Slot C) - 22:30 UTC -> 04:00 IST (Next day)
-    
-    if hour >= 20:
-        if ENABLE_LONGFORM:
-            slot = "Slot C (Longform)"
-        else:
-            slot = "Slot A (Discovery)" # Fallback to Shorts during longform hours
-    elif hour < 8:
-        slot = "Slot A (Discovery)"
-    else:
-        slot = "Slot B (Utility)"
+    # Single daily upload — always Slot A
+    slot = "Slot A (Discovery)"
         
-    # Schedule Matrix
-    # (Day, Slot A Category, Slot B Category)
-    matrix = {
-        "Mon": ("Model Benchmarks", "Agentic System Design"),
-        "Tue": ("Cost-Optimized AI", "Local LMM Apps"),
-        "Wed": ("Research-to-Production", "Cloud GPU Infra"),
-        "Thu": ("Hybrid Architectures", "Cloud AI Architecture"),
-        "Fri": ("SOTA Benchmarking", "Agentic Orchestration"),
-        "Sat": ("Open Source Focus", "Build-with-VJ"),
-        "Sun": ("Weekly Recap (Dev)", "Future Roadmap")
+    # Daily category rotation (one per day)
+    daily_categories = {
+        "Mon": "Model Benchmarks",
+        "Tue": "Cost-Optimized AI",
+        "Wed": "Research-to-Production",
+        "Thu": "Hybrid Architectures",
+        "Fri": "SOTA Benchmarking",
+        "Sat": "Open Source Focus",
+        "Sun": "Weekly Recap (Dev)"
     }
     
-    categories = matrix.get(day_name, ("AI News", "AI Tool"))
-    
-    if "Slot A" in slot:
-        category = categories[0]
-    else:
-        category = categories[1]
+    category = daily_categories.get(day_name, "AI News")
     
     return day_name, slot, category
 
