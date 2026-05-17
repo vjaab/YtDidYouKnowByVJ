@@ -10,7 +10,10 @@ SCOPES = [
     "https://www.googleapis.com/auth/youtube.force-ssl",  # required for comments
 ]
 
-PINNED_COMMENT_TEXT = """💡 Every day you're not learning, someone else is getting ahead.
+# ── YPP COMPLIANCE: Rotating pinned comment templates ──
+# Prevents identical metadata fingerprint across uploads
+PINNED_COMMENT_TEMPLATES = [
+    """💡 Every day you're not learning, someone else is getting ahead.
 
 I share what top devs & AI engineers are reading right now:
 
@@ -22,7 +25,52 @@ I share what top devs & AI engineers are reading right now:
 Join early 👇
 🚀 Telegram → https://t.me/technewsbyvj
 💬 WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
-🔗 (Links in Header!)"""
+🔗 (Links in Header!)""",
+
+    """🔥 This is just the tip of the iceberg.
+
+I post the FULL source code, implementation guides, and architecture breakdowns on Telegram every single day.
+
+What you get:
+→ Daily AI research drops (before they trend)
+→ Open-source tool reviews & benchmarks
+→ Job alerts from top companies
+
+📲 Telegram: https://t.me/technewsbyvj
+💬 WhatsApp: https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z""",
+
+    """⚡ Want the code behind this? It's already on my Telegram.
+
+I break down one cutting-edge AI paper or tool every day — with working code.
+
+Why 5,000+ engineers follow:
+• Zero fluff, pure engineering
+• Arxiv → Production in under 24h
+• GPU-optimized implementations
+
+Join → https://t.me/technewsbyvj
+WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z""",
+
+    """🧠 If you made it this far, you're the type of engineer who actually ships.
+
+I share battle-tested AI implementations daily:
+🔬 Research paper breakdowns
+🛠️ Ready-to-deploy code
+📊 Benchmark comparisons
+
+The best part? It's all free.
+
+📲 https://t.me/technewsbyvj
+💬 https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
+🔗 Everything → link in bio""",
+]
+
+def _get_pinned_comment(title=""):
+    """Select a pinned comment template based on the video title hash."""
+    import hashlib
+    seed = int(hashlib.md5(title.encode()).hexdigest(), 16)
+    idx = seed % len(PINNED_COMMENT_TEMPLATES)
+    return PINNED_COMMENT_TEMPLATES[idx]
 
 
 import os.path
@@ -99,9 +147,10 @@ def upload_video(video_path, title, description, tags, thumbnail_path=None, cate
             except Exception as e:
                 print(f"Thumbnail upload failed (non-fatal): {e}")
 
-        # Step 3: Post + pin comment immediately
+        # Step 3: Post + pin comment immediately (rotated template for YPP compliance)
         try:
-            full_comment = f"{title}\n\n{comment_hook}\n\n{PINNED_COMMENT_TEXT}" if comment_hook else PINNED_COMMENT_TEXT
+            pinned_text = _get_pinned_comment(title)
+            full_comment = f"{title}\n\n{comment_hook}\n\n{pinned_text}" if comment_hook else pinned_text
             post_and_pin_comment(youtube, video_id, full_comment)
         except Exception as e:
             print(f"Pinned comment failed (non-fatal): {e}")

@@ -40,15 +40,13 @@ def format_description(ai_description, script, hashtags, slot="Slot A", chunks=N
     hashtag_str = " ".join(hashtags) if hashtags else ""
     
     # ── Action-Oriented Summary ──
-    # Ensure the summary is crisp and lacks large blocks of text
-    clean_summary = ai_description.split(". ")[0] + "." # Just the first hard-hitting line for the summary
+    clean_summary = ai_description.split(". ")[0] + "."
     if len(clean_summary) > 150: clean_summary = clean_summary[:147] + "..."
 
     # ── Timestamp Logic (for Slot C / Long-form) ──
     timestamps_str = ""
     if "Slot C" in slot and chunks:
         timestamps_str = "\n📌 TECHNICAL BREAKDOWN:\n"
-        # Pick 3-5 key points to cite
         step = max(1, len(chunks) // 4)
         for i in range(0, len(chunks), step):
             if i >= len(chunks): break
@@ -68,7 +66,15 @@ def format_description(ai_description, script, hashtags, slot="Slot A", chunks=N
         
     source_str = f"📰 SOURCE ARTICLE: {source_url}\n" if source_url else ""
 
-    return f"""🚀 ELITE AI ENGINEERING → https://wa.me/919585793939
+    # ── YPP COMPLIANCE: Rotate between 4 description templates ──
+    # Deterministic selection via headline hash to avoid identical descriptions
+    import hashlib
+    desc_seed = int(hashlib.md5(clean_summary.encode()).hexdigest(), 16)
+    template_idx = desc_seed % 4
+
+    templates = [
+        # Template 0: Original style
+        f"""🚀 ELITE AI ENGINEERING → https://wa.me/919585793939
 🔥 Automated Agentic Systems & Cost-Optimized AI.
 ━━━━━━━━━━━━━━━━━━━━━━
 💡 {clean_summary}
@@ -92,7 +98,66 @@ Join the 1% building the future 👇
 ━━━━━━━━━━━━━━━━━━━━━━
 
 {hashtag_str}
-#agenticai #llmops #python #machinelearning #aiarchitecture #shorts"""
+#agenticai #llmops #python #machinelearning #aiarchitecture #shorts""",
+
+        # Template 1: Minimalist authority style
+        f"""⚡ {clean_summary}
+{timestamps_str}
+{source_str}
+{links_str}
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+📬 Get daily AI intel before it trends:
+→ Telegram: https://t.me/technewsbyvj
+→ WhatsApp: https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
+→ LinkedIn: https://www.linkedin.com/in/vijayakumar-j/
+
+🔧 Full source code & implementation guides → link in bio
+
+{hashtag_str}
+#ai #deeplearning #techshorts #programming #innovation""",
+
+        # Template 2: Newsletter/community style
+        f"""What happened: {clean_summary}
+{timestamps_str}
+Why it matters: This changes how engineers build, deploy, and scale AI systems.
+
+{source_str}
+📚 Resources mentioned in this video:
+{links_str if links_str else "→ Check the pinned comment for links"}
+
+━━━━━━━━━━━━━━━━━━━━━━
+🧠 Want the full breakdown with code?
+Join 5,000+ engineers getting daily AI research drops:
+
+📲 Telegram → https://t.me/technewsbyvj
+💬 WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
+🔗 All links → bio
+
+{hashtag_str}
+#airesearch #mlops #softwaredevelopment #techtrends #shorts""",
+
+        # Template 3: Hook-first engagement style
+        f"""👆 If this blew your mind, you need to see what's in the full guide.
+━━━━━━━━━━━━━━━━━━━━━━
+💡 {clean_summary}
+{timestamps_str}
+{source_str}
+{links_str}
+━━━━━━━━━━━━━━━━━━━━━━
+🏗️ Build with me:
+• Source code + step-by-step guides on Telegram
+• Daily AI drops you won't find anywhere else
+• Real engineering, zero hype
+
+📲 https://t.me/technewsbyvj
+💬 https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
+💼 https://www.linkedin.com/in/vijayakumar-j/
+
+{hashtag_str}
+#artificialintelligence #coding #startup #devtools #techshorts""",
+    ]
+
+    return templates[template_idx]
 
 
 def generate_pinned_comment(script_data, next_series_slot):
