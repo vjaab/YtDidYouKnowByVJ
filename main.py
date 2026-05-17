@@ -18,7 +18,8 @@ from gemini_script import pick_and_generate_script
 from ecosystem_logic import get_slot_info, get_series_identity, get_next_slot
 from audio_gen import generate_voiceover, clean_tts_text
 from chunk_builder import build_chunks, redistribute_to_audio_duration
-from pexels_fetcher import fetch_all_chunk_visuals
+from pexels_fetcher import fetch_all_chunk_visuals, generate_visual_style_guide
+from nano_scene_gen import generate_nano_scene_visuals
 from video_gen import create_video
 from screenshot_gen import capture_article_screenshot
 from thumbnail_gen import generate_thumbnail
@@ -404,11 +405,24 @@ def run_pipeline(topic_type="research"):
     script_data["retention_config"] = retention_config
     log_message(f"Engagement Layers Active: {list(retention_config.keys())}")
 
-    # ── STEP 7: Fetch Per-Chunk Visuals (Decision Tree) ───────────────────────
-    log_message("STEP 7: Fetching per-chunk visuals from Pexels/Imagen...")
+    # ── STEP 7: Nano-Scene Per-Sentence Visual Generation ─────────────────────
+    log_message("STEP 7: Generating per-sentence nano-scene backgrounds (Imagen 4.0)...")
     topic_context = script_data.get("original_news_headline", title)
     is_longform = "Slot C" in slot
-    chunks = fetch_all_chunk_visuals(chunks, topic_context=topic_context, script_data=script_data, is_longform=is_longform)
+    
+    # Generate global visual style guide for consistency
+    style_guide = generate_visual_style_guide(topic_context)
+    
+    # Try nano-scene generation first (per-sentence Imagen)
+    chunks = generate_nano_scene_visuals(chunks, topic_context, style_guide=style_guide)
+    
+    # Check how many chunks got visuals — fallback to old system if nano-scenes mostly failed
+    nano_success = sum(1 for c in chunks if c.get("visual_path") and "Nano-Scene" in c.get("source", ""))
+    if nano_success < len(chunks) * 0.5:
+        log_message(f"⚠️ Nano-scene only generated {nano_success}/{len(chunks)} visuals. Falling back to legacy fetcher...")
+        chunks = fetch_all_chunk_visuals(chunks, topic_context=topic_context, script_data=script_data, is_longform=is_longform)
+    else:
+        log_message(f"✅ Nano-scene generated {nano_success}/{len(chunks)} per-sentence backgrounds.")
 
     # ── STEP 8: Render Video ──────────────────────────────────────────────────
     log_message("STEP 8: Rendering final video with all engagement layers...")

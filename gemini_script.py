@@ -396,7 +396,8 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "subtitle_chunks": [{{
       "chunk_id": 1, "text": "Sentence 1", "start": 0.00, "end": 3.50, 
       "has_infographic": true, "infographic_type": "process|slide", 
-      "infographic_data": {{"steps": ["Step 1", "Step 2"]}}
+      "infographic_data": {{"steps": ["Step 1", "Step 2"]}},
+      "nano_visual_prompt": "A highly specific, cinematic visual description for THIS sentence. Must depict the exact subject/entity/concept spoken in this sentence. Example: 'Satellite view of Earth at night showing glowing city lights and data center hotspots, cinematic 9:16, dark background'. NO TEXT in the image. NO faces of real people. Photorealistic, 8K."
   }}],
   "original_news_headline": "Exact headline",
   "original_news_url": "Direct article URL",
@@ -439,7 +440,8 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "breaking_news_level": 9,
   "retention_cues": [{{"timestamp": 3.0, "effect": "zoom_in", "reason": "hook_impact"}}],
   "subtitle_chunks": [{{
-      "chunk_id": 1, "text": "Sentence 1", "start": 0.00, "end": 2.50
+      "chunk_id": 1, "text": "Sentence 1", "start": 0.00, "end": 2.50,
+      "nano_visual_prompt": "A highly specific, cinematic visual description for THIS sentence. Must depict the exact subject/entity/concept spoken in this sentence. Example: 'Close-up of NVIDIA H100 GPU chip with glowing green circuit traces, dark background, studio lighting, 9:16 vertical'. NO TEXT in the image. NO faces of real people. Photorealistic, 8K."
   }}],
   "original_news_headline": "Exact headline",
   "original_news_url": "Direct article URL",
