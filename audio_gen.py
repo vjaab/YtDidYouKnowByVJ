@@ -22,10 +22,44 @@ def _apply_stable_ts(audio_path, text):
     try:
         import stable_whisper
         import warnings
+        import signal
+        import os
+
+        # Suppress ALL warnings including C-level scipy Cholesky warnings
         warnings.filterwarnings("ignore")
-        print("Running stable-ts to extract REAL word timestamps...")
-        model = stable_whisper.load_model('base')
-        result = model.align(audio_path, text, language='en')
+        os.environ["PYTHONWARNINGS"] = "ignore"
+
+        # Use 'tiny' model on CPU for speed (base hangs on GHA runners)
+        model_size = 'tiny'
+        print(f"Running stable-ts ({model_size}) to extract REAL word timestamps...")
+        model = stable_whisper.load_model(model_size)
+
+        # Timeout mechanism to prevent infinite Cholesky loops on CPU
+        class AlignmentTimeout(Exception):
+            pass
+
+        def _timeout_handler(signum, frame):
+            raise AlignmentTimeout("stable-ts alignment timed out after 120s")
+
+        # Set 120s timeout (only works on Unix/Linux — GHA is Linux)
+        old_handler = None
+        try:
+            old_handler = signal.signal(signal.SIGALRM, _timeout_handler)
+            signal.alarm(120)  # 120 second timeout
+        except (AttributeError, ValueError):
+            pass  # Windows or signal not available — skip timeout
+
+        try:
+            result = model.align(audio_path, text, language='en')
+        finally:
+            # Cancel the alarm
+            try:
+                signal.alarm(0)
+                if old_handler is not None:
+                    signal.signal(signal.SIGALRM, old_handler)
+            except (AttributeError, ValueError):
+                pass
+
         word_timestamps = []
         for segment in result.segments:
             for word in segment.words:
@@ -51,6 +85,11 @@ def _apply_stable_ts(audio_path, text):
             return word_timestamps
     except Exception as e:
         print(f"stable-ts unavailable or failed: {e}")
+        # Cleanup model on failure too
+        try:
+            del model
+        except NameError:
+            pass
     return None
 
 def trim_audio_silence(path, word_timestamps):
