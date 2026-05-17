@@ -2,28 +2,48 @@ name: Daily Tech News Shorts Pipeline
 
 on:
   schedule:
-    # ── 1 SHORT PER DAY, ROTATING UPLOAD TIMES ──
-    # Each day gets a different upload time for algorithmic diversity
-    # Mon 06:00 IST (00:30 UTC) | Tue 12:00 IST (06:30 UTC) | Wed 18:00 IST (12:30 UTC)
-    # Thu 08:30 IST (03:00 UTC) | Fri 20:00 IST (14:30 UTC) | Sat 10:00 IST (04:30 UTC)
-    # Sun 16:00 IST (10:30 UTC)
-    - cron: '30 0 * * 1'   # Monday    06:00 IST
-    - cron: '30 6 * * 2'   # Tuesday   12:00 IST
-    - cron: '30 12 * * 3'  # Wednesday 18:00 IST
-    - cron: '0 3 * * 4'    # Thursday  08:30 IST
-    - cron: '30 14 * * 5'  # Friday    20:00 IST
-    - cron: '30 4 * * 6'   # Saturday  10:00 IST
-    - cron: '30 10 * * 0'  # Sunday    16:00 IST
+    # ── 1 SHORT PER DAY — ROTATING UPLOAD TIME ──
+    # Triggers daily at 00:00 UTC (05:30 IST).
+    # The pipeline adds a computed delay (0-14h) based on week+day
+    # so the actual upload time rotates week over week.
+    - cron: '0 0 * * *'
   workflow_dispatch: # Allows manual trigger from GitHub Actions UI
 
 jobs:
   run-pipeline:
     runs-on: ubuntu-latest
-    timeout-minutes: 240 # Accommodate heavy MuseTalk processing and potential cloud fallbacks
+    timeout-minutes: 360 # 6h max: up to 4.5h rotating delay + 1.5h render
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     
     steps:
+      - name: Compute Upload Delay (Rotating Schedule)
+        id: delay
+        run: |
+          # Deterministic but rotating delay with good mixing
+          WEEK=$(date +%V)
+          DOW=$(date +%u)
+          YEAR=$(date +%Y)
+          # Better hash: combine year+week+day with XOR shifts for wide spread
+          SEED=$((YEAR * 371 + WEEK * 53 + DOW * 97))
+          HASH=$(( (SEED * 2654435761) ^ (SEED >> 3) ))
+          # Absolute value and mod to 0-16200 seconds (0-4.5 hours)
+          DELAY_SECONDS=$(( (HASH % 16200 + 16200) % 16200 ))
+          DELAY_HOURS=$((DELAY_SECONDS / 3600))
+          DELAY_MINS=$(( (DELAY_SECONDS % 3600) / 60 ))
+          echo "delay_seconds=$DELAY_SECONDS" >> $GITHUB_OUTPUT
+          echo "🕐 Today's upload delay: ${DELAY_HOURS}h ${DELAY_MINS}m (seed=$SEED)"
+          
+      - name: Wait for Rotating Upload Time
+        if: github.event_name == 'schedule'
+        run: |
+          DELAY=${{ steps.delay.outputs.delay_seconds }}
+          HOURS=$((DELAY / 3600))
+          MINS=$(( (DELAY % 3600) / 60 ))
+          echo "⏳ Sleeping ${HOURS}h ${MINS}m to hit today's rotated upload window..."
+          sleep $DELAY
+          echo "✅ Upload window reached. Starting pipeline."
+
       - name: Checkout Code
         uses: actions/checkout@v4
         
