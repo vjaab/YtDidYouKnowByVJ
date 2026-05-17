@@ -442,6 +442,14 @@ def run_pipeline(topic_type="research"):
     
     notify_telegram(f"✅ Video Live & Pipeline Finished!\n\n{title}\n{youtube_url}\n\n🧹 Output folder cleaned ({cleaned_count} files removed).", "🚀")
     
+    # ── STEP 13: Terminate Orphan Processes ───────────────────────────────────
+    log_message("STEP 13: Terminating leftover ffmpeg processes to prevent pipeline hang...")
+    try:
+        # In CI/CD, orphaned ffmpeg processes can hold stdout open and cause the job to hang
+        os.system("pkill -9 -f ffmpeg")
+    except Exception as e:
+        log_message(f"Process cleanup failed: {e}")
+    
     return True
 
 

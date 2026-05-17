@@ -3223,4 +3223,10 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         output_path, fps=30, codec="libx264", audio_codec="aac",
         threads=4, preset="ultrafast", ffmpeg_params=["-pix_fmt", "yuv420p"]
     )
+    
+    try:
+        final.close()
+    except Exception as e:
+        print(f"Cleanup warning: {e}")
+        
     return output_path
