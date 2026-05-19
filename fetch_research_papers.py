@@ -13,6 +13,9 @@ RSS_FEEDS = [
     "https://aws.amazon.com/blogs/machine-learning/feed/",
     "https://arstechnica.com/tag/ai/feed/",
     "https://decrypt.co/news/technology/ai/rss",
+    "https://www.wired.com/feed/tag/ai/latest/rss",
+    "https://www.technologyreview.com/feed/",
+    "https://www.engadget.com/tag/artificial-intelligence/rss/",
 ]
 
 TOOL_RSS_FEEDS = [
@@ -21,6 +24,8 @@ TOOL_RSS_FEEDS = [
     "https://venturebeat.com/category/ai/feed/",
     "https://news.ycombinator.com/rss", 
     "https://mashable.com/category/artificial-intelligence/rss",
+    "https://www.cnbc.com/id/100727362/device/rss/rss.html",
+    "https://www.reuters.com/technology/rss",
 ]
 
 def fetch_trending_from_newsapi():

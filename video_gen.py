@@ -1951,7 +1951,10 @@ def _article_screenshot_clip(screenshot_path, duration):
                 return (off_x, off_y)
 
             clip = clip.with_position(pan_fn).with_start(current_start)
-            clip = clip.with_effects([vfx.CrossFadeIn(0.6), vfx.CrossFadeOut(0.6)])
+            if current_start == 0.0:
+                clip = clip.with_effects([vfx.CrossFadeOut(0.6)])
+            else:
+                clip = clip.with_effects([vfx.CrossFadeIn(0.6), vfx.CrossFadeOut(0.6)])
             clips.append(clip)
             
             current_start += interval
@@ -2879,16 +2882,20 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         # ── REFINED "ALIVE" MOTION (Head-Bob & Breathing) ────────────────
         # Apply motion AFTER masking so the mask follows the head movement
         import math
+        # Calculate a slow zoom that increases scale by 10% over the full video
+        zoom_speed = 0.10 / max(audio_duration, 1.0)
+        
         avatar_clip = avatar_clip.with_effects([
-            # Micro-Breathing: 0.6% scale fluctuation
-            vfx.Resize(lambda t: 1.0 + 0.006 * math.sin(t * 1.8)), 
+            # Continuous dynamic zoom-in + Micro-Breathing
+            vfx.Resize(lambda t: 1.0 + zoom_speed * t + 0.006 * math.sin(t * 1.8)), 
             # Natural Head Tilt: Very subtle +/- 0.5 degree swing
             vfx.Rotate(lambda t: 0.6 * math.sin(t * 1.4 + 0.5))
         ])
 
         def pip_position(t):
-            scaled_w = int(cur_w * 1.0)
-            scaled_h = int(cur_h * 1.0)
+            current_scale = 1.0 + zoom_speed * t + 0.006 * math.sin(t * 1.8)
+            scaled_w = int(cur_w * current_scale)
+            scaled_h = int(cur_h * current_scale)
             base_x = (FRAME_W - scaled_w) // 2 + layout["avatar_x_offset"]
             base_y = FRAME_H - scaled_h
             return (base_x, base_y)
@@ -3091,16 +3098,17 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             except Exception as e:
                 print(f"SFX load failed for {ctype} (non-fatal): {e}")
                 
-    # Auto-inject SFX for subtitle transitions (new lines) - DISABLED as requested
-    # for chunk in chunks:
-    #     # 1. Woosh on every chunk (sentence) start
-    #     cue_ts = chunk["start"]
-    #     sfx_path_woosh = os.path.join(ASSETS_DIR, "sfx", "woosh.wav")
-    #     if os.path.exists(sfx_path_woosh) and cue_ts < audio_duration:
-    #         try:
-    #             sfx_clip = AudioFileClip(sfx_path_woosh).with_start(cue_ts).with_effects([afx.MultiplyVolume(0.3)])
-    #             final_audio_layers.append(sfx_clip)
-    #         except: pass
+    # Auto-inject SFX for subtitle transitions (new lines)
+    # To avoid being overwhelming with the new 1-3 word chunks, we only inject every 3rd chunk, or if it's the very first chunk.
+    for i, chunk in enumerate(chunks):
+        if i % 3 == 0 or i == 0:
+            cue_ts = chunk["start"]
+            sfx_path_woosh = os.path.join(ASSETS_DIR, "sfx", "woosh.wav")
+            if os.path.exists(sfx_path_woosh) and cue_ts < audio_duration:
+                try:
+                    sfx_clip = AudioFileClip(sfx_path_woosh).with_start(cue_ts).with_effects([afx.MultiplyVolume(0.15)])
+                    final_audio_layers.append(sfx_clip)
+                except: pass
     
     # Background Music Selection (Topic-Aware: unique music per headline)
     music_files = sorted([f for f in os.listdir(MUSIC_DIR) if f.endswith(('.mp3', '.wav', '.m4a'))])

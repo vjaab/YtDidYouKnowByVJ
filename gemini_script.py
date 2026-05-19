@@ -26,7 +26,7 @@ SUCCESS PATTERNS (2026):
 - HOOKS: Focus on "Fear of Privacy Leaks" or "Shadow AI" dangers. Start with a "Result-First" statement.
 - ANALOGIES: Use sharp analogies to explain complex breakthroughs.
 - 3x ARTICLE EVIDENCE: You MUST explicitly reference source articles, documentation, or code repositories at least 3 times during the script to build authority.
-- CTAs: At the end of every script, you MUST first ask a highly provocative, open-ended question to the viewers about the topic to drive comments. THEN, immediately after the question, you MUST explicitly say verbatim: "I just posted the full source code and guide on my Telegram. Grab it now—link in bio! And subscribe for more AI tech." This is a hard requirement for the outro. """
+- CTAs: At the end of every script, you MUST first ask a highly provocative, open-ended question to the viewers about the topic to drive comments. THEN, immediately after the question, you MUST explicitly say verbatim: "Follow me on Telegram for more AI news just like this! Link is on my channel home page. And subscribe for daily AI updates." This is a hard requirement for the outro. """
 
 RESEARCH_AGENT_TEMPLATE = """{persona}
 
@@ -49,7 +49,7 @@ Return ONLY a JSON object:
 HOOK_AGENT_TEMPLATE = """{persona}
 
 HOOK AGENT TASK:
-Based on the following research, generate 10 potential YouTube Shorts hooks (0-3s).
+Based on the following research, generate 10 potential YouTube Shorts hooks (<1.5s).
 Hooks MUST create surprise, contradiction, urgency, or curiosity. No greetings. No generic statements.
 
 RESEARCH:
@@ -149,6 +149,8 @@ OPTIMIZED SCRIPT:
 
 SCHEMA REQUIREMENTS:
 {schema_requirements}
+
+CRITICAL SUBTITLE RULE: The `subtitle_chunks` array MUST break the script down into extremely small chunks of EXACTLY 1 to 3 words maximum. Do not generate long sentences for subtitles.
 
 Return ONLY the final JSON object matching the schema. No markdown wrapping unless inside the string values. No explanations."""
 
@@ -282,8 +284,19 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
                     hot_score += 20
                 
                 # Keyword density for "Breaking" signals
-                breaking_keywords = ["launch", "release", "leak", "breakthrough", "benchmark", "announces", "unveils", "shuts down"]
+                breaking_keywords = ["launch", "release", "leak", "breakthrough", "benchmark", "announces", "unveils", "shuts down",
+                                     "lawsuit", "ban", "hack", "scandal", "fired", "exposed", "shutdown", "raises", "billion", "million",
+                                     "warns", "danger", "kills", "replaces", "outperforms", "beats", "surpass", "free", "open-source"]
                 hot_score += sum(10 for kw in breaking_keywords if kw in title_lower)
+                
+                # Controversy / Emotional Trigger Boost (stories with strong emotional valence go viral)
+                controversy_keywords = ["wrong", "lie", "fake", "scam", "caught", "secretly", "hidden", "nobody", "shocking",
+                                        "insane", "crazy", "terrifying", "scary", "devastating", "destroy", "war"]
+                hot_score += sum(12 for kw in controversy_keywords if kw in title_lower)
+                
+                # Big-Name Company Boost (household names drive clicks)
+                big_names = ["google", "apple", "openai", "meta", "microsoft", "nvidia", "tesla", "amazon", "anthropic", "deepmind"]
+                hot_score += sum(8 for name in big_names if name in title_lower)
                 
                 # Recency Boost (Last 24h gets +15)
                 pub_at = art.get("publishedAt", "")
@@ -407,12 +420,12 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
 }}"""
     else:
         selection_instruction = (
-            f"Analyze the following {content_desc} and pick the SINGLE most impactful story to convert into a 38-44s YouTube Short script.\n"
+            f"Analyze the following {content_desc} and pick the SINGLE most impactful story to convert into a 50-58s YouTube Short script.\n"
             f"PRIMARY CATEGORY: {category}\n"
             "SELECTION FILTERS:\n"
-            f"1. PRIORITIZE: Stories related to '{category}'. However, if no high-impact story exists for this category today, you ARE AUTHORIZED to pick the single most viral/surprising AI story from any other category instead.\n"
+            f"1. PRIORITIZE: Stories involving big-name companies (Google, OpenAI, Meta, NVIDIA, Apple) or controversy/lawsuits/leaks. These drive the most views. If no high-impact story exists for '{category}', pick the single most viral/surprising AI story from any category.\n"
             "2. MUST be New, Useful, or Surprising (Absolute mandatory).\n"
-            "3. MUST be explainable in exactly <40s of dense technically-accurate speech (approx 120-140 words total).\n"
+            "3. MUST be explainable in exactly <58s of dense technically-accurate speech (approx 150-170 words total). The STRICT MAXIMUM is 58 seconds — videos over 60 seconds are NOT eligible for YouTube Shorts.\n"
             "4. MUST contain one concrete takeaway or engineering tip the viewer can use today.\n"
             "5. PACING: Keep sentences short (under 12 words) for better TTS pacing and Micro-Cut boundaries.\n\n"
             "FORMAT: You MUST follow the strict 5-part structure: Hook -> Problem -> Solution -> Retention Loop -> Call to Action.\n\n"
@@ -425,12 +438,12 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "description": "Full 100+ word rich SEO description for youtube describing the video, including timestamps and credits.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
   "title": "Punchy YouTube title max 60 chars",
-  "hook_script": "The Hook (0-3s): Start with a Result-First statement. Do not introduce the paper title immediately. Focus on impact (e.g., '90% cheaper', '10x faster'). Approx 10 words.",
+  "hook_script": "The Hook (<1.5s): Start with a Result-First statement. Do not introduce the paper title immediately. Focus on impact. Approx 6 words.",
   "problem_context": "The Problem (3-10s): Briefly state the bottleneck this research solves. Approx 20 words.",
   "solution_tech": "The Solution (10-45s): Explain the core technical breakthrough using analogies. Keep sentences UNDER 12 words. Approx 80 words.",
   "retention_loop": "The Retention Loop (45-55s): End with a cliffhanger or a seamless bridge that leads back to the start of the video. Approx 15 words.",
   "outro_cta": "Call to Action: Include one engagement trigger (e.g., 'Check the pinned repo' or 'Drop a comment if you'd use this'). Approx 10 words.",
-  "script": "The FULL unified voiceover script seamlessly concatenating hook_script, problem_context, solution_tech, retention_loop, and outro_cta into ONE single flowing text block. Target total duration: 38-44 sec (approx 120-140 words).",
+  "script": "The FULL unified voiceover script seamlessly concatenating hook_script, problem_context, solution_tech, retention_loop, and outro_cta into ONE single flowing text block. Target total duration: 50-58 sec (approx 150-170 words). STRICT MAXIMUM: 58 seconds. Videos over 60 seconds lose Shorts eligibility.",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://github.com/...", "https://arxiv.org/abs/..."],
   "phonetic_pronunciation_map": {{"NVIDIA": "In-vid-yah"}},

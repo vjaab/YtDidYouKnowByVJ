@@ -89,38 +89,11 @@ def render_frosted_glass_subtitle(bg_frame_array, text_lines, x, y, font, text_c
     x1 = max(0, min(x, W))
     x2 = max(0, min(x+box_w, W))
     
-    # Calculate brightness
-    bg_region = bg_frame_array[y1:y2, x1:x2] if box_w > 0 and box_h > 0 else None
-    op, extra_stroke, extra_blur = determine_brightness_mods(bg_region)
-    stroke = base_stroke + extra_stroke
-    
-    # We only return the isolated transparent overlay layer that Moviepy can comp on top, OR the fully comped image.
-    # Because we need frosted glass, we MUST output an RGB image for this box area with alpha, or just overlay it.
+    # New MrBeast/Hormozi style: High contrast text with no background box.
+    # We enforce a thick black stroke and strong drop shadow instead.
+    stroke = base_stroke + 4 # Thicker stroke for readability without box
     
     canvas = Image.new("RGBA", (W, H), (0,0,0,0))
-    
-    if bg_region is not None and bg_region.size > 0:
-        # Step 1 & 2: extract and blur
-        region_img = Image.fromarray(bg_region).convert("RGBA")
-        blurred_region = region_img.filter(ImageFilter.GaussianBlur(18 + extra_blur))
-        
-        # Step 3: Darken region by 55%
-        # Darkening RGB channels
-        darkened_arr = np.array(blurred_region)
-        darkened_arr[:,:,:3] = darkened_arr[:,:,:3] * 0.45
-        darkened_img = Image.fromarray(darkened_arr)
-        
-        # Step 4: Draw rounded rectangle over it color rgba(0,0,0,0.75) -- rule actually says op 0.75 or 0.82 min
-        # Rule 7 says: Min background opacity: 0.82
-        mask = Image.new("L", (x2-x1, y2-y1), 0)
-        ImageDraw.Draw(mask).rounded_rectangle([0,0, x2-x1, y2-y1], radius=18, fill=255)
-        
-        box_layer = Image.new("RGBA", (x2-x1, y2-y1), (0,0,0, int(255 * max(0.82, op))))
-        
-        # Composite the frosted part into canvas
-        canvas.paste(darkened_img, (x1, y1), mask)
-        canvas.paste(box_layer, (x1, y1), mask)
-    
     draw = ImageDraw.Draw(canvas)
     
     cur_y = y + 22
