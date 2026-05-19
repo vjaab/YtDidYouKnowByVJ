@@ -382,37 +382,49 @@ def _ambient_particles(duration, accent_color, particle_style="bokeh"):
                  for _ in range(n)]
 
     def make_frame(t):
-        img = np.zeros((FRAME_H, FRAME_W, 3), dtype=np.uint8)
+        scale_down = 4 if particle_style == "bokeh" else 2 # Scale down for faster blur
+        sm_w, sm_h = FRAME_W // scale_down, FRAME_H // scale_down
+        img = np.zeros((sm_h, sm_w, 3), dtype=np.uint8)
+        
         for px, py, speed, offset, p_size in particles:
             y = (py - speed * t * 60 - offset) % FRAME_H
+            sm_px, sm_py, sm_size = int(px / scale_down), int(y / scale_down), max(1, int(p_size / scale_down))
+            
             if particle_style == "digital":
-                # Digital blocks/lines
-                cv2.rectangle(img, (int(px), int(y)), (int(px+p_size), int(y+2)), accent_color, -1)
+                cv2.rectangle(img, (sm_px, sm_py), (sm_px+sm_size, sm_py+max(1, 2//scale_down)), accent_color, -1)
             elif particle_style == "stars":
-                # Tiny sharp stars
-                cv2.circle(img, (int(px), int(y)), 2, (255, 255, 255), -1)
+                cv2.circle(img, (sm_px, sm_py), max(1, 2//scale_down), (255, 255, 255), -1)
             else:
-                # Default bokeh
-                cv2.circle(img, (int(px), int(y)), int(p_size), accent_color, -1)
+                cv2.circle(img, (sm_px, sm_py), sm_size, accent_color, -1)
         
         if particle_style != "stars":
-            blur_size = 75 if particle_style == "bokeh" else 15
+            # Adjust blur radius based on scale
+            blur_size = 19 if particle_style == "bokeh" else 7
             img = cv2.GaussianBlur(img, (blur_size, blur_size), 0)
-        return img
+            
+        # Upscale back to full resolution
+        return cv2.resize(img, (FRAME_W, FRAME_H), interpolation=cv2.INTER_LINEAR)
 
     def make_mask(t):
-        mask = np.zeros((FRAME_H, FRAME_W), dtype=np.uint8)
+        scale_down = 4 if particle_style == "bokeh" else 2
+        sm_w, sm_h = FRAME_W // scale_down, FRAME_H // scale_down
+        mask = np.zeros((sm_h, sm_w), dtype=np.uint8)
+        
         for px, py, speed, offset, p_size in particles:
             y = (py - speed * t * 60 - offset) % FRAME_H
+            sm_px, sm_py, sm_size = int(px / scale_down), int(y / scale_down), max(1, int(p_size / scale_down))
+            
             if particle_style == "digital":
-                cv2.rectangle(mask, (int(px), int(y)), (int(px+p_size), int(y+2)), 255, -1)
+                cv2.rectangle(mask, (sm_px, sm_py), (sm_px+sm_size, sm_py+max(1, 2//scale_down)), 255, -1)
             else:
-                cv2.circle(mask, (int(px), int(y)), int(p_size), 255, -1)
+                cv2.circle(mask, (sm_px, sm_py), sm_size, 255, -1)
         
         if particle_style != "stars":
-            blur_size = 75 if particle_style == "bokeh" else 15
+            blur_size = 19 if particle_style == "bokeh" else 7
             mask = cv2.GaussianBlur(mask, (blur_size, blur_size), 0)
-        return (mask.astype(float) / 255.0) * 0.15 # 15% Opacity digital dust
+            
+        mask_full = cv2.resize(mask, (FRAME_W, FRAME_H), interpolation=cv2.INTER_LINEAR)
+        return (mask_full.astype(float) / 255.0) * 0.15 # 15% Opacity digital dust
 
     clip = VideoClip(make_frame, duration=duration)
     mask = VideoClip(make_mask, is_mask=True, duration=duration)
@@ -425,6 +437,16 @@ def _dynamic_tech_background(duration, accent_color, bg_base_color=(10, 10, 15))
     cols, rows = 12, 22
     spacing_x = FRAME_W // cols
     spacing_y = FRAME_H // rows
+    
+    # Pre-render the massive blur for the pulse glow to save CPU time
+    pre_glow = np.zeros((FRAME_H, FRAME_W, 3), dtype=np.uint8)
+    cv2.circle(pre_glow, (FRAME_W//2, FRAME_H//2), 450, accent_color, -1)
+    
+    # Scale down, blur, scale up to approximate large Gaussian blur very quickly
+    scale = 4
+    pre_glow_sm = cv2.resize(pre_glow, (FRAME_W//scale, FRAME_H//scale))
+    pre_glow_sm = cv2.GaussianBlur(pre_glow_sm, (39, 39), 0)
+    base_glow = cv2.resize(pre_glow_sm, (FRAME_W, FRAME_H), interpolation=cv2.INTER_LINEAR)
     
     def make_frame(t):
         # Dark obsidian base (now randomized)
@@ -444,15 +466,10 @@ def _dynamic_tech_background(duration, accent_color, bg_base_color=(10, 10, 15))
         for y in range(-spacing_y, FRAME_H + spacing_y, spacing_y):
             cv2.line(frame, (0, int(y + drift_y)), (FRAME_W, int(y + drift_y)), grid_color, 1)
 
-        # Pulse glow at center
+        # Pulse glow at center (alpha blended)
         pulse = (math.sin(t * 1.2) + 1) / 2
-        glow_radius = int(400 + 50 * pulse)
-        glow_img = np.zeros_like(frame)
-        cv2.circle(glow_img, (FRAME_W//2, FRAME_H//2), glow_radius, accent_color, -1)
-        glow_img = cv2.GaussianBlur(glow_img, (151, 151), 0)
-        
-        # Blend glow with 5% opacity
-        frame = cv2.addWeighted(frame, 1.0, glow_img, 0.05, 0)
+        opacity = 0.02 + 0.03 * pulse # Max 5% opacity
+        frame = cv2.addWeighted(frame, 1.0, base_glow, opacity, 0)
         
         return frame
 
@@ -2826,12 +2843,16 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 rgba = remove(
                     frame,
                     session=rembg_session,
-                    alpha_matting=True,
-                    alpha_matting_foreground_threshold=240,
-                    alpha_matting_background_threshold=10,
-                    alpha_matting_erode_size=10
+                    alpha_matting=False, # Disabled alpha matting to fix Cholesky solver crashes & severe CPU bottlenecks
+                    post_process_mask=True # Keeps edges clean without the massive performance hit
                 )
                 alpha = (rgba[:, :, 3] / 255.0).astype(np.float32)
+                
+                # Erase the bottom 12% of the mask to completely hide the Gemini/Veo watermark logo
+                h, w = alpha.shape
+                watermark_height = int(h * 0.12)
+                alpha[-watermark_height:, :] = 0.0
+                
                 return alpha
 
             # Create a mask clip by applying the transformation to every frame of the avatar
