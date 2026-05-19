@@ -75,28 +75,27 @@ def format_description(ai_description, script, hashtags, slot="Slot A", chunks=N
 
     templates = [
         # Template 0: Original style
-        f"""🚀 ELITE AI ENGINEERING → https://wa.me/919585793939
-🔥 Automated Agentic Systems & Cost-Optimized AI.
+        f"""🎙️ Curated & analyzed by VJ — daily AI news for engineers.
+🚀 JOIN FOR MORE AI NEWS → https://t.me/technewsbyvj
 ━━━━━━━━━━━━━━━━━━━━━━
 💡 {clean_summary}
 {timestamps_str}
 ━━━━━━━━━━━━━━━━━━━━━━
 {source_str}━━━━━━━━━━━━━━━━━━━━━━
-🛠️ IMPLEMENTATION BLUEPRINT & RESOURCES:
+🛠️ RESOURCES & DEEP DIVES:
 
-{links_str if links_str else "🚀 SOTA AGENTIC LOOPS (Local & Cloud Hybrid)"}
-💼 GPU INFRA & COST-OPTIMIZED SCALING
-🛠️ OPEN SOURCE SOVEREIGNTY (Llama, Kokoro, Whisper)
-📰 ARXIV-TO-PRODUCTION WORKFLOWS
+{links_str if links_str else "🚀 FULL AI NEWS ARCHIVE ON TELEGRAM"}
+💼 Career & Industry Insights
+🛠️ Open Source Tools & Reviews
+📰 Daily Research Breakdowns
 
-Join the 1% building the future 👇
+Join the community 👇
 
 🚀 Telegram → https://t.me/technewsbyvj
 💼 LinkedIn → https://www.linkedin.com/in/vijayakumar-j/
 💬 WhatsApp Dev Channel → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
 
-🔗 (Blueprints & SDKs in Bio!)
-━━━━━━━━━━━━━━━━━━━━━━
+⚠️ DISCLOSURE: This video uses AI-assisted production tools (TTS voiceover, AI-generated visuals). All editorial opinions, topic selection, and analysis are by VJ.
 
 {hashtag_str}
 #agenticai #llmops #python #machinelearning #aiarchitecture #shorts""",
@@ -107,12 +106,14 @@ Join the 1% building the future 👇
 {source_str}
 {links_str}
 ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
-📬 Get daily AI intel before it trends:
+📬 Get daily AI news before it trends:
 → Telegram: https://t.me/technewsbyvj
 → WhatsApp: https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
 → LinkedIn: https://www.linkedin.com/in/vijayakumar-j/
 
-🔧 Full source code & implementation guides → link in bio
+🔧 Full analysis & deep dives → Telegram
+
+⚠️ DISCLOSURE: AI tools are used in production (voiceover, visuals). Topic selection, research, and commentary by VJ.
 
 {hashtag_str}
 #ai #deeplearning #techshorts #programming #innovation""",
@@ -127,32 +128,36 @@ Why it matters: This changes how engineers build, deploy, and scale AI systems.
 {links_str if links_str else "→ Check the pinned comment for links"}
 
 ━━━━━━━━━━━━━━━━━━━━━━
-🧠 Want the full breakdown with code?
-Join 5,000+ engineers getting daily AI research drops:
+🧠 Want the full breakdown?
+Join engineers getting daily AI research drops:
 
 📲 Telegram → https://t.me/technewsbyvj
 💬 WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
 🔗 All links → bio
 
+⚠️ DISCLOSURE: This video uses AI-assisted tools for production. All editorial decisions and analysis are human-driven by VJ.
+
 {hashtag_str}
 #airesearch #mlops #softwaredevelopment #techtrends #shorts""",
 
         # Template 3: Hook-first engagement style
-        f"""👆 If this blew your mind, you need to see what's in the full guide.
+        f"""👆 If this blew your mind, you need to see what's on Telegram.
 ━━━━━━━━━━━━━━━━━━━━━━
 💡 {clean_summary}
 {timestamps_str}
 {source_str}
 {links_str}
 ━━━━━━━━━━━━━━━━━━━━━━
-🏗️ Build with me:
-• Source code + step-by-step guides on Telegram
-• Daily AI drops you won't find anywhere else
-• Real engineering, zero hype
+🏗️ Follow for more AI news:
+• Daily AI research & industry analysis
+• Curated by VJ — no fluff, no filler
+• The stories that matter for engineers
 
 📲 https://t.me/technewsbyvj
 💬 https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
 💼 https://www.linkedin.com/in/vijayakumar-j/
+
+⚠️ DISCLOSURE: AI-assisted production (voiceover, visuals). Editorial direction & analysis by VJ.
 
 {hashtag_str}
 #artificialintelligence #coding #startup #devtools #techshorts""",

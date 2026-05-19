@@ -13,14 +13,14 @@ SCOPES = [
 # ── YPP COMPLIANCE: Rotating pinned comment templates ──
 # Prevents identical metadata fingerprint across uploads
 PINNED_COMMENT_TEMPLATES = [
-    """💡 Every day you're not learning, someone else is getting ahead.
+    """💡 Every day you're not keeping up with AI, someone else is getting ahead.
 
-I share what top devs & AI engineers are reading right now:
+I share what top engineers are reading — before it trends:
 
-🚀 Hottest AI research (before it goes viral)
-💼 High-paying jobs & hiring alerts
-🛠️ Dev tools & resources that save hours
-📰 Tech news that actually matters
+🚀 Breaking AI news & analysis
+💼 Industry moves & career insights
+🛠️ Open source tools & reviews
+📰 Research that actually matters
 
 Join early 👇
 🚀 Telegram → https://t.me/technewsbyvj
@@ -29,34 +29,34 @@ Join early 👇
 
     """🔥 This is just the tip of the iceberg.
 
-I post the FULL source code, implementation guides, and architecture breakdowns on Telegram every single day.
+I post FULL breakdowns, analysis, and deep-dives on Telegram every single day.
 
 What you get:
-→ Daily AI research drops (before they trend)
-→ Open-source tool reviews & benchmarks
-→ Job alerts from top companies
+→ Daily AI news drops (before they trend)
+→ My personal take on every major story
+→ Industry analysis you won't find elsewhere
 
 📲 Telegram: https://t.me/technewsbyvj
 💬 WhatsApp: https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z""",
 
-    """⚡ Want the code behind this? It's already on my Telegram.
+    """⚡ Want the full story? It's already on my Telegram.
 
-I break down one cutting-edge AI paper or tool every day — with working code.
+I break down one major AI story every day — with context most channels skip.
 
-Why 5,000+ engineers follow:
-• Zero fluff, pure engineering
-• Arxiv → Production in under 24h
-• GPU-optimized implementations
+Why engineers follow:
+• No fluff, pure analysis
+• Controversial takes on every big announcement
+• The stories that actually affect your career
 
 Join → https://t.me/technewsbyvj
 WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z""",
 
-    """🧠 If you made it this far, you're the type of engineer who actually ships.
+    """🧠 If you made it this far, you're the type of person who wants the REAL story.
 
-I share battle-tested AI implementations daily:
-🔬 Research paper breakdowns
-🛠️ Ready-to-deploy code
-📊 Benchmark comparisons
+I share daily AI analysis that goes deeper than headlines:
+🔬 What happened & WHY it matters
+🛠️ Who wins, who loses
+📊 My predictions (and track record)
 
 The best part? It's all free.
 
