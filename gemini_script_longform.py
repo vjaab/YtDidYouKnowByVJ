@@ -24,7 +24,8 @@ from config import GEMINI_API_KEY, LOGS_DIR
 from topic_tracker import load_tracker, check_story_uniqueness
 from config_longform import (
     LONGFORM_NUM_TOPICS, LONGFORM_PER_TOPIC_DURATION,
-    LONGFORM_WORD_COUNT_TARGET, LONGFORM_TARGET_AUDIO_DURATION
+    LONGFORM_WORD_COUNT_TARGET, LONGFORM_TARGET_AUDIO_DURATION,
+    LONGFORM_TRACKER_FILE
 )
 
 
@@ -623,7 +624,7 @@ def generate_longform_script(articles=None, failed_topics=None):
         news_context = "No RSS articles available. Use Gemini Search to find today's top AI stories."
 
     # ── Build avoidance list from tracker ─────────────────────────────────
-    tracker = load_tracker()
+    tracker = load_tracker(tracker_file=LONGFORM_TRACKER_FILE)
     recent_history = tracker.get("history", [])[-20:]
     recent_titles = tracker.get("used_titles", [])[-40:]
     
@@ -648,7 +649,7 @@ def generate_longform_script(articles=None, failed_topics=None):
         # Final uniqueness safeguard
         headline = script_data.get("original_news_headline", "")
         news_url = script_data.get("original_news_url", "")
-        is_unique, msg = check_story_uniqueness(headline, news_url=news_url)
+        is_unique, msg = check_story_uniqueness(headline, news_url=news_url, tracker_file=LONGFORM_TRACKER_FILE)
         if not is_unique:
             print(f"⚠️ [LONGFORM] Post-generation uniqueness check failed: {msg}")
             # For compilations this is less strict — we allow it since the headline is synthetic

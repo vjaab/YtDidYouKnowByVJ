@@ -24,7 +24,8 @@ from datetime import datetime
 from config import LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY, MUSIC_DIR
 from config_longform import (
     LONGFORM_TARGET_AUDIO_DURATION, LONGFORM_NUM_TOPICS,
-    LONGFORM_BGM_VOLUME, LONGFORM_MAX_RETRY_ATTEMPTS
+    LONGFORM_BGM_VOLUME, LONGFORM_MAX_RETRY_ATTEMPTS,
+    LONGFORM_TRACKER_FILE
 )
 from fetch_research_papers import fetch_tech_news, fetch_ai_tools, fetch_trending_from_newsapi
 from topic_tracker import record_story, update_youtube_url
@@ -279,7 +280,8 @@ def run_longform_pipeline(dry_run=False):
     record_story(
         title, script_data.get("original_news_headline"),
         "AI Did You Know", companies_all, keywords, 7,
-        "compilation", "pending_upload", script_data.get("original_news_url")
+        "compilation", "pending_upload", script_data.get("original_news_url"),
+        tracker_file=LONGFORM_TRACKER_FILE
     )
 
     # ── STEP 5: Build Visual Chunks ──────────────────────────────────────
@@ -370,7 +372,7 @@ def run_longform_pipeline(dry_run=False):
     log_message(f"SUCCESS: {youtube_url}")
 
     # ── STEP 12: Update Tracker ──────────────────────────────────────────
-    update_youtube_url(script_data.get("original_news_headline"), youtube_url)
+    update_youtube_url(script_data.get("original_news_headline"), youtube_url, tracker_file=LONGFORM_TRACKER_FILE)
 
     # ── STEP 13: Cleanup ─────────────────────────────────────────────────
     log_message("STEP 13: Cleaning up output folder...")

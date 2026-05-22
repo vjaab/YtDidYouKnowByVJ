@@ -4,8 +4,8 @@ from datetime import datetime
 from rapidfuzz import fuzz
 from config import TRACKER_FILE
 
-def load_tracker():
-    if not os.path.exists(TRACKER_FILE):
+def load_tracker(tracker_file=TRACKER_FILE):
+    if not os.path.exists(tracker_file):
         return {
             "used_titles": [],
             "used_keywords": [],
@@ -18,15 +18,15 @@ def load_tracker():
             "last_upload": None,
             "history": []
         }
-    with open(TRACKER_FILE, 'r') as f:
+    with open(tracker_file, 'r') as f:
         return json.load(f)
 
-def save_tracker(tracker_data):
-    with open(TRACKER_FILE, 'w') as f:
+def save_tracker(tracker_data, tracker_file=TRACKER_FILE):
+    with open(tracker_file, 'w') as f:
         json.dump(tracker_data, f, indent=4)
 
-def check_story_uniqueness(new_title, new_headline=None, new_keywords=None, new_url=None):
-    tracker = load_tracker()
+def check_story_uniqueness(new_title, new_headline=None, new_keywords=None, new_url=None, tracker_file=TRACKER_FILE):
+    tracker = load_tracker(tracker_file)
     if not tracker:
         return True, "Unique (Empty tracker)"
     
@@ -68,8 +68,8 @@ def check_story_uniqueness(new_title, new_headline=None, new_keywords=None, new_
                 
     return True, "Unique"
     
-def check_cooldowns(companies, subcategory):
-    tracker = load_tracker()
+def check_cooldowns(companies, subcategory, tracker_file=TRACKER_FILE):
+    tracker = load_tracker(tracker_file)
     last_3_companies = tracker.get('last_3_days_companies', [])
     for comp in companies:
         if comp in last_3_companies:
@@ -81,8 +81,8 @@ def check_cooldowns(companies, subcategory):
         
     return True, "Cooldowns OK"
 
-def record_story(title, news_headline, subcategory, companies, keywords, breaking_news_level, voice_used, youtube_url, news_source_url):
-    tracker = load_tracker()
+def record_story(title, news_headline, subcategory, companies, keywords, breaking_news_level, voice_used, youtube_url, news_source_url, tracker_file=TRACKER_FILE):
+    tracker = load_tracker(tracker_file)
     today = datetime.now().strftime("%Y-%m-%d")
     
     tracker.setdefault("used_titles", []).append(title)
@@ -127,12 +127,12 @@ def record_story(title, news_headline, subcategory, companies, keywords, breakin
         "news_source_url": news_source_url
     }
     tracker.setdefault("history", []).append(history_entry)
-    save_tracker(tracker)
+    save_tracker(tracker, tracker_file)
 
-def update_youtube_url(news_headline, youtube_url):
-    tracker = load_tracker()
+def update_youtube_url(news_headline, youtube_url, tracker_file=TRACKER_FILE):
+    tracker = load_tracker(tracker_file)
     for entry in tracker.get("history", []):
         if entry.get("news_headline") == news_headline:
             entry["youtube_url"] = youtube_url
             break
-    save_tracker(tracker)
+    save_tracker(tracker, tracker_file)

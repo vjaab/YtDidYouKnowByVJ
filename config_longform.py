@@ -3,6 +3,11 @@ config_longform.py — Configuration for the daily "Did You Know" 16:9 long-form
 
 Separate from config.py so that the Shorts pipeline is never affected.
 """
+import os
+
+# ── Directory Paths ───────────────────────────────────────────────────────────
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+LONGFORM_TRACKER_FILE = os.path.join(BASE_DIR, "longform_news_log.json")
 
 # ── Duration & Resolution ─────────────────────────────────────────────────────
 LONGFORM_TARGET_AUDIO_DURATION = (150, 180)   # 2.5–3 min of speech
