@@ -193,33 +193,99 @@ def ts(text, font):
     bb = font.getbbox(text)
     return bb[2] - bb[0], bb[3] - bb[1]
 
-def _prepare_screenshot_canvas(img, target_w, target_h):
+def _prepare_screenshot_canvas(img, target_w, target_h, url=None):
     """
     Creates a premium 'Blurred Backdrop' canvas for wide screenshots.
-    Ensures the original image is fully visible (contained) in the center.
+    Wraps the screenshot in an elegant macOS dark-mode browser mockup with controls,
+    rounded corners, neon glowing outline, and dynamic domain name inside the address bar.
     """
     # 1. Create heavily blurred background (scaled to fill)
     bg = ImageOps.fit(img, (target_w, target_h), Image.LANCZOS)
     bg = bg.filter(ImageFilter.GaussianBlur(radius=45))
     bg = bg.point(lambda p: p * 0.45) # Darken backdrop
     
-    # 2. Prepare foreground (scaled to fit)
+    # 2. Fit screenshot image with spacing for top browser bar (50px)
     iw, ih = img.size
-    scale = min(target_w / iw, target_h / ih) * 0.92 # Slightly smaller for breathing room
+    bar_h = 50
+    
+    # Calculate scale so that the screenshot PLUS the top bar fits nicely in the safe area
+    scale = min(target_w * 0.86 / iw, (target_h * 0.86 - bar_h) / ih)
     fw, fh = int(iw * scale), int(ih * scale)
-    fg = img.resize((fw, fh), Image.LANCZOS).convert("RGBA")
     
-    # 3. Add premium drop shadow/glow to foreground
-    shadow_pad = 20
-    shadow_img = Image.new("RGBA", (fw + shadow_pad*2, fh + shadow_pad*2), (0,0,0,0))
+    # Resize original screenshot
+    fg_resized = img.resize((fw, fh), Image.LANCZOS).convert("RGBA")
+    
+    # Overall browser window dimensions
+    win_w = fw
+    win_h = fh + bar_h
+    
+    # 3. Create the browser window image
+    browser_win = Image.new("RGBA", (win_w, win_h), (0, 0, 0, 0))
+    b_draw = ImageDraw.Draw(browser_win)
+    
+    # Draw dark browser top bar background
+    bar_color = (30, 31, 33, 255) # Dark charcoal
+    b_draw.rounded_rectangle([0, 0, win_w, bar_h + 20], radius=16, fill=bar_color) # Draw slightly lower to blend with bottom
+    
+    # Draw macOS window controls
+    dot_radius = 5
+    dot_y = bar_h // 2
+    b_draw.ellipse([20 - dot_radius, dot_y - dot_radius, 20 + dot_radius, dot_y + dot_radius], fill=(255, 95, 87, 255))
+    b_draw.ellipse([36 - dot_radius, dot_y - dot_radius, 36 + dot_radius, dot_y + dot_radius], fill=(254, 188, 46, 255))
+    b_draw.ellipse([52 - dot_radius, dot_y - dot_radius, 52 + dot_radius, dot_y + dot_radius], fill=(40, 200, 64, 255))
+    
+    # Draw address bar
+    addr_w = min(400, int(win_w * 0.65))
+    addr_x1 = (win_w - addr_w) // 2
+    addr_x2 = addr_x1 + addr_w
+    addr_y1 = 10
+    addr_y2 = bar_h - 10
+    b_draw.rounded_rectangle([addr_x1, addr_y1, addr_x2, addr_y2], radius=8, fill=(45, 46, 49, 255))
+    
+    # Parse domain name from URL
+    from urllib.parse import urlparse
+    domain = "techcrunch.com"
+    if url:
+        try:
+            domain = urlparse(url).netloc
+            if domain.startswith("www."):
+                domain = domain[4:]
+        except Exception:
+            pass
+    if not domain:
+        domain = "techcrunch.com"
+        
+    # Draw lock icon and domain text in address bar
+    addr_font = gf(14, bold=False)
+    domain_text = f"🔒  {domain}"
+    b_draw.text((win_w // 2, bar_h // 2), domain_text, font=addr_font, fill=(180, 180, 182, 255), anchor="mm")
+    
+    # Paste resized screenshot onto browser window below the bar
+    browser_win.paste(fg_resized, (0, bar_h), fg_resized)
+    
+    # 4. Crop the entire browser window to rounded rectangle corners
+    mask = Image.new("L", (win_w, win_h), 0)
+    m_draw = ImageDraw.Draw(mask)
+    m_draw.rounded_rectangle([0, 0, win_w, win_h], radius=16, fill=255)
+    
+    rounded_browser = Image.new("RGBA", (win_w, win_h), (0,0,0,0))
+    rounded_browser.paste(browser_win, (0,0), mask=mask)
+    
+    # 5. Draw a sleek neon border outline around the rounded browser window
+    r_draw = ImageDraw.Draw(rounded_browser)
+    r_draw.rounded_rectangle([0, 0, win_w, win_h], radius=16, outline=(0, 240, 255, 120), width=3) # Electric Cyan outline
+    
+    # 6. Add beautiful drop shadow to the rounded browser window
+    shadow_pad = 30
+    shadow_img = Image.new("RGBA", (win_w + shadow_pad*2, win_h + shadow_pad*2), (0,0,0,0))
     s_draw = ImageDraw.Draw(shadow_img)
-    s_draw.rectangle([shadow_pad, shadow_pad, fw+shadow_pad, fh+shadow_pad], fill=(0,0,0,180))
-    shadow_img = shadow_img.filter(ImageFilter.GaussianBlur(radius=15))
+    s_draw.rounded_rectangle([shadow_pad, shadow_pad, win_w+shadow_pad, win_h+shadow_pad], radius=16, fill=(0,0,0,200))
+    shadow_img = shadow_img.filter(ImageFilter.GaussianBlur(radius=20))
     
-    # 4. Composite
+    # 7. Composite
     canvas = bg.convert("RGBA")
     canvas.paste(shadow_img, ((target_w - shadow_img.width)//2, (target_h - shadow_img.height)//2), shadow_img)
-    canvas.paste(fg, ((target_w - fw)//2, (target_h - fh)//2), fg)
+    canvas.paste(rounded_browser, ((target_w - win_w)//2, (target_h - win_h)//2), rounded_browser)
     
     return canvas.convert("RGB")
 
@@ -1917,7 +1983,7 @@ def _article_screenshot_clip(screenshot_path, duration):
         # Load and prepare the canvas once
         img = Image.open(screenshot_path).convert("RGB")
         target_h, target_w = FRAME_H, FRAME_W
-        canvas = _prepare_screenshot_canvas(img, target_w, target_h)
+        canvas = _prepare_screenshot_canvas(img, target_w, target_h, screenshot_path)
         
         # Prepare RGB and Mask arrays for explicit alpha handling in MoviePy
         arr_rgba = np.array(canvas.convert("RGBA"))
@@ -2013,7 +2079,7 @@ def _longform_article_screenshot_clips(script_json, audio_duration):
             # Load and prepare canvas for this screenshot
             img = Image.open(screenshot_path).convert("RGB")
             target_h, target_w = FRAME_H, FRAME_W
-            canvas = _prepare_screenshot_canvas(img, target_w, target_h)
+            canvas = _prepare_screenshot_canvas(img, target_w, target_h, topic.get("source_url"))
             
             # Prepare RGB array
             arr_rgba = np.array(canvas.convert("RGBA"))
@@ -2056,6 +2122,116 @@ def _longform_article_screenshot_clips(script_json, audio_duration):
             
     return clips
 
+def _longform_topic_transition_clips(script_json, audio_duration):
+    """
+    Creates stunning animated fullscreen topic transition title cards 
+    for each fact segment in longform compilation videos.
+    """
+    print("🎬 Generating longform topic transition cards...")
+    fact_timestamps = script_json.get("fact_timestamps", [])
+    topics = script_json.get("longform_topics", [])
+    if not fact_timestamps:
+        return []
+        
+    clips = []
+    
+    for i, ft in enumerate(fact_timestamps):
+        fact_num = ft.get("fact_number", i + 1)
+        start_s = float(ft.get("approx_start_seconds", 0))
+        
+        # Don't create transition card for Fact 1 if it's right at the start of the video
+        # since we have the main intro hook clip.
+        if i == 0 and start_s < 2.0:
+            continue
+            
+        # Get topic headline
+        topic_idx = i
+        if topic_idx >= len(topics):
+            topic_idx = len(topics) - 1
+        topic_headline = ""
+        if topics:
+            topic_headline = topics[topic_idx].get("headline", ft.get("topic", ""))
+        else:
+            topic_headline = ft.get("topic", "")
+            
+        if not topic_headline:
+            continue
+            
+        dur = 3.0 # Show card for exactly 3 seconds
+        
+        try:
+            # Create a Pillow image for the card
+            img = Image.new("RGBA", (FRAME_W, FRAME_H), (0, 0, 0, 0))
+            draw = ImageDraw.Draw(img)
+            
+            # 1. Dark semi-transparent card backdrop
+            card_w, card_h = 1200, 450
+            card_x1 = (FRAME_W - card_w) // 2
+            card_y1 = (FRAME_H - card_h) // 2
+            card_x2 = card_x1 + card_w
+            card_y2 = card_y1 + card_h
+            
+            # Semi-transparent glassmorphic background
+            draw.rounded_rectangle([card_x1, card_y1, card_x2, card_y2], radius=24, fill=(10, 12, 18, 225))
+            
+            # Neon border highlight (Electric Cyan)
+            draw.rounded_rectangle([card_x1, card_y1, card_x2, card_y2], radius=24, outline=(0, 240, 255, 180), width=4)
+            
+            # 2. Draw "TOPIC X OF 5" tracker
+            label_text = f"TOPIC 0{fact_num} OF 5"
+            label_font = gf(24, bold=True)
+            draw.text((FRAME_W // 2, card_y1 + 60), label_text, font=label_font, fill=(0, 240, 255, 255), anchor="mm")
+            
+            # 3. Draw Headline text
+            headline_font = gf(44, bold=True)
+            # Wrap headline to fit in the card
+            words = topic_headline.split()
+            lines = []
+            current_line = []
+            for w in words:
+                test_line = " ".join(current_line + [w])
+                bbox = draw.textbbox((0, 0), test_line, font=headline_font)
+                if bbox[2] - bbox[0] < card_w - 120:
+                    current_line.append(w)
+                else:
+                    lines.append(" ".join(current_line))
+                    current_line = [w]
+            if current_line:
+                lines.append(" ".join(current_line))
+                
+            # Limit to 2 lines
+            lines = lines[:2]
+            
+            y_offset = card_y1 + 180
+            for line in lines:
+                draw.text((FRAME_W // 2, y_offset), line, font=headline_font, fill=(255, 255, 255, 255), anchor="mm")
+                y_offset += 75
+                
+            # Convert to numpy arrays
+            arr_rgba = np.array(img.convert("RGBA"))
+            arr_rgb = arr_rgba[:, :, :3]
+            arr_mask = (arr_rgba[:, :, 3] / 255.0).astype(float)
+            
+            # Create video clip
+            card_clip = ImageClip(arr_rgb, duration=dur)
+            mask_clip = VideoClip(lambda t, cd=dur: arr_mask, is_mask=True, duration=cd)
+            card_clip = card_clip.with_mask(mask_clip)
+            
+            # Dynamic entrance animation (zoom-in ease effect)
+            card_clip = card_clip.resized(lambda t, d=dur: 0.9 + 0.1 * easeInOutQuad(t / d))
+            card_clip = card_clip.with_position("center").with_start(start_s)
+            card_clip = card_clip.with_effects([vfx.CrossFadeIn(0.4), vfx.CrossFadeOut(0.4)])
+            
+            clips.append(card_clip)
+            print(f"  🎬 Generated Topic {fact_num} transition card at {start_s}s: {topic_headline[:30]}...")
+            
+        except Exception as e:
+            print(f"⚠️ Error creating transition card for Topic {fact_num}: {e}")
+            import traceback
+            traceback.print_exc()
+            
+    return clips
+
 def _evidence_screenshot_clip(evidence_path, duration):
     """
     Shows a secondary 'Evidence' or 'Use Case' screenshot during the analytical section.
@@ -2065,7 +2241,7 @@ def _evidence_screenshot_clip(evidence_path, duration):
     try:
         img = Image.open(evidence_path).convert("RGB")
         target_h, target_w = FRAME_H, FRAME_W
-        canvas = _prepare_screenshot_canvas(img, target_w, target_h)
+        canvas = _prepare_screenshot_canvas(img, target_w, target_h, evidence_path)
         
         arr_rgba = np.array(canvas.convert("RGBA"))
         arr_rgb = arr_rgba[:, :, :3]
@@ -2443,7 +2619,7 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
             
             if is_active:
                 c_fill = (204, 255, 0, 255) # Electric Yellow
-                f_word = gf(base_size, bold=True) # Scale 1.0 (No zoom)
+                f_word = gf(int(base_size * 1.12), bold=True) # Boost size by 12% for premium Pop zoom effect
                 w_w, w_h = ts(word_text, f_word)
                 word_img = Image.new("RGBA", (w_w + 60, w_h + 60), (0,0,0,0))
                 word_draw = ImageDraw.Draw(word_img)
@@ -3109,7 +3285,11 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     LONGFORM_NUM_TOPICS_DEFAULT = 5
 
     # Stack background, then screenshot clips on top of background
-    base_layers = bg_layer_clips + screenshot_clips
+    topic_transition_clips = []
+    if is_longform:
+        topic_transition_clips = _longform_topic_transition_clips(script_json, audio_duration)
+        
+    base_layers = bg_layer_clips + screenshot_clips + topic_transition_clips
     
     # Add overlays
     base_layers.append(gradient)
