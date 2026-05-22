@@ -2827,8 +2827,14 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
         w, h = vid_clip.size
         
-        # Crop to portrait aspect ratio (9:16) to focus on the character and fit naturally in Shorts
-        target_aspect = 9 / 16
+        # Crop avatar based on video format
+        if is_longform:
+            # For longform 16:9: crop to square (1:1) for bottom-right PiP bubble
+            target_aspect = 1.0
+        else:
+            # For Shorts 9:16: crop to portrait to focus on character
+            target_aspect = 9 / 16
+        
         if w/h > target_aspect:
             new_w = int(h * target_aspect)
             x1 = (w - new_w) // 2
@@ -2840,8 +2846,9 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             
         w, h = vid_clip.size
         
-        # Make the avatar occupy exactly the bottom 40% of the screen
-        height_pip = int(FRAME_H * 0.40)
+        # Avatar size: 30% for longform (less obstruction in 16:9), 40% for Shorts
+        avatar_height_pct = 0.30 if is_longform else 0.40
+        height_pip = int(FRAME_H * avatar_height_pct)
         width_pip = int(height_pip * (w / h))
         
         # Apply refinements from dynamic_params
@@ -2912,7 +2919,12 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             current_scale = 1.0 + zoom_speed * t + 0.006 * math.sin(t * 1.8)
             scaled_w = int(cur_w * current_scale)
             scaled_h = int(cur_h * current_scale)
-            base_x = (FRAME_W - scaled_w) // 2 + layout["avatar_x_offset"]
+            if is_longform:
+                # Bottom-right corner for longform 16:9 with 30px margin
+                base_x = FRAME_W - scaled_w - 30
+            else:
+                # Bottom-center for Shorts 9:16
+                base_x = (FRAME_W - scaled_w) // 2 + layout["avatar_x_offset"]
             base_y = FRAME_H - scaled_h
             return (base_x, base_y)
 

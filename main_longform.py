@@ -28,6 +28,7 @@ from config_longform import (
     LONGFORM_TRACKER_FILE
 )
 from fetch_research_papers import fetch_tech_news, fetch_ai_tools, fetch_trending_from_newsapi
+from kaggle_handover import trigger_kaggle_gpu_job
 from topic_tracker import record_story, update_youtube_url
 from gemini_script_longform import generate_longform_script
 from audio_gen import generate_voiceover, clean_tts_text
@@ -212,7 +213,7 @@ def run_longform_pipeline(dry_run=False):
             url = topic.get("source_url", "")
             if url:
                 ss_filename = f"screenshot_longform_{i+1}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-                ss_path = capture_article_screenshot(url, ss_filename)
+                ss_path = capture_article_screenshot(url, ss_filename, desktop=True)
                 if ss_path:
                     topic["screenshot_path"] = ss_path
                     screenshots_captured += 1
@@ -226,7 +227,7 @@ def run_longform_pipeline(dry_run=False):
         if not script_data.get("screenshot_path") and screenshots_captured == 0:
             log_message("⚠️ No screenshots captured. Proceeding anyway (long-form is less dependent).")
 
-        # ── STEP 3: Generate Audio ───────────────────────────────────────
+        # ── STEP 3: Generate Audio + Lip-Sync ────────────────────────────
         log_message("STEP 3: Generating voiceover + word timestamps...")
         custom_map = script_data.get("phonetic_pronunciation_map", {})
 
@@ -240,9 +241,41 @@ def run_longform_pipeline(dry_run=False):
         script_data["lipsync_face_path"] = intro_videos[video_idx]
         log_message(f"Selected Lip-Sync Template: {intro_videos[video_idx]}")
 
-        audio_path, duration, word_timestamps = generate_voiceover(
-            script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY
-        )
+        # ── Kaggle GPU Handover (Audio + Lip-Sync) ───────────────────────
+        has_kaggle = os.path.exists(os.path.expanduser("~/.kaggle/kaggle.json"))
+        use_local_only = os.environ.get("USE_LOCAL_ONLY") == "true"
+
+        if has_kaggle and not use_local_only:
+            log_message("Attempting Kaggle GPU handover for audio + lip-sync...")
+            results = trigger_kaggle_gpu_job(script_data, custom_map)
+            if results:
+                audio_path = results.get("audio_path")
+                duration = results.get("duration")
+                word_timestamps = results.get("word_timestamps")
+                ls_path = results.get("lipsync_path")
+                script_data["kaggle_lipsync_path"] = ls_path
+
+                # Verify files exist on disk
+                ls_received = ls_path and os.path.exists(ls_path)
+                audio_received = audio_path and os.path.exists(audio_path)
+
+                if audio_received and ls_received:
+                    log_message("✅ Received Audio and Lip-Sync from Kaggle GPU!")
+                elif audio_received:
+                    log_message("✅ Received Audio from Kaggle GPU! (Lip-Sync was missing/failed)")
+                else:
+                    log_message("❌ Kaggle job finished but critical audio output is missing.")
+                    attempts += 1
+                    continue
+            else:
+                log_message("❌ Kaggle Handover failed or job reported an error.")
+                attempts += 1
+                continue
+        else:
+            # Local fallback: generate audio without Kaggle GPU
+            audio_path, duration, word_timestamps = generate_voiceover(
+                script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY
+            )
 
         if not audio_path:
             log_message("ERROR: Audio generation failed.")
