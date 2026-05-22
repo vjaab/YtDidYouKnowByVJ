@@ -23,7 +23,7 @@ TODAY = datetime.now().strftime("%Y-%m-%d")
 client = genai.Client(api_key=GEMINI_API_KEY)
 
 
-def _generate_missing_prompts(chunks, headline, style_guide):
+def _generate_missing_prompts(chunks, headline, style_guide, aspect_ratio="9:16"):
     """
     For chunks that don't have a nano_visual_prompt (older schema or alignment fallback),
     use Gemini Flash to batch-generate visual prompts for all of them in one call.
@@ -40,19 +40,19 @@ def _generate_missing_prompts(chunks, headline, style_guide):
         for i, c in enumerate(missing)
     ])
 
+    format_desc = "16:9 landscape format" if aspect_ratio == "16:9" else "9:16 vertical format"
     prompt = f"""You are a cinematic visual director for YouTube Shorts.
 
 HEADLINE: {headline}
 VISUAL STYLE: {style_guide}
 
 For each sentence below, generate a specific, cinematic IMAGE PROMPT that visually represents
-EXACTLY what is being spoken in that sentence. The image will be used as a fullscreen 9:16 
-background behind a talking head.
+EXACTLY what is being spoken in that sentence. The image will be used as a fullscreen background.
 
 RULES:
 - Each prompt must be SPECIFIC to the sentence content (not generic)
 - NO text in images. NO faces of real people. NO watermarks.
-- Photorealistic, cinematic lighting, 9:16 vertical format, 8K quality
+- Photorealistic, cinematic lighting, {format_desc}, 8K quality
 - Include relevant objects, environments, or symbolic imagery
 - Keep each prompt under 80 words
 
@@ -89,7 +89,7 @@ Return ONLY a JSON array of objects, one per sentence, in order:
                 # Fallback: use the chunk text itself as a basic prompt
                 c["nano_visual_prompt"] = (
                     f"Cinematic visualization of: {c.get('text', 'technology')[:60]}. "
-                    f"Photorealistic, 9:16 vertical, {style_guide}, no text, no faces."
+                    f"Photorealistic, {aspect_ratio} format, {style_guide}, no text, no faces."
                 )
         print(f"  ✅ Generated {len(prompts)} nano-scene prompts via Gemini Flash.")
     except Exception as e:
@@ -97,13 +97,13 @@ Return ONLY a JSON array of objects, one per sentence, in order:
         for c in missing:
             c["nano_visual_prompt"] = (
                 f"Cinematic visualization of: {c.get('text', 'technology')[:60]}. "
-                f"Photorealistic, 9:16 vertical, {style_guide}, no text, no faces."
+                f"Photorealistic, {aspect_ratio} format, {style_guide}, no text, no faces."
             )
 
     return chunks
 
 
-def _generate_imagen_image(prompt, output_path):
+def _generate_imagen_image(prompt, output_path, aspect_ratio="9:16"):
     """Generate a single image via Imagen 4.0. Returns path on success, None on failure."""
 
     # Early exit if quota is exhausted for this run
@@ -123,7 +123,7 @@ def _generate_imagen_image(prompt, output_path):
                 prompt=prompt,
                 config=genai.types.GenerateImagesConfig(
                     number_of_images=1,
-                    aspect_ratio="9:16",
+                    aspect_ratio=aspect_ratio,
                     output_mime_type="image/jpeg",
                 ),
             )
@@ -148,7 +148,7 @@ def _generate_imagen_image(prompt, output_path):
     return None
 
 
-def generate_nano_scene_visuals(chunks, headline, style_guide=""):
+def generate_nano_scene_visuals(chunks, headline, style_guide="", aspect_ratio="9:16"):
     """
     Main entry point: generates one Imagen 4.0 background image per chunk.
 
@@ -167,7 +167,7 @@ def generate_nano_scene_visuals(chunks, headline, style_guide=""):
     print(f"\n🎬 NANO-SCENE ENGINE: Generating {total} per-sentence backgrounds...")
 
     # Step 1: Ensure all chunks have nano_visual_prompts
-    chunks = _generate_missing_prompts(chunks, headline, style_guide)
+    chunks = _generate_missing_prompts(chunks, headline, style_guide, aspect_ratio=aspect_ratio)
 
     # Step 2: Generate images
     last_successful_path = None
@@ -191,7 +191,7 @@ def generate_nano_scene_visuals(chunks, headline, style_guide=""):
 
         print(f"  [{i + 1}/{total}] Generating: {prompt[:70]}...")
 
-        path = _generate_imagen_image(prompt, output_path)
+        path = _generate_imagen_image(prompt, output_path, aspect_ratio=aspect_ratio)
 
         if path:
             chunk["visual_path"] = path
