@@ -649,7 +649,7 @@ def generate_longform_script(articles=None, failed_topics=None):
         # Final uniqueness safeguard
         headline = script_data.get("original_news_headline", "")
         news_url = script_data.get("original_news_url", "")
-        is_unique, msg = check_story_uniqueness(headline, news_url=news_url, tracker_file=LONGFORM_TRACKER_FILE)
+        is_unique, msg = check_story_uniqueness(headline, new_url=news_url, tracker_file=LONGFORM_TRACKER_FILE)
         if not is_unique:
             print(f"⚠️ [LONGFORM] Post-generation uniqueness check failed: {msg}")
             # For compilations this is less strict — we allow it since the headline is synthetic
