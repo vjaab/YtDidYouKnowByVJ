@@ -1967,6 +1967,95 @@ def _article_screenshot_clip(screenshot_path, duration):
         traceback.print_exc()
         return []
 
+def _longform_article_screenshot_clips(script_json, audio_duration):
+    """
+    For long-form videos: Maps the article screenshot of EACH topic to its
+    approximate active time window. Shows it at the start of the topic, and
+    optionally halfway through, with premium Ken Burns zoom and pan transitions.
+    """
+    print("🎬 Generating topic-aligned screenshots for long-form compilation...")
+    fact_timestamps = script_json.get("fact_timestamps", [])
+    topics = script_json.get("longform_topics", [])
+    if not topics or not fact_timestamps:
+        print("⚠️ No topics or fact timestamps found for longform screenshots. Falling back to default.")
+        screenshot_path = script_json.get("screenshot_path")
+        return _article_screenshot_clip(screenshot_path, audio_duration)
+        
+    clips = []
+    
+    for i, ft in enumerate(fact_timestamps):
+        fact_num = ft.get("fact_number", i + 1)
+        start_s = float(ft.get("approx_start_seconds", 0))
+        
+        # Duration until next fact or end of audio
+        if i + 1 < len(fact_timestamps):
+            end_s = float(fact_timestamps[i + 1].get("approx_start_seconds", audio_duration))
+        else:
+            end_s = audio_duration
+        fact_dur = max(1.0, end_s - start_s)
+        
+        # Get matching topic screenshot
+        topic_idx = i
+        if topic_idx >= len(topics):
+            # Fallback if list lengths mismatch
+            topic_idx = len(topics) - 1
+            
+        topic = topics[topic_idx]
+        screenshot_path = topic.get("screenshot_path")
+        if not screenshot_path or not os.path.exists(screenshot_path):
+            # Fallback to main screenshot
+            screenshot_path = script_json.get("screenshot_path")
+            
+        if not screenshot_path or not os.path.exists(screenshot_path):
+            continue
+            
+        try:
+            # Load and prepare canvas for this screenshot
+            img = Image.open(screenshot_path).convert("RGB")
+            target_h, target_w = FRAME_H, FRAME_W
+            canvas = _prepare_screenshot_canvas(img, target_w, target_h)
+            
+            # Prepare RGB array
+            arr_rgba = np.array(canvas.convert("RGBA"))
+            arr_rgb = arr_rgba[:, :, :3]
+            
+            # Determine show intervals within this fact segment [start_s, end_s]
+            intervals = []
+            
+            # First interval: show for 6 seconds at the start of the fact
+            first_dur = min(6.0, fact_dur)
+            if first_dur >= 1.0:
+                intervals.append((start_s, first_dur))
+                
+            # Second interval: if fact lasts longer than 18 seconds, show again for 5 seconds later in the fact
+            if fact_dur > 18.0:
+                sec_start = start_s + 14.0
+                sec_dur = min(5.0, end_s - sec_start)
+                if sec_dur >= 1.0:
+                    intervals.append((sec_start, sec_dur))
+                    
+            for c_start, c_dur in intervals:
+                # Create Ken Burns animated clip
+                clip = ImageClip(arr_rgb, duration=c_dur)
+                zoom_amt = 0.30
+                clip = clip.resized(lambda t, cd=c_dur: 1.0 + zoom_amt * easeInOutQuad(t / cd))
+                
+                def pan_fn(t, cd=c_dur):
+                    prog = easeInOutQuad(t / cd)
+                    off_x = -int(80 * prog)
+                    off_y = -int(50 * prog)
+                    return (off_x, off_y)
+                    
+                clip = clip.with_position(pan_fn).with_start(c_start)
+                clip = clip.with_effects([vfx.CrossFadeIn(0.5), vfx.CrossFadeOut(0.5)])
+                clips.append(clip)
+                
+            print(f"  Fact {fact_num}: Generated {len(intervals)} screenshot clips using: {os.path.basename(screenshot_path)}")
+        except Exception as e:
+            print(f"⚠️ Error preparing screenshot clip for Fact {fact_num}: {e}")
+            
+    return clips
+
 def _evidence_screenshot_clip(evidence_path, duration):
     """
     Shows a secondary 'Evidence' or 'Use Case' screenshot during the analytical section.
@@ -2931,8 +3020,11 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         avatar_pip = avatar_clip.with_position(pip_position).with_start(0)
 
     # ── LAYERS ───────────────────────────────────────────────────────────
-    screenshot_path = script_json.get("screenshot_path")
-    screenshot_clips = _article_screenshot_clip(screenshot_path, audio_duration)
+    if is_longform:
+        screenshot_clips = _longform_article_screenshot_clips(script_json, audio_duration)
+    else:
+        screenshot_path = script_json.get("screenshot_path")
+        screenshot_clips = _article_screenshot_clip(screenshot_path, audio_duration)
     gradient = _gradient_clip(audio_duration, height_pct=layout["gradient_height_pct"], position=layout["gradient_position"])
 
     # ── HUMAN REALISM OVERLAYS ───────────────────────────────────────────────
