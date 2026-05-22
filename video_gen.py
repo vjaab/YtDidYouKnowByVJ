@@ -2314,8 +2314,11 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     
     line_h = int(90 * scale_ratio) # Reverted to original
     
-    # Position: LOWER THIRD (60% Height)
-    start_y = int(frame_height * 0.60) - (len(lines) * line_h // 2) + y_shift
+    # Position: LOWER THIRD
+    # 60% Height for Shorts, 80% Height for Landscape
+    is_landscape = frame_width > frame_height
+    y_pos_pct = 0.80 if is_landscape else 0.60
+    start_y = int(frame_height * y_pos_pct) - (len(lines) * line_h // 2) + y_shift
     
     # Calculate dimensions for the unified background block
     max_line_w = 0
@@ -2654,7 +2657,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     # Merge layout jitter into subtitle shift
     subtitle_y_shift += layout["subtitle_y_jitter"]
 
-    is_longform = "Slot C" in script_json.get("slot", "")
+    slot_str = script_json.get("slot", "")
+    is_longform = "Slot C" in slot_str or "Slot L" in slot_str or script_json.get("is_longform", False)
     set_resolutions(is_longform)
     
     today = datetime.now().strftime("%Y-%m-%d")
@@ -2732,16 +2736,28 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 else:
                     c_clip = ImageClip(vp).with_duration(clip_dur)
                 
-                # Standard Resize & Crop to 9:16
+                # Standard Resize & Crop (adapts to 9:16 or 16:9 based on longform)
                 w, h = c_clip.size
-                target_h = int(w * 16 / 9)
-                if target_h <= h:
-                    y1 = (h - target_h) // 2
-                    c_clip = c_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h)
+                if is_longform:
+                    # 16:9 landscape crop
+                    target_w_crop = int(h * 16 / 9)
+                    if target_w_crop <= w:
+                        x1 = (w - target_w_crop) // 2
+                        c_clip = c_clip.cropped(x1=x1, y1=0, x2=x1 + target_w_crop, y2=h)
+                    else:
+                        target_h_crop = int(w * 9 / 16)
+                        y1 = (h - target_h_crop) // 2
+                        c_clip = c_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h_crop)
                 else:
-                    target_w = int(h * 9 / 16)
-                    x1 = (w - target_w) // 2
-                    c_clip = c_clip.cropped(x1=x1, y1=0, x2=w, y2=h)
+                    # 9:16 portrait crop (Shorts)
+                    target_h = int(w * 16 / 9)
+                    if target_h <= h:
+                        y1 = (h - target_h) // 2
+                        c_clip = c_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h)
+                    else:
+                        target_w = int(h * 9 / 16)
+                        x1 = (w - target_w) // 2
+                        c_clip = c_clip.cropped(x1=x1, y1=0, x2=w, y2=h)
 
                 c_clip = c_clip.resized((FRAME_W, FRAME_H))
                 
@@ -2941,6 +2957,53 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     #         iclip = _infographic_card_clip(...)
     #         if iclip: infographic_clips.append(iclip)
 
+    # ── LONGFORM: "FACT X/5" BADGE OVERLAYS ──────────────────────────────────
+    longform_badge_clips = []
+    if is_longform and script_json.get("longform_format") == "did_you_know":
+        fact_timestamps = script_json.get("fact_timestamps", [])
+        total_facts = len(fact_timestamps) if fact_timestamps else LONGFORM_NUM_TOPICS_DEFAULT
+        
+        for i, ft in enumerate(fact_timestamps):
+            fact_num = ft.get("fact_number", i + 1)
+            start_s = float(ft.get("approx_start_seconds", 0))
+            
+            # Duration until next fact or end of audio
+            if i + 1 < len(fact_timestamps):
+                end_s = float(fact_timestamps[i + 1].get("approx_start_seconds", audio_duration))
+            else:
+                end_s = audio_duration
+            fact_dur = max(1.0, end_s - start_s)
+            
+            # Render badge image
+            badge_text = f"FACT {fact_num}/{total_facts}"
+            badge_f = gf(28, bold=True) if callable(gf) else gf(28)
+            bw, bh = ts(badge_text, badge_f) if callable(ts) else (200, 35)
+            pad_x, pad_y = 16, 10
+            badge_img = Image.new("RGBA", (bw + pad_x * 2, bh + pad_y * 2), (0, 0, 0, 0))
+            badge_draw = ImageDraw.Draw(badge_img)
+            badge_draw.rounded_rectangle(
+                [0, 0, bw + pad_x * 2 - 1, bh + pad_y * 2 - 1],
+                radius=12, fill=(*accent_color, 200)
+            )
+            badge_draw.text((pad_x, pad_y), badge_text, font=badge_f, fill=(255, 255, 255, 255))
+            
+            badge_arr = np.array(badge_img.convert("RGB"))
+            badge_mask = np.array(badge_img.split()[3]).astype(float) / 255.0
+            
+            def make_badge_opacity(t, _dur=fact_dur):
+                if t < 0.4: return t / 0.4
+                elif t > _dur - 0.4: return max(0, (_dur - t) / 0.4)
+                return 1.0
+            
+            b_clip = VideoClip(lambda t, _arr=badge_arr: _arr, duration=fact_dur)
+            b_mask = VideoClip(lambda t, _m=badge_mask, _dur=fact_dur: _m * make_badge_opacity(t, _dur), is_mask=True, duration=fact_dur)
+            b_clip = b_clip.with_mask(b_mask).with_position((40, 40)).with_start(start_s)
+            b_clip = b_clip.with_effects([vfx.CrossFadeIn(0.3)])
+            longform_badge_clips.append(b_clip)
+
+    # Default constant for badge generation when fact_timestamps is missing
+    LONGFORM_NUM_TOPICS_DEFAULT = 5
+
     # Stack background, then screenshot clips on top of background
     base_layers = bg_layer_clips + screenshot_clips
     
@@ -2951,6 +3014,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     if flare_layer: base_layers.append(flare_layer)
     if grain_layer: base_layers.append(grain_layer)
     if avatar_pip: base_layers.append(avatar_pip)
+    base_layers.extend(longform_badge_clips)
     # ── LOGO BRANDING OVERLAY STACK ────────────────────────────────────
     # Place multiple logos/photos in the top-right corner
     branding_entities = []

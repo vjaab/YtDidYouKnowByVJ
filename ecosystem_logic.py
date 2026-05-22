@@ -27,9 +27,21 @@ def get_slot_info():
     
     return day_name, slot, category
 
+def get_longform_slot_info():
+    """
+    Returns slot info for the daily long-form "Did You Know" pipeline.
+    Always returns Slot L with a fixed category.
+    """
+    now = datetime.datetime.utcnow()
+    day_name = now.strftime("%a")
+    slot = "Slot L (Long-form)"
+    category = "AI Did You Know"
+    return day_name, slot, category
+
 SERIES_MAP = {
     "Slot A": {"name": "⚡ AGENTIC OPS",     "tagline": "Architecting autonomous systems."},
     "Slot B": {"name": "🔬 HYBRID AI",       "tagline": "Local models. Production scale."},
+    "Slot L": {"name": "🧠 DID YOU KNOW",    "tagline": "5 mind-blowing AI facts daily."},
 }
 
 def get_series_identity(slot):

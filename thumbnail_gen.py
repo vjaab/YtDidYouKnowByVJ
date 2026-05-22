@@ -164,6 +164,63 @@ def _render_premium_thumbnail(hook_text, bg_img, avatar_img, accent_color, width
     
     return canvas
 
+def _render_compilation_thumbnail(bg_img, avatar_img, accent_color, width, height):
+    """Specialized 16:9 thumbnail for 'Did You Know' 5-fact compilations."""
+    canvas = bg_img.resize((width, height), Image.LANCZOS)
+    canvas = ImageEnhance.Brightness(canvas).enhance(0.6) # Darker for compilation text
+    draw = ImageDraw.Draw(canvas)
+    
+    # 1. Overlay Avatar (Authority) - Right Side
+    if avatar_img:
+        av_h = int(height * 0.90)
+        scale = av_h / avatar_img.height
+        av_res = avatar_img.resize((int(avatar_img.width * scale), av_h), Image.LANCZOS)
+        
+        pos = (width - av_res.width - 20, height - av_res.height)
+            
+        glow = av_res.split()[3].point(lambda x: 255 if x > 0 else 0)
+        glow = glow.filter(ImageFilter.GaussianBlur(radius=25))
+        glow_img = Image.new("RGBA", av_res.size, (*accent_color, 140))
+        canvas.paste(glow_img, pos, mask=glow)
+        
+        canvas.paste(av_res, pos, mask=av_res)
+
+    # 2. Render "DID YOU KNOW?" (Massive, Yellow)
+    f_main = _load_font(130, "black")
+    txt_color = (255, 214, 0)
+    text_main = "DID YOU\nKNOW?"
+    
+    y = 120
+    x = 80
+    
+    for line in text_main.split("\n"):
+        lw, lh = _text_size(line, f_main)
+        for offset in range(1, 8):
+            draw.text((x+offset, y+offset), line, font=f_main, fill=(0,0,0, 150))
+        draw.text((x, y), line, font=f_main, fill=txt_color)
+        y += lh + 20
+
+    # 3. Render "5 AI FACTS" badge
+    f_sub = _load_font(80, "extrabold")
+    sub_txt = "5 AI FACTS"
+    sub_w, sub_h = _text_size(sub_txt, f_sub)
+    
+    badge_x = 80
+    badge_y = y + 40
+    
+    # Red/Accent glowing pill
+    draw.rounded_rectangle([badge_x - 20, badge_y - 10, badge_x + sub_w + 20, badge_y + sub_h + 30], 
+                           radius=25, fill=(220, 20, 60, 240)) # Crimson pill
+                           
+    for offset in range(1, 4):
+        draw.text((badge_x+offset, badge_y+offset), sub_txt, font=f_sub, fill=(0,0,0, 100))
+    draw.text((badge_x, badge_y), sub_txt, font=f_sub, fill=(255, 255, 255, 255))
+
+    # 4. Branding Accent
+    draw.rectangle([0, height-15, width, height], fill=accent_color)
+    
+    return canvas
+
 def generate_thumbnail(script_json):
     client = genai.Client(api_key=GEMINI_API_KEY)
     title = script_json.get("title", "AI Breakthrough")
@@ -175,23 +232,33 @@ def generate_thumbnail(script_json):
     out_shorts = os.path.join(OUTPUT_DIR, f"thumbnail_shorts_{date_str}.jpg")
 
     # Pipeline
-    hook = _generate_hook_text(title, client)
     bg = _generate_imagen_background(title, client)
     avatar = _process_avatar()
 
-    # YT (16:9)
-    print("🎬 Rendering YouTube Thumbnail...")
-    yt = _render_premium_thumbnail(hook, bg, avatar, accent_rgb, THUMB_W, THUMB_H)
-    yt.convert("RGB").save(out_yt, "JPEG", quality=95)
+    is_compilation = script_json.get("is_longform") and script_json.get("longform_format") == "did_you_know"
 
-    # Shorts (9:16)
-    print("🎬 Rendering Shorts Thumbnail...")
-    bg_vert = bg.resize((SHORTS_W, SHORTS_H), Image.LANCZOS)
-    shorts = _render_premium_thumbnail(hook, bg_vert, avatar, accent_rgb, SHORTS_W, SHORTS_H, is_shorts=True)
-    shorts.convert("RGB").save(out_shorts, "JPEG", quality=95)
+    if is_compilation:
+        print("🎬 Rendering Long-Form Compilation Thumbnail...")
+        yt = _render_compilation_thumbnail(bg, avatar, accent_rgb, THUMB_W, THUMB_H)
+        yt.convert("RGB").save(out_yt, "JPEG", quality=95)
+        print(f"✅ Premium Compilation Thumbnail Generated: {out_yt}")
+        return out_yt
+    else:
+        hook = _generate_hook_text(title, client)
+        
+        # YT (16:9)
+        print("🎬 Rendering YouTube Thumbnail...")
+        yt = _render_premium_thumbnail(hook, bg, avatar, accent_rgb, THUMB_W, THUMB_H)
+        yt.convert("RGB").save(out_yt, "JPEG", quality=95)
 
-    print(f"✅ Premium Thumbnails Generated: {out_yt}")
-    return out_yt
+        # Shorts (9:16)
+        print("🎬 Rendering Shorts Thumbnail...")
+        bg_vert = bg.resize((SHORTS_W, SHORTS_H), Image.LANCZOS)
+        shorts = _render_premium_thumbnail(hook, bg_vert, avatar, accent_rgb, SHORTS_W, SHORTS_H, is_shorts=True)
+        shorts.convert("RGB").save(out_shorts, "JPEG", quality=95)
+
+        print(f"✅ Premium Thumbnails Generated: {out_yt}")
+        return out_yt
 
 if __name__ == "__main__":
     # Test run
