@@ -624,7 +624,8 @@ def generate_voiceover(text, custom_phonetic_map=None, api_key=None):
                 iterations += 1
                 continue
             else:
-                print(f"⭐ [AUDIO LOOP] Quality Score: {feedback.get('score', 'N/A')}/10. Ready.")
+                score_display = feedback.get('score', 'N/A') if feedback else 'N/A'
+                print(f"⭐ [AUDIO LOOP] Quality Score: {score_display}/10. Ready.")
         
         best_path, best_dur, best_ts = path, dur, word_timestamps
         break
