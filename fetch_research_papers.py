@@ -178,3 +178,77 @@ def fetch_tech_news():
 def fetch_ai_tools():
     print("=== FETCH LATEST AI TOOLS & PRODUCTS ===")
     return _fetch_rss(TOOL_RSS_FEEDS, "tools")
+
+def fetch_x_trending_ai_topics():
+    """
+    Fetches trending AI topics from X.com (Twitter) using the search recent API v2.
+    Sorts by engagement to return the most popular/viral tweets on AI.
+    """
+    from config import X_BEARER_TOKEN
+    if not X_BEARER_TOKEN or "XXX" in X_BEARER_TOKEN or not X_BEARER_TOKEN.strip():
+        print("⚠️ X.com Bearer Token missing. Skipping X trending fetch.")
+        return []
+        
+    print("📡 Fetching viral trending AI topics from X.com...")
+    url = "https://api.twitter.com/2/tweets/search/recent"
+    
+    # Query for popular AI tweets in English from last 7 days
+    query = "(#AI OR #LLM OR #GenerativeAI OR OpenAI OR DeepMind OR Claude3 OR Gemini1.5) -is:retweet lang:en"
+    
+    params = {
+        "query": query,
+        "max_results": 15,
+        "tweet.fields": "created_at,public_metrics,author_id",
+        "expansions": "author_id",
+        "user.fields": "username,name"
+    }
+    
+    headers = {
+        "Authorization": f"Bearer {X_BEARER_TOKEN}"
+    }
+    
+    try:
+        response = requests.get(url, params=params, headers=headers, timeout=25)
+        if response.status_code != 200:
+            print(f"⚠️ X.com API Error (HTTP {response.status_code}): {response.text}")
+            return []
+            
+        data = response.json()
+        tweets = data.get("data", [])
+        users = {u["id"]: u for u in data.get("includes", {}).get("users", [])}
+        
+        articles = []
+        for t in tweets:
+            author_id = t.get("author_id")
+            user_info = users.get(author_id, {})
+            username = user_info.get("username", "XUser")
+            
+            text = t.get("text", "")
+            # Clean text for title
+            clean_text = re.sub(r"https://t.co/\S+", "", text).strip()
+            clean_text = clean_text.replace("\n", " ")
+            title = f"X.com Alert: @{username} on AI"
+            
+            # Format public metrics
+            metrics = t.get("public_metrics", {})
+            likes = metrics.get("like_count", 0)
+            rts = metrics.get("retweet_count", 0)
+            engagement_desc = f"📈 Engagement: {likes} Likes, {rts} Retweets. \n\nTweet: {text}"
+            
+            tweet_url = f"https://x.com/{username}/status/{t.get('id')}"
+            
+            articles.append({
+                "title": title,
+                "description": engagement_desc,
+                "source": {"name": f"X.com (@{username})"},
+                "url": tweet_url,
+                "urlToImage": "",
+                "publishedAt": t.get("created_at"),
+                "type": "trending"
+            })
+            
+        print(f"✅ X.com Search: Retrieved {len(articles)} viral AI topics.")
+        return articles
+    except Exception as e:
+        print(f"⚠️ X.com Search fetch failed: {e}")
+        return []

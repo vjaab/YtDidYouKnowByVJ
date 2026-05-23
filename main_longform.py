@@ -156,15 +156,24 @@ def run_longform_pipeline(dry_run=False):
         research_news = fetch_tech_news()
         ai_tool_news = fetch_ai_tools()
         trending_news = fetch_trending_from_newsapi()
-        rss_articles = research_news + ai_tool_news + trending_news
+        
+        # Fetch X.com trending AI topics
+        try:
+            from fetch_research_papers import fetch_x_trending_ai_topics
+            x_news = fetch_x_trending_ai_topics()
+        except Exception as ex:
+            log_message(f"⚠️ Failed to import x_trending_fetcher: {ex}")
+            x_news = []
+            
+        rss_articles = research_news + ai_tool_news + trending_news + x_news
 
         if not rss_articles:
             log_message("⚠️ All sources returned 0 articles. Pipeline will rely on Gemini Search.")
         else:
             log_message(f"✅ Fetched {len(rss_articles)} total articles "
-                       f"({len(research_news)} research, {len(ai_tool_news)} tools, {len(trending_news)} trending).")
+                       f"({len(research_news)} research, {len(ai_tool_news)} tools, {len(trending_news)} trending, {len(x_news)} X.com).")
     except Exception as e:
-        log_message(f"⚠️ RSS Fetch failed: {e}")
+        log_message(f"⚠️ RSS/X Fetch failed: {e}")
 
     # ── STEP 2: Generate Long-Form Script ────────────────────────────────
     attempts = 0

@@ -203,14 +203,23 @@ def run_pipeline(topic_type="research"):
         # Fetch both to give Gemini more options
         research_news = fetch_tech_news()
         ai_tool_news = fetch_ai_tools()
-        rss_articles = research_news + ai_tool_news
+        
+        # Fetch X.com trending AI topics
+        try:
+            from fetch_research_papers import fetch_x_trending_ai_topics
+            x_news = fetch_x_trending_ai_topics()
+        except Exception as ex:
+            log_message(f"⚠️ Failed to import x_trending_fetcher: {ex}")
+            x_news = []
+            
+        rss_articles = research_news + ai_tool_news + x_news
             
         if not rss_articles:
             log_message("⚠️ All RSS feeds returned 0 articles.")
         else:
-            log_message(f"✅ Fetched {len(rss_articles)} total articles ({len(research_news)} research, {len(ai_tool_news)} tools).")
+            log_message(f"✅ Fetched {len(rss_articles)} total articles ({len(research_news)} research, {len(ai_tool_news)} tools, {len(x_news)} X.com).")
     except Exception as e:
-        log_message(f"⚠️ RSS Fetch failed: {e}")
+        log_message(f"⚠️ RSS/X Fetch failed: {e}")
 
     # ── STEP 3: Script Generation (with retry) ────────────────────────────────
     # Screenshot is MANDATORY — if we can't capture it, we reject the topic and retry.
