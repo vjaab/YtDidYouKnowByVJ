@@ -2420,6 +2420,204 @@ def _generate_room_tone(duration):
         clip = clip.subclipped(0, duration)
     return clip.with_effects([afx.MultiplyVolume(0.1)])
 
+def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hooks, output_duration, bgm_volume_config, output_path):
+    """
+    Composes and masters the entire video soundtrack using Pydub:
+    1. Import Voiceover, apply professional leveler.
+    2. Import BGM, loop, and apply smooth sidechain-compression (ducking) and dramatic silence beats.
+    3. Synthesize environmental room tone (low atmospheric hum).
+    4. Inject and mix SFX cues (woosh, pop, glitch) precisely.
+    5. Master the final composite output (limit peaks, normalize to -1dB).
+    """
+    import math
+    import numpy as np
+    from pydub import AudioSegment
+    
+    print("🎙️ Starting Pydub Audio Mastering Engine...")
+    
+    # 1. Load Voiceover
+    voice = AudioSegment.from_file(voice_path).set_frame_rate(44100).set_channels(2)
+    target_duration_ms = int(output_duration * 1000)
+    
+    # 2. Load and Prepare BGM
+    ducked_bgm = AudioSegment.silent(duration=target_duration_ms, frame_rate=44100).set_channels(2)
+    if bgm_path and os.path.exists(bgm_path) and os.path.getsize(bgm_path) > 0:
+        try:
+            bgm = AudioSegment.from_file(bgm_path).set_frame_rate(44100).set_channels(2)
+            # Loop BGM to cover the entire target duration
+            looped_bgm = AudioSegment.empty()
+            while len(looped_bgm) < target_duration_ms:
+                looped_bgm += bgm
+            looped_bgm = looped_bgm[:target_duration_ms]
+            
+            # --- Sidechain Compression & Hook Silencing ---
+            step_ms = 20
+            n_steps = target_duration_ms // step_ms
+            
+            # Identify when speaking (speech activity envelope)
+            speech_active = np.zeros(n_steps)
+            for c in chunks:
+                start_step = max(0, int(c["start"] * 1000 / step_ms))
+                end_step = min(n_steps - 1, int(c["end"] * 1000 / step_ms))
+                speech_active[start_step:end_step + 1] = 1.0
+                
+            # Identify dramatic silence beats (from retention cues)
+            silence_active = np.ones(n_steps)
+            for cue in retention_hooks:
+                if cue.get("effect") in ("zoom_snap", "flash_accent"):
+                    cue_t = float(cue.get("timestamp", 0))
+                    # 0.4 seconds of silence around cue
+                    start_sil = max(0, int((cue_t - 0.2) * 1000 / step_ms))
+                    end_sil = min(n_steps - 1, int((cue_t + 0.2) * 1000 / step_ms))
+                    silence_active[start_sil:end_sil + 1] = 0.0
+                    
+            # Compute attack/release curves for sidechain compression
+            duck_envelope = np.zeros(n_steps)
+            alpha_attack = 1.0 - math.exp(-step_ms / 80.0)    # 80ms fast attack to duck music
+            alpha_release = 1.0 - math.exp(-step_ms / 500.0)  # 500ms release to bring music back
+            
+            current_duck = 0.0
+            for i in range(n_steps):
+                target_duck = speech_active[i]
+                if target_duck > current_duck:
+                    current_duck += (target_duck - current_duck) * alpha_attack
+                else:
+                    current_duck += (target_duck - current_duck) * alpha_release
+                duck_envelope[i] = current_duck
+                
+            # Compute smooth attack/release for dramatic silence beats to avoid clicks/pops
+            smooth_silence = np.ones(n_steps)
+            alpha_sil_attack = 1.0 - math.exp(-step_ms / 30.0)   # 30ms sudden cut
+            alpha_sil_release = 1.0 - math.exp(-step_ms / 120.0) # 120ms restore
+            
+            current_sil = 1.0
+            for i in range(n_steps):
+                target_sil = silence_active[i]
+                if target_sil < current_sil:
+                    current_sil += (target_sil - current_sil) * alpha_sil_attack
+                else:
+                    current_sil += (target_sil - current_sil) * alpha_sil_release
+                    
+                smooth_silence[i] = current_sil
+                
+            # Apply ducking envelope in 20ms steps
+            bgm_chunks = []
+            base_bgm_gain_db = 20 * math.log10(bgm_volume_config) if bgm_volume_config > 0 else -100.0
+            
+            for i in range(n_steps):
+                chunk_start = i * step_ms
+                chunk_end = (i + 1) * step_ms
+                bgm_chunk = looped_bgm[chunk_start:chunk_end]
+                
+                duck_factor = duck_envelope[i]
+                sil_factor = smooth_silence[i]
+                
+                # Interpolate volume multiplier: 1.2x (unducked) to 0.25x (ducked)
+                vol_multiplier = (1.2 * (1.0 - duck_factor) + 0.25 * duck_factor) * sil_factor
+                
+                if vol_multiplier < 0.0001 or base_bgm_gain_db < -90.0:
+                    gain_db = -100.0
+                else:
+                    gain_db = base_bgm_gain_db + 20 * math.log10(vol_multiplier)
+                    
+                bgm_chunks.append(bgm_chunk.apply_gain(gain_db))
+                
+            ducked_bgm = bgm_chunks[0]
+            for c in bgm_chunks[1:]:
+                ducked_bgm += c
+                
+            # Append remaining milliseconds if any
+            rem_ms = target_duration_ms % step_ms
+            if rem_ms > 0:
+                rem_chunk = looped_bgm[target_duration_ms - rem_ms:]
+                duck_factor = duck_envelope[-1]
+                sil_factor = smooth_silence[-1]
+                vol_multiplier = (1.2 * (1.0 - duck_factor) + 0.25 * duck_factor) * sil_factor
+                gain_db = base_bgm_gain_db + 20 * math.log10(max(0.0001, vol_multiplier))
+                ducked_bgm += rem_chunk.apply_gain(gain_db)
+                
+            # Fade out BGM during last 2 seconds
+            ducked_bgm = ducked_bgm.fade_out(2000)
+            print("   🎵 Topic-Aware BGM looped and processed with sidechain compression.")
+        except Exception as e:
+            print(f"   ⚠️ BGM processing failed: {e}")
+            
+    # 3. Synthesize Room Tone (atmospheric background noise)
+    room_tone = AudioSegment.silent(duration=target_duration_ms, frame_rate=44100).set_channels(2)
+    try:
+        duration_s = target_duration_ms / 1000.0
+        samples = np.random.normal(0, 0.01, int(44100 * duration_s))
+        samples = np.convolve(samples, np.ones(120)/120, mode='same')  # Moving average low-pass filter
+        samples_int16 = (samples * 32767).astype(np.int16)
+        
+        # Load into AudioSegment
+        raw_room_tone = AudioSegment(
+            samples_int16.tobytes(),
+            frame_rate=44100,
+            sample_width=2,
+            channels=1
+        ).set_channels(2)
+        
+        # Reduce volume to -36dB for a very subtle room tone
+        room_tone = raw_room_tone - 36
+        print("   🏠 Environmental Room Tone synthesized.")
+    except Exception as e:
+        print(f"   ⚠️ Room Tone synthesis failed: {e}")
+        
+    # Combine layers: Room Tone + Ducked BGM + Voiceover
+    composite = room_tone.overlay(ducked_bgm)
+    composite = composite.overlay(voice, position=0)
+    
+    # 4. Mix SFX cues
+    sfx_count = 0
+    for cue in sfx_cues:
+        ctype = cue.get("type", "woosh").lower()
+        cue_ts = float(cue.get("timestamp", 0))
+        sfx_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "sfx", f"{ctype}.wav")
+        if os.path.exists(sfx_path) and os.path.getsize(sfx_path) > 0 and cue_ts < output_duration:
+            try:
+                sfx = AudioSegment.from_file(sfx_path).set_frame_rate(44100).set_channels(2)
+                # SFX volume mapping: Woosh is subtle, pops are crispy, glitches are sharp
+                if ctype == "woosh":
+                    sfx = sfx - 10  # Moderate woosh volume
+                elif ctype == "pop":
+                    sfx = sfx - 6   # Crispy pop volume
+                else:
+                    sfx = sfx - 8   # Default volume
+                
+                pos_ms = int(cue_ts * 1000)
+                composite = composite.overlay(sfx, position=pos_ms)
+                sfx_count += 1
+            except Exception as e:
+                print(f"   ⚠️ Failed to load SFX {ctype}: {e}")
+                
+    # Auto-inject transition Woosh SFX for subtitle transitions (every 3rd sentence)
+    auto_sfx_count = 0
+    for i, chunk in enumerate(chunks):
+        if i % 3 == 0 or i == 0:
+            cue_ts = chunk["start"]
+            sfx_path_woosh = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "sfx", "woosh.wav")
+            if os.path.exists(sfx_path_woosh) and cue_ts < output_duration:
+                try:
+                    sfx = AudioSegment.from_file(sfx_path_woosh).set_frame_rate(44100).set_channels(2)
+                    # Very subtle woosh for transitions
+                    sfx = sfx - 18
+                    pos_ms = int(cue_ts * 1000)
+                    composite = composite.overlay(sfx, position=pos_ms)
+                    auto_sfx_count += 1
+                except:
+                    pass
+                    
+    print(f"   🔊 Mixed {sfx_count} explicit SFX cues + {auto_sfx_count} auto-transition wooshes.")
+    
+    # 5. Master Output (Normalize to -1.0dB headroom to prevent clipping)
+    from pydub.effects import normalize
+    mastered = normalize(composite, headroom=1.0)
+    
+    # Export final master wav
+    mastered.export(output_path, format="wav")
+    print(f"⭐ Audio mastering complete! Output saved to: {output_path}")
+
 def _sweep_clip(duration, accent_color, frame_width=1080):
     """Creates a moving highlights 'sweep' for entity tags."""
     sweep_w = 150
@@ -4069,44 +4267,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
     base_comp = CompositeVideoClip(base_layers, size=(FRAME_W, FRAME_H)).with_duration(audio_duration)
 
-    # ── KINETIC SFX DESIGN ───────────────────────────────────────────────────
-    final_audio_layers = [audio]
-    
-    # ── HUMAN REALISM: Environmental Room Tone (0.01 vol) ──────────────────
-    try:
-        room_tone = _generate_room_tone(audio_duration)
-        final_audio_layers.append(room_tone)
-    except Exception as e:
-        print(f"Room tone synthesis failed (non-fatal): {e}")
-
-    sfx_cues = script_json.get("sfx_cues", [])
-    for cue in sfx_cues:
-        ctype = cue.get("type", "woosh").lower()
-        cue_ts = float(cue.get("timestamp", 0))
-        sfx_path = os.path.join(ASSETS_DIR, "sfx", f"{ctype}.wav")
-        if os.path.exists(sfx_path) and os.path.getsize(sfx_path) > 0 and cue_ts < audio_duration:
-            try:
-                sfx_clip = AudioFileClip(sfx_path)
-                max_sfx_dur = audio_duration - cue_ts
-                if sfx_clip.duration and sfx_clip.duration > max_sfx_dur:
-                    sfx_clip = sfx_clip.subclipped(0, max_sfx_dur)
-                sfx_clip = sfx_clip.with_start(cue_ts).with_effects([afx.MultiplyVolume(0.4)])
-                final_audio_layers.append(sfx_clip)
-            except Exception as e:
-                print(f"SFX load failed for {ctype} (non-fatal): {e}")
-                
-    # Auto-inject SFX for subtitle transitions (new lines)
-    # To avoid being overwhelming with the new 1-3 word chunks, we only inject every 3rd chunk, or if it's the very first chunk.
-    for i, chunk in enumerate(chunks):
-        if i % 3 == 0 or i == 0:
-            cue_ts = chunk["start"]
-            sfx_path_woosh = os.path.join(ASSETS_DIR, "sfx", "woosh.wav")
-            if os.path.exists(sfx_path_woosh) and cue_ts < audio_duration:
-                try:
-                    sfx_clip = AudioFileClip(sfx_path_woosh).with_start(cue_ts).with_effects([afx.MultiplyVolume(0.15)])
-                    final_audio_layers.append(sfx_clip)
-                except: pass
-    
+    # ── KINETIC SFX & BGM MASTERING ENGINE (Pydub-driven) ────────────────────
     # Background Music Selection (Topic-Aware: unique music per headline)
     music_files = sorted([f for f in os.listdir(MUSIC_DIR) if f.endswith(('.mp3', '.wav', '.m4a'))])
     if music_files:
@@ -4123,58 +4284,22 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     else:
         bgm_path = os.path.join(MUSIC_DIR, "modern_tech.mp3")
 
-    if os.path.exists(bgm_path) and os.path.getsize(bgm_path) > 0:
-        try:
-            bgm = AudioFileClip(bgm_path)
-            if bgm.duration is None or bgm.duration <= 0:
-                print(f"WARNING: BGM has no valid duration, skipping.")
-            else:
-                if bgm.duration < audio_duration:
-                    # Use afx.AudioLoop (NOT vfx.Loop which is video-only and causes
-                    # out-of-bounds audio reads — the root cause of the IndexError crash)
-                    bgm = bgm.with_effects([afx.AudioLoop(duration=audio_duration)])
-                else:
-                    bgm = bgm.subclipped(0, audio_duration)
-                
-                def ducking_volume(get_frame, t):
-                    retention_hooks = script_json.get("retention_cues", [])
-                    if isinstance(t, np.ndarray):
-                        vols = []
-                        for time_t in t:
-                            # IMPROVEMENT #8: Total silence at dramatic hook moments
-                            is_silence_beat = any(
-                                abs(time_t - float(cue.get("timestamp", 0))) < 0.5
-                                for cue in retention_hooks
-                                if cue.get("effect") in ("zoom_snap", "flash_accent")
-                            )
-                            if is_silence_beat:
-                                vols.append(0.0)
-                            else:
-                                is_speak = any(c["start"] - 0.1 <= time_t <= c["end"] + 0.1 for c in chunks)
-                                vol = BGM_VOLUME * 0.2 if is_speak else BGM_VOLUME * 1.3
-                                vols.append(vol)
-                        multiplier = np.array(vols).reshape(-1, 1)
-                        return get_frame(t) * multiplier
-                    else:
-                        # IMPROVEMENT #8: Total silence at dramatic hook moments
-                        is_silence_beat = any(
-                            abs(t - float(cue.get("timestamp", 0))) < 0.5
-                            for cue in retention_hooks
-                            if cue.get("effect") in ("zoom_snap", "flash_accent")
-                        )
-                        if is_silence_beat:
-                            return get_frame(t) * 0.0
-                        is_speak = any(c["start"] - 0.1 <= t <= c["end"] + 0.1 for c in chunks)
-                        vol = BGM_VOLUME * 0.2 if is_speak else BGM_VOLUME * 1.3
-                        return get_frame(t) * vol
-                    
-                bgm = bgm.transform(ducking_volume).with_effects([afx.AudioFadeOut(2)])
-                
-                final_audio_layers.append(bgm)
-        except Exception as e:
-            print(f"BGM loading failed (non-fatal): {e}")
-
-    final_audio = CompositeAudioClip(final_audio_layers).with_duration(audio_duration)
+    # Generate a single high-fidelity mastered soundtrack using pure Pydub
+    mastered_audio_path = os.path.join(OUTPUT_DIR, f"master_soundtrack_{today}.wav")
+    sfx_cues = script_json.get("sfx_cues", [])
+    
+    _mix_and_master_audio(
+        voice_path=audio_path,
+        bgm_path=bgm_path,
+        sfx_cues=sfx_cues,
+        chunks=chunks,
+        retention_hooks=script_json.get("retention_cues", []),
+        output_duration=audio_duration,
+        bgm_volume_config=BGM_VOLUME,
+        output_path=mastered_audio_path
+    )
+    
+    final_audio = AudioFileClip(mastered_audio_path)
     
     # Header bar DISABLED — reference style has no persistent title
     header_img = Image.new('RGBA', (FRAME_W, FRAME_H), (0, 0, 0, 0))

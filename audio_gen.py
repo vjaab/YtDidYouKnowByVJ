@@ -129,6 +129,77 @@ def trim_audio_silence(path, word_timestamps):
     new_dur = len(trimmed_audio) / 1000.0
     print(f"Audio trimmed: -{shift_sec:.2f}s from start. New duration: {new_dur:.2f}s")
     return new_dur, new_ts
+
+def optimize_audio_gaps(audio_path, word_timestamps, max_gap_s=0.35, target_gap_s=0.15):
+    """
+    Detects silent gaps between words and shortens them if they exceed max_gap_s.
+    Modifies both the audio file and the word_timestamps in place, and shifts
+    all subsequent word timings to keep audio, subtitles, and lip-sync 100% in-sync.
+    """
+    from pydub import AudioSegment
+    try:
+        audio = AudioSegment.from_file(audio_path)
+        
+        # We will build a new AudioSegment and a new list of word timestamps
+        new_audio = AudioSegment.empty()
+        new_ts = []
+        
+        # Sort word timestamps
+        word_timestamps = sorted(word_timestamps, key=lambda x: x["start"])
+        
+        if not word_timestamps:
+            return len(audio) / 1000.0, word_timestamps
+            
+        # Add the audio before the first word
+        first_word_start_ms = int(word_timestamps[0]["start"] * 1000)
+        if first_word_start_ms > 0:
+            new_audio += audio[:first_word_start_ms]
+            
+        for idx, wt in enumerate(word_timestamps):
+            w_start_ms = int(wt["start"] * 1000)
+            w_end_ms = int(wt["end"] * 1000)
+            
+            # Start of the word in the new audio
+            new_w_start_ms = len(new_audio)
+            new_audio += audio[w_start_ms:w_end_ms]
+            new_w_end_ms = len(new_audio)
+            
+            # Save adjusted timestamps
+            new_ts.append({
+                "word": wt["word"],
+                "start": round(new_w_start_ms / 1000.0, 3),
+                "end": round(new_w_end_ms / 1000.0, 3)
+            })
+            
+            # Check gap to the next word
+            if idx < len(word_timestamps) - 1:
+                next_w_start_ms = int(word_timestamps[idx + 1]["start"] * 1000)
+                gap_ms = next_w_start_ms - w_end_ms
+                
+                if gap_ms > max_gap_s * 1000:
+                    # Compress the gap to target_gap_s
+                    target_gap_ms = int(target_gap_s * 1000)
+                    silence_segment = audio[w_end_ms:next_w_start_ms]
+                    new_audio += silence_segment[:target_gap_ms]
+                else:
+                    # Keep original gap
+                    if gap_ms > 0:
+                        new_audio += audio[w_end_ms:next_w_start_ms]
+                        
+        # Append remaining audio after the last word
+        last_word_end_ms = int(word_timestamps[-1]["end"] * 1000)
+        if last_word_end_ms < len(audio):
+            new_audio += audio[last_word_end_ms:]
+            
+        # Export the optimized audio back to the path
+        new_audio.export(audio_path, format="wav" if audio_path.endswith(".wav") else "mp3")
+        new_duration = len(new_audio) / 1000.0
+        print(f"   🔊 Pacing Optimized: silent gaps trimmed. {len(audio)/1000.0:.2f}s -> {new_duration:.2f}s")
+        return new_duration, new_ts
+    except Exception as e:
+        print(f"   ⚠️ Gap pacing optimization failed: {e}")
+        return len(audio) / 1000.0, word_timestamps
+
 # F5-TTS Paths
 ASSETS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
 
@@ -240,10 +311,14 @@ def _smart_split_sentences(text, max_chars=120):
 def _postprocess_voice_audio(wav_path):
     """
     Professional post-processing chain to enhance clarity and presence:
-    1. High-pass filter at 100Hz to remove low-end "mud" and rumble.
-    2. Dynamic Range Compression to level out the voice and make it "pop".
-    3. Final normalization to -1dB for consistent loudness.
-    4. Subtle fade-in/out to prevent clicks.
+    1. High-pass filter at 120Hz to remove low-end rumble and mud.
+    2. Three-Band Presence EQ Crossover Network:
+       - Lows (100Hz - 200Hz): warm chest boost (+1.5dB).
+       - Mids (200Hz - 3kHz): vocal core.
+       - Highs (3kHz - 15kHz): crisp sparkle presence boost (+3.5dB) and high-end air.
+    3. Dynamic Range Compression to level out the voice and make it "pop".
+    4. Final normalization to -1dB for consistent loudness.
+    5. Subtle fade-in/out to prevent clicks.
     """
     try:
         from pydub import AudioSegment
@@ -251,21 +326,33 @@ def _postprocess_voice_audio(wav_path):
         
         audio = AudioSegment.from_wav(wav_path)
         
-        # 1. High-pass filter (130Hz) - Removes low-frequency energy (AC hum) that masks speech clarity
-        audio = audio.high_pass_filter(130)
+        # 1. High-pass filter (120Hz) - Removes low-frequency room rumble
+        audio = audio.high_pass_filter(120)
         
-        # 2. Dynamic Compression - Makes the voice sound more authoritative
-        # Threshold -15dB, Ratio 3:1, Attack 5ms, Release 50ms (higher threshold prevents noise floor pumping)
+        # 2. Three-Band Presence EQ Crossover
+        lows = audio.low_pass_filter(200).high_pass_filter(100)
+        mids = audio.high_pass_filter(200).low_pass_filter(3000)
+        highs = audio.high_pass_filter(3000)
+        
+        # Apply premium boosting gains
+        lows = lows + 1.5   # Warmth chest boost
+        highs = highs + 3.5 # Sparkle & presence air boost
+        
+        # Recombine frequency crossover bands
+        audio = lows.overlay(mids).overlay(highs)
+        
+        # 3. Dynamic Compression - Makes the voice sound authoritative and professional
+        # Threshold -15dB, Ratio 3:1, Attack 5ms, Release 50ms
         audio = compress_dynamic_range(audio, threshold=-15.0, ratio=3.0, attack=5.0, release=50.0)
         
-        # 3. Final Normalization
+        # 4. Final Normalization
         audio = normalize(audio, headroom=1.0)
         
-        # 4. Prevent click artifacts
+        # 5. Prevent click artifacts
         audio = audio.fade_in(5).fade_out(5)
         
         audio.export(wav_path, format="wav")
-        print(f"   🎙️ Audio enhanced: 130Hz HPF, dynamic compression, normalized to -1dB")
+        print(f"   🎙️ Audio enhanced: 120Hz HPF, 3-band presence EQ, dynamic compression, normalized to -1dB")
     except Exception as e:
         print(f"   ⚠ Audio post-processing skipped: {e}")
 
@@ -607,6 +694,7 @@ def generate_voiceover(text, custom_phonetic_map=None, api_key=None):
             word_timestamps = restore_original_words(word_timestamps, original_raw_text, custom_phonetic_map=current_phonetic_map)
         if path and word_timestamps:
             dur, word_timestamps = trim_audio_silence(path, word_timestamps)
+            dur, word_timestamps = optimize_audio_gaps(path, word_timestamps)
 
         # 2. OBSERVE & CRITIQUE
         if api_key and iterations < max_iters:
