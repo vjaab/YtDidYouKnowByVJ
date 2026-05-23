@@ -24,6 +24,7 @@ from video_gen import create_video
 from screenshot_gen import capture_article_screenshot
 from thumbnail_gen import generate_thumbnail
 from youtube_upload import upload_video
+from x_upload import upload_video_to_x
 from telegram_selector import notify_telegram
 from entity_fetcher import fetch_all_entities, get_retention_layers_config
 from kaggle_handover import trigger_kaggle_gpu_job
@@ -501,6 +502,18 @@ def run_pipeline(topic_type="research"):
 
     youtube_url = f"https://youtu.be/{result}"
     log_message(f"SUCCESS: {youtube_url}")
+
+    # ── STEP 10c: X.com Auto-Post ─────────────────────────────────────────────
+    log_message("STEP 10c: Auto-posting Short to X.com...")
+    try:
+        x_post_text = f"🔥 {title}\n\nFull breakdown: {youtube_url}\n\n#AI #TechNews"
+        x_uploaded, x_result = upload_video_to_x(video_path, x_post_text)
+        if x_uploaded:
+            log_message(f"SUCCESS: Posted video to X.com! Tweet ID: {x_result}")
+        else:
+            log_message(f"WARNING: X.com posting skipped/failed: {x_result}")
+    except Exception as ex:
+        log_message(f"WARNING: X.com auto-post failed: {ex}")
 
     # ── STEP 10b: Generate Pinned Comment ───────────────────────────────────
     next_slot = get_next_slot(slot)
