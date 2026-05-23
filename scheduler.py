@@ -10,12 +10,12 @@ def check_time_and_run():
     current_hhmm = ist_now.strftime("%H:%M")
     
     if current_hhmm in UPLOAD_TIMES:
-        if current_hhmm == "04:00":
+        if current_hhmm == "08:30":
             topic_type = "research"
-        elif current_hhmm == "13:30":
+        elif current_hhmm == "20:00":
             topic_type = "tools"
         else:
-            topic_type = "tools"
+            topic_type = "research"
             
         print(f"[{ist_now}] Triggering AI Pipeline ({topic_type.upper()}) for {current_hhmm} slot...")
         run_pipeline(topic_type=topic_type)

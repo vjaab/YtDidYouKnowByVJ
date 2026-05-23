@@ -2,11 +2,10 @@ name: Daily Tech News Shorts Pipeline
 
 on:
   schedule:
-    # ── 1 SHORT PER DAY — ROTATING UPLOAD TIME ──
-    # Triggers daily at 00:00 UTC (05:30 IST).
-    # The pipeline adds a computed delay (0-14h) based on week+day
-    # so the actual upload time rotates week over week.
+    # ── 2 SHORTS PER DAY — ROTATING UPLOAD TIME ──
+    # Triggers daily at 00:00 UTC (05:30 IST) and 12:00 UTC (17:30 IST)
     - cron: '0 0 * * *'
+    - cron: '0 12 * * *'
   workflow_dispatch: # Allows manual trigger from GitHub Actions UI
 
 jobs:
@@ -21,11 +20,12 @@ jobs:
         id: delay
         run: |
           # Deterministic but rotating delay with good mixing
-          WEEK=$(date +%V)
-          DOW=$(date +%u)
-          YEAR=$(date +%Y)
-          # Better hash: combine year+week+day with XOR shifts for wide spread
-          SEED=$((YEAR * 371 + WEEK * 53 + DOW * 97))
+          WEEK=$(date -u +%V)
+          DOW=$(date -u +%u)
+          YEAR=$(date -u +%Y)
+          HOUR=$(date -u +%H)
+          # Better hash: combine year+week+day+hour with XOR shifts for wide spread
+          SEED=$((YEAR * 371 + WEEK * 53 + DOW * 97 + HOUR * 13))
           HASH=$(( (SEED * 2654435761) ^ (SEED >> 3) ))
           # Absolute value and mod to 0-16200 seconds (0-4.5 hours)
           DELAY_SECONDS=$(( (HASH % 16200 + 16200) % 16200 ))

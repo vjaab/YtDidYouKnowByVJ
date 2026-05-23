@@ -34,7 +34,7 @@ for d in [OUTPUT_DIR, LOGS_DIR, FONTS_DIR, MUSIC_DIR]:
 
 # Application Settings
 TIMEZONE = "Asia/Kolkata"
-UPLOAD_TIMES = ["06:00", "12:00", "18:00", "08:30", "20:00", "10:00", "16:00"]  # 1/day, rotated per weekday (Mon-Sun)
+UPLOAD_TIMES = ["08:30", "20:00"]  # 2/day schedule (Morning and Evening IST)
 MAX_RETRY_ATTEMPTS = 10
 SIMILARITY_THRESHOLD = 75
 CATEGORY_COOLDOWN_DAYS = 3
