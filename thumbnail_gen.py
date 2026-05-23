@@ -82,8 +82,7 @@ def _generate_imagen_background(title, client):
             prompt=prompt,
             config=types.GenerateImagesConfig(
                 number_of_images=1,
-                aspect_ratio='16:9',
-                add_watermark=False
+                aspect_ratio='16:9'
             )
         )
         img_bytes = response.generated_images[0].image.image_bytes
@@ -91,6 +90,157 @@ def _generate_imagen_background(title, client):
     except Exception as e:
         print(f"⚠️ Imagen failed: {e}. Using dark fallback.")
         return Image.new("RGB", (THUMB_W, THUMB_H), (10, 10, 15))
+
+# ── FIGMA TECH REF UTILITIES ──────────────────────────────────────────────────
+
+def _render_tech_grid(canvas, grid_color=(128, 128, 128, 25), spacing=60, dash_len=5):
+    """Renders a beautiful semi-transparent dashed technical grid overlay."""
+    overlay = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+    w, h = canvas.size
+    
+    # Vertical lines (dashed)
+    for x in range(0, w, spacing):
+        for y in range(0, h, dash_len * 2):
+            draw.line([(x, y), (x, y + dash_len)], fill=grid_color, width=1)
+            
+    # Horizontal lines (dashed)
+    for y in range(0, h, spacing):
+        for x in range(0, w, dash_len * 2):
+            draw.line([(x, y), (x + dash_len, y)], fill=grid_color, width=1)
+            
+    return Image.alpha_composite(canvas.convert("RGBA"), overlay).convert("RGB")
+
+def _draw_tech_decorations(canvas, accent_color):
+    """Draws subtle Figma HUD/UI style decorations (crosshairs, boundary brackets, micro labels)."""
+    overlay = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+    w, h = canvas.size
+    accent_alpha = (*accent_color, 75)
+    white_alpha = (255, 255, 255, 55)
+    
+    # 1. Floating Crosshairs (+) in empty areas
+    crosshairs = [
+        (w // 4, h // 5),
+        (w // 3, h // 2 + 100),
+        (w // 2 - 100, h // 4 - 30),
+        (w // 2 + 150, h // 2 + 180)
+    ]
+    cross_size = 8
+    for cx, cy in crosshairs:
+        draw.line([(cx - cross_size, cy), (cx + cross_size, cy)], fill=white_alpha, width=1)
+        draw.line([(cx, cy - cross_size), (cx, cy + cross_size)], fill=white_alpha, width=1)
+        
+    # 2. Corner right-angle bounding brackets
+    margin = 35
+    bracket_len = 25
+    # Top-Left Bracket
+    draw.line([(margin, margin), (margin + bracket_len, margin)], fill=accent_alpha, width=2)
+    draw.line([(margin, margin), (margin, margin + bracket_len)], fill=accent_alpha, width=2)
+    # Top-Right Bracket
+    draw.line([(w - margin, margin), (w - margin - bracket_len, margin)], fill=accent_alpha, width=2)
+    draw.line([(w - margin, margin), (w - margin, margin + bracket_len)], fill=accent_alpha, width=2)
+    # Bottom-Left Bracket
+    draw.line([(margin, h - margin), (margin + bracket_len, h - margin)], fill=accent_alpha, width=2)
+    draw.line([(margin, h - margin), (margin, h - margin - bracket_len)], fill=accent_alpha, width=2)
+    # Bottom-Right Bracket
+    draw.line([(w - margin, h - margin), (w - margin - bracket_len, h - margin)], fill=accent_alpha, width=2)
+    draw.line([(w - margin, h - margin), (w - margin, h - margin - bracket_len)], fill=accent_alpha, width=2)
+    
+    # 3. Monospace dimensional micro-label in top-right
+    try:
+        f_mono = _load_font(18, "extrabold")
+        label_text = f"[ 16:9_HD // {w}x{h} ]"
+        draw.text((w - 280, 50), label_text, font=f_mono, fill=(255, 255, 255, 90))
+    except Exception as e:
+        print("⚠️ Monospace decoration label failed:", e)
+        
+    return Image.alpha_composite(canvas.convert("RGBA"), overlay).convert("RGB")
+
+def _get_bezier_points(p0, p1, p2, p3, steps=30):
+    points = []
+    for t in [i / steps for i in range(steps + 1)]:
+        x = (1-t)**3 * p0[0] + 3*(1-t)**2 * t * p1[0] + 3*(1-t) * t**2 * p2[0] + t**3 * p3[0]
+        y = (1-t)**3 * p0[1] + 3*(1-t)**2 * t * p1[1] + 3*(1-t) * t**2 * p2[1] + t**3 * p3[1]
+        points.append((x, y))
+    return points
+
+def _draw_curved_accent(canvas, accent_color):
+    """Draws a premium glowing organic bezier curve near bottom-left corner with glowing pips."""
+    overlay = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+    w, h = canvas.size
+    
+    # Define Bezier points near the bottom left (away from text and avatar)
+    p0 = (60, h - 120)
+    p1 = (120, h - 80)
+    p2 = (200, h - 160)
+    p3 = (260, h - 140)
+    
+    points = _get_bezier_points(p0, p1, p2, p3)
+    
+    # Draw glowing shadow for the line
+    for gw in range(8, 2, -2):
+        draw.line(points, fill=(*accent_color, int(80 / gw)), width=gw)
+    # Draw main accent line (White)
+    draw.line(points, fill=(255, 255, 255, 200), width=2)
+    
+    # Draw glowing circular nodes (pips) at key points
+    for px, py in [p0, p3]:
+        # Outer glow
+        draw.ellipse([px - 8, py - 8, px + 8, py + 8], fill=(*accent_color, 80))
+        # Inner node (bright White)
+        draw.ellipse([px - 4, py - 4, px + 4, py + 4], fill=(255, 255, 255, 240))
+        
+    return Image.alpha_composite(canvas.convert("RGBA"), overlay).convert("RGB")
+
+def _draw_multi_tier_glow(canvas, av_res, pos, accent_color):
+    """Draws a beautiful, premium multi-tiered glowing aura radiating behind the avatar."""
+    glow_canvas = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+    # Calculate center of the avatar
+    av_center_x = pos[0] + av_res.width // 2
+    av_center_y = pos[1] + av_res.height // 2
+    
+    draw = ImageDraw.Draw(glow_canvas)
+    
+    # Tier 1: Massive soft backdrop aura (large radius, very low opacity)
+    r1 = int(av_res.height * 0.55)
+    draw.ellipse([av_center_x - r1, av_center_y - r1, av_center_x + r1, av_center_y + r1], 
+                 fill=(*accent_color, 40))
+                 
+    # Tier 2: Medium backdrop aura (medium radius, medium opacity)
+    r2 = int(av_res.height * 0.40)
+    draw.ellipse([av_center_x - r2, av_center_y - r2, av_center_x + r2, av_center_y + r2], 
+                 fill=(*accent_color, 75))
+                 
+    # Tier 3: Core intensive backing glow (smaller radius, high opacity)
+    r3 = int(av_res.height * 0.22)
+    draw.ellipse([av_center_x - r3, av_center_y - r3, av_center_x + r3, av_center_y + r3], 
+                 fill=(*accent_color, 130))
+                 
+    # Apply heavy blur to the radial gradient circle overlay
+    glow_canvas = glow_canvas.filter(ImageFilter.GaussianBlur(radius=45))
+    
+    # Tier 4: Detailed outline body glow matching the avatar's exact shape
+    body_mask = av_res.split()[3].point(lambda x: 255 if x > 0 else 0)
+    body_glow = body_mask.filter(ImageFilter.GaussianBlur(radius=25))
+    body_glow_img = Image.new("RGBA", av_res.size, (*accent_color, 120))
+    
+    # Compose everything
+    canvas_rgba = canvas.convert("RGBA")
+    # Paste global radial backdrop glow
+    canvas_rgba = Image.alpha_composite(canvas_rgba, glow_canvas)
+    # Paste local avatar body glow onto composite
+    temp_local = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+    temp_local.paste(body_glow_img, pos, mask=body_glow)
+    canvas_rgba = Image.alpha_composite(canvas_rgba, temp_local)
+    
+    # Paste the actual avatar image
+    temp_avatar = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+    temp_avatar.paste(av_res, pos, mask=av_res)
+    canvas_rgba = Image.alpha_composite(canvas_rgba, temp_avatar)
+    
+    return canvas_rgba.convert("RGB")
 
 # ── IMAGE PROCESSING ─────────────────────────────────────────────────────────
 
@@ -115,11 +265,18 @@ def _render_premium_thumbnail(hook_text, bg_img, avatar_img, accent_color, width
     canvas = bg_img.resize((width, height), Image.LANCZOS)
     # Darken background slightly for text readability
     canvas = ImageEnhance.Brightness(canvas).enhance(0.7)
+    
+    # 1. Apply Figma Tech HUD decorations if it is a 16:9 thumbnail
+    if not is_shorts:
+        canvas = _render_tech_grid(canvas)
+        canvas = _draw_tech_decorations(canvas, accent_color)
+        canvas = _draw_curved_accent(canvas, accent_color)
+        
     draw = ImageDraw.Draw(canvas)
     
-    # 1. Overlay Avatar (Authority)
+    # 2. Overlay Avatar with Premium Aura Glow
     if avatar_img:
-        # Scale avatar to fit ~70% of height
+        # Scale avatar to fit ~85% of height for landscape, ~45% for portrait
         av_h = int(height * 0.85) if not is_shorts else int(height * 0.45)
         scale = av_h / avatar_img.height
         av_res = avatar_img.resize((int(avatar_img.width * scale), av_h), Image.LANCZOS)
@@ -130,36 +287,54 @@ def _render_premium_thumbnail(hook_text, bg_img, avatar_img, accent_color, width
         else:
             pos = (width - av_res.width - 20, height - av_res.height)
             
-        # Add subtle glow/shadow behind avatar
-        glow = av_res.split()[3].point(lambda x: 255 if x > 0 else 0)
-        glow = glow.filter(ImageFilter.GaussianBlur(radius=20))
-        glow_img = Image.new("RGBA", av_res.size, (*accent_color, 120))
-        canvas.paste(glow_img, pos, mask=glow)
-        
-        canvas.paste(av_res, pos, mask=av_res)
+        canvas = _draw_multi_tier_glow(canvas, av_res, pos, accent_color)
+        draw = ImageDraw.Draw(canvas) # Re-get draw for subsequent drawing
 
-    # 2. Render Hook Text (Curiosity Gap)
+    # 3. Render Hook Text (Curiosity Gap) with Figma blocks & high-contrast colors
     lines = hook_text.split("\n")
-    font_size = 95 if not is_shorts else 110
+    font_size = 90 if not is_shorts else 110
     font = _load_font(font_size, "black")
     
-    # Yellow High-Impact Color
-    txt_color = (255, 214, 0) # Premium Yellow
-    
-    total_h = sum(_text_size(l, font)[1] for l in lines) + 20 * (len(lines)-1)
+    # Calculate height considering badge padding
+    total_h = sum(_text_size(l, font)[1] for l in lines) + 40 * (len(lines)-1)
     y = (height - total_h) // 2 if not is_shorts else height // 2
-    x = 60
+    x = 80 if not is_shorts else 60
     
-    for line in lines:
+    for idx, line in enumerate(lines):
         lw, lh = _text_size(line, font)
-        # Professional multi-pass drop shadow
+        
+        # Multi-color strategy: First line clean white, emphasis lines are the neon accent color
+        if idx == 0:
+            txt_color = (255, 255, 255)
+        else:
+            txt_color = accent_color
+            
+        # Draw translucent tech badge backing box
+        box_padding_x = 25
+        box_padding_y = 12
+        box_coords = [
+            x - box_padding_x,
+            y - box_padding_y,
+            x + lw + box_padding_x,
+            y + lh + box_padding_y
+        ]
+        
+        block_overlay = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+        block_draw = ImageDraw.Draw(block_overlay)
+        # Translucent dark charcoal block (Figma HUD block) with thin accent border
+        block_draw.rounded_rectangle(box_coords, radius=12, fill=(10, 10, 15, 195), outline=(*accent_color, 100), width=2)
+        canvas = Image.alpha_composite(canvas.convert("RGBA"), block_overlay).convert("RGB")
+        draw = ImageDraw.Draw(canvas)
+        
+        # Professional multi-pass drop shadow behind text
         for offset in range(1, 6):
-            draw.text((x+offset, y+offset), line, font=font, fill=(0,0,0, 100))
+            draw.text((x+offset, y+offset), line, font=font, fill=(0, 0, 0, 140))
         
         draw.text((x, y), line, font=font, fill=txt_color)
-        y += lh + 25
-
-    # 3. Branding Accent
+        y += lh + 45
+        
+    # 4. Branding Accent
+    draw = ImageDraw.Draw(canvas)
     draw.rectangle([0, height-15, width, height], fill=accent_color)
     
     return canvas
@@ -200,9 +375,15 @@ def _render_compilation_thumbnail(bg_img, avatar_img, accent_color, width, heigh
     """Specialized 16:9 thumbnail for 'Did You Know' 5-fact compilations."""
     canvas = bg_img.resize((width, height), Image.LANCZOS)
     canvas = ImageEnhance.Brightness(canvas).enhance(0.6) # Darker for compilation text
+    
+    # 1. Apply Figma Tech HUD decorations
+    canvas = _render_tech_grid(canvas)
+    canvas = _draw_tech_decorations(canvas, accent_color)
+    canvas = _draw_curved_accent(canvas, accent_color)
+    
     draw = ImageDraw.Draw(canvas)
     
-    # 1. Overlay Avatar (Authority) - Right Side
+    # 2. Overlay Avatar with Premium Aura Glow - Right Side
     if avatar_img:
         av_h = int(height * 0.90)
         scale = av_h / avatar_img.height
@@ -210,35 +391,50 @@ def _render_compilation_thumbnail(bg_img, avatar_img, accent_color, width, heigh
         
         pos = (width - av_res.width - 20, height - av_res.height)
             
-        glow = av_res.split()[3].point(lambda x: 255 if x > 0 else 0)
-        glow = glow.filter(ImageFilter.GaussianBlur(radius=25))
-        glow_img = Image.new("RGBA", av_res.size, (*accent_color, 140))
-        canvas.paste(glow_img, pos, mask=glow)
-        
-        canvas.paste(av_res, pos, mask=av_res)
+        canvas = _draw_multi_tier_glow(canvas, av_res, pos, accent_color)
+        draw = ImageDraw.Draw(canvas) # Re-get draw
 
-    # 2. Render "DID YOU KNOW?" (Massive, Yellow)
+    # 3. Render "DID YOU KNOW?" with translucent backing boxes & hybrid colors
     f_main = _load_font(130, "black")
-    txt_color = (255, 214, 0)
     text_main = "DID YOU\nKNOW?"
     
     y = 120
     x = 80
     
-    for line in text_main.split("\n"):
+    for idx, line in enumerate(text_main.split("\n")):
         lw, lh = _text_size(line, f_main)
+        
+        # Color: Line 0 White, rest are Premium Yellow
+        txt_color = (255, 255, 255) if idx == 0 else (255, 214, 0)
+        
+        # Translucent tech badge backing box
+        box_padding_x = 25
+        box_padding_y = 12
+        box_coords = [
+            x - box_padding_x,
+            y - box_padding_y,
+            x + lw + box_padding_x,
+            y + lh + box_padding_y
+        ]
+        
+        block_overlay = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+        block_draw = ImageDraw.Draw(block_overlay)
+        block_draw.rounded_rectangle(box_coords, radius=12, fill=(10, 10, 15, 195), outline=(*accent_color, 100), width=2)
+        canvas = Image.alpha_composite(canvas.convert("RGBA"), block_overlay).convert("RGB")
+        draw = ImageDraw.Draw(canvas)
+        
         for offset in range(1, 8):
             draw.text((x+offset, y+offset), line, font=f_main, fill=(0,0,0, 150))
         draw.text((x, y), line, font=f_main, fill=txt_color)
-        y += lh + 20
+        y += lh + 40
 
-    # 3. Render "5 AI FACTS" badge
+    # 4. Render "5 AI FACTS" badge
     f_sub = _load_font(80, "extrabold")
     sub_txt = "5 AI FACTS"
     sub_w, sub_h = _text_size(sub_txt, f_sub)
     
     badge_x = 80
-    badge_y = y + 40
+    badge_y = y + 45
     
     # Red/Accent glowing pill
     draw.rounded_rectangle([badge_x - 20, badge_y - 10, badge_x + sub_w + 20, badge_y + sub_h + 30], 
