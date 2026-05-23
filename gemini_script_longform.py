@@ -224,7 +224,11 @@ Return ONLY this exact JSON:
   ],
   "original_news_headline": "Compilation: 5 AI Facts - [Today's Date]",
   "original_news_url": "Primary source URL from Fact 1",
-  "use_case_evidence_url": "Primary source URL from the most impactful fact"
+  "use_case_evidence_url": "Primary source URL from the most impactful fact",
+  "metric_popups": [
+    {{"text": "1,000 tok/sec", "timestamp": 8.5, "fact_number": 1}},
+    {{"text": "93% Zero-Click", "timestamp": 42.0, "fact_number": 3}}
+  ]
 }}"""
 
 

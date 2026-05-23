@@ -196,17 +196,24 @@ def ts(text, font):
 def _prepare_screenshot_canvas(img, target_w, target_h, url=None):
     """
     Creates a premium 'Blurred Backdrop' canvas for wide screenshots.
-    Wraps the screenshot in an elegant macOS dark-mode browser mockup with controls,
-    rounded corners, neon glowing outline, and dynamic domain name inside the address bar.
+    - Longform (16:9): Clean frosted glass card with rounded corners + drop shadow (no browser mockup)
+    - Shorts (9:16): Elegant macOS dark-mode browser mockup with controls, outline, and domain name.
+    Also automatically crops the top 80px of captured screenshots for longform to remove any browser chrome.
     """
-    # 1. Create heavily blurred background (scaled to fill)
+    is_longform = target_w > target_h
+
+    # 1. Automatic chrome removal (crop top 80px of the screenshot) for longform
+    if is_longform and img.height > 160:
+        img = img.crop((0, 80, img.width, img.height))
+
+    # Create heavily blurred background (scaled to fill)
     bg = ImageOps.fit(img, (target_w, target_h), Image.LANCZOS)
     bg = bg.filter(ImageFilter.GaussianBlur(radius=45))
     bg = bg.point(lambda p: p * 0.45) # Darken backdrop
     
-    # 2. Fit screenshot image with spacing for top browser bar (50px)
+    # 2. Fit screenshot image
     iw, ih = img.size
-    bar_h = 50
+    bar_h = 0 if is_longform else 50
     
     # Calculate scale so that the screenshot PLUS the top bar fits nicely in the safe area
     scale = min(target_w * 0.86 / iw, (target_h * 0.86 - bar_h) / ih)
@@ -215,55 +222,59 @@ def _prepare_screenshot_canvas(img, target_w, target_h, url=None):
     # Resize original screenshot
     fg_resized = img.resize((fw, fh), Image.LANCZOS).convert("RGBA")
     
-    # Overall browser window dimensions
+    # Overall window dimensions
     win_w = fw
     win_h = fh + bar_h
     
-    # 3. Create the browser window image
+    # 3. Create the window image
     browser_win = Image.new("RGBA", (win_w, win_h), (0, 0, 0, 0))
     b_draw = ImageDraw.Draw(browser_win)
     
-    # Draw dark browser top bar background
-    bar_color = (30, 31, 33, 255) # Dark charcoal
-    b_draw.rounded_rectangle([0, 0, win_w, bar_h + 20], radius=16, fill=bar_color) # Draw slightly lower to blend with bottom
-    
-    # Draw macOS window controls
-    dot_radius = 5
-    dot_y = bar_h // 2
-    b_draw.ellipse([20 - dot_radius, dot_y - dot_radius, 20 + dot_radius, dot_y + dot_radius], fill=(255, 95, 87, 255))
-    b_draw.ellipse([36 - dot_radius, dot_y - dot_radius, 36 + dot_radius, dot_y + dot_radius], fill=(254, 188, 46, 255))
-    b_draw.ellipse([52 - dot_radius, dot_y - dot_radius, 52 + dot_radius, dot_y + dot_radius], fill=(40, 200, 64, 255))
-    
-    # Draw address bar
-    addr_w = min(400, int(win_w * 0.65))
-    addr_x1 = (win_w - addr_w) // 2
-    addr_x2 = addr_x1 + addr_w
-    addr_y1 = 10
-    addr_y2 = bar_h - 10
-    b_draw.rounded_rectangle([addr_x1, addr_y1, addr_x2, addr_y2], radius=8, fill=(45, 46, 49, 255))
-    
-    # Parse domain name from URL
-    from urllib.parse import urlparse
-    domain = "techcrunch.com"
-    if url:
-        try:
-            domain = urlparse(url).netloc
-            if domain.startswith("www."):
-                domain = domain[4:]
-        except Exception:
-            pass
-    if not domain:
-        domain = "techcrunch.com"
+    if not is_longform:
+        # Draw dark browser top bar background (Shorts only)
+        bar_color = (30, 31, 33, 255) # Dark charcoal
+        b_draw.rounded_rectangle([0, 0, win_w, bar_h + 20], radius=16, fill=bar_color)
         
-    # Draw lock icon and domain text in address bar
-    addr_font = gf(14, bold=False)
-    domain_text = f"🔒  {domain}"
-    b_draw.text((win_w // 2, bar_h // 2), domain_text, font=addr_font, fill=(180, 180, 182, 255), anchor="mm")
+        # Draw macOS window controls
+        dot_radius = 5
+        dot_y = bar_h // 2
+        b_draw.ellipse([20 - dot_radius, dot_y - dot_radius, 20 + dot_radius, dot_y + dot_radius], fill=(255, 95, 87, 255))
+        b_draw.ellipse([36 - dot_radius, dot_y - dot_radius, 36 + dot_radius, dot_y + dot_radius], fill=(254, 188, 46, 255))
+        b_draw.ellipse([52 - dot_radius, dot_y - dot_radius, 52 + dot_radius, dot_y + dot_radius], fill=(40, 200, 64, 255))
+        
+        # Draw address bar
+        addr_w = min(400, int(win_w * 0.65))
+        addr_x1 = (win_w - addr_w) // 2
+        addr_x2 = addr_x1 + addr_w
+        addr_y1 = 10
+        addr_y2 = bar_h - 10
+        b_draw.rounded_rectangle([addr_x1, addr_y1, addr_x2, addr_y2], radius=8, fill=(45, 46, 49, 255))
+        
+        # Parse domain name from URL
+        from urllib.parse import urlparse
+        domain = "techcrunch.com"
+        if url:
+            try:
+                domain = urlparse(url).netloc
+                if domain.startswith("www."):
+                    domain = domain[4:]
+            except Exception:
+                pass
+        if not domain:
+            domain = "techcrunch.com"
+            
+        # Draw lock icon and domain text in address bar
+        addr_font = gf(14, bold=False)
+        domain_text = f"🔒  {domain}"
+        b_draw.text((win_w // 2, bar_h // 2), domain_text, font=addr_font, fill=(180, 180, 182, 255), anchor="mm")
+        
+        # Paste resized screenshot onto browser window below the bar
+        browser_win.paste(fg_resized, (0, bar_h), fg_resized)
+    else:
+        # Longform: no browser controls, just paste the screenshot directly
+        browser_win.paste(fg_resized, (0, 0), fg_resized)
     
-    # Paste resized screenshot onto browser window below the bar
-    browser_win.paste(fg_resized, (0, bar_h), fg_resized)
-    
-    # 4. Crop the entire browser window to rounded rectangle corners
+    # 4. Crop the entire window to rounded rectangle corners
     mask = Image.new("L", (win_w, win_h), 0)
     m_draw = ImageDraw.Draw(mask)
     m_draw.rounded_rectangle([0, 0, win_w, win_h], radius=16, fill=255)
@@ -271,11 +282,16 @@ def _prepare_screenshot_canvas(img, target_w, target_h, url=None):
     rounded_browser = Image.new("RGBA", (win_w, win_h), (0,0,0,0))
     rounded_browser.paste(browser_win, (0,0), mask=mask)
     
-    # 5. Draw a sleek neon border outline around the rounded browser window
+    # 5. Draw a sleek outline around the rounded window
     r_draw = ImageDraw.Draw(rounded_browser)
-    r_draw.rounded_rectangle([0, 0, win_w, win_h], radius=16, outline=(0, 240, 255, 120), width=3) # Electric Cyan outline
+    if is_longform:
+        # Subtle frosted glass border outline for longform card
+        r_draw.rounded_rectangle([0, 0, win_w, win_h], radius=16, outline=(255, 255, 255, 40), width=3)
+    else:
+        # Electric Cyan outline for Shorts browser mockup
+        r_draw.rounded_rectangle([0, 0, win_w, win_h], radius=16, outline=(0, 240, 255, 120), width=3)
     
-    # 6. Add beautiful drop shadow to the rounded browser window
+    # 6. Add beautiful drop shadow to the rounded window
     shadow_pad = 30
     shadow_img = Image.new("RGBA", (win_w + shadow_pad*2, win_h + shadow_pad*2), (0,0,0,0))
     s_draw = ImageDraw.Draw(shadow_img)
@@ -1725,6 +1741,466 @@ def _curiosity_timer(total_dur):
     return clip.with_mask(mclip).with_position((FRAME_W - w - pad_x * 2 - 20, 170)).with_start(start)
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+# LONGFORM RETENTION UPGRADE: New Visual Layers (2026 Premium Spec)
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ── IMPROVEMENT #2: Kinetic Metric Pop-Up ─────────────────────────────────────
+def _kinetic_metric_popup(metric_text, start_time, accent_color, audio_duration, hold=2.0):
+    """
+    Punches a key metric/stat onto the screen with an elastic scale-in animation.
+    Reference: Vaibhav Sisinty '15x Faster', '3.8 Cr', '90% Cheaper' pop-ups.
+    Renders a fullscreen-width horizontal bar at 25% height (16:9) or 35% (9:16).
+    """
+    if not metric_text or start_time >= audio_duration:
+        return None
+    dur = min(hold + 0.5, audio_duration - start_time)
+    if dur < 0.5:
+        return None
+
+    is_landscape = FRAME_W > FRAME_H
+    bar_h = 130 if is_landscape else 160
+    bar_w = int(FRAME_W * 0.85)
+
+    # Render the metric card
+    img = Image.new("RGBA", (bar_w, bar_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    # Frosted glass background
+    draw.rounded_rectangle([0, 0, bar_w, bar_h], radius=20, fill=(0, 0, 0, 200))
+    # Accent top/bottom edge lines
+    draw.rectangle([0, 0, bar_w, 4], fill=(*accent_color, 255))
+    draw.rectangle([0, bar_h - 4, bar_w, bar_h], fill=(*accent_color, 255))
+
+    # Metric text — large, bold, accent colored
+    f_metric = gf(80 if is_landscape else 70, bold=True)
+    tw, th = ts(metric_text, f_metric)
+
+    # If text is too wide, shrink font
+    if tw > bar_w - 80:
+        f_metric = gf(60 if is_landscape else 55, bold=True)
+        tw, th = ts(metric_text, f_metric)
+
+    tx = (bar_w - tw) // 2
+    ty = (bar_h - th) // 2
+
+    # Glow effect behind text
+    for dx, dy in [(-2, 0), (2, 0), (0, -2), (0, 2), (-1, -1), (1, 1)]:
+        draw.text((tx + dx, ty + dy), metric_text, font=f_metric, fill=(*accent_color, 100))
+    draw.text((tx, ty), metric_text, font=f_metric, fill=(255, 255, 255, 255))
+
+    arr = np.array(img.convert("RGB"))
+    mask_arr = np.array(img.split()[3]).astype(float) / 255.0
+
+    def opacity_fn(t):
+        # Elastic scale-in: 0→1 in 0.15s, hold, fade out 0.3s
+        if t < 0.15:
+            return t / 0.15
+        elif t > dur - 0.3:
+            return max(0, (dur - t) / 0.3)
+        return 1.0
+
+    def scale_fn(t):
+        if t < 0.15:
+            # Elastic bounce: overshoot to 1.15x then settle to 1.0x
+            progress = t / 0.15
+            return 0.5 + 0.65 * progress - 0.15 * math.sin(progress * math.pi)
+        elif t < 0.35:
+            # Settle bounce
+            settle = (t - 0.15) / 0.2
+            return 1.0 + 0.08 * math.exp(-settle * 5) * math.sin(settle * 12)
+        return 1.0
+
+    def make_frame(t):
+        s = scale_fn(t)
+        if abs(s - 1.0) < 0.01:
+            return arr
+        sw, sh = max(1, int(bar_w * s)), max(1, int(bar_h * s))
+        scaled = Image.fromarray(arr).resize((sw, sh), Image.LANCZOS)
+        # Center crop back to original size
+        cx, cy = (sw - bar_w) // 2, (sh - bar_h) // 2
+        cx, cy = max(0, cx), max(0, cy)
+        cropped = np.array(scaled)[cy:cy + bar_h, cx:cx + bar_w]
+        if cropped.shape[0] < bar_h or cropped.shape[1] < bar_w:
+            result = np.zeros((bar_h, bar_w, 3), dtype=np.uint8)
+            result[:cropped.shape[0], :cropped.shape[1]] = cropped
+            return result
+        return cropped
+
+    def make_mask(t):
+        s = scale_fn(t)
+        o = opacity_fn(t)
+        if abs(s - 1.0) < 0.01:
+            return mask_arr * o
+        sw, sh = max(1, int(bar_w * s)), max(1, int(bar_h * s))
+        scaled = Image.fromarray((mask_arr * 255).astype(np.uint8)).resize((sw, sh), Image.LANCZOS)
+        cx, cy = max(0, (sw - bar_w) // 2), max(0, (sh - bar_h) // 2)
+        cropped = np.array(scaled)[cy:cy + bar_h, cx:cx + bar_w].astype(float) / 255.0
+        if cropped.shape[0] < bar_h or cropped.shape[1] < bar_w:
+            result = np.zeros((bar_h, bar_w), dtype=float)
+            result[:cropped.shape[0], :cropped.shape[1]] = cropped
+            return result * o
+        return cropped * o
+
+    clip = VideoClip(make_frame, duration=dur)
+    mclip = VideoClip(make_mask, is_mask=True, duration=dur)
+
+    y_pos = int(FRAME_H * 0.22) if is_landscape else int(FRAME_H * 0.32)
+    x_pos = (FRAME_W - bar_w) // 2
+    return clip.with_mask(mclip).with_position((x_pos, y_pos)).with_start(start_time)
+
+
+# ── IMPROVEMENT #3: Visual Progress Tracker (Dot Navigator) ──────────────────
+def _longform_progress_dots(fact_timestamps, accent_color, audio_duration):
+    """
+    Apple keynote-style dot navigator showing which fact is currently active.
+    5 dots at the top-center. Active = large accent, upcoming = small gray,
+    completed = medium dimmed accent.
+    """
+    if not fact_timestamps or audio_duration <= 0:
+        return []
+
+    total_facts = len(fact_timestamps)
+    dot_spacing = 36
+    dot_r_active = 8
+    dot_r_inactive = 5
+    dot_r_done = 6
+    total_w = (total_facts - 1) * dot_spacing + dot_r_active * 2
+    canvas_w = total_w + 60
+    canvas_h = 40
+
+    clips = []
+
+    for i, ft in enumerate(fact_timestamps):
+        active_fact = i  # This fact is active during this segment
+        start_s = float(ft.get("approx_start_seconds", 0))
+
+        # Duration until next fact or end
+        if i + 1 < len(fact_timestamps):
+            end_s = float(fact_timestamps[i + 1].get("approx_start_seconds", audio_duration))
+        else:
+            end_s = audio_duration
+        fact_dur = max(0.5, end_s - start_s)
+
+        # Render dot strip for this fact segment
+        img = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+
+        # Semi-transparent backing pill
+        draw.rounded_rectangle([0, 0, canvas_w, canvas_h], radius=canvas_h // 2, fill=(0, 0, 0, 120))
+
+        for j in range(total_facts):
+            cx = 30 + j * dot_spacing
+            cy = canvas_h // 2
+
+            if j < active_fact:
+                # Completed: medium dimmed accent
+                r = dot_r_done
+                color = (*accent_color, 140)
+            elif j == active_fact:
+                # Active: large, bright accent with glow
+                r = dot_r_active
+                color = (*accent_color, 255)
+                # Glow ring
+                draw.ellipse([cx - r - 3, cy - r - 3, cx + r + 3, cy + r + 3],
+                             fill=(*accent_color, 60))
+            else:
+                # Upcoming: small gray
+                r = dot_r_inactive
+                color = (120, 120, 130, 180)
+
+            draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color)
+
+        arr = np.array(img.convert("RGB"))
+        mask_arr = np.array(img.split()[3]).astype(float) / 255.0
+
+        def make_opacity(t, _dur=fact_dur):
+            if t < 0.3:
+                return t / 0.3
+            elif t > _dur - 0.3:
+                return max(0, (_dur - t) / 0.3)
+            return 1.0
+
+        clip = VideoClip(lambda t, _a=arr: _a, duration=fact_dur)
+        mclip = VideoClip(lambda t, _m=mask_arr, _d=fact_dur: _m * make_opacity(t, _d),
+                          is_mask=True, duration=fact_dur)
+
+        x_pos = (FRAME_W - canvas_w) // 2
+        y_pos = 20  # Top of screen
+        clip = clip.with_mask(mclip).with_position((x_pos, y_pos)).with_start(start_s)
+        clips.append(clip)
+
+    return clips
+
+
+# ── IMPROVEMENT #1: Floating Circular Face-Cam Frame ─────────────────────────
+def _apply_circular_facecam_frame(avatar_clip, cur_w, cur_h, accent_color, audio_duration, is_longform=False):
+    """
+    Wraps the avatar PiP in a premium circular frame with neon glow ring
+    and drop shadow. Returns a new composite clip.
+    Reference: Vaibhav Sisinty floating circular face-cam.
+    """
+    # Determine circle diameter (use the smaller dimension)
+    diameter = min(cur_w, cur_h)
+
+    # Create circular mask
+    circle_mask = np.zeros((cur_h, cur_w), dtype=np.float32)
+    cy, cx = cur_h // 2, cur_w // 2
+    Y, X = np.ogrid[:cur_h, :cur_w]
+    r = diameter // 2 - 4  # Slight inset for border
+    dist = np.sqrt((X - cx) ** 2 + (Y - cy) ** 2)
+    circle_mask[dist <= r] = 1.0
+    # Smooth edge (anti-alias)
+    edge_band = 3.0
+    circle_mask[(dist > r) & (dist <= r + edge_band)] = 1.0 - (dist[(dist > r) & (dist <= r + edge_band)] - r) / edge_band
+
+    # Apply circular mask to the avatar
+    mask_clip = VideoClip(lambda t: circle_mask, is_mask=True, duration=audio_duration)
+    avatar_clip = avatar_clip.with_mask(mask_clip)
+
+    # Create glow ring overlay
+    ring_size = diameter + 16  # Slightly larger than avatar
+    ring_img = Image.new("RGBA", (ring_size, ring_size), (0, 0, 0, 0))
+    ring_draw = ImageDraw.Draw(ring_img)
+
+    # Outer glow (soft, large)
+    for glow_r in range(8, 0, -1):
+        alpha = int(25 * (glow_r / 8))
+        ring_draw.ellipse([8 - glow_r, 8 - glow_r, ring_size - 8 + glow_r, ring_size - 8 + glow_r],
+                          outline=(*accent_color, alpha), width=2)
+
+    # Main border ring
+    ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4],
+                      outline=(*accent_color, 200), width=3)
+    # Inner subtle white ring
+    ring_draw.ellipse([7, 7, ring_size - 7, ring_size - 7],
+                      outline=(255, 255, 255, 60), width=1)
+
+    ring_arr = np.array(ring_img.convert("RGB"))
+    ring_mask = np.array(ring_img.split()[3]).astype(float) / 255.0
+
+    # Pulsing glow opacity
+    def ring_opacity(t):
+        pulse = 0.7 + 0.3 * math.sin(t * 2.0)
+        return ring_mask * pulse
+
+    ring_clip = VideoClip(lambda t: ring_arr, duration=audio_duration)
+    ring_mclip = VideoClip(ring_opacity, is_mask=True, duration=audio_duration)
+    ring_clip = ring_clip.with_mask(ring_mclip)
+
+    return avatar_clip, ring_clip, ring_size
+
+
+# ── IMPROVEMENT #7: Mid-Video Subscribe CTA ──────────────────────────────────
+def _mid_video_subscribe_prompt(accent_color, audio_duration):
+    """
+    Visual-only subscribe prompt that appears at 75% of the video.
+    Glassmorphic card with pulsing subscribe button icon.
+    Duration: 4 seconds. No spoken CTA — purely visual overlay.
+    """
+    dur = 4.0
+    start_time = audio_duration * 0.75
+    if start_time + dur > audio_duration:
+        start_time = max(0, audio_duration - dur - 2)
+
+    is_landscape = FRAME_W > FRAME_H
+    card_w = int(FRAME_W * 0.55) if is_landscape else int(FRAME_W * 0.85)
+    card_h = 160 if is_landscape else 200
+
+    def make_frame(t):
+        img = Image.new("RGBA", (card_w, card_h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+
+        # Glassmorphic background
+        draw.rounded_rectangle([0, 0, card_w, card_h], radius=24, fill=(10, 10, 18, 220))
+        # Accent border with pulse
+        pulse = 1.0 + 0.12 * math.sin(t * 6)
+        border_w = max(2, int(3 * pulse))
+        draw.rounded_rectangle([0, 0, card_w, card_h], radius=24,
+                                outline=(*accent_color, 220), width=border_w)
+
+        # Subscribe icon (red pill button)
+        btn_w, btn_h = 220, 50
+        btn_x = (card_w - btn_w) // 2
+        btn_y = 20
+        # Pulse the button
+        btn_scale = 1.0 + 0.06 * math.sin(t * 4)
+        scaled_w = int(btn_w * btn_scale)
+        scaled_h = int(btn_h * btn_scale)
+        btn_x_s = (card_w - scaled_w) // 2
+        btn_y_s = btn_y - int((scaled_h - btn_h) / 2)
+
+        draw.rounded_rectangle([btn_x_s, btn_y_s, btn_x_s + scaled_w, btn_y_s + scaled_h],
+                                radius=scaled_h // 2, fill=(220, 20, 60, 255))
+        f_btn = gf(26, bold=True)
+        draw.text((card_w // 2, btn_y_s + scaled_h // 2), "🔔 SUBSCRIBE", font=f_btn,
+                  fill=(255, 255, 255, 255), anchor="mm")
+
+        # Supporting text
+        f_text = gf(24)
+        msg = "70% of viewers aren't subscribed yet"
+        draw.text((card_w // 2, btn_y_s + scaled_h + 30), msg, font=f_text,
+                  fill=(200, 200, 210, 200), anchor="mm")
+
+        f_small = gf(20)
+        draw.text((card_w // 2, btn_y_s + scaled_h + 60), "Hit subscribe — you'll thank me later",
+                  font=f_small, fill=(160, 160, 170, 180), anchor="mm")
+
+        return np.array(img.convert("RGB"))
+
+    def make_mask(t):
+        img = Image.new("RGBA", (card_w, card_h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        draw.rounded_rectangle([0, 0, card_w, card_h], radius=24, fill=(255, 255, 255, 230))
+
+        opacity = 1.0
+        if t < 0.4:
+            opacity = t / 0.4
+        elif t > dur - 0.5:
+            opacity = max(0, (dur - t) / 0.5)
+        return np.array(img.split()[3]).astype(float) / 255.0 * opacity
+
+    clip = VideoClip(make_frame, duration=dur)
+    mclip = VideoClip(make_mask, is_mask=True, duration=dur)
+
+    x_pos = (FRAME_W - card_w) // 2
+    y_pos = int(FRAME_H * 0.10) if is_landscape else int(FRAME_H * 0.25)
+    return clip.with_mask(mclip).with_position((x_pos, y_pos)).with_start(start_time)
+
+
+# ── IMPROVEMENT #6: Value Loop Montage (Intro Teaser) ────────────────────────
+def _value_loop_montage_clips(script_json, accent_color, audio_duration):
+    """
+    Generates quick-flash teaser metric cards for the first 8-12 seconds.
+    Shows the most shocking stat from each upcoming fact as a rapid montage.
+    These overlay ON TOP of the normal intro visuals.
+    """
+    metric_popups = script_json.get("metric_popups", [])
+    if not metric_popups:
+        # Fallback: use fact_timestamps topics as teasers
+        fact_timestamps = script_json.get("fact_timestamps", [])
+        for ft in fact_timestamps[1:4]:  # Facts 2-4 as teasers
+            topic = ft.get("topic", "")
+            if topic:
+                metric_popups.append({
+                    "text": topic[:30],
+                    "timestamp": 0,
+                    "fact_number": ft.get("fact_number", 0)
+                })
+
+    if not metric_popups:
+        return []
+
+    clips = []
+    teaser_dur = 2.5  # Each teaser flash lasts 2.5s
+    current_t = 1.0  # Start after 1 second
+
+    for i, mp in enumerate(metric_popups[:4]):
+        text = mp.get("text", "")
+        if not text or current_t >= audio_duration - 5:
+            continue
+
+        # Render teaser card — giant metric text on dark overlay
+        card_w, card_h = FRAME_W, int(FRAME_H * 0.35)
+        img = Image.new("RGBA", (card_w, card_h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+
+        # Dark backdrop
+        draw.rectangle([0, 0, card_w, card_h], fill=(0, 0, 0, 180))
+
+        # Giant metric text
+        f_metric = gf(72 if FRAME_W > FRAME_H else 60, bold=True)
+        tw, th = ts(text, f_metric)
+        if tw > card_w - 80:
+            f_metric = gf(55 if FRAME_W > FRAME_H else 48, bold=True)
+            tw, th = ts(text, f_metric)
+
+        tx = (card_w - tw) // 2
+        ty = (card_h - th) // 2
+
+        # Accent color glow
+        for dx, dy in [(-2, 0), (2, 0), (0, -2), (0, 2)]:
+            draw.text((tx + dx, ty + dy), text, font=f_metric, fill=(*accent_color, 120))
+        draw.text((tx, ty), text, font=f_metric, fill=(255, 255, 255, 255))
+
+        # Fact number badge
+        f_badge = gf(22, bold=True)
+        badge_txt = f"COMING UP: FACT {mp.get('fact_number', i + 2)}"
+        btw, bth = ts(badge_txt, f_badge)
+        draw.rounded_rectangle([tx - 10, ty - bth - 20, tx + btw + 10, ty - 8],
+                                radius=8, fill=(*accent_color, 200))
+        draw.text((tx, ty - bth - 14), badge_txt, font=f_badge, fill=(255, 255, 255, 255))
+
+        arr = np.array(img.convert("RGB"))
+        mask_arr = np.array(img.split()[3]).astype(float) / 255.0
+
+        def opacity_fn(t, _dur=teaser_dur):
+            if t < 0.12:
+                return t / 0.12  # Snap in
+            elif t > _dur - 0.2:
+                return max(0, (_dur - t) / 0.2)
+            return 1.0
+
+        clip = VideoClip(lambda t, _a=arr: _a, duration=teaser_dur)
+        mclip = VideoClip(lambda t, _m=mask_arr, _d=teaser_dur: _m * opacity_fn(t, _d),
+                          is_mask=True, duration=teaser_dur)
+
+        y_pos = int(FRAME_H * 0.30)
+        clip = clip.with_mask(mclip).with_position(("center", y_pos)).with_start(current_t)
+        clips.append(clip)
+
+        current_t += teaser_dur + 0.1  # Small gap between flashes
+
+    return clips
+
+
+# ── IMPROVEMENT #4: Pattern Interrupt Helpers ────────────────────────────────
+def _generate_snap_zoom_interrupts(chunks, audio_duration, interval=5.0):
+    """
+    Generates snap-zoom timestamps every `interval` seconds.
+    These are applied per-frame in make_final_frame.
+    Returns a list of timestamps where snap-zooms should occur.
+    """
+    timestamps = []
+    t = interval
+    while t < audio_duration - 1.0:
+        # Avoid zooming during the very start or end
+        timestamps.append(t)
+        t += interval
+    return timestamps
+
+def _fact_boundary_darkener(fact_timestamps, accent_color, audio_duration):
+    """
+    Creates brief 0.6s 'chapter boundary' dark overlays at the start of each fact.
+    Dims everything to 30% then reveals the new fact badge — creates visual breathing room.
+    """
+    clips = []
+    for i, ft in enumerate(fact_timestamps):
+        if i == 0:
+            continue  # Skip first fact — intro handles this
+        start_s = float(ft.get("approx_start_seconds", 0))
+        if start_s >= audio_duration - 2:
+            continue
+        dur = 0.6
+
+        def make_frame(t):
+            return np.full((FRAME_H, FRAME_W, 3), 0, dtype=np.uint8)
+
+        def make_mask(t, _dur=dur):
+            # Quick darken then reveal
+            if t < 0.15:
+                return np.full((FRAME_H, FRAME_W), 0.7 * (t / 0.15), dtype=float)
+            elif t > _dur - 0.25:
+                return np.full((FRAME_H, FRAME_W), 0.7 * max(0, (_dur - t) / 0.25), dtype=float)
+            return np.full((FRAME_H, FRAME_W), 0.7, dtype=float)
+
+        clip = VideoClip(make_frame, duration=dur)
+        mclip = VideoClip(make_mask, is_mask=True, duration=dur)
+        clips.append(clip.with_mask(mclip).with_start(start_s))
+
+    return clips
+
+
 # ── Sync checks ───────────────────────────────────────────────────────────────
 def _sync_checks(chunks, audio_duration):
     issues = []
@@ -3065,6 +3541,26 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 # Capture scale_factor and clip_dur by value to avoid lambda-in-loop bugs
                 c_clip = c_clip.resized(lambda t, sf=scale_factor, cd=clip_dur: 1.0 + (sf - 1.0) * (t / cd))
                 c_clip = _apply_handheld_shake(c_clip)
+                
+                # Apply alternating color grade tinting (warm vs. cool) for longform
+                if is_longform:
+                    is_warm = (i % 2 == 0)
+                    def tint_frame(frame, is_w=is_warm):
+                        # frame is shape (H, W, 3) and dtype uint8
+                        frame_f = frame.astype(np.float32)
+                        if is_w:
+                            # Warm tint: slight boost to red and green channels
+                            frame_f[:, :, 0] = np.clip(frame_f[:, :, 0] * 1.04 + 3, 0, 255)
+                            frame_f[:, :, 1] = np.clip(frame_f[:, :, 1] * 1.01, 0, 255)
+                            frame_f[:, :, 2] = np.clip(frame_f[:, :, 2] * 0.96 - 3, 0, 255)
+                        else:
+                            # Cool tint: slight boost to blue and green channels
+                            frame_f[:, :, 0] = np.clip(frame_f[:, :, 0] * 0.96 - 3, 0, 255)
+                            frame_f[:, :, 1] = np.clip(frame_f[:, :, 1] * 1.01, 0, 255)
+                            frame_f[:, :, 2] = np.clip(frame_f[:, :, 2] * 1.04 + 3, 0, 255)
+                        return frame_f.astype(np.uint8)
+                    c_clip = c_clip.image_transform(tint_frame)
+                
                 c_clip = c_clip.with_start(current_start)
                 
                 bg_layer_clips.append(c_clip)
@@ -3111,8 +3607,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             
         w, h = vid_clip.size
         
-        # Avatar size: 30% for longform (less obstruction in 16:9), 40% for Shorts
-        avatar_height_pct = 0.30 if is_longform else 0.40
+        # Avatar size: 22% for longform (premium floating circle), 40% for Shorts
+        avatar_height_pct = 0.22 if is_longform else 0.40
         height_pip = int(FRAME_H * avatar_height_pct)
         width_pip = int(height_pip * (w / h))
         
@@ -3180,18 +3676,87 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             vfx.Rotate(lambda t: 0.6 * math.sin(t * 1.4 + 0.5))
         ])
 
+        # ── IMPROVEMENT #1: Circular Face-Cam Frame (Premium PiP) ─────────
+        ring_clip = None
+        ring_size = 0
+        if is_longform:
+            try:
+                avatar_clip, ring_clip, ring_size = _apply_circular_facecam_frame(
+                    avatar_clip, cur_w, cur_h, accent_color, audio_duration, is_longform=True
+                )
+                print("   ✅ Circular face-cam frame with glow ring applied.")
+            except Exception as e:
+                print(f"   ⚠️ Circular frame failed (non-fatal): {e}")
+
         def pip_position(t):
             current_scale = 1.0 + zoom_speed * t + 0.006 * math.sin(t * 1.8)
             scaled_w = int(cur_w * current_scale)
             scaled_h = int(cur_h * current_scale)
             if is_longform:
-                # Bottom-right corner for longform 16:9 with 30px margin
-                base_x = FRAME_W - scaled_w - 30
+                # Bottom-right corner for longform 16:9 with 40px margin
+                base_x = FRAME_W - scaled_w - 40
             else:
                 # Bottom-center for Shorts 9:16
                 base_x = (FRAME_W - scaled_w) // 2 + layout["avatar_x_offset"]
-            base_y = FRAME_H - scaled_h
+            base_y = FRAME_H - scaled_h - 30
             return (base_x, base_y)
+
+        # Let's collect all screenshot active intervals for longform
+        if is_longform:
+            screenshot_intervals = []
+            fact_timestamps = script_json.get("fact_timestamps", [])
+            topics = script_json.get("longform_topics", [])
+            if topics and fact_timestamps:
+                for i, ft in enumerate(fact_timestamps):
+                    start_s = float(ft.get("approx_start_seconds", 0))
+                    if i + 1 < len(fact_timestamps):
+                        end_s = float(fact_timestamps[i + 1].get("approx_start_seconds", audio_duration))
+                    else:
+                        end_s = audio_duration
+                    fact_dur = max(1.0, end_s - start_s)
+                    
+                    first_dur = min(6.0, fact_dur)
+                    if first_dur >= 1.0:
+                        screenshot_intervals.append((start_s, start_s + first_dur))
+                        
+                    if fact_dur > 18.0:
+                        sec_start = start_s + 14.0
+                        sec_dur = min(5.0, end_s - sec_start)
+                        if sec_dur >= 1.0:
+                            screenshot_intervals.append((sec_start, sec_start + sec_dur))
+            
+            def hide_avatar_during_screenshots(t):
+                # Fade out/in slightly (0.3s) at boundaries
+                for s_start, s_end in screenshot_intervals:
+                    if s_start <= t <= s_end:
+                        fade_win = 0.3
+                        if t < s_start + fade_win:
+                            return max(0.0, (s_start + fade_win - t) / fade_win)
+                        elif t > s_end - fade_win:
+                            return max(0.0, (t - (s_end - fade_win)) / fade_win)
+                        return 0.0
+                return 1.0
+
+            # Wrap the avatar's mask to apply the hiding factor
+            orig_mask = avatar_clip.mask
+            if orig_mask is not None:
+                def hide_mask_frame(t):
+                    return orig_mask.get_frame(t) * hide_avatar_during_screenshots(t)
+                avatar_clip = avatar_clip.with_mask(VideoClip(hide_mask_frame, is_mask=True, duration=audio_duration))
+                
+            # Wrap the ring's mask to apply the hiding factor
+            if ring_clip is not None and ring_clip.mask is not None:
+                orig_ring_mask = ring_clip.mask
+                def hide_ring_frame(t):
+                    return orig_ring_mask.get_frame(t) * hide_avatar_during_screenshots(t)
+                ring_clip = ring_clip.with_mask(VideoClip(hide_ring_frame, is_mask=True, duration=audio_duration))
+
+        # Position the glow ring to track the avatar
+        def ring_position(t):
+            ax, ay = pip_position(t)
+            # Center the ring around the avatar (ring is slightly larger)
+            offset = (ring_size - min(cur_w, cur_h)) // 2
+            return (ax - offset, ay - offset)
 
         avatar_pip = avatar_clip.with_position(pip_position).with_start(0)
 
@@ -3347,7 +3912,91 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     base_layers.append(disclosure)
     base_layers.extend(engagement_clips)
 
-    # ... rest of the original create_video logic continues ...
+    # ══════════════════════════════════════════════════════════════════════
+    # LONGFORM RETENTION UPGRADE: Wire in new premium visual layers
+    # ══════════════════════════════════════════════════════════════════════
+    snap_zoom_timestamps = []  # Used per-frame in make_final_frame
+    
+    if is_longform and script_json.get("longform_format") == "did_you_know":
+        fact_timestamps_lf = script_json.get("fact_timestamps", [])
+        
+        # IMPROVEMENT #1: Glow ring behind avatar PiP
+        if ring_clip is not None:
+            positioned_ring = ring_clip.with_position(ring_position).with_start(0)
+            # Insert ring BEFORE avatar in the layer stack (so it renders behind)
+            # Find avatar_pip index and insert ring before it
+            if avatar_pip in base_layers:
+                idx = base_layers.index(avatar_pip)
+                base_layers.insert(idx, positioned_ring)
+            else:
+                base_layers.append(positioned_ring)
+            print("   🔴 Glow ring layer added behind avatar.")
+
+        # IMPROVEMENT #3: Progress Dot Navigator (top-center)
+        try:
+            progress_dot_clips = _longform_progress_dots(fact_timestamps_lf, accent_color, audio_duration)
+            base_layers.extend(progress_dot_clips)
+            print(f"   ⏺ Progress dot navigator added ({len(progress_dot_clips)} segments).")
+        except Exception as e:
+            print(f"   ⚠️ Progress dots failed (non-fatal): {e}")
+
+        # IMPROVEMENT #2: Kinetic Metric Pop-Ups
+        try:
+            metric_popups = script_json.get("metric_popups", [])
+            # Fallback: extract key_stat from each fact script if no metric_popups
+            if not metric_popups:
+                fact_scripts = script_json.get("fact_scripts", [])
+                for fs in fact_scripts:
+                    key_stat = fs.get("key_stat", "")
+                    # Estimate timestamp from fact number
+                    fact_num = fs.get("fact_number", 0)
+                    est_ts = 5.0 + (fact_num - 1) * 30.0  # Rough estimate
+                    if key_stat and est_ts < audio_duration:
+                        metric_popups.append({"text": key_stat, "timestamp": est_ts})
+            
+            metric_popup_clips = []
+            for mp in metric_popups:
+                mp_clip = _kinetic_metric_popup(
+                    mp.get("text", ""), float(mp.get("timestamp", 0)),
+                    accent_color, audio_duration
+                )
+                if mp_clip:
+                    metric_popup_clips.append(mp_clip)
+            base_layers.extend(metric_popup_clips)
+            print(f"   📊 Kinetic metric pop-ups added ({len(metric_popup_clips)} metrics).")
+        except Exception as e:
+            print(f"   ⚠️ Metric pop-ups failed (non-fatal): {e}")
+
+        # IMPROVEMENT #6: Value Loop Montage (Intro Teasers)
+        try:
+            value_loop_clips = _value_loop_montage_clips(script_json, accent_color, audio_duration)
+            base_layers.extend(value_loop_clips)
+            print(f"   🎬 Value loop montage added ({len(value_loop_clips)} teasers).")
+        except Exception as e:
+            print(f"   ⚠️ Value loop montage failed (non-fatal): {e}")
+
+        # IMPROVEMENT #7: Mid-Video Subscribe CTA
+        try:
+            subscribe_cta = _mid_video_subscribe_prompt(accent_color, audio_duration)
+            if subscribe_cta:
+                base_layers.append(subscribe_cta)
+                print("   🔔 Mid-video subscribe CTA added at 75% mark.")
+        except Exception as e:
+            print(f"   ⚠️ Subscribe CTA failed (non-fatal): {e}")
+
+        # IMPROVEMENT #4: Fact Boundary Darkeners (chapter breaks)
+        try:
+            boundary_clips = _fact_boundary_darkener(fact_timestamps_lf, accent_color, audio_duration)
+            base_layers.extend(boundary_clips)
+            print(f"   🌑 Fact boundary darkeners added ({len(boundary_clips)} boundaries).")
+        except Exception as e:
+            print(f"   ⚠️ Boundary darkeners failed (non-fatal): {e}")
+
+        # IMPROVEMENT #4: Generate snap-zoom timestamps for per-frame processing
+        snap_zoom_timestamps = _generate_snap_zoom_interrupts(chunks, audio_duration, interval=5.0)
+        print(f"   ⚡ Snap-zoom interrupts scheduled ({len(snap_zoom_timestamps)} zooms every 5s).")
+
+
 
     # ── PROGRESS BAR ────────────────────────────────────────────────────────
     def get_progress_color(t):
@@ -3488,16 +4137,33 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                     bgm = bgm.subclipped(0, audio_duration)
                 
                 def ducking_volume(get_frame, t):
+                    retention_hooks = script_json.get("retention_cues", [])
                     if isinstance(t, np.ndarray):
                         vols = []
                         for time_t in t:
-                            is_speak = any(c["start"] - 0.1 <= time_t <= c["end"] + 0.1 for c in chunks)
-                            # Duck when speaking, boost when silent for 'energy'
-                            vol = BGM_VOLUME * 0.2 if is_speak else BGM_VOLUME * 1.3
-                            vols.append(vol)
+                            # IMPROVEMENT #8: Total silence at dramatic hook moments
+                            is_silence_beat = any(
+                                abs(time_t - float(cue.get("timestamp", 0))) < 0.5
+                                for cue in retention_hooks
+                                if cue.get("effect") in ("zoom_snap", "flash_accent")
+                            )
+                            if is_silence_beat:
+                                vols.append(0.0)
+                            else:
+                                is_speak = any(c["start"] - 0.1 <= time_t <= c["end"] + 0.1 for c in chunks)
+                                vol = BGM_VOLUME * 0.2 if is_speak else BGM_VOLUME * 1.3
+                                vols.append(vol)
                         multiplier = np.array(vols).reshape(-1, 1)
                         return get_frame(t) * multiplier
                     else:
+                        # IMPROVEMENT #8: Total silence at dramatic hook moments
+                        is_silence_beat = any(
+                            abs(t - float(cue.get("timestamp", 0))) < 0.5
+                            for cue in retention_hooks
+                            if cue.get("effect") in ("zoom_snap", "flash_accent")
+                        )
+                        if is_silence_beat:
+                            return get_frame(t) * 0.0
                         is_speak = any(c["start"] - 0.1 <= t <= c["end"] + 0.1 for c in chunks)
                         vol = BGM_VOLUME * 0.2 if is_speak else BGM_VOLUME * 1.3
                         return get_frame(t) * vol
@@ -3562,7 +4228,23 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             # 2. Flash Burst
             bg_frame = bg_frame.astype(np.float32)
             bg_frame = np.clip(bg_frame + 60, 0, 255).astype(np.uint8)
-            
+
+        # ── IMPROVEMENT #4: Snap-Zoom Pattern Interrupts (5-second rule) ──
+        # Quick 1.08x zoom pulse every 5 seconds to re-engage viewers
+        for sz_t in snap_zoom_timestamps:
+            delta = t - sz_t
+            if 0 <= delta < 0.3:
+                # Quick zoom in over 0.3s
+                progress = delta / 0.3
+                zoom = 1.0 + 0.08 * (1.0 - abs(progress - 0.5) * 2)  # Peak at 0.15s
+                h_f, w_f = bg_frame.shape[:2]
+                nh, nw = int(h_f / zoom), int(w_f / zoom)
+                dy, dx = (h_f - nh) // 2, (w_f - nw) // 2
+                if nh > 0 and nw > 0 and dy >= 0 and dx >= 0:
+                    cropped = bg_frame[dy:dy + nh, dx:dx + nw]
+                    bg_frame = cv2.resize(cropped, (w_f, h_f), interpolation=cv2.INTER_LINEAR)
+                break  # Only one snap-zoom at a time
+
         # ── RETENTION LAYERS: Script-Driven Engagement Cues ──────────────────
         retention_hooks = script_json.get("retention_cues", [])
         for cue in retention_hooks:
@@ -3627,49 +4309,120 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     final = VideoClip(make_final_frame, duration=audio_duration)
     final = final.with_audio(final_audio)
 
-    # ── TELEGRAM CTA V2 (Last 3s) ─────────────────────────────────────────────
-    cta_duration = 3.0
-    cta_img = Image.new("RGBA", (FRAME_W, FRAME_H), (10, 10, 15, 255))
-    cta_d = ImageDraw.Draw(cta_img)
-    
-    # 1. Topic-Sync Headline (varied per layout profile)
-    topic = script_json.get("topic", "AI")
-    cta_txt = layout["cta_headline_template"].format(topic=topic)
-    cta_d.text((FRAME_W//2, 180), cta_txt, fill=(255, 255, 255, 255), font=gf(54, bold=True), anchor="mm")
-    
-    # 2. Telegram Channel Screenshot (Top 50% Crop)
-    try:
-        brand_path = os.path.join(ASSETS_DIR, "branding", "tele_brand2.jpg")
-        if os.path.exists(brand_path):
-            brand_img = Image.open(brand_path).convert("RGBA")
-            # Crop top 50%
-            bw, bh = brand_img.size
-            brand_img = brand_img.crop((0, 0, bw, bh // 2))
-            ratio = (FRAME_W - 100) / float(brand_img.width)
-            brand_img = brand_img.resize((int(brand_img.width * ratio), int(brand_img.height * ratio)), Image.LANCZOS)
-            cta_img.alpha_composite(brand_img, (50, 320))
-    except: pass
-    
-    # 3. Link in Bio (Bottom 50%) — pill color varies per layout profile
-    pill_y = FRAME_H - 450
-    pill_color = layout["cta_pill_color"]
-    cta_d.rounded_rectangle([200, pill_y, FRAME_W - 200, pill_y + 120], radius=60, fill=(*pill_color, 255))
-    cta_d.text((FRAME_W//2, pill_y + 60), "Link in Bio", fill=(0, 0, 0, 255), font=gf(50, bold=True), anchor="mm")
-    
-    # Description (varied per layout profile)
-    cta_d.text((FRAME_W//2, pill_y + 180), layout["cta_description"], fill=(200, 200, 200, 255), font=gf(34), anchor="mm")
-
-    cta_clip = ImageClip(np.array(cta_img.convert("RGB"))).with_duration(cta_duration)
-    
-    # SFX at CTA
-    sfx_path = os.path.join(ASSETS_DIR, "sfx", "pop.wav")
-    if os.path.exists(sfx_path):
-        cta_audio = AudioFileClip(sfx_path).with_effects([afx.MultiplyVolume(0.5)])
-        silence = AudioClip(lambda t: [0,0], duration=max(0.1, cta_duration - cta_audio.duration))
-        cta_audio = concatenate_audioclips([cta_audio, silence])
-        cta_clip = cta_clip.with_audio(cta_audio)
+    # ── IMPROVEMENT #9: Seamless CTA (Longform) vs. Static CTA (Shorts) ───────
+    if is_longform:
+        # For longform: overlay CTA as a floating card during the last 5s
+        # instead of hard-cutting to a static dark card
+        cta_overlay_dur = 5.0
+        cta_start = max(0, audio_duration - cta_overlay_dur)
         
-    final = concatenate_videoclips([final, cta_clip], method="compose")
+        cta_card_w = int(FRAME_W * 0.45)
+        cta_card_h = 280
+        cta_overlay_img = Image.new("RGBA", (cta_card_w, cta_card_h), (0, 0, 0, 0))
+        cta_d = ImageDraw.Draw(cta_overlay_img)
+        
+        # Glassmorphic floating CTA card
+        cta_d.rounded_rectangle([0, 0, cta_card_w, cta_card_h], radius=20, fill=(10, 10, 18, 220))
+        cta_d.rounded_rectangle([0, 0, cta_card_w, cta_card_h], radius=20,
+                                 outline=(*accent_color, 180), width=2)
+        
+        # Topic-Sync Headline
+        topic = script_json.get("topic", "AI")
+        cta_txt = layout["cta_headline_template"].format(topic=topic)
+        cta_d.text((cta_card_w // 2, 40), cta_txt, fill=(255, 255, 255, 255),
+                   font=gf(30, bold=True), anchor="mm")
+        
+        # Telegram brand image (mini)
+        try:
+            brand_path = os.path.join(ASSETS_DIR, "branding", "tele_brand2.jpg")
+            if os.path.exists(brand_path):
+                brand_img = Image.open(brand_path).convert("RGBA")
+                bw, bh = brand_img.size
+                brand_img = brand_img.crop((0, 0, bw, bh // 2))
+                ratio = (cta_card_w - 40) / float(brand_img.width)
+                brand_img = brand_img.resize((int(brand_img.width * ratio), int(brand_img.height * ratio)), Image.LANCZOS)
+                cta_overlay_img.alpha_composite(brand_img, (20, 65))
+        except:
+            pass
+        
+        # Link in Bio pill
+        pill_y = cta_card_h - 70
+        pill_color = layout["cta_pill_color"]
+        cta_d.rounded_rectangle([30, pill_y, cta_card_w - 30, pill_y + 50], radius=25,
+                                 fill=(*pill_color, 255))
+        cta_d.text((cta_card_w // 2, pill_y + 25), "Link in Bio",
+                   fill=(0, 0, 0, 255), font=gf(28, bold=True), anchor="mm")
+        
+        cta_arr = np.array(cta_overlay_img.convert("RGB"))
+        cta_mask = np.array(cta_overlay_img.split()[3]).astype(float) / 255.0
+        
+        def cta_opacity(t):
+            if t < 0.5:
+                return t / 0.5
+            return 1.0
+        
+        cta_clip = VideoClip(lambda t, _a=cta_arr: _a, duration=cta_overlay_dur)
+        cta_mclip = VideoClip(lambda t, _m=cta_mask: _m * cta_opacity(t),
+                              is_mask=True, duration=cta_overlay_dur)
+        cta_clip = cta_clip.with_mask(cta_mclip)
+        
+        # Position: bottom-left (leaving bottom-right free for YouTube end screen)
+        cta_x = 40
+        cta_y = FRAME_H - cta_card_h - 40
+        cta_clip = cta_clip.with_position((cta_x, cta_y)).with_start(cta_start)
+        
+        # Compose the CTA overlay on top of the main video
+        final = CompositeVideoClip([final, cta_clip], size=(FRAME_W, FRAME_H)).with_duration(audio_duration)
+        final = final.with_audio(final_audio)
+        
+        # Activate the existing _next_video_tease function
+        tease_text = script_json.get("next_video_tease", "")
+        if tease_text:
+            tease_clip = _next_video_tease(tease_text, accent_color, audio_duration)
+            if tease_clip:
+                final = CompositeVideoClip([final, tease_clip], size=(FRAME_W, FRAME_H)).with_duration(audio_duration)
+                final = final.with_audio(final_audio)
+        
+        print("   ✅ Seamless CTA overlay applied (last 5s, bottom-left).")
+    else:
+        # Shorts: keep existing static CTA card behavior (appended at end)
+        cta_duration = 3.0
+        cta_img = Image.new("RGBA", (FRAME_W, FRAME_H), (10, 10, 15, 255))
+        cta_d = ImageDraw.Draw(cta_img)
+        
+        topic = script_json.get("topic", "AI")
+        cta_txt = layout["cta_headline_template"].format(topic=topic)
+        cta_d.text((FRAME_W//2, 180), cta_txt, fill=(255, 255, 255, 255), font=gf(54, bold=True), anchor="mm")
+        
+        try:
+            brand_path = os.path.join(ASSETS_DIR, "branding", "tele_brand2.jpg")
+            if os.path.exists(brand_path):
+                brand_img = Image.open(brand_path).convert("RGBA")
+                bw, bh = brand_img.size
+                brand_img = brand_img.crop((0, 0, bw, bh // 2))
+                ratio = (FRAME_W - 100) / float(brand_img.width)
+                brand_img = brand_img.resize((int(brand_img.width * ratio), int(brand_img.height * ratio)), Image.LANCZOS)
+                cta_img.alpha_composite(brand_img, (50, 320))
+        except:
+            pass
+        
+        pill_y = FRAME_H - 450
+        pill_color = layout["cta_pill_color"]
+        cta_d.rounded_rectangle([200, pill_y, FRAME_W - 200, pill_y + 120], radius=60, fill=(*pill_color, 255))
+        cta_d.text((FRAME_W//2, pill_y + 60), "Link in Bio", fill=(0, 0, 0, 255), font=gf(50, bold=True), anchor="mm")
+        
+        cta_d.text((FRAME_W//2, pill_y + 180), layout["cta_description"], fill=(200, 200, 200, 255), font=gf(34), anchor="mm")
+
+        cta_clip = ImageClip(np.array(cta_img.convert("RGB"))).with_duration(cta_duration)
+        
+        sfx_path = os.path.join(ASSETS_DIR, "sfx", "pop.wav")
+        if os.path.exists(sfx_path):
+            cta_audio = AudioFileClip(sfx_path).with_effects([afx.MultiplyVolume(0.5)])
+            silence = AudioClip(lambda t: [0,0], duration=max(0.1, cta_duration - cta_audio.duration))
+            cta_audio = concatenate_audioclips([cta_audio, silence])
+            cta_clip = cta_clip.with_audio(cta_audio)
+            
+        final = concatenate_videoclips([final, cta_clip], method="compose")
 
     print(f"Exporting {audio_duration:.1f}s → {output_path}")
     

@@ -164,6 +164,38 @@ def _render_premium_thumbnail(hook_text, bg_img, avatar_img, accent_color, width
     
     return canvas
 
+def _draw_neon_arrow(draw, start, end, accent_color, width=12):
+    """Draws a premium neon arrow pointing from start to end with glow."""
+    # 1. Outer neon glow for the line
+    for glow_w in range(width + 8, width, -2):
+        alpha = int(70 * ((width + 8 - glow_w) / 8))
+        draw.line([start, end], fill=(*accent_color, alpha), width=glow_w)
+    # Main arrow line (Crimson Red)
+    draw.line([start, end], fill=(255, 32, 32, 255), width=width)
+    
+    # 2. Calculate arrowhead points
+    dx = end[0] - start[0]
+    dy = end[1] - start[1]
+    angle = math.atan2(dy, dx)
+    
+    arrow_len = 45
+    angle_offset = math.pi / 6 # 30 degrees
+    
+    p1 = (end[0] - arrow_len * math.cos(angle - angle_offset),
+          end[1] - arrow_len * math.sin(angle - angle_offset))
+    p2 = (end[0] - arrow_len * math.cos(angle + angle_offset),
+          end[1] - arrow_len * math.sin(angle + angle_offset))
+          
+    # Outer glow for arrowhead
+    for glow_w in range(width + 6, width, -2):
+        alpha = int(70 * ((width + 6 - glow_w) / 6))
+        draw.line([p1, end], fill=(*accent_color, alpha), width=glow_w)
+        draw.line([p2, end], fill=(*accent_color, alpha), width=glow_w)
+        
+    draw.line([p1, end], fill=(255, 32, 32, 255), width=width)
+    draw.line([p2, end], fill=(255, 32, 32, 255), width=width)
+
+
 def _render_compilation_thumbnail(bg_img, avatar_img, accent_color, width, height):
     """Specialized 16:9 thumbnail for 'Did You Know' 5-fact compilations."""
     canvas = bg_img.resize((width, height), Image.LANCZOS)
@@ -215,6 +247,27 @@ def _render_compilation_thumbnail(bg_img, avatar_img, accent_color, width, heigh
     for offset in range(1, 4):
         draw.text((badge_x+offset, badge_y+offset), sub_txt, font=f_sub, fill=(0,0,0, 100))
     draw.text((badge_x, badge_y), sub_txt, font=f_sub, fill=(255, 255, 255, 255))
+
+    # 5. Draw CTR-boosting neon-red arrow pointing from center-left toward avatar
+    try:
+        arrow_start = (width // 2 - 140, height // 2 + 120)
+        arrow_end = (width - 340, height // 2 - 10)
+        _draw_neon_arrow(draw, arrow_start, arrow_end, accent_color, width=14)
+    except Exception as e:
+        print(f"⚠️ Arrow rendering failed: {e}")
+
+    # 6. Draw shocked face emoji overlay for high clickability
+    try:
+        # Load emoji using same font helper
+        f_emoji = _load_font(120, "black")
+        emoji_x = width // 2 - 190
+        emoji_y = height // 2 - 60
+        # Multi-pass drop shadow behind emoji
+        for offset in range(1, 6):
+            draw.text((emoji_x + offset, emoji_y + offset), "😱", font=f_emoji, fill=(0, 0, 0, 180))
+        draw.text((emoji_x, emoji_y), "😱", font=f_emoji, fill=(255, 255, 255, 255))
+    except Exception as e:
+        print(f"⚠️ Emoji rendering failed: {e}")
 
     # 4. Branding Accent
     draw.rectangle([0, height-15, width, height], fill=accent_color)
