@@ -210,7 +210,10 @@ def fetch_x_trending_ai_topics():
     try:
         response = requests.get(url, params=params, headers=headers, timeout=25)
         if response.status_code != 200:
-            print(f"⚠️ X.com API Error (HTTP {response.status_code}): {response.text}")
+            if response.status_code == 402:
+                print("⚠️ X.com API Error (HTTP 402): Credits Depleted. Skipping X.com fetch.")
+            else:
+                print(f"⚠️ X.com API Error (HTTP {response.status_code}): {response.text}")
             return []
             
         data = response.json()

@@ -480,6 +480,10 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
         is_unique, msg = check_story_uniqueness(title, headline, keywords, news_url)
         if not is_unique:
             print(f"⚠️ [LOOP] Safeguard: Post-loop uniqueness check failed: {msg}")
+            if headline:
+                failed_topics.append(headline)
+            if news_url:
+                failed_topics.append(news_url)
             return None
             
     return script_data
