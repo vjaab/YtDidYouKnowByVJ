@@ -190,6 +190,10 @@ ASSEMBLY RULES:
    "Which one shocked you the most? Drop it in the comments! Follow me on Telegram for daily AI facts just like these... link is on my channel home page. And subscribe for more mind-blowing AI content!"
 7. TOTAL WORD COUNT: {min_words}-{max_words} words (for ~3 minutes at ~2.7 words/second).
 8. CRITICAL SUBTITLE RULE: The `subtitle_chunks` array MUST break the script down into extremely small chunks of EXACTLY 1 to 3 words maximum. Do not generate long sentences for subtitles.
+9. DYNAMIC ATTRACTIVE TITLES: The generated "title" and "title_options" MUST be extremely attractive, high-CTR, click-enticing titles (max 65 chars, with 1 emoji) designed dynamically around the most shocking or mind-blowing topics covered in this specific script's 5 facts (e.g. referencing a specific company, fear factor, or insane capability, rather than generic placeholders). Make them custom and highly relevant to your actual news content. Use high-performing dynamic formats such as:
+   - "5 AI Facts That [Shocking/Fear Action] (e.g., '5 AI Facts That Keep Engineers Awake At Night 💀')"
+   - "5 [Intensity] AI Discoveries That [Benefit/Shock] (e.g., '5 INSANE AI Facts Nobody Is Telling You 🤫')"
+   - "This AI Fact [Curiosity Action] (e.g., '5 AI Facts That Prove The Future Is Already Here 🤖')"
 
 Return ONLY this exact JSON:
 {{
