@@ -2888,7 +2888,7 @@ def _longform_topic_transition_clips(script_json, audio_duration):
             
             # Create video clip
             card_clip = ImageClip(arr_rgb, duration=dur)
-            mask_clip = VideoClip(lambda t, cd=dur: arr_mask, is_mask=True, duration=cd)
+            mask_clip = VideoClip(lambda t: arr_mask, is_mask=True, duration=dur)
             card_clip = card_clip.with_mask(mask_clip)
             
             # Dynamic entrance animation (zoom-in ease effect)
@@ -4123,8 +4123,9 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             positioned_ring = ring_clip.with_position(ring_position).with_start(0)
             # Insert ring BEFORE avatar in the layer stack (so it renders behind)
             # Find avatar_pip index and insert ring before it
-            if avatar_pip in base_layers:
-                idx = base_layers.index(avatar_pip)
+            # Find index using identity check to avoid MoviePy's buggy Clip.__eq__
+            idx = next((i for i, clip in enumerate(base_layers) if clip is avatar_pip), -1)
+            if idx != -1:
                 base_layers.insert(idx, positioned_ring)
             else:
                 base_layers.append(positioned_ring)
