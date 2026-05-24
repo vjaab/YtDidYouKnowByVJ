@@ -3807,8 +3807,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             
         w, h = vid_clip.size
         
-        # Avatar size: 22% for longform (premium floating circle), 40% for Shorts
-        avatar_height_pct = 0.22 if is_longform else 0.40
+        # Avatar size: 60% for longform (premium centered presenter), 40% for Shorts
+        avatar_height_pct = 0.60 if is_longform else 0.40
         height_pip = int(FRAME_H * avatar_height_pct)
         width_pip = int(height_pip * (w / h))
         
@@ -3881,7 +3881,9 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         # ── IMPROVEMENT #1: Circular Face-Cam Frame (Premium PiP) ─────────
         ring_clip = None
         ring_size = 0
-        if is_longform:
+        # Disabled circular facecam for longform to create a centered talking-head presenter
+        # standing in front of background visuals, matching the explainer style of the reference video.
+        if is_longform and False:
             try:
                 avatar_clip, ring_clip, ring_size = _apply_circular_facecam_frame(
                     avatar_clip, cur_w, cur_h, accent_color, audio_duration, is_longform=True
@@ -3895,12 +3897,13 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             scaled_w = int(cur_w * current_scale)
             scaled_h = int(cur_h * current_scale)
             if is_longform:
-                # Bottom-right corner for longform 16:9 with 40px margin
-                base_x = FRAME_W - scaled_w - 40
+                # Center horizontally for longform 16:9 like a news anchor / central explainer host
+                base_x = (FRAME_W - scaled_w) // 2
+                base_y = FRAME_H - scaled_h
             else:
                 # Bottom-center for Shorts 9:16
                 base_x = (FRAME_W - scaled_w) // 2 + layout["avatar_x_offset"]
-            base_y = FRAME_H - scaled_h - 30
+                base_y = FRAME_H - scaled_h - 30
             return (base_x, base_y)
 
         # Let's collect all screenshot active intervals for longform
