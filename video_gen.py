@@ -2851,8 +2851,8 @@ def _longform_topic_transition_clips(script_json, audio_duration):
             # Neon border highlight (Electric Cyan)
             draw.rounded_rectangle([card_x1, card_y1, card_x2, card_y2], radius=24, outline=(0, 240, 255, 180), width=4)
             
-            # 2. Draw "TOPIC X OF 5" tracker
-            label_text = f"TOPIC 0{fact_num} OF 5"
+            # 2. Draw "FACT X OF 5" tracker
+            label_text = f"FACT #{fact_num} OF 5"
             label_font = gf(24, bold=True)
             draw.text((FRAME_W // 2, card_y1 + 60), label_text, font=label_font, fill=(0, 240, 255, 255), anchor="mm")
             
@@ -3800,7 +3800,9 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             vid_clip = vid_clip.cropped(x1=x1, y1=0, x2=x1+new_w, y2=h)
         else:
             new_h = int(w / target_aspect)
-            y1 = (h - new_h) // 2
+            # Shift the vertical crop window upwards to ensure face and hair are fully visible
+            # in the circular PiP instead of being cut off at the top
+            y1 = int((h - new_h) * 0.12) if h > new_h else 0
             vid_clip = vid_clip.cropped(x1=0, y1=y1, x2=w, y2=y1+new_h)
             
         w, h = vid_clip.size

@@ -52,7 +52,10 @@ GOLDEN RULES:
 7. PERSONAL STAKES: At least 2 of the 5 facts MUST explain how this affects the viewer personally (job, privacy, daily life).
 8. CTA: The final 10 seconds = provocative question + "Follow me on Telegram for daily AI facts. Link is on my channel home page. And subscribe for more mind-blowing AI content!"
 9. NO INFOGRAPHICS: Do not include infographics, flowcharts, or slides in the script structure.
-10. CLARITY OVER JARGON: If you use a complex term like 'Quantization', follow it immediately with a simple 3-word analogy (e.g., '...essentially data compression')."""
+10. CLARITY OVER JARGON: If you use a complex term like 'Quantization', follow it immediately with a simple 3-word analogy (e.g., '...essentially data compression').
+11. SUBJECT CLARITY: Always clearly state the primary subject name (e.g., "Ferrari", "IBM") in the first 2 seconds of each fact's hook. Never start with a dangling verb or pronoun without naming the subject aloud first.
+12. COMPLETE SENTENCES: Every single sentence MUST be grammatically complete and fully resolved. Never truncate, cut short, or leave a thought unfinished.
+13. SMOOTH PHRASING: Avoid awkward phrasing or word salads. Read the script internally to ensure extremely smooth, professional tech-journalist transitions (e.g., write "The next voice-phishing attack..." instead of "Next fishing attack...")."""
 
 
 TOPIC_DISCOVERY_TEMPLATE = """{persona}
@@ -182,10 +185,11 @@ ASSEMBLY RULES:
 2. Ensure bridges between facts feel NATURAL, not forced. Remove redundant transitions.
 3. MAINTAIN escalating intensity (Fact 1 = warm, Fact 5 = mind-blown).
 4. At approximately the halfway point (after Fact 3), insert a meta-comment like: "And this next one... this is the one that kept ME up last night."
-5. OUTRO (10s): After Fact 5, add the CTA:
+5. FACT SIGNPOSTS: Each fact segment in the script MUST explicitly start with the spoken signpost 'Fact number [one/two/three/four/five].' followed by a comma or ellipsis for a natural pause (e.g., "Fact number one. Did you know..." or "Fact number two... Ferrari is using...").
+6. OUTRO (10s): After Fact 5, add the CTA:
    "Which one shocked you the most? Drop it in the comments! Follow me on Telegram for daily AI facts just like these... link is on my channel home page. And subscribe for more mind-blowing AI content!"
-6. TOTAL WORD COUNT: {min_words}-{max_words} words (for ~3 minutes at ~2.7 words/second).
-7. CRITICAL SUBTITLE RULE: The `subtitle_chunks` array MUST break the script down into extremely small chunks of EXACTLY 1 to 3 words maximum. Do not generate long sentences for subtitles.
+7. TOTAL WORD COUNT: {min_words}-{max_words} words (for ~3 minutes at ~2.7 words/second).
+8. CRITICAL SUBTITLE RULE: The `subtitle_chunks` array MUST break the script down into extremely small chunks of EXACTLY 1 to 3 words maximum. Do not generate long sentences for subtitles.
 
 Return ONLY this exact JSON:
 {{
@@ -253,6 +257,8 @@ OPTIMIZATIONS:
 5. Remove ALL filler: "basically", "essentially", "actually", "literally", "so".
 6. Add vocal dynamics: commas, ellipses, exclamation marks, ALL CAPS on key words.
 7. Verify TOTAL word count is between {min_words} and {max_words}.
+8. DO NOT remove the spoken "Fact number [one/two/three/four/five]" signposts at the start of each fact segment.
+9. COMPLETE SENTENCES: Ensure every single sentence remains grammatically complete and fully resolved. Never truncate, cut off, or leave a phrase half-finished.
 
 ASSEMBLED SCRIPT:
 {assembled_script}

@@ -62,11 +62,18 @@ def format_longform_description(script_data, hashtags):
     
     # Build timestamps section
     timestamps_str = "📌 TIMESTAMPS:\n"
+    timestamps_str += "0:00 — Introduction / Hook\n"
+    last_start = 0
     for ft in fact_timestamps:
         approx_s = ft.get("approx_start_seconds", 0)
         m, s = divmod(int(approx_s), 60)
-        topic = ft.get("topic", f"Fact {ft.get('fact_number', '?')}")[:50]
-        timestamps_str += f"{m}:{s:02d} — {topic}\n"
+        fact_num = ft.get("fact_number", "?")
+        topic = ft.get("topic", f"Fact {fact_num}")[:50]
+        timestamps_str += f"{m}:{s:02d} — Fact {fact_num}: {topic}\n"
+        last_start = max(last_start, approx_s)
+        
+    m_out, s_out = divmod(int(last_start + 35), 60)
+    timestamps_str += f"{m_out}:{s_out:02d} — Outro & Discussion\n"
     
     # Build sources section
     sources_str = "📚 SOURCES:\n"
@@ -82,49 +89,50 @@ def format_longform_description(script_data, hashtags):
     template_idx = desc_seed % 3
 
     templates = [
-        f"""🧠 {description_ai}
+        f"""📲 Get daily AI news drops before they trend:
+🚀 Telegram → https://t.me/technewsbyvj
+💬 WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
+━━━━━━━━━━━━━━━━━━━━━━
+🧠 {description_ai}
 
 {timestamps_str}
 ━━━━━━━━━━━━━━━━━━━━━━
 {sources_str}
 ━━━━━━━━━━━━━━━━━━━━━━
-🚀 Get daily AI news before it trends:
-📲 Telegram → https://t.me/technewsbyvj
-💬 WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
-💼 LinkedIn → https://www.linkedin.com/in/vijayakumar-j/
+💼 VJ LinkedIn: https://www.linkedin.com/in/vijayakumar-j/
 
 ⚠️ DISCLOSURE: This video uses AI-assisted production tools (TTS voiceover, AI-generated visuals). All editorial opinions, topic selection, and analysis are by VJ.
 
 {hashtag_str}
 #DidYouKnow #AIFacts #TechFacts #ArtificialIntelligence #MachineLearning""",
 
-        f"""⚡ 5 AI facts that will blow your mind — all from the last 48 hours.
+        f"""📲 Join the community for daily AI intelligence:
+🚀 Telegram: https://t.me/technewsbyvj
+💬 WhatsApp: https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
+━━━━━━━━━━━━━━━━━━━━━━
+⚡ 5 AI facts that will blow your mind — all from the last 48 hours.
 
 {timestamps_str}
 {sources_str}
 ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
-📬 Join the community for daily AI intelligence:
-→ Telegram: https://t.me/technewsbyvj
-→ WhatsApp: https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
-→ LinkedIn: https://www.linkedin.com/in/vijayakumar-j/
+💼 LinkedIn: https://www.linkedin.com/in/vijayakumar-j/
 
 ⚠️ DISCLOSURE: AI tools are used in production (voiceover, visuals). Topic selection, research, and commentary by VJ.
 
 {hashtag_str}
 #AI #DidYouKnow #TechNews #DeepLearning #Innovation""",
 
-        f"""👆 Which fact shocked you the most? Comment the number!
+        f"""📲 Direct Links to Communities:
+🚀 Telegram → https://t.me/technewsbyvj
+💬 WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
+━━━━━━━━━━━━━━━━━━━━━━
+👆 Which fact shocked you the most? Comment the number!
 
 {timestamps_str}
 ━━━━━━━━━━━━━━━━━━━━━━
 {sources_str}
-🏗️ Follow for more daily AI compilations:
-• 5 mind-blowing facts every day
-• Curated by VJ — no fluff, no filler
-
-📲 https://t.me/technewsbyvj
-💬 https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
-💼 https://www.linkedin.com/in/vijayakumar-j/
+━━━━━━━━━━━━━━━━━━━━━━
+💼 LinkedIn: https://www.linkedin.com/in/vijayakumar-j/
 
 ⚠️ DISCLOSURE: AI-assisted production (voiceover, visuals). Editorial direction & analysis by VJ.
 
