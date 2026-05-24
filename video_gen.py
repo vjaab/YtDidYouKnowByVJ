@@ -3820,7 +3820,6 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         # ── AI BACKGROUND REMOVAL (Premium Mode - Highly Optimized) ───────
         try:
             from rembg import remove, new_session
-            import cv2
             print("👤 Initializing AI Background Removal (Optimized Mode)...")
             
             # Use a persistent session to optimize speed across frames
@@ -3840,12 +3839,6 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             h_mask, w_mask = static_mask.shape
             watermark_height = int(h_mask * 0.12)
             static_mask[-watermark_height:, :] = 0.0
-            
-            # Dilate mask slightly to prevent any head bobs or lip-sync movements from being cut off
-            binary_mask = (static_mask * 255.0).astype(np.uint8)
-            kernel = np.ones((15, 15), np.uint8)
-            dilated_binary = cv2.dilate(binary_mask, kernel, iterations=1)
-            static_mask = (dilated_binary / 255.0).astype(np.float32)
             
             mclip = VideoClip(lambda t: static_mask, is_mask=True, duration=audio_duration)
             avatar_clip = avatar_clip.with_mask(mclip)
