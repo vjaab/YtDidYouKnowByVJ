@@ -3767,17 +3767,26 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 print(f"Failed to load background img {vp}: {e}")
 
     # ── AVATAR VIDEO PiP ──────────────────────────────────────────────────
-    print("Preparing Dimension Avatar PiP...")
-    lipsync_path = script_json.get("kaggle_lipsync_path")
-    face_template = script_json.get("lipsync_face_path") or os.path.join(ASSETS_DIR, "video", "Firefly_video_final.mp4")
+    # Skip avatar entirely when Kaggle GPU fallback was used (no lip-sync available)
+    skip_avatar = script_json.get("skip_avatar", False)
     
-    if not lipsync_path or not os.path.exists(lipsync_path):
-        lipsync_path = _generate_lipsync_video(audio_path, face_template)
+    if skip_avatar:
+        print("⏭️ Skipping Avatar PiP (Kaggle GPU fallback — no lip-sync available).")
+        avatar_pip = None
+        ring_clip = None
+        ring_size = 0
+        lipsync_path = None
+    else:
+        print("Preparing Dimension Avatar PiP...")
+        lipsync_path = script_json.get("kaggle_lipsync_path")
+        face_template = script_json.get("lipsync_face_path") or os.path.join(ASSETS_DIR, "video", "Firefly_video_final.mp4")
+    
+        if not lipsync_path or not os.path.exists(lipsync_path):
+            lipsync_path = _generate_lipsync_video(audio_path, face_template)
         
-    avatar_video_path = lipsync_path if lipsync_path else face_template
+        avatar_video_path = lipsync_path if lipsync_path else face_template
 
-    avatar_pip = None
-    if os.path.exists(avatar_video_path):
+    if not skip_avatar and os.path.exists(avatar_video_path):
         vid_clip = VideoFileClip(avatar_video_path)
         if vid_clip.duration < audio_duration:
             vid_clip = vid_clip.with_effects([vfx.Loop(duration=audio_duration)])

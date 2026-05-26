@@ -265,7 +265,20 @@ def run_longform_pipeline(dry_run=False):
         if has_kaggle and not use_local_only:
             log_message("Attempting Kaggle GPU handover for audio + lip-sync...")
             results = trigger_kaggle_gpu_job(script_data, custom_map)
-            if results:
+            
+            # Check if Kaggle returned a structured error (dict with "error" key)
+            kaggle_failed = False
+            if results is None:
+                kaggle_failed = True
+                log_message("❌ Kaggle Handover returned None (unexpected failure).")
+            elif isinstance(results, dict) and "error" in results:
+                kaggle_failed = True
+                error_type = results["error"]
+                error_msg = results.get("message", "Unknown")
+                log_message(f"❌ Kaggle Handover failed: [{error_type}] {error_msg}")
+            
+            if not kaggle_failed:
+                # Kaggle succeeded — use its results
                 audio_path = results.get("audio_path")
                 duration = results.get("duration")
                 word_timestamps = results.get("word_timestamps")
@@ -285,9 +298,25 @@ def run_longform_pipeline(dry_run=False):
                     attempts += 1
                     continue
             else:
-                log_message("❌ Kaggle Handover failed or job reported an error.")
-                attempts += 1
-                continue
+                # ── FALLBACK: Generate audio via cloud TTS (no GPU needed) ──
+                log_message("🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...")
+                log_message("⚠️ Lip-sync and avatar will be SKIPPED for this video (requires GPU).")
+                
+                try:
+                    notify_telegram(
+                        f"🔄 Kaggle GPU fallback activated (Long-form)\n\n"
+                        f"Using cloud TTS instead. Avatar/lip-sync skipped.\n"
+                        f"Title: {script_data.get('title', 'Unknown')}",
+                        "⚠️"
+                    )
+                except Exception:
+                    pass
+                
+                audio_path, duration, word_timestamps = generate_voiceover(
+                    script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY
+                )
+                script_data["kaggle_lipsync_path"] = None  # No lip-sync available
+                script_data["skip_avatar"] = True           # Skip avatar PiP in video render
         else:
             # Local fallback: generate audio without Kaggle GPU
             audio_path, duration, word_timestamps = generate_voiceover(

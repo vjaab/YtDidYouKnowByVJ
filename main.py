@@ -324,10 +324,24 @@ def run_pipeline(topic_type="research"):
         
         has_kaggle = os.path.exists(os.path.expanduser("~/.kaggle/kaggle.json"))
         use_local_only = os.environ.get("USE_LOCAL_ONLY") == "true"
+        kaggle_fallback_used = False
         
         if has_kaggle and not use_local_only:
             results = trigger_kaggle_gpu_job(script_data, custom_map)
-            if results:
+            
+            # Check if Kaggle returned a structured error (new: dict with "error" key)
+            kaggle_failed = False
+            if results is None:
+                kaggle_failed = True
+                log_message("❌ Kaggle Handover returned None (unexpected failure).")
+            elif isinstance(results, dict) and "error" in results:
+                kaggle_failed = True
+                error_type = results["error"]
+                error_msg = results.get("message", "Unknown")
+                log_message(f"❌ Kaggle Handover failed: [{error_type}] {error_msg}")
+            
+            if not kaggle_failed:
+                # Kaggle succeeded — use its results
                 audio_path = results.get("audio_path")
                 duration = results.get("duration")
                 word_timestamps = results.get("word_timestamps")
@@ -347,8 +361,27 @@ def run_pipeline(topic_type="research"):
                     log_message("❌ Kaggle job finished but critical audio output is missing.")
                     return False
             else:
-                log_message("❌ Kaggle Handover failed or job reported an error.")
-                return False
+                # ── FALLBACK: Generate audio via cloud TTS (no GPU needed) ──
+                log_message("🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...")
+                log_message("⚠️ Lip-sync will be SKIPPED for this video (requires GPU).")
+                
+                try:
+                    from telegram_selector import notify_telegram
+                    notify_telegram(
+                        f"🔄 Kaggle GPU fallback activated\n\n"
+                        f"Using cloud TTS instead. Lip-sync skipped.\n"
+                        f"Topic: {script_data.get('original_news_headline', 'Unknown')}",
+                        "⚠️"
+                    )
+                except Exception:
+                    pass
+                
+                audio_path, duration, word_timestamps = generate_voiceover(
+                    script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY
+                )
+                script_data["kaggle_lipsync_path"] = None  # No lip-sync available
+                script_data["skip_avatar"] = True           # Skip avatar PiP in video render
+                kaggle_fallback_used = True
         else:
             audio_path, duration, word_timestamps = generate_voiceover(script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY)
         
