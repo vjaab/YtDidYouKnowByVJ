@@ -366,7 +366,6 @@ def run_pipeline(topic_type="research"):
                 log_message("⚠️ Lip-sync will be SKIPPED for this video (requires GPU).")
                 
                 try:
-                    from telegram_selector import notify_telegram
                     notify_telegram(
                         f"🔄 Kaggle GPU fallback activated\n\n"
                         f"Using cloud TTS instead. Lip-sync skipped.\n"
