@@ -3826,32 +3826,50 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         cur_h = max(1, int(height_pip * avatar_scale_mult))
         avatar_clip = vid_clip.resized((cur_w, cur_h)).without_audio()
 
-        # ── AI BACKGROUND REMOVAL (Premium Mode - Highly Optimized) ───────
+        # ── AI BACKGROUND REMOVAL (Premium Mode - Highly Optimized & Dynamic) ───────
         try:
             from rembg import remove, new_session
-            print("👤 Initializing AI Background Removal (Optimized Mode)...")
+            print("👤 Initializing AI Background Removal (Dynamic Mode)...")
             
-            # Use a persistent session to optimize speed across frames
-            rembg_session = new_session()
+            # Use u2net_human_seg for faster and highly precise human segmentation
+            rembg_session = new_session(model_name="u2net_human_seg")
             
-            # Extract first frame to build high-quality static mask
-            first_frame = avatar_clip.get_frame(0.0)
-            rgba = remove(
-                first_frame,
-                session=rembg_session,
-                alpha_matting=False, # Disabled alpha matting to fix Cholesky solver crashes & severe CPU bottlenecks
-                post_process_mask=True # Keeps edges clean without the massive performance hit
-            )
-            static_mask = (rgba[:, :, 3] / 255.0).astype(np.float32)
+            # Keep a reference to the unmasked avatar clip for frame extraction
+            unmasked_avatar = avatar_clip
             
-            # Erase the bottom 12% of the mask to completely hide the Gemini/Veo watermark logo
-            h_mask, w_mask = static_mask.shape
-            watermark_height = int(h_mask * 0.12)
-            static_mask[-watermark_height:, :] = 0.0
+            # Memoize computed masks to avoid redundant rembg processing
+            mask_cache = {}
+            fps = getattr(vid_clip, "fps", 30.0) or 30.0
             
-            mclip = VideoClip(lambda t: static_mask, is_mask=True, duration=audio_duration)
+            def make_mask_frame(t):
+                # cache by integer frame index
+                frame_idx = int(round(t * fps))
+                if frame_idx in mask_cache:
+                    return mask_cache[frame_idx]
+                
+                # Get the unmasked frame
+                frame = unmasked_avatar.get_frame(t)
+                
+                # Perform dynamic background removal
+                rgba = remove(
+                    frame,
+                    session=rembg_session,
+                    alpha_matting=False,
+                    post_process_mask=True
+                )
+                mask = (rgba[:, :, 3] / 255.0).astype(np.float32)
+                
+                # Erase the bottom 12% of the mask to completely hide the Gemini/Veo watermark logo
+                h_mask, w_mask = mask.shape
+                watermark_height = int(h_mask * 0.12)
+                mask[-watermark_height:, :] = 0.0
+                
+                mask_cache[frame_idx] = mask
+                return mask
+            
+            mclip = VideoClip(make_mask_frame, is_mask=True, duration=audio_duration)
             avatar_clip = avatar_clip.with_mask(mclip)
-            print("   ✅ Optimized static avatar mask applied successfully (1000x rendering speedup).")
+            print("   ✅ Dynamic AI background removal mask applied successfully (frame-by-frame).")
             
         except Exception as e:
             print(f"⚠️ rembg failed: {e}. Falling back to Rounded Authority Card.")
