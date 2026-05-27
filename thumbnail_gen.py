@@ -13,6 +13,7 @@ import io
 import math
 import random
 import textwrap
+import hashlib
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 from datetime import datetime
@@ -20,6 +21,7 @@ from google import genai
 from google.genai import types
 from rembg import remove
 from config import OUTPUT_DIR, ASSETS_DIR, GEMINI_API_KEY
+import cv2
 
 THUMB_W, THUMB_H = 1280, 720
 SHORTS_W, SHORTS_H = 1080, 1920
@@ -244,24 +246,202 @@ def _draw_multi_tier_glow(canvas, av_res, pos, accent_color):
 
 # ── IMAGE PROCESSING ─────────────────────────────────────────────────────────
 
-def _process_avatar():
-    """Removes background from the user avatar and optimizes it for overlay."""
-    if not os.path.exists(AVATAR_PATH):
-        print("⚠️ Avatar not found at", AVATAR_PATH)
-        return None
+def _process_avatar_still(avatar_path=None, still_time=1.0):
+    """
+    Extracts an avatar frame (if video) or loads a static image,
+    removes the background using rembg with local caching, and returns the cutout PIL Image.
+    """
+    if not avatar_path:
+        avatar_path = AVATAR_PATH
+        
+    if not os.path.exists(avatar_path):
+        print(f"⚠️ Avatar not found at: {avatar_path}. Falling back to default AVATAR_PATH.")
+        avatar_path = AVATAR_PATH
+        if not os.path.exists(avatar_path):
+            print("⚠️ Default avatar not found at", AVATAR_PATH)
+            return None
+
+    # Setup cutout cache directory
+    cache_dir = os.path.join(OUTPUT_DIR, ".avatar_cutout_cache")
+    os.makedirs(cache_dir, exist_ok=True)
+
+    # Compute a unique cache key based on path & timestamp
+    path_hash = hashlib.md5(f"{os.path.abspath(avatar_path)}_{still_time}".encode('utf-8')).hexdigest()
+    cache_file = os.path.join(cache_dir, f"cutout_{path_hash}.png")
+
+    if os.path.exists(cache_file):
+        try:
+            print(f"🎯 Loading cached avatar cutout: {cache_file}")
+            return Image.open(cache_file).convert("RGBA")
+        except Exception as e:
+            print(f"⚠️ Failed to load cached cutout: {e}. Re-processing...")
+
+    print(f"👤 Processing avatar still from: {avatar_path} (time={still_time}s)...")
     try:
-        print("👤 Processing avatar (background removal)...")
-        input_img = Image.open(AVATAR_PATH)
-        # Remove background using rembg
+        input_img = None
+        ext = os.path.splitext(avatar_path)[1].lower()
+        
+        # If it's a video, extract frame at still_time using cv2
+        if ext in ['.mp4', '.avi', '.mov', '.mkv', '.webm']:
+            cap = cv2.VideoCapture(avatar_path)
+            fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
+            frame_idx = int(still_time * fps)
+            cap.set(cv2.CAP_PROP_POS_FRAMES, frame_idx)
+            success, frame = cap.read()
+            if not success:
+                # Fallback: try reading the first frame
+                cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                success, frame = cap.read()
+            
+            if success:
+                # Convert BGR (cv2 default) to RGB
+                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                input_img = Image.fromarray(frame_rgb)
+            cap.release()
+            
+            if input_img is None:
+                raise Exception("Failed to extract frame from video.")
+        else:
+            # It's a static image
+            input_img = Image.open(avatar_path).convert("RGBA")
+            
+        print("🪄 Removing background via rembg...")
         output_img = remove(input_img)
+        
+        # Save to cache
+        output_img.save(cache_file, "PNG")
         return output_img
     except Exception as e:
         print(f"⚠️ Avatar processing failed: {e}")
-        return None
+        # Final fallback, try loading as static image if possible
+        try:
+            return Image.open(avatar_path).convert("RGBA")
+        except:
+            return None
+
+def _draw_logo_badges(canvas, script_json, accent_color, is_shorts=False):
+    """
+    Renders premium glassmorphic HUD logo badges on the canvas.
+    """
+    overlay = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+    w, h = canvas.size
+    
+    # Gather logos from script_json
+    logo_list = []
+    
+    single_logo = script_json.get("logo_path")
+    if single_logo:
+        logo_list.append({"path": single_logo, "position": "top_left", "label": "AUTHORITY SYSTEM"})
+        
+    json_logos = script_json.get("logos")
+    if json_logos:
+        if isinstance(json_logos, list):
+            for l in json_logos:
+                if isinstance(l, dict) and "path" in l:
+                    logo_list.append({
+                        "path": l["path"],
+                        "position": l.get("position", "top_left"),
+                        "label": l.get("label", "")
+                    })
+                elif isinstance(l, str):
+                    logo_list.append({"path": l, "position": "top_left", "label": ""})
+                    
+    # Default fallback: if no logos specified, let's auto-overlay assets/logo.png in top_left
+    if not logo_list:
+        default_logo = os.path.join(ASSETS_DIR, "logo.png")
+        if os.path.exists(default_logo):
+            logo_list.append({"path": default_logo, "position": "top_left", "label": "GEN NEWS"})
+
+    for logo_spec in logo_list:
+        path = logo_spec["path"]
+        pos_name = logo_spec["position"]
+        label = logo_spec["label"]
+        
+        if not os.path.exists(path):
+            # Check if it's in assets/icons/ or assets/
+            for cand in [os.path.join(ASSETS_DIR, "icons", path), os.path.join(ASSETS_DIR, path)]:
+                if os.path.exists(cand):
+                    path = cand
+                    break
+            else:
+                print(f"⚠️ Logo file not found: {path}")
+                continue
+                
+        try:
+            logo_img = Image.open(path).convert("RGBA")
+        except Exception as e:
+            print(f"⚠️ Failed to load logo {path}: {e}")
+            continue
+            
+        # Draw badge depending on position
+        if is_shorts:
+            logo_h = 50
+            scale = logo_h / logo_img.height
+            logo_w = int(logo_img.width * scale)
+            logo_res = logo_img.resize((logo_w, logo_h), Image.LANCZOS)
+            
+            px, py = 50, 60
+            draw.rounded_rectangle([px - 15, py - 10, px + logo_w + 15, py + logo_h + 10], radius=8, fill=(10, 10, 15, 180), outline=(*accent_color, 120), width=1)
+            overlay.paste(logo_res, (px, py), mask=logo_res)
+        else:
+            if pos_name == "top_left":
+                logo_h = 42
+                scale = logo_h / logo_img.height
+                logo_w = int(logo_img.width * scale)
+                logo_res = logo_img.resize((logo_w, logo_h), Image.LANCZOS)
+                
+                px = 60
+                py = 50
+                
+                font_label = _load_font(14, "extrabold")
+                label_w = 0
+                if label:
+                    label_w, _ = _text_size(label, font_label)
+                    label_w += 20
+                    
+                badge_w = logo_w + 30 + label_w
+                badge_h = logo_h + 20
+                
+                box_coords = [px - 15, py - 10, px + badge_w - 15, py + badge_h - 10]
+                draw.rounded_rectangle(box_coords, radius=10, fill=(10, 10, 15, 210), outline=(*accent_color, 140), width=2)
+                
+                overlay.paste(logo_res, (px, py), mask=logo_res)
+                
+                if label:
+                    draw.text((px + logo_w + 12, py + 12), label, font=font_label, fill=(255, 255, 255, 230))
+                    
+            elif pos_name == "bottom_left":
+                logo_h = 38
+                scale = logo_h / logo_img.height
+                logo_w = int(logo_img.width * scale)
+                logo_res = logo_img.resize((logo_w, logo_h), Image.LANCZOS)
+                
+                px = 60
+                py = h - 85
+                
+                box_coords = [px - 12, py - 8, px + logo_w + 12, py + logo_h + 8]
+                draw.rounded_rectangle(box_coords, radius=8, fill=(10, 10, 15, 190), outline=(255, 255, 255, 60), width=1)
+                overlay.paste(logo_res, (px, py), mask=logo_res)
+                
+            elif pos_name == "top_right":
+                logo_h = 35
+                scale = logo_h / logo_img.height
+                logo_w = int(logo_img.width * scale)
+                logo_res = logo_img.resize((logo_w, logo_h), Image.LANCZOS)
+                
+                px = w - logo_w - 300
+                py = 42
+                
+                box_coords = [px - 12, py - 8, px + logo_w + 12, py + logo_h + 8]
+                draw.rounded_rectangle(box_coords, radius=8, fill=(10, 10, 15, 190), outline=(*accent_color, 100), width=1)
+                overlay.paste(logo_res, (px, py), mask=logo_res)
+
+    return Image.alpha_composite(canvas.convert("RGBA"), overlay).convert("RGB")
 
 # ── RENDERING ─────────────────────────────────────────────────────────────────
 
-def _render_premium_thumbnail(hook_text, bg_img, avatar_img, accent_color, width, height, is_shorts=False):
+def _render_premium_thumbnail(hook_text, bg_img, avatar_img, accent_color, width, height, script_json=None, is_shorts=False):
     canvas = bg_img.resize((width, height), Image.LANCZOS)
     # Darken background slightly for text readability
     canvas = ImageEnhance.Brightness(canvas).enhance(0.7)
@@ -337,6 +517,10 @@ def _render_premium_thumbnail(hook_text, bg_img, avatar_img, accent_color, width
     draw = ImageDraw.Draw(canvas)
     draw.rectangle([0, height-15, width, height], fill=accent_color)
     
+    # 5. Render Logos
+    if script_json:
+        canvas = _draw_logo_badges(canvas, script_json, accent_color, is_shorts=is_shorts)
+        
     return canvas
 
 def _draw_neon_arrow(draw, start, end, accent_color, width=12):
@@ -371,7 +555,7 @@ def _draw_neon_arrow(draw, start, end, accent_color, width=12):
     draw.line([p2, end], fill=(255, 32, 32, 255), width=width)
 
 
-def _render_compilation_thumbnail(bg_img, avatar_img, accent_color, width, height):
+def _render_compilation_thumbnail(bg_img, avatar_img, accent_color, width, height, script_json=None):
     """Specialized 16:9 thumbnail for 'Did You Know' 5-fact compilations."""
     canvas = bg_img.resize((width, height), Image.LANCZOS)
     canvas = ImageEnhance.Brightness(canvas).enhance(0.6) # Darker for compilation text
@@ -468,42 +652,62 @@ def _render_compilation_thumbnail(bg_img, avatar_img, accent_color, width, heigh
     # 4. Branding Accent
     draw.rectangle([0, height-15, width, height], fill=accent_color)
     
+    # 5. Render Logos
+    if script_json:
+        canvas = _draw_logo_badges(canvas, script_json, accent_color, is_shorts=False)
+        
     return canvas
 
 def generate_thumbnail(script_json):
     client = genai.Client(api_key=GEMINI_API_KEY)
+    
+    # Support varying title or custom hook directly
+    custom_hook = script_json.get("custom_hook") or script_json.get("hook_text")
     title = script_json.get("title", "AI Breakthrough")
+    
     accent_hex = script_json.get("color_theme", {}).get("accent", "#FFD600").lstrip("#")
     accent_rgb = tuple(int(accent_hex[i:i+2], 16) for i in (0, 2, 4))
     
     date_str = datetime.now().strftime("%Y-%m-%d")
-    out_yt = os.path.join(OUTPUT_DIR, f"thumbnail_{date_str}.jpg")
-    out_shorts = os.path.join(OUTPUT_DIR, f"thumbnail_shorts_{date_str}.jpg")
+    custom_suffix = script_json.get("output_suffix", "")
+    suffix_str = f"_{custom_suffix}" if custom_suffix else f"_{date_str}"
+    
+    out_yt = os.path.join(OUTPUT_DIR, f"thumbnail{suffix_str}.jpg")
+    out_shorts = os.path.join(OUTPUT_DIR, f"thumbnail_shorts{suffix_str}.jpg")
 
     # Pipeline
     bg = _generate_imagen_background(title, client)
-    avatar = _process_avatar()
+    
+    # Dynamic avatar still selection/extraction with frame time
+    avatar_still = script_json.get("avatar_still") or script_json.get("avatar_path")
+    still_time = float(script_json.get("avatar_still_time", 1.0))
+    avatar = _process_avatar_still(avatar_still, still_time)
 
     is_compilation = script_json.get("is_longform") and script_json.get("longform_format") == "did_you_know"
 
     if is_compilation:
         print("🎬 Rendering Long-Form Compilation Thumbnail...")
-        yt = _render_compilation_thumbnail(bg, avatar, accent_rgb, THUMB_W, THUMB_H)
+        yt = _render_compilation_thumbnail(bg, avatar, accent_rgb, THUMB_W, THUMB_H, script_json=script_json)
         yt.convert("RGB").save(out_yt, "JPEG", quality=95)
         print(f"✅ Premium Compilation Thumbnail Generated: {out_yt}")
         return out_yt
     else:
-        hook = _generate_hook_text(title, client)
-        
+        # Determine Hook Text
+        if custom_hook:
+            print("📝 Using custom hook text from script_json...")
+            hook = custom_hook.replace("\\n", "\n")
+        else:
+            hook = _generate_hook_text(title, client)
+            
         # YT (16:9)
         print("🎬 Rendering YouTube Thumbnail...")
-        yt = _render_premium_thumbnail(hook, bg, avatar, accent_rgb, THUMB_W, THUMB_H)
+        yt = _render_premium_thumbnail(hook, bg, avatar, accent_rgb, THUMB_W, THUMB_H, script_json=script_json)
         yt.convert("RGB").save(out_yt, "JPEG", quality=95)
 
         # Shorts (9:16)
         print("🎬 Rendering Shorts Thumbnail...")
         bg_vert = bg.resize((SHORTS_W, SHORTS_H), Image.LANCZOS)
-        shorts = _render_premium_thumbnail(hook, bg_vert, avatar, accent_rgb, SHORTS_W, SHORTS_H, is_shorts=True)
+        shorts = _render_premium_thumbnail(hook, bg_vert, avatar, accent_rgb, SHORTS_W, SHORTS_H, script_json=script_json, is_shorts=True)
         shorts.convert("RGB").save(out_shorts, "JPEG", quality=95)
 
         print(f"✅ Premium Thumbnails Generated: {out_yt}")
