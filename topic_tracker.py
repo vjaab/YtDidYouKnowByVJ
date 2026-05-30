@@ -81,7 +81,7 @@ def check_cooldowns(companies, subcategory, tracker_file=TRACKER_FILE):
         
     return True, "Cooldowns OK"
 
-def record_story(title, news_headline, subcategory, companies, keywords, breaking_news_level, voice_used, youtube_url, news_source_url, tracker_file=TRACKER_FILE):
+def record_story(title, news_headline, subcategory, companies, keywords, breaking_news_level, voice_used, youtube_url, news_source_url, topic_type=None, tracker_file=TRACKER_FILE):
     tracker = load_tracker(tracker_file)
     today = datetime.now().strftime("%Y-%m-%d")
     
@@ -126,6 +126,9 @@ def record_story(title, news_headline, subcategory, companies, keywords, breakin
         "youtube_url": youtube_url,
         "news_source_url": news_source_url
     }
+    if topic_type:
+        history_entry["topic_type"] = topic_type
+        
     tracker.setdefault("history", []).append(history_entry)
     save_tracker(tracker, tracker_file)
 
@@ -136,3 +139,63 @@ def update_youtube_url(news_headline, youtube_url, tracker_file=TRACKER_FILE):
             entry["youtube_url"] = youtube_url
             break
     save_tracker(tracker, tracker_file)
+
+def get_next_topic_type_by_ratio(tracker_file=TRACKER_FILE):
+    """
+    Computes the proportion of each topic_type ('tools', 'news', 'research') 
+    in recent history (last 30 entries) and returns the type that is most
+    in deficit compared to the target ratio:
+      - tools: 60% (0.60)
+      - news: 20% (0.20)
+      - research: 20% (0.20)
+    """
+    tracker = load_tracker(tracker_file)
+    history = tracker.get("history", [])
+    
+    target_ratios = {
+        "tools": 0.60,
+        "news": 0.20,
+        "research": 0.20
+    }
+    
+    # Analyze the last 30 entries in history (or as many as exist)
+    recent_entries = history[-30:] if history else []
+    
+    counts = {"tools": 0, "news": 0, "research": 0}
+    total_counted = 0
+    
+    for entry in recent_entries:
+        if not isinstance(entry, dict):
+            continue
+        ttype = entry.get("topic_type")
+        if ttype in counts:
+            counts[ttype] += 1
+            total_counted += 1
+        else:
+            # Heuristics for backward compatibility with existing entries
+            sub_cat = str(entry.get("sub_category", "")).lower()
+            title = str(entry.get("title", "")).lower()
+            headline = str(entry.get("news_headline", "")).lower()
+            
+            if "tool" in sub_cat or "app" in sub_cat or "mcp" in title or "workflow" in title or "cursor" in title or "claude code" in title or "try-on" in title:
+                counts["tools"] += 1
+                total_counted += 1
+            elif "research" in sub_cat or "paper" in title or "arxiv" in title or "benchmark" in title or "eval" in title or "study" in title or "molecule" in title or "model" in title:
+                counts["research"] += 1
+                total_counted += 1
+            else:
+                counts["news"] += 1
+                total_counted += 1
+                
+    if total_counted == 0:
+        return "tools"
+        
+    deficits = {}
+    for t, target in target_ratios.items():
+        current_ratio = counts[t] / total_counted
+        deficits[t] = target - current_ratio
+        
+    selected = max(deficits, key=deficits.get)
+    print(f"📊 Ratio calculation: counts={counts}, deficits={deficits} -> Selected: {selected}")
+    return selected
+

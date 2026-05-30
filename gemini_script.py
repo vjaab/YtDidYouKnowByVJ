@@ -298,6 +298,23 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
                 big_names = ["google", "apple", "openai", "meta", "microsoft", "nvidia", "tesla", "amazon", "anthropic", "deepmind"]
                 hot_score += sum(8 for name in big_names if name in title_lower)
                 
+                # Type-Specific Scoring Boosts (Production Spec 2026)
+                if topic_type == "tools":
+                    tool_keywords = ["tool", "app", "ui", "workflow", "extension", "github", "build", "sdk", "library", "software", "try-on", "use case", "plugin"]
+                    hot_score += sum(15 for kw in tool_keywords if kw in title_lower)
+                    if art.get("type") == "tools":
+                        hot_score += 25
+                elif topic_type == "news":
+                    news_keywords = ["breaking", "lawsuit", "scandal", "fires", "ban", "partnership", "ceo", "acquires", "invests", "valuation", "trending", "revenue", "warns"]
+                    hot_score += sum(15 for kw in news_keywords if kw in title_lower)
+                    if art.get("type") == "trending":
+                        hot_score += 25
+                elif topic_type == "research":
+                    research_keywords = ["paper", "arxiv", "architecture", "researchers", "study", "dataset", "framework", "speculative decoding", "proof", "benchmark", "molecule", "polymerase"]
+                    hot_score += sum(15 for kw in research_keywords if kw in title_lower)
+                    if art.get("type") == "research":
+                        hot_score += 25
+                
                 # Recency Boost (Last 24h gets +15)
                 pub_at = art.get("publishedAt", "")
                 if pub_at:
@@ -369,9 +386,11 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
 
     # Build the story selection instruction
     if topic_type == "tools":
-        content_desc = "latest AI tools and product launches"
+        content_desc = "latest trending AI tools, product workflows, and developer libraries/applications"
+    elif topic_type == "news":
+        content_desc = "latest breaking AI model launches, corporate tech updates, and industry announcements"
     else:
-        content_desc = "research papers and engineering blogs"
+        content_desc = "trending AI research papers, model architectures, and deep engineering breakthroughs"
 
     from config import ENABLE_LONGFORM
     is_longform = ("Slot C" in slot) and ENABLE_LONGFORM
@@ -419,48 +438,125 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "comment_hook": "Provocative question to drive engagement (e.g. 'Which department at your job is leaking the most data?')"
 }}"""
     else:
-        selection_instruction = (
-            f"Analyze the following {content_desc} and pick the SINGLE most impactful story to convert into a 50-58s YouTube Short script.\n"
-            f"PRIMARY CATEGORY: {category}\n"
-            "SELECTION FILTERS:\n"
-            f"1. PRIORITIZE: Stories involving big-name companies (Google, OpenAI, Meta, NVIDIA, Apple) or controversy/lawsuits/leaks. These drive the most views. If no high-impact story exists for '{category}', pick the single most viral/surprising AI story from any category.\n"
-            "2. MUST be New, Useful, or Surprising (Absolute mandatory).\n"
-            "3. MUST be explainable in exactly <58s of dense technically-accurate speech (approx 150-170 words total). The STRICT MAXIMUM is 58 seconds — videos over 60 seconds are NOT eligible for YouTube Shorts.\n"
-            "4. MUST contain one concrete takeaway or engineering tip the viewer can use today.\n"
-            "5. PACING: Keep sentences short (under 12 words) for better TTS pacing and Micro-Cut boundaries.\n\n"
-            "FORMAT: You MUST follow the strict 5-part structure: Hook -> Problem -> Solution -> Retention Loop -> Call to Action.\n\n"
-            "HOOK ALIGNMENT (DROP TEST):\n"
-            "If the topic doesn't produce a strong 'Winner' hook (Stat, Absolute Contradiction, or 'You are using this wrong'), DROP IT and pick another.\n"
-        )
-        prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
+        if topic_type == "tools":
+            selection_instruction = (
+                f"Analyze the following {content_desc} and pick the SINGLE most trending AI tool or hands-on product to teach the audience.\n"
+                f"PRIMARY CATEGORY: AI Tools Teaching\n"
+                "SELECTION FILTERS:\n"
+                "1. PRIORITIZE: Tools with extremely high utility (e.g. Chrome extensions, devtools like Cursor, Claude Code, open-source libraries) that speed up work. Pick a tool that the viewer can actually start using today.\n"
+                "2. VISUAL DEMONSTRATION REQUIRED: The final script and subtitle chunks MUST explicitly describe the visual interface and steps to use the tool. The `nano_visual_prompt` fields MUST describe highly specific, actual UI screenshots of this tool at each step.\n"
+                "3. MUST be explainable in exactly <58s (approx 150-170 words total). Strict 60s limit.\n"
+                "4. FORMAT: Hook (surprise/contradiction about a problem) -> Tool Walkthrough (Step-by-step teaching) -> Visual Proof -> Call to Action (Check the link/pinned comment)."
+            )
+            prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
 {{
   "title_options": ["Title Case + Emoji + Curiosity Gap 1", "Title Case + Emoji + Curiosity Gap 2"],
   "description": "Full 100+ word rich SEO description for youtube describing the video, including timestamps and credits.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
   "title": "Punchy YouTube title max 60 chars",
-  "hook_script": "The Hook (<1.5s): Start with a Result-First statement. Do not introduce the paper title immediately. Focus on impact. Approx 6 words.",
-  "problem_context": "The Problem (3-10s): Briefly state the bottleneck this research solves. Approx 20 words.",
-  "solution_tech": "The Solution (10-45s): Explain the core technical breakthrough using analogies. Keep sentences UNDER 12 words. Approx 80 words.",
-  "retention_loop": "The Retention Loop (45-55s): End with a cliffhanger or a seamless bridge that leads back to the start of the video. Approx 15 words.",
-  "outro_cta": "Call to Action: Include one engagement trigger (e.g., 'Check the pinned repo' or 'Drop a comment if you'd use this'). Approx 10 words.",
-  "script": "The FULL unified voiceover script seamlessly concatenating hook_script, problem_context, solution_tech, retention_loop, and outro_cta into ONE single flowing text block. Target total duration: 50-58 sec (approx 150-170 words). STRICT MAXIMUM: 58 seconds. Videos over 60 seconds lose Shorts eligibility.",
+  "hook_script": "The Hook (<1.5s): Start with a Result-First statement about a massive problem. Approx 6 words.",
+  "problem_context": "The Problem (3-10s): State why standard workflows are too slow or outdated. Approx 20 words.",
+  "solution_tech": "The Solution (10-45s): Teach the exact steps/recipe to use this specific AI tool. Give concrete technical tips. Approx 80 words.",
+  "retention_loop": "The Retention Loop (45-55s): Provide a seamless bridge back to the opening statement. Approx 15 words.",
+  "outro_cta": "Call to Action: Try this tool now and follow on Telegram for daily devtools tips. Approx 10 words.",
+  "script": "The FULL unified voiceover script seamlessly concatenating hook_script, problem_context, solution_tech, retention_loop, and outro_cta into ONE single flowing text block. Target total duration: 50-58 sec (approx 150-170 words). STRICT MAXIMUM: 58 seconds.",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://github.com/...", "https://arxiv.org/abs/..."],
   "phonetic_pronunciation_map": {{"NVIDIA": "In-vid-yah"}},
   "hook": "Matches the first sentence of the script",
   "summary": "One line summary",
-  "sub_category": "AI/Machine Learning",
+  "sub_category": "AI Tools",
   "breaking_news_level": 9,
   "retention_cues": [{{"timestamp": 3.0, "effect": "zoom_in", "reason": "hook_impact"}}],
   "subtitle_chunks": [{{
       "chunk_id": 1, "text": "Sentence 1", "start": 0.00, "end": 2.50,
-      "nano_visual_prompt": "A highly specific, cinematic visual description for THIS sentence. Must depict the exact subject/entity/concept spoken in this sentence. Example: 'Close-up of NVIDIA H100 GPU chip with glowing green circuit traces, dark background, studio lighting, 9:16 vertical'. NO TEXT in the image. NO faces of real people. Photorealistic, 8K."
+      "nano_visual_prompt": "A highly specific, cinematic UI screenshot description for THIS sentence showing the actual tool interface. Example: 'UI screenshot of Cursor AI editor sidebar with chat panel showing active code generations, dark mode, 9:16 vertical'. NO TEXT in the image except the clean editor interface. Photorealistic, 8K."
   }}],
   "original_news_headline": "Exact headline",
   "original_news_url": "Direct article URL",
-  "keywords": ["AI"],
-  "hashtags": ["#AI", "#Tech", "#MachineLearning", "#Python", "#OpenAI"],
-  "comment_hook": "A custom question targeting the seed audience: 'Which part of this architecture surprised you most? Let's discuss! 👇'"
+  "keywords": ["AI Tools", "Developer Tools", "Productivity"],
+  "hashtags": ["#AITools", "#DevTools", "#Programming", "#Python", "#AI"],
+  "comment_hook": "A custom question: 'What is your favorite new AI tool this week? Let me know below! 👇'"
+}}"""
+        elif topic_type == "news":
+            selection_instruction = (
+                f"Analyze the following {content_desc} and pick the SINGLE most shocking or viral tech news story.\n"
+                f"PRIMARY CATEGORY: AI & Tech News\n"
+                "SELECTION FILTERS:\n"
+                "1. PRIORITIZE: High-stakes industry announcements, CEO updates, scandals, major business revenue shifts, or model benchmark leaks. Stories with strong drama or massive consequences go viral.\n"
+                "2. EVIDENCE REQUIRED: You MUST cite specific article evidence, numbers, dates, or direct quotes at least 3 times in the script. The `use_case_evidence_url` field is MANDATORY and must be the news article URL.\n"
+                "3. MUST be explainable in exactly <58s (approx 150-170 words total). Strict 60s limit.\n"
+                "4. FORMAT: Hook (Breaking news hook) -> Context (The announcement/event) -> Evidence & Deconstruction -> Personal Stakes -> Outro Discussion (Provocative question)."
+            )
+            prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
+{{
+  "title_options": ["Title Case + Emoji + Curiosity Gap 1", "Title Case + Emoji + Curiosity Gap 2"],
+  "description": "Full 100+ word rich SEO description for youtube describing the video, including timestamps and credits.",
+  "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
+  "title": "Punchy YouTube title max 60 chars",
+  "hook_script": "The Hook (<1.5s): Start with a dramatic Result-First breaking news hook. Approx 6 words.",
+  "problem_context": "The Problem (3-10s): State why this news changes everything or presents a massive controversy. Approx 20 words.",
+  "solution_tech": "The Solution (10-45s): Explain the tech news details, citing article evidence, quotes, and stats. Approx 80 words.",
+  "retention_loop": "The Retention Loop (45-55s): Seamlessly bridge back to the opening statement. Approx 15 words.",
+  "outro_cta": "Call to Action: Drop your thoughts in the comments and follow on Telegram for breaking AI news. Approx 10 words.",
+  "script": "The FULL unified voiceover script seamlessly concatenating hook_script, problem_context, solution_tech, retention_loop, and outro_cta into ONE single flowing text block. Target total duration: 50-58 sec (approx 150-170 words). STRICT MAXIMUM: 58 seconds.",
+  "hook_text": "The exact first 5-8 words of the script.",
+  "relevant_links": ["https://github.com/...", "https://arxiv.org/abs/..."],
+  "phonetic_pronunciation_map": {{"NVIDIA": "In-vid-yah"}},
+  "hook": "Matches the first sentence of the script",
+  "summary": "One line summary",
+  "sub_category": "AI News",
+  "breaking_news_level": 9,
+  "retention_cues": [{{"timestamp": 3.0, "effect": "zoom_in", "reason": "hook_impact"}}],
+  "subtitle_chunks": [{{
+      "chunk_id": 1, "text": "Sentence 1", "start": 0.00, "end": 2.50,
+      "nano_visual_prompt": "A highly specific, cinematic visual representing the tech news article or company logo. Example: 'A tech news website article screenshot showing a header block about OpenAI, clean composition, dark mode, 9:16 vertical'. NO TEXT except the clean corporate branding. Photorealistic, 8K."
+  }}],
+  "original_news_headline": "Exact headline",
+  "original_news_url": "Direct article URL",
+  "keywords": ["AI News", "Tech News", "Breaking News"],
+  "hashtags": ["#AINews", "#TechNews", "#BreakingNews", "#Google", "#OpenAI"],
+  "comment_hook": "A custom question: 'What is your take on this massive shift? Let me know below! 👇'"
+}}"""
+        else: # research
+            selection_instruction = (
+                f"Analyze the following {content_desc} and pick the SINGLE most groundbreaking research paper or engineering blog.\n"
+                f"PRIMARY CATEGORY: AI Research Papers\n"
+                "SELECTION FILTERS:\n"
+                "1. PRIORITIZE: Breakthrough architectures, speculative decoding, local model optimization milestones, or causal reasoning improvements. Focus on solving existing LLM bottlenecks.\n"
+                "2. ACADEMIC EVIDENCE REQUIRED: You MUST mention the paper's title or authors, and cite specific academic evidence (such as benchmark percentages, model parameter sizes, or repository features). The `use_case_evidence_url` must be the arXiv or project website URL.\n"
+                "3. MUST be explainable in exactly <58s (approx 150-170 words total). Strict 60s limit.\n"
+                "4. FORMAT: Hook (Surprising limitation of current LLMs) -> The Paper's Discovery -> The Analogy (Simplified explanation of the math/architecture) -> Performance Stats -> CTA (Check the repo)."
+            )
+            prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
+{{
+  "title_options": ["Title Case + Emoji + Curiosity Gap 1", "Title Case + Emoji + Curiosity Gap 2"],
+  "description": "Full 100+ word rich SEO description for youtube describing the video, including timestamps and credits.",
+  "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
+  "title": "Punchy YouTube title max 60 chars",
+  "hook_script": "The Hook (<1.5s): Start with a surprising limitation or benchmark about current LLMs. Approx 6 words.",
+  "problem_context": "The Problem (3-10s): State why standard models struggle with this specific math/logical bottleneck. Approx 20 words.",
+  "solution_tech": "The Solution (10-45s): Explain the paper's core breakthrough using a sharp analogy. Mention authors/title and stats. Approx 80 words.",
+  "retention_loop": "The Retention Loop (45-55s): Seamlessly bridge back to the opening statement. Approx 15 words.",
+  "outro_cta": "Call to Action: Read the full paper and follow on Telegram for daily AI research deconstructions. Approx 10 words.",
+  "script": "The FULL unified voiceover script seamlessly concatenating hook_script, problem_context, solution_tech, retention_loop, and outro_cta into ONE single flowing text block. Target total duration: 50-58 sec (approx 150-170 words). STRICT MAXIMUM: 58 seconds.",
+  "hook_text": "The exact first 5-8 words of the script.",
+  "relevant_links": ["https://github.com/...", "https://arxiv.org/abs/..."],
+  "phonetic_pronunciation_map": {{"NVIDIA": "In-vid-yah"}},
+  "hook": "Matches the first sentence of the script",
+  "summary": "One line summary",
+  "sub_category": "AI Research",
+  "breaking_news_level": 9,
+  "retention_cues": [{{"timestamp": 3.0, "effect": "zoom_in", "reason": "hook_impact"}}],
+  "subtitle_chunks": [{{
+      "chunk_id": 1, "text": "Sentence 1", "start": 0.00, "end": 2.50,
+      "nano_visual_prompt": "A highly specific, cinematic visual representing the academic paper structure or neural network architecture. Example: 'A clean mathematical diagram of neural connections or code blocks on a dark screen, futuristic 9:16 vertical'. NO TEXT except the clean diagram structures. Photorealistic, 8K."
+  }}],
+  "original_news_headline": "Exact headline",
+  "original_news_url": "Direct article URL",
+  "keywords": ["AI Research", "Machine Learning", "Neural Networks"],
+  "hashtags": ["#AI", "#MachineLearning", "#DeepLearning", "#Research", "#Coding"],
+  "comment_hook": "A custom question: 'What do you think of this mathematical approach? Let's discuss below! 👇'"
 }}"""
 
     # Inject any extra instructions (e.g. screenshot avoidance, length adjustments) into context

@@ -13,7 +13,7 @@ from datetime import datetime
 
 from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY
 from fetch_research_papers import fetch_tech_news, fetch_ai_tools
-from topic_tracker import record_story, update_youtube_url
+from topic_tracker import record_story, update_youtube_url, get_next_topic_type_by_ratio
 from gemini_script import pick_and_generate_script
 from ecosystem_logic import get_slot_info, get_series_identity, get_next_slot
 from audio_gen import generate_voiceover, clean_tts_text
@@ -179,7 +179,9 @@ def generate_pinned_comment(script_data, next_series_slot):
         f"👇 {cta}"
     )
 
-def run_pipeline(topic_type="research"):
+def run_pipeline(topic_type="auto"):
+    if topic_type == "auto":
+        topic_type = get_next_topic_type_by_ratio()
     log_message(f"=== STARTING DAILY AI PIPIELINE ({topic_type.upper()}) ===")
 
     # ── Clean output folder before starting ───────────────────────────────────
@@ -429,7 +431,8 @@ def run_pipeline(topic_type="research"):
     record_story(
         title, script_data.get("original_news_headline"),
         subcat, companies, keywords, breaking_level,
-        voice_used, "pending_upload", script_data.get("original_news_url")
+        voice_used, "pending_upload", script_data.get("original_news_url"),
+        topic_type=topic_type
     )
 
     # ── STEP 5: Build Visual Chunks ───────────────────────────────────────────
@@ -591,7 +594,7 @@ def run_pipeline(topic_type="research"):
     return True
 
 
-def run_local(topic_type="research"):
+def run_local(topic_type="auto"):
     # XTTS server launch removed. Calling pipeline directly.
     success = run_pipeline(topic_type=topic_type)
     if not success:
@@ -602,7 +605,7 @@ def run_local(topic_type="research"):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--now", action="store_true", help="Run pipeline immediately.")
-    parser.add_argument("--type", type=str, choices=["research", "tools"], default="research", help="Content type mapped to the schedule")
+    parser.add_argument("--type", type=str, choices=["auto", "research", "tools", "news"], default="auto", help="Content type mapped to the schedule")
     args = parser.parse_args()
 
     if args.now:
