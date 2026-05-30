@@ -145,17 +145,17 @@ def get_next_topic_type_by_ratio(tracker_file=TRACKER_FILE):
     Computes the proportion of each topic_type ('tools', 'news', 'research') 
     in recent history (last 30 entries) and returns the type that is most
     in deficit compared to the target ratio:
-      - tools: 60% (0.60)
-      - news: 20% (0.20)
-      - research: 20% (0.20)
+      - tools: 80% (0.80)
+      - news: 10% (0.10)
+      - research: 10% (0.10)
     """
     tracker = load_tracker(tracker_file)
     history = tracker.get("history", [])
     
     target_ratios = {
-        "tools": 0.60,
-        "news": 0.20,
-        "research": 0.20
+        "tools": 0.80,
+        "news": 0.10,
+        "research": 0.10
     }
     
     # Analyze the last 30 entries in history (or as many as exist)
