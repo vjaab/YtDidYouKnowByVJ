@@ -21,9 +21,11 @@ def capture_article_screenshot(url, output_filename, desktop=False):
     try:
         # Use a real browser user agent to avoid being blocked by simple scrapers
         resp = requests.head(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10, allow_redirects=True)
-        if resp.status_code >= 400:
-            print(f"⚠️ URL unreachable or 404: {url} (Status: {resp.status_code})")
+        if resp.status_code in (404, 410):
+            print(f"⚠️ URL definitely dead or 404: {url} (Status: {resp.status_code})")
             return None
+        elif resp.status_code >= 400:
+            print(f"⚠️ URL pre-flight check returned status {resp.status_code} for {url}. Proceeding to Playwright anyway...")
     except Exception as e:
         print(f"⚠️ URL pre-flight check failed for {url}: {e}")
         # Continue anyway, as HEAD might be blocked but GET might work via Playwright
