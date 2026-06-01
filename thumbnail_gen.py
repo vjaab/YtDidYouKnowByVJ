@@ -612,9 +612,12 @@ def _render_compilation_thumbnail(bg_img, avatar_img, accent_color, width, heigh
         draw.text((x, y), line, font=f_main, fill=txt_color)
         y += lh + 40
 
-    # 4. Render "5 AI FACTS" badge
+    # 4. Render "N AI FACTS" badge
     f_sub = _load_font(80, "extrabold")
-    sub_txt = "5 AI FACTS"
+    num_facts = 10
+    if script_json:
+        num_facts = script_json.get("num_facts", len(script_json.get("fact_scripts", [])) or 10)
+    sub_txt = f"{num_facts} AI FACTS"
     sub_w, sub_h = _text_size(sub_txt, f_sub)
     
     badge_x = 80

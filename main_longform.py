@@ -53,8 +53,9 @@ def log_message(msg):
 
 def format_longform_description(script_data, hashtags):
     """Generate a rich YouTube description for the long-form compilation."""
-    title = script_data.get("title", "5 AI Facts")
     fact_timestamps = script_data.get("fact_timestamps", [])
+    num_facts = script_data.get("num_facts") or len(fact_timestamps) or 10
+    title = script_data.get("title", f"{num_facts} AI Facts")
     topics = script_data.get("longform_topics", [])
     description_ai = script_data.get("description", "")
     
@@ -68,6 +69,9 @@ def format_longform_description(script_data, hashtags):
         approx_s = ft.get("approx_start_seconds", 0)
         m, s = divmod(int(approx_s), 60)
         fact_num = ft.get("fact_number", "?")
+        # Skip non-numeric/recap markers
+        if not isinstance(fact_num, int):
+            continue
         topic = ft.get("topic", f"Fact {fact_num}")[:50]
         timestamps_str += f"{m}:{s:02d} — Fact {fact_num}: {topic}\n"
         last_start = max(last_start, approx_s)
@@ -77,7 +81,7 @@ def format_longform_description(script_data, hashtags):
     
     # Build sources section
     sources_str = "📚 SOURCES:\n"
-    for t in topics[:5]:
+    for t in topics:
         url = t.get("source_url", "")
         name = t.get("source_name", "")
         headline = t.get("headline", "")[:60]
@@ -110,7 +114,7 @@ def format_longform_description(script_data, hashtags):
 🚀 Telegram: https://t.me/technewsbyvj
 💬 WhatsApp: https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
 ━━━━━━━━━━━━━━━━━━━━━━
-⚡ 5 AI facts that will blow your mind — all from the last 48 hours.
+⚡ {num_facts} AI facts that will blow your mind — all from the last 48 hours.
 
 {timestamps_str}
 {sources_str}
@@ -452,6 +456,17 @@ def run_longform_pipeline(dry_run=False):
 
     # ── STEP 12: Update Tracker ──────────────────────────────────────────
     update_youtube_url(script_data.get("original_news_headline"), youtube_url, tracker_file=LONGFORM_TRACKER_FILE)
+
+    # ── STEP 12.5: Shorts Cross-Promotion Teaser ──────────────────────────
+    from config_longform import LONGFORM_GENERATE_SHORTS_TEASER
+    if LONGFORM_GENERATE_SHORTS_TEASER:
+        log_message("STEP 12.5: Generating and uploading Shorts Teaser...")
+        try:
+            from shorts_teaser import generate_and_upload_shorts_teaser
+            generate_and_upload_shorts_teaser(script_data, result, dry_run=dry_run)
+        except Exception as e:
+            log_message(f"⚠️ Shorts teaser failed: {e}")
+            traceback.print_exc()
 
     # ── STEP 13: Cleanup ─────────────────────────────────────────────────
     log_message("STEP 13: Cleaning up output folder...")

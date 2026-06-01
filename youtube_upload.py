@@ -133,7 +133,7 @@ def upload_video(video_path, title, description, tags, thumbnail_path=None, cate
     }
 
     media = MediaFileUpload(video_path, chunksize=-1, resumable=True)
-    request = youtube.videos().insert(part="snippet,status", body=body, media_body=media)
+    request = youtube.videos().insert(part="snippet,status", body=body, media_body=media, notifySubscribers=True)
 
     try:
         response = request.execute()

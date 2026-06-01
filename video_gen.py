@@ -2420,7 +2420,7 @@ def _generate_room_tone(duration):
         clip = clip.subclipped(0, duration)
     return clip.with_effects([afx.MultiplyVolume(0.1)])
 
-def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hooks, output_duration, bgm_volume_config, output_path):
+def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hooks, output_duration, bgm_volume_config, output_path, fact_timestamps=None):
     """
     Composes and masters the entire video soundtrack using Pydub:
     1. Import Voiceover, apply professional leveler.
@@ -2438,6 +2438,17 @@ def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hook
     # 1. Load Voiceover
     voice = AudioSegment.from_file(voice_path).set_frame_rate(44100).set_channels(2)
     target_duration_ms = int(output_duration * 1000)
+    
+    # Copy sfx_cues to prevent mutation and dynamically inject fact transitions
+    sfx_cues = list(sfx_cues) if sfx_cues is not None else []
+    if fact_timestamps:
+        for ft in fact_timestamps:
+            start_s = float(ft.get("approx_start_seconds", 0))
+            if start_s > 2.0 and start_s < output_duration:
+                sfx_cues.append({
+                    "type": "glitch",
+                    "timestamp": start_s
+                })
     
     # 2. Load and Prepare BGM
     ducked_bgm = AudioSegment.silent(duration=target_duration_ms, frame_rate=44100).set_channels(2)
@@ -2461,7 +2472,7 @@ def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hook
                 end_step = min(n_steps - 1, int(c["end"] * 1000 / step_ms))
                 speech_active[start_step:end_step + 1] = 1.0
                 
-            # Identify dramatic silence beats (from retention cues)
+            # Identify dramatic silence beats (from retention cues and fact boundaries)
             silence_active = np.ones(n_steps)
             for cue in retention_hooks:
                 if cue.get("effect") in ("zoom_snap", "flash_accent"):
@@ -2470,6 +2481,15 @@ def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hook
                     start_sil = max(0, int((cue_t - 0.2) * 1000 / step_ms))
                     end_sil = min(n_steps - 1, int((cue_t + 0.2) * 1000 / step_ms))
                     silence_active[start_sil:end_sil + 1] = 0.0
+                    
+            if fact_timestamps:
+                for ft in fact_timestamps:
+                    start_s = float(ft.get("approx_start_seconds", 0))
+                    if start_s > 2.0:
+                        # 0.3s silence before the fact starts
+                        start_sil = max(0, int((start_s - 0.3) * 1000 / step_ms))
+                        end_sil = min(n_steps - 1, int(start_s * 1000 / step_ms))
+                        silence_active[start_sil:end_sil + 1] = 0.0
                     
             # Compute attack/release curves for sidechain compression
             duck_envelope = np.zeros(n_steps)
@@ -2515,6 +2535,13 @@ def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hook
                 # Interpolate volume multiplier: 1.2x (unducked) to 0.25x (ducked)
                 vol_multiplier = (1.2 * (1.0 - duck_factor) + 0.25 * duck_factor) * sil_factor
                 
+                # --- INTENSITY RAMP FOR LONGFORM (Last 30% of duration) ---
+                progress_ratio = i / max(1, n_steps)
+                if progress_ratio > 0.7:
+                    # Ramps from 1.0 to 1.45 at the end (~ +3.2dB increase in music intensity for dramatic climax)
+                    ramp_factor = 1.0 + 0.45 * ((progress_ratio - 0.7) / 0.3)
+                    vol_multiplier *= ramp_factor
+                
                 if vol_multiplier < 0.0001 or base_bgm_gain_db < -90.0:
                     gain_db = -100.0
                 else:
@@ -2533,12 +2560,17 @@ def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hook
                 duck_factor = duck_envelope[-1]
                 sil_factor = smooth_silence[-1]
                 vol_multiplier = (1.2 * (1.0 - duck_factor) + 0.25 * duck_factor) * sil_factor
+                
+                progress_ratio = 1.0
+                ramp_factor = 1.45
+                vol_multiplier *= ramp_factor
+                
                 gain_db = base_bgm_gain_db + 20 * math.log10(max(0.0001, vol_multiplier))
                 ducked_bgm += rem_chunk.apply_gain(gain_db)
                 
             # Fade out BGM during last 2 seconds
             ducked_bgm = ducked_bgm.fade_out(2000)
-            print("   🎵 Topic-Aware BGM looped and processed with sidechain compression.")
+            print("   🎵 Topic-Aware BGM looped and processed with sidechain compression + fact boundary ducking.")
         except Exception as e:
             print(f"   ⚠️ BGM processing failed: {e}")
             
@@ -2851,9 +2883,10 @@ def _longform_topic_transition_clips(script_json, audio_duration):
             # Neon border highlight (Electric Cyan)
             draw.rounded_rectangle([card_x1, card_y1, card_x2, card_y2], radius=24, outline=(0, 240, 255, 180), width=4)
             
-            # 2. Draw "FACT X OF 5" tracker
-            label_text = f"FACT #{fact_num} OF 5"
-            label_font = gf(24, bold=True)
+            # 2. Draw "FACT X OF N" tracker
+            total_f = script_json.get("num_facts", len(topics) if topics else 10)
+            label_text = f"FACT #{fact_num} OF {total_f}"
+            label_font = gf(28, bold=True)
             draw.text((FRAME_W // 2, card_y1 + 60), label_text, font=label_font, fill=(0, 240, 255, 255), anchor="mm")
             
             # 3. Draw Headline text
@@ -3237,7 +3270,12 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     draw = ImageDraw.Draw(img)
     
     scale_ratio = frame_width / 1080.0 if frame_width < frame_height else frame_width / 1920.0
-    base_size = int(58 * scale_ratio) # Reverted to original as requested
+    
+    is_landscape = frame_width > frame_height
+    if is_landscape:
+        base_size = int(72 * scale_ratio) # Larger base size for landscape/longform readability
+    else:
+        base_size = int(58 * scale_ratio) # Reverted to original as requested
     
     f_main = gf(base_size, bold=True)
     
@@ -3248,7 +3286,10 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     for i, wd in enumerate(word_data):
         word_widths.append(fake_draw.textbbox((0,0), words[i], font=f_main)[2] - fake_draw.textbbox((0,0), words[i], font=f_main)[0])
     
-    max_sub_width = int(frame_width * 0.80) # More narrow for punchy center focus
+    if is_landscape:
+        max_sub_width = int(frame_width * 0.65) # Narrower center focus in 16:9
+    else:
+        max_sub_width = int(frame_width * 0.80) # More narrow for punchy center focus
     lines = wrap_text_to_lines(words, word_widths, max_sub_width, f_main)
     
     line_h = int(90 * scale_ratio) # Reverted to original
@@ -3659,21 +3700,44 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     if not visual_paths:
         bg_layer_clips.append(ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=audio_duration))
     else:
-        crossfade = 0.4 # Increased for smoother motion transitions
-        num_clips = len(visual_paths)
-        clip_dur = (audio_duration + (num_clips - 1) * crossfade) / num_clips
-        current_start = 0.0
+        crossfade = 0.4 if not is_longform else 0.6 # Longer crossfade for longform smoothness
         
-        for i, vp in enumerate(visual_paths):
+        # --- LONGFORM 2.5s PACING PATTERN INTERRUPTS ---
+        if is_longform:
+            clip_dur = 2.5 + crossfade
+            num_clips_needed = int(audio_duration // 2.5) + 1
+            expanded_visual_paths = []
+            while len(expanded_visual_paths) < num_clips_needed:
+                expanded_visual_paths.extend(visual_paths)
+            expanded_visual_paths = expanded_visual_paths[:num_clips_needed]
+        else:
+            expanded_visual_paths = visual_paths
+            num_clips = len(visual_paths)
+            clip_dur = (audio_duration + (num_clips - 1) * crossfade) / num_clips
+            
+        current_start = 0.0
+        clip_cache = {}
+        
+        for i, vp in enumerate(expanded_visual_paths):
             try:
                 if vp.endswith(".mp4"):
-                    c_clip = VideoFileClip(vp).without_audio()
+                    if vp in clip_cache:
+                        c_clip = clip_cache[vp].copy()
+                    else:
+                        c_clip = VideoFileClip(vp).without_audio()
+                        clip_cache[vp] = c_clip
+                    
                     if c_clip.duration < clip_dur:
                         c_clip = c_clip.with_effects([vfx.Loop(duration=clip_dur)])
                     else:
                         c_clip = c_clip.subclipped(0, clip_dur)
                 else:
-                    c_clip = ImageClip(vp).with_duration(clip_dur)
+                    if vp in clip_cache:
+                        c_clip = clip_cache[vp].copy()
+                    else:
+                        c_clip = ImageClip(vp)
+                        clip_cache[vp] = c_clip
+                    c_clip = c_clip.with_duration(clip_dur)
                 
                 # Standard Resize & Crop (adapts to 9:16 or 16:9 based on longform)
                 w, h = c_clip.size
@@ -3765,6 +3829,24 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 current_start += (clip_dur - crossfade)
             except Exception as e:
                 print(f"Failed to load background img {vp}: {e}")
+
+        # ── B-ROLL BURSTS AT FACT BOUNDARIES ──────────────────────────────────────
+        if is_longform and script_json.get("longform_format") == "did_you_know":
+            fact_timestamps_lf = script_json.get("fact_timestamps", [])
+            for ft in fact_timestamps_lf:
+                start_s = float(ft.get("approx_start_seconds", 0))
+                if start_s > 5.0 and len(expanded_visual_paths) >= 3:
+                    burst_start = start_s - 0.25
+                    try:
+                        burst_images = random.sample(expanded_visual_paths, 3)
+                        for idx, b_vp in enumerate(burst_images):
+                            b_clip = ImageClip(b_vp).with_duration(0.17).resized((FRAME_W, FRAME_H))
+                            b_clip = b_clip.with_start(burst_start + idx * 0.17)
+                            if idx == 0:
+                                b_clip = b_clip.with_effects([vfx.CrossFadeIn(0.05)])
+                            burst_clips.append(b_clip)
+                    except:
+                        pass
 
     # ── AVATAR VIDEO PiP ──────────────────────────────────────────────────
     # Skip avatar entirely when Kaggle GPU fallback was used (no lip-sync available)
@@ -4027,14 +4109,18 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     #         iclip = _infographic_card_clip(...)
     #         if iclip: infographic_clips.append(iclip)
 
-    # ── LONGFORM: "FACT X/5" BADGE OVERLAYS ──────────────────────────────────
+    # ── LONGFORM: "FACT X/N" BADGE OVERLAYS ──────────────────────────────────
     longform_badge_clips = []
     if is_longform and script_json.get("longform_format") == "did_you_know":
         fact_timestamps = script_json.get("fact_timestamps", [])
-        total_facts = len(fact_timestamps) if fact_timestamps else LONGFORM_NUM_TOPICS_DEFAULT
+        # Use num_facts from script or count only numeric fact entries
+        total_facts = script_json.get("num_facts", 10)
         
         for i, ft in enumerate(fact_timestamps):
             fact_num = ft.get("fact_number", i + 1)
+            # Skip non-numeric entries (recaps, outro, cold open)
+            if not isinstance(fact_num, int) or fact_num <= 0:
+                continue
             start_s = float(ft.get("approx_start_seconds", 0))
             
             # Duration until next fact or end of audio
@@ -4044,16 +4130,16 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 end_s = audio_duration
             fact_dur = max(1.0, end_s - start_s)
             
-            # Render badge image
+            # Render badge image — larger font for 16:9 readability
             badge_text = f"FACT {fact_num}/{total_facts}"
-            badge_f = gf(28, bold=True) if callable(gf) else gf(28)
-            bw, bh = ts(badge_text, badge_f) if callable(ts) else (200, 35)
-            pad_x, pad_y = 16, 10
+            badge_f = gf(34, bold=True)
+            bw, bh = ts(badge_text, badge_f)
+            pad_x, pad_y = 20, 12
             badge_img = Image.new("RGBA", (bw + pad_x * 2, bh + pad_y * 2), (0, 0, 0, 0))
             badge_draw = ImageDraw.Draw(badge_img)
             badge_draw.rounded_rectangle(
                 [0, 0, bw + pad_x * 2 - 1, bh + pad_y * 2 - 1],
-                radius=12, fill=(*accent_color, 200)
+                radius=14, fill=(*accent_color, 220)
             )
             badge_draw.text((pad_x, pad_y), badge_text, font=badge_f, fill=(255, 255, 255, 255))
             
@@ -4072,14 +4158,14 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             longform_badge_clips.append(b_clip)
 
     # Default constant for badge generation when fact_timestamps is missing
-    LONGFORM_NUM_TOPICS_DEFAULT = 5
+    LONGFORM_NUM_TOPICS_DEFAULT = 10
 
     # Stack background, then screenshot clips on top of background
     topic_transition_clips = []
     if is_longform:
         topic_transition_clips = _longform_topic_transition_clips(script_json, audio_duration)
         
-    base_layers = bg_layer_clips + screenshot_clips + topic_transition_clips
+    base_layers = bg_layer_clips + burst_clips + screenshot_clips + topic_transition_clips
     
     # Add overlays
     base_layers.append(gradient)
@@ -4324,7 +4410,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         retention_hooks=script_json.get("retention_cues", []),
         output_duration=audio_duration,
         bgm_volume_config=BGM_VOLUME,
-        output_path=mastered_audio_path
+        output_path=mastered_audio_path,
+        fact_timestamps=script_json.get("fact_timestamps", [])
     )
     
     final_audio = AudioFileClip(mastered_audio_path)
