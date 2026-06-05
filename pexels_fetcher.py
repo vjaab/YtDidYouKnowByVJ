@@ -33,7 +33,7 @@ def score_relevance(chunk_text, visual_desc):
     while attempts < 3:
         try:
             # Use 2.0-flash for high speed and stability
-            target_model = "gemini-2.0-flash" 
+            target_model = "gemini-2.5-flash" 
             prompt = f"""Rate relevance 0-10 between technical text and visual description.
 Chunk text: '{chunk_text}'
 Visual description: '{visual_desc}'
@@ -76,7 +76,7 @@ def generate_visual_style_guide(headline):
     """
     print("🎨 Designing Global Visual Style Guide...")
     try:
-        target_model = "gemini-2.0-flash"
+        target_model = "gemini-2.5-flash"
         prompt = f"""Based on this news headline: '{headline}', define a cohesive visual style for a 9:16 vertical cinematic video.
 
 CRITICAL: The style MUST be tailored to this specific story. Include:
@@ -265,7 +265,7 @@ def _extract_visual_subject(headline):
     attempts = 0
     while attempts < 3:
         try:
-            target_model = "gemini-2.0-flash"
+            target_model = "gemini-2.5-flash"
             prompt = f"""From this news headline, extract the PRIMARY visual subject that should appear in a background image.
 Return ONLY the short subject name (1-5 words). Examples:
 - "Elon Musk sues OpenAI" → "OpenAI vs Elon Musk"
@@ -343,7 +343,7 @@ CURRENT CHUNK TEXT: '{chunk_text}'
         attempts = 0
         while attempts < 3:
             try:
-                target_model = "gemini-2.0-flash"
+                target_model = "gemini-2.5-flash"
                 resp = client.models.generate_content(model=target_model, contents=prompt_builder)
                 best_prompt = resp.text.strip()
                 # Clean up any lingering intro text

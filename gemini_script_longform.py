@@ -409,7 +409,7 @@ class LongformGenerationEngine:
         self.news_context = news_context
         self.avoid_list_str = avoid_list_str
 
-    def _call_gemini(self, prompt, model='gemini-2.0-flash', use_search=False):
+    def _call_gemini(self, prompt, model='gemini-2.5-flash', use_search=False):
         """Call Gemini with retry logic and model fallback."""
         attempts = 0
         current_model = model
@@ -434,15 +434,15 @@ class LongformGenerationEngine:
                 return json.loads(raw)
             except Exception as e:
                 err_str = str(e).upper()
-                if any(x in err_str for x in ["503", "UNAVAILABLE", "RESOURCE_EXHAUSTED", "429"]):
+                if any(x in err_str for x in ["503", "UNAVAILABLE", "RESOURCE_EXHAUSTED", "429", "NOT_FOUND", "404"]):
                     wait_time = (5 ** (attempts + 1)) + random.uniform(2, 5)
                     if current_model == 'gemini-2.5-pro':
-                        print(f"⚠️ [LONGFORM] {current_model} unavailable. Falling back to gemini-2.0-flash...")
-                        current_model = 'gemini-2.0-flash'
-                        continue
-                    elif current_model == 'gemini-2.0-flash' and attempts >= 1:
-                        print(f"⚠️ [LONGFORM] {current_model} overloaded. Falling back to gemini-2.5-flash...")
+                        print(f"⚠️ [LONGFORM] {current_model} unavailable. Falling back to gemini-2.5-flash...")
                         current_model = 'gemini-2.5-flash'
+                        continue
+                    elif current_model == 'gemini-2.5-flash' and attempts >= 1:
+                        print(f"⚠️ [LONGFORM] {current_model} overloaded. Falling back to gemini-2.5-flash-lite...")
+                        current_model = 'gemini-2.5-flash-lite'
                         continue
                     print(f"⚠️ [LONGFORM] Rate limit ({current_model}). Retrying in {wait_time:.1f}s...")
                     time.sleep(wait_time)
@@ -458,7 +458,7 @@ class LongformGenerationEngine:
         while attempts < 3:
             try:
                 response = self.client.models.generate_content(
-                    model='gemini-2.0-flash',
+                    model='gemini-2.5-flash',
                     contents=query,
                     config=types.GenerateContentConfig(
                         tools=[{'google_search': {}}]

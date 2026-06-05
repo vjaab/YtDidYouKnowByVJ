@@ -647,7 +647,7 @@ class AudioAuditEngine:
             }}"""
 
             response = self.client.models.generate_content(
-                model='gemini-2.0-flash',
+                model='gemini-2.5-flash',
                 contents=[
                     types.Part.from_bytes(data=audio_data, mime_type='audio/wav'),
                     prompt

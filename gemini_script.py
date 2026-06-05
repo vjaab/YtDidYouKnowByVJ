@@ -182,7 +182,7 @@ def get_hottest_tech_topic(client, avoid_list=""):
     while attempts < 3:
         try:
             response = client.models.generate_content(
-                model='gemini-2.0-flash',
+                model='gemini-2.5-flash',
                 contents=(
                     "Analyze today's Google Trends and viral tech news. "
                     "What is the single most trending AI search topic, breakout term, or breaking news story in the last 24 hours? "
@@ -349,7 +349,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
             
             try:
                 search_response = client.models.generate_content(
-                    model='gemini-2.0-flash', # Use stable flash for tools
+                    model='gemini-2.5-flash', # Use stable flash for tools
                     contents=search_query,
                     config=types.GenerateContentConfig(
                         tools=[{'google_search': {}}]
@@ -594,7 +594,7 @@ class MultiAgentGenerationEngine:
         self.is_longform = is_longform
         self.raw_articles = raw_articles
 
-    def _call_gemini(self, prompt, model='gemini-2.0-flash'):
+    def _call_gemini(self, prompt, model='gemini-2.5-flash'):
         attempts = 0
         current_model = model
         while attempts < 5:
@@ -614,19 +614,18 @@ class MultiAgentGenerationEngine:
                 return json.loads(raw)
             except Exception as e:
                 err_str = str(e).upper()
-                # Handle Overloaded (503) or Resource Exhausted (429)
-                if any(x in err_str for x in ["503", "UNAVAILABLE", "RESOURCE_EXHAUSTED", "429"]):
+                # Handle Overloaded (503), Resource Exhausted (429), or Model Deprecated (404)
+                if any(x in err_str for x in ["503", "UNAVAILABLE", "RESOURCE_EXHAUSTED", "429", "NOT_FOUND", "404"]):
                     wait_time = (5 ** (attempts + 1)) + random.uniform(2, 5) # Progressive wait: 7s, 27s, 127s...
                     
                     # Model Fallback Logic
                     if current_model == 'gemini-2.5-pro':
-                        print(f"⚠️ [LOOP] Model {current_model} is UNAVAILABLE. Falling back to gemini-2.0-flash...")
-                        current_model = 'gemini-2.0-flash'
-                        continue
-                    elif current_model == 'gemini-2.0-flash' and attempts >= 1:
-                        # Fallback to 2.5-flash (which is used in video_gen.py) instead of 1.5-flash (which 404s)
-                        print(f"⚠️ [LOOP] Model {current_model} is OVERLOADED. Falling back to gemini-2.5-flash...")
+                        print(f"⚠️ [LOOP] Model {current_model} is UNAVAILABLE. Falling back to gemini-2.5-flash...")
                         current_model = 'gemini-2.5-flash'
+                        continue
+                    elif current_model == 'gemini-2.5-flash' and attempts >= 1:
+                        print(f"⚠️ [LOOP] Model {current_model} is OVERLOADED. Falling back to gemini-2.5-flash-lite...")
+                        current_model = 'gemini-2.5-flash-lite'
                         continue
                         
                     print(f"⚠️ [LOOP] Call failed ({current_model}): Rate Limit/Overload. Retrying in {wait_time:.1f}s...")

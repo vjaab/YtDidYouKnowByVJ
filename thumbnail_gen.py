@@ -64,7 +64,7 @@ Use \\n for line breaks (max 3 lines).
 Example: "Google is\\nfinally\\nfinished..."
 Return ONLY the text."""
     try:
-        response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
+        response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
         hook = response.text.strip().replace("\\n", "\n")
         return "\n".join(hook.split("\n")[:3])
     except:
