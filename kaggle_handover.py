@@ -88,6 +88,8 @@ def trigger_kaggle_gpu_job(script_data, custom_map):
     start_time = time.time()
     job_started_running = False
     running_start_time = None
+    consecutive_status_errors = 0
+    max_consecutive_errors = 10
     
     while True:
         elapsed_s = time.time() - start_time
@@ -97,6 +99,7 @@ def trigger_kaggle_gpu_job(script_data, custom_map):
             status_output = subprocess.check_output(
                 [kaggle_cmd, "kernels", "status", kernel_id], text=True
             )
+            consecutive_status_errors = 0  # Reset on successful API check
             status_lower = status_output.strip().lower()
             print(f"   Status: {status_output.strip()}")
             
@@ -154,7 +157,16 @@ def trigger_kaggle_gpu_job(script_data, custom_map):
                     return {"error": "run_timeout", "message": msg}
                     
         except Exception as e:
-            print(f"⚠️ Error checking status: {e}")
+            consecutive_status_errors += 1
+            print(f"⚠️ Error checking status ({consecutive_status_errors}/{max_consecutive_errors}): {e}")
+            if consecutive_status_errors >= max_consecutive_errors:
+                msg = f"Kaggle API/Status check failed consecutively {consecutive_status_errors} times. Aborting loop."
+                print(f"❌ {msg}")
+                _notify_kaggle_failure(
+                    f"🚨 Kaggle API/Status Check Failure\n\n{msg}\n\n"
+                    f"Pipeline will attempt cloud TTS fallback."
+                )
+                return {"error": "api_failed", "message": msg}
             
         time.sleep(poll_interval_s)
 
