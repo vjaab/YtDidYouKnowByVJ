@@ -117,6 +117,64 @@ Return ONLY a JSON object:
   "optimized_script": "The full rewritten text combining all parts into a fast-paced script."
 }}"""
 
+# ── PHASE 2: RETENTION SCIENTIST AGENT ────────────────────────────────────────
+RETENTION_SCIENTIST_TEMPLATE = """{persona}
+
+RETENTION SCIENTIST TASK:
+Analyze the optimized script and inject PROVEN retention patterns at calculated intervals.
+You are a YouTube Shorts retention strategist. Your ONLY job is to maximize the percentage of viewers who watch to the end.
+
+CRITICAL RETENTION RULES (based on 2026 YouTube Shorts algorithm data):
+1. HOOK DENSITY: The first 1.5 seconds (first 6 words) MUST contain a surprising claim, stat, or contradiction.
+   - BAD: "Today we're going to talk about AI."
+   - GOOD: "OpenAI just deleted their safety team."
+
+2. OPEN LOOPS: Plant at least 3 "open loops" (unanswered questions) in the first 20 seconds.
+   - Technique: Mention something intriguing but don't resolve it for 8-12 seconds.
+   - Example: "But here's the part nobody is talking about..." then continue with OTHER info before resolving.
+
+3. PATTERN INTERRUPTS: Every 8-12 seconds, inject a cognitive shift:
+   - Rhetorical question ("But wait...")
+   - Contradiction ("The crazy part?")
+   - Number/stat bomb ("$4.2 billion.")
+   - Direct address ("Here's why YOU should care.")
+   - Emotional pivot ("And that's when everything changed.")
+
+4. CURIOSITY GAPS: End every major point with an incomplete thought that requires the next sentence to resolve.
+   - BAD: "The model scored 95% on the benchmark. It was impressive."
+   - GOOD: "The model scored 95%. But that's not the scary part..."
+
+5. PAYOFF STACKING: The most valuable, surprising, or controversial information MUST be in the LAST 15 seconds.
+   Viewers who reach 70% completion almost always finish. Front-load curiosity, back-load payoff.
+
+6. VOCAL VARIETY MARKERS: Add explicit markers for TTS energy:
+   - ALL CAPS for emphasis words (max 2 per sentence)
+   - "..." for dramatic pauses (1-2 per 15 seconds)
+   - Short sentences (< 8 words) after complex explanations
+   - "!" for energy spikes at key reveals
+
+SCRIPT TO ENHANCE:
+{optimized_script}
+
+Return ONLY a JSON object:
+{{
+  "retention_enhanced_script": "The full rewritten script with all retention patterns injected",
+  "retention_map": {{
+    "open_loops": [
+      {{"text": "The phrase that opens the loop", "planted_at_word": 15, "resolved_at_word": 45}}
+    ],
+    "pattern_interrupts": [
+      {{"type": "contradiction", "text": "But here's the twist...", "at_word": 30}}
+    ],
+    "curiosity_gap_ratio": 0.65,
+    "hook_word_count": 6,
+    "payoff_zone_start_word": 120,
+    "retention_risk_zones": [
+      {{"at_word": 50, "risk": "explanation_fatigue", "mitigation": "Added rhetorical question"}}
+    ]
+  }}
+}}"""
+
 SELECTOR_AGENT_TEMPLATE = """{persona}
 
 SELECTOR AGENT TASK:
@@ -252,7 +310,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
     else:
         # ── STEP 0: FETCH & FILTER + RE-RANK BY VIRAL POTENTIAL ───────────────────────
         if articles:
-            print(f"📡 STEP 0: Scoring {len(articles)} articles for viral potential...")
+            print(f"📡 STEP 0: Scoring {len(articles)} articles for viral potential (engagement-weighted)...")
             
             # Fetch global trending articles from NewsAPI as an additional boost
             from fetch_research_papers import fetch_trending_from_newsapi
@@ -275,56 +333,103 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
                 if any(fuzz.token_set_ratio(title.lower(), s.lower()) > 80 for s in seen_titles_in_this_batch):
                     continue
                     
-                # 3. Viral Potential Scoring
+                # ── 3. MULTI-SIGNAL VIRAL SCORING (Phase 1 Upgrade) ──────────
                 title_lower = title.lower()
-                hot_score = sum(15 for kw in hot_keywords if kw in title_lower)
                 
-                # Additional weight for 'Trending' type from NewsAPI
-                if art.get("type") == "trending":
-                    hot_score += 20
-                
-                # Keyword density for "Breaking" signals
+                # A. Keyword Score (legacy, reduced weight)
+                keyword_score = sum(15 for kw in hot_keywords if kw in title_lower)
                 breaking_keywords = ["launch", "release", "leak", "breakthrough", "benchmark", "announces", "unveils", "shuts down",
                                      "lawsuit", "ban", "hack", "scandal", "fired", "exposed", "shutdown", "raises", "billion", "million",
                                      "warns", "danger", "kills", "replaces", "outperforms", "beats", "surpass", "free", "open-source"]
-                hot_score += sum(10 for kw in breaking_keywords if kw in title_lower)
-                
-                # Controversy / Emotional Trigger Boost (stories with strong emotional valence go viral)
+                keyword_score += sum(10 for kw in breaking_keywords if kw in title_lower)
                 controversy_keywords = ["wrong", "lie", "fake", "scam", "caught", "secretly", "hidden", "nobody", "shocking",
                                         "insane", "crazy", "terrifying", "scary", "devastating", "destroy", "war"]
-                hot_score += sum(12 for kw in controversy_keywords if kw in title_lower)
-                
-                # Big-Name Company Boost (household names drive clicks)
+                keyword_score += sum(12 for kw in controversy_keywords if kw in title_lower)
                 big_names = ["google", "apple", "openai", "meta", "microsoft", "nvidia", "tesla", "amazon", "anthropic", "deepmind"]
-                hot_score += sum(8 for name in big_names if name in title_lower)
+                keyword_score += sum(8 for name in big_names if name in title_lower)
                 
-                # Type-Specific Scoring Boosts (Production Spec 2026)
-                if topic_type == "tools":
-                    tool_keywords = ["tool", "app", "ui", "workflow", "extension", "github", "build", "sdk", "library", "software", "try-on", "use case", "plugin"]
-                    hot_score += sum(15 for kw in tool_keywords if kw in title_lower)
-                    if art.get("type") == "tools":
-                        hot_score += 25
-                elif topic_type == "news":
-                    news_keywords = ["breaking", "lawsuit", "scandal", "fires", "ban", "partnership", "ceo", "acquires", "invests", "valuation", "trending", "revenue", "warns"]
-                    hot_score += sum(15 for kw in news_keywords if kw in title_lower)
-                    if art.get("type") == "trending":
-                        hot_score += 25
-                elif topic_type == "research":
-                    research_keywords = ["paper", "arxiv", "architecture", "researchers", "study", "dataset", "framework", "speculative decoding", "proof", "benchmark", "molecule", "polymerase"]
-                    hot_score += sum(15 for kw in research_keywords if kw in title_lower)
-                    if art.get("type") == "research":
-                        hot_score += 25
+                # B. Source Engagement Score (NEW: from trending engine)
+                engagement_score = art.get("_engagement_score", 0)  # Pre-computed by trending_engine
+                if not engagement_score:
+                    # Legacy sources without engagement data get base scores by type
+                    if art.get("type") == "trending": engagement_score = 20
+                    elif art.get("type") == "tools": engagement_score = 10
+                    elif art.get("type") == "research": engagement_score = 10
+                    else: engagement_score = 5
                 
-                # Recency Boost (Last 24h gets +15)
+                # C. Trending Velocity Score (NEW: how fast is this topic rising?)
+                trending_velocity_score = 0
+                eng = art.get("_engagement", {})
+                if art.get("type") == "reddit_trending":
+                    velocity = eng.get("upvote_velocity", 0)
+                    if velocity > 100: trending_velocity_score = 40
+                    elif velocity > 50: trending_velocity_score = 30
+                    elif velocity > 20: trending_velocity_score = 20
+                    elif velocity > 5: trending_velocity_score = 10
+                elif art.get("type") == "youtube_trending":
+                    views = eng.get("views", 0)
+                    if views > 100000: trending_velocity_score = 40
+                    elif views > 50000: trending_velocity_score = 30
+                    elif views > 10000: trending_velocity_score = 20
+                elif art.get("type") == "github_trending":
+                    spd = eng.get("stars_per_day", 0)
+                    if spd > 100: trending_velocity_score = 35
+                    elif spd > 50: trending_velocity_score = 25
+                    elif spd > 10: trending_velocity_score = 15
+                
+                # D. Niche Gap Score (NEW: prefer topics competitors haven't covered)
+                niche_score = 0
+                niche_types = ["github_trending", "reddit_trending"]
+                if art.get("type") in niche_types:
+                    niche_score = 15  # Niche sources get a boost
+                
+                # E. Recency Score
+                recency_score = 0
                 pub_at = art.get("publishedAt", "")
                 if pub_at:
                     try:
                         pub_dt = datetime.fromisoformat(pub_at.replace('Z', '+00:00'))
-                        if datetime.now(timezone.utc) - pub_dt < timedelta(hours=24):
-                            hot_score += 15
+                        hours_ago = (datetime.now(timezone.utc) - pub_dt).total_seconds() / 3600
+                        if hours_ago < 6: recency_score = 25
+                        elif hours_ago < 12: recency_score = 20
+                        elif hours_ago < 24: recency_score = 15
+                        elif hours_ago < 48: recency_score = 8
                     except: pass
+                
+                # F. Type-Specific Scoring Boosts
+                type_score = 0
+                if topic_type == "tools":
+                    tool_keywords = ["tool", "app", "ui", "workflow", "extension", "github", "build", "sdk", "library", "software", "try-on", "use case", "plugin"]
+                    type_score += sum(15 for kw in tool_keywords if kw in title_lower)
+                    if art.get("type") in ["tools", "github_trending"]:
+                        type_score += 25
+                elif topic_type == "news":
+                    news_keywords = ["breaking", "lawsuit", "scandal", "fires", "ban", "partnership", "ceo", "acquires", "invests", "valuation", "trending", "revenue", "warns"]
+                    type_score += sum(15 for kw in news_keywords if kw in title_lower)
+                    if art.get("type") in ["trending", "youtube_trending"]:
+                        type_score += 25
+                elif topic_type == "research":
+                    research_keywords = ["paper", "arxiv", "architecture", "researchers", "study", "dataset", "framework", "speculative decoding", "proof", "benchmark", "molecule", "polymerase"]
+                    type_score += sum(15 for kw in research_keywords if kw in title_lower)
+                    if art.get("type") in ["research", "reddit_trending"]:
+                        type_score += 25
+                
+                # ── COMPOSITE VIRAL SCORE (weighted blend) ──
+                hot_score = (
+                    keyword_score * 0.15 +
+                    engagement_score * 0.35 +
+                    trending_velocity_score * 0.25 +
+                    niche_score * 0.15 +
+                    recency_score * 0.10 +
+                    type_score * 0.10
+                )
 
-                art['_hot_score'] = hot_score
+                art['_hot_score'] = round(hot_score, 1)
+                art['_score_breakdown'] = {
+                    'kw': keyword_score, 'eng': engagement_score, 
+                    'vel': trending_velocity_score, 'niche': niche_score,
+                    'rec': recency_score, 'type': type_score
+                }
                 filtered_articles.append(art)
                 seen_titles_in_this_batch.append(title)
             
@@ -332,10 +437,12 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
                 print("⚠️ No unique viral articles. Falling back to Search...")
                 articles = None
             else:
-                # Rank by viral score
+                # Rank by composite viral score
                 filtered_articles.sort(key=lambda x: x.get('_hot_score', 0), reverse=True)
                 top = filtered_articles[0]
-                print(f"🏆 Top Viral Candidate: '{top.get('title')}' (Score: {top['_hot_score']})")
+                bd = top.get('_score_breakdown', {})
+                print(f"🏆 Top Viral Candidate: '{top.get('title')}' (Score: {top['_hot_score']:.1f})")
+                print(f"   Breakdown: kw={bd.get('kw',0)} eng={bd.get('eng',0)} vel={bd.get('vel',0)} niche={bd.get('niche',0)} rec={bd.get('rec',0)} type={bd.get('type',0)}")
                 articles = filtered_articles
 
         # ── STEP 1: GEMINI SEARCH FALLBACK (biased toward hot topic) ────────────
@@ -726,15 +833,21 @@ class MultiAgentGenerationEngine:
         hooks_data = self._call_gemini(hook_prompt)
         if not hooks_data or "hooks" not in hooks_data: return None
         
-        # Pick best hook (highest combined score)
-        best_hook = max(hooks_data["hooks"], key=lambda h: h.get("curiosity_score", 0) + h.get("emotional_trigger_score", 0))
-        print(f"🎯 Selected Hook: {best_hook.get('text')}")
+        # Pick best hook (highest combined score including swipe-stop power)
+        best_hook = max(hooks_data["hooks"], key=lambda h: (
+            h.get("curiosity_score", 0) + 
+            h.get("emotional_trigger_score", 0) + 
+            h.get("swipe_stop_score", h.get("curiosity_score", 0))  # Backward-compatible
+        ))
+        hook_text = best_hook.get('text', '')
+        hook_words = len(hook_text.split())
+        print(f"🎯 Selected Hook ({hook_words} words): {hook_text}")
 
         print("📖 [AGENT 3] Narrative Agent: Building escalating structure...")
         narrative_prompt = NARRATIVE_AGENT_TEMPLATE.format(
             persona=SYSTEM_PERSONA,
             research_json=json.dumps(research),
-            selected_hook=best_hook.get("text"),
+            selected_hook=hook_text,
             selection_instruction=selection_instruction
         )
         narrative = self._call_gemini(narrative_prompt, model='gemini-2.5-pro')
@@ -747,6 +860,25 @@ class MultiAgentGenerationEngine:
         )
         optimized = self._call_gemini(retention_prompt, model='gemini-2.5-pro')
         if not optimized: return None
+
+        # ── PHASE 2: RETENTION SCIENTIST (Agent 4.5) ──────────────────────────
+        print("🧬 [AGENT 4.5] Retention Scientist: Injecting proven retention patterns...")
+        retention_sci_prompt = RETENTION_SCIENTIST_TEMPLATE.format(
+            persona=SYSTEM_PERSONA,
+            optimized_script=optimized.get("optimized_script", "")
+        )
+        retention_result = self._call_gemini(retention_sci_prompt, model='gemini-2.5-pro')
+        
+        retention_map = {}
+        if retention_result and "retention_enhanced_script" in retention_result:
+            optimized["optimized_script"] = retention_result["retention_enhanced_script"]
+            retention_map = retention_result.get("retention_map", {})
+            cgr = retention_map.get("curiosity_gap_ratio", 0)
+            loops = len(retention_map.get("open_loops", []))
+            interrupts = len(retention_map.get("pattern_interrupts", []))
+            print(f"   ✅ Retention: {loops} open loops, {interrupts} pattern interrupts, {cgr:.0%} curiosity gap ratio")
+        else:
+            print("   ⚠️ Retention Scientist failed (non-fatal). Using optimizer output directly.")
 
         print("🗣️ [AGENT 5] Humanizer Agent: Fixing AI cadence and returning final schema...")
         # Inject the selected headline and URL back into the requirements if they are missing
@@ -769,6 +901,10 @@ class MultiAgentGenerationEngine:
                 final_script["original_news_headline"] = selected_headline
             if not final_script.get("original_news_url") or final_script.get("original_news_url") == "Direct article URL":
                 final_script["original_news_url"] = selected_url
+            
+            # ── PHASE 2: Attach retention_map to the final script for downstream use ──
+            if retention_map:
+                final_script["retention_map"] = retention_map
             
             print("⭐ [PIPELINE] Multi-Agent script generation completed successfully.")
         return final_script

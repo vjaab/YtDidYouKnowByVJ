@@ -385,20 +385,24 @@ def run_longform_pipeline(dry_run=False):
     retention_config = get_retention_layers_config()
     script_data["retention_config"] = retention_config
 
-    # ── STEP 7: Generate Per-Sentence Visuals (16:9) ─────────────────────
-    log_message("STEP 7: Generating per-sentence nano-scene backgrounds (16:9 Imagen)...")
+    # ── STEP 7: Google Veo / Google Image Per-Sentence Visual Generation (16:9) ──────
+    log_message("STEP 7: Generating visuals using Google Veo and Google Image (16:9, primary option)...")
     topic_context = f"Did You Know AI Facts Compilation: {title}"
     style_guide = generate_visual_style_guide(topic_context)
 
-    chunks = generate_nano_scene_visuals(chunks, topic_context, style_guide=style_guide, aspect_ratio="16:9")
+    from pexels_fetcher import fetch_all_chunk_visuals
+    chunks = fetch_all_chunk_visuals(chunks, topic_context=topic_context, script_data=script_data, is_longform=True)
 
-    nano_success = sum(1 for c in chunks if c.get("visual_path") and "Nano-Scene" in c.get("source", ""))
-    if nano_success < len(chunks) * 0.5:
-        log_message(f"⚠️ Nano-scene only generated {nano_success}/{len(chunks)} visuals. Using fallback...")
-        from pexels_fetcher import fetch_all_chunk_visuals
-        chunks = fetch_all_chunk_visuals(chunks, topic_context=topic_context, script_data=script_data, is_longform=True)
+    # Check success rate of the primary generator
+    gen_success = sum(1 for c in chunks if c.get("visual_path") and c.get("source") in [
+        "Veo (veo_concept)", "Veo (veo_cta)", "Imagen (nano_hook)", "Imagen (nano_concept)", "Imagen (nano_evidence)", "Imagen (fallback from veo)", "Real Article Screenshot", "Evidence Screenshot", "Fact Article Screenshot", "Main Article Screenshot"
+    ])
+    
+    if gen_success < len(chunks) * 0.5:
+        log_message(f"⚠️ Primary visual generator only generated {gen_success}/{len(chunks)} visuals. Falling back to nano-scene engine (16:9 Imagen)...")
+        chunks = generate_nano_scene_visuals(chunks, topic_context, style_guide=style_guide, aspect_ratio="16:9")
     else:
-        log_message(f"✅ Nano-scene generated {nano_success}/{len(chunks)} per-sentence backgrounds.")
+        log_message(f"✅ Primary visual generator successfully created {gen_success}/{len(chunks)} clips/images.")
 
     # ── STEP 8: Visual Variety (Color Theme) ─────────────────────────────
     visual_palettes = [

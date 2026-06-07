@@ -18,6 +18,11 @@ X_ACCESS_TOKEN = os.getenv("X_ACCESS_TOKEN", "")
 X_ACCESS_TOKEN_SECRET = os.getenv("X_ACCESS_TOKEN_SECRET", "")
 X_BEARER_TOKEN = os.getenv("X_BEARER_TOKEN", "")
 
+# Trending Engine API Keys (Phase 1)
+YOUTUBE_DATA_API_KEY = os.getenv("YOUTUBE_DATA_API_KEY", "")
+REDDIT_CLIENT_ID = os.getenv("REDDIT_CLIENT_ID", "")
+REDDIT_CLIENT_SECRET = os.getenv("REDDIT_CLIENT_SECRET", "")
+
 
 # Directory Paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -26,10 +31,11 @@ LOGS_DIR = os.path.join(BASE_DIR, "logs")
 ASSETS_DIR = os.path.join(BASE_DIR, "assets")
 FONTS_DIR = os.path.join(ASSETS_DIR, "fonts")
 MUSIC_DIR = os.path.join(ASSETS_DIR, "music")
+SFX_DIR = os.path.join(ASSETS_DIR, "sfx")
 TRACKER_FILE = os.path.join(BASE_DIR, "news_log.json")
 
 # Create required directories
-for d in [OUTPUT_DIR, LOGS_DIR, FONTS_DIR, MUSIC_DIR]:
+for d in [OUTPUT_DIR, LOGS_DIR, FONTS_DIR, MUSIC_DIR, SFX_DIR]:
     os.makedirs(d, exist_ok=True)
 
 # Application Settings
@@ -43,6 +49,7 @@ TARGET_AUDIO_DURATION = (45, 58) # Optimized for 60s Shorts limit (YPP Spec 2026
 
 # Global Feature Flags
 ENABLE_LONGFORM = False
+ENABLE_TRENDING_ENGINE = True    # Phase 1: YouTube/Reddit/GitHub trending aggregation
 
 # Engagement & Retention Pillars (Production Spec 2026)
 ENABLE_KINETIC_CAPTIONS = True
@@ -50,3 +57,10 @@ ENABLE_AUDIO_DUCKING = True
 ENABLE_PERIODIC_CUTS = True
 ENABLE_EVIDENCE_SCREENSHOTS = True
 ENABLE_HORMOZI_STYLING = True
+
+# Retention Engine Settings (Phase 3 & 4)
+VISUAL_CUT_TARGET_SECONDS = 2.0   # Target visual change frequency (was ~4s, now 2s)
+ENABLE_CINEMATIC_TRANSITIONS = True  # Whip pan, zoom punch, flash cut, glitch
+ENABLE_STRATEGIC_SFX = True       # Whoosh/bass at pattern interrupts
+ENABLE_DYNAMIC_BGM_CURVE = True   # BGM energy follows Hook→Body→Payoff→CTA
+TRENDING_NICHE_BIAS = 0.7         # 0=prefer broad topics, 1=prefer niche topics

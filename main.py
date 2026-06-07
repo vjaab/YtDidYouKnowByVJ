@@ -11,7 +11,7 @@ import random
 import traceback
 from datetime import datetime
 
-from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY
+from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY, ENABLE_TRENDING_ENGINE
 from fetch_research_papers import fetch_tech_news, fetch_ai_tools
 from topic_tracker import record_story, update_youtube_url, get_next_topic_type_by_ratio
 from gemini_script import pick_and_generate_script
@@ -198,8 +198,8 @@ def run_pipeline(topic_type="auto"):
     day_name, slot, category = get_slot_info()
     log_message(f"STEP 1: Content Ecosystem Check -> Day: {day_name}, Slot: {slot}, Category: {category}")
     
-    # ── STEP 2: Selection Strategy (RSS Fetch) ────────────────────────────────
-    log_message(f"STEP 2: Fetching RSS articles (Research + Tools)...")
+    # ── STEP 2: Selection Strategy (RSS + Trending Engine) ─────────────────────
+    log_message(f"STEP 2: Fetching articles (RSS + Trending Engine)...")
     rss_articles = []
     try:
         # Fetch both to give Gemini more options
@@ -215,13 +215,24 @@ def run_pipeline(topic_type="auto"):
             x_news = []
             
         rss_articles = research_news + ai_tool_news + x_news
+        
+        # ── TRENDING ENGINE (Phase 1): YouTube, Reddit, GitHub signals ──
+        trending_articles = []
+        if ENABLE_TRENDING_ENGINE:
+            try:
+                from trending_engine import fetch_all_trending_signals
+                trending_articles = fetch_all_trending_signals()
+                rss_articles = trending_articles + rss_articles  # Trending FIRST for priority
+                log_message(f"🔥 Trending Engine injected {len(trending_articles)} high-signal articles.")
+            except Exception as ex:
+                log_message(f"⚠️ Trending Engine failed (non-fatal): {ex}")
             
         if not rss_articles:
-            log_message("⚠️ All RSS feeds returned 0 articles.")
+            log_message("⚠️ All feeds returned 0 articles.")
         else:
-            log_message(f"✅ Fetched {len(rss_articles)} total articles ({len(research_news)} research, {len(ai_tool_news)} tools, {len(x_news)} X.com).")
+            log_message(f"✅ Fetched {len(rss_articles)} total articles ({len(research_news)} research, {len(ai_tool_news)} tools, {len(x_news)} X.com, {len(trending_articles)} trending).")
     except Exception as e:
-        log_message(f"⚠️ RSS/X Fetch failed: {e}")
+        log_message(f"⚠️ RSS/Trending Fetch failed: {e}")
 
     # ── STEP 3: Script Generation (with retry) ────────────────────────────────
     # Screenshot is MANDATORY — if we can't capture it, we reject the topic and retry.
@@ -455,24 +466,27 @@ def run_pipeline(topic_type="auto"):
     script_data["retention_config"] = retention_config
     log_message(f"Engagement Layers Active: {list(retention_config.keys())}")
 
-    # ── STEP 7: Nano-Scene Per-Sentence Visual Generation ─────────────────────
-    log_message("STEP 7: Generating per-sentence nano-scene backgrounds (Imagen 4.0)...")
+    # ── STEP 7: Google Veo / Google Image Per-Sentence Visual Generation ──────
+    log_message("STEP 7: Generating visuals using Google Veo and Google Image (primary option)...")
     topic_context = script_data.get("original_news_headline", title)
     is_longform = "Slot C" in slot
     
     # Generate global visual style guide for consistency
     style_guide = generate_visual_style_guide(topic_context)
     
-    # Try nano-scene generation first (per-sentence Imagen)
-    chunks = generate_nano_scene_visuals(chunks, topic_context, style_guide=style_guide)
+    # Try the primary generator first (Veo and Imagen)
+    chunks = fetch_all_chunk_visuals(chunks, topic_context=topic_context, script_data=script_data, is_longform=is_longform)
     
-    # Check how many chunks got visuals — fallback to old system if nano-scenes mostly failed
-    nano_success = sum(1 for c in chunks if c.get("visual_path") and "Nano-Scene" in c.get("source", ""))
-    if nano_success < len(chunks) * 0.5:
-        log_message(f"⚠️ Nano-scene only generated {nano_success}/{len(chunks)} visuals. Falling back to legacy fetcher...")
-        chunks = fetch_all_chunk_visuals(chunks, topic_context=topic_context, script_data=script_data, is_longform=is_longform)
+    # Check success rate of the primary generator
+    gen_success = sum(1 for c in chunks if c.get("visual_path") and c.get("source") in [
+        "Veo (veo_concept)", "Veo (veo_cta)", "Imagen (nano_hook)", "Imagen (nano_concept)", "Imagen (nano_evidence)", "Imagen (fallback from veo)", "Real Article Screenshot", "Evidence Screenshot", "Fact Article Screenshot", "Main Article Screenshot"
+    ])
+    
+    if gen_success < len(chunks) * 0.5:
+        log_message(f"⚠️ Primary visual generator only generated {gen_success}/{len(chunks)} visuals. Falling back to nano-scene engine (Imagen)...")
+        chunks = generate_nano_scene_visuals(chunks, topic_context, style_guide=style_guide)
     else:
-        log_message(f"✅ Nano-scene generated {nano_success}/{len(chunks)} per-sentence backgrounds.")
+        log_message(f"✅ Primary visual generator successfully created {gen_success}/{len(chunks)} clips/images.")
 
     # ── STEP 8: Render Video ──────────────────────────────────────────────────
     log_message("STEP 8: Rendering final video with all engagement layers...")

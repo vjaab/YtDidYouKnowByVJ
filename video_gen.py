@@ -331,7 +331,8 @@ def get_cinematic_font(size, bold=True, italic=False):
 
 # ── Ken Burns ─────────────────────────────────────────────────────────────────
 _kb_idx = 0
-KB_PATTERNS = ["smooth_zoom", "reveal_zoom", "z_pan_high_energy", "z_pan_subtle"]
+# Phase 3: Added crash_zoom and drift_parallax for higher visual energy
+KB_PATTERNS = ["smooth_zoom", "reveal_zoom", "z_pan_high_energy", "z_pan_subtle", "crash_zoom", "drift_parallax"]
 
 def get_ease_factor(t):
     # Standard Ease-In-Out Quadratic
@@ -371,6 +372,15 @@ def build_ken_burns(img_path, duration, pattern_idx):
             angle = -1.0 + (2.0 * eased_t)
             cx = pw // 2 + int(-40 + 80 * eased_t)
             cy = ph // 2 + int(40 - 80 * eased_t)
+        elif pattern == "crash_zoom":
+            # Phase 3: Fast 1.3x zoom-in with slight tilt (HIGH ENERGY)
+            current_scale = 1.0 + (0.30 * eased_t)
+            angle = -0.5 + (1.0 * eased_t)
+        elif pattern == "drift_parallax":
+            # Phase 3: Slow lateral drift with gentle zoom (CINEMATIC)
+            current_scale = 1.05 + (0.08 * eased_t)
+            cx = pw // 2 + int(-60 + 120 * eased_t)
+            cy = ph // 2 + int(10 * math.sin(eased_t * math.pi))
         else:
             # Subtle Pan (Start slightly off-center left -> zoom toward upper-right third)
             current_scale = 1.0 + (0.12 * eased_t)
@@ -395,6 +405,103 @@ def build_ken_burns(img_path, duration, pattern_idx):
         return np.clip(out * 0.88 * 1.12, 0, 255).astype(np.uint8)
 
     return VideoClip(make_frame, duration=duration)
+
+
+# ── PHASE 3: CINEMATIC TRANSITIONS ─────────────────────────────────────────
+def _create_transition_clip(transition_type, duration=0.2):
+    """
+    Creates a brief transition clip between visual chunks for retention.
+    Types: whip_pan, zoom_punch, flash_cut, glitch
+    """
+    from config import ENABLE_CINEMATIC_TRANSITIONS
+    if not ENABLE_CINEMATIC_TRANSITIONS:
+        return None
+    
+    trans_dur = min(duration, 0.3)  # Max 300ms
+    
+    if transition_type == "flash_cut":
+        # 2-frame white flash
+        def make_frame(t):
+            progress = t / max(trans_dur, 0.01)
+            brightness = int(255 * (1.0 - progress))  # Flash then fade
+            return np.full((FRAME_H, FRAME_W, 3), brightness, dtype=np.uint8)
+        return VideoClip(make_frame, duration=trans_dur)
+    
+    elif transition_type == "glitch":
+        # RGB channel offset effect
+        def make_frame(t):
+            frame = np.zeros((FRAME_H, FRAME_W, 3), dtype=np.uint8)
+            progress = t / max(trans_dur, 0.01)
+            offset = int(15 * (1.0 - progress))
+            # Red channel shifted right, Blue shifted left
+            frame[offset:, :, 0] = 80  # Red shifted down
+            frame[:FRAME_H-offset, :, 2] = 80  # Blue shifted up
+            # Random scan lines
+            for y in range(0, FRAME_H, random.randint(20, 60)):
+                frame[y:y+2, :, :] = 200
+            return frame
+        return VideoClip(make_frame, duration=trans_dur)
+    
+    elif transition_type == "zoom_punch":
+        # Quick 1.1x zoom burst
+        def make_frame(t):
+            progress = t / max(trans_dur, 0.01)
+            # Dark frame with a bright center expanding
+            frame = np.full((FRAME_H, FRAME_W, 3), 5, dtype=np.uint8)
+            radius = int(FRAME_W * 0.3 * progress)
+            cv2.circle(frame, (FRAME_W//2, FRAME_H//2), max(1, radius), (30, 30, 40), -1)
+            return frame
+        return VideoClip(make_frame, duration=trans_dur)
+    
+    elif transition_type == "whip_pan":
+        # Horizontal motion blur
+        def make_frame(t):
+            progress = t / max(trans_dur, 0.01)
+            frame = np.full((FRAME_H, FRAME_W, 3), 10, dtype=np.uint8)
+            # Horizontal streaks
+            for y in range(0, FRAME_H, 3):
+                brightness = int(40 * (1.0 - abs(progress - 0.5) * 2))
+                frame[y:y+1, :, :] = brightness
+            return frame
+        return VideoClip(make_frame, duration=trans_dur)
+    
+    return None
+
+
+def get_transition_type_for_chunk(chunk_idx, retention_map, total_chunks):
+    """
+    Phase 3: Selects the appropriate transition type based on the retention_map.
+    Maps pattern interrupt types to visual transitions.
+    """
+    from config import ENABLE_CINEMATIC_TRANSITIONS
+    if not ENABLE_CINEMATIC_TRANSITIONS or not retention_map:
+        return "crossfade"  # Default
+    
+    pattern_interrupts = retention_map.get("pattern_interrupts", [])
+    
+    for pi in pattern_interrupts:
+        pi_word = pi.get("at_word", 0)
+        pi_type = pi.get("type", "")
+        estimated_chunk = pi_word // max(1, 170 // total_chunks)
+        
+        if abs(chunk_idx - estimated_chunk) <= 1:
+            # Map retention event type to visual transition
+            if pi_type in ["contradiction", "emotional_pivot"]:
+                return "flash_cut"
+            elif pi_type in ["stat_bomb", "number"]:
+                return "zoom_punch"
+            elif pi_type in ["rhetorical_question", "direct_address"]:
+                return "whip_pan"
+            else:
+                return "glitch"
+    
+    # Default: alternate between crossfade and subtle transitions
+    if chunk_idx % 5 == 0:
+        return "zoom_punch"
+    elif chunk_idx % 7 == 0:
+        return "flash_cut"
+    
+    return "crossfade"
 
 
 def build_video_clip(video_path, duration):
@@ -2420,7 +2527,7 @@ def _generate_room_tone(duration):
         clip = clip.subclipped(0, duration)
     return clip.with_effects([afx.MultiplyVolume(0.1)])
 
-def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hooks, output_duration, bgm_volume_config, output_path, fact_timestamps=None):
+def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hooks, output_duration, bgm_volume_config, output_path, fact_timestamps=None, retention_map=None):
     """
     Composes and masters the entire video soundtrack using Pydub:
     1. Import Voiceover, apply professional leveler.
@@ -2448,6 +2555,30 @@ def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hook
                 sfx_cues.append({
                     "type": "glitch",
                     "timestamp": start_s
+                })
+                
+    # ── PHASE 4: STRATEGIC SFX LAYER (Auto-inject at pattern interrupts) ──
+    from config import ENABLE_STRATEGIC_SFX
+    if ENABLE_STRATEGIC_SFX and retention_map:
+        pi_timestamps = retention_map.get("pattern_interrupts", [])
+        for pi in pi_timestamps:
+            pi_word = pi.get("at_word", 0)
+            pi_type = pi.get("type", "contradiction")
+            # Estimate timestamp from word position
+            pi_time_s = pi_word / 3.0
+            
+            # Map pattern interrupt type to a sound effect
+            if pi_type in ["contradiction", "stat_bomb"]:
+                sfx_type = "glitch"
+            elif pi_type in ["rhetorical_question", "direct_address"]:
+                sfx_type = "pop"
+            else:
+                sfx_type = "woosh"
+                
+            if pi_time_s < output_duration:
+                sfx_cues.append({
+                    "type": sfx_type,
+                    "timestamp": pi_time_s
                 })
     
     # 2. Load and Prepare BGM
@@ -2535,12 +2666,46 @@ def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hook
                 # Interpolate volume multiplier: 1.2x (unducked) to 0.25x (ducked)
                 vol_multiplier = (1.2 * (1.0 - duck_factor) + 0.25 * duck_factor) * sil_factor
                 
-                # --- INTENSITY RAMP FOR LONGFORM (Last 30% of duration) ---
+                # ── PHASE 4: DYNAMIC BGM ENERGY CURVE ────────────────────────
+                # BGM follows Hook→Body→Payoff→CTA arc instead of flat volume
+                from config import ENABLE_DYNAMIC_BGM_CURVE
                 progress_ratio = i / max(1, n_steps)
-                if progress_ratio > 0.7:
-                    # Ramps from 1.0 to 1.45 at the end (~ +3.2dB increase in music intensity for dramatic climax)
-                    ramp_factor = 1.0 + 0.45 * ((progress_ratio - 0.7) / 0.3)
-                    vol_multiplier *= ramp_factor
+                
+                if ENABLE_DYNAMIC_BGM_CURVE:
+                    if progress_ratio < 0.05:
+                        # Hook zone (0-5%): Higher energy to match opening
+                        energy_mult = 1.4
+                    elif progress_ratio < 0.80:
+                        # Body zone (5-80%): Lower, voice-focused
+                        energy_mult = 0.85
+                    elif progress_ratio < 0.92:
+                        # Payoff zone (80-92%): Build back up for climax
+                        ramp_prog = (progress_ratio - 0.80) / 0.12
+                        energy_mult = 0.85 + (0.40 * ramp_prog)  # 0.85 → 1.25
+                    else:
+                        # CTA zone (92-100%): Drop for authority
+                        energy_mult = 0.6
+                    vol_multiplier *= energy_mult
+                else:
+                    # --- LEGACY: INTENSITY RAMP FOR LONGFORM (Last 30%) ---
+                    if progress_ratio > 0.7:
+                        ramp_factor = 1.0 + 0.45 * ((progress_ratio - 0.7) / 0.3)
+                        vol_multiplier *= ramp_factor
+                
+                # ── PHASE 4: PATTERN INTERRUPT DUCKING ────────────────────────
+                # Duck BGM at retention pattern interrupt timestamps for impact
+                from config import ENABLE_STRATEGIC_SFX
+                if ENABLE_STRATEGIC_SFX and retention_map:
+                    # retention_map contains pattern_interrupt info
+                    pi_timestamps = retention_map.get("pattern_interrupts", [])
+                    for pi in pi_timestamps:
+                        pi_word = pi.get("at_word", 0)
+                        # Estimate timestamp from word position (≈3 words/sec in 170-word/58s script)
+                        pi_time_ms = int((pi_word / 3.0) * 1000)
+                        # Duck window: 250ms before to 250ms after
+                        if pi_time_ms - 250 <= chunk_start <= pi_time_ms + 250:
+                            vol_multiplier *= 0.15  # Deep duck for impact
+                            break
                 
                 if vol_multiplier < 0.0001 or base_bgm_gain_db < -90.0:
                     gain_db = -100.0
@@ -2681,63 +2846,8 @@ def _article_screenshot_clip(screenshot_path, duration):
     Shows the source article as a full-screen backdrop with a premium Ken Burns effect.
     Ensures visibility every 10s for 7s throughout the video.
     """
-    print(f"🔍 DEBUG: _article_screenshot_clip called with path: {screenshot_path}, dur: {duration}")
-    if not screenshot_path or not os.path.exists(screenshot_path):
-        print(f"⚠️ DEBUG: Screenshot path missing or invalid: {screenshot_path}")
-        return []
-    try:
-        # Load and prepare the canvas once
-        img = Image.open(screenshot_path).convert("RGB")
-        target_h, target_w = FRAME_H, FRAME_W
-        canvas = _prepare_screenshot_canvas(img, target_w, target_h, screenshot_path)
-        
-        # Prepare RGB and Mask arrays for explicit alpha handling in MoviePy
-        arr_rgba = np.array(canvas.convert("RGBA"))
-        arr_rgb = arr_rgba[:, :, :3]
-        arr_mask = (arr_rgba[:, :, 3] / 255.0).astype(float)
-        
-        clips = []
-        interval = 10.0
-        display_dur = 7.0
-        
-        # Start at 0.0 to ensure it appears immediately
-        current_start = 0.0
-        while current_start < duration:
-            # Clamp duration for the last clip if it would exceed total video length
-            current_dur = min(display_dur, duration - current_start)
-            if current_dur < 1.0:
-                break
-            
-            # Create a static ImageClip from the prepared canvas array
-            # ImageClip(arr_rgb) is faster than loading from disk every time in a loop
-            clip = ImageClip(arr_rgb, duration=current_dur)
-            
-            # --- PREMIUM KEN BURNS EFFECT (Zoom + Pan) ---
-            zoom_amt = 0.35 # Balanced zoom
-            clip = clip.resized(lambda t, cd=current_dur: 1.0 + zoom_amt * easeInOutQuad(t / cd))
-            
-            def pan_fn(t, cd=current_dur):
-                prog = easeInOutQuad(t / cd)
-                off_x = -int(90 * prog) 
-                off_y = -int(60 * prog)
-                return (off_x, off_y)
-
-            clip = clip.with_position(pan_fn).with_start(current_start)
-            if current_start == 0.0:
-                clip = clip.with_effects([vfx.CrossFadeOut(0.6)])
-            else:
-                clip = clip.with_effects([vfx.CrossFadeIn(0.6), vfx.CrossFadeOut(0.6)])
-            clips.append(clip)
-            
-            current_start += interval
-            
-        print(f"🎬 Generated {len(clips)} article screenshot intervals for path {os.path.basename(screenshot_path)}.")
-        return clips
-    except Exception as e:
-        print(f"Article screenshot clip error: {e}")
-        import traceback
-        traceback.print_exc()
-        return []
+    print(f"🔍 DEBUG: _article_screenshot_clip called with path: {screenshot_path}, dur: {duration} (Disabled repeating overlay)")
+    return []
 
 def _longform_article_screenshot_clips(script_json, audio_duration):
     """
@@ -2745,88 +2855,9 @@ def _longform_article_screenshot_clips(script_json, audio_duration):
     approximate active time window. Shows it at the start of the topic, and
     optionally halfway through, with premium Ken Burns zoom and pan transitions.
     """
-    print("🎬 Generating topic-aligned screenshots for long-form compilation...")
-    fact_timestamps = script_json.get("fact_timestamps", [])
-    topics = script_json.get("longform_topics", [])
-    if not topics or not fact_timestamps:
-        print("⚠️ No topics or fact timestamps found for longform screenshots. Falling back to default.")
-        screenshot_path = script_json.get("screenshot_path")
-        return _article_screenshot_clip(screenshot_path, audio_duration)
-        
-    clips = []
-    
-    for i, ft in enumerate(fact_timestamps):
-        fact_num = ft.get("fact_number", i + 1)
-        start_s = float(ft.get("approx_start_seconds", 0))
-        
-        # Duration until next fact or end of audio
-        if i + 1 < len(fact_timestamps):
-            end_s = float(fact_timestamps[i + 1].get("approx_start_seconds", audio_duration))
-        else:
-            end_s = audio_duration
-        fact_dur = max(1.0, end_s - start_s)
-        
-        # Get matching topic screenshot
-        topic_idx = i
-        if topic_idx >= len(topics):
-            # Fallback if list lengths mismatch
-            topic_idx = len(topics) - 1
-            
-        topic = topics[topic_idx]
-        screenshot_path = topic.get("screenshot_path")
-        if not screenshot_path or not os.path.exists(screenshot_path):
-            # Fallback to main screenshot
-            screenshot_path = script_json.get("screenshot_path")
-            
-        if not screenshot_path or not os.path.exists(screenshot_path):
-            continue
-            
-        try:
-            # Load and prepare canvas for this screenshot
-            img = Image.open(screenshot_path).convert("RGB")
-            target_h, target_w = FRAME_H, FRAME_W
-            canvas = _prepare_screenshot_canvas(img, target_w, target_h, topic.get("source_url"))
-            
-            # Prepare RGB array
-            arr_rgba = np.array(canvas.convert("RGBA"))
-            arr_rgb = arr_rgba[:, :, :3]
-            
-            # Determine show intervals within this fact segment [start_s, end_s]
-            intervals = []
-            
-            # First interval: show for 6 seconds at the start of the fact
-            first_dur = min(6.0, fact_dur)
-            if first_dur >= 1.0:
-                intervals.append((start_s, first_dur))
-                
-            # Second interval: if fact lasts longer than 18 seconds, show again for 5 seconds later in the fact
-            if fact_dur > 18.0:
-                sec_start = start_s + 14.0
-                sec_dur = min(5.0, end_s - sec_start)
-                if sec_dur >= 1.0:
-                    intervals.append((sec_start, sec_dur))
-                    
-            for c_start, c_dur in intervals:
-                # Create Ken Burns animated clip
-                clip = ImageClip(arr_rgb, duration=c_dur)
-                zoom_amt = 0.30
-                clip = clip.resized(lambda t, cd=c_dur: 1.0 + zoom_amt * easeInOutQuad(t / cd))
-                
-                def pan_fn(t, cd=c_dur):
-                    prog = easeInOutQuad(t / cd)
-                    off_x = -int(80 * prog)
-                    off_y = -int(50 * prog)
-                    return (off_x, off_y)
-                    
-                clip = clip.with_position(pan_fn).with_start(c_start)
-                clip = clip.with_effects([vfx.CrossFadeIn(0.5), vfx.CrossFadeOut(0.5)])
-                clips.append(clip)
-                
-            print(f"  Fact {fact_num}: Generated {len(intervals)} screenshot clips using: {os.path.basename(screenshot_path)}")
-        except Exception as e:
-            print(f"⚠️ Error preparing screenshot clip for Fact {fact_num}: {e}")
-            
-    return clips
+    print("🎬 Generating topic-aligned screenshots for long-form compilation... (Disabled repeating overlay)")
+    return []
+
 
 def _longform_topic_transition_clips(script_json, audio_duration):
     """
@@ -3764,9 +3795,23 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
                 c_clip = c_clip.resized((FRAME_W, FRAME_H))
                 
-                # ── CREATIVE TRANSITIONS ──
+                # ── CREATIVE TRANSITIONS (Phase 3: Retention-Map Aware) ──
                 if i > 0:
-                    trans_type = random.choice(["zoom", "slide_r", "slide_l", "slide_t", "glitch"])
+                    # Phase 3: Use retention_map to select transition type
+                    retention_map = script_json.get("retention_map", {})
+                    if retention_map:
+                        trans_type = get_transition_type_for_chunk(i, retention_map, len(expanded_visual_paths))
+                        # Map retention transition types to existing effects
+                        if trans_type == "flash_cut":
+                            trans_type = "glitch"
+                        elif trans_type == "zoom_punch":
+                            trans_type = "zoom"
+                        elif trans_type == "whip_pan":
+                            trans_type = random.choice(["slide_r", "slide_l"])
+                        else:
+                            trans_type = random.choice(["zoom", "slide_r", "slide_l", "slide_t", "glitch"])
+                    else:
+                        trans_type = random.choice(["zoom", "slide_r", "slide_l", "slide_t", "glitch"])
                     
                     if trans_type == "zoom":
                         # Dramatic Zoom In
@@ -3790,8 +3835,11 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                     elif trans_type == "glitch":
                         # Fast Glitch Cut
                         c_clip = c_clip.with_effects([vfx.CrossFadeIn(0.1)])
-                        # (Glitch logic is handled per-frame in make_final_frame based on start time)
-                        pass
+                        # Insert a brief cinematic transition clip if enabled
+                        trans_clip = _create_transition_clip("glitch", duration=0.15)
+                        if trans_clip:
+                            trans_clip = trans_clip.with_start(current_start)
+                            logo_clips.append(trans_clip)
 
                     # Impact Flash Sync
                     flash = ColorClip(size=(FRAME_W, FRAME_H), color=(255, 255, 255), duration=0.2).with_opacity(0.6)
@@ -4411,7 +4459,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         output_duration=audio_duration,
         bgm_volume_config=BGM_VOLUME,
         output_path=mastered_audio_path,
-        fact_timestamps=script_json.get("fact_timestamps", [])
+        fact_timestamps=script_json.get("fact_timestamps", []),
+        retention_map=script_json.get("retention_map", {})
     )
     
     final_audio = AudioFileClip(mastered_audio_path)

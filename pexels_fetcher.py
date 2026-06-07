@@ -303,7 +303,7 @@ Return ONLY the subject:"""
     return subject
 
 
-def _generate_imagen3(chunk_text, output_path, topic_context="", global_style_guide="", visual_subject=None):
+def _generate_imagen3(chunk_text, output_path, topic_context="", global_style_guide="", visual_subject=None, aspect_ratio="9:16"):
     topic = detect_topic(topic_context)
     
     # ── DAILY AESTHETIC ROTATION ──
@@ -318,20 +318,22 @@ def _generate_imagen3(chunk_text, output_path, topic_context="", global_style_gu
     
     print(f"  -> Visual Subject: '{visual_subject}'")
     
+    format_desc = "16:9 landscape format" if aspect_ratio == "16:9" else "9:16 vertical format"
+    
     if topic:
         template = random.choice(TOPIC_PROMPT_TEMPLATES[topic])
-        best_prompt = f"{template.format(name=visual_subject)}, {style_suffix}, {daily_style['motif']} elements, news editorial style, 9:16 vertical, ultra realistic, no text"
+        best_prompt = f"{template.format(name=visual_subject)}, {style_suffix}, {daily_style['motif']} elements, news editorial style, {format_desc}, ultra realistic, no text"
         print(f"  -> Detected Topic: {topic}. Using themed prompt for {visual_subject} with Day {day_idx} style.")
     else:
         # Ask Gemini to craft a headline-specific Imagen prompt
         topic_prompt = f"Topic Context: {topic_context}. The image MUST be highly relevant to this specific story.\n" if topic_context else ""
-        prompt_builder = f"""Create a detailed Imagen 3 prompt for a YouTube Shorts background image.
+        prompt_builder = f"""Create a detailed Imagen prompt for a fullscreen background video/image.
 
 NEWS HEADLINE: '{topic_context}'
 CURRENT CHUNK TEXT: '{chunk_text}'
 
 {topic_prompt}Requirements:
-- Photorealistic, cinematic, 9:16 vertical
+- Photorealistic, cinematic, {format_desc}
 - Style guide to follow: {global_style_guide}
 - The image MUST visually represent the specific topic/entities in the headline above
 - Include relevant logos, products, or symbolic imagery that viewers will immediately associate with the story
@@ -375,7 +377,7 @@ CURRENT CHUNK TEXT: '{chunk_text}'
                 prompt=best_prompt,
                 config=genai.types.GenerateImagesConfig(
                     number_of_images=1,
-                    aspect_ratio="9:16",
+                    aspect_ratio=aspect_ratio,
                     output_mime_type="image/jpeg",
                 )
             )
@@ -390,7 +392,6 @@ CURRENT CHUNK TEXT: '{chunk_text}'
             break
     return None
 
-    # Updated to 4.0 models as 3.0 is missing from the API in this environment
 def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide="", is_longform=False, visual_mode="veo_concept", visual_subject=None):
     """
     Executes the Visual Fetching Decision Tree with Switch-Back Logic
@@ -416,6 +417,8 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
     style = DAILY_AESTHETIC_MATRIX[day_idx % len(DAILY_AESTHETIC_MATRIX)]
     print(f"  📅 Day {day_idx} Aesthetic: {style['mood']} ({style['lighting']})")
 
+    format_desc = "16:9 landscape format" if is_longform else "9:16 vertical format for mobile"
+
     veo_broll_prompt = (
         f"Cinematic, high-definition 4k video in a {style['mood']} style. "
         f"Subject: {visual_subject}. Visuals should feature {style['motif']}, with {style['lighting']} lighting. "
@@ -425,11 +428,11 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
     nano_evidence_prompt = (
         f"A professional macro photograph of a scientific research paper titled '{headline}'. "
         f"Style: {style['mood']}. Focus on a specific complex diagram or a paragraph of mathematical equations. "
-        f"Realistic paper texture with {style['lighting']} lighting. Format: Vertical 9:16 for mobile."
+        f"Realistic paper texture with {style['lighting']} lighting. Format: {format_desc}."
     )
     
     nano_concept_prompt = (
-        f"Cinematic, high-definition 9:16 vertical image in a {style['mood']} style. "
+        f"Cinematic, high-definition {orientation} image in a {style['mood']} style. "
         f"Subject: {visual_subject}. Visuals should feature {style['motif']}, with {style['lighting']} lighting. "
         f"Style: Minimalist, clean. No text."
     )
@@ -437,7 +440,7 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
     if visual_mode == "nano_hook" or visual_mode == "nano_concept":
         print(f"Chunk {cid} -> MODE: {visual_mode}")
         prompt = nano_concept_prompt if visual_mode == "nano_concept" else nano_concept_prompt + " Dramatic hero shot."
-        path = _generate_imagen3(prompt, photo_out, topic_context, global_style_guide, visual_subject=visual_subject)
+        path = _generate_imagen3(prompt, photo_out, topic_context, global_style_guide, visual_subject=visual_subject, aspect_ratio=orientation)
         if path:
             chunk["visual_path"] = path
             chunk["visual_type"] = "photo"
@@ -446,18 +449,59 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
             return chunk
 
     elif visual_mode == "nano_evidence":
-        # Prefer REAL article screenshot if available in script_data
-        real_screenshot = script_data.get("screenshot_path")
-        if real_screenshot and os.path.exists(real_screenshot):
-            print(f"Chunk {cid} -> MODE: nano_evidence (Using REAL screenshot)")
-            chunk["visual_path"] = real_screenshot
+        # Alternating/selecting screenshots based on short vs long-form format
+        selected_screenshot = None
+        screenshot_source = None
+        
+        if is_longform:
+            # For longform compilation: map chunk's fact_number to the topic's screenshot
+            fact_num = chunk.get("fact_number")
+            topics = script_data.get("longform_topics", [])
+            if isinstance(fact_num, int) and 1 <= fact_num <= len(topics):
+                topic = topics[fact_num - 1]
+                screenshot_path = topic.get("screenshot_path")
+                if screenshot_path and os.path.exists(screenshot_path):
+                    selected_screenshot = screenshot_path
+                    screenshot_source = f"Fact {fact_num} Article Screenshot"
+            
+            # Fallback to main screenshot
+            if not selected_screenshot:
+                main_screenshot = script_data.get("screenshot_path")
+                if main_screenshot and os.path.exists(main_screenshot):
+                    selected_screenshot = main_screenshot
+                    screenshot_source = "Main Article Screenshot"
+        else:
+            # For Shorts: alternate between main and use-case evidence screenshots
+            main_screenshot = script_data.get("screenshot_path")
+            evidence_screenshot = script_data.get("evidence_screenshot_path")
+            
+            if cid == 2:
+                # First evidence slot: prefer main article screenshot
+                if main_screenshot and os.path.exists(main_screenshot):
+                    selected_screenshot = main_screenshot
+                    screenshot_source = "Real Article Screenshot"
+                elif evidence_screenshot and os.path.exists(evidence_screenshot):
+                    selected_screenshot = evidence_screenshot
+                    screenshot_source = "Evidence Screenshot"
+            else:
+                # Subsequent evidence slots: prefer use-case evidence screenshot if available
+                if evidence_screenshot and os.path.exists(evidence_screenshot):
+                    selected_screenshot = evidence_screenshot
+                    screenshot_source = "Evidence Screenshot"
+                elif main_screenshot and os.path.exists(main_screenshot):
+                    selected_screenshot = main_screenshot
+                    screenshot_source = "Real Article Screenshot"
+                    
+        if selected_screenshot:
+            print(f"Chunk {cid} -> MODE: nano_evidence (Using {screenshot_source}: {selected_screenshot})")
+            chunk["visual_path"] = selected_screenshot
             chunk["visual_type"] = "photo"
             chunk["relevance_score"] = 10
-            chunk["source"] = "Real Article Screenshot"
+            chunk["source"] = screenshot_source
             return chunk
 
         print(f"Chunk {cid} -> MODE: nano_evidence (Using AI Macro Fallback)")
-        path = _generate_imagen3(nano_evidence_prompt, photo_out, topic_context, global_style_guide)
+        path = _generate_imagen3(nano_evidence_prompt, photo_out, topic_context, global_style_guide, aspect_ratio=orientation)
         if path:
             chunk["visual_path"] = path
             chunk["visual_type"] = "photo"
@@ -477,7 +521,7 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
             
         # Fallback to Imagen if Veo fails
         print(f"Chunk {cid} -> Veo failed, falling back to Imagen")
-        path = _generate_imagen3(nano_concept_prompt, photo_out, topic_context, global_style_guide, visual_subject=visual_subject)
+        path = _generate_imagen3(nano_concept_prompt, photo_out, topic_context, global_style_guide, visual_subject=visual_subject, aspect_ratio=orientation)
         if path:
             chunk["visual_path"] = path
             chunk["visual_type"] = "photo"
@@ -504,25 +548,93 @@ def fetch_all_chunk_visuals(chunks, topic_context="", script_data=None, is_longf
         
     print(f"Running Decision Tree for {len(chunks)} chunks (with Smart Throttling)...")
     
+    current_fact = None
+    fact_offset = 0
+
     for i, chunk in enumerate(chunks):
         if "pexels_primary" not in chunk:
             chunk["pexels_primary"] = " ".join(chunk["text"].split()[:3])
             chunk["pexels_fallback"] = "technology"
 
-        # Determine visual mode based on index
+        # Determine visual mode based on index and is_longform
         total_chunks = len(chunks)
-        if i == 0:
-            v_mode = "nano_hook"
-        elif i == 1:
-            v_mode = "nano_evidence" # The "Evidence Flash"
-        elif i == total_chunks - 1:
-            v_mode = "veo_cta"
-        elif i % 4 == 1:
-            # Every 4th chunk (starting from 5), switch back to Evidence
-            v_mode = "nano_evidence"
+        
+        if is_longform:
+            fact_num = chunk.get("fact_number")
+            
+            # If the fact number changes, reset the offset
+            if fact_num != current_fact:
+                current_fact = fact_num
+                fact_offset = 0
+            else:
+                fact_offset += 1
+                
+            # Determine mode within the current fact
+            if fact_num == 0:  # Cold Open
+                if fact_offset == 0:
+                    v_mode = "nano_hook"
+                else:
+                    v_mode = "veo_concept" if fact_offset % 2 == 0 else "nano_concept"
+            elif fact_num == "outro":
+                v_mode = "veo_cta"
+            elif isinstance(fact_num, str) and "recap" in fact_num:
+                v_mode = "nano_concept"
+            else:
+                # Standard fact structure
+                if fact_offset == 0:
+                    v_mode = "nano_hook"
+                elif fact_offset == 1:
+                    v_mode = "nano_evidence"  # Show topic-aligned screenshot right after hook
+                elif i == total_chunks - 1:
+                    v_mode = "veo_cta"
+                else:
+                    # Alternate between Veo video and Imagen image
+                    v_mode = "veo_concept" if fact_offset % 2 == 0 else "nano_concept"
         else:
-            # Alternate concept loop for the rest
-            v_mode = "veo_concept" if i % 2 == 0 else "nano_concept"
+            # Shorts logic
+            if i == 0:
+                v_mode = "nano_hook"
+            elif i == 1:
+                v_mode = "nano_evidence" # The "Evidence Flash"
+            elif i == total_chunks - 1:
+                v_mode = "veo_cta"
+            elif i % 4 == 1:
+                # Every 4th chunk (starting from 5), switch back to Evidence
+                v_mode = "nano_evidence"
+            else:
+                # Alternate concept loop for the rest
+                v_mode = "veo_concept" if i % 2 == 0 else "nano_concept"
+        
+        # ── PHASE 3: RETENTION-DRIVEN VISUAL OVERRIDES ────────────────────
+        # Use the retention_map from Phase 2 to force visual changes at risk zones
+        retention_map = script_data.get("retention_map", {})
+        if retention_map and not is_longform:
+            # Get pattern interrupt positions (convert word positions to chunk indices)
+            pattern_interrupts = retention_map.get("pattern_interrupts", [])
+            risk_zones = retention_map.get("retention_risk_zones", [])
+            
+            # Check if this chunk aligns with a pattern interrupt
+            chunk_text_words = chunk.get("text", "").split()
+            for pi in pattern_interrupts:
+                pi_word = pi.get("at_word", 0)
+                pi_type = pi.get("type", "")
+                # Rough mapping: each chunk is ~5-8 words, so chunk index ≈ word_pos / 6
+                estimated_chunk = pi_word // max(1, 170 // total_chunks)
+                if abs(i - estimated_chunk) <= 1:
+                    # Override visual mode for pattern interrupt effect
+                    if pi_type in ["contradiction", "stat_bomb"]:
+                        v_mode = "nano_hook"  # High-impact imagery
+                    elif pi_type in ["rhetorical_question", "direct_address"]:
+                        v_mode = "nano_evidence"  # Ground with proof
+                    break
+            
+            # Force visual change at retention risk zones
+            for rz in risk_zones:
+                rz_word = rz.get("at_word", 0)
+                estimated_chunk = rz_word // max(1, 170 // total_chunks)
+                if abs(i - estimated_chunk) <= 1 and v_mode not in ["nano_hook", "nano_evidence"]:
+                    v_mode = "veo_concept"  # Motion video to recapture attention
+                    break
 
         print(f"  Processing chunk {i+1}/{len(chunks)} [{v_mode}]...")
         try:
