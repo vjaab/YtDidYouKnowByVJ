@@ -71,6 +71,9 @@ def trigger_kaggle_gpu_job(script_data, custom_map):
             kaggle_cmd = "venv/bin/kaggle"
             
         subprocess.run([kaggle_cmd, "kernels", "push", "-p", scripts_dir], check=True, timeout=90)
+        kernel_id = meta.get("id", "vijayakumarj/ytdidyouknowbyvj-gpu-worker")
+        print(f"✅ Kernel pushed successfully!")
+        print(f"🔗 Kaggle URL: https://www.kaggle.com/code/{kernel_id}")
     except Exception as e:
         msg = f"Failed to push Kaggle kernel: {e}"
         print(f"❌ {msg}")
@@ -79,6 +82,7 @@ def trigger_kaggle_gpu_job(script_data, custom_map):
 
     # 3. Poll for Completion (with separate QUEUED vs RUNNING timeouts and an absolute safety limit)
     kernel_id = "vijayakumarj/ytdidyouknowbyvj-gpu-worker"
+    print(f"🔗 Kaggle URL: https://www.kaggle.com/code/{kernel_id}")
     print(f"⌛ Waiting for Kaggle job ({kernel_id}) to finish...")
     
     max_queued_mins = 15   # Give up if stuck in QUEUED for 15 min (GPU unavailable)
