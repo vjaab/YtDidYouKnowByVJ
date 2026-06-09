@@ -70,20 +70,21 @@ def trigger_kaggle_gpu_job(script_data, custom_map):
         if os.path.exists("venv/bin/kaggle"):
             kaggle_cmd = "venv/bin/kaggle"
             
-        subprocess.run([kaggle_cmd, "kernels", "push", "-p", scripts_dir], check=True)
+        subprocess.run([kaggle_cmd, "kernels", "push", "-p", scripts_dir], check=True, timeout=90)
     except Exception as e:
         msg = f"Failed to push Kaggle kernel: {e}"
         print(f"❌ {msg}")
         _notify_kaggle_failure(f"🚨 Kaggle Push Failed\n\n{msg}\n\nPipeline will attempt cloud TTS fallback.")
         return {"error": "push_failed", "message": msg}
 
-    # 3. Poll for Completion (with separate QUEUED vs RUNNING timeouts)
+    # 3. Poll for Completion (with separate QUEUED vs RUNNING timeouts and an absolute safety limit)
     kernel_id = "vijayakumarj/ytdidyouknowbyvj-gpu-worker"
     print(f"⌛ Waiting for Kaggle job ({kernel_id}) to finish...")
     
     max_queued_mins = 15   # Give up if stuck in QUEUED for 15 min (GPU unavailable)
     max_running_mins = 45  # Allow up to 45 min once the job actually starts running
     poll_interval_s = 30   # Poll every 30 seconds
+    absolute_timeout_s = (max_queued_mins + max_running_mins + 5) * 60
     
     start_time = time.time()
     job_started_running = False
@@ -94,6 +95,16 @@ def trigger_kaggle_gpu_job(script_data, custom_map):
     while True:
         elapsed_s = time.time() - start_time
         elapsed_mins = elapsed_s / 60
+        
+        # Absolute safety timeout to prevent infinite hangs
+        if elapsed_s > absolute_timeout_s:
+            msg = f"Kaggle job exceeded absolute safety timeout of {absolute_timeout_s/60:.0f} minutes."
+            print(f"❌ {msg}")
+            _notify_kaggle_failure(
+                f"⏰ Kaggle GPU Absolute Timeout\n\n{msg}\n\n"
+                f"Pipeline will attempt cloud TTS fallback (no lip-sync)."
+            )
+            return {"error": "absolute_timeout", "message": msg}
         
         try:
             status_output = subprocess.check_output(
@@ -174,7 +185,7 @@ def trigger_kaggle_gpu_job(script_data, custom_map):
     print("📥 Downloading results from Kaggle...")
     output_dir = "output"
     try:
-        subprocess.run([kaggle_cmd, "kernels", "output", kernel_id, "-p", output_dir], check=True)
+        subprocess.run([kaggle_cmd, "kernels", "output", kernel_id, "-p", output_dir], check=True, timeout=120)
         
         results_file = os.path.join(output_dir, "results.json")
         if os.path.exists(results_file):

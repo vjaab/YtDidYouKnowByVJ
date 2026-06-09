@@ -137,11 +137,11 @@ jobs:
           # 1. Pull latest changes first using rebase and autostash
           git pull origin main --rebase --autostash || echo "Pull failed, proceeding anyway"
           
-          # 2. Add tracking files and technical logs (more specific to avoid pathspec errors)
+          # 2. Add tracking files and technical logs (force add since logs/ is gitignored)
           git add news_log.json facts_log.json || echo "Root logs missing"
           if [ -d "logs" ]; then
-            git add logs/*.txt 2>/dev/null || echo "No txt logs"
-            git add logs/*.json 2>/dev/null || echo "No json logs"
+            git add -f logs/*.txt 2>/dev/null || echo "No txt logs"
+            git add -f logs/*.json 2>/dev/null || echo "No json logs"
           fi
           
           # Only commit if there are actual changes

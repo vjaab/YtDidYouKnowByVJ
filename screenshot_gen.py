@@ -53,7 +53,7 @@ def capture_article_screenshot(url, output_filename, desktop=False):
     
     try:
         print(f"📸 Capturing screenshot: {url} -> {output_path}")
-        subprocess.run(cmd, check=True, capture_output=True)
+        subprocess.run(cmd, check=True, capture_output=True, timeout=60)
         if os.path.exists(output_path):
             return output_path
     except Exception as e:
