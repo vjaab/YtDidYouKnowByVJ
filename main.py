@@ -4,6 +4,8 @@ import argparse
 import subprocess
 import time
 import sys
+import socket
+socket.setdefaulttimeout(20) # Prevent network socket calls (e.g. feedparser) from hanging indefinitely
 import requests
 import glob
 import hashlib

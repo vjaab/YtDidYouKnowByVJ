@@ -89,7 +89,7 @@ jobs:
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
         run: |
-          python main_longform.py --now
+          python -u main_longform.py --now
         
       - name: Commit Updated Tracking File & Logs
         if: always()

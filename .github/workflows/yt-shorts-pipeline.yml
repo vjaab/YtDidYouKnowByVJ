@@ -125,7 +125,7 @@ jobs:
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
         run: |
-          python main.py --now
+          python -u main.py --now
         
       - name: Commit Updated Tracking File & Logs
         # Always run this step to save the log, preventing duplicate topics tomorrow
