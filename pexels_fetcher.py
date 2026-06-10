@@ -239,7 +239,7 @@ def _generate_veo_video(prompt, output_path, aspect_ratio="9:16"):
                 return output_path
             elif hasattr(video, 'uri') and video.uri:
                 # If it's a URI, we need to download it with the API key
-                r = requests.get(video.uri, headers={"x-goog-api-key": GEMINI_API_KEY})
+                r = requests.get(video.uri, headers={"x-goog-api-key": GEMINI_API_KEY}, timeout=60)
                 if r.status_code == 200:
                     with open(output_path, "wb") as f:
                         f.write(r.content)

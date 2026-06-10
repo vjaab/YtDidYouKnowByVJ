@@ -112,7 +112,7 @@ def trigger_kaggle_gpu_job(script_data, custom_map):
         
         try:
             status_output = subprocess.check_output(
-                [kaggle_cmd, "kernels", "status", kernel_id], text=True
+                [kaggle_cmd, "kernels", "status", kernel_id], text=True, timeout=60
             )
             consecutive_status_errors = 0  # Reset on successful API check
             status_lower = status_output.strip().lower()

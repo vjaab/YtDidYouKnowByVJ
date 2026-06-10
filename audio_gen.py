@@ -600,7 +600,7 @@ def _generate_elevenlabs(text, output_path):
             }
         }
         
-        response = requests.post(url, json=data, headers=headers)
+        response = requests.post(url, json=data, headers=headers, timeout=60)
         if response.status_code == 200:
             with open(output_path, 'wb') as f:
                 f.write(response.content)

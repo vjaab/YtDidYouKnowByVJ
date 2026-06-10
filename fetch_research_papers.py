@@ -47,7 +47,7 @@ def fetch_trending_from_newsapi():
             f"pageSize=20&"
             f"apiKey={NEWS_API_KEY}"
         )
-        response = requests.get(url)
+        response = requests.get(url, timeout=25)
         data = response.json()
         
         if data.get("status") != "ok":

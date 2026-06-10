@@ -9,7 +9,7 @@ import random
 import traceback
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
-from moviepy import VideoFileClip, ImageClip, CompositeVideoClip
+from moviepy import VideoFileClip, ImageClip, CompositeVideoClip, VideoClip
 import moviepy.video.fx as vfx
 from config import OUTPUT_DIR, ASSETS_DIR
 from youtube_upload import upload_video
