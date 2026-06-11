@@ -135,13 +135,28 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
           # 1. Pull latest changes first using rebase and autostash
-          git pull origin main --rebase --autostash || echo "Pull failed, proceeding anyway"
+          if ! git pull origin main --rebase --autostash; then
+            echo "⚠️ Rebase pull failed. Checking for merge conflicts..."
+            if [ -n "$(git diff --name-only --diff-filter=U)" ]; then
+              echo "❌ Merge conflicts detected! Aborting rebase to prevent committing conflicts."
+              git rebase --abort || echo "Rebase abort failed"
+              exit 1
+            else
+              echo "Pull failed for other reasons, proceeding..."
+            fi
+          fi
           
           # 2. Add tracking files and technical logs (force add since logs/ is gitignored)
           git add news_log.json facts_log.json || echo "Root logs missing"
           if [ -d "logs" ]; then
             git add -f logs/*.txt 2>/dev/null || echo "No txt logs"
             git add -f logs/*.json 2>/dev/null || echo "No json logs"
+          fi
+          
+          # Safety check: Ensure no conflict markers exist in news_log.json or facts_log.json
+          if grep -q "^<<<<<<<" news_log.json facts_log.json 2>/dev/null; then
+            echo "❌ Conflict markers found in news_log.json or facts_log.json. Aborting commit."
+            exit 1
           fi
           
           # Only commit if there are actual changes
@@ -157,7 +172,11 @@ jobs:
               fi
               echo "⚠️ Push failed, syncing and retrying..."
               sleep 10
-              git pull origin main --rebase
+              if ! git pull origin main --rebase; then
+                echo "⚠️ Sync failed, aborting rebase if active..."
+                git rebase --abort || echo "Rebase abort failed"
+                exit 1
+              fi
             done
             echo "❌ Failed to push logs after 5 attempts."
             # We don't exit 1 here to keep the overall job status "Success" if generation worked

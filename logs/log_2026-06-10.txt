@@ -9,7 +9,6 @@
 [03:51:11] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
 [06:02:30] ERROR: Script generation failed.
 [06:02:30] STEP 3 (Attempt 2/10): Gemini Searching & Generating Script...
-<<<<<<< Updated upstream
 [16:15:11] === STARTING DAILY AI PIPIELINE (TOOLS) ===
 [16:15:11] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
 [16:15:11] STEP 1: Content Ecosystem Check -> Day: Wed, Slot: Slot A (Discovery), Category: Breakthrough AI Models
@@ -44,7 +43,7 @@
 [19:08:21] 📌 PINNED COMMENT TEMPLATE:
 
 🔔 What's *your* take on Apple's 'AI' versus the open-source revolution? Let me know below! 👇
-=======
+
 [16:05:19] === STARTING DAILY AI PIPIELINE (TOOLS) ===
 [16:05:19] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
 [16:05:19] STEP 1: Content Ecosystem Check -> Day: Wed, Slot: Slot A (Discovery), Category: Breakthrough AI Models
@@ -79,20 +78,12 @@
 [19:21:15] 📌 PINNED COMMENT TEMPLATE:
 
 🔔 What future do YOU want? Cheap, open AI... or private, locked-down intelligence? Let me know below! 👇
->>>>>>> Stashed changes
 
 Tomorrow on 🔬 HYBRID AI: something big tomorrow
 
 👇 Join the elite builders.
 
-<<<<<<< Updated upstream
-[19:08:21] STEP 11: Updating YouTube URL in tracker...
-[19:08:21] STEP 12: Cleaning up output folder...
-[19:08:21] === PIPELINE COMPLETED SUCCESSFULLY ===
-[19:08:21] STEP 13: Terminating leftover ffmpeg processes to prevent pipeline hang...
-=======
 [19:21:15] STEP 11: Updating YouTube URL in tracker...
 [19:21:15] STEP 12: Cleaning up output folder...
-[19:21:15] === PIPELINE COMPLETED SUCCESSFULLY ===
+[19:21:16] === PIPELINE COMPLETED SUCCESSFULLY ===
 [19:21:16] STEP 13: Terminating leftover ffmpeg processes to prevent pipeline hang...
->>>>>>> Stashed changes

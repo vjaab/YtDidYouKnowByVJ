@@ -18,12 +18,37 @@ def load_tracker(tracker_file=TRACKER_FILE):
             "last_upload": None,
             "history": []
         }
-    with open(tracker_file, 'r') as f:
-        return json.load(f)
+    try:
+        with open(tracker_file, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except json.JSONDecodeError as e:
+        import shutil
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        corrupt_backup = f"{tracker_file}.corrupt_{timestamp}"
+        try:
+            shutil.copy2(tracker_file, corrupt_backup)
+            print(f"⚠️ Warning: {tracker_file} is corrupted. Backed up to {corrupt_backup}")
+        except Exception as copy_err:
+            print(f"❌ Failed to backup corrupted tracker file: {copy_err}")
+        
+        print(f"❌ JSON Decode Error reading {tracker_file}: {e}")
+        print("💡 Suggestion: Check for Git conflict markers (<<<<<<<, =======, >>>>>>>) or partial writes in the file.")
+        raise
 
 def save_tracker(tracker_data, tracker_file=TRACKER_FILE):
-    with open(tracker_file, 'w') as f:
-        json.dump(tracker_data, f, indent=4)
+    tmp_file = f"{tracker_file}.tmp"
+    try:
+        with open(tmp_file, 'w', encoding='utf-8') as f:
+            json.dump(tracker_data, f, indent=4)
+        os.replace(tmp_file, tracker_file)
+    except Exception as e:
+        print(f"❌ Failed to save tracker to {tracker_file}: {e}")
+        if os.path.exists(tmp_file):
+            try:
+                os.remove(tmp_file)
+            except Exception:
+                pass
+        raise
 
 def check_story_uniqueness(new_title, new_headline=None, new_keywords=None, new_url=None, tracker_file=TRACKER_FILE):
     tracker = load_tracker(tracker_file)
