@@ -170,17 +170,17 @@ def get_next_topic_type_by_ratio(tracker_file=TRACKER_FILE):
     Computes the proportion of each topic_type ('tools', 'news', 'research') 
     in recent history (last 30 entries) and returns the type that is most
     in deficit compared to the target ratio:
-      - tools: 80% (0.80)
-      - news: 10% (0.10)
-      - research: 10% (0.10)
+      - tools: 50% (0.50) — Hidden features, AI tools, free apps, tips & tricks
+      - news: 30% (0.30) — Tech myths, privacy scares, common mistakes  
+      - research: 20% (0.20) — Comparisons, AI experiments, educational tech facts
     """
     tracker = load_tracker(tracker_file)
     history = tracker.get("history", [])
     
     target_ratios = {
-        "tools": 0.80,
-        "news": 0.10,
-        "research": 0.10
+        "tools": 0.50,
+        "news": 0.30,
+        "research": 0.20
     }
     
     # Analyze the last 30 entries in history (or as many as exist)
@@ -202,14 +202,14 @@ def get_next_topic_type_by_ratio(tracker_file=TRACKER_FILE):
             title = str(entry.get("title", "")).lower()
             headline = str(entry.get("news_headline", "")).lower()
             
-            if "tool" in sub_cat or "app" in sub_cat or "mcp" in title or "workflow" in title or "cursor" in title or "claude code" in title or "try-on" in title:
+            if "tool" in sub_cat or "app" in sub_cat or "feature" in sub_cat or "tip" in title or "trick" in title or "hidden" in title or "hack" in title:
                 counts["tools"] += 1
                 total_counted += 1
-            elif "research" in sub_cat or "paper" in title or "arxiv" in title or "benchmark" in title or "eval" in title or "study" in title or "molecule" in title or "model" in title:
-                counts["research"] += 1
+            elif "myth" in sub_cat or "privacy" in sub_cat or "scary" in sub_cat or "wrong" in title or "mistake" in title or "stop" in title or "myth" in title:
+                counts["news"] += 1
                 total_counted += 1
             else:
-                counts["news"] += 1
+                counts["research"] += 1
                 total_counted += 1
                 
     if total_counted == 0:

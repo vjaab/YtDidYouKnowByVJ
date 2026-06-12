@@ -45,7 +45,7 @@ MAX_RETRY_ATTEMPTS = 10
 SIMILARITY_THRESHOLD = 75
 CATEGORY_COOLDOWN_DAYS = 3
 BGM_VOLUME = 0.07
-TARGET_AUDIO_DURATION = (45, 58) # Optimized for 60s Shorts limit (YPP Spec 2026)
+TARGET_AUDIO_DURATION = (15, 35) # Shorter Shorts = higher completion rates = more algorithmic push
 
 # Global Feature Flags
 ENABLE_LONGFORM = False

@@ -416,7 +416,7 @@ def run_pipeline(topic_type="auto"):
                 log_message(f"⚠️ Topic '{failed_headline}' repeatedly too short. Skipping.")
                 extra_instruction = ""
             else:
-                extra_instruction = f"The previous script was too short at {duration:.0f}s. Make the script longer, aim for 65-70 seconds of speaking."
+                extra_instruction = f"The previous script was too short at {duration:.0f}s. Make the script slightly longer, aim for 25-35 seconds of speaking."
             attempts += 1
             continue
 

@@ -36,11 +36,13 @@ def fetch_youtube_trending_shorts():
     print("📺 Fetching trending AI Shorts from YouTube Data API...")
     
     search_queries = [
-        "AI news today",
-        "artificial intelligence breaking",
-        "LLM breakthrough",
-        "OpenAI Google AI",
-        "AI tools 2026",
+        "tech tips hidden features",
+        "iPhone Android tricks 2026",
+        "AI tools free productivity",
+        "privacy security phone settings",
+        "tech myths debunked",
+        "free app alternative paid",
+        "Windows shortcuts tricks",
     ]
     
     all_results = []
@@ -162,13 +164,16 @@ def fetch_reddit_hot_ai():
     print("🔴 Fetching hot AI posts from Reddit...")
     
     subreddits = [
+        "LifeProTips",
+        "techsupport",
+        "Android",
+        "iphone",
+        "privacy",
+        "technology",
+        "gadgets",
         "MachineLearning",
-        "artificial",
-        "LocalLLaMA",
-        "singularity",
         "ChatGPT",
-        "OpenAI",
-        "StableDiffusion",
+        "LocalLLaMA",
     ]
     
     token = _get_reddit_token()
@@ -262,7 +267,7 @@ def fetch_github_trending_ai():
         since_date = (datetime.now(timezone.utc) - timedelta(days=7)).strftime("%Y-%m-%d")
         
         params = {
-            "q": f"\"artificial intelligence\" OR \"machine learning\" OR LLM OR GPT pushed:>{since_date}",
+            "q": f"(\"tech tips\" OR \"hidden features\" OR \"life hack\" OR \"AI tool\" OR \"free alternative\" OR \"privacy\") pushed:>{since_date}",
             "sort": "stars",
             "order": "desc",
             "per_page": 15

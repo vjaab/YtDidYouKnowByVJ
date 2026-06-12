@@ -4,28 +4,29 @@ import feedparser
 from datetime import datetime, timedelta, timezone
 from config import NEWS_API_KEY
 
-# ── RESEARCH SOURCES ──────────────────────────────────────────────────────────
+# ── CONTENT SOURCES (Mass-Appeal Tech) ─────────────────────────────────────────
 RSS_FEEDS = [
-    "https://openai.com/blog/rss/",
-    "https://research.google/blog/rss/", 
-    "https://www.anthropic.com/rss",
-    "https://huggingface.co/blog/feed.xml",
-    "https://aws.amazon.com/blogs/machine-learning/feed/",
+    "https://www.theverge.com/rss/index.xml",
+    "https://arstechnica.com/gadgets/feed/",
+    "https://www.wired.com/feed/category/gear/latest/rss",
+    "https://www.tomsguide.com/feeds/all",
+    "https://lifehacker.com/feed/rss",
+    "https://mashable.com/category/tech/rss",
+    "https://www.cnet.com/rss/news/",
     "https://arstechnica.com/tag/ai/feed/",
-    "https://decrypt.co/news/technology/ai/rss",
-    "https://www.wired.com/feed/tag/ai/latest/rss",
+    "https://www.engadget.com/rss/",
     "https://www.technologyreview.com/feed/",
-    "https://www.engadget.com/tag/artificial-intelligence/rss/",
 ]
 
 TOOL_RSS_FEEDS = [
-    "https://techcrunch.com/category/artificial-intelligence/feed/",
-    "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml",
-    "https://venturebeat.com/category/ai/feed/",
-    "https://news.ycombinator.com/rss", 
-    "https://mashable.com/category/artificial-intelligence/rss",
-    "https://www.cnbc.com/id/100727362/device/rss/rss.html",
-    "https://www.reuters.com/technology/rss",
+    "https://techcrunch.com/feed/",
+    "https://www.theverge.com/apps/rss/index.xml",
+    "https://venturebeat.com/feed/",
+    "https://news.ycombinator.com/rss",
+    "https://9to5mac.com/feed/",
+    "https://9to5google.com/feed/",
+    "https://www.xda-developers.com/feed/",
+    "https://www.makeuseof.com/feed/",
 ]
 
 def fetch_trending_from_newsapi():
@@ -40,7 +41,7 @@ def fetch_trending_from_newsapi():
         from_date = (datetime.now(timezone.utc) - timedelta(hours=48)).strftime("%Y-%m-%dT%H:%M:%SZ")
         url = (
             f"https://newsapi.org/v2/everything?"
-            f"q=(AI OR \"Artificial Intelligence\" OR LLM OR \"Generative AI\" OR \"OpenAI\" OR \"DeepMind\")&"
+            f"q=(\"tech tips\" OR \"hidden features\" OR \"AI tool\" OR \"iPhone\" OR \"Android\" OR \"privacy\")&"
             f"from={from_date}&"
             f"sortBy=popularity&"
             f"language=en&"
