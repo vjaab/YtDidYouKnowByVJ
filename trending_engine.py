@@ -142,15 +142,23 @@ def fetch_youtube_trending_shorts():
 def _get_reddit_token():
     """Get OAuth token for Reddit API."""
     if not REDDIT_CLIENT_ID or not REDDIT_CLIENT_SECRET:
+        print("  ⚠️ Reddit OAuth credentials missing (REDDIT_CLIENT_ID / REDDIT_CLIENT_SECRET).")
+        print("    → Reddit blocks unauthenticated requests from cloud IPs (GitHub Actions).")
+        print("    → Create a Reddit app at https://www.reddit.com/prefs/apps and add secrets.")
         return None
     try:
         auth = requests.auth.HTTPBasicAuth(REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET)
         data = {"grant_type": "client_credentials"}
-        headers = {"User-Agent": "VJTechNews/1.0"}
+        headers = {"User-Agent": "VJTechNews/1.0 (by /u/vjaab)"}
         r = requests.post("https://www.reddit.com/api/v1/access_token",
                           auth=auth, data=data, headers=headers, timeout=10)
         if r.status_code == 200:
-            return r.json().get("access_token")
+            token = r.json().get("access_token")
+            if token:
+                print("  ✅ Reddit OAuth token acquired successfully.")
+            return token
+        else:
+            print(f"  ⚠️ Reddit OAuth failed (HTTP {r.status_code}): {r.text[:200]}")
     except Exception as e:
         print(f"  ⚠️ Reddit OAuth failed: {e}")
     return None
@@ -159,7 +167,7 @@ def _get_reddit_token():
 def fetch_reddit_hot_ai():
     """
     Fetches hot posts from AI subreddits. Uses OAuth if credentials available,
-    falls back to public JSON API otherwise.
+    falls back to old.reddit.com public JSON API otherwise.
     """
     print("🔴 Fetching hot AI posts from Reddit...")
     
@@ -177,26 +185,37 @@ def fetch_reddit_hot_ai():
     ]
     
     token = _get_reddit_token()
-    headers = {"User-Agent": "VJTechNews/1.0"}
+    headers = {"User-Agent": "VJTechNews/1.0 (by /u/vjaab)"}
     if token:
         headers["Authorization"] = f"Bearer {token}"
         base_url = "https://oauth.reddit.com"
     else:
-        base_url = "https://www.reddit.com"
+        # old.reddit.com is more permissive than www.reddit.com for unauthenticated access
+        base_url = "https://old.reddit.com"
     
     all_posts = []
+    consecutive_failures = 0  # Early-abort counter
     
     for sub in subreddits:
+        # Early abort: if 3+ consecutive subreddits fail, Reddit is blocking us entirely
+        if consecutive_failures >= 3:
+            remaining = len(subreddits) - subreddits.index(sub)
+            print(f"  🛑 Reddit: {consecutive_failures} consecutive failures. Aborting remaining {remaining} subreddits.")
+            if not token:
+                print("    → Fix: Add REDDIT_CLIENT_ID and REDDIT_CLIENT_SECRET as GitHub Secrets.")
+            break
+        
         try:
-            if token:
-                url = f"{base_url}/r/{sub}/hot.json?limit=10"
-            else:
-                url = f"{base_url}/r/{sub}/hot.json?limit=10"
+            url = f"{base_url}/r/{sub}/hot.json?limit=10&raw_json=1"
             
             r = requests.get(url, headers=headers, timeout=15)
             if r.status_code != 200:
                 print(f"  ⚠️ Reddit r/{sub} failed ({r.status_code})")
+                consecutive_failures += 1
                 continue
+            
+            # Success — reset consecutive failure counter
+            consecutive_failures = 0
             
             data = r.json()
             posts = data.get("data", {}).get("children", [])
@@ -242,6 +261,7 @@ def fetch_reddit_hot_ai():
             
         except Exception as e:
             print(f"  ⚠️ Reddit r/{sub} fetch failed: {e}")
+            consecutive_failures += 1
     
     # Sort by upvote velocity (fastest-rising posts first)
     all_posts.sort(key=lambda x: x.get("_engagement", {}).get("upvote_velocity", 0), reverse=True)
@@ -253,75 +273,149 @@ def fetch_reddit_hot_ai():
 # ─────────────────────────────────────────────────────────────────────────────
 # 3. GITHUB TRENDING REPOS
 # ─────────────────────────────────────────────────────────────────────────────
+def _parse_github_repos(repos, min_stars=50):
+    """Shared parser: converts GitHub API repo objects into trending articles."""
+    results = []
+    for repo in repos:
+        stars = repo.get("stargazers_count", 0)
+        if stars < min_stars:
+            continue
+        
+        # Calculate approximate stars velocity
+        created_at = repo.get("created_at", "")
+        age_days = 1
+        if created_at:
+            try:
+                created_dt = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+                age_days = max(1, (datetime.now(timezone.utc) - created_dt).days)
+            except:
+                pass
+        
+        stars_per_day = stars / age_days
+        desc = repo.get('description', '') or ''
+        
+        results.append({
+            "title": f"GitHub Trending: {repo.get('full_name', '')} — {desc[:100]}",
+            "description": f"⭐ {stars} stars ({stars_per_day:.0f}/day) | {repo.get('language', 'Unknown')} | {desc}",
+            "source": {"name": f"GitHub ({repo.get('full_name', '')})"},
+            "url": repo.get("html_url", ""),
+            "urlToImage": repo.get("owner", {}).get("avatar_url", ""),
+            "publishedAt": created_at,
+            "type": "github_trending",
+            "_engagement": {
+                "stars": stars,
+                "stars_per_day": round(stars_per_day, 1),
+                "forks": repo.get("forks_count", 0),
+                "watchers": repo.get("watchers_count", 0)
+            }
+        })
+    return results
+
+
 def fetch_github_trending_ai():
     """
-    Scrapes GitHub Trending page for AI/ML repos.
+    Fetches trending AI/ML repos from GitHub Search API.
     Stars velocity = early signal for tool content before mainstream coverage.
+    Falls back to scraping github.com/trending if the API returns 0 results.
     No API key needed.
     """
     print("🐙 Fetching trending AI repos from GitHub...")
     
+    headers = {
+        "Accept": "application/vnd.github.v3+json",
+        "User-Agent": "VJTechNews/1.0"
+    }
+    
+    all_results = []
+    
+    # ── Strategy 1: Broad AI/ML topic search via GitHub Search API ──
+    since_date = (datetime.now(timezone.utc) - timedelta(days=7)).strftime("%Y-%m-%d")
+    
+    search_queries = [
+        # Broad AI/ML queries that match real repo names and descriptions
+        f"topic:machine-learning stars:>50 pushed:>{since_date}",
+        f"topic:llm stars:>50 pushed:>{since_date}",
+        f"topic:artificial-intelligence stars:>50 pushed:>{since_date}",
+        f"(AI OR LLM OR GPT OR \"open source\") stars:>100 pushed:>{since_date}",
+    ]
+    
     try:
         url = "https://api.github.com/search/repositories"
-        # Repos created or pushed in the last 7 days with AI/ML topics
-        since_date = (datetime.now(timezone.utc) - timedelta(days=7)).strftime("%Y-%m-%d")
+        seen_repos = set()
         
-        params = {
-            "q": f"(\"tech tips\" OR \"hidden features\" OR \"life hack\" OR \"AI tool\" OR \"free alternative\" OR \"privacy\") pushed:>{since_date}",
-            "sort": "stars",
-            "order": "desc",
-            "per_page": 15
-        }
-        headers = {
-            "Accept": "application/vnd.github.v3+json",
-            "User-Agent": "VJTechNews/1.0"
-        }
-        
-        r = requests.get(url, params=params, headers=headers, timeout=15)
-        if r.status_code != 200:
-            print(f"  ⚠️ GitHub API Error ({r.status_code})")
-            return []
-        
-        data = r.json()
-        repos = data.get("items", [])
-        
-        results = []
-        for repo in repos:
-            stars = repo.get("stargazers_count", 0)
-            if stars < 100:
-                continue
-            
-            # Calculate approximate stars velocity
-            created_at = repo.get("created_at", "")
-            age_days = 1
-            if created_at:
-                try:
-                    created_dt = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
-                    age_days = max(1, (datetime.now(timezone.utc) - created_dt).days)
-                except:
-                    pass
-            
-            stars_per_day = stars / age_days
-            
-            results.append({
-                "title": f"GitHub Trending: {repo.get('full_name', '')} — {repo.get('description', '')[:100]}",
-                "description": f"⭐ {stars} stars ({stars_per_day:.0f}/day) | {repo.get('language', 'Unknown')} | {repo.get('description', '')}",
-                "source": {"name": f"GitHub ({repo.get('full_name', '')})"},
-                "url": repo.get("html_url", ""),
-                "urlToImage": repo.get("owner", {}).get("avatar_url", ""),
-                "publishedAt": created_at,
-                "type": "github_trending",
-                "_engagement": {
-                    "stars": stars,
-                    "stars_per_day": round(stars_per_day, 1),
-                    "forks": repo.get("forks_count", 0),
-                    "watchers": repo.get("watchers_count", 0)
+        for query in search_queries:
+            try:
+                params = {
+                    "q": query,
+                    "sort": "stars",
+                    "order": "desc",
+                    "per_page": 10
                 }
-            })
+                
+                r = requests.get(url, params=params, headers=headers, timeout=15)
+                if r.status_code != 200:
+                    print(f"  ⚠️ GitHub API Error ({r.status_code}) for query: {query[:50]}...")
+                    continue
+                
+                data = r.json()
+                repos = data.get("items", [])
+                
+                # Deduplicate across queries
+                new_repos = []
+                for repo in repos:
+                    repo_id = repo.get("id")
+                    if repo_id not in seen_repos:
+                        seen_repos.add(repo_id)
+                        new_repos.append(repo)
+                
+                parsed = _parse_github_repos(new_repos, min_stars=50)
+                all_results.extend(parsed)
+                
+                time.sleep(1)  # GitHub rate limit courtesy
+                
+            except Exception as e:
+                print(f"  ⚠️ GitHub search query failed: {e}")
         
-        results.sort(key=lambda x: x["_engagement"]["stars_per_day"], reverse=True)
-        print(f"✅ GitHub: Found {len(results)} trending AI repos.")
-        return results
+        # ── Strategy 2: Fallback — scrape GitHub Trending page if API returned 0 ──
+        if not all_results:
+            print("  📋 GitHub API returned 0 results. Trying GitHub Trending page fallback...")
+            try:
+                trending_url = "https://github.com/trending?since=weekly&spoken_language_code=en"
+                r = requests.get(trending_url, headers={"User-Agent": "VJTechNews/1.0"}, timeout=15)
+                if r.status_code == 200:
+                    # Extract repo slugs from the trending page HTML
+                    repo_slugs = re.findall(r'href="/([\w-]+/[\w.-]+)"\s+class="', r.text)
+                    # Deduplicate while preserving order
+                    seen_slugs = set()
+                    unique_slugs = []
+                    for slug in repo_slugs:
+                        if slug not in seen_slugs:
+                            seen_slugs.add(slug)
+                            unique_slugs.append(slug)
+                    
+                    # Fetch details for top trending repos via API
+                    for slug in unique_slugs[:10]:
+                        try:
+                            repo_r = requests.get(
+                                f"https://api.github.com/repos/{slug}",
+                                headers=headers, timeout=10
+                            )
+                            if repo_r.status_code == 200:
+                                repo_data = repo_r.json()
+                                parsed = _parse_github_repos([repo_data], min_stars=50)
+                                all_results.extend(parsed)
+                            time.sleep(0.5)
+                        except:
+                            continue
+                    
+                    if all_results:
+                        print(f"  ✅ GitHub Trending page fallback: Found {len(all_results)} repos.")
+            except Exception as e:
+                print(f"  ⚠️ GitHub Trending page fallback failed: {e}")
+        
+        all_results.sort(key=lambda x: x["_engagement"]["stars_per_day"], reverse=True)
+        print(f"✅ GitHub: Found {len(all_results)} trending AI repos.")
+        return all_results
         
     except Exception as e:
         print(f"  ⚠️ GitHub trending fetch failed: {e}")
