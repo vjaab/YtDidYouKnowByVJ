@@ -46,6 +46,9 @@ def fetch_youtube_trending_shorts():
         "online scam alerts identity theft",
         "smartphone battery saving tricks",
         "everyday life tech hacks",
+        "photo video editing tricks viral",
+        "shopping hacks budget apps",
+        "smart home lifestyle organization",
     ]
     
     all_results = []
