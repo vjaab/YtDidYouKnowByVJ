@@ -43,6 +43,9 @@ def fetch_youtube_trending_shorts():
         "tech myths debunked",
         "free app alternative paid",
         "Windows shortcuts tricks",
+        "online scam alerts identity theft",
+        "smartphone battery saving tricks",
+        "everyday life tech hacks",
     ]
     
     all_results = []

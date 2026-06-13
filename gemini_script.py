@@ -14,13 +14,14 @@ from ecosystem_logic import get_slot_info, get_category_prompt_enhancement
 SYSTEM_PERSONA = """Role: You are a viral Tech Tips content creator specialized in high-retention YouTube Shorts that get millions of views.
 Your goal is to create "snackable" 15-35 second scripts that STOP the scroll and make viewers watch to the end.
 Tone: Energetic, surprising, and personal. You speak like a friend sharing an incredible secret, NOT like a news anchor or professor.
-Target Audience: EVERYONE who owns a smartphone or computer. All ages, all skill levels. Use simple, everyday language that a 14-year-old AND a 50-year-old can understand.
+Target Audience: EVERYONE who owns a smartphone or computer. All age groups from 18 to 70 years old, all skill levels. Use simple, everyday, accessible language that both young adults and older seniors can instantly relate to and understand. Avoid any developer terminology, academic jargon, or tech-bro buzzwords.
 Constraint Checklist:
 - No Fluff: Remove "In this video," "Hello everyone," or "Today we explore."
 - NO INFOGRAPHICS: Do not include infographics, flowcharts, or slides in the script structure.
 - SIMPLE LANGUAGE: NO jargon. NO acronyms without explanation. If a term has more than 3 syllables, follow it with a simple everyday analogy.
 - VOCAL DYNAMICS: Use heavy punctuation (commas, ellipses '...', exclamation marks, ALL CAPS) for emphasis. The TTS engine relies on punctuation.
-- PERSONAL STAKES: Every script MUST make the viewer feel "this affects ME personally" — their phone, their money, their privacy, their time.
+- PERSONAL STAKES: Every script MUST make the viewer feel "this affects ME personally" — their phone, their money, their privacy, their time, their safety.
+- UNIVERSAL DEMOGRAPHIC FOCUS: Ensure the hook and content speak to daily human needs: saving money, protecting privacy, keeping safe from scams, saving time, or pure wonder. Never assume the viewer knows how to write code, configure servers, or build AI pipelines.
 - LOOP-FRIENDLY: The LAST sentence of the script MUST flow seamlessly back into the FIRST sentence, creating a natural viewing loop. Viewers who reach the end should feel compelled to watch again.
 - SCRIPT LENGTH: STRICT 80-120 words maximum. Target 15-35 seconds of speaking. SHORT = HIGH COMPLETION RATE = MORE VIEWS.
 SUCCESS PATTERNS (2026): 
@@ -247,7 +248,11 @@ def get_hottest_tech_topic(client, avoid_list=""):
                     "Look for: hidden phone features, tech tips, AI tools people are trying, "
                     "privacy scares, tech myths being debunked, free app alternatives, "
                     "iPhone/Android tricks, Windows shortcuts, or any tech hack going viral on social media. "
-                    "The topic must appeal to EVERYONE with a smartphone, not just engineers. "
+                    "CRITICAL: The topic must appeal to ALL age groups from 18 to 70. "
+                    "Focus on universal concerns like battery life, digital privacy, online scam protection, "
+                    "everyday helper tools (photo editors, scanners, translators), and common tech misconceptions. "
+                    "Do NOT choose developer news, programming tutorials, API releases, model benchmarking scores, "
+                    "or corporate tech-investor updates that a general audience or older adults would find dry or hard to follow. "
                     f"{avoid_prompt}\n\n"
                     "Return ONLY a JSON object with two fields: "
                     "'topic' (3-6 word phrase, e.g. 'iPhone hidden battery trick viral') and "
@@ -334,6 +339,24 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
                 # 2. Internal batch uniqueness
                 from rapidfuzz import fuzz
                 if any(fuzz.token_set_ratio(title.lower(), s.lower()) > 80 for s in seen_titles_in_this_batch):
+                    continue
+
+                # 2.5 Dev-centric or Niche Filtering for General Consumer Appeal (18-70)
+                dev_antikeywords = [
+                    "repository", "git commit", "api endpoint", "npm package", "pip install", 
+                    "cuda", "pytorch", "fine-tune", "fine-tuning", "weights", "parameters", 
+                    "benchmark", "llmops", "mlops", "orchestration", "agentic architecture",
+                    "sdk", "library", "framework", "repo", "github repo", "developer tools", 
+                    "coding tutorial", "syntax", "refactoring", "hugging face", "huggingface",
+                    "dataset", "datasets", "arxiv", "paper", "arxiv paper", "pre-print", 
+                    "quantization", "quantized", "loss function", "hyperparameters", "github.com",
+                    "open-source library", "backend architecture", "python package", "javascript library",
+                    "npm install", "local model run", "r/MachineLearning", "r/LocalLLaMA"
+                ]
+                title_lower = title.lower()
+                desc_lower = (art.get('description', '') or '').lower()
+                if any(kw in title_lower or kw in desc_lower for kw in dev_antikeywords):
+                    # Skip highly developer-centric / tech-niche articles to ensure mass-appeal (18-70)
                     continue
                     
                 # ── 3. MULTI-SIGNAL VIRAL SCORING (Phase 1 Upgrade) ──────────
@@ -567,7 +590,8 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
                 "2. VISUAL DEMONSTRATION REQUIRED: The `nano_visual_prompt` fields MUST describe the exact screen/device showing the tip in action.\n"
                 "3. MUST be explainable in exactly <35s (approx 80-120 words total). Strict 35s limit. SHORTER = MORE VIEWS.\n"
                 "4. FORMAT: Hook (bold claim or surprising result) -> Quick Demo (show it working) -> Payoff (mind-blown moment) -> CTA (follow for more).\n"
-                "5. LOOP-FRIENDLY: The last sentence MUST connect back to the first, creating a natural loop."
+                "5. LOOP-FRIENDLY: The last sentence MUST connect back to the first, creating a natural loop.\n"
+                "6. UNIVERSAL DEMOGRAPHIC (18-70): The topic must appeal to all age groups from 18 to 70. Do NOT pick highly technical tools like Python frameworks, LLM APIs, code generators, git tools, CLI extensions, or niche backend developer tools. Focus on consumer technology: iPhone/Android settings, general browser hacks, popular apps (WhatsApp, YouTube, Gmail), free alternatives to popular paid subscription services, security/scam protection, and simple productivity tools."
             )
             prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
 {{
@@ -608,7 +632,8 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
                 "2. Must be understandable by ANYONE — no jargon, no technical terms without simple analogies.\n"
                 "3. MUST be explainable in exactly <35s (approx 80-120 words total). Strict 35s limit. SHORTER = MORE VIEWS.\n"
                 "4. FORMAT: Hook (bold scary claim) -> Proof (show evidence) -> Fix/Truth (how to protect yourself) -> CTA (follow for more).\n"
-                "5. LOOP-FRIENDLY: The last sentence MUST connect back to the first, creating a natural loop."
+                "5. LOOP-FRIENDLY: The last sentence MUST connect back to the first, creating a natural loop.\n"
+                "6. UNIVERSAL DEMOGRAPHIC (18-70): Ensure the fact is highly relevant to all age groups from 18 to 70. Avoid news about developer updates, academic AI benchmarks (like GSM8k, MMLU scores), or minor changes in model architectures. Focus on privacy threats, everyday digital safety, major consumer tech launches, health tech breakthroughs, or debunking popular tech myths."
             )
             prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
 {{
@@ -649,7 +674,8 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
                 "2. Must be understandable by ANYONE — a teenager and a grandparent should both find it useful or amazing.\n"
                 "3. MUST be explainable in exactly <35s (approx 80-120 words total). Strict 35s limit. SHORTER = MORE VIEWS.\n"
                 "4. FORMAT: Hook (surprising claim) -> Evidence/Demo (show it) -> Payoff (the 'wow' moment) -> CTA (follow for more).\n"
-                "5. LOOP-FRIENDLY: The last sentence MUST connect back to the first, creating a natural loop."
+                "5. LOOP-FRIENDLY: The last sentence MUST connect back to the first, creating a natural loop.\n"
+                "6. UNIVERSAL DEMOGRAPHIC (18-70): Choose topics that both young adults (18-35) and older adults (50-70) can engage with. Exclude programmer-specific content. Prefer everyday utilities, smart home tech, AI's impact on job trends or daily tasks, and visual/engaging AI experiments."
             )
             prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
 {{

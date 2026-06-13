@@ -63,4 +63,4 @@ VISUAL_CUT_TARGET_SECONDS = 2.0   # Target visual change frequency (was ~4s, now
 ENABLE_CINEMATIC_TRANSITIONS = True  # Whip pan, zoom punch, flash cut, glitch
 ENABLE_STRATEGIC_SFX = True       # Whoosh/bass at pattern interrupts
 ENABLE_DYNAMIC_BGM_CURVE = True   # BGM energy follows Hook→Body→Payoff→CTA
-TRENDING_NICHE_BIAS = 0.7         # 0=prefer broad topics, 1=prefer niche topics
+TRENDING_NICHE_BIAS = 0.15         # 0=prefer broad topics, 1=prefer niche topics
