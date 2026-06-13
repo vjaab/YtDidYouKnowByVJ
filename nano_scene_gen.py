@@ -41,20 +41,19 @@ def _generate_missing_prompts(chunks, headline, style_guide, aspect_ratio="9:16"
     ])
 
     format_desc = "16:9 landscape format" if aspect_ratio == "16:9" else "9:16 vertical format"
-    prompt = f"""You are a cinematic visual director for YouTube Shorts.
-
+    prompt = f"""You are a senior Hollywood director and AI visual prompt designer.
 HEADLINE: {headline}
-VISUAL STYLE: {style_guide}
+VISUAL STYLE/VIBE: {style_guide}
 
-For each sentence below, generate a specific, cinematic IMAGE PROMPT that visually represents
-EXACTLY what is being spoken in that sentence. The image will be used as a fullscreen background.
+For each sentence below, generate an elite, highly detailed image prompt for a fullscreen vertical background image that visually represents EXACTLY what is being spoken.
 
 RULES:
-- Each prompt must be SPECIFIC to the sentence content (not generic)
-- NO text in images. NO faces of real people. NO watermarks.
-- Photorealistic, cinematic lighting, {format_desc}, 8K quality
-- Include relevant objects, environments, or symbolic imagery
-- Keep each prompt under 80 words
+1. The prompt MUST be directly relevant to the sentence content.
+2. NO text, typography, logos, or watermarks in any generated prompts.
+3. NO faces of real people (e.g. Sam Altman, Elon Musk). Use generic descriptions (e.g. "a tech executive looking at a futuristic interface").
+4. Include premium details: camera shot, angle, lens (e.g. "close-up, 35mm lens"), dramatic lighting (e.g. "cinematic split lighting"), color grading (e.g. "vibrant cyber-cyan/amber contrast"), and textures (e.g. "volumetric dust particles in light beams").
+5. The format must be {format_desc}.
+6. Keep each prompt under 80 words.
 
 SENTENCES:
 {chunk_list}
@@ -228,14 +227,26 @@ def generate_nano_scene_visuals(chunks, headline, style_guide="", aspect_ratio="
 
 
 def _fill_visual_gaps(chunks):
-    """Forward-fill: propagate the last successful visual to any gap chunks."""
-    last_path = None
-    last_type = "photo"
+    """Robust two-pass visual gap filler."""
+    first_path = None
+    first_type = "photo"
     for c in chunks:
-        if c.get("visual_path"):
+        if c.get("visual_path") and os.path.exists(c["visual_path"]):
+            first_path = c["visual_path"]
+            first_type = c.get("visual_type", "photo")
+            break
+
+    if not first_path:
+        first_path = "dummy_screenshot.png"
+        first_type = "photo"
+
+    last_path = first_path
+    last_type = first_type
+    for c in chunks:
+        if c.get("visual_path") and os.path.exists(c["visual_path"]):
             last_path = c["visual_path"]
             last_type = c.get("visual_type", "photo")
-        elif last_path:
+        else:
             c["visual_path"] = last_path
             c["visual_type"] = last_type
-            c["source"] = c.get("source", "Nano-Scene (gap-filled)")
+            c["source"] = c.get("source") or "Nano-Scene (gap-filled)"

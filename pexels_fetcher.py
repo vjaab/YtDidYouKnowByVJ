@@ -249,7 +249,194 @@ def _generate_veo_video(prompt, output_path, aspect_ratio="9:16"):
         print(f"⚠️ Veo generation failed: {e}")
     return None
 
-# Pexels Stock Footage functions removed in favor of Generative AI.
+def _search_pexels_videos(query, chunk_duration, dynamic_params=None):
+    if dynamic_params is None: dynamic_params = {}
+    if not PEXELS_API_KEY:
+        return []
+    try:
+        orientation = dynamic_params.get("orientation", "portrait")
+        r = requests.get(
+            "https://api.pexels.com/videos/search",
+            headers={"Authorization": PEXELS_API_KEY},
+            params={"query": query, "per_page": 5, "orientation": orientation},
+            timeout=15
+        )
+        if r.status_code != 200:
+            return []
+        
+        results = []
+        for v in r.json().get("videos", []):
+            vid_id = v.get("id")
+            if vid_id in _used_media:
+                continue
+                
+            dur = v.get("duration", 0)
+            if dur < max(1.0, chunk_duration - 1.0):
+                continue
+                
+            # Extract title/description from URL
+            url_slug = v.get("url", "").split("/")[-2] if "pexels.com/video/" in v.get("url", "") else query
+            title = url_slug.replace("-", " ")
+            
+            # Find portrait/landscape link depending on orientation
+            files = v.get("video_files", [])
+            if orientation == "portrait":
+                target_files = [f for f in files if f.get("width", 0) < f.get("height", 1) and f.get("height", 0) >= 720]
+            else:
+                target_files = [f for f in files if f.get("width", 0) > f.get("height", 1) and f.get("width", 0) >= 1280]
+                
+            if not target_files:
+                target_files = sorted(files, key=lambda f: f.get("height", 0), reverse=True)
+                
+            if target_files:
+                results.append({
+                    "id": vid_id, 
+                    "link": target_files[0]["link"], 
+                    "desc": title, 
+                    "type": "video"
+                })
+        return results
+    except Exception as e:
+        print(f"Pexels video search error: {e}")
+    return []
+
+def _search_pexels_photos(query, orientation="portrait"):
+    if not PEXELS_API_KEY:
+        return []
+    try:
+        r = requests.get(
+            "https://api.pexels.com/v1/search",
+            headers={"Authorization": PEXELS_API_KEY},
+            params={"query": query, "per_page": 5, "orientation": orientation},
+            timeout=15
+        )
+        if r.status_code != 200:
+            return []
+            
+        results = []
+        for p in r.json().get("photos", []):
+            pid = p.get("id")
+            if pid in _used_media:
+                continue
+            
+            alt = p.get("alt", query)
+            url = p.get("src", {}).get("large2x") or p.get("src", {}).get("large")
+            if url:
+                results.append({
+                    "id": pid,
+                    "link": url,
+                    "desc": alt,
+                    "type": "photo"
+                })
+        return results
+    except Exception as e:
+        print(f"Pexels photo search error: {e}")
+    return []
+
+def _download_video(url, output_path):
+    try:
+        r = requests.get(url, timeout=60, stream=True)
+        if r.status_code == 200:
+            with open(output_path, "wb") as f:
+                for chunk in r.iter_content(65536):
+                    f.write(chunk)
+            return output_path
+        return None
+    except Exception as e:
+        print(f"Video download err: {e}")
+        return None
+
+def _download_photo(url, output_path, is_longform=False):
+    try:
+        from PIL import Image, ImageOps
+        r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=20)
+        if r.status_code == 200:
+            img = Image.open(io.BytesIO(r.content)).convert("RGB")
+            w, h = img.size
+            if is_longform:
+                # Target 16:9 landscape
+                target_w = int(h * 16 / 9)
+                if target_w <= w:
+                    left = (w - target_w) // 2
+                    img = img.crop((left, 0, left + target_w, h))
+                else:
+                    target_h = int(w * 9 / 16)
+                    top = (h - target_h) // 2
+                    img = img.crop((0, top, w, top + target_h))
+                img = img.resize((1920, 1080))
+            else:
+                # Target 9:16 portrait
+                target_h = int(w * 16 / 9)
+                if target_h <= h:
+                    top = (h - target_h) // 2
+                    img = img.crop((0, top, w, top + target_h))
+                else:
+                    target_w = int(h * 9 / 16)
+                    left = (w - target_w) // 2
+                    img = img.crop((left, 0, left + target_w, h))
+                img = img.resize((1080, 1920))
+            img.save(output_path, "JPEG", quality=90)
+            return output_path
+        return None
+    except Exception as e:
+        print(f"Photo download err: {e}")
+        return None
+
+def _fetch_pexels_fallback(chunk, duration, is_video=False, is_longform=False):
+    cid = chunk.get("chunk_id")
+    primary_q = chunk.get("pexels_primary", "technology")
+    fallback_q = chunk.get("pexels_fallback", "innovation")
+    video_out = os.path.join(OUTPUT_DIR, f"chunk_{cid}_{TODAY}.mp4")
+    photo_out = os.path.join(OUTPUT_DIR, f"chunk_{cid}_{TODAY}.jpg")
+    
+    orientation = "landscape" if is_longform else "portrait"
+    
+    if is_video:
+        # Try videos first
+        for query in [primary_q, fallback_q]:
+            print(f"   Searching Pexels video for '{query}'...")
+            videos = _search_pexels_videos(query, duration, {"orientation": orientation})
+            for v in videos:
+                path = _download_video(v["link"], video_out)
+                if path:
+                    with _download_lock:
+                        _used_media.add(v["id"])
+                    return path, f"Video ({query})", "video"
+        
+        # Fallback to photos if no videos found
+        for query in [primary_q, fallback_q]:
+            print(f"   No video found. Searching Pexels photo for '{query}'...")
+            photos = _search_pexels_photos(query, orientation=orientation)
+            for p in photos:
+                path = _download_photo(p["link"], photo_out, is_longform=is_longform)
+                if path:
+                    with _download_lock:
+                        _used_media.add(p["id"])
+                    return path, f"Photo ({query})", "photo"
+    else:
+        # Try photos first
+        for query in [primary_q, fallback_q]:
+            print(f"   Searching Pexels photo for '{query}'...")
+            photos = _search_pexels_photos(query, orientation=orientation)
+            for p in photos:
+                path = _download_photo(p["link"], photo_out, is_longform=is_longform)
+                if path:
+                    with _download_lock:
+                        _used_media.add(p["id"])
+                    return path, f"Photo ({query})", "photo"
+                    
+        # Fallback to videos if no photos found
+        for query in [primary_q, fallback_q]:
+            print(f"   No photo found. Searching Pexels video for '{query}'...")
+            videos = _search_pexels_videos(query, duration, {"orientation": orientation})
+            for v in videos:
+                path = _download_video(v["link"], video_out)
+                if path:
+                    with _download_lock:
+                        _used_media.add(v["id"])
+                    return path, f"Video ({query})", "video"
+                    
+    return None, None, None
 
 # ─────────────────────────────────────────────────────────────────────────────
 # STEP E: Imagen 3
@@ -303,62 +490,65 @@ Return ONLY the subject:"""
     return subject
 
 
-def _generate_imagen3(chunk_text, output_path, topic_context="", global_style_guide="", visual_subject=None, aspect_ratio="9:16"):
-    topic = detect_topic(topic_context)
+def generate_premium_prompt_via_gemini(chunk_text, topic_context, global_style_guide, original_visual_prompt=None, aspect_ratio="9:16", is_video=False):
+    """
+    Calls Gemini to generate a highly specific, cinematic, visual prompt for Imagen or Veo.
+    """
+    import re
+    target_model = "gemini-2.5-flash"
+    orientation = "16:9 landscape format" if aspect_ratio == "16:9" else "9:16 vertical format for mobile"
+    media_type = "video clip with slow, fluid cinematic motion" if is_video else "photorealistic high-end image"
     
-    # ── DAILY AESTHETIC ROTATION ──
-    day_idx = datetime.now().day
-    daily_style = DAILY_AESTHETIC_MATRIX[day_idx % len(DAILY_AESTHETIC_MATRIX)]
+    # Clean up chunk text and original visual prompt
+    chunk_text_clean = re.sub(r'\s+', ' ', chunk_text).strip()
+    original_visual_prompt_clean = re.sub(r'\s+', ' ', original_visual_prompt).strip() if original_visual_prompt else ""
     
-    style_suffix = f", {global_style_guide}" if global_style_guide else f", {daily_style['lighting']} lighting, {daily_style['mood']} style, 8k, photorealistic"
-    
-    # Use passed subject or extract if missing
-    if not visual_subject:
-        visual_subject = _extract_visual_subject(topic_context)
-    
-    print(f"  -> Visual Subject: '{visual_subject}'")
-    
-    format_desc = "16:9 landscape format" if aspect_ratio == "16:9" else "9:16 vertical format"
-    
-    if topic:
-        template = random.choice(TOPIC_PROMPT_TEMPLATES[topic])
-        best_prompt = f"{template.format(name=visual_subject)}, {style_suffix}, {daily_style['motif']} elements, news editorial style, {format_desc}, ultra realistic, no text"
-        print(f"  -> Detected Topic: {topic}. Using themed prompt for {visual_subject} with Day {day_idx} style.")
-    else:
-        # Ask Gemini to craft a headline-specific Imagen prompt
-        topic_prompt = f"Topic Context: {topic_context}. The image MUST be highly relevant to this specific story.\n" if topic_context else ""
-        prompt_builder = f"""Create a detailed Imagen prompt for a fullscreen background video/image.
+    prompt = f"""You are a senior Hollywood director and AI visual prompt designer.
+Generate an elite prompt for a fullscreen background {media_type} to be used in a high-production-value YouTube Short about tech news.
 
-NEWS HEADLINE: '{topic_context}'
-CURRENT CHUNK TEXT: '{chunk_text}'
+CONTEXT:
+- Video Topic/Headline: "{topic_context}"
+- Current sentence being spoken: "{chunk_text_clean}"
+- Global Visual Style/Aesthetic: "{global_style_guide}"
+"""
+    if original_visual_prompt_clean:
+        prompt += f'- Original concept suggestion: "{original_visual_prompt_clean}"\n'
+        
+    prompt += f"""
+RULES for the generated prompt:
+1. It MUST be highly relevant, visually representing the core concept or subject of: "{chunk_text_clean}".
+2. Do NOT put any text, typography, subtitles, labels, logos, or watermarks in the prompt. Keep it purely visual.
+3. Do NOT include faces of real people (e.g. Sam Altman, Sundar Pichai, Elon Musk). Instead, use generic descriptions (e.g., "a visionary CEO in a dark tech-noir room", "a researcher looking at a glowing holographic screen").
+4. Describe the camera shot, angle, lighting, and lens details to make it look premium (e.g. "shot on 35mm lens, cinematic split lighting, shallow depth of field, subtle hand-held camera shake, volumetric dust particles").
+5. Use vibrant, harmonious, modern color grading (e.g., cyber-cyan/amber contrast, deep emerald greens and dark charcoal, moody cyberpunk neon).
+6. Format must be {orientation}.
+7. Do NOT include any introductory or concluding text (e.g. "Here is your prompt:"). Return ONLY the raw prompt.
 
-{topic_prompt}Requirements:
-- Photorealistic, cinematic, {format_desc}
-- Style guide to follow: {global_style_guide}
-- The image MUST visually represent the specific topic/entities in the headline above
-- Include relevant logos, products, or symbolic imagery that viewers will immediately associate with the story
-- No text, no watermarks, no faces of real people
-- High detail, dramatic lighting, news editorial style
-- RETURN ONLY the prompt text. No introductory sentence."""
-        
-        best_prompt = chunk_text  # Default
-        attempts = 0
-        while attempts < 3:
-            try:
-                target_model = "gemini-2.5-flash"
-                resp = client.models.generate_content(model=target_model, contents=prompt_builder)
-                best_prompt = resp.text.strip()
-                # Clean up any lingering intro text
-                if best_prompt.lower().startswith("here is") or "prompt:" in best_prompt.lower()[:20]:
-                    best_prompt = best_prompt.split("\n")[-1]
-                break
-            except Exception as e:
-                print(f"Imagen prompt gen failed (att {attempts+1}): {e}")
-                attempts += 1
-                time.sleep(2)
-            
-    print(f"  -> Generated Imagen prompt: {best_prompt[:80]}...")
-        
+Output the visual prompt:"""
+
+    try:
+        response = client.models.generate_content(
+            model=target_model,
+            contents=prompt,
+            config=genai.types.GenerateContentConfig(temperature=0.8)
+        )
+        res = response.text.strip().strip('"').strip("'")
+        print(f"   [GEMINI PROMPT GEN] Created prompt: {res[:100]}...")
+        return res
+    except Exception as e:
+        print(f"⚠️ Gemini prompt generation failed: {e}. Using fallback.")
+        vibe = global_style_guide if global_style_guide else "cinematic lighting, photorealistic, 8k"
+        subj = original_visual_prompt_clean if original_visual_prompt_clean else chunk_text_clean
+        return f"{subj}, {vibe}, {orientation}, highly detailed, photorealistic, no text"
+
+
+def _generate_imagen3(prompt, output_path, topic_context="", global_style_guide="", visual_subject=None, aspect_ratio="9:16"):
+    """
+    Generates an image via Imagen 4.0 using the fully engineered prompt.
+    Keeps signature compatibility for other modules like entity_fetcher.
+    """
+    print(f"🎨 Generating Imagen Image with prompt: {prompt[:80]}...")
+    
     # Early exit if we already know Imagen is exhausted for this run
     if os.environ.get("IMAGEN_QUOTA_EXHAUSTED"):
          return None
@@ -374,7 +564,7 @@ CURRENT CHUNK TEXT: '{chunk_text}'
         try:
             result = client.models.generate_images(
                 model=model_name,
-                prompt=best_prompt,
+                prompt=prompt,
                 config=genai.types.GenerateImagesConfig(
                     number_of_images=1,
                     aspect_ratio=aspect_ratio,
@@ -388,9 +578,13 @@ CURRENT CHUNK TEXT: '{chunk_text}'
         except Exception as e:
             err_str = str(e).lower()
             if "429" in err_str and ("quota" in err_str or "exhausted" in err_str):
+                print(f"  ⚠️ Imagen quota exhausted on {model_name}. Trying next...")
                 continue
+            print(f"  ⚠️ Imagen call failed on {model_name}: {e}")
             break
+            
     return None
+
 
 def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide="", is_longform=False, visual_mode="veo_concept", visual_subject=None):
     """
@@ -406,55 +600,52 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
     video_out = os.path.join(OUTPUT_DIR, f"chunk_{cid}_{TODAY}.mp4")
     photo_out = os.path.join(OUTPUT_DIR, f"chunk_{cid}_{TODAY}.jpg")
     
-    # ── SWITCH-BACK LOGIC ──────────────────────────────────────────────────
     if not visual_subject:
         visual_subject = _extract_visual_subject(topic_context)
     
     headline = topic_context if topic_context else "Scientific Research"
     
-    # ── DAILY AESTHETIC ROTATION ──
     day_idx = datetime.now().day
     style = DAILY_AESTHETIC_MATRIX[day_idx % len(DAILY_AESTHETIC_MATRIX)]
     print(f"  📅 Day {day_idx} Aesthetic: {style['mood']} ({style['lighting']})")
 
-    format_desc = "16:9 landscape format" if is_longform else "9:16 vertical format for mobile"
-
-    veo_broll_prompt = (
-        f"Cinematic, high-definition 4k video in a {style['mood']} style. "
-        f"Subject: {visual_subject}. Visuals should feature {style['motif']}, with {style['lighting']} lighting. "
-        f"Motion: {style['camera']}. Style: Minimalist, clean. No text in video. Video language: English."
-    )
-    
-    nano_evidence_prompt = (
-        f"A professional macro photograph of a scientific research paper titled '{headline}'. "
-        f"Style: {style['mood']}. Focus on a specific complex diagram or a paragraph of mathematical equations. "
-        f"Realistic paper texture with {style['lighting']} lighting. Format: {format_desc}."
-    )
-    
-    nano_concept_prompt = (
-        f"Cinematic, high-definition {orientation} image in a {style['mood']} style. "
-        f"Subject: {visual_subject}. Visuals should feature {style['motif']}, with {style['lighting']} lighting. "
-        f"Style: Minimalist, clean. No text."
-    )
+    # Get original visual prompt generated during script planning (if any)
+    original_prompt = chunk.get("nano_visual_prompt", "")
 
     if visual_mode == "nano_hook" or visual_mode == "nano_concept":
         print(f"Chunk {cid} -> MODE: {visual_mode}")
-        prompt = nano_concept_prompt if visual_mode == "nano_concept" else nano_concept_prompt + " Dramatic hero shot."
-        path = _generate_imagen3(prompt, photo_out, topic_context, global_style_guide, visual_subject=visual_subject, aspect_ratio=orientation)
+        # Generate custom prompt via Gemini
+        custom_prompt = generate_premium_prompt_via_gemini(
+            chunk_text=text,
+            topic_context=topic_context,
+            global_style_guide=global_style_guide,
+            original_visual_prompt=original_prompt,
+            aspect_ratio=orientation,
+            is_video=False
+        )
+        path = _generate_imagen3(custom_prompt, photo_out, aspect_ratio=orientation)
         if path:
             chunk["visual_path"] = path
             chunk["visual_type"] = "photo"
             chunk["relevance_score"] = 10
             chunk["source"] = f"Imagen ({visual_mode})"
             return chunk
+            
+        # Pexels fallback for photo mode!
+        print(f"Chunk {cid} -> Imagen failed, falling back to Pexels search...")
+        path, source_desc, v_type = _fetch_pexels_fallback(chunk, dur, is_video=False, is_longform=is_longform)
+        if path:
+            chunk["visual_path"] = path
+            chunk["visual_type"] = v_type
+            chunk["relevance_score"] = 7
+            chunk["source"] = f"Pexels fallback ({source_desc})"
+            return chunk
 
     elif visual_mode == "nano_evidence":
-        # Alternating/selecting screenshots based on short vs long-form format
         selected_screenshot = None
         screenshot_source = None
         
         if is_longform:
-            # For longform compilation: map chunk's fact_number to the topic's screenshot
             fact_num = chunk.get("fact_number")
             topics = script_data.get("longform_topics", [])
             if isinstance(fact_num, int) and 1 <= fact_num <= len(topics):
@@ -464,19 +655,16 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
                     selected_screenshot = screenshot_path
                     screenshot_source = f"Fact {fact_num} Article Screenshot"
             
-            # Fallback to main screenshot
             if not selected_screenshot:
                 main_screenshot = script_data.get("screenshot_path")
                 if main_screenshot and os.path.exists(main_screenshot):
                     selected_screenshot = main_screenshot
                     screenshot_source = "Main Article Screenshot"
         else:
-            # For Shorts: alternate between main and use-case evidence screenshots
             main_screenshot = script_data.get("screenshot_path")
             evidence_screenshot = script_data.get("evidence_screenshot_path")
             
             if cid == 2:
-                # First evidence slot: prefer main article screenshot
                 if main_screenshot and os.path.exists(main_screenshot):
                     selected_screenshot = main_screenshot
                     screenshot_source = "Real Article Screenshot"
@@ -484,7 +672,6 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
                     selected_screenshot = evidence_screenshot
                     screenshot_source = "Evidence Screenshot"
             else:
-                # Subsequent evidence slots: prefer use-case evidence screenshot if available
                 if evidence_screenshot and os.path.exists(evidence_screenshot):
                     selected_screenshot = evidence_screenshot
                     screenshot_source = "Evidence Screenshot"
@@ -501,17 +688,44 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
             return chunk
 
         print(f"Chunk {cid} -> MODE: nano_evidence (Using AI Macro Fallback)")
-        path = _generate_imagen3(nano_evidence_prompt, photo_out, topic_context, global_style_guide, aspect_ratio=orientation)
+        evidence_concept = f"A professional macro photograph of scientific research paper, technical charts, code editor or document titled '{headline}'."
+        custom_prompt = generate_premium_prompt_via_gemini(
+            chunk_text=text,
+            topic_context=topic_context,
+            global_style_guide=global_style_guide,
+            original_visual_prompt=evidence_concept,
+            aspect_ratio=orientation,
+            is_video=False
+        )
+        path = _generate_imagen3(custom_prompt, photo_out, aspect_ratio=orientation)
         if path:
             chunk["visual_path"] = path
             chunk["visual_type"] = "photo"
             chunk["relevance_score"] = 10
             chunk["source"] = "Imagen (nano_evidence)"
             return chunk
+            
+        # Pexels fallback for evidence mode!
+        print(f"Chunk {cid} -> Imagen evidence failed, falling back to Pexels search...")
+        path, source_desc, v_type = _fetch_pexels_fallback(chunk, dur, is_video=False, is_longform=is_longform)
+        if path:
+            chunk["visual_path"] = path
+            chunk["visual_type"] = v_type
+            chunk["relevance_score"] = 7
+            chunk["source"] = f"Pexels evidence fallback ({source_desc})"
+            return chunk
 
     elif visual_mode == "veo_concept" or visual_mode == "veo_cta":
         print(f"Chunk {cid} -> MODE: {visual_mode}")
-        path = _generate_veo_video(veo_broll_prompt, video_out, aspect_ratio=orientation)
+        custom_video_prompt = generate_premium_prompt_via_gemini(
+            chunk_text=text,
+            topic_context=topic_context,
+            global_style_guide=global_style_guide,
+            original_visual_prompt=original_prompt,
+            aspect_ratio=orientation,
+            is_video=True
+        )
+        path = _generate_veo_video(custom_video_prompt, video_out, aspect_ratio=orientation)
         if path:
             chunk["visual_path"] = path
             chunk["visual_type"] = "video"
@@ -521,12 +735,30 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
             
         # Fallback to Imagen if Veo fails
         print(f"Chunk {cid} -> Veo failed, falling back to Imagen")
-        path = _generate_imagen3(nano_concept_prompt, photo_out, topic_context, global_style_guide, visual_subject=visual_subject, aspect_ratio=orientation)
+        custom_img_prompt = generate_premium_prompt_via_gemini(
+            chunk_text=text,
+            topic_context=topic_context,
+            global_style_guide=global_style_guide,
+            original_visual_prompt=original_prompt,
+            aspect_ratio=orientation,
+            is_video=False
+        )
+        path = _generate_imagen3(custom_img_prompt, photo_out, aspect_ratio=orientation)
         if path:
             chunk["visual_path"] = path
             chunk["visual_type"] = "photo"
             chunk["relevance_score"] = 8
             chunk["source"] = "Imagen (fallback from veo)"
+            return chunk
+            
+        # Pexels fallback for video mode!
+        print(f"Chunk {cid} -> Veo/Imagen failed, falling back to Pexels search...")
+        path, source_desc, v_type = _fetch_pexels_fallback(chunk, dur, is_video=True, is_longform=is_longform)
+        if path:
+            chunk["visual_path"] = path
+            chunk["visual_type"] = v_type
+            chunk["relevance_score"] = 7
+            chunk["source"] = f"Pexels video fallback ({source_desc})"
             return chunk
 
     chunk["visual_path"] = None
@@ -660,15 +892,29 @@ def fetch_all_chunk_visuals(chunks, topic_context="", script_data=None, is_longf
             else:
                 print(f"  -> Local/Cached asset. Skipping cooldown.")
 
-    # Fill any failed chunks with the previous chunk's visual
-    last_path = None
-    last_type = "photo"
+    # Robust two-pass visual gap filler
+    first_path = None
+    first_type = "photo"
     for c in chunks:
-        if c.get("visual_path"):
+        if c.get("visual_path") and os.path.exists(c["visual_path"]):
+            first_path = c["visual_path"]
+            first_type = c.get("visual_type", "photo")
+            break
+
+    if not first_path:
+        # Absolute fallback if all generations failed and no screenshots exist
+        first_path = "dummy_screenshot.png"
+        first_type = "photo"
+
+    last_path = first_path
+    last_type = first_type
+    for c in chunks:
+        if c.get("visual_path") and os.path.exists(c["visual_path"]):
             last_path = c["visual_path"]
-            last_type = c["visual_type"]
-        elif last_path:
+            last_type = c.get("visual_type", "photo")
+        else:
             c["visual_path"] = last_path
             c["visual_type"] = last_type
+            c["source"] = c.get("source") or "Gap-filled"
 
     return chunks

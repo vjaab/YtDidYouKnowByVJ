@@ -72,7 +72,7 @@ def _generate_layout_profile(headline):
     title_bottom_gap = rng.randint(165, 220)                # was fixed 192px
 
     # Particles
-    particle_style = rng.choice(["bokeh", "digital", "stars"])  # was always bokeh
+    particle_style = rng.choice(["bokeh", "digital", "stars", "digital_rain", "lens_dust"])
 
     # Progress bar
     progress_bar_height = rng.randint(4, 8)                 # was fixed 6px
@@ -125,7 +125,7 @@ def _generate_layout_profile(headline):
         "cta_headline_template": cta_headline_template,
         "cta_description": cta_description,
     }
-    print(f"\U0001F3B2 Layout Profile: gradient={gradient_position}@{gradient_height_pct:.0%}, "
+    print(f"🎲 Layout Profile: gradient={gradient_position}@{gradient_height_pct:.0%}, "
           f"particles={particle_style}, title_gap={title_bottom_gap}px, "
           f"progress={progress_bar_position}@{progress_bar_height}px, "
           f"avatar_offset={avatar_x_offset}px, cta_variant={cta_variant}")
@@ -134,12 +134,34 @@ def _generate_layout_profile(headline):
 import cv2
 
 def apply_tech_grade(frame):
-    # Boost contrast and apply a slight cooling (blue/teal) to shadows
-    # and warming (orange) to highlights
-    frame = frame.astype(np.float32) / 255.0
-    frame[:, :, 0] *= 1.1  # Warm up Reds
-    frame[:, :, 2] *= 1.2  # Cool down Blues
-    return np.clip(frame * 255, 0, 255).astype(np.uint8)
+    """
+    Applies a premium cinematic color grading to the background image:
+    1. Contrast enhancement via an S-curve.
+    2. Split-toning: cool teal/blue in shadows, warm orange/gold in highlights.
+    """
+    # Convert to float32 in [0, 1]
+    arr = frame.astype(np.float32) / 255.0
+    
+    # 1. S-curve contrast boost: f(x) = 3x^2 - 2x^3
+    arr = 3 * (arr ** 2) - 2 * (arr ** 3)
+    
+    # 2. Split toning based on luminance
+    lum = 0.299 * arr[:, :, 0] + 0.587 * arr[:, :, 1] + 0.114 * arr[:, :, 2]
+    lum = np.expand_dims(lum, axis=2) # Shape: (H, W, 1)
+    
+    shadow_mask = np.clip(1.0 - lum, 0, 1)
+    highlight_mask = np.clip(lum, 0, 1)
+    
+    # Cool shadows: slight boost to Blue, minor boost to Green
+    arr[:, :, 2] += shadow_mask[:, :, 0] * 0.04  # Blue
+    arr[:, :, 1] += shadow_mask[:, :, 0] * 0.01  # Green
+    
+    # Warm highlights: slight boost to Red, drop Blue
+    arr[:, :, 0] += highlight_mask[:, :, 0] * 0.05  # Red
+    arr[:, :, 1] += highlight_mask[:, :, 0] * 0.02  # Green
+    arr[:, :, 2] -= highlight_mask[:, :, 0] * 0.02  # Reduce Blue
+    
+    return np.clip(arr * 255.0, 0, 255).astype(np.uint8).astype(np.uint8)
 
 # ── Font ──────────────────────────────────────────────────────────────────────
 FONT_PATHS = [
@@ -543,12 +565,41 @@ def _pil_clip(pil_img, duration, pos=("center", "center"), start=0, opacity=1.0)
 
 
 # ── LAYER 3: Gradient ─────────────────────────────────────────────────────────
-def _gradient_clip(duration, height_pct=0.45, position="bottom"):
-    # Dark gradient — height and position randomized per LayoutProfile
+def _dual_directional_gradient_clip(duration, top_pct=0.32, bottom_pct=0.32):
+    """
+    Creates a full-screen dual gradient clip: dark at top and bottom,
+    fading to transparent in the middle, framing the main visual area.
+    """
+    arr = np.zeros((FRAME_H, FRAME_W, 3), dtype=np.uint8)
+    mask_arr = np.zeros((FRAME_H, FRAME_W), dtype=float)
+    
+    top_h = int(FRAME_H * top_pct)
+    bottom_h = int(FRAME_H * bottom_pct)
+    
+    for y in range(FRAME_H):
+        if y < top_h:
+            opacity = ((top_h - y) / top_h) ** 1.2
+        elif y > FRAME_H - bottom_h:
+            dist_from_bottom = y - (FRAME_H - bottom_h)
+            opacity = (dist_from_bottom / bottom_h) ** 1.2
+        else:
+            opacity = 0.0
+        mask_arr[y, :] = opacity
+        
+    clip = ImageClip(arr, duration=duration)
+    mask = VideoClip(lambda t: mask_arr, is_mask=True, duration=duration)
+    return clip.with_mask(mask)
+
+
+def _gradient_clip(duration, height_pct=0.45, position="bottom", is_longform=False):
+    if not is_longform:
+        # Dual-directional gradient for vertical Shorts framing
+        return _dual_directional_gradient_clip(duration)
+    
+    # Fallback to original single-sided gradient for landscape long-form
     h = int(FRAME_H * height_pct)
     arr = np.zeros((h, FRAME_W, 3), dtype=np.uint8)
     if position == "top":
-        # Gradient fades downward from top
         mask_arr = np.array(
             [(int(255 * ((h - y)/h)**0.5),) * FRAME_W for y in range(h)],
             dtype=float) / 255.0
@@ -566,54 +617,89 @@ def _gradient_clip(duration, height_pct=0.45, position="bottom"):
 def _ambient_particles(duration, accent_color, particle_style="bokeh"):
     n = 35
     random.seed(42)
-    particles = [(random.uniform(0, FRAME_W), random.uniform(0, FRAME_H),
-                  random.uniform(0.1, 0.8), random.uniform(0, FRAME_H), random.uniform(8, 25))
-                 for _ in range(n)]
+    
+    # Pre-generate particle properties: (x, y, speed, offset, size, streak_len)
+    particles = []
+    for _ in range(n):
+        px = random.uniform(0, FRAME_W)
+        py = random.uniform(0, FRAME_H)
+        speed = random.uniform(0.15, 0.55) # falling speed
+        offset = random.uniform(0, FRAME_H)
+        p_size = random.uniform(4, 15) if particle_style in ["bokeh", "lens_dust"] else random.uniform(8, 25)
+        streak_len = random.uniform(15, 40)
+        particles.append((px, py, speed, offset, p_size, streak_len))
 
     def make_frame(t):
-        scale_down = 4 if particle_style == "bokeh" else 2 # Scale down for faster blur
+        scale_down = 4 if particle_style in ["bokeh", "lens_dust"] else 2
         sm_w, sm_h = FRAME_W // scale_down, FRAME_H // scale_down
         img = np.zeros((sm_h, sm_w, 3), dtype=np.uint8)
         
-        for px, py, speed, offset, p_size in particles:
-            y = (py - speed * t * 60 - offset) % FRAME_H
-            sm_px, sm_py, sm_size = int(px / scale_down), int(y / scale_down), max(1, int(p_size / scale_down))
+        for px, py, speed, offset, p_size, streak_len in particles:
+            # Fall downward: add speed instead of subtract
+            y = (py + speed * t * 45 + offset) % FRAME_H
+            
+            # Horizontal drift for lens_dust
+            if particle_style == "lens_dust":
+                x = (px + math.sin(t * 0.4 + offset) * 15) % FRAME_W
+            else:
+                x = px
+                
+            sm_px = int(x / scale_down)
+            sm_py = int(y / scale_down)
+            sm_size = max(1, int(p_size / scale_down))
             
             if particle_style == "digital":
                 cv2.rectangle(img, (sm_px, sm_py), (sm_px+sm_size, sm_py+max(1, 2//scale_down)), accent_color, -1)
+            elif particle_style == "digital_rain":
+                sm_streak = max(2, int(streak_len / scale_down))
+                cv2.line(img, (sm_px, sm_py), (sm_px, sm_py + sm_streak), accent_color, max(1, 2//scale_down))
             elif particle_style == "stars":
                 cv2.circle(img, (sm_px, sm_py), max(1, 2//scale_down), (255, 255, 255), -1)
-            else:
+            else: # bokeh, lens_dust
                 cv2.circle(img, (sm_px, sm_py), sm_size, accent_color, -1)
         
-        if particle_style != "stars":
-            # Adjust blur radius based on scale
-            blur_size = 19 if particle_style == "bokeh" else 7
+        if particle_style not in ["stars", "digital_rain"]:
+            blur_size = 19 if particle_style in ["bokeh", "lens_dust"] else 7
             img = cv2.GaussianBlur(img, (blur_size, blur_size), 0)
             
-        # Upscale back to full resolution
         return cv2.resize(img, (FRAME_W, FRAME_H), interpolation=cv2.INTER_LINEAR)
 
     def make_mask(t):
-        scale_down = 4 if particle_style == "bokeh" else 2
+        scale_down = 4 if particle_style in ["bokeh", "lens_dust"] else 2
         sm_w, sm_h = FRAME_W // scale_down, FRAME_H // scale_down
         mask = np.zeros((sm_h, sm_w), dtype=np.uint8)
         
-        for px, py, speed, offset, p_size in particles:
-            y = (py - speed * t * 60 - offset) % FRAME_H
-            sm_px, sm_py, sm_size = int(px / scale_down), int(y / scale_down), max(1, int(p_size / scale_down))
+        for px, py, speed, offset, p_size, streak_len in particles:
+            y = (py + speed * t * 45 + offset) % FRAME_H
+            
+            if particle_style == "lens_dust":
+                x = (px + math.sin(t * 0.4 + offset) * 15) % FRAME_W
+            else:
+                x = px
+                
+            sm_px = int(x / scale_down)
+            sm_py = int(y / scale_down)
+            sm_size = max(1, int(p_size / scale_down))
             
             if particle_style == "digital":
                 cv2.rectangle(mask, (sm_px, sm_py), (sm_px+sm_size, sm_py+max(1, 2//scale_down)), 255, -1)
+            elif particle_style == "digital_rain":
+                sm_streak = max(2, int(streak_len / scale_down))
+                cv2.line(mask, (sm_px, sm_py), (sm_px, sm_py + sm_streak), 255, max(1, 2//scale_down))
+            elif particle_style == "stars":
+                cv2.circle(mask, (sm_px, sm_py), max(1, 2//scale_down), 255, -1)
             else:
                 cv2.circle(mask, (sm_px, sm_py), sm_size, 255, -1)
         
-        if particle_style != "stars":
-            blur_size = 19 if particle_style == "bokeh" else 7
+        if particle_style not in ["stars", "digital_rain"]:
+            blur_size = 19 if particle_style in ["bokeh", "lens_dust"] else 7
             mask = cv2.GaussianBlur(mask, (blur_size, blur_size), 0)
             
         mask_full = cv2.resize(mask, (FRAME_W, FRAME_H), interpolation=cv2.INTER_LINEAR)
-        return (mask_full.astype(float) / 255.0) * 0.15 # 15% Opacity digital dust
+        
+        # Bolder opacity for digital rain/digital structures
+        max_opacity = 0.25 if particle_style in ["digital_rain", "digital"] else 0.15
+        return (mask_full.astype(float) / 255.0) * max_opacity
 
     clip = VideoClip(make_frame, duration=duration)
     mask = VideoClip(make_mask, is_mask=True, duration=duration)
@@ -3741,142 +3827,277 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             while len(expanded_visual_paths) < num_clips_needed:
                 expanded_visual_paths.extend(visual_paths)
             expanded_visual_paths = expanded_visual_paths[:num_clips_needed]
-        else:
-            expanded_visual_paths = visual_paths
-            num_clips = len(visual_paths)
-            clip_dur = (audio_duration + (num_clips - 1) * crossfade) / num_clips
             
-        current_start = 0.0
-        clip_cache = {}
-        
-        for i, vp in enumerate(expanded_visual_paths):
-            try:
-                if vp.endswith(".mp4"):
-                    if vp in clip_cache:
-                        c_clip = clip_cache[vp].copy()
+            current_start = 0.0
+            clip_cache = {}
+            
+            for i, vp in enumerate(expanded_visual_paths):
+                try:
+                    if vp.endswith(".mp4"):
+                        if vp in clip_cache:
+                            c_clip = clip_cache[vp].copy()
+                        else:
+                            c_clip = VideoFileClip(vp).without_audio()
+                            clip_cache[vp] = c_clip
+                        
+                        if c_clip.duration < clip_dur:
+                            c_clip = c_clip.with_effects([vfx.Loop(duration=clip_dur)])
+                        else:
+                            c_clip = c_clip.subclipped(0, clip_dur)
+                        
+                        # Standard Resize & Crop (adapts to 16:9 based on longform)
+                        w, h = c_clip.size
+                        # 16:9 landscape crop
+                        target_w_crop = int(h * 16 / 9)
+                        if target_w_crop <= w:
+                            x1 = (w - target_w_crop) // 2
+                            c_clip = c_clip.cropped(x1=x1, y1=0, x2=x1 + target_w_crop, y2=h)
+                        else:
+                            target_h_crop = int(w * 9 / 16)
+                            y1 = (h - target_h_crop) // 2
+                            c_clip = c_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h_crop)
+                        c_clip = c_clip.resized((FRAME_W, FRAME_H))
                     else:
-                        c_clip = VideoFileClip(vp).without_audio()
-                        clip_cache[vp] = c_clip
+                        if vp.endswith(".png"):
+                            if vp in clip_cache:
+                                c_clip = clip_cache[vp].copy()
+                            else:
+                                from PIL import Image
+                                import numpy as np
+                                try:
+                                    raw_img = Image.open(vp)
+                                    canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H)
+                                    canvas_arr = np.array(canvas_img.convert("RGB"))
+                                    c_clip = ImageClip(canvas_arr)
+                                    clip_cache[vp] = c_clip
+                                except Exception as e:
+                                    print(f"⚠️ Error preparing screenshot canvas in longform for {vp}: {e}")
+                                    c_clip = ImageClip(vp)
+                                    clip_cache[vp] = c_clip
+                            c_clip = c_clip.with_duration(clip_dur)
+                        else:
+                            if vp in clip_cache:
+                                c_clip = clip_cache[vp].copy()
+                            else:
+                                c_clip = ImageClip(vp)
+                                clip_cache[vp] = c_clip
+                            c_clip = c_clip.with_duration(clip_dur)
+                            
+                            # Standard Resize & Crop (adapts to 16:9 based on longform)
+                            w, h = c_clip.size
+                            # 16:9 landscape crop
+                            target_w_crop = int(h * 16 / 9)
+                            if target_w_crop <= w:
+                                x1 = (w - target_w_crop) // 2
+                                c_clip = c_clip.cropped(x1=x1, y1=0, x2=x1 + target_w_crop, y2=h)
+                            else:
+                                target_h_crop = int(w * 9 / 16)
+                                y1 = (h - target_h_crop) // 2
+                                c_clip = c_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h_crop)
+                            c_clip = c_clip.resized((FRAME_W, FRAME_H))
                     
-                    if c_clip.duration < clip_dur:
-                        c_clip = c_clip.with_effects([vfx.Loop(duration=clip_dur)])
-                    else:
-                        c_clip = c_clip.subclipped(0, clip_dur)
-                else:
-                    if vp in clip_cache:
-                        c_clip = clip_cache[vp].copy()
-                    else:
-                        c_clip = ImageClip(vp)
-                        clip_cache[vp] = c_clip
-                    c_clip = c_clip.with_duration(clip_dur)
-                
-                # Standard Resize & Crop (adapts to 9:16 or 16:9 based on longform)
-                w, h = c_clip.size
-                if is_longform:
-                    # 16:9 landscape crop
-                    target_w_crop = int(h * 16 / 9)
-                    if target_w_crop <= w:
-                        x1 = (w - target_w_crop) // 2
-                        c_clip = c_clip.cropped(x1=x1, y1=0, x2=x1 + target_w_crop, y2=h)
-                    else:
-                        target_h_crop = int(w * 9 / 16)
-                        y1 = (h - target_h_crop) // 2
-                        c_clip = c_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h_crop)
-                else:
-                    # 9:16 portrait crop (Shorts)
-                    target_h = int(w * 16 / 9)
-                    if target_h <= h:
-                        y1 = (h - target_h) // 2
-                        c_clip = c_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h)
-                    else:
-                        target_w = int(h * 9 / 16)
-                        x1 = (w - target_w) // 2
-                        c_clip = c_clip.cropped(x1=x1, y1=0, x2=w, y2=h)
-
-                c_clip = c_clip.resized((FRAME_W, FRAME_H))
-                
-                # ── CREATIVE TRANSITIONS (Phase 3: Retention-Map Aware) ──
-                if i > 0:
-                    # Phase 3: Use retention_map to select transition type
-                    retention_map = script_json.get("retention_map", {})
-                    if retention_map:
-                        trans_type = get_transition_type_for_chunk(i, retention_map, len(expanded_visual_paths))
-                        # Map retention transition types to existing effects
-                        if trans_type == "flash_cut":
-                            trans_type = "glitch"
-                        elif trans_type == "zoom_punch":
-                            trans_type = "zoom"
-                        elif trans_type == "whip_pan":
-                            trans_type = random.choice(["slide_r", "slide_l"])
+                    if i > 0:
+                        retention_map = script_json.get("retention_map", {})
+                        if retention_map:
+                            trans_type = get_transition_type_for_chunk(i, retention_map, len(expanded_visual_paths))
+                            if trans_type == "flash_cut": trans_type = "glitch"
+                            elif trans_type == "zoom_punch": trans_type = "zoom"
+                            elif trans_type == "whip_pan": trans_type = random.choice(["slide_r", "slide_l"])
+                            else: trans_type = random.choice(["zoom", "slide_r", "slide_l", "slide_t", "glitch"])
                         else:
                             trans_type = random.choice(["zoom", "slide_r", "slide_l", "slide_t", "glitch"])
-                    else:
-                        trans_type = random.choice(["zoom", "slide_r", "slide_l", "slide_t", "glitch"])
-                    
-                    if trans_type == "zoom":
-                        # Dramatic Zoom In
-                        c_clip = c_clip.with_effects([vfx.CrossFadeIn(crossfade)])
-                        c_clip = c_clip.resized(lambda t: 1.3 - (0.3 * min(1, t / crossfade)) if t < crossfade else 1.0)
-                    
-                    elif "slide" in trans_type:
-                        # Smooth Directional Slide
-                        c_clip = c_clip.with_effects([vfx.CrossFadeIn(crossfade * 0.5)])
-                        def slide_pos(t):
-                            if t > crossfade: return ("center", "center")
-                            prog = t / crossfade
-                            # Exponential ease out for 'smooth' feel
-                            prog = 1 - (1 - prog)**3 
-                            if trans_type == "slide_r": return (int(FRAME_W * (1 - prog)), "center")
-                            if trans_type == "slide_l": return (int(-FRAME_W * (1 - prog)), "center")
-                            if trans_type == "slide_t": return ("center", int(-FRAME_H * (1 - prog)))
-                            return ("center", "center")
-                        c_clip = c_clip.with_position(slide_pos)
-                    
-                    elif trans_type == "glitch":
-                        # Fast Glitch Cut
-                        c_clip = c_clip.with_effects([vfx.CrossFadeIn(0.1)])
-                        # Insert a brief cinematic transition clip if enabled
-                        trans_clip = _create_transition_clip("glitch", duration=0.15)
-                        if trans_clip:
-                            trans_clip = trans_clip.with_start(current_start)
-                            logo_clips.append(trans_clip)
+                        
+                        if trans_type == "zoom":
+                            c_clip = c_clip.with_effects([vfx.CrossFadeIn(crossfade)])
+                            c_clip = c_clip.resized(lambda t: 1.3 - (0.3 * min(1, t / crossfade)) if t < crossfade else 1.0)
+                        elif "slide" in trans_type:
+                            c_clip = c_clip.with_effects([vfx.CrossFadeIn(crossfade * 0.5)])
+                            def slide_pos(t):
+                                if t > crossfade: return ("center", "center")
+                                prog = t / crossfade
+                                prog = 1 - (1 - prog)**3 
+                                if trans_type == "slide_r": return (int(FRAME_W * (1 - prog)), "center")
+                                if trans_type == "slide_l": return (int(-FRAME_W * (1 - prog)), "center")
+                                if trans_type == "slide_t": return ("center", int(-FRAME_H * (1 - prog)))
+                                return ("center", "center")
+                            c_clip = c_clip.with_position(slide_pos)
+                        elif trans_type == "glitch":
+                            c_clip = c_clip.with_effects([vfx.CrossFadeIn(0.1)])
+                            trans_clip = _create_transition_clip("glitch", duration=0.15)
+                            if trans_clip:
+                                trans_clip = trans_clip.with_start(current_start)
+                                logo_clips.append(trans_clip)
 
-                    # Impact Flash Sync
-                    flash = ColorClip(size=(FRAME_W, FRAME_H), color=(255, 255, 255), duration=0.2).with_opacity(0.6)
-                    flash = flash.with_start(current_start).with_effects([vfx.CrossFadeOut(0.15)])
-                    logo_clips.append(flash)
+                        flash = ColorClip(size=(FRAME_W, FRAME_H), color=(255, 255, 255), duration=0.2).with_opacity(0.6)
+                        flash = flash.with_start(current_start).with_effects([vfx.CrossFadeOut(0.15)])
+                        logo_clips.append(flash)
 
-                # ── CONTINUOUS MOTION ──
-                scale_factor = 1.0 + random.uniform(0.18, 0.25)
-                # Capture scale_factor and clip_dur by value to avoid lambda-in-loop bugs
-                c_clip = c_clip.resized(lambda t, sf=scale_factor, cd=clip_dur: 1.0 + (sf - 1.0) * (t / cd))
-                c_clip = _apply_handheld_shake(c_clip)
-                
-                # Apply alternating color grade tinting (warm vs. cool) for longform
-                if is_longform:
+                    scale_factor = 1.0 + random.uniform(0.18, 0.25)
+                    c_clip = c_clip.resized(lambda t, sf=scale_factor, cd=clip_dur: 1.0 + (sf - 1.0) * (t / cd))
+                    c_clip = _apply_handheld_shake(c_clip)
+                    
                     is_warm = (i % 2 == 0)
                     def tint_frame(frame, is_w=is_warm):
-                        # frame is shape (H, W, 3) and dtype uint8
                         frame_f = frame.astype(np.float32)
                         if is_w:
-                            # Warm tint: slight boost to red and green channels
                             frame_f[:, :, 0] = np.clip(frame_f[:, :, 0] * 1.04 + 3, 0, 255)
                             frame_f[:, :, 1] = np.clip(frame_f[:, :, 1] * 1.01, 0, 255)
                             frame_f[:, :, 2] = np.clip(frame_f[:, :, 2] * 0.96 - 3, 0, 255)
                         else:
-                            # Cool tint: slight boost to blue and green channels
                             frame_f[:, :, 0] = np.clip(frame_f[:, :, 0] * 0.96 - 3, 0, 255)
                             frame_f[:, :, 1] = np.clip(frame_f[:, :, 1] * 1.01, 0, 255)
                             frame_f[:, :, 2] = np.clip(frame_f[:, :, 2] * 1.04 + 3, 0, 255)
                         return frame_f.astype(np.uint8)
                     c_clip = c_clip.image_transform(tint_frame)
+                    
+                    c_clip = c_clip.with_start(current_start)
+                    bg_layer_clips.append(c_clip)
+                    current_start += (clip_dur - crossfade)
+                except Exception as e:
+                    print(f"Failed to load background img {vp}: {e}")
+        else:
+            # --- SHORTS PACING SYNCHRONIZED TO CHUNKS ---
+            clip_cache = {}
+            for i, chunk in enumerate(chunks):
+                vp = chunk.get("visual_path")
+                if not vp or not os.path.exists(vp):
+                    continue
                 
-                c_clip = c_clip.with_start(current_start)
+                start_t = chunk["start"]
+                end_t = chunk["end"]
                 
-                bg_layer_clips.append(c_clip)
-                current_start += (clip_dur - crossfade)
-            except Exception as e:
-                print(f"Failed to load background img {vp}: {e}")
+                is_last = (i == len(chunks) - 1)
+                this_crossfade = crossfade if not is_last else 0.0
+                clip_dur = (end_t - start_t) + this_crossfade
+                
+                if clip_dur <= 0.01:
+                    continue
+                
+                try:
+                    if vp.endswith(".mp4"):
+                        if vp in clip_cache:
+                            c_clip = clip_cache[vp].copy()
+                        else:
+                            c_clip = VideoFileClip(vp).without_audio()
+                            clip_cache[vp] = c_clip
+                        
+                        if c_clip.duration < clip_dur:
+                            c_clip = c_clip.with_effects([vfx.Loop(duration=clip_dur)])
+                        else:
+                            c_clip = c_clip.subclipped(0, clip_dur)
+                        
+                        # 9:16 portrait crop (Shorts)
+                        w, h = c_clip.size
+                        target_h = int(w * 16 / 9)
+                        if target_h <= h:
+                            y1 = (h - target_h) // 2
+                            c_clip = c_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h)
+                        else:
+                            target_w = int(h * 9 / 16)
+                            x1 = (w - target_w) // 2
+                            c_clip = c_clip.cropped(x1=x1, y1=0, x2=w, y2=h)
+                        c_clip = c_clip.resized((FRAME_W, FRAME_H))
+                    else:
+                        if vp.endswith(".png"):
+                            if vp in clip_cache:
+                                c_clip = clip_cache[vp].copy()
+                            else:
+                                from PIL import Image
+                                import numpy as np
+                                try:
+                                    raw_img = Image.open(vp)
+                                    canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H)
+                                    canvas_arr = np.array(canvas_img.convert("RGB"))
+                                    c_clip = ImageClip(canvas_arr)
+                                    clip_cache[vp] = c_clip
+                                except Exception as e:
+                                    print(f"⚠️ Error preparing screenshot canvas for {vp}: {e}")
+                                    c_clip = ImageClip(vp)
+                                    clip_cache[vp] = c_clip
+                            c_clip = c_clip.with_duration(clip_dur)
+                        else:
+                            if vp in clip_cache:
+                                c_clip = clip_cache[vp].copy()
+                            else:
+                                c_clip = ImageClip(vp)
+                                clip_cache[vp] = c_clip
+                            c_clip = c_clip.with_duration(clip_dur)
+                            
+                            # 9:16 portrait crop (Shorts)
+                            w, h = c_clip.size
+                            target_h = int(w * 16 / 9)
+                            if target_h <= h:
+                                y1 = (h - target_h) // 2
+                                c_clip = c_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h)
+                            else:
+                                target_w = int(h * 9 / 16)
+                                x1 = (w - target_w) // 2
+                                c_clip = c_clip.cropped(x1=x1, y1=0, x2=w, y2=h)
+                            c_clip = c_clip.resized((FRAME_W, FRAME_H))
+                    
+                    # Apply premium cinematic color grade
+                    c_clip = c_clip.image_transform(apply_tech_grade)
+                    
+                    if i > 0:
+                        retention_map = script_json.get("retention_map", {})
+                        if retention_map:
+                            trans_type = get_transition_type_for_chunk(i, retention_map, len(chunks))
+                            if trans_type == "flash_cut": trans_type = "glitch"
+                            elif trans_type == "zoom_punch": trans_type = "zoom"
+                            elif trans_type == "whip_pan": trans_type = random.choice(["slide_r", "slide_l"])
+                            else: trans_type = random.choice(["zoom", "slide_r", "slide_l", "slide_t", "glitch", "morph"])
+                        else:
+                            trans_type = random.choice(["zoom", "slide_r", "slide_l", "slide_t", "glitch", "morph"])
+                        
+                        if trans_type == "zoom":
+                            c_clip = c_clip.with_effects([vfx.CrossFadeIn(this_crossfade)])
+                            c_clip = c_clip.resized(lambda t, cf=this_crossfade: 1.25 - (0.25 * min(1, t / cf)) if t < cf else 1.0)
+                        elif trans_type == "morph":
+                            c_clip = c_clip.with_effects([vfx.CrossFadeIn(this_crossfade)])
+                            c_clip = c_clip.resized(lambda t, cf=this_crossfade: 1.2 - (0.2 * min(1, t / cf)) if t < cf else 1.0)
+                            
+                            def morph_blur(frame, t, cf=this_crossfade):
+                                if t >= cf:
+                                    return frame
+                                prog = t / cf
+                                blur_radius = int(19 * (1.0 - prog))
+                                if blur_radius % 2 == 0:
+                                    blur_radius += 1
+                                if blur_radius > 1:
+                                    return cv2.GaussianBlur(frame, (blur_radius, blur_radius), 0)
+                                return frame
+                            c_clip = c_clip.transform(lambda gf, t: morph_blur(gf(t), t))
+                        elif "slide" in trans_type:
+                            c_clip = c_clip.with_effects([vfx.CrossFadeIn(this_crossfade * 0.5)])
+                            def slide_pos(t, cf=this_crossfade, tt=trans_type):
+                                if t > cf: return ("center", "center")
+                                prog = t / cf
+                                prog = 1 - (1 - prog)**3
+                                if tt == "slide_r": return (int(FRAME_W * (1 - prog)), "center")
+                                if tt == "slide_l": return (int(-FRAME_W * (1 - prog)), "center")
+                                if tt == "slide_t": return ("center", int(-FRAME_H * (1 - prog)))
+                                return ("center", "center")
+                            c_clip = c_clip.with_position(slide_pos)
+                        elif trans_type == "glitch":
+                            c_clip = c_clip.with_effects([vfx.CrossFadeIn(0.1)])
+                            trans_clip = _create_transition_clip("glitch", duration=0.15)
+                            if trans_clip:
+                                trans_clip = trans_clip.with_start(start_t)
+                                logo_clips.append(trans_clip)
+                        
+                        # Premium Luminance Dip
+                        dip = ColorClip(size=(FRAME_W, FRAME_H), color=(0, 0, 0), duration=0.2).with_opacity(0.35)
+                        dip = dip.with_start(start_t).with_effects([vfx.CrossFadeIn(0.1), vfx.CrossFadeOut(0.1)])
+                        logo_clips.append(dip)
+                    
+                    scale_factor = 1.0 + random.uniform(0.15, 0.22)
+                    c_clip = c_clip.resized(lambda t, sf=scale_factor, cd=clip_dur: 1.0 + (sf - 1.0) * (t / cd))
+                    c_clip = _apply_handheld_shake(c_clip)
+                    
+                    c_clip = c_clip.with_start(start_t)
+                    bg_layer_clips.append(c_clip)
+                except Exception as e:
+                    print(f"Failed to load background img {vp} for chunk {i}: {e}")
 
         # ── B-ROLL BURSTS AT FACT BOUNDARIES ──────────────────────────────────────
         if is_longform and script_json.get("longform_format") == "did_you_know":
@@ -3899,12 +4120,12 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     # ── AVATAR VIDEO PiP ──────────────────────────────────────────────────
     # Skip avatar entirely when Kaggle GPU fallback was used (no lip-sync available)
     skip_avatar = script_json.get("skip_avatar", False)
+    avatar_pip = None
+    ring_clip = None
+    ring_size = 0
     
     if skip_avatar:
         print("⏭️ Skipping Avatar PiP (Kaggle GPU fallback — no lip-sync available).")
-        avatar_pip = None
-        ring_clip = None
-        ring_size = 0
         lipsync_path = None
     else:
         print("Preparing Dimension Avatar PiP...")
@@ -4121,7 +4342,10 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     else:
         screenshot_path = script_json.get("screenshot_path")
         screenshot_clips = _article_screenshot_clip(screenshot_path, audio_duration)
-    gradient = _gradient_clip(audio_duration, height_pct=layout["gradient_height_pct"], position=layout["gradient_position"])
+    gradient = _gradient_clip(audio_duration, height_pct=layout["gradient_height_pct"], position=layout["gradient_position"], is_longform=is_longform)
+    
+    # Ambient Particles
+    particle_layer = _ambient_particles(audio_duration, accent_color, particle_style=layout["particle_style"])
 
     # ── HUMAN REALISM OVERLAYS ───────────────────────────────────────────────
     grain_layer = _generate_film_grain(audio_duration, FRAME_W, FRAME_H)
@@ -4213,7 +4437,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     if is_longform:
         topic_transition_clips = _longform_topic_transition_clips(script_json, audio_duration)
         
-    base_layers = bg_layer_clips + burst_clips + screenshot_clips + topic_transition_clips
+    base_layers = bg_layer_clips + burst_clips + [particle_layer] + screenshot_clips + topic_transition_clips
     
     # Add overlays
     base_layers.append(gradient)
