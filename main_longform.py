@@ -404,6 +404,18 @@ def run_longform_pipeline(dry_run=False):
     if gen_success < len(chunks) * 0.5:
         log_message(f"⚠️ Primary visual generator only generated {gen_success}/{len(chunks)} visuals. Falling back to nano-scene engine (16:9 Imagen)...")
         chunks = generate_nano_scene_visuals(chunks, topic_context, style_guide=style_guide, aspect_ratio="16:9")
+        
+        # Check if nano-scene engine ALSO failed to produce new visuals (16:9)
+        import os
+        final_success = sum(1 for c in chunks if c.get("visual_path") and os.path.exists(c["visual_path"]) and c.get("source") in [
+            "Veo (veo_concept)", "Veo (veo_cta)", "Imagen (nano_hook)", "Imagen (nano_concept)", "Imagen (nano_evidence)", "Imagen (fallback from veo)", 
+            "Nano-Scene (Imagen 4.0)", "Real Article Screenshot", "Evidence Screenshot", "Fact Article Screenshot", "Main Article Screenshot"
+        ])
+        
+        if final_success < len(chunks) * 0.5:
+            log_message(f"⚠️ Both primary and nano-scene visual generation failed (only {final_success}/{len(chunks)} succeeded). Falling back to whiteboard animation videos!")
+            from whiteboard_gen import generate_whiteboard_visuals
+            chunks = generate_whiteboard_visuals(chunks, topic_context, is_longform=True)
     else:
         log_message(f"✅ Primary visual generator successfully created {gen_success}/{len(chunks)} clips/images.")
 
