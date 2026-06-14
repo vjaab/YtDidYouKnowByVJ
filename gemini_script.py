@@ -737,6 +737,145 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
             
     return script_data
 
+def call_fallback_model(prompt):
+    """
+    Attempts to call non-Gemini fallback APIs in sequence:
+    OpenAI -> Anthropic (Claude) -> Groq (Llama) -> DeepSeek -> OpenRouter.
+    Returns the parsed JSON response dict or None.
+    """
+    import os
+    import json
+    import requests
+
+    def clean_and_parse_json(content):
+        raw = content.strip()
+        if "```json" in raw:
+            raw = raw[raw.find("```json")+7:raw.rfind("```")]
+        elif "```" in raw:
+            raw = raw[raw.find("```")+3:raw.rfind("```")]
+        return json.loads(raw.strip())
+
+    # 1. OpenAI
+    openai_key = os.getenv("OPENAI_API_KEY")
+    if openai_key:
+        print("🔮 Gemini failed. Falling back to OpenAI (gpt-4o-mini)...")
+        try:
+            headers = {
+                "Authorization": f"Bearer {openai_key}",
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "model": "gpt-4o-mini",
+                "messages": [{"role": "user", "content": prompt}],
+                "response_format": {"type": "json_object"},
+                "temperature": 0.7
+            }
+            r = requests.post("https://api.openai.com/v1/chat/completions", json=payload, headers=headers, timeout=30)
+            if r.status_code == 200:
+                content = r.json()["choices"][0]["message"]["content"].strip()
+                return clean_and_parse_json(content)
+            else:
+                print(f"⚠️ OpenAI API failed with code {r.status_code}: {r.text}")
+        except Exception as e:
+            print(f"⚠️ OpenAI fallback failed: {e}")
+
+    # 2. Anthropic (Claude)
+    anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+    if anthropic_key:
+        print("🔮 Gemini/OpenAI failed. Falling back to Anthropic (claude-3-5-haiku-20241022)...")
+        try:
+            headers = {
+                "x-api-key": anthropic_key,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json"
+            }
+            payload = {
+                "model": "claude-3-5-haiku-20241022",
+                "max_tokens": 4000,
+                "messages": [{"role": "user", "content": prompt}]
+            }
+            r = requests.post("https://api.anthropic.com/v1/messages", json=payload, headers=headers, timeout=30)
+            if r.status_code == 200:
+                content = r.json()["content"][0]["text"].strip()
+                return clean_and_parse_json(content)
+            else:
+                print(f"⚠️ Anthropic API failed with code {r.status_code}: {r.text}")
+        except Exception as e:
+            print(f"⚠️ Anthropic fallback failed: {e}")
+
+    # 3. Groq (Llama)
+    groq_key = os.getenv("GROQ_API_KEY")
+    if groq_key:
+        print("🔮 Gemini/OpenAI/Anthropic failed. Falling back to Groq (llama-3.3-70b-versatile)...")
+        try:
+            headers = {
+                "Authorization": f"Bearer {groq_key}",
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "model": "llama-3.3-70b-versatile",
+                "messages": [{"role": "user", "content": prompt}],
+                "response_format": {"type": "json_object"},
+                "temperature": 0.7
+            }
+            r = requests.post("https://api.groq.com/openai/v1/chat/completions", json=payload, headers=headers, timeout=30)
+            if r.status_code == 200:
+                content = r.json()["choices"][0]["message"]["content"].strip()
+                return clean_and_parse_json(content)
+            else:
+                print(f"⚠️ Groq API failed with code {r.status_code}: {r.text}")
+        except Exception as e:
+            print(f"⚠️ Groq fallback failed: {e}")
+
+    # 4. DeepSeek
+    deepseek_key = os.getenv("DEEPSEEK_API_KEY")
+    if deepseek_key:
+        print("🔮 Falling back to DeepSeek (deepseek-chat)...")
+        try:
+            headers = {
+                "Authorization": f"Bearer {deepseek_key}",
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "model": "deepseek-chat",
+                "messages": [{"role": "user", "content": prompt}],
+                "response_format": {"type": "json_object"},
+                "temperature": 0.7
+            }
+            r = requests.post("https://api.deepseek.com/chat/completions", json=payload, headers=headers, timeout=30)
+            if r.status_code == 200:
+                content = r.json()["choices"][0]["message"]["content"].strip()
+                return clean_and_parse_json(content)
+            else:
+                print(f"⚠️ DeepSeek API failed with code {r.status_code}: {r.text}")
+        except Exception as e:
+            print(f"⚠️ DeepSeek fallback failed: {e}")
+
+    # 5. OpenRouter
+    openrouter_key = os.getenv("OPENROUTER_API_KEY")
+    if openrouter_key:
+        print("🔮 Falling back to OpenRouter (meta-llama/llama-3.3-70b-instruct)...")
+        try:
+            headers = {
+                "Authorization": f"Bearer {openrouter_key}",
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "model": "meta-llama/llama-3.3-70b-instruct",
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.7
+            }
+            r = requests.post("https://openrouter.ai/api/v1/chat/completions", json=payload, headers=headers, timeout=30)
+            if r.status_code == 200:
+                content = r.json()["choices"][0]["message"]["content"].strip()
+                return clean_and_parse_json(content)
+            else:
+                print(f"⚠️ OpenRouter API failed with code {r.status_code}: {r.text}")
+        except Exception as e:
+            print(f"⚠️ OpenRouter fallback failed: {e}")
+
+    return None
+
 class MultiAgentGenerationEngine:
     def __init__(self, client, context, slot, category, strategy_enhancement, is_longform, raw_articles=None):
         self.client = client
@@ -788,6 +927,13 @@ class MultiAgentGenerationEngine:
                     print(f"⚠️ [LOOP] Call failed ({current_model}): {e}. Retrying...")
                     time.sleep(3)
                 attempts += 1
+                
+        print("🚨 Gemini failed all attempts. Attempting fallback models...")
+        fallback_res = call_fallback_model(prompt)
+        if fallback_res:
+            return fallback_res
+
+        print("🚨 All fallback models failed or not configured.")
         return None
 
     def execute(self, selection_instruction, prompt_requirements):
