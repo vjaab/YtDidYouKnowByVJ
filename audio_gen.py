@@ -23,7 +23,6 @@ def _apply_stable_ts(audio_path, text):
         import stable_whisper
         import warnings
         import signal
-        import os
 
         # Suppress ALL warnings including C-level scipy Cholesky warnings
         warnings.filterwarnings("ignore")

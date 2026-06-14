@@ -489,7 +489,6 @@ def run_pipeline(topic_type="auto"):
         chunks = generate_nano_scene_visuals(chunks, topic_context, style_guide=style_guide)
         
         # Check if nano-scene engine ALSO failed to produce new visuals
-        import os
         final_success = sum(1 for c in chunks if c.get("visual_path") and os.path.exists(c["visual_path"]) and c.get("source") in [
             "Veo (veo_concept)", "Veo (veo_cta)", "Imagen (nano_hook)", "Imagen (nano_concept)", "Imagen (nano_evidence)", "Imagen (fallback from veo)", 
             "Nano-Scene (Imagen 4.0)", "Real Article Screenshot", "Evidence Screenshot", "Fact Article Screenshot", "Main Article Screenshot"
