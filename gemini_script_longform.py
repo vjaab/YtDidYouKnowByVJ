@@ -26,7 +26,11 @@ import os
 import time
 import random
 from datetime import datetime
-from config import GEMINI_API_KEY, LOGS_DIR
+from config import (
+    GEMINI_API_KEY, LOGS_DIR,
+    GEMINI_PRO_MODEL, GEMINI_FLASH_MODEL, GEMINI_FLASH_LITE_MODEL,
+    GEMINI_RPM_SLEEP
+)
 from topic_tracker import load_tracker, check_story_uniqueness
 from config_longform import (
     LONGFORM_NUM_TOPICS, LONGFORM_PER_TOPIC_DURATION,
@@ -409,7 +413,7 @@ class LongformGenerationEngine:
         self.news_context = news_context
         self.avoid_list_str = avoid_list_str
 
-    def _call_gemini(self, prompt, model='gemini-2.5-flash', use_search=False):
+    def _call_gemini(self, prompt, model=GEMINI_FLASH_MODEL, use_search=False):
         """Call Gemini with retry logic and model fallback."""
         attempts = 0
         current_model = model
@@ -435,14 +439,15 @@ class LongformGenerationEngine:
             except Exception as e:
                 err_str = str(e).upper()
                 if any(x in err_str for x in ["503", "UNAVAILABLE", "RESOURCE_EXHAUSTED", "429", "NOT_FOUND", "404"]):
-                    wait_time = (5 ** (attempts + 1)) + random.uniform(2, 5)
-                    if current_model == 'gemini-2.5-pro':
-                        print(f"⚠️ [LONGFORM] {current_model} unavailable. Falling back to gemini-2.5-flash...")
-                        current_model = 'gemini-2.5-flash'
+                    # Gentler exponential backoff capped at 60s
+                    wait_time = min((2 ** (attempts + 1)) + random.uniform(2, 5), 60.0)
+                    if current_model == GEMINI_PRO_MODEL:
+                        print(f"⚠️ [LONGFORM] {current_model} unavailable. Falling back to {GEMINI_FLASH_MODEL}...")
+                        current_model = GEMINI_FLASH_MODEL
                         continue
-                    elif current_model == 'gemini-2.5-flash' and attempts >= 1:
-                        print(f"⚠️ [LONGFORM] {current_model} overloaded. Falling back to gemini-2.5-flash-lite...")
-                        current_model = 'gemini-2.5-flash-lite'
+                    elif current_model == GEMINI_FLASH_MODEL and attempts >= 1:
+                        print(f"⚠️ [LONGFORM] {current_model} overloaded. Falling back to {GEMINI_FLASH_LITE_MODEL}...")
+                        current_model = GEMINI_FLASH_LITE_MODEL
                         continue
                     print(f"⚠️ [LONGFORM] Rate limit ({current_model}). Retrying in {wait_time:.1f}s...")
                     time.sleep(wait_time)
@@ -458,7 +463,7 @@ class LongformGenerationEngine:
         while attempts < 3:
             try:
                 response = self.client.models.generate_content(
-                    model='gemini-2.5-flash',
+                    model=GEMINI_FLASH_MODEL,
                     contents=query,
                     config=types.GenerateContentConfig(
                         tools=[{'google_search': {}}]
@@ -603,7 +608,7 @@ class LongformGenerationEngine:
         )
         
         print(f"   📝 [AGENT 2.{fact_number}] Generating Fact #{fact_number} script ({intensity})...")
-        return self._call_gemini(prompt, model='gemini-2.5-pro')
+        return self._call_gemini(prompt, model=GEMINI_PRO_MODEL)
 
     # ── STEP 3: Assemble compilation ─────────────────────────────────────────
     def assemble_compilation(self, fact_scripts):
@@ -620,7 +625,7 @@ class LongformGenerationEngine:
             min_words=min_words,
             max_words=max_words
         )
-        return self._call_gemini(prompt, model='gemini-2.5-pro')
+        return self._call_gemini(prompt, model=GEMINI_PRO_MODEL)
 
     # ── STEP 4: Optimize retention ───────────────────────────────────────────
     def optimize_retention(self, assembled_script):
@@ -635,7 +640,7 @@ class LongformGenerationEngine:
             min_words=min_words,
             max_words=max_words
         )
-        return self._call_gemini(prompt, model='gemini-2.5-pro')
+        return self._call_gemini(prompt, model=GEMINI_PRO_MODEL)
 
     # ── STEP 5: Humanize and finalize ────────────────────────────────────────
     def humanize_and_finalize(self, optimized_script, compilation_data, schema_requirements):
@@ -648,13 +653,14 @@ class LongformGenerationEngine:
             compilation_data=json.dumps(compilation_data, indent=2),
             schema_requirements=schema_requirements
         )
-        return self._call_gemini(prompt, model='gemini-2.5-pro')
+        return self._call_gemini(prompt, model=GEMINI_PRO_MODEL)
 
     # ── FULL PIPELINE ────────────────────────────────────────────────────────
     def execute(self):
         """Run the full multi-agent pipeline end-to-end."""
         # 0. Discover topics
         topics = self.discover_topics()
+        if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         if not topics or len(topics) < 5:
             print("❌ [LONGFORM] Could not discover enough topics. Aborting.")
             return None
@@ -667,12 +673,14 @@ class LongformGenerationEngine:
             
             # Research
             research = self.research_topic(topic)
+            if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
             if not research:
                 print(f"   ⚠️ Research failed for Fact #{fact_num}. Using headline only.")
                 research = {"core_narrative": topic.get("one_liner", ""), "facts": [], "implications": []}
             
             # Generate script
             fact_script = self.generate_fact_script(topic, research, fact_num)
+            if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
             if fact_script:
                 fact_script["topic"] = topic  # Attach topic metadata
                 fact_scripts.append(fact_script)
@@ -687,6 +695,7 @@ class LongformGenerationEngine:
 
         # 3. Assemble compilation
         compilation = self.assemble_compilation(fact_scripts)
+        if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         if not compilation or "script" not in compilation:
             print("❌ [LONGFORM] Compilation assembly failed. Aborting.")
             return None
@@ -697,6 +706,7 @@ class LongformGenerationEngine:
 
         # 4. Optimize retention
         optimized = self.optimize_retention(assembled_script)
+        if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         if optimized and "optimized_script" in optimized:
             final_script = optimized["optimized_script"]
             opt_word_count = len(final_script.split())
@@ -712,6 +722,7 @@ class LongformGenerationEngine:
         schema_requirements = COMPILATION_ASSEMBLER_TEMPLATE.split("Return ONLY this exact JSON:")[1] if "Return ONLY this exact JSON:" in COMPILATION_ASSEMBLER_TEMPLATE else ""
 
         final_data = self.humanize_and_finalize(final_script, compilation, schema_requirements)
+        if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         
         if not final_data:
             print("   ⚠️ Humanizer failed. Using compilation data directly.")

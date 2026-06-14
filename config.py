@@ -64,3 +64,11 @@ ENABLE_CINEMATIC_TRANSITIONS = True  # Whip pan, zoom punch, flash cut, glitch
 ENABLE_STRATEGIC_SFX = True       # Whoosh/bass at pattern interrupts
 ENABLE_DYNAMIC_BGM_CURVE = True   # BGM energy follows Hook→Body→Payoff→CTA
 TRENDING_NICHE_BIAS = 0.15         # 0=prefer broad topics, 1=prefer niche topics
+
+# Model Configurations (to easily switch/override via env variables or custom values)
+GEMINI_PRO_MODEL = os.getenv("GEMINI_PRO_MODEL", "gemini-2.5-pro")
+GEMINI_FLASH_MODEL = os.getenv("GEMINI_FLASH_MODEL", "gemini-2.5-flash")
+GEMINI_FLASH_LITE_MODEL = os.getenv("GEMINI_FLASH_LITE_MODEL", "gemini-2.5-flash-lite")
+
+# API Call Spacing Delay to prevent rate-limiting on Free Tier keys
+GEMINI_RPM_SLEEP = float(os.getenv("GEMINI_RPM_SLEEP", "2.0"))

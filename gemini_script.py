@@ -5,7 +5,11 @@ import os
 from datetime import datetime
 import time
 import random
-from config import GEMINI_API_KEY, LOGS_DIR
+from config import (
+    GEMINI_API_KEY, LOGS_DIR,
+    GEMINI_PRO_MODEL, GEMINI_FLASH_MODEL, GEMINI_FLASH_LITE_MODEL,
+    GEMINI_RPM_SLEEP
+)
 from topic_tracker import load_tracker, check_story_uniqueness, check_cooldowns
 from ecosystem_logic import get_slot_info, get_category_prompt_enhancement
 
@@ -241,7 +245,7 @@ def get_hottest_tech_topic(client, avoid_list=""):
     while attempts < 3:
         try:
             response = client.models.generate_content(
-                model='gemini-2.5-flash',
+                model=GEMINI_FLASH_MODEL,
                 contents=(
                     "Analyze today's Google Trends and viral tech content. "
                     "What is the single most trending technology topic right now? "
@@ -492,7 +496,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
             
             try:
                 search_response = client.models.generate_content(
-                    model='gemini-2.5-flash', # Use stable flash for tools
+                    model=GEMINI_FLASH_MODEL, # Use stable flash for tools
                     contents=search_query,
                     config=types.GenerateContentConfig(
                         tools=[{'google_search': {}}]
@@ -743,7 +747,7 @@ class MultiAgentGenerationEngine:
         self.is_longform = is_longform
         self.raw_articles = raw_articles
 
-    def _call_gemini(self, prompt, model='gemini-2.5-flash'):
+    def _call_gemini(self, prompt, model=GEMINI_FLASH_MODEL):
         attempts = 0
         current_model = model
         while attempts < 5:
@@ -765,16 +769,17 @@ class MultiAgentGenerationEngine:
                 err_str = str(e).upper()
                 # Handle Overloaded (503), Resource Exhausted (429), or Model Deprecated (404)
                 if any(x in err_str for x in ["503", "UNAVAILABLE", "RESOURCE_EXHAUSTED", "429", "NOT_FOUND", "404"]):
-                    wait_time = (5 ** (attempts + 1)) + random.uniform(2, 5) # Progressive wait: 7s, 27s, 127s...
+                    # Gentler exponential backoff capped at 60s
+                    wait_time = min((2 ** (attempts + 1)) + random.uniform(2, 5), 60.0)
                     
                     # Model Fallback Logic
-                    if current_model == 'gemini-2.5-pro':
-                        print(f"⚠️ [LOOP] Model {current_model} is UNAVAILABLE. Falling back to gemini-2.5-flash...")
-                        current_model = 'gemini-2.5-flash'
+                    if current_model == GEMINI_PRO_MODEL:
+                        print(f"⚠️ [LOOP] Model {current_model} is UNAVAILABLE. Falling back to {GEMINI_FLASH_MODEL}...")
+                        current_model = GEMINI_FLASH_MODEL
                         continue
-                    elif current_model == 'gemini-2.5-flash' and attempts >= 1:
-                        print(f"⚠️ [LOOP] Model {current_model} is OVERLOADED. Falling back to gemini-2.5-flash-lite...")
-                        current_model = 'gemini-2.5-flash-lite'
+                    elif current_model == GEMINI_FLASH_MODEL and attempts >= 1:
+                        print(f"⚠️ [LOOP] Model {current_model} is OVERLOADED. Falling back to {GEMINI_FLASH_LITE_MODEL}...")
+                        current_model = GEMINI_FLASH_LITE_MODEL
                         continue
                         
                     print(f"⚠️ [LOOP] Call failed ({current_model}): Rate Limit/Overload. Retrying in {wait_time:.1f}s...")
@@ -793,6 +798,7 @@ class MultiAgentGenerationEngine:
             news_context=self.context
         )
         selection = self._call_gemini(selector_prompt)
+        if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         if not selection or "selected_headline" not in selection:
             print("⚠️ Selector Agent failed. Using raw context fallback.")
             # If we have articles, pick the top one from raw_articles as fallback
@@ -840,6 +846,7 @@ class MultiAgentGenerationEngine:
                 context=isolated_context # Pass the messy context to be sharpened
             )
             sharpened_data = self._call_gemini(sharpener_prompt)
+            if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
             
             if sharpened_data and "core_narrative" in sharpened_data:
                 isolated_context = (
@@ -865,6 +872,7 @@ class MultiAgentGenerationEngine:
             news_context=selected_context
         )
         research = self._call_gemini(research_prompt)
+        if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         if not research: return None
 
         print("🪝 [AGENT 2] Hook Agent: Generating high-retention hooks...")
@@ -873,6 +881,7 @@ class MultiAgentGenerationEngine:
             research_json=json.dumps(research)
         )
         hooks_data = self._call_gemini(hook_prompt)
+        if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         if not hooks_data or "hooks" not in hooks_data: return None
         
         # Pick best hook (highest combined score including swipe-stop power)
@@ -885,14 +894,15 @@ class MultiAgentGenerationEngine:
         hook_words = len(hook_text.split())
         print(f"🎯 Selected Hook ({hook_words} words): {hook_text}")
 
-        print("📖 [AGENT 3] Narrative Agent: Building escalating structure...")
+        print("📝 [AGENT 3] Fact Script Generator: Writing the unified retention-optimized script...")
         narrative_prompt = NARRATIVE_AGENT_TEMPLATE.format(
             persona=SYSTEM_PERSONA,
             research_json=json.dumps(research),
             selected_hook=hook_text,
             selection_instruction=selection_instruction
         )
-        narrative = self._call_gemini(narrative_prompt, model='gemini-2.5-pro')
+        narrative = self._call_gemini(narrative_prompt, model=GEMINI_PRO_MODEL)
+        if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         if not narrative: return None
 
         print("⚡ [AGENT 4] Retention Optimizer: Maximizing pacing and curiosity density...")
@@ -900,7 +910,8 @@ class MultiAgentGenerationEngine:
             persona=SYSTEM_PERSONA,
             narrative_json=json.dumps(narrative)
         )
-        optimized = self._call_gemini(retention_prompt, model='gemini-2.5-pro')
+        optimized = self._call_gemini(retention_prompt, model=GEMINI_PRO_MODEL)
+        if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         if not optimized: return None
 
         # ── PHASE 2: RETENTION SCIENTIST (Agent 4.5) ──────────────────────────
@@ -909,7 +920,8 @@ class MultiAgentGenerationEngine:
             persona=SYSTEM_PERSONA,
             optimized_script=optimized.get("optimized_script", "")
         )
-        retention_result = self._call_gemini(retention_sci_prompt, model='gemini-2.5-pro')
+        retention_result = self._call_gemini(retention_sci_prompt, model=GEMINI_PRO_MODEL)
+        if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         
         retention_map = {}
         if retention_result and "retention_enhanced_script" in retention_result:
@@ -935,7 +947,7 @@ class MultiAgentGenerationEngine:
             optimized_script=optimized.get("optimized_script", ""),
             schema_requirements=refined_requirements
         )
-        final_script = self._call_gemini(humanizer_prompt, model='gemini-2.5-pro')
+        final_script = self._call_gemini(humanizer_prompt, model=GEMINI_PRO_MODEL)
         
         if final_script:
             # Final safety check: ensure the headline/url are set correctly in the final object
