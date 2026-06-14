@@ -3863,7 +3863,6 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                                 c_clip = clip_cache[vp].copy()
                             else:
                                 from PIL import Image
-                                import numpy as np
                                 try:
                                     raw_img = Image.open(vp)
                                     canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H)
@@ -4003,7 +4002,6 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                                 c_clip = clip_cache[vp].copy()
                             else:
                                 from PIL import Image
-                                import numpy as np
                                 try:
                                     raw_img = Image.open(vp)
                                     canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H)
