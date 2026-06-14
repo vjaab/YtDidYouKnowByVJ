@@ -70,6 +70,21 @@ jobs:
           echo "X_ACCESS_TOKEN=${{ secrets.X_ACCESS_TOKEN }}" >> .env
           echo "X_ACCESS_TOKEN_SECRET=${{ secrets.X_ACCESS_TOKEN_SECRET }}" >> .env
           echo "X_BEARER_TOKEN=${{ secrets.X_BEARER_TOKEN }}" >> .env
+          if [ ! -z "${{ secrets.OPENAI_API_KEY }}" ]; then
+            echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+          fi
+          if [ ! -z "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+            echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> .env
+          fi
+          if [ ! -z "${{ secrets.GROQ_API_KEY }}" ]; then
+            echo "GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}" >> .env
+          fi
+          if [ ! -z "${{ secrets.DEEPSEEK_API_KEY }}" ]; then
+            echo "DEEPSEEK_API_KEY=${{ secrets.DEEPSEEK_API_KEY }}" >> .env
+          fi
+          if [ ! -z "${{ secrets.OPENROUTER_API_KEY }}" ]; then
+            echo "OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}" >> .env
+          fi
           
       - name: Setup YouTube Auth Files
         run: |
