@@ -814,7 +814,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "sub_category": "{category}",
   "breaking_news_level": 9,
   "retention_cues": [{{"timestamp": 2.0, "effect": "zoom_in", "reason": "hook_impact"}}],
-  "subtitle_chunks": [{
+  "subtitle_chunks": [{{
       "chunk_id": 1,
       "text": "Sentence 1",
       "start": 0.00,
@@ -825,7 +825,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
       "on_screen_elements": ["labels/arrows/highlights/icons/charts/code"],
       "camera_motion": "Slow zoom|Dolly-in|Orbit|Pan|Tracking shot|None",
       "transition": "Match cut|Zoom transition|Morph|Swipe|Data stream transition|Neural network transition"
-  }],
+  }}],
   "original_news_headline": "Exact headline",
   "original_news_url": "Direct article URL",
   "keywords": ["Privacy", "Tech Tips", "Security", "Phone Hacks"],
@@ -864,7 +864,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "sub_category": "{category}",
   "breaking_news_level": 9,
   "retention_cues": [{{"timestamp": 2.0, "effect": "zoom_in", "reason": "hook_impact"}}],
-  "subtitle_chunks": [{
+  "subtitle_chunks": [{{
       "chunk_id": 1,
       "text": "Sentence 1",
       "start": 0.00,
@@ -875,7 +875,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
       "on_screen_elements": ["labels/arrows/highlights/icons/charts/code"],
       "camera_motion": "Slow zoom|Dolly-in|Orbit|Pan|Tracking shot|None",
       "transition": "Match cut|Zoom transition|Morph|Swipe|Data stream transition|Neural network transition"
-  }],
+  }}],
   "original_news_headline": "Exact headline",
   "original_news_url": "Direct article URL",
   "keywords": ["Tech Tips", "Free Apps", "Hidden Features", "AI"],
