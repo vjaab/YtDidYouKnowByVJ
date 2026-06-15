@@ -974,29 +974,32 @@ def call_fallback_model(prompt):
         except Exception as e:
             print(f"⚠️ Anthropic fallback failed: {e}")
 
-    # 3. Groq (Llama)
+    # 3. Groq
     groq_key = os.getenv("GROQ_API_KEY")
     if groq_key:
-        print("🔮 Gemini/OpenAI/Anthropic failed. Falling back to Groq (llama-3.3-70b-versatile)...")
-        try:
-            headers = {
-                "Authorization": f"Bearer {groq_key}",
-                "Content-Type": "application/json"
-            }
-            payload = {
-                "model": "llama-3.3-70b-versatile",
-                "messages": [{"role": "user", "content": prompt}],
-                "response_format": {"type": "json_object"},
-                "temperature": 0.7
-            }
-            r = requests.post("https://api.groq.com/openai/v1/chat/completions", json=payload, headers=headers, timeout=30)
-            if r.status_code == 200:
-                content = r.json()["choices"][0]["message"]["content"].strip()
-                return clean_and_parse_json(content)
-            else:
-                print(f"⚠️ Groq API failed with code {r.status_code}: {r.text}")
-        except Exception as e:
-            print(f"⚠️ Groq fallback failed: {e}")
+        headers = {
+            "Authorization": f"Bearer {groq_key}",
+            "Content-Type": "application/json"
+        }
+        # Model preference order: gpt-oss-120b -> qwen3-32b -> llama-3.3-70b-versatile
+        groq_models = ["gpt-oss-120b", "qwen3-32b", "llama-3.3-70b-versatile"]
+        for model_name in groq_models:
+            print(f"🔮 Gemini/OpenAI/Anthropic failed. Falling back to Groq ({model_name})...")
+            try:
+                payload = {
+                    "model": model_name,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "response_format": {"type": "json_object"},
+                    "temperature": 0.7
+                }
+                r = requests.post("https://api.groq.com/openai/v1/chat/completions", json=payload, headers=headers, timeout=30)
+                if r.status_code == 200:
+                    content = r.json()["choices"][0]["message"]["content"].strip()
+                    return clean_and_parse_json(content)
+                else:
+                    print(f"⚠️ Groq ({model_name}) failed with code {r.status_code}: {r.text}")
+            except Exception as e:
+                print(f"⚠️ Groq ({model_name}) fallback failed: {e}")
 
     # 4. DeepSeek
     deepseek_key = os.getenv("DEEPSEEK_API_KEY")
