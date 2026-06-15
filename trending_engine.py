@@ -15,6 +15,9 @@ import re
 import json
 import time
 import requests
+import urllib.request
+import urllib.parse
+import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta, timezone
 from config import (
     GEMINI_API_KEY, YOUTUBE_DATA_API_KEY, REDDIT_CLIENT_ID,
@@ -422,14 +425,230 @@ def fetch_github_trending_ai():
         all_results.sort(key=lambda x: x["_engagement"]["stars_per_day"], reverse=True)
         print(f"✅ GitHub: Found {len(all_results)} trending AI repos.")
         return all_results
-        
     except Exception as e:
         print(f"  ⚠️ GitHub trending fetch failed: {e}")
         return []
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 4. PROGRAMMATIC GOOGLE TRENDS TECH MINER (Stream A)
+# ─────────────────────────────────────────────────────────────────────────────
+def fetch_google_trending_tech():
+    """
+    Fetches the active Google Trends RSS feed for the US region and filters
+    terms against a whitelist of tech trigger words.
+    """
+    print("📈 Fetching daily trends from Google Trends RSS...")
+    url = "https://trends.google.com/trending/rss?geo=US"
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0'}
+    
+    whitelist = {'ai', 'open-source', 'github', 'ios', 'android', 'nvidia', 'code', 'tool', 'software', 'chatgpt', 'dev', 'leak', 'hack'}
+    tech_trends = []
+    
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=15) as response:
+            xml_data = response.read()
+        
+        root = ET.fromstring(xml_data)
+        items = root.findall('.//item')
+        
+        for item in items:
+            title = item.find('title').text or ""
+            desc = ""
+            desc_elem = item.find('description')
+            if desc_elem is not None:
+                desc = desc_elem.text or ""
+                
+            approx_traffic = item.find('{https://trends.google.com/trends/trendingsearches/daily}approx_traffic')
+            traffic_str = approx_traffic.text if approx_traffic is not None else "N/A"
+            
+            title_lower = title.lower()
+            desc_lower = desc.lower()
+            
+            # Whitelist match
+            is_tech = False
+            for word in whitelist:
+                if word in title_lower or word in desc_lower:
+                    is_tech = True
+                    break
+                    
+            if is_tech:
+                tech_trends.append({
+                    "title": f"Google Trend: {title}",
+                    "description": f"Breakout Google search trend with traffic {traffic_str}. Context: {desc}",
+                    "source": {"name": "Google Trends (US)"},
+                    "url": f"https://trends.google.com/trends/explore?geo=US&q={urllib.parse.quote(title)}",
+                    "urlToImage": "",
+                    "publishedAt": datetime.now(timezone.utc).isoformat(),
+                    "type": "google_trends",
+                    "_engagement": {
+                        "traffic": traffic_str,
+                        "query": title
+                    }
+                })
+        
+        print(f"✅ Google Trends: Found {len(tech_trends)} tech-related trending terms.")
+    except Exception as e:
+        print(f"⚠️ Google Trends RSS fetch failed: {e}")
+        
+    return tech_trends
+
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 4. UNIFIED TRENDING AGGREGATOR
+# 5. YOUTUBE OUTLIER HUNTER (Stream B)
+# ─────────────────────────────────────────────────────────────────────────────
+def fetch_youtube_outlier_trends(outlier_threshold=3.0):
+    """
+    YouTube Data API (The Outlier Hunter).
+    Queries search.list endpoint daily using broad tech keywords,
+    then uses channels.list to pull subscriber counts and computes view-to-sub ratio.
+    """
+    if not YOUTUBE_DATA_API_KEY:
+        print("⚠️ YouTube Data API key missing. Skipping YouTube Outlier Hunter.")
+        return []
+
+    print("📺 Running YouTube Outlier Hunter...")
+    keywords = ["new AI tool", "developer update", "github open source", "coding hack"]
+    published_after = (datetime.now(timezone.utc) - timedelta(hours=48)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    
+    video_candidates = {}
+    
+    for kw in keywords:
+        try:
+            url = "https://www.googleapis.com/youtube/v3/search"
+            params = {
+                "part": "snippet",
+                "q": kw,
+                "type": "video",
+                "publishedAfter": published_after,
+                "maxResults": 25,
+                "relevanceLanguage": "en",
+                "key": YOUTUBE_DATA_API_KEY
+            }
+            r = requests.get(url, params=params, timeout=15)
+            if r.status_code != 200:
+                print(f"  ⚠️ YouTube Outlier search failed for '{kw}': {r.text[:200]}")
+                continue
+                
+            data = r.json()
+            for item in data.get("items", []):
+                vid = item.get("id", {}).get("videoId")
+                if vid:
+                    snippet = item.get("snippet", {})
+                    video_candidates[vid] = {
+                        "title": snippet.get("title", ""),
+                        "description": snippet.get("description", ""),
+                        "channelId": snippet.get("channelId", ""),
+                        "channelTitle": snippet.get("channelTitle", ""),
+                        "publishedAt": snippet.get("publishedAt", ""),
+                        "videoId": vid
+                    }
+            time.sleep(0.5)
+        except Exception as e:
+            print(f"  ⚠️ YouTube Outlier search query '{kw}' failed: {e}")
+            
+    if not video_candidates:
+        return []
+        
+    print(f"  🔍 Found {len(video_candidates)} candidate videos. Fetching stats and channel subscriber counts...")
+    
+    # Batch get statistics and tags for all candidate videos
+    vid_list = list(video_candidates.keys())
+    outliers = []
+    
+    for i in range(0, len(vid_list), 50):
+        batch_vids = vid_list[i:i+50]
+        try:
+            url = "https://www.googleapis.com/youtube/v3/videos"
+            params = {
+                "part": "statistics,snippet",
+                "id": ",".join(batch_vids),
+                "key": YOUTUBE_DATA_API_KEY
+            }
+            r = requests.get(url, params=params, timeout=15)
+            if r.status_code != 200:
+                continue
+            data = r.json()
+            for item in data.get("items", []):
+                vid = item.get("id")
+                stats = item.get("statistics", {})
+                snippet = item.get("snippet", {})
+                views = int(stats.get("viewCount", 0))
+                likes = int(stats.get("likeCount", 0))
+                comments = int(stats.get("commentCount", 0))
+                tags = snippet.get("tags", [])
+                
+                if vid in video_candidates:
+                    video_candidates[vid].update({
+                        "views": views,
+                        "likes": likes,
+                        "comments": comments,
+                        "tags": tags
+                    })
+        except Exception as e:
+            print(f"  ⚠️ Error fetching video stats: {e}")
+            
+    # Batch get channel subscriber counts
+    channel_ids = list(set(v["channelId"] for v in video_candidates.values() if v.get("channelId")))
+    channel_subs = {}
+    
+    for i in range(0, len(channel_ids), 50):
+        batch_channels = channel_ids[i:i+50]
+        try:
+            url = "https://www.googleapis.com/youtube/v3/channels"
+            params = {
+                "part": "statistics",
+                "id": ",".join(batch_channels),
+                "key": YOUTUBE_DATA_API_KEY
+            }
+            r = requests.get(url, params=params, timeout=15)
+            if r.status_code == 200:
+                data = r.json()
+                for item in data.get("items", []):
+                    cid = item.get("id")
+                    stats = item.get("statistics", {})
+                    subs = int(stats.get("subscriberCount", 0))
+                    channel_subs[cid] = subs
+        except Exception as e:
+            print(f"  ⚠️ Error fetching channel statistics: {e}")
+            
+    # Calculate outlier scores and filter
+    for vid, v in video_candidates.items():
+        if "views" not in v:
+            continue
+            
+        cid = v["channelId"]
+        subs = channel_subs.get(cid, 0)
+        views = v["views"]
+        
+        outlier_score = views / max(subs, 1)
+        
+        if outlier_score > outlier_threshold:
+            outliers.append({
+                "title": v["title"],
+                "description": f"Outlier Score: {outlier_score:.2f} (Views: {views} | Subscribers: {subs}). Description: {v['description']}",
+                "source": {"name": f"YouTube Outlier ({v['channelTitle']})"},
+                "url": f"https://youtube.com/watch?v={vid}",
+                "urlToImage": "",
+                "publishedAt": v["publishedAt"],
+                "type": "youtube_outliers",
+                "_engagement": {
+                    "views": views,
+                    "likes": v["likes"],
+                    "comments": v["comments"],
+                    "subscribers": subs,
+                    "outlier_score": outlier_score,
+                    "tags": v["tags"]
+                }
+            })
+            
+    outliers.sort(key=lambda x: x["_engagement"]["outlier_score"], reverse=True)
+    print(f"✅ YouTube Outlier Hunter: Found {len(outliers)} viral outlier tech videos.")
+    return outliers
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 6. UNIFIED TRENDING AGGREGATOR
 # ─────────────────────────────────────────────────────────────────────────────
 def compute_engagement_score(article):
     """
@@ -453,11 +672,11 @@ def compute_engagement_score(article):
         elif views >= 10000: score += 18
         elif views >= 1000: score += 10
         
-        # Like ratio bonus (high engagement = quality content)
+        # Like ratio bonus
         if like_ratio > 5: score += 15
         elif like_ratio > 3: score += 10
         
-        # Comments = discussion = viral potential
+        # Comments
         comments = eng.get("comments", 0)
         if comments > 500: score += 15
         elif comments > 100: score += 10
@@ -469,24 +688,20 @@ def compute_engagement_score(article):
         ratio = eng.get("upvote_ratio", 0.5)
         comments = eng.get("comments", 0)
         
-        # Upvote velocity is the STRONGEST signal (how fast is it rising?)
         if velocity > 200: score += 35
         elif velocity > 100: score += 28
         elif velocity > 50: score += 20
         elif velocity > 20: score += 12
         elif velocity > 5: score += 6
         
-        # Absolute upvote tiers
         if ups > 5000: score += 20
         elif ups > 1000: score += 15
         elif ups > 500: score += 10
         elif ups > 100: score += 5
         
-        # High upvote ratio = consensus (not controversial spam)
         if ratio > 0.95: score += 10
         elif ratio > 0.90: score += 7
         
-        # Discussion depth
         if comments > 200: score += 10
         elif comments > 50: score += 5
     
@@ -494,29 +709,52 @@ def compute_engagement_score(article):
         stars_pd = eng.get("stars_per_day", 0)
         stars = eng.get("stars", 0)
         
-        # Stars velocity (early breakout signal)
         if stars_pd > 500: score += 35
         elif stars_pd > 100: score += 28
         elif stars_pd > 50: score += 20
         elif stars_pd > 10: score += 12
         
-        # Absolute stars
         if stars > 10000: score += 20
         elif stars > 5000: score += 15
         elif stars > 1000: score += 10
+
+    elif art_type == "google_trends":
+        # Google Trends represents massive search volume/velocity.
+        score += 35
+        # Add traffic bonus
+        traffic = eng.get("traffic", "N/A").lower()
+        if "m" in traffic:
+            score += 25
+        elif "k" in traffic:
+            try:
+                num = int(traffic.replace("k+", "").replace(",", "").strip())
+                if num >= 100: score += 20
+                elif num >= 50: score += 15
+                else: score += 10
+            except:
+                score += 10
+
+    elif art_type == "youtube_outliers":
+        outlier = eng.get("outlier_score", 0.0)
+        if outlier >= 20.0: score += 45
+        elif outlier >= 10.0: score += 35
+        elif outlier >= 5.0: score += 25
+        else: score += 15
+        
+        views = eng.get("views", 0)
+        if views >= 100000: score += 20
+        elif views >= 50000: score += 15
+        elif views >= 10000: score += 10
     
     elif art_type == "trending":
-        # NewsAPI trending articles (legacy)
         score += 15
     
     else:
-        # RSS articles (lowest signal strength)
         score += 5
     
-    # Niche bias: Prefer topics from specialized sources
-    niche_sources = ["reddit_trending", "github_trending"]
+    niche_sources = ["reddit_trending", "github_trending", "youtube_outliers"]
     if art_type in niche_sources:
-        score += TRENDING_NICHE_BIAS * 15  # Up to +10.5 bonus for niche
+        score += TRENDING_NICHE_BIAS * 15
     
     return min(100, score)
 
@@ -550,8 +788,22 @@ def fetch_all_trending_signals():
         all_articles.extend(github_articles)
     except Exception as e:
         print(f"⚠️ GitHub trending failed: {e}")
+
+    # 4. Google Trends (Stream A)
+    try:
+        gt_articles = fetch_google_trending_tech()
+        all_articles.extend(gt_articles)
+    except Exception as e:
+        print(f"⚠️ Google Trends fetch failed: {e}")
+
+    # 5. YouTube Outlier Hunter (Stream B)
+    try:
+        yo_articles = fetch_youtube_outlier_trends()
+        all_articles.extend(yo_articles)
+    except Exception as e:
+        print(f"⚠️ YouTube Outlier Hunter fetch failed: {e}")
     
-    # 4. Compute unified engagement scores
+    # 6. Compute unified engagement scores
     for art in all_articles:
         art["_engagement_score"] = compute_engagement_score(art)
     
@@ -562,9 +814,12 @@ def fetch_all_trending_signals():
     yt_count = sum(1 for a in all_articles if a.get("type") == "youtube_trending")
     reddit_count = sum(1 for a in all_articles if a.get("type") == "reddit_trending")
     github_count = sum(1 for a in all_articles if a.get("type") == "github_trending")
+    gt_count = sum(1 for a in all_articles if a.get("type") == "google_trends")
+    yo_count = sum(1 for a in all_articles if a.get("type") == "youtube_outliers")
     
     print(f"\n📊 Trending Engine Summary: {len(all_articles)} total signals")
-    print(f"   YouTube: {yt_count} | Reddit: {reddit_count} | GitHub: {github_count}")
+    print(f"   YouTube Trending: {yt_count} | Reddit: {reddit_count} | GitHub: {github_count}")
+    print(f"   Google Trends: {gt_count} | YouTube Outliers: {yo_count}")
     if all_articles:
         top = all_articles[0]
         print(f"   🏆 Top Signal: '{top['title'][:60]}...' (Score: {top.get('_engagement_score', 0)})")

@@ -235,6 +235,46 @@ Return ONLY a JSON object:
   "core_narrative": "A one paragraph summary focusing ONLY on this story."
 }}"""
 
+def check_shorts_viability_via_gemini(client, title, description):
+    """
+    Evaluates if a tech topic is viable for YouTube Shorts based on three criteria:
+    1. The Friction Test: Does it solve an immediate, relatable problem?
+    2. The Visual Pivot: Can it be explained visually using split-screen/immediate demo?
+    3. The Enemy/Hero Angle: Frame around an entity (e.g., 'Google just killed...').
+    """
+    print(f"🧐 Evaluating viability for: '{title[:50]}...'")
+    prompt = f"""Evaluate if the following tech trending topic is suitable for a 50-second YouTube Short:
+Topic Title: {title}
+Description: {description}
+
+Assess based on these three strict tests:
+1. The Friction Test: Does it solve an immediate, relatable consumer/user problem (e.g. saving battery, digital privacy, free app alternative, replacing boilerplate code) rather than deep infrastructure/corporate updates?
+2. The Visual Pivot: Can it be explained visually using a 3-second split-screen or an immediate 'before and after' UI demonstration?
+3. The "Enemy" or "Hero" Angle: Can it be framed around a polarizing or high-utility entity? E.g., "Google just killed this app" or "This open-source tool is making Nvidia nervous."
+
+Return ONLY a JSON object:
+{{
+  "passes_friction_test": true|false,
+  "passes_visual_pivot": true|false,
+  "passes_enemy_hero_angle": true|false,
+  "overall_viable": true|false,
+  "reason": "Brief explanation of the decision",
+  "enemy_hero_hook_framing": "Example hook framing (e.g. 'Google just killed...')"
+}}"""
+    try:
+        response = client.models.generate_content(
+            model=GEMINI_FLASH_MODEL,
+            contents=prompt,
+        )
+        raw = response.text.strip()
+        if "{" in raw and "}" in raw:
+            raw = raw[raw.find("{"):raw.rfind("}")+1]
+        data = json.loads(raw)
+        return data
+    except Exception as e:
+        print(f"⚠️ Viability check failed, assuming True: {e}")
+        return {"overall_viable": True, "enemy_hero_hook_framing": None, "reason": "Fallback due to API error"}
+
 def get_hottest_tech_topic(client, avoid_list=""):
     """Uses Gemini Search grounding to find today's most VIRAL tech tip, hidden feature, or tech fact."""
     print("🔥 Fetching hottest tech topic for today (Google Trends Analysis)...")
@@ -478,11 +518,40 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
             else:
                 # Rank by composite viral score
                 filtered_articles.sort(key=lambda x: x.get('_hot_score', 0), reverse=True)
-                top = filtered_articles[0]
+                
+                viable_article = None
+                print("🧐 Running Shorts viability checks on top candidates...")
+                for art in filtered_articles[:5]:
+                    t_title = art.get("title", "")
+                    t_desc = art.get("description", "")
+                    viability = check_shorts_viability_via_gemini(client, t_title, t_desc)
+                    if viability.get("overall_viable"):
+                        print(f"✅ Topic is viable: '{t_title[:60]}...' (Reason: {viability.get('reason')})")
+                        viable_article = art
+                        framing = viability.get("enemy_hero_hook_framing")
+                        if framing:
+                            extra_instruction += f"\nFraming instruction: Frame the script around this angle: '{framing}'.\n"
+                        break
+                    else:
+                        print(f"❌ Topic failed viability check: '{t_title[:60]}...' (Reason: {viability.get('reason')})")
+                
+                if viable_article:
+                    filtered_articles.remove(viable_article)
+                    filtered_articles.insert(0, viable_article)
+                    top = viable_article
+                else:
+                    print("⚠️ No candidate passed the viability filter. Using the highest scored one.")
+                    top = filtered_articles[0]
+                    
                 bd = top.get('_score_breakdown', {})
                 print(f"🏆 Top Viral Candidate: '{top.get('title')}' (Score: {top['_hot_score']:.1f})")
                 print(f"   Breakdown: kw={bd.get('kw',0)} eng={bd.get('eng',0)} vel={bd.get('vel',0)} niche={bd.get('niche',0)} rec={bd.get('rec',0)} type={bd.get('type',0)}")
                 articles = filtered_articles
+                
+                # Force tech_trends topic_type if selected article is Google Trends or YouTube Outlier
+                if top and top.get("type") in ["google_trends", "youtube_outliers"]:
+                    print(f"🔥 Selected article type is '{top.get('type')}'. Switching topic_type to 'tech_trends' to apply 3-part Shorts Formula.")
+                    topic_type = "tech_trends"
 
         # ── STEP 1: GEMINI SEARCH FALLBACK (biased toward hot topic) ────────────
         if not articles:
@@ -536,6 +605,8 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
         content_desc = "trending tech tips, hidden phone features, free AI tools, app hacks, and productivity tricks that appeal to EVERYONE"
     elif topic_type == "news":
         content_desc = "scary privacy facts, tech myths being debunked, common tech mistakes people make, and viral tech warnings"
+    elif topic_type == "tech_trends":
+        content_desc = "high-velocity Google tech search trends and viral YouTube breakout videos"
     else:
         content_desc = "surprising tech facts, hidden device features, free vs paid app comparisons, and AI transformation experiments"
 
@@ -585,7 +656,46 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "comment_hook": "Provocative question to drive engagement (e.g. 'Which department at your job is leaking the most data?')"
 }}"""
     else:
-        if topic_type == "tools":
+        if topic_type == "tech_trends":
+            selection_instruction = (
+                f"Analyze the following {content_desc} and pick the SINGLE most breakout, high-velocity tech topic or viral video.\n"
+                f"PRIMARY CATEGORY: {category}\n"
+                "SELECTION FILTERS:\n"
+                "1. MUST follow the high-engagement 3-part micro-script structure precisely.\n"
+                "2. VISUAL DEMONSTRATION REQUIRED: The `nano_visual_prompt` fields MUST describe the exact screen, code editor, or device showing the tech in action.\n"
+                "3. STRICT DURATION: Enforce a target total word count of 120-140 words, explainable in 45-50 seconds of fast-paced speech. Keep it extremely tight.\n"
+                "4. LOOP-FRIENDLY: The final loop CTA must connect seamlessly back to the visual hook."
+            )
+            prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
+{{
+  "title_options": ["Title Case + Emoji + Curiosity Gap 1", "Title Case + Emoji + Curiosity Gap 2"],
+  "description": "Full 100+ word rich SEO description for youtube describing the video, including relevant hashtags.",
+  "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
+  "title": "Punchy YouTube title max 60 chars — must appeal to tech-interested audiences",
+  "hook_script": "The Visual Hook (0:00 - 0:03): State the breakout tech trend/query immediately as a negative or high-stakes claim. Never start with an introduction. 10-15 words.",
+  "solution_tech": "The Technical Core (0:03 - 0:45): Deliver the exact breakout answer or content gap solution. Keep code snippets under 3 lines or focus on UI step-by-step demonstrations. 90-110 words.",
+  "retention_loop": "The Loop/CTA (0:45 - 0:50): End on an incomplete thought or a question that seamlessly loops back to the opening hook script. 15-20 words.",
+  "outro_cta": "CTA: Subscribe/Follow for more daily tech trends. 8-10 words.",
+  "script": "The FULL voiceover script concatenating hook_script, solution_tech, and retention_loop. Target 120-145 words total (approx 45-50s). The final sentence MUST flow back into the first sentence for looping.",
+  "hook_text": "The exact first 5-8 words of the script.",
+  "relevant_links": ["https://example.com"],
+  "phonetic_pronunciation_map": {{}},
+  "hook": "Matches the first sentence of the script",
+  "summary": "One line summary",
+  "sub_category": "{category}",
+  "breaking_news_level": 9,
+  "retention_cues": [{{"timestamp": 3.0, "effect": "zoom_in", "reason": "hook_impact"}}],
+  "subtitle_chunks": [{{
+      "chunk_id": 1, "text": "Sentence 1", "start": 0.00, "end": 3.00,
+      "nano_visual_prompt": "A clean, specific visual for THIS sentence. Example: 'Close-up of a code editor showing a python script executing, dark mode, 9:16 vertical'. Photorealistic, 8K. NO text overlays."
+  }}],
+  "original_news_headline": "Exact headline or trend query name",
+  "original_news_url": "Direct article or trend URL",
+  "keywords": ["Tech Trends", "AI", "Coding", "Software"],
+  "hashtags": ["#TechTrends", "#AI", "#Coding", "#Software", "#Developer"],
+  "comment_hook": "A provocative question: 'What do you think of this breakout tool? Let me know below! 👇'"
+}}"""
+        elif topic_type == "tools":
             selection_instruction = (
                 f"Analyze the following {content_desc} and pick the SINGLE most useful, surprising tip or tool for EVERYDAY smartphone/computer users.\n"
                 f"PRIMARY CATEGORY: {category}\n"

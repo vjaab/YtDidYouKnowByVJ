@@ -632,7 +632,7 @@ def run_local(topic_type="auto"):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--now", action="store_true", help="Run pipeline immediately.")
-    parser.add_argument("--type", type=str, choices=["auto", "research", "tools", "news"], default="auto", help="Content type mapped to the schedule")
+    parser.add_argument("--type", type=str, choices=["auto", "research", "tools", "news", "tech_trends"], default="auto", help="Content type mapped to the schedule")
     args = parser.parse_args()
 
     if args.now:
