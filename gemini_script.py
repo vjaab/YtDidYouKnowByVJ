@@ -981,8 +981,8 @@ def call_fallback_model(prompt):
             "Authorization": f"Bearer {groq_key}",
             "Content-Type": "application/json"
         }
-        # Model preference order: gpt-oss-120b -> qwen3-32b -> llama-3.3-70b-versatile
-        groq_models = ["gpt-oss-120b", "qwen3-32b", "llama-3.3-70b-versatile"]
+        # Model preference order: openai/gpt-oss-120b -> qwen/qwen3-32b -> llama-3.3-70b-versatile
+        groq_models = ["openai/gpt-oss-120b", "qwen/qwen3-32b", "llama-3.3-70b-versatile"]
         for model_name in groq_models:
             print(f"🔮 Gemini/OpenAI/Anthropic failed. Falling back to Groq ({model_name})...")
             try:
