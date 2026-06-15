@@ -21,7 +21,7 @@ Tone: Energetic, surprising, and personal. You speak like a friend sharing an in
 Target Audience: EVERYONE who owns a smartphone or computer. All age groups from 18 to 70 years old, all skill levels. Ensure complete gender inclusivity so that topics and scripting appeal equally to men, women, girls, and boys. Use simple, everyday, accessible language that both young adults and older seniors can instantly relate to and understand. Avoid any developer terminology, academic jargon, or tech-bro buzzwords.
 Constraint Checklist:
 - No Fluff: Remove "In this video," "Hello everyone," or "Today we explore."
-- NO INFOGRAPHICS: Do not include infographics, flowcharts, or slides in the script structure.
+- NO INFOGRAPHICS IN VOICEOVER: Do not include text description references of infographics or charts in the spoken script itself.
 - SIMPLE LANGUAGE: NO jargon. NO acronyms without explanation. If a term has more than 3 syllables, follow it with a simple everyday analogy.
 - VOCAL DYNAMICS: Use heavy punctuation (commas, ellipses '...', exclamation marks, ALL CAPS) for emphasis. The TTS engine relies on punctuation.
 - PERSONAL STAKES: Every script MUST make the viewer feel "this affects ME personally" — their phone, their money, their privacy, their time, their safety.
@@ -31,7 +31,30 @@ Constraint Checklist:
 SUCCESS PATTERNS (2026): 
 - HOOKS: Start with a RESULT-FIRST statement or a BOLD CLAIM that challenges a common belief. First 3-5 words must STOP the scroll.
 - PERSONAL LANGUAGE: Use "YOU" and "YOUR" heavily. Make it about the viewer, not about technology.
-- CTAs: End with a provocative question to drive comments, then say: "Follow for more tips like this. And subscribe so you don't miss the next one." Keep it natural and short. """
+- CTAs: End with a provocative question to drive comments, then say: "Follow for more tips like this. And subscribe so you don't miss the next one." Keep it natural and short. 
+
+Visual Director Persona & Visual Selection Logic:
+You are also an expert Visual Director. For each narration segment in the `subtitle_chunks` array, you generate highly engaging, visually rich, and contextually accurate visual prompts at the semantic level (not keyword level).
+Choose the most suitable visual format:
+1. Video (Google Veo) when explaining scenarios, workflows, future tech, AI agents, robots, data centers, software dev workflows.
+2. AI Image (Gemini) when showing concepts, architectures, comparisons, timelines, hardware components.
+3. Whiteboard when explaining algorithms, system design, networking, databases, programming concepts, data flow.
+4. Infographic when showing stats, benchmarks, lists, performance metrics.
+5. Diagram when showing system architecture or database replication.
+6. Animated UI Mockup when demonstrating app/settings navigation.
+
+Technology Visualization Rules:
+Never use unrelated visuals (like generic stock footage or random unrelated robots). Map concepts:
+- AI: Neural networks, data streams, assistants, digital brains, copilots.
+- Cybersecurity: Shields, encryption, threat maps, lock icons, attack simulations.
+- Cloud: Connected servers, cloud infrastructure, data pipelines.
+- Programming: Realistic code editors, APIs, request-response flows.
+- Databases: Data tables, storage layers, query flows.
+- Networking: Routers, packets, traffic flow animations.
+- Machine Learning: Training datasets, feature extraction diagrams.
+
+Quality & Mobile Standards:
+Every visual must be high-contrast, readable in 1 second on mobile screens, and educational (passing the Muted Viewer Test: a viewer must understand the key idea even if audio is muted)."""
 
 RESEARCH_AGENT_TEMPLATE = """{persona}
 
@@ -642,12 +665,18 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "summary": "One line summary",
   "sub_category": "AI/Machine Learning",
   "breaking_news_level": 9,
-  "retention_cues": [{{"timestamp": 3.0, "effect": "zoom_in", "reason": "hook_impact"}}],
+  "retention_cues": [{{ "timestamp": 3.0, "effect": "zoom_in", "reason": "hook_impact" }}],
   "subtitle_chunks": [{{
-      "chunk_id": 1, "text": "Sentence 1", "start": 0.00, "end": 3.50, 
-      "has_infographic": true, "infographic_type": "process|slide", 
-      "infographic_data": {{"steps": ["Step 1", "Step 2"]}},
-      "nano_visual_prompt": "A highly specific, cinematic visual description for THIS sentence. Must depict the exact subject/entity/concept spoken in this sentence. Example: 'Satellite view of Earth at night showing glowing city lights and data center hotspots, cinematic 9:16, dark background'. NO TEXT in the image. NO faces of real people. Photorealistic, 8K."
+      "chunk_id": 1,
+      "text": "Sentence 1",
+      "start": 0.00,
+      "end": 3.50, 
+      "scene_objective": "What technical concept must be understood here",
+      "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup",
+      "nano_visual_prompt": "A highly specific, cinematic visual description for THIS sentence. Must depict the exact subject/entity/concept spoken in this sentence. Example: 'Satellite view of Earth at night showing glowing city lights and data center hotspots, cinematic 9:16, dark background'. NO TEXT in the image. NO faces of real people. Photorealistic, 8K.",
+      "on_screen_elements": ["labels/arrows/highlights/icons/charts/code"],
+      "camera_motion": "Slow zoom|Dolly-in|Orbit|Pan|Tracking shot|None",
+      "transition": "Match cut|Zoom transition|Morph|Swipe|Data stream transition|Neural network transition"
   }}],
   "original_news_headline": "Exact headline",
   "original_news_url": "Direct article URL",
@@ -684,10 +713,18 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "summary": "One line summary",
   "sub_category": "{category}",
   "breaking_news_level": 9,
-  "retention_cues": [{{"timestamp": 3.0, "effect": "zoom_in", "reason": "hook_impact"}}],
+  "retention_cues": [{{ "timestamp": 3.0, "effect": "zoom_in", "reason": "hook_impact" }}],
   "subtitle_chunks": [{{
-      "chunk_id": 1, "text": "Sentence 1", "start": 0.00, "end": 3.00,
-      "nano_visual_prompt": "A clean, specific visual for THIS sentence. Example: 'Close-up of a code editor showing a python script executing, dark mode, 9:16 vertical'. Photorealistic, 8K. NO text overlays."
+      "chunk_id": 1,
+      "text": "Sentence 1",
+      "start": 0.00,
+      "end": 3.00,
+      "scene_objective": "What technical concept must be understood here",
+      "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup",
+      "nano_visual_prompt": "A clean, specific visual for THIS sentence. Example: 'Close-up of a code editor showing a python script executing, dark mode, 9:16 vertical'. Photorealistic, 8K. NO text overlays.",
+      "on_screen_elements": ["labels/arrows/highlights/icons/charts/code"],
+      "camera_motion": "Slow zoom|Dolly-in|Orbit|Pan|Tracking shot|None",
+      "transition": "Match cut|Zoom transition|Morph|Swipe|Data stream transition|Neural network transition"
   }}],
   "original_news_headline": "Exact headline or trend query name",
   "original_news_url": "Direct article or trend URL",
@@ -726,10 +763,18 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "summary": "One line summary",
   "sub_category": "{category}",
   "breaking_news_level": 9,
-  "retention_cues": [{{"timestamp": 2.0, "effect": "zoom_in", "reason": "hook_impact"}}],
+  "retention_cues": [{{ "timestamp": 2.0, "effect": "zoom_in", "reason": "hook_impact" }}],
   "subtitle_chunks": [{{
-      "chunk_id": 1, "text": "Sentence 1", "start": 0.00, "end": 2.50,
-      "nano_visual_prompt": "A clean, specific visual for THIS sentence. Example: 'Close-up of an iPhone settings screen showing the hidden menu option highlighted, dark mode, 9:16 vertical'. Photorealistic, 8K. NO text overlays."
+      "chunk_id": 1,
+      "text": "Sentence 1",
+      "start": 0.00,
+      "end": 2.50,
+      "scene_objective": "What technical concept must be understood here",
+      "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup",
+      "nano_visual_prompt": "A clean, specific visual for THIS sentence. Example: 'Close-up of an iPhone settings screen showing the hidden menu option highlighted, dark mode, 9:16 vertical'. Photorealistic, 8K. NO text overlays.",
+      "on_screen_elements": ["labels/arrows/highlights/icons/charts/code"],
+      "camera_motion": "Slow zoom|Dolly-in|Orbit|Pan|Tracking shot|None",
+      "transition": "Match cut|Zoom transition|Morph|Swipe|Data stream transition|Neural network transition"
   }}],
   "original_news_headline": "Exact headline",
   "original_news_url": "Direct article URL",
@@ -769,10 +814,18 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "sub_category": "{category}",
   "breaking_news_level": 9,
   "retention_cues": [{{"timestamp": 2.0, "effect": "zoom_in", "reason": "hook_impact"}}],
-  "subtitle_chunks": [{{
-      "chunk_id": 1, "text": "Sentence 1", "start": 0.00, "end": 2.50,
-      "nano_visual_prompt": "A dramatic, cinematic visual for THIS sentence. Example: 'Close-up of a smartphone screen showing location tracking data, dark moody lighting, 9:16 vertical'. Photorealistic, 8K. NO text overlays."
-  }}],
+  "subtitle_chunks": [{
+      "chunk_id": 1,
+      "text": "Sentence 1",
+      "start": 0.00,
+      "end": 2.50,
+      "scene_objective": "What technical concept must be understood here",
+      "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup",
+      "nano_visual_prompt": "A dramatic, cinematic visual for THIS sentence. Example: 'Close-up of a smartphone screen showing location tracking data, dark moody lighting, 9:16 vertical'. Photorealistic, 8K. NO text overlays.",
+      "on_screen_elements": ["labels/arrows/highlights/icons/charts/code"],
+      "camera_motion": "Slow zoom|Dolly-in|Orbit|Pan|Tracking shot|None",
+      "transition": "Match cut|Zoom transition|Morph|Swipe|Data stream transition|Neural network transition"
+  }],
   "original_news_headline": "Exact headline",
   "original_news_url": "Direct article URL",
   "keywords": ["Privacy", "Tech Tips", "Security", "Phone Hacks"],
@@ -811,10 +864,18 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "sub_category": "{category}",
   "breaking_news_level": 9,
   "retention_cues": [{{"timestamp": 2.0, "effect": "zoom_in", "reason": "hook_impact"}}],
-  "subtitle_chunks": [{{
-      "chunk_id": 1, "text": "Sentence 1", "start": 0.00, "end": 2.50,
-      "nano_visual_prompt": "A clean, specific visual for THIS sentence. Example: 'Split screen showing a free app vs expensive app side by side, clean modern UI, 9:16 vertical'. Photorealistic, 8K. NO text overlays."
-  }}],
+  "subtitle_chunks": [{
+      "chunk_id": 1,
+      "text": "Sentence 1",
+      "start": 0.00,
+      "end": 2.50,
+      "scene_objective": "What technical concept must be understood here",
+      "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup",
+      "nano_visual_prompt": "A clean, specific visual for THIS sentence. Example: 'Split screen showing a free app vs expensive app side by side, clean modern UI, 9:16 vertical'. Photorealistic, 8K. NO text overlays.",
+      "on_screen_elements": ["labels/arrows/highlights/icons/charts/code"],
+      "camera_motion": "Slow zoom|Dolly-in|Orbit|Pan|Tracking shot|None",
+      "transition": "Match cut|Zoom transition|Morph|Swipe|Data stream transition|Neural network transition"
+  }],
   "original_news_headline": "Exact headline",
   "original_news_url": "Direct article URL",
   "keywords": ["Tech Tips", "Free Apps", "Hidden Features", "AI"],
