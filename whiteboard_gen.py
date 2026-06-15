@@ -1,9 +1,69 @@
 import os
 import random
-from PIL import Image, ImageDraw, ImageFont
+import io
+from PIL import Image, ImageDraw, ImageFont, ImageChops
 from datetime import datetime
+from google import genai
+from config import GEMINI_API_KEY
 
 TODAY = datetime.now().strftime("%Y-%m-%d")
+
+def generate_whiteboard_doodle_ai(text, topic_context=""):
+    """
+    Calls Gemini to generate a conceptual metaphor sketch description,
+    then calls Imagen to generate a whiteboard-style sketch of that metaphor.
+    """
+    if not GEMINI_API_KEY:
+        print("⚠️ GEMINI_API_KEY not found in config. Skipping AI whiteboard doodle generation.")
+        return None
+    try:
+        client = genai.Client(api_key=GEMINI_API_KEY)
+        
+        # 1. Ask Gemini to define a visual metaphor doodle
+        prompt = f"""You are an expert AI Whiteboard Animation Director.
+For the spoken phrase: "{text}"
+(Context: {topic_context})
+
+Define a single visual metaphor, sketch, or literal drawing to draw on a whiteboard.
+Guidelines:
+- Do NOT just write out words or text.
+- Create a visual metaphor. E.g. "GitHub" -> "Octocat logo or code tree", "privacy/reputation at risk" -> "shield cracking".
+- Keep it simple, clear, and easy to draw as a line sketch.
+- Return ONLY the description of the sketch (max 15 words).
+Example: "A hand cursor clicking a large button"
+"""
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+        )
+        doodle_concept = response.text.strip().strip('"').strip("'")
+        print(f"🎨 [WHITEBOARD AI DOODLE] Concept: '{doodle_concept}' for text: '{text[:40]}...'")
+        
+        # 2. Call Imagen to generate a whiteboard drawing of this concept
+        imagen_prompt = f"A simple whiteboard marker sketch of {doodle_concept}, black marker hand-drawn outline on a clean white whiteboard background, minimalist doodle, professional sketch, no text."
+        
+        # Try fast generate model first
+        models = ["imagen-4.0-fast-generate-001", "imagen-4.0-generate-001"]
+        for model in models:
+            try:
+                print(f"🎨 Generating whiteboard doodle using {model}...")
+                result = client.models.generate_images(
+                    model=model,
+                    prompt=imagen_prompt,
+                    config=genai.types.GenerateImagesConfig(
+                        number_of_images=1,
+                        aspect_ratio="1:1",  # square doodle
+                        output_mime_type="image/jpeg",
+                    )
+                )
+                for gen_img in result.generated_images:
+                    return Image.open(io.BytesIO(gen_img.image.image_bytes))
+            except Exception as e:
+                print(f"⚠️ Imagen whiteboard doodle failed on {model}: {e}")
+                continue
+    except Exception as e:
+        print(f"⚠️ Failed to generate AI whiteboard doodle: {e}")
+    return None
 
 def generate_whiteboard_frame(text, output_path, headline="", is_longform=False):
     width, height = (1920, 1080) if is_longform else (1080, 1920)
@@ -98,53 +158,67 @@ def generate_whiteboard_frame(text, output_path, headline="", is_longform=False)
     divider_y = start_y + total_text_h + 30
     draw.line([width//2 - 200 + random.randint(-10,10), divider_y, width//2 + 200 + random.randint(-10,10), divider_y + random.randint(-2,2)], fill=(220, 50, 50), width=5)
     
-    # Draw Doodle Graphics depending on keywords
-    doodle_color = (220, 50, 50)
-    text_lower = text.lower()
-    
-    if any(k in text_lower for k in ["scam", "hack", "safe", "privacy", "lock", "secure"]):
-        # Draw shield/lock
-        doodle_x = width // 2
-        doodle_y = divider_y + 120
-        draw.line([doodle_x - 40, doodle_y - 45, doodle_x + 40, doodle_y - 45], fill=doodle_color, width=4)
-        draw.line([doodle_x - 40, doodle_y - 45, doodle_x - 40, doodle_y], fill=doodle_color, width=4)
-        draw.line([doodle_x + 40, doodle_y - 45, doodle_x + 40, doodle_y], fill=doodle_color, width=4)
-        draw.line([doodle_x - 40, doodle_y, doodle_x, doodle_y + 50], fill=doodle_color, width=4)
-        draw.line([doodle_x + 40, doodle_y, doodle_x, doodle_y + 50], fill=doodle_color, width=4)
-        draw.line([doodle_x - 15, doodle_y, doodle_x - 3, doodle_y + 15], fill=doodle_color, width=4)
-        draw.line([doodle_x - 3, doodle_y + 15, doodle_x + 20, doodle_y - 15], fill=doodle_color, width=4)
-    elif any(k in text_lower for k in ["phone", "iphone", "android", "device", "mobile"]):
-        # Phone silhouette
-        doodle_x = width // 2
-        doodle_y = divider_y + 100
-        draw_sketchy_rect(doodle_x - 35, doodle_y - 60, doodle_x + 35, doodle_y + 60, color=doodle_color, width_line=4)
-        draw.line([doodle_x - 30, doodle_y - 45, doodle_x + 30, doodle_y - 45], fill=doodle_color, width=2)
-        draw.line([doodle_x - 30, doodle_y + 45, doodle_x + 30, doodle_y + 45], fill=doodle_color, width=2)
-        draw.ellipse([doodle_x - 6, doodle_y + 48, doodle_x + 6, doodle_y + 60], outline=doodle_color, width=2)
-    elif any(k in text_lower for k in ["money", "free", "save", "price", "cost", "dollar"]):
-        # Dollar sign
-        doodle_x = width // 2
-        doodle_y = divider_y + 110
-        draw.line([doodle_x, doodle_y - 50, doodle_x, doodle_y + 50], fill=doodle_color, width=5)
-        draw.arc([doodle_x - 25, doodle_y - 40, doodle_x + 25, doodle_y], start=180, end=360, fill=doodle_color, width=5)
-        draw.arc([doodle_x - 25, doodle_y - 40, doodle_x + 25, doodle_y], start=0, end=90, fill=doodle_color, width=5)
-        draw.line([doodle_x - 25, doodle_y, doodle_x + 25, doodle_y], fill=doodle_color, width=5)
-        draw.arc([doodle_x - 25, doodle_y, doodle_x + 25, doodle_y + 40], start=0, end=180, fill=doodle_color, width=5)
-        draw.arc([doodle_x - 25, doodle_y, doodle_x + 25, doodle_y + 40], start=270, end=360, fill=doodle_color, width=5)
+    # Generate and draw AI whiteboard doodle if possible
+    ai_doodle = generate_whiteboard_doodle_ai(text, headline)
+    if ai_doodle:
+        doodle_size = 300 if is_longform else 400
+        ai_doodle = ai_doodle.resize((doodle_size, doodle_size), Image.Resampling.LANCZOS).convert("RGB")
+        doodle_x = (width - doodle_size) // 2
+        doodle_y = divider_y + 40
+        
+        # Multiply blend with the creamy background dot grid
+        box = (doodle_x, doodle_y, doodle_x + doodle_size, doodle_y + doodle_size)
+        bg_region = img.crop(box)
+        blended_region = ImageChops.multiply(bg_region, ai_doodle)
+        img.paste(blended_region, box)
     else:
-        # Lightbulb
-        doodle_x = width // 2
-        doodle_y = divider_y + 110
-        draw.ellipse([doodle_x - 35, doodle_y - 45, doodle_x + 35, doodle_y + 25], outline=doodle_color, width=4)
-        draw.line([doodle_x - 20, doodle_y + 25, doodle_x + 20, doodle_y + 25], fill=doodle_color, width=4)
-        draw.line([doodle_x - 15, doodle_y + 33, doodle_x + 15, doodle_y + 33], fill=doodle_color, width=4)
-        draw.line([doodle_x - 8, doodle_y + 41, doodle_x + 8, doodle_y + 41], fill=doodle_color, width=4)
-        draw.line([doodle_x - 10, doodle_y + 10, doodle_x - 10, doodle_y - 15], fill=doodle_color, width=3)
-        draw.line([doodle_x + 10, doodle_y + 10, doodle_x + 10, doodle_y - 15], fill=doodle_color, width=3)
-        draw.line([doodle_x - 10, doodle_y - 15, doodle_x + 10, doodle_y - 15], fill=doodle_color, width=3)
-        draw.line([doodle_x - 55, doodle_y - 30, doodle_x - 43, doodle_y - 20], fill=doodle_color, width=3)
-        draw.line([doodle_x + 55, doodle_y - 30, doodle_x + 43, doodle_y - 20], fill=doodle_color, width=3)
-        draw.line([doodle_x, doodle_y - 65, doodle_x, doodle_y - 52], fill=doodle_color, width=3)
+        # Draw Doodle Graphics depending on keywords
+        doodle_color = (220, 50, 50)
+        text_lower = text.lower()
+        
+        if any(k in text_lower for k in ["scam", "hack", "safe", "privacy", "lock", "secure"]):
+            # Draw shield/lock
+            doodle_x = width // 2
+            doodle_y = divider_y + 120
+            draw.line([doodle_x - 40, doodle_y - 45, doodle_x + 40, doodle_y - 45], fill=doodle_color, width=4)
+            draw.line([doodle_x - 40, doodle_y - 45, doodle_x - 40, doodle_y], fill=doodle_color, width=4)
+            draw.line([doodle_x + 40, doodle_y - 45, doodle_x + 40, doodle_y], fill=doodle_color, width=4)
+            draw.line([doodle_x - 40, doodle_y, doodle_x, doodle_y + 50], fill=doodle_color, width=4)
+            draw.line([doodle_x + 40, doodle_y, doodle_x, doodle_y + 50], fill=doodle_color, width=4)
+            draw.line([doodle_x - 15, doodle_y, doodle_x - 3, doodle_y + 15], fill=doodle_color, width=4)
+            draw.line([doodle_x - 3, doodle_y + 15, doodle_x + 20, doodle_y - 15], fill=doodle_color, width=4)
+        elif any(k in text_lower for k in ["phone", "iphone", "android", "device", "mobile"]):
+            # Phone silhouette
+            doodle_x = width // 2
+            doodle_y = divider_y + 100
+            draw_sketchy_rect(doodle_x - 35, doodle_y - 60, doodle_x + 35, doodle_y + 60, color=doodle_color, width_line=4)
+            draw.line([doodle_x - 30, doodle_y - 45, doodle_x + 30, doodle_y - 45], fill=doodle_color, width=2)
+            draw.line([doodle_x - 30, doodle_y + 45, doodle_x + 30, doodle_y + 45], fill=doodle_color, width=2)
+            draw.ellipse([doodle_x - 6, doodle_y + 48, doodle_x + 6, doodle_y + 60], outline=doodle_color, width=2)
+        elif any(k in text_lower for k in ["money", "free", "save", "price", "cost", "dollar"]):
+            # Dollar sign
+            doodle_x = width // 2
+            doodle_y = divider_y + 110
+            draw.line([doodle_x, doodle_y - 50, doodle_x, doodle_y + 50], fill=doodle_color, width=5)
+            draw.arc([doodle_x - 25, doodle_y - 40, doodle_x + 25, doodle_y], start=180, end=360, fill=doodle_color, width=5)
+            draw.arc([doodle_x - 25, doodle_y - 40, doodle_x + 25, doodle_y], start=0, end=90, fill=doodle_color, width=5)
+            draw.line([doodle_x - 25, doodle_y, doodle_x + 25, doodle_y], fill=doodle_color, width=5)
+            draw.arc([doodle_x - 25, doodle_y, doodle_x + 25, doodle_y + 40], start=0, end=180, fill=doodle_color, width=5)
+            draw.arc([doodle_x - 25, doodle_y, doodle_x + 25, doodle_y + 40], start=270, end=360, fill=doodle_color, width=5)
+        else:
+            # Lightbulb
+            doodle_x = width // 2
+            doodle_y = divider_y + 110
+            draw.ellipse([doodle_x - 35, doodle_y - 45, doodle_x + 35, doodle_y + 25], outline=doodle_color, width=4)
+            draw.line([doodle_x - 20, doodle_y + 25, doodle_x + 20, doodle_y + 25], fill=doodle_color, width=4)
+            draw.line([doodle_x - 15, doodle_y + 33, doodle_x + 15, doodle_y + 33], fill=doodle_color, width=4)
+            draw.line([doodle_x - 8, doodle_y + 41, doodle_x + 8, doodle_y + 41], fill=doodle_color, width=4)
+            draw.line([doodle_x - 10, doodle_y + 10, doodle_x - 10, doodle_y - 15], fill=doodle_color, width=3)
+            draw.line([doodle_x + 10, doodle_y + 10, doodle_x + 10, doodle_y - 15], fill=doodle_color, width=3)
+            draw.line([doodle_x - 10, doodle_y - 15, doodle_x + 10, doodle_y - 15], fill=doodle_color, width=3)
+            draw.line([doodle_x - 55, doodle_y - 30, doodle_x - 43, doodle_y - 20], fill=doodle_color, width=3)
+            draw.line([doodle_x + 55, doodle_y - 30, doodle_x + 43, doodle_y - 20], fill=doodle_color, width=3)
+            draw.line([doodle_x, doodle_y - 65, doodle_x, doodle_y - 52], fill=doodle_color, width=3)
 
     img.save(output_path, "JPEG", quality=95)
     return output_path
