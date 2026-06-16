@@ -310,17 +310,17 @@ def get_hottest_tech_topic(client, avoid_list=""):
                 contents=(
                     "Analyze today's Google Trends and viral tech content. "
                     "What is the single most trending technology topic right now? "
-                    "Look for: hidden phone features, tech tips, AI tools people are trying, "
-                    "privacy scares, tech myths being debunked, free app alternatives, "
-                    "iPhone/Android tricks, Windows shortcuts, or any tech hack going viral on social media. "
+                    "Look for: viral AI tools people are trying, fascinating tech facts, "
+                    "money making side hustles, productivity life hacks, "
+                    "AI coding shortcuts, agentic AI developments, or any tech hack going viral on social media. "
                     "CRITICAL: The topic must appeal to ALL age groups from 18 to 70, and must appeal equally to women and girls. "
-                    "Focus on universal and gender-inclusive themes like battery life, digital privacy, online scam protection, "
-                    "lifestyle and smart organization apps, budget-friendly shopping hacks, photo and video enhancement, and common tech misconceptions. "
+                    "Focus on universal and gender-inclusive themes like saving time, making money, interesting facts, "
+                    "lifestyle and smart organization apps, budget-friendly AI tools, and productivity enhancement. "
                     "Do NOT choose developer news, programming tutorials, API releases, model benchmarking scores, "
                     "or corporate tech-investor updates, nor heavily male-biased topics like PC hardware overclocking or gaming frame rate hacks. "
                     f"{avoid_prompt}\n\n"
                     "Return ONLY a JSON object with two fields: "
-                    "'topic' (3-6 word phrase, e.g. 'iPhone hidden battery trick viral') and "
+                    "'topic' (3-6 word phrase, e.g. 'viral AI productivity tool') and "
                     "'keywords' (list of 6-8 specific search keywords). No markdown, no explanation."
                 ),
                 config=types.GenerateContentConfig(
@@ -580,7 +580,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
             print(f"🔍 STEP 1: Using Gemini Search for '{search_subject}'...")
             search_query = (
                 f"Find the most viral, trending content about: {search_subject}. "
-                f"Look for hidden features, tips, tricks, myths, privacy warnings, or free alternatives "
+                f"Look for AI tools, fascinating facts, side hustles, productivity hacks, or free alternatives "
                 f"that are going viral on social media right now. Must appeal to general consumers."
             )
             
@@ -623,13 +623,13 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
 
     # Build the story selection instruction
     if topic_type == "tools":
-        content_desc = "trending tech tips, hidden phone features, free AI tools, app hacks, and productivity tricks that appeal to EVERYONE"
+        content_desc = "viral AI tools, money-making side hustles, productivity hacks, and free apps that appeal to EVERYONE"
     elif topic_type == "news":
-        content_desc = "scary privacy facts, tech myths being debunked, common tech mistakes people make, and viral tech warnings"
+        content_desc = "fascinating tech facts, AI industry shifts, motivation and success stories, and viral tech updates"
     elif topic_type == "tech_trends":
         content_desc = "high-velocity Google tech search trends and viral YouTube breakout videos"
     else:
-        content_desc = "surprising tech facts, hidden device features, free vs paid app comparisons, and AI transformation experiments"
+        content_desc = "surprising tech facts, agentic AI facts, AI coding shortcuts, and AI transformation experiments"
 
     from config import ENABLE_LONGFORM
     is_longform = ("Slot C" in slot) and ENABLE_LONGFORM

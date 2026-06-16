@@ -12,18 +12,18 @@ def get_slot_info():
     # Single daily upload — always Slot A
     slot = "Slot A (Discovery)"
         
-    # Daily category rotation — Mass-Appeal Tech (audience pool: 100M+ per category)
+    # Daily category rotation — High Views & Subscribers Strategy
     daily_categories = {
-        "Mon": "Hidden Phone Features",        # iPhone/Android hidden settings — everyone with a phone
-        "Tue": "AI Tools You Need",            # Practical AI tool demos — saves time/money
-        "Wed": "Tech Myths Busted",            # Debunking misconceptions — triggers comments
-        "Thu": "Scary Tech Facts",             # Privacy/security warnings — fear-driven engagement
-        "Fri": "You're Using It Wrong",        # Common tech mistakes — FOMO + ego trigger
-        "Sat": "Free vs Paid Apps",            # Budget alternatives — universal appeal
-        "Sun": "AI vs Reality"                 # AI transformation mashups — shareable entertainment
+        "Mon": "AI & Tech Tools",          # Massive trend, AI demos
+        "Tue": "Facts & Trivia",           # Binge-worthy, Did you know
+        "Wed": "Money & Side Hustles",     # High CPC, quick income ideas
+        "Thu": "Motivation & Self-Help",   # High engagement, viral potential
+        "Fri": "Life Hacks",               # Clever tips, productivity
+        "Sat": "Agentic AI Facts",         # AI expertise, niche but high CPC
+        "Sun": "Coding Hacks"              # AI expertise, Python/AI shortcuts
     }
     
-    category = daily_categories.get(day_name, "Tech Tips")
+    category = daily_categories.get(day_name, "AI & Tech Tools")
     
     return day_name, slot, category
 
@@ -57,83 +57,75 @@ def get_next_slot(current_slot):
 def get_category_prompt_enhancement(category, slot):
     """
     Returns specific instructions and formatting for the given category/slot.
-    All categories now target MASS-MARKET audiences (not just ML engineers).
+    Targeting mass-market audiences for high views, subscribers, and CPC.
     """
-    base_discovery = "FOCUS: Viral Discovery. Use broad, mass-appeal hooks. Target EVERYONE with a phone/computer."
+    base_discovery = "FOCUS: Viral Discovery. Use broad, mass-appeal hooks. Target EVERYONE with a smartphone or computer."
     
     enhancements = {
-        "Hidden Phone Features": f"""
-            CATEGORY: Hidden Phone Features (iPhone/Android/Windows Secret Settings).
+        "AI & Tech Tools": f"""
+            CATEGORY: AI & Tech Tools (Massive trend, viewers love AI demos).
             STRATEGY: {base_discovery}
-            AUDIENCE: EVERYONE who owns a smartphone or computer. NOT just engineers.
-            GOAL: Reveal hidden settings, secret menus, or unknown features in popular devices (iPhone, Android, Windows, Chrome, WhatsApp). The viewer must feel like they discovered a "cheat code" for their phone.
-            HOOK STYLE: 'Your iPhone has a secret menu Apple doesn't want you to find.' or 'Change this ONE setting and your phone gets 2x faster.'
-            EMOTIONAL TRIGGER: FOMO (Fear of Missing Out) + feeling like a "power user"
-            CONTENT FORMAT: Screen recording style. Show the exact steps. Result-first (show the outcome, then explain how).
-        """,
-        "AI Tools You Need": f"""
-            CATEGORY: AI Tools You Need (Practical AI for Everyday People).
-            STRATEGY: {base_discovery}
-            AUDIENCE: Anyone who wants to save time or money. Students, professionals, small business owners. NOT just programmers.
-            GOAL: Show ONE specific free AI tool that solves a real everyday problem. The viewer must be able to try it themselves immediately.
-            HOOK STYLE: 'Stop paying for Photoshop. This AI does it FREE.' or 'I wrote a 10-page report in 30 seconds using this AI tool.'
-            EMOTIONAL TRIGGER: "I NEED to try this right now" + time/money savings
+            AUDIENCE: Anyone wanting to save time, increase productivity, or try cool AI. 
+            GOAL: Show ONE specific free AI tool or hack that solves a real problem or does something amazing. (e.g., '3 Free AI Tools for Students', 'ChatGPT Hack You Didn't Know').
+            HOOK STYLE: 'Stop paying for this app. This AI does it FREE.' or 'This secret AI tool will replace your job.'
+            EMOTIONAL TRIGGER: "I NEED to try this right now" + time/money savings.
             CONTENT FORMAT: Quick demo (result-first). Show the tool working. No jargon.
         """,
-        "Tech Myths Busted": f"""
-            CATEGORY: Tech Myths Busted (Debunking Common Misconceptions).
+        "Facts & Trivia": f"""
+            CATEGORY: Facts & Trivia (Highly shareable, binge-worthy).
             STRATEGY: {base_discovery}
-            AUDIENCE: EVERYONE. These are beliefs that 90% of people hold incorrectly.
-            GOAL: Challenge a widely-held tech belief with proof. Make the viewer feel smart for learning the truth. Drive massive comment engagement from people arguing.
-            HOOK STYLE: 'Closing apps does NOT save battery. Here's proof.' or 'Incognito mode does NOT make you private. Here's what actually happens.'
-            EMOTIONAL TRIGGER: "Wait, I've been doing this wrong my whole life?!" + ego challenge
-            CONTENT FORMAT: Bold claim → visual proof → mind-blown payoff. Extremely controversial hooks drive comments.
+            AUDIENCE: EVERYONE. People who love learning surprising, weird, or hidden facts.
+            GOAL: Share a "Did you know?" tech fact, a weird historical tech story, or debunk a common myth.
+            HOOK STYLE: '99% of people don't know what this iPhone button actually does.' or 'The terrifying truth about Google's servers.'
+            EMOTIONAL TRIGGER: "Wait, really?!" + curiosity + shareability.
+            CONTENT FORMAT: Bold claim/hook → fascinating story/proof → mind-blown payoff.
         """,
-        "Scary Tech Facts": f"""
-            CATEGORY: Scary Tech Facts (Privacy, Security, and Surveillance Warnings).
+        "Money & Side Hustles": f"""
+            CATEGORY: Money & Side Hustles (Everyone wants quick income, High CPC).
             STRATEGY: {base_discovery}
-            AUDIENCE: EVERYONE who owns a device connected to the internet. This affects ALL viewers personally.
-            GOAL: Reveal a terrifying privacy or security fact that makes the viewer feel personally at risk. Then show them how to protect themselves.
-            HOOK STYLE: 'Your phone is recording you RIGHT NOW. Here's proof.' or 'Google knows where you were 3 years ago. Check this setting.'
-            EMOTIONAL TRIGGER: Fear + urgency + "I need to fix this NOW"
-            CONTENT FORMAT: Dramatic hook → proof/demonstration → "Here's how to protect yourself" (actionable fix).
+            AUDIENCE: People looking for passive income, side hustles, or financial growth using tech/AI.
+            GOAL: Provide actionable, realistic ways to make money online using AI or tech tools.
+            HOOK STYLE: '3 AI side hustles to make $100 a day.' or 'How to make passive income using ChatGPT in 2026.'
+            EMOTIONAL TRIGGER: Financial freedom + greed/ambition + "I can do that easily".
+            CONTENT FORMAT: Hook → Step-by-step breakdown of the hustle → Proof/potential earnings → CTA.
         """,
-        "You're Using It Wrong": f"""
-            CATEGORY: You're Using It Wrong (Common Tech Mistakes Everyone Makes).
+        "Motivation & Self-Help": f"""
+            CATEGORY: Motivation & Self-Help (High engagement, viral potential).
             STRATEGY: {base_discovery}
-            AUDIENCE: EVERYONE. Target universal behaviors that most people do incorrectly.
-            GOAL: Show ONE common tech mistake and the correct way to do it. The viewer must feel personally called out.
-            HOOK STYLE: 'Stop charging your phone like this. You're killing your battery.' or 'You've been using Google wrong your entire life.'
-            EMOTIONAL TRIGGER: Ego challenge + curiosity + "Am I doing this wrong too?"
-            CONTENT FORMAT: Call-out the mistake → explain why it's wrong → show the correct way. Keep it punchy.
+            AUDIENCE: Ambitious individuals, tech entrepreneurs, students, anyone needing inspiration.
+            GOAL: Share a powerful success story, mindset tip, or motivational quote related to tech, AI, or startups.
+            HOOK STYLE: 'How a 19-year-old built a $1M AI startup in his bedroom.' or 'The ONE habit that made Steve Jobs successful.'
+            EMOTIONAL TRIGGER: Inspiration + aspiration + "I need to get to work".
+            CONTENT FORMAT: Hook → Story of struggle/success → The core lesson/mindset shift → Motivational CTA.
         """,
-        "Free vs Paid Apps": f"""
-            CATEGORY: Free vs Paid Apps (Budget Alternatives That Are Actually Better).
+        "Life Hacks": f"""
+            CATEGORY: Life Hacks (Continued viewer interest, productivity).
             STRATEGY: {base_discovery}
-            AUDIENCE: Students, budget-conscious users, anyone paying for subscriptions they don't need.
-            GOAL: Compare an expensive paid app/service with a FREE alternative that's just as good (or better). Make the viewer feel like they've been wasting money.
-            HOOK STYLE: 'Stop paying $10/month for this app. This free one is BETTER.' or 'I replaced 5 paid apps with this ONE free tool.'
-            EMOTIONAL TRIGGER: "I've been wasting money this whole time!" + immediate savings
-            CONTENT FORMAT: Side-by-side comparison. Show the free alternative actually working. Name specific apps.
+            AUDIENCE: EVERYONE. Universal appeal for making daily life easier.
+            GOAL: Share a clever tech tip, productivity hack, or DIY solution that saves time and effort.
+            HOOK STYLE: 'This 10-second tech hack will save you 5 hours a week.' or 'The ultimate productivity trick for your laptop.'
+            EMOTIONAL TRIGGER: Immediate utility + FOMO.
+            CONTENT FORMAT: Fast, punchy, result-first. Show the hack in action immediately.
         """,
-        "AI vs Reality": f"""
-            CATEGORY: AI vs Reality (AI Transformation Mashups & Experiments).
-            STRATEGY: {base_discovery}
-            AUDIENCE: EVERYONE. Pure entertainment with a tech twist. Highly shareable.
-            GOAL: Use AI to create a surprising, visual, or funny transformation. The viewer must want to share this with friends or try it themselves.
-            HOOK STYLE: 'I asked AI to predict what I'll look like in 30 years. The result is INSANE.' or 'AI turned my bedroom photo into a luxury penthouse.'
-            EMOTIONAL TRIGGER: "Wow, I want to try this!" + shareability + visual amazement
-            CONTENT FORMAT: Visual transformation (before → AI result). Show the result FIRST, then how you did it. 15-25 seconds ideal.
+        "Agentic AI Facts": f"""
+            CATEGORY: Agentic AI Facts (Niche but High CPC, AI/ML Background).
+            STRATEGY: Leverage your Senior AI Engineer expertise while keeping it accessible.
+            AUDIENCE: Tech enthusiasts, professionals, students, and curious minds.
+            GOAL: Explain autonomous AI agents or complex AI facts fast. Make it sound mind-blowing but easy to grasp.
+            HOOK STYLE: 'AI agents are about to run the internet. Here is what they actually do.' or 'What is an autonomous AI agent? Explained in 30 seconds.'
+            EMOTIONAL TRIGGER: Future-shock + "I'm learning from an expert" + awe.
+            CONTENT FORMAT: Hook → Simple everyday analogy for the AI concept → Real-world implication → CTA.
         """,
-        "Tech Tips": f"""
-            CATEGORY: Tech Tips (General Technology Tips & Tricks).
-            STRATEGY: {base_discovery}
-            GOAL: Cover the single most useful, surprising, or mind-blowing tech tip of the day. Must be applicable to EVERYONE, not just engineers.
-            HOOK STYLE: 'This ONE trick will change how you use your phone forever.' or 'I wish I knew this sooner. Here's the tech hack that saved me hours.'
-            EMOTIONAL TRIGGER: Immediate utility + FOMO
-            CONTENT FORMAT: Fast, punchy, result-first. Show the tip working.
+        "Coding Hacks": f"""
+            CATEGORY: Coding Hacks (Niche but High CPC, AI/ML Background).
+            STRATEGY: Leverage your Senior AI Engineer expertise. Provide extreme value quickly.
+            AUDIENCE: Developers, CS students, tech workers, and people learning to code.
+            GOAL: Share a Python trick, AI coding shortcut, or workflow improvement.
+            HOOK STYLE: 'This Python trick will save you 100 lines of code.' or 'How to use AI to write your backend in 40 seconds.'
+            EMOTIONAL TRIGGER: "I've been doing it the hard way!" + immediate utility.
+            CONTENT FORMAT: Problem setup → Show the long way vs the Hack/AI way → Payoff/Result.
         """
     }
     
-    return enhancements.get(category, enhancements.get("Tech Tips", ""))
+    return enhancements.get(category, enhancements.get("AI & Tech Tools", ""))
 
