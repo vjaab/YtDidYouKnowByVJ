@@ -979,7 +979,7 @@ def call_fallback_model(prompt):
             "Authorization": f"Bearer {cerebras_key}",
             "Content-Type": "application/json"
         }
-        cerebras_models = ["llama3.3-70b", "llama3.1-70b", "llama3.1-8b"]
+        cerebras_models = ["llama-3.3-70b", "llama-3.1-70b", "llama-3.1-8b"]
         for model_name in cerebras_models:
             print(f"🔮 Falling back to Cerebras ({model_name})...")
             try:
@@ -1006,7 +1006,7 @@ def call_fallback_model(prompt):
             "Content-Type": "application/json"
         }
         # Model preference order
-        groq_models = ["llama-3.3-70b-versatile", "llama3-70b-8192", "mixtral-8x7b-32768", "gemma2-9b-it", "llama-3.1-8b-instant", "deepseek-r1-distill-llama-70b"]
+        groq_models = ["llama-3.3-70b-versatile", "llama-3.1-70b-versatile", "mixtral-8x7b-32768", "gemma2-9b-it", "llama-3.1-8b-instant", "deepseek-r1-distill-llama-70b"]
         for model_name in groq_models:
             print(f"🔮 Gemini/OpenAI/Anthropic failed. Falling back to Groq ({model_name})...")
             try:
