@@ -975,26 +975,28 @@ def call_fallback_model(prompt):
     # 2.5 Cerebras
     cerebras_key = os.getenv("CEREBRAS_API_KEY")
     if cerebras_key:
-        print("🔮 Falling back to Cerebras (llama-3.3-70b)...")
-        try:
-            headers = {
-                "Authorization": f"Bearer {cerebras_key}",
-                "Content-Type": "application/json"
-            }
-            payload = {
-                "model": "llama-3.3-70b",
-                "messages": [{"role": "user", "content": prompt}],
-                "response_format": {"type": "json_object"},
-                "temperature": 0.7
-            }
-            r = requests.post("https://api.cerebras.ai/v1/chat/completions", json=payload, headers=headers, timeout=30)
-            if r.status_code == 200:
-                content = r.json()["choices"][0]["message"]["content"].strip()
-                return clean_and_parse_json(content)
-            else:
-                print(f"⚠️ Cerebras API failed with code {r.status_code}: {r.text}")
-        except Exception as e:
-            print(f"⚠️ Cerebras fallback failed: {e}")
+        headers = {
+            "Authorization": f"Bearer {cerebras_key}",
+            "Content-Type": "application/json"
+        }
+        cerebras_models = ["llama3.3-70b", "llama3.1-70b", "llama3.1-8b"]
+        for model_name in cerebras_models:
+            print(f"🔮 Falling back to Cerebras ({model_name})...")
+            try:
+                payload = {
+                    "model": model_name,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "response_format": {"type": "json_object"},
+                    "temperature": 0.7
+                }
+                r = requests.post("https://api.cerebras.ai/v1/chat/completions", json=payload, headers=headers, timeout=30)
+                if r.status_code == 200:
+                    content = r.json()["choices"][0]["message"]["content"].strip()
+                    return clean_and_parse_json(content)
+                else:
+                    print(f"⚠️ Cerebras API ({model_name}) failed with code {r.status_code}: {r.text}")
+            except Exception as e:
+                print(f"⚠️ Cerebras ({model_name}) fallback failed: {e}")
 
     # 3. Groq
     groq_key = os.getenv("GROQ_API_KEY")
@@ -1004,7 +1006,7 @@ def call_fallback_model(prompt):
             "Content-Type": "application/json"
         }
         # Model preference order
-        groq_models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
+        groq_models = ["llama-3.3-70b-versatile", "llama3-70b-8192", "mixtral-8x7b-32768", "gemma2-9b-it", "llama-3.1-8b-instant", "deepseek-r1-distill-llama-70b"]
         for model_name in groq_models:
             print(f"🔮 Gemini/OpenAI/Anthropic failed. Falling back to Groq ({model_name})...")
             try:
@@ -1054,7 +1056,7 @@ def call_fallback_model(prompt):
             "Authorization": f"Bearer {openrouter_key}",
             "Content-Type": "application/json"
         }
-        openrouter_models = ["meta-llama/llama-3.3-70b-instruct:free", "google/gemini-2.5-flash:free", "qwen/qwen-2.5-72b-instruct:free"]
+        openrouter_models = ["meta-llama/llama-3.3-70b-instruct:free", "google/gemini-2.5-flash", "qwen/qwen-2.5-72b-instruct", "google/gemini-2.0-flash-lite-preview-02-05:free", "deepseek/deepseek-chat:free", "nvidia/llama-3.1-nemotron-70b-instruct:free"]
         for or_model in openrouter_models:
             print(f"🔮 Falling back to OpenRouter ({or_model})...")
             try:
