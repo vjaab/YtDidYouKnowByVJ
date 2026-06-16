@@ -972,6 +972,30 @@ def call_fallback_model(prompt):
         except Exception as e:
             print(f"⚠️ Anthropic fallback failed: {e}")
 
+    # 2.5 Cerebras
+    cerebras_key = os.getenv("CEREBRAS_API_KEY")
+    if cerebras_key:
+        print("🔮 Falling back to Cerebras (llama-3.3-70b)...")
+        try:
+            headers = {
+                "Authorization": f"Bearer {cerebras_key}",
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "model": "llama-3.3-70b",
+                "messages": [{"role": "user", "content": prompt}],
+                "response_format": {"type": "json_object"},
+                "temperature": 0.7
+            }
+            r = requests.post("https://api.cerebras.ai/v1/chat/completions", json=payload, headers=headers, timeout=30)
+            if r.status_code == 200:
+                content = r.json()["choices"][0]["message"]["content"].strip()
+                return clean_and_parse_json(content)
+            else:
+                print(f"⚠️ Cerebras API failed with code {r.status_code}: {r.text}")
+        except Exception as e:
+            print(f"⚠️ Cerebras fallback failed: {e}")
+
     # 3. Groq
     groq_key = os.getenv("GROQ_API_KEY")
     if groq_key:
@@ -979,8 +1003,8 @@ def call_fallback_model(prompt):
             "Authorization": f"Bearer {groq_key}",
             "Content-Type": "application/json"
         }
-        # Model preference order: openai/gpt-oss-120b -> qwen/qwen3-32b -> llama-3.3-70b-versatile
-        groq_models = ["openai/gpt-oss-120b", "qwen/qwen3-32b", "llama-3.3-70b-versatile"]
+        # Model preference order
+        groq_models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
         for model_name in groq_models:
             print(f"🔮 Gemini/OpenAI/Anthropic failed. Falling back to Groq ({model_name})...")
             try:
@@ -1026,25 +1050,27 @@ def call_fallback_model(prompt):
     # 5. OpenRouter
     openrouter_key = os.getenv("OPENROUTER_API_KEY")
     if openrouter_key:
-        print("🔮 Falling back to OpenRouter (meta-llama/llama-3.3-70b-instruct)...")
-        try:
-            headers = {
-                "Authorization": f"Bearer {openrouter_key}",
-                "Content-Type": "application/json"
-            }
-            payload = {
-                "model": "meta-llama/llama-3.3-70b-instruct",
-                "messages": [{"role": "user", "content": prompt}],
-                "temperature": 0.7
-            }
-            r = requests.post("https://openrouter.ai/api/v1/chat/completions", json=payload, headers=headers, timeout=30)
-            if r.status_code == 200:
-                content = r.json()["choices"][0]["message"]["content"].strip()
-                return clean_and_parse_json(content)
-            else:
-                print(f"⚠️ OpenRouter API failed with code {r.status_code}: {r.text}")
-        except Exception as e:
-            print(f"⚠️ OpenRouter fallback failed: {e}")
+        headers = {
+            "Authorization": f"Bearer {openrouter_key}",
+            "Content-Type": "application/json"
+        }
+        openrouter_models = ["meta-llama/llama-3.3-70b-instruct:free", "google/gemini-2.5-flash:free", "qwen/qwen-2.5-72b-instruct:free"]
+        for or_model in openrouter_models:
+            print(f"🔮 Falling back to OpenRouter ({or_model})...")
+            try:
+                payload = {
+                    "model": or_model,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "temperature": 0.7
+                }
+                r = requests.post("https://openrouter.ai/api/v1/chat/completions", json=payload, headers=headers, timeout=30)
+                if r.status_code == 200:
+                    content = r.json()["choices"][0]["message"]["content"].strip()
+                    return clean_and_parse_json(content)
+                else:
+                    print(f"⚠️ OpenRouter API ({or_model}) failed with code {r.status_code}: {r.text}")
+            except Exception as e:
+                print(f"⚠️ OpenRouter ({or_model}) fallback failed: {e}")
 
     return None
 
@@ -1059,11 +1085,33 @@ class MultiAgentGenerationEngine:
         self.raw_articles = raw_articles
 
     def _call_gemini(self, prompt, model=GEMINI_FLASH_MODEL):
-        attempts = 0
-        current_model = model
-        while attempts < 5:
+        import os
+        from google import genai
+        
+        # Get list of API keys
+        api_keys_env = os.getenv("GEMINI_API_KEYS", os.getenv("GEMINI_API_KEY", ""))
+        api_keys = [k.strip() for k in api_keys_env.split(",") if k.strip()]
+        if not api_keys:
+            api_keys = [GEMINI_API_KEY]
+            
+        # Initialize models to try
+        models_to_try = [model]
+        if model == GEMINI_PRO_MODEL:
+            models_to_try.extend([GEMINI_FLASH_MODEL, GEMINI_FLASH_LITE_MODEL])
+        elif model == GEMINI_FLASH_MODEL:
+            models_to_try.extend([GEMINI_FLASH_LITE_MODEL])
+            
+        model_idx = 0
+        key_idx = 0
+        
+        while models_to_try:
+            current_model = models_to_try[model_idx % len(models_to_try)]
+            current_key = api_keys[key_idx % len(api_keys)]
+            
             try:
-                response = self.client.models.generate_content(
+                # Initialize client with current key
+                client = genai.Client(api_key=current_key)
+                response = client.models.generate_content(
                     model=current_model,
                     contents=prompt,
                     config=types.GenerateContentConfig(
@@ -1078,27 +1126,20 @@ class MultiAgentGenerationEngine:
                 return json.loads(raw)
             except Exception as e:
                 err_str = str(e).upper()
-                # Handle Overloaded (503), Resource Exhausted (429), or Model Deprecated (404)
-                if any(x in err_str for x in ["503", "UNAVAILABLE", "RESOURCE_EXHAUSTED", "429", "NOT_FOUND", "404"]):
-                    # Gentler exponential backoff capped at 60s
-                    wait_time = min((2 ** (attempts + 1)) + random.uniform(2, 5), 60.0)
+                # Handle Rate Limit (429), Overloaded (503), Depleted Quota (LIMIT: 0), or Not Found (404)
+                if any(x in err_str for x in ["503", "UNAVAILABLE", "RESOURCE_EXHAUSTED", "429", "NOT_FOUND", "404", "LIMIT: 0", "QUOTA"]):
+                    print(f"⚠️ [LOOP] Call failed ({current_model} with key {key_idx+1}/{len(api_keys)}): Rate Limit/Overload/Quota.")
+                    key_idx += 1
                     
-                    # Model Fallback Logic
-                    if current_model == GEMINI_PRO_MODEL:
-                        print(f"⚠️ [LOOP] Model {current_model} is UNAVAILABLE. Falling back to {GEMINI_FLASH_MODEL}...")
-                        current_model = GEMINI_FLASH_MODEL
-                        continue
-                    elif current_model == GEMINI_FLASH_MODEL and attempts >= 1:
-                        print(f"⚠️ [LOOP] Model {current_model} is OVERLOADED. Falling back to {GEMINI_FLASH_LITE_MODEL}...")
-                        current_model = GEMINI_FLASH_LITE_MODEL
-                        continue
-                        
-                    print(f"⚠️ [LOOP] Call failed ({current_model}): Rate Limit/Overload. Retrying in {wait_time:.1f}s...")
-                    time.sleep(wait_time)
+                    # If we have tried all keys for this model
+                    if key_idx % len(api_keys) == 0:
+                        print(f"⚠️ [LOOP] All keys exhausted for {current_model}. Removing from rotation.")
+                        models_to_try.pop(model_idx % len(models_to_try))
+                        # Do not increment model_idx since the list shrunk, so we automatically try the next model
                 else:
-                    print(f"⚠️ [LOOP] Call failed ({current_model}): {e}. Retrying...")
-                    time.sleep(3)
-                attempts += 1
+                    print(f"⚠️ [LOOP] Call failed ({current_model}): {e}. Removing model from rotation.")
+                    models_to_try.pop(model_idx % len(models_to_try))
+                    key_idx = 0 # Reset key idx for the next model
                 
         print("🚨 Gemini failed all attempts. Attempting fallback models...")
         fallback_res = call_fallback_model(prompt)
