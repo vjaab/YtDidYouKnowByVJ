@@ -2454,6 +2454,51 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
     
     return img
 
+def render_shorts_header_bar(title, frame_width=1080):
+    """Renders a solid black top bar with white title text for Shorts."""
+    font = gf(54, bold=True)
+    draw_temp = ImageDraw.Draw(Image.new('RGBA', (frame_width, 200)))
+    
+    # Wrap text to fit inside the bar (with 60px padding on each side)
+    max_w = frame_width - 120
+    words = title.split()
+    lines = []
+    current_line = []
+    for word in words:
+        test_line = " ".join(current_line + [word])
+        w = draw_temp.textlength(test_line, font=font)
+        if w > max_w and current_line:
+            lines.append(" ".join(current_line))
+            current_line = [word]
+        else:
+            current_line.append(word)
+    if current_line:
+        lines.append(" ".join(current_line))
+        
+    lines = lines[:2] # Max 2 lines to keep header compact
+    
+    bbox = font.getbbox("Ag")
+    line_height = bbox[3] - bbox[1]
+    line_spacing = int(line_height * 0.2)
+    
+    padding_y = 35
+    bar_height = padding_y * 2 + len(lines) * line_height + (len(lines) - 1) * line_spacing
+    
+    img = Image.new('RGBA', (frame_width, FRAME_H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    
+    # Draw solid black background bar at the top
+    draw.rectangle([0, 0, frame_width, bar_height], fill=(0, 0, 0, 255))
+    
+    # Draw centered white text
+    for i, line in enumerate(lines):
+        lw = draw.textlength(line, font=font)
+        tx = (frame_width - lw) // 2
+        ty = padding_y + i * (line_height + line_spacing)
+        draw.text((tx, ty), line, font=font, fill=(255, 255, 255, 255))
+        
+    return img
+
 def render_entity_tags(entities, accent_color, frame_width=1080, on_right=False):
     """Renders small floating tags for various entities (Models, Clouds, Companies, etc.) on the side."""
     tag_h = 600
@@ -3323,8 +3368,10 @@ def build_transparency_watermark(width, height):
     font = gf(24) # Small, elite typography
     tw, th = ts(text, font)
     
-    # Position: Very Top Right corner
-    x, y = width - tw - 40, 40
+    # Position: Very Top Right corner (shifted down for Shorts to avoid black title bar overlap)
+    is_shorts = width < height
+    y = 200 if is_shorts else 40
+    x = width - tw - 40
     
     # Glassmorphism backing
     rect = [x - 15, y - 8, x + tw + 15, y + th + 8]
@@ -4457,7 +4504,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     
     card_size = 130 # Slightly smaller for stack
     margin = 30
-    current_y = 80
+    current_y = 180 if not is_longform else 80
     
     for i, (name, path, is_person) in enumerate(branding_entities):
         try:
@@ -4685,8 +4732,11 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     
     final_audio = AudioFileClip(mastered_audio_path)
     
-    # Header bar DISABLED — reference style has no persistent title
-    header_img = Image.new('RGBA', (FRAME_W, FRAME_H), (0, 0, 0, 0))
+    # Header bar: solid black top bar with white text for Shorts, disabled for Longform
+    if not is_longform:
+        header_img = render_shorts_header_bar(title, FRAME_W)
+    else:
+        header_img = Image.new('RGBA', (FRAME_W, FRAME_H), (0, 0, 0, 0))
     
     # Pre-render 2026 Compliance Watermark
     transparency_img = build_transparency_watermark(FRAME_W, FRAME_H)
