@@ -2455,7 +2455,7 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
     return img
 
 def render_shorts_header_bar(title, frame_width=1080):
-    """Renders a solid black top bar with white title text for Shorts."""
+    """Renders a solid black bottom bar with white title text for Shorts."""
     font = gf(54, bold=True)
     draw_temp = ImageDraw.Draw(Image.new('RGBA', (frame_width, 200)))
     
@@ -2487,17 +2487,18 @@ def render_shorts_header_bar(title, frame_width=1080):
     img = Image.new('RGBA', (frame_width, FRAME_H), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     
-    # Draw solid black background bar at the top
-    draw.rectangle([0, 0, frame_width, bar_height], fill=(0, 0, 0, 255))
+    # Draw solid black background bar at the bottom
+    draw.rectangle([0, FRAME_H - bar_height, frame_width, FRAME_H], fill=(0, 0, 0, 255))
     
     # Draw centered white text
+    y_start = FRAME_H - bar_height
     for i, line in enumerate(lines):
         lw = draw.textlength(line, font=font)
         tx = (frame_width - lw) // 2
-        ty = padding_y + i * (line_height + line_spacing)
+        ty = y_start + padding_y + i * (line_height + line_spacing)
         draw.text((tx, ty), line, font=font, fill=(255, 255, 255, 255))
         
-    return img
+    return img, bar_height
 
 def render_entity_tags(entities, accent_color, frame_width=1080, on_right=False):
     """Renders small floating tags for various entities (Models, Clouds, Companies, etc.) on the side."""
@@ -3358,7 +3359,7 @@ def _render_animated_stat(stat_text, width, height, progress_ratio, accent_color
     
     return img
 
-def build_transparency_watermark(width, height):
+def build_transparency_watermark(width, height, title_bar_height=0):
     """Creates a subtle, high-end transparency watermark for 2026 compliance."""
     img = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
@@ -3368,10 +3369,13 @@ def build_transparency_watermark(width, height):
     font = gf(24) # Small, elite typography
     tw, th = ts(text, font)
     
-    # Position: Very Top Right corner (shifted down for Shorts to avoid black title bar overlap)
+    # Position: just above the bottom title bar for Shorts, otherwise very Top Right corner
     is_shorts = width < height
-    y = 200 if is_shorts else 40
-    x = width - tw - 40
+    if is_shorts and title_bar_height > 0:
+        y = height - title_bar_height - th - 40
+        x = width - tw - 40
+    else:
+        x, y = width - tw - 40, 40
     
     # Glassmorphism backing
     rect = [x - 15, y - 8, x + tw + 15, y + th + 8]
@@ -4504,7 +4508,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     
     card_size = 130 # Slightly smaller for stack
     margin = 30
-    current_y = 180 if not is_longform else 80
+    current_y = 80
     
     for i, (name, path, is_person) in enumerate(branding_entities):
         try:
@@ -4732,14 +4736,15 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     
     final_audio = AudioFileClip(mastered_audio_path)
     
-    # Header bar: solid black top bar with white text for Shorts, disabled for Longform
+    # Header bar: solid black bottom bar with white text for Shorts, disabled for Longform
+    bar_height = 0
     if not is_longform:
-        header_img = render_shorts_header_bar(title, FRAME_W)
+        header_img, bar_height = render_shorts_header_bar(title, FRAME_W)
     else:
         header_img = Image.new('RGBA', (FRAME_W, FRAME_H), (0, 0, 0, 0))
     
     # Pre-render 2026 Compliance Watermark
-    transparency_img = build_transparency_watermark(FRAME_W, FRAME_H)
+    transparency_img = build_transparency_watermark(FRAME_W, FRAME_H, bar_height)
 
     def make_final_frame(t):
         bg_frame = base_comp.get_frame(t)
@@ -4999,7 +5004,10 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 
                 print(f"Validating text rendering at {t:.1f}s...")
                 verify_text_visibility(test_frame, f"SUBTITLE {p}", 1450, 1800)
-                verify_text_visibility(test_frame, f"HEADER {p}", 0, 240)
+                if not is_longform:
+                    verify_text_visibility(test_frame, f"TITLE_BAR {p}", 1920 - 150, 1920)
+                else:
+                    verify_text_visibility(test_frame, f"HEADER {p}", 0, 240)
                 
                 test_path = output_path.replace(".mp4", f"_test_{int(p*100)}pct.jpg")
                 img.save(test_path)
