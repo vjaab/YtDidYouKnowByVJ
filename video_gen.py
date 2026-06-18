@@ -2620,10 +2620,9 @@ def render_dynamic_entity_tags(entities, accent_color, t, frame_width=1080, fram
         # Calculate dynamic box width
         name_w = draw.textlength(val, font=f_name)
         desc_w = draw.textlength(desc, font=f_desc) if desc else 0
-        text_w = max(name_w, desc_w)
         
-        # Base box width: padding left (24) + text_w + padding right (24)
-        box_w = text_w + int(48 * scale)
+        # Make the entity box span from left side to right side till the end
+        box_w = frame_width - (start_x * 2)
         
         logo_w, logo_h = 0, 0
         if logo_img:
