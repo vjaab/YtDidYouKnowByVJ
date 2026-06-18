@@ -22,6 +22,13 @@ def main():
         "color_theme": {"background": "#121212", "accent": "#00E5FF", "text": "#ffffff"}, # Cyber Cyan
         "screenshot_path": "dummy_screenshot.png",
         "slot": "Slot A",
+        "companies": [
+            {"name": "WhatsApp", "local_logo_path": "assets/icons/whatsapp_logo.png", "description": "Messaging App"},
+            {"name": "Telegram", "local_logo_path": "assets/icons/telegram_logo.png", "description": "Privacy Chat"}
+        ],
+        "people": [
+            {"name": "VJ Profile", "local_image_path": "assets/vj_profile.jpg", "description": "Tech Creator"}
+        ],
         "retention_map": {
             "pacing_speed": "fast"
         }
@@ -35,16 +42,13 @@ def main():
         print("Created dummy_screenshot.png")
 
     # 3. Mock chunks to verify morph transition
-    # We will define 4 chunks so we check transitions between them.
-    # Chunk index 0 to 1, 1 to 2, 2 to 3.
-    # Let's force trans_type selection by running the loop multiple times or forcing choices.
     chunks = [
         {
             "chunk_id": 1,
             "start": 0.0,
             "end": 1.0,
             "duration": 1.0,
-            "text": "Unlock your AI's",
+            "text": "Unlock WhatsApp hidden tricks.",
             "visual_path": "dummy_screenshot.png",
             "visual_type": "photo"
         },
@@ -53,7 +57,7 @@ def main():
             "start": 1.0,
             "end": 2.0,
             "duration": 1.0,
-            "text": "hidden SUPERPOWERS!",
+            "text": "Telegram is also loaded with powers.",
             "visual_path": "dummy_screenshot.png",
             "visual_type": "photo"
         },
@@ -62,7 +66,7 @@ def main():
             "start": 2.0,
             "end": 3.0,
             "duration": 1.0,
-            "text": "Just check this out.",
+            "text": "Or just check VJ Profile online.",
             "visual_path": "dummy_screenshot.png",
             "visual_type": "photo"
         }

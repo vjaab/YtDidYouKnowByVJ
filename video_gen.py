@@ -2487,14 +2487,17 @@ def render_shorts_header_bar(title, frame_width=1080):
     img = Image.new('RGBA', (frame_width, FRAME_H), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     
-    # Draw solid black background bar at the top
-    draw.rectangle([0, 0, frame_width, bar_height], fill=(0, 0, 0, 255))
+    # Shift down by 3 cm (113 pixels at 96 DPI) to avoid system HUD/notch overlap
+    offset_y = 113
+    
+    # Draw solid black background bar shifted down
+    draw.rectangle([0, offset_y, frame_width, offset_y + bar_height], fill=(0, 0, 0, 255))
     
     # Draw centered white text
     for i, line in enumerate(lines):
         lw = draw.textlength(line, font=font)
         tx = (frame_width - lw) // 2
-        ty = padding_y + i * (line_height + line_spacing)
+        ty = offset_y + padding_y + i * (line_height + line_spacing)
         draw.text((tx, ty), line, font=font, fill=(255, 255, 255, 255))
         
     return img
@@ -2567,6 +2570,115 @@ def render_entity_tags(entities, accent_color, frame_width=1080, on_right=False)
         draw.text((content_x, curr_y + 11), val, font=f_val, fill=(5, 5, 5, 255))
         
         curr_y += box_h + 10
+        
+    return img
+
+def render_dynamic_entity_tags(entities, accent_color, t, frame_width=1080, frame_height=1920):
+    """Renders small floating tags for various entities dynamically with fade effects."""
+    img = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
+    draw = ImageDraw.Draw(img)
+    
+    scale = frame_width / 1080.0
+    
+    # Scale parameters
+    box_h = int(96 * scale)
+    spacing = int(16 * scale)
+    start_y = int(293 * scale)
+    start_x = int(40 * scale)
+    
+    font_size_name = int(36 * scale)
+    font_size_desc = int(22 * scale)
+    
+    # Fonts
+    try:
+        f_name = ImageFont.truetype('assets/fonts/Montserrat-Bold.ttf', font_size_name)
+        f_desc = ImageFont.truetype('assets/fonts/Montserrat-Medium.ttf', font_size_desc)
+    except:
+        f_name = ImageFont.load_default()
+        f_desc = ImageFont.load_default()
+    
+    for i, ent in enumerate(entities[:4]): # Max 4 entities
+        opacity = 0.0
+        intervals = ent.get("active_intervals", [])
+        for start, end in intervals:
+            if start <= t <= end:
+                if t - start < 0.3:
+                    opacity = (t - start) / 0.3
+                elif end - t < 0.5:
+                    opacity = (end - t) / 0.5
+                else:
+                    opacity = 1.0
+                break
+                
+        if opacity <= 0.0:
+            continue
+            
+        val = ent.get("name", "Unknown")
+        desc = ent.get("description", "")
+        logo_img = ent.get("pil_logo")
+        
+        # Calculate dynamic box width
+        name_w = draw.textlength(val, font=f_name)
+        desc_w = draw.textlength(desc, font=f_desc) if desc else 0
+        text_w = max(name_w, desc_w)
+        
+        # Base box width: padding left (24) + text_w + padding right (24)
+        box_w = text_w + int(48 * scale)
+        
+        logo_w, logo_h = 0, 0
+        if logo_img:
+            # Scale logo to fit nicely within height of 56
+            aspect = logo_img.width / logo_img.height
+            logo_h = int(56 * scale)
+            logo_w = int(logo_h * aspect)
+            box_w += logo_w + int(16 * scale)
+            
+        curr_y = start_y + i * (box_h + spacing)
+        
+        # Create a temp surface for the individual tag to apply opacity
+        tag_img = Image.new('RGBA', (int(box_w + 10), int(box_h + 10)), (0,0,0,0))
+        tag_draw = ImageDraw.Draw(tag_img)
+        
+        # High-visibility Rounded box (Light/White theme)
+        radius = int(16 * scale)
+        outline_w = max(1, int(2 * scale))
+        tag_draw.rounded_rectangle([2, 2, box_w + 2, box_h + 2], radius=radius, 
+                                   fill=(255, 255, 255, 255), 
+                                   outline=(240, 240, 240, 255), width=outline_w)
+        
+        # Accent vertical line on the left edge of the box
+        accent_w = int(6 * scale)
+        accent_pad_top = int(14 * scale)
+        accent_pad_bottom = int(10 * scale)
+        tag_draw.rectangle([2, accent_pad_top, 2 + accent_w, box_h - accent_pad_bottom], fill=accent_color)
+        
+        content_x = int(24 * scale)
+        
+        # Paste Logo if available
+        if logo_img:
+            scaled_logo = logo_img.resize((logo_w, logo_h), Image.LANCZOS)
+            logo_x = int(content_x)
+            logo_y = int((box_h - logo_h) // 2)
+            tag_img.paste(scaled_logo, (logo_x, logo_y), scaled_logo)
+            content_x += logo_w + int(16 * scale)
+            
+        # Draw Text
+        if desc:
+            name_y = box_h // 2 - int(4 * scale)
+            desc_y = box_h // 2 + int(22 * scale)
+            tag_draw.text((content_x, name_y), val, font=f_name, fill=(18, 18, 18, 255), anchor="lm")
+            tag_draw.text((content_x, desc_y), desc, font=f_desc, fill=(100, 100, 100, 255), anchor="lm")
+        else:
+            tag_draw.text((content_x, box_h // 2), val, font=f_name, fill=(18, 18, 18, 255), anchor="lm")
+            
+        # Apply opacity to the tag image
+        if opacity < 1.0:
+            r, g, b, a = tag_img.split()
+            a = a.point(lambda p: int(p * opacity))
+            tag_img = Image.merge('RGBA', (r, g, b, a))
+            
+        # Paste the tag onto the main frame image
+        img.alpha_composite(tag_img, (start_x - 2, curr_y - 2))
         
     return img
 
@@ -3368,9 +3480,8 @@ def build_transparency_watermark(width, height):
     font = gf(24) # Small, elite typography
     tw, th = ts(text, font)
     
-    # Position: Very Top Right corner (shifted down for Shorts to avoid black title bar overlap)
-    is_shorts = width < height
-    y = 200 if is_shorts else 40
+    # Position: Very Top Right corner (above the shifted title bar for Shorts)
+    y = 40
     x = width - tw - 40
     
     # Glassmorphism backing
@@ -3382,8 +3493,8 @@ def build_transparency_watermark(width, height):
     
     return img
 
-def composite_frame(background_frame, timestamp, header_img, subtitle_img, transparency_img=None):
-    """Clean talking-head composite: header + subtitles only."""
+def composite_frame(background_frame, timestamp, header_img, subtitle_img, transparency_img=None, entity_tags_img=None):
+    """Clean talking-head composite: header + subtitles + entity tags."""
     frame = Image.fromarray(background_frame).convert('RGBA')
     
     # 1. Header at top
@@ -3392,8 +3503,12 @@ def composite_frame(background_frame, timestamp, header_img, subtitle_img, trans
     # 2. Transparency Watermark (2026 Compliance)
     if transparency_img is not None:
         frame.alpha_composite(transparency_img, dest=(0, 0))
+        
+    # 3. Dynamic Entity Tags (Shorts spoken topics)
+    if entity_tags_img is not None:
+        frame.alpha_composite(entity_tags_img, dest=(0, 0))
     
-    # 3. Subtitles
+    # 4. Subtitles
     if subtitle_img is not None:
         frame.alpha_composite(subtitle_img, dest=(0, 0))
     
@@ -4392,7 +4507,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
     # ── HUMAN REALISM OVERLAYS ───────────────────────────────────────────────
     grain_layer = _generate_film_grain(audio_duration, FRAME_W, FRAME_H)
-    flare_layer = _generate_lens_flare(audio_duration, FRAME_W)
+    flare_layer = None  # Disabled lens flare circle drifting left-to-right as requested
     
     # ── COMPLIANCE & BRANDING ────────────────────────────────────────────────
     disclosure = _ai_disclosure_overlay(audio_duration)
@@ -4491,49 +4606,101 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     if avatar_pip: base_layers.append(avatar_pip)
     base_layers.extend(longform_badge_clips)
     # ── LOGO BRANDING OVERLAY STACK ────────────────────────────────────
-    # Place multiple logos/photos in the top-right corner
-    branding_entities = []
-    # Collect up to 4 entities to avoid overcrowding
-    for ent_list_key in ["people", "companies", "key_entities"]:
+    # Render entity tags on the left side below the title for Shorts, or use the right-side logo stack for longform
+    entities_list = []
+    for ent_list_key in ["companies", "people", "key_entities"]:
         for ent in script_json.get(ent_list_key, []):
-            if len(branding_entities) >= 4: break
+            if not any(e.get("name") == ent.get("name") for e in entities_list):
+                # Ensure local_logo_path is set
+                logo_path = ent.get("local_logo_path") or ent.get("local_hq_path") or ent.get("local_image_path")
+                if logo_path:
+                    ent["local_logo_path"] = logo_path
+                entities_list.append(ent)
+                
+    if not is_longform and entities_list:
+        # Pre-calculate active time intervals for each entity based on chunk mentions
+        for ent in entities_list:
+            name = ent.get("name", "").lower()
+            intervals = []
+            for chunk in chunks:
+                chunk_text = chunk.get("text", "").lower()
+                if name in chunk_text:
+                    intervals.append((chunk["start"], chunk["end"] + 3.0))
             
-            lp = ent.get("local_logo_path") or ent.get("local_image_path")
-            if lp and os.path.exists(lp):
-                branding_entities.append((ent.get("name", "Entity"), lp, ent_list_key == "people"))
-    
-    card_size = 130 # Slightly smaller for stack
-    margin = 30
-    current_y = 180 if not is_longform else 80
-    
-    for i, (name, path, is_person) in enumerate(branding_entities):
-        try:
-            img = Image.open(path).convert("RGBA")
-            if is_person:
-                # Circular crop for people
-                img = ImageOps.fit(img, (card_size, card_size), Image.LANCZOS)
-                img = _crop_to_circle(img, border_color=accent_color)
+            # Merge overlapping/adjacent intervals
+            merged = []
+            if intervals:
+                intervals.sort(key=lambda x: x[0])
+                curr_start, curr_end = intervals[0]
+                for s, e in intervals[1:]:
+                    if s <= curr_end:
+                        curr_end = max(curr_end, e)
+                    else:
+                        merged.append((curr_start, curr_end))
+                        curr_start, curr_end = s, e
+                merged.append((curr_start, curr_end))
+            
+            # If the entity is never mentioned in the script text, default to showing it throughout
+            if not merged:
+                merged.append((0.0, audio_duration))
+                
+            ent["active_intervals"] = merged
+
+        # Pre-load PIL images for entity logos to avoid disk I/O in the frame loop
+        for ent in entities_list:
+            logo_path = ent.get("local_logo_path")
+            if logo_path and os.path.exists(logo_path):
+                try:
+                    ent["pil_logo"] = Image.open(logo_path).convert("RGBA")
+                except Exception as e:
+                    print(f"Failed to pre-load logo {logo_path}: {e}")
+                    ent["pil_logo"] = None
             else:
-                # Rounded card for companies/models
-                lw, lh = img.size
-                scale = (card_size - 40) / max(lw, lh)
-                img = img.resize((int(lw * scale), int(lh * scale)), Image.LANCZOS)
-                canvas = Image.new("RGBA", (card_size, card_size), (0,0,0,0))
-                draw = ImageDraw.Draw(canvas)
-                draw.rounded_rectangle([0, 0, card_size, card_size], radius=25, fill=(255,255,255,230))
-                canvas.paste(img, ((card_size - img.width)//2, (card_size - img.height)//2), img if img.mode == 'RGBA' else None)
-                img = canvas
-            
-            b_clip = ImageClip(np.array(img)).with_duration(audio_duration)
-            # Staggered entry (0.5s apart)
-            entry_delay = 0.5 + (i * 0.5)
-            b_clip = b_clip.with_position((FRAME_W - card_size - 50, current_y)).with_start(entry_delay)
-            b_clip = b_clip.with_effects([vfx.CrossFadeIn(0.5)])
-            base_layers.append(b_clip)
-            
-            current_y += card_size + margin
-        except Exception as e:
-            print(f"Branding failed for {name}: {e}")
+                ent["pil_logo"] = None
+        
+    if is_longform:
+        branding_entities = []
+        # Collect up to 4 entities to avoid overcrowding
+        for ent_list_key in ["people", "companies", "key_entities"]:
+            for ent in script_json.get(ent_list_key, []):
+                if len(branding_entities) >= 4: break
+                
+                lp = ent.get("local_logo_path") or ent.get("local_image_path")
+                if lp and os.path.exists(lp):
+                    branding_entities.append((ent.get("name", "Entity"), lp, ent_list_key == "people"))
+        
+        card_size = 130 # Slightly smaller for stack
+        margin = 30
+        current_y = 80
+        
+        for i, (name, path, is_person) in enumerate(branding_entities):
+            try:
+                img = Image.open(path).convert("RGBA")
+                if is_person:
+                    # Circular crop for people
+                    img = ImageOps.fit(img, (card_size, card_size), Image.LANCZOS)
+                    img = _crop_to_circle(img, border_color=accent_color)
+                else:
+                    # Rounded card for companies/models
+                    lw, lh = img.size
+                    scale = (card_size - 40) / max(lw, lh)
+                    img = img.resize((int(lw * scale), int(lh * scale)), Image.LANCZOS)
+                    canvas = Image.new("RGBA", (card_size, card_size), (0,0,0,0))
+                    draw = ImageDraw.Draw(canvas)
+                    draw.rounded_rectangle([0, 0, card_size, card_size], radius=25, fill=(255,255,255,230))
+                    canvas.paste(img, ((card_size - img.width)//2, (card_size - img.height)//2), img if img.mode == 'RGBA' else None)
+                    img = canvas
+                
+                b_clip = ImageClip(np.array(img)).with_duration(audio_duration)
+                # Staggered entry (0.5s apart)
+                entry_delay = 0.5 + (i * 0.5)
+                b_clip = b_clip.with_position((FRAME_W - card_size - 50, current_y)).with_start(entry_delay)
+                b_clip = b_clip.with_effects([vfx.CrossFadeIn(0.5)])
+                base_layers.append(b_clip)
+                
+                current_y += card_size + margin
+            except Exception as e:
+                print(f"Branding failed for {name}: {e}")
 
     base_layers.append(disclosure)
     base_layers.extend(engagement_clips)
@@ -4862,7 +5029,11 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         # Intro flash DISABLED — reference style
         pass
 
-        return composite_frame(bg_frame, t, header_img, subtitle_img, transparency_img)
+        entity_tags_img = None
+        if not is_longform and entities_list:
+            entity_tags_img = render_dynamic_entity_tags(entities_list, accent_color, t, FRAME_W, FRAME_H)
+
+        return composite_frame(bg_frame, t, header_img, subtitle_img, transparency_img, entity_tags_img)
 
 
     final = VideoClip(make_final_frame, duration=audio_duration)
@@ -4999,7 +5170,10 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 
                 print(f"Validating text rendering at {t:.1f}s...")
                 verify_text_visibility(test_frame, f"SUBTITLE {p}", 1450, 1800)
-                verify_text_visibility(test_frame, f"HEADER {p}", 0, 240)
+                if not is_longform:
+                    verify_text_visibility(test_frame, f"HEADER {p}", 113, 353)
+                else:
+                    verify_text_visibility(test_frame, f"HEADER {p}", 0, 240)
                 
                 test_path = output_path.replace(".mp4", f"_test_{int(p*100)}pct.jpg")
                 img.save(test_path)
