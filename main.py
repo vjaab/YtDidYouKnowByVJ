@@ -245,6 +245,9 @@ def run_pipeline(topic_type="auto"):
     duration    = 0
     extra_instruction = ""
     min_dur, max_dur = TARGET_AUDIO_DURATION
+    if topic_type == "vaibhav":
+        min_dur = 45
+        max_dur = 65
     failed_topics = []  # Track topics whose screenshots failed so Gemini avoids them
 
     while attempts < MAX_RETRY_ATTEMPTS:
@@ -416,7 +419,8 @@ def run_pipeline(topic_type="auto"):
                 log_message(f"⚠️ Topic '{failed_headline}' repeatedly too short. Skipping.")
                 extra_instruction = ""
             else:
-                extra_instruction = f"The previous script was too short at {duration:.0f}s. Make the script slightly longer, aim for 25-35 seconds of speaking."
+                target_seconds = "45-60" if topic_type == "vaibhav" else "25-35"
+                extra_instruction = f"The previous script was too short at {duration:.0f}s. Make the script slightly longer, aim for {target_seconds} seconds of speaking."
             attempts += 1
             continue
 
@@ -632,7 +636,7 @@ def run_local(topic_type="auto"):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--now", action="store_true", help="Run pipeline immediately.")
-    parser.add_argument("--type", type=str, choices=["auto", "research", "tools", "news", "tech_trends"], default="auto", help="Content type mapped to the schedule")
+    parser.add_argument("--type", type=str, choices=["auto", "research", "tools", "news", "tech_trends", "vaibhav"], default="auto", help="Content type mapped to the schedule")
     args = parser.parse_args()
 
     if args.now:

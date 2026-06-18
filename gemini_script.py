@@ -60,6 +60,37 @@ Never use unrelated visuals (like generic stock footage or random unrelated robo
 Quality & Mobile Standards:
 Every visual must be high-contrast, readable in 1 second on mobile screens, and educational (passing the Muted Viewer Test: a viewer must understand the key idea even if audio is muted)."""
 
+VAIBHAV_SYSTEM_PERSONA = """Role: You are an expert scriptwriter for highly engaging, tech-focused YouTube Shorts.
+You write punchy, high-retention scripts in the style of Vaibhav Sisinty — direct, slightly alarming hooks, practical payoff, conversational tone. No fluff. No filler. Every word earns its place.
+Target Audience: Indian professionals, creators, and founders aged 22–40 who want to stay ahead.
+Tone: Conversational, urgent, slightly alarming hook, direct "you" language. Speak like a smart friend over coffee.
+
+STRICT RULES:
+- Open with the hook line from the JSON — do not soften it.
+- No intro like "Hey guys", "What's up", or channel name mentions.
+- Use "you" language — speak directly to the viewer.
+- Keep sentences short. Max 10 words per sentence.
+- One idea per sentence. No compound sentences.
+- Use a pause beat ("...") max twice for dramatic effect.
+- End with a soft CTA — follow for more, comment your answer, or save this.
+- Do NOT use emojis in the script text.
+- Do NOT say "In this video" or "Today we're going to".
+- Output must be plain spoken text only — no stage directions, no scene labels.
+- SCRIPT LENGTH: Target a 55-second YouTube Short (approx 130-145 words spoken at natural pace).
+
+Visual Director Persona & Visual Selection Logic:
+You are also an expert Visual Director. For each narration segment in the `subtitle_chunks` array, you generate highly engaging, visually rich, and contextually accurate visual prompts at the semantic level (not keyword level).
+Choose the most suitable visual format:
+1. Video (Google Veo) when explaining scenarios, workflows, future tech, AI agents, robots, data centers, software dev workflows.
+2. AI Image (Gemini) when showing concepts, comparisons, timelines, hardware components.
+3. Whiteboard when explaining algorithms, system design, networking, databases, programming concepts, data flow.
+4. Infographic when showing stats, benchmarks, lists, performance metrics.
+5. Diagram when showing system architecture or database replication.
+6. Animated UI Mockup when demonstrating app/settings navigation.
+
+Quality & Mobile Standards:
+Every visual must be high-contrast, readable in 1 second on mobile screens, and educational (passing the Muted Viewer Test: a viewer must understand the key idea even if audio is muted)."""
+
 RESEARCH_AGENT_TEMPLATE = """{persona}
 
 RESEARCH AGENT TASK:
@@ -687,7 +718,65 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "comment_hook": "Provocative question to drive engagement (e.g. 'Which department at your job is leaking the most data?')"
 }}"""
     else:
-        if topic_type == "tech_trends":
+        if topic_type == "vaibhav":
+            selection_instruction = (
+                f"Analyze the following {content_desc} and pick the SINGLE most breakout AI/tech story that matches the Vaibhav Sisinty content pillars:\n"
+                f"PRIMARY CATEGORY: {category}\n"
+                "CONTENT PILLARS:\n"
+                "1. AI Tool Spotlight — newly launched/underrated AI tools with specific use cases.\n"
+                "2. Prompt Hack — specific copy-paste prompts that solve real tasks.\n"
+                "3. AI Workflow Reveal — automating or speeding up common work tasks using AI.\n"
+                "4. Career/Job Impact — how AI is reshaping specific jobs or skills.\n"
+                "5. AI Business Idea — simple businesses someone can start today using AI tools.\n\n"
+                "SELECTION FILTERS:\n"
+                "1. MUST appeal to Indian professionals, creators, and founders (22-40yo).\n"
+                "2. MUST solve a real pain point: saving time, staying relevant, earning more, outpacing competition.\n"
+                "3. AVOID pure tech jargon, deep research papers, or developer tools with no consumer/creator angle.\n"
+                "4. CHOOSE a story that enables a slightly alarming hook (creates urgency or curiosity)."
+            )
+            prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
+{{
+  "title_options": ["Title Case + Emoji + Curiosity Gap 1", "Title Case + Emoji + Curiosity Gap 2"],
+  "description": "Full 100+ word rich SEO description for youtube describing the video, including relevant hashtags and the source URL.",
+  "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
+  "title": "Punchy YouTube title max 60 chars — must appeal to professionals and creators",
+  "hook_script": "The Hook (0-5s): Direct, slightly alarming opening hook. 10-15 words.",
+  "problem_context": "The Problem (5-12s): What most people are doing wrong or missing. 15-20 words.",
+  "solution_tech": "The Solution (12-35s): The specific tool, prompt, or workflow in action. 50-60 words.",
+  "retention_loop": "The Proof/Result (35-50s): Concrete outcome: time saved, task automated. 30-40 words.",
+  "outro_cta": "The Outro/CTA (50-55s): Soft CTA (follow for more, save this). 10-15 words.",
+  "script": "The FULL voiceover script. Target 130-145 words total (approx 55 seconds). The last sentence MUST flow back into the first for looping.",
+  "hook_text": "The exact first 5-8 words of the script.",
+  "relevant_links": ["https://example.com"],
+  "phonetic_pronunciation_map": {{}},
+  "hook": "Matches the first sentence of the script",
+  "summary": "One line summary",
+  "sub_category": "{category}",
+  "breaking_news_level": 9,
+  "retention_cues": [{{ "timestamp": 2.0, "effect": "zoom_in", "reason": "hook_impact" }}],
+  "subtitle_chunks": [{{
+      "chunk_id": 1,
+      "text": "Sentence 1",
+      "start": 0.00,
+      "end": 2.50,
+      "scene_objective": "What technical concept must be understood here",
+      "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup",
+      "nano_visual_prompt": "A clean, specific visual for THIS sentence. Vertical 9:16. Photorealistic, 8K. NO text overlays.",
+      "on_screen_elements": ["labels/arrows/highlights/icons/charts/code"],
+      "camera_motion": "Slow zoom|Dolly-in|Orbit|Pan|Tracking shot|None",
+      "transition": "Match cut|Zoom transition|Morph|Swipe|Data stream transition|Neural network transition"
+  }}],
+  "original_news_headline": "Exact headline",
+  "original_news_url": "Direct article URL",
+  "keywords": ["AI Hacks", "Tech Tips", "Productivity"],
+  "hashtags": ["#AIHacks", "#TechTips", "#Productivity", "#VaibhavSisinty"],
+  "companies_mentioned": ["list of company names mentioned in the script"],
+  "companies": [{{"name": "Company Name", "domain": "domain.com", "description": "2-4 word description of the company"}}],
+  "people": [{{"name": "Person Name", "wikipedia_slug": "Wikipedia_Slug", "description": "2-4 word description of the person's role"}}],
+  "key_entities": [{{"name": "Entity Name", "type": "COMPANY|PEOPLE|TOOL|OTHER", "description": "2-4 word description of the entity"}}],
+  "comment_hook": "A provocative question: 'What do you think? Drop your comment below! 👇'"
+}}"""
+        elif topic_type == "tech_trends":
             selection_instruction = (
                 f"Analyze the following {content_desc} and pick the SINGLE most breakout, high-velocity tech topic or viral video.\n"
                 f"PRIMARY CATEGORY: {category}\n"
@@ -905,7 +994,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
     if extra_instruction:
         news_context += f"\n\nADDITIONAL INSTRUCTIONS:\n{extra_instruction}\n"
 
-    engine = MultiAgentGenerationEngine(client, news_context, slot, category, strategy_enhancement, is_longform, raw_articles=articles)
+    engine = MultiAgentGenerationEngine(client, news_context, slot, category, strategy_enhancement, is_longform, raw_articles=articles, topic_type=topic_type)
     script_data = engine.execute(selection_instruction, prompt_requirements)
     
     if script_data:
@@ -1097,7 +1186,7 @@ def call_fallback_model(prompt):
     return None
 
 class MultiAgentGenerationEngine:
-    def __init__(self, client, context, slot, category, strategy_enhancement, is_longform, raw_articles=None):
+    def __init__(self, client, context, slot, category, strategy_enhancement, is_longform, raw_articles=None, topic_type=None):
         self.client = client
         self.context = context
         self.slot = slot
@@ -1105,6 +1194,10 @@ class MultiAgentGenerationEngine:
         self.strategy_enhancement = strategy_enhancement
         self.is_longform = is_longform
         self.raw_articles = raw_articles
+        if topic_type == "vaibhav":
+            self.persona = VAIBHAV_SYSTEM_PERSONA
+        else:
+            self.persona = SYSTEM_PERSONA
 
     def _call_gemini(self, prompt, model=GEMINI_FLASH_MODEL):
         import os
@@ -1174,7 +1267,7 @@ class MultiAgentGenerationEngine:
     def execute(self, selection_instruction, prompt_requirements):
         print("🎯 [AGENT 0] Selector Agent: Picking the single best story...")
         selector_prompt = SELECTOR_AGENT_TEMPLATE.format(
-            persona=SYSTEM_PERSONA,
+            persona=self.persona,
             selection_instruction=selection_instruction,
             news_context=self.context
         )
@@ -1222,7 +1315,7 @@ class MultiAgentGenerationEngine:
             # to prevent 'Hallucination Leakage' from other stories in the search result.
             print("🔬 [AGENT 0.5] Context Sharpener: Isolating target story facts...")
             sharpener_prompt = FACT_EXTRACTOR_TEMPLATE.format(
-                persona=SYSTEM_PERSONA,
+                persona=self.persona,
                 target_headline=selected_headline,
                 context=isolated_context # Pass the messy context to be sharpened
             )
@@ -1249,7 +1342,7 @@ class MultiAgentGenerationEngine:
 
         print("🕵️ [AGENT 1] Research Agent: Extracting narrative elements...")
         research_prompt = RESEARCH_AGENT_TEMPLATE.format(
-            persona=SYSTEM_PERSONA,
+            persona=self.persona,
             news_context=selected_context
         )
         research = self._call_gemini(research_prompt)
@@ -1258,7 +1351,7 @@ class MultiAgentGenerationEngine:
 
         print("🪝 [AGENT 2] Hook Agent: Generating high-retention hooks...")
         hook_prompt = HOOK_AGENT_TEMPLATE.format(
-            persona=SYSTEM_PERSONA,
+            persona=self.persona,
             research_json=json.dumps(research)
         )
         hooks_data = self._call_gemini(hook_prompt)
@@ -1277,7 +1370,7 @@ class MultiAgentGenerationEngine:
 
         print("📝 [AGENT 3] Fact Script Generator: Writing the unified retention-optimized script...")
         narrative_prompt = NARRATIVE_AGENT_TEMPLATE.format(
-            persona=SYSTEM_PERSONA,
+            persona=self.persona,
             research_json=json.dumps(research),
             selected_hook=hook_text,
             selection_instruction=selection_instruction
@@ -1288,7 +1381,7 @@ class MultiAgentGenerationEngine:
 
         print("⚡ [AGENT 4] Retention Optimizer: Maximizing pacing and curiosity density...")
         retention_prompt = RETENTION_OPTIMIZER_TEMPLATE.format(
-            persona=SYSTEM_PERSONA,
+            persona=self.persona,
             narrative_json=json.dumps(narrative)
         )
         optimized = self._call_gemini(retention_prompt, model=GEMINI_PRO_MODEL)
@@ -1298,7 +1391,7 @@ class MultiAgentGenerationEngine:
         # ── PHASE 2: RETENTION SCIENTIST (Agent 4.5) ──────────────────────────
         print("🧬 [AGENT 4.5] Retention Scientist: Injecting proven retention patterns...")
         retention_sci_prompt = RETENTION_SCIENTIST_TEMPLATE.format(
-            persona=SYSTEM_PERSONA,
+            persona=self.persona,
             optimized_script=optimized.get("optimized_script", "")
         )
         retention_result = self._call_gemini(retention_sci_prompt, model=GEMINI_PRO_MODEL)
@@ -1324,7 +1417,7 @@ class MultiAgentGenerationEngine:
             refined_requirements = refined_requirements.replace('"original_news_url": "Direct article URL"', f'"original_news_url": "{selected_url}"')
 
         humanizer_prompt = HUMANIZER_AGENT_TEMPLATE.format(
-            persona=SYSTEM_PERSONA,
+            persona=self.persona,
             optimized_script=optimized.get("optimized_script", ""),
             schema_requirements=refined_requirements
         )
