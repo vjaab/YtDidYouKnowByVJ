@@ -2581,7 +2581,7 @@ def render_dynamic_entity_tags(entities, accent_color, t, frame_width=1080, fram
     scale = frame_width / 1080.0
     
     # Scale parameters
-    box_h = int(96 * scale)
+    box_h = int(250 * scale)
     spacing = int(16 * scale)
     start_y = int(293 * scale)
     start_x = int(40 * scale)
@@ -2591,15 +2591,22 @@ def render_dynamic_entity_tags(entities, accent_color, t, frame_width=1080, fram
     
     # Fonts
     try:
-        f_name = ImageFont.truetype('assets/fonts/Montserrat-Bold.ttf', font_size_name)
-        f_desc = ImageFont.truetype('assets/fonts/Montserrat-Medium.ttf', font_size_desc)
-    except:
+        f_name = ImageFont.truetype('assets/fonts/Roboto-Regular.ttf', font_size_name)
+    except Exception as e:
+        print(f"Error loading name font: {e}")
         f_name = ImageFont.load_default()
+        
+    try:
+        f_desc = ImageFont.truetype('assets/fonts/Roboto-Regular.ttf', font_size_desc)
+    except Exception as e:
+        print(f"Error loading desc font: {e}")
         f_desc = ImageFont.load_default()
     
     for i, ent in enumerate(entities[:4]): # Max 4 entities
         opacity = 0.0
-        intervals = ent.get("active_intervals", [])
+        # Show each label one by one for 5 seconds
+        intervals = [[i * 5.0, (i + 1) * 5.0]]
+        
         for start, end in intervals:
             if start <= t <= end:
                 if t - start < 0.3:
@@ -2620,36 +2627,32 @@ def render_dynamic_entity_tags(entities, accent_color, t, frame_width=1080, fram
         # Calculate dynamic box width
         name_w = draw.textlength(val, font=f_name)
         desc_w = draw.textlength(desc, font=f_desc) if desc else 0
-        
-        # Make the entity box span from left side to right side till the end
-        box_w = frame_width - (start_x * 2)
+        max_text_w = max(name_w, desc_w)
         
         logo_w, logo_h = 0, 0
         if logo_img:
-            # Scale logo to fit nicely within height of 56
+            # Scale logo to fit nicely within height of 224
             aspect = logo_img.width / logo_img.height
-            logo_h = int(56 * scale)
+            logo_h = int(224 * scale)
             logo_w = int(logo_h * aspect)
-            box_w += logo_w + int(16 * scale)
             
-        curr_y = start_y + i * (box_h + spacing)
+        content_x_start = int(24 * scale)
+        padding_after_text = int(24 * scale)
+        logo_space = (logo_w + int(16 * scale)) if logo_img else 0
+        
+        # Bare minimum box width required
+        min_box_w = content_x_start + logo_space + max_text_w + padding_after_text
+        
+        # Max allowed box width spanning till the right side
+        max_box_w = frame_width - (start_x * 2)
+        
+        box_w = min(min_box_w, max_box_w)
+            
+        curr_y = start_y
         
         # Create a temp surface for the individual tag to apply opacity
         tag_img = Image.new('RGBA', (int(box_w + 10), int(box_h + 10)), (0,0,0,0))
         tag_draw = ImageDraw.Draw(tag_img)
-        
-        # High-visibility Rounded box (Light/White theme)
-        radius = int(16 * scale)
-        outline_w = max(1, int(2 * scale))
-        tag_draw.rounded_rectangle([2, 2, box_w + 2, box_h + 2], radius=radius, 
-                                   fill=(255, 255, 255, 255), 
-                                   outline=(240, 240, 240, 255), width=outline_w)
-        
-        # Accent vertical line on the left edge of the box
-        accent_w = int(6 * scale)
-        accent_pad_top = int(14 * scale)
-        accent_pad_bottom = int(10 * scale)
-        tag_draw.rectangle([2, accent_pad_top, 2 + accent_w, box_h - accent_pad_bottom], fill=accent_color)
         
         content_x = int(24 * scale)
         
@@ -2661,14 +2664,17 @@ def render_dynamic_entity_tags(entities, accent_color, t, frame_width=1080, fram
             tag_img.paste(scaled_logo, (logo_x, logo_y), scaled_logo)
             content_x += logo_w + int(16 * scale)
             
-        # Draw Text
+        # Draw Text (Floating without a box, so we add a stroke for contrast)
+        stroke_w = int(1 * scale)
+        stroke_c = (0, 0, 0, 200)
+        
         if desc:
-            name_y = box_h // 2 - int(4 * scale)
-            desc_y = box_h // 2 + int(22 * scale)
-            tag_draw.text((content_x, name_y), val, font=f_name, fill=(18, 18, 18, 255), anchor="lm")
-            tag_draw.text((content_x, desc_y), desc, font=f_desc, fill=(100, 100, 100, 255), anchor="lm")
+            name_y = box_h // 2 - int(15 * scale)
+            desc_y = box_h // 2 + int(25 * scale)
+            tag_draw.text((content_x, name_y), val, font=f_name, fill=(255, 255, 255, 255), stroke_width=stroke_w, stroke_fill=stroke_c, anchor="lm")
+            tag_draw.text((content_x, desc_y), desc, font=f_desc, fill=(220, 220, 220, 255), stroke_width=stroke_w, stroke_fill=stroke_c, anchor="lm")
         else:
-            tag_draw.text((content_x, box_h // 2), val, font=f_name, fill=(18, 18, 18, 255), anchor="lm")
+            tag_draw.text((content_x, box_h // 2), val, font=f_name, fill=(255, 255, 255, 255), stroke_width=stroke_w, stroke_fill=stroke_c, anchor="lm")
             
         # Apply opacity to the tag image
         if opacity < 1.0:
