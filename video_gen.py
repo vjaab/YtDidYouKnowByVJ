@@ -2573,7 +2573,7 @@ def render_entity_tags(entities, accent_color, frame_width=1080, on_right=False)
         
     return img
 
-def render_dynamic_entity_tags(entities, accent_color, t, frame_width=1080, frame_height=1920):
+def render_dynamic_entity_tags(entities, accent_color, t, audio_duration, frame_width=1080, frame_height=1920):
     """Renders small floating tags for various entities dynamically with fade effects."""
     img = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
     draw = ImageDraw.Draw(img)
@@ -2602,20 +2602,28 @@ def render_dynamic_entity_tags(entities, accent_color, t, frame_width=1080, fram
         print(f"Error loading desc font: {e}")
         f_desc = ImageFont.load_default()
     
-    for i, ent in enumerate(entities[:4]): # Max 4 entities
-        opacity = 0.0
-        # Show each label one by one for 5 seconds
-        intervals = [[i * 5.0, (i + 1) * 5.0]]
+    num_entities = len(entities)
+    if num_entities == 0:
+        return img
         
-        for start, end in intervals:
-            if start <= t <= end:
-                if t - start < 0.3:
-                    opacity = (t - start) / 0.3
-                elif end - t < 0.5:
-                    opacity = (end - t) / 0.5
-                else:
-                    opacity = 1.0
-                break
+    duration_per_entity = audio_duration / num_entities
+    
+    for i, ent in enumerate(entities):
+        opacity = 0.0
+        # Show each label one by one in sequence based on duration_per_entity
+        start = i * duration_per_entity
+        end = (i + 1) * duration_per_entity
+        
+        if start <= t <= end:
+            fade_in = min(0.3, duration_per_entity * 0.1)
+            fade_out = min(0.5, duration_per_entity * 0.1)
+            
+            if t - start < fade_in:
+                opacity = (t - start) / fade_in
+            elif end - t < fade_out:
+                opacity = (end - t) / fade_out
+            else:
+                opacity = 1.0
                 
         if opacity <= 0.0:
             continue
@@ -5036,7 +5044,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
         entity_tags_img = None
         if not is_longform and entities_list:
-            entity_tags_img = render_dynamic_entity_tags(entities_list, accent_color, t, FRAME_W, FRAME_H)
+            entity_tags_img = render_dynamic_entity_tags(entities_list, accent_color, t, audio_duration, FRAME_W, FRAME_H)
 
         return composite_frame(bg_frame, t, header_img, subtitle_img, transparency_img, entity_tags_img)
 

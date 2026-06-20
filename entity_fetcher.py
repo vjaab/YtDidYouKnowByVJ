@@ -43,7 +43,7 @@ def fetch_person_photo(person):
             if "thumbnail" in data and "source" in data["thumbnail"]:
                 img_url = data["thumbnail"]["source"]
                 # Try to get larger image if possible by removing size limit from URL
-                img_url = img_url.replace(data["thumbnail"]["width"], "400") # rough hack
+                img_url = img_url.replace(str(data["thumbnail"]["width"]), "400") # rough hack
                 path = _save_image_from_url(img_url, output_path)
                 if path:
                     print(f"  -> Found Wikipedia photo for {name}")
@@ -115,6 +115,35 @@ def fetch_all_entities(script_data):
     Downloads all person photos and company logos.
     Updates the script_data object with local paths in place.
     """
+    # ── GATHER ALL POTENTIAL ENTITIES ─────────────────────────────────────────
+    # If there are companies_mentioned or tools_mentioned that are not in key_entities/companies/people,
+    # add them to key_entities to ensure their logos are fetched and they are rendered.
+    companies_mentioned = script_data.get("companies_mentioned", [])
+    tools_mentioned = script_data.get("tools_mentioned", [])
+    
+    key_entities = script_data.get("key_entities", [])
+    if not isinstance(key_entities, list):
+        key_entities = []
+        script_data["key_entities"] = key_entities
+
+    existing_names = {ent.get("name", "").lower() for ent in key_entities if isinstance(ent, dict)}
+    for p in script_data.get("people", []):
+        if isinstance(p, dict):
+            existing_names.add(p.get("name", "").lower())
+    for c in script_data.get("companies", []):
+        if isinstance(c, dict):
+            existing_names.add(c.get("name", "").lower())
+
+    for c in companies_mentioned:
+        if c and isinstance(c, str) and c.lower() not in existing_names:
+            key_entities.append({"name": c, "type": "COMPANY"})
+            existing_names.add(c.lower())
+
+    for t in tools_mentioned:
+        if t and isinstance(t, str) and t.lower() not in existing_names:
+            key_entities.append({"name": t, "type": "TOOL"})
+            existing_names.add(t.lower())
+
     for person in script_data.get("people", []):
         path = fetch_person_photo(person)
         if path:
