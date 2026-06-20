@@ -1,0 +1,6 @@
+I, VJ, owner of the YouTube channel "YtDidYouKnowByVJ", hereby explicitly consent to and authorize the use of my voice for cloning via F5-TTS (trained/referenced from the audio file 'vj.wav' in this repository) to generate all voiceovers, speech, and audio content uploaded to this channel and associated platforms.
+
+This document serves as the self-consent record required under YouTube's monetization and synthetic media policies.
+
+Signed: VJ
+Date: June 21, 2026

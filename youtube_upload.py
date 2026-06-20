@@ -114,12 +114,10 @@ def upload_video(video_path, title, description, tags, thumbnail_path=None, cate
     if not youtube:
         return False, "Failed to authenticate with YouTube API"
 
-    # Target high-RPM native English regions
-    target_regions = ["USA", "United States", "UK", "United Kingdom", "Australia", "Canada", "New Zealand", "English"]
     if not isinstance(tags, list):
         tags = []
     unique_tags = []
-    for t in (tags + target_regions):
+    for t in tags:
         cleaned_t = str(t).strip()
         if cleaned_t and cleaned_t not in unique_tags:
             unique_tags.append(cleaned_t)
