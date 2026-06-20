@@ -41,7 +41,13 @@ def log_message(msg):
 
 
 def format_description(ai_description, script, hashtags, slot="Slot A", chunks=None, relevant_links=[], source_url=""):
-    hashtag_str = " ".join(hashtags) if hashtags else ""
+    # Target high-RPM native English regions
+    target_hashtags = ["#TechUSA", "#TechUK", "#TechCanada", "#TechAustralia", "#TechNZ", "#English"]
+    all_hashtags = list(hashtags) if hashtags else []
+    for tag in target_hashtags:
+        if tag not in all_hashtags:
+            all_hashtags.append(tag)
+    hashtag_str = " ".join(all_hashtags)
     
     # ── Action-Oriented Summary ──
     clean_summary = ai_description.split(". ")[0] + "."

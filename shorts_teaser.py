@@ -215,7 +215,7 @@ def generate_and_upload_shorts_teaser(script_json, longform_video_id, dry_run=Fa
             f"This is just 1 of {len(fact_timestamps)} insane AI facts. \n"
             f"Watch the FULL video here: https://youtu.be/{longform_video_id}\n\n"
             f"Daily cutting-edge tech intelligence by VJ.\n\n"
-            f"#Shorts #TechNews #ArtificialIntelligence #VJTech"
+            f"#Shorts #TechNews #ArtificialIntelligence #VJTech #TechUSA #TechUK #TechCanada #TechAustralia #TechNZ #English"
         )
         
         tags = ["Shorts", "AIFacts", "TechNews", "VJTech", "AI", "Explainer"]

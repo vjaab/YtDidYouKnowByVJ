@@ -62,7 +62,13 @@ def format_longform_description(script_data, hashtags):
     topics = script_data.get("longform_topics", [])
     description_ai = script_data.get("description", "")
     
-    hashtag_str = " ".join(hashtags) if hashtags else ""
+    # Target high-RPM native English regions
+    target_hashtags = ["#TechUSA", "#TechUK", "#TechCanada", "#TechAustralia", "#TechNZ", "#English"]
+    all_hashtags = list(hashtags) if hashtags else []
+    for tag in target_hashtags:
+        if tag not in all_hashtags:
+            all_hashtags.append(tag)
+    hashtag_str = " ".join(all_hashtags)
     
     # Build timestamps section
     timestamps_str = "📌 TIMESTAMPS:\n"

@@ -114,14 +114,24 @@ def upload_video(video_path, title, description, tags, thumbnail_path=None, cate
     if not youtube:
         return False, "Failed to authenticate with YouTube API"
 
+    # Target high-RPM native English regions
+    target_regions = ["USA", "United States", "UK", "United Kingdom", "Australia", "Canada", "New Zealand", "English"]
+    if not isinstance(tags, list):
+        tags = []
+    unique_tags = []
+    for t in (tags + target_regions):
+        cleaned_t = str(t).strip()
+        if cleaned_t and cleaned_t not in unique_tags:
+            unique_tags.append(cleaned_t)
+
     body = {
         "snippet": {
             "title":                title[:100],
             "description":          description[:5000],
-            "tags":                 tags[:15],
+            "tags":                 unique_tags[:30],
             "categoryId":           category_id,
-            "defaultLanguage":      "en",
-            "defaultAudioLanguage": "en",
+            "defaultLanguage":      "en-US",
+            "defaultAudioLanguage": "en-US",
         },
         "status": {
             "privacyStatus":          "public",
