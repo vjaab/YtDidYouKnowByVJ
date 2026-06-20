@@ -14,13 +14,13 @@ def get_slot_info():
         
     # Daily category rotation — High Views & Subscribers Strategy
     daily_categories = {
-        "Mon": "AI & Tech Tools",          # Massive trend, AI demos
-        "Tue": "Facts & Trivia",           # Binge-worthy, Did you know
-        "Wed": "Money & Side Hustles",     # High CPC, quick income ideas
-        "Thu": "Motivation & Self-Help",   # High engagement, viral potential
-        "Fri": "Life Hacks",               # Clever tips, productivity
-        "Sat": "Agentic AI Facts",         # AI expertise, niche but high CPC
-        "Sun": "Coding Hacks"              # AI expertise, Python/AI shortcuts
+        "Mon": "AI & Tech Tools",             # Massive trend, AI demos
+        "Tue": "Tech Gadgets & Inventions",   # Consumer tech gadgets, smart devices, new hardware
+        "Wed": "Finance & Tech Economy",      # High-CPC personal finance, Fintech, crypto, market trends
+        "Thu": "Facts & Trivia",              # Binge-worthy, Did you know
+        "Fri": "Life Hacks & Productivity",   # Clever tips, device optimization
+        "Sat": "Agentic AI Facts",            # AI expertise, niche but high CPC
+        "Sun": "Coding & Development Hacks"   # Python/AI shortcuts, developer tools
     }
     
     category = daily_categories.get(day_name, "AI & Tech Tools")
@@ -80,32 +80,32 @@ def get_category_prompt_enhancement(category, slot):
             EMOTIONAL TRIGGER: "Wait, really?!" + curiosity + shareability.
             CONTENT FORMAT: Bold claim/hook → fascinating story/proof → mind-blown payoff.
         """,
-        "Money & Side Hustles": f"""
-            CATEGORY: Money & Side Hustles (Everyone wants quick income, High CPC).
+        "Tech Gadgets & Inventions": f"""
+            CATEGORY: Tech Gadgets & Inventions (High mass-market curiosity).
             STRATEGY: {base_discovery}
-            AUDIENCE: People looking for passive income, side hustles, or financial growth using tech/AI.
-            GOAL: Provide actionable, realistic ways to make money online using AI or tech tools.
-            HOOK STYLE: '3 AI side hustles to make $100 a day.' or 'How to make passive income using ChatGPT in 2026.'
-            EMOTIONAL TRIGGER: Financial freedom + greed/ambition + "I can do that easily".
-            CONTENT FORMAT: Hook → Step-by-step breakdown of the hustle → Proof/potential earnings → CTA.
+            AUDIENCE: Tech consumers, gadget lovers, early adopters, anyone wanting smart lifestyle upgrades.
+            GOAL: Showcase a revolutionary new gadget, consumer tech hardware release, smart device leak, or physical tech invention.
+            HOOK STYLE: 'This tiny gadget makes your home completely offline.' or 'Apple is secretly planning this new device...'
+            EMOTIONAL TRIGGER: Futuristic awe + "I want to buy this" + curiosity gap.
+            CONTENT FORMAT: Hook → Describe the gadget's unique feature/mechanism → How it improves daily life → Engagement/subscription CTA.
         """,
-        "Motivation & Self-Help": f"""
-            CATEGORY: Motivation & Self-Help (High engagement, viral potential).
+        "Finance & Tech Economy": f"""
+            CATEGORY: Finance & Tech Economy (High-CPC personal finance, Fintech, tech economy trends).
             STRATEGY: {base_discovery}
-            AUDIENCE: Ambitious individuals, tech entrepreneurs, students, anyone needing inspiration.
-            GOAL: Share a powerful success story, mindset tip, or motivational quote related to tech, AI, or startups.
-            HOOK STYLE: 'How a 19-year-old built a $1M AI startup in his bedroom.' or 'The ONE habit that made Steve Jobs successful.'
-            EMOTIONAL TRIGGER: Inspiration + aspiration + "I need to get to work".
-            CONTENT FORMAT: Hook → Story of struggle/success → The core lesson/mindset shift → Motivational CTA.
+            AUDIENCE: Retail investors, tech professionals, anyone seeking financial growth, wealth protection, and understanding tech markets.
+            GOAL: Provide tech-driven personal finance tips, fintech tools, tech market breakdowns, crypto/market updates, or AI wealth hacks.
+            HOOK STYLE: 'How to use AI to track your monthly budget automatically.' or 'The fintech tool banks don't want you to know about.'
+            EMOTIONAL TRIGGER: Wealth maximization + immediate monetary utility + financial curiosity.
+            CONTENT FORMAT: Hook → Specific fintech/investment tip or tool breakdown → Clear step-by-step application → Low-friction engagement CTA.
         """,
-        "Life Hacks": f"""
-            CATEGORY: Life Hacks (Continued viewer interest, productivity).
+        "Life Hacks & Productivity": f"""
+            CATEGORY: Life Hacks & Productivity (Universal appeal for efficiency).
             STRATEGY: {base_discovery}
-            AUDIENCE: EVERYONE. Universal appeal for making daily life easier.
-            GOAL: Share a clever tech tip, productivity hack, or DIY solution that saves time and effort.
-            HOOK STYLE: 'This 10-second tech hack will save you 5 hours a week.' or 'The ultimate productivity trick for your laptop.'
+            AUDIENCE: EVERYONE. Universal appeal for device optimization and time-saving workflows.
+            GOAL: Share a clever phone/computer tip, productivity system, or workflow hack that saves hours.
+            HOOK STYLE: 'Turn this setting off immediately to double your battery life.' or 'This 30-second workflow hack saves 5 hours of work.'
             EMOTIONAL TRIGGER: Immediate utility + FOMO.
-            CONTENT FORMAT: Fast, punchy, result-first. Show the hack in action immediately.
+            CONTENT FORMAT: Fast-paced, result-first. Show the settings/trick step-by-step immediately.
         """,
         "Agentic AI Facts": f"""
             CATEGORY: Agentic AI Facts (Niche but High CPC, AI/ML Background).
@@ -116,14 +116,14 @@ def get_category_prompt_enhancement(category, slot):
             EMOTIONAL TRIGGER: Future-shock + "I'm learning from an expert" + awe.
             CONTENT FORMAT: Hook → Simple everyday analogy for the AI concept → Real-world implication → CTA.
         """,
-        "Coding Hacks": f"""
-            CATEGORY: Coding Hacks (Niche but High CPC, AI/ML Background).
-            STRATEGY: Leverage your Senior AI Engineer expertise. Provide extreme value quickly.
-            AUDIENCE: Developers, CS students, tech workers, and people learning to code.
-            GOAL: Share a Python trick, AI coding shortcut, or workflow improvement.
-            HOOK STYLE: 'This Python trick will save you 100 lines of code.' or 'How to use AI to write your backend in 40 seconds.'
-            EMOTIONAL TRIGGER: "I've been doing it the hard way!" + immediate utility.
-            CONTENT FORMAT: Problem setup → Show the long way vs the Hack/AI way → Payoff/Result.
+        "Coding & Development Hacks": f"""
+            CATEGORY: Coding & Development Hacks (Leverages engineering background, high CPC).
+            STRATEGY: Leverage your Senior AI Engineer expertise. Provide extreme programming value.
+            AUDIENCE: Software engineers, developers, computer science students, and tech creators.
+            GOAL: Share an advanced coding shortcut, Python optimization trick, or AI developer tool workflow.
+            HOOK STYLE: 'Stop writing boilerplate code. Use this Python decorator trick instead.' or 'The open-source library that replaces 80% of your backend.'
+            EMOTIONAL TRIGGER: "I've been doing it the hard way!" + engineering authority.
+            CONTENT FORMAT: Problem setup → The traditional way vs the optimized/AI Hack way → Payoff/performance benchmark.
         """
     }
     

@@ -51,7 +51,7 @@ Structure: 10 mind-blowing AI facts, each lasting 35-50 seconds, stitched with s
 
 Tone: Authoritative yet conversational. Like a tech-savvy friend who just discovered something INSANE and can't wait to tell you. Think Mark Rober meets Fireship — clear, punchy, and impossible to look away from.
 
-Target Audience: Tech enthusiasts, AI curious professionals, and engineers from USA, UK, Australia, Canada, and New Zealand. Use standard English, USD ($), and universally understood analogies.
+Target Audience: Tech enthusiasts, AI curious professionals, and engineers from USA, UK, Canada, Australia, New Zealand, Singapore, South Korea, and European countries. Use standard English, USD ($), and universally understood analogies.
 
 ═══════════════════════════════════════════════════
 GOLDEN RULES (NON-NEGOTIABLE):
