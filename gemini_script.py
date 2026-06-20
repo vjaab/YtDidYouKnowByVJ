@@ -327,9 +327,19 @@ Return ONLY a JSON object:
         print(f"⚠️ Viability check failed, assuming True: {e}")
         return {"overall_viable": True, "enemy_hero_hook_framing": None, "reason": "Fallback due to API error"}
 
-def get_hottest_tech_topic(client, avoid_list=""):
-    """Uses Gemini Search grounding to find today's most VIRAL tech tip, hidden feature, or tech fact."""
-    print("🔥 Fetching hottest tech topic for today (Google Trends Analysis)...")
+COUNTRY_NAMES = {
+    "US": "USA (United States)",
+    "GB": "UK (United Kingdom)",
+    "AU": "Australia",
+    "CA": "Canada",
+    "NZ": "New Zealand",
+    "IN": "India"
+}
+
+def get_hottest_tech_topic(client, target_country="US", avoid_list=""):
+    """Uses Gemini Search grounding to find today's most VIRAL tech tip, hidden feature, or tech fact for the target country."""
+    country_name = COUNTRY_NAMES.get(target_country, "USA")
+    print(f"🔥 Fetching hottest tech topic for today in {country_name} (Google Trends Analysis)...")
     
     avoid_prompt = f"\n\nCRITICAL: DO NOT pick any topics related to the following recently covered stories:\n{avoid_list}" if avoid_list else ""
     
@@ -339,14 +349,14 @@ def get_hottest_tech_topic(client, avoid_list=""):
             response = client.models.generate_content(
                 model=GEMINI_FLASH_MODEL,
                 contents=(
-                    "Analyze today's Google Trends and viral tech content. "
-                    "What is the single most trending technology topic right now? "
+                    f"Analyze today's Google Trends and viral tech content in {country_name}. "
+                    f"What is the single most trending technology topic right now in {country_name}? "
                     "Look for: viral AI tools people are trying, fascinating tech facts, "
                     "money making side hustles, productivity life hacks, "
                     "AI coding shortcuts, agentic AI developments, or any tech hack going viral on social media. "
-                    "CRITICAL: The topic must appeal to ALL age groups from 18 to 70, and must appeal equally to women and girls. "
-                    "Focus on universal and gender-inclusive themes like saving time, making money, interesting facts, "
-                    "lifestyle and smart organization apps, budget-friendly AI tools, and productivity enhancement. "
+                    f"CRITICAL: The topic must appeal to high-RPM English-speaking audiences in {country_name} as well as other high-RPM regions (USA, UK, Canada, Australia, New Zealand) and India. "
+                    f"Focus on universal and gender-inclusive themes like saving time, making money, interesting facts, "
+                    f"lifestyle and smart organization apps, budget-friendly AI tools, and productivity enhancement in {country_name}. "
                     "Do NOT choose developer news, programming tutorials, API releases, model benchmarking scores, "
                     "or corporate tech-investor updates, nor heavily male-biased topics like PC hardware overclocking or gaming frame rate hacks. "
                     f"{avoid_prompt}\n\n"
@@ -364,7 +374,7 @@ def get_hottest_tech_topic(client, avoid_list=""):
                 raw = raw[raw.find("{"):raw.rfind("}")+1]
             
             data = json.loads(raw)
-            print(f"📈 Google Trends Hot Topic: {data['topic']}")
+            print(f"📈 Google Trends Hot Topic ({country_name}): {data['topic']}")
             return data
         except Exception as e:
             err_str = str(e).upper()
@@ -379,8 +389,8 @@ def get_hottest_tech_topic(client, avoid_list=""):
     
     print("⚠️ Google Trends exhausted after retries. Proceeding with RSS only.")
     return None
-
-def pick_and_generate_script(articles=None, extra_instruction="", forced_article=None, topic_type="research", failed_topics=[]):
+ 
+def pick_and_generate_script(articles=None, extra_instruction="", forced_article=None, topic_type="research", failed_topics=[], target_country="US"):
     client = genai.Client(api_key=GEMINI_API_KEY)
     
     day_name, slot, category = get_slot_info()
@@ -403,7 +413,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
 
     # ── STEP -1.5: FETCH HOTTEST TOPIC ──────────────────────────────────────────
     # Pass the avoid list to Google Trends fetcher
-    hot_topic = get_hottest_tech_topic(client, avoid_list=avoid_list_str)
+    hot_topic = get_hottest_tech_topic(client, target_country=target_country, avoid_list=avoid_list_str)
     hot_keywords = [kw.lower() for kw in hot_topic.get("keywords", [])] if hot_topic else []
     hot_topic_str = hot_topic.get("topic", "") if hot_topic else ""
 

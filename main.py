@@ -15,7 +15,7 @@ from datetime import datetime
 
 from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY, ENABLE_TRENDING_ENGINE
 from fetch_research_papers import fetch_tech_news, fetch_ai_tools
-from topic_tracker import record_story, update_youtube_url, get_next_topic_type_by_ratio
+from topic_tracker import record_story, update_youtube_url, get_next_topic_type_by_ratio, get_next_target_country
 from gemini_script import pick_and_generate_script
 from ecosystem_logic import get_slot_info, get_series_identity, get_next_slot
 from audio_gen import generate_voiceover, clean_tts_text
@@ -190,7 +190,8 @@ def generate_pinned_comment(script_data, next_series_slot):
 def run_pipeline(topic_type="auto"):
     if topic_type == "auto":
         topic_type = get_next_topic_type_by_ratio()
-    log_message(f"=== STARTING DAILY AI PIPIELINE ({topic_type.upper()}) ===")
+    target_country = get_next_target_country()
+    log_message(f"=== STARTING DAILY AI PIPIELINE ({topic_type.upper()}) | COUNTRY: {target_country} ===")
 
     # ── Clean output folder before starting ───────────────────────────────────
     if os.path.exists(OUTPUT_DIR):
@@ -229,9 +230,9 @@ def run_pipeline(topic_type="auto"):
         if ENABLE_TRENDING_ENGINE:
             try:
                 from trending_engine import fetch_all_trending_signals
-                trending_articles = fetch_all_trending_signals()
+                trending_articles = fetch_all_trending_signals(target_country=target_country)
                 rss_articles = trending_articles + rss_articles  # Trending FIRST for priority
-                log_message(f"🔥 Trending Engine injected {len(trending_articles)} high-signal articles.")
+                log_message(f"🔥 Trending Engine injected {len(trending_articles)} high-signal articles for geo={target_country}.")
             except Exception as ex:
                 log_message(f"⚠️ Trending Engine failed (non-fatal): {ex}")
             
@@ -271,7 +272,7 @@ def run_pipeline(topic_type="auto"):
         combined_instruction = extra_instruction + screenshot_avoid
         
         script_data = pick_and_generate_script(
-            articles=rss_articles, extra_instruction=combined_instruction, forced_article=None, topic_type=topic_type, failed_topics=failed_topics
+            articles=rss_articles, extra_instruction=combined_instruction, forced_article=None, topic_type=topic_type, failed_topics=failed_topics, target_country=target_country
         )
 
         if not script_data:
@@ -455,7 +456,7 @@ def run_pipeline(topic_type="auto"):
         title, script_data.get("original_news_headline"),
         subcat, companies, keywords, breaking_level,
         voice_used, "pending_upload", script_data.get("original_news_url"),
-        topic_type=topic_type
+        topic_type=topic_type, target_country=target_country
     )
 
     # ── STEP 5: Build Visual Chunks ───────────────────────────────────────────

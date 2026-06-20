@@ -106,7 +106,7 @@ def check_cooldowns(companies, subcategory, tracker_file=TRACKER_FILE):
         
     return True, "Cooldowns OK"
 
-def record_story(title, news_headline, subcategory, companies, keywords, breaking_news_level, voice_used, youtube_url, news_source_url, topic_type=None, tracker_file=TRACKER_FILE):
+def record_story(title, news_headline, subcategory, companies, keywords, breaking_news_level, voice_used, youtube_url, news_source_url, topic_type=None, target_country=None, tracker_file=TRACKER_FILE):
     tracker = load_tracker(tracker_file)
     today = datetime.now().strftime("%Y-%m-%d")
     
@@ -149,7 +149,8 @@ def record_story(title, news_headline, subcategory, companies, keywords, breakin
         "breaking_news_level": breaking_news_level,
         "voice_used": voice_used,
         "youtube_url": youtube_url,
-        "news_source_url": news_source_url
+        "news_source_url": news_source_url,
+        "target_country": target_country
     }
     if topic_type:
         history_entry["topic_type"] = topic_type
@@ -223,4 +224,36 @@ def get_next_topic_type_by_ratio(tracker_file=TRACKER_FILE):
     selected = max(deficits, key=deficits.get)
     print(f"📊 Ratio calculation: counts={counts}, deficits={deficits} -> Selected: {selected}")
     return selected
+
+
+def get_next_target_country(tracker_file=TRACKER_FILE):
+    """
+    Determines the next target country in the sequence:
+    US -> GB -> AU -> CA -> NZ -> IN
+    based on the last recorded story's target country.
+    """
+    tracker = load_tracker(tracker_file)
+    history = tracker.get("history", [])
+    
+    country_sequence = ["US", "GB", "AU", "CA", "NZ", "IN"]
+    
+    # Traverse history backwards to find the last target country
+    last_country = None
+    for entry in reversed(history):
+        if not isinstance(entry, dict):
+            continue
+        c = entry.get("target_country")
+        if c in country_sequence:
+            last_country = c
+            break
+            
+    if not last_country:
+        return "US"
+        
+    try:
+        idx = country_sequence.index(last_country)
+        next_idx = (idx + 1) % len(country_sequence)
+        return country_sequence[next_idx]
+    except ValueError:
+        return "US"
 

@@ -27,7 +27,7 @@ from config import (
 # ─────────────────────────────────────────────────────────────────────────────
 # 1. YOUTUBE TRENDING SHORTS ANALYSIS
 # ─────────────────────────────────────────────────────────────────────────────
-def fetch_youtube_trending_shorts():
+def fetch_youtube_trending_shorts(target_country="US"):
     """
     Uses YouTube Data API v3 to find recently uploaded AI Shorts
     with high view counts — topics proven to get views in Shorts format.
@@ -36,7 +36,7 @@ def fetch_youtube_trending_shorts():
         print("⚠️ YouTube Data API key missing. Skipping YouTube trending fetch.")
         return []
 
-    print("📺 Fetching trending AI Shorts from YouTube Data API...")
+    print(f"📺 Fetching trending AI Shorts from YouTube Data API for region={target_country}...")
     
     search_queries = [
         "tech tips hidden features",
@@ -71,7 +71,8 @@ def fetch_youtube_trending_shorts():
                 "publishedAfter": published_after,
                 "maxResults": 5,
                 "key": YOUTUBE_DATA_API_KEY,
-                "relevanceLanguage": "en"
+                "relevanceLanguage": "en",
+                "regionCode": target_country
             }
             
             r = requests.get(url, params=params, timeout=15)
@@ -432,13 +433,13 @@ def fetch_github_trending_ai():
 # ─────────────────────────────────────────────────────────────────────────────
 # 4. PROGRAMMATIC GOOGLE TRENDS TECH MINER (Stream A)
 # ─────────────────────────────────────────────────────────────────────────────
-def fetch_google_trending_tech():
+def fetch_google_trending_tech(target_country="US"):
     """
-    Fetches the active Google Trends RSS feed for the US region and filters
+    Fetches the active Google Trends RSS feed for the target region and filters
     terms against a whitelist of tech trigger words.
     """
-    print("📈 Fetching daily trends from Google Trends RSS...")
-    url = "https://trends.google.com/trending/rss?geo=US"
+    print(f"📈 Fetching daily trends from Google Trends RSS for geo={target_country}...")
+    url = f"https://trends.google.com/trending/rss?geo={target_country}"
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0'}
     
     whitelist = {'ai', 'open-source', 'github', 'ios', 'android', 'nvidia', 'code', 'tool', 'software', 'chatgpt', 'dev', 'leak', 'hack'}
@@ -476,8 +477,8 @@ def fetch_google_trending_tech():
                 tech_trends.append({
                     "title": f"Google Trend: {title}",
                     "description": f"Breakout Google search trend with traffic {traffic_str}. Context: {desc}",
-                    "source": {"name": "Google Trends (US)"},
-                    "url": f"https://trends.google.com/trends/explore?geo=US&q={urllib.parse.quote(title)}",
+                    "source": {"name": f"Google Trends ({target_country})"},
+                    "url": f"https://trends.google.com/trends/explore?geo={target_country}&q={urllib.parse.quote(title)}",
                     "urlToImage": "",
                     "publishedAt": datetime.now(timezone.utc).isoformat(),
                     "type": "google_trends",
@@ -487,7 +488,7 @@ def fetch_google_trending_tech():
                     }
                 })
         
-        print(f"✅ Google Trends: Found {len(tech_trends)} tech-related trending terms.")
+        print(f"✅ Google Trends ({target_country}): Found {len(tech_trends)} tech-related trending terms.")
     except Exception as e:
         print(f"⚠️ Google Trends RSS fetch failed: {e}")
         
@@ -497,7 +498,7 @@ def fetch_google_trending_tech():
 # ─────────────────────────────────────────────────────────────────────────────
 # 5. YOUTUBE OUTLIER HUNTER (Stream B)
 # ─────────────────────────────────────────────────────────────────────────────
-def fetch_youtube_outlier_trends(outlier_threshold=3.0):
+def fetch_youtube_outlier_trends(target_country="US", outlier_threshold=3.0):
     """
     YouTube Data API (The Outlier Hunter).
     Queries search.list endpoint daily using broad tech keywords,
@@ -507,7 +508,7 @@ def fetch_youtube_outlier_trends(outlier_threshold=3.0):
         print("⚠️ YouTube Data API key missing. Skipping YouTube Outlier Hunter.")
         return []
 
-    print("📺 Running YouTube Outlier Hunter...")
+    print(f"📺 Running YouTube Outlier Hunter for region={target_country}...")
     keywords = ["new AI tool", "developer update", "github open source", "coding hack"]
     published_after = (datetime.now(timezone.utc) - timedelta(hours=48)).strftime("%Y-%m-%dT%H:%M:%SZ")
     
@@ -523,11 +524,12 @@ def fetch_youtube_outlier_trends(outlier_threshold=3.0):
                 "publishedAfter": published_after,
                 "maxResults": 25,
                 "relevanceLanguage": "en",
-                "key": YOUTUBE_DATA_API_KEY
+                "key": YOUTUBE_DATA_API_KEY,
+                "regionCode": target_country
             }
             r = requests.get(url, params=params, timeout=15)
             if r.status_code != 200:
-                print(f"  ⚠️ YouTube Outlier search failed for '{kw}': {r.text[:200]}")
+                print(f"  ⚠️ YouTube Outlier search failed for '{kw}' (region={target_country}): {r.text[:200]}")
                 continue
                 
             data = r.json()
@@ -759,18 +761,18 @@ def compute_engagement_score(article):
     return min(100, score)
 
 
-def fetch_all_trending_signals():
+def fetch_all_trending_signals(target_country="US"):
     """
     Master aggregator: fetches from all trending sources and returns
     a unified, scored article list ready for the pipeline.
     """
-    print("\n🔥 === TRENDING ENGINE: Fetching Multi-Platform Signals === 🔥")
+    print(f"\n🔥 === TRENDING ENGINE: Fetching Multi-Platform Signals for region={target_country} === 🔥")
     
     all_articles = []
     
     # 1. YouTube Trending Shorts
     try:
-        yt_articles = fetch_youtube_trending_shorts()
+        yt_articles = fetch_youtube_trending_shorts(target_country)
         all_articles.extend(yt_articles)
     except Exception as e:
         print(f"⚠️ YouTube trending failed: {e}")
@@ -791,14 +793,14 @@ def fetch_all_trending_signals():
 
     # 4. Google Trends (Stream A)
     try:
-        gt_articles = fetch_google_trending_tech()
+        gt_articles = fetch_google_trending_tech(target_country)
         all_articles.extend(gt_articles)
     except Exception as e:
         print(f"⚠️ Google Trends fetch failed: {e}")
 
     # 5. YouTube Outlier Hunter (Stream B)
     try:
-        yo_articles = fetch_youtube_outlier_trends()
+        yo_articles = fetch_youtube_outlier_trends(target_country)
         all_articles.extend(yo_articles)
     except Exception as e:
         print(f"⚠️ YouTube Outlier Hunter fetch failed: {e}")
