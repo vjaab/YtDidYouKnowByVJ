@@ -266,10 +266,10 @@ def run_longform_pipeline(dry_run=False):
         if not intro_videos:
             intro_videos = ["assets/video/Firefly_video_final.mp4"]
         
-        headline = script_data.get("original_news_headline", "")
-        video_idx = int(hashlib.md5(headline.encode()).hexdigest(), 16) % len(intro_videos)
-        script_data["lipsync_face_path"] = intro_videos[video_idx]
-        log_message(f"Selected Lip-Sync Template: {intro_videos[video_idx]}")
+        from topic_tracker import get_next_avatar
+        selected_avatar = get_next_avatar(intro_videos, tracker_file=LONGFORM_TRACKER_FILE)
+        script_data["lipsync_face_path"] = selected_avatar
+        log_message(f"Selected Lip-Sync Template: {selected_avatar}")
 
         # ── Kaggle GPU Handover (Audio + Lip-Sync) ───────────────────────
         has_kaggle = os.path.exists(os.path.expanduser("~/.kaggle/kaggle.json"))
@@ -373,6 +373,7 @@ def run_longform_pipeline(dry_run=False):
         title, script_data.get("original_news_headline"),
         "AI Did You Know", companies_all, keywords, 7,
         "compilation", "pending_upload", script_data.get("original_news_url"),
+        avatar_used=script_data.get("lipsync_face_path"),
         tracker_file=LONGFORM_TRACKER_FILE
     )
 

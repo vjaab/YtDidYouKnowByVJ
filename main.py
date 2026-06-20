@@ -342,10 +342,9 @@ def run_pipeline(topic_type="auto"):
         if not intro_videos:
             intro_videos = ["assets/video/Firefly_video_final.mp4"]
             
-        headline = script_data.get("original_news_headline", "")
-        video_idx = int(hashlib.md5(headline.encode()).hexdigest(), 16) % len(intro_videos)
-        script_data["lipsync_face_path"] = intro_videos[video_idx]
-        log_message(f"Selected Lip-Sync Template: {intro_videos[video_idx]} (from {len(intro_videos)} options)")
+        selected_avatar = get_next_avatar(intro_videos)
+        script_data["lipsync_face_path"] = selected_avatar
+        log_message(f"Selected Lip-Sync Template: {selected_avatar} (from {len(intro_videos)} options)")
         
         has_kaggle = os.path.exists(os.path.expanduser("~/.kaggle/kaggle.json"))
         use_local_only = os.environ.get("USE_LOCAL_ONLY") == "true"
@@ -456,7 +455,8 @@ def run_pipeline(topic_type="auto"):
         title, script_data.get("original_news_headline"),
         subcat, companies, keywords, breaking_level,
         voice_used, "pending_upload", script_data.get("original_news_url"),
-        topic_type=topic_type, target_country=target_country
+        topic_type=topic_type, target_country=target_country,
+        avatar_used=script_data.get("lipsync_face_path")
     )
 
     # ── STEP 5: Build Visual Chunks ───────────────────────────────────────────

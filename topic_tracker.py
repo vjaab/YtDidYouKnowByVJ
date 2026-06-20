@@ -106,7 +106,7 @@ def check_cooldowns(companies, subcategory, tracker_file=TRACKER_FILE):
         
     return True, "Cooldowns OK"
 
-def record_story(title, news_headline, subcategory, companies, keywords, breaking_news_level, voice_used, youtube_url, news_source_url, topic_type=None, target_country=None, tracker_file=TRACKER_FILE):
+def record_story(title, news_headline, subcategory, companies, keywords, breaking_news_level, voice_used, youtube_url, news_source_url, topic_type=None, target_country=None, avatar_used=None, tracker_file=TRACKER_FILE):
     tracker = load_tracker(tracker_file)
     today = datetime.now().strftime("%Y-%m-%d")
     
@@ -150,7 +150,8 @@ def record_story(title, news_headline, subcategory, companies, keywords, breakin
         "voice_used": voice_used,
         "youtube_url": youtube_url,
         "news_source_url": news_source_url,
-        "target_country": target_country
+        "target_country": target_country,
+        "avatar_used": avatar_used
     }
     if topic_type:
         history_entry["topic_type"] = topic_type
@@ -256,4 +257,39 @@ def get_next_target_country(tracker_file=TRACKER_FILE):
         return country_sequence[next_idx]
     except ValueError:
         return "US"
+
+
+def get_next_avatar(intro_videos, tracker_file=TRACKER_FILE):
+    """
+    Selects the next avatar from the list of intro videos,
+    ensuring we rotate through all of them before repeating.
+    """
+    if not intro_videos:
+        return None
+        
+    tracker = load_tracker(tracker_file)
+    history = tracker.get("history", [])
+    
+    # Sort intro_videos to guarantee consistent indexing across runs
+    sorted_videos = sorted(intro_videos)
+    
+    # Find the last used avatar path in history
+    last_avatar = None
+    for entry in reversed(history):
+        if not isinstance(entry, dict):
+            continue
+        av = entry.get("avatar_used")
+        if av in sorted_videos:
+            last_avatar = av
+            break
+            
+    if not last_avatar:
+        return sorted_videos[0]
+        
+    try:
+        idx = sorted_videos.index(last_avatar)
+        next_idx = (idx + 1) % len(sorted_videos)
+        return sorted_videos[next_idx]
+    except ValueError:
+        return sorted_videos[0]
 
