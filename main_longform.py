@@ -62,8 +62,8 @@ def format_longform_description(script_data, hashtags):
     topics = script_data.get("longform_topics", [])
     description_ai = script_data.get("description", "")
     
-    # Target high-RPM regions (USA, UK, Canada, Australia, NZ, Singapore, South Korea, Europe)
-    target_hashtags = ["#TechUSA", "#TechUK", "#TechCanada", "#TechAustralia", "#TechNZ", "#TechSingapore", "#TechSouthKorea", "#TechEurope", "#English"]
+    # Target high-RPM regions (USA, UK, Canada, Australia, NZ, Singapore, South Korea, Japan, Europe)
+    target_hashtags = ["#TechUSA", "#TechUK", "#TechCanada", "#TechAustralia", "#TechNZ", "#TechSingapore", "#TechSouthKorea", "#TechJapan", "#TechEurope", "#English"]
     all_hashtags = list(hashtags) if hashtags else []
     for tag in target_hashtags:
         if tag not in all_hashtags:

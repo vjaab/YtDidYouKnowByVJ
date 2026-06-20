@@ -230,13 +230,13 @@ def get_next_topic_type_by_ratio(tracker_file=TRACKER_FILE):
 def get_next_target_country(tracker_file=TRACKER_FILE):
     """
     Determines the next target country in the sequence:
-    US -> GB -> CA -> AU -> NZ -> SG -> KR -> DE -> FR -> IE
+    US -> GB -> CA -> AU -> NZ -> SG -> KR -> JP -> DE -> FR -> IE
     based on the last recorded story's target country.
     """
     tracker = load_tracker(tracker_file)
     history = tracker.get("history", [])
     
-    country_sequence = ["US", "GB", "CA", "AU", "NZ", "SG", "KR", "DE", "FR", "IE"]
+    country_sequence = ["US", "GB", "CA", "AU", "NZ", "SG", "KR", "JP", "DE", "FR", "IE"]
     
     # Traverse history backwards to find the last target country
     last_country = None
