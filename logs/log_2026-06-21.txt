@@ -1,0 +1,14 @@
+[02:22:57] === STARTING DAILY AI PIPIELINE (VAIBHAV) | COUNTRY: US ===
+[02:22:57] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[02:22:57] STEP 1: Content Ecosystem Check -> Day: Sun, Slot: Slot A (Discovery), Category: Coding & Development Hacks
+[02:22:57] STEP 2: Fetching articles (RSS + Trending Engine)...
+[02:23:10] 🔥 Trending Engine injected 26 high-signal articles for geo=US.
+[02:23:10] ✅ Fetched 142 total articles (69 research, 47 tools, 0 X.com, 26 trending).
+[02:23:10] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[02:24:48] Selected Headline: I compared free Claude and free Gemini for real work, and only one is actually good for heavy daily use
+[02:24:48] Selected URL: https://www.makeuseof.com/compared-free-claude-free-gemini-for-real-work-one-good-daily-use/
+[02:24:48] Breaking Level: 9
+[02:24:48] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[02:24:59] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20260621_022448.png
+[02:25:11] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20260621_022459.png
+[02:25:11] STEP 4: Generating voiceover + word timestamps...
