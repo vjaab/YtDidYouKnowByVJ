@@ -12,3 +12,17 @@
 [02:24:59] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20260621_022448.png
 [02:25:11] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20260621_022459.png
 [02:25:11] STEP 4: Generating voiceover + word timestamps...
+[15:44:42] === STARTING DAILY AI PIPIELINE (VAIBHAV) | COUNTRY: US ===
+[15:44:42] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[15:44:42] STEP 1: Content Ecosystem Check -> Day: Sun, Slot: Slot A (Discovery), Category: Coding & Development Hacks
+[15:44:42] STEP 2: Fetching articles (RSS + Trending Engine)...
+[15:44:54] 🔥 Trending Engine injected 27 high-signal articles for geo=US.
+[15:44:54] ✅ Fetched 126 total articles (54 research, 45 tools, 0 X.com, 27 trending).
+[15:44:54] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[15:46:44] Selected Headline: FlowiseAI/Flowise — Build AI Agents, Visually
+[15:46:44] Selected URL: https://github.com/FlowiseAI/Flowise
+[15:46:44] Breaking Level: 9
+[15:46:44] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[15:46:58] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20260621_154644.png
+[15:47:09] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20260621_154658.png
+[15:47:09] STEP 4: Generating voiceover + word timestamps...
