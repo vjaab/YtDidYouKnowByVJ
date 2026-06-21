@@ -15,7 +15,7 @@ from datetime import datetime
 
 from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY, ENABLE_TRENDING_ENGINE
 from fetch_research_papers import fetch_tech_news, fetch_ai_tools
-from topic_tracker import record_story, update_youtube_url, get_next_topic_type_by_ratio, get_next_target_country
+from topic_tracker import record_story, update_youtube_url, get_next_topic_type_by_ratio, get_next_target_country, get_next_avatar
 from gemini_script import pick_and_generate_script
 from ecosystem_logic import get_slot_info, get_series_identity, get_next_slot
 from audio_gen import generate_voiceover, clean_tts_text
