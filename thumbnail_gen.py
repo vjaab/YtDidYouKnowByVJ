@@ -90,7 +90,20 @@ def _generate_imagen_background(title, client):
         img_bytes = response.generated_images[0].image.image_bytes
         return Image.open(io.BytesIO(img_bytes)).convert("RGB")
     except Exception as e:
-        print(f"⚠️ Imagen failed: {e}. Using dark fallback.")
+        print(f"⚠️ Imagen failed: {e}. Trying Pollinations fallback...")
+        try:
+            import urllib.parse
+            import requests
+            encoded_prompt = urllib.parse.quote(prompt)
+            url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=1280&height=720&nologo=true&private=true"
+            resp = requests.get(url, timeout=15)
+            if resp.status_code == 200:
+                print("✅ Pollinations background generated successfully!")
+                return Image.open(io.BytesIO(resp.content)).convert("RGB")
+        except Exception as pe:
+            print(f"⚠️ Pollinations fallback failed: {pe}")
+            
+        print("Using dark fallback.")
         return Image.new("RGB", (THUMB_W, THUMB_H), (10, 10, 15))
 
 # ── FIGMA TECH REF UTILITIES ──────────────────────────────────────────────────

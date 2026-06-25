@@ -542,6 +542,34 @@ Output the visual prompt:"""
         return f"{subj}, {vibe}, {orientation}, highly detailed, photorealistic, no text"
 
 
+
+def _generate_pollinations_image(prompt, output_path, aspect_ratio="9:16"):
+    """Free, no-key AI image generation fallback if Imagen and Veo fail."""
+    width, height = (1080, 1920) if aspect_ratio == "9:16" else (1920, 1080)
+    import urllib.parse
+    encoded_prompt = urllib.parse.quote(prompt)
+    url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&nologo=true&private=true"
+    
+    max_attempts = 2
+    for attempt in range(1, max_attempts + 1):
+        try:
+            print(f"     → Attempting Pollinations AI fallback (attempt {attempt}/{max_attempts})...")
+            resp = requests.get(url, timeout=12)
+            if resp.status_code == 200:
+                with open(output_path, "wb") as f:
+                    f.write(resp.content)
+                return output_path
+            else:
+                print(f"  ⚠️ [pollinations] Attempt {attempt} returned status: {resp.status_code}")
+        except Exception as e:
+            print(f"  ⚠️ [pollinations] Attempt {attempt} failed: {e}")
+        
+        if attempt < max_attempts:
+            time.sleep(2)
+            
+    return None
+
+
 def _generate_imagen3(prompt, output_path, topic_context="", global_style_guide="", visual_subject=None, aspect_ratio="9:16"):
     """
     Generates an image via Imagen 4.0 using the fully engineered prompt.
@@ -631,8 +659,18 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
             chunk["source"] = f"Imagen ({visual_mode})"
             return chunk
             
+        # Fallback to Pollinations AI
+        print(f"Chunk {cid} -> Imagen failed, trying Pollinations AI fallback...")
+        path = _generate_pollinations_image(custom_prompt, photo_out, aspect_ratio=orientation)
+        if path:
+            chunk["visual_path"] = path
+            chunk["visual_type"] = "photo"
+            chunk["relevance_score"] = 9
+            chunk["source"] = f"Pollinations ({visual_mode})"
+            return chunk
+            
         # Pexels fallback for photo mode!
-        print(f"Chunk {cid} -> Imagen failed, falling back to Pexels search...")
+        print(f"Chunk {cid} -> Imagen/Pollinations failed, falling back to Pexels search...")
         path, source_desc, v_type = _fetch_pexels_fallback(chunk, dur, is_video=False, is_longform=is_longform)
         if path:
             chunk["visual_path"] = path
@@ -705,8 +743,18 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
             chunk["source"] = "Imagen (nano_evidence)"
             return chunk
             
+        # Fallback to Pollinations AI
+        print(f"Chunk {cid} -> Imagen evidence failed, trying Pollinations AI fallback...")
+        path = _generate_pollinations_image(custom_prompt, photo_out, aspect_ratio=orientation)
+        if path:
+            chunk["visual_path"] = path
+            chunk["visual_type"] = "photo"
+            chunk["relevance_score"] = 9
+            chunk["source"] = "Pollinations (nano_evidence)"
+            return chunk
+
         # Pexels fallback for evidence mode!
-        print(f"Chunk {cid} -> Imagen evidence failed, falling back to Pexels search...")
+        print(f"Chunk {cid} -> Imagen/Pollinations evidence failed, falling back to Pexels search...")
         path, source_desc, v_type = _fetch_pexels_fallback(chunk, dur, is_video=False, is_longform=is_longform)
         if path:
             chunk["visual_path"] = path
@@ -751,8 +799,18 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
             chunk["source"] = "Imagen (fallback from veo)"
             return chunk
             
+        # Fallback to Pollinations AI
+        print(f"Chunk {cid} -> Imagen fallback failed, trying Pollinations AI fallback...")
+        path = _generate_pollinations_image(custom_img_prompt, photo_out, aspect_ratio=orientation)
+        if path:
+            chunk["visual_path"] = path
+            chunk["visual_type"] = "photo"
+            chunk["relevance_score"] = 8
+            chunk["source"] = "Pollinations (fallback from veo)"
+            return chunk
+
         # Pexels fallback for video mode!
-        print(f"Chunk {cid} -> Veo/Imagen failed, falling back to Pexels search...")
+        print(f"Chunk {cid} -> Veo/Imagen/Pollinations failed, falling back to Pexels search...")
         path, source_desc, v_type = _fetch_pexels_fallback(chunk, dur, is_video=True, is_longform=is_longform)
         if path:
             chunk["visual_path"] = path

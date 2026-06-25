@@ -61,6 +61,20 @@ Example: "A hand cursor clicking a large button"
             except Exception as e:
                 print(f"⚠️ Imagen whiteboard doodle failed on {model}: {e}")
                 continue
+
+        # Try Pollinations fallback
+        print("🎨 Imagen whiteboard doodle failed. Trying Pollinations AI fallback...")
+        try:
+            import urllib.parse
+            import requests
+            encoded_prompt = urllib.parse.quote(imagen_prompt)
+            url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=1024&height=1024&nologo=true&private=true"
+            resp = requests.get(url, timeout=15)
+            if resp.status_code == 200:
+                print("✅ Pollinations whiteboard doodle generated successfully!")
+                return Image.open(io.BytesIO(resp.content)).convert("RGB")
+        except Exception as pe:
+            print(f"⚠️ Pollinations whiteboard doodle failed: {pe}")
     except Exception as e:
         print(f"⚠️ Failed to generate AI whiteboard doodle: {e}")
     return None

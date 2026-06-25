@@ -150,6 +150,35 @@ Return ONLY a JSON array of objects, one per sentence, in order:
     return chunks
 
 
+
+def _generate_pollinations_image(prompt, output_path, aspect_ratio="9:16"):
+    """Free, no-key AI image generation fallback if Imagen and Veo fail."""
+    width, height = (1080, 1920) if aspect_ratio == "9:16" else (1920, 1080)
+    import requests
+    import urllib.parse
+    encoded_prompt = urllib.parse.quote(prompt)
+    url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&nologo=true&private=true"
+    
+    max_attempts = 2
+    for attempt in range(1, max_attempts + 1):
+        try:
+            print(f"     → Attempting Pollinations AI fallback (attempt {attempt}/{max_attempts})...")
+            resp = requests.get(url, timeout=12)
+            if resp.status_code == 200:
+                with open(output_path, "wb") as f:
+                    f.write(resp.content)
+                return output_path
+            else:
+                print(f"  ⚠️ [pollinations] Attempt {attempt} returned status: {resp.status_code}")
+        except Exception as e:
+            print(f"  ⚠️ [pollinations] Attempt {attempt} failed: {e}")
+        
+        if attempt < max_attempts:
+            time.sleep(2)
+            
+    return None
+
+
 def _generate_imagen_image(prompt, output_path, aspect_ratio="9:16"):
     """Generate a single image via Imagen 4.0. Returns path on success, None on failure."""
 
@@ -240,11 +269,21 @@ def generate_nano_scene_visuals(chunks, headline, style_guide="", aspect_ratio="
 
         path = _generate_imagen_image(prompt, output_path, aspect_ratio=aspect_ratio)
 
+        if not path:
+            # Fallback to Pollinations AI
+            print(f"  [{i + 1}/{total}] Imagen failed, trying Pollinations AI fallback...")
+            path = _generate_pollinations_image(prompt, output_path, aspect_ratio=aspect_ratio)
+            source_name = "Nano-Scene (Pollinations AI)"
+            relevance = 9
+        else:
+            source_name = "Nano-Scene (Imagen 4.0)"
+            relevance = 10
+
         if path:
             chunk["visual_path"] = path
             chunk["visual_type"] = "photo"
-            chunk["source"] = "Nano-Scene (Imagen 4.0)"
-            chunk["relevance_score"] = 10
+            chunk["source"] = source_name
+            chunk["relevance_score"] = relevance
             last_successful_path = path
             generated_count += 1
         elif last_successful_path:

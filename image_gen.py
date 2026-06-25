@@ -11,6 +11,34 @@ PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")
 TODAY = datetime.now().strftime("%Y-%m-%d")
 
 
+
+def _generate_pollinations_image(prompt, output_path, aspect_ratio="9:16"):
+    """Free, no-key AI image generation fallback if Imagen and Veo fail."""
+    width, height = (1080, 1920) if aspect_ratio == "9:16" else (1920, 1080)
+    import urllib.parse
+    encoded_prompt = urllib.parse.quote(prompt)
+    url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&nologo=true&private=true"
+    
+    max_attempts = 2
+    for attempt in range(1, max_attempts + 1):
+        try:
+            print(f"     → Attempting Pollinations AI fallback (attempt {attempt}/{max_attempts})...")
+            resp = requests.get(url, timeout=12)
+            if resp.status_code == 200:
+                with open(output_path, "wb") as f:
+                    f.write(resp.content)
+                return output_path
+            else:
+                print(f"  ⚠️ [pollinations] Attempt {attempt} returned status: {resp.status_code}")
+        except Exception as e:
+            print(f"  ⚠️ [pollinations] Attempt {attempt} failed: {e}")
+        
+        if attempt < max_attempts:
+            time.sleep(2)
+            
+    return None
+
+
 def _save_image_from_url(url, output_path, target_ratio=9/16):
     """Download an image URL, crop to 9:16, save to disk. Returns path or None."""
     headers = {'User-Agent': 'Mozilla/5.0'}
@@ -201,7 +229,14 @@ def generate_images(prompts, image_url=None, keywords=None):
                 break
                 
         if not success:
-            if previous_path:
+            # Fallback to Pollinations AI
+            print(f"Imagen failed for image {i+1}, trying Pollinations AI fallback...")
+            path = _generate_pollinations_image(prompt + style_suffix, out, aspect_ratio="9:16")
+            if path:
+                generated_paths.append(path)
+                previous_path = path
+                success = True
+            elif previous_path:
                 generated_paths.append(previous_path)
             else:
                 return None
