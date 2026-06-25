@@ -300,7 +300,11 @@ def run_pipeline(topic_type="auto"):
         
         if news_url:
             screenshot_filename = f"screenshot_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-            screenshot_path = capture_article_screenshot(news_url, screenshot_filename)
+            screenshot_path = capture_article_screenshot(
+                news_url, 
+                screenshot_filename, 
+                headline=script_data.get("original_news_headline")
+            )
             if screenshot_path:
                 script_data["screenshot_path"] = screenshot_path
                 log_message(f"✅ Main screenshot captured: {screenshot_path}")
@@ -326,7 +330,11 @@ def run_pipeline(topic_type="auto"):
         evidence_url = script_data.get("use_case_evidence_url")
         if evidence_url and "http" in evidence_url:
             evidence_filename = f"evidence_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-            evidence_path = capture_article_screenshot(evidence_url, evidence_filename)
+            evidence_path = capture_article_screenshot(
+                evidence_url, 
+                evidence_filename, 
+                headline=script_data.get("title")
+            )
             if evidence_path:
                 script_data["evidence_screenshot_path"] = evidence_path
                 log_message(f"Evidence screenshot captured: {evidence_path}")

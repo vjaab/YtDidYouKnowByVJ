@@ -243,7 +243,12 @@ def run_longform_pipeline(dry_run=False):
             url = topic.get("source_url", "")
             if url:
                 ss_filename = f"screenshot_longform_{i+1}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-                ss_path = capture_article_screenshot(url, ss_filename, desktop=True)
+                ss_path = capture_article_screenshot(
+                    url, 
+                    ss_filename, 
+                    desktop=True, 
+                    headline=topic.get("headline")
+                )
                 if ss_path:
                     topic["screenshot_path"] = ss_path
                     screenshots_captured += 1
