@@ -4,6 +4,9 @@ import os
 # Add parent directory to path so we can import vidiq_trending
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+from dotenv import load_dotenv
+load_dotenv()
+
 try:
     from vidiq_trending import get_pipeline_topics, _extract_topic
     
