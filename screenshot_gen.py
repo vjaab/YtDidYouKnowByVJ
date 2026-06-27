@@ -2,7 +2,8 @@ import os
 import subprocess
 import time
 import requests
-from config import ASSETS_DIR, LOGS_DIR, FONTS_DIR
+from config import ASSETS_DIR, LOGS_DIR, FONTS_DIR, GEMINI_API_KEY, GEMINI_FLASH_MODEL
+
 
 def generate_fallback_screenshot(url, output_path, desktop=False, headline=None):
     """
@@ -202,6 +203,78 @@ def generate_fallback_screenshot(url, output_path, desktop=False, headline=None)
     return output_path
 
 
+def check_screenshot_validity(image_path):
+    """
+    Checks if the screenshot contains a human verification page or error.
+    Returns True if valid, False if it is a captcha/cloudflare/etc.
+    """
+    import os
+    # Get list of API keys
+    api_keys_env = os.getenv("GEMINI_API_KEYS", os.getenv("GEMINI_API_KEY", ""))
+    api_keys = [k.strip() for k in api_keys_env.split(",") if k.strip()]
+    if not api_keys:
+        if GEMINI_API_KEY:
+            api_keys = [GEMINI_API_KEY]
+        else:
+            print("⚠️ GEMINI_API_KEY not found in config. Skipping screenshot validation.")
+            return True
+
+    # Initialize models to try
+    models_to_try = [GEMINI_FLASH_MODEL or "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-1.5-flash"]
+    
+    from google import genai
+    from PIL import Image
+    
+    img = None
+    try:
+        img = Image.open(image_path)
+    except Exception as e:
+        print(f"⚠️ Failed to open image {image_path}: {e}")
+        return True # Can't read, skip blocking it
+
+    prompt = (
+        "Analyze this screenshot. Does it display a human verification screen, "
+        "CAPTCHA, Cloudflare 'Checking your browser' or 'Verify you are human' page, "
+        "Turnstile, hCaptcha, DDoS protection page, access denied error, "
+        "or generic browser connection/network error page? "
+        "Answer with exactly 'YES' or 'NO' (no punctuation or explanation)."
+    )
+
+    # Rotate through models and keys
+    model_idx = 0
+    key_idx = 0
+    attempts = 0
+    max_attempts = len(models_to_try) * len(api_keys)
+
+    while attempts < max_attempts:
+        current_model = models_to_try[model_idx % len(models_to_try)]
+        current_key = api_keys[key_idx % len(api_keys)]
+        
+        try:
+            client = genai.Client(api_key=current_key)
+            response = client.models.generate_content(
+                model=current_model,
+                contents=[img, prompt]
+            )
+            answer = response.text.strip().upper()
+            print(f"🔍 Gemini ({current_model}) verification scan result: {answer}")
+            
+            if "YES" in answer:
+                print(f"⚠️ Screenshot {image_path} detected as human verification/block screen.")
+                return False
+            return True
+        except Exception as e:
+            print(f"⚠️ API call failed with model {current_model} using key index {key_idx % len(api_keys)}: {e}")
+            attempts += 1
+            # Rotate key on every failure, and rotate model after trying all keys
+            key_idx += 1
+            if key_idx % len(api_keys) == 0:
+                model_idx += 1
+                
+    print("⚠️ All keys and models exhausted for screenshot verification. Assuming screenshot is valid.")
+    return True
+
+
 def capture_article_screenshot(url, output_filename, desktop=False, headline=None):
     """
     Captures a screenshot of the article URL using playwright via npx.
@@ -238,10 +311,12 @@ def capture_article_screenshot(url, output_filename, desktop=False, headline=Non
     viewport = "1920,1080" if desktop else "1080,1920"
     
     # Run Playwright with a fast wait-for-timeout and a shorter subprocess timeout for quick fallback
+    user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
     cmd = [
         "npx", "-y", "playwright", "screenshot",
         f"--viewport-size={viewport}",
         "--wait-for-timeout=3000", # Fast timeout to allow settling without hanging
+        f"--user-agent={user_agent}",
         url,
         output_path
     ]
@@ -250,7 +325,14 @@ def capture_article_screenshot(url, output_filename, desktop=False, headline=Non
         print(f"📸 Capturing screenshot: {url} -> {output_path}")
         subprocess.run(cmd, check=True, capture_output=True, timeout=25)
         if os.path.exists(output_path):
-            return output_path
+            if check_screenshot_validity(output_path):
+                return output_path
+            else:
+                print(f"🗑️ Deleting invalid screenshot (contains human verification/error).")
+                try:
+                    os.remove(output_path)
+                except Exception:
+                    pass
     except Exception as e:
         print(f"⚠️ Playwright screenshot failed/timed out for {url}: {e}")
         
