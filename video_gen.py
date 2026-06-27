@@ -3128,10 +3128,40 @@ def easeInOutQuad(t):
 def _article_screenshot_clip(screenshot_path, duration):
     """
     Shows the source article as a full-screen backdrop with a premium Ken Burns effect.
-    Ensures visibility every 10s for 7s throughout the video.
+    Shows the screenshot from second 4.0 to 12.0 (8 seconds duration) with fade-in and fade-out.
     """
-    print(f"🔍 DEBUG: _article_screenshot_clip called with path: {screenshot_path}, dur: {duration} (Disabled repeating overlay)")
-    return []
+    if not screenshot_path or not os.path.exists(screenshot_path):
+        return []
+        
+    try:
+        raw_img = Image.open(screenshot_path)
+        canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H)
+        canvas_arr = np.array(canvas_img.convert("RGB"))
+        
+        # Show from 4.0 to 12.0 (8s duration)
+        start_time = 4.0
+        # Cap end_time at duration - 2.0 to avoid overlapping with outro/CTA card
+        end_time = min(12.0, duration - 2.0)
+        clip_dur = end_time - start_time
+        
+        if clip_dur < 1.0:
+            return []
+            
+        screenshot_clip = ImageClip(canvas_arr).with_duration(clip_dur).with_start(start_time)
+        
+        # Subtle Ken Burns effect (zoom in slightly over the duration)
+        screenshot_clip = screenshot_clip.resized(lambda t, cd=clip_dur: 1.0 + 0.08 * (t / cd))
+        
+        # Smooth fade-in and fade-out (0.3s)
+        screenshot_clip = screenshot_clip.with_effects([
+            vfx.CrossFadeIn(0.3),
+            vfx.CrossFadeOut(0.3)
+        ])
+        
+        return [screenshot_clip]
+    except Exception as e:
+        print(f"⚠️ Error creating article screenshot clip: {e}")
+        return []
 
 def _longform_article_screenshot_clips(script_json, audio_duration):
     """
@@ -4476,9 +4506,9 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 base_y = FRAME_H - scaled_h - 30
             return (base_x, base_y)
 
-        # Let's collect all screenshot active intervals for longform
+        # Let's collect all screenshot active intervals to hide avatar during screenshots
+        screenshot_intervals = []
         if is_longform:
-            screenshot_intervals = []
             fact_timestamps = script_json.get("fact_timestamps", [])
             topics = script_json.get("longform_topics", [])
             if topics and fact_timestamps:
@@ -4499,6 +4529,12 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                         sec_dur = min(5.0, end_s - sec_start)
                         if sec_dur >= 1.0:
                             screenshot_intervals.append((sec_start, sec_start + sec_dur))
+        else:
+            # For Shorts: screenshot is active from 4.0s to min(12.0s, audio_duration - 2.0)
+            start_s = 4.0
+            end_s = min(12.0, audio_duration - 2.0)
+            if end_s - start_s >= 1.0:
+                screenshot_intervals.append((start_s, end_s))
             
             def hide_avatar_during_screenshots(t):
                 # Fade out/in slightly (0.3s) at boundaries
