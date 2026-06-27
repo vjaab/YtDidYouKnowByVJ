@@ -27,7 +27,7 @@ from screenshot_gen import capture_article_screenshot
 from thumbnail_gen import generate_thumbnail
 from youtube_upload import upload_video
 from x_upload import upload_video_to_x
-from telegram_selector import notify_telegram
+from telegram_selector import notify_telegram as real_notify_telegram
 from entity_fetcher import fetch_all_entities, get_retention_layers_config
 from kaggle_handover import trigger_kaggle_gpu_job
 
@@ -187,10 +187,13 @@ def generate_pinned_comment(script_data, next_series_slot):
         f"👇 {cta}"
     )
 
-def run_pipeline(topic_type="auto"):
-    # Local mock to avoid sending real Telegram notifications during tests
+def run_pipeline(topic_type="auto", dry_run=False):
+    # Local mock or real Telegram notification based on dry_run
     def notify_telegram(msg, emoji=""):
-        print(f"📢 [TELEGRAM MOCK] {emoji} {msg}")
+        if dry_run:
+            print(f"📢 [TELEGRAM MOCK] {emoji} {msg}")
+        else:
+            real_notify_telegram(msg, emoji)
 
     if topic_type == "auto":
         topic_type = get_next_topic_type_by_ratio()
@@ -606,9 +609,20 @@ def run_pipeline(topic_type="auto"):
 
     tags = list(set(keywords + companies + [t.replace("#", "") for t in hashtags]))[:15]
 
-    # MOCK UPLOADS FOR TEST RUN
-    print("🧪 [DRY RUN] Simulating YouTube upload...")
-    uploaded, result = True, "MOCK_VIDEO_ID"
+    # YouTube Upload
+    if dry_run:
+        print("🧪 [DRY RUN] Simulating YouTube upload...")
+        uploaded, result = True, "MOCK_VIDEO_ID"
+    else:
+        uploaded, result = upload_video(
+            video_path=video_path,
+            title=title,
+            description=description,
+            tags=tags,
+            thumbnail_path=thumbnail_path,
+            comment_hook=script_data.get("comment_hook")
+        )
+
     if not uploaded:
         log_message(f"ERROR: YouTube upload failed: {result}")
         return False
@@ -620,8 +634,12 @@ def run_pipeline(topic_type="auto"):
     log_message("STEP 10c: Auto-posting Short to X.com...")
     try:
         x_post_text = f"🔥 {title}\n\nFull breakdown: {youtube_url}\n\n#AI #TechNews"
-        print("🧪 [DRY RUN] Simulating X.com auto-post...")
-        x_uploaded, x_result = True, "MOCK_TWEET_ID"
+        if dry_run:
+            print("🧪 [DRY RUN] Simulating X.com auto-post...")
+            x_uploaded, x_result = True, "MOCK_TWEET_ID"
+        else:
+            x_uploaded, x_result = upload_video_to_x(video_path, x_post_text)
+
         if x_uploaded:
             log_message(f"SUCCESS: Posted video to X.com! Tweet ID: {x_result}")
         else:
@@ -664,9 +682,9 @@ def run_pipeline(topic_type="auto"):
     return True
 
 
-def run_local(topic_type="auto"):
+def run_local(topic_type="auto", dry_run=False):
     # XTTS server launch removed. Calling pipeline directly.
-    success = run_pipeline(topic_type=topic_type)
+    success = run_pipeline(topic_type=topic_type, dry_run=dry_run)
     if not success:
         print("❌ Pipeline failed. Exiting with error code.")
         sys.exit(1)
@@ -676,10 +694,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--now", action="store_true", help="Run pipeline immediately.")
     parser.add_argument("--type", type=str, choices=["auto", "research", "tools", "news", "tech_trends", "vaibhav"], default="auto", help="Content type mapped to the schedule")
+    parser.add_argument("--dry-run", action="store_true", help="Run without uploading to YouTube/X.com/Telegram.")
     args = parser.parse_args()
 
-    if args.now:
-        run_local(topic_type=args.type)
+    if args.now or args.dry_run:
+        run_local(topic_type=args.type, dry_run=args.dry_run)
     else:
         print("Usage: python main.py --now")
+        print("For dry runs: python main.py --dry-run")
         print("For scheduled runs: python scheduler.py")
