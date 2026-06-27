@@ -258,9 +258,13 @@ HUMANIZER AGENT TASK:
 This is the final step. Fix robotic phrasing, repetitive AI wording, over-explanation, and "In conclusion" style endings.
 Add contractions, punchier cadence, and conversational flow.
 Format the output EXACTLY matching the required schema below.
+Use the ORIGINAL STORY CONTEXT below to fill out metadata like companies, people, key_entities, links, etc.
 
 OPTIMIZED SCRIPT:
 {optimized_script}
+
+ORIGINAL STORY CONTEXT:
+{news_context}
 
 SCHEMA REQUIREMENTS:
 {schema_requirements}
@@ -1443,6 +1447,7 @@ class MultiAgentGenerationEngine:
         humanizer_prompt = HUMANIZER_AGENT_TEMPLATE.format(
             persona=self.persona,
             optimized_script=optimized.get("optimized_script", ""),
+            news_context=selected_context,
             schema_requirements=refined_requirements
         )
         final_script = self._call_gemini(humanizer_prompt, model=GEMINI_PRO_MODEL)

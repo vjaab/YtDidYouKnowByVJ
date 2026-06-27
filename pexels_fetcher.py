@@ -705,7 +705,13 @@ def _generate_imagen3(prompt, output_path, topic_context="", global_style_guide=
                 continue
             print(f"  ⚠️ Imagen call failed on {model_name}: {e}")
             break
-            
+    # Fallback to HuggingFace/Cloudflare/Pollinations if Imagen fails
+    print("  ⚠️ Imagen failed completely. Trying fallback generators...")
+    path, fb_source = _generate_fallback_image(prompt, output_path, aspect_ratio=aspect_ratio)
+    if path:
+        print(f"  ✅ Fallback generator ({fb_source}) succeeded.")
+        return path
+        
     return None
 
 

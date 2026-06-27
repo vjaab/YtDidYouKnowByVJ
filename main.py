@@ -499,19 +499,20 @@ def run_pipeline(topic_type="auto"):
     chunks = fetch_all_chunk_visuals(chunks, topic_context=topic_context, script_data=script_data, is_longform=is_longform)
     
     # Check success rate of the primary generator
-    gen_success = sum(1 for c in chunks if c.get("visual_path") and c.get("source") in [
-        "Veo (veo_concept)", "Veo (veo_cta)", "Imagen (nano_hook)", "Imagen (nano_concept)", "Imagen (nano_evidence)", "Imagen (fallback from veo)", "Real Article Screenshot", "Evidence Screenshot", "Fact Article Screenshot", "Main Article Screenshot"
-    ])
+    def is_valid_engagement_source(source):
+        if not source:
+            return False
+        valid_keywords = ["Veo", "Imagen", "Screenshot", "HuggingFace", "Cloudflare", "Pollinations", "Nano-Scene", "Pexels"]
+        return any(k in source for k in valid_keywords)
+
+    gen_success = sum(1 for c in chunks if c.get("visual_path") and is_valid_engagement_source(c.get("source")))
     
     if gen_success < len(chunks) * 0.5:
         log_message(f"⚠️ Primary visual generator only generated {gen_success}/{len(chunks)} visuals. Falling back to nano-scene engine (Imagen)...")
         chunks = generate_nano_scene_visuals(chunks, topic_context, style_guide=style_guide)
         
         # Check if nano-scene engine ALSO failed to produce new visuals
-        final_success = sum(1 for c in chunks if c.get("visual_path") and os.path.exists(c["visual_path"]) and c.get("source") in [
-            "Veo (veo_concept)", "Veo (veo_cta)", "Imagen (nano_hook)", "Imagen (nano_concept)", "Imagen (nano_evidence)", "Imagen (fallback from veo)", 
-            "Nano-Scene (Imagen 4.0)", "Real Article Screenshot", "Evidence Screenshot", "Fact Article Screenshot", "Main Article Screenshot"
-        ])
+        final_success = sum(1 for c in chunks if c.get("visual_path") and os.path.exists(c["visual_path"]) and is_valid_engagement_source(c.get("source")))
         
         if final_success < len(chunks) * 0.5:
             log_message(f"⚠️ Both primary and nano-scene visual generation failed (only {final_success}/{len(chunks)} succeeded). Falling back to whiteboard animation videos!")
