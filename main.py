@@ -30,6 +30,8 @@ from x_upload import upload_video_to_x
 from telegram_selector import notify_telegram as real_notify_telegram
 from entity_fetcher import fetch_all_entities, get_retention_layers_config
 from kaggle_handover import trigger_kaggle_gpu_job
+from tags_helper import get_optimized_metadata
+
 
 
 def log_message(msg):
@@ -590,14 +592,32 @@ def run_pipeline(topic_type="auto", dry_run=False):
 
     # ── STEP 10: YouTube Upload ───────────────────────────────────────────────
     log_message("STEP 10: Uploading to YouTube...")
+    # Ensure variety in titles using the options if generated
     ai_desc = script_data.get("description", "")
+    if script_data.get("title_options"):
+        title = random.choice(script_data["title_options"])
+    
+    # Generate dynamic, optimized hashtags and tags
+    initial_people = [p.get("name") for p in script_data.get("people", [])] if script_data.get("people") else []
+    optimized_metadata = get_optimized_metadata(
+        title=title,
+        script=script,
+        sub_category=script_data.get("sub_category", ""),
+        initial_keywords=script_data.get("keywords", []),
+        initial_companies=script_data.get("companies_mentioned", []),
+        initial_people=initial_people,
+        initial_hashtags=script_data.get("hashtags", [])
+    )
+    hashtags = optimized_metadata["hashtags"]
+    tags = optimized_metadata["tags"]
+    
+    log_message(f"Optimized Tags: {tags}")
+    log_message(f"Optimized Hashtags: {hashtags}")
+
     # ── Output Metadata ──
     relevant_links = script_data.get("relevant_links", [])
     source_url = script_data.get("original_news_url", "")
     description = format_description(ai_desc, script, hashtags, slot=slot, chunks=chunks, relevant_links=relevant_links, source_url=source_url)
-    # Ensure variety in titles using the options if generated
-    if script_data.get("title_options"):
-        title = random.choice(script_data["title_options"])
     
     # Algorithm Optimization: Append primary hashtag to title for Shorts feed boost
     if hashtags:
@@ -607,7 +627,6 @@ def run_pipeline(topic_type="auto", dry_run=False):
             if len(title) + len(primary_tag) < 95:
                 title = f"{title} {primary_tag}"
 
-    tags = list(set(keywords + companies + [t.replace("#", "") for t in hashtags]))[:15]
 
     # YouTube Upload
     if dry_run:

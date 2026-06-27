@@ -13,6 +13,8 @@ from moviepy import VideoFileClip, ImageClip, CompositeVideoClip, VideoClip
 import moviepy.video.fx as vfx
 from config import OUTPUT_DIR, ASSETS_DIR
 from youtube_upload import upload_video
+from tags_helper import get_optimized_metadata
+
 
 # Asset Font Loader Helper
 def _load_teaser_font(size):
@@ -211,15 +213,37 @@ def generate_and_upload_shorts_teaser(script_json, longform_video_id, dry_run=Fa
         longform_title = script_json.get("title", "10 AI Facts")
         teaser_title = f"This 1 fact changes everything... 🤯 #Shorts #AIFacts"
         
+        # Generate dynamic, optimized hashtags and tags
+        initial_people = [p.get("name") for p in script_json.get("people", [])] if script_json.get("people") else []
+        optimized_metadata = get_optimized_metadata(
+            title=teaser_title,
+            script=best_fact_info.get("hook_for_shorts", "") + " " + longform_title,
+            sub_category=script_json.get("sub_category", "AI Facts"),
+            initial_keywords=script_json.get("keywords", []),
+            initial_companies=script_json.get("companies_mentioned", []),
+            initial_people=initial_people,
+            initial_hashtags=script_json.get("hashtags", [])
+        )
+        hashtags = optimized_metadata["hashtags"]
+        tags = optimized_metadata["tags"]
+        
+        # Ensure #Shorts is present for teaser hashtags and tags
+        if not any(h.lower() == "#shorts" for h in hashtags):
+            hashtags.insert(0, "#Shorts")
+        if not any(t.lower() == "shorts" for t in tags):
+            tags.insert(0, "Shorts")
+
+        hashtag_str = " ".join(hashtags)
+        print(f"Teaser Optimized Tags: {tags}")
+        print(f"Teaser Optimized Hashtags: {hashtags}")
+
         teaser_description = (
             f"This is just 1 of {len(fact_timestamps)} insane AI facts. \n"
             f"Watch the FULL video here: https://youtu.be/{longform_video_id}\n\n"
             f"Daily cutting-edge tech intelligence by VJ.\n\n"
             f"⚠️ DISCLOSURE: AI-assisted production (voiceover, visuals). Editorial direction & analysis by VJ.\n\n"
-            f"#Shorts #TechNews #ArtificialIntelligence #VJTech #TechUSA #TechUK #TechCanada #TechAustralia #TechNZ #English"
+            f"{hashtag_str}"
         )
-        
-        tags = ["Shorts", "AIFacts", "TechNews", "VJTech", "AI", "Explainer"]
         
         uploaded, teaser_id = upload_video(
             video_path=teaser_output_path,
@@ -228,6 +252,7 @@ def generate_and_upload_shorts_teaser(script_json, longform_video_id, dry_run=Fa
             tags=tags,
             thumbnail_path=None
         )
+
         
         if uploaded:
             print(f"🎉 Shorts Teaser live on YouTube: https://youtu.be/{teaser_id}")

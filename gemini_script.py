@@ -949,9 +949,9 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "keywords": ["Privacy", "Tech Tips", "Security", "Phone Hacks"],
   "hashtags": ["#Privacy", "#TechTips", "#iPhone", "#Android", "#ScaryTech"],
   "companies_mentioned": ["list of company names mentioned in the script"],
-  "companies": [{"name": "Company Name", "domain": "domain.com", "description": "2-4 word description of the company"}],
-  "people": [{"name": "Person Name", "wikipedia_slug": "Wikipedia_Slug", "description": "2-4 word description of the person's role"}],
-  "key_entities": [{"name": "Entity Name", "type": "COMPANY|PEOPLE|TOOL|OTHER", "description": "2-4 word description of the entity"}],
+  "companies": [{{"name": "Company Name", "domain": "domain.com", "description": "2-4 word description of the company"}}],
+  "people": [{{"name": "Person Name", "wikipedia_slug": "Wikipedia_Slug", "description": "2-4 word description of the person's role"}}],
+  "key_entities": [{{"name": "Entity Name", "type": "COMPANY|PEOPLE|TOOL|OTHER", "description": "2-4 word description of the entity"}}],
   "comment_hook": "A provocative question: 'Did you know about this? Are you going to change this setting? 👇'"
 }}"""
         else: # research / educational / general
@@ -1003,9 +1003,9 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "keywords": ["Tech Tips", "Free Apps", "Hidden Features", "AI"],
   "hashtags": ["#TechTips", "#FreeApps", "#LifeHack", "#DidYouKnow", "#Tech"],
   "companies_mentioned": ["list of company names mentioned in the script"],
-  "companies": [{"name": "Company Name", "domain": "domain.com", "description": "2-4 word description of the company"}],
-  "people": [{"name": "Person Name", "wikipedia_slug": "Wikipedia_Slug", "description": "2-4 word description of the person's role"}],
-  "key_entities": [{"name": "Entity Name", "type": "COMPANY|PEOPLE|TOOL|OTHER", "description": "2-4 word description of the entity"}],
+  "companies": [{{"name": "Company Name", "domain": "domain.com", "description": "2-4 word description of the company"}}],
+  "people": [{{"name": "Person Name", "wikipedia_slug": "Wikipedia_Slug", "description": "2-4 word description of the person's role"}}],
+  "key_entities": [{{"name": "Entity Name", "type": "COMPANY|PEOPLE|TOOL|OTHER", "description": "2-4 word description of the entity"}}],
   "comment_hook": "A provocative question: 'Which one are YOU using? Drop your answer below! 👇'"
 }}"""
 

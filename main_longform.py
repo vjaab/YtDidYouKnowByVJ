@@ -44,6 +44,8 @@ from thumbnail_gen import generate_thumbnail
 from youtube_upload import upload_video
 from telegram_selector import notify_telegram
 from entity_fetcher import fetch_all_entities, get_retention_layers_config
+from tags_helper import get_optimized_metadata
+
 
 
 def log_message(msg):
@@ -490,13 +492,30 @@ def run_longform_pipeline(dry_run=False):
 
     # ── STEP 11: Upload to YouTube ───────────────────────────────────────
     log_message("STEP 11: Uploading to YouTube...")
-    description = format_longform_description(script_data, hashtags)
-
+    
     # Title selection
     if script_data.get("title_options"):
         title = random.choice(script_data["title_options"])
 
-    tags = list(set(keywords + [t.replace("#", "") for t in hashtags]))[:15]
+    # Generate dynamic, optimized hashtags and tags
+    initial_people = [p.get("name") for p in script_data.get("people", [])] if script_data.get("people") else []
+    optimized_metadata = get_optimized_metadata(
+        title=title,
+        script=script,
+        sub_category=script_data.get("sub_category", ""),
+        initial_keywords=keywords,
+        initial_companies=companies_all,
+        initial_people=initial_people,
+        initial_hashtags=hashtags
+    )
+    hashtags = optimized_metadata["hashtags"]
+    tags = optimized_metadata["tags"]
+
+    log_message(f"Optimized Tags: {tags}")
+    log_message(f"Optimized Hashtags: {hashtags}")
+
+    description = format_longform_description(script_data, hashtags)
+
 
     uploaded, result = upload_video(
         video_path, title, description, tags,
