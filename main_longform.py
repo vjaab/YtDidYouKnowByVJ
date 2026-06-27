@@ -432,15 +432,40 @@ def run_longform_pipeline(dry_run=False):
         log_message(f"✅ Primary visual generator successfully created {gen_success}/{len(chunks)} clips/images.")
 
     # ── STEP 8: Visual Variety (Color Theme) ─────────────────────────────
-    visual_palettes = [
-        {"background": "#121212", "accent": "#00E5FF", "text": "#ffffff"},
-        {"background": "#0D0D1A", "accent": "#FFD700", "text": "#ffffff"},
-        {"background": "#1A0000", "accent": "#FF4444", "text": "#ffffff"},
-        {"background": "#0F1A12", "accent": "#00FF7F", "text": "#ffffff"},
-        {"background": "#10002B", "accent": "#E0AAFF", "text": "#ffffff"},
-        {"background": "#1A1A1D", "accent": "#F5A623", "text": "#ffffff"},
-    ]
-    script_data["color_theme"] = random.choice(visual_palettes)
+    title = script_data.get("title", "")
+    subcat = script_data.get("sub_category", "")
+    keywords = script_data.get("keywords", [])
+
+    def get_color_theme_for_topic(category, title, keywords):
+        cat_lower = str(category).lower()
+        title_lower = str(title).lower()
+        kw_lower = [str(k).lower() for k in keywords]
+        
+        # 1. Cyber Security / Privacy / Threat / Danger / Scam -> Deep Red
+        red_indicators = ["security", "privacy", "hack", "scam", "leak", "danger", "scary", "threat", "cyber", "exploit", "warning", "ban"]
+        if any(x in cat_lower or x in title_lower for x in red_indicators) or any(x in k for k in kw_lower for x in red_indicators):
+            return {"background": "#1A0000", "accent": "#FF4444", "text": "#ffffff"} # Deep Red
+            
+        # 2. Coding / Development / GitHub / Automation / Tech Tips -> Hacker Green
+        green_indicators = ["code", "coding", "developer", "github", "repo", "automation", "workflow", "tip", "hack", "productivity", "python", "javascript", "programming"]
+        if any(x in cat_lower or x in title_lower for x in green_indicators) or any(x in k for k in kw_lower for x in green_indicators):
+            return {"background": "#0F1A12", "accent": "#00FF7F", "text": "#ffffff"} # Hacker Green
+            
+        # 3. Business / Finance / Startup / Career / Hustle / Money -> Dark Gold
+        gold_indicators = ["money", "earn", "hustle", "business", "startup", "finance", "career", "job", "salary", "million", "billion", "market", "stock", "cost"]
+        if any(x in cat_lower or x in title_lower for x in gold_indicators) or any(x in k for k in kw_lower for x in gold_indicators):
+            return {"background": "#0D0D1A", "accent": "#FFD700", "text": "#ffffff"} # Dark Gold
+            
+        # 4. Neural Nets / Models / LLMs / Big Tech Giants (OpenAI, Gemini, Meta) -> Neon Purple
+        purple_indicators = ["model", "llm", "gemini", "openai", "gpt", "claude", "meta", "nvidia", "deepseek", "anthropic", "apple", "microsoft"]
+        if any(x in cat_lower or x in title_lower for x in purple_indicators) or any(x in k for k in kw_lower for x in purple_indicators):
+            return {"background": "#10002B", "accent": "#E0AAFF", "text": "#ffffff"} # Neon Purple
+
+        # 5. Default/General AI / High-tech -> Cyber Cyan
+        return {"background": "#121212", "accent": "#00E5FF", "text": "#ffffff"} # Cyber Cyan
+
+    chosen_style = get_color_theme_for_topic(subcat, title, keywords)
+    script_data["color_theme"] = chosen_style
 
     # ── STEP 9: Render Video (16:9) ──────────────────────────────────────
     log_message("STEP 9: Rendering final 16:9 video with engagement layers...")

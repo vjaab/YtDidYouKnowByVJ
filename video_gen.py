@@ -2454,8 +2454,8 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
     
     return img
 
-def render_shorts_header_bar(title, frame_width=1080):
-    """Renders a solid black top bar with white title text for Shorts."""
+def render_shorts_header_bar(title, accent_color=(255, 255, 255), frame_width=1080):
+    """Renders a solid black top bar with white and accent colored title text for Shorts."""
     font = gf(54, bold=True)
     draw_temp = ImageDraw.Draw(Image.new('RGBA', (frame_width, 200)))
     
@@ -2493,13 +2493,41 @@ def render_shorts_header_bar(title, frame_width=1080):
     # Draw solid black background bar shifted down
     draw.rectangle([0, offset_y, frame_width, offset_y + bar_height], fill=(0, 0, 0, 255))
     
-    # Draw centered white text
+    # Draw centered text with color variant
     for i, line in enumerate(lines):
-        lw = draw.textlength(line, font=font)
-        tx = (frame_width - lw) // 2
-        ty = offset_y + padding_y + i * (line_height + line_spacing)
-        draw.text((tx, ty), line, font=font, fill=(255, 255, 255, 255))
+        words_in_line = line.split()
+        if not words_in_line:
+            continue
+            
+        highlight_mask = [False] * len(words_in_line)
+        if len(lines) == 1:
+            # Highlight the last 1 or 2 words (approx last 30%)
+            num_highlight = max(1, len(words_in_line) // 3)
+            for idx in range(len(words_in_line) - num_highlight, len(words_in_line)):
+                highlight_mask[idx] = True
+        else:
+            # Highlight the entire second line
+            if i == 1:
+                highlight_mask = [True] * len(words_in_line)
+                
+        space_w = draw.textlength(" ", font=font)
+        word_widths = [draw.textlength(w, font=font) for w in words_in_line]
+        total_line_w = sum(word_widths) + space_w * (len(words_in_line) - 1)
         
+        cur_x = (frame_width - total_line_w) // 2
+        ty = offset_y + padding_y + i * (line_height + line_spacing)
+        
+        for idx, word in enumerate(words_in_line):
+            w_w = word_widths[idx]
+            color = accent_color if highlight_mask[idx] else (255, 255, 255, 255)
+            
+            # Draw shadow for maximum contrast
+            for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                draw.text((cur_x + dx, ty + dy), word, font=font, fill=(0, 0, 0, 150))
+                
+            draw.text((cur_x, ty), word, font=font, fill=color)
+            cur_x += w_w + space_w
+            
     return img
 
 def render_entity_tags(entities, accent_color, frame_width=1080, on_right=False):
@@ -4914,7 +4942,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     
     # Header bar: solid black top bar with white text for Shorts, disabled for Longform
     if not is_longform:
-        header_img = render_shorts_header_bar(title, FRAME_W)
+        header_img = render_shorts_header_bar(title, accent_color, FRAME_W)
     else:
         header_img = Image.new('RGBA', (FRAME_W, FRAME_H), (0, 0, 0, 0))
     
