@@ -220,6 +220,25 @@ def run_pipeline(topic_type="auto", dry_run=False):
     log_message(f"STEP 2: Fetching articles (RSS + Trending Engine)...")
     rss_articles = []
     try:
+        # Fetch vidIQ trending topics
+        vidiq_news = []
+        try:
+            from vidiq_trending import get_pipeline_topics
+            vidiq_raw = get_pipeline_topics(category=category)
+            for item in vidiq_raw:
+                vidiq_news.append({
+                    "title": item["original_title"] if item.get("original_title") else item["title"],
+                    "description": f"vidIQ Opportunity Score: {item.get('score', 60)} (Volume: {item.get('search_volume')}, Competition: {item.get('competition')})",
+                    "source": {"name": item.get("source", "vidIQ")},
+                    "url": item.get("url", ""),
+                    "publishedAt": datetime.now().isoformat(),
+                    "type": "trending",
+                    "_engagement_score": item.get("score", 60)
+                })
+            log_message(f"📈 vidIQ: Injected {len(vidiq_news)} high-signal topics.")
+        except Exception as ex:
+            log_message(f"⚠️ vidIQ Fetch failed (non-fatal): {ex}")
+
         # Fetch both to give Gemini more options
         research_news = fetch_tech_news()
         ai_tool_news = fetch_ai_tools()
@@ -232,7 +251,7 @@ def run_pipeline(topic_type="auto", dry_run=False):
             log_message(f"⚠️ Failed to import x_trending_fetcher: {ex}")
             x_news = []
             
-        rss_articles = research_news + ai_tool_news + x_news
+        rss_articles = vidiq_news + research_news + ai_tool_news + x_news
         
         # ── TRENDING ENGINE (Phase 1): YouTube, Reddit, GitHub signals ──
         trending_articles = []
@@ -248,7 +267,7 @@ def run_pipeline(topic_type="auto", dry_run=False):
         if not rss_articles:
             log_message("⚠️ All feeds returned 0 articles.")
         else:
-            log_message(f"✅ Fetched {len(rss_articles)} total articles ({len(research_news)} research, {len(ai_tool_news)} tools, {len(x_news)} X.com, {len(trending_articles)} trending).")
+            log_message(f"✅ Fetched {len(rss_articles)} total articles ({len(vidiq_news)} vidIQ, {len(research_news)} research, {len(ai_tool_news)} tools, {len(x_news)} X.com, {len(trending_articles)} trending).")
     except Exception as e:
         log_message(f"⚠️ RSS/Trending Fetch failed: {e}")
 

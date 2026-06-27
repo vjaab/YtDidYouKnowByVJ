@@ -1,0 +1,11 @@
+# GitHub Actions Snippet for vidIQ Integration
+# Add this configuration under the 'Setup Environment Secrets (.env)' step in your workflow files:
+
+      - name: Setup Environment Secrets (.env)
+        run: |
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
+          echo "NEWS_API_KEY=${{ secrets.NEWS_API_KEY }}" >> .env
+          # ... existing secrets ...
+          if [ ! -z "${{ secrets.VIDIQ_API_KEY }}" ]; then
+            echo "VIDIQ_API_KEY=${{ secrets.VIDIQ_API_KEY }}" >> .env
+          fi

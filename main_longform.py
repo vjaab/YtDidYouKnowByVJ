@@ -176,6 +176,25 @@ def run_longform_pipeline(dry_run=False):
     log_message("STEP 1: Fetching RSS articles (Research + Tools + Trending)...")
     rss_articles = []
     try:
+        # Fetch vidIQ trending topics
+        vidiq_news = []
+        try:
+            from vidiq_trending import get_pipeline_topics
+            vidiq_raw = get_pipeline_topics(category="AI Did You Know")
+            for item in vidiq_raw:
+                vidiq_news.append({
+                    "title": item["original_title"] if item.get("original_title") else item["title"],
+                    "description": f"vidIQ Opportunity Score: {item.get('score', 60)} (Volume: {item.get('search_volume')}, Competition: {item.get('competition')})",
+                    "source": {"name": item.get("source", "vidIQ")},
+                    "url": item.get("url", ""),
+                    "publishedAt": datetime.now().isoformat(),
+                    "type": "trending",
+                    "_engagement_score": item.get("score", 60)
+                })
+            log_message(f"📈 vidIQ: Injected {len(vidiq_news)} high-signal topics.")
+        except Exception as ex:
+            log_message(f"⚠️ vidIQ Fetch failed (non-fatal): {ex}")
+
         research_news = fetch_tech_news()
         ai_tool_news = fetch_ai_tools()
         trending_news = fetch_trending_from_newsapi()
@@ -188,13 +207,13 @@ def run_longform_pipeline(dry_run=False):
             log_message(f"⚠️ Failed to import x_trending_fetcher: {ex}")
             x_news = []
             
-        rss_articles = research_news + ai_tool_news + trending_news + x_news
+        rss_articles = vidiq_news + research_news + ai_tool_news + trending_news + x_news
 
         if not rss_articles:
             log_message("⚠️ All sources returned 0 articles. Pipeline will rely on Gemini Search.")
         else:
             log_message(f"✅ Fetched {len(rss_articles)} total articles "
-                       f"({len(research_news)} research, {len(ai_tool_news)} tools, {len(trending_news)} trending, {len(x_news)} X.com).")
+                       f"({len(vidiq_news)} vidIQ, {len(research_news)} research, {len(ai_tool_news)} tools, {len(trending_news)} trending, {len(x_news)} X.com).")
     except Exception as e:
         log_message(f"⚠️ RSS/X Fetch failed: {e}")
 
