@@ -4471,9 +4471,29 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         # Calculate a slow zoom that increases scale by 10% over the full video
         zoom_speed = 0.10 / max(audio_duration, 1.0)
         
+        # Combined dynamic scale: shrink/glide for Shorts intro + continuous micro-breathing/slow zoom
+        def avatar_resize_fn(t):
+            base_scale = 1.0 + zoom_speed * t + 0.006 * math.sin(t * 1.8)
+            if is_longform:
+                return base_scale
+                
+            # Glide/shrink logic for Shorts
+            glide_dur = 3.5
+            scale_start = 1080.0 / cur_w
+            scale_end = 1.0
+            
+            if t < glide_dur:
+                p = t / glide_dur
+                p = 1.0 - (1.0 - p)**3 # cubic ease-out
+                intro_scale = scale_start + (scale_end - scale_start) * p
+            else:
+                intro_scale = scale_end
+                
+            return intro_scale * base_scale
+
         avatar_clip = avatar_clip.with_effects([
-            # Continuous dynamic zoom-in + Micro-Breathing
-            vfx.Resize(lambda t: 1.0 + zoom_speed * t + 0.006 * math.sin(t * 1.8)), 
+            # Continuous dynamic zoom-in + Micro-Breathing + intro glide resize
+            vfx.Resize(avatar_resize_fn), 
             # Natural Head Tilt: Very subtle +/- 0.5 degree swing
             vfx.Rotate(lambda t: 0.6 * math.sin(t * 1.4 + 0.5))
         ])
@@ -4492,19 +4512,37 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             except Exception as e:
                 print(f"   ⚠️ Circular frame failed (non-fatal): {e}")
 
+        def get_scaled_dims(t):
+            scale = avatar_resize_fn(t)
+            return int(cur_w * scale), int(cur_h * scale)
+
         def pip_position(t):
-            current_scale = 1.0 + zoom_speed * t + 0.006 * math.sin(t * 1.8)
-            scaled_w = int(cur_w * current_scale)
-            scaled_h = int(cur_h * current_scale)
+            scaled_w, scaled_h = get_scaled_dims(t)
             if is_longform:
                 # Center horizontally for longform 16:9 like a news anchor / central explainer host
                 base_x = (FRAME_W - scaled_w) // 2
                 base_y = FRAME_H - scaled_h
+                return (base_x, base_y)
             else:
-                # Bottom-center for Shorts 9:16
-                base_x = (FRAME_W - scaled_w) // 2 + layout["avatar_x_offset"]
-                base_y = FRAME_H - scaled_h - 30
-            return (base_x, base_y)
+                # Glide/shrink position interpolation for Shorts
+                glide_dur = 3.5
+                
+                # Start position (centered just below the header bar)
+                x_start = 0.0
+                y_start = 350.0
+                
+                # Target bottom-center PIP position
+                x_end = (FRAME_W - scaled_w) / 2.0 + layout["avatar_x_offset"]
+                y_end = FRAME_H - scaled_h - 30.0
+                
+                if t < glide_dur:
+                    p = t / glide_dur
+                    p = 1.0 - (1.0 - p)**3 # cubic ease-out
+                    x_pos = x_start + (x_end - x_start) * p
+                    y_pos = y_start + (y_end - y_start) * p
+                    return (int(x_pos), int(y_pos))
+                else:
+                    return (int(x_end), int(y_end))
 
         # Let's collect all screenshot active intervals to hide avatar during screenshots
         screenshot_intervals = []
