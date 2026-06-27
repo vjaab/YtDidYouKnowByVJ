@@ -369,6 +369,33 @@ def run_pipeline(topic_type="auto", dry_run=False):
         else:
             log_message("No valid evidence URL found for secondary screenshot.")
 
+        # ── STEP 3d: Fetch and Validate Entity Tags (MANDATORY for Shorts) ──
+        is_longform = "Slot C" in slot
+        if not is_longform:
+            log_message("STEP 3d: Fetching and validating entity tags for Short...")
+            script_data = fetch_all_entities(script_data)
+            
+            # Find entities with name, description, and successfully downloaded logo
+            valid_entities = []
+            for ent_list_key in ["companies", "people", "key_entities"]:
+                for ent in script_data.get(ent_list_key, []):
+                    name = ent.get("name")
+                    desc = ent.get("description")
+                    logo_path = ent.get("local_logo_path") or ent.get("local_hq_path") or ent.get("local_image_path")
+                    if name and desc and logo_path and os.path.exists(logo_path):
+                        if not any(e.get("name") == name for e in valid_entities):
+                            valid_entities.append(ent)
+            
+            if not valid_entities:
+                log_message("❌ Short validation FAILED: No valid entity tags (logo + name + description) found.")
+                failed_headline = script_data.get("original_news_headline", title)
+                failed_topics.append(failed_headline)
+                script_data = None
+                attempts += 1
+                continue
+            else:
+                log_message(f"✅ Found {len(valid_entities)} valid entity tags for the Short.")
+
         # ── STEP 4: Generate Audio + Word Timestamps ──────────────────────────
         log_message("STEP 4: Generating voiceover + word timestamps...")
         custom_map = script_data.get("custom_map", {})

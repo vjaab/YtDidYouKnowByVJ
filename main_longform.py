@@ -74,21 +74,32 @@ def format_longform_description(script_data, hashtags):
     
     # Build timestamps section
     timestamps_str = "📌 TIMESTAMPS:\n"
-    timestamps_str += "0:00 — Introduction / Hook\n"
-    last_start = 0
-    for ft in fact_timestamps:
-        approx_s = ft.get("approx_start_seconds", 0)
-        m, s = divmod(int(approx_s), 60)
-        fact_num = ft.get("fact_number", "?")
-        # Skip non-numeric/recap markers
-        if not isinstance(fact_num, int):
-            continue
-        topic = ft.get("topic", f"Fact {fact_num}")[:50]
-        timestamps_str += f"{m}:{s:02d} — Fact {fact_num}: {topic}\n"
-        last_start = max(last_start, approx_s)
-        
-    m_out, s_out = divmod(int(last_start + 35), 60)
-    timestamps_str += f"{m_out}:{s_out:02d} — Outro & Discussion\n"
+    is_vaibhav = script_data.get("longform_format") == "vaibhav"
+    
+    if is_vaibhav:
+        last_start = 0
+        for ft in fact_timestamps:
+            approx_s = ft.get("approx_start_seconds", 0)
+            m, s = divmod(int(approx_s), 60)
+            topic = ft.get("topic", ft.get("section", "Section"))[:60]
+            timestamps_str += f"{m}:{s:02d} — {topic}\n"
+            last_start = max(last_start, approx_s)
+    else:
+        timestamps_str += "0:00 — Introduction / Hook\n"
+        last_start = 0
+        for ft in fact_timestamps:
+            approx_s = ft.get("approx_start_seconds", 0)
+            m, s = divmod(int(approx_s), 60)
+            fact_num = ft.get("fact_number", "?")
+            # Skip non-numeric/recap markers
+            if not isinstance(fact_num, int):
+                continue
+            topic = ft.get("topic", f"Fact {fact_num}")[:50]
+            timestamps_str += f"{m}:{s:02d} — Fact {fact_num}: {topic}\n"
+            last_start = max(last_start, approx_s)
+            
+        m_out, s_out = divmod(int(last_start + 35), 60)
+        timestamps_str += f"{m_out}:{s_out:02d} — Outro & Discussion\n"
     
     # Build sources section
     sources_str = "📚 SOURCES:\n"

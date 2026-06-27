@@ -1,12 +1,12 @@
 """
-config_longform.py — Configuration for the daily "Did You Know" 16:9 long-form pipeline.
+config_longform.py — Configuration for the 16:9 long-form pipeline in Vaibhav Sisinty format.
 
 Separate from config.py so that the Shorts pipeline is never affected.
 
-VIRAL RETENTION OVERHAUL (2026-06-01):
-  - Scaled from 3-min / 5-fact → 8-min / 10-fact format
+VAIBHAV SISINTY FORMAT OVERHAUL (2026-06-28):
+  - Transitioned from 10-fact compilation to: 1 Main Topic Deep Dive + News Roundup updates
   - Enables mid-roll ads (8+ min threshold)
-  - Matches top-performing "Did You Know" channels (Bright Side, BE AMAZED)
+  - Follows high-utility, tactical explainer style
 """
 import os
 
@@ -20,17 +20,19 @@ LONGFORM_RESOLUTION = (1920, 1080)            # 16:9 Landscape
 LONGFORM_FPS = 30
 
 # ── Content Structure ─────────────────────────────────────────────────────────
-LONGFORM_NUM_TOPICS = 10                      # 10 facts per compilation (doubled)
-LONGFORM_PER_TOPIC_DURATION = (35, 50)        # Seconds per individual fact (deeper)
-LONGFORM_INTRO_DURATION = 15                  # 15s intro hook (cold open + intro)
-LONGFORM_OUTRO_DURATION = 20                  # 20s CTA outro (end screen safe zone)
+LONGFORM_NUM_TOPICS = 2                       # 1 Main Topic + 1 news update (Temporarily for quick testing)
+LONGFORM_PER_TOPIC_DURATION = (10, 15)        # Seconds per individual fact/segment (deeper)
+LONGFORM_INTRO_DURATION = 5                   # 5s intro hook (cold open + intro)
+LONGFORM_OUTRO_DURATION = 5                   # 5s CTA outro (end screen safe zone)
+LONGFORM_WORD_COUNT_TARGET = (50, 100)        # Short word count for quick testing
+LONGFORM_TARGET_AUDIO_DURATION = (15, 35)     # Short duration for quick rendering
 
 # ── Upload Schedule ───────────────────────────────────────────────────────────
 LONGFORM_UPLOAD_TIME = "04:30"                # 10:00 AM IST = 04:30 UTC
 
 # ── Audio ─────────────────────────────────────────────────────────────────────
 LONGFORM_BGM_VOLUME = 0.09                    # Atmospheric BGM for 8-min content
-LONGFORM_WORD_COUNT_TARGET = (1100, 1350)     # ~150 WPM for 8 min
+# LONGFORM_WORD_COUNT_TARGET = (1100, 1350)     # ~150 WPM for 8 min (commented out for testing)
 LONGFORM_BGM_INTENSITY_RAMP = True            # BGM volume ramps up for last 3 facts
 
 # ── Retry Logic ───────────────────────────────────────────────────────────────

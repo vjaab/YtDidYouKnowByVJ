@@ -2609,13 +2609,13 @@ def render_dynamic_entity_tags(entities, accent_color, t, audio_duration, frame_
     scale = frame_width / 1080.0
     
     # Scale parameters
-    box_h = int(250 * scale)
+    box_h = int(450 * scale)
     spacing = int(16 * scale)
     start_y = int(293 * scale)
     start_x = int(40 * scale)
     
-    font_size_name = int(36 * scale)
-    font_size_desc = int(22 * scale)
+    font_size_name = int(72 * scale)
+    font_size_desc = int(44 * scale)
     
     # Fonts
     try:
@@ -2667,14 +2667,14 @@ def render_dynamic_entity_tags(entities, accent_color, t, audio_duration, frame_
         
         logo_w, logo_h = 0, 0
         if logo_img:
-            # Scale logo to fit nicely within height of 224
+            # Scale logo to fit nicely within height of 350
             aspect = logo_img.width / logo_img.height
-            logo_h = int(224 * scale)
+            logo_h = int(350 * scale)
             logo_w = int(logo_h * aspect)
             
-        content_x_start = int(24 * scale)
-        padding_after_text = int(24 * scale)
-        logo_space = (logo_w + int(16 * scale)) if logo_img else 0
+        content_x_start = int(40 * scale)
+        padding_after_text = int(40 * scale)
+        logo_space = (logo_w + int(32 * scale)) if logo_img else 0
         
         # Bare minimum box width required
         min_box_w = content_x_start + logo_space + max_text_w + padding_after_text
@@ -2690,7 +2690,7 @@ def render_dynamic_entity_tags(entities, accent_color, t, audio_duration, frame_
         tag_img = Image.new('RGBA', (int(box_w + 10), int(box_h + 10)), (0,0,0,0))
         tag_draw = ImageDraw.Draw(tag_img)
         
-        content_x = int(24 * scale)
+        content_x = int(40 * scale)
         
         # Paste Logo if available
         if logo_img:
@@ -2698,15 +2698,15 @@ def render_dynamic_entity_tags(entities, accent_color, t, audio_duration, frame_
             logo_x = int(content_x)
             logo_y = int((box_h - logo_h) // 2)
             tag_img.paste(scaled_logo, (logo_x, logo_y), scaled_logo)
-            content_x += logo_w + int(16 * scale)
+            content_x += logo_w + int(32 * scale)
             
         # Draw Text (Floating without a box, so we add a stroke for contrast)
-        stroke_w = int(1 * scale)
+        stroke_w = int(2 * scale)
         stroke_c = (0, 0, 0, 200)
         
         if desc:
-            name_y = box_h // 2 - int(15 * scale)
-            desc_y = box_h // 2 + int(25 * scale)
+            name_y = box_h // 2 - int(35 * scale)
+            desc_y = box_h // 2 + int(35 * scale)
             tag_draw.text((content_x, name_y), val, font=f_name, fill=(255, 255, 255, 255), stroke_width=stroke_w, stroke_fill=stroke_c, anchor="lm")
             tag_draw.text((content_x, desc_y), desc, font=f_desc, fill=(220, 220, 220, 255), stroke_width=stroke_w, stroke_fill=stroke_c, anchor="lm")
         else:
@@ -4731,6 +4731,13 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 if logo_path:
                     ent["local_logo_path"] = logo_path
                 entities_list.append(ent)
+                
+    if not is_longform:
+        # Filter entities to only those that have a name, a description, and a logo
+        entities_list = [
+            e for e in entities_list
+            if e.get("name") and e.get("description") and e.get("local_logo_path") and os.path.exists(e.get("local_logo_path"))
+        ]
                 
     if not is_longform and entities_list:
         # Pre-calculate active time intervals for each entity based on chunk mentions

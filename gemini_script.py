@@ -731,9 +731,9 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "keywords": ["AI"],
   "hashtags": ["#AI", "#CyberSecurity", "#DataPrivacy", "#TechNews"],
   "companies_mentioned": ["list of company names mentioned in the script"],
-  "companies": [{"name": "Company Name", "domain": "domain.com", "description": "2-4 word description of the company"}],
-  "people": [{"name": "Person Name", "wikipedia_slug": "Wikipedia_Slug", "description": "2-4 word description of the person's role"}],
-  "key_entities": [{"name": "Entity Name", "type": "COMPANY|PEOPLE|TOOL|OTHER", "description": "2-4 word description of the entity"}],
+  "companies": [{{"name": "Company Name", "domain": "domain.com", "description": "2-4 word description of the company"}}],
+  "people": [{{"name": "Person Name", "wikipedia_slug": "Wikipedia_Slug", "description": "2-4 word description of the person's role"}}],
+  "key_entities": [{{"name": "Entity Name", "type": "COMPANY|PEOPLE|TOOL|OTHER", "description": "2-4 word description of the entity"}}],
   "comment_hook": "Provocative question to drive engagement (e.g. 'Which department at your job is leaking the most data?')"
 }}"""
     else:
@@ -841,9 +841,9 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "keywords": ["Tech Trends", "AI", "Coding", "Software"],
   "hashtags": ["#TechTrends", "#AI", "#Coding", "#Software", "#Developer"],
   "companies_mentioned": ["list of company names mentioned in the script"],
-  "companies": [{"name": "Company Name", "domain": "domain.com", "description": "2-4 word description of the company"}],
-  "people": [{"name": "Person Name", "wikipedia_slug": "Wikipedia_Slug", "description": "2-4 word description of the person's role"}],
-  "key_entities": [{"name": "Entity Name", "type": "COMPANY|PEOPLE|TOOL|OTHER", "description": "2-4 word description of the entity"}],
+  "companies": [{{"name": "Company Name", "domain": "domain.com", "description": "2-4 word description of the company"}}],
+  "people": [{{"name": "Person Name", "wikipedia_slug": "Wikipedia_Slug", "description": "2-4 word description of the person's role"}}],
+  "key_entities": [{{"name": "Entity Name", "type": "COMPANY|PEOPLE|TOOL|OTHER", "description": "2-4 word description of the entity"}}],
   "comment_hook": "A provocative question: 'What do you think of this breakout tool? Let me know below! 👇'"
 }}"""
         elif topic_type == "tools":
@@ -895,9 +895,9 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "keywords": ["Tech Tips", "iPhone", "Android", "Hidden Features"],
   "hashtags": ["#TechTips", "#iPhone", "#Android", "#HiddenFeatures", "#LifeHack"],
   "companies_mentioned": ["list of company names mentioned in the script"],
-  "companies": [{"name": "Company Name", "domain": "domain.com", "description": "2-4 word description of the company"}],
-  "people": [{"name": "Person Name", "wikipedia_slug": "Wikipedia_Slug", "description": "2-4 word description of the person's role"}],
-  "key_entities": [{"name": "Entity Name", "type": "COMPANY|PEOPLE|TOOL|OTHER", "description": "2-4 word description of the entity"}],
+  "companies": [{{"name": "Company Name", "domain": "domain.com", "description": "2-4 word description of the company"}}],
+  "people": [{{"name": "Person Name", "wikipedia_slug": "Wikipedia_Slug", "description": "2-4 word description of the person's role"}}],
+  "key_entities": [{{"name": "Entity Name", "type": "COMPANY|PEOPLE|TOOL|OTHER", "description": "2-4 word description of the entity"}}],
   "comment_hook": "A provocative question: 'Did you know about this? Drop a 🤯 if this blew your mind!'"
 }}"""
         elif topic_type == "news":

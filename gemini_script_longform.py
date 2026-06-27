@@ -41,94 +41,57 @@ from config_longform import (
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# PROMPT TEMPLATES
+# PROMPT TEMPLATES (VAIBHAV SISINTY FORMAT)
 # ═══════════════════════════════════════════════════════════════════════════════
 
-SYSTEM_PERSONA_LONGFORM = """Role: You are an elite AI Research Content Architect who creates "Did You Know" style compilation videos that go VIRAL on YouTube — targeting millions of views and 50%+ average retention.
+SYSTEM_PERSONA_LONGFORM = """Role: You are an elite AI Content Architect and growth hacker who creates high-utility, fast-paced, "no-fluff" YouTube long-form videos in the style of Vaibhav Sisinty — targeting millions of views, extremely active comment sections, and 50%+ average retention from professionals, creators, and founders.
 
-Format: 16:9 Landscape, 8-minute "Rapid-Fire AI Facts" video.
-Structure: 10 mind-blowing AI facts, each lasting 35-50 seconds, stitched with smooth narrative bridges and escalating intensity.
+Format: 16:9 Landscape, 7-9 minutes, fast-paced, high-utility explainer video.
+Structure:
+- A main topic deep-dive (approx 4-5 minutes) covering: Hook -> The Problem -> The Framework -> The Live Demo (Prompts & workflow) -> The Payoff/Result.
+- A news roundup (approx 3-4 minutes) covering 5-8 hot AI updates or tool releases from the last 72 hours, adding massive value and scope to the video.
 
-Tone: Authoritative yet conversational. Like a tech-savvy friend who just discovered something INSANE and can't wait to tell you. Think Mark Rober meets Fireship — clear, punchy, and impossible to look away from.
+Tone: High-energy, tactical, authoritative yet conversational. Like a growth-focused founder or tech product manager who has just optimized a workflow and is showing you exactly how to do it. Bias toward action: "Build, don't talk" and "Taste over tech".
 
-Target Audience: Tech enthusiasts, AI curious professionals, and engineers from USA, UK, Canada, Australia, New Zealand, Singapore, South Korea, Japan, and European countries. Use standard English, USD ($), and universally understood analogies.
-
-═══════════════════════════════════════════════════
-GOLDEN RULES (NON-NEGOTIABLE):
-═══════════════════════════════════════════════════
-
-1. EACH FACT starts with "Did you know..." or a variant ("Here's something insane...", "Most people have no idea that...", "This one blew my mind...", "Nobody is talking about this but...").
-2. ESCALATING INTENSITY: Fact 1 = interesting, Fact 5 = surprising, Fact 10 = mind-blowing. The viewer must feel the video gets BETTER with every fact.
-3. BRIDGES: Each fact MUST end with a curiosity cliffhanger that FORCES the viewer to keep watching. Never let the viewer feel like a natural stopping point. Examples:
-   - "But that's nothing compared to what Google just did..."
-   - "And the NEXT fact? It makes this look like child's play."
-   - "Wait until you hear what happened three days AFTER this announcement..."
-4. NO FLUFF: Zero filler words. No "In this video", "Hello everyone", "Today we explore".
-5. COLD OPEN: Start with a 15-second teaser of the MOST SHOCKING fact (Fact 8, 9, or 10) before the intro. Example: "In just a moment, I'll show you something that made the CEO of Google lose sleep. But first..." — then begin Fact 1.
-6. VOCAL DYNAMICS: Heavy punctuation (commas, ellipses '...', ALL CAPS) for TTS emphasis. Pause after every technical term with 3+ syllables.
-7. EVIDENCE: Each fact MUST reference a specific source (company, paper, benchmark, or study) for authority.
-8. PERSONAL STAKES: At least 4 of the 10 facts MUST explain how this affects the viewer personally (job, privacy, daily life, money).
-9. PATTERN INTERRUPT EVERY 30 SECONDS: Insert a micro-hook, rhetorical question, or pattern interrupt at least once every 30 seconds. Examples:
-   - "Wait... did I hear that right?"
-   - "Now pause and think about that for a second."
-   - "And here's where it gets really interesting..."
-10. POWER OF 3: Each fact should have 3 components — (1) the hook, (2) the evidence/data, (3) the personal impact.
-11. RECAP BUMPERS: After every 3 facts, insert a 5-second recap: "So far we've covered [X], [Y], and [Z] — but this NEXT fact completely changes everything."
-12. MIDPOINT TWIST: At the halfway mark (after Fact 5), insert a dramatic escalation: "Okay, those first five facts were just the warm-up. Everything from here on out... is on a completely different level."
-13. CTA: The final 15 seconds = provocative question + "Drop a comment with which fact shocked you most! Follow me on Telegram for daily AI facts. Link is on my channel home page. And hit subscribe — because tomorrow's video? It's even crazier."
-14. NO INFOGRAPHICS: Do not include infographics, flowcharts, or slides in the script structure.
-15. CLARITY OVER JARGON: If you use a complex term like 'Quantization', follow it immediately with a simple 3-word analogy (e.g., '...essentially data compression').
-16. SUBJECT CLARITY: Always clearly state the primary subject name (e.g., "Ferrari", "IBM") in the first 2 seconds of each fact's hook. Never start with a dangling verb or pronoun without naming the subject aloud first.
-17. COMPLETE SENTENCES: Every single sentence MUST be grammatically complete and fully resolved. Never truncate, cut short, or leave a thought unfinished.
-18. SMOOTH PHRASING: Avoid awkward phrasing or word salads. Read the script internally to ensure extremely smooth, professional tech-journalist transitions.
-19. ESCALATION LABELS: At facts 7, 8, 9, 10 — verbally label the intensity: "This NEXT fact ranks number three on our shock meter..." to gamify the viewing experience.
-20. END SCREEN SAFE ZONE: The last 20 seconds of the script must be structured so the video can show YouTube end screen cards without covering important visuals."""
+Target Audience: Founders, creators, knowledge workers, and professionals from high-RPM countries (USA, UK, Canada, Australia, Singapore, India). Use standard English, clean numbers, and clear analogies. Use commas and ellipses '...' for natural speech pacing in TTS. Never include infographics or generic flowcharts in instructions."""
 
 
 TOPIC_DISCOVERY_TEMPLATE = """{persona}
 
 TOPIC DISCOVERY AGENT TASK:
-Search today's AI landscape and find the TOP 10 most viral, surprising, and mind-blowing AI facts, discoveries, or announcements from the last 72 hours.
+Search today's AI landscape and discover:
+1. One MAIN BREAKOUT topic (the main_topic): This must be a major AI release, a revolutionary tool, an insane prompt hack, or a life-changing automated workflow with massive utility for professionals or creators.
+2. 5 to 7 SECONDARY topics (news_updates): These must be hot AI updates, tool launches, or interesting tech facts from the last 72 hours.
 
 SOURCES TO ANALYZE:
 {news_context}
 
 SELECTION CRITERIA (in order of priority):
-1. SHOCK VALUE: "Wait, WHAT?!" reaction. Facts that make people stop scrolling.
-2. RECENCY: Happened in the last 24-72 hours. Fresh news > old knowledge.
-3. PERSONAL IMPACT: Affects the viewer's job, privacy, money, or daily routine.
-4. BIG NAMES: Google, OpenAI, Meta, NVIDIA, Apple, Anthropic, Microsoft, xAI, Amazon = more clicks.
-5. CONTROVERSY: Lawsuits, leaks, ethical scandals, unexpected failures.
-6. VARIETY: All 10 topics MUST be from DIFFERENT areas of AI (no two about the same company or subfield).
-
-ESCALATION ORDER (10-fact format):
-- Topic 1: Interesting/Cool (Warm-up hook)
-- Topic 2: Useful/Practical (Value delivery)
-- Topic 3: Surprising/Counterintuitive (First pattern interrupt)
-- Topic 4: Industry-shaking (Power move)
-- Topic 5: Scary/Concerning (First emotional peak)
-- Topic 6: Useful/Life-changing tool (Recovery — value delivery)
-- Topic 7: Counterintuitive/Underdog (Surprise factor)
-- Topic 8: Controversial/Divisive (Debate fuel — drives comments)
-- Topic 9: Alarming/Privacy-related (Emotional peak #2)
-- Topic 10: Mind-blowing/World-changing (Ultimate climax)
+- High utility: solves a real pain point (saving time, making money, future-proofing jobs).
+- Urgent/Breaking: happened in the last 24-72 hours.
+- Mass appeal: avoid dry developer-only tutorials, PC overclocking, or academic benchmarks without consumer application.
 
 AVOIDANCE LIST (DO NOT select topics similar to these):
 {avoid_list}
 
 Return ONLY a JSON object:
 {{
-  "topics": [
+  "main_topic": {{
+    "headline": "Headline or breakout tool name",
+    "source_url": "Direct source article URL",
+    "source_name": "Company/source name",
+    "one_liner": "Why this tool/hack is a game-changer for professionals",
+    "search_keywords": ["keyword1", "keyword2", "keyword3"],
+    "content_pillar": "AI Tool Spotlight"
+  }},
+  "news_updates": [
     {{
-      "rank": 1,
-      "headline": "Exact headline or discovery",
-      "source_url": "Direct URL to the source article",
-      "source_name": "Publication or Company name",
-      "shock_level": 7,
-      "category": "Model Launch",
-      "one_liner": "One-sentence summary of why this is mind-blowing",
-      "search_keywords": ["keyword1", "keyword2", "keyword3"],
-      "personal_impact": "How this affects the average viewer"
+      "rank": 2,
+      "headline": "Secondary news update or tool headline",
+      "source_url": "Direct source URL",
+      "source_name": "Company/source name",
+      "one_liner": "Quick update summary",
+      "search_keywords": ["keyword1", "keyword2"]
     }}
   ]
 }}"""
@@ -138,7 +101,6 @@ FACT_RESEARCH_TEMPLATE = """{persona}
 
 RESEARCH AGENT TASK:
 Extract ONLY the technical facts, data points, and narrative details for the specific story below.
-IGNORE all other news stories. Focus on providing the 'isolated truth' for this one story.
 
 TARGET STORY: {target_headline}
 SOURCE URL: {source_url}
@@ -147,218 +109,148 @@ ADDITIONAL CONTEXT:
 {context}
 
 Go DEEP. Find:
-1. Specific numbers, benchmarks, and data points (e.g., "93% accuracy", "$2.5 billion", "10x faster")
-2. Who said what — direct quotes from executives or researchers
-3. Timeline — when did this happen, and what's next?
-4. Competition context — how does this compare to rivals?
-5. Personal impact — how does this affect a software engineer, a student, a business owner?
+1. Specific steps, inputs, or workflow description.
+2. Prompts used or how a user can replicate it.
+3. Competitor comparison or background context.
+4. Key numbers (e.g. 10x faster, $10/month, free).
 
 Return ONLY a JSON object:
 {{
-  "facts": ["Fact 1", "Fact 2", "Fact 3", "Fact 4", "Fact 5"],
-  "controversies": ["Controversy 1"],
+  "details": ["Detail 1", "Detail 2"],
+  "prompts_or_steps": ["Step 1", "Step 2"],
+  "competitor_context": "How it compares to competitors",
   "implications": ["Implication 1", "Implication 2"],
-  "key_numbers": ["$2.5 billion", "10x faster", "95% accuracy"],
-  "quotes": ["Direct quote from a key figure"],
-  "timeline": "When this happened and what's expected next",
-  "competitive_context": "How this compares to competitors",
+  "facts": ["Fact 1", "Fact 2"],
   "core_narrative": "A detailed paragraph summary focusing ONLY on this story."
 }}"""
 
 
-FACT_SCRIPT_TEMPLATE = """{persona}
+DEEP_DIVE_SCRIPT_TEMPLATE = """{persona}
 
-FACT SCRIPT GENERATOR TASK:
-Write a 35-50 second script segment for ONE "Did You Know" fact in an 8-minute, 10-fact compilation video.
+DEEP DIVE SCRIPT ARCHITECT TASK:
+Write the main deep-dive segment (4-5 minutes) for a Vaibhav Sisinty-style YouTube video.
 
-FACT #{fact_number} of 10 (Intensity Level: {intensity})
-TOPIC: {topic_headline}
-SOURCE: {source_url}
+MAIN TOPIC: {headline}
 RESEARCH CONTEXT:
 {research_context}
 
-STRUCTURE (MANDATORY — "Power of 3"):
-1. HOOK (3-5s): Start with "Did you know..." or a variant. Pattern interrupt. Use ALL CAPS on the key reveal word. Name the subject (company/person) in the FIRST sentence.
-2. CORE FACT + EVIDENCE (12-18s): Explain the discovery or news with a sharp analogy. Reference the specific source, paper, or benchmark. Use concrete numbers. Keep sentences UNDER 15 words.
-3. PERSONAL STAKES (8-12s): Why should the viewer care RIGHT NOW? Use "YOU" and "YOUR". Be specific about how this affects their job, privacy, finances, or daily life.
-4. BRIDGE (3-5s): Tease the next fact. Create an irresistible open loop that FORCES the viewer to keep watching.
-   {bridge_instruction}
-
-{escalation_label_instruction}
-
-WORD COUNT: 100-140 words (for 35-50 seconds of speech at ~2.8 words/second).
+STRUCTURE (MANDATORY):
+1. THE COLD OPEN & HOOK (0:00 - 0:45): Challenge a common belief or state a bold, slightly alarming claim about the tool/breakthrough. Make it high stakes. Name the tool immediately. (approx 100-120 words)
+2. THE PROBLEM/GAP (0:45 - 1:30): Explain why the traditional way of doing this task (or using basic AI prompts) is slow, expensive, or outdated. (approx 100-120 words)
+3. THE FRAMEWORK/SECRET SAUCE (1:30 - 2:30): Introduce a specific framework, rule, or concept (e.g. GPS Framework, Loop Engineering, Magic Prompt formula) to solve the problem. Explain the theory simply. (approx 130-150 words)
+4. THE LIVE DEMO/EXECUTION (2:30 - 4:15): Walk through the exact step-by-step prompts, tools, or inputs. Describe the screen action clearly so the video generator can place visuals/mockups. (approx 200-240 words)
+5. THE PAYOFF/RESULT (4:15 - 5:00): Show the concrete result — time saved, money earned, or business automated. (approx 100-120 words)
 
 VOCAL DYNAMICS:
-- Use '...' after technical terms with 3+ syllables (e.g., "Quantization... is essentially...")
-- Use ALL CAPS for emphasis on 2-3 key words per fact
-- Use commas for natural pauses
-- Use exclamation marks for energy spikes
-- Keep sentences SHORT. Under 15 words. Punchy.
-- Include at least ONE pattern interrupt (rhetorical question, "wait...", "think about that")
+- Use heavy punctuation (..., ALL CAPS, exclamation points, commas) to vary TTS pitch/cadence.
+- Short, punchy sentences. Under 15 words.
+- No filler words. Bias toward action.
 
 Return ONLY a JSON object:
 {{
-  "fact_number": {fact_number},
-  "script": "The full voiceover text for this 35-50 second fact segment. DO NOT include timestamps or speaker labels.",
-  "hook_text": "The first 5-8 words of the script",
-  "key_stat": "One memorable number or data point (e.g., '10x faster')",
-  "personal_impact_sentence": "The single most impactful sentence about how this affects the viewer",
-  "shock_level": 8,
+  "headline": "{headline}",
+  "hook_script": "The Hook section text.",
+  "problem_script": "The Problem section text.",
+  "framework_script": "The Framework section text.",
+  "demo_script": "The Demo section text.",
+  "payoff_script": "The Payoff section text.",
+  "script": "The full concatenated deep-dive script.",
+  "key_prompt_used": "The primary prompt or workflow highlight",
   "nano_visual_prompts": [
     {{
-      "sentence": "The exact sentence from the script this visual accompanies",
-      "visual_prompt": "Highly specific, cinematic visual description. 16:9 LANDSCAPE format. Dark tech aesthetic, dramatic lighting. NO text in the image. NO faces of real people. Photorealistic, 8K. Example: 'Wide-angle aerial view of a massive data center complex at night, glowing blue server racks visible through glass walls, cinematic fog, dramatic volumetric lighting, 16:9 landscape'",
+      "sentence": "Exact sentence from the script",
+      "visual_prompt": "16:9 cinematic landscape visual prompt (no text, no real faces, dark tech aesthetic).",
       "duration_estimate": 4.5
     }}
-  ],
-  "transition_style": "glitch",
-  "source_reference": "Exact source attribution (e.g., 'According to OpenAI's blog post...')"
+  ]
+}}"""
+
+
+UPDATE_SCRIPT_TEMPLATE = """{persona}
+
+NEWS UPDATE SCRIPT GENERATOR TASK:
+Write a rapid-fire 15-20 second news update segment.
+
+UPDATE TOPIC: {headline}
+RESEARCH CONTEXT:
+{research_context}
+
+RULES:
+1. Start with a direct signpost like "Next up..." or "In other news...".
+2. Explain the update simply with 1 key metric or detail.
+3. Focus on utility/impact for professionals.
+4. Word count: 40-50 words.
+
+Return ONLY a JSON object:
+{{
+  "headline": "{headline}",
+  "script": "The full voiceover script for this update.",
+  "nano_visual_prompts": [
+    {{
+      "sentence": "Exact sentence from the script",
+      "visual_prompt": "16:9 cinematic landscape visual prompt.",
+      "duration_estimate": 5.0
+    }}
+  ]
 }}"""
 
 
 COMPILATION_ASSEMBLER_TEMPLATE = """{persona}
 
 COMPILATION ASSEMBLER TASK:
-You have {num_facts} individual fact scripts. Assemble them into ONE seamless, flowing 8-minute voiceover script with smooth transitions and maximum retention architecture.
+Stitch the main deep-dive script and the news updates into a single cohesive, high-retention 7-9 minute voiceover script.
 
-INDIVIDUAL FACT SCRIPTS:
-{fact_scripts_json}
+DEEP DIVE SEGMENT:
+{deep_dive_json}
 
-ASSEMBLY RULES (CRITICAL FOR VIRAL PERFORMANCE):
+NEWS UPDATES SEGMENTS:
+{updates_json}
 
-1. COLD OPEN (15s): Start with a teaser of the MOST SHOCKING fact (Fact 8, 9, or 10). Examples:
-   - "In just a moment, I'll reveal something that made the CEO of Google lose sleep. But FIRST..."
-   - "One of these ten facts is so disturbing, it was ALMOST censored. Stick around to find out which one."
-   - "By the end of this video, you'll see AI completely differently. And fact number nine? That's the one that changed everything for ME."
-   Then transition: "Let's start with fact number one."
-
-2. FACT SIGNPOSTS: Each fact segment MUST start with the spoken signpost "Fact number [one/two/.../ten]." followed by a comma or ellipsis.
-
-3. BRIDGES: Ensure bridges between facts feel NATURAL, not forced. Remove redundant transitions. Each bridge must create an OPEN LOOP — an unanswered question that can only be resolved by watching the next fact.
-
-4. ESCALATING INTENSITY: Facts 1-3 = warm/interesting, Facts 4-6 = surprising/useful, Facts 7-10 = mind-blowing/alarming.
-
-5. RECAP BUMPERS: After Fact 3 and Fact 6, insert a quick recap:
-   - After Fact 3: "So far we've covered [Fact 1 topic], [Fact 2 topic], and [Fact 3 topic]. But this NEXT fact? It completely changes the game."
-   - After Fact 6: "We're past the halfway mark, and we've already seen [brief summary]. But honestly... the craziest stuff is still ahead."
-
-6. MIDPOINT TWIST (after Fact 5): Insert a dramatic escalation: "Okay, those first five facts were just the warm-up. Everything from here on out... is on a completely different level."
-
-7. ESCALATION LABELS (Facts 7-10): Verbally label the intensity to gamify the experience:
-   - Fact 7: "This next fact ranks number FOUR on our shock meter..."
-   - Fact 8: "Fact eight... and this one ranks number THREE..."
-   - Fact 9: "This is number TWO on our shock list... and for good reason."
-   - Fact 10: "And the NUMBER ONE most mind-blowing AI fact of today..."
-
-8. PATTERN INTERRUPTS: Insert a micro-hook every ~30 seconds. Examples:
-   - "Now pause and think about that for a second."
-   - "And here's where it gets really interesting..."
-   - "Wait... did they really just say that?"
-
-9. OUTRO (20s): After Fact 10, add the CTA:
-   "Which fact shocked you the MOST? Drop the number in the comments — I read every single one! If you learned something new today, smash that subscribe button... because tomorrow's video? It's even crazier. And for daily AI facts before they trend, follow me on Telegram... link is on my channel home page. I'll see you in the next one."
-
-10. TOTAL WORD COUNT: {min_words}-{max_words} words (for ~8 minutes at ~2.8 words/second).
-
-11. CRITICAL SUBTITLE RULE: The `subtitle_chunks` array MUST break the script down into extremely small chunks of EXACTLY 1 to 3 words maximum. Do not generate long sentences for subtitles.
-
-12. DYNAMIC ATTRACTIVE TITLES: Generate titles that are EXTREMELY specific to the actual content of this video — not generic. Use the most shocking/recognizable company name or capability from the 10 facts. Max 60 chars + 1 emoji. High-CTR formulas:
-    - "10 AI Facts That [Shocking Action] 🤯" (e.g., "10 AI Facts That Keep Engineers Awake 💀")
-    - "Did You Know These 10 [Adjective] AI Facts? 😱"
-    - "[Company Name] Just Did Something INSANE + 9 More AI Facts 🔥"
-    - "10 AI Facts Nobody Is Telling You [Year] 🤫"
+ASSEMBLY RULES:
+1. Transition smoothly from the deep-dive payoff to the news updates using a bridge like: "But [Main Tool] isn't the only thing changing the game this week. Here are [X] more massive AI updates you need to know to stay ahead."
+2. Label each update clearly (e.g. "Update number one: ...", "Update number two: ...") to maintain a structured pacing.
+3. After the last update, transition to the Outro/CTA: "Which of these updates or tools are you going to use first? Let me know in the comments below — I read every single one! If you want my exact prompts, playbooks, and tool lists, join my Telegram community. The link is on my channel homepage. Make sure to subscribe to stay ahead, and I'll see you in the next one."
+4. Total word count target: {min_words}-{max_words} words (~7-9 minutes of speech).
+5. SUBTITLES: The `subtitle_chunks` array must break the script down into small chunks of exactly 1 to 3 words maximum.
+6. Generate dynamic and attractive titles cases for professionals and creators.
 
 Return ONLY this exact JSON:
 {{
-  "title_options": ["Title 1 (max 60 chars + emoji)", "Title 2", "Title 3", "Title 4", "Title 5"],
-  "title": "Best title for YouTube (max 60 chars + emoji, curiosity gap)",
-  "description": "Full 300+ word SEO description for YouTube. Must include: fact-by-fact timestamps (e.g., 0:00 Cold Open, 0:15 Fact 1, etc.), credits, SEO keywords, AI disclosure, links to Telegram and WhatsApp.",
-  "script": "The FULL unified voiceover script. Cold open + intro + all 10 facts with bridges + recap bumpers + midpoint twist + outro. One continuous flowing text block.",
-  "cold_open_fact_number": 9,
+  "title_options": ["Curiosity-gap title 1", "Curiosity-gap title 2", "Curiosity-gap title 3", "Curiosity-gap title 4"],
+  "title": "Main YouTube Title (max 60 chars + emoji)",
+  "description": "Full 300+ word rich SEO description including stamps, credits, Telegram/WhatsApp links, and resources.",
+  "script": "The full concatenated continuous script.",
   "fact_timestamps": [
-    {{"fact_number": 0, "approx_start_seconds": 0, "topic": "Cold Open Teaser"}},
-    {{"fact_number": 1, "approx_start_seconds": 15, "topic": "Topic headline"}},
-    {{"fact_number": 2, "approx_start_seconds": 55, "topic": "Topic headline"}},
-    {{"fact_number": 3, "approx_start_seconds": 95, "topic": "Topic headline"}},
-    {{"fact_number": "recap_1", "approx_start_seconds": 130, "topic": "Recap 1-3"}},
-    {{"fact_number": 4, "approx_start_seconds": 140, "topic": "Topic headline"}},
-    {{"fact_number": 5, "approx_start_seconds": 180, "topic": "Topic headline + Midpoint Twist"}},
-    {{"fact_number": 6, "approx_start_seconds": 225, "topic": "Topic headline"}},
-    {{"fact_number": "recap_2", "approx_start_seconds": 260, "topic": "Recap 4-6"}},
-    {{"fact_number": 7, "approx_start_seconds": 270, "topic": "Topic headline"}},
-    {{"fact_number": 8, "approx_start_seconds": 315, "topic": "Topic headline"}},
-    {{"fact_number": 9, "approx_start_seconds": 360, "topic": "Topic headline"}},
-    {{"fact_number": 10, "approx_start_seconds": 405, "topic": "Topic headline"}},
-    {{"fact_number": "outro", "approx_start_seconds": 445, "topic": "CTA + Outro"}}
+    {{"section": "Intro", "approx_start_seconds": 0, "topic": "Introduction & The Paradox"}},
+    {{"section": "Problem", "approx_start_seconds": 45, "topic": "Why basic prompts fail"}},
+    {{"section": "Framework", "approx_start_seconds": 90, "topic": "The framework/solution"}},
+    {{"section": "Demo", "approx_start_seconds": 150, "topic": "Live walkthrough & prompts"}},
+    {{"section": "Updates Intro", "approx_start_seconds": 300, "topic": "Rapid AI News Roundup"}},
+    {{"section": "Update 1", "approx_start_seconds": 315, "topic": "Update 1 topic"}},
+    {{"section": "Outro", "approx_start_seconds": 440, "topic": "Outro & Resources"}}
   ],
   "subtitle_chunks": [
     {{
       "chunk_id": 1,
-      "text": "Exactly 1-3 words for subtitle display",
+      "text": "1-3 words subtitle",
       "start": 0.00,
       "end": 1.50,
-      "nano_visual_prompt": "16:9 landscape cinematic visual. Dark tech aesthetic, no text, no faces. 8K photorealistic.",
-      "fact_number": 0
+      "nano_visual_prompt": "16:9 landscape visual prompt."
     }}
   ],
-  "keywords": ["AI", "Did You Know", "Tech Facts", "Machine Learning", "Artificial Intelligence", "AI News 2026", "10 AI Facts"],
-  "hashtags": ["#AI", "#DidYouKnow", "#TechFacts", "#MachineLearning", "#ArtificialIntelligence", "#AINews"],
-  "comment_hook": "Provocative question for comments (e.g., 'Which fact shocked you the most? Drop the number!')",
-  "phonetic_pronunciation_map": {{"NVIDIA": "In-vid-yah", "LLaMA": "Lah-mah"}},
-  "best_fact_for_shorts": {{
-    "fact_number": 9,
-    "reason": "Highest shock value and standalone watchability",
-    "hook_for_shorts": "This is just 1 of 10 insane AI facts. Full video linked above!"
-  }},
-  "retention_cues": [
-    {{"timestamp": 3.0, "effect": "zoom_in", "reason": "cold_open_hook"}},
-    {{"timestamp": 15.0, "effect": "transition_glitch", "reason": "cold_open_to_fact_1"}},
-    {{"timestamp": 55.0, "effect": "transition_glitch", "reason": "fact_1_to_2_bridge"}},
-    {{"timestamp": 130.0, "effect": "flash_accent", "reason": "recap_bumper_1"}},
-    {{"timestamp": 225.0, "effect": "flash_accent", "reason": "midpoint_twist"}},
-    {{"timestamp": 260.0, "effect": "flash_accent", "reason": "recap_bumper_2"}},
-    {{"timestamp": 405.0, "effect": "zoom_snap", "reason": "fact_10_climax"}}
-  ],
-  "original_news_headline": "Compilation: 10 AI Facts - [Today's Date]",
-  "original_news_url": "Primary source URL from the most impactful fact",
-  "use_case_evidence_url": "Primary source URL from the most impactful fact",
-  "metric_popups": [
-    {{"text": "1,000 tok/sec", "timestamp": 25.0, "fact_number": 1}},
-    {{"text": "93% Zero-Click", "timestamp": 70.0, "fact_number": 2}}
-  ]
+  "keywords": ["AI Hacks", "Tech Tips", "Productivity"],
+  "hashtags": ["#AIHacks", "#TechTips", "#Productivity", "#VaibhavSisinty"],
+  "comment_hook": "Provocative question for comments",
+  "phonetic_pronunciation_map": {{}}
 }}"""
 
 
 RETENTION_OPTIMIZER_LONGFORM_TEMPLATE = """{persona}
 
 RETENTION OPTIMIZER TASK (LONG-FORM — 8 MINUTES):
-This is an 8-minute, 10-fact compilation video. Viewer drop-off is the #1 enemy.
-Rewrite the assembled script to MAXIMIZE retention at these critical points:
-
-CRITICAL DROP-OFF POINTS (YouTube analytics data):
-- 0:30 mark (after cold open — viewer decides to stay or leave) — MOST IMPORTANT
-- 1:00 mark (after Fact 1 — "is this worth my time?")
-- 2:00 mark (the "two-minute cliff" — biggest drop-off point for longform)
-- 3:00 mark (attention fatigue — needs a STRONG recap bumper)
-- 4:00 mark (halfway — needs the midpoint twist to re-engage)
-- 5:00 mark (post-midpoint — verify escalation is working)
-- 6:00 mark (final third — must feel the climax building)
-- 7:00 mark (approaching outro — maintain urgency)
-
-OPTIMIZATIONS:
-1. Shorten any sentence over 18 words.
-2. Add '...' pauses after every 3+ syllable technical term.
-3. Ensure each fact ENDS with an open-loop bridge to the next.
-4. Verify the cold open teaser is maximally intriguing (name a specific company or number).
-5. Verify recap bumpers are present after Facts 3 and 6.
-6. Verify midpoint twist is present after Fact 5.
-7. Verify escalation labels are present for Facts 7-10.
-8. Remove ALL filler: "basically", "essentially", "actually", "literally", "so", "in fact", "as a matter of fact".
-9. Add vocal dynamics: commas, ellipses, exclamation marks, ALL CAPS on key words.
-10. Verify TOTAL word count is between {min_words} and {max_words}.
-11. DO NOT remove the spoken "Fact number [one/two/.../ten]" signposts at the start of each fact segment.
-12. COMPLETE SENTENCES: Ensure every single sentence remains grammatically complete and fully resolved.
-13. Pattern interrupts: Ensure at least one micro-hook every 30 seconds (rhetorical question, "wait...", "think about that").
+Optimize this Vaibhav Sisinty explainer style script to maximize pacing and viewer retention.
+Ensure there are no filler words and add vocal dynamics (commas, ellipses, exclamation marks, ALL CAPS on key words).
+Shorten any sentence over 18 words.
 
 ASSEMBLED SCRIPT:
 {assembled_script}
@@ -367,19 +259,18 @@ Return ONLY a JSON object:
 {{
   "optimized_script": "The full rewritten script with all optimizations applied.",
   "word_count": 1200,
-  "estimated_duration_seconds": 430,
-  "retention_hooks_added": ["0:30 cold open strengthened", "2:00 pattern interrupt added", "4:00 midpoint twist verified"],
-  "sentences_shortened": 12,
-  "filler_words_removed": 8
+  "estimated_duration_seconds": 450,
+  "retention_hooks_added": ["cold open hook strengthened", "bridge transition optimized"],
+  "sentences_shortened": 5,
+  "filler_words_removed": 12
 }}"""
 
 
 HUMANIZER_TEMPLATE = """{persona}
 
 HUMANIZER AGENT TASK:
-This is the final step. Fix robotic phrasing, repetitive AI wording, over-explanation, and "In conclusion" style endings.
-Add contractions, punchier cadence, and conversational flow.
-Format the output EXACTLY matching the required schema below.
+Polishes the wording, adds contractions, fixes robotic/repetitive phrasing, ensures extremely smooth flow.
+Formats the final output EXACTLY matching the required schema below.
 
 OPTIMIZED SCRIPT:
 {optimized_script}
@@ -389,14 +280,6 @@ FULL COMPILATION DATA:
 
 SCHEMA REQUIREMENTS:
 {schema_requirements}
-
-CRITICAL RULES:
-1. The `subtitle_chunks` array MUST break the script down into extremely small chunks of EXACTLY 1 to 3 words maximum.
-2. Every sentence must sound like it's spoken by a real person, not read from a teleprompter.
-3. Replace "Furthermore" with "And", "However" with "But", "Additionally" with "Plus".
-4. Add contractions: "it is" → "it's", "they are" → "they're", "do not" → "don't".
-5. The `best_fact_for_shorts` field MUST identify the single most viral fact for Shorts cross-promotion.
-6. YouTube chapter timestamps in `fact_timestamps` MUST be accurate based on word count estimates.
 
 Return ONLY the final JSON object matching the schema. No markdown wrapping. No explanations."""
 
@@ -557,7 +440,7 @@ def call_fallback_model(prompt):
     return None
 
 class LongformGenerationEngine:
-    """Multi-agent script generation engine for 10-topic "Did You Know" videos."""
+    """Multi-agent script generation engine for Vaibhav Sisinty format videos."""
 
     def __init__(self, client, news_context, avoid_list_str):
         self.client = client
@@ -653,8 +536,8 @@ class LongformGenerationEngine:
 
     # ── STEP 0: Topic Discovery ──────────────────────────────────────────────
     def discover_topics(self):
-        """Find the top 10 viral AI topics for today's compilation."""
-        print("🔥 [AGENT 0] Topic Discovery: Finding top 10 viral AI facts...")
+        """Find the main topic and news updates for today's video."""
+        print("🔥 [AGENT 0] Topic Discovery: Finding main breakout topic + news updates...")
 
         # Enrich context with live search
         search_text, search_links = self._call_gemini_search(
@@ -677,14 +560,15 @@ class LongformGenerationEngine:
             avoid_list=self.avoid_list_str
         )
         result = self._call_gemini(prompt)
-        if not result or "topics" not in result:
-            print("⚠️ Topic Discovery failed. Falling back to search-only topics...")
+        if not result or "main_topic" not in result:
+            print("⚠️ Topic Discovery failed.")
             return None
         
-        topics = result["topics"][:LONGFORM_NUM_TOPICS]
-        for i, t in enumerate(topics):
-            print(f"   📌 Fact {i+1}: {t.get('headline', 'Unknown')} (Shock: {t.get('shock_level', '?')}/10)")
-        return topics
+        main_t = result.get("main_topic", {})
+        news_u = result.get("news_updates", [])
+        print(f"   📌 Main topic discovered: {main_t.get('headline', 'Unknown')}")
+        print(f"   📌 Discovered {len(news_u)} secondary news updates.")
+        return result
 
     # ── STEP 1: Research per topic ───────────────────────────────────────────
     def research_topic(self, topic):
@@ -714,72 +598,39 @@ class LongformGenerationEngine:
         )
         return self._call_gemini(prompt)
 
-    # ── STEP 2: Generate script for one fact ─────────────────────────────────
-    def generate_fact_script(self, topic, research_data, fact_number):
-        """Generate a 35-50s script for a single fact."""
+    # ── STEP 2a: Generate script for main deep-dive topic ────────────────────
+    def generate_deep_dive_script(self, topic, research_data):
         headline = topic.get("headline", "")
-        source_url = topic.get("source_url", "")
-        
-        intensity_map = {
-            1: "warm/interesting", 2: "useful/practical", 
-            3: "surprising/counterintuitive", 4: "industry-shaking/power move",
-            5: "scary/concerning", 6: "useful/life-changing",
-            7: "counterintuitive/underdog", 8: "controversial/divisive",
-            9: "alarming/privacy-related", 10: "mind-blowing/climax"
-        }
-        intensity = intensity_map.get(fact_number, "interesting")
-
-        # Bridge instruction varies per fact
-        if fact_number < LONGFORM_NUM_TOPICS:
-            bridge_instruction = (
-                "BRIDGE: End with a curiosity cliffhanger for the NEXT fact. "
-                "Example: 'But that's nothing compared to what happens next...' "
-                "or 'And it gets even crazier from here...'"
-            )
-        else:
-            bridge_instruction = (
-                "BRIDGE: This is the LAST fact (#10). End with a powerful closing statement, "
-                "then transition to the CTA. Example: 'And THAT... is what nobody saw coming.'"
-            )
-
-        # Escalation labels for facts 7-10
-        escalation_label_instruction = ""
-        if fact_number >= 7:
-            rank = 10 - fact_number + 1  # Fact 7 = rank 4, Fact 10 = rank 1
-            escalation_label_instruction = (
-                f"ESCALATION LABEL: This fact ranks #{rank} on the shock meter. "
-                f"Start with a verbal label like: 'This NEXT fact ranks number {rank} on our shock meter...' "
-                f"BEFORE the 'Did you know' hook."
-            )
-
         research_context = json.dumps(research_data, indent=2) if research_data else "No detailed research available."
-
-        prompt = FACT_SCRIPT_TEMPLATE.format(
+        prompt = DEEP_DIVE_SCRIPT_TEMPLATE.format(
             persona=SYSTEM_PERSONA_LONGFORM,
-            fact_number=fact_number,
-            intensity=intensity,
-            topic_headline=headline,
-            source_url=source_url,
-            research_context=research_context,
-            bridge_instruction=bridge_instruction,
-            escalation_label_instruction=escalation_label_instruction
+            headline=headline,
+            research_context=research_context
         )
-        
-        print(f"   📝 [AGENT 2.{fact_number}] Generating Fact #{fact_number} script ({intensity})...")
+        print(f"   📝 [AGENT 2.DEEP_DIVE] Generating main deep dive script for {headline}...")
+        return self._call_gemini(prompt, model=GEMINI_PRO_MODEL)
+
+    # ── STEP 2b: Generate script for news update ─────────────────────────────
+    def generate_update_script(self, topic, research_data):
+        headline = topic.get("headline", "")
+        research_context = json.dumps(research_data, indent=2) if research_data else "No detailed research available."
+        prompt = UPDATE_SCRIPT_TEMPLATE.format(
+            persona=SYSTEM_PERSONA_LONGFORM,
+            headline=headline,
+            research_context=research_context
+        )
+        print(f"   📝 [AGENT 2.UPDATE] Generating news update script for {headline}...")
         return self._call_gemini(prompt, model=GEMINI_PRO_MODEL)
 
     # ── STEP 3: Assemble compilation ─────────────────────────────────────────
-    def assemble_compilation(self, fact_scripts):
-        """Stitch fact scripts into one seamless 8-minute compilation."""
-        num_facts = len(fact_scripts)
-        print(f"🎬 [AGENT 3] Compilation Assembler: Stitching {num_facts} facts into one video...")
-        
+    def assemble_compilation(self, deep_dive_script, updates_scripts):
+        """Stitch deep-dive and news updates into one seamless video script."""
+        print("🎬 [AGENT 3] Compilation Assembler: Stitching deep-dive and news updates...")
         min_words, max_words = LONGFORM_WORD_COUNT_TARGET
-
         prompt = COMPILATION_ASSEMBLER_TEMPLATE.format(
             persona=SYSTEM_PERSONA_LONGFORM,
-            fact_scripts_json=json.dumps(fact_scripts, indent=2),
-            num_facts=num_facts,
+            deep_dive_json=json.dumps(deep_dive_script, indent=2),
+            updates_json=json.dumps(updates_scripts, indent=2),
             min_words=min_words,
             max_words=max_words
         )
@@ -788,7 +639,7 @@ class LongformGenerationEngine:
     # ── STEP 4: Optimize retention ───────────────────────────────────────────
     def optimize_retention(self, assembled_script):
         """Maximize retention at critical drop-off points."""
-        print("⚡ [AGENT 4] Retention Optimizer: Maximizing pacing for 8-minute video...")
+        print("⚡ [AGENT 4] Retention Optimizer: Maximizing pacing for video...")
         
         min_words, max_words = LONGFORM_WORD_COUNT_TARGET
 
@@ -803,7 +654,7 @@ class LongformGenerationEngine:
     # ── STEP 5: Humanize and finalize ────────────────────────────────────────
     def humanize_and_finalize(self, optimized_script, compilation_data, schema_requirements):
         """Fix AI cadence and return final JSON schema."""
-        print("🗣️ [AGENT 5] Humanizer: Fixing AI cadence for 10-fact format...")
+        print("🗣️ [AGENT 5] Humanizer: Fixing AI cadence for final schema...")
 
         prompt = HUMANIZER_TEMPLATE.format(
             persona=SYSTEM_PERSONA_LONGFORM,
@@ -817,42 +668,58 @@ class LongformGenerationEngine:
     def execute(self):
         """Run the full multi-agent pipeline end-to-end."""
         # 0. Discover topics
-        topics = self.discover_topics()
+        topics_data = self.discover_topics()
         if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
-        if not topics or len(topics) < 5:
-            print("❌ [LONGFORM] Could not discover enough topics. Aborting.")
+        if not topics_data or "main_topic" not in topics_data:
+            print("❌ [LONGFORM] Could not discover main topic. Aborting.")
             return None
 
-        # 1-2. Research + Generate script per topic
-        fact_scripts = []
-        successful_topics = []
-        for i, topic in enumerate(topics):
-            fact_num = i + 1
-            
+        main_topic = topics_data["main_topic"]
+        news_updates = topics_data.get("news_updates", [])
+
+        # 1. Research main topic
+        main_research = self.research_topic(main_topic)
+        if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
+        if not main_research:
+            main_research = {"core_narrative": main_topic.get("one_liner", ""), "details": [], "prompts_or_steps": []}
+
+        # 2. Generate deep-dive script
+        deep_dive_script = self.generate_deep_dive_script(main_topic, main_research)
+        if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
+        if not deep_dive_script:
+            print("❌ [LONGFORM] Deep-dive script generation failed. Aborting.")
+            return None
+        deep_dive_script["topic"] = main_topic
+
+        # 3. Research + generate scripts for news updates
+        updates_scripts = []
+        successful_topics = [main_topic]
+        
+        # Max news updates count: total topics (LONGFORM_NUM_TOPICS = 8) - 1 main topic = 7 updates
+        target_updates_count = LONGFORM_NUM_TOPICS - 1
+        news_updates = news_updates[:target_updates_count]
+
+        for i, topic in enumerate(news_updates):
+            update_num = i + 1
             # Research
             research = self.research_topic(topic)
             if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
             if not research:
-                print(f"   ⚠️ Research failed for Fact #{fact_num}. Using headline only.")
-                research = {"core_narrative": topic.get("one_liner", ""), "facts": [], "implications": []}
+                research = {"core_narrative": topic.get("one_liner", ""), "details": [], "facts": []}
             
-            # Generate script
-            fact_script = self.generate_fact_script(topic, research, fact_num)
+            # Generate update script
+            update_script = self.generate_update_script(topic, research)
             if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
-            if fact_script:
-                fact_script["topic"] = topic  # Attach topic metadata
-                fact_scripts.append(fact_script)
+            if update_script:
+                update_script["topic"] = topic
+                updates_scripts.append(update_script)
                 successful_topics.append(topic)
-                print(f"   ✅ Fact #{fact_num} script generated ({len(fact_script.get('script', '').split())} words)")
+                print(f"   ✅ News Update #{update_num} script generated ({len(update_script.get('script', '').split())} words)")
             else:
-                print(f"   ❌ Fact #{fact_num} script generation failed. Skipping.")
+                print(f"   ❌ News Update #{update_num} script generation failed. Skipping.")
 
-        if len(fact_scripts) < 5:
-            print(f"❌ [LONGFORM] Only {len(fact_scripts)}/10 facts generated. Need at least 5. Aborting.")
-            return None
-
-        # 3. Assemble compilation
-        compilation = self.assemble_compilation(fact_scripts)
+        # 4. Assemble compilation
+        compilation = self.assemble_compilation(deep_dive_script, updates_scripts)
         if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         if not compilation or "script" not in compilation:
             print("❌ [LONGFORM] Compilation assembly failed. Aborting.")
@@ -862,23 +729,19 @@ class LongformGenerationEngine:
         word_count = len(assembled_script.split())
         print(f"   📊 Assembled script: {word_count} words")
 
-        # 4. Optimize retention
+        # 5. Optimize retention
         optimized = self.optimize_retention(assembled_script)
         if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         if optimized and "optimized_script" in optimized:
             final_script = optimized["optimized_script"]
             opt_word_count = len(final_script.split())
             print(f"   📊 Optimized script: {opt_word_count} words")
-            print(f"   📊 Retention hooks added: {optimized.get('retention_hooks_added', [])}")
-            print(f"   📊 Filler words removed: {optimized.get('filler_words_removed', 0)}")
         else:
             print("   ⚠️ Retention optimization failed. Using assembled script as-is.")
             final_script = assembled_script
 
-        # 5. Humanize and get final JSON
-        min_words, max_words = LONGFORM_WORD_COUNT_TARGET
+        # 6. Humanize and get final JSON
         schema_requirements = COMPILATION_ASSEMBLER_TEMPLATE.split("Return ONLY this exact JSON:")[1] if "Return ONLY this exact JSON:" in COMPILATION_ASSEMBLER_TEMPLATE else ""
-
         final_data = self.humanize_and_finalize(final_script, compilation, schema_requirements)
         if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         
@@ -890,31 +753,47 @@ class LongformGenerationEngine:
         # Ensure critical fields are populated
         today_str = datetime.now().strftime("%Y-%m-%d")
         if not final_data.get("original_news_headline") or "Exact" in final_data.get("original_news_headline", ""):
-            final_data["original_news_headline"] = f"10 AI Facts That Blew My Mind - {today_str}"
+            final_data["original_news_headline"] = f"Top AI Updates That Feel Illegal - {today_str}"
         if not final_data.get("original_news_url") or "Primary" in final_data.get("original_news_url", ""):
             final_data["original_news_url"] = successful_topics[0].get("source_url", "") if successful_topics else ""
         
         # Attach successful topics metadata for downstream use
         final_data["longform_topics"] = successful_topics
-        final_data["fact_scripts"] = fact_scripts
+        
+        # For compatibility with main_longform.py which uses fact_scripts to check shock levels:
+        combined_fact_scripts = []
+        dd_fs = {
+            "fact_number": 1,
+            "script": deep_dive_script.get("script", ""),
+            "shock_level": 8,
+            "key_stat": deep_dive_script.get("key_prompt_used", "Deep Dive"),
+            "transition_style": "glitch",
+            "source_reference": main_topic.get("source_name", "")
+        }
+        combined_fact_scripts.append(dd_fs)
+        
+        for idx, us in enumerate(updates_scripts):
+            us_fs = {
+                "fact_number": idx + 2,
+                "script": us.get("script", ""),
+                "shock_level": 7,
+                "key_stat": "News Update",
+                "transition_style": "zoom",
+                "source_reference": us.get("topic", {}).get("source_name", "")
+            }
+            combined_fact_scripts.append(us_fs)
+            
+        final_data["fact_scripts"] = combined_fact_scripts
         final_data["is_longform"] = True
-        final_data["longform_format"] = "did_you_know"
+        final_data["longform_format"] = "vaibhav"
         final_data["num_facts"] = len(successful_topics)
 
         # Ensure best_fact_for_shorts is populated
         if not final_data.get("best_fact_for_shorts"):
-            # Pick the fact with the highest shock level
-            best_shock = 0
-            best_fact_num = len(successful_topics)
-            for fs in fact_scripts:
-                sl = fs.get("shock_level", 0)
-                if sl > best_shock:
-                    best_shock = sl
-                    best_fact_num = fs.get("fact_number", best_fact_num)
             final_data["best_fact_for_shorts"] = {
-                "fact_number": best_fact_num,
-                "reason": "Highest shock level",
-                "hook_for_shorts": "This is just 1 of 10 insane AI facts. Full video linked above!"
+                "fact_number": 1,
+                "reason": "Main deep dive topic hook",
+                "hook_for_shorts": "This is how to 10x your productivity. Full guide in the long video!"
             }
 
         print(f"⭐ [LONGFORM PIPELINE] Multi-agent generation completed: "

@@ -277,7 +277,7 @@ def check_screenshot_validity(image_path):
 
 def capture_article_screenshot(url, output_filename, desktop=False, headline=None):
     """
-    Captures a screenshot of the article URL using playwright via npx.
+    Captures a screenshot of the article URL using playwright.
     Falls back to generating a beautiful mock card if Playwright fails.
     
     Args:
@@ -309,21 +309,42 @@ def capture_article_screenshot(url, output_filename, desktop=False, headline=Non
     
     # Desktop viewport for longform 16:9, mobile viewport for Shorts 9:16
     viewport = "1920,1080" if desktop else "1080,1920"
-    
-    # Run Playwright with a fast wait-for-timeout and a shorter subprocess timeout for quick fallback
     user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
-    cmd = [
-        "npx", "-y", "playwright", "screenshot",
-        f"--viewport-size={viewport}",
-        "--wait-for-timeout=3000", # Fast timeout to allow settling without hanging
-        f"--user-agent={user_agent}",
-        url,
-        output_path
-    ]
     
     try:
-        print(f"📸 Capturing screenshot: {url} -> {output_path}")
-        subprocess.run(cmd, check=True, capture_output=True, timeout=25)
+        print(f"📸 Capturing screenshot via Playwright Python API: {url} -> {output_path}")
+        from playwright.sync_api import sync_playwright
+        
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            width, height = map(int, viewport.split(','))
+            context = browser.new_context(
+                user_agent=user_agent,
+                viewport={"width": width, "height": height}
+            )
+            page = context.new_page()
+            page.set_default_timeout(20000)
+            
+            try:
+                page.goto(url, wait_until="domcontentloaded")
+            except Exception as e:
+                print(f"⚠️ Playwright page.goto warning: {e}")
+                
+            # Wait for content to settle
+            page.wait_for_timeout(3000)
+            
+            # Zoom in the page to make text highly readable
+            zoom_factor = 1.2 if desktop else 1.5
+            print(f"🔍 Zooming page by {zoom_factor}x for enhanced readability")
+            try:
+                page.evaluate(f"document.body.style.zoom = '{zoom_factor}';")
+                page.wait_for_timeout(500)
+            except Exception as zoom_err:
+                print(f"⚠️ Failed to apply page zoom: {zoom_err}")
+                
+            page.screenshot(path=output_path)
+            browser.close()
+            
         if os.path.exists(output_path):
             if check_screenshot_validity(output_path):
                 return output_path

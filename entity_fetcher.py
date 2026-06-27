@@ -23,16 +23,55 @@ def _save_image_from_url(url, output_path, is_logo=False):
         print(f"Failed to download image from {url}: {e}")
     return None
 
+def _get_wikipedia_slug(name):
+    """Queries Wikipedia Search API to find the most relevant title/slug for an entity name."""
+    try:
+        url = "https://en.wikipedia.org/w/api.php"
+        params = {
+            "action": "query",
+            "list": "search",
+            "srsearch": name,
+            "format": "json",
+            "srlimit": 1
+        }
+        r = requests.get(url, params=params, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
+        if r.status_code == 200:
+            data = r.json()
+            search_results = data.get("query", {}).get("search", [])
+            if search_results:
+                return search_results[0]["title"].replace(" ", "_")
+    except Exception as e:
+        print(f"  Wikipedia Search API lookup failed for {name}: {e}")
+    return name.replace(" ", "_")
+
+def _fetch_ddg_image(name, output_path, is_logo=False):
+    """Fallback: DuckDuckGo Instant Answer API for entity image from internet."""
+    try:
+        ddg_url = f"https://api.duckduckgo.com/?q={name}&format=json"
+        r = requests.get(ddg_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
+        if r.status_code == 200:
+            data = r.json()
+            ddg_img = data.get("Image")
+            if ddg_img:
+                if not ddg_img.startswith("http"):
+                    ddg_img = "https://duckduckgo.com" + ddg_img
+                path = _save_image_from_url(ddg_img, output_path, is_logo=is_logo)
+                if path:
+                    print(f"  -> Found DuckDuckGo image/logo from internet for {name}")
+                    return path
+    except Exception as e:
+        print(f"  DuckDuckGo API lookup failed for {name}: {e}")
+    return None
+
 def fetch_person_photo(person):
     name = person.get("name")
     twitter_handle = person.get("twitter_handle")
-    wiki_slug = person.get("wikipedia_slug") or name.replace(" ", "_")
+    wiki_slug = person.get("wikipedia_slug") or _get_wikipedia_slug(name)
     
-    print(f"Fetching photo for person: {name}...")
+    print(f"Fetching photo for person: {name} (slug: {wiki_slug})...")
     output_path = os.path.join(OUTPUT_DIR, f"person_{name.replace(' ', '_')}.jpg")
     if os.path.exists(output_path):
         return output_path
-
 
     # PRIORITY 2: Wikipedia API
     try:
@@ -42,7 +81,6 @@ def fetch_person_photo(person):
             data = r.json()
             if "thumbnail" in data and "source" in data["thumbnail"]:
                 img_url = data["thumbnail"]["source"]
-                # Try to get larger image if possible by removing size limit from URL
                 img_url = img_url.replace(str(data["thumbnail"]["width"]), "400") # rough hack
                 path = _save_image_from_url(img_url, output_path)
                 if path:
@@ -50,6 +88,11 @@ def fetch_person_photo(person):
                     return path
     except Exception as e:
         print(f"  Wikipedia API fetch failed: {e}")
+
+    # PRIORITY 3: DuckDuckGo Fallback
+    path = _fetch_ddg_image(name, output_path, is_logo=False)
+    if path:
+        return path
 
     # PRIORITY 4: Generative AI fallback (was Pexels)
     print(f"  -> Falling back to Generative AI for {name}...")
@@ -85,7 +128,7 @@ def fetch_company_logo(company):
 
     # PRIORITY 2: Wikipedia API
     try:
-        wiki_slug = name.replace(" ", "_")
+        wiki_slug = company.get("wikipedia_slug") or _get_wikipedia_slug(name)
         url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{wiki_slug}"
         r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
         if r.status_code == 200:
@@ -99,7 +142,12 @@ def fetch_company_logo(company):
     except Exception as e:
         print(f"  Wikipedia fetch failed: {e}")
 
-    # PRIORITY 3: Generative AI fallback (was Pexels)
+    # PRIORITY 3: DuckDuckGo Fallback
+    path = _fetch_ddg_image(name, output_path, is_logo=True)
+    if path:
+        return path
+
+    # PRIORITY 4: Generative AI fallback (was Pexels)
     print(f"  -> Falling back to Generative AI for {name}...")
     imagen_out = os.path.join(OUTPUT_DIR, f"company_{name.replace(' ', '_')}_office.jpg")
     search_query = company.get("hq_pexels_search") or f"{name} office headquarters"
@@ -136,12 +184,12 @@ def fetch_all_entities(script_data):
 
     for c in companies_mentioned:
         if c and isinstance(c, str) and c.lower() not in existing_names:
-            key_entities.append({"name": c, "type": "COMPANY"})
+            key_entities.append({"name": c, "type": "COMPANY", "description": "Tech Company"})
             existing_names.add(c.lower())
 
     for t in tools_mentioned:
         if t and isinstance(t, str) and t.lower() not in existing_names:
-            key_entities.append({"name": t, "type": "TOOL"})
+            key_entities.append({"name": t, "type": "TOOL", "description": "AI Tool"})
             existing_names.add(t.lower())
 
     for person in script_data.get("people", []):
