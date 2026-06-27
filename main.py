@@ -188,10 +188,14 @@ def generate_pinned_comment(script_data, next_series_slot):
     )
 
 def run_pipeline(topic_type="auto"):
+    # Local mock to avoid sending real Telegram notifications during tests
+    def notify_telegram(msg, emoji=""):
+        print(f"📢 [TELEGRAM MOCK] {emoji} {msg}")
+
     if topic_type == "auto":
         topic_type = get_next_topic_type_by_ratio()
     target_country = get_next_target_country()
-    log_message(f"=== STARTING DAILY AI PIPIELINE ({topic_type.upper()}) | COUNTRY: {target_country} ===")
+    log_message(f"=== STARTING DAILY DAILY AI PIPIELINE ({topic_type.upper()}) | COUNTRY: {target_country} ===")
 
     # ── Clean output folder before starting ───────────────────────────────────
     if os.path.exists(OUTPUT_DIR):
@@ -602,10 +606,9 @@ def run_pipeline(topic_type="auto"):
 
     tags = list(set(keywords + companies + [t.replace("#", "") for t in hashtags]))[:15]
 
-    uploaded, result = upload_video(
-        video_path, title, description, tags, 
-        thumbnail_path=thumbnail_path, comment_hook=script_data.get("comment_hook")
-    )
+    # MOCK UPLOADS FOR TEST RUN
+    print("🧪 [DRY RUN] Simulating YouTube upload...")
+    uploaded, result = True, "MOCK_VIDEO_ID"
     if not uploaded:
         log_message(f"ERROR: YouTube upload failed: {result}")
         return False
@@ -617,7 +620,8 @@ def run_pipeline(topic_type="auto"):
     log_message("STEP 10c: Auto-posting Short to X.com...")
     try:
         x_post_text = f"🔥 {title}\n\nFull breakdown: {youtube_url}\n\n#AI #TechNews"
-        x_uploaded, x_result = upload_video_to_x(video_path, x_post_text)
+        print("🧪 [DRY RUN] Simulating X.com auto-post...")
+        x_uploaded, x_result = True, "MOCK_TWEET_ID"
         if x_uploaded:
             log_message(f"SUCCESS: Posted video to X.com! Tweet ID: {x_result}")
         else:
