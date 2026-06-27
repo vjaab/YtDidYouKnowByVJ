@@ -543,31 +543,126 @@ Output the visual prompt:"""
 
 
 
+def _generate_huggingface_image(prompt, output_path, aspect_ratio="9:16"):
+    """Generate an image using Hugging Face FLUX.1 Schnell (free tier, needs HF_TOKEN)."""
+    from config import HF_TOKEN
+    if not HF_TOKEN:
+        return None
+    
+    width, height = (1080, 1920) if aspect_ratio == "9:16" else (1920, 1080)
+    
+    try:
+        print(f"     → Attempting Hugging Face FLUX.1 Schnell fallback...")
+        resp = requests.post(
+            "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
+            headers={"Authorization": f"Bearer {HF_TOKEN}"},
+            json={"inputs": prompt, "parameters": {"width": width, "height": height}},
+            timeout=60
+        )
+        if resp.status_code == 200 and resp.headers.get("content-type", "").startswith("image"):
+            with open(output_path, "wb") as f:
+                f.write(resp.content)
+            print(f"  ✅ [huggingface] FLUX.1 Schnell generated successfully!")
+            return output_path
+        elif resp.status_code == 503:
+            print(f"  ⚠️ [huggingface] Model loading (503). Skipping.")
+        else:
+            print(f"  ⚠️ [huggingface] Returned status: {resp.status_code}")
+    except Exception as e:
+        print(f"  ⚠️ [huggingface] Failed: {e}")
+    return None
+
+
 def _generate_pollinations_image(prompt, output_path, aspect_ratio="9:16"):
-    """Free, no-key AI image generation fallback if Imagen and Veo fail."""
+    """Free, no-key AI image generation fallback if Imagen, HuggingFace and Veo fail."""
     width, height = (1080, 1920) if aspect_ratio == "9:16" else (1920, 1080)
     import urllib.parse
     encoded_prompt = urllib.parse.quote(prompt)
     url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&nologo=true&private=true"
     
-    max_attempts = 2
+    max_attempts = 3
     for attempt in range(1, max_attempts + 1):
         try:
             print(f"     → Attempting Pollinations AI fallback (attempt {attempt}/{max_attempts})...")
-            resp = requests.get(url, timeout=12)
+            resp = requests.get(url, timeout=45)
             if resp.status_code == 200:
                 with open(output_path, "wb") as f:
                     f.write(resp.content)
                 return output_path
+            elif resp.status_code == 429:
+                wait = 15 * attempt
+                print(f"  ⚠️ [pollinations] Rate limited (429). Waiting {wait}s before retry...")
+                time.sleep(wait)
             else:
                 print(f"  ⚠️ [pollinations] Attempt {attempt} returned status: {resp.status_code}")
         except Exception as e:
             print(f"  ⚠️ [pollinations] Attempt {attempt} failed: {e}")
         
         if attempt < max_attempts:
-            time.sleep(2)
+            time.sleep(10 * attempt)  # 10s, 20s backoff between retries
             
     return None
+
+
+def _generate_cloudflare_image(prompt, output_path, aspect_ratio="9:16"):
+    """Generate an image using Cloudflare Workers AI FLUX.1 Schnell (free tier, needs CF credentials)."""
+    from config import CF_ACCOUNT_ID, CF_API_TOKEN
+    if not CF_ACCOUNT_ID or not CF_API_TOKEN:
+        return None
+    
+    try:
+        print(f"     → Attempting Cloudflare Workers AI FLUX.1 Schnell fallback...")
+        resp = requests.post(
+            f"https://api.cloudflare.com/client/v4/accounts/{CF_ACCOUNT_ID}/ai/run/@cf/black-forest-labs/flux-1-schnell",
+            headers={
+                "Authorization": f"Bearer {CF_API_TOKEN}",
+                "Content-Type": "application/json"
+            },
+            json={"prompt": prompt},
+            timeout=60
+        )
+        if resp.status_code == 200:
+            content_type = resp.headers.get("content-type", "")
+            if content_type.startswith("image"):
+                with open(output_path, "wb") as f:
+                    f.write(resp.content)
+                print(f"  ✅ [cloudflare] FLUX.1 Schnell generated successfully!")
+                return output_path
+            else:
+                # Cloudflare may return JSON with base64 image
+                try:
+                    import base64
+                    data = resp.json()
+                    if data.get("success") and data.get("result", {}).get("image"):
+                        img_bytes = base64.b64decode(data["result"]["image"])
+                        with open(output_path, "wb") as f:
+                            f.write(img_bytes)
+                        print(f"  ✅ [cloudflare] FLUX.1 Schnell generated successfully (base64)!")
+                        return output_path
+                except Exception:
+                    pass
+                print(f"  ⚠️ [cloudflare] Unexpected response format: {content_type}")
+        elif resp.status_code == 429:
+            print(f"  ⚠️ [cloudflare] Rate limited (429). Skipping.")
+        else:
+            print(f"  ⚠️ [cloudflare] Returned status: {resp.status_code}")
+    except Exception as e:
+        print(f"  ⚠️ [cloudflare] Failed: {e}")
+    return None
+
+
+def _generate_fallback_image(prompt, output_path, aspect_ratio="9:16"):
+    """Unified fallback: tries HuggingFace FLUX → Cloudflare FLUX → Pollinations."""
+    path = _generate_huggingface_image(prompt, output_path, aspect_ratio=aspect_ratio)
+    if path:
+        return path, "HuggingFace (FLUX.1)"
+    path = _generate_cloudflare_image(prompt, output_path, aspect_ratio=aspect_ratio)
+    if path:
+        return path, "Cloudflare (FLUX.1)"
+    path = _generate_pollinations_image(prompt, output_path, aspect_ratio=aspect_ratio)
+    if path:
+        return path, "Pollinations"
+    return None, None
 
 
 def _generate_imagen3(prompt, output_path, topic_context="", global_style_guide="", visual_subject=None, aspect_ratio="9:16"):
@@ -659,14 +754,14 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
             chunk["source"] = f"Imagen ({visual_mode})"
             return chunk
             
-        # Fallback to Pollinations AI
-        print(f"Chunk {cid} -> Imagen failed, trying Pollinations AI fallback...")
-        path = _generate_pollinations_image(custom_prompt, photo_out, aspect_ratio=orientation)
+        # Fallback to HuggingFace FLUX / Pollinations AI
+        print(f"Chunk {cid} -> Imagen failed, trying HuggingFace/Pollinations fallback...")
+        path, fb_source = _generate_fallback_image(custom_prompt, photo_out, aspect_ratio=orientation)
         if path:
             chunk["visual_path"] = path
             chunk["visual_type"] = "photo"
             chunk["relevance_score"] = 9
-            chunk["source"] = f"Pollinations ({visual_mode})"
+            chunk["source"] = f"{fb_source} ({visual_mode})"
             return chunk
             
         # Pexels fallback for photo mode!
@@ -743,14 +838,14 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
             chunk["source"] = "Imagen (nano_evidence)"
             return chunk
             
-        # Fallback to Pollinations AI
-        print(f"Chunk {cid} -> Imagen evidence failed, trying Pollinations AI fallback...")
-        path = _generate_pollinations_image(custom_prompt, photo_out, aspect_ratio=orientation)
+        # Fallback to HuggingFace FLUX / Pollinations AI
+        print(f"Chunk {cid} -> Imagen evidence failed, trying HuggingFace/Pollinations fallback...")
+        path, fb_source = _generate_fallback_image(custom_prompt, photo_out, aspect_ratio=orientation)
         if path:
             chunk["visual_path"] = path
             chunk["visual_type"] = "photo"
             chunk["relevance_score"] = 9
-            chunk["source"] = "Pollinations (nano_evidence)"
+            chunk["source"] = f"{fb_source} (nano_evidence)"
             return chunk
 
         # Pexels fallback for evidence mode!
@@ -799,14 +894,14 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
             chunk["source"] = "Imagen (fallback from veo)"
             return chunk
             
-        # Fallback to Pollinations AI
-        print(f"Chunk {cid} -> Imagen fallback failed, trying Pollinations AI fallback...")
-        path = _generate_pollinations_image(custom_img_prompt, photo_out, aspect_ratio=orientation)
+        # Fallback to HuggingFace FLUX / Pollinations AI
+        print(f"Chunk {cid} -> Imagen fallback failed, trying HuggingFace/Pollinations fallback...")
+        path, fb_source = _generate_fallback_image(custom_img_prompt, photo_out, aspect_ratio=orientation)
         if path:
             chunk["visual_path"] = path
             chunk["visual_type"] = "photo"
             chunk["relevance_score"] = 8
-            chunk["source"] = "Pollinations (fallback from veo)"
+            chunk["source"] = f"{fb_source} (fallback from veo)"
             return chunk
 
         # Pexels fallback for video mode!
@@ -937,16 +1032,18 @@ def fetch_all_chunk_visuals(chunks, topic_context="", script_data=None, is_longf
             chunk["source"] = "Failed"
         
         # ── SMART THROTTLING ──────────────────────────────────────────────────
-        api_sources = [
-            "Imagen (nano_hook)", "Imagen (nano_concept)", "Imagen (nano_evidence)",
-            "Veo (veo_concept)", "Veo (veo_cta)", "Imagen (fallback from veo)",
+        # Cooldown between chunks to respect API rate limits (Imagen, Veo, HuggingFace, Pollinations)
+        api_source_prefixes = [
+            "Imagen", "Veo", "HuggingFace", "Cloudflare", "Pollinations",
             "Real Article Screenshot"
         ]
         
         if i < len(chunks) - 1:
-            if chunk.get("source") in api_sources:
-                print(f"  -> AI generated asset used. Cooling down for 10s to respect API Rate Limits...")
-                time.sleep(10)
+            chunk_source = chunk.get("source", "")
+            if any(chunk_source.startswith(prefix) for prefix in api_source_prefixes):
+                cooldown = 15 if chunk_source.startswith("Pollinations") else 10
+                print(f"  -> AI generated asset ({chunk_source}). Cooling down for {cooldown}s...")
+                time.sleep(cooldown)
             else:
                 print(f"  -> Local/Cached asset. Skipping cooldown.")
 

@@ -22,6 +22,7 @@ from google.genai import types
 from rembg import remove
 from config import OUTPUT_DIR, ASSETS_DIR, GEMINI_API_KEY
 import cv2
+import requests
 
 THUMB_W, THUMB_H = 1280, 720
 SHORTS_W, SHORTS_H = 1080, 1920
@@ -90,16 +91,70 @@ def _generate_imagen_background(title, client):
         img_bytes = response.generated_images[0].image.image_bytes
         return Image.open(io.BytesIO(img_bytes)).convert("RGB")
     except Exception as e:
-        print(f"⚠️ Imagen failed: {e}. Trying Pollinations fallback...")
+        print(f"⚠️ Imagen failed: {e}. Trying HuggingFace/Pollinations fallback...")
+        
+        # Try HuggingFace FLUX.1 first
+        try:
+            from config import HF_TOKEN
+            if HF_TOKEN:
+                resp = requests.post(
+                    "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
+                    headers={"Authorization": f"Bearer {HF_TOKEN}"},
+                    json={"inputs": prompt, "parameters": {"width": 1280, "height": 720}},
+                    timeout=60
+                )
+                if resp.status_code == 200 and resp.headers.get("content-type", "").startswith("image"):
+                    print("✅ HuggingFace background generated successfully!")
+                    return Image.open(io.BytesIO(resp.content)).convert("RGB")
+                else:
+                    print(f"⚠️ HuggingFace returned status: {resp.status_code}")
+        except Exception as hfe:
+            print(f"⚠️ HuggingFace fallback failed: {hfe}")
+        
+        # Then try Cloudflare Workers AI
+        try:
+            from config import CF_ACCOUNT_ID, CF_API_TOKEN
+            if CF_ACCOUNT_ID and CF_API_TOKEN:
+                resp = requests.post(
+                    f"https://api.cloudflare.com/client/v4/accounts/{CF_ACCOUNT_ID}/ai/run/@cf/black-forest-labs/flux-1-schnell",
+                    headers={
+                        "Authorization": f"Bearer {CF_API_TOKEN}",
+                        "Content-Type": "application/json"
+                    },
+                    json={"prompt": prompt},
+                    timeout=60
+                )
+                if resp.status_code == 200:
+                    content_type = resp.headers.get("content-type", "")
+                    if content_type.startswith("image"):
+                        print("✅ Cloudflare background generated successfully!")
+                        return Image.open(io.BytesIO(resp.content)).convert("RGB")
+                    else:
+                        try:
+                            import base64
+                            data = resp.json()
+                            if data.get("success") and data.get("result", {}).get("image"):
+                                img_bytes = base64.b64decode(data["result"]["image"])
+                                print("✅ Cloudflare background generated successfully (base64)!")
+                                return Image.open(io.BytesIO(img_bytes)).convert("RGB")
+                        except Exception:
+                            pass
+                else:
+                    print(f"⚠️ Cloudflare returned status: {resp.status_code}")
+        except Exception as cfe:
+            print(f"⚠️ Cloudflare fallback failed: {cfe}")
+        
+        # Then try Pollinations
         try:
             import urllib.parse
-            import requests
             encoded_prompt = urllib.parse.quote(prompt)
             url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=1280&height=720&nologo=true&private=true"
-            resp = requests.get(url, timeout=15)
+            resp = requests.get(url, timeout=45)
             if resp.status_code == 200:
                 print("✅ Pollinations background generated successfully!")
                 return Image.open(io.BytesIO(resp.content)).convert("RGB")
+            elif resp.status_code == 429:
+                print(f"⚠️ Pollinations rate limited (429). Skipping.")
         except Exception as pe:
             print(f"⚠️ Pollinations fallback failed: {pe}")
             

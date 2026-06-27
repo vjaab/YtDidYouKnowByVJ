@@ -1,6 +1,7 @@
 import os
 import random
 import io
+import requests
 from PIL import Image, ImageDraw, ImageFont, ImageChops
 from datetime import datetime
 from google import genai
@@ -62,17 +63,71 @@ Example: "A hand cursor clicking a large button"
                 print(f"⚠️ Imagen whiteboard doodle failed on {model}: {e}")
                 continue
 
+        # Try HuggingFace FLUX.1 fallback first
+        print("🎨 Imagen whiteboard doodle failed. Trying HuggingFace FLUX.1 fallback...")
+        try:
+            from config import HF_TOKEN
+            if HF_TOKEN:
+                resp = requests.post(
+                    "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
+                    headers={"Authorization": f"Bearer {HF_TOKEN}"},
+                    json={"inputs": imagen_prompt, "parameters": {"width": 1024, "height": 1024}},
+                    timeout=60
+                )
+                if resp.status_code == 200 and resp.headers.get("content-type", "").startswith("image"):
+                    print("✅ HuggingFace whiteboard doodle generated successfully!")
+                    return Image.open(io.BytesIO(resp.content)).convert("RGB")
+                else:
+                    print(f"⚠️ HuggingFace whiteboard doodle returned status: {resp.status_code}")
+        except Exception as hfe:
+            print(f"⚠️ HuggingFace whiteboard doodle failed: {hfe}")
+
+        # Try Cloudflare Workers AI fallback
+        print("🎨 Trying Cloudflare Workers AI FLUX.1 fallback...")
+        try:
+            from config import CF_ACCOUNT_ID, CF_API_TOKEN
+            if CF_ACCOUNT_ID and CF_API_TOKEN:
+                resp = requests.post(
+                    f"https://api.cloudflare.com/client/v4/accounts/{CF_ACCOUNT_ID}/ai/run/@cf/black-forest-labs/flux-1-schnell",
+                    headers={
+                        "Authorization": f"Bearer {CF_API_TOKEN}",
+                        "Content-Type": "application/json"
+                    },
+                    json={"prompt": imagen_prompt},
+                    timeout=60
+                )
+                if resp.status_code == 200:
+                    content_type = resp.headers.get("content-type", "")
+                    if content_type.startswith("image"):
+                        print("✅ Cloudflare whiteboard doodle generated successfully!")
+                        return Image.open(io.BytesIO(resp.content)).convert("RGB")
+                    else:
+                        try:
+                            import base64
+                            data = resp.json()
+                            if data.get("success") and data.get("result", {}).get("image"):
+                                img_bytes = base64.b64decode(data["result"]["image"])
+                                print("✅ Cloudflare whiteboard doodle generated successfully (base64)!")
+                                return Image.open(io.BytesIO(img_bytes)).convert("RGB")
+                        except Exception:
+                            pass
+                else:
+                    print(f"⚠️ Cloudflare whiteboard doodle returned status: {resp.status_code}")
+        except Exception as cfe:
+            print(f"⚠️ Cloudflare whiteboard doodle failed: {cfe}")
+
         # Try Pollinations fallback
-        print("🎨 Imagen whiteboard doodle failed. Trying Pollinations AI fallback...")
+        print("🎨 Trying Pollinations AI fallback...")
         try:
             import urllib.parse
-            import requests
             encoded_prompt = urllib.parse.quote(imagen_prompt)
             url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=1024&height=1024&nologo=true&private=true"
-            resp = requests.get(url, timeout=15)
+            resp = requests.get(url, timeout=45)
             if resp.status_code == 200:
                 print("✅ Pollinations whiteboard doodle generated successfully!")
                 return Image.open(io.BytesIO(resp.content)).convert("RGB")
+            elif resp.status_code == 429:
+                print(f"⚠️ Pollinations rate limited (429). Skipping.")
         except Exception as pe:
             print(f"⚠️ Pollinations whiteboard doodle failed: {pe}")
     except Exception as e:

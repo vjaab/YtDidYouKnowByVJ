@@ -8,6 +8,9 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 NEWS_API_KEY = os.getenv("NEWS_API_KEY", "")
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
 ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "")
+HF_TOKEN = os.getenv("HF_TOKEN", "")
+CF_ACCOUNT_ID = os.getenv("CF_ACCOUNT_ID", "")
+CF_API_TOKEN = os.getenv("CF_API_TOKEN", "")
 YOUTUBE_CLIENT_SECRET_FILE = os.getenv("YOUTUBE_CLIENT_SECRET_FILE", "client_secret.json")
 VEO_MODEL_ID = "veo-3.1-generate-preview"
 

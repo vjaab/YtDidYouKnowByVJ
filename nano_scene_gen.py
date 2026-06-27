@@ -151,33 +151,114 @@ Return ONLY a JSON array of objects, one per sentence, in order:
 
 
 
+def _generate_huggingface_image(prompt, output_path, aspect_ratio="9:16"):
+    """Generate an image using Hugging Face FLUX.1 Schnell (free tier, needs HF_TOKEN)."""
+    from config import HF_TOKEN
+    if not HF_TOKEN:
+        return None
+    
+    import requests
+    width, height = (1080, 1920) if aspect_ratio == "9:16" else (1920, 1080)
+    
+    try:
+        print(f"     → Attempting Hugging Face FLUX.1 Schnell fallback...")
+        resp = requests.post(
+            "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
+            headers={"Authorization": f"Bearer {HF_TOKEN}"},
+            json={"inputs": prompt, "parameters": {"width": width, "height": height}},
+            timeout=60
+        )
+        if resp.status_code == 200 and resp.headers.get("content-type", "").startswith("image"):
+            with open(output_path, "wb") as f:
+                f.write(resp.content)
+            print(f"  ✅ [huggingface] FLUX.1 Schnell generated successfully!")
+            return output_path
+        elif resp.status_code == 503:
+            print(f"  ⚠️ [huggingface] Model loading (503). Skipping.")
+        else:
+            print(f"  ⚠️ [huggingface] Returned status: {resp.status_code}")
+    except Exception as e:
+        print(f"  ⚠️ [huggingface] Failed: {e}")
+    return None
+
+
 def _generate_pollinations_image(prompt, output_path, aspect_ratio="9:16"):
-    """Free, no-key AI image generation fallback if Imagen and Veo fail."""
+    """Free, no-key AI image generation fallback if Imagen, HuggingFace and Veo fail."""
     width, height = (1080, 1920) if aspect_ratio == "9:16" else (1920, 1080)
     import requests
     import urllib.parse
     encoded_prompt = urllib.parse.quote(prompt)
     url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&nologo=true&private=true"
     
-    max_attempts = 2
+    max_attempts = 3
     for attempt in range(1, max_attempts + 1):
         try:
             print(f"     → Attempting Pollinations AI fallback (attempt {attempt}/{max_attempts})...")
-            resp = requests.get(url, timeout=12)
+            resp = requests.get(url, timeout=45)
             if resp.status_code == 200:
                 with open(output_path, "wb") as f:
                     f.write(resp.content)
                 return output_path
+            elif resp.status_code == 429:
+                wait = 15 * attempt
+                print(f"  ⚠️ [pollinations] Rate limited (429). Waiting {wait}s before retry...")
+                time.sleep(wait)
             else:
                 print(f"  ⚠️ [pollinations] Attempt {attempt} returned status: {resp.status_code}")
         except Exception as e:
             print(f"  ⚠️ [pollinations] Attempt {attempt} failed: {e}")
         
         if attempt < max_attempts:
-            time.sleep(2)
+            time.sleep(10 * attempt)  # 10s, 20s backoff between retries
             
     return None
 
+
+def _generate_cloudflare_image(prompt, output_path, aspect_ratio="9:16"):
+    """Generate an image using Cloudflare Workers AI FLUX.1 Schnell (free tier, needs CF credentials)."""
+    from config import CF_ACCOUNT_ID, CF_API_TOKEN
+    if not CF_ACCOUNT_ID or not CF_API_TOKEN:
+        return None
+    
+    import requests
+    try:
+        print(f"     → Attempting Cloudflare Workers AI FLUX.1 Schnell fallback...")
+        resp = requests.post(
+            f"https://api.cloudflare.com/client/v4/accounts/{CF_ACCOUNT_ID}/ai/run/@cf/black-forest-labs/flux-1-schnell",
+            headers={
+                "Authorization": f"Bearer {CF_API_TOKEN}",
+                "Content-Type": "application/json"
+            },
+            json={"prompt": prompt},
+            timeout=60
+        )
+        if resp.status_code == 200:
+            content_type = resp.headers.get("content-type", "")
+            if content_type.startswith("image"):
+                with open(output_path, "wb") as f:
+                    f.write(resp.content)
+                print(f"  ✅ [cloudflare] FLUX.1 Schnell generated successfully!")
+                return output_path
+            else:
+                try:
+                    import base64
+                    data = resp.json()
+                    if data.get("success") and data.get("result", {}).get("image"):
+                        img_bytes = base64.b64decode(data["result"]["image"])
+                        with open(output_path, "wb") as f:
+                            f.write(img_bytes)
+                        print(f"  ✅ [cloudflare] FLUX.1 Schnell generated successfully (base64)!")
+                        return output_path
+                except Exception:
+                    pass
+                print(f"  ⚠️ [cloudflare] Unexpected response format: {content_type}")
+        elif resp.status_code == 429:
+            print(f"  ⚠️ [cloudflare] Rate limited (429). Skipping.")
+        else:
+            print(f"  ⚠️ [cloudflare] Returned status: {resp.status_code}")
+    except Exception as e:
+        print(f"  ⚠️ [cloudflare] Failed: {e}")
+    return None
 
 def _generate_imagen_image(prompt, output_path, aspect_ratio="9:16"):
     """Generate a single image via Imagen 4.0. Returns path on success, None on failure."""
@@ -270,11 +351,21 @@ def generate_nano_scene_visuals(chunks, headline, style_guide="", aspect_ratio="
         path = _generate_imagen_image(prompt, output_path, aspect_ratio=aspect_ratio)
 
         if not path:
-            # Fallback to Pollinations AI
-            print(f"  [{i + 1}/{total}] Imagen failed, trying Pollinations AI fallback...")
-            path = _generate_pollinations_image(prompt, output_path, aspect_ratio=aspect_ratio)
-            source_name = "Nano-Scene (Pollinations AI)"
-            relevance = 9
+            # Fallback chain: HuggingFace FLUX → Cloudflare FLUX → Pollinations AI
+            print(f"  [{i + 1}/{total}] Imagen failed, trying HuggingFace/Cloudflare/Pollinations fallback...")
+            path = _generate_huggingface_image(prompt, output_path, aspect_ratio=aspect_ratio)
+            if path:
+                source_name = "Nano-Scene (HuggingFace FLUX.1)"
+                relevance = 9
+            else:
+                path = _generate_cloudflare_image(prompt, output_path, aspect_ratio=aspect_ratio)
+                if path:
+                    source_name = "Nano-Scene (Cloudflare FLUX.1)"
+                    relevance = 9
+                else:
+                    path = _generate_pollinations_image(prompt, output_path, aspect_ratio=aspect_ratio)
+                    source_name = "Nano-Scene (Pollinations AI)"
+                    relevance = 9
         else:
             source_name = "Nano-Scene (Imagen 4.0)"
             relevance = 10
