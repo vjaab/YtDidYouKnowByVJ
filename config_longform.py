@@ -20,20 +20,20 @@ LONGFORM_RESOLUTION = (1920, 1080)            # 16:9 Landscape
 LONGFORM_FPS = 30
 
 # ── Content Structure ─────────────────────────────────────────────────────────
-LONGFORM_NUM_TOPICS = 2                       # 1 Main Topic + 1 news update (Temporarily for quick testing)
+LONGFORM_NUM_TOPICS = 8                       # 1 Main Topic + 7 news updates
 LONGFORM_PER_TOPIC_DURATION = (10, 15)        # Seconds per individual fact/segment (deeper)
 LONGFORM_INTRO_DURATION = 5                   # 5s intro hook (cold open + intro)
 LONGFORM_OUTRO_DURATION = 5                   # 5s CTA outro (end screen safe zone)
-LONGFORM_WORD_COUNT_TARGET = (50, 100)        # Short word count for quick testing
-LONGFORM_TARGET_AUDIO_DURATION = (15, 35)     # Short duration for quick rendering
+LONGFORM_WORD_COUNT_TARGET = (1100, 1350)     # ~150 WPM for 8 min
+LONGFORM_TARGET_AUDIO_DURATION = (480, 540)   # 8-9 minutes target duration (mid-roll eligible)
 
 # ── Upload Schedule ───────────────────────────────────────────────────────────
 LONGFORM_UPLOAD_TIME = "04:30"                # 10:00 AM IST = 04:30 UTC
 
 # ── Audio ─────────────────────────────────────────────────────────────────────
 LONGFORM_BGM_VOLUME = 0.09                    # Atmospheric BGM for 8-min content
-# LONGFORM_WORD_COUNT_TARGET = (1100, 1350)     # ~150 WPM for 8 min (commented out for testing)
 LONGFORM_BGM_INTENSITY_RAMP = True            # BGM volume ramps up for last 3 facts
+
 
 # ── Retry Logic ───────────────────────────────────────────────────────────────
 LONGFORM_MAX_RETRY_ATTEMPTS = 12              # More retries since 10 topics

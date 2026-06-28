@@ -30,7 +30,7 @@ from config_longform import (
     LONGFORM_BGM_VOLUME, LONGFORM_MAX_RETRY_ATTEMPTS,
     LONGFORM_TRACKER_FILE
 )
-from fetch_research_papers import fetch_tech_news, fetch_ai_tools, fetch_trending_from_newsapi
+from fetch_research_papers import fetch_tech_news, fetch_ai_tools, fetch_trending_from_newsapi, fetch_reddit_news
 from kaggle_handover import trigger_kaggle_gpu_job
 from topic_tracker import record_story, update_youtube_url
 from gemini_script_longform import generate_longform_script
@@ -206,9 +206,16 @@ def run_longform_pipeline(dry_run=False):
         except Exception as ex:
             log_message(f"⚠️ vidIQ Fetch failed (non-fatal): {ex}")
 
-        research_news = fetch_tech_news()
-        ai_tool_news = fetch_ai_tools()
+        research_news = fetch_tech_news(hours=48)
+        ai_tool_news = fetch_ai_tools(hours=48)
         trending_news = fetch_trending_from_newsapi()
+        
+        # Fetch Reddit trending AI topics
+        try:
+            reddit_news = fetch_reddit_news(hours=48)
+        except Exception as ex:
+            log_message(f"⚠️ Reddit Fetch failed: {ex}")
+            reddit_news = []
         
         # Fetch X.com trending AI topics
         try:
@@ -218,13 +225,14 @@ def run_longform_pipeline(dry_run=False):
             log_message(f"⚠️ Failed to import x_trending_fetcher: {ex}")
             x_news = []
             
-        rss_articles = vidiq_news + research_news + ai_tool_news + trending_news + x_news
+        rss_articles = vidiq_news + research_news + ai_tool_news + trending_news + x_news + reddit_news
 
         if not rss_articles:
             log_message("⚠️ All sources returned 0 articles. Pipeline will rely on Gemini Search.")
         else:
             log_message(f"✅ Fetched {len(rss_articles)} total articles "
-                       f"({len(vidiq_news)} vidIQ, {len(research_news)} research, {len(ai_tool_news)} tools, {len(trending_news)} trending, {len(x_news)} X.com).")
+                       f"({len(vidiq_news)} vidIQ, {len(research_news)} research, {len(ai_tool_news)} tools, "
+                       f"{len(trending_news)} trending, {len(x_news)} X.com, {len(reddit_news)} Reddit).")
     except Exception as e:
         log_message(f"⚠️ RSS/X Fetch failed: {e}")
 

@@ -1,10 +1,19 @@
 import re
+import random
 import requests
 import feedparser
 from datetime import datetime, timedelta, timezone
+from bs4 import BeautifulSoup
 from config import NEWS_API_KEY
 
-# ── CONTENT SOURCES (Mass-Appeal Tech) ─────────────────────────────────────────
+USER_AGENTS = [
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0'
+]
+
+# ── CONTENT SOURCES (Mass-Appeal Tech & AI Research) ─────────────────────────────────────────
 RSS_FEEDS = [
     "https://www.theverge.com/rss/index.xml",
     "https://arstechnica.com/gadgets/feed/",
@@ -16,6 +25,13 @@ RSS_FEEDS = [
     "https://arstechnica.com/tag/ai/feed/",
     "https://www.engadget.com/rss/",
     "https://www.technologyreview.com/feed/",
+    
+    # AI Research & Engineering (from Tech News by VJ bot.py)
+    "https://openai.com/blog/rss/",
+    "https://research.google/blog/rss/", 
+    "https://www.anthropic.com/rss",
+    "https://huggingface.co/blog/feed.xml",
+    "https://aws.amazon.com/blogs/machine-learning/feed/",
 ]
 
 TOOL_RSS_FEEDS = [
@@ -28,6 +44,7 @@ TOOL_RSS_FEEDS = [
     "https://www.xda-developers.com/feed/",
     "https://www.makeuseof.com/feed/",
 ]
+
 
 def fetch_trending_from_newsapi():
     """Fetches global trending AI news using NewsAPI.org sorted by popularity."""
@@ -73,10 +90,25 @@ def fetch_trending_from_newsapi():
         print(f"⚠️ NewsAPI Fetch failed: {e}")
         return []
 
-def _fetch_rss(feed_urls, feed_type="research"):
-    print(f"Fetching from {feed_type} blogs...")
+def fetch_deep_article_content(url):
+    """Visits the actual URL to grab real paragraph text for a better LLM summary."""
+    try:
+        headers = {'User-Agent': random.choice(USER_AGENTS)}
+        r = requests.get(url, headers=headers, timeout=5)
+        if r.status_code == 200:
+            soup = BeautifulSoup(r.content, 'html.parser')
+            # Extract text from paragraphs
+            paragraphs = soup.find_all('p')
+            text = " ".join([p.get_text(strip=True) for p in paragraphs if len(p.get_text(strip=True)) > 20])
+            return text[:1000] # Return the first 1000 characters
+    except Exception:
+        pass
+    return ""
+
+def _fetch_rss(feed_urls, feed_type="research", hours=24):
+    print(f"Fetching from {feed_type} blogs (within last {hours} hours)...")
     all_articles = []
-    cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
 
     for feed_url in feed_urls:
         try:
@@ -107,9 +139,25 @@ def _fetch_rss(feed_urls, feed_type="research"):
                     if m:
                         image_url = m.group(1)
 
+                # Clean HTML from RSS description
+                clean_desc = ""
+                if desc:
+                    try:
+                        soup = BeautifulSoup(desc, "html.parser")
+                        clean_desc = soup.get_text()[:400].strip()
+                    except Exception:
+                        clean_desc = desc[:400].strip()
+
+                # Fetch deeper content if description is short or teaser
+                deep_content = ""
+                if len(clean_desc) < 150:
+                    deep_content = fetch_deep_article_content(entry.link)
+
+                final_desc = deep_content if (deep_content and len(deep_content) > len(clean_desc)) else clean_desc
+
                 all_articles.append({
                     "title": title,
-                    "description": desc,
+                    "description": final_desc,
                     "source": {"name": getattr(feed.feed, 'title', 'Research Blog')},
                     "url": entry.link,
                     "urlToImage": image_url,
@@ -136,7 +184,7 @@ def _fetch_rss(feed_urls, feed_type="research"):
 
     if fresh_articles:
         articles = fresh_articles
-        print(f"{feed_type.capitalize()} Blogs: Found {len(articles)} fresh articles in the last 24h.")
+        print(f"{feed_type.capitalize()} Blogs: Found {len(articles)} fresh articles in the last {hours}h.")
     elif valid_articles:
         articles = valid_articles[:10]  # Take top 10 most recent if no fresh ones (but within 7 days)
         print(f"{feed_type.capitalize()} Blogs: Found 0 fresh articles. Falling back to {len(articles)} recent ones from this week.")
@@ -148,23 +196,23 @@ def _fetch_rss(feed_urls, feed_type="research"):
         import os
         if os.path.exists(TRACKER_FILE):
              with open(TRACKER_FILE, 'r') as f:
-                 tracker = json.load(f)
-                 history = tracker.get("history", [])
-                 if history:
-                     # Filter by type if possible, or just take random recent ones
-                     backup = [h for h in history if h.get("sub_category") == feed_type or feed_type == "research"]
-                     articles = backup[-10:] if backup else history[-10:]
-                     print(f"✅ Loaded {len(articles)} historical articles from tracker as fallback.")
-                     # Reformat to match RSS article structure
-                     articles = [{
-                         "title": a.get("news_headline", a.get("title")),
-                         "description": "Historical coverage fallback.",
-                         "source": {"name": "Historical Cache"},
-                         "url": a.get("news_source_url", ""),
-                         "urlToImage": "",
-                         "publishedAt": a.get("date", ""),
-                         "type": feed_type
-                     } for a in articles]
+                  tracker = json.load(f)
+                  history = tracker.get("history", [])
+                  if history:
+                      # Filter by type if possible, or just take random recent ones
+                      backup = [h for h in history if h.get("sub_category") == feed_type or feed_type == "research"]
+                      articles = backup[-10:] if backup else history[-10:]
+                      print(f"✅ Loaded {len(articles)} historical articles from tracker as fallback.")
+                      # Reformat to match RSS article structure
+                      articles = [{
+                          "title": a.get("news_headline", a.get("title")),
+                          "description": "Historical coverage fallback.",
+                          "source": {"name": "Historical Cache"},
+                          "url": a.get("news_source_url", ""),
+                          "urlToImage": "",
+                          "publishedAt": a.get("date", ""),
+                          "type": feed_type
+                      } for a in articles]
         
         if not articles:
             print("⚠️ Critical: No RSS or Historical data found.")
@@ -172,13 +220,90 @@ def _fetch_rss(feed_urls, feed_type="research"):
     return articles
 
 
-def fetch_tech_news():
+def fetch_tech_news(hours=24):
     print("=== FETCH LATEST AI RESEARCH & ENGINEERING NEWS ===")
-    return _fetch_rss(RSS_FEEDS, "research")
+    return _fetch_rss(RSS_FEEDS, "research", hours=hours)
 
-def fetch_ai_tools():
+def fetch_ai_tools(hours=24):
     print("=== FETCH LATEST AI TOOLS & PRODUCTS ===")
-    return _fetch_rss(TOOL_RSS_FEEDS, "tools")
+    return _fetch_rss(TOOL_RSS_FEEDS, "tools", hours=hours)
+
+def fetch_reddit_news(hours=24):
+    """Fetches trending tech/AI news from specified subreddits."""
+    import random
+    from bs4 import BeautifulSoup
+    
+    REDDIT_SUBREDDITS = [
+        "MachineLearning",
+        "artificial",
+        "LocalLLaMA", 
+        "technology",
+        "singularity" 
+    ]
+    
+    def is_within_hours(published_date_str, hrs):
+        if not published_date_str:
+             return True
+        try:
+            from dateutil import parser as date_parser
+            import pytz
+            pub_date = date_parser.parse(published_date_str)
+            if pub_date.tzinfo is None:
+                 pub_date = pytz.utc.localize(pub_date)
+            now = datetime.now(pytz.utc)
+            return (now - pub_date) < timedelta(hours=hrs)
+        except Exception:
+            return True
+
+    news_items = []
+    print("👽 Fetching Reddit top posts...")
+    
+    for sub in REDDIT_SUBREDDITS:
+        # Use t=week to fetch up to 7 days, then filter locally by `hours`
+        url = f"https://www.reddit.com/r/{sub}/top/.rss?t=week&limit=15"
+        headers = {'User-Agent': random.choice(USER_AGENTS)}
+        try:
+            response = requests.get(url, headers=headers, timeout=15)
+            if response.status_code == 200:
+                feed = feedparser.parse(response.content)
+                for entry in feed.entries:
+                    published = getattr(entry, 'updated', None)
+                    if published and not is_within_hours(published, hours):
+                        continue
+                        
+                    post_url = entry.link
+                    
+                    # Extract image url if any
+                    image_url = ""
+                    if hasattr(entry, 'content') and len(entry.content) > 0:
+                        m = re.search(r'img.*?src=[\'\"](.*?)[\'\"]', entry.content[0].value)
+                        if m:
+                            image_url = m.group(1)
+                    
+                    deep_content = fetch_deep_article_content(post_url)
+                    # Clean Reddit summaries/HTML if not fetching deep content
+                    reddit_summary = ""
+                    if hasattr(entry, 'summary'):
+                        soup_sum = BeautifulSoup(entry.summary, "html.parser")
+                        reddit_summary = soup_sum.get_text()[:400].strip() + "..."
+                    
+                    news_items.append({
+                        "title": entry.title,
+                        "description": deep_content if deep_content else reddit_summary,
+                        "source": {"name": f"r/{sub}"},
+                        "url": post_url,
+                        "urlToImage": image_url,
+                        "publishedAt": published or datetime.now().isoformat(),
+                        "type": "research" if sub in ["MachineLearning", "LocalLLaMA", "singularity"] else "trending"
+                    })
+            else:
+                print(f"⚠️ Reddit Error {response.status_code} for r/{sub}")
+            time.sleep(1)
+        except Exception as e:
+            print(f"⚠️ Error fetching r/{sub}: {e}")
+            
+    print(f"✅ Reddit Search: Retrieved {len(news_items)} posts from the last {hours} hours.")
+    return news_items
 
 def fetch_x_trending_ai_topics():
     """

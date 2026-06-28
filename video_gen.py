@@ -4373,7 +4373,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                     print(f"Failed to load background img {vp} for chunk {i}: {e}")
 
         # ── B-ROLL BURSTS AT FACT BOUNDARIES ──────────────────────────────────────
-        if is_longform and script_json.get("longform_format") == "did_you_know":
+        if is_longform and script_json.get("longform_format") in ["did_you_know", "vaibhav"]:
             fact_timestamps_lf = script_json.get("fact_timestamps", [])
             for ft in fact_timestamps_lf:
                 start_s = float(ft.get("approx_start_seconds", 0))
@@ -4671,16 +4671,19 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
     # ── LONGFORM: "FACT X/N" BADGE OVERLAYS ──────────────────────────────────
     longform_badge_clips = []
-    if is_longform and script_json.get("longform_format") == "did_you_know":
+    if is_longform and script_json.get("longform_format") in ["did_you_know", "vaibhav"]:
         fact_timestamps = script_json.get("fact_timestamps", [])
-        # Use num_facts from script or count only numeric fact entries
         total_facts = script_json.get("num_facts", 10)
+        is_vaibhav = script_json.get("longform_format") == "vaibhav"
         
         for i, ft in enumerate(fact_timestamps):
             fact_num = ft.get("fact_number", i + 1)
-            # Skip non-numeric entries (recaps, outro, cold open)
-            if not isinstance(fact_num, int) or fact_num <= 0:
-                continue
+            
+            # Skip non-numeric entries only for did_you_know
+            if not is_vaibhav:
+                if not isinstance(fact_num, int) or fact_num <= 0:
+                    continue
+                    
             start_s = float(ft.get("approx_start_seconds", 0))
             
             # Duration until next fact or end of audio
@@ -4691,7 +4694,10 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             fact_dur = max(1.0, end_s - start_s)
             
             # Render badge image — larger font for 16:9 readability
-            badge_text = f"FACT {fact_num}/{total_facts}"
+            if is_vaibhav:
+                badge_text = ft.get("section", f"SECTION {fact_num}").upper()
+            else:
+                badge_text = f"FACT {fact_num}/{total_facts}"
             badge_f = gf(34, bold=True)
             bw, bh = ts(badge_text, badge_f)
             pad_x, pad_y = 20, 12
@@ -4847,7 +4853,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     # ══════════════════════════════════════════════════════════════════════
     snap_zoom_timestamps = []  # Used per-frame in make_final_frame
     
-    if is_longform and script_json.get("longform_format") == "did_you_know":
+    if is_longform and script_json.get("longform_format") in ["did_you_know", "vaibhav"]:
         fact_timestamps_lf = script_json.get("fact_timestamps", [])
         
         # IMPROVEMENT #1: Glow ring behind avatar PiP
