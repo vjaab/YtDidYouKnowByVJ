@@ -388,7 +388,7 @@ def get_hottest_tech_topic(client, target_country="US", avoid_list=""):
         except Exception as e:
             err_str = str(e).upper()
             if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
-                wait = (attempts + 1) * 5
+                wait = 30 + attempts * 15
                 print(f"⚠️ Google Trends rate limited (429). Retrying in {wait}s... (Attempt {attempts+1}/3)")
                 time.sleep(wait)
                 attempts += 1
@@ -1052,55 +1052,7 @@ def call_fallback_model(prompt):
             raw = raw[raw.find("```")+3:raw.rfind("```")]
         return json.loads(raw.strip())
 
-    # 1. OpenAI
-    openai_key = os.getenv("OPENAI_API_KEY")
-    if openai_key:
-        print("🔮 Gemini failed. Falling back to OpenAI (gpt-4o-mini)...")
-        try:
-            headers = {
-                "Authorization": f"Bearer {openai_key}",
-                "Content-Type": "application/json"
-            }
-            payload = {
-                "model": "gpt-4o-mini",
-                "messages": [{"role": "user", "content": prompt}],
-                "response_format": {"type": "json_object"},
-                "temperature": 0.7
-            }
-            r = requests.post("https://api.openai.com/v1/chat/completions", json=payload, headers=headers, timeout=30)
-            if r.status_code == 200:
-                content = r.json()["choices"][0]["message"]["content"].strip()
-                return clean_and_parse_json(content)
-            else:
-                print(f"⚠️ OpenAI API failed with code {r.status_code}: {r.text}")
-        except Exception as e:
-            print(f"⚠️ OpenAI fallback failed: {e}")
-
-    # 2. Anthropic (Claude)
-    anthropic_key = os.getenv("ANTHROPIC_API_KEY")
-    if anthropic_key:
-        print("🔮 Gemini/OpenAI failed. Falling back to Anthropic (claude-3-5-haiku-20241022)...")
-        try:
-            headers = {
-                "x-api-key": anthropic_key,
-                "anthropic-version": "2023-06-01",
-                "content-type": "application/json"
-            }
-            payload = {
-                "model": "claude-3-5-haiku-20241022",
-                "max_tokens": 4000,
-                "messages": [{"role": "user", "content": prompt}]
-            }
-            r = requests.post("https://api.anthropic.com/v1/messages", json=payload, headers=headers, timeout=30)
-            if r.status_code == 200:
-                content = r.json()["content"][0]["text"].strip()
-                return clean_and_parse_json(content)
-            else:
-                print(f"⚠️ Anthropic API failed with code {r.status_code}: {r.text}")
-        except Exception as e:
-            print(f"⚠️ Anthropic fallback failed: {e}")
-
-    # 2.5 Cerebras
+    # 1. Cerebras
     cerebras_key = os.getenv("CEREBRAS_API_KEY")
     if cerebras_key:
         headers = {
@@ -1126,21 +1078,66 @@ def call_fallback_model(prompt):
             except Exception as e:
                 print(f"⚠️ Cerebras ({model_name}) fallback failed: {e}")
 
-    # 3. Groq
+    # 2. OpenAI
+    openai_key = os.getenv("OPENAI_API_KEY")
+    if openai_key:
+        print("🔮 Gemini failed. Falling back to OpenAI (gpt-4o-mini)...")
+        try:
+            headers = {
+                "Authorization": f"Bearer {openai_key}",
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "model": "gpt-4o-mini",
+                "messages": [{"role": "user", "content": prompt}],
+                "response_format": {"type": "json_object"},
+                "temperature": 0.7
+            }
+            r = requests.post("https://api.openai.com/v1/chat/completions", json=payload, headers=headers, timeout=30)
+            if r.status_code == 200:
+                content = r.json()["choices"][0]["message"]["content"].strip()
+                return clean_and_parse_json(content)
+            else:
+                print(f"⚠️ OpenAI API failed with code {r.status_code}: {r.text}")
+        except Exception as e:
+            print(f"⚠️ OpenAI fallback failed: {e}")
+
+    # 3. Anthropic (Claude)
+    anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+    if anthropic_key:
+        print("🔮 Gemini/OpenAI failed. Falling back to Anthropic (claude-3-5-haiku-20241022)...")
+        try:
+            headers = {
+                "x-api-key": anthropic_key,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json"
+            }
+            payload = {
+                "model": "claude-3-5-haiku-20241022",
+                "max_tokens": 4000,
+                "messages": [{"role": "user", "content": prompt}]
+            }
+            r = requests.post("https://api.anthropic.com/v1/messages", json=payload, headers=headers, timeout=30)
+            if r.status_code == 200:
+                content = r.json()["content"][0]["text"].strip()
+                return clean_and_parse_json(content)
+            else:
+                print(f"⚠️ Anthropic API failed with code {r.status_code}: {r.text}")
+        except Exception as e:
+            print(f"⚠️ Anthropic fallback failed: {e}")
+
+    # 4. Groq
     groq_key = os.getenv("GROQ_API_KEY")
     if groq_key:
         headers = {
             "Authorization": f"Bearer {groq_key}",
             "Content-Type": "application/json"
         }
-        # Model preference order: openai/gpt-oss-120b -> qwen/qwen3.6-27b -> meta-llama/llama-4-scout-17b-16e-instruct -> qwen/qwen3-32b -> llama-3.3-70b-versatile -> groq/compound -> openai/gpt-oss-20b -> llama-3.1-8b-instant
+        # Model preference order: openai/gpt-oss-120b -> meta-llama/llama-4-scout-17b-16e-instruct -> llama-3.3-70b-versatile -> openai/gpt-oss-20b -> llama-3.1-8b-instant
         groq_models = [
             "openai/gpt-oss-120b",
-            "qwen/qwen3.6-27b",
             "meta-llama/llama-4-scout-17b-16e-instruct",
-            "qwen/qwen3-32b",
             "llama-3.3-70b-versatile",
-            "groq/compound",
             "openai/gpt-oss-20b",
             "llama-3.1-8b-instant"
         ]
@@ -1317,63 +1314,69 @@ class MultiAgentGenerationEngine:
             selected_headline = selection["selected_headline"]
             selected_url = selection["selected_url"]
             
-            # ── CONTEXT ISOLATION (Fixes topic-screenshot mismatch) ───────────
-            isolated_context = ""
-            if self.raw_articles:
-                # Find matching article in the original list to provide rich but isolated context
-                for art in self.raw_articles:
-                    if art.get("url") == selected_url or art.get("title") == selected_headline:
-                        isolated_context = (
-                            f"Title: {art.get('title')}\n"
-                            f"Description: {art.get('description')}\n"
-                            f"Source: {art.get('source', {}).get('name')}\n"
-                            f"URL: {art.get('url')}"
-                        )
-                        break
+        # ── Selection Uniqueness Check ──
+        is_unique, msg = check_story_uniqueness(selected_headline, new_url=selected_url)
+        if not is_unique:
+            print(f"⚠️ [SELECTOR] Selected story is not unique: {msg}")
+            return None
             
-            if not isolated_context:
-                # Fallback if no match found (e.g. search fallback)
-                isolated_context = f"STORY: {selected_headline}\nSOURCE: {selected_url}"
-                if "GEMINI SEARCH RESULTS" in self.context:
-                    # If in search mode, we must include the grounded text but we'll instruct the agent to focus.
-                    isolated_context += f"\n\nSEARCH CONTEXT:\n{self.context}"
-            
-            # ── CONTEXT SHARPENING (NEW) ──────────────────────────────────────
-            # If we don't have rich RSS metadata, we MUST sharpen the search context
-            # to prevent 'Hallucination Leakage' from other stories in the search result.
-            print("🔬 [AGENT 0.5] Context Sharpener: Isolating target story facts...")
-            sharpener_prompt = FACT_EXTRACTOR_TEMPLATE.format(
-                persona=self.persona,
-                target_headline=selected_headline,
-                context=isolated_context # Pass the messy context to be sharpened
+        # ── CONTEXT ISOLATION (Fixes topic-screenshot mismatch) ───────────
+        isolated_context = ""
+        if self.raw_articles:
+            # Find matching article in the original list to provide rich but isolated context
+            for art in self.raw_articles:
+                if art.get("url") == selected_url or art.get("title") == selected_headline:
+                    isolated_context = (
+                        f"Title: {art.get('title')}\n"
+                        f"Description: {art.get('description')}\n"
+                        f"Source: {art.get('source', {}).get('name')}\n"
+                        f"URL: {art.get('url')}"
+                    )
+                    break
+        
+        if not isolated_context:
+            # Fallback if no match found (e.g. search fallback)
+            isolated_context = f"STORY: {selected_headline}\nSOURCE: {selected_url}"
+            if "GEMINI SEARCH RESULTS" in self.context:
+                # If in search mode, we must include the grounded text but we'll instruct the agent to focus.
+                isolated_context += f"\n\nSEARCH CONTEXT:\n{self.context}"
+        
+        # ── CONTEXT SHARPENING (NEW) ──────────────────────────────────────
+        # If we don't have rich RSS metadata, we MUST sharpen the search context
+        # to prevent 'Hallucination Leakage' from other stories in the search result.
+        print("🔬 [AGENT 0.5] Context Sharpener: Isolating target story facts...")
+        sharpener_prompt = FACT_EXTRACTOR_TEMPLATE.format(
+            persona=self.persona,
+            target_headline=selected_headline,
+            context=isolated_context # Pass the messy context to be sharpened
+        )
+        sharpened_data = self._call_gemini(sharpener_prompt)
+        if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
+        
+        if sharpened_data and "core_narrative" in sharpened_data:
+            isolated_context = (
+                f"STORY: {selected_headline}\n"
+                f"SOURCE: {selected_url}\n\n"
+                f"ISOLATED FACTS:\n{json.dumps(sharpened_data, indent=2)}"
             )
-            sharpened_data = self._call_gemini(sharpener_prompt)
-            if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
-            
-            if sharpened_data and "core_narrative" in sharpened_data:
-                isolated_context = (
-                    f"STORY: {selected_headline}\n"
-                    f"SOURCE: {selected_url}\n\n"
-                    f"ISOLATED FACTS:\n{json.dumps(sharpened_data, indent=2)}"
-                )
-                print(f"✨ Context sharpened successfully for: {selected_headline}")
-            else:
-                print("⚠️ Context Sharpener failed. Falling back to raw isolation.")
+            print(f"✨ Context sharpened successfully for: {selected_headline}")
+        else:
+            print("⚠️ Context Sharpener failed. Falling back to raw isolation.")
 
-            additional_instr = ""
-            if self.context and "ADDITIONAL INSTRUCTIONS:" in self.context:
-                parts = self.context.split("ADDITIONAL INSTRUCTIONS:")
-                if len(parts) > 1:
-                    additional_instr = f"\n\nADDITIONAL INSTRUCTIONS:\n{parts[1].strip()}"
+        additional_instr = ""
+        if self.context and "ADDITIONAL INSTRUCTIONS:" in self.context:
+            parts = self.context.split("ADDITIONAL INSTRUCTIONS:")
+            if len(parts) > 1:
+                additional_instr = f"\n\nADDITIONAL INSTRUCTIONS:\n{parts[1].strip()}"
 
-            selected_context = (
-                f"STRICT INSTRUCTION: You MUST ONLY research and write about the following story. "
-                f"IGNORE all other news articles mentioned in any previous context.\n\n"
-                f"TARGET STORY:\n{isolated_context}"
-                f"{additional_instr}"
-            )
-            print(f"🔒 Isolated Context for downstream agents: {len(isolated_context)} chars")
-            print(f"✅ Selected Story: {selected_headline}")
+        selected_context = (
+            f"STRICT INSTRUCTION: You MUST ONLY research and write about the following story. "
+            f"IGNORE all other news articles mentioned in any previous context.\n\n"
+            f"TARGET STORY:\n{isolated_context}"
+            f"{additional_instr}"
+        )
+        print(f"🔒 Isolated Context for downstream agents: {len(isolated_context)} chars")
+        print(f"✅ Selected Story: {selected_headline}")
 
         print("🕵️ [AGENT 1] Research Agent: Extracting narrative elements...")
         research_prompt = RESEARCH_AGENT_TEMPLATE.format(

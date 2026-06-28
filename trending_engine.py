@@ -174,6 +174,58 @@ def _get_reddit_token():
     return None
 
 
+def fetch_reddit_via_google_news(sub):
+    """
+    Fallback: Query Google News RSS for hot posts in a specific subreddit
+    since GHA IPs are blocked by Reddit directly.
+    """
+    import urllib.parse
+    import xml.etree.ElementTree as ET
+    
+    print(f"  🔍 Reddit Fallback: Querying Google News RSS for r/{sub}...")
+    articles = []
+    
+    try:
+        query = f"site:reddit.com/r/{sub}"
+        url = f"https://news.google.com/rss/search?q={urllib.parse.quote(query)}"
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=10) as response:
+            xml_data = response.read()
+            
+        root = ET.fromstring(xml_data)
+        items = root.findall('.//item')
+        
+        for item in items[:5]: # Limit to top 5 recent posts
+            title = item.find('title').text or ""
+            # Strip source suffix E.g. "Title - Subreddit - Source"
+            title_clean = re.sub(r'\s+-\s+.*$', '', title).strip()
+            link = item.find('link').text or ""
+            pub_date = item.find('pubDate').text or ""
+            
+            # Mock engagement values since they are not in the RSS
+            articles.append({
+                "title": title_clean,
+                "description": f"Google News indexed post from r/{sub}: {title_clean}",
+                "source": {"name": f"Reddit r/{sub} (via News)"},
+                "url": link,
+                "urlToImage": "",
+                "publishedAt": pub_date,
+                "type": "reddit_trending",
+                "_engagement": {
+                    "upvotes": 120,
+                    "comments": 25,
+                    "upvote_ratio": 0.9,
+                    "upvote_velocity": 8.0,
+                    "age_hours": 12.0
+                }
+            })
+    except Exception as e:
+        print(f"  ⚠️ Reddit Fallback for r/{sub} failed: {e}")
+        
+    return articles
+
+
 def fetch_reddit_hot_ai():
     """
     Fetches hot posts from AI subreddits. Uses OAuth if credentials available,
@@ -210,9 +262,13 @@ def fetch_reddit_hot_ai():
         # Early abort: if 3+ consecutive subreddits fail, Reddit is blocking us entirely
         if consecutive_failures >= 3:
             remaining = len(subreddits) - subreddits.index(sub)
-            print(f"  🛑 Reddit: {consecutive_failures} consecutive failures. Aborting remaining {remaining} subreddits.")
+            print(f"  🛑 Reddit: {consecutive_failures} consecutive failures. Aborting remaining {remaining} subreddits native calls.")
             if not token:
                 print("    → Fix: Add REDDIT_CLIENT_ID and REDDIT_CLIENT_SECRET as GitHub Secrets.")
+            
+            # Fall back to Google News for the remaining subreddits
+            for fallback_sub in subreddits[subreddits.index(sub):]:
+                all_posts.extend(fetch_reddit_via_google_news(fallback_sub))
             break
         
         try:
@@ -222,6 +278,7 @@ def fetch_reddit_hot_ai():
             if r.status_code != 200:
                 print(f"  ⚠️ Reddit r/{sub} failed ({r.status_code})")
                 consecutive_failures += 1
+                all_posts.extend(fetch_reddit_via_google_news(sub))
                 continue
             
             # Success — reset consecutive failure counter
@@ -272,6 +329,7 @@ def fetch_reddit_hot_ai():
         except Exception as e:
             print(f"  ⚠️ Reddit r/{sub} fetch failed: {e}")
             consecutive_failures += 1
+            all_posts.extend(fetch_reddit_via_google_news(sub))
     
     # Sort by upvote velocity (fastest-rising posts first)
     all_posts.sort(key=lambda x: x.get("_engagement", {}).get("upvote_velocity", 0), reverse=True)

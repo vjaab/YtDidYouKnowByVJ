@@ -194,17 +194,15 @@ def fetch_company_logo(company):
     if os.path.exists(output_path):
         return output_path
 
-    # PRIORITY 1: Clearbit Logo API
+    # PRIORITY 1: Hunter.io Logo API (Clearbit successor)
     try:
-        url = f"https://logo.clearbit.com/{domain}?size=600"
-        r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
-        if r.status_code == 200:
-            path = _save_image_from_url(url, output_path, is_logo=True)
-            if path:
-                print(f"  -> Found Clearbit logo for {name}")
-                return path
+        url = f"https://logos.hunter.io/{domain}"
+        path = _save_image_from_url(url, output_path, is_logo=True)
+        if path:
+            print(f"  -> Found Hunter.io logo for {name}")
+            return path
     except Exception as e:
-        print(f"  Clearbit fetch failed: {e}")
+        print(f"  Hunter.io fetch failed: {e}")
 
     # PRIORITY 2: Wikipedia API
     try:

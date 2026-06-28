@@ -308,9 +308,21 @@ def run_longform_pipeline(dry_run=False):
         script_data["lipsync_face_path"] = selected_avatar
         log_message(f"Selected Lip-Sync Template: {selected_avatar}")
 
-        # ── Kaggle GPU Handover (Audio + Lip-Sync) ───────────────────────
-        has_kaggle = os.path.exists(os.path.expanduser("~/.kaggle/kaggle.json"))
-        use_local_only = os.environ.get("USE_LOCAL_ONLY") == "true"
+        # ── Word Count Pre-Flight Gate ────────────────────────────────────────
+        script = script_data.get("script", "")
+        word_count = len(script.split())
+        expected_dur = word_count / 2.33  # ~140 WPM (2.33 words per second)
+        
+        if expected_dur < min_dur:
+            log_message(f"⚠️ Script word count too low ({word_count} words, expected ~{expected_dur:.1f}s < {min_dur}s). Retrying script generation early to save GPU time.")
+            attempts += 1
+            script_data = None
+            continue
+        elif expected_dur > max_dur + 30:
+            log_message(f"⚠️ Script word count too high ({word_count} words, expected ~{expected_dur:.1f}s > {max_dur + 30}s). Retrying script generation early to save GPU time.")
+            attempts += 1
+            script_data = None
+            continue
 
         if has_kaggle and not use_local_only:
             log_message("Attempting Kaggle GPU handover for audio + lip-sync...")

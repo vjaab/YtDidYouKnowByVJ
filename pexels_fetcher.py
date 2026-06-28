@@ -207,6 +207,10 @@ def detect_topic(headline):
 
 def _generate_veo_video(prompt, output_path, aspect_ratio="9:16"):
     """Generates a video using Google Veo (async polling)."""
+    if os.environ.get("VEO_QUOTA_EXHAUSTED") == "true":
+        print("   ⏭️ Veo quota previously exhausted. Skipping Veo generation call.")
+        return None
+
     print(f"🎬 Generating Veo Video: {prompt[:80]}...")
     try:
         operation = client.models.generate_videos(
@@ -227,6 +231,10 @@ def _generate_veo_video(prompt, output_path, aspect_ratio="9:16"):
 
         if operation.error:
             print(f"❌ Veo Operation Failed: {operation.error}")
+            err_msg = str(operation.error).upper()
+            if "429" in err_msg or "RESOURCE_EXHAUSTED" in err_msg or "QUOTA" in err_msg:
+                print("🚨 Veo API Quota Exhausted (429/Resource Exhausted). Setting fast-fallback flag.")
+                os.environ["VEO_QUOTA_EXHAUSTED"] = "true"
             return None
 
         if operation.result and hasattr(operation.result, 'generated_videos') and operation.result.generated_videos:
@@ -247,6 +255,10 @@ def _generate_veo_video(prompt, output_path, aspect_ratio="9:16"):
         print(f"⚠️ Veo operation finished but no video found. Result: {operation.result}")
     except Exception as e:
         print(f"⚠️ Veo generation failed: {e}")
+        err_msg = str(e).upper()
+        if "429" in err_msg or "RESOURCE_EXHAUSTED" in err_msg or "QUOTA" in err_msg:
+            print("🚨 Veo API Quota Exhausted (429/Resource Exhausted). Setting fast-fallback flag.")
+            os.environ["VEO_QUOTA_EXHAUSTED"] = "true"
     return None
 
 def _search_pexels_videos(query, chunk_duration, dynamic_params=None):
@@ -554,7 +566,7 @@ def _generate_huggingface_image(prompt, output_path, aspect_ratio="9:16"):
     try:
         print(f"     → Attempting Hugging Face FLUX.1 Schnell fallback...")
         resp = requests.post(
-            "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
+            "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell",
             headers={"Authorization": f"Bearer {HF_TOKEN}"},
             json={"inputs": prompt, "parameters": {"width": width, "height": height}},
             timeout=60

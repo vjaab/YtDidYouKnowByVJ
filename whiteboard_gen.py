@@ -69,7 +69,7 @@ Example: "A hand cursor clicking a large button"
             from config import HF_TOKEN
             if HF_TOKEN:
                 resp = requests.post(
-                    "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
+                    "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell",
                     headers={"Authorization": f"Bearer {HF_TOKEN}"},
                     json={"inputs": imagen_prompt, "parameters": {"width": 1024, "height": 1024}},
                     timeout=60

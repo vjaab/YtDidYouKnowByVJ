@@ -411,8 +411,25 @@ def run_pipeline(topic_type="auto", dry_run=False):
         
         has_kaggle = os.path.exists(os.path.expanduser("~/.kaggle/kaggle.json"))
         use_local_only = os.environ.get("USE_LOCAL_ONLY") == "true"
-        kaggle_fallback_used = False
+        # ── Word Count Pre-Flight Gate ────────────────────────────────────────
+        script = script_data.get("script", "")
+        word_count = len(script.split())
+        expected_dur = word_count / 2.33  # ~140 WPM (2.33 words per second)
         
+        if expected_dur < min_dur:
+            log_message(f"⚠️ Script word count too low ({word_count} words, expected ~{expected_dur:.1f}s < {min_dur}s). Retrying script generation early to save GPU time.")
+            if (attempts % 3 == 2):
+                failed_headline = script_data.get("original_news_headline", title)
+                failed_topics.append(failed_headline)
+                log_message(f"⚠️ Topic '{failed_headline}' repeatedly too short. Skipping.")
+                extra_instruction = ""
+            else:
+                target_seconds = "45-60" if topic_type == "vaibhav" else "25-35"
+                extra_instruction = f"The previous script was too short at {word_count} words (expected ~{expected_dur:.0f}s). Make the script longer, aim for at least {int(min_dur * 2.4)} words (approx {target_seconds} seconds)."
+            attempts += 1
+            script_data = None
+            continue
+
         if has_kaggle and not use_local_only:
             results = trigger_kaggle_gpu_job(script_data, custom_map)
             
@@ -709,8 +726,17 @@ def run_pipeline(topic_type="auto", dry_run=False):
             log_message(f"SUCCESS: Posted video to X.com! Tweet ID: {x_result}")
         else:
             log_message(f"WARNING: X.com posting skipped/failed: {x_result}")
+            if "Skipped" not in str(x_result):
+                try:
+                    notify_telegram(f"⚠️ X.com auto-post failed: {x_result}\nTopic: {title}", "⚠️")
+                except Exception as tg_ex:
+                    log_message(f"WARNING: Telegram notification failed: {tg_ex}")
     except Exception as ex:
         log_message(f"WARNING: X.com auto-post failed: {ex}")
+        try:
+            notify_telegram(f"⚠️ X.com auto-post failed: {ex}\nTopic: {title}", "⚠️")
+        except:
+            pass
 
     # ── STEP 10b: Generate Pinned Comment ───────────────────────────────────
     next_slot = get_next_slot(slot)
