@@ -726,17 +726,8 @@ def run_pipeline(topic_type="auto", dry_run=False):
             log_message(f"SUCCESS: Posted video to X.com! Tweet ID: {x_result}")
         else:
             log_message(f"WARNING: X.com posting skipped/failed: {x_result}")
-            if "Skipped" not in str(x_result):
-                try:
-                    notify_telegram(f"⚠️ X.com auto-post failed: {x_result}\nTopic: {title}", "⚠️")
-                except Exception as tg_ex:
-                    log_message(f"WARNING: Telegram notification failed: {tg_ex}")
     except Exception as ex:
         log_message(f"WARNING: X.com auto-post failed: {ex}")
-        try:
-            notify_telegram(f"⚠️ X.com auto-post failed: {ex}\nTopic: {title}", "⚠️")
-        except:
-            pass
 
     # ── STEP 10b: Generate Pinned Comment ───────────────────────────────────
     next_slot = get_next_slot(slot)
