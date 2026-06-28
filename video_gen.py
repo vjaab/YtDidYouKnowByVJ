@@ -2601,7 +2601,7 @@ def render_entity_tags(entities, accent_color, frame_width=1080, on_right=False)
         
     return img
 
-def render_dynamic_entity_tags(entities, accent_color, t, audio_duration, frame_width=1080, frame_height=1920):
+def render_dynamic_entity_tags(entities, accent_color, t, audio_duration, frame_width=1080, frame_height=1920, screenshot_intervals=None):
     """Renders small floating tags for various entities dynamically with fade effects."""
     img = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
     draw = ImageDraw.Draw(img)
@@ -2636,6 +2636,17 @@ def render_dynamic_entity_tags(entities, accent_color, t, audio_duration, frame_
         
     duration_per_entity = audio_duration / num_entities
     
+    screenshot_opacity = 1.0
+    if screenshot_intervals:
+        for s_start, s_end in screenshot_intervals:
+            if s_start <= t <= s_end:
+                screenshot_opacity = 0.0
+                break
+            elif s_start - 0.3 <= t < s_start:
+                screenshot_opacity = min(screenshot_opacity, (s_start - t) / 0.3)
+            elif s_end < t <= s_end + 0.3:
+                screenshot_opacity = min(screenshot_opacity, (t - s_end) / 0.3)
+                
     for i, ent in enumerate(entities):
         opacity = 0.0
         # Show each label one by one in sequence based on duration_per_entity
@@ -2653,6 +2664,9 @@ def render_dynamic_entity_tags(entities, accent_color, t, audio_duration, frame_
             else:
                 opacity = 1.0
                 
+        # Fade out during screenshots to not overlay on the article screenshot
+        opacity *= screenshot_opacity
+        
         if opacity <= 0.0:
             continue
             
@@ -4008,6 +4022,36 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         return None
     print(f"Audio validated: {audio_duration:.2f}s from {os.path.basename(audio_path)}")
 
+    # Let's collect all screenshot active intervals early in the main scope
+    screenshot_intervals = []
+    if is_longform:
+        fact_timestamps = script_json.get("fact_timestamps", [])
+        topics = script_json.get("longform_topics", [])
+        if topics and fact_timestamps:
+            for i, ft in enumerate(fact_timestamps):
+                start_s = float(ft.get("approx_start_seconds", 0))
+                if i + 1 < len(fact_timestamps):
+                    end_s = float(fact_timestamps[i + 1].get("approx_start_seconds", audio_duration))
+                else:
+                    end_s = audio_duration
+                fact_dur = max(1.0, end_s - start_s)
+                
+                first_dur = min(6.0, fact_dur)
+                if first_dur >= 1.0:
+                    screenshot_intervals.append((start_s, start_s + first_dur))
+                    
+                if fact_dur > 18.0:
+                    sec_start = start_s + 14.0
+                    sec_dur = min(5.0, end_s - sec_start)
+                    if sec_dur >= 1.0:
+                        screenshot_intervals.append((sec_start, sec_start + sec_dur))
+    else:
+        # For Shorts: screenshot is active from 4.0s to min(12.0s, audio_duration - 2.0)
+        start_s = 4.0
+        end_s = min(12.0, audio_duration - 2.0)
+        if end_s - start_s >= 1.0:
+            screenshot_intervals.append((start_s, end_s))
+
     if not chunks:
         print("ERROR: no chunks")
         return None
@@ -4544,36 +4588,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 else:
                     return (int(x_end), int(y_end))
 
-        # Let's collect all screenshot active intervals to hide avatar during screenshots
-        screenshot_intervals = []
-        if is_longform:
-            fact_timestamps = script_json.get("fact_timestamps", [])
-            topics = script_json.get("longform_topics", [])
-            if topics and fact_timestamps:
-                for i, ft in enumerate(fact_timestamps):
-                    start_s = float(ft.get("approx_start_seconds", 0))
-                    if i + 1 < len(fact_timestamps):
-                        end_s = float(fact_timestamps[i + 1].get("approx_start_seconds", audio_duration))
-                    else:
-                        end_s = audio_duration
-                    fact_dur = max(1.0, end_s - start_s)
-                    
-                    first_dur = min(6.0, fact_dur)
-                    if first_dur >= 1.0:
-                        screenshot_intervals.append((start_s, start_s + first_dur))
-                        
-                    if fact_dur > 18.0:
-                        sec_start = start_s + 14.0
-                        sec_dur = min(5.0, end_s - sec_start)
-                        if sec_dur >= 1.0:
-                            screenshot_intervals.append((sec_start, sec_start + sec_dur))
-        else:
-            # For Shorts: screenshot is active from 4.0s to min(12.0s, audio_duration - 2.0)
-            start_s = 4.0
-            end_s = min(12.0, audio_duration - 2.0)
-            if end_s - start_s >= 1.0:
-                screenshot_intervals.append((start_s, end_s))
-            
+        if not is_longform:
             def hide_avatar_during_screenshots(t):
                 # Fade out/in slightly (0.3s) at boundaries
                 for s_start, s_end in screenshot_intervals:
@@ -5153,7 +5168,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
         entity_tags_img = None
         if not is_longform and entities_list:
-            entity_tags_img = render_dynamic_entity_tags(entities_list, accent_color, t, audio_duration, FRAME_W, FRAME_H)
+            entity_tags_img = render_dynamic_entity_tags(entities_list, accent_color, t, audio_duration, FRAME_W, FRAME_H, screenshot_intervals=screenshot_intervals)
 
         return composite_frame(bg_frame, t, header_img, subtitle_img, transparency_img, entity_tags_img)
 
