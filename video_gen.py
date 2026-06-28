@@ -3614,7 +3614,7 @@ def wrap_text_to_lines(words, word_widths, max_width, font):
     lines = []
     current_line = []
     current_w = 0
-    space_w = 18
+    space_w = 22
     for word, w in zip(words, word_widths):
         # Standard wrapping based on width
         if not current_line or (current_w + w <= max_width):
@@ -5051,15 +5051,14 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         # Subtitle logic map for the exact current timestamp
         subtitle_img = None
         
-        # Find active chunk or hold the last one if t is past the end
+        # Zero-gap subtitle timing: a chunk remains active until the next one starts
         active_chunk = None
-        for chunk in chunks:
-            if chunk["start"] - 0.1 <= t <= chunk["end"] + 0.1:
+        for i, chunk in enumerate(chunks):
+            chunk_start = chunk["start"]
+            next_start = chunks[i+1]["start"] if i + 1 < len(chunks) else audio_duration
+            if chunk_start - 0.1 <= t < next_start:
                 active_chunk = chunk
                 break
-                
-        if not active_chunk and chunks and t > chunks[-1]["end"]:
-            active_chunk = chunks[-1]
             
         if active_chunk:
             word_status_list = []

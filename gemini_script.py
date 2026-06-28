@@ -76,7 +76,7 @@ STRICT RULES:
 - Do NOT use emojis in the script text.
 - Do NOT say "In this video" or "Today we're going to".
 - Output must be plain spoken text only — no stage directions, no scene labels.
-- SCRIPT LENGTH: Target a 55-second YouTube Short (approx 130-145 words spoken at natural pace).
+- SCRIPT LENGTH: Target a 70-second YouTube Short (approx 170-195 words spoken at natural pace). This raw length is required to hit our 45-65s final audio duration threshold after compression and silence optimization.
 
 Visual Director Persona & Visual Selection Logic:
 You are also an expert Visual Director. For each narration segment in the `subtitle_chunks` array, you generate highly engaging, visually rich, and contextually accurate visual prompts at the semantic level (not keyword level).
@@ -269,7 +269,7 @@ ORIGINAL STORY CONTEXT:
 SCHEMA REQUIREMENTS:
 {schema_requirements}
 
-CRITICAL SUBTITLE RULE: The `subtitle_chunks` array MUST break the script down into extremely small chunks of EXACTLY 1 to 3 words maximum. Do not generate long sentences for subtitles.
+CRITICAL SUBTITLE RULE: The `subtitle_chunks` array MUST break the script down into natural clause-level or sentence-level chunks of approximately 6 to 10 words each. Do not generate single-word or 2-word chunks, as it makes the JSON too large and causes API timeouts.
 
 Return ONLY the final JSON object matching the schema. No markdown wrapping unless inside the string values. No explanations."""
 
@@ -759,12 +759,12 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
   "description": "Full 100+ word rich SEO description for youtube describing the video, including relevant hashtags and the source URL.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
   "title": "Punchy YouTube title max 60 chars — must appeal to professionals and creators",
-  "hook_script": "The Hook (0-5s): Direct, slightly alarming opening hook. 10-15 words.",
-  "problem_context": "The Problem (5-12s): What most people are doing wrong or missing. 15-20 words.",
-  "solution_tech": "The Solution (12-35s): The specific tool, prompt, or workflow in action. 50-60 words.",
-  "retention_loop": "The Proof/Result (35-50s): Concrete outcome: time saved, task automated. 30-40 words.",
-  "outro_cta": "The Outro/CTA (50-55s): Soft CTA (follow for more, save this). 10-15 words.",
-  "script": "The FULL voiceover script. Target 130-145 words total (approx 55 seconds). The last sentence MUST flow back into the first for looping.",
+  "hook_script": "The Hook (0-6s): Direct, slightly alarming opening hook. 15-20 words.",
+  "problem_context": "The Problem (6-15s): What most people are doing wrong or missing. 20-25 words.",
+  "solution_tech": "The Solution (15-45s): The specific tool, prompt, or workflow in action. 75-85 words.",
+  "retention_loop": "The Proof/Result (45-65s): Concrete outcome: time saved, task automated. 45-55 words.",
+  "outro_cta": "The Outro/CTA (65-70s): Soft CTA (follow for more, save this). 15-20 words.",
+  "script": "The FULL voiceover script. Target 170-195 words total (approx 70 seconds). The last sentence MUST flow back into the first for looping.",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://example.com"],
   "phonetic_pronunciation_map": {{}},
@@ -1360,10 +1360,17 @@ class MultiAgentGenerationEngine:
             else:
                 print("⚠️ Context Sharpener failed. Falling back to raw isolation.")
 
+            additional_instr = ""
+            if self.context and "ADDITIONAL INSTRUCTIONS:" in self.context:
+                parts = self.context.split("ADDITIONAL INSTRUCTIONS:")
+                if len(parts) > 1:
+                    additional_instr = f"\n\nADDITIONAL INSTRUCTIONS:\n{parts[1].strip()}"
+
             selected_context = (
                 f"STRICT INSTRUCTION: You MUST ONLY research and write about the following story. "
                 f"IGNORE all other news articles mentioned in any previous context.\n\n"
                 f"TARGET STORY:\n{isolated_context}"
+                f"{additional_instr}"
             )
             print(f"🔒 Isolated Context for downstream agents: {len(isolated_context)} chars")
             print(f"✅ Selected Story: {selected_headline}")

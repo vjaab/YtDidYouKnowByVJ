@@ -85,7 +85,7 @@ jobs:
           pip install --upgrade imageio imageio-ffmpeg moviepy
           
       - name: Install Playwright Browsers
-        run: npx -y playwright install --with-deps chromium
+        run: playwright install --with-deps chromium
 
       - name: Setup Environment Secrets (.env)
         run: |
