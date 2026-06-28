@@ -1,9 +1,84 @@
 import os
 import requests
+import hashlib
 from io import BytesIO
-from PIL import Image
-from config import OUTPUT_DIR
+from PIL import Image, ImageDraw, ImageFont
+from config import OUTPUT_DIR, BASE_DIR
 from pexels_fetcher import _generate_imagen3
+
+def _generate_local_fallback_logo(name, output_path, is_logo=True):
+    """
+    Generates a beautiful local placeholder image using PIL when all downloads and AI generations fail.
+    This guarantees the file exists on disk and the entity validation passes.
+    """
+    try:
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        size = (400, 400)
+        img = Image.new("RGBA", size, (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        
+        # Color palette for placeholder background based on name hash
+        name_hash = int(hashlib.md5(name.encode('utf-8')).hexdigest(), 16)
+        colors = [
+            (255, 68, 68),   # Red
+            (0, 229, 255),   # Cyan
+            (0, 255, 127),   # Green
+            (255, 215, 0),   # Gold
+            (224, 170, 255), # Purple
+            (255, 105, 180), # Pink
+            (30, 144, 255)   # Dodger Blue
+        ]
+        bg_color = colors[name_hash % len(colors)]
+        
+        # Draw rounded rectangle background card
+        draw.rounded_rectangle([10, 10, 390, 390], radius=50, fill=bg_color)
+        draw.rounded_rectangle([10, 10, 390, 390], radius=50, outline=(255, 255, 255, 200), width=8)
+        
+        # Get initials (up to 2 characters)
+        initials = "".join([part[0].upper() for part in name.split() if part])[:2]
+        if not initials:
+            initials = "AI"
+            
+        font = None
+        font_paths = [
+            os.path.join(BASE_DIR, "assets", "fonts", "Montserrat-ExtraBold.ttf"),
+            os.path.join(BASE_DIR, "assets", "fonts", "Montserrat-Bold.ttf"),
+            "/System/Library/Fonts/Helvetica.ttc",
+            "/System/Library/Fonts/Supplemental/Arial Bold.ttf"
+        ]
+        for font_path in font_paths:
+            if os.path.exists(font_path):
+                try:
+                    font = ImageFont.truetype(font_path, 180)
+                    break
+                except:
+                    pass
+        if not font:
+            try:
+                font = ImageFont.load_default()
+            except:
+                pass
+                
+        if font:
+            bb = draw.textbbox((0, 0), initials, font=font)
+            tw = bb[2] - bb[0]
+            th = bb[3] - bb[1]
+            tx = (400 - tw) // 2 - bb[0]
+            ty = (400 - th) // 2 - bb[1]
+            draw.text((tx, ty), initials, font=font, fill=(255, 255, 255, 255))
+            
+        if is_logo:
+            img.save(output_path, "PNG")
+        else:
+            img = img.convert("RGB")
+            img.save(output_path, "JPEG", quality=90)
+            
+        print(f"  🎨 Generated local fallback logo/placeholder for {name} -> {output_path}")
+        return output_path
+    except Exception as e:
+        print(f"  ⚠️ Failed to generate local fallback logo for {name}: {e}")
+        return None
+
 
 def _save_image_from_url(url, output_path, is_logo=False):
     """Downloads and saves an image, ensuring proper formatting."""
@@ -100,6 +175,11 @@ def fetch_person_photo(person):
     if path:
         return path
 
+    # PRIORITY 5: Local beautiful placeholder fallback
+    path = _generate_local_fallback_logo(name, output_path, is_logo=False)
+    if path:
+        return path
+
     print(f"  -> Could not find photo for {name}")
     return None
 
@@ -155,6 +235,11 @@ def fetch_company_logo(company):
     if path:
         return path
 
+    # PRIORITY 5: Local beautiful placeholder fallback
+    path = _generate_local_fallback_logo(name, output_path, is_logo=True)
+    if path:
+        return path
+
     print(f"  -> Could not find logo/hq for {name}")
     return None
 
@@ -169,6 +254,55 @@ def fetch_all_entities(script_data):
     companies_mentioned = script_data.get("companies_mentioned", [])
     tools_mentioned = script_data.get("tools_mentioned", [])
     
+    # Check if we have any entity fields populated at all
+    has_any = (
+        len(script_data.get("companies", [])) > 0 or
+        len(script_data.get("people", [])) > 0 or
+        len(script_data.get("key_entities", [])) > 0 or
+        len(companies_mentioned) > 0 or
+        len(tools_mentioned) > 0
+    )
+    
+    if not has_any:
+        # Pre-emptively scan the script text or headline for known tech companies to add
+        script_text = (script_data.get("script") or "").lower()
+        headline_text = (script_data.get("original_news_headline") or "").lower()
+        
+        known_tech = [
+            {"name": "Apple", "domain": "apple.com", "description": "Tech Company"},
+            {"name": "Google", "domain": "google.com", "description": "Tech Company"},
+            {"name": "Samsung", "domain": "samsung.com", "description": "Tech Company"},
+            {"name": "OpenAI", "domain": "openai.com", "description": "AI Company"},
+            {"name": "ChatGPT", "domain": "openai.com", "description": "AI Tool"},
+            {"name": "Microsoft", "domain": "microsoft.com", "description": "Tech Company"},
+            {"name": "Meta", "domain": "meta.com", "description": "Tech Company"},
+            {"name": "Nvidia", "domain": "nvidia.com", "description": "Tech Company"},
+            {"name": "Claude", "domain": "anthropic.com", "description": "AI Tool"},
+            {"name": "Anthropic", "domain": "anthropic.com", "description": "AI Company"},
+            {"name": "Tesla", "domain": "tesla.com", "description": "Tech Company"},
+            {"name": "Amazon", "domain": "amazon.com", "description": "Tech Company"},
+        ]
+        
+        found_any = False
+        for tech in known_tech:
+            if tech["name"].lower() in script_text or tech["name"].lower() in headline_text:
+                if "companies" not in script_data or not isinstance(script_data["companies"], list):
+                    script_data["companies"] = []
+                script_data["companies"].append(tech)
+                found_any = True
+                break
+                
+        if not found_any:
+            # Absolute fallback to our channel brand
+            if "companies" not in script_data or not isinstance(script_data["companies"], list):
+                script_data["companies"] = []
+            script_data["companies"].append({
+                "name": "VJ AI News",
+                "domain": "youtube.com",
+                "description": "Daily Tech News"
+            })
+            print("  ⚠️ No entities found in script_data. Added VJ AI News as fallback entity.")
+
     key_entities = script_data.get("key_entities", [])
     if not isinstance(key_entities, list):
         key_entities = []
