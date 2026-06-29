@@ -11,314 +11,509 @@ TECH_ENTITY_MAPPING = {
     "openai": {
         "domain": "openai.com",
         "wiki_slug": "OpenAI",
-        "keywords": "OpenAI logo"
+        "keywords": "OpenAI logo",
+        "description": "AI Research Company",
+        "type": "COMPANY"
     },
     "chatgpt": {
         "domain": "openai.com",
         "wiki_slug": "ChatGPT",
-        "keywords": "ChatGPT logo"
+        "keywords": "ChatGPT logo",
+        "description": "AI Chatbot Tool",
+        "type": "TOOL"
     },
     "gpt-4": {
         "domain": "openai.com",
         "wiki_slug": "GPT-4",
-        "keywords": "OpenAI GPT-4 logo"
+        "keywords": "OpenAI GPT-4 logo",
+        "description": "Large Language Model",
+        "type": "TOOL"
     },
     "gpt-4o": {
         "domain": "openai.com",
         "wiki_slug": "GPT-4o",
-        "keywords": "OpenAI GPT-4o logo"
+        "keywords": "OpenAI GPT-4o logo",
+        "description": "Large Language Model",
+        "type": "TOOL"
     },
     "sora": {
         "domain": "openai.com",
         "wiki_slug": "Sora_(text-to-video_model)",
-        "keywords": "OpenAI Sora logo"
+        "keywords": "OpenAI Sora logo",
+        "description": "AI Video Generator",
+        "type": "TOOL"
     },
     "dall-e": {
         "domain": "openai.com",
         "wiki_slug": "DALL-E",
-        "keywords": "OpenAI DALL-E logo"
+        "keywords": "OpenAI DALL-E logo",
+        "description": "AI Image Generator",
+        "type": "TOOL"
     },
     "dall-e 3": {
         "domain": "openai.com",
         "wiki_slug": "DALL-E",
-        "keywords": "OpenAI DALL-E logo"
+        "keywords": "OpenAI DALL-E logo",
+        "description": "AI Image Generator",
+        "type": "TOOL"
     },
     # Google
     "google": {
         "domain": "google.com",
         "wiki_slug": "Google",
-        "keywords": "Google logo"
+        "keywords": "Google logo",
+        "description": "Tech Giant",
+        "type": "COMPANY"
     },
     "gemini": {
         "domain": "google.com",
         "wiki_slug": "Gemini_(chatbot)",
-        "keywords": "Google Gemini logo"
+        "keywords": "Google Gemini logo",
+        "description": "AI Chatbot Tool",
+        "type": "TOOL"
     },
     "gemini 1.5": {
         "domain": "google.com",
         "wiki_slug": "Gemini_(chatbot)",
-        "keywords": "Google Gemini logo"
+        "keywords": "Google Gemini logo",
+        "description": "Large Language Model",
+        "type": "TOOL"
     },
     "gemini 1.5 pro": {
         "domain": "google.com",
         "wiki_slug": "Gemini_(chatbot)",
-        "keywords": "Google Gemini logo"
+        "keywords": "Google Gemini logo",
+        "description": "Large Language Model",
+        "type": "TOOL"
     },
     "gemini 1.5 flash": {
         "domain": "google.com",
         "wiki_slug": "Gemini_(chatbot)",
-        "keywords": "Google Gemini logo"
+        "keywords": "Google Gemini logo",
+        "description": "Large Language Model",
+        "type": "TOOL"
     },
     "imagen": {
         "domain": "google.com",
         "wiki_slug": "Google_Imagen",
-        "keywords": "Google Imagen logo"
+        "keywords": "Google Imagen logo",
+        "description": "AI Image Generator",
+        "type": "TOOL"
     },
     "veo": {
         "domain": "google.com",
         "wiki_slug": "Google",
-        "keywords": "Google Veo logo"
+        "keywords": "Google Veo logo",
+        "description": "AI Video Generator",
+        "type": "TOOL"
+    },
+    "google colab": {
+        "domain": "google.com",
+        "wiki_slug": "Google_Colab",
+        "keywords": "Google Colab logo",
+        "description": "Hosted Notebook Service",
+        "type": "TOOL"
     },
     # Anthropic
     "anthropic": {
         "domain": "anthropic.com",
         "wiki_slug": "Anthropic",
-        "keywords": "Anthropic logo"
+        "keywords": "Anthropic logo",
+        "description": "AI Research Company",
+        "type": "COMPANY"
     },
     "claude": {
         "domain": "anthropic.com",
         "wiki_slug": "Claude_(chatbot)",
-        "keywords": "Anthropic Claude logo"
+        "keywords": "Anthropic Claude logo",
+        "description": "AI Assistant Tool",
+        "type": "TOOL"
     },
     "claude 3": {
         "domain": "anthropic.com",
         "wiki_slug": "Claude_(chatbot)",
-        "keywords": "Anthropic Claude logo"
+        "keywords": "Anthropic Claude logo",
+        "description": "Large Language Model",
+        "type": "TOOL"
     },
     "claude 3.5": {
         "domain": "anthropic.com",
         "wiki_slug": "Claude_(chatbot)",
-        "keywords": "Anthropic Claude logo"
+        "keywords": "Anthropic Claude logo",
+        "description": "Large Language Model",
+        "type": "TOOL"
     },
     "claude 3.5 sonnet": {
         "domain": "anthropic.com",
         "wiki_slug": "Claude_(chatbot)",
-        "keywords": "Anthropic Claude logo"
+        "keywords": "Anthropic Claude logo",
+        "description": "Large Language Model",
+        "type": "TOOL"
     },
     # Meta / Facebook
     "meta": {
         "domain": "meta.com",
         "wiki_slug": "Meta_Platforms",
-        "keywords": "Meta logo"
+        "keywords": "Meta logo",
+        "description": "Tech Giant",
+        "type": "COMPANY"
     },
     "llama": {
         "domain": "meta.com",
         "wiki_slug": "Llama_(language_model)",
-        "keywords": "Meta Llama logo"
+        "keywords": "Meta Llama logo",
+        "description": "Large Language Model",
+        "type": "TOOL"
     },
     "llama 2": {
         "domain": "meta.com",
         "wiki_slug": "Llama_(language_model)",
-        "keywords": "Meta Llama logo"
+        "keywords": "Meta Llama logo",
+        "description": "Large Language Model",
+        "type": "TOOL"
     },
     "llama 3": {
         "domain": "meta.com",
         "wiki_slug": "Llama_(language_model)",
-        "keywords": "Meta Llama logo"
+        "keywords": "Meta Llama logo",
+        "description": "Large Language Model",
+        "type": "TOOL"
     },
     "llama 3.1": {
         "domain": "meta.com",
         "wiki_slug": "Llama_(language_model)",
-        "keywords": "Meta Llama logo"
+        "keywords": "Meta Llama logo",
+        "description": "Large Language Model",
+        "type": "TOOL"
     },
     "llama 3.2": {
         "domain": "meta.com",
         "wiki_slug": "Llama_(language_model)",
-        "keywords": "Meta Llama logo"
+        "keywords": "Meta Llama logo",
+        "description": "Large Language Model",
+        "type": "TOOL"
     },
     # Microsoft
     "microsoft": {
         "domain": "microsoft.com",
         "wiki_slug": "Microsoft",
-        "keywords": "Microsoft logo"
+        "keywords": "Microsoft logo",
+        "description": "Tech Giant",
+        "type": "COMPANY"
     },
     "copilot": {
         "domain": "microsoft.com",
         "wiki_slug": "Microsoft_Copilot",
-        "keywords": "Microsoft Copilot logo"
+        "keywords": "Microsoft Copilot logo",
+        "description": "AI Assistant Tool",
+        "type": "TOOL"
     },
     "microsoft copilot": {
         "domain": "microsoft.com",
         "wiki_slug": "Microsoft_Copilot",
-        "keywords": "Microsoft Copilot logo"
+        "keywords": "Microsoft Copilot logo",
+        "description": "AI Assistant Tool",
+        "type": "TOOL"
     },
     "github copilot": {
         "domain": "github.com",
         "wiki_slug": "GitHub_Copilot",
-        "keywords": "GitHub Copilot logo"
+        "keywords": "GitHub Copilot logo",
+        "description": "AI Coding Assistant",
+        "type": "TOOL"
     },
     # Apple
     "apple": {
         "domain": "apple.com",
         "wiki_slug": "Apple_Inc.",
-        "keywords": "Apple logo"
+        "keywords": "Apple logo",
+        "description": "Tech Giant",
+        "type": "COMPANY"
     },
     "apple intelligence": {
         "domain": "apple.com",
         "wiki_slug": "Apple_Intelligence",
-        "keywords": "Apple Intelligence logo"
+        "keywords": "Apple Intelligence logo",
+        "description": "AI Feature Suite",
+        "type": "TOOL"
+    },
+    # GitHub
+    "github": {
+        "domain": "github.com",
+        "wiki_slug": "GitHub",
+        "keywords": "GitHub logo",
+        "description": "Code Hosting Platform",
+        "type": "COMPANY"
+    },
+    # Python
+    "python": {
+        "domain": "python.org",
+        "wiki_slug": "Python_(programming_language)",
+        "keywords": "Python language logo",
+        "description": "Programming Language",
+        "type": "TOOL"
+    },
+    # Ollama
+    "ollama": {
+        "domain": "ollama.com",
+        "wiki_slug": "Ollama",
+        "keywords": "Ollama logo",
+        "description": "Local LLM Runner",
+        "type": "TOOL"
+    },
+    # Generic Tech Acronyms / Terms
+    "llm": {
+        "domain": "wikipedia.org",
+        "wiki_slug": "Large_language_model",
+        "keywords": "artificial intelligence brain network icon",
+        "description": "Large Language Model",
+        "type": "TOOL"
+    },
+    "large language model": {
+        "domain": "wikipedia.org",
+        "wiki_slug": "Large_language_model",
+        "keywords": "artificial intelligence brain network icon",
+        "description": "Large Language Model",
+        "type": "TOOL"
+    },
+    "gpu": {
+        "domain": "nvidia.com",
+        "wiki_slug": "Graphics_processing_unit",
+        "keywords": "NVIDIA GPU graphics card microchip",
+        "description": "Graphics Processing Unit",
+        "type": "TOOL"
+    },
+    "t4 gpu": {
+        "domain": "nvidia.com",
+        "wiki_slug": "Tesla_T4",
+        "keywords": "NVIDIA Tesla T4 GPU chip graphics card",
+        "description": "NVIDIA GPU Accelerator",
+        "type": "TOOL"
+    },
+    "tesla t4": {
+        "domain": "nvidia.com",
+        "wiki_slug": "Tesla_T4",
+        "keywords": "NVIDIA Tesla T4 GPU chip graphics card",
+        "description": "NVIDIA GPU Accelerator",
+        "type": "TOOL"
     },
     # Other AI Companies / Tools
     "midjourney": {
         "domain": "midjourney.com",
         "wiki_slug": "Midjourney",
-        "keywords": "Midjourney logo"
+        "keywords": "Midjourney logo",
+        "description": "AI Image Generator",
+        "type": "TOOL"
     },
     "stable diffusion": {
         "domain": "stability.ai",
         "wiki_slug": "Stable_Diffusion",
-        "keywords": "Stable Diffusion logo"
+        "keywords": "Stable Diffusion logo",
+        "description": "AI Image Generator",
+        "type": "TOOL"
     },
     "stability ai": {
         "domain": "stability.ai",
         "wiki_slug": "Stability_AI",
-        "keywords": "Stability AI logo"
+        "keywords": "Stability AI logo",
+        "description": "AI Research Company",
+        "type": "COMPANY"
     },
     "perplexity": {
         "domain": "perplexity.ai",
         "wiki_slug": "Perplexity_AI",
-        "keywords": "Perplexity AI logo"
+        "keywords": "Perplexity AI logo",
+        "description": "AI Search Engine",
+        "type": "TOOL"
     },
     "groq": {
         "domain": "groq.com",
         "wiki_slug": "Groq",
-        "keywords": "Groq logo"
+        "keywords": "Groq logo",
+        "description": "AI Inference Chipmaker",
+        "type": "COMPANY"
     },
     "mistral": {
         "domain": "mistral.ai",
         "wiki_slug": "Mistral_AI",
-        "keywords": "Mistral AI logo"
+        "keywords": "Mistral AI logo",
+        "description": "AI Research Company",
+        "type": "COMPANY"
     },
     "deepseek": {
         "domain": "deepseek.com",
         "wiki_slug": "DeepSeek",
-        "keywords": "DeepSeek logo"
+        "keywords": "DeepSeek logo",
+        "description": "AI Research Company",
+        "type": "COMPANY"
     },
     "hugging face": {
         "domain": "huggingface.co",
         "wiki_slug": "Hugging_Face",
-        "keywords": "Hugging Face logo"
+        "keywords": "Hugging Face logo",
+        "description": "AI Model Repository",
+        "type": "COMPANY"
     },
     "huggingface": {
         "domain": "huggingface.co",
         "wiki_slug": "Hugging_Face",
-        "keywords": "Hugging Face logo"
+        "keywords": "Hugging Face logo",
+        "description": "AI Model Repository",
+        "type": "COMPANY"
     },
     "nvidia": {
         "domain": "nvidia.com",
         "wiki_slug": "Nvidia",
-        "keywords": "NVIDIA logo"
+        "keywords": "NVIDIA logo",
+        "description": "AI Computing Company",
+        "type": "COMPANY"
     },
     "x.ai": {
         "domain": "x.ai",
         "wiki_slug": "X.AI_(company)",
-        "keywords": "xAI logo"
+        "keywords": "xAI logo",
+        "description": "AI Startup",
+        "type": "COMPANY"
     },
     "xai": {
         "domain": "x.ai",
         "wiki_slug": "X.AI_(company)",
-        "keywords": "xAI logo"
+        "keywords": "xAI logo",
+        "description": "AI Startup",
+        "type": "COMPANY"
     },
     "grok": {
         "domain": "x.ai",
         "wiki_slug": "Grok_(chatbot)",
-        "keywords": "Grok logo"
+        "keywords": "Grok logo",
+        "description": "AI Chatbot Tool",
+        "type": "TOOL"
     },
     "runway": {
         "domain": "runwayml.com",
         "wiki_slug": "Runway_(company)",
-        "keywords": "Runway AI logo"
+        "keywords": "Runway AI logo",
+        "description": "AI Creative Platform",
+        "type": "COMPANY"
     },
     "pika": {
         "domain": "pika.art",
         "wiki_slug": "Pika_Labs",
-        "keywords": "Pika AI logo"
+        "keywords": "Pika AI logo",
+        "description": "AI Video Generator",
+        "type": "TOOL"
     },
     "elevenlabs": {
         "domain": "elevenlabs.io",
         "wiki_slug": "ElevenLabs",
-        "keywords": "ElevenLabs logo"
+        "keywords": "ElevenLabs logo",
+        "description": "AI Voice Generator",
+        "type": "TOOL"
     },
     "suno": {
         "domain": "suno.com",
         "wiki_slug": "Suno_AI",
-        "keywords": "Suno AI logo"
+        "keywords": "Suno AI logo",
+        "description": "AI Music Platform",
+        "type": "TOOL"
     },
     "udio": {
         "domain": "udio.com",
         "wiki_slug": "Udio",
-        "keywords": "Udio logo"
+        "keywords": "Udio logo",
+        "description": "AI Music Platform",
+        "type": "TOOL"
     },
     # People
     "sam altman": {
         "wiki_slug": "Sam_Altman",
-        "keywords": "Sam Altman portrait"
+        "keywords": "Sam Altman portrait",
+        "description": "CEO of OpenAI",
+        "type": "PEOPLE"
     },
     "sundar pichai": {
         "wiki_slug": "Sundar_Pichai",
-        "keywords": "Sundar Pichai portrait"
+        "keywords": "Sundar Pichai portrait",
+        "description": "CEO of Google",
+        "type": "PEOPLE"
     },
     "elon musk": {
         "wiki_slug": "Elon_Musk",
-        "keywords": "Elon Musk portrait"
+        "keywords": "Elon Musk portrait",
+        "description": "Tech Visionary & Founder",
+        "type": "PEOPLE"
     },
     "mark zuckerberg": {
         "wiki_slug": "Mark_Zuckerberg",
-        "keywords": "Mark Zuckerberg portrait"
+        "keywords": "Mark Zuckerberg portrait",
+        "description": "CEO of Meta",
+        "type": "PEOPLE"
     },
     "satya nadella": {
         "wiki_slug": "Satya_Nadella",
-        "keywords": "Satya Nadella portrait"
+        "keywords": "Satya Nadella portrait",
+        "description": "CEO of Microsoft",
+        "type": "PEOPLE"
     },
     "jensen huang": {
         "wiki_slug": "Jensen_Huang",
-        "keywords": "Jensen Huang portrait"
+        "keywords": "Jensen Huang portrait",
+        "description": "CEO of NVIDIA",
+        "type": "PEOPLE"
     },
     "tim cook": {
         "wiki_slug": "Tim_Cook",
-        "keywords": "Tim Cook portrait"
+        "keywords": "Tim Cook portrait",
+        "description": "CEO of Apple",
+        "type": "PEOPLE"
     },
     "jeff bezos": {
         "wiki_slug": "Jeff_Bezos",
-        "keywords": "Jeff Bezos portrait"
+        "keywords": "Jeff Bezos portrait",
+        "description": "Founder of Amazon",
+        "type": "PEOPLE"
     },
     "demis hassabis": {
         "wiki_slug": "Demis_Hassabis",
-        "keywords": "Demis Hassabis portrait"
+        "keywords": "Demis Hassabis portrait",
+        "description": "CEO of Google DeepMind",
+        "type": "PEOPLE"
     },
     "yann lecun": {
         "wiki_slug": "Yann_LeCun",
-        "keywords": "Yann LeCun portrait"
+        "keywords": "Yann LeCun portrait",
+        "description": "Chief AI Scientist at Meta",
+        "type": "PEOPLE"
     },
     "andrej karpathy": {
         "wiki_slug": "Andrej_Karpathy",
-        "keywords": "Andrej Karpathy portrait"
+        "keywords": "Andrej Karpathy portrait",
+        "description": "AI Researcher & Educator",
+        "type": "PEOPLE"
     },
     "ilya sutskever": {
         "wiki_slug": "Ilya_Sutskever",
-        "keywords": "Ilya Sutskever portrait"
+        "keywords": "Ilya Sutskever portrait",
+        "description": "Co-founder of Safe Superintelligence",
+        "type": "PEOPLE"
     },
     "dario amodei": {
         "wiki_slug": "Dario_Amodei",
-        "keywords": "Dario Amodei portrait"
+        "keywords": "Dario Amodei portrait",
+        "description": "CEO of Anthropic",
+        "type": "PEOPLE"
     },
     "mira murati": {
         "wiki_slug": "Mira_Murati",
-        "keywords": "Mira Murati portrait"
+        "keywords": "Mira Murati portrait",
+        "description": "Former CTO of OpenAI",
+        "type": "PEOPLE"
     },
     "greg brockman": {
         "wiki_slug": "Greg_Brockman",
-        "keywords": "Greg Brockman portrait"
+        "keywords": "Greg Brockman portrait",
+        "description": "President of OpenAI",
+        "type": "PEOPLE"
     }
 }
 
@@ -605,6 +800,17 @@ def fetch_all_entities(script_data):
     Downloads all person photos and company logos.
     Updates the script_data object with local paths in place.
     """
+    # Override descriptions and types of known tech entities to clean up categorizations
+    for ent_list_key in ["companies", "people", "key_entities"]:
+        for ent in script_data.get(ent_list_key, []):
+            if isinstance(ent, dict) and ent.get("name"):
+                resolved = resolve_tech_entity(ent["name"])
+                if resolved:
+                    if "description" in resolved:
+                        ent["description"] = resolved["description"]
+                    if "type" in resolved:
+                        ent["type"] = resolved["type"]
+
     # ── GATHER ALL POTENTIAL ENTITIES ─────────────────────────────────────────
     # If there are companies_mentioned or tools_mentioned that are not in key_entities/companies/people,
     # add them to key_entities to ensure their logos are fetched and they are rendered.

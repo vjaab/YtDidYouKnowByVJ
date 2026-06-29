@@ -260,6 +260,11 @@ Add contractions, punchier cadence, and conversational flow.
 Format the output EXACTLY matching the required schema below.
 Use the ORIGINAL STORY CONTEXT below to fill out metadata like companies, people, key_entities, links, etc.
 
+METADATA VALIDATION RULES:
+1. "companies", "people", and "key_entities" list entries MUST only contain real, concrete names of actual companies, tools, models, and individuals explicitly mentioned in the script text.
+2. Do NOT generate generic or meta entities (e.g., "Deep dive", "AI Explained", "Video Outline").
+3. "description" fields MUST be actual, factual descriptions of the entity (e.g. "AI Tool", "Tech Company", "CEO of OpenAI") and MUST NOT contain script sentences, promotional CTAs, or other script text.
+
 OPTIMIZED SCRIPT:
 {optimized_script}
 
