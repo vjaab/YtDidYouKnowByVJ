@@ -6,6 +6,335 @@ from PIL import Image, ImageDraw, ImageFont
 from config import OUTPUT_DIR, BASE_DIR
 from pexels_fetcher import _generate_imagen3
 
+TECH_ENTITY_MAPPING = {
+    # OpenAI
+    "openai": {
+        "domain": "openai.com",
+        "wiki_slug": "OpenAI",
+        "keywords": "OpenAI logo"
+    },
+    "chatgpt": {
+        "domain": "openai.com",
+        "wiki_slug": "ChatGPT",
+        "keywords": "ChatGPT logo"
+    },
+    "gpt-4": {
+        "domain": "openai.com",
+        "wiki_slug": "GPT-4",
+        "keywords": "OpenAI GPT-4 logo"
+    },
+    "gpt-4o": {
+        "domain": "openai.com",
+        "wiki_slug": "GPT-4o",
+        "keywords": "OpenAI GPT-4o logo"
+    },
+    "sora": {
+        "domain": "openai.com",
+        "wiki_slug": "Sora_(text-to-video_model)",
+        "keywords": "OpenAI Sora logo"
+    },
+    "dall-e": {
+        "domain": "openai.com",
+        "wiki_slug": "DALL-E",
+        "keywords": "OpenAI DALL-E logo"
+    },
+    "dall-e 3": {
+        "domain": "openai.com",
+        "wiki_slug": "DALL-E",
+        "keywords": "OpenAI DALL-E logo"
+    },
+    # Google
+    "google": {
+        "domain": "google.com",
+        "wiki_slug": "Google",
+        "keywords": "Google logo"
+    },
+    "gemini": {
+        "domain": "google.com",
+        "wiki_slug": "Gemini_(chatbot)",
+        "keywords": "Google Gemini logo"
+    },
+    "gemini 1.5": {
+        "domain": "google.com",
+        "wiki_slug": "Gemini_(chatbot)",
+        "keywords": "Google Gemini logo"
+    },
+    "gemini 1.5 pro": {
+        "domain": "google.com",
+        "wiki_slug": "Gemini_(chatbot)",
+        "keywords": "Google Gemini logo"
+    },
+    "gemini 1.5 flash": {
+        "domain": "google.com",
+        "wiki_slug": "Gemini_(chatbot)",
+        "keywords": "Google Gemini logo"
+    },
+    "imagen": {
+        "domain": "google.com",
+        "wiki_slug": "Google_Imagen",
+        "keywords": "Google Imagen logo"
+    },
+    "veo": {
+        "domain": "google.com",
+        "wiki_slug": "Google",
+        "keywords": "Google Veo logo"
+    },
+    # Anthropic
+    "anthropic": {
+        "domain": "anthropic.com",
+        "wiki_slug": "Anthropic",
+        "keywords": "Anthropic logo"
+    },
+    "claude": {
+        "domain": "anthropic.com",
+        "wiki_slug": "Claude_(chatbot)",
+        "keywords": "Anthropic Claude logo"
+    },
+    "claude 3": {
+        "domain": "anthropic.com",
+        "wiki_slug": "Claude_(chatbot)",
+        "keywords": "Anthropic Claude logo"
+    },
+    "claude 3.5": {
+        "domain": "anthropic.com",
+        "wiki_slug": "Claude_(chatbot)",
+        "keywords": "Anthropic Claude logo"
+    },
+    "claude 3.5 sonnet": {
+        "domain": "anthropic.com",
+        "wiki_slug": "Claude_(chatbot)",
+        "keywords": "Anthropic Claude logo"
+    },
+    # Meta / Facebook
+    "meta": {
+        "domain": "meta.com",
+        "wiki_slug": "Meta_Platforms",
+        "keywords": "Meta logo"
+    },
+    "llama": {
+        "domain": "meta.com",
+        "wiki_slug": "Llama_(language_model)",
+        "keywords": "Meta Llama logo"
+    },
+    "llama 2": {
+        "domain": "meta.com",
+        "wiki_slug": "Llama_(language_model)",
+        "keywords": "Meta Llama logo"
+    },
+    "llama 3": {
+        "domain": "meta.com",
+        "wiki_slug": "Llama_(language_model)",
+        "keywords": "Meta Llama logo"
+    },
+    "llama 3.1": {
+        "domain": "meta.com",
+        "wiki_slug": "Llama_(language_model)",
+        "keywords": "Meta Llama logo"
+    },
+    "llama 3.2": {
+        "domain": "meta.com",
+        "wiki_slug": "Llama_(language_model)",
+        "keywords": "Meta Llama logo"
+    },
+    # Microsoft
+    "microsoft": {
+        "domain": "microsoft.com",
+        "wiki_slug": "Microsoft",
+        "keywords": "Microsoft logo"
+    },
+    "copilot": {
+        "domain": "microsoft.com",
+        "wiki_slug": "Microsoft_Copilot",
+        "keywords": "Microsoft Copilot logo"
+    },
+    "microsoft copilot": {
+        "domain": "microsoft.com",
+        "wiki_slug": "Microsoft_Copilot",
+        "keywords": "Microsoft Copilot logo"
+    },
+    "github copilot": {
+        "domain": "github.com",
+        "wiki_slug": "GitHub_Copilot",
+        "keywords": "GitHub Copilot logo"
+    },
+    # Apple
+    "apple": {
+        "domain": "apple.com",
+        "wiki_slug": "Apple_Inc.",
+        "keywords": "Apple logo"
+    },
+    "apple intelligence": {
+        "domain": "apple.com",
+        "wiki_slug": "Apple_Intelligence",
+        "keywords": "Apple Intelligence logo"
+    },
+    # Other AI Companies / Tools
+    "midjourney": {
+        "domain": "midjourney.com",
+        "wiki_slug": "Midjourney",
+        "keywords": "Midjourney logo"
+    },
+    "stable diffusion": {
+        "domain": "stability.ai",
+        "wiki_slug": "Stable_Diffusion",
+        "keywords": "Stable Diffusion logo"
+    },
+    "stability ai": {
+        "domain": "stability.ai",
+        "wiki_slug": "Stability_AI",
+        "keywords": "Stability AI logo"
+    },
+    "perplexity": {
+        "domain": "perplexity.ai",
+        "wiki_slug": "Perplexity_AI",
+        "keywords": "Perplexity AI logo"
+    },
+    "groq": {
+        "domain": "groq.com",
+        "wiki_slug": "Groq",
+        "keywords": "Groq logo"
+    },
+    "mistral": {
+        "domain": "mistral.ai",
+        "wiki_slug": "Mistral_AI",
+        "keywords": "Mistral AI logo"
+    },
+    "deepseek": {
+        "domain": "deepseek.com",
+        "wiki_slug": "DeepSeek",
+        "keywords": "DeepSeek logo"
+    },
+    "hugging face": {
+        "domain": "huggingface.co",
+        "wiki_slug": "Hugging_Face",
+        "keywords": "Hugging Face logo"
+    },
+    "huggingface": {
+        "domain": "huggingface.co",
+        "wiki_slug": "Hugging_Face",
+        "keywords": "Hugging Face logo"
+    },
+    "nvidia": {
+        "domain": "nvidia.com",
+        "wiki_slug": "Nvidia",
+        "keywords": "NVIDIA logo"
+    },
+    "x.ai": {
+        "domain": "x.ai",
+        "wiki_slug": "X.AI_(company)",
+        "keywords": "xAI logo"
+    },
+    "xai": {
+        "domain": "x.ai",
+        "wiki_slug": "X.AI_(company)",
+        "keywords": "xAI logo"
+    },
+    "grok": {
+        "domain": "x.ai",
+        "wiki_slug": "Grok_(chatbot)",
+        "keywords": "Grok logo"
+    },
+    "runway": {
+        "domain": "runwayml.com",
+        "wiki_slug": "Runway_(company)",
+        "keywords": "Runway AI logo"
+    },
+    "pika": {
+        "domain": "pika.art",
+        "wiki_slug": "Pika_Labs",
+        "keywords": "Pika AI logo"
+    },
+    "elevenlabs": {
+        "domain": "elevenlabs.io",
+        "wiki_slug": "ElevenLabs",
+        "keywords": "ElevenLabs logo"
+    },
+    "suno": {
+        "domain": "suno.com",
+        "wiki_slug": "Suno_AI",
+        "keywords": "Suno AI logo"
+    },
+    "udio": {
+        "domain": "udio.com",
+        "wiki_slug": "Udio",
+        "keywords": "Udio logo"
+    },
+    # People
+    "sam altman": {
+        "wiki_slug": "Sam_Altman",
+        "keywords": "Sam Altman portrait"
+    },
+    "sundar pichai": {
+        "wiki_slug": "Sundar_Pichai",
+        "keywords": "Sundar Pichai portrait"
+    },
+    "elon musk": {
+        "wiki_slug": "Elon_Musk",
+        "keywords": "Elon Musk portrait"
+    },
+    "mark zuckerberg": {
+        "wiki_slug": "Mark_Zuckerberg",
+        "keywords": "Mark Zuckerberg portrait"
+    },
+    "satya nadella": {
+        "wiki_slug": "Satya_Nadella",
+        "keywords": "Satya Nadella portrait"
+    },
+    "jensen huang": {
+        "wiki_slug": "Jensen_Huang",
+        "keywords": "Jensen Huang portrait"
+    },
+    "tim cook": {
+        "wiki_slug": "Tim_Cook",
+        "keywords": "Tim Cook portrait"
+    },
+    "jeff bezos": {
+        "wiki_slug": "Jeff_Bezos",
+        "keywords": "Jeff Bezos portrait"
+    },
+    "demis hassabis": {
+        "wiki_slug": "Demis_Hassabis",
+        "keywords": "Demis Hassabis portrait"
+    },
+    "yann lecun": {
+        "wiki_slug": "Yann_LeCun",
+        "keywords": "Yann LeCun portrait"
+    },
+    "andrej karpathy": {
+        "wiki_slug": "Andrej_Karpathy",
+        "keywords": "Andrej Karpathy portrait"
+    },
+    "ilya sutskever": {
+        "wiki_slug": "Ilya_Sutskever",
+        "keywords": "Ilya Sutskever portrait"
+    },
+    "dario amodei": {
+        "wiki_slug": "Dario_Amodei",
+        "keywords": "Dario Amodei portrait"
+    },
+    "mira murati": {
+        "wiki_slug": "Mira_Murati",
+        "keywords": "Mira Murati portrait"
+    },
+    "greg brockman": {
+        "wiki_slug": "Greg_Brockman",
+        "keywords": "Greg Brockman portrait"
+    }
+}
+
+def resolve_tech_entity(name):
+    if not name:
+        return None
+    normalized = name.lower().strip()
+    # Check exact match first
+    if normalized in TECH_ENTITY_MAPPING:
+        return TECH_ENTITY_MAPPING[normalized]
+    # Check substring matches (longest key first)
+    for key in sorted(TECH_ENTITY_MAPPING.keys(), key=len, reverse=True):
+        if key in normalized:
+            return TECH_ENTITY_MAPPING[key]
+    return None
+
 def _generate_local_fallback_logo(name, output_path, is_logo=True):
     """
     Generates a beautiful local placeholder image using PIL when all downloads and AI generations fail.
@@ -140,8 +469,15 @@ def _fetch_ddg_image(name, output_path, is_logo=False):
 
 def fetch_person_photo(person):
     name = person.get("name")
+    resolved = resolve_tech_entity(name)
     twitter_handle = person.get("twitter_handle")
-    wiki_slug = person.get("wikipedia_slug") or _get_wikipedia_slug(name)
+    
+    wiki_slug = person.get("wikipedia_slug")
+    if not wiki_slug:
+        if resolved and "wiki_slug" in resolved:
+            wiki_slug = resolved["wiki_slug"]
+        else:
+            wiki_slug = _get_wikipedia_slug(name)
     
     print(f"Fetching photo for person: {name} (slug: {wiki_slug})...")
     output_path = os.path.join(OUTPUT_DIR, f"person_{name.replace(' ', '_')}.jpg")
@@ -165,13 +501,18 @@ def fetch_person_photo(person):
         print(f"  Wikipedia API fetch failed: {e}")
 
     # PRIORITY 3: DuckDuckGo Fallback
-    path = _fetch_ddg_image(name, output_path, is_logo=False)
+    search_name = name
+    if resolved and "keywords" in resolved:
+        search_name = resolved["keywords"]
+    path = _fetch_ddg_image(search_name, output_path, is_logo=False)
     if path:
         return path
 
     # PRIORITY 4: Generative AI fallback (was Pexels)
     print(f"  -> Falling back to Generative AI for {name}...")
-    path = _generate_imagen3(f"Professional portrait photo of {name}", output_path, topic_context=name)
+    desc = person.get("description") or "visionary tech industry leader portrait"
+    prompt = f"Professional portrait photo headshot of a {desc}, corporate studio lighting, clean office background, highly detailed, photorealistic, premium corporate headshot"
+    path = _generate_imagen3(prompt, output_path, topic_context=name, aspect_ratio="9:16")
     if path:
         return path
 
@@ -185,7 +526,11 @@ def fetch_person_photo(person):
 
 def fetch_company_logo(company):
     name = company.get("name")
+    resolved = resolve_tech_entity(name)
+    
     domain = company.get("domain") or company.get("company_domain")
+    if not domain and resolved and "domain" in resolved:
+        domain = resolved["domain"]
     if not domain:
         domain = f"{name.lower().replace(' ', '')}.com"
     
@@ -206,7 +551,13 @@ def fetch_company_logo(company):
 
     # PRIORITY 2: Wikipedia API
     try:
-        wiki_slug = company.get("wikipedia_slug") or _get_wikipedia_slug(name)
+        wiki_slug = company.get("wikipedia_slug")
+        if not wiki_slug:
+            if resolved and "wiki_slug" in resolved:
+                wiki_slug = resolved["wiki_slug"]
+            else:
+                wiki_slug = _get_wikipedia_slug(name)
+                
         url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{wiki_slug}"
         r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
         if r.status_code == 200:
@@ -221,15 +572,23 @@ def fetch_company_logo(company):
         print(f"  Wikipedia fetch failed: {e}")
 
     # PRIORITY 3: DuckDuckGo Fallback
-    path = _fetch_ddg_image(name, output_path, is_logo=True)
+    search_name = name
+    if resolved and "keywords" in resolved:
+        search_name = resolved["keywords"]
+    path = _fetch_ddg_image(search_name, output_path, is_logo=True)
     if path:
         return path
 
-    # PRIORITY 4: Generative AI fallback (was Pexels)
-    print(f"  -> Falling back to Generative AI for {name}...")
-    imagen_out = os.path.join(OUTPUT_DIR, f"company_{name.replace(' ', '_')}_office.jpg")
-    search_query = company.get("hq_pexels_search") or f"{name} office headquarters"
-    path = _generate_imagen3(f"Professional corporate office headquarters for {search_query}", imagen_out, topic_context=name)
+    # PRIORITY 4: Generative AI fallback
+    print(f"  -> Falling back to Generative AI logo for {name}...")
+    prompt = (
+        f"A clean, modern, minimalist vector-style logo for '{name}', "
+        f"professional corporate brand identity, digital vector graphic icon, "
+        f"high contrast, centered composition, white background, no photorealistic backgrounds, "
+        f"no text, no clutter"
+    )
+    # Generate as 1:1 aspect ratio square image
+    path = _generate_imagen3(prompt, output_path, topic_context=name, aspect_ratio="1:1")
     if path:
         return path
 
@@ -338,13 +697,18 @@ def fetch_all_entities(script_data):
                 company["local_hq_path"] = path
 
     for entity in script_data.get("key_entities", []):
-        # We can try to fetch logo for anything, clearbit is domain-based and cheap
-        path = fetch_company_logo(entity)
-        if path:
-            if path.endswith(".png"):
-                entity["local_logo_path"] = path
-            else:
-                entity["local_hq_path"] = path
+        ent_type = str(entity.get("type", "")).upper()
+        if ent_type in ["PEOPLE", "PERSON"]:
+            path = fetch_person_photo(entity)
+            if path:
+                entity["local_image_path"] = path
+        else:
+            path = fetch_company_logo(entity)
+            if path:
+                if path.endswith(".png"):
+                    entity["local_logo_path"] = path
+                else:
+                    entity["local_hq_path"] = path
 
     return script_data
 

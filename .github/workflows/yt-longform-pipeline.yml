@@ -1,10 +1,10 @@
 name: Daily Long-form "Did You Know" Pipeline
 
 on:
-  schedule:
-    # ── 1 LONG-FORM EVERY 2 DAYS ──
-    # Triggers every two days at 04:30 UTC (10:00 AM IST)
-    - cron: '30 4 */2 * *'
+#  schedule:
+#    # ── 1 LONG-FORM EVERY 2 DAYS ──
+#    # Triggers every two days at 04:30 UTC (10:00 AM IST)
+#    - cron: '30 4 */2 * *'
   workflow_dispatch: # Allows manual trigger from GitHub Actions UI
 
 jobs:

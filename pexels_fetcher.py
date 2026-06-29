@@ -561,7 +561,12 @@ def _generate_huggingface_image(prompt, output_path, aspect_ratio="9:16"):
     if not HF_TOKEN:
         return None
     
-    width, height = (1080, 1920) if aspect_ratio == "9:16" else (1920, 1080)
+    if aspect_ratio == "9:16":
+        width, height = (1080, 1920)
+    elif aspect_ratio == "16:9":
+        width, height = (1920, 1080)
+    else:
+        width, height = (1024, 1024)
     
     try:
         print(f"     → Attempting Hugging Face FLUX.1 Schnell fallback...")
@@ -587,7 +592,12 @@ def _generate_huggingface_image(prompt, output_path, aspect_ratio="9:16"):
 
 def _generate_pollinations_image(prompt, output_path, aspect_ratio="9:16"):
     """Free, no-key AI image generation fallback if Imagen, HuggingFace and Veo fail."""
-    width, height = (1080, 1920) if aspect_ratio == "9:16" else (1920, 1080)
+    if aspect_ratio == "9:16":
+        width, height = (1080, 1920)
+    elif aspect_ratio == "16:9":
+        width, height = (1920, 1080)
+    else:
+        width, height = (1024, 1024)
     import urllib.parse
     encoded_prompt = urllib.parse.quote(prompt)
     url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&nologo=true&private=true"
@@ -629,7 +639,7 @@ def _generate_cloudflare_image(prompt, output_path, aspect_ratio="9:16"):
             headers={
                 "Authorization": f"Bearer {CF_API_TOKEN}",
                 "Content-Type": "application/json"
-            },
+			},
             json={"prompt": prompt},
             timeout=60
         )
