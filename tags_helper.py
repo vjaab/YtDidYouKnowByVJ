@@ -172,6 +172,40 @@ PEOPLE_METADATA = {
 DEFAULT_BROAD_HASHTAGS = ["#ArtificialIntelligence", "#Technology", "#MachineLearning"]
 DEFAULT_NICHE_HASHTAGS = ["#AITools", "#TechFacts"]
 
+GENERIC_HASHTAGS = {
+    "#aihacks", "#techtips", "#productivity", "#vaibhavsisinty", "#shorts",
+    "#didyouknow", "#amazingfacts", "#techfacts", "#aifacts", "#futuretech",
+    "#artificialintelligence", "#technology", "#machinelearning", "#aitools",
+    "#techusa", "#techuk", "#techcanada", "#techaustralia", "#technz",
+    "#techsingapore", "#techsouthkorea", "#techjapan", "#techeurope", "#english"
+}
+
+def to_clean_hashtag(s):
+    """Converts a phrase or tag string into a clean PascalCase hashtag."""
+    if not s:
+        return ""
+    # Strip existing hash prefix if present to clean it up
+    s_clean = s.strip()
+    if s_clean.startswith("#"):
+        s_clean = s_clean[1:]
+    # Split by spaces, hyphens, underscores, slashes
+    parts = re.split(r'[\s\-_\/]+', s_clean)
+    capitalized_parts = []
+    for p in parts:
+        clean_part = re.sub(r'[^\w]', '', p)
+        if clean_part:
+            # Capitalize first letter, keep the rest (if all lowercase, capitalize first letter)
+            if clean_part.islower():
+                capitalized_parts.append(clean_part.capitalize())
+            else:
+                capitalized_parts.append(clean_part)
+    hashtag = "".join(capitalized_parts)
+    if not hashtag or len(hashtag) < 2 or len(hashtag) > 25:
+        return ""
+    if hashtag.isdigit():
+        return ""
+    return f"#{hashtag}"
+
 def get_optimized_metadata(
     title, 
     script, 
@@ -207,17 +241,27 @@ def get_optimized_metadata(
             matched_tags.extend(meta["tags"])
             matched_hashtags.append(meta["hashtag"])
             
-    # 2. Add Initial Metadata
+    # 2. Add Initial Metadata to Tags
     for tag in initial_keywords + initial_companies + initial_people:
         if tag and len(tag) > 1:
             matched_tags.append(tag.strip())
             
+    # Dynamically generate hashtags from companies, people, sub-category and keywords
+    for item in initial_companies + initial_people + initial_keywords:
+        if item:
+            ht = to_clean_hashtag(item)
+            if ht:
+                matched_hashtags.append(ht)
+
+    if sub_category:
+        ht_cat = to_clean_hashtag(sub_category)
+        if ht_cat:
+            matched_hashtags.append(ht_cat)
+
     for ht in initial_hashtags:
-        ht_clean = ht.strip()
-        if ht_clean.startswith("#"):
+        ht_clean = to_clean_hashtag(ht)
+        if ht_clean:
             matched_hashtags.append(ht_clean)
-        elif ht_clean:
-            matched_hashtags.append(f"#{ht_clean}")
             
     # 3. Match Specific Tools & Platforms
     for topic in TRENDING_AI_TOPICS:
@@ -283,45 +327,45 @@ def get_optimized_metadata(
     
     # Standardize matched hashtags
     for ht in matched_hashtags:
-        ht_clean = "#" + re.sub(r'[^\w]', '', ht).strip()
-        if len(ht_clean) <= 2:
+        ht_clean = to_clean_hashtag(ht)
+        if not ht_clean:
             continue
         ht_lower = ht_clean.lower()
         if ht_lower not in seen_ht_lower:
             seen_ht_lower.add(ht_lower)
             cleaned_hashtags.append(ht_clean)
             
-    # Construct dynamic hashtags selection (3-5 items):
-    # - We want a combination of:
-    #   * Specific (matched from content)
-    #   * Niche (from our pool: #AITools, #TechFacts, etc.)
-    #   * Broad (from our pool: #ArtificialIntelligence, #Technology, #MachineLearning)
-    
-    specific_hashtags = [h for h in cleaned_hashtags if h not in DEFAULT_BROAD_HASHTAGS and h not in DEFAULT_NICHE_HASHTAGS]
+    # Split into specific (topic-based) and generic hashtags
+    specific_hashtags = [h for h in cleaned_hashtags if h.lower() not in GENERIC_HASHTAGS]
+    generic_matched_hashtags = [h for h in cleaned_hashtags if h.lower() in GENERIC_HASHTAGS]
     
     final_hashtags = []
     
-    # A. Select 1-2 Specific hashtags first
+    # A. Select up to 4 Specific hashtags first (prioritize topic relevance)
     for sh in specific_hashtags:
-        if len(final_hashtags) < 2:
-            final_hashtags.append(sh)
-            
-    # B. Select 1-2 Niche hashtags
+        if len(final_hashtags) < 4:
+            if sh.lower() not in [h.lower() for h in final_hashtags]:
+                final_hashtags.append(sh)
+                
+    # B. Select generic matched hashtags if there's still space under 4
+    for gh in generic_matched_hashtags:
+        if len(final_hashtags) < 4:
+            if gh.lower() not in [h.lower() for h in final_hashtags]:
+                final_hashtags.append(gh)
+                
+    # C. Backfill with Niche hashtags if needed
     for nh in DEFAULT_NICHE_HASHTAGS:
-        nh_lower = nh.lower()
-        # Prefer niche hashtags not already in final_hashtags
-        if nh_lower not in [h.lower() for h in final_hashtags]:
-            if len(final_hashtags) < 3:
+        if len(final_hashtags) < 4:
+            if nh.lower() not in [h.lower() for h in final_hashtags]:
                 final_hashtags.append(nh)
                 
-    # C. Select 1-2 Broad hashtags
+    # D. Backfill with Broad hashtags if needed (up to 5 max)
     for bh in DEFAULT_BROAD_HASHTAGS:
-        bh_lower = bh.lower()
-        if bh_lower not in [h.lower() for h in final_hashtags]:
-            if len(final_hashtags) < 5:
+        if len(final_hashtags) < 5:
+            if bh.lower() not in [h.lower() for h in final_hashtags]:
                 final_hashtags.append(bh)
                 
-    # D. Fillers if still less than 3
+    # E. Fillers if still less than 3
     if len(final_hashtags) < 3:
         for nh in DEFAULT_NICHE_HASHTAGS + DEFAULT_BROAD_HASHTAGS:
             if nh.lower() not in [h.lower() for h in final_hashtags]:
