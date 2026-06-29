@@ -1,0 +1,182 @@
+[09:22:03] === STARTING DAILY LONG-FORM 'DID YOU KNOW' PIPELINE ===
+[09:22:03] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[09:22:03] STEP 1: Fetching RSS articles (Research + Tools + Trending)...
+[09:22:03] 📈 vidIQ: Injected 8 high-signal topics.
+[09:23:03] ✅ Fetched 191 total articles (8 vidIQ, 96 research, 64 tools, 20 trending, 0 X.com, 3 Reddit).
+[09:23:03] STEP 2 (Attempt 1/12): Generating long-form 5-topic compilation script...
+[09:36:47] Generated Title: Stop Using ChatGPT for Code! 🚀 Claude 3.5 Sonnet
+[09:36:47] Script word count: 797
+[09:36:47] Topics covered: 7
+[09:36:47]   Fact 1: STOP Using ChatGPT for Coding! Claude 3.5 Sonnet is Your NEW AI Co-Pilot & Here's Why...
+[09:36:47]   Fact 2: NVIDIA Blackwell B200: The AI Superchip Powering the Future
+[09:36:47]   Fact 3: Meta Drops Llama 3 400B: Open Source AI Revolutionizes Coding
+[09:36:47]   Fact 4: Google Veo vs. OpenAI Sora: The AI Video Generator Showdown
+[09:36:47]   Fact 5: Meta AI Glasses: A Month In, Still Not Convinced on Wearables Future
+[09:36:47]   Fact 6: Is AI Giving You 'Popcorn Brain'? The Hidden Cost of Constant AI Use
+[09:36:47]   Fact 7: Ditch Google AI: Master DuckDuckGo's No-AI Search for Privacy
+[09:36:47] STEP 2b: Capturing article screenshots for evidence...
+[09:37:50] ✅ Captured 7/7 article screenshots.
+[09:37:50] STEP 3: Generating voiceover + word timestamps...
+[09:37:50] Selected Lip-Sync Template: assets/video/C_white.mp4
+[09:37:50] ⚠️ Script word count too low (797 words, expected ~342.1s < 480s). Retrying script generation early to save GPU time.
+[09:37:50] STEP 2 (Attempt 2/12): Generating long-form 5-topic compilation script...
+[10:06:50] Generated Title: Claude 3.5 Sonnet 🤖 Code Like a Senior Dev – 6 AI Updates You Can’t Miss
+[10:06:50] Script word count: 961
+[10:06:50] Topics covered: 7
+[10:06:50]   Fact 1: Claude 3.5 Sonnet: The Ultimate Programming AI Assistant
+[10:06:50]   Fact 2: NVIDIA Blackwell B200 GPU Architecture Deep Dive
+[10:06:50]   Fact 3: Meta Llama 3 400B Open Source AI Changes Coding Forever
+[10:06:50]   Fact 4: Google Veo vs OpenAI Sora: The Ultimate AI Video Generator Test
+[10:06:50]   Fact 5: How to Build Your Own Agentic AI Workflow from Scratch
+[10:06:50]   Fact 6: DJI's Osmo Pocket 4P promises 17 stops of dynamic range
+[10:06:50]   Fact 7: I use AI every day — then I realized it might be giving me 'popcorn brain'
+[10:06:50] STEP 2b: Capturing article screenshots for evidence...
+[10:07:45] ✅ Captured 7/7 article screenshots.
+[10:07:45] STEP 3: Generating voiceover + word timestamps...
+[10:07:45] Selected Lip-Sync Template: assets/video/C_white.mp4
+[10:07:45] ⚠️ Script word count too low (961 words, expected ~412.4s < 480s). Retrying script generation early to save GPU time.
+[10:07:45] STEP 2 (Attempt 3/12): Generating long-form 5-topic compilation script...
+[10:37:55] Generated Title: Claude 3.5 Sonnet vs GPT-4 Turbo: 3× Faster Coding AI 🤖
+[10:37:55] Script word count: 982
+[10:37:55] Topics covered: 7
+[10:37:55]   Fact 1: Claude 3.5 Sonnet: The Ultimate Programming AI Assistant
+[10:37:55]   Fact 2: NVIDIA Blackwell B200 GPU Architecture Deep Dive
+[10:37:55]   Fact 3: Meta Llama 3 400B Open Source AI Changes Coding Forever
+[10:37:55]   Fact 4: Google Veo vs OpenAI Sora: The Ultimate AI Video Generator Test
+[10:37:55]   Fact 5: How to Build Your Own Agentic AI Workflow from Scratch
+[10:37:55]   Fact 6: DJI's Osmo Pocket 4P promises 17 stops of dynamic range
+[10:37:55]   Fact 7: T-Mobile is giving away the Apple iPhone 17 for free
+[10:37:55] STEP 2b: Capturing article screenshots for evidence...
+[10:38:48] ✅ Captured 7/7 article screenshots.
+[10:38:48] STEP 3: Generating voiceover + word timestamps...
+[10:38:48] Selected Lip-Sync Template: assets/video/C_white.mp4
+[10:38:48] ⚠️ Script word count too low (982 words, expected ~421.5s < 480s). Retrying script generation early to save GPU time.
+[10:38:48] STEP 2 (Attempt 4/12): Generating long-form 5-topic compilation script...
+[11:09:06] Generated Title: Claude 3.5 Sonnet: The #1 AI Coding Assistant
+[11:09:06] Script word count: 466
+[11:09:06] Topics covered: 7
+[11:09:06]   Fact 1: Claude 3.5 Sonnet: The Ultimate Programming AI Assistant
+[11:09:06]   Fact 2: NVIDIA Blackwell B200 GPU Architecture Deep Dive
+[11:09:06]   Fact 3: Meta Llama 3 400B Open Source AI Changes Coding Forever
+[11:09:06]   Fact 4: Google Veo vs OpenAI Sora: The Ultimate AI Video Generator Test
+[11:09:06]   Fact 5: How to Build Your Own Agentic AI Workflow from Scratch
+[11:09:06]   Fact 6: DJI's Osmo Pocket 4P promises 17 stops of dynamic range
+[11:09:06]   Fact 7: T-Mobile is giving away the Apple iPhone 17 for free
+[11:09:06] STEP 2b: Capturing article screenshots for evidence...
+[11:09:57] ✅ Captured 7/7 article screenshots.
+[11:09:57] STEP 3: Generating voiceover + word timestamps...
+[11:09:57] Selected Lip-Sync Template: assets/video/C_white.mp4
+[11:09:57] ⚠️ Script word count too low (466 words, expected ~200.0s < 480s). Retrying script generation early to save GPU time.
+[11:09:57] STEP 2 (Attempt 5/12): Generating long-form 5-topic compilation script...
+[11:40:15] Generated Title: Claude 3.5 Sonnet: AI Coding Revolution 🤖
+[11:40:15] Script word count: 517
+[11:40:15] Topics covered: 7
+[11:40:15]   Fact 1: Claude 3.5 Sonnet: The Ultimate Programming AI Assistant
+[11:40:15]   Fact 2: NVIDIA Blackwell B200 GPU Architecture Deep Dive
+[11:40:15]   Fact 3: Meta Llama 3 400B Open Source AI Changes Coding Forever
+[11:40:15]   Fact 4: Google Veo vs OpenAI Sora: The Ultimate AI Video Generator Test
+[11:40:15]   Fact 5: How to Build Your Own Agentic AI Workflow from Scratch
+[11:40:15]   Fact 6: DJI's Osmo Pocket 4P promises 17 stops of dynamic range
+[11:40:15]   Fact 7: T-Mobile is giving away the Apple iPhone 17 for free
+[11:40:15] STEP 2b: Capturing article screenshots for evidence...
+[11:41:04] ✅ Captured 7/7 article screenshots.
+[11:41:04] STEP 3: Generating voiceover + word timestamps...
+[11:41:04] Selected Lip-Sync Template: assets/video/C_white.mp4
+[11:41:04] ⚠️ Script word count too low (517 words, expected ~221.9s < 480s). Retrying script generation early to save GPU time.
+[11:41:04] STEP 2 (Attempt 6/12): Generating long-form 5-topic compilation script...
+[12:11:37] Generated Title: Claude 3.5 Sonnet: Cut Your Coding Time in Half? 🤖
+[12:11:37] Script word count: 773
+[12:11:37] Topics covered: 7
+[12:11:37]   Fact 1: Claude 3.5 Sonnet: The Ultimate Programming AI Assistant
+[12:11:37]   Fact 2: NVIDIA Blackwell B200 GPU Architecture Deep Dive
+[12:11:37]   Fact 3: Meta Llama 3 400B Open Source AI Changes Coding Forever
+[12:11:37]   Fact 4: Google Veo vs OpenAI Sora: The Ultimate AI Video Generator Test
+[12:11:37]   Fact 5: How to Build Your Own Agentic AI Workflow from Scratch
+[12:11:37]   Fact 6: DJI's Osmo Pocket 4P promises 17 stops of dynamic range
+[12:11:37]   Fact 7: T-Mobile is giving away the Apple iPhone 17 for free
+[12:11:37] STEP 2b: Capturing article screenshots for evidence...
+[12:12:35] ✅ Captured 7/7 article screenshots.
+[12:12:35] STEP 3: Generating voiceover + word timestamps...
+[12:12:35] Selected Lip-Sync Template: assets/video/C_white.mp4
+[12:12:35] ⚠️ Script word count too low (773 words, expected ~331.8s < 480s). Retrying script generation early to save GPU time.
+[12:12:35] STEP 2 (Attempt 7/12): Generating long-form 5-topic compilation script...
+[12:43:08] Generated Title: Claude 3.5 Sonnet: The Ultimate AI Coding Assistant 🤖
+[12:43:08] Script word count: 581
+[12:43:08] Topics covered: 7
+[12:43:08]   Fact 1: Claude 3.5 Sonnet: The Ultimate Programming AI Assistant
+[12:43:08]   Fact 2: Meta Llama 3 400B Open Source AI Changes Coding Forever
+[12:43:08]   Fact 3: NVIDIA Blackwell B200 GPU Architecture Deep Dive
+[12:43:08]   Fact 4: Google Veo vs OpenAI Sora: The Ultimate AI Video Generator Test
+[12:43:08]   Fact 5: How to Build Your Own Agentic AI Workflow from Scratch
+[12:43:08]   Fact 6: DJI's Osmo Pocket 4P promises 17 stops of dynamic range
+[12:43:08]   Fact 7: T-Mobile is giving away the Apple iPhone 17 for free
+[12:43:08] STEP 2b: Capturing article screenshots for evidence...
+[12:43:51] ✅ Captured 7/7 article screenshots.
+[12:43:51] STEP 3: Generating voiceover + word timestamps...
+[12:43:51] Selected Lip-Sync Template: assets/video/C_white.mp4
+[12:43:51] ⚠️ Script word count too low (581 words, expected ~249.4s < 480s). Retrying script generation early to save GPU time.
+[12:43:51] STEP 2 (Attempt 8/12): Generating long-form 5-topic compilation script...
+[13:14:11] Generated Title: Claude 3.5 Sonnet: 2x Faster, 2x Cheaper AI Coding
+[13:14:11] Script word count: 640
+[13:14:11] Topics covered: 7
+[13:14:11]   Fact 1: Claude 3.5 Sonnet: The Ultimate Programming AI Assistant
+[13:14:11]   Fact 2: NVIDIA Blackwell B200 GPU Architecture Deep Dive
+[13:14:11]   Fact 3: Meta Llama 3 400B Open Source AI Changes Coding Forever
+[13:14:11]   Fact 4: Google Veo vs OpenAI Sora: The Ultimate AI Video Generator Test
+[13:14:11]   Fact 5: How to Build Your Own Agentic AI Workflow from Scratch
+[13:14:11]   Fact 6: DJI's Osmo Pocket 4P promises 17 stops of dynamic range
+[13:14:11]   Fact 7: T-Mobile is giving away the Apple iPhone 17 for free
+[13:14:11] STEP 2b: Capturing article screenshots for evidence...
+[13:15:01] ✅ Captured 7/7 article screenshots.
+[13:15:01] STEP 3: Generating voiceover + word timestamps...
+[13:15:01] Selected Lip-Sync Template: assets/video/C_white.mp4
+[13:15:01] ⚠️ Script word count too low (640 words, expected ~274.7s < 480s). Retrying script generation early to save GPU time.
+[13:15:01] STEP 2 (Attempt 9/12): Generating long-form 5-topic compilation script...
+[13:45:46] Generated Title: Claude 3.5 Sonnet: The Ultimate AI Coding Assistant 🤖
+[13:45:46] Script word count: 670
+[13:45:46] Topics covered: 7
+[13:45:46]   Fact 1: Claude 3.5 Sonnet: The Ultimate Programming AI Assistant
+[13:45:46]   Fact 2: NVIDIA Blackwell B200 GPU Architecture Deep Dive
+[13:45:46]   Fact 3: Meta Llama 3 400B Open Source AI Changes Coding Forever
+[13:45:46]   Fact 4: Google Veo vs OpenAI Sora: The Ultimate AI Video Generator Test
+[13:45:46]   Fact 5: How to Build Your Own Agentic AI Workflow from Scratch
+[13:45:46]   Fact 6: DJI's Osmo Pocket 4P promises 17 stops of dynamic range
+[13:45:46]   Fact 7: T-Mobile is giving away the Apple iPhone 17 for free
+[13:45:46] STEP 2b: Capturing article screenshots for evidence...
+[13:46:39] ✅ Captured 7/7 article screenshots.
+[13:46:39] STEP 3: Generating voiceover + word timestamps...
+[13:46:39] Selected Lip-Sync Template: assets/video/C_white.mp4
+[13:46:39] ⚠️ Script word count too low (670 words, expected ~287.6s < 480s). Retrying script generation early to save GPU time.
+[13:46:39] STEP 2 (Attempt 10/12): Generating long-form 5-topic compilation script...
+[14:17:08] Generated Title: Claude 3.5 Sonnet: The Ultimate AI Coding Assistant 🤖
+[14:17:08] Script word count: 731
+[14:17:08] Topics covered: 7
+[14:17:08]   Fact 1: Claude 3.5 Sonnet: The Ultimate Programming AI Assistant
+[14:17:08]   Fact 2: Meta Llama 3 400B Open Source AI Changes Coding Forever
+[14:17:08]   Fact 3: NVIDIA Blackwell B200 GPU Architecture Deep Dive
+[14:17:08]   Fact 4: Google Veo vs OpenAI Sora: The Ultimate AI Video Generator Test
+[14:17:08]   Fact 5: How to Build Your Own Agentic AI Workflow from Scratch
+[14:17:08]   Fact 6: DJI's Osmo Pocket 4P promises 17 stops of dynamic range
+[14:17:08]   Fact 7: T-Mobile is giving away the Apple iPhone 17 for free
+[14:17:08] STEP 2b: Capturing article screenshots for evidence...
+[14:18:00] ✅ Captured 7/7 article screenshots.
+[14:18:00] STEP 3: Generating voiceover + word timestamps...
+[14:18:00] Selected Lip-Sync Template: assets/video/C_white.mp4
+[14:18:00] ⚠️ Script word count too low (731 words, expected ~313.7s < 480s). Retrying script generation early to save GPU time.
+[14:18:00] STEP 2 (Attempt 11/12): Generating long-form 5-topic compilation script...
+[14:47:57] Generated Title: Claude 3.5 Sonnet: The Ultimate AI Coding Assistant 🤖
+[14:47:57] Script word count: 699
+[14:47:57] Topics covered: 7
+[14:47:57]   Fact 1: Claude 3.5 Sonnet: The Ultimate Programming AI Assistant
+[14:47:57]   Fact 2: NVIDIA Blackwell B200 GPU Architecture Deep Dive
+[14:47:57]   Fact 3: Meta Llama 3 400B Open Source AI Changes Coding Forever
+[14:47:57]   Fact 4: Google Veo vs OpenAI Sora: The Ultimate AI Video Generator Test
+[14:47:57]   Fact 5: How to Build Your Own Agentic AI Workflow from Scratch
+[14:47:57]   Fact 6: DJI's Osmo Pocket 4P promises 17 stops of dynamic range
+[14:47:57]   Fact 7: T-Mobile is giving away the Apple iPhone 17 for free
+[14:47:57] STEP 2b: Capturing article screenshots for evidence...
+[14:48:40] ✅ Captured 7/7 article screenshots.
+[14:48:40] STEP 3: Generating voiceover + word timestamps...
+[14:48:40] Selected Lip-Sync Template: assets/video/C_white.mp4
+[14:48:40] ⚠️ Script word count too low (699 words, expected ~300.0s < 480s). Retrying script generation early to save GPU time.
+[14:48:40] STEP 2 (Attempt 12/12): Generating long-form 5-topic compilation script...
