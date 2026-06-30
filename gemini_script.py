@@ -112,49 +112,40 @@ Return ONLY a JSON object:
 HOOK_AGENT_TEMPLATE = """{persona}
 
 HOOK AGENT TASK:
-Based on the following research, generate 10 potential YouTube Shorts hooks (<1.5s).
-Hooks MUST create surprise, contradiction, urgency, or curiosity. No greetings. No generic statements.
+Generate 10 hooks (<1.5s each). First 3 words MUST stop the scroll.
+NO greetings. NO "Today we..." NO "In this video..."
+
+RULES:
+- Lead with: specific stat, contradiction, or "You" + immediate stakes
+- Examples: "Your iPhone records this..." / "Google just killed..." / "$4.2B wasted..."
+- Max 8 words. One clause only.
 
 RESEARCH:
 {research_json}
 
-Return ONLY a JSON object:
+Return ONLY JSON:
 {{
   "hooks": [
-    {{
-      "text": "Hook text",
-      "curiosity_score": 1-10,
-      "emotional_trigger_score": 1-10,
-      "reason": "Why it works"
-    }}
+    {{"text": "Hook text", "curiosity_score": 1-10, "emotional_trigger_score": 1-10, "reason": "Why it works"}}
   ]
 }}"""
 
 NARRATIVE_AGENT_TEMPLATE = """{persona}
 
 NARRATIVE AGENT TASK:
-Using the selected hook and research, create a short storytelling flow adhering to the strict 4-part structure.
-Include:
-1. THE HOOK (0-5s): Start with a compelling, realistic hook grounded in specific facts or features. (The selected hook)
-2. THE CORE PROBLEM & VALUE (5-25s): Clearly state the "Why should I care?" factor. Name the exact feature, app, or company. Be specific about how or where data is stored/used.
-3. THE IMMEDIATE SOLUTION (25-40s): Provide a real, actionable fix directly inside the Short. Give clear instructions (e.g., "To turn it off: Open ChatGPT, go to Settings..."). Do NOT gatekeep or say "link in bio".
-4. THE CALL TO ACTION (40-45s): Close with a clean, low-friction request for engagement.
+Write 4-part script using SELECTED HOOK exactly as-is.
 
-RESEARCH:
-{research_json}
+1. HOOK (0-5s): {selected_hook}  ← USE VERBATIM
+2. PROBLEM (5-20s): Why viewer is personally affected. Name exact feature/app. "Your [app] does [specific thing]..."
+3. SOLUTION (20-45s): Actionable steps. "To fix: Open [app] > [setting] > Toggle [X] off." Max 2 sentences per step.
+4. CTA (45-50s): Soft loop. "Save this if you use [app]. Follow for more."
 
-SELECTED HOOK:
-{selected_hook}
+VISUAL PROMPT RULE: The FIRST nano_visual_prompt (hook segment) MUST depict the EXACT product/tool/feature named in the hook. Example: if hook says 'MemoMind One glasses', prompt = 'Close-up of MemoMind One smart glasses on desk, transparent AR lenses showing notifications, photorealistic 9:16, dark background'. NO generic 'person holding box'.
 
-{selection_instruction}
+RESEARCH: {research_json}
+SELECTED HOOK: {selected_hook}
 
-Return ONLY a JSON object representing the narrative draft (not the final schema yet, just the content parts):
-{{
-  "hook": "...",
-  "core_problem": "...",
-  "immediate_solution": "...",
-  "call_to_action": "..."
-}}"""
+Return JSON with: hook, core_problem, immediate_solution, call_to_action"""
 
 RETENTION_OPTIMIZER_TEMPLATE = """{persona}
 
@@ -254,29 +245,27 @@ Return ONLY a JSON object:
 
 HUMANIZER_AGENT_TEMPLATE = """{persona}
 
-HUMANIZER AGENT TASK:
-This is the final step. Fix robotic phrasing, repetitive AI wording, over-explanation, and "In conclusion" style endings.
-Add contractions, punchier cadence, and conversational flow.
-Format the output EXACTLY matching the required schema below.
-Use the ORIGINAL STORY CONTEXT below to fill out metadata like companies, people, key_entities, links, etc.
+HUMANIZER TASK:
+Fix these SPECIFIC AI patterns:
+- "It is important to note" → DELETE
+- "In order to" → "To"
+- "Utilize" → "Use"
+- "Furthermore/Moreover" → DELETE
+- "Delve/Dive into" → "Show"
+- "Leverage" → "Use"
+- "Seamless" → DELETE
+- "Robust" → DELETE
+- "Crucial/Critical" → "Key" or DELETE
+- "In today's world" → DELETE
+- Passive voice → Active ("The feature protects you" not "You are protected by")
 
-METADATA VALIDATION RULES:
-1. "companies", "people", and "key_entities" list entries MUST only contain real, concrete names of actual companies, tools, models, and individuals explicitly mentioned in the script text.
-2. Do NOT generate generic or meta entities (e.g., "Deep dive", "AI Explained", "Video Outline").
-3. "description" fields MUST be actual, factual descriptions of the entity (e.g. "AI Tool", "Tech Company", "CEO of OpenAI") and MUST NOT contain script sentences, promotional CTAs, or other script text.
+Add contractions: "it is"→"it's", "you are"→"you're", "do not"→"don't", "cannot"→"can't"
 
-OPTIMIZED SCRIPT:
-{optimized_script}
+OPTIMIZED SCRIPT: {optimized_script}
+ORIGINAL STORY CONTEXT: {news_context}
+SCHEMA REQUIREMENTS: {schema_requirements}
 
-ORIGINAL STORY CONTEXT:
-{news_context}
-
-SCHEMA REQUIREMENTS:
-{schema_requirements}
-
-CRITICAL SUBTITLE RULE: The `subtitle_chunks` array MUST break the script down into natural clause-level or sentence-level chunks of approximately 6 to 10 words each. Do not generate single-word or 2-word chunks, as it makes the JSON too large and causes API timeouts.
-
-Return ONLY the final JSON object matching the schema. No markdown wrapping unless inside the string values. No explanations."""
+Return FINAL JSON matching schema exactly."""
 
 FACT_EXTRACTOR_TEMPLATE = """{persona}
 

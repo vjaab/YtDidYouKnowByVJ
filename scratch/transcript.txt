@@ -1,0 +1,577 @@
+[0:00] All right, guys. We are at Google I/O
+[0:02] right now. This is me, Vaibhav, in real
+[0:04] flesh, not my AI avatar this time.
+[0:05] [music] And there are some incredible
+[0:07] things that Google has already dropped.
+[0:09] I had an opportunity to kind of, you
+[0:11] know, experience all of them before
+[0:12] everyone else.
+[0:15] And honestly, this is the single biggest
+[0:17] set of AI updates any company has
+[0:20] released in 24 hours, ever. So, we've
+[0:22] shortlisted over 20 major announcements
+[0:25] to share with you with a detailed dive
+[0:27] in on a few important tools. AI is
+[0:29] moving from predicting text to
+[0:31] simulating reality. But the real
+[0:33] breakthrough isn't the technology. It's
+[0:36] what you do with it. And you can see
+[0:38] this in Google's drops this year. They
+[0:40] have saved millions by predicting
+[0:42] natural disasters and provided all its
+[0:44] tools for free, so we all can leverage
+[0:46] them and transform our lives. But that's
+[0:49] the least of it. Google has also decided
+[0:52] to compete with Mark Zuckerberg this
+[0:53] year and tackle his Meta Ray-Ban
+[0:55] glasses, which were the only tool
+[0:57] showing us that the future of AI lives
+[1:00] on your face. [music] And the new
+[1:01] release might just completely beat
+[1:03] Meta's product line. My team and I sat
+[1:05] through the entire keynote to get the
+[1:07] best of every announcement [music] for
+[1:09] you. And one tool in there made me
+[1:11] genuinely surprised. Google's
+[1:13] anti-gravity. So, we pushed it to build
+[1:15] us something amazing. That's the one I
+[1:17] highly recommend you to watch. And if
+[1:19] you want an even faster version of these
+[1:21] 20-plus updates, I turned the entire
+[1:23] Google keynote into a quick brief. It's
+[1:25] in my free WhatsApp community. Grab it
+[1:27] from the link in the description. Right,
+[1:29] now let's get into the video.
+[1:32] Google just shipped Gemini Omni Flash.
+[1:35] It is basically Google's new AI model
+[1:37] that combines Gemini's ability to
+[1:39] actually reason about the world with the
+[1:42] ability to create things from scratch.
+[1:44] And the very first thing it has launched
+[1:46] with is video generation. Until now,
+[1:48] most AI video tools needed you to feed
+[1:51] them very specific instructions and
+[1:53] still could not really understand the
+[1:55] topic you were asking them to make a
+[1:57] video about, which is why most AI
+[1:59] generated videos look nice on the
+[2:01] surface but had no real depth or
+[2:03] accuracy behind them. With Omni, you can
+[2:06] throw in any combination of images,
+[2:08] audio clips, existing video footage, and
+[2:11] plain text as the input and it will
+[2:13] generate a finished high-quality video
+[2:16] that genuinely understands the subject
+[2:18] matter because it is built on top of
+[2:20] everything Gemini already knows about
+[2:23] the real world. So, to actually see what
+[2:25] this thing can do, let's give it a
+[2:26] prompt. Make a claymation explainer of
+[2:29] protein folding. Don't use hands or stop
+[2:31] motion and make it accurate. The model
+[2:34] running underneath this was flash
+[2:35] extended, which is the version of Omni
+[2:38] built for slightly longer video outputs.
+[2:40] After hitting generate, the system
+[2:42] produced a fully finished claymation
+[2:44] video on its own. Watch this. Play
+[2:46] video.
+[2:46] >> Proteins are built as long chains of
+[2:48] amino acids. They immediately fold into
+[2:50] helices and sheets. This curves into a
+[2:53] complex three-dimensional shape. Now,
+[2:55] the protein is ready to do its work.
+[2:56] >> [music]
+[2:57] >> What makes this genuinely different from
+[2:59] every other AI video tool is that
+[3:01] explanation is scientifically accurate.
+[3:03] The visuals match what the narrator is
+[3:05] describing in real time on screen and
+[3:07] all of it came out of one sentence
+[3:10] asking for a claymation explainer. No
+[3:12] script was uploaded for the voiceover
+[3:14] and no research paper was attached for
+[3:15] the science. Google Search redesigned
+[3:18] itself for the first time in 25 years.
+[3:20] Now, the search box accepts way more
+[3:23] than just text now. You can drop in
+[3:24] images, files, videos, even open Chrome
+[3:27] tabs as part of your query. Search will
+[3:29] analyze all of it together and answer
+[3:32] accordingly. The interface is
+[3:33] generative, too, meaning Search will
+[3:36] build a custom UI inside the results
+[3:38] page based on what you asked. Ask about
+[3:40] astrophysics or visualize how your watch
+[3:43] works and it builds an interactive
+[3:44] simulation. Ask it to track your fitness
+[3:47] routine or plan a home move and it
+[3:49] builds you a custom dashboard right
+[3:51] inside [music] the results. This is
+[3:53] going live globally today. The biggest
+[3:55] change in Google search engine redesign
+[3:57] is that they have put agents right in
+[3:59] the search bar. These AI agents can run
+[4:01] tasks for 24/7 from tracking topics you
+[4:05] care about and triggering notifications
+[4:07] when something changes. For example, now
+[4:09] you can track a sneaker collab drop from
+[4:11] your favorite athlete the moment it's
+[4:13] announced and it will send you
+[4:14] notifications when the time comes. Or
+[4:17] you can also ask it to find something
+[4:18] specific [music] like a private karaoke
+[4:20] room for six on a Friday night that
+[4:23] serves food late and it will send you
+[4:25] relevant options. By adding these agents
+[4:27] to the search bar, Google is trying to
+[4:30] make its more complex tools accessible
+[4:32] for the major public. Google search
+[4:34] itself can now write and execute code in
+[4:37] real time to give you better answers.
+[4:39] Ask a question about astrophysics or ask
+[4:42] how your watch actually works and
+[4:43] instead of giving you 10 blue links to
+[4:45] read through, it now builds an
+[4:47] interactive simulation right inside the
+[4:49] results page that you can play around
+[4:51] with directly. You can also ask it to
+[4:53] build you a custom fitness tracker mini
+[4:55] app and it pulls in real-time data like
+[4:57] live maps and your local weather to make
+[5:00] the whole thing actually functional for
+[5:02] you. The interface is generated live
+[5:04] just for your specific query [music]
+[5:06] which has never been possible before on
+[5:08] any search engine. The interactive
+[5:10] simulations and visuals will launch
+[5:12] globally this summer completely free for
+[5:14] everyone. Google also launched Gemini
+[5:17] Spark, a 24/7 personal AI agent to help
+[5:21] you navigate your digital life. Not only
+[5:23] can this assistant answer your questions
+[5:25] but also do real work on your behalf and
+[5:28] under your direction. For example,
+[5:30] [music] it knew that the child Sam's
+[5:31] game is tomorrow at 11:00 a.m. and the
+[5:34] parent is in charge of nut-free snacks.
+[5:36] So it added suggested items to Instacart
+[5:39] and only waited for payment. It's also
+[5:41] deeply integrated with the workspace
+[5:43] tools you rely on daily like Gmail,
+[5:46] Docs, Slides and more. So, it can
+[5:48] monitor your child's school inbox for
+[5:50] deadlines and submit a daily report to
+[5:53] both parents or automatically check your
+[5:55] monthly credit card statements to flag
+[5:58] new or hidden subscription fees. There
+[6:00] are infinite use cases. The best part is
+[6:02] because it runs on Google Cloud, you
+[6:04] don't even need to keep your laptop open
+[6:06] for it to work. Google built an agent to
+[6:08] give you a personalized morning summary
+[6:11] that is designed to be your first stop
+[6:13] every day, called Daily Brief. Once you
+[6:15] opt in, Gemini goes through your apps
+[6:17] every morning. It gathers urgent
+[6:19] information from your Gmail inbox,
+[6:21] tracks upcoming events from your
+[6:23] calendar, and compiles relevant
+[6:25] follow-up details into a briefing. Not
+[6:27] only does it summarize, but also
+[6:29] prioritizes what's urgent and organizes
+[6:32] things by importance. You can find
+[6:34] [music] it in your Gemini app on the
+[6:36] left task bar. The Gemini app got
+[6:38] rebuilt from the ground up, and Google
+[6:40] calls the new design language Neural
+[6:42] Expressive. The interface now features
+[6:45] fluid animations, vibrant colors, new
+[6:47] typography, and haptic feedback when you
+[6:50] tap things. Google has also made it much
+[6:53] easier to discover and generate images,
+[6:55] videos, and music directly inside the
+[6:57] app. With built-in templates, you can
+[7:00] remix instantly without writing long
+[7:02] prompts from scratch. The Gemini Live
+[7:04] experience has been completely
+[7:06] transformed, too. So, instead of taking
+[7:08] over your full screen, it now opens
+[7:10] immediately [music] and in line inside
+[7:12] the conversation you are already in.
+[7:14] This allows you to move between typing
+[7:16] and talking effortlessly. [music]
+[7:18] Soon, you will even be able to pick a
+[7:19] regional dialect within the chat. Google
+[7:22] also launched an actual desktop
+[7:23] application of Gemini specially for the
+[7:26] Mac OS. They are also bringing Gemini
+[7:28] Spark to this desktop application in a
+[7:30] few months. Once that happens, you will
+[7:32] be able to work with your local files
+[7:34] and automate workflows. The bigger
+[7:36] feature, though, is advanced voice
+[7:38] dictation. You can talk to it normally
+[7:40] with all the ums or what abouts that
+[7:42] happen as you think aloud. Using the
+[7:44] context from your screen, [music] Gemini
+[7:46] can turn this speech into clean drafts
+[7:48] right where your cursor is. This Mac app
+[7:50] is available to download today for all
+[7:53] users. This update is for developers.
+[7:56] Anti-gravity 2.0 is Google's new desktop
+[7:59] application built around the idea of
+[8:01] working multiple AI agents in parallel,
+[8:04] each working on a different piece of the
+[8:06] same problem, all reporting back to you.
+[8:09] The old version of Anti-gravity looked
+[8:11] exactly like a programmer's screen with
+[8:13] files, code, and a terminal window. It
+[8:15] felt like a tool built for developers.
+[8:17] The new version has stripped all of that
+[8:20] away completely, and the entire
+[8:21] interface is now just a chat box [music]
+[8:23] that looks identical to ChatGPT or
+[8:26] WhatsApp with only three options on the
+[8:28] sidebar, which are new conversation,
+[8:30] conversation history, and scheduled
+[8:32] tasks. So, to actually test what this
+[8:34] thing can do, we typed one single
+[8:36] sentence into the chat box, which was
+[8:39] "Make a Chrome Dino infinite runner game
+[8:41] that plays itself in a cyber theme." And
+[8:43] we picked Gemini 3.5 Flash as the model
+[8:46] running it. Within about 4 seconds, the
+[8:49] agent had written out a complete plan
+[8:51] for how it was going to build the entire
+[8:53] game, breaking down the visuals, the
+[8:55] cyber styling, the Dino movement, the
+[8:57] self-playing brain, and the retro sound
+[8:59] effects, and [music] we just clicked the
+[9:01] proceed button to let it start building.
+[9:03] The only manual step from our end during
+[9:06] the entire build was clicking "Allow one
+[9:08] time" when it needed permission to run
+[9:10] something on the computer. When we
+[9:11] opened the game in Chrome to actually
+[9:13] play it, we hit an error saying the page
+[9:16] could not load. So, we just typed back,
+[9:18] "This is not working. Please make it
+[9:20] work." And the agent started
+[9:22] investigating the problem completely on
+[9:24] its own without any further guidance
+[9:26] from us. It tried a few different
+[9:28] approaches one after the other
+[9:30] automatically until the game actually
+[9:32] loaded properly in the browser. [music]
+[9:34] The AI player inside the game was
+[9:37] honestly pretty bad at the start,
+[9:38] crashing again and again. So, we
+[9:40] switched back to the anti-gravity chat
+[9:42] to figure out what to do next. The
+[9:44] genuinely interesting part is that we
+[9:46] did not need to type anything new at all
+[9:49] because the agent had already noticed
+[9:51] the failures from the running game on
+[9:52] its own, and it was already fixing the
+[9:55] obstacle detection and the jumping logic
+[9:57] by itself. We now have a fully working
+[9:59] cyber-themed Chrome Dino game playing
+[10:02] itself inside the browser with zero
+[10:04] amount of code written. For creators who
+[10:06] have always wanted custom video tools,
+[10:08] but could never justify learning to
+[10:10] code, Google Flow shipped a new feature
+[10:12] called Flow Tools that lets you do wipe
+[10:15] coding. It is just a fancy way of saying
+[10:17] you build software by describing it in
+[10:20] plain English instead of writing any
+[10:22] actual code. You describe a creative
+[10:24] tool you want, something like a custom
+[10:26] video resizer, a color shader, or a
+[10:29] visual effects generator, and Flow
+[10:31] builds the entire thing right there
+[10:33] inside the editor. Alongside this,
+[10:36] Google also shipped Flow Agent, a
+[10:38] Gemini-powered AI assistant that helps
+[10:41] with every other step of the creative
+[10:43] process, including brainstorming,
+[10:45] creating, and editing. This sounds
+[10:47] slightly complicated, but if you like,
+[10:49] [music] we can make you a tutorial on
+[10:50] some use cases. Let us know in the
+[10:52] comments. Moving on, Stitch, which is
+[10:55] Google's AI-powered UI design product,
+[10:57] just picked up five major upgrades. The
+[11:00] first one is streaming, which means your
+[11:02] designs now render live on the canvas
+[11:04] [music] in real time as the AI is
+[11:06] generating them, so you can see the work
+[11:08] happening and start steering it before
+[11:10] the final design is even done [music]
+[11:12] instead of just waiting around for the
+[11:14] big reveal at the end. Secondly, you can
+[11:16] now start from your existing design
+[11:19] instead of a blank canvas by importing a
+[11:21] Figma file, a code base, or an existing
+[11:24] site. [music] Just click on start with
+[11:26] your design button, and Stitch will read
+[11:28] it and build forward from there. Third
+[11:30] is in-place AI edits, where you can
+[11:32] highlight any single element directly on
+[11:35] your screen and rewrite just that part
+[11:37] of the design with a quick prompt
+[11:39] without regenerating the whole layout.
+[11:42] Fourth is motion on HTML native canvas,
+[11:45] which means you can now build real
+[11:47] working animations directly inside your
+[11:49] prototypes instead of static mockups.
+[11:51] [music]
+[11:52] And fifth, more import and export
+[11:54] options have been added including dot
+[11:56] fig files for Figma plus direct export
+[12:00] to Netlify, Lovable, and Bolt. The big
+[12:02] bonus is that you can now import and
+[12:05] sync your entire codebase directly
+[12:07] inside Stage and work on both the design
+[12:10] and the code in one single place. For
+[12:12] founders who actually design [music] and
+[12:14] build their own products, this is the
+[12:16] closest any tool has come to handling
+[12:18] the full loop in one workflow. Google
+[12:21] Picks is a new AI image creation and
+[12:23] editing tool built on Nano Banana 2. And
+[12:26] the difference between this and other
+[12:28] image generators is that this tool
+[12:30] treats every element inside as a
+[12:32] separate object that you can edit
+[12:34] independently. [music]
+[12:35] For example, you can select a single
+[12:37] object and move, resize, or transform
+[12:40] it. You can edit text directly [music]
+[12:42] inside the image or translate it into
+[12:44] another language while keeping the
+[12:46] original font intact. Multiple people
+[12:49] can also collaborate on the same canvas
+[12:51] at once, [music] the way you would on a
+[12:53] Google Doc. This is much closer to a
+[12:55] real designer's workflow than a typical
+[12:57] prompt-to-picture tool. It's almost like
+[13:00] Google's planning to replace Canva
+[13:01] entirely. Last year, Google introduced
+[13:03] Google Flow, built with and for
+[13:05] filmmakers. This year, they added a new
+[13:08] tool called Flow Music for artists,
+[13:10] producers, and songwriters. Here's all
+[13:13] that you can do with this. First, you
+[13:15] can highlight any specific section of a
+[13:17] song, a chorus, a guitar line, or just
+[13:19] the lyrics and edit only that part
+[13:21] without touching the rest. You can also
+[13:23] swap the beat drop without redoing the
+[13:25] vocals or take a rock track and turn it
+[13:28] into lo-fi while keeping your melody.
+[13:30] It's all powered by the new model Lyria
+[13:33] 3 Pro. This not only works for audio,
+[13:35] but also video. You can edit any scene
+[13:38] by describing the change in plain
+[13:40] English. You can turn day into night,
+[13:42] swap a character's outfit, keep the same
+[13:44] character consistent across cuts, or
+[13:46] rebuild a shot all without re-rendering
+[13:49] from scratch. Gemini Omni can also
+[13:51] generate a full music video directly
+[13:53] from your track. Google DeepMind dropped
+[13:56] one of the wildest updates of the entire
+[13:58] IO event. Project Genie, their model
+[14:00] that generates fully interactive virtual
+[14:03] environments, can now be plugged
+[14:05] directly into real Google Street View
+[14:07] imagery. What that means is that you can
+[14:09] pick a real location from Google [music]
+[14:11] Maps, choose a creative style like Ocean
+[14:13] World or Stone Age, describe a
+[14:15] character, and Genie will generate a
+[14:17] fully interactive virtual world grounded
+[14:20] [music] in the actual Street View
+[14:22] imagery of that place, but reimagined
+[14:24] with the style you chose. So, in this
+[14:26] example, they have picked the Golden
+[14:28] Gate Bridge in the US and explored it
+[14:30] underwater with schools of fish. But,
+[14:32] you can also reimagine the Taj Mahal in
+[14:35] the 1600s when it was first built.
+[14:37] YouTube is rolling out a new feature
+[14:39] called Ask YouTube, which is essentially
+[14:41] a conversational search experience. It
+[14:44] lets you type the full query the way you
+[14:46] would actually ask [music] it, not just
+[14:47] keywords. So, instead of typing, "Teach
+[14:50] 3-year-old pedal bike", you can just
+[14:52] say, "How to teach my 3-year-old how to
+[14:54] ride a pedal bike?" They already know
+[14:56] how to ride a balance bike, and it
+[14:57] understands the intent. But, here's the
+[14:59] best part. Instead of returning a list
+[15:01] of 20 videos to scroll through, it gives
+[15:03] you a structured answer picking the most
+[15:04] relevant videos across YouTube's full
+[15:06] catalog, including shorts. And what's
+[15:08] more, it jumps you straight to the exact
+[15:11] timestamp inside the video where the
+[15:12] answer is actually discussed. You can
+[15:14] also ask follow-up questions to refine
+[15:16] what you're looking for, and the
+[15:17] conversation keeps its context
+[15:19] throughout. This may sound small, but
+[15:21] can save massive time wasted on the
+[15:23] platform. Apart from all the software
+[15:24] launched, Google and Samsung unveiled
+[15:26] some hardware in the form of intelligent
+[15:29] eyewear. I got to try it out. In fact, I
+[15:31] was the only one in India who got access
+[15:34] to it when I went to the Google I/O
+[15:36] summit. And let me tell you, it was
+[15:38] extraordinary. It's going to be the
+[15:40] future when it finally launches for the
+[15:42] public. The smart glasses basically come
+[15:44] in two varieties. Audio glasses that
+[15:46] deliver spoken assistance directly into
+[15:49] the user's ears and display glasses that
+[15:51] overlay visual information in front of
+[15:54] the [music] eyes. Here's all that you
+[15:55] can do with it. Say, "Hey Google." Or
+[15:58] tap the side of the frame to ask about
+[16:00] anything you're looking at, pulling
+[16:01] reviews for a restaurant you are walking
+[16:03] past. You can also use this to navigate
+[16:05] with ease, getting turn-by-turn
+[16:07] directions. You can also manage calls
+[16:09] and texts using the glasses and even
+[16:11] take photos without touching your phone.
+[16:14] New voice in front of you. So, the
+[16:16] technology that powers this is Android
+[16:18] XR, which is Google and Samsung's
+[16:20] unified AI-powered operating system.
+[16:23] Google is not gating this to its own
+[16:25] ecosystem. This is probably because they
+[16:28] are going to go head-to-head with Meta's
+[16:30] Oakley and Ray-Ban glasses. [music]
+[16:31] And there's a fair chance that with all
+[16:33] Google's capabilities, they'll come out
+[16:35] the winner. Google also pushed a major
+[16:37] update to Pomelo, their AI tool for
+[16:40] small and medium businesses that
+[16:42] launched last year. It is now getting
+[16:44] full agentic capabilities that genuinely
+[16:46] change what one person sitting at a
+[16:49] laptop can ship in an afternoon. With
+[16:51] this update, the new Pomelo agent first
+[16:53] builds what Google calls your business
+[16:55] DNA, which is essentially your brand
+[16:58] identity, by either pulling from product
+[17:00] docs and photos you upload or by
+[17:02] chatting with you from scratch. From
+[17:04] there, it can generate a complete brand
+[17:06] book with your custom images, fonts, and
+[17:08] colors. And then, you can also design
+[17:10] and set up a fully working website in a
+[17:13] few clicks. What used to require
+[17:15] multiple tools and subscriptions across
+[17:17] design and web hosting. You can now run
+[17:20] as a single workflow inside Pomelo with
+[17:23] the AI handling everything on its own.
+[17:25] If you want a detailed tutorial on this,
+[17:27] let us know in the comments. In the
+[17:29] science domain, Google announced
+[17:30] something called Gemini for science. It
+[17:33] brings together a number of powerful AI
+[17:35] tools to help accelerate research. For
+[17:37] example, Science Skills is a bundle that
+[17:40] connects anti-gravity, Google's agent
+[17:42] platform, to over 30 major life science
+[17:45] databases. Google's own researchers used
+[17:47] it to analyze a rare genetic disease
+[17:50] linked to mutations in minutes rather
+[17:52] than hours. You can actually find this
+[17:54] on GitHub today. Additionally, [music]
+[17:56] Google also shared that its DeepMind
+[17:58] weather model, Weather Next, helped the
+[18:00] National Hurricane Center predict
+[18:03] Hurricane Melissa's category 5 landfall
+[18:05] in Jamaica 5 days in advance with 80%
+[18:08] confidence. For researchers in climate,
+[18:10] biotech, and pharma, this might quietly
+[18:13] be one of the most consequential parts
+[18:15] of the entire event. As generative AI
+[18:18] gets better, so does the need for
+[18:20] greater transparency. Research shows
+[18:22] people can correctly identify
+[18:24] high-quality deepfake videos only about
+[18:26] a quarter of the time. Three years ago,
+[18:28] Google launched SynthID, their watermark
+[18:31] that is invisible to the naked eye.
+[18:33] Since launch, SynthID has now
+[18:35] watermarked 100 billion [clears throat]
+[18:37] images and videos. Millions of people
+[18:39] are using their SynthID detector in the
+[18:41] Gemini app to verify AI-generated
+[18:44] content. Then they went a step further
+[18:46] and added content credentials
+[18:48] verification, which shows you whether
+[18:50] the origin was AI or camera and if it's
+[18:53] been edited with these tools. In this
+[18:54] example, Gemini can tell this photo was
+[18:57] captured with a Pixel camera and then
+[18:59] edited with Google Photos. To make this
+[19:01] practice widespread, they are expanding
+[19:03] both content credentials and SynthID
+[19:05] verification to search and Chrome. This
+[19:08] only works at scale if more partners
+[19:10] decide to watermark their own AI
+[19:12] generated content.
+[19:13] >> [music]
+[19:13] >> Nvidia signed on to SynthID last year.
+[19:16] And now OpenAI, Kakao, and Eleven Labs
+[19:19] are adopting SynthID, too. Google just
+[19:21] shipped Gemini 3.5, and this is the
+[19:24] model that is genuinely powering almost
+[19:27] every other Google AI update you are
+[19:29] seeing today. They have kicked off the
+[19:31] launch with the flash version, which is
+[19:33] the fast and cheap one, while the bigger
+[19:35] reasoning model in this family called
+[19:37] Gemini 3.5 Pro is launching next month.
+[19:40] Google says it beats their previous
+[19:42] flagship Gemini 3.1 Pro across almost
+[19:45] every coding, agentic, and multimodal
+[19:48] benchmark. But, here is the part that
+[19:50] matters to you guys. Gemini 3.5 Flash is
+[19:53] four times faster than other frontier
+[19:55] models on output tokens per second, and
+[19:58] it costs roughly a third to half of what
+[20:01] 3.1 Pro costs. For anyone building with
+[20:03] AI, this is going to be the new default.
+[20:06] The pattern across all of them is
+[20:07] unmistakable. Google is not building AI
+[20:10] features anymore. They are rebuilding
+[20:12] every single one of their products with
+[20:14] AI underneath. Search, Workspace,
+[20:16] Android, hardware, Chrome, YouTube,
+[20:18] [music] every surface they own. And
+[20:21] Google is spending $190 billion
+[20:24] in CapEx this year to make sure it
+[20:26] [music] happens. If you want us to make
+[20:28] longer tool videos on any of these
+[20:30] updates, do let us know in the comments.
+[20:32] We are already working on a few. And if
+[20:34] you want to watch these launches broken
+[20:36] down the same way that we just did, hit
+[20:38] the subscribe button so the next one
+[20:40] shows up in your feed and you don't miss
+[20:41] out. And if you like this video, I'll
+[20:43] recommend that you check out the AI
+[20:45] updates that we drop every week. I'll
+[20:48] link the video on screen so you don't
+[20:49] miss it. That's all for today. See you
+[20:52] in the next one.

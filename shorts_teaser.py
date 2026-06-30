@@ -32,59 +32,57 @@ def _load_teaser_font(size):
                 pass
     return ImageFont.load_default()
 
+
 def draw_teaser_overlay(fact_num, hook_text, accent_color=(0, 240, 255)):
     """
-    Creates a transparent 1080x1920 overlay with a premium top header and 
-    bottom call-to-action banner for maximum viewer conversion.
+    Creates a transparent 1080x1920 overlay with corner watermark and 
+    bottom CTA banner that stays clear of the speaker's face (center-safe zone).
     """
     img = Image.new("RGBA", (1080, 1920), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     
-    # ── TOP BANNER: "🤯 INSANE AI FACT X/10" ──────────────────────────────
-    f_title = _load_teaser_font(52)
-    title_text = f"🤯 INSANE AI FACT {fact_num}/10"
+    # ── TOP-RIGHT CORNER WATERMARK: "🤯 FACT X/10" ──────────────────────
+    f_title = _load_teaser_font(36)
+    title_text = f"🤯 FACT {fact_num}/10"
     
-    # Text sizing fallback for PIL
     try:
         tw = draw.textbbox((0, 0), title_text, font=f_title)[2]
     except:
-        tw = len(title_text) * 32
+        tw = len(title_text) * 24
         
-    pad_x, pad_y = 35, 18
-    tx = (1080 - tw) // 2
-    ty = 130
+    pad_x, pad_y = 20, 12
+    tx = 1080 - tw - pad_x - 20  # Right-aligned with 20px margin
+    ty = 60  # Higher up, well above face zone
     
-    # Neon background pill
     draw.rounded_rectangle(
-        [tx - pad_x, ty - pad_y, tx + tw + pad_x, ty + 65 + pad_y], 
-        radius=30, fill=(15, 15, 22, 230), outline=accent_color, width=4
+        [tx - pad_x, ty - pad_y, tx + tw + pad_x, ty + 48 + pad_y], 
+        radius=20, fill=(15, 15, 22, 200), outline=accent_color, width=2
     )
     
-    # Shadow and text
-    draw.text((tx + 3, ty + 3), title_text, font=f_title, fill=(0, 0, 0, 160))
+    draw.text((tx + 2, ty + 2), title_text, font=f_title, fill=(0, 0, 0, 120))
     draw.text((tx, ty), title_text, font=f_title, fill=(255, 255, 255, 255))
     
-    # ── BOTTOM BANNER: "👇 FULL VIDEO LINKED BELOW!" ─────────────────────
-    f_cta = _load_teaser_font(48)
-    cta_text = "👇 WATCH FULL VIDEO BELOW!"
+    # ── BOTTOM CTA BANNER (narrower, shorter, only last 3s) ─────────────
+    f_cta = _load_teaser_font(36)
+    cta_text = "👇 FULL VIDEO"
     try:
         cw = draw.textbbox((0, 0), cta_text, font=f_cta)[2]
     except:
-        cw = len(cta_text) * 28
+        cw = len(cta_text) * 22
         
     cx = (1080 - cw) // 2
-    cy = 1680
+    cy = 1750  # Lower, less intrusive
     
-    # Crimson pulse background pill
     draw.rounded_rectangle(
-        [cx - pad_x, cy - pad_y, cx + cw + pad_x, cy + 60 + pad_y], 
-        radius=30, fill=(220, 20, 60, 230), outline=(255, 255, 255, 180), width=3
+        [cx - pad_x, cy - pad_y, cx + cw + pad_x, cy + 44 + pad_y], 
+        radius=18, fill=(220, 20, 60, 200), outline=(255, 255, 255, 150), width=2
     )
     
-    draw.text((cx + 3, cy + 3), cta_text, font=f_cta, fill=(0, 0, 0, 160))
+    draw.text((cx + 2, cy + 2), cta_text, font=f_cta, fill=(0, 0, 0, 120))
     draw.text((cx, cy), cta_text, font=f_cta, fill=(255, 255, 255, 255))
     
     return img
+
 
 def generate_and_upload_shorts_teaser(script_json, longform_video_id, dry_run=False):
     """
@@ -94,86 +92,116 @@ def generate_and_upload_shorts_teaser(script_json, longform_video_id, dry_run=Fa
     """
     print("⚡ Starting Shorts Teaser Generation Engine...")
     
-    fact_timestamps = script_json.get("fact_timestamps", [])
-    if not fact_timestamps:
-        print("⚠️ No fact timestamps available. Skipping Shorts Teaser.")
-        return False
-        
-    # 1. Identify the Best Fact for Shorts
-    best_fact_info = script_json.get("best_fact_for_shorts", {})
-    best_fact_num = best_fact_info.get("fact_number", 1)
-    
-    print(f"🎯 Target teaser fact: Fact #{best_fact_num} (Reason: {best_fact_info.get('reason', 'Default')})")
-    
-    # Find timestamps for the chosen fact
-    target_start = 0.0
-    target_end = 0.0
-    found = False
-    
-    for i, ft in enumerate(fact_timestamps):
-        f_num = ft.get("fact_number", i + 1)
-        if f_num == best_fact_num:
-            target_start = float(ft.get("approx_start_seconds", 0))
-            if i + 1 < len(fact_timestamps):
-                target_end = float(fact_timestamps[i + 1].get("approx_start_seconds", target_start + 45))
-            else:
-                # Default duration to 50 seconds if last fact
-                target_end = target_start + 50.0
-            found = True
-            break
-            
-    if not found:
-        print("⚠️ Fact number not found in timestamps. Using Fact #1 as default.")
-        target_start = float(fact_timestamps[0].get("approx_start_seconds", 0))
-        if len(fact_timestamps) > 1:
-            target_end = float(fact_timestamps[1].get("approx_start_seconds", 45))
-        else:
-            target_end = target_start + 45.0
-            
-    # Clip duration check (Shorts must be < 60s)
-    duration = target_end - target_start
-    if duration > 58.0:
-        print(f"⚠️ Teaser duration ({duration:.1f}s) is too long for Shorts. Trimming to 58s.")
-        target_end = target_start + 58.0
-        duration = 58.0
-        
-    print(f"🎬 Slice Range: {target_start:.2f}s ➔ {target_end:.2f}s (Duration: {duration:.1f}s)")
-    
-    # 2. Slice and Smart Crop Longform Video
-    # Locate longform output video file
-    from datetime import datetime
-    today = datetime.now().strftime("%Y-%m-%d")
-    longform_suffix = script_json.get("output_suffix", "")
-    suffix_str = f"_{longform_suffix}" if longform_suffix else f"_{today}"
-    
-    longform_filename = f"video_longform{suffix_str}.mp4"
-    longform_path = os.path.join(OUTPUT_DIR, longform_filename)
-    
-    if not os.path.exists(longform_path):
-        # Fallback to scanning the output directory for any MP4
-        import glob
-        mp4_files = sorted(glob.glob(os.path.join(OUTPUT_DIR, "*longform*.mp4")))
-        if mp4_files:
-            longform_path = mp4_files[-1]
-        else:
-            print(f"❌ Long-form video file not found at: {longform_path}. Skipping teaser.")
+    try:
+        fact_timestamps = script_json.get("fact_timestamps", [])
+        if not fact_timestamps:
+            print("⚠️ No fact timestamps available. Skipping Shorts Teaser.")
             return False
             
-    print(f"📹 Slicing source longform video: {longform_path}...")
-    
-    try:
-        lf_clip = VideoFileClip(longform_path)
-        teaser_slice = lf_clip.subclipped(target_start, target_end)
+        # 1. Identify the Best Fact for Shorts
+        best_fact_info = script_json.get("best_fact_for_shorts", {})
+        best_fact_num = best_fact_info.get("fact_number", 1)
         
-        # Crop the center 9:16 segment (horizontal center is identical in explainer layouts)
-        # 16:9 is 1920x1080 -> center 9:16 segment width is 1080 * 9 / 16 = 607.5px (use 608px for alignment)
-        crop_w = 608
-        x1 = (1920 - crop_w) // 2
+        print(f"🎯 Target teaser fact: Fact #{best_fact_num} (Reason: {best_fact_info.get('reason', 'Default')})")
         
-        print("✂️ Cropping 16:9 to 9:16 vertical widescreen segment...")
-        cropped_vertical = teaser_slice.cropped(x1=x1, y1=0, x2=x1 + crop_w, y2=1080)
-        resized_vertical = cropped_vertical.resized((1080, 1920))
+        # Find timestamps for the chosen fact
+        target_start = 0.0
+        target_end = 0.0
+        found = False
         
+        for i, ft in enumerate(fact_timestamps):
+            f_num = ft.get("fact_number", i + 1)
+            if f_num == best_fact_num:
+                target_start = float(ft.get("approx_start_seconds", 0))
+                if i + 1 < len(fact_timestamps):
+                    target_end = float(fact_timestamps[i + 1].get("approx_start_seconds", target_start + 45))
+                else:
+                    # Default duration to 50 seconds if last fact
+                    target_end = target_start + 50.0
+                found = True
+                break
+                
+        if not found:
+            print("⚠️ Fact number not found in timestamps. Using Fact #1 as default.")
+            target_start = float(fact_timestamps[0].get("approx_start_seconds", 0))
+            if len(fact_timestamps) > 1:
+                target_end = float(fact_timestamps[1].get("approx_start_seconds", 45))
+            else:
+                target_end = target_start + 45.0
+                
+        # Clip duration check (Shorts must be < 60s)
+        duration = target_end - target_start
+        if duration > 58.0:
+            print(f"⚠️ Teaser duration ({duration:.1f}s) is too long for Shorts. Trimming to 58s.")
+            target_end = target_start + 58.0
+            duration = 58.0
+            
+        print(f"🎬 Slice Range: {target_start:.2f}s ➔ {target_end:.2f}s (Duration: {duration:.1f}s)")
+        
+        # 2. Build Teaser Visual: Prefer article screenshot over longform crop
+        screenshot_path = script_json.get("screenshot_path") or script_json.get("evidence_screenshot_path")
+        use_screenshot = screenshot_path and os.path.exists(screenshot_path)
+        
+        if use_screenshot:
+            print(f"📸 Using article screenshot for teaser visual: {screenshot_path}")
+            from PIL import Image
+            import numpy as np
+            from video_gen import _prepare_screenshot_canvas
+            
+            img = Image.open(screenshot_path)
+            canvas = _prepare_screenshot_canvas(img, 1080, 1920, url=script_json.get("original_news_url"))
+            
+            # Ken Burns on the screenshot canvas
+            bg_arr = np.array(canvas)
+            
+            def make_frame(t):
+                progress = min(t / max(duration, 0.01), 1.0)
+                eased_t = 2 * progress * progress if progress < 0.5 else 1 - pow(-2 * progress + 2, 2) / 2
+                scale = 1.0 + 0.08 * eased_t
+                h, w = bg_arr.shape[:2]
+                new_w, new_h = int(w * scale), int(h * scale)
+                from PIL import Image as PILImage
+                scaled = PILImage.fromarray(bg_arr).resize((new_w, new_h), PILImage.LANCZOS)
+                cx, cy = new_w // 2, new_h // 2
+                x1 = cx - 1080 // 2
+                y1 = cy - 1920 // 2
+                crop = np.array(scaled.crop((x1, y1, x1 + 1080, y1 + 1920)))
+                return crop
+            
+            base_visual = VideoClip(make_frame, duration=duration)
+        else:
+            print("⚠️ No screenshot found. Falling back to longform center-crop.")
+            # Locate longform output video file
+            from datetime import datetime
+            today = datetime.now().strftime("%Y-%m-%d")
+            longform_suffix = script_json.get("output_suffix", "")
+            suffix_str = f"_{longform_suffix}" if longform_suffix else f"_{today}"
+            
+            longform_filename = f"video_longform{suffix_str}.mp4"
+            longform_path = os.path.join(OUTPUT_DIR, longform_filename)
+            
+            if not os.path.exists(longform_path):
+                import glob
+                mp4_files = sorted(glob.glob(os.path.join(OUTPUT_DIR, "*longform*.mp4")))
+                if mp4_files:
+                    longform_path = mp4_files[-1]
+                else:
+                    print(f"❌ Long-form video file not found at: {longform_path}. Skipping teaser.")
+                    return False
+                    
+            print(f"📹 Slicing source longform video: {longform_path}...")
+            
+            lf_clip = VideoFileClip(longform_path)
+            teaser_slice = lf_clip.subclipped(target_start, target_end)
+            
+            # Crop the center 9:16 segment
+            crop_w = 608
+            x1 = (1920 - crop_w) // 2
+            
+            print("✂️ Cropping 16:9 to 9:16 vertical widescreen segment...")
+            cropped_vertical = teaser_slice.cropped(x1=x1, y1=0, x2=x1 + crop_w, y2=1080)
+            base_visual = cropped_vertical.resized((1080, 1920))
+
         # 3. Apply Premium Engagement Overlay
         accent_hex = script_json.get("color_theme", {}).get("accent", "#00E5FF").lstrip("#")
         accent_rgb = tuple(int(accent_hex[i:i+2], 16) for i in (0, 2, 4))
@@ -187,9 +215,13 @@ def generate_and_upload_shorts_teaser(script_json, longform_video_id, dry_run=Fa
         overlay_mask_clip = VideoClip(lambda t: overlay_mask, is_mask=True, duration=duration)
         overlay_clip = overlay_clip.with_mask(overlay_mask_clip)
         
-        final_teaser = CompositeVideoClip([resized_vertical, overlay_clip], size=(1080, 1920)).with_duration(duration)
+        final_teaser = CompositeVideoClip([base_visual, overlay_clip], size=(1080, 1920)).with_duration(duration)
         
         # Export vertical teaser
+        from datetime import datetime
+        today = datetime.now().strftime("%Y-%m-%d")
+        longform_suffix = script_json.get("output_suffix", "")
+        suffix_str = f"_{longform_suffix}" if longform_suffix else f"_{today}"
         teaser_filename = f"shorts_teaser{suffix_str}.mp4"
         teaser_output_path = os.path.join(OUTPUT_DIR, teaser_filename)
         
@@ -252,7 +284,6 @@ def generate_and_upload_shorts_teaser(script_json, longform_video_id, dry_run=Fa
             tags=tags,
             thumbnail_path=None
         )
-
         
         if uploaded:
             print(f"🎉 Shorts Teaser live on YouTube: https://youtu.be/{teaser_id}")

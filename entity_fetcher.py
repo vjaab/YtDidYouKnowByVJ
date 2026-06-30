@@ -817,55 +817,6 @@ def fetch_all_entities(script_data):
     companies_mentioned = script_data.get("companies_mentioned", [])
     tools_mentioned = script_data.get("tools_mentioned", [])
     
-    # Check if we have any entity fields populated at all
-    has_any = (
-        len(script_data.get("companies", [])) > 0 or
-        len(script_data.get("people", [])) > 0 or
-        len(script_data.get("key_entities", [])) > 0 or
-        len(companies_mentioned) > 0 or
-        len(tools_mentioned) > 0
-    )
-    
-    if not has_any:
-        # Pre-emptively scan the script text or headline for known tech companies to add
-        script_text = (script_data.get("script") or "").lower()
-        headline_text = (script_data.get("original_news_headline") or "").lower()
-        
-        known_tech = [
-            {"name": "Apple", "domain": "apple.com", "description": "Tech Company"},
-            {"name": "Google", "domain": "google.com", "description": "Tech Company"},
-            {"name": "Samsung", "domain": "samsung.com", "description": "Tech Company"},
-            {"name": "OpenAI", "domain": "openai.com", "description": "AI Company"},
-            {"name": "ChatGPT", "domain": "openai.com", "description": "AI Tool"},
-            {"name": "Microsoft", "domain": "microsoft.com", "description": "Tech Company"},
-            {"name": "Meta", "domain": "meta.com", "description": "Tech Company"},
-            {"name": "Nvidia", "domain": "nvidia.com", "description": "Tech Company"},
-            {"name": "Claude", "domain": "anthropic.com", "description": "AI Tool"},
-            {"name": "Anthropic", "domain": "anthropic.com", "description": "AI Company"},
-            {"name": "Tesla", "domain": "tesla.com", "description": "Tech Company"},
-            {"name": "Amazon", "domain": "amazon.com", "description": "Tech Company"},
-        ]
-        
-        found_any = False
-        for tech in known_tech:
-            if tech["name"].lower() in script_text or tech["name"].lower() in headline_text:
-                if "companies" not in script_data or not isinstance(script_data["companies"], list):
-                    script_data["companies"] = []
-                script_data["companies"].append(tech)
-                found_any = True
-                break
-                
-        if not found_any:
-            # Absolute fallback to our channel brand
-            if "companies" not in script_data or not isinstance(script_data["companies"], list):
-                script_data["companies"] = []
-            script_data["companies"].append({
-                "name": "VJ AI News",
-                "domain": "youtube.com",
-                "description": "Daily Tech News"
-            })
-            print("  ⚠️ No entities found in script_data. Added VJ AI News as fallback entity.")
-
     key_entities = script_data.get("key_entities", [])
     if not isinstance(key_entities, list):
         key_entities = []

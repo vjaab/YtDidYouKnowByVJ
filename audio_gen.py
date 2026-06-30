@@ -129,7 +129,7 @@ def trim_audio_silence(path, word_timestamps):
     print(f"Audio trimmed: -{shift_sec:.2f}s from start. New duration: {new_dur:.2f}s")
     return new_dur, new_ts
 
-def optimize_audio_gaps(audio_path, word_timestamps, max_gap_s=0.35, target_gap_s=0.15):
+def optimize_audio_gaps(audio_path, word_timestamps, max_gap_s=0.25, target_gap_s=0.08):
     """
     Detects silent gaps between words and shortens them if they exceed max_gap_s.
     Modifies both the audio file and the word_timestamps in place, and shifts
@@ -271,7 +271,7 @@ def get_audio_duration(path):
 # PRIMARY: F5-TTS (0 Rs / Local Voice Cloning) — High-Quality Pipeline
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _smart_split_sentences(text, max_chars=120):
+def _smart_split_sentences(text, max_chars=80):
     """
     Split text into natural sentence-boundary chunks for F5-TTS.
     Keeps chunks under max_chars to prevent the 12s clipping issue.
@@ -375,9 +375,9 @@ def _generate_f5_clone(text, output_path):
             ref_text=VJ_REF_TEXT,
             gen_text=chunk,
             file_wave=seg_path,
-            nfe_step=64,      # Increased from 32 for higher audio fidelity and clarity
-            remove_silence=True, # Cleanup of chunk edges
-            speed=1.0
+            nfe_step=64,
+            remove_silence=True,
+            speed=1.08
         )
         segment_paths.append(seg_path)
         
@@ -501,6 +501,41 @@ def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
             "DANGER": "... dayn-jer ...",
         }
         full_map.update(urgency_emphasis)
+
+        # Fix common TTS mispronunciations
+        pronunciation_fixes = {
+            "locally": "lo-cal-ly",
+            "virtually": "vir-choo-al-ly",
+            "globally": "glo-bal-ly",
+            "technically": "tek-nik-lee",
+            "theoretically": "thee-uh-ret-ik-lee",
+            "specifically": "spi-sif-ik-lee",
+            "artificially": "ar-ti-fish-al-ly",
+            "automatically": "aw-to-mat-ik-lee",
+            "dramatically": "dra-mat-ik-lee",
+            "systematically": "sis-tem-at-ik-lee",
+            "practically": "prak-tik-lee",
+            "effectively": "eh-fek-tiv-lee",
+            "relatively": "rel-uh-tiv-lee",
+            "literally": "lit-er-al-ly",
+            "obviously": "ob-vee-us-lee",
+            "certainly": "sur-tin-lee",
+            "immediately": "ih-mee-dee-ut-lee",
+            "simultaneously": "sy-mul-tay-nee-us-lee",
+            "substantially": "sub-stan-shul-lee",
+            "significantly": "sig-nif-uh-kant-lee",
+            "considerably": "con-sid-er-uh-blee",
+            "remarkably": "ri-mark-uh-blee",
+            "fundamentally": "fun-da-men-tal-lee",
+            "essentially": "es-sen-shul-lee",
+            "explicitly": "ik-splis-it-lee",
+            "implicitly": "im-plis-it-lee",
+            "intrinsically": "in-trin-sik-lee",
+            "extrinsically": "ex-trin-sik-lee",
+            "synchronously": "sing-kruh-nus-lee",
+            "asynchronously": "ay-sing-kruh-nus-lee",
+        }
+        full_map.update(pronunciation_fixes)
 
         for word, replacement in full_map.items():
             pattern = r'\b' + re.escape(word) + r'\b'
@@ -925,8 +960,10 @@ def _generate_elevenlabs(text, output_path):
             "text": text,
             "model_id": "eleven_turbo_v2_5",
             "voice_settings": {
-                "stability": 0.5,
-                "similarity_boost": 0.75
+                "stability": 0.3,
+                "similarity_boost": 0.85,
+                "style": 0.3,
+                "use_speaker_boost": True
             }
         }
         
