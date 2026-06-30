@@ -442,42 +442,71 @@ def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
     """
     Strips out AI meta-instructions and fixes pronunciation issues.
     If phonetic=True, it replaces difficult words with phonetic spellings.
+    Implements Phase 1: Text Script Pre-processing & Cleanup rules.
     """
     if not text: return ""
     
+    # ── PHASE 1: TEXT SCRIPT PRE-PROCESSING & CLEANUP ──────────────────────
+    
     # 1. Broadly remove ALL bracketed and parenthesized meta-instructions/timestamps
-    # This prevents the TTS from speaking things like [0.0], [14.0], (pause), [glitch], etc.
     cleaned = re.sub(r'\[[^\]]*\]', ' ', text)
     cleaned = re.sub(r'\([^)]*\)', ' ', cleaned)
     
     # 2. Fix pronunciation artifacts (The "Strike" issue)
-    cleaned = cleaned.replace("—", "...") # Em-dash
-    cleaned = cleaned.replace("–", "...") # En-dash
-    cleaned = cleaned.replace("--", "...") # Double hyphen
-    cleaned = cleaned.replace("*", " ")    # Asterisks
-    cleaned = cleaned.replace("•", " ")    # Bullet point
-    cleaned = cleaned.replace("·", " ")    # Middle dot
-    cleaned = cleaned.replace("⁃", " ")    # Hyphen bullet
-    cleaned = cleaned.replace("●", " ")    # Circle bullet
-    cleaned = cleaned.replace("▪", " ")    # Square bullet
-    cleaned = cleaned.replace("~", " ")    # Tilde
+    cleaned = cleaned.replace("—", "...")  # Em-dash
+    cleaned = cleaned.replace("–", "...")  # En-dash
+    cleaned = cleaned.replace("--", "...")  # Double hyphen
+    cleaned = cleaned.replace("*", " ")     # Asterisks
+    cleaned = cleaned.replace("•", " ")     # Bullet point
+    cleaned = cleaned.replace("·", " ")     # Middle dot
+    cleaned = cleaned.replace("⁃", " ")     # Hyphen bullet
+    cleaned = cleaned.replace("●", " ")     # Circle bullet
+    cleaned = cleaned.replace("▪", " ")     # Square bullet
+    cleaned = cleaned.replace("~", " ")     # Tilde
     
     # Standalone hyphens
     cleaned = re.sub(r'\n\s*-\s*', '\n ', cleaned)
     cleaned = re.sub(r'\s+-\s+', ' ... ', cleaned)
     
-    # 3. Phonetic Cleanups for Clarity
+    # 3. ENFORCE PHRASING PAUSES & EMPHASIS (Phase 2 Rule 1) - Text-level markers
+    # Must run BEFORE phonetic processing to catch urgency words in original form
+    cleaned = _enforce_phrasing_pauses(cleaned)
+    
+    # 4. EXPAND FILE EXTENSIONS TO PHONETICS (Phase 1 Rule 1)
+    cleaned = _expand_file_extensions(cleaned)
+    
+    # 5. CLEAN NUMERIC & VERSION RESOLUTION (Phase 1 Rule 2)
+    cleaned = _expand_version_numbers(cleaned)
+    
+    # 6. RE-FORMAT REPO & TECH TERMINOLOGY (Phase 1 Rule 3)
+    cleaned = _reformat_tech_terminology(cleaned)
+    
+    # 7. Phonetic Cleanups for Clarity
     if phonetic:
         # Merge global dictionary and custom Gemini map
         full_map = PHONETIC_DICT.copy()
         if custom_phonetic_map:
             full_map.update(custom_phonetic_map)
 
+        # Add urgency words with emphasis markers (preserve emphasis from Phase 2)
+        urgency_emphasis = {
+            "URGENT": "... ur-junt ...",
+            "NOW": "... now ...",
+            "CRITICAL": "... krit-ih-kul ...",
+            "IMMEDIATE": "... ih-mee-dee-ut ...",
+            "IMMEDIATELY": "... ih-mee-dee-ut-lee ...",
+            "WARNING": "... wawr-ning ...",
+            "ALERT": "... uh-lurt ...",
+            "STOP": "... stop ...",
+            "DANGER": "... dayn-jer ...",
+        }
+        full_map.update(urgency_emphasis)
+
         for word, replacement in full_map.items():
             pattern = r'\b' + re.escape(word) + r'\b'
             cleaned = re.sub(pattern, replacement, cleaned, flags=re.IGNORECASE)
 
-        # 4. Auto-detect remaining hard words via g2p_en (neural G2P fallback)
+        # 8. Auto-detect remaining hard words via g2p_en (neural G2P fallback)
         try:
             auto_corrections = auto_detect_hard_words(cleaned)
             for word, respelling in auto_corrections.items():
@@ -486,8 +515,7 @@ def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
         except Exception as e:
             print(f"g2p_en auto-detection skipped: {e}")
     else:
-        # 3b. Non-phonetic (Subtitle) Spell Correction
-        # This handles cases where Gemini mispells words that should be caught
+        # Non-phonetic (Subtitle) Spell Correction
         corrections = {
             "parallesim": "parallelism",
             "paralllesim": "parallelism",
@@ -503,7 +531,310 @@ def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
     
     # Clean up double spaces
     cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+    
     return cleaned
+
+
+def _expand_file_extensions(text):
+    """
+    Phase 1 Rule 1: Expand file extensions to phonetics.
+    """
+    # Order matters - longer extensions first to avoid partial matches
+    extensions = [
+        (r'\.ipynb\b', ' dot i p y notebook'),
+        (r'\.txt\b', ' dot text'),
+        (r'\.text\b', ' dot text'),
+        (r'\.py\b', ' dot p y'),
+        (r'\.csv\b', ' dot c s v'),
+        (r'\.json\b', ' dot j son'),
+        (r'\.js\b', ' dot j s'),
+        (r'\.ts\b', ' dot t s'),
+        (r'\.jsx\b', ' dot j s x'),
+        (r'\.tsx\b', ' dot t s x'),
+        (r'\.html\b', ' dot h t m l'),
+        (r'\.css\b', ' dot c s s'),
+        (r'\.md\b', ' dot m d'),
+        (r'\.pdf\b', ' dot p d f'),
+        (r'\.png\b', ' dot p n g'),
+        (r'\.jpg\b', ' dot j p g'),
+        (r'\.jpeg\b', ' dot j p e g'),
+        (r'\.gif\b', ' dot g i f'),
+        (r'\.mp4\b', ' dot m p four'),
+        (r'\.mov\b', ' dot m o v'),
+        (r'\.wav\b', ' dot w a v'),
+        (r'\.mp3\b', ' dot m p three'),
+        (r'\.zip\b', ' dot zip'),
+        (r'\.tar\b', ' dot tar'),
+        (r'\.gz\b', ' dot g z'),
+        (r'\.yml\b', ' dot y m l'),
+        (r'\.yaml\b', ' dot y a m l'),
+        (r'\.toml\b', ' dot t o m l'),
+        (r'\.ini\b', ' dot i n i'),
+        (r'\.cfg\b', ' dot c f g'),
+        (r'\.conf\b', ' dot conf'),
+        (r'\.log\b', ' dot log'),
+        (r'\.sql\b', ' dot s q l'),
+        (r'\.db\b', ' dot d b'),
+        (r'\.sqlite\b', ' dot s q lite'),
+        (r'\.dockerfile\b', ' dot docker file'),
+        (r'\.gitignore\b', ' dot git ignore'),
+        (r'\.env\b', ' dot env'),
+        (r'\.sh\b', ' dot s h'),
+        (r'\.bash\b', ' dot bash'),
+        (r'\.zsh\b', ' dot z s h'),
+        (r'\.rs\b', ' dot r s'),
+        (r'\.go\b', ' dot go'),
+        (r'\.java\b', ' dot java'),
+        (r'\.kt\b', ' dot k t'),
+        (r'\.swift\b', ' dot swift'),
+        (r'\.rb\b', ' dot r b'),
+        (r'\.php\b', ' dot p h p'),
+        (r'\.cs\b', ' dot c s'),
+        (r'\.cpp\b', ' dot c p p'),
+        (r'\.h\b', ' dot h'),
+        (r'\.hpp\b', ' dot h p p'),
+    ]
+    
+    for pattern, replacement in extensions:
+        text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
+    
+    return text
+
+
+def _expand_version_numbers(text):
+    """
+    Phase 1 Rule 2: Clean numeric & version resolution.
+    Convert dot-notation versions to spoken words.
+    """
+    # Match version patterns like 26.5.2, 1.0.0, 3.14.15, etc.
+    # Also handles v26.5.2, version 26.5.2 patterns
+    
+    def version_to_words(match):
+        version_str = match.group(0)
+        # Remove leading 'v' or 'version' prefix if present
+        version_str = re.sub(r'^[vV](?=\d)', '', version_str)
+        version_str = re.sub(r'^version\s+', '', version_str, flags=re.IGNORECASE)
+        
+        parts = version_str.split('.')
+        words = []
+        for part in parts:
+            if part.isdigit():
+                words.append(_number_to_words(int(part)))
+            else:
+                words.append(part)
+        return ' point '.join(words)
+    
+    # Pattern: version numbers with 2+ dot-separated parts, optionally prefixed with v/version
+    # Matches: 1.0, 26.5.2, v1.2.3, version 2.0, etc.
+    version_pattern = r'\b(?:v|version\s+)?\d+(?:\.\d+){1,3}\b'
+    text = re.sub(version_pattern, version_to_words, text, flags=re.IGNORECASE)
+    
+    # Also handle standalone decimal numbers that look like versions (e.g., "Python 3.11")
+    # But be careful not to match regular decimals like prices ($3.99) or measurements
+    # We'll target version-like contexts
+    return text
+
+
+def _number_to_words(n):
+    """Convert integer to words (supports up to billions)."""
+    if n == 0:
+        return "zero"
+    
+    ones = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+    teens = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"]
+    tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]
+    
+    def convert_hundreds(num):
+        if num == 0:
+            return ""
+        result = ""
+        if num >= 100:
+            result += ones[num // 100] + " hundred"
+            num %= 100
+            if num > 0:
+                result += " "
+        if num >= 20:
+            result += tens[num // 10]
+            num %= 10
+            if num > 0:
+                result += "-" + ones[num]
+        elif num >= 10:
+            result += teens[num - 10]
+        elif num > 0:
+            result += ones[num]
+        return result
+    
+    if n >= 1_000_000_000:
+        return convert_hundreds(n // 1_000_000_000) + " billion" + (" " + convert_hundreds((n % 1_000_000_000) // 1_000_000) + " million" if n % 1_000_000_000 >= 1_000_000 else "") + (" " + convert_hundreds((n % 1_000_000) // 1000) + " thousand" if n % 1_000_000 >= 1000 else "") + (" " + convert_hundreds(n % 1000) if n % 1000 > 0 else "")
+    elif n >= 1_000_000:
+        return convert_hundreds(n // 1_000_000) + " million" + (" " + convert_hundreds((n % 1_000_000) // 1000) + " thousand" if n % 1_000_000 >= 1000 else "") + (" " + convert_hundreds(n % 1000) if n % 1000 > 0 else "")
+    elif n >= 1000:
+        return convert_hundreds(n // 1000) + " thousand" + (" " + convert_hundreds(n % 1000) if n % 1000 > 0 else "")
+    else:
+        return convert_hundreds(n)
+
+
+def _reformat_tech_terminology(text):
+    """
+    Phase 1 Rule 3: Re-format repo & tech terminology.
+    Inject spaces/hyphens between compound technical phrases.
+    Add syllable breaks for tongue-twister terms.
+    """
+    # Compound technical terms that need separation
+    compounds = [
+        (r'\binferencenotebook\b', 'inference notebook'),
+        (r'\binference\s*notebook\b', 'inference notebook'),
+        (r'\bparameterization\b', 'parameter-ization'),
+        (r'\bcompatibility\b', 'com-pat-i-bil-i-ty'),
+        (r'\binfrastructure\b', 'in-fra-struc-ture'),
+        (r'\borchestration\b', 'or-ches-tra-tion'),
+        (r'\bcontainerization\b', 'con-tain-er-ization'),
+        (r'\bvirtualization\b', 'vir-tu-al-ization'),
+        (r'\bobservability\b', 'ob-serv-a-bil-i-ty'),
+        (r'\binteroperability\b', 'in-ter-op-er-a-bil-i-ty'),
+        (r'\bscalability\b', 'scal-a-bil-i-ty'),
+        (r'\bmaintainability\b', 'main-tain-a-bil-i-ty'),
+        (r'\breliability\b', 're-li-a-bil-i-ty'),
+        (r'\bavailability\b', 'avail-a-bil-i-ty'),
+        (r'\bconfiguration\b', 'con-fig-u-ra-tion'),
+        (r'\bimplementation\b', 'im-ple-men-ta-tion'),
+        (r'\boptimization\b', 'op-ti-mi-za-tion'),
+        (r'\bstandardization\b', 'stan-dar-diza-tion'),
+        (r'\bmodernization\b', 'mod-ern-iza-tion'),
+        (r'\bdigitalization\b', 'dig-i-tal-iza-tion'),
+        (r'\bauthentication\b', 'au-then-ti-ca-tion'),
+        (r'\bauthorization\b', 'au-thor-iza-tion'),
+        (r'\bserialization\b', 'se-ri-al-iza-tion'),
+        (r'\bdeserialization\b', 'de-se-ri-al-iza-tion'),
+        (r'\binitialization\b', 'in-it-ial-iza-tion'),
+        (r'\bdeinitialization\b', 'de-in-it-ial-iza-tion'),
+        (r'\bvisualization\b', 'vis-u-al-iza-tion'),
+        (r'\bconceptualization\b', 'con-cep-tu-al-iza-tion'),
+        (r'\brevolutionary\b', 'rev-o-lu-tion-ary'),
+        (r'\btransformative\b', 'trans-for-ma-tive'),
+        (r'\bunprecedented\b', 'un-prece-dent-ed'),
+        (r'\bsophisticated\b', 'so-phis-ti-cated'),
+        (r'\bcomprehensive\b', 'com-pre-hen-sive'),
+        (r'\bsignificantly\b', 'sig-nif-i-cant-ly'),
+        (r'\bsubstantially\b', 'sub-stan-tial-ly'),
+        (r'\bconsiderably\b', 'con-sid-er-a-bly'),
+        (r'\bremarkably\b', 're-mark-a-bly'),
+        (r'\bincredibly\b', 'in-cred-i-bly'),
+        (r'\bfundamentally\b', 'fun-da-men-tal-ly'),
+        (r'\btechnically\b', 'tech-ni-cal-ly'),
+        (r'\btheoretically\b', 'the-o-ret-i-cal-ly'),
+        (r'\bhypothetically\b', 'hy-po-thet-i-cal-ly'),
+        (r'\bstatistically\b', 'sta-tis-ti-cal-ly'),
+        (r'\bempirically\b', 'em-pir-i-cal-ly'),
+        (r'\bhistorically\b', 'his-tor-i-cal-ly'),
+        (r'\bglobally\b', 'glob-al-ly'),
+        (r'\blocally\b', 'lo-cal-ly'),
+        (r'\bvirtually\b', 'vir-tu-al-ly'),
+        (r'\bfiguratively\b', 'fig-u-ra-tive-ly'),
+        (r'\bessentially\b', 'es-sen-tial-ly'),
+        (r'\bimplicitly\b', 'im-pli-cit-ly'),
+        (r'\bexplicitly\b', 'ex-plic-it-ly'),
+        (r'\bintrinsically\b', 'in-trin-sic-al-ly'),
+        (r'\bextrinsically\b', 'ex-trin-sic-al-ly'),
+        (r'\bsynchronously\b', 'syn-chro-nous-ly'),
+        (r'\basynchronously\b', 'a-syn-chro-nous-ly'),
+        (r'\bdistributed\b', 'dis-trib-u-ted'),
+        (r'\bconfiguration\b', 'con-fig-u-ra-tion'),
+        (r'\benvironment\b', 'en-vi-ron-ment'),
+    ]
+    
+    for pattern, replacement in compounds:
+        text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
+    
+    return text
+
+
+def _enforce_phrasing_pauses(text):
+    """
+    Phase 2 Rule 1: Enforce phrasing pauses & emphasis at text level.
+    Insert pause markers that TTS engines can interpret.
+    """
+    # 1. Mandatory 150-250ms pause at sentence boundaries (., ?, !)
+    # We use ... (ellipsis) which TTS engines typically render as a pause
+    text = re.sub(r'([.!?])\s+', r'\1... ', text)
+    
+    # 2. High-urgency keywords: add padding markers (50ms before/after)
+    # Using special markers that TTS can interpret
+    urgency_words = ['URGENT', 'NOW', 'CRITICAL', 'IMMEDIATE', 'WARNING', 'ALERT', 'STOP', 'DANGER']
+    for word in urgency_words:
+        # Add pause markers before and after
+        pattern = r'\b(' + word + r')\b'
+        text = re.sub(pattern, r'... \1 ...', text, flags=re.IGNORECASE)
+    
+    # 3. Add pauses after colons and semicolons for clause separation
+    text = re.sub(r'([;:])\s+', r'\1... ', text)
+    
+    # 4. Add pauses around commas in long sentences (but not in numbers)
+    # This helps with pacing in technical explanations
+    text = re.sub(r'(\d+),\s*(\d+)', r'\1,\2', text)  # Keep numbers like 1,000 intact
+    # Add slight pause after commas that aren't in numbers
+    text = re.sub(r'(?<!\d),\s+(?!\d)', ', ... ', text)
+    
+    return text
+
+
+def apply_audio_pacing(audio_path, word_timestamps):
+    """
+    Phase 2 Rule 2: Prevent coda accordioning & track clipping.
+    Apply post-processing to audio file to ensure proper trailing consonants
+    and add safety tail.
+    
+    Args:
+        audio_path: Path to the generated audio file
+        word_timestamps: List of word timestamp dicts
+        
+    Returns:
+        Tuple of (new_duration, updated_timestamps)
+    """
+    from pydub import AudioSegment
+    
+    audio = AudioSegment.from_file(audio_path)
+    
+    # 1. Ensure final trailing consonants are fully rendered
+    # The TTS sometimes cuts off the last word's ending consonants
+    # We add a 100ms silence tail to prevent word-swallowing
+    SAFETY_TAIL_MS = 100
+    silence_tail = AudioSegment.silent(duration=SAFETY_TAIL_MS)
+    audio = audio + silence_tail
+    
+    # 2. Ensure minimum silence between sentences (150-250ms)
+    # This is handled at text level via _enforce_phrasing_pauses, 
+    # but we can also enforce at audio level if timestamps available
+    
+    if word_timestamps and len(word_timestamps) > 1:
+        # Check for sentence-ending words and ensure minimum gap after them
+        sentence_end_words = []
+        for i, wt in enumerate(word_timestamps):
+            word = wt['word'].strip().rstrip('.,!?')
+            if word and word[-1] in '.!?':
+                sentence_end_words.append(i)
+        
+        # If we have sentence boundaries, we could insert silence
+        # But this is complex with pydub - better handled at TTS text level
+    
+    # 3. Normalize to prevent clipping
+    audio = audio.normalize(headroom=0.1)
+    
+    # 4. Fade in/out to prevent clicks (5ms each)
+    audio = audio.fade_in(5).fade_out(5)
+    
+    # Export back
+    audio.export(audio_path, format="wav" if audio_path.endswith(".wav") else "mp3")
+    
+    new_duration = len(audio) / 1000.0
+    
+    # Update timestamps for the added safety tail
+    updated_timestamps = word_timestamps.copy()
+    # The safety tail is at the end, so no timestamp shifts needed for words
+    
+    print(f"   🔊 Audio pacing applied: +{SAFETY_TAIL_MS}ms safety tail, normalized, fade in/out. Duration: {new_duration:.2f}s")
+    
+    return new_duration, updated_timestamps
 
 def restore_original_words(word_timestamps, original_text, custom_phonetic_map=None):
     """
@@ -714,6 +1045,9 @@ def generate_voiceover(text, custom_phonetic_map=None, api_key=None):
         if path and word_timestamps:
             dur, word_timestamps = trim_audio_silence(path, word_timestamps)
             dur, word_timestamps = optimize_audio_gaps(path, word_timestamps)
+            
+            # Phase 2: Apply audio pacing & clipping management
+            dur, word_timestamps = apply_audio_pacing(path, word_timestamps)
 
         # 2. OBSERVE & CRITIQUE
         if api_key and iterations < max_iters:
