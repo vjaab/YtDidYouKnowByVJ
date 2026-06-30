@@ -3629,33 +3629,48 @@ def wrap_text_to_lines(words, word_widths, max_width, font):
     return lines
 
 def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), frame_width=1080, frame_height=1920, y_shift=0):
-    """Viral 'High Energy' captions: Large tilted words with pop sounds."""
+    """Viral 'High Energy' captions: Large tilted words with pop sounds.
+
+    FIX: Filter out spoken words BEFORE layout calculation to prevent
+    invisible gaps and ensure dynamic line-by-line updates.
+    """
     img = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
     draw = ImageDraw.Draw(img)
-    
+
     scale_ratio = frame_width / 1080.0 if frame_width < frame_height else frame_width / 1920.0
-    
+
     is_landscape = frame_width > frame_height
     if is_landscape:
         base_size = int(72 * scale_ratio) # Larger base size for landscape/longform readability
     else:
         base_size = int(58 * scale_ratio) # Reverted to original as requested
-    
+
     f_main = gf(base_size, bold=True)
-    
-    words = [wd["word"] for wd in word_data]
+
+    # FILTER: Only keep words that are NOT yet spoken for layout & rendering
+    # This ensures spoken words don't create invisible gaps in line wrapping
+    active_word_data = [wd for wd in word_data if not wd.get("is_spoken", False)]
+
+    # If all words are spoken, return empty frame (subtitles cleared)
+    if not active_word_data:
+        return img
+
+    words = [wd["word"] for wd in active_word_data]
     word_widths = []
     fake_draw = ImageDraw.Draw(Image.new("RGBA", (1,1)))
-    
-    for i, wd in enumerate(word_data):
+
+    for i, wd in enumerate(active_word_data):
         word_widths.append(fake_draw.textbbox((0,0), words[i], font=f_main)[2] - fake_draw.textbbox((0,0), words[i], font=f_main)[0])
-    
+
     if is_landscape:
         max_sub_width = int(frame_width * 0.65) # Narrower center focus in 16:9
     else:
         max_sub_width = int(frame_width * 0.80) # More narrow for punchy center focus
     lines = wrap_text_to_lines(words, word_widths, max_sub_width, f_main)
-    
+
+    # LIMIT: Maximum 1 line per frame for Shorts-style dynamic captions
+    lines = lines[:1]
+
     line_h = int(90 * scale_ratio) # Reverted to original
     
     # Position: LOWER THIRD
@@ -3679,10 +3694,10 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     block_x2 = (frame_width + max_line_w) // 2 + bg_pad_x
     block_y1 = start_y - bg_pad_y
     block_y2 = start_y + len(lines) * line_h - (line_h - base_size) + bg_pad_y
-    
+
     draw.rounded_rectangle(
-        [block_x1, block_y1, block_x2, block_y2], 
-        radius=12, 
+        [block_x1, block_y1, block_x2, block_y2],
+        radius=12,
         fill=(0, 0, 0, 215) # Increased opacity from 160 for guaranteed contrast
     )
 
@@ -3693,37 +3708,32 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
         cur_x = (frame_width - line_w) // 2
 
         for word_text in line:
-            wd = word_data[word_idx]
+            wd = active_word_data[word_idx]
             is_active = wd["is_active"]
-            is_spoken = wd.get("is_spoken", False)
-            
-            if is_spoken:
-                word_idx += 1
-                cur_x += word_widths[word_idx - 1] + 22
-                continue
-            
+            # No need for is_spoken check - already filtered out above
+
             if is_active:
                 c_fill = (204, 255, 0, 255) # Electric Yellow
                 f_word = gf(int(base_size * 1.12), bold=True) # Boost size by 12% for premium Pop zoom effect
                 w_w, w_h = ts(word_text, f_word)
                 word_img = Image.new("RGBA", (w_w + 60, w_h + 60), (0,0,0,0))
                 word_draw = ImageDraw.Draw(word_img)
-                
+
                 # High-Contrast Edge: 5px black stroke simulation (Stronger for visibility)
                 stroke = 5
                 for dx in range(-stroke, stroke+1):
                     for dy in range(-stroke, stroke+1):
                         if dx*dx + dy*dy <= stroke*stroke:
                             word_draw.text((30+dx, 30+dy), word_text, font=f_word, fill=(0,0,0,255))
-                
+
                 # 3D Depth: 4px offset shadow
                 word_draw.text((34, 34), word_text, font=f_word, fill=(0,0,0,180))
                 # Main Text
                 word_draw.text((30, 30), word_text, font=f_word, fill=c_fill)
-                
+
                 tilt = 0 # Reverted to no tilt as per reference
                 rotated = word_img.rotate(tilt, resample=Image.BICUBIC, expand=True)
-                
+
                 orig_w = word_widths[word_idx]
                 target_x = int(cur_x - (rotated.width - orig_w)//2)
                 target_y = int(line_y - (rotated.height - base_size)//2 + 2)
@@ -3736,10 +3746,10 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
                         draw.text((cur_x+dx, line_y+2+dy), word_text, font=f_main, fill=(0,0,0,255))
                 draw.text((cur_x+3, line_y+5), word_text, font=f_main, fill=(0,0,0,160))
                 draw.text((cur_x, line_y + 2), word_text, font=f_main, fill=c_fill)
-            
+
             cur_x += word_widths[word_idx] + 22
             word_idx += 1
-            
+
     return img
 
 def _generate_lipsync_video(audio_path, face_path=None):
