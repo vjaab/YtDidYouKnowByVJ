@@ -3695,6 +3695,12 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
         for word_text in line:
             wd = word_data[word_idx]
             is_active = wd["is_active"]
+            is_spoken = wd.get("is_spoken", False)
+            
+            if is_spoken:
+                word_idx += 1
+                cur_x += word_widths[word_idx - 1] + 22
+                continue
             
             if is_active:
                 c_fill = (204, 255, 0, 255) # Electric Yellow
