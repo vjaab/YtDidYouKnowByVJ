@@ -2561,7 +2561,7 @@ def render_entity_tags(entities, accent_color, frame_width=1080, on_right=False)
                 raw_logo = Image.open(logo_path).convert("RGBA")
                 # Scale logo to fit nicely within height of 40 (box is 60)
                 aspect = raw_logo.width / raw_logo.height
-                logo_h = 40
+                logo_h = 20
                 logo_w = int(logo_h * aspect)
                 logo_img = raw_logo.resize((logo_w, logo_h), Image.LANCZOS)
                 box_w += logo_w + 10 # Add space for logo + padding
@@ -2683,7 +2683,7 @@ def render_dynamic_entity_tags(entities, accent_color, t, audio_duration, frame_
         if logo_img:
             # Scale logo to fit nicely within height of 350
             aspect = logo_img.width / logo_img.height
-            logo_h = int(350 * scale)
+            logo_h = int(175 * scale)
             logo_w = int(logo_h * aspect)
             
         content_x_start = int(40 * scale)
@@ -4834,9 +4834,9 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 if lp and os.path.exists(lp):
                     branding_entities.append((ent.get("name", "Entity"), lp, ent_list_key == "people"))
         
-        card_size = 130 # Slightly smaller for stack
-        margin = 30
-        current_y = 80
+        card_size = 65 # Slightly smaller for stack
+        margin = 15
+        current_y = 40
         
         for i, (name, path, is_person) in enumerate(branding_entities):
             try:
@@ -4852,7 +4852,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                     img = img.resize((int(lw * scale), int(lh * scale)), Image.LANCZOS)
                     canvas = Image.new("RGBA", (card_size, card_size), (0,0,0,0))
                     draw = ImageDraw.Draw(canvas)
-                    draw.rounded_rectangle([0, 0, card_size, card_size], radius=25, fill=(255,255,255,230))
+                    draw.rounded_rectangle([0, 0, card_size, card_size], radius=12, fill=(255,255,255,230))
                     canvas.paste(img, ((card_size - img.width)//2, (card_size - img.height)//2), img if img.mode == 'RGBA' else None)
                     img = canvas
                 
