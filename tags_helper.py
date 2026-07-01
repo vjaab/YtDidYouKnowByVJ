@@ -224,6 +224,28 @@ def get_optimized_metadata(
     initial_people = initial_people or []
     initial_hashtags = initial_hashtags or []
     
+    # Normalize initial_companies to list of strings (handle both string and dict formats)
+    norm_companies = []
+    for c in initial_companies:
+        if isinstance(c, dict):
+            name = c.get("name")
+            if name:
+                norm_companies.append(name)
+        elif isinstance(c, str):
+            norm_companies.append(c)
+    initial_companies = norm_companies
+    
+    # Normalize initial_people to list of strings
+    norm_people = []
+    for p in initial_people:
+        if isinstance(p, dict):
+            name = p.get("name")
+            if name:
+                norm_people.append(name)
+        elif isinstance(p, str):
+            norm_people.append(p)
+    initial_people = norm_people
+    
     full_text = f"{title} {script} {sub_category}".lower()
     
     matched_tags = []

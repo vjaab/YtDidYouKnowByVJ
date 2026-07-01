@@ -831,14 +831,26 @@ def fetch_all_entities(script_data):
             existing_names.add(c.get("name", "").lower())
 
     for c in companies_mentioned:
-        if c and isinstance(c, str) and c.lower() not in existing_names:
-            key_entities.append({"name": c, "type": "COMPANY", "description": "Tech Company"})
-            existing_names.add(c.lower())
+        if isinstance(c, dict):
+            c_name = c.get("name")
+        elif isinstance(c, str):
+            c_name = c
+        else:
+            c_name = None
+        if c_name and c_name.lower() not in existing_names:
+            key_entities.append({"name": c_name, "type": "COMPANY", "description": "Tech Company"})
+            existing_names.add(c_name.lower())
 
     for t in tools_mentioned:
-        if t and isinstance(t, str) and t.lower() not in existing_names:
-            key_entities.append({"name": t, "type": "TOOL", "description": "AI Tool"})
-            existing_names.add(t.lower())
+        if isinstance(t, dict):
+            t_name = t.get("name")
+        elif isinstance(t, str):
+            t_name = t
+        else:
+            t_name = None
+        if t_name and t_name.lower() not in existing_names:
+            key_entities.append({"name": t_name, "type": "TOOL", "description": "AI Tool"})
+            existing_names.add(t_name.lower())
 
     for person in script_data.get("people", []):
         path = fetch_person_photo(person)

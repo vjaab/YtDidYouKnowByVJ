@@ -97,8 +97,9 @@ def check_cooldowns(companies, subcategory, tracker_file=TRACKER_FILE):
     tracker = load_tracker(tracker_file)
     last_3_companies = tracker.get('last_3_days_companies', [])
     for comp in companies:
-        if comp in last_3_companies:
-            return False, f"Company '{comp}' covered in last 3 days."
+        comp_name = comp.get("name") if isinstance(comp, dict) else comp
+        if comp_name in last_3_companies:
+            return False, f"Company '{comp_name}' covered in last 3 days."
             
     last_3_subcategories = tracker.get('last_3_days_subcategories', [])
     if last_3_subcategories.count(subcategory) >= 2:
@@ -118,7 +119,12 @@ def record_story(title, news_headline, subcategory, companies, keywords, breakin
     
     tracker.setdefault("used_companies", {})
     for comp in companies:
-        tracker["used_companies"][comp] = tracker["used_companies"].get(comp, 0) + 1
+        if isinstance(comp, dict):
+            comp_name = comp.get("name")
+            if comp_name:
+                tracker["used_companies"][comp_name] = tracker["used_companies"].get(comp_name, 0) + 1
+        elif isinstance(comp, str):
+            tracker["used_companies"][comp] = tracker["used_companies"].get(comp, 0) + 1
         
     tracker.setdefault("used_subcategories", {})
     tracker["used_subcategories"][subcategory] = tracker["used_subcategories"].get(subcategory, 0) + 1
@@ -132,7 +138,9 @@ def record_story(title, news_headline, subcategory, companies, keywords, breakin
         tracker["last_3_days_subcategories"].pop(0)
         
     for comp in companies:
-        tracker.setdefault("last_3_days_companies", []).append(comp)
+        comp_name = comp.get("name") if isinstance(comp, dict) else comp
+        if comp_name:
+            tracker.setdefault("last_3_days_companies", []).append(comp_name)
     if len(tracker["last_3_days_companies"]) > 5:
         tracker["last_3_days_companies"] = tracker["last_3_days_companies"][-5:]
     

@@ -526,7 +526,16 @@ def run_pipeline(topic_type="auto", dry_run=False):
     log_message("STEP 4.5: Reserving topic in tracker to prevent reuse on failure...")
     title  = script_data.get("title", "Tech News!")
     subcat = script_data.get("sub_category", "")
-    companies   = script_data.get("companies_mentioned", [])
+    # Normalize companies_mentioned to list of strings (handle both string and dict formats)
+    raw_companies = script_data.get("companies_mentioned", [])
+    companies = []
+    for c in raw_companies:
+        if isinstance(c, dict):
+            name = c.get("name")
+            if name:
+                companies.append(name)
+        elif isinstance(c, str):
+            companies.append(c)
     keywords    = script_data.get("keywords", [])
     breaking_level = script_data.get("breaking_news_level", 0)
     voice_used  = script_data.get("edge_tts_voice")
@@ -599,7 +608,16 @@ def run_pipeline(topic_type="auto", dry_run=False):
         title  = script_data.get("title")
         script = script_data.get("script")
         subcat = script_data.get("sub_category", "")
-        companies   = script_data.get("companies_mentioned", [])
+        # Normalize companies_mentioned to list of strings
+        raw_companies = script_data.get("companies_mentioned", [])
+        companies = []
+        for c in raw_companies:
+            if isinstance(c, dict):
+                name = c.get("name")
+                if name:
+                    companies.append(name)
+            elif isinstance(c, str):
+                companies.append(c)
         keywords    = script_data.get("keywords", [])
         hashtags    = script_data.get("hashtags", [])
         breaking_level = script_data.get("breaking_news_level", 0)

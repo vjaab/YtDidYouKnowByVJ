@@ -4089,8 +4089,14 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     tools = script_json.get("tools_mentioned", [])
     key_entities = script_json.get("key_entities", [])
     if not key_entities:
-        for c in companies: key_entities.append({"name": c, "type": "COMPANY"})
-        for t in tools: key_entities.append({"name": t, "type": "TOOL"})
+        for c in companies:
+            c_name = c.get("name") if isinstance(c, dict) else c
+            if c_name:
+                key_entities.append({"name": c_name, "type": "COMPANY"})
+        for t in tools:
+            t_name = t.get("name") if isinstance(t, dict) else t
+            if t_name:
+                key_entities.append({"name": t_name, "type": "TOOL"})
 
     # ── FULL SCREEN BACKGROUND ───────────────────────────────────────────
     print("Preparing full-screen background...")
