@@ -288,6 +288,9 @@ Return ONLY the final JSON object matching the schema. No markdown wrapping. No 
 # ENGINE
 # ═══════════════════════════════════════════════════════════════════════════════
 
+# Module-level cache for failed Cloudflare models (permanent errors like 400/403/404)
+_FAILED_CLOUDFLARE_MODELS = set()
+
 def call_fallback_model(prompt):
     """
     Attempts to call non-Gemini fallback APIs in sequence:
@@ -306,7 +309,7 @@ def call_fallback_model(prompt):
             raw = raw[raw.find("```")+3:raw.rfind("```")]
         return json.loads(raw.strip())
 
-# 0. Cloudflare Workers AI (fast, free tier available)
+    # 0. Cloudflare Workers AI (fast, free tier available)
     cloudflare_token = os.getenv("CF_API_TOKEN") or os.getenv("CLOUDFLARE_API_TOKEN")
     cloudflare_account_id = os.getenv("CF_ACCOUNT_ID") or os.getenv("CLOUDFLARE_ACCOUNT_ID")
     if cloudflare_token and cloudflare_account_id:
@@ -332,6 +335,10 @@ def call_fallback_model(prompt):
         # gpt-oss models use Chat Completions format
         gpt_oss_models = {"@cf/openai/gpt-oss-120b", "@cf/openai/gpt-oss-20b"}
         for model_name in CLOUDFLARE_MODELS:
+            # Skip models that already failed permanently in this run
+            if model_name in _FAILED_CLOUDFLARE_MODELS:
+                print(f"⏭️ Skipping known-bad Cloudflare model: {model_name}")
+                continue
             print(f"🔮 Falling back to Cloudflare ({model_name})...")
             try:
                 payload = {
@@ -359,6 +366,10 @@ def call_fallback_model(prompt):
                         print(f"⚠️ Cloudflare ({model_name}) returned empty content")
                 else:
                     print(f"⚠️ Cloudflare ({model_name}) failed with code {r.status_code}: {r.text}")
+                    # Cache permanent failures: 400 (bad model), 403 (no access), 404 (not found)
+                    if r.status_code in (400, 403, 404):
+                        _FAILED_CLOUDFLARE_MODELS.add(model_name)
+                        print(f"🚫 Caching {model_name} as permanently failed for this run")
             except Exception as e:
                 print(f"⚠️ Cloudflare ({model_name}) fallback failed: {e}")
 
