@@ -291,7 +291,7 @@ Return ONLY the final JSON object matching the schema. No markdown wrapping. No 
 def call_fallback_model(prompt):
     """
     Attempts to call non-Gemini fallback APIs in sequence:
-    OpenAI -> Anthropic (Claude) -> Groq (Llama) -> DeepSeek -> OpenRouter.
+    Cloudflare Workers AI -> OpenAI -> Anthropic (Claude) -> Groq (Llama) -> DeepSeek -> OpenRouter.
     Returns the parsed JSON response dict or None.
     """
     import os
@@ -305,6 +305,51 @@ def call_fallback_model(prompt):
         elif "```" in raw:
             raw = raw[raw.find("```")+3:raw.rfind("```")]
         return json.loads(raw.strip())
+
+    # 0. Cloudflare Workers AI (fast, free tier available)
+    cloudflare_token = os.getenv("CF_API_TOKEN") or os.getenv("CLOUDFLARE_API_TOKEN")
+    cloudflare_account_id = os.getenv("CF_ACCOUNT_ID") or os.getenv("CLOUDFLARE_ACCOUNT_ID")
+    if cloudflare_token and cloudflare_account_id:
+        try:
+            from config import CLOUDFLARE_MODELS
+        except ImportError:
+            CLOUDFLARE_MODELS = [
+                "@cf/meta/llama-3.3-70b-instruct",
+                "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+                "@cf/zai/glm-4.7-flash",
+                "@cf/openai/gpt-oss-120b",
+                "@cf/nvidia/nemotron-3-120b-a12b",
+                "@cf/meta/llama-4-scout-17b-16e-instruct",
+                "@cf/qwen/qwq-32b",
+                "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+                "@cf/meta/llama-3.1-70b-instruct",
+                "@cf/qwen/qwen2.5-72b-instruct",
+            ]
+        headers = {
+            "Authorization": f"Bearer {cloudflare_token}",
+            "Content-Type": "application/json"
+        }
+        for model_name in CLOUDFLARE_MODELS:
+            print(f"🔮 Falling back to Cloudflare ({model_name})...")
+            try:
+                payload = {
+                    "messages": [{"role": "user", "content": prompt}],
+                    "response_format": {"type": "json_object"},
+                    "temperature": 0.7
+                }
+                r = requests.post(
+                    f"https://api.cloudflare.com/client/v4/accounts/{cloudflare_account_id}/ai/run/{model_name}",
+                    json=payload,
+                    headers=headers,
+                    timeout=30
+                )
+                if r.status_code == 200:
+                    content = r.json()["result"]["response"].strip()
+                    return clean_and_parse_json(content)
+                else:
+                    print(f"⚠️ Cloudflare ({model_name}) failed with code {r.status_code}: {r.text}")
+            except Exception as e:
+                print(f"⚠️ Cloudflare ({model_name}) fallback failed: {e}")
 
     # 1. OpenAI
     openai_key = os.getenv("OPENAI_API_KEY")
@@ -361,15 +406,13 @@ def call_fallback_model(prompt):
             "Authorization": f"Bearer {groq_key}",
             "Content-Type": "application/json"
         }
-        # Model preference order: openai/gpt-oss-120b -> qwen/qwen3.6-27b -> meta-llama/llama-4-scout-17b-16e-instruct -> qwen/qwen3-32b -> llama-3.3-70b-versatile -> groq/compound -> openai/gpt-oss-20b -> llama-3.1-8b-instant
+        # Model preference order: only verified working models
         groq_models = [
             "openai/gpt-oss-120b",
-            "qwen/qwen3.6-27b",
-            "meta-llama/llama-4-scout-17b-16e-instruct",
-            "qwen/qwen3-32b",
             "llama-3.3-70b-versatile",
-            "groq/compound",
+            "qwen/qwen3-32b",
             "openai/gpt-oss-20b",
+            "gemma2-9b-it",
             "llama-3.1-8b-instant"
         ]
         for model_name in groq_models:

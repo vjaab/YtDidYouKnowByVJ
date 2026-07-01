@@ -64,6 +64,8 @@ jobs:
           echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> .env
           echo "CF_ACCOUNT_ID=${{ secrets.CF_ACCOUNT_ID }}" >> .env
           echo "CF_API_TOKEN=${{ secrets.CF_API_TOKEN }}" >> .env
+          echo "CLOUDFLARE_ACCOUNT_ID=${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" >> .env
+          echo "CLOUDFLARE_API_TOKEN=${{ secrets.CLOUDFLARE_API_TOKEN }}" >> .env
           echo "FAL_KEY=${{ secrets.FAL_KEY }}" >> .env
           echo "KAGGLE_USERNAME=${{ secrets.KAGGLE_USERNAME }}" >> .env
           echo "KAGGLE_KEY=${{ secrets.KAGGLE_KEY }}" >> .env

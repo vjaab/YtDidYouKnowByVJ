@@ -68,6 +68,211 @@ ENABLE_STRATEGIC_SFX = True       # Whoosh/bass at pattern interrupts
 ENABLE_DYNAMIC_BGM_CURVE = True   # BGM energy follows Hook→Body→Payoff→CTA
 TRENDING_NICHE_BIAS = 0.15         # 0=prefer broad topics, 1=prefer niche topics
 
+# Cloudflare Workers AI
+CLOUDFLARE_API_TOKEN = os.getenv("CLOUDFLARE_API_TOKEN", "")
+CLOUDFLARE_ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID", "")
+
+# Text Generation Models (LLMs)
+CLOUDFLARE_TEXT_MODELS = [
+    # Latest flagship models
+    "@cf/meta/llama-3.3-70b-instruct",
+    "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "@cf/meta/llama-3.1-70b-instruct",
+    "@cf/meta/llama-3.1-8b-instruct",
+    "@cf/meta/llama-3.1-8b-instruct-fp8",
+    "@cf/meta/llama-3.1-8b-instruct-fast",
+    "@cf/meta/llama-3.2-1b-instruct",
+    "@cf/meta/llama-3.2-3b-instruct",
+    "@cf/meta/llama-3.2-11b-vision-instruct",
+    "@cf/meta/llama-4-scout-17b-16e-instruct",
+    "@cf/meta/llama-guard-3-8b",
+    
+    # Qwen models
+    "@cf/qwen/qwen2.5-72b-instruct",
+    "@cf/qwen/qwen2.5-coder-32b-instruct",
+    "@cf/qwen/qwq-32b",
+    "@cf/qwen/qwen3-30b-a3b-fp8",
+    
+    # Mistral models
+    "@cf/mistral/mistral-7b-instruct-v0.1",
+    "@cf/mistral/mistral-7b-instruct-v0.2",
+    "@cf/mistral/mistral-small-3.1-24b-instruct",
+    
+    # Google Gemma
+    "@cf/google/gemma-7b-it",
+    "@cf/google/gemma-3-12b-it",
+    "@cf/google/gemma-4-26b-a4b-it",
+    "@cf/google/gemma-2b-it-lora",
+    "@cf/google/gemma-7b-it-lora",
+    
+    # Z.ai GLM
+    "@cf/zai/glm-4.7-flash",
+    "@cf/zai/glm-5.2",
+    
+    # Moonshot Kimi
+    "@cf/moonshotai/kimi-k2.5",
+    "@cf/moonshotai/kimi-k2.6",
+    "@cf/moonshotai/kimi-k2.7-code",
+    
+    # NVIDIA Nemotron
+    "@cf/nvidia/nemotron-3-120b-a12b",
+    
+    # DeepSeek
+    "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+    
+    # OpenAI
+    "@cf/openai/gpt-oss-120b",
+    "@cf/openai/gpt-oss-20b",
+    
+    # Others
+    "@cf/baai/bge-reranker-base",
+    "@cf/ibm/granite-4.0-h-micro",
+    "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
+    "@cf/nousresearch/hermes-2-pro-mistral-7b",
+    "@cf/defog/sqlcoder-7b-2",
+    "@cf/microsoft/phi-2",
+    "@cf/meta/bart-large-cnn",
+    "@cf/meta/m2m100-1.2b",
+]
+
+# Text-to-Image Models
+CLOUDFLARE_TEXT_TO_IMAGE_MODELS = [
+    "@cf/blackforestlabs/flux-2-dev",
+    "@cf/blackforestlabs/flux-2-klein-4b",
+    "@cf/blackforestlabs/flux-2-klein-9b",
+    "@cf/blackforestlabs/flux-1-schnell",
+    "@cf/runwayml/stable-diffusion-v1-5-img2img",
+    "@cf/runwayml/stable-diffusion-v1-5-inpainting",
+    "@cf/stabilityai/stable-diffusion-xl-base-1.0",
+    "@cf/bytedance/stable-diffusion-xl-lightning",
+    "@cf/lykon/dreamshaper-8-lcm",
+    "@cf/leonardo/lucid-origin",
+    "@cf/leonardo/phoenix-1.0",
+]
+
+# Text-to-Video Models (if available)
+CLOUDFLARE_TEXT_TO_VIDEO_MODELS = [
+    # Note: Cloudflare Workers AI currently doesn't have native text-to-video models
+]
+
+# Image-to-Text / Vision Models
+CLOUDFLARE_IMAGE_TO_TEXT_MODELS = [
+    "@cf/meta/llama-3.2-11b-vision-instruct",
+    "@cf/llava-hf/llava-1.5-7b-hf",
+    "@cf/unum/uform-gen2-qwen-500m",
+]
+
+# Text-to-Speech Models
+CLOUDFLARE_TEXT_TO_SPEECH_MODELS = [
+    "@cf/deepgram/aura-1",
+    "@cf/deepgram/aura-2-en",
+    "@cf/deepgram/aura-2-es",
+    "@cf/myshell/melotts",
+]
+
+# Automatic Speech Recognition (Speech-to-Text)
+CLOUDFLARE_SPEECH_TO_TEXT_MODELS = [
+    "@cf/openai/whisper",
+    "@cf/openai/whisper-large-v3-turbo",
+    "@cf/openai/whisper-tiny-en",
+    "@cf/deepgram/nova-3",
+    "@cf/deepgram/flux",
+]
+
+# Embedding Models
+CLOUDFLARE_EMBEDDING_MODELS = [
+    "@cf/baai/bge-large-en-v1.5",
+    "@cf/baai/bge-base-en-v1.5",
+    "@cf/baai/bge-small-en-v1.5",
+    "@cf/baai/bge-m3",
+    "@cf/google/embeddinggemma-300m",
+    "@cf/qwen/qwen3-embedding-0.6b",
+    "@cf/pfnet/plamo-embedding-1b",
+]
+
+# Translation Models
+CLOUDFLARE_TRANSLATION_MODELS = [
+    "@cf/ai4bharat/indictrans2-en-indic-1b",
+    "@cf/meta/m2m100-1.2b",
+]
+
+# Classification / Other Models
+CLOUDFLARE_CLASSIFICATION_MODELS = [
+    "@cf/huggingface/distilbert-sst-2-int8",
+    "@cf/meta/detr-resnet-50",
+    "@cf/microsoft/resnet-50",
+]
+
+# Voice Activity Detection
+CLOUDFLARE_VAD_MODELS = [
+    "@cf/pipecat/smart-turn-v2",
+]
+
+# Legacy/Deprecated models (kept for compatibility)
+CLOUDFLARE_LEGACY_MODELS = [
+    "@cf/meta/llama-2-7b-chat-fp16",
+    "@cf/meta/llama-2-7b-chat-int8",
+    "@cf/meta/llama-2-7b-chat-hf-lora",
+    "@cf/meta/llama-3-8b-instruct",
+    "@cf/meta/llama-3-8b-instruct-awq",
+    "@cf/meta/meta-llama-3-8b-instruct",
+    "@cf/meta/llama-3.1-8b-instruct-awq",
+    "@cf/mistral/mistral-7b-instruct-v0.2-lora",
+]
+
+# Default model list for fallback (prioritized by capability)
+CLOUDFLARE_MODELS = [
+    # Top tier - best for reasoning/complex tasks
+    "@cf/meta/llama-3.3-70b-instruct",
+    "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "@cf/zai/glm-4.7-flash",
+    "@cf/openai/gpt-oss-120b",
+    "@cf/nvidia/nemotron-3-120b-a12b",
+    "@cf/meta/llama-4-scout-17b-16e-instruct",
+    "@cf/qwen/qwq-32b",
+    "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+    
+    # High quality - good balance
+    "@cf/meta/llama-3.1-70b-instruct",
+    "@cf/qwen/qwen2.5-72b-instruct",
+    "@cf/qwen/qwen3-30b-a3b-fp8",
+    "@cf/qwen/qwen2.5-coder-32b-instruct",
+    "@cf/mistral/mistral-small-3.1-24b-instruct",
+    "@cf/google/gemma-4-26b-a4b-it",
+    "@cf/moonshotai/kimi-k2.7-code",
+    "@cf/moonshotai/kimi-k2.6",
+    
+    # Fast/Efficient
+    "@cf/meta/llama-3.1-8b-instruct",
+    "@cf/meta/llama-3.1-8b-instruct-fp8",
+    "@cf/meta/llama-3.1-8b-instruct-fast",
+    "@cf/meta/llama-3.2-3b-instruct",
+    "@cf/mistral/mistral-7b-instruct-v0.1",
+    "@cf/mistral/mistral-7b-instruct-v0.2",
+    "@cf/google/gemma-3-12b-it",
+    "@cf/google/gemma-7b-it",
+    "@cf/zai/glm-5.2",
+    
+    # Lightweight
+    "@cf/meta/llama-3.2-1b-instruct",
+    "@cf/openai/gpt-oss-20b",
+    "@cf/ibm/granite-4.0-h-micro",
+]
+
+# All models combined for reference
+CLOUDFLARE_ALL_MODELS = (
+    CLOUDFLARE_TEXT_MODELS + 
+    CLOUDFLARE_TEXT_TO_IMAGE_MODELS + 
+    CLOUDFLARE_TEXT_TO_VIDEO_MODELS + 
+    CLOUDFLARE_IMAGE_TO_TEXT_MODELS + 
+    CLOUDFLARE_TEXT_TO_SPEECH_MODELS + 
+    CLOUDFLARE_SPEECH_TO_TEXT_MODELS + 
+    CLOUDFLARE_EMBEDDING_MODELS + 
+    CLOUDFLARE_TRANSLATION_MODELS + 
+    CLOUDFLARE_CLASSIFICATION_MODELS + 
+    CLOUDFLARE_VAD_MODELS
+)
+
 # Model Configurations (to easily switch/override via env variables or custom values)
 GEMINI_PRO_MODEL = os.getenv("GEMINI_PRO_MODEL", "gemini-2.5-pro")
 GEMINI_FLASH_MODEL = os.getenv("GEMINI_FLASH_MODEL", "gemini-2.5-flash")
