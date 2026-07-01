@@ -94,20 +94,14 @@ CLOUDFLARE_TEXT_MODELS = [
     "@cf/qwen/qwen3-30b-a3b-fp8",
     
     # Mistral models
-    "@cf/mistral/mistral-7b-instruct-v0.1",
-    "@cf/mistral/mistral-7b-instruct-v0.2",
     "@cf/mistral/mistral-small-3.1-24b-instruct",
     
     # Google Gemma
-    "@cf/google/gemma-7b-it",
-    "@cf/google/gemma-3-12b-it",
     "@cf/google/gemma-4-26b-a4b-it",
-    "@cf/google/gemma-2b-it-lora",
-    "@cf/google/gemma-7b-it-lora",
     
     # Z.ai GLM
-    "@cf/zai/glm-4.7-flash",
-    "@cf/zai/glm-5.2",
+    "@cf/zai-org/glm-4.7-flash",
+    "@cf/zai-org/glm-5.2",
     
     # Moonshot Kimi
     "@cf/moonshotai/kimi-k2.5",
@@ -126,7 +120,7 @@ CLOUDFLARE_TEXT_MODELS = [
     
     # Others
     "@cf/baai/bge-reranker-base",
-    "@cf/ibm/granite-4.0-h-micro",
+    "@cf/ibm-granite/granite-4.0-h-micro",
     "@cf/aisingapore/gemma-sea-lion-v4-27b-it",
     "@cf/nousresearch/hermes-2-pro-mistral-7b",
     "@cf/defog/sqlcoder-7b-2",
@@ -225,7 +219,7 @@ CLOUDFLARE_MODELS = [
     # Top tier - best for reasoning/complex tasks
     "@cf/meta/llama-3.3-70b-instruct",
     "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-    "@cf/zai/glm-4.7-flash",
+    "@cf/zai-org/glm-4.7-flash",
     "@cf/openai/gpt-oss-120b",
     "@cf/nvidia/nemotron-3-120b-a12b",
     "@cf/meta/llama-4-scout-17b-16e-instruct",
@@ -247,16 +241,12 @@ CLOUDFLARE_MODELS = [
     "@cf/meta/llama-3.1-8b-instruct-fp8",
     "@cf/meta/llama-3.1-8b-instruct-fast",
     "@cf/meta/llama-3.2-3b-instruct",
-    "@cf/mistral/mistral-7b-instruct-v0.1",
-    "@cf/mistral/mistral-7b-instruct-v0.2",
-    "@cf/google/gemma-3-12b-it",
-    "@cf/google/gemma-7b-it",
-    "@cf/zai/glm-5.2",
+    "@cf/zai-org/glm-5.2",
     
     # Lightweight
     "@cf/meta/llama-3.2-1b-instruct",
     "@cf/openai/gpt-oss-20b",
-    "@cf/ibm/granite-4.0-h-micro",
+    "@cf/ibm-granite/granite-4.0-h-micro",
 ]
 
 # All models combined for reference
