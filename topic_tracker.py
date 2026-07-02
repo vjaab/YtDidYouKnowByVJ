@@ -78,14 +78,17 @@ def check_story_uniqueness(new_title, new_headline=None, new_keywords=None, new_
     # 3. Keyword Overlap Check (Batch Deduplication)
     if new_keywords:
         recent_keywords = []
-        for entry in tracker.get('history', [])[-10:]: # Look at last 10 stories
+        for entry in tracker.get('history', [])[-10:]:  # Look at last 10 stories
+            # Skip if same URL (exact same story already recorded)
+            if new_url and entry.get('news_source_url') == new_url:
+                continue
             recent_keywords.extend([k.lower() for k in entry.get('keywords', [])])
         
         new_k_set = set([k.lower() for k in new_keywords])
         old_k_set = set(recent_keywords)
         intersection = new_k_set.intersection(old_k_set)
         
-        # If > 60% of keywords overlap with recent stories, it's likely redundant
+        # If > 65% of keywords overlap with recent stories, it's likely redundant
         if len(new_k_set) > 0:
             overlap_pct = (len(intersection) / len(new_k_set)) * 100
             if overlap_pct > 65:

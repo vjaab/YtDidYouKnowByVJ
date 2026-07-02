@@ -1034,7 +1034,7 @@ _FAILED_CLOUDFLARE_MODELS = set()
 def call_fallback_model(prompt):
     """
     Attempts to call non-Gemini fallback APIs in sequence:
-    Cloudflare Workers AI -> Cerebras -> OpenAI -> Anthropic (Claude) -> Groq (Llama) -> DeepSeek -> OpenRouter.
+    Groq (Llama) -> Cloudflare Workers AI -> Cerebras -> OpenAI -> Anthropic (Claude) -> DeepSeek -> OpenRouter.
     Returns the parsed JSON response dict or None.
     """
     import os
@@ -1049,7 +1049,40 @@ def call_fallback_model(prompt):
             raw = raw[raw.find("```")+3:raw.rfind("```")]
         return json.loads(raw.strip())
 
-    # 0. Cloudflare Workers AI (fast, free tier available)
+    # 0. Groq (fast, reliable, high quota - prioritized first)
+    groq_key = os.getenv("GROQ_API_KEY")
+    if groq_key:
+        headers = {
+            "Authorization": f"Bearer {groq_key}",
+            "Content-Type": "application/json"
+        }
+        # Model preference order: only verified working models
+        groq_models = [
+            "openai/gpt-oss-120b",
+            "llama-3.3-70b-versatile",
+            "qwen/qwen3-32b",
+            "openai/gpt-oss-20b",
+            "llama-3.1-8b-instant"
+        ]
+        for model_name in groq_models:
+            print(f"🔮 Falling back to Groq ({model_name})...")
+            try:
+                payload = {
+                    "model": model_name,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "response_format": {"type": "json_object"},
+                    "temperature": 0.7
+                }
+                r = requests.post("https://api.groq.com/openai/v1/chat/completions", json=payload, headers=headers, timeout=30)
+                if r.status_code == 200:
+                    content = r.json()["choices"][0]["message"]["content"].strip()
+                    return clean_and_parse_json(content)
+                else:
+                    print(f"⚠️ Groq ({model_name}) failed with code {r.status_code}: {r.text}")
+            except Exception as e:
+                print(f"⚠️ Groq ({model_name}) fallback failed: {e}")
+
+    # 1. Cloudflare Workers AI (fast, free tier available)
     cloudflare_token = os.getenv("CF_API_TOKEN") or os.getenv("CLOUDFLARE_API_TOKEN")
     cloudflare_account_id = os.getenv("CF_ACCOUNT_ID") or os.getenv("CLOUDFLARE_ACCOUNT_ID")
     if cloudflare_token and cloudflare_account_id:
@@ -1107,20 +1140,41 @@ def call_fallback_model(prompt):
                 else:
                     print(f"⚠️ Cloudflare ({model_name}) failed with code {r.status_code}: {r.text}")
                     # Cache permanent failures: 400 (bad model), 403 (no access), 404 (not found)
-                    if r.status_code in (400, 403, 404):
+                    # Also check response body for Cloudflare error code 4006 (quota exhausted)
+                    error_code = None
+                    try:
+                        error_data = r.json()
+                        if isinstance(error_data, dict):
+                            # Cloudflare Workers AI error format: {"result": null, "success": false, "errors": [{"code": 4006, ...}]}
+                            errors = error_data.get("errors", [])
+                            if errors and isinstance(errors, list):
+                                error_code = errors[0].get("code")
+                    except:
+                        pass
+                    
+                    if r.status_code in (400, 403, 404) or error_code == 4006:
                         _FAILED_CLOUDFLARE_MODELS.add(model_name)
                         print(f"🚫 Caching {model_name} as permanently failed for this run")
+                        if error_code == 4006:
+                            print(f"🚫 Cloudflare quota exhausted (code 4006) - marking entire provider as dead for this run")
+                            # Mark all Cloudflare models as failed to skip remaining models
+                            try:
+                                from config import CLOUDFLARE_MODELS
+                                for m in CLOUDFLARE_MODELS:
+                                    _FAILED_CLOUDFLARE_MODELS.add(m)
+                            except ImportError:
+                                pass
             except Exception as e:
                 print(f"⚠️ Cloudflare ({model_name}) fallback failed: {e}")
 
-    # 1. Cerebras
+    # 2. Cerebras
     cerebras_key = os.getenv("CEREBRAS_API_KEY")
     if cerebras_key:
         headers = {
             "Authorization": f"Bearer {cerebras_key}",
             "Content-Type": "application/json"
         }
-        cerebras_models = ["llama-3.3-70b", "llama-3.1-70b", "llama-3.1-8b"]
+        cerebras_models = ["llama3.3-70b", "llama3.1-70b", "llama3.1-8b"]
         for model_name in cerebras_models:
             print(f"🔮 Falling back to Cerebras ({model_name})...")
             try:
@@ -1139,10 +1193,10 @@ def call_fallback_model(prompt):
             except Exception as e:
                 print(f"⚠️ Cerebras ({model_name}) fallback failed: {e}")
 
-    # 2. OpenAI
+    # 3. OpenAI
     openai_key = os.getenv("OPENAI_API_KEY")
     if openai_key:
-        print("🔮 Gemini failed. Falling back to OpenAI (gpt-4o-mini)...")
+        print("🔮 Falling back to OpenAI (gpt-4o-mini)...")
         try:
             headers = {
                 "Authorization": f"Bearer {openai_key}",
@@ -1163,10 +1217,10 @@ def call_fallback_model(prompt):
         except Exception as e:
             print(f"⚠️ OpenAI fallback failed: {e}")
 
-    # 3. Anthropic (Claude)
+    # 4. Anthropic (Claude)
     anthropic_key = os.getenv("ANTHROPIC_API_KEY")
     if anthropic_key:
-        print("🔮 Gemini/OpenAI failed. Falling back to Anthropic (claude-3-5-haiku-20241022)...")
+        print("🔮 Falling back to Anthropic (claude-3-5-haiku-20241022)...")
         try:
             headers = {
                 "x-api-key": anthropic_key,
@@ -1187,41 +1241,7 @@ def call_fallback_model(prompt):
         except Exception as e:
             print(f"⚠️ Anthropic fallback failed: {e}")
 
-    # 4. Groq
-    groq_key = os.getenv("GROQ_API_KEY")
-    if groq_key:
-        headers = {
-            "Authorization": f"Bearer {groq_key}",
-            "Content-Type": "application/json"
-        }
-        # Model preference order: only verified working models
-        groq_models = [
-            "openai/gpt-oss-120b",
-            "llama-3.3-70b-versatile",
-            "qwen/qwen3-32b",
-            "openai/gpt-oss-20b",
-            "gemma2-9b-it",
-            "llama-3.1-8b-instant"
-        ]
-        for model_name in groq_models:
-            print(f"🔮 Gemini/OpenAI/Anthropic failed. Falling back to Groq ({model_name})...")
-            try:
-                payload = {
-                    "model": model_name,
-                    "messages": [{"role": "user", "content": prompt}],
-                    "response_format": {"type": "json_object"},
-                    "temperature": 0.7
-                }
-                r = requests.post("https://api.groq.com/openai/v1/chat/completions", json=payload, headers=headers, timeout=30)
-                if r.status_code == 200:
-                    content = r.json()["choices"][0]["message"]["content"].strip()
-                    return clean_and_parse_json(content)
-                else:
-                    print(f"⚠️ Groq ({model_name}) failed with code {r.status_code}: {r.text}")
-            except Exception as e:
-                print(f"⚠️ Groq ({model_name}) fallback failed: {e}")
-
-    # 4. DeepSeek
+    # 5. DeepSeek
     deepseek_key = os.getenv("DEEPSEEK_API_KEY")
     if deepseek_key:
         print("🔮 Falling back to DeepSeek (deepseek-chat)...")
@@ -1245,7 +1265,7 @@ def call_fallback_model(prompt):
         except Exception as e:
             print(f"⚠️ DeepSeek fallback failed: {e}")
 
-    # 5. OpenRouter
+    # 6. OpenRouter
     openrouter_key = os.getenv("OPENROUTER_API_KEY")
     if openrouter_key:
         headers = {
