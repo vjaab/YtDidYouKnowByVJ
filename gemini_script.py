@@ -58,7 +58,14 @@ Never use unrelated visuals (like generic stock footage or random unrelated robo
 - Machine Learning: Training datasets, feature extraction diagrams.
 
 Quality & Mobile Standards:
-Every visual must be high-contrast, readable in 1 second on mobile screens, and educational (passing the Muted Viewer Test: a viewer must understand the key idea even if audio is muted)."""
+Every visual must be high-contrast, readable in 1 second on mobile screens, and educational (passing the Muted Viewer Test: a viewer must understand the key idea even if audio is muted).
+
+TTS-READY OUTPUT RULES (CRITICAL):
+- The "script" field must contain ONLY speakable text. NO alternate word options (word1/word2), NO pronunciation guides, NO formatting notes, NO meta-instructions, NO scene labels, NO stage directions.
+- If a tool or brand name is hard to pronounce, pick ONE spelling and use it consistently throughout. Do NOT include alternate pronunciations like "use-strix/strix" or "(pronounce as X)".
+- CLEAN ENDING: The script must end on a single, clean CTA sentence. Do NOT repeat the hook after the CTA. Do NOT append video metadata, titles, hashtags, or descriptions into the script field.
+- NO NUMBERED LISTS in the script field. Write flowing prose, not bullet points.
+- Every sentence must be grammatically complete with a subject and verb."""
 
 VAIBHAV_SYSTEM_PERSONA = """Role: You are an expert scriptwriter for highly engaging, tech-focused YouTube Shorts.
 You write punchy, high-retention scripts in the style of Vaibhav Sisinty — direct, slightly alarming hooks, practical payoff, conversational tone. No fluff. No filler. Every word earns its place.
@@ -89,7 +96,14 @@ Choose the most suitable visual format:
 6. Animated UI Mockup when demonstrating app/settings navigation.
 
 Quality & Mobile Standards:
-Every visual must be high-contrast, readable in 1 second on mobile screens, and educational (passing the Muted Viewer Test: a viewer must understand the key idea even if audio is muted)."""
+Every visual must be high-contrast, readable in 1 second on mobile screens, and educational (passing the Muted Viewer Test: a viewer must understand the key idea even if audio is muted).
+
+TTS-READY OUTPUT RULES (CRITICAL):
+- The "script" field must contain ONLY speakable text. NO alternate word options (word1/word2), NO pronunciation guides, NO formatting notes, NO meta-instructions, NO scene labels, NO stage directions.
+- If a tool or brand name is hard to pronounce, pick ONE spelling and use it consistently throughout. Do NOT include alternate pronunciations like "use-strix/strix" or "(pronounce as X)".
+- CLEAN ENDING: The script must end on a single, clean CTA sentence. Do NOT repeat the hook after the CTA. Do NOT append video metadata, titles, hashtags, or descriptions into the script field.
+- NO NUMBERED LISTS in the script field. Write flowing prose, not bullet points.
+- Every sentence must be grammatically complete with a subject and verb."""
 
 RESEARCH_AGENT_TEMPLATE = """{persona}
 
@@ -1011,6 +1025,15 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
     script_data = engine.execute(selection_instruction, prompt_requirements)
     
     if script_data:
+        # ── Post-generation sanitization: strip LLM artifacts from script text ──
+        if script_data.get("script"):
+            from audio_gen import sanitize_script_for_tts
+            original_script = script_data["script"]
+            sanitized_script = sanitize_script_for_tts(original_script)
+            if sanitized_script != original_script:
+                print(f"🧹 Script sanitized: removed {len(original_script) - len(sanitized_script)} chars of LLM artifacts.")
+                script_data["script"] = sanitized_script
+        
         # Perform uniqueness check (Final safeguard)
         headline = script_data.get("original_news_headline", "")
         news_url = script_data.get("original_news_url", "")

@@ -676,6 +676,105 @@ def _generate_edge_tts(text, output_path):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# SCRIPT SANITIZATION (Strip LLM artifacts before TTS)
+# ─────────────────────────────────────────────────────────────────────────────
+def sanitize_script_for_tts(text):
+    """
+    Aggressively strips LLM generation artifacts that Gemini sometimes leaks
+    into the 'script' field. Must run BEFORE clean_tts_text().
+    
+    Catches:
+    - Alternate phrasing options: "word1/word2", "use X or contextually appropriate Y"
+    - Stage directions: [pause], [beat], (dramatic tone), (softly)
+    - Meta-instructions: "as one compound word", "pronounce as"
+    - Formatting artifacts: numbered lists, bullets, markdown headers
+    - Trailing loop artifacts: hook text repeated after CTA
+    """
+    if not text:
+        return ""
+    
+    cleaned = text
+    
+    # 1. Remove alternate phrasing patterns: "word1/word2" → keep word1
+    #    e.g., "use stricks/tricks" → "use stricks"
+    #    But preserve legit slashes like "CI/CD", "24/7", "input/output"
+    legit_slash_terms = {
+        'CI/CD', 'I/O', 'input/output', 'read/write', 'TCP/IP',
+        'client/server', 'OS/2', 'w/', '24/7', 'he/she', 'and/or'
+    }
+    # Protect legit slash terms by replacing with placeholders
+    placeholders = {}
+    for i, term in enumerate(legit_slash_terms):
+        placeholder = f"__SLASH_PLACEHOLDER_{i}__"
+        placeholders[placeholder] = term
+        cleaned = cleaned.replace(term, placeholder)
+    
+    # Remove "word1/word2" patterns (keep the first word)
+    cleaned = re.sub(r'\b(\w+)/(\w+)\b', r'\1', cleaned)
+    
+    # Restore legit slash terms
+    for placeholder, term in placeholders.items():
+        cleaned = cleaned.replace(placeholder, term)
+    
+    # 2. Remove meta-instruction phrases that LLMs sometimes leak
+    meta_patterns = [
+        r'(?i)\bas one compound word\b',
+        r'(?i)\bor contextually appropriate\b[^.!?]*',
+        r'(?i)\bpronounce\s+(as|it|this)\b[^.!?]*',
+        r'(?i)\buse\s+\w+\s+or\s+if\s+contextually\b[^.!?]*',
+        r'(?i)\bspoken\s+as\b[^.!?]*',
+        r'(?i)\bsay\s+it\s+as\b[^.!?]*',
+        r'(?i)\bformat(?:ted)?\s+as\b[^.!?]*',
+        r'(?i)\bnote\s*:\s*[^.!?]*',
+        r'(?i)\binstruction\s*:\s*[^.!?]*',
+        r'(?i)\bdirector\'?s?\s+note\s*:\s*[^.!?]*',
+    ]
+    for pattern in meta_patterns:
+        cleaned = re.sub(pattern, ' ', cleaned)
+    
+    # 3. Remove stage directions in brackets/parens: [pause], (beat), [dramatic tone]
+    cleaned = re.sub(r'\[\s*(pause|beat|silence|breathe|dramatic|softly|loudly|whisper|slowly|quickly|emphasis|transition|cut)\s*[^\]]*\]', ' ', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\(\s*(pause|beat|silence|breathe|dramatic|softly|loudly|whisper|slowly|quickly|emphasis|transition)\s*[^)]*\)', ' ', cleaned, flags=re.IGNORECASE)
+    
+    # 4. Remove scene/section labels that shouldn't be spoken
+    cleaned = re.sub(r'(?i)^\s*(HOOK|PROBLEM|SOLUTION|CTA|OUTRO|INTRO|SCENE|PART)\s*[:\-]\s*', '', cleaned, flags=re.MULTILINE)
+    cleaned = re.sub(r'(?i)\b(HOOK|PROBLEM|SOLUTION|CTA|SECTION)\s*\d*\s*:', ' ', cleaned)
+    
+    # 5. Remove numbered list formatting ("1. ", "2. ", etc.)
+    cleaned = re.sub(r'(?m)^\s*\d+\.\s+', '', cleaned)
+    
+    # 6. Remove markdown formatting artifacts
+    cleaned = re.sub(r'#{1,6}\s+', '', cleaned)  # Headers
+    cleaned = re.sub(r'\*{1,3}([^*]+)\*{1,3}', r'\1', cleaned)  # Bold/italic
+    cleaned = re.sub(r'`([^`]+)`', r'\1', cleaned)  # Inline code
+    
+    # 7. Detect and truncate trailing loop artifacts
+    #    If the CTA appears and then the hook repeats, cut at the CTA
+    #    Pattern: "...follow for more..." followed by text that re-states the hook
+    cta_markers = [
+        r'(?i)(follow\s+for\s+more[^.!?]*[.!?])',
+        r'(?i)(subscribe\s+for\s+more[^.!?]*[.!?])',
+        r'(?i)(save\s+this[^.!?]*[.!?])',
+        r'(?i)(drop\s+a\s+comment[^.!?]*[.!?])',
+        r'(?i)(comment\s+below[^.!?]*[.!?])',
+    ]
+    for cta_pattern in cta_markers:
+        match = re.search(cta_pattern, cleaned)
+        if match:
+            cta_end = match.end()
+            remaining = cleaned[cta_end:].strip()
+            # If remaining text is short (<40 chars) and looks like a loop-back, remove it
+            if remaining and len(remaining) < 80:
+                cleaned = cleaned[:cta_end].strip()
+                break
+    
+    # 8. Clean up whitespace artifacts
+    cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+    
+    return cleaned
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # PUBLIC ENTRY POINT
 # ─────────────────────────────────────────────────────────────────────────────
 def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
@@ -686,10 +785,13 @@ def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
     """
     if not text: return ""
     
+    # ── PHASE 0: SANITIZE LLM ARTIFACTS ────────────────────────────────────
+    cleaned = sanitize_script_for_tts(text)
+    
     # ── PHASE 1: TEXT SCRIPT PRE-PROCESSING & CLEANUP ──────────────────────
     
     # 1. Broadly remove ALL bracketed and parenthesized meta-instructions/timestamps
-    cleaned = re.sub(r'\[[^\]]*\]', ' ', text)
+    cleaned = re.sub(r'\[[^\]]*\]', ' ', cleaned)
     cleaned = re.sub(r'\([^)]*\)', ' ', cleaned)
     
     # 2. Fix pronunciation artifacts (The "Strike" issue)
@@ -721,63 +823,70 @@ def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
     # 6. RE-FORMAT REPO & TECH TERMINOLOGY (Phase 1 Rule 3)
     cleaned = _reformat_tech_terminology(cleaned)
     
-    # 7. Phonetic Cleanups for Clarity
+    # 7. Phonetic Cleanups for Clarity (TECH TERMS ONLY)
     if phonetic:
         # Merge global dictionary and custom Gemini map
         full_map = PHONETIC_DICT.copy()
         if custom_phonetic_map:
             full_map.update(custom_phonetic_map)
 
-        # Add urgency words with emphasis markers (preserve emphasis from Phase 2)
-        urgency_emphasis = {
-            "URGENT": "... ur-junt ...",
-            "NOW": "... now ...",
-            "CRITICAL": "... krit-ih-kul ...",
-            "IMMEDIATE": "... ih-mee-dee-ut ...",
-            "IMMEDIATELY": "... ih-mee-dee-ut-lee ...",
-            "WARNING": "... wawr-ning ...",
-            "ALERT": "... uh-lurt ...",
-            "STOP": "... stop ...",
-            "DANGER": "... dayn-jer ...",
+        # NOTE: pronunciation_fixes for common English words ("automatically" → "aw-to-mat-ik-lee")
+        # has been REMOVED. ElevenLabs/Edge-TTS already pronounce these correctly, and the
+        # hyphenated forms were rendering literally in captions ("aw-to-mat-ik-lee uncovers").
+        # Only tech-specific terms from PHONETIC_DICT are kept (NVIDIA, GGUF, vLLM, etc.).
+        
+        # Filter: Skip common English words that TTS engines already handle correctly.
+        # Only apply phonetics to: brand names, acronyms, tech jargon, foreign terms,
+        # and genuinely tricky words that TTS consistently mispronounces.
+        _COMMON_ENGLISH_SKIP = {
+            # -ly adverbs that TTS handles fine
+            "locally", "virtually", "globally", "technically", "theoretically",
+            "specifically", "artificially", "automatically", "dramatically",
+            "systematically", "practically", "effectively", "relatively",
+            "literally", "obviously", "certainly", "immediately", "simultaneously",
+            "substantially", "significantly", "considerably", "remarkably",
+            "fundamentally", "essentially", "explicitly", "implicitly",
+            "intrinsically", "extrinsically", "synchronously", "asynchronously",
+            "basically", "probably", "actually", "naturally", "generally",
+            "especially", "definitely", "particularly", "temporarily",
+            "extraordinarily", "consequently", "subsequently", "ultimately",
+            "historically", "empirically", "statistically", "hypothetically",
+            "figuratively", "potentially", "successfully", "inevitably",
+            # Common nouns/adjectives TTS handles fine
+            "vulnerability", "vulnerabilities", "comfortable", "vegetable",
+            "chocolate", "interesting", "different", "temperature", "restaurant",
+            "necessary", "laboratory", "category", "environment", "government",
+            "development", "industry", "innovation", "analysis", "strategy",
+            "comprehensive", "revolutionary", "transformative", "groundbreaking",
+            "unprecedented", "sophisticated", "uncomplicated", "incredible",
+            "incredibly", "accessible", "accessibility", "relevant",
+            "significant", "remarkable", "available", "availability",
+            "reliability", "scalability", "infrastructure", "implementation",
+            "configuration", "optimization", "architecture", "architectural",
+            "perspective", "perspectives", "resilience", "compliance",
+            # Common words TTS handles fine 
+            "fact", "facts", "way", "ways", "only", "says", "said",
+            "iron", "often", "listen", "height", "month", "months",
+            "island", "islands", "subtle", "subtly", "debt", "doubt",
+            "receipt", "salmon", "almond", "Wednesday", "February",
+            "writer", "officer", "market", "analyst", "analysts",
+            "specific", "prioritize", "distributed", "parallel",
+            "concurrency", "orchestration", "technical",
+            # Heteronyms that could change meaning if replaced
+            "read", "lead", "live", "content", "present", "record",
+            "object", "produce", "project", "estimate", "conduct",
+            # Common "-tion" words
+            "standardization", "modernization", "digitalization",
+            "pronunciation", "instantaneous", "instantaneously", "instantly",
         }
-        full_map.update(urgency_emphasis)
-
-        # Fix common TTS mispronunciations
-        pronunciation_fixes = {
-            "locally": "lo-cal-ly",
-            "virtually": "vir-choo-al-ly",
-            "globally": "glo-bal-ly",
-            "technically": "tek-nik-lee",
-            "theoretically": "thee-uh-ret-ik-lee",
-            "specifically": "spi-sif-ik-lee",
-            "artificially": "ar-ti-fish-al-ly",
-            "automatically": "aw-to-mat-ik-lee",
-            "dramatically": "dra-mat-ik-lee",
-            "systematically": "sis-tem-at-ik-lee",
-            "practically": "prak-tik-lee",
-            "effectively": "eh-fek-tiv-lee",
-            "relatively": "rel-uh-tiv-lee",
-            "literally": "lit-er-al-ly",
-            "obviously": "ob-vee-us-lee",
-            "certainly": "sur-tin-lee",
-            "immediately": "ih-mee-dee-ut-lee",
-            "simultaneously": "sy-mul-tay-nee-us-lee",
-            "substantially": "sub-stan-shul-lee",
-            "significantly": "sig-nif-uh-kant-lee",
-            "considerably": "con-sid-er-uh-blee",
-            "remarkably": "ri-mark-uh-blee",
-            "fundamentally": "fun-da-men-tal-lee",
-            "essentially": "es-sen-shul-lee",
-            "explicitly": "ik-splis-it-lee",
-            "implicitly": "im-plis-it-lee",
-            "intrinsically": "in-trin-sik-lee",
-            "extrinsically": "ex-trin-sik-lee",
-            "synchronously": "sing-kruh-nus-lee",
-            "asynchronously": "ay-sing-kruh-nus-lee",
+        
+        filtered_map = {
+            word: replacement 
+            for word, replacement in full_map.items() 
+            if word.lower() not in _COMMON_ENGLISH_SKIP
         }
-        full_map.update(pronunciation_fixes)
 
-        for word, replacement in full_map.items():
+        for word, replacement in filtered_map.items():
             pattern = r'\b' + re.escape(word) + r'\b'
             cleaned = re.sub(pattern, replacement, cleaned, flags=re.IGNORECASE)
 
@@ -1026,29 +1135,16 @@ def _reformat_tech_terminology(text):
 
 def _enforce_phrasing_pauses(text):
     """
-    Phase 2 Rule 1: Enforce phrasing pauses & emphasis at text level.
-    Insert pause markers that TTS engines can interpret.
+    Phase 2 Rule 1: Enforce phrasing pauses at sentence boundaries.
+    Only adds pauses at sentence endings (., ?, !) — NOT after every
+    comma, colon, or semicolon, which was causing stuttering/run-on feel.
     """
-    # 1. Mandatory 150-250ms pause at sentence boundaries (., ?, !)
+    # 1. Mandatory pause at sentence boundaries (., ?, !) only
     # We use ... (ellipsis) which TTS engines typically render as a pause
-    text = re.sub(r'([.!?])\s+', r'\1... ', text)
+    text = re.sub(r'([.!?])\s+', r'\1 ... ', text)
     
-    # 2. High-urgency keywords: add padding markers (50ms before/after)
-    # Using special markers that TTS can interpret
-    urgency_words = ['URGENT', 'NOW', 'CRITICAL', 'IMMEDIATE', 'WARNING', 'ALERT', 'STOP', 'DANGER']
-    for word in urgency_words:
-        # Add pause markers before and after
-        pattern = r'\b(' + word + r')\b'
-        text = re.sub(pattern, r'... \1 ...', text, flags=re.IGNORECASE)
-    
-    # 3. Add pauses after colons and semicolons for clause separation
-    text = re.sub(r'([;:])\s+', r'\1... ', text)
-    
-    # 4. Add pauses around commas in long sentences (but not in numbers)
-    # This helps with pacing in technical explanations
-    text = re.sub(r'(\d+),\s*(\d+)', r'\1,\2', text)  # Keep numbers like 1,000 intact
-    # Add slight pause after commas that aren't in numbers
-    text = re.sub(r'(?<!\d),\s+(?!\d)', ', ... ', text)
+    # 2. DON'T add pauses after commas, colons, semicolons — the TTS engine
+    # handles these naturally. Over-adding "..." was causing stuttering.
     
     return text
 
