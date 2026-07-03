@@ -188,9 +188,70 @@ def trigger_kaggle_gpu_job(script_data, custom_map):
     # 4. Download Results
     print("📥 Downloading results from Kaggle...")
     output_dir = "output"
+    os.makedirs(output_dir, exist_ok=True)
+    
+    download_success = False
+    
+    # Strategy 1: Try CLI command (works with kaggle<=1.6.x)
     try:
         subprocess.run([kaggle_cmd, "kernels", "output", kernel_id, "-p", output_dir], check=True, timeout=120)
+        download_success = True
+    except Exception as cli_err:
+        print(f"⚠️ CLI download failed: {cli_err}")
+        print("🔄 Retrying download via Kaggle Python API...")
         
+        # Strategy 2: Use the Kaggle Python API directly (handles both dict and object responses)
+        try:
+            from kaggle.api.kaggle_api_extended import KaggleApi
+            api = KaggleApi()
+            api.authenticate()
+            
+            # kernels_output returns (result, token) — result is a list of output file objects
+            result_files, _ = api.kernels_output(kernel_id, output_dir, force=True, quiet=False)
+            download_success = True
+            print(f"✅ Downloaded {len(result_files) if result_files else 0} output files via Python API.")
+        except TypeError as te:
+            # Handle the 'ApiKernelSessionOutputFile' not subscriptable error
+            # by using the lower-level API with manual file download
+            print(f"⚠️ Python API also hit TypeError: {te}")
+            print("🔄 Attempting manual download via Kaggle API...")
+            try:
+                from kaggle.api.kaggle_api_extended import KaggleApi
+                api = KaggleApi()
+                api.authenticate()
+                
+                # Use the raw API call and handle response objects with attribute access
+                owner_slug, kernel_slug = kernel_id.split("/")
+                response = api.process_response(
+                    api.kernel_output_with_http_info(owner_slug, kernel_slug)
+                )
+                
+                # Download each file manually
+                files_list = response.get("files", []) if isinstance(response, dict) else getattr(response, "files", [])
+                for item in files_list:
+                    file_name = item["fileName"] if isinstance(item, dict) else getattr(item, "file_name", getattr(item, "fileName", None))
+                    if file_name:
+                        download_url = item.get("url", "") if isinstance(item, dict) else getattr(item, "url", "")
+                        if download_url:
+                            import urllib.request
+                            dest_path = os.path.join(output_dir, file_name)
+                            urllib.request.urlretrieve(download_url, dest_path)
+                            print(f"  📁 Downloaded: {file_name}")
+                
+                download_success = True
+            except Exception as manual_err:
+                print(f"❌ Manual download also failed: {manual_err}")
+        except Exception as api_err:
+            print(f"❌ Python API download failed: {api_err}")
+    
+    if not download_success:
+        msg = f"Failed to download Kaggle results after all retry strategies."
+        print(f"❌ {msg}")
+        _notify_kaggle_failure(f"🚨 Kaggle Download Failed\n\n{msg}")
+        return {"error": "download_failed", "message": msg}
+    
+    # Parse the downloaded results
+    try:
         results_file = os.path.join(output_dir, "results.json")
         if os.path.exists(results_file):
             with open(results_file, "r") as f:
@@ -209,7 +270,8 @@ def trigger_kaggle_gpu_job(script_data, custom_map):
             _notify_kaggle_failure(f"🚨 Kaggle Results Missing\n\n{msg}")
             return {"error": "download_failed", "message": msg}
     except Exception as e:
-        msg = f"Failed to download/process Kaggle results: {e}"
+        msg = f"Failed to process Kaggle results: {e}"
         print(f"❌ {msg}")
-        _notify_kaggle_failure(f"🚨 Kaggle Download Failed\n\n{msg}")
+        _notify_kaggle_failure(f"🚨 Kaggle Results Processing Failed\n\n{msg}")
         return {"error": "download_failed", "message": msg}
+

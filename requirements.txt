@@ -92,7 +92,7 @@ websockets==15.0.1
 yarl==1.22.0
 pydub
 tqdm
-kaggle==1.7.4
+kaggle==1.6.17
 stable-ts
 torch
 torchvision
