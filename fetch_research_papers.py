@@ -1,7 +1,11 @@
 import re
 import random
+import time
 import requests
 import feedparser
+import urllib.request
+import urllib.parse
+import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta, timezone
 from bs4 import BeautifulSoup
 from config import NEWS_API_KEY
@@ -305,15 +309,66 @@ def fetch_reddit_news(hours=24):
     print(f"✅ Reddit Search: Retrieved {len(news_items)} posts from the last {hours} hours.")
     return news_items
 
+def _fetch_xcom_via_google_news():
+    """
+    Fallback: Query Google News RSS for viral AI tweets from X.com
+    when the X.com API is unavailable (credits depleted, rate limited, etc.)
+    """
+    print("  🔍 X.com Fallback: Querying Google News RSS for viral AI tweets...")
+    articles = []
+    
+    queries = [
+        "site:x.com AI artificial intelligence",
+        "site:x.com LLM machine learning viral",
+        "site:x.com OpenAI Google DeepMind",
+    ]
+    
+    for query in queries:
+        try:
+            url = f"https://news.google.com/rss/search?q={urllib.parse.quote(query)}&hl=en&gl=US&ceid=US:en"
+            headers = {'User-Agent': 'Mozilla/5.0'}
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=10) as response:
+                xml_data = response.read()
+                
+            root = ET.fromstring(xml_data)
+            items = root.findall('.//item')
+            
+            for item in items[:3]:  # Top 3 per query
+                title = item.find('title').text or ""
+                title_clean = re.sub(r'\s+-\s+.*$', '', title).strip()
+                link = item.find('link').text or ""
+                pub_date = item.find('pubDate').text or ""
+                
+                articles.append({
+                    "title": title_clean,
+                    "description": f"Google News indexed tweet: {title_clean}",
+                    "source": {"name": "X.com (via News)"},
+                    "url": link,
+                    "urlToImage": "",
+                    "publishedAt": pub_date,
+                    "type": "trending"
+                })
+        except Exception as e:
+            print(f"  ⚠️ X.com News fallback query failed: {e}")
+    
+    if articles:
+        print(f"  ✅ X.com Fallback: Retrieved {len(articles)} topics via Google News.")
+    else:
+        print(f"  ⚠️ X.com Fallback: No results from Google News.")
+    return articles
+
+
 def fetch_x_trending_ai_topics():
     """
     Fetches trending AI topics from X.com (Twitter) using the search recent API v2.
     Sorts by engagement to return the most popular/viral tweets on AI.
+    Falls back to Google News RSS if API credits are depleted.
     """
     from config import X_BEARER_TOKEN
     if not X_BEARER_TOKEN or "XXX" in X_BEARER_TOKEN or not X_BEARER_TOKEN.strip():
-        print("⚠️ X.com Bearer Token missing. Skipping X trending fetch.")
-        return []
+        print("⚠️ X.com Bearer Token missing. Trying Google News fallback...")
+        return _fetch_xcom_via_google_news()
         
     print("📡 Fetching viral trending AI topics from X.com...")
     url = "https://api.twitter.com/2/tweets/search/recent"
@@ -337,10 +392,12 @@ def fetch_x_trending_ai_topics():
         response = requests.get(url, params=params, headers=headers, timeout=25)
         if response.status_code != 200:
             if response.status_code == 402:
-                print("⚠️ X.com API Error (HTTP 402): Credits Depleted. Skipping X.com fetch.")
+                print("⚠️ X.com API Error (HTTP 402): Credits Depleted. Falling back to Google News RSS...")
+            elif response.status_code == 429:
+                print("⚠️ X.com API Error (HTTP 429): Rate Limited. Falling back to Google News RSS...")
             else:
-                print(f"⚠️ X.com API Error (HTTP {response.status_code}): {response.text}")
-            return []
+                print(f"⚠️ X.com API Error (HTTP {response.status_code}): {response.text[:200]}. Falling back to Google News RSS...")
+            return _fetch_xcom_via_google_news()
             
         data = response.json()
         tweets = data.get("data", [])
@@ -379,5 +436,6 @@ def fetch_x_trending_ai_topics():
         print(f"✅ X.com Search: Retrieved {len(articles)} viral AI topics.")
         return articles
     except Exception as e:
-        print(f"⚠️ X.com Search fetch failed: {e}")
-        return []
+        print(f"⚠️ X.com Search fetch failed: {e}. Trying Google News fallback...")
+        return _fetch_xcom_via_google_news()
+

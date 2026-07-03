@@ -200,7 +200,7 @@ def run_pipeline(topic_type="auto", dry_run=False):
     if topic_type == "auto":
         topic_type = get_next_topic_type_by_ratio()
     target_country = get_next_target_country()
-    log_message(f"=== STARTING DAILY DAILY AI PIPIELINE ({topic_type.upper()}) | COUNTRY: {target_country} ===")
+    log_message(f"=== STARTING DAILY AI PIPELINE ({topic_type.upper()}) | COUNTRY: {target_country} ===")
 
     # ── Clean output folder before starting ───────────────────────────────────
     if os.path.exists(OUTPUT_DIR):

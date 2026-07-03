@@ -154,6 +154,7 @@ jobs:
           FAL_KEY: ${{ secrets.FAL_KEY }}
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+          ORT_LOG_LEVEL: ERROR  # Suppress harmless ONNX Runtime PCI bus warnings
         run: |
           python -u main.py --now --type vaibhav
         

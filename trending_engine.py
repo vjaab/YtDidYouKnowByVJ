@@ -178,6 +178,7 @@ def fetch_reddit_via_google_news(sub):
     """
     Fallback: Query Google News RSS for hot posts in a specific subreddit
     since GHA IPs are blocked by Reddit directly.
+    Engagement values are estimated baselines (not real), flagged accordingly.
     """
     import urllib.parse
     import xml.etree.ElementTree as ET
@@ -203,7 +204,7 @@ def fetch_reddit_via_google_news(sub):
             link = item.find('link').text or ""
             pub_date = item.find('pubDate').text or ""
             
-            # Mock engagement values since they are not in the RSS
+            # Low baseline engagement — flagged as estimated so scoring can penalize
             articles.append({
                 "title": title_clean,
                 "description": f"Google News indexed post from r/{sub}: {title_clean}",
@@ -213,11 +214,12 @@ def fetch_reddit_via_google_news(sub):
                 "publishedAt": pub_date,
                 "type": "reddit_trending",
                 "_engagement": {
-                    "upvotes": 120,
-                    "comments": 25,
-                    "upvote_ratio": 0.9,
-                    "upvote_velocity": 8.0,
-                    "age_hours": 12.0
+                    "upvotes": 10,
+                    "comments": 2,
+                    "upvote_ratio": 0.7,
+                    "upvote_velocity": 1.0,
+                    "age_hours": 24.0,
+                    "engagement_estimated": True
                 }
             })
     except Exception as e:
@@ -816,6 +818,10 @@ def compute_engagement_score(article):
     if art_type in niche_sources:
         score += TRENDING_NICHE_BIAS * 15
     
+    # Penalize estimated engagement (e.g. Google News RSS fallback for Reddit)
+    if eng.get("engagement_estimated"):
+        score = int(score * 0.4)
+    
     return min(100, score)
 
 
@@ -873,6 +879,7 @@ def fetch_all_trending_signals(target_country="US"):
     # Summary
     yt_count = sum(1 for a in all_articles if a.get("type") == "youtube_trending")
     reddit_count = sum(1 for a in all_articles if a.get("type") == "reddit_trending")
+    reddit_estimated = sum(1 for a in all_articles if a.get("type") == "reddit_trending" and a.get("_engagement", {}).get("engagement_estimated"))
     github_count = sum(1 for a in all_articles if a.get("type") == "github_trending")
     gt_count = sum(1 for a in all_articles if a.get("type") == "google_trends")
     yo_count = sum(1 for a in all_articles if a.get("type") == "youtube_outliers")
@@ -883,5 +890,26 @@ def fetch_all_trending_signals(target_country="US"):
     if all_articles:
         top = all_articles[0]
         print(f"   🏆 Top Signal: '{top['title'][:60]}...' (Score: {top.get('_engagement_score', 0)})")
+    
+    # ── Data Source Health Dashboard ──────────────────────────────────────
+    yt_status = "✅ Active" if yt_count > 0 else "❌ Offline (YOUTUBE_DATA_API_KEY missing?)"
+    reddit_native = reddit_count - reddit_estimated
+    if reddit_native > 0:
+        reddit_status = "✅ Active"
+    elif reddit_estimated > 0:
+        reddit_status = f"⚠️ Degraded (fallback only, {reddit_estimated} estimated)"
+    else:
+        reddit_status = "❌ Offline (REDDIT_CLIENT_ID/SECRET missing?)"
+    github_status = "✅ Active" if github_count > 0 else "⚠️ No results"
+    gt_status = "✅ Active" if gt_count > 0 else "⚠️ No results"
+    yo_status = "✅ Active" if yo_count > 0 else "⚠️ No results"
+    
+    active_count = sum(1 for s in [yt_status, reddit_status, github_status, gt_status, yo_status] if s.startswith("✅"))
+    print(f"\n🏥 Data Source Health: {active_count}/5 sources fully active")
+    print(f"   YouTube Trending : {yt_status}")
+    print(f"   Reddit           : {reddit_status}")
+    print(f"   GitHub            : {github_status}")
+    print(f"   Google Trends     : {gt_status}")
+    print(f"   YouTube Outliers  : {yo_status}")
     
     return all_articles
