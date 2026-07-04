@@ -590,6 +590,7 @@ PHONETIC_DICT = {
     "phenotype": "fee-noh-type",
     "clandestine": "klan-des-tin",
     "surveillance": "sur-vay-lents",
+    "anonymous": "uh-non-ih-mus",
     "clandestinely": "klan-des-tin-lee",
     "reconnaissance": "ree-kon-uh-sents",
     "idiosyncrasy": "id-ee-oh-sin-kruh-see",

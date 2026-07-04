@@ -332,34 +332,42 @@ def _remove_vocal_artifacts(wav_path, word_timestamps, text):
         ("tatas", 0.15, 0.4),   # "tatas" artifact ~150-400ms
         ("tat a", 0.15, 0.4),   # split "tatas"
         ("ta tas", 0.15, 0.4),  # split "tatas"
-        ("uh", 0.08, 0.3),      # "uh" filler ~80-300ms
-        ("um", 0.08, 0.3),      # "um" filler
-        ("eh", 0.05, 0.25),     # "eh" filler
-        ("ah", 0.05, 0.25),     # "ah" filler
-        ("er", 0.05, 0.2),      # "er" filler
-        ("hmm", 0.1, 0.4),      # "hmm" filler
     ]
     
     # Use word timestamps to find suspicious short segments
     cleaned_timestamps = []
+    accumulated_shift = 0.0
+    
+    unconditional_fillers = {
+        "uh", "um", "eh", "ah", "er", "hmm", "uhh", "umm", "uhhh", "ummm"
+    }
+    
     for i, wt in enumerate(word_timestamps):
-        word = wt["word"].lower().strip()
+        word = wt["word"].lower().strip().strip(".,?!:;-\"'_")
         duration = wt["end"] - wt["start"]
         
         is_artifact = False
-        for pattern, min_dur, max_dur in artifact_patterns:
-            if pattern in word and min_dur <= duration <= max_dur:
-                # Check if this word is isolated (surrounded by longer words)
-                prev_dur = word_timestamps[i-1]["end"] - word_timestamps[i-1]["start"] if i > 0 else 0
-                next_dur = word_timestamps[i+1]["end"] - word_timestamps[i+1]["start"] if i < len(word_timestamps)-1 else 0
-                
-                # More aggressive detection: if surrounded by real words (>0.25s) and this is short (<0.4s)
-                if (prev_dur > 0.25 or next_dur > 0.25) and duration < 0.4:
-                    is_artifact = True
-                    artifacts_removed.append((wt["start"], wt["end"], word))
-                    break
         
-        # Also detect: any very short word (<0.15s) that's not a common short word
+        # 1. Unconditional filler word check
+        if word in unconditional_fillers:
+            is_artifact = True
+            artifacts_removed.append((wt["start"], wt["end"], wt["word"]))
+        
+        # 2. Check other artifact patterns with duration constraints (e.g. "tatas")
+        if not is_artifact:
+            for pattern, min_dur, max_dur in artifact_patterns:
+                if pattern in word and min_dur <= duration <= max_dur:
+                    # Check if this word is isolated (surrounded by longer words)
+                    prev_dur = word_timestamps[i-1]["end"] - word_timestamps[i-1]["start"] if i > 0 else 0
+                    next_dur = word_timestamps[i+1]["end"] - word_timestamps[i+1]["start"] if i < len(word_timestamps)-1 else 0
+                    
+                    # More aggressive detection: if surrounded by real words (>0.25s) and this is short (<0.4s)
+                    if (prev_dur > 0.25 or next_dur > 0.25) and duration < 0.4:
+                        is_artifact = True
+                        artifacts_removed.append((wt["start"], wt["end"], wt["word"]))
+                        break
+        
+        # 3. Also detect: any very short word (<0.15s) that's not a common short word
         common_short = {"a", "i", "in", "on", "at", "to", "of", "the", "and", "or", "but", "for", "as", "is", "it", "he", "she", "we", "you", "my", "me", "by", "do", "go", "no", "so", "up", "us"}
         if not is_artifact and duration < 0.15 and word not in common_short:
             # Check if surrounded by normal words
@@ -367,10 +375,16 @@ def _remove_vocal_artifacts(wav_path, word_timestamps, text):
             next_dur = word_timestamps[i+1]["end"] - word_timestamps[i+1]["start"] if i < len(word_timestamps)-1 else 0
             if prev_dur > 0.2 and next_dur > 0.2:
                 is_artifact = True
-                artifacts_removed.append((wt["start"], wt["end"], word))
+                artifacts_removed.append((wt["start"], wt["end"], wt["word"]))
         
-        if not is_artifact:
-            cleaned_timestamps.append(wt)
+        if is_artifact:
+            # Shift all subsequent word timestamps by this removed segment's duration
+            accumulated_shift += duration
+        else:
+            shifted_wt = wt.copy()
+            shifted_wt["start"] = max(0.0, round(wt["start"] - accumulated_shift, 3))
+            shifted_wt["end"] = max(0.0, round(wt["end"] - accumulated_shift, 3))
+            cleaned_timestamps.append(shifted_wt)
     
     if artifacts_removed:
         print(f"   🧹 Removed {len(artifacts_removed)} vocal artifacts: {[a[2] for a in artifacts_removed]}")
@@ -395,7 +409,7 @@ def _remove_vocal_artifacts(wav_path, word_timestamps, text):
             if len(before) > fade_ms and len(after) > fade_ms:
                 before = before.fade_out(fade_ms)
                 after = after.fade_in(fade_ms)
-                audio = before + after
+            audio = before + after
     
     audio.export(wav_path, format="wav")
     return cleaned_timestamps if artifacts_removed else word_timestamps
@@ -802,6 +816,17 @@ def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
     # ── PHASE 0: SANITIZE LLM ARTIFACTS ────────────────────────────────────
     cleaned = sanitize_script_for_tts(text)
     
+    # ── PHASE 0.5: TRANSITIONS & GRAMMAR CLEANUP ───────────────────────────
+    # 1. Replace settings path chevrons/arrows with a natural spoken transition
+    # Matches '->', '=>', '→', '>>', '›', '»', or single '>'
+    cleaned = re.sub(r'\s*(?:->|=>|→|>\s*>|›|»)\s*', ' ... then ', cleaned)
+    cleaned = re.sub(r'\s*>\s*', ' ... then ', cleaned)
+
+    # 2. Fix common grammar/stutter patterns in generated script text
+    cleaned = re.sub(r'\bprivacy vulnerable\b', 'privacy vulnerability', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\bprivacy b now\b', 'privacy now', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\bb now\b', 'now', cleaned, flags=re.IGNORECASE)
+    
     # ── PHASE 1: TEXT SCRIPT PRE-PROCESSING & CLEANUP ──────────────────────
     
     # 1. Broadly remove ALL bracketed and parenthesized meta-instructions/timestamps
@@ -1154,8 +1179,9 @@ def _enforce_phrasing_pauses(text):
     comma, colon, or semicolon, which was causing stuttering/run-on feel.
     """
     # 1. Mandatory pause at sentence boundaries (., ?, !) only
-    # We use ... (ellipsis) which TTS engines typically render as a pause
-    text = re.sub(r'([.!?])\s+', r'\1 ... ', text)
+    # We use ... (ellipsis) which TTS engines typically render as a pause.
+    # Exclude dots that are part of an ellipsis '...' to prevent duplication.
+    text = re.sub(r'(?<!\.)([!?]|\.(?!\.))\s+', r'\1 ... ', text)
     
     # 2. DON'T add pauses after commas, colons, semicolons — the TTS engine
     # handles these naturally. Over-adding "..." was causing stuttering.
