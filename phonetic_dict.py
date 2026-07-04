@@ -59,7 +59,8 @@ PHONETIC_DICT = {
     # ─── AI / MACHINE LEARNING ────────────────────────────────────────────────
     "AI": "A-I",
     "OpenAI": "Open-A-I",
-    "Anthropic": "An-throp-ick",
+    "Anthropic": "Ann-throw-pick",
+    "Anthropic's": "Ann-throw-picks",
     "Claude": "Clod",
     "Gemini": "Jem-in-eye",
     "Gemini's": "Jem-in-eye's",

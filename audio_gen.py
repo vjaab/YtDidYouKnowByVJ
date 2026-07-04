@@ -375,10 +375,16 @@ def _remove_vocal_artifacts(wav_path, word_timestamps, text):
     if artifacts_removed:
         print(f"   🧹 Removed {len(artifacts_removed)} vocal artifacts: {[a[2] for a in artifacts_removed]}")
         
-        # Rebuild audio without artifact segments using crossfade
-        for start_s, end_s, word in artifacts_removed:
+        # Rebuild audio without artifact segments using crossfade.
+        # CRITICAL: Process in REVERSE order (last-to-first) so that each
+        # splice doesn't shift the byte positions of earlier artifacts.
+        for start_s, end_s, word in reversed(artifacts_removed):
             start_ms = int(start_s * 1000)
             end_ms = int(end_s * 1000)
+            
+            # Guard against positions that exceed current audio length
+            if start_ms >= len(audio) or end_ms > len(audio):
+                continue
             
             # Create a short crossfade bridge
             before = audio[:start_ms]
@@ -613,16 +619,24 @@ def _generate_f5_clone(text, output_path):
             file_wave=seg_path,
             nfe_step=64,
             remove_silence=True,
-            speed=1.08
+            speed=1.02
         )
         segment_paths.append(seg_path)
         
-    # Combine segments with 30ms cross-fade for seamless joins
-    CROSSFADE_MS = 30
-    combined = AudioSegment.from_wav(segment_paths[0]) if segment_paths else AudioSegment.empty()
-    for sp in segment_paths[1:]:
+    # Combine segments with 80ms cross-fade for seamless joins (was 30ms — too short,
+    # caused audible hard-cuts between sentence segments)
+    CROSSFADE_MS = 80
+    SEGMENT_FADE_MS = 15  # Per-segment fade to eliminate click artifacts at boundaries
+    combined = AudioSegment.empty()
+    for idx_sp, sp in enumerate(segment_paths):
         seg = AudioSegment.from_wav(sp)
-        combined = combined.append(seg, crossfade=CROSSFADE_MS)
+        # Apply per-segment fade-in/out to prevent click artifacts before crossfading
+        if len(seg) > SEGMENT_FADE_MS * 2:
+            seg = seg.fade_in(SEGMENT_FADE_MS).fade_out(SEGMENT_FADE_MS)
+        if idx_sp == 0:
+            combined = seg
+        else:
+            combined = combined.append(seg, crossfade=CROSSFADE_MS)
     
     # Clean up segment files
     for sp in segment_paths:
@@ -1149,6 +1163,148 @@ def _enforce_phrasing_pauses(text):
     return text
 
 
+def _sanitize_tts_symbols(text):
+    """
+    Pre-TTS cleanup: strips/replaces characters that trip up TTS engines
+    and cause glitchy audio artifacts. Runs just before TTS generation.
+    """
+    if not text:
+        return text
+    
+    cleaned = text
+    
+    # 1. Replace curly/smart quotes with straight quotes
+    cleaned = cleaned.replace('\u201c', '"').replace('\u201d', '"')  # \u201c\u201d \u2192 ""
+    cleaned = cleaned.replace('\u2018', "'").replace('\u2019', "'")  # \u2018\u2019 \u2192 ''
+    
+    # 2. Remove URLs (TTS reads them character by character)
+    cleaned = re.sub(r'https?://\S+', '', cleaned)
+    cleaned = re.sub(r'www\.\S+', '', cleaned)
+    
+    # 3. Remove leftover markdown links [text](url) \u2192 text
+    cleaned = re.sub(r'\[([^\]]+)\]\([^)]*\)', r'\1', cleaned)
+    
+    # 4. Replace excessive ellipsis (4+) with single pause marker
+    cleaned = re.sub(r'\.{4,}', '...', cleaned)
+    
+    # 5. Remove inline em/en dashes that aren't already converted
+    #    (these cause "dash" to be spoken)
+    cleaned = re.sub(r'\s*[\u2013\u2014]\s*', ' ... ', cleaned)
+    
+    # 6. Remove stray special characters that cause glitches
+    cleaned = re.sub(r'[\u2022\u2023\u25aa\u25cf\u2043]', ' ', cleaned)  # bullet chars
+    cleaned = re.sub(r'[\u00ab\u00bb\u2039\u203a]', '', cleaned)  # guillemets
+    cleaned = re.sub(r'[\u200b\u200c\u200d\ufeff]', '', cleaned)  # zero-width chars
+    
+    # 7. Clean up resulting whitespace
+    cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+    
+    return cleaned
+
+
+def _inject_context_pauses(audio_path, word_timestamps):
+    """
+    Post-generation silence injection at major context shifts.
+    Inserts deterministic pauses AFTER TTS generation to give the audience
+    time to digest information. Updates word timestamps to stay in sync.
+    
+    Pauses:
+    - 150ms after sentence-ending words (. ! ?)
+    - 250ms after major context shifts (But, However, Now, Here's, So, etc.)
+    """
+    from pydub import AudioSegment
+    
+    try:
+        audio = AudioSegment.from_file(audio_path)
+        
+        # Context shift markers - words that typically start a new major point
+        CONTEXT_SHIFT_WORDS = {
+            'but', 'however', 'now', "here's", 'so', 'meanwhile',
+            'instead', 'yet', 'still', 'actually', 'seriously',
+            'basically', 'look', 'think', 'imagine', 'remember',
+            'worse', 'better', 'first', 'second', 'finally',
+            'why', 'how', 'what', 'the',
+        }
+        
+        SENTENCE_PAUSE_MS = 150
+        CONTEXT_PAUSE_MS = 250
+        
+        # Build list of pause insertions: (position_ms, pause_duration_ms)
+        insertions = []
+        
+        for i, wt in enumerate(word_timestamps):
+            word_raw = wt['word'].strip()
+            end_ms = int(wt['end'] * 1000)
+            
+            # Check if this word ends a sentence
+            is_sentence_end = bool(re.search(r'[.!?]$', word_raw))
+            
+            if is_sentence_end and i < len(word_timestamps) - 1:
+                # Check if the NEXT word is a context shift marker
+                next_word = word_timestamps[i + 1]['word'].strip().lower().rstrip('.,!?;:')
+                
+                if next_word in CONTEXT_SHIFT_WORDS:
+                    insertions.append((end_ms, CONTEXT_PAUSE_MS))
+                else:
+                    insertions.append((end_ms, SENTENCE_PAUSE_MS))
+        
+        if not insertions:
+            return len(audio) / 1000.0, word_timestamps
+        
+        # Build new audio with pauses inserted (process front-to-back)
+        new_audio = AudioSegment.empty()
+        prev_end = 0
+        cumulative_shift_ms = 0
+        new_timestamps = [dict(wt) for wt in word_timestamps]  # deep copy
+        
+        # Track which insertion we need to process next
+        insert_idx = 0
+        
+        for i, wt in enumerate(new_timestamps):
+            orig_end_ms = int(word_timestamps[i]['end'] * 1000)
+            
+            # Shift this word's timestamps by cumulative pause added so far
+            wt['start'] = round((word_timestamps[i]['start'] * 1000 + cumulative_shift_ms) / 1000.0, 3)
+            wt['end'] = round((word_timestamps[i]['end'] * 1000 + cumulative_shift_ms) / 1000.0, 3)
+            
+            # Check if we need to insert a pause after this word
+            if insert_idx < len(insertions):
+                target_pos_ms = insertions[insert_idx][0]
+                pause_ms = insertions[insert_idx][1]
+                
+                # Match by original end position
+                if abs(orig_end_ms - target_pos_ms) < 50:
+                    # Add audio up to this point
+                    new_audio += audio[prev_end:orig_end_ms]
+                    # Add the pause
+                    new_audio += AudioSegment.silent(duration=pause_ms)
+                    prev_end = orig_end_ms
+                    cumulative_shift_ms += pause_ms
+                    insert_idx += 1
+        
+        # Add remaining audio
+        if prev_end < len(audio):
+            new_audio += audio[prev_end:]
+        
+        new_audio.export(audio_path, format='wav' if audio_path.endswith('.wav') else 'mp3')
+        new_duration = len(new_audio) / 1000.0
+        
+        print(f"   \u23f8\ufe0f Context pauses injected: {len(insertions)} pauses "
+              f"({sum(p[1] for p in insertions)}ms total). "
+              f"Duration: {len(audio)/1000.0:.2f}s \u2192 {new_duration:.2f}s")
+        
+        return new_duration, new_timestamps
+        
+    except Exception as e:
+        print(f"   \u26a0\ufe0f Context pause injection failed: {e}")
+        import traceback
+        traceback.print_exc()
+        try:
+            return len(AudioSegment.from_file(audio_path)) / 1000.0, word_timestamps
+        except Exception:
+            return 0, word_timestamps
+
+
 def apply_audio_pacing(audio_path, word_timestamps):
     """
     Phase 2 Rule 2: Prevent coda accordioning & track clipping.
@@ -1380,6 +1536,8 @@ def generate_voiceover(text, custom_phonetic_map=None, api_key=None):
     while iterations <= max_iters:
         # 1. ACT: Generate Audio
         text_to_speak = clean_tts_text(text, phonetic=True, custom_phonetic_map=current_phonetic_map)
+        # Pre-TTS symbol sanitization to prevent glitchy artifacts
+        text_to_speak = _sanitize_tts_symbols(text_to_speak)
         print(f"🎙️ [AUDIO LOOP] Act: Generating iteration {iterations}...")
         
         path, dur, word_timestamps = None, 0, []
@@ -1421,6 +1579,9 @@ def generate_voiceover(text, custom_phonetic_map=None, api_key=None):
             
             # Phase 2: Apply audio pacing & clipping management
             dur, word_timestamps = apply_audio_pacing(path, word_timestamps)
+            
+            # Phase 3: Inject context-shift pauses for natural breathing room
+            dur, word_timestamps = _inject_context_pauses(path, word_timestamps)
 
         # 2. OBSERVE & CRITIQUE
         if api_key and iterations < max_iters:
