@@ -152,7 +152,7 @@ def _fallback_build_chunks(word_timestamps, subtitle_chunks=None):
                 
             if best_sc:
                 # Copy visual metadata keys
-                for key in ["pexels_primary", "pexels_fallback", "nano_visual_prompt", "scene_objective", "visual_type"]:
+                for key in ["pexels_primary", "pexels_fallback", "nano_visual_prompt", "scene_objective", "visual_type", "is_setting_chunk", "has_infographic", "infographic_type", "infographic_data"]:
                     if key in best_sc:
                         fc[key] = best_sc[key]
 

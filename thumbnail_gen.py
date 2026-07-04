@@ -39,7 +39,10 @@ _fcache = {}
 def _load_font(size, weight="black"):
     key = (size, weight)
     if key not in _fcache:
-        candidates = [FONT_BLACK, FONT_EXTRABOLD] + FALLBACKS
+        if weight == "extrabold":
+            candidates = [FONT_EXTRABOLD, FONT_BLACK] + FALLBACKS
+        else:
+            candidates = [FONT_BLACK, FONT_EXTRABOLD] + FALLBACKS
         for p in candidates:
             if os.path.exists(p):
                 try:
@@ -56,9 +59,18 @@ def _text_size(text, font):
 
 # ── AI AGENTS ─────────────────────────────────────────────────────────────────
 
-def _generate_hook_text(title, client):
+def _generate_hook_text(title, client, is_shorts=False):
     """Generates a high-click-through curiosity gap hook."""
-    prompt = f"""You are a viral YouTube thumbnail copywriter. 
+    if is_shorts:
+        prompt = f"""You are a viral YouTube Short thumbnail designer.
+Generate an extremely short, high-impact curiosity value proposition or alert message in ALL CAPS for a mobile vertical thumbnail about: "{title}".
+RULES:
+1. Max 3 words, ALL CAPS.
+2. Extremely punchy, viral and dramatic (e.g. "TURN OFF NOW", "DON'T TRUST IT", "DO THIS NOW", "HIDDEN MENU").
+3. Use \\n for line breaks between words to stack them vertically.
+Return ONLY the raw words. No quotes, no preamble."""
+    else:
+        prompt = f"""You are a viral YouTube thumbnail copywriter. 
 Generate a SHORT, punchy curiosity gap hook for this topic: "{title}"
 RULES: Max 8 words, emotional, curiosity-gap style, end with "...". 
 Use \\n for line breaks (max 3 lines). 
@@ -67,17 +79,23 @@ Return ONLY the text."""
     try:
         response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
         hook = response.text.strip().replace("\\n", "\n")
+        if is_shorts:
+            hook = "\n".join(w.strip().upper() for w in hook.split("\n") if w.strip())
+            return "\n".join(hook.split("\n")[:3])
         return "\n".join(hook.split("\n")[:3])
     except:
+        if is_shorts:
+            return "WARNING!"
         return title[:20] + "..."
 
 def _generate_imagen_background(title, client):
     """Generates a thematic tech background using Imagen-3."""
     print(f"🎨 Generating Premium Imagen background for: {title}")
     prompt = (
-        f"A high-authority, cinematic tech background for: {title}. "
-        "Dark tech aesthetic, glowing neon accents, cybernetic data lines, 8k resolution. "
-        "No text, no humans, clean composition. High contrast."
+        f"A cinematic high-contrast YouTube thumbnail background about: {title}. "
+        "Must feature a shocked expressive tech creator pointing, alongside a stylized generic app icon or tech symbol (such as a lock, gear, alert warning emblem, or app glyph). "
+        "Strictly avoid any copyrighted brand logos, trademarks, or company marks (like Apple, GitHub, OpenAI, WhatsApp). "
+        "Dark cyberpunk noir mood, dramatic studio neon lighting, high contrast, 8k resolution, clean composition, no text."
     )
     try:
         response = client.models.generate_images(
@@ -540,16 +558,17 @@ def _render_premium_thumbnail(hook_text, bg_img, avatar_img, accent_color, width
 
     # 3. Render Hook Text (Curiosity Gap) with Figma blocks & high-contrast colors
     lines = hook_text.split("\n")
-    font_size = 90 if not is_shorts else 110
-    font = _load_font(font_size, "black")
+    font_size = 90 if not is_shorts else 125
+    font = _load_font(font_size, "extrabold" if is_shorts else "black")
     
     # Calculate height considering badge padding
     total_h = sum(_text_size(l, font)[1] for l in lines) + 40 * (len(lines)-1)
-    y = (height - total_h) // 2 if not is_shorts else height // 2
+    y = (height - total_h) // 2 if not is_shorts else height // 2 - (total_h // 2)
     x = 80 if not is_shorts else 60
     
     for idx, line in enumerate(lines):
         lw, lh = _text_size(line, font)
+        cur_x = x if not is_shorts else (width - lw) // 2
         
         # Multi-color strategy: First line clean white, emphasis lines are the neon accent color
         if idx == 0:
@@ -561,9 +580,9 @@ def _render_premium_thumbnail(hook_text, bg_img, avatar_img, accent_color, width
         box_padding_x = 25
         box_padding_y = 12
         box_coords = [
-            x - box_padding_x,
+            cur_x - box_padding_x,
             y - box_padding_y,
-            x + lw + box_padding_x,
+            cur_x + lw + box_padding_x,
             y + lh + box_padding_y
         ]
         
@@ -576,9 +595,9 @@ def _render_premium_thumbnail(hook_text, bg_img, avatar_img, accent_color, width
         
         # Professional multi-pass drop shadow behind text
         for offset in range(1, 6):
-            draw.text((x+offset, y+offset), line, font=font, fill=(0, 0, 0, 140))
+            draw.text((cur_x+offset, y+offset), line, font=font, fill=(0, 0, 0, 140))
         
-        draw.text((x, y), line, font=font, fill=txt_color)
+        draw.text((cur_x, y), line, font=font, fill=txt_color)
         y += lh + 45
         
     # 4. Branding Accent
@@ -766,19 +785,21 @@ def generate_thumbnail(script_json):
         # Determine Hook Text
         if custom_hook:
             print("📝 Using custom hook text from script_json...")
-            hook = custom_hook.replace("\\n", "\n")
+            hook_yt = custom_hook.replace("\\n", "\n")
+            hook_shorts = custom_hook.replace("\\n", "\n").upper()
         else:
-            hook = _generate_hook_text(title, client)
+            hook_yt = _generate_hook_text(title, client, is_shorts=False)
+            hook_shorts = _generate_hook_text(title, client, is_shorts=True)
             
         # YT (16:9)
         print("🎬 Rendering YouTube Thumbnail...")
-        yt = _render_premium_thumbnail(hook, bg, avatar, accent_rgb, THUMB_W, THUMB_H, script_json=script_json)
+        yt = _render_premium_thumbnail(hook_yt, bg, avatar, accent_rgb, THUMB_W, THUMB_H, script_json=script_json)
         yt.convert("RGB").save(out_yt, "JPEG", quality=95)
 
         # Shorts (9:16)
         print("🎬 Rendering Shorts Thumbnail...")
         bg_vert = bg.resize((SHORTS_W, SHORTS_H), Image.LANCZOS)
-        shorts = _render_premium_thumbnail(hook, bg_vert, avatar, accent_rgb, SHORTS_W, SHORTS_H, script_json=script_json, is_shorts=True)
+        shorts = _render_premium_thumbnail(hook_shorts, bg_vert, avatar, accent_rgb, SHORTS_W, SHORTS_H, script_json=script_json, is_shorts=True)
         shorts.convert("RGB").save(out_shorts, "JPEG", quality=95)
 
         print(f"✅ Premium Thumbnails Generated: {out_yt}")

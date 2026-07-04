@@ -767,6 +767,10 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
       "scene_objective": "What technical concept must be understood here",
       "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup",
       "nano_visual_prompt": "A highly specific, cinematic visual description for THIS sentence. Must depict the exact subject/entity/concept spoken in this sentence. Example: 'Satellite view of Earth at night showing glowing city lights and data center hotspots, cinematic 9:16, dark background'. NO TEXT in the image. NO faces of real people. Photorealistic, 8K.",
+      "is_setting_chunk": false,
+      "has_infographic": false,
+      "infographic_type": null,
+      "infographic_data": null,
       "on_screen_elements": ["labels/arrows/highlights/icons/charts/code"],
       "camera_motion": "Slow zoom|Dolly-in|Orbit|Pan|Tracking shot|None",
       "transition": "Match cut|Zoom transition|Morph|Swipe|Data stream transition|Neural network transition"
@@ -826,6 +830,10 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
       "scene_objective": "What technical concept must be understood here",
       "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup",
       "nano_visual_prompt": "A clean, specific visual for THIS sentence. Vertical 9:16. Photorealistic, 8K. NO text overlays.",
+      "is_setting_chunk": false,
+      "has_infographic": false,
+      "infographic_type": null,
+      "infographic_data": null,
       "on_screen_elements": ["labels/arrows/highlights/icons/charts/code"],
       "camera_motion": "Slow zoom|Dolly-in|Orbit|Pan|Tracking shot|None",
       "transition": "Match cut|Zoom transition|Morph|Swipe|Data stream transition|Neural network transition"
@@ -877,6 +885,10 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
       "scene_objective": "What technical concept must be understood here",
       "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup",
       "nano_visual_prompt": "A clean, specific visual for THIS sentence. Example: 'Close-up of a code editor showing a python script executing, dark mode, 9:16 vertical'. Photorealistic, 8K. NO text overlays.",
+      "is_setting_chunk": false,
+      "has_infographic": false,
+      "infographic_type": null,
+      "infographic_data": null,
       "on_screen_elements": ["labels/arrows/highlights/icons/charts/code"],
       "camera_motion": "Slow zoom|Dolly-in|Orbit|Pan|Tracking shot|None",
       "transition": "Match cut|Zoom transition|Morph|Swipe|Data stream transition|Neural network transition"
@@ -931,6 +943,10 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
       "scene_objective": "What technical concept must be understood here",
       "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup",
       "nano_visual_prompt": "A clean, specific visual for THIS sentence. Example: 'Close-up of an iPhone settings screen showing the hidden menu option highlighted, dark mode, 9:16 vertical'. Photorealistic, 8K. NO text overlays.",
+      "is_setting_chunk": false,
+      "has_infographic": false,
+      "infographic_type": null,
+      "infographic_data": null,
       "on_screen_elements": ["labels/arrows/highlights/icons/charts/code"],
       "camera_motion": "Slow zoom|Dolly-in|Orbit|Pan|Tracking shot|None",
       "transition": "Match cut|Zoom transition|Morph|Swipe|Data stream transition|Neural network transition"
@@ -985,6 +1001,10 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
       "scene_objective": "What technical concept must be understood here",
       "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup",
       "nano_visual_prompt": "A dramatic, cinematic visual for THIS sentence. Example: 'Close-up of a smartphone screen showing location tracking data, dark moody lighting, 9:16 vertical'. Photorealistic, 8K. NO text overlays.",
+      "is_setting_chunk": false,
+      "has_infographic": false,
+      "infographic_type": null,
+      "infographic_data": null,
       "on_screen_elements": ["labels/arrows/highlights/icons/charts/code"],
       "camera_motion": "Slow zoom|Dolly-in|Orbit|Pan|Tracking shot|None",
       "transition": "Match cut|Zoom transition|Morph|Swipe|Data stream transition|Neural network transition"
@@ -1039,6 +1059,10 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
       "scene_objective": "What technical concept must be understood here",
       "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup",
       "nano_visual_prompt": "A clean, specific visual for THIS sentence. Example: 'Split screen showing a free app vs expensive app side by side, clean modern UI, 9:16 vertical'. Photorealistic, 8K. NO text overlays.",
+      "is_setting_chunk": false,
+      "has_infographic": false,
+      "infographic_type": null,
+      "infographic_data": null,
       "on_screen_elements": ["labels/arrows/highlights/icons/charts/code"],
       "camera_motion": "Slow zoom|Dolly-in|Orbit|Pan|Tracking shot|None",
       "transition": "Match cut|Zoom transition|Morph|Swipe|Data stream transition|Neural network transition"
@@ -1057,6 +1081,22 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
     # Inject any extra instructions (e.g. screenshot avoidance, length adjustments) into context
     if extra_instruction:
         news_context += f"\n\nADDITIONAL INSTRUCTIONS:\n{extra_instruction}\n"
+
+    # Universally inject visual retention instructions
+    retention_instructions = (
+        "\nTo improve viewer retention, we support interactive on-screen settings toggles and infographic cards:\n"
+        "1. Setting Walkthroughs: If a chunk is actively demonstrating a step-by-step menu navigation, settings toggle change, or app option (e.g., turning off location/tracking permissions), set `\"is_setting_chunk\": true`. Otherwise, set it to `false`.\n"
+        "2. Infographics: If a chunk presents a dictionary definition, statistic/metrics, comparison, step process, or flowchart diagram, set `\"has_infographic\": true` and specify:\n"
+        "   - `\"infographic_type\"`: 'definition' | 'stat' | 'comparison' | 'process' | 'flowchart'\n"
+        "   - `\"infographic_data\"`: matching structure:\n"
+        "     - definition -> {\"term\": \"RAG\", \"definition\": \"Retrieval-Augmented Generation...\"}\n"
+        "     - stat -> {\"value\": \"$4.6B\", \"label\": \"OpenAI 2025 Revenue\"}\n"
+        "     - comparison -> {\"left_label\": \"GPT-4\", \"left_val\": \"128K ctx\", \"right_label\": \"GPT-5\", \"right_val\": \"1M ctx\"}\n"
+        "     - process -> {\"steps\": [\"Fetch\", \"Embed\", \"Retrieve\", \"Generate\"]}\n"
+        "     - flowchart -> {\"steps\": [\"Step A\", \"Step B\", \"Step C\"]}\n"
+        "   If no infographic is needed, set `\"has_infographic\": false`, `\"infographic_type\": null`, and `\"infographic_data\": null`."
+    )
+    selection_instruction += retention_instructions
 
     engine = MultiAgentGenerationEngine(client, news_context, slot, category, strategy_enhancement, is_longform, raw_articles=articles, topic_type=topic_type)
     script_data = engine.execute(selection_instruction, prompt_requirements)

@@ -1075,15 +1075,19 @@ def _pattern_interrupt_flash(accent_color, total_dur):
 
 # ── LAYER E2: Giant Hook Text (First 1.5s) ────────────────────────────────────
 def _hook_text_overlay(hook_text, accent_color, total_dur):
-    """Displays giant hook text — clean white serif, no background box (reference style)."""
-    if not hook_text:
+    """Displays giant hook text. Redesigned to use centered bold uppercase sans-serif text,
+    obsidian card backing, and neon accent border.
+    """
+    enable_hook = os.environ.get("ENABLE_HOOK_OVERLAY", "1") == "1"
+    if not enable_hook or not hook_text:
         return None
-    dur = min(2.5, total_dur)
-    f = get_cinematic_font(68, italic=True)
+        
+    dur = min(3.0, total_dur)
+    f = gf(68, bold=True)
     max_w = FRAME_W - 120
 
-    # Word-wrap the hook text
-    words = hook_text.split()
+    # Word-wrap the hook text in ALL CAPS
+    words = hook_text.upper().split()
     lines, cur = [], []
     for w in words:
         test = " ".join(cur + [w])
@@ -1097,19 +1101,52 @@ def _hook_text_overlay(hook_text, accent_color, total_dur):
     lines = lines[:3]
 
     lh = ts("Ag", f)[1]
-    lsp = int(lh * 1.5)
+    lsp = int(lh * 1.3)
     total_h = lh + (len(lines) - 1) * lsp
-    canvas_h = total_h + 60
+    
+    # Calculate dimensions for the backdrop block
+    max_line_w = max(ts(line, f)[0] for line in lines)
+    
+    bg_pad_x, bg_pad_y = 40, 25
+    block_w = max_line_w + bg_pad_x * 2
+    block_h = total_h + bg_pad_y * 2
+    
+    canvas_h = block_h + 60
     canvas = Image.new("RGBA", (FRAME_W, canvas_h), (0, 0, 0, 0))
     draw = ImageDraw.Draw(canvas)
+    
+    # Position of block in canvas
+    bx1 = (FRAME_W - block_w) // 2
+    by1 = 30
+    bx2 = bx1 + block_w
+    by2 = by1 + block_h
+    
+    # Draw glassmorphic background box with neon border outline
+    draw.rounded_rectangle(
+        [bx1, by1, bx2, by2],
+        radius=20,
+        fill=(10, 10, 15, 230),
+        outline=accent_color,
+        width=3
+    )
 
     for i, line in enumerate(lines):
         lw, _ = ts(line, f)
         tx = (FRAME_W - lw) // 2
-        ty = 30 + i * lsp
+        ty = by1 + bg_pad_y + i * lsp
+        
+        # High contrast drop shadow
         for dx, dy in [(-3, -3), (3, -3), (-3, 3), (3, 3), (-2, 0), (2, 0), (0, -2), (0, 2)]:
-            draw.text((tx + dx, ty + dy), line, font=f, fill=(0, 0, 0, 200))
-        draw.text((tx, ty), line, font=f, fill=(255, 255, 255, 255))
+            draw.text((tx + dx, ty + dy), line, font=f, fill=(0, 0, 0, 220))
+            
+        # Alternate line colors: Line 1 is the accent color, others are white
+        txt_fill = (255, 255, 255, 255)
+        if len(lines) > 1 and i == 1:
+            txt_fill = (*accent_color, 255) if len(accent_color) == 3 else (204, 255, 0, 255)
+        elif len(lines) == 1:
+            txt_fill = (*accent_color, 255) if len(accent_color) == 3 else (204, 255, 0, 255)
+            
+        draw.text((tx, ty), line, font=f, fill=txt_fill)
 
     arr = np.array(canvas.convert("RGB"))
     mask = np.array(canvas.split()[3]).astype(float) / 255.0
@@ -1117,14 +1154,162 @@ def _hook_text_overlay(hook_text, accent_color, total_dur):
     def opacity_fn(t):
         if t < 0.2:
             return t / 0.2
-        elif t > dur - 0.5:
-            return max(0, (dur - t) / 0.5)
+        elif t > dur - 0.4:
+            return max(0, (dur - t) / 0.4)
         return 1.0
 
     clip = VideoClip(lambda t: arr, duration=dur)
     mclip = VideoClip(lambda t: mask * opacity_fn(t), is_mask=True, duration=dur)
-    y_pos = int(FRAME_H * 0.38)
+    
+    # Center-middle position
+    y_pos = int(FRAME_H * 0.35) - (canvas_h // 2)
     return clip.with_mask(mclip).with_position(("center", y_pos)).with_start(0)
+
+
+def _create_settings_mockup_clip(text, start_time, duration, accent_color, audio_duration):
+    """
+    Creates an animated, pre-rendered glassmorphic settings card overlay clip.
+    Toggles off, draws a tapping hand cursor, ripple, and a neon outline highlight.
+    Precomputed and cached to avoid per-frame draw overhead during main video render.
+    """
+    enable_mockup = os.environ.get("ENABLE_SETTINGS_MOCKUP", "1") == "1"
+    if not enable_mockup:
+        return None
+
+    # Calculate actual visual duration
+    dur = min(duration, audio_duration - start_time)
+    if dur < 0.5:
+        return None
+
+    # Animation FPS
+    fps = 12
+    total_frames = int(dur * fps) + 1
+    
+    rgb_frames = []
+    alpha_masks = []
+    
+    # Determine settings title/description based on text keywords
+    text_l = text.lower()
+    if "track" in text_l or "tracking" in text_l or "privacy" in text_l:
+        title = "Allow Apps to Request to Track"
+        desc = "Let apps ask to track activity across other apps."
+    elif "location" in text_l or "gps" in text_l or "map" in text_l:
+        title = "Location Services"
+        desc = "Share your location with apps in the background."
+    elif "ad" in text_l or "ads" in text_l or "personalized" in text_l:
+        title = "Personalized Ads"
+        desc = "Apple advertising privacy settings."
+    elif "analytics" in text_l or "data" in text_l or "share" in text_l:
+        title = "Share iPhone Analytics"
+        desc = "Send diagnostic data to Apple daily."
+    else:
+        title = "Background App Refresh"
+        desc = "Allow apps to refresh content in background."
+
+    # Dimensions
+    card_w, card_h = 920, 200
+    card_x1 = (FRAME_W - card_w) // 2
+    card_y1 = 1100  # Lower-middle third (subtitles are at 0.38)
+    card_x2 = card_x1 + card_w
+    card_y2 = card_y1 + card_h
+
+    toggle_w, toggle_h = 100, 52
+    toggle_x1 = card_x2 - toggle_w - 40
+    toggle_y1 = card_y1 + (card_h - toggle_h) // 2
+    toggle_x2 = toggle_x1 + toggle_w
+    toggle_y2 = toggle_y1 + toggle_h
+
+    # Switch flips OFF at 1.2s into the chunk
+    flip_offset = 1.2
+
+    for frame_idx in range(total_frames):
+        t_offset = frame_idx / float(fps)
+        
+        # Transparent canvas
+        canvas = Image.new("RGBA", (FRAME_W, FRAME_H), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(canvas)
+        
+        # 1. Glassmorphic card background
+        draw.rounded_rectangle([card_x1, card_y1, card_x2, card_y2], radius=24, fill=(18, 19, 21, 235), outline=(255, 255, 255, 30), width=2)
+        
+        f_title = gf(32, bold=True)
+        f_desc = gf(20, bold=False)
+        
+        draw.text((card_x1 + 40, card_y1 + 45), title, font=f_title, fill=(255, 255, 255, 255))
+        draw.text((card_x1 + 40, card_y1 + 105), desc, font=f_desc, fill=(160, 160, 165, 255))
+        
+        # 2. Toggle Switch State
+        is_on = t_offset < flip_offset
+        if is_on:
+            draw.rounded_rectangle([toggle_x1, toggle_y1, toggle_x2, toggle_y2], radius=toggle_h//2, fill=(48, 209, 88, 255))
+            knob_x = toggle_x2 - toggle_h // 2
+        else:
+            draw.rounded_rectangle([toggle_x1, toggle_y1, toggle_x2, toggle_y2], radius=toggle_h//2, fill=(120, 120, 128, 255))
+            knob_x = toggle_x1 + toggle_h // 2
+            
+        knob_y = toggle_y1 + toggle_h // 2
+        knob_r = 22
+        draw.ellipse([knob_x - knob_r, knob_y - knob_r, knob_x + knob_r, knob_y + knob_r], fill=(255, 255, 255, 255))
+        
+        # 3. Tapping ripple animation (lasts 0.4 seconds after flip)
+        if not is_on and (0 <= t_offset - flip_offset < 0.4):
+            ripple_progress = (t_offset - flip_offset) / 0.4
+            ripple_r = int(22 + 45 * ripple_progress)
+            ripple_opacity = int(200 * (1.0 - ripple_progress))
+            
+            # Draw ripple in RGBA using separate image overlay
+            ripple_img = Image.new("RGBA", (FRAME_W, FRAME_H), (0, 0, 0, 0))
+            r_draw = ImageDraw.Draw(ripple_img)
+            r_draw.ellipse([knob_x - ripple_r, knob_y - ripple_r, knob_x + ripple_r, knob_y + ripple_r], outline=(*accent_color, ripple_opacity), width=4)
+            canvas.alpha_composite(ripple_img)
+            draw = ImageDraw.Draw(canvas) # reset draw
+            
+        # 4. Neon bounding box highlight (lasts 0.6 seconds after flip)
+        if not is_on and (0 <= t_offset - flip_offset < 0.6):
+            box_img = Image.new("RGBA", (FRAME_W, FRAME_H), (0, 0, 0, 0))
+            box_draw = ImageDraw.Draw(box_img)
+            box_draw.rounded_rectangle([card_x1 - 4, card_y1 - 4, card_x2 + 4, card_y2 + 4], radius=28, outline=(255, 40, 150, 255), width=5)
+            canvas.alpha_composite(box_img)
+            draw = ImageDraw.Draw(canvas) # reset draw
+            
+        # 5. Hand cursor sliding in to click
+        if t_offset < flip_offset + 0.5:
+            if t_offset < flip_offset:
+                # Sliding in from bottom right
+                p = t_offset / flip_offset
+                hx = int(FRAME_W + (toggle_x2 - FRAME_W) * p)
+                hy = int(FRAME_H + (knob_y - FRAME_H) * p)
+            else:
+                # Sliding out
+                p = (t_offset - flip_offset) / 0.5
+                hx = int(knob_x + (FRAME_W - knob_x) * p)
+                hy = int(knob_y + (FRAME_H - knob_y) * p)
+                
+            pointer_img = Image.new("RGBA", (FRAME_W, FRAME_H), (0, 0, 0, 0))
+            p_draw = ImageDraw.Draw(pointer_img)
+            p_draw.polygon([(hx, hy), (hx + 20, hy + 40), (hx + 40, hy + 20)], fill=(255, 214, 0, 255), outline=(0,0,0,255), width=2)
+            canvas.alpha_composite(pointer_img)
+            draw = ImageDraw.Draw(canvas) # reset draw
+            
+        # Store frame arrays
+        rgb_frames.append(np.array(canvas.convert("RGB")))
+        alpha_masks.append(np.array(canvas.split()[3]).astype(float) / 255.0)
+
+    # Frame retrieval functions
+    def make_rgb_frame(t):
+        idx = min(int(t * fps), len(rgb_frames) - 1)
+        return rgb_frames[idx]
+        
+    def make_mask_frame(t):
+        idx = min(int(t * fps), len(alpha_masks) - 1)
+        return alpha_masks[idx]
+
+    clip = VideoClip(make_rgb_frame, duration=dur)
+    mclip = VideoClip(make_mask_frame, is_mask=True, duration=dur)
+    
+    # Smooth fade-in/fade-out
+    clip = clip.with_mask(mclip).with_effects([vfx.CrossFadeIn(0.25), vfx.CrossFadeOut(0.25)])
+    return clip.with_start(start_time)
 
 
 # ── LAYER E3: Micro-Cliffhanger Captions ──────────────────────────────────────
@@ -3628,127 +3813,232 @@ def wrap_text_to_lines(words, word_widths, max_width, font):
         lines.append(current_line)
     return lines
 
+_WRAP_CACHE = {}
+
 def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), frame_width=1080, frame_height=1920, y_shift=0):
     """Viral 'High Energy' captions: Large tilted words with pop sounds.
-
-    FIX: Filter out spoken words BEFORE layout calculation to prevent
-    invisible gaps and ensure dynamic line-by-line updates.
+    
+    Revised: Locked static line rendering (kinetic text), safe-zone positioning,
+    dimmed past words, and precomputed wrap caching for high rendering performance.
     """
     img = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
     draw = ImageDraw.Draw(img)
 
     scale_ratio = frame_width / 1080.0 if frame_width < frame_height else frame_width / 1920.0
-
     is_landscape = frame_width > frame_height
     if is_landscape:
-        base_size = int(72 * scale_ratio) # Larger base size for landscape/longform readability
+        base_size = int(72 * scale_ratio)
     else:
-        base_size = int(58 * scale_ratio) # Reverted to original as requested
+        base_size = int(58 * scale_ratio)
 
     f_main = gf(base_size, bold=True)
 
-    # FILTER: Only keep words that are NOT yet spoken for layout & rendering
-    # This ensures spoken words don't create invisible gaps in line wrapping
-    active_word_data = [wd for wd in word_data if not wd.get("is_spoken", False)]
+    # Feature flag to switch to new kinetic style
+    enable_kinetic = os.environ.get("ENABLE_KINETIC_CAPTIONS", "1") == "1"
 
-    # If all words are spoken, return empty frame (subtitles cleared)
-    if not active_word_data:
+    if not enable_kinetic:
+        # ORIGINAL FALLBACK LOGIC
+        active_word_data = [wd for wd in word_data if not wd.get("is_spoken", False)]
+        if not active_word_data:
+            return img
+
+        words = [wd["word"] for wd in active_word_data]
+        word_widths = []
+        fake_draw = ImageDraw.Draw(Image.new("RGBA", (1,1)))
+        for i, wd in enumerate(active_word_data):
+            word_widths.append(fake_draw.textbbox((0,0), words[i], font=f_main)[2] - fake_draw.textbbox((0,0), words[i], font=f_main)[0])
+
+        if is_landscape:
+            max_sub_width = int(frame_width * 0.65)
+        else:
+            max_sub_width = int(frame_width * 0.80)
+        lines = wrap_text_to_lines(words, word_widths, max_sub_width, f_main)
+        lines = lines[:1]
+        line_h = int(90 * scale_ratio)
+        
+        y_pos_pct = 0.80 if is_landscape else 0.60
+        start_y = int(frame_height * y_pos_pct) - (len(lines) * line_h // 2) + y_shift
+        
+        max_line_w = 0
+        temp_idx = 0
+        for line in lines:
+            line_w = sum(word_widths[temp_idx:temp_idx+len(line)]) + 22 * (len(line)-1)
+            if line_w > max_line_w:
+                max_line_w = line_w
+            temp_idx += len(line)
+        
+        bg_pad_x, bg_pad_y = 30, 18
+        block_x1 = (frame_width - max_line_w) // 2 - bg_pad_x
+        block_x2 = (frame_width + max_line_w) // 2 + bg_pad_x
+        block_y1 = start_y - bg_pad_y
+        block_y2 = start_y + len(lines) * line_h - (line_h - base_size) + bg_pad_y
+
+        draw.rounded_rectangle(
+            [block_x1, block_y1, block_x2, block_y2],
+            radius=12,
+            fill=(0, 0, 0, 215)
+        )
+
+        word_idx = 0
+        for i, line in enumerate(lines):
+            line_y = start_y + i * line_h
+            line_w = sum(word_widths[word_idx:word_idx+len(line)]) + 22 * (len(line)-1)
+            cur_x = (frame_width - line_w) // 2
+
+            for word_text in line:
+                wd = active_word_data[word_idx]
+                is_active = wd["is_active"]
+
+                if is_active:
+                    c_fill = (204, 255, 0, 255) # Electric Yellow
+                    f_word = gf(int(base_size * 1.12), bold=True)
+                    w_w, w_h = ts(word_text, f_word)
+                    word_img = Image.new("RGBA", (w_w + 60, w_h + 60), (0,0,0,0))
+                    word_draw = ImageDraw.Draw(word_img)
+
+                    stroke = 5
+                    for dx in range(-stroke, stroke+1):
+                        for dy in range(-stroke, stroke+1):
+                            if dx*dx + dy*dy <= stroke*stroke:
+                                word_draw.text((30+dx, 30+dy), word_text, font=f_word, fill=(0,0,0,255))
+
+                    word_draw.text((34, 34), word_text, font=f_word, fill=(0,0,0,180))
+                    word_draw.text((30, 30), word_text, font=f_word, fill=c_fill)
+
+                    rotated = word_img.rotate(0, resample=Image.BICUBIC, expand=True)
+                    orig_w = word_widths[word_idx]
+                    target_x = int(cur_x - (rotated.width - orig_w)//2)
+                    target_y = int(line_y - (rotated.height - base_size)//2 + 2)
+                    img.alpha_composite(rotated, (target_x, target_y))
+                else:
+                    c_fill = (255, 255, 255, 255)
+                    for dx in range(-3, 4):
+                        for dy in range(-3, 4):
+                            draw.text((cur_x+dx, line_y+2+dy), word_text, font=f_main, fill=(0,0,0,255))
+                    draw.text((cur_x+3, line_y+5), word_text, font=f_main, fill=(0,0,0,160))
+                    draw.text((cur_x, line_y + 2), word_text, font=f_main, fill=c_fill)
+
+                cur_x += word_widths[word_idx] + 22
+                word_idx += 1
+
         return img
 
-    words = [wd["word"] for wd in active_word_data]
-    word_widths = []
-    fake_draw = ImageDraw.Draw(Image.new("RGBA", (1,1)))
-
-    for i, wd in enumerate(active_word_data):
-        word_widths.append(fake_draw.textbbox((0,0), words[i], font=f_main)[2] - fake_draw.textbbox((0,0), words[i], font=f_main)[0])
-
+    # NEW KINETIC STYLE (Safe Zone, Locked Static Line, Dimmed Past, Electric Accent)
+    words = [wd["word"] for wd in word_data]
     if is_landscape:
-        max_sub_width = int(frame_width * 0.65) # Narrower center focus in 16:9
+        max_sub_width = int(frame_width * 0.65)
     else:
-        max_sub_width = int(frame_width * 0.80) # More narrow for punchy center focus
-    lines = wrap_text_to_lines(words, word_widths, max_sub_width, f_main)
+        max_sub_width = int(frame_width * 0.85)
 
-    # LIMIT: Maximum 1 line per frame for Shorts-style dynamic captions
-    lines = lines[:1]
+    # Wrap cache retrieval to save CPU cycles
+    cache_key = (tuple(words), base_size, max_sub_width)
+    if cache_key in _WRAP_CACHE:
+        lines, word_widths = _WRAP_CACHE[cache_key]
+    else:
+        word_widths = []
+        fake_draw = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+        for w in words:
+            bbox = fake_draw.textbbox((0, 0), w, font=f_main)
+            word_widths.append(bbox[2] - bbox[0])
+        lines = wrap_text_to_lines(words, word_widths, max_sub_width, f_main)
+        _WRAP_CACHE[cache_key] = (lines, word_widths)
 
-    line_h = int(90 * scale_ratio) # Reverted to original
-    
-    # Position: LOWER THIRD
-    # 60% Height for Shorts, 80% Height for Landscape
-    is_landscape = frame_width > frame_height
-    y_pos_pct = 0.80 if is_landscape else 0.60
-    start_y = int(frame_height * y_pos_pct) - (len(lines) * line_h // 2) + y_shift
-    
-    # Calculate dimensions for the unified background block
-    max_line_w = 0
-    temp_idx = 0
-    for line in lines:
-        line_w = sum(word_widths[temp_idx:temp_idx+len(line)]) + 22 * (len(line)-1)
-        if line_w > max_line_w:
-            max_line_w = line_w
-        temp_idx += len(line)
-    
-    # Tightened Obsidian Background Block (Improved Visibility for B-Roll)
+    if not lines:
+        return img
+
+    # Find the active word index in the full list
+    active_idx = -1
+    for idx, wd in enumerate(word_data):
+        if wd.get("is_active", False):
+            active_idx = idx
+            break
+    if active_idx == -1:
+        for idx, wd in enumerate(word_data):
+            if not wd.get("is_spoken", False):
+                active_idx = idx
+                break
+    if active_idx == -1:
+        active_idx = len(word_data) - 1
+
+    # Locate the active line index and starting index of words in that line
+    word_counter = 0
+    active_line_idx = 0
+    for line_idx, line in enumerate(lines):
+        line_len = len(line)
+        if word_counter <= active_idx < word_counter + line_len:
+            active_line_idx = line_idx
+            break
+        word_counter += line_len
+
+    active_line_idx = min(active_line_idx, len(lines) - 1)
+    target_line = lines[active_line_idx]
+
+    # Recalculate word_counter for the actual selected line
+    word_counter = sum(len(l) for l in lines[:active_line_idx])
+
+    line_h = int(90 * scale_ratio)
+    # Safe Zone Rule: Move text overlays to upper-middle third (y_pos_pct=0.38)
+    y_pos_pct = 0.80 if is_landscape else 0.38
+    start_y = int(frame_height * y_pos_pct) - (line_h // 2) + y_shift
+
+    target_word_widths = word_widths[word_counter : word_counter + len(target_line)]
+    line_w = sum(target_word_widths) + 22 * (len(target_line) - 1)
+
+    # Tightened Obsidian Background Block for the single active line
     bg_pad_x, bg_pad_y = 30, 18
-    block_x1 = (frame_width - max_line_w) // 2 - bg_pad_x
-    block_x2 = (frame_width + max_line_w) // 2 + bg_pad_x
+    block_x1 = (frame_width - line_w) // 2 - bg_pad_x
+    block_x2 = (frame_width + line_w) // 2 + bg_pad_x
     block_y1 = start_y - bg_pad_y
-    block_y2 = start_y + len(lines) * line_h - (line_h - base_size) + bg_pad_y
+    block_y2 = start_y + line_h - (line_h - base_size) + bg_pad_y
 
     draw.rounded_rectangle(
         [block_x1, block_y1, block_x2, block_y2],
         radius=12,
-        fill=(0, 0, 0, 215) # Increased opacity from 160 for guaranteed contrast
+        fill=(0, 0, 0, 215)
     )
 
-    word_idx = 0
-    for i, line in enumerate(lines):
-        line_y = start_y + i * line_h
-        line_w = sum(word_widths[word_idx:word_idx+len(line)]) + 22 * (len(line)-1)
-        cur_x = (frame_width - line_w) // 2
+    cur_x = (frame_width - line_w) // 2
+    for offset, word_text in enumerate(target_line):
+        global_idx = word_counter + offset
+        wd = word_data[global_idx]
+        
+        is_active = wd.get("is_active", False)
+        is_spoken = wd.get("is_spoken", False)
 
-        for word_text in line:
-            wd = active_word_data[word_idx]
-            is_active = wd["is_active"]
-            # No need for is_spoken check - already filtered out above
+        if is_active:
+            # Highlight current word in Electric Yellow with 1.15x Pop Zoom
+            c_fill = (204, 255, 0, 255)
+            f_word = gf(int(base_size * 1.15), bold=True)
+            w_w, w_h = ts(word_text, f_word)
+            word_img = Image.new("RGBA", (w_w + 60, w_h + 60), (0,0,0,0))
+            word_draw = ImageDraw.Draw(word_img)
 
-            if is_active:
-                c_fill = (204, 255, 0, 255) # Electric Yellow
-                f_word = gf(int(base_size * 1.12), bold=True) # Boost size by 12% for premium Pop zoom effect
-                w_w, w_h = ts(word_text, f_word)
-                word_img = Image.new("RGBA", (w_w + 60, w_h + 60), (0,0,0,0))
-                word_draw = ImageDraw.Draw(word_img)
+            # High-Contrast Edge: 5px black stroke
+            stroke = 5
+            for dx in range(-stroke, stroke+1):
+                for dy in range(-stroke, stroke+1):
+                    if dx*dx + dy*dy <= stroke*stroke:
+                        word_draw.text((30+dx, 30+dy), word_text, font=f_word, fill=(0,0,0,255))
+            word_draw.text((34, 34), word_text, font=f_word, fill=(0,0,0,180)) # shadow
+            word_draw.text((30, 30), word_text, font=f_word, fill=c_fill)
 
-                # High-Contrast Edge: 5px black stroke simulation (Stronger for visibility)
-                stroke = 5
-                for dx in range(-stroke, stroke+1):
-                    for dy in range(-stroke, stroke+1):
-                        if dx*dx + dy*dy <= stroke*stroke:
-                            word_draw.text((30+dx, 30+dy), word_text, font=f_word, fill=(0,0,0,255))
+            rotated = word_img.rotate(0, resample=Image.BICUBIC, expand=True)
+            orig_w = target_word_widths[offset]
+            target_x = int(cur_x - (rotated.width - orig_w)//2)
+            target_y = int(start_y - (rotated.height - base_size)//2 + 2)
+            img.alpha_composite(rotated, (target_x, target_y))
+        else:
+            # Dimmed white for spoken past words (140 opacity), normal white for future words
+            opacity = 140 if is_spoken else 255
+            c_fill = (255, 255, 255, opacity)
 
-                # 3D Depth: 4px offset shadow
-                word_draw.text((34, 34), word_text, font=f_word, fill=(0,0,0,180))
-                # Main Text
-                word_draw.text((30, 30), word_text, font=f_word, fill=c_fill)
+            # Draw inactive word with outline matching opacity
+            for dx in range(-3, 4):
+                for dy in range(-3, 4):
+                    draw.text((cur_x+dx, start_y+2+dy), word_text, font=f_main, fill=(0,0,0,opacity))
+            draw.text((cur_x, start_y + 2), word_text, font=f_main, fill=c_fill)
 
-                tilt = 0 # Reverted to no tilt as per reference
-                rotated = word_img.rotate(tilt, resample=Image.BICUBIC, expand=True)
-
-                orig_w = word_widths[word_idx]
-                target_x = int(cur_x - (rotated.width - orig_w)//2)
-                target_y = int(line_y - (rotated.height - base_size)//2 + 2)
-                img.alpha_composite(rotated, (target_x, target_y))
-            else:
-                c_fill = (255, 255, 255, 255)
-                # Inactive words get a 3px stroke and offset shadow for readability
-                for dx in range(-3, 4):
-                    for dy in range(-3, 4):
-                        draw.text((cur_x+dx, line_y+2+dy), word_text, font=f_main, fill=(0,0,0,255))
-                draw.text((cur_x+3, line_y+5), word_text, font=f_main, fill=(0,0,0,160))
-                draw.text((cur_x, line_y + 2), word_text, font=f_main, fill=c_fill)
-
-            cur_x += word_widths[word_idx] + 22
-            word_idx += 1
+        cur_x += target_word_widths[offset] + 22
 
     return img
 
@@ -4667,10 +4957,11 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     # ── ENGAGEMENT LAYERS (Retention Boosters) ────────────────────────────────
     engagement_clips = []
     
-    # Hook overlay removed to declutter as requested
-    # hook_overlay = _hook_text_overlay(hook_text, accent_color, audio_duration)
-    # if hook_overlay:
-    #     engagement_clips.append(hook_overlay)
+    # Re-enabled hook overlay stack
+    hook_text = script_json.get("hook_text") or script_json.get("hook") or script_json.get("title", "Tech News")
+    hook_overlay = _hook_text_overlay(hook_text, accent_color, audio_duration)
+    if hook_overlay:
+        engagement_clips.append(hook_overlay)
 
     # Phased scans removed in favor of full-screen loops as requested
     pass
@@ -4684,12 +4975,38 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     #         engagement_clips.append(telegram_cta)
 
     # ── COMPOSITING ──
-    # Collect infographics logic — DISABLED (user requested removal)
+    # Collect infographics logic — ENABLED if feature flag is active
     infographic_clips = []
-    # for chunk in chunks:
-    #     if chunk.get("has_infographic") and chunk.get("infographic_type"):
-    #         iclip = _infographic_card_clip(...)
-    #         if iclip: infographic_clips.append(iclip)
+    enable_infographics = os.environ.get("ENABLE_INFOGRAPHICS", "1") == "1"
+    if enable_infographics:
+        for chunk in chunks:
+            if chunk.get("has_infographic") and chunk.get("infographic_type"):
+                iclip = _infographic_card_clip(
+                    chunk.get("infographic_type"),
+                    chunk.get("infographic_data"),
+                    accent_color,
+                    chunk["start"],
+                    chunk["duration"],
+                    audio_duration
+                )
+                if iclip:
+                    infographic_clips.append(iclip)
+
+    # Collect settings mockup clips
+    settings_mockup_clips = []
+    enable_mockup = os.environ.get("ENABLE_SETTINGS_MOCKUP", "1") == "1"
+    if enable_mockup:
+        for chunk in chunks:
+            if chunk.get("is_setting_chunk"):
+                sclip = _create_settings_mockup_clip(
+                    chunk.get("text", ""),
+                    chunk["start"],
+                    chunk["duration"],
+                    accent_color,
+                    audio_duration
+                )
+                if sclip:
+                    settings_mockup_clips.append(sclip)
 
     # ── LONGFORM: "FACT X/N" BADGE OVERLAYS ──────────────────────────────────
     longform_badge_clips = []
@@ -4753,7 +5070,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     if is_longform:
         topic_transition_clips = _longform_topic_transition_clips(script_json, audio_duration)
         
-    base_layers = bg_layer_clips + burst_clips + [particle_layer] + screenshot_clips + topic_transition_clips
+    base_layers = bg_layer_clips + burst_clips + [particle_layer] + screenshot_clips + topic_transition_clips + infographic_clips + settings_mockup_clips
     
     # Add overlays
     base_layers.append(gradient)
@@ -5088,23 +5405,50 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 active_chunk = chunk
                 break
             
+        if active_chunk and active_chunk.get("is_setting_chunk"):
+            enable_mockup = os.environ.get("ENABLE_SETTINGS_MOCKUP", "1") == "1"
+            if enable_mockup:
+                import math
+                dur = active_chunk.get("duration", 1.0)
+                if dur > 0.1:
+                    t_rel = max(0.0, min(t - active_chunk["start"], dur))
+                    # Sine wave easing from 1.0 to 1.22x
+                    zoom_factor = 1.0 + 0.22 * math.sin(math.pi * t_rel / dur)
+                    try:
+                        h, w, c = bg_frame.shape
+                        pil_img = Image.fromarray(bg_frame)
+                        new_w = int(w / zoom_factor)
+                        new_h = int(h / zoom_factor)
+                        x1 = (w - new_w) // 2
+                        y1 = (h - new_h) // 2
+                        cropped = pil_img.crop((x1, y1, x1 + new_w, y1 + new_h))
+                        resized = cropped.resize((w, h), Image.BILINEAR)
+                        bg_frame = np.array(resized)
+                    except Exception as e:
+                        pass
+            
         if active_chunk:
-            word_status_list = []
-            for w in active_chunk.get("words", []):
-                is_active = w["start"] - 0.05 <= t <= w["end"] + 0.05
-                word_status_list.append({
-                    "word": w["word"],
-                    "is_active": is_active,
-                    "is_spoken": t > w["end"],
-                    "scale": 1.0 # No zoom
-                })
+            enable_hook = os.environ.get("ENABLE_HOOK_OVERLAY", "1") == "1"
+            if not is_longform and enable_hook and t < 3.0:
+                # Timing collision fix: skip subtitles while hook overlay is showing
+                pass
+            else:
+                word_status_list = []
+                for w in active_chunk.get("words", []):
+                    is_active = w["start"] - 0.05 <= t <= w["end"] + 0.05
+                    word_status_list.append({
+                        "word": w["word"],
+                        "is_active": is_active,
+                        "is_spoken": t > w["end"],
+                        "scale": 1.0 # No zoom
+                    })
 
-            if word_status_list:
-                subtitle_img = render_subtitle_frame(
-                    word_status_list, bg_frame=bg_frame, 
-                    accent_color=accent_color, frame_width=FRAME_W, frame_height=FRAME_H,
-                    y_shift=subtitle_y_shift
-                )
+                if word_status_list:
+                    subtitle_img = render_subtitle_frame(
+                        word_status_list, bg_frame=bg_frame, 
+                        accent_color=accent_color, frame_width=FRAME_W, frame_height=FRAME_H,
+                        y_shift=subtitle_y_shift
+                    )
                 
         # SENTENCE POP ANIMATION DISABLED (No zoom)
         pass

@@ -41,34 +41,39 @@ def main():
         img.save('dummy_screenshot.png')
         print("Created dummy_screenshot.png")
 
-    # 3. Mock chunks to verify morph transition
     chunks = [
         {
             "chunk_id": 1,
             "start": 0.0,
-            "end": 1.0,
-            "duration": 1.0,
+            "end": 2.9,
+            "duration": 2.9,
             "text": "Unlock WhatsApp hidden tricks.",
             "visual_path": "dummy_screenshot.png",
-            "visual_type": "photo"
+            "visual_type": "photo",
+            "words": [
+                {"word": "Unlock", "start": 0.0, "end": 0.6},
+                {"word": "WhatsApp", "start": 0.6, "end": 1.2},
+                {"word": "hidden", "start": 1.2, "end": 1.8},
+                {"word": "tricks.", "start": 1.8, "end": 2.9}
+            ]
         },
         {
             "chunk_id": 2,
-            "start": 1.0,
-            "end": 2.0,
-            "duration": 1.0,
+            "start": 2.9,
+            "end": 5.0,
+            "duration": 2.1,
             "text": "Telegram is also loaded with powers.",
             "visual_path": "dummy_screenshot.png",
-            "visual_type": "photo"
-        },
-        {
-            "chunk_id": 3,
-            "start": 2.0,
-            "end": 3.0,
-            "duration": 1.0,
-            "text": "Or just check VJ Profile online.",
-            "visual_path": "dummy_screenshot.png",
-            "visual_type": "photo"
+            "visual_type": "photo",
+            "is_setting_chunk": True,
+            "words": [
+                {"word": "Telegram", "start": 2.9, "end": 3.4},
+                {"word": "is", "start": 3.4, "end": 3.6},
+                {"word": "also", "start": 3.6, "end": 4.0},
+                {"word": "loaded", "start": 4.0, "end": 4.3},
+                {"word": "with", "start": 4.3, "end": 4.5},
+                {"word": "powers.", "start": 4.5, "end": 5.0}
+            ]
         }
     ]
 

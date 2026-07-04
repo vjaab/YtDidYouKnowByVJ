@@ -502,7 +502,7 @@ Return ONLY the subject:"""
     return subject
 
 
-def generate_premium_prompt_via_gemini(chunk_text, topic_context, global_style_guide, original_visual_prompt=None, aspect_ratio="9:16", is_video=False):
+def generate_premium_prompt_via_gemini(chunk_text, topic_context, global_style_guide, original_visual_prompt=None, aspect_ratio="9:16", is_video=False, is_hook=False):
     """
     Calls Gemini to generate a highly specific, cinematic, visual prompt for Imagen or Veo.
     """
@@ -525,6 +525,15 @@ CONTEXT:
 """
     if original_visual_prompt_clean:
         prompt += f'- Original concept suggestion: "{original_visual_prompt_clean}"\n'
+        
+    if is_hook:
+        prompt += (
+            "\nCRITICAL INSTRUCTION FOR THE HOOK VISUAL (First 3 seconds):\n"
+            "This is the opening hook of the video, which must capture viewer attention instantly.\n"
+            "- For privacy/security topics: Describe a macro close-up of a physical phone screen displaying a stylized 'Tracking Active' alert or warning popup, or a fast-paced zoom-in on a stylized security app icon.\n"
+            "- For performance/utility topics: Describe a close-up of a device screen showcasing a dramatic peak value or a highly optimized interface.\n"
+            "- Ensure the scene has dramatic dark cyber-neon lighting, vibrant contrast, cybernetic textures, and looks incredibly mysterious and high-intrigue. No generic stock photos.\n"
+        )
         
     prompt += f"""
 RULES for the generated prompt:
@@ -772,7 +781,8 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
             global_style_guide=global_style_guide,
             original_visual_prompt=original_prompt,
             aspect_ratio=orientation,
-            is_video=False
+            is_video=False,
+            is_hook=(visual_mode == "nano_hook")
         )
         path = _generate_imagen3(custom_prompt, photo_out, aspect_ratio=orientation)
         if path:
