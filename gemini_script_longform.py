@@ -53,7 +53,24 @@ Structure:
 
 Tone: High-energy, tactical, authoritative yet conversational. Like a growth-focused founder or tech product manager who has just optimized a workflow and is showing you exactly how to do it. Bias toward action: "Build, don't talk" and "Taste over tech".
 
-Target Audience: Founders, creators, knowledge workers, and professionals from high-RPM countries (USA, UK, Canada, Australia, Singapore, India). Use standard English, clean numbers, and clear analogies. Use commas and ellipses '...' for natural speech pacing in TTS. Never include infographics or generic flowcharts in instructions."""
+Target Audience: Founders, creators, knowledge workers, and professionals from high-RPM countries (USA, UK, Canada, Australia, Singapore, India). Use standard English, clean numbers, and clear analogies. Use commas and ellipses '...' for natural speech pacing in TTS.
+
+HIGH-RETENTION VIDEO CONCEPTS (MANDATORY FRAMING):
+The main topic deep-dive must always fit into one of these three series format structures:
+1. The "Visual Code Archaeology" Series:
+   - Hook archetype: "How [Famous App/Game/System] handles [Massive Problem] in just 50 lines of code."
+   - Focus: Simplify production engineering. Visualize the DAG of Git, Spotify's music recommendations, or Doom (1993) rendering 3D graphics on 90s hardware.
+2. "AI Battles: Model vs. Model" Series:
+   - Hook archetype: "We forced 5 AI models to build the same application. The results were terrifying."
+   - Focus: Side-by-side programmatic LLM execution, comparing GPT-4o, Gemini, and DeepSeek on code quality, errors, and MLOps benchmarks.
+3. "System Design Chronicles" Series:
+   - Hook archetype: "What happens inside Netflix's servers when millions of people hit 'Play' at the exact same millisecond?"
+   - Focus: Infrastructure, vector DBs vs SQL, scaling secrets (Netflix, WhatsApp servers handling billions of messages without crashes).
+
+CRUCIAL RETENTION RULES:
+- The 3-Second Rule: First sentence must immediately state high stakes (e.g. "This line of code caused a $500 million dollar blackout..."). NO welcome messages, intros, or channel name references.
+- Visual Reset Rule: Specify visual cues, camera zoom, text pops, background color shift, or code highlighting at least every 4 seconds in the visual segments.
+- Cut the Fluff: Programmatically strip out any phrase or sentence that doesn't actively advance the technical value or story."""
 
 
 TOPIC_DISCOVERY_TEMPLATE = """{persona}
@@ -251,6 +268,11 @@ RETENTION OPTIMIZER TASK (LONG-FORM — 8 MINUTES):
 Optimize this Vaibhav Sisinty explainer style script to maximize pacing and viewer retention.
 Ensure there are no filler words and add vocal dynamics (commas, ellipses, exclamation marks, ALL CAPS on key words).
 Shorten any sentence over 18 words.
+
+STRICT RETENTION ENFORCEMENTS:
+1. 3-Second Rule: Check that the very first sentence immediately states the stakes (e.g. "This line of code caused a $500 million dollar blackout..."). Strip out any intro greeting.
+2. 4-Second Visual Reset: Make sure visual cues in the visual layout details shift at least every 4 seconds.
+3. Cut the Fluff: Remove any sentences that don't add direct engineering value.
 
 ASSEMBLED SCRIPT:
 {assembled_script}
@@ -626,10 +648,9 @@ class LongformGenerationEngine:
 
         # Enrich context with live search
         search_text, search_links = self._call_gemini_search(
-            "What are the top 10 most surprising, viral, or breaking AI news stories "
-            "in the last 48 hours? Include model launches, benchmarks, controversies, "
-            "privacy scandals, open-source breakthroughs, AI regulation, startup funding, "
-            "and unexpected AI applications. Be specific with company names and numbers."
+            "What are the top 10 most trending, viral, or breakout AI news stories, engineering breakdowns, "
+            "or system design chronicles in the last 48 hours? Include model launches, code archaeology "
+            "deep dives, model vs model comparisons, or massive server scaling secrets (e.g. Netflix, WhatsApp, Git, Spotify, Doom)."
         )
         enriched_context = self.news_context
         if search_text:
