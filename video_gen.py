@@ -1166,6 +1166,9 @@ def _hook_text_overlay(hook_text, accent_color, total_dur):
     return clip.with_mask(mclip).with_position(("center", y_pos)).with_start(0)
 
 
+TOGGLE_FLIP_OFFSET_SEC = 1.2
+
+
 def _create_settings_mockup_clip(text, start_time, duration, accent_color, audio_duration):
     """
     Creates an animated, pre-rendered glassmorphic settings card overlay clip.
@@ -1219,8 +1222,8 @@ def _create_settings_mockup_clip(text, start_time, duration, accent_color, audio
     toggle_x2 = toggle_x1 + toggle_w
     toggle_y2 = toggle_y1 + toggle_h
 
-    # Switch flips OFF at 1.2s into the chunk
-    flip_offset = 1.2
+    # Switch flips OFF at TOGGLE_FLIP_OFFSET_SEC into the chunk
+    flip_offset = TOGGLE_FLIP_OFFSET_SEC
 
     for frame_idx in range(total_frames):
         t_offset = frame_idx / float(fps)
@@ -5364,7 +5367,36 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
     # Generate a single high-fidelity mastered soundtrack using pure Pydub
     mastered_audio_path = os.path.join(OUTPUT_DIR, f"master_soundtrack_{today}.wav")
-    sfx_cues = script_json.get("sfx_cues", [])
+    sfx_cues = list(script_json.get("sfx_cues", []))
+    
+    # Auto-generate SFX cues to match visual pacing and transitions
+    last_whoosh = -5.0
+    for idx, c in enumerate(chunks):
+        start_t = c.get("start", 0.0)
+        # 1. Slide transition whoosh SFX at chunk boundaries (at least 2.0s apart)
+        if start_t - last_whoosh >= 2.0 and start_t < audio_duration:
+            sfx_cues.append({
+                "type": "woosh",
+                "timestamp": start_t
+            })
+            last_whoosh = start_t
+            
+        # 2. Pop click SFX exactly when setting toggle flips
+        if c.get("is_setting_chunk"):
+            toggle_t = start_t + TOGGLE_FLIP_OFFSET_SEC
+            if toggle_t < audio_duration:
+                sfx_cues.append({
+                    "type": "pop",
+                    "timestamp": toggle_t
+                })
+                
+        # 3. Pop entrance SFX when infographics appear
+        if c.get("has_infographic") and c.get("infographic_type"):
+            if start_t < audio_duration:
+                sfx_cues.append({
+                    "type": "pop",
+                    "timestamp": start_t
+                })
     
     _mix_and_master_audio(
         voice_path=audio_path,

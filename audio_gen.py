@@ -925,9 +925,11 @@ def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
             if word.lower() not in _COMMON_ENGLISH_SKIP
         }
 
-        for word, replacement in filtered_map.items():
+        # Sort keys by word count and length descending to apply longer match first
+        sorted_keys = sorted(filtered_map.keys(), key=lambda k: (len(k.split()), len(k)), reverse=True)
+        for word in sorted_keys:
             pattern = r'\b' + re.escape(word) + r'\b'
-            cleaned = re.sub(pattern, replacement, cleaned, flags=re.IGNORECASE)
+            cleaned = re.sub(pattern, filtered_map[word], cleaned, flags=re.IGNORECASE)
 
         # 8. Auto-detect remaining hard words via g2p_en (neural G2P fallback)
         try:
@@ -1252,8 +1254,8 @@ def _inject_context_pauses(audio_path, word_timestamps):
             'why', 'how', 'what', 'the',
         }
         
-        SENTENCE_PAUSE_MS = 150
-        CONTEXT_PAUSE_MS = 250
+        SENTENCE_PAUSE_MS = 300
+        CONTEXT_PAUSE_MS = 450
         
         # Build list of pause insertions: (position_ms, pause_duration_ms)
         insertions = []

@@ -1094,7 +1094,13 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
         "     - comparison -> {\"left_label\": \"GPT-4\", \"left_val\": \"128K ctx\", \"right_label\": \"GPT-5\", \"right_val\": \"1M ctx\"}\n"
         "     - process -> {\"steps\": [\"Fetch\", \"Embed\", \"Retrieve\", \"Generate\"]}\n"
         "     - flowchart -> {\"steps\": [\"Step A\", \"Step B\", \"Step C\"]}\n"
-        "   If no infographic is needed, set `\"has_infographic\": false`, `\"infographic_type\": null`, and `\"infographic_data\": null`."
+        "   If no infographic is needed, set `\"has_infographic\": false`, `\"infographic_type\": null`, and `\"infographic_data\": null`.\n"
+        "3. CALL TO ACTION (CTA) ALIGNMENT: The final sentence/chunk of the script MUST explicitly use one of these rotating CTA options to perfectly match the visual on-screen 'Link in Bio' card:\n"
+        "   - 'Check the link in my bio to get the full tool.'\n"
+        "   - 'Grab the full breakdown at the link in my bio.'\n"
+        "   - 'Head to the link in my bio to try it yourself.'\n"
+        "   - 'Find the direct link in my bio.'\n"
+        "   Avoid asking viewers to 'comment below' in the audio track."
     )
     selection_instruction += retention_instructions
 

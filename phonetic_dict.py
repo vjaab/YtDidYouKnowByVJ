@@ -16,6 +16,20 @@ Subtitles always show original words (handled by restore_original_words in audio
 
 PHONETIC_DICT = {
 
+    # ─── PHRASE-LEVEL & SPECIFIC OVERRIDES (TRADEMARK & PRONOUN SAFE) ─────────
+    "follow us": "follow uss",
+    "join us": "join uss",
+    "with us": "with uss",
+    "tell us": "tell uss",
+    "show us": "show uss",
+    "link in bio": "link in by-oh",
+    "link in my bio": "link in my by-oh",
+    "VJ": "Vee-Jay",
+    "ChatGPT": "Chat-G-P-T",
+    "ChatGPT's": "Chat-G-P-T's",
+    "Chat GPT": "Chat-G-P-T",
+    "Chat GPT's": "Chat-G-P-T's",
+
     # ─── TECH COMPANIES & BRANDS ──────────────────────────────────────────────
     "NVIDIA": "In-vid-yah",
     "AMD": "A-M-D",

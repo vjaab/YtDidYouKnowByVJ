@@ -18,7 +18,7 @@ def main():
     # 2. Mock script_data
     script_data = {
         "title": "Test Video",
-        "script": "Unlock your AI's hidden SUPERPOWERS! Just check this out.",
+        "script": "Unlock your AI's hidden SUPERPOWERS with VJ! Let's discuss biology and join us to check the link in bio.",
         "color_theme": {"background": "#121212", "accent": "#00E5FF", "text": "#ffffff"}, # Cyber Cyan
         "screenshot_path": "dummy_screenshot.png",
         "slot": "Slot A",
@@ -33,6 +33,22 @@ def main():
             "pacing_speed": "fast"
         }
     }
+
+    # Phonetic Substring Validation Test
+    from audio_gen import clean_tts_text
+    cleaned_txt = clean_tts_text(script_data["script"])
+    print("--------------------------------------------------")
+    print(f"Original Text: {script_data['script']}")
+    print(f"Cleaned Text:  {cleaned_txt}")
+    print("--------------------------------------------------")
+    
+    # Assertions to confirm correctness:
+    assert "discuss" in cleaned_txt, "Error: 'discuss' was mangled!"
+    assert "biology" in cleaned_txt, "Error: 'biology' was mangled!"
+    assert "Vee-Jay" in cleaned_txt, "Error: 'VJ' phonetic override failed!"
+    assert "join uss" in cleaned_txt, "Error: 'join us' phonetic override failed!"
+    assert "link in by-oh" in cleaned_txt, "Error: 'link in bio' phonetic override failed!"
+    print("✅ Phonetic Override Substring Validation Passed successfully!")
     
     # Create a dummy image if not exists
     if not os.path.exists("dummy_screenshot.png"):
