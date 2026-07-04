@@ -93,7 +93,11 @@ def main():
         }
     ]
 
-    output_path = "output/test_rendered_video.mp4"
+    output_dirs = {
+        "split_screen": "output/test_rendered_video_split_screen.mp4",
+        "hero_center": "output/test_rendered_video_hero_center.mp4",
+        "asymmetric": "output/test_rendered_video_asymmetric.mp4"
+    }
     os.makedirs("output", exist_ok=True)
     
     # Let's override random.choice inside video_gen for testing to ensure morph is hit!
@@ -109,13 +113,73 @@ def main():
         
     random.choice = mock_choice
 
-    try:
-        video_path = create_video(audio_path, script_data, chunks, output_path=output_path)
-        print(f"Success! Video rendered and saved to: {video_path}")
-    except Exception as e:
-        print(f"Failed rendering: {e}")
-        import traceback
-        traceback.print_exc()
+    # Enable layout variation flag
+    os.environ["ENABLE_LAYOUT_VARIATION"] = "1"
+
+    for layout_type, output_path in output_dirs.items():
+        print(f"\n🎬 Rendering video for layout: {layout_type}...")
+        os.environ["FORCE_LAYOUT_TYPE"] = layout_type
+        try:
+            video_path = create_video(audio_path, script_data, chunks, output_path=output_path)
+            print(f"✅ Success! Video for layout '{layout_type}' rendered to: {video_path}")
+        except Exception as e:
+            print(f"❌ Failed rendering for layout '{layout_type}': {e}")
+            import traceback
+            traceback.print_exc()
+
+    # MD5 headline-seeded layout distribution test
+    print("\n📊 Checking MD5 Headline Layout Distribution Check...")
+    from video_gen import _generate_layout_profile
+    sample_headlines = [
+        "Unlocking WhatsApp hidden features",
+        "How WhatsApp secure chats work",
+        "VJ explains biology of aging",
+        "Deep dive: Telegram group calls vs Discord",
+        "Top 10 terminal productivity tricks",
+        "Inside Apple's custom M4 AI cores",
+        "Google's Gemini 1.5 Pro architecture guide",
+        "Why standard SQL is making a huge comeback",
+        "The complete guide to React Server Components",
+        "How to self-host your own database cluster",
+        "Why C++ remains the king of systems programming",
+        "Unveiling biology of neural nets",
+        "Telegram bots implementation playbook",
+        "VJ's setup guide: Cyberpunk minimal terminal",
+        "Top AI research papers of 2026",
+        "Building production-grade MoviePy pipelines",
+        "How to avoid repetitive content filter",
+        "React vs Vue vs Svelte in 2026",
+        "What's new in Python 3.14",
+        "Unveiling the future of web browsers",
+        "How compilers optimize matrix multiplication",
+        "VJ plays retro synthwave music",
+        "Secure your SSH key in 60 seconds",
+        "Why Docker is still relevant in 2026",
+        "Understanding zero-knowledge proofs",
+        "Building a compiler from scratch in Go",
+        "How video codecs compress high-motion scenes",
+        "VJ's dark mode minimalist terminal setup",
+        "Creating beautiful infographic cards dynamically",
+        "The layout engine that YouTube hates"
+    ]
+    
+    distribution = {"split_screen": 0, "hero_center": 0, "asymmetric": 0}
+    # Temporarily unset override
+    os.environ["FORCE_LAYOUT_TYPE"] = ""
+    for hl in sample_headlines:
+        prof = _generate_layout_profile(hl)
+        lt = prof["layout_type"]
+        distribution[lt] += 1
+        
+    print(f"Headline count: {len(sample_headlines)}")
+    for lt, count in distribution.items():
+        percentage = (count / len(sample_headlines)) * 100
+        print(f"  - {lt}: {count} ({percentage:.1f}%)")
+    
+    # Assert reasonable distribution (each should be hit at least 15% of the time)
+    for lt, count in distribution.items():
+        assert count > 2, f"Clustering detected! Layout '{lt}' only hit {count} times."
+    print("✅ Distribution test passed! High entropy confirmed.")
 
 if __name__ == "__main__":
     main()

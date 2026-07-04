@@ -55,47 +55,167 @@ TITLE_BOTTOM_GAP = 192  # Default; overridden per-video by LayoutProfile
 
 import hashlib as _hashlib
 
-def _generate_layout_profile(headline):
+def get_vibrant_dominant_color(img_path):
+    """
+    Analyzes an image cheaply by resizing it to 32x32, converting to HSV, and
+    filtering for vibrant colors (Saturation > 0.22, Value between 0.2 and 0.9).
+    Returns the dominant vibrant (R, G, B) tuple, or None if no vibrant color exists.
+    """
+    if not img_path or not os.path.exists(img_path):
+        return None
+    try:
+        with Image.open(img_path) as img:
+            small_img = img.resize((32, 32))
+            colors = small_img.getcolors(32 * 32)
+            if not colors:
+                return None
+            
+            vibrant_colors = []
+            for count, color in colors:
+                r, g, b = color[:3]
+                # RGB to HSV calculation
+                mx = max(r, g, b)
+                mn = min(r, g, b)
+                df = mx - mn
+                sat = 0.0 if mx == 0 else (df / mx)
+                val = mx / 255.0
+                
+                # Check for vibrance (discard grayscale, near-black, near-white)
+                if sat > 0.22 and 0.2 < val < 0.9:
+                    vibrant_colors.append((count, (r, g, b)))
+            
+            if vibrant_colors:
+                # Sort by count/frequency
+                vibrant_colors.sort(key=lambda x: x[0], reverse=True)
+                return vibrant_colors[0][1]
+            return None
+    except Exception as e:
+        print(f"⚠️ Error extracting dominant color: {e}")
+        return None
+
+def _generate_layout_profile(headline, dominant_color=None):
     """
     YPP Compliance: Generate a deterministic-but-unique visual layout
     for each video based on its headline hash. This breaks the
     'template fingerprint' that YouTube's Inauthentic Content policy flags.
     """
-    seed = int(_hashlib.md5(headline.encode()).hexdigest(), 16)
+    seed = int(_hashlib.md5(headline.encode('utf-8')).hexdigest(), 16)
     rng = random.Random(seed)
 
-    # Gradient
-    gradient_height_pct = rng.uniform(0.40, 0.50)          # 40-50% (was fixed 45%)
-    gradient_position = rng.choice(["bottom", "top"])       # was always bottom
+    # Legacy defaults (if flag is off)
+    layout_type = "asymmetric"
+    layout_variation_enabled = os.environ.get("ENABLE_LAYOUT_VARIATION", "0") == "1"
+    
+    force_layout = os.environ.get("FORCE_LAYOUT_TYPE")
+    if force_layout in ["split_screen", "hero_center", "asymmetric"]:
+        layout_type = force_layout
+        layout_variation_enabled = True
 
-    # Title box
-    title_bottom_gap = rng.randint(165, 220)                # was fixed 192px
+    # Default Theme / Colors
+    theme = {
+        "name": "Legacy Cyan/Yellow",
+        "highlight": (204, 255, 0, 255),  # Electric Yellow
+        "normal": (255, 255, 255, 255),
+        "box_fill": (0, 0, 0, 215),
+        "accent": (255, 214, 0),
+        "font_file": "Montserrat-Bold.ttf"
+    }
 
-    # Particles
+    if layout_variation_enabled:
+        if not force_layout or force_layout not in ["split_screen", "hero_center", "asymmetric"]:
+            layout_type = rng.choice(["split_screen", "hero_center", "asymmetric"])
+        
+        # Tech-focused color palettes (Cyberpunk Neon, Clean Minimalist, Dark Mode Terminal, Retro Synthwave, Electric Cyan)
+        PALETTES = [
+            {
+                "name": "Cyberpunk Neon",
+                "highlight": (255, 0, 128, 255),       # Neon pink
+                "normal": (255, 255, 255, 255),        # White
+                "box_fill": (15, 5, 25, 220),         # Dark indigo/black
+                "accent": (255, 0, 128),
+                "font_file": "Montserrat-ExtraBold.ttf"
+            },
+            {
+                "name": "Electric Cyan",
+                "highlight": (0, 230, 255, 255),       # Neon Cyan
+                "normal": (240, 240, 240, 255),        # Off-white
+                "box_fill": (10, 15, 25, 220),        # Dark blue/black
+                "accent": (0, 230, 255),
+                "font_file": "Montserrat-Bold.ttf"
+            },
+            {
+                "name": "Dark Mode Terminal",
+                "highlight": (50, 255, 50, 255),        # Matrix Green
+                "normal": (200, 240, 200, 255),        # Light green
+                "box_fill": (5, 12, 5, 230),           # Deep terminal black
+                "accent": (50, 255, 50),
+                "font_file": "Roboto-Bold.ttf"
+            },
+            {
+                "name": "Clean Minimalist Gold",
+                "highlight": (255, 215, 0, 255),       # Gold
+                "normal": (255, 255, 255, 255),        # White
+                "box_fill": (20, 20, 20, 215),         # Charcoal black
+                "accent": (255, 215, 0),
+                "font_file": "Montserrat-Bold.ttf"
+            },
+            {
+                "name": "Retro Synthwave",
+                "highlight": (255, 110, 0, 255),       # Bright Orange
+                "normal": (255, 250, 220, 255),        # Soft yellow-white
+                "box_fill": (20, 10, 30, 220),         # Deep purple-black
+                "accent": (255, 110, 0),
+                "font_file": "Montserrat-ExtraBold.ttf"
+            }
+        ]
+        
+        # Pick palette
+        palette_idx = rng.randint(0, len(PALETTES) - 1)
+        theme = dict(PALETTES[palette_idx])
+
+        # If a vibrant dominant color is provided, use it to tint the overlays/particles/accent
+        if dominant_color:
+            theme["accent"] = dominant_color
+            # Calculate brightness-appropriate highlight
+            r, g, b = dominant_color
+            brightness = (0.299 * r + 0.587 * g + 0.114 * b)
+            if brightness < 200:
+                vibrant_color = tuple(min(255, int(c * 1.5)) for c in dominant_color)
+                theme["highlight"] = (*vibrant_color, 255)
+            else:
+                theme["highlight"] = (*dominant_color, 255)
+
+    # Coordinates and layout bounds
+    if layout_type == "split_screen":
+        image_y_start_pct = 0.42
+        image_height_pct = 0.58
+    elif layout_type == "hero_center":
+        image_y_start_pct = 0.20
+        image_height_pct = 0.60
+    else:  # asymmetric
+        image_y_start_pct = 0.0
+        image_height_pct = 1.0
+
+    # Gradient & particle configuration
+    gradient_height_pct = rng.uniform(0.40, 0.50)
+    gradient_position = rng.choice(["bottom", "top"])
+    title_bottom_gap = rng.randint(165, 220)
     particle_style = rng.choice(["bokeh", "digital", "stars", "digital_rain", "lens_dust"])
+    progress_bar_height = rng.randint(4, 8)
+    progress_bar_position = rng.choice(["bottom", "top"])
+    hook_transition_time = rng.uniform(3.5, 5.0)
+    avatar_x_offset = rng.randint(-60, 60)
+    subtitle_y_jitter = rng.randint(-30, 30)
 
-    # Progress bar
-    progress_bar_height = rng.randint(4, 8)                 # was fixed 6px
-    progress_bar_position = rng.choice(["bottom", "top"])    # was always bottom
-
-    # Hook transition
-    hook_transition_time = rng.uniform(3.5, 5.0)            # was fixed 4.2s
-
-    # Avatar horizontal offset
-    avatar_x_offset = rng.randint(-60, 60)                  # was always centered
-
-    # Subtitle Y jitter
-    subtitle_y_jitter = rng.randint(-30, 30)                # was fixed 0
-
-    # CTA end card style
-    cta_variant = rng.randint(0, 3)                         # 4 CTA styles
+    cta_variant = rng.randint(0, 3)
     cta_pill_colors = [
-        (204, 255, 0),    # Neon green (original)
-        (0, 200, 255),    # Cyan
-        (255, 100, 100),  # Coral
-        (180, 130, 255),  # Lavender
+        theme["accent"],
+        (0, 200, 255),
+        (255, 100, 100),
+        (180, 130, 255)
     ]
     cta_pill_color = cta_pill_colors[cta_variant]
+    
     cta_headlines = [
         "Full {topic} guide + source code",
         "Get the complete {topic} breakdown",
@@ -103,6 +223,7 @@ def _generate_layout_profile(headline):
         "Deep dive: {topic} explained",
     ]
     cta_headline_template = cta_headlines[cta_variant]
+    
     cta_descriptions = [
         "Join the community 🚀",
         "Free access — link in bio 📥",
@@ -112,6 +233,10 @@ def _generate_layout_profile(headline):
     cta_description = cta_descriptions[cta_variant]
 
     profile = {
+        "layout_type": layout_type,
+        "theme": theme,
+        "image_y_start_pct": image_y_start_pct,
+        "image_height_pct": image_height_pct,
         "gradient_height_pct": gradient_height_pct,
         "gradient_position": gradient_position,
         "title_bottom_gap": title_bottom_gap,
@@ -125,10 +250,11 @@ def _generate_layout_profile(headline):
         "cta_headline_template": cta_headline_template,
         "cta_description": cta_description,
     }
-    print(f"🎲 Layout Profile: gradient={gradient_position}@{gradient_height_pct:.0%}, "
-          f"particles={particle_style}, title_gap={title_bottom_gap}px, "
-          f"progress={progress_bar_position}@{progress_bar_height}px, "
-          f"avatar_offset={avatar_x_offset}px, cta_variant={cta_variant}")
+    
+    print(f"🎲 Layout Profile: type={layout_type}, theme={theme['name']}, "
+          f"gradient={gradient_position}@{gradient_height_pct:.0%}, "
+          f"particles={particle_style}, progress={progress_bar_position}@{progress_bar_height}px, "
+          f"cta_variant={cta_variant}")
     return profile
 
 import cv2
@@ -550,6 +676,195 @@ def build_video_clip(video_path, duration):
         print(f"Video clip failed: {e}")
         return None
 
+
+def _build_layout_bg_clip(vp, clip_dur, layout, chunk_idx):
+    """
+    Builds a composite background layer clip for a specific chunk.
+    Applies the layout crop bounds, overscan calculation, and a zero-resize drift pan.
+    """
+    layout_type = layout.get("layout_type", "asymmetric")
+    
+    # Target visual asset dimensions
+    if layout_type == "split_screen":
+        target_w = FRAME_W
+        target_h = int(FRAME_H * 0.58)
+        pos = (0, int(FRAME_H * 0.42))
+    elif layout_type == "hero_center":
+        target_w = FRAME_W
+        target_h = int(FRAME_H * 0.60)
+        pos = (0, int(FRAME_H * 0.20))
+    else:  # asymmetric / full screen
+        target_w = FRAME_W
+        target_h = FRAME_H
+        pos = (0, 0)
+
+    # 15% overscan relative to the target dimensions
+    overscan_w = int(target_w * 1.15)
+    overscan_h = int(target_h * 1.15)
+    
+    is_video = vp.endswith(".mp4")
+    
+    # Load primary asset clip
+    if is_video:
+        c_clip = VideoFileClip(vp).without_audio()
+        if c_clip.duration < clip_dur:
+            c_clip = c_clip.with_effects([vfx.Loop(duration=clip_dur)])
+        else:
+            c_clip = c_clip.subclipped(0, clip_dur)
+    else:
+        # We will load the image inside make_frame using PIL to pan dynamically,
+        # so we don't need a heavy ImageClip structure.
+        c_clip = None
+
+    # Calculate crop pan coordinates (drift pan over duration)
+    # Drift pan is a moving window crop of size (target_w, target_h)
+    # inside the (overscan_w, overscan_h) pre-scaled image.
+    dw = overscan_w - target_w
+    dh = overscan_h - target_h
+    
+    # Seed a deterministic pan style per chunk
+    rng = random.Random(chunk_idx)
+    pan_style = rng.choice(["pan_left_right", "pan_right_left", "pan_top_bottom", "pan_bottom_top", "drift_diagonal"])
+    
+    def get_crop_coords(t):
+        progress = min(t / max(clip_dur, 0.01), 1.0)
+        # Slow ease pan
+        eased = 2 * progress * progress if progress < 0.5 else 1 - pow(-2 * progress + 2, 2) / 2
+        
+        if pan_style == "pan_left_right":
+            x = int(dw * eased)
+            y = dh // 2
+        elif pan_style == "pan_right_left":
+            x = int(dw * (1.0 - eased))
+            y = dh // 2
+        elif pan_style == "pan_top_bottom":
+            x = dw // 2
+            y = int(dh * eased)
+        elif pan_style == "pan_bottom_top":
+            x = dw // 2
+            y = int(dh * (1.0 - eased))
+        else:  # drift_diagonal
+            x = int(dw * eased)
+            y = int(dh * eased)
+            
+        # Ensure we don't overshoot boundaries
+        x = max(0, min(x, dw))
+        y = max(0, min(y, dh))
+        return x, y, x + target_w, y + target_h
+
+    # Target aspect ratios for crop preprocessing
+    target_aspect = target_w / target_h
+
+    if is_video:
+        # For video: use transform filter to crop each frame dynamically
+        # Since it's a video file, it's already a clip
+        w, h = c_clip.size
+        current_aspect = w / h
+        if current_aspect > target_aspect:
+            crop_w = int(h * target_aspect)
+            x1 = (w - crop_w) // 2
+            c_clip = c_clip.cropped(x1=x1, y1=0, x2=x1 + crop_w, y2=h)
+        else:
+            crop_h = int(w / target_aspect)
+            y1 = (h - crop_h) // 2
+            c_clip = c_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + crop_h)
+            
+        c_clip = c_clip.resized((overscan_w, overscan_h))
+        
+        def crop_filter(get_frame, t):
+            frame = get_frame(t)
+            x1, y1, x2, y2 = get_crop_coords(t)
+            cropped_frame = frame[y1:y2, x1:x2]
+            # Ensure exact target dimensions
+            if cropped_frame.shape[0] != target_h or cropped_frame.shape[1] != target_w:
+                cropped_frame = cv2.resize(cropped_frame, (target_w, target_h))
+            return cropped_frame
+            
+        c_clip = c_clip.transform(crop_filter)
+    else:
+        # For image: pre-scale once using PIL, then create a VideoClip from make_frame
+        try:
+            pil_img = Image.open(vp).convert("RGB")
+            # crop to target aspect ratio first
+            w, h = pil_img.size
+            current_aspect = w / h
+            if current_aspect > target_aspect:
+                crop_w = int(h * target_aspect)
+                x1 = (w - crop_w) // 2
+                pil_img = pil_img.crop((x1, 0, x1 + crop_w, h))
+            else:
+                crop_h = int(w / target_aspect)
+                y1 = (h - crop_h) // 2
+                pil_img = pil_img.crop((0, y1, w, y1 + crop_h))
+            base_img = ImageOps.fit(pil_img, (overscan_w, overscan_h), Image.LANCZOS)
+        except Exception as e:
+            print(f"⚠️ Error preparing image for crop: {e}")
+            base_img = Image.new("RGB", (overscan_w, overscan_h), (10, 10, 15))
+            
+        def make_frame(t):
+            x1, y1, x2, y2 = get_crop_coords(t)
+            cropped_pil = base_img.crop((x1, y1, x2, y2))
+            frame_arr = np.array(cropped_pil)
+            # Ensure exact target dimensions
+            if frame_arr.shape[0] != target_h or frame_arr.shape[1] != target_w:
+                frame_arr = cv2.resize(frame_arr, (target_w, target_h))
+            return frame_arr
+            
+        c_clip = VideoClip(make_frame, duration=clip_dur)
+
+    # Apply color grading tint/grade
+    c_clip = c_clip.image_transform(apply_tech_grade)
+
+    # Construct the backing/blurred backdrop layers
+    if layout_type in ["split_screen", "hero_center"]:
+        try:
+            if is_video:
+                bg_blur = ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=clip_dur)
+            else:
+                raw_img = Image.open(vp).convert("RGB")
+                bg_img = ImageOps.fit(raw_img, (FRAME_W, FRAME_H), Image.LANCZOS)
+                bg_arr = np.array(bg_img)
+                bg_arr = cv2.GaussianBlur(bg_arr, (51, 51), 0)
+                bg_blur = ImageClip(bg_arr).with_duration(clip_dur).with_opacity(0.35)
+        except Exception as e:
+            print(f"⚠️ Error constructing backdrop blur: {e}")
+            bg_blur = ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=clip_dur)
+            
+        c_clip = c_clip.with_position(pos)
+        comp = CompositeVideoClip([bg_blur, c_clip], size=(FRAME_W, FRAME_H)).with_duration(clip_dur)
+        return comp
+    else:
+        # Asymmetric layout: heavily blurred full-screen background
+        try:
+            if is_video:
+                bg_blur = ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=clip_dur)
+            else:
+                raw_img = Image.open(vp).convert("RGB")
+                bg_img = ImageOps.fit(raw_img, (FRAME_W, FRAME_H), Image.LANCZOS)
+                bg_arr = np.array(bg_img)
+                bg_arr = cv2.GaussianBlur(bg_arr, (71, 71), 0)
+                bg_blur = ImageClip(bg_arr).with_duration(clip_dur)
+        except Exception as e:
+            bg_blur = ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=clip_dur)
+        
+        # Scale to overscan once and crop pan the blurred background as well (cinematic drift)
+        if not is_video and not isinstance(bg_blur, ColorClip):
+            overscan_w_bg = int(FRAME_W * 1.15)
+            overscan_h_bg = int(FRAME_H * 1.15)
+            bg_blur_pil = Image.fromarray(bg_blur.img)
+            base_bg_blur = ImageOps.fit(bg_blur_pil, (overscan_w_bg, overscan_h_bg), Image.LANCZOS)
+            dw_bg = overscan_w_bg - FRAME_W
+            dh_bg = overscan_h_bg - FRAME_H
+            
+            def make_bg_frame(t):
+                x1, y1, x2, y2 = get_crop_coords(t)
+                x1_bg = int(x1 * (dw_bg / max(1, dw)))
+                y1_bg = int(y1 * (dh_bg / max(1, dh)))
+                cropped_bg = base_bg_blur.crop((x1_bg, y1_bg, x1_bg + FRAME_W, y1_bg + FRAME_H))
+                return np.array(cropped_bg)
+                
+            bg_blur = VideoClip(make_bg_frame, duration=clip_dur)
+        return bg_blur
 
 # ── PIL clip helper ───────────────────────────────────────────────────────────
 def _pil_clip(pil_img, duration, pos=("center", "center"), start=0, opacity=1.0):
@@ -4306,7 +4621,24 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
     # ── YPP COMPLIANCE: Per-Video Layout Randomization ────────────────────
     headline = script_json.get("original_news_headline", script_json.get("title", "Tech News"))
-    layout = _generate_layout_profile(headline)
+    
+    # Extract dominant color from first valid visual path
+    first_visual_path = None
+    for chunk in chunks:
+        vp = chunk.get("visual_path")
+        if vp and os.path.exists(vp):
+            first_visual_path = vp
+            break
+            
+    dominant_color = None
+    if first_visual_path:
+        dominant_color = get_vibrant_dominant_color(first_visual_path)
+        if dominant_color:
+            print(f"🎨 Dominant color extracted from first asset: {dominant_color}")
+        else:
+            print(f"🎨 No vibrant dominant color found in {first_visual_path}, using default accents.")
+
+    layout = _generate_layout_profile(headline, dominant_color=dominant_color)
     # Merge layout jitter into subtitle shift
     subtitle_y_shift += layout["subtitle_y_jitter"]
 
@@ -4564,52 +4896,21 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                     continue
                 
                 try:
-                    if vp.endswith(".mp4"):
-                        if vp in clip_cache:
-                            c_clip = clip_cache[vp].copy()
-                        else:
-                            c_clip = VideoFileClip(vp).without_audio()
-                            clip_cache[vp] = c_clip
-                        
-                        if c_clip.duration < clip_dur:
-                            c_clip = c_clip.with_effects([vfx.Loop(duration=clip_dur)])
-                        else:
-                            c_clip = c_clip.subclipped(0, clip_dur)
-                        
-                        # 9:16 portrait crop (Shorts)
-                        w, h = c_clip.size
-                        target_h = int(w * 16 / 9)
-                        if target_h <= h:
-                            y1 = (h - target_h) // 2
-                            c_clip = c_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h)
-                        else:
-                            target_w = int(h * 9 / 16)
-                            x1 = (w - target_w) // 2
-                            c_clip = c_clip.cropped(x1=x1, y1=0, x2=w, y2=h)
-                        c_clip = c_clip.resized((FRAME_W, FRAME_H))
+                    layout_variation_enabled = os.environ.get("ENABLE_LAYOUT_VARIATION", "0") == "1"
+                    if layout_variation_enabled:
+                        c_clip = _build_layout_bg_clip(vp, clip_dur, layout, i)
                     else:
-                        if vp.endswith(".png"):
+                        if vp.endswith(".mp4"):
                             if vp in clip_cache:
                                 c_clip = clip_cache[vp].copy()
                             else:
-                                try:
-                                    raw_img = Image.open(vp)
-                                    canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H)
-                                    canvas_arr = np.array(canvas_img.convert("RGB"))
-                                    c_clip = ImageClip(canvas_arr)
-                                    clip_cache[vp] = c_clip
-                                except Exception as e:
-                                    print(f"⚠️ Error preparing screenshot canvas for {vp}: {e}")
-                                    c_clip = ImageClip(vp)
-                                    clip_cache[vp] = c_clip
-                            c_clip = c_clip.with_duration(clip_dur)
-                        else:
-                            if vp in clip_cache:
-                                c_clip = clip_cache[vp].copy()
-                            else:
-                                c_clip = ImageClip(vp)
+                                c_clip = VideoFileClip(vp).without_audio()
                                 clip_cache[vp] = c_clip
-                            c_clip = c_clip.with_duration(clip_dur)
+                            
+                            if c_clip.duration < clip_dur:
+                                c_clip = c_clip.with_effects([vfx.Loop(duration=clip_dur)])
+                            else:
+                                c_clip = c_clip.subclipped(0, clip_dur)
                             
                             # 9:16 portrait crop (Shorts)
                             w, h = c_clip.size
@@ -4622,9 +4923,47 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                                 x1 = (w - target_w) // 2
                                 c_clip = c_clip.cropped(x1=x1, y1=0, x2=w, y2=h)
                             c_clip = c_clip.resized((FRAME_W, FRAME_H))
-                    
-                    # Apply premium cinematic color grade
-                    c_clip = c_clip.image_transform(apply_tech_grade)
+                        else:
+                            if vp.endswith(".png"):
+                                if vp in clip_cache:
+                                    c_clip = clip_cache[vp].copy()
+                                else:
+                                    try:
+                                        raw_img = Image.open(vp)
+                                        canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H)
+                                        canvas_arr = np.array(canvas_img.convert("RGB"))
+                                        c_clip = ImageClip(canvas_arr)
+                                        clip_cache[vp] = c_clip
+                                    except Exception as e:
+                                        print(f"⚠️ Error preparing screenshot canvas for {vp}: {e}")
+                                        c_clip = ImageClip(vp)
+                                        clip_cache[vp] = c_clip
+                                c_clip = c_clip.with_duration(clip_dur)
+                            else:
+                                if vp in clip_cache:
+                                    c_clip = clip_cache[vp].copy()
+                                else:
+                                    c_clip = ImageClip(vp)
+                                    clip_cache[vp] = c_clip
+                                c_clip = c_clip.with_duration(clip_dur)
+                                
+                                # 9:16 portrait crop (Shorts)
+                                w, h = c_clip.size
+                                target_h = int(w * 16 / 9)
+                                if target_h <= h:
+                                    y1 = (h - target_h) // 2
+                                    c_clip = c_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h)
+                                else:
+                                    target_w = int(h * 9 / 16)
+                                    x1 = (w - target_w) // 2
+                                    c_clip = c_clip.cropped(x1=x1, y1=0, x2=w, y2=h)
+                                c_clip = c_clip.resized((FRAME_W, FRAME_H))
+                        
+                        # Apply premium cinematic color grade
+                        c_clip = c_clip.image_transform(apply_tech_grade)
+                        
+                        scale_factor = 1.0 + random.uniform(0.15, 0.22)
+                        c_clip = c_clip.resized(lambda t, sf=scale_factor, cd=clip_dur: 1.0 + (sf - 1.0) * (t / cd))
                     
                     if i > 0:
                         retention_map = script_json.get("retention_map", {})
@@ -4678,8 +5017,6 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                         dip = dip.with_start(start_t).with_effects([vfx.CrossFadeIn(0.1), vfx.CrossFadeOut(0.1)])
                         logo_clips.append(dip)
                     
-                    scale_factor = 1.0 + random.uniform(0.15, 0.22)
-                    c_clip = c_clip.resized(lambda t, sf=scale_factor, cd=clip_dur: 1.0 + (sf - 1.0) * (t / cd))
                     c_clip = _apply_handheld_shake(c_clip)
                     
                     c_clip = c_clip.with_start(start_t)
@@ -4734,12 +5071,20 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
         w, h = vid_clip.size
         
+        # Check if circular avatar is enabled based on layout archetype
+        layout_variation_enabled = os.environ.get("ENABLE_LAYOUT_VARIATION", "0") == "1"
+        enable_circular_avatar = (
+            layout_variation_enabled 
+            and not is_longform 
+            and layout.get("layout_type") in ["split_screen", "hero_center"]
+        )
+
         # Crop avatar based on video format
-        if is_longform:
-            # For longform 16:9: crop to square (1:1) for bottom-right PiP bubble
+        if is_longform or enable_circular_avatar:
+            # For longform or circular facecam: crop to square (1:1) for PiP bubble
             target_aspect = 1.0
         else:
-            # For Shorts 9:16: crop to portrait to focus on character
+            # For Shorts asymmetric (full-screen presenter): crop to portrait 9:16
             target_aspect = 9 / 16
         
         if w/h > target_aspect:
@@ -4755,8 +5100,20 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             
         w, h = vid_clip.size
         
-        # Avatar size: 60% for longform (premium centered presenter), 40% for Shorts
-        avatar_height_pct = 0.60 if is_longform else 0.40
+        # Avatar size based on layout type
+        if is_longform:
+            avatar_height_pct = 0.60
+        else:
+            if layout_variation_enabled:
+                if layout.get("layout_type") == "split_screen":
+                    avatar_height_pct = 0.22
+                elif layout.get("layout_type") == "hero_center":
+                    avatar_height_pct = 0.25
+                else: # asymmetric (full-screen presenter)
+                    avatar_height_pct = 0.85
+            else:
+                avatar_height_pct = 0.40
+                
         height_pip = int(FRAME_H * avatar_height_pct)
         width_pip = int(height_pip * (w / h))
         
@@ -4884,15 +5241,34 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 return (base_x, base_y)
             else:
                 # Glide/shrink position interpolation for Shorts
-                glide_dur = 3.5
+                layout_type = layout.get("layout_type", "asymmetric")
                 
-                # Start position (centered just below the header bar)
+                if layout_variation_enabled:
+                    if layout_type == "split_screen":
+                        # Position circular facecam at top-right
+                        x_end = FRAME_W - scaled_w - 40.0
+                        y_end = 120.0
+                    elif layout_type == "hero_center":
+                        # Position circular facecam at bottom-right
+                        x_end = FRAME_W - scaled_w - 40.0
+                        y_end = FRAME_H - scaled_h - 180.0
+                    else: # asymmetric (full-screen presenter)
+                        # Center horizontally, position at bottom
+                        x_end = (FRAME_W - scaled_w) / 2.0
+                        y_end = FRAME_H - scaled_h
+                        
+                    # For full-screen asymmetric layout, no glide is needed, it remains centered
+                    if layout_type == "asymmetric":
+                        return (int(x_end), int(y_end))
+                else:
+                    # Legacy default
+                    x_end = (FRAME_W - scaled_w) / 2.0 + layout["avatar_x_offset"]
+                    y_end = FRAME_H - scaled_h - 30.0
+                    
+                # Apply legacy glide animation for split_screen / hero_center (reaches target pos in 3.5s)
+                glide_dur = 3.5
                 x_start = 0.0
                 y_start = 350.0
-                
-                # Target bottom-center PIP position
-                x_end = (FRAME_W - scaled_w) / 2.0 + layout["avatar_x_offset"]
-                y_end = FRAME_H - scaled_h - 30.0
                 
                 if t < glide_dur:
                     p = t / glide_dur
@@ -4948,7 +5324,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     gradient = _gradient_clip(audio_duration, height_pct=layout["gradient_height_pct"], position=layout["gradient_position"], is_longform=is_longform)
     
     # Ambient Particles
-    particle_layer = _ambient_particles(audio_duration, accent_color, particle_style=layout["particle_style"])
+    bg_accent = layout["theme"]["accent"] if (layout.get("theme") and os.environ.get("ENABLE_LAYOUT_VARIATION", "0") == "1") else accent_color
+    particle_layer = _ambient_particles(audio_duration, bg_accent, particle_style=layout["particle_style"])
 
     # ── HUMAN REALISM OVERLAYS ───────────────────────────────────────────────
     grain_layer = _generate_film_grain(audio_duration, FRAME_W, FRAME_H)
@@ -5195,21 +5572,21 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     # ══════════════════════════════════════════════════════════════════════
     snap_zoom_timestamps = []  # Used per-frame in make_final_frame
     
+    # IMPROVEMENT #1: Glow ring behind avatar PiP
+    if ring_clip is not None:
+        positioned_ring = ring_clip.with_position(ring_position).with_start(0)
+        # Insert ring BEFORE avatar in the layer stack (so it renders behind)
+        # Find avatar_pip index and insert ring before it
+        # Find index using identity check to avoid MoviePy's buggy Clip.__eq__
+        idx = next((i for i, clip in enumerate(base_layers) if clip is avatar_pip), -1)
+        if idx != -1:
+            base_layers.insert(idx, positioned_ring)
+        else:
+            base_layers.append(positioned_ring)
+        print("   🔴 Glow ring layer added behind avatar.")
+
     if is_longform and script_json.get("longform_format") in ["did_you_know", "vaibhav"]:
         fact_timestamps_lf = script_json.get("fact_timestamps", [])
-        
-        # IMPROVEMENT #1: Glow ring behind avatar PiP
-        if ring_clip is not None:
-            positioned_ring = ring_clip.with_position(ring_position).with_start(0)
-            # Insert ring BEFORE avatar in the layer stack (so it renders behind)
-            # Find avatar_pip index and insert ring before it
-            # Find index using identity check to avoid MoviePy's buggy Clip.__eq__
-            idx = next((i for i, clip in enumerate(base_layers) if clip is avatar_pip), -1)
-            if idx != -1:
-                base_layers.insert(idx, positioned_ring)
-            else:
-                base_layers.append(positioned_ring)
-            print("   🔴 Glow ring layer added behind avatar.")
 
         # IMPROVEMENT #3: Progress Dot Navigator (top-center)
         try:
