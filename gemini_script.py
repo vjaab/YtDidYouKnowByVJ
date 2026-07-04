@@ -245,6 +245,13 @@ Analyze the following tech news context and pick the SINGLE most impactful, surp
 CRITICAL AVOIDANCE RULE:
 You MUST NOT select any story that is semantically similar to the 'RECENTLY COVERED STORIES' listed in the context. If the hottest trending story matches a recently covered one, SKIP IT and pick the next best unique story.
 
+PRIORITIZATION RULE:
+You MUST give highest priority to unique stories that fall under any of the following 3 high-performing categories:
+1. Open-Source AI Hacks & Development (e.g., viral GitHub repos, MiniMind, training custom/local LLMs from scratch, democratization/optimization of AI).
+2. Device Security & "Shadow AI" Privacy Risks (e.g., Apple's Significant Locations, hidden tracking settings, shadow AI tools scraping corporate data, codebase leaks via dev extensions).
+3. Frontier Tech Gadgets & Privacy-First Hardware (e.g., wearable AR concepts, camera-free AR smart glasses, HUD devices eliminating privacy risks).
+Only select other tech stories if none of these 3 high-performing categories are present in the context.
+
 {selection_instruction}
 
 NEWS CONTEXT:
@@ -312,9 +319,11 @@ Topic Title: {title}
 Description: {description}
 
 Assess based on these three strict tests:
-1. The Friction Test: Does it solve an immediate, relatable consumer/user problem (e.g. saving battery, digital privacy, free app alternative, replacing boilerplate code) rather than deep infrastructure/corporate updates?
+1. The Friction Test: Does it solve an immediate, relatable consumer/user problem (e.g. saving battery, digital privacy, free app alternative, replacing boilerplate code, training custom/local models from scratch, local AI model hacks) rather than deep infrastructure/corporate updates?
 2. The Visual Pivot: Can it be explained visually using a 3-second split-screen or an immediate 'before and after' UI demonstration?
 3. The "Enemy" or "Hero" Angle: Can it be framed around a polarizing or high-utility entity? E.g., "Google just killed this app" or "This open-source tool is making Nvidia nervous."
+
+Note: Topics matching any of our viral pillars (1. Open-source AI hacks/MiniMind, 2. OS security/tracking settings toggles/shadow AI data leakage, 3. Camera-free/privacy smart glasses HUD gadgets) are highly viable.
 
 Return ONLY a JSON object:
 {{
@@ -368,14 +377,16 @@ def get_hottest_tech_topic(client, target_country="US", avoid_list=""):
                 contents=(
                     f"Analyze today's Google Trends and viral tech content in {country_name}. "
                     f"What is the single most trending technology topic right now in {country_name}? "
-                    "Look for: viral AI tools people are trying, fascinating tech facts, "
-                    "money making side hustles, productivity life hacks, "
-                    "AI coding shortcuts, agentic AI developments, or any tech hack going viral on social media. "
+                    "Look for today's most viral and trending tech topics in one of these high-performing categories: "
+                    "1. Open-Source AI Hacks & Development (e.g. viral GitHub repositories, MiniMind, training custom/local LLMs from scratch, democratization/optimization of AI). "
+                    "2. Device Security & Shadow AI Privacy Risks (e.g. Apple's Significant Locations, hidden tracking settings, shadow AI tools scraping corporate data, codebase leaks via dev extensions). "
+                    "3. Frontier Tech Gadgets & Privacy-First Hardware (e.g. wearable AR concepts, camera-free AR smart glasses, HUD devices eliminating privacy risks). "
+                    "4. Fascinating tech facts, AI tools, or digital productivity hacks going viral. "
                     f"CRITICAL: The topic must appeal to high-RPM English-speaking audiences in {country_name} as well as other high-RPM regions (USA, UK, Canada, Australia, New Zealand) and India. "
                     f"Focus on universal and gender-inclusive themes like saving time, making money, interesting facts, "
                     f"lifestyle and smart organization apps, budget-friendly AI tools, and productivity enhancement in {country_name}. "
-                    "Do NOT choose developer news, programming tutorials, API releases, model benchmarking scores, "
-                    "or corporate tech-investor updates, nor heavily male-biased topics like PC hardware overclocking or gaming frame rate hacks. "
+                    "Do NOT choose programming tutorials, API releases, corporate tech-investor updates, nor heavily male-biased topics like PC hardware overclocking or gaming frame rate hacks. "
+                    "(Note: High-impact open-source AI hacks like MiniMind or training custom LLMs from scratch are explicitly ALLOWED and should be prioritized). "
                     f"{avoid_prompt}\n\n"
                     "Return ONLY a JSON object with two fields: "
                     "'topic' (3-6 word phrase, e.g. 'viral AI productivity tool') and "
@@ -464,23 +475,43 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
                 if any(fuzz.token_set_ratio(title.lower(), s.lower()) > 80 for s in seen_titles_in_this_batch):
                     continue
 
-                # 2.5 Dev-centric or Niche Filtering for General Consumer Appeal (18-70)
-                dev_antikeywords = [
-                    "repository", "git commit", "api endpoint", "npm package", "pip install", 
-                    "cuda", "pytorch", "fine-tune", "fine-tuning", "weights", "parameters", 
-                    "benchmark", "llmops", "mlops", "orchestration", "agentic architecture",
-                    "sdk", "library", "framework", "repo", "github repo", "developer tools", 
-                    "coding tutorial", "syntax", "refactoring", "hugging face", "huggingface",
-                    "dataset", "datasets", "arxiv", "paper", "arxiv paper", "pre-print", 
-                    "quantization", "quantized", "loss function", "hyperparameters", "github.com",
-                    "open-source library", "backend architecture", "python package", "javascript library",
-                    "npm install", "local model run", "r/MachineLearning", "r/LocalLLaMA"
-                ]
+                # 2.5 Categorize & Filter for Viral Tech Pillars
                 title_lower = title.lower()
                 desc_lower = (art.get('description', '') or '').lower()
-                if any(kw in title_lower or kw in desc_lower for kw in dev_antikeywords):
-                    # Skip highly developer-centric / tech-niche articles to ensure mass-appeal (18-70)
-                    continue
+                
+                is_viral_category = False
+                
+                # Category 1: Open-Source AI Hacks & Development
+                cat1_keywords = ["minimind", "train from scratch", "train custom llm", "custom llm", "github repository", "github repo", "open-source repo", "open source repo", "compact framework", "open-source model", "local model", "efficient training", "democratization of ai", "64-million parameter", "64m parameter", "64m llm", "train custom model"]
+                # Category 2: Device Security & "Shadow AI" Privacy Risks
+                cat2_keywords = ["hidden settings", "hidden setting", "significant locations", "operating system feature", "toggle off", "shadow ai", "data scraping", "unauthorized ai", "corporate data leak", "leak proprietary", "codebase leak", "third-party dev extension", "unauthorized scraping", "unauthorized data tracking", "data tracking", "tracking setting", "apple tracking", "iphone tracking"]
+                # Category 3: Frontier Tech Gadgets & Privacy-First Hardware
+                cat3_keywords = ["smart glasses", "ar smart glasses", "wearable ar", "camera-free", "heads-up display", "privacy-first hardware", "ar glasses", "camera free ar", "privacy smart glasses", "frontier tech gadgets", "wearable display"]
+                
+                if any(k in title_lower or k in desc_lower for k in cat1_keywords):
+                    is_viral_category = True
+                elif any(k in title_lower or k in desc_lower for k in cat2_keywords):
+                    is_viral_category = True
+                elif any(k in title_lower or k in desc_lower for k in cat3_keywords):
+                    is_viral_category = True
+                
+                # Dev-centric or Niche Filtering for General Consumer Appeal (18-70)
+                # Bypassed if the article falls under a viral category.
+                if not is_viral_category:
+                    dev_antikeywords = [
+                        "repository", "git commit", "api endpoint", "npm package", "pip install", 
+                        "cuda", "pytorch", "fine-tune", "fine-tuning", "weights", "parameters", 
+                        "benchmark", "llmops", "mlops", "orchestration", "agentic architecture",
+                        "sdk", "library", "framework", "repo", "github repo", "developer tools", 
+                        "coding tutorial", "syntax", "refactoring", "hugging face", "huggingface",
+                        "dataset", "datasets", "arxiv", "paper", "arxiv paper", "pre-print", 
+                        "quantization", "quantized", "loss function", "hyperparameters", "github.com",
+                        "open-source library", "backend architecture", "python package", "javascript library",
+                        "npm install", "local model run", "r/MachineLearning", "r/LocalLLaMA"
+                    ]
+                    if any(kw in title_lower or kw in desc_lower for kw in dev_antikeywords):
+                        # Skip highly developer-centric / tech-niche articles to ensure mass-appeal (18-70)
+                        continue
                     
                 # ── 3. MULTI-SIGNAL VIRAL SCORING (Phase 1 Upgrade) ──────────
                 title_lower = title.lower()
@@ -582,6 +613,9 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
                     type_score * 0.10
                 )
 
+                if is_viral_category:
+                    hot_score += 150.0  # Massive score boost to prioritize this topic
+
                 art['_hot_score'] = round(hot_score, 1)
                 art['_score_breakdown'] = {
                     'kw': keyword_score, 'eng': engagement_score, 
@@ -638,8 +672,11 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
             print(f"🔍 STEP 1: Using Gemini Search for '{search_subject}'...")
             search_query = (
                 f"Find the most viral, trending content about: {search_subject}. "
-                f"Look for AI tools, fascinating facts, side hustles, productivity hacks, or free alternatives "
-                f"that are going viral on social media right now. Must appeal to general consumers."
+                "PRIORITIZE finding stories in these high-performing categories if available:\n"
+                "1. Open-Source AI Hacks & Development (e.g. viral GitHub repos, MiniMind, training custom/local LLMs from scratch, democratization/optimization of AI).\n"
+                "2. Device Security & Shadow AI Privacy Risks (e.g. Apple's Significant Locations, hidden tracking settings, shadow AI tools scraping corporate data, codebase leaks via dev extensions).\n"
+                "3. Frontier Tech Gadgets & Privacy-First Hardware (e.g. wearable AR concepts, camera-free AR smart glasses, HUD devices eliminating privacy risks).\n"
+                "If none of these are trending, search for other AI tools, fascinating facts, side hustles, productivity hacks, or free alternatives going viral."
             )
             
             try:
