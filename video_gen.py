@@ -44,6 +44,7 @@ from pydub import AudioSegment
 AudioSegment.converter = imageio_ffmpeg.get_ffmpeg_exe()
 
 FRAME_W, FRAME_H = 1080, 1920 # Default for Shorts
+IS_LONGFORM_ACTIVE = False
 def set_resolutions(is_longform=False):
     global FRAME_W, FRAME_H
     if is_longform:
@@ -305,17 +306,25 @@ def gf(size, bold=False, italic=False):
     Global Font Loader with caching and fallback weights.
     Ensures that 'bold=True' requests actually return a bold font variant.
     """
-    key = (size, bold, italic)
+    key = (size, bold, italic, IS_LONGFORM_ACTIVE)
     if key not in _fc:
         search_paths = []
         
         # 1. Prioritize specific fonts for bold/italic if available in assets
-        if italic:
-            search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Montserrat-Italic.ttf"))
-        if bold:
-            # Try ExtraBold first, then standard Bold
-            search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Montserrat-ExtraBold.ttf"))
-            search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Montserrat-Bold.ttf"))
+        if IS_LONGFORM_ACTIVE:
+            # Roboto for Longform
+            if bold:
+                search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Roboto-Bold.ttf"))
+            else:
+                search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Roboto-Regular.ttf"))
+        else:
+            # Montserrat for Shorts
+            if italic:
+                search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Montserrat-Italic.ttf"))
+            if bold:
+                # Try ExtraBold first, then standard Bold
+                search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Montserrat-ExtraBold.ttf"))
+                search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Montserrat-Bold.ttf"))
         
         # 2. Add the rest of the system/default paths
         for p in FONT_PATHS:
@@ -3040,7 +3049,7 @@ def render_entity_tags(entities, accent_color, frame_width=1080, on_right=False)
     draw = ImageDraw.Draw(img)
     
     # Font (Increased from 32 for better readability)
-    f_val = ImageFont.truetype('assets/fonts/Montserrat-Bold.ttf', 44)
+    f_val = gf(44, bold=True)
     
     if not entities:
         return img
@@ -3246,7 +3255,7 @@ def render_emoji_popup(emoji, frame_width=1080):
     draw = ImageDraw.Draw(img)
     # Using a large font for the emoji
     try:
-        f = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 200)
+        f = gf(200, bold=True)
     except:
         f = ImageFont.load_default()
         
@@ -3260,7 +3269,7 @@ def insert_easter_egg(frame_width=1080, frame_height=1920):
     draw = ImageDraw.Draw(img)
     # Neon glitch style
     draw.rectangle([0, 0, frame_width, frame_height], fill=(0, 255, 100, 40))
-    f = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 60)
+    f = gf(60, bold=True)
     draw.text((frame_width//2, frame_height//2), "ALGORITHM DETECTED", font=f, fill=(255,255,255,255), anchor="mm")
     return img
 
@@ -3960,7 +3969,7 @@ def _render_hook_overlay(hook_text, width, height, timestamp):
         
         # Massive Bold hook text
         try:
-            font = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 110)
+            font = gf(110, bold=True)
         except:
             font = ImageFont.load_default()
         
@@ -3997,7 +4006,7 @@ def _render_comment_bait(comment_text, width, height):
         padding = 60
         
         try:
-            font = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 38)
+            font = gf(38, bold=True)
         except:
             font = ImageFont.load_default()
         
@@ -4040,7 +4049,7 @@ def _render_animated_stat(stat_text, width, height, progress_ratio, accent_color
             display_text += p
             
     try:
-        font = ImageFont.truetype('assets/fonts/Montserrat-ExtraBold.ttf', 160)
+        font = gf(160, bold=True)
     except:
         font = ImageFont.load_default()
     
@@ -4644,6 +4653,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
     slot_str = script_json.get("slot", "")
     is_longform = "Slot C" in slot_str or "Slot L" in slot_str or script_json.get("is_longform", False)
+    global IS_LONGFORM_ACTIVE
+    IS_LONGFORM_ACTIVE = is_longform
     set_resolutions(is_longform)
     
     today = datetime.now().strftime("%Y-%m-%d")
@@ -5080,11 +5091,11 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         )
 
         # Crop avatar based on video format
-        if is_longform or enable_circular_avatar:
-            # For longform or circular facecam: crop to square (1:1) for PiP bubble
+        if enable_circular_avatar:
+            # For circular facecam: crop to square (1:1) for PiP bubble
             target_aspect = 1.0
         else:
-            # For Shorts asymmetric (full-screen presenter): crop to portrait 9:16
+            # For Shorts asymmetric or longform presenter: crop to portrait 9:16
             target_aspect = 9 / 16
         
         if w/h > target_aspect:
@@ -5120,200 +5131,228 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         # Apply refinements from dynamic_params
         cur_w = max(1, int(width_pip * avatar_scale_mult))
         cur_h = max(1, int(height_pip * avatar_scale_mult))
-        avatar_clip = vid_clip.resized((cur_w, cur_h)).without_audio()
-
-        # ── AI BACKGROUND REMOVAL (Premium Mode - Highly Optimized & Dynamic) ───────
-        try:
-            from rembg import remove, new_session
-            print("👤 Initializing AI Background Removal (Dynamic Mode)...")
-            
-            # Use u2net_human_seg for faster and highly precise human segmentation
-            rembg_session = new_session(model_name="u2net_human_seg")
-            
-            # Keep a reference to the unmasked avatar clip for frame extraction
-            unmasked_avatar = avatar_clip
-            
-            # Memoize computed masks to avoid redundant rembg processing
-            mask_cache = {}
-            fps = getattr(vid_clip, "fps", 30.0) or 30.0
-            
-            def make_mask_frame(t):
-                # cache by integer frame index
-                frame_idx = int(round(t * fps))
-                if frame_idx in mask_cache:
-                    return mask_cache[frame_idx]
-                
-                # Get the unmasked frame
-                frame = unmasked_avatar.get_frame(t)
-                
-                # Perform dynamic background removal
-                rgba = remove(
-                    frame,
-                    session=rembg_session,
-                    alpha_matting=False,
-                    post_process_mask=True
-                )
-                mask = (rgba[:, :, 3] / 255.0).astype(np.float32)
-                
-                # Erase the bottom 12% of the mask to completely hide the Gemini/Veo watermark logo
-                h_mask, w_mask = mask.shape
-                watermark_height = int(h_mask * 0.12)
-                mask[-watermark_height:, :] = 0.0
-                
-                mask_cache[frame_idx] = mask
-                return mask
-            
-            mclip = VideoClip(make_mask_frame, is_mask=True, duration=audio_duration)
-            avatar_clip = avatar_clip.with_mask(mclip)
-            print("   ✅ Dynamic AI background removal mask applied successfully (frame-by-frame).")
-            
-        except Exception as e:
-            print(f"⚠️ rembg failed: {e}. Falling back to Rounded Authority Card.")
-            # Fallback: Clean Rounded Card instead of a messy vignette
-            Y, X = np.ogrid[:cur_h, :cur_w]
-            rad = int(min(cur_w, cur_h) * 0.15)
-            mask = np.ones((cur_h, cur_w), dtype=np.float32)
-            for y, x in [(rad, rad), (rad, cur_w-rad), (cur_h-rad, rad), (cur_h-rad, cur_w-rad)]:
-                dist = np.sqrt((Y-y)**2 + (X-x)**2)
-                corner_mask = (dist > rad) & ( ( (Y<rad) if y==rad else (Y>cur_h-rad) ) & ( (X<rad) if x==rad else (X>cur_w-rad) ) )
-                mask[corner_mask] = 0
-            
-            mclip = VideoClip(lambda t: mask, is_mask=True, duration=audio_duration)
-            avatar_clip = avatar_clip.with_mask(mclip)
-
-        # ── REFINED "ALIVE" MOTION (Head-Bob & Breathing) ────────────────
-        # Apply motion AFTER masking so the mask follows the head movement
-        import math
-        # Calculate a slow zoom that increases scale by 10% over the full video
-        zoom_speed = 0.10 / max(audio_duration, 1.0)
         
-        # Combined dynamic scale: shrink/glide for Shorts intro + continuous micro-breathing/slow zoom
-        def avatar_resize_fn(t):
-            base_scale = 1.0 + zoom_speed * t + 0.006 * math.sin(t * 1.8)
-            if is_longform:
-                return base_scale
-                
-            # Glide/shrink logic for Shorts
-            glide_dur = 3.5
-            scale_start = 1080.0 / cur_w
-            scale_end = 1.0
+        if is_longform:
+            # 1. Full-screen portrait version: height 918, width 516 (aspect 9/16)
+            fs_w, fs_h = 516, 918
+            avatar_fs_clip = vid_clip.resized((fs_w, fs_h)).without_audio()
             
-            if t < glide_dur:
-                p = t / glide_dur
-                p = 1.0 - (1.0 - p)**3 # cubic ease-out
-                intro_scale = scale_start + (scale_end - scale_start) * p
-            else:
-                intro_scale = scale_end
-                
-            return intro_scale * base_scale
-
-        avatar_clip = avatar_clip.with_effects([
-            # Continuous dynamic zoom-in + Micro-Breathing + intro glide resize
-            vfx.Resize(avatar_resize_fn), 
-            # Natural Head Tilt: Very subtle +/- 0.5 degree swing
-            vfx.Rotate(lambda t: 0.6 * math.sin(t * 1.4 + 0.5))
-        ])
-
-        # ── IMPROVEMENT #1: Circular Face-Cam Frame (Premium PiP) ─────────
-        ring_clip = None
-        ring_size = 0
-        # Disabled circular facecam for longform to create a centered talking-head presenter
-        # standing in front of background visuals, matching the explainer style of the reference video.
-        if is_longform and False:
+            # 2. Windowed square version: height 320, width 320 (cropped to 1.0 aspect)
+            w_raw, h_raw = vid_clip.size
+            crop_size = min(w_raw, h_raw)
+            x_crop = (w_raw - crop_size) // 2
+            y_crop = (h_raw - crop_size) // 2
+            win_cropped = vid_clip.cropped(x1=x_crop, y1=y_crop, x2=x_crop+crop_size, y2=y_crop+crop_size)
+            avatar_win_clip = win_cropped.resized((320, 320)).without_audio()
+            
+            # Initialize rembg for full-screen presenter
+            from rembg import remove, new_session
+            rembg_session_fs = new_session(model_name="u2net_human_seg")
+            mask_cache_fs = {}
+            
+            # Pre-generate card mask for windowed layout once
+            card_mask_img = Image.new("L", (320, 320), 0)
+            card_mask_draw = ImageDraw.Draw(card_mask_img)
+            card_mask_draw.rounded_rectangle([0, 0, 320, 320], radius=24, fill=255)
+            card_mask_arr = np.array(card_mask_img).astype(np.float32) / 255.0
+            
+            avatar_pip = None
+            ring_clip = None
+        else:
+            avatar_clip = vid_clip.resized((cur_w, cur_h)).without_audio()
+            
+            # ── AI BACKGROUND REMOVAL (Premium Mode - Highly Optimized & Dynamic) ───────
             try:
-                avatar_clip, ring_clip, ring_size = _apply_circular_facecam_frame(
-                    avatar_clip, cur_w, cur_h, accent_color, audio_duration, is_longform=True
-                )
-                print("   ✅ Circular face-cam frame with glow ring applied.")
-            except Exception as e:
-                print(f"   ⚠️ Circular frame failed (non-fatal): {e}")
-
-        def get_scaled_dims(t):
-            scale = avatar_resize_fn(t)
-            return int(cur_w * scale), int(cur_h * scale)
-
-        def pip_position(t):
-            scaled_w, scaled_h = get_scaled_dims(t)
-            if is_longform:
-                # Center horizontally for longform 16:9 like a news anchor / central explainer host
-                base_x = (FRAME_W - scaled_w) // 2
-                base_y = FRAME_H - scaled_h
-                return (base_x, base_y)
-            else:
-                # Glide/shrink position interpolation for Shorts
-                layout_type = layout.get("layout_type", "asymmetric")
+                from rembg import remove, new_session
+                print("👤 Initializing AI Background Removal (Dynamic Mode)...")
                 
-                if layout_variation_enabled:
-                    if layout_type == "split_screen":
-                        # Position circular facecam at top-right
-                        x_end = FRAME_W - scaled_w - 40.0
-                        y_end = 120.0
-                    elif layout_type == "hero_center":
-                        # Position circular facecam at bottom-right
-                        x_end = FRAME_W - scaled_w - 40.0
-                        y_end = FRAME_H - scaled_h - 180.0
-                    else: # asymmetric (full-screen presenter)
-                        # Center horizontally, position at bottom
-                        x_end = (FRAME_W - scaled_w) / 2.0
-                        y_end = FRAME_H - scaled_h
-                        
-                    # For full-screen asymmetric layout, no glide is needed, it remains centered
-                    if layout_type == "asymmetric":
-                        return (int(x_end), int(y_end))
-                else:
-                    # Legacy default
-                    x_end = (FRAME_W - scaled_w) / 2.0 + layout["avatar_x_offset"]
-                    y_end = FRAME_H - scaled_h - 30.0
+                # Use u2net_human_seg for faster and highly precise human segmentation
+                rembg_session = new_session(model_name="u2net_human_seg")
+                
+                # Keep a reference to the unmasked avatar clip for frame extraction
+                unmasked_avatar = avatar_clip
+                
+                # Memoize computed masks to avoid redundant rembg processing
+                mask_cache = {}
+                fps = getattr(vid_clip, "fps", 30.0) or 30.0
+                
+                def make_mask_frame(t):
+                    # cache by integer frame index
+                    frame_idx = int(round(t * fps))
+                    if frame_idx in mask_cache:
+                        return mask_cache[frame_idx]
                     
-                # Apply legacy glide animation for split_screen / hero_center (reaches target pos in 3.5s)
+                    # Get the unmasked frame
+                    frame = unmasked_avatar.get_frame(t)
+                    
+                    # Perform dynamic background removal
+                    rgba = remove(
+                        frame,
+                        session=rembg_session,
+                        alpha_matting=False,
+                        post_process_mask=True
+                    )
+                    mask = (rgba[:, :, 3] / 255.0).astype(np.float32)
+                    
+                    # Erase the bottom 12% of the mask to completely hide the Gemini/Veo watermark logo
+                    h_mask, w_mask = mask.shape
+                    watermark_height = int(h_mask * 0.12)
+                    mask[-watermark_height:, :] = 0.0
+                    
+                    mask_cache[frame_idx] = mask
+                    return mask
+                
+                mclip = VideoClip(make_mask_frame, is_mask=True, duration=audio_duration)
+                avatar_clip = avatar_clip.with_mask(mclip)
+                print("   ✅ Dynamic AI background removal mask applied successfully (frame-by-frame).")
+                
+            except Exception as e:
+                print(f"⚠️ rembg failed: {e}. Falling back to Rounded Authority Card.")
+                # Fallback: Clean Rounded Card instead of a messy vignette
+                Y, X = np.ogrid[:cur_h, :cur_w]
+                rad = int(min(cur_w, cur_h) * 0.15)
+                mask = np.ones((cur_h, cur_w), dtype=np.float32)
+                for y, x in [(rad, rad), (rad, cur_w-rad), (cur_h-rad, rad), (cur_h-rad, cur_w-rad)]:
+                    dist = np.sqrt((Y-y)**2 + (X-x)**2)
+                    corner_mask = (dist > rad) & ( ( (Y<rad) if y==rad else (Y>cur_h-rad) ) & ( (X<rad) if x==rad else (X>cur_w-rad) ) )
+                    mask[corner_mask] = 0
+                
+                mclip = VideoClip(lambda t: mask, is_mask=True, duration=audio_duration)
+                avatar_clip = avatar_clip.with_mask(mclip)
+
+            # ── REFINED "ALIVE" MOTION (Head-Bob & Breathing) ────────────────
+            # Apply motion AFTER masking so the mask follows the head movement
+            import math
+            # Calculate a slow zoom that increases scale by 10% over the full video
+            zoom_speed = 0.10 / max(audio_duration, 1.0)
+            
+            # Combined dynamic scale: shrink/glide for Shorts intro + continuous micro-breathing/slow zoom
+            def avatar_resize_fn(t):
+                base_scale = 1.0 + zoom_speed * t + 0.006 * math.sin(t * 1.8)
+                if is_longform:
+                    return base_scale
+                    
+                # Glide/shrink logic for Shorts
                 glide_dur = 3.5
-                x_start = 0.0
-                y_start = 350.0
+                scale_start = 1080.0 / cur_w
+                scale_end = 1.0
                 
                 if t < glide_dur:
                     p = t / glide_dur
                     p = 1.0 - (1.0 - p)**3 # cubic ease-out
-                    x_pos = x_start + (x_end - x_start) * p
-                    y_pos = y_start + (y_end - y_start) * p
-                    return (int(x_pos), int(y_pos))
+                    intro_scale = scale_start + (scale_end - scale_start) * p
                 else:
-                    return (int(x_end), int(y_end))
+                    intro_scale = scale_end
+                    
+                return intro_scale * base_scale
 
-        if not is_longform:
-            def hide_avatar_during_screenshots(t):
-                # Fade out/in slightly (0.3s) at boundaries
-                for s_start, s_end in screenshot_intervals:
-                    if s_start <= t <= s_end:
-                        fade_win = 0.3
-                        if t < s_start + fade_win:
-                            return max(0.0, (s_start + fade_win - t) / fade_win)
-                        elif t > s_end - fade_win:
-                            return max(0.0, (t - (s_end - fade_win)) / fade_win)
-                        return 0.0
-                return 1.0
+            avatar_clip = avatar_clip.with_effects([
+                # Continuous dynamic zoom-in + Micro-Breathing + intro glide resize
+                vfx.Resize(avatar_resize_fn), 
+                # Natural Head Tilt: Very subtle +/- 0.5 degree swing
+                vfx.Rotate(lambda t: 0.6 * math.sin(t * 1.4 + 0.5))
+            ])
 
-            # Wrap the avatar's mask to apply the hiding factor
-            orig_mask = avatar_clip.mask
-            if orig_mask is not None:
-                def hide_mask_frame(t):
-                    return orig_mask.get_frame(t) * hide_avatar_during_screenshots(t)
-                avatar_clip = avatar_clip.with_mask(VideoClip(hide_mask_frame, is_mask=True, duration=audio_duration))
-                
-            # Wrap the ring's mask to apply the hiding factor
-            if ring_clip is not None and ring_clip.mask is not None:
-                orig_ring_mask = ring_clip.mask
-                def hide_ring_frame(t):
-                    return orig_ring_mask.get_frame(t) * hide_avatar_during_screenshots(t)
-                ring_clip = ring_clip.with_mask(VideoClip(hide_ring_frame, is_mask=True, duration=audio_duration))
+            # ── IMPROVEMENT #1: Circular Face-Cam Frame (Premium PiP) ─────────
+            ring_clip = None
+            ring_size = 0
+            # Disabled circular facecam for longform to create a centered talking-head presenter
+            # standing in front of background visuals, matching the explainer style of the reference video.
+            if is_longform and False:
+                try:
+                    avatar_clip, ring_clip, ring_size = _apply_circular_facecam_frame(
+                        avatar_clip, cur_w, cur_h, accent_color, audio_duration, is_longform=True
+                    )
+                    print("   ✅ Circular face-cam frame with glow ring applied.")
+                except Exception as e:
+                    print(f"   ⚠️ Circular frame failed (non-fatal): {e}")
 
-        # Position the glow ring to track the avatar
-        def ring_position(t):
-            ax, ay = pip_position(t)
-            # Center the ring around the avatar (ring is slightly larger)
-            offset = (ring_size - min(cur_w, cur_h)) // 2
-            return (ax - offset, ay - offset)
+            def get_scaled_dims(t):
+                scale = avatar_resize_fn(t)
+                return int(cur_w * scale), int(cur_h * scale)
 
-        avatar_pip = avatar_clip.with_position(pip_position).with_start(0)
+            def pip_position(t):
+                scaled_w, scaled_h = get_scaled_dims(t)
+                if is_longform:
+                    # Center horizontally for longform 16:9 like a news anchor / central explainer host
+                    base_x = (FRAME_W - scaled_w) // 2
+                    base_y = FRAME_H - scaled_h
+                    return (base_x, base_y)
+                else:
+                    # Glide/shrink position interpolation for Shorts
+                    layout_type = layout.get("layout_type", "asymmetric")
+                    
+                    if layout_variation_enabled:
+                        if layout_type == "split_screen":
+                            # Position circular facecam at top-right
+                            x_end = FRAME_W - scaled_w - 40.0
+                            y_end = 120.0
+                        elif layout_type == "hero_center":
+                            # Position circular facecam at bottom-right
+                            x_end = FRAME_W - scaled_w - 40.0
+                            y_end = FRAME_H - scaled_h - 180.0
+                        else: # asymmetric (full-screen presenter)
+                            # Center horizontally, position at bottom
+                            x_end = (FRAME_W - scaled_w) / 2.0
+                            y_end = FRAME_H - scaled_h
+                            
+                        # For full-screen asymmetric layout, no glide is needed, it remains centered
+                        if layout_type == "asymmetric":
+                            return (int(x_end), int(y_end))
+                    else:
+                        # Legacy default
+                        x_end = (FRAME_W - scaled_w) / 2.0 + layout["avatar_x_offset"]
+                        y_end = FRAME_H - scaled_h - 30.0
+                        
+                    # Apply legacy glide animation for split_screen / hero_center (reaches target pos in 3.5s)
+                    glide_dur = 3.5
+                    x_start = 0.0
+                    y_start = 350.0
+                    
+                    if t < glide_dur:
+                        p = t / glide_dur
+                        p = 1.0 - (1.0 - p)**3 # cubic ease-out
+                        x_pos = x_start + (x_end - x_start) * p
+                        y_pos = y_start + (y_end - y_start) * p
+                        return (int(x_pos), int(y_pos))
+                    else:
+                        return (int(x_end), int(y_end))
+
+            if not is_longform:
+                def hide_avatar_during_screenshots(t):
+                    # Fade out/in slightly (0.3s) at boundaries
+                    for s_start, s_end in screenshot_intervals:
+                        if s_start <= t <= s_end:
+                            fade_win = 0.3
+                            if t < s_start + fade_win:
+                                return max(0.0, (s_start + fade_win - t) / fade_win)
+                            elif t > s_end - fade_win:
+                                return max(0.0, (t - (s_end - fade_win)) / fade_win)
+                            return 0.0
+                    return 1.0
+
+                # Wrap the avatar's mask to apply the hiding factor
+                orig_mask = avatar_clip.mask
+                if orig_mask is not None:
+                    def hide_mask_frame(t):
+                        return orig_mask.get_frame(t) * hide_avatar_during_screenshots(t)
+                    avatar_clip = avatar_clip.with_mask(VideoClip(hide_mask_frame, is_mask=True, duration=audio_duration))
+                    
+                # Wrap the ring's mask to apply the hiding factor
+                if ring_clip is not None and ring_clip.mask is not None:
+                    orig_ring_mask = ring_clip.mask
+                    def hide_ring_frame(t):
+                        return orig_ring_mask.get_frame(t) * hide_avatar_during_screenshots(t)
+                    ring_clip = ring_clip.with_mask(VideoClip(hide_ring_frame, is_mask=True, duration=audio_duration))
+
+            # Position the glow ring to track the avatar
+            def ring_position(t):
+                ax, ay = pip_position(t)
+                # Center the ring around the avatar (ring is slightly larger)
+                offset = (ring_size - min(cur_w, cur_h)) // 2
+                return (ax - offset, ay - offset)
+
+            avatar_pip = avatar_clip.with_position(pip_position).with_start(0)
 
     # ── LAYERS ───────────────────────────────────────────────────────────
     if is_longform:
@@ -5950,7 +5989,107 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         if not is_longform and entities_list:
             entity_tags_img = render_dynamic_entity_tags(entities_list, accent_color, t, audio_duration, FRAME_W, FRAME_H, screenshot_intervals=screenshot_intervals)
 
-        return composite_frame(bg_frame, t, header_img, subtitle_img, transparency_img, entity_tags_img)
+        # Minimize Static Branding: Only pass transparency_img in the first 5 seconds for longform
+        this_transparency_img = transparency_img if (not is_longform or t < 5.0) else None
+        
+        # ── LONGFORM TALING-HEAD OVERLAY SYSTEM (Transitions & Styled Cards) ──
+        if is_longform and 'avatar_fs_clip' in locals():
+            # Get active fact timestamp
+            is_fs = False
+            active_headline = ""
+            for idx_ft, ft in enumerate(fact_timestamps):
+                start_s = float(ft.get("approx_start_seconds", 0))
+                next_s = float(fact_timestamps[idx_ft+1].get("approx_start_seconds", 9999)) if idx_ft + 1 < len(fact_timestamps) else 9999
+                if start_s <= t < next_s:
+                    # First 3 seconds of each fact is a full-screen transition
+                    is_fs = (t - start_s) < 3.0
+                    active_headline = ft.get("topic", "")
+                    break
+            
+            # Force full-screen presenter during the first 5 seconds of the video (Intro Hook)
+            if t < 5.0:
+                is_fs = True
+                active_headline = script_json.get("title", "")
+                
+            bg_accent = layout["theme"]["accent"] if layout.get("theme") else accent_color
+            
+            def apply_color_grade(frame, accent_rgb):
+                # Subtle 12% tint matching the theme accent color
+                tint_arr = np.full(frame.shape, accent_rgb, dtype=np.uint8)
+                return cv2.addWeighted(frame, 0.88, tint_arr, 0.12, 0)
+
+            if is_fs:
+                # 1. Blur backdrop completely for full-screen presenter
+                bg_frame = cv2.GaussianBlur(bg_frame, (51, 51), 0)
+                
+                # 2. Get full-screen frame
+                fs_frame = avatar_fs_clip.get_frame(t)
+                
+                # 3. Retrieve or compute mask from rembg
+                frame_idx = int(round(t * 30.0))
+                if frame_idx in mask_cache_fs:
+                    mask_fs = mask_cache_fs[frame_idx]
+                else:
+                    try:
+                        rgba = remove(fs_frame, session=rembg_session_fs, alpha_matting=False, post_process_mask=True)
+                        mask_fs = (rgba[:, :, 3] / 255.0).astype(np.float32)
+                        
+                        # Erase bottom 12% watermark
+                        h_m, w_m = mask_fs.shape
+                        wm_h = int(h_m * 0.12)
+                        mask_fs[-wm_h:, :] = 0.0
+                    except Exception as e:
+                        mask_fs = np.ones((fs_frame.shape[0], fs_frame.shape[1]), dtype=np.float32)
+                    mask_cache_fs[frame_idx] = mask_fs
+                
+                # 4. Apply color grading
+                fs_frame_graded = apply_color_grade(fs_frame, bg_accent)
+                
+                # 5. Composite full-screen presenter (516x918 centered at bottom)
+                # Position: x = (1920 - 516) // 2 = 702, y = 1080 - 918 = 162
+                mask_3d = np.expand_dims(mask_fs, axis=2)
+                dest_area = bg_frame[162:162+918, 702:702+516]
+                blended = fs_frame_graded * mask_3d + dest_area * (1.0 - mask_3d)
+                bg_frame[162:162+918, 702:702+516] = blended.astype(np.uint8)
+                
+                # 6. Render elegant fact title text at top center
+                if active_headline:
+                    pil_frame = Image.fromarray(bg_frame).convert("RGBA")
+                    draw_t = ImageDraw.Draw(pil_frame)
+                    title_font = gf(40, bold=True)
+                    title_text = active_headline.upper()
+                    tb = draw_t.textbbox((0, 0), title_text, font=title_font)
+                    tw = tb[2] - tb[0]
+                    th = tb[3] - tb[1]
+                    rect_x1 = (1920 - tw) // 2 - 40
+                    rect_y1 = 40
+                    rect_x2 = (1920 + tw) // 2 + 40
+                    rect_y2 = 40 + th + 30
+                    draw_t.rounded_rectangle([rect_x1, rect_y1, rect_x2, rect_y2], radius=15, fill=(0, 0, 0, 180), outline=(*bg_accent, 180), width=2)
+                    draw_t.text(((1920 - tw) // 2, 52), title_text, font=title_font, fill=(255, 255, 255, 255))
+                    bg_frame = np.array(pil_frame.convert("RGB"))
+            else:
+                # Windowed card mode (bottom-right: 320x320)
+                win_frame = avatar_win_clip.get_frame(t)
+                win_frame_graded = apply_color_grade(win_frame, bg_accent)
+                
+                card_img = Image.new("RGBA", (320, 320), (0, 0, 0, 0))
+                c_draw = ImageDraw.Draw(card_img)
+                # Glassmorphic rounded rectangle border window
+                c_draw.rounded_rectangle([0, 0, 320, 320], radius=24, fill=(15, 15, 20, 180), outline=(*bg_accent, 180), width=2)
+                
+                # Apply rounded mask to win_frame_graded
+                win_pil = Image.fromarray(win_frame_graded).convert("RGBA")
+                mask_img = Image.fromarray((card_mask_arr * 255).astype(np.uint8), mode="L")
+                win_pil.putalpha(mask_img)
+                card_img.alpha_composite(win_pil)
+                
+                # Paste card in bottom-right corner: x = 1550, y = 610
+                main_pil = Image.fromarray(bg_frame).convert("RGBA")
+                main_pil.alpha_composite(card_img, dest=(1550, 610))
+                bg_frame = np.array(main_pil.convert("RGB"))
+
+        return composite_frame(bg_frame, t, header_img, subtitle_img, this_transparency_img, entity_tags_img)
 
 
     final = VideoClip(make_final_frame, duration=audio_duration)

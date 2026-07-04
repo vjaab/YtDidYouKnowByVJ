@@ -69,7 +69,7 @@ Return ONLY the raw integer (0-10)."""
 # ─────────────────────────────────────────────────────────────────────────────
 # GLOBAL VISUAL CONTINUITY
 # ─────────────────────────────────────────────────────────────────────────────
-def generate_visual_style_guide(headline):
+def generate_visual_style_guide(headline, is_longform=False):
     """
     Asks Gemini to define a consistent, HEADLINE-SPECIFIC visual 'vibe' for the whole video.
     This ensures all AI-generated images share a palette, lighting style, and are relevant to the story.
@@ -77,15 +77,20 @@ def generate_visual_style_guide(headline):
     print("🎨 Designing Global Visual Style Guide...")
     try:
         target_model = "gemini-2.5-flash"
-        prompt = f"""Based on this news headline: '{headline}', define a cohesive visual style for a 9:16 vertical cinematic video.
+        orientation = "16:9 landscape cinematic video" if is_longform else "9:16 vertical cinematic video"
+        
+        prompt = f"""Based on this news headline: '{headline}', define a cohesive visual style for a {orientation}.
 
 CRITICAL: The style MUST be tailored to this specific story. Include:
 1. Color palette that matches the mood/entities (e.g., OpenAI = green/white, Google = blue/red/yellow/green, cybersecurity = dark/neon)
 2. Lighting style that fits the story tone (e.g., lawsuit = dramatic/contrasty, product launch = bright/clean)
 3. Visual motifs related to the entities mentioned (e.g., tech company logos as glowing elements, relevant product imagery)
-
-Return a short string (max 50 words) describing the lighting, color palette, camera style, AND relevant visual motifs.
-Example: 'Dark courtroom drama aesthetic, OpenAI green and Tesla silver palette, dramatic split-lighting, gavel imagery, digital contract visuals, shot on 35mm lens, high contrast, editorial news photography style.'
+"""
+        if is_longform:
+            prompt += """4. CONTEXTUAL NO-B-ROLL RULE: Avoid all generic stock-style abstract tech loops (like digital brains, glowing neural networks, or particle vortexes). Instead, prioritize direct, real-world visuals: screen recordings of code editor interfaces (e.g. VS Code, Jupyter), terminal inputs/outputs, system architecture blueprints, vector diagrams, API request flows, or simple high-contrast typography cards for data/metrics.
+"""
+        prompt += """
+Return a short string (max 60 words) describing the lighting, color palette, camera style, AND relevant visual motifs.
 Return ONLY the description."""
         
         response = client.models.generate_content(
@@ -964,7 +969,7 @@ def fetch_all_chunk_visuals(chunks, topic_context="", script_data=None, is_longf
         script_data = {}
         
     # 1. Generate Global Style Guide for visual continuity
-    global_style = generate_visual_style_guide(topic_context)
+    global_style = generate_visual_style_guide(topic_context, is_longform=is_longform)
     
     # 2. Extract Visual Subject once (to avoid 429 rate limits on redundant calls)
     vis_subject = _extract_visual_subject(topic_context)
