@@ -265,6 +265,7 @@ Return ONLY a JSON object:
 {{
   "selected_headline": "The exact headline or title",
   "selected_url": "The exact URL",
+  "keywords": ["3-5 lowercase keywords representing the key concepts/entities of the story"],
   "reason": "Briefly why this was picked (focus on viral potential and uniqueness)"
 }}"""
 
@@ -1108,7 +1109,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
     )
     selection_instruction += retention_instructions
 
-    engine = MultiAgentGenerationEngine(client, news_context, slot, category, strategy_enhancement, is_longform, raw_articles=articles, topic_type=topic_type)
+    engine = MultiAgentGenerationEngine(client, news_context, slot, category, strategy_enhancement, is_longform, raw_articles=articles, topic_type=topic_type, failed_topics=failed_topics)
     script_data = engine.execute(selection_instruction, prompt_requirements)
     
     if script_data:
@@ -1168,11 +1169,11 @@ def call_fallback_model(prompt):
         }
         # Model preference order: only verified working models
         groq_models = [
-            "openai/gpt-oss-120b",
             "llama-3.3-70b-versatile",
             "qwen/qwen3-32b",
             "openai/gpt-oss-20b",
-            "llama-3.1-8b-instant"
+            "llama-3.1-8b-instant",
+            "openai/gpt-oss-120b"
         ]
         for model_name in groq_models:
             print(f"🔮 Falling back to Groq ({model_name})...")
@@ -1403,7 +1404,7 @@ def call_fallback_model(prompt):
     return None
 
 class MultiAgentGenerationEngine:
-    def __init__(self, client, context, slot, category, strategy_enhancement, is_longform, raw_articles=None, topic_type=None):
+    def __init__(self, client, context, slot, category, strategy_enhancement, is_longform, raw_articles=None, topic_type=None, failed_topics=None):
         self.client = client
         self.context = context
         self.slot = slot
@@ -1411,6 +1412,7 @@ class MultiAgentGenerationEngine:
         self.strategy_enhancement = strategy_enhancement
         self.is_longform = is_longform
         self.raw_articles = raw_articles
+        self.failed_topics = failed_topics if failed_topics is not None else []
         if topic_type == "vaibhav":
             self.persona = VAIBHAV_SYSTEM_PERSONA
         else:
@@ -1482,34 +1484,84 @@ class MultiAgentGenerationEngine:
         return None
 
     def execute(self, selection_instruction, prompt_requirements):
-        print("🎯 [AGENT 0] Selector Agent: Picking the single best story...")
-        selector_prompt = SELECTOR_AGENT_TEMPLATE.format(
-            persona=self.persona,
-            selection_instruction=selection_instruction,
-            news_context=self.context
-        )
-        selection = self._call_gemini(selector_prompt)
-        if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
-        if not selection or "selected_headline" not in selection:
-            print("⚠️ Selector Agent failed. Using raw context fallback.")
-            # If we have articles, pick the top one from raw_articles as fallback
-            if self.raw_articles and len(self.raw_articles) > 0:
-                top = self.raw_articles[0]
-                selected_headline = top.get("title", "AI Tech Breakthrough")
-                selected_url = top.get("url", "")
-                print(f"🔄 Fallback to Top Scored Article: {selected_headline}")
-            else:
+        max_selection_attempts = 3
+        selection_attempts = 0
+        local_failed_topics = []
+        
+        selected_headline = None
+        selected_url = None
+        
+        while selection_attempts < max_selection_attempts:
+            # We rebuild the avoid list dynamically if any selection was not unique
+            current_context = self.context
+            if local_failed_topics:
+                avoid_block = "\n".join([f"- {t}" for t in local_failed_topics if t])
+                # We prepend a critical instruction to the context
+                current_context = (
+                    f"CRITICAL: The following stories/topics were JUST rejected as duplicates. "
+                    f"You MUST NOT select them under any circumstances. Select a DIFFERENT unique story:\n{avoid_block}\n\n"
+                    + current_context
+                )
+            
+            print(f"🎯 [AGENT 0] Selector Agent (Attempt {selection_attempts+1}/{max_selection_attempts}): Picking the single best story...")
+            selector_prompt = SELECTOR_AGENT_TEMPLATE.format(
+                persona=self.persona,
+                selection_instruction=selection_instruction,
+                news_context=current_context
+            )
+            selection = self._call_gemini(selector_prompt)
+            if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
+            
+            if not selection or "selected_headline" not in selection:
+                print("⚠️ Selector Agent failed. Using raw context fallback.")
+                # If we have articles, pick the top one from raw_articles as fallback
+                if self.raw_articles and len(self.raw_articles) > 0:
+                    top = None
+                    for art in self.raw_articles:
+                        art_title = art.get("title", "")
+                        art_url = art.get("url", "")
+                        if art_title in local_failed_topics or art_url in local_failed_topics:
+                            continue
+                        # Also check uniqueness against tracker
+                        is_uniq, _ = check_story_uniqueness(art_title, new_url=art_url)
+                        if is_uniq:
+                            top = art
+                            break
+                    if top:
+                        selected_headline = top.get("title", "AI Tech Breakthrough")
+                        selected_url = top.get("url", "")
+                        print(f"🔄 Fallback to Top Unique Scored Article: {selected_headline}")
+                        break
+                
                 selected_headline = "AI Tech Breakthrough"
                 selected_url = ""
-            selected_context = f"SELECTED STORY: {selected_headline}\nSOURCE: {selected_url}\n\nORIGINAL CONTEXT:\n{self.context}"
-        else:
-            selected_headline = selection["selected_headline"]
-            selected_url = selection["selected_url"]
-            
-        # ── Selection Uniqueness Check ──
-        is_unique, msg = check_story_uniqueness(selected_headline, new_url=selected_url)
+                break
+            else:
+                selected_headline = selection["selected_headline"]
+                selected_url = selection.get("selected_url", "")
+                selected_keywords = selection.get("keywords", [])
+                
+                # Check uniqueness against tracker
+                is_unique, msg = check_story_uniqueness(selected_headline, new_keywords=selected_keywords, new_url=selected_url)
+                if is_unique:
+                    # Found a unique story!
+                    break
+                else:
+                    print(f"⚠️ [SELECTOR] Selected story '{selected_headline}' is not unique: {msg}. Retrying...")
+                    local_failed_topics.append(selected_headline)
+                    if selected_headline not in self.failed_topics:
+                        self.failed_topics.append(selected_headline)
+                    if selected_url:
+                        local_failed_topics.append(selected_url)
+                        if selected_url not in self.failed_topics:
+                            self.failed_topics.append(selected_url)
+                    selection_attempts += 1
+                    
+        # Final safeguard uniqueness check
+        final_keywords = selection.get("keywords", []) if (selection and isinstance(selection, dict)) else []
+        is_unique, msg = check_story_uniqueness(selected_headline, new_keywords=final_keywords, new_url=selected_url)
         if not is_unique:
-            print(f"⚠️ [SELECTOR] Selected story is not unique: {msg}")
+            print(f"🚨 [SELECTOR] Failed to select a unique story after {max_selection_attempts} attempts.")
             return None
             
         # ── CONTEXT ISOLATION (Fixes topic-screenshot mismatch) ───────────

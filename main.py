@@ -288,13 +288,13 @@ def run_pipeline(topic_type="auto", dry_run=False):
     while attempts < MAX_RETRY_ATTEMPTS:
         log_message(f"STEP 3 (Attempt {attempts+1}/{MAX_RETRY_ATTEMPTS}): Gemini Searching & Generating Script...")
         
-        # Build avoidance instruction from failed screenshot topics
+        # Build avoidance instruction from failed topics (duplicates or screenshot failures)
         screenshot_avoid = ""
         if failed_topics:
             avoid_lines = "\n".join([f"- {t}" for t in failed_topics])
             screenshot_avoid = (
-                f"\n\nCRITICAL: The following topics/URLs were REJECTED because their article screenshot could not be captured. "
-                f"DO NOT pick these again. Choose a DIFFERENT story:\n{avoid_lines}\n"
+                f"\n\nCRITICAL: The following topics/URLs were REJECTED (either because they are duplicates or their article screenshot could not be captured). "
+                f"DO NOT pick these again. Choose a DIFFERENT unique story:\n{avoid_lines}\n"
             )
         
         combined_instruction = extra_instruction + screenshot_avoid
