@@ -1,0 +1,123 @@
+[07:49:25] === STARTING DAILY LONG-FORM 'DID YOU KNOW' PIPELINE ===
+[07:49:25] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[07:49:25] STEP 1: Fetching RSS articles (Research + Tools + Trending)...
+[07:49:25] 📈 vidIQ: Injected 8 high-signal topics.
+[07:50:31] ✅ Fetched 201 total articles (8 vidIQ, 94 research, 69 tools, 19 trending, 9 X.com, 2 Reddit).
+[07:50:31] STEP 2 (Attempt 1/12): Generating long-form 5-topic compilation script...
+[08:20:28] ERROR: Long-form script generation failed.
+[08:20:28] STEP 2 (Attempt 2/12): Generating long-form 5-topic compilation script...
+[08:49:50] Generated Title: Claude 3.5 Sonnet’s 4‑Step CODE‑Loop: Build Code 70% Faster 🚀
+[08:49:50] Script word count: 1002
+[08:49:50] Topics covered: 7
+[08:49:50]   Fact 1: Claude 3.5 Sonnet: The Ultimate Programming AI Assistant
+[08:49:50]   Fact 2: Meta Llama 3 400B Open Source AI Changes Coding Forever
+[08:49:50]   Fact 3: Google Veo vs OpenAI Sora: The Ultimate AI Video Generator Test
+[08:49:50]   Fact 4: NVIDIA Blackwell B200 GPU Architecture Deep Dive
+[08:49:50]   Fact 5: How I Automated My ENTIRE Job with Python AI Agents
+[08:49:50]   Fact 6: AI Chatbot Pricing Breakdown: Is Premium AI Worth the Cost?
+[08:49:50]   Fact 7: Phones need to focus less on AI, and more on what makes hardware actually great — here's why
+[08:49:50] STEP 2b: Capturing article screenshots for evidence...
+[08:50:38] ✅ Captured 7/7 article screenshots.
+[08:50:38] STEP 3: Generating voiceover + word timestamps...
+[08:50:38] Selected Lip-Sync Template: assets/video/C_white.mp4
+[08:50:38] ⚠️ Script word count too low (1002 words, expected ~430.0s < 480s). Retrying script generation early to save GPU time.
+[08:50:38] STEP 2 (Attempt 3/12): Generating long-form 5-topic compilation script...
+[08:53:03] ERROR: Long-form script generation failed.
+[08:53:03] ⏳ Potential rate limit. Sleeping 60s...
+[08:54:03] STEP 2 (Attempt 4/12): Generating long-form 5-topic compilation script...
+[09:27:17] Generated Title: Save $200K with Claude 3.5 Sonnet 🚀
+[09:27:17] Script word count: 747
+[09:27:17] Topics covered: 8
+[09:27:17]   Fact 1: Claude 3.5 Sonnet — The Ultimate Programming AI Assistant
+[09:27:17]   Fact 2: How I Automated My ENTIRE Job with Python AI Agents
+[09:27:17]   Fact 3: Build Your Own Agentic AI Workflow from Scratch
+[09:27:17]   Fact 4: Stop Using ChatGPT! Use This Insane AI Hack Instead
+[09:27:17]   Fact 5: Meta Llama 3 400B Open Source AI Changes Coding Forever
+[09:27:17]   Fact 6: NVIDIA Blackwell B200 GPU Architecture Deep Dive
+[09:27:17]   Fact 7: Google Veo vs OpenAI Sora: The Ultimate AI Video Generator Test
+[09:27:17]   Fact 8: AI Chatbot Pricing Breakdown: Is Premium AI Worth the Cost?
+[09:27:17] STEP 2b: Capturing article screenshots for evidence...
+[09:28:13] ✅ Captured 8/8 article screenshots.
+[09:28:13] STEP 3: Generating voiceover + word timestamps...
+[09:28:13] Selected Lip-Sync Template: assets/video/C_white.mp4
+[09:28:13] ⚠️ Script word count too low (747 words, expected ~320.6s < 480s). Retrying script generation early to save GPU time.
+[09:28:13] STEP 2 (Attempt 5/12): Generating long-form 5-topic compilation script...
+[09:57:54] Generated Title: Meta Llama 3 400B: $150M Outage Fixed in 2 Sec – Free‑Code Revolution 🚀
+[09:57:54] Script word count: 887
+[09:57:54] Topics covered: 7
+[09:57:54]   Fact 1: Meta Llama 3 400B Open‑Source Model – Coding Revolution
+[09:57:54]   Fact 2: Claude 3.5 Sonnet – Anthropic’s New Programming Assistant
+[09:57:54]   Fact 3: NVIDIA Blackwell B200 GPU Architecture Deep Dive
+[09:57:54]   Fact 4: Google Veo vs OpenAI Sora – Head‑to‑Head AI Video Generator Test
+[09:57:54]   Fact 5: Build Your Own Agentic AI Workflow from Scratch (LangChain)
+[09:57:54]   Fact 6: AI Chatbot Pricing Breakdown – Is Premium Worth It?
+[09:57:54]   Fact 7: Automate Your Entire Job with Python AI Agents – Real‑World Case Study
+[09:57:54] STEP 2b: Capturing article screenshots for evidence...
+[09:58:43] ✅ Captured 7/7 article screenshots.
+[09:58:43] STEP 3: Generating voiceover + word timestamps...
+[09:58:43] Selected Lip-Sync Template: assets/video/C_white.mp4
+[09:58:43] ⚠️ Script word count too low (887 words, expected ~380.7s < 480s). Retrying script generation early to save GPU time.
+[09:58:43] STEP 2 (Attempt 6/12): Generating long-form 5-topic compilation script...
+[10:22:40] Generated Title: Meta Llama 3 400B: Free AI 🚀
+[10:22:40] Script word count: 357
+[10:22:40] Topics covered: 6
+[10:22:40]   Fact 1: Meta Llama 3 400B Open Source AI
+[10:22:40]   Fact 2: Claude 3.5 Sonnet: The Ultimate Programming AI Assistant
+[10:22:40]   Fact 3: AI Chatbot Pricing Breakdown: Is Premium AI Worth the Cost?
+[10:22:40]   Fact 4: NVIDIA Blackwell B200 GPU Architecture Deep Dive
+[10:22:40]   Fact 5: Google Veo vs OpenAI Sora: The Ultimate AI Video Generator Test
+[10:22:40]   Fact 6: How I Automated My ENTIRE Job with Python AI Agents
+[10:22:40] STEP 2b: Capturing article screenshots for evidence...
+[10:23:29] ✅ Captured 6/6 article screenshots.
+[10:23:29] STEP 3: Generating voiceover + word timestamps...
+[10:23:29] Selected Lip-Sync Template: assets/video/C_white.mp4
+[10:23:29] ⚠️ Script word count too low (357 words, expected ~153.2s < 480s). Retrying script generation early to save GPU time.
+[10:23:29] STEP 2 (Attempt 7/12): Generating long-form 5-topic compilation script...
+[10:50:56] Generated Title: Meta Llama 3 400B: Revolutionizing Coding Forever 😱
+[10:50:56] Script word count: 380
+[10:50:56] Topics covered: 6
+[10:50:56]   Fact 1: Meta Llama 3 400B Open Source AI
+[10:50:56]   Fact 2: Claude 3.5 Sonnet: The Ultimate Programming AI Assistant
+[10:50:56]   Fact 3: AI Chatbot Pricing Breakdown: Is Premium AI Worth the Cost?
+[10:50:56]   Fact 4: NVIDIA Blackwell B200 GPU Architecture Deep Dive
+[10:50:56]   Fact 5: Google Veo vs OpenAI Sora: The Ultimate AI Video Generator Test
+[10:50:56]   Fact 6: How I Automated My ENTIRE Job with Python AI Agents
+[10:50:56] STEP 2b: Capturing article screenshots for evidence...
+[10:51:39] ✅ Captured 6/6 article screenshots.
+[10:51:39] STEP 3: Generating voiceover + word timestamps...
+[10:51:39] Selected Lip-Sync Template: assets/video/C_white.mp4
+[10:51:39] ⚠️ Script word count too low (380 words, expected ~163.1s < 480s). Retrying script generation early to save GPU time.
+[10:51:39] STEP 2 (Attempt 8/12): Generating long-form 5-topic compilation script...
+[10:53:38] ERROR: Long-form script generation failed.
+[10:53:38] STEP 2 (Attempt 9/12): Generating long-form 5-topic compilation script...
+[11:17:54] ERROR: Long-form script generation failed.
+[11:17:54] ⏳ Potential rate limit. Sleeping 60s...
+[11:18:54] STEP 2 (Attempt 10/12): Generating long-form 5-topic compilation script...
+[11:20:46] ERROR: Long-form script generation failed.
+[11:20:46] STEP 2 (Attempt 11/12): Generating long-form 5-topic compilation script...
+[11:47:29] Generated Title: Code Evolution Revolution: Claude 3.5 Sonnet & More 🚀
+[11:47:29] Script word count: 525
+[11:47:29] Topics covered: 6
+[11:47:29]   Fact 1: Claude 3.5 Sonnet: The Ultimate Programming AI Assistant
+[11:47:29]   Fact 2: Meta Llama 3 400B Open Source AI Changes Coding Forever
+[11:47:29]   Fact 3: NVIDIA Blackwell B200 GPU Architecture Deep Dive
+[11:47:29]   Fact 4: Google Veo vs OpenAI Sora: The Ultimate AI Video Generator Test
+[11:47:29]   Fact 5: How I Automated My ENTIRE Job with Python AI Agents
+[11:47:29]   Fact 6: How to Build Your Own Agentic AI Workflow from Scratch
+[11:47:29] STEP 2b: Capturing article screenshots for evidence...
+[11:48:12] ✅ Captured 6/6 article screenshots.
+[11:48:12] STEP 3: Generating voiceover + word timestamps...
+[11:48:12] Selected Lip-Sync Template: assets/video/C_white.mp4
+[11:48:12] ⚠️ Script word count too low (525 words, expected ~225.3s < 480s). Retrying script generation early to save GPU time.
+[11:48:12] STEP 2 (Attempt 12/12): Generating long-form 5-topic compilation script...
+[12:02:45] Generated Title: Claude 3.5 Sonnet: The Ultimate AI Programming Assistant 
+[12:02:45] Script word count: 560
+[12:02:45] Topics covered: 2
+[12:02:45]   Fact 1: Claude 3.5 Sonnet: The Ultimate Programming AI Assistant
+[12:02:45]   Fact 2: Meta Llama 3 400B Open Source AI Changes Coding Forever
+[12:02:45] STEP 2b: Capturing article screenshots for evidence...
+[12:02:59] ✅ Captured 2/2 article screenshots.
+[12:02:59] STEP 3: Generating voiceover + word timestamps...
+[12:02:59] Selected Lip-Sync Template: assets/video/C_white.mp4
+[12:02:59] ⚠️ Script word count too low (560 words, expected ~240.3s < 480s). Retrying script generation early to save GPU time.
+[12:02:59] ERROR: Could not generate valid assets. Aborting.
