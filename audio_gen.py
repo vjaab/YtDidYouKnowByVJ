@@ -130,7 +130,7 @@ def trim_audio_silence(path, word_timestamps):
     print(f"Audio trimmed: -{shift_sec:.2f}s from start. New duration: {new_dur:.2f}s")
     return new_dur, new_ts
 
-def optimize_audio_gaps(audio_path, word_timestamps, max_gap_s=0.25, target_gap_s=0.08):
+def optimize_audio_gaps(audio_path, word_timestamps, max_gap_s=0.5, target_gap_s=0.2):
     """
     Detects silent gaps between words and shortens them if they exceed max_gap_s.
     Modifies both the audio file and the word_timestamps in place, and shifts
@@ -420,26 +420,23 @@ def _inject_human_phrasing(wav_path, word_timestamps, text):
     Add natural human-like phrasing variations:
     1. Micro-pauses at clause boundaries (commas, semicolons)
     2. Breath-like pauses at sentence boundaries
-    3. Subtle pitch/tempo variation (prosody simulation via time-stretch)
-    4. Pre-emphasis on key technical terms
-    4. Simulated breathing at natural intervals
+    3. Simulated breathing at natural intervals
+    Updates word timestamps to stay perfectly in sync with the audio.
     """
     from pydub import AudioSegment
     import random
     
-    audio = AudioSegment.from_wav(wav_path)
-    
-    # Parse text for punctuation-based pause insertion
-    import re
-    sentences = re.split(r'([.!?]+)', text)
-    clauses = re.split(r'([,;:]+)', text)
-    
-    # We'll apply subtle time-stretching to simulate prosody
-    # Speed variation: ±3% per clause for natural flow
+    try:
+        audio = AudioSegment.from_wav(wav_path)
+    except Exception as e:
+        print(f"   ⚠️ Could not load audio for human phrasing: {e}")
+        return word_timestamps
+
     segments = []
     current_pos = 0
+    accumulated_shift_ms = 0
+    new_timestamps = []
     
-    # Track position for breathing
     last_breath_pos = 0
     breath_interval_ms = random.randint(8000, 15000)  # Breath every 8-15 seconds
     
@@ -447,6 +444,18 @@ def _inject_human_phrasing(wav_path, word_timestamps, text):
         word = wt["word"]
         start_ms = int(wt["start"] * 1000)
         end_ms = int(wt["end"] * 1000)
+        
+        # Word duration in original timeline
+        word_dur_ms = end_ms - start_ms
+        
+        # Calculate shifted start and end times
+        new_start_ms = start_ms + accumulated_shift_ms
+        new_end_ms = new_start_ms + word_dur_ms
+        
+        new_wt = wt.copy()
+        new_wt["start"] = round(new_start_ms / 1000.0, 3)
+        new_wt["end"] = round(new_end_ms / 1000.0, 3)
+        new_timestamps.append(new_wt)
         
         # Add micro-pause after commas/semicolons
         if word.rstrip(',;:').endswith((',', ';', ':')):
@@ -456,6 +465,7 @@ def _inject_human_phrasing(wav_path, word_timestamps, text):
             segments.append(audio[start_ms:end_ms])
             segments.append(silence)
             current_pos = end_ms
+            accumulated_shift_ms += pause_ms
         
         # Add breath pause after sentences
         elif word.rstrip('.!?').endswith(('.', '!', '?')):
@@ -465,48 +475,30 @@ def _inject_human_phrasing(wav_path, word_timestamps, text):
             segments.append(audio[start_ms:end_ms])
             segments.append(silence)
             current_pos = end_ms
+            accumulated_shift_ms += pause_ms
             
             # Simulate a breath every ~10 seconds
             if end_ms - last_breath_pos > breath_interval_ms:
-                breath_pause = AudioSegment.silent(duration=random.randint(300, 500))
+                breath_dur_ms = random.randint(300, 500)
+                breath_pause = AudioSegment.silent(duration=breath_dur_ms)
                 segments.append(breath_pause)
                 last_breath_pos = end_ms
                 breath_interval_ms = random.randint(8000, 15000)
-    
+                accumulated_shift_ms += breath_dur_ms
+
     if segments:
-        # Rebuild with pauses
         new_audio = sum(segments, AudioSegment.empty())
         if current_pos < len(audio):
             new_audio += audio[current_pos:]
         
-        # Apply subtle per-clause speed variation (±4%)
-        # Split into ~4-6 second chunks and vary speed slightly
-        chunk_ms = random.randint(4000, 6000)
-        final_audio = AudioSegment.empty()
-        
-        for i in range(0, len(new_audio), chunk_ms):
-            chunk = new_audio[i:i+chunk_ms]
-            if len(chunk) > 1000:  # Only process chunks > 1s
-                speed_factor = 1.0 + random.uniform(-0.04, 0.04)
-                # Time stretch without pitch change (approximate via frame rate manipulation)
-                new_len = int(len(chunk) / speed_factor)
-                if new_len > 0:
-                    chunk = chunk._spawn(chunk.raw_data, overrides={
-                        "frame_rate": int(chunk.frame_rate * speed_factor)
-                    }).set_frame_rate(chunk.frame_rate)
-                    if len(chunk) > new_len:
-                        chunk = chunk[:new_len]
-                    elif len(chunk) < new_len:
-                        chunk = chunk + AudioSegment.silent(duration=new_len - len(chunk))
-            final_audio += chunk
-        
         # Add very subtle volume variation (±1.5dB) to simulate natural emphasis
-        final_audio = _add_natural_volume_variation(final_audio)
+        new_audio = _add_natural_volume_variation(new_audio)
         
-        final_audio.export(wav_path, format="wav")
-        print(f"   🎭 Human phrasing injected: micro-pauses, breath pauses, ±4% tempo variation, natural volume dynamics")
-    
-    return word_timestamps  # Timestamps would need recalculation in production
+        new_audio.export(wav_path, format="wav")
+        print(f"   🎭 Human phrasing injected: micro-pauses, breath pauses, corrected timestamps (shift: +{accumulated_shift_ms}ms)")
+        return new_timestamps
+        
+    return word_timestamps
 
 
 def _add_natural_volume_variation(audio):
