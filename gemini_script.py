@@ -1386,6 +1386,33 @@ def call_fallback_model(prompt):
             except Exception as e:
                 print(f"⚠️ Cloudflare ({model_name}) fallback failed: {e}")
 
+    # 1.5. OpenCode Zen (Nemotron 3 Ultra Free - free tier, reasoning support)
+    opencode_key = os.getenv("OPENCODE_API_KEY")
+    if opencode_key:
+        model_name = "nemotron-3-ultra-free"
+        if not is_model_exhausted("opencode_models", model_name):
+            print(f"🔮 Falling back to OpenCode Zen ({model_name})...")
+            headers = {
+                "Authorization": f"Bearer {opencode_key}",
+                "Content-Type": "application/json"
+            }
+            try:
+                payload = {
+                    "model": model_name,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "temperature": 0.7
+                }
+                r = requests.post("https://opencode.ai/zen/v1/chat/completions", json=payload, headers=headers, timeout=30)
+                if r.status_code == 200:
+                    content = r.json()["choices"][0]["message"]["content"].strip()
+                    return clean_and_parse_json(content)
+                else:
+                    print(f"⚠️ OpenCode Zen ({model_name}) failed with code {r.status_code}: {r.text}")
+                    if r.status_code == 429:
+                        mark_model_exhausted("opencode_models", model_name, r.text)
+            except Exception as e:
+                print(f"⚠️ OpenCode Zen ({model_name}) fallback failed: {e}")
+
     # 2. Cerebras
     cerebras_key = os.getenv("CEREBRAS_API_KEY")
     if cerebras_key:
