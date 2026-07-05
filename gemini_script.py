@@ -423,6 +423,18 @@ def get_hottest_tech_topic(client, target_country="US", avoid_list=""):
     print("⚠️ Google Trends exhausted after retries. Proceeding with RSS only.")
     return None
  
+def _get_active_gemini_key():
+    import os
+    api_keys_env = os.getenv("GEMINI_API_KEYS", os.getenv("GEMINI_API_KEY", ""))
+    api_keys = [k.strip() for k in api_keys_env.split(",") if k.strip()]
+    if not api_keys:
+        api_keys = [GEMINI_API_KEY]
+        
+    for k in api_keys:
+        if not is_model_exhausted("gemini_keys", _hash_key(k)):
+            return k
+    return api_keys[0]
+
 def _pick_and_generate_script_attempt(articles=None, extra_instruction="", forced_article=None, topic_type="research", failed_topics=None, target_country="US", recent_history=None, recent_titles=None):
     if failed_topics is None:
         failed_topics = []
@@ -431,7 +443,8 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
     if recent_titles is None:
         recent_titles = []
 
-    client = genai.Client(api_key=GEMINI_API_KEY)
+    active_key = _get_active_gemini_key()
+    client = genai.Client(api_key=active_key)
     
     day_name, slot, category = get_slot_info()
     strategy_enhancement = get_category_prompt_enhancement(category, slot)

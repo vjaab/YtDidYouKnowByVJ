@@ -943,7 +943,9 @@ class LongformGenerationEngine:
 
 def generate_longform_script(articles=None, failed_topics=None):
     """Main entry point for long-form "Did You Know" script generation."""
-    client = genai.Client(api_key=GEMINI_API_KEY)
+    from gemini_script import _get_active_gemini_key
+    active_key = _get_active_gemini_key()
+    client = genai.Client(api_key=active_key)
     
     if failed_topics is None:
         failed_topics = []
