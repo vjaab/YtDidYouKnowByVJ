@@ -1420,8 +1420,11 @@ def call_fallback_model(prompt):
             "Authorization": f"Bearer {cerebras_key}",
             "Content-Type": "application/json"
         }
-        cerebras_models = ["llama3.3-70b", "llama3.1-70b", "llama3.1-8b"]
+        cerebras_models = ["gpt-oss-120b", "zai-glm-4.7", "gemma-4-31b"]
         for model_name in cerebras_models:
+            if is_model_exhausted("cerebras_models", model_name):
+                print(f"⏭️ Skipping known-bad Cerebras model: {model_name}")
+                continue
             print(f"🔮 Falling back to Cerebras ({model_name})...")
             try:
                 payload = {
@@ -1436,6 +1439,8 @@ def call_fallback_model(prompt):
                     return clean_and_parse_json(content)
                 else:
                     print(f"⚠️ Cerebras API ({model_name}) failed with code {r.status_code}: {r.text}")
+                    if r.status_code == 429:
+                        mark_model_exhausted("cerebras_models", model_name, r.text)
             except Exception as e:
                 print(f"⚠️ Cerebras ({model_name}) fallback failed: {e}")
 
