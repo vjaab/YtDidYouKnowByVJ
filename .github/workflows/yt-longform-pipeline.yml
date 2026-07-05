@@ -95,6 +95,9 @@ jobs:
           if [ ! -z "${{ secrets.VIDIQ_API_KEY }}" ]; then
             echo "VIDIQ_API_KEY=${{ secrets.VIDIQ_API_KEY }}" >> .env
           fi
+          if [ ! -z "${{ secrets.OPENCODE_API_KEY }}" ]; then
+            echo "OPENCODE_API_KEY=${{ secrets.OPENCODE_API_KEY }}" >> .env
+          fi
           
       - name: Setup YouTube Auth Files
         run: |
