@@ -1,0 +1,35 @@
+{
+  "groq_models": {
+    "llama-3.3-70b-versatile": 1783297098.2426474,
+    "qwen/qwen3-32b": 1783297107.365774,
+    "openai/gpt-oss-20b": 1783297129.0286553,
+    "llama-3.1-8b-instant": 1783297132.5167794,
+    "openai/gpt-oss-120b": 1783297306.3076882
+  },
+  "cloudflare_models": {
+    "@cf/meta/llama-3.3-70b-instruct": 1783297139.380535,
+    "@cf/meta/llama-3.3-70b-instruct-fp8-fast": 1783297139.3808215,
+    "@cf/zai-org/glm-4.7-flash": 1783297139.381117,
+    "@cf/openai/gpt-oss-120b": 1783297139.3813841,
+    "@cf/nvidia/nemotron-3-120b-a12b": 1783297139.381651,
+    "@cf/meta/llama-4-scout-17b-16e-instruct": 1783297139.38192,
+    "@cf/qwen/qwq-32b": 1783297139.3822165,
+    "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b": 1783297139.3824973,
+    "@cf/meta/llama-3.1-70b-instruct": 1783297139.382794,
+    "@cf/qwen/qwen2.5-72b-instruct": 1783297139.3831077,
+    "@cf/qwen/qwen3-30b-a3b-fp8": 1783297139.3834047,
+    "@cf/qwen/qwen2.5-coder-32b-instruct": 1783297139.3836942,
+    "@cf/mistral/mistral-small-3.1-24b-instruct": 1783297139.3840084,
+    "@cf/google/gemma-4-26b-a4b-it": 1783297139.3843153,
+    "@cf/moonshotai/kimi-k2.7-code": 1783297139.3846133,
+    "@cf/moonshotai/kimi-k2.6": 1783297139.385087,
+    "@cf/meta/llama-3.1-8b-instruct": 1783297139.3853977,
+    "@cf/meta/llama-3.1-8b-instruct-fp8": 1783297139.385707,
+    "@cf/meta/llama-3.1-8b-instruct-fast": 1783297139.3860416,
+    "@cf/meta/llama-3.2-3b-instruct": 1783297139.386356,
+    "@cf/zai-org/glm-5.2": 1783297139.3866746,
+    "@cf/meta/llama-3.2-1b-instruct": 1783297139.3870256,
+    "@cf/openai/gpt-oss-20b": 1783297139.387352,
+    "@cf/ibm-granite/granite-4.0-h-micro": 1783297139.387681
+  }
+}
