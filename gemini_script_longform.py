@@ -322,6 +322,7 @@ def call_fallback_model(prompt):
     import os
     import json
     import requests
+    from gemini_script import is_model_exhausted, mark_model_exhausted
 
     def clean_and_parse_json(content):
         raw = content.strip()
@@ -347,6 +348,9 @@ def call_fallback_model(prompt):
             "openai/gpt-oss-120b"
         ]
         for model_name in groq_models:
+            if is_model_exhausted("groq_models", model_name):
+                print(f"⏭️ Skipping known-bad Groq model: {model_name}")
+                continue
             print(f"🔮 Falling back to Groq ({model_name})...")
             try:
                 payload = {
@@ -361,6 +365,8 @@ def call_fallback_model(prompt):
                     return clean_and_parse_json(content)
                 else:
                     print(f"⚠️ Groq ({model_name}) failed with code {r.status_code}: {r.text}")
+                    if r.status_code == 429:
+                        mark_model_exhausted("groq_models", model_name, r.text)
             except Exception as e:
                 print(f"⚠️ Groq ({model_name}) fallback failed: {e}")
 

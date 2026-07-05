@@ -423,18 +423,20 @@ def get_hottest_tech_topic(client, target_country="US", avoid_list=""):
     print("⚠️ Google Trends exhausted after retries. Proceeding with RSS only.")
     return None
  
-def pick_and_generate_script(articles=None, extra_instruction="", forced_article=None, topic_type="research", failed_topics=[], target_country="US"):
+def _pick_and_generate_script_attempt(articles=None, extra_instruction="", forced_article=None, topic_type="research", failed_topics=None, target_country="US", recent_history=None, recent_titles=None):
+    if failed_topics is None:
+        failed_topics = []
+    if recent_history is None:
+        recent_history = []
+    if recent_titles is None:
+        recent_titles = []
+
     client = genai.Client(api_key=GEMINI_API_KEY)
     
     day_name, slot, category = get_slot_info()
     strategy_enhancement = get_category_prompt_enhancement(category, slot)
     
     # ── STEP -2: REPETITION AVOIDANCE (Moved Up) ────────────────────────────────────────
-    tracker = load_tracker()
-    recent_history = tracker.get("history", [])[-15:]
-    # Also include titles from the last 7 days list for better coverage
-    recent_titles = tracker.get("used_titles", [])[-30:]
-    
     avoid_items = [h.get('news_headline', h.get('title')) for h in recent_history] + recent_titles
     if failed_topics:
         avoid_items += failed_topics
@@ -457,12 +459,9 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
     else:
         # ── STEP 0: FETCH & FILTER + RE-RANK BY VIRAL POTENTIAL ───────────────────────
         if articles:
+            # Copy to avoid mutating the caller's list
+            articles = list(articles)
             print(f"📡 STEP 0: Scoring {len(articles)} articles for viral potential (engagement-weighted)...")
-            
-            # Fetch global trending articles from NewsAPI as an additional boost
-            from fetch_research_papers import fetch_trending_from_newsapi
-            trending_boost = fetch_trending_from_newsapi()
-            articles += trending_boost
             
             seen_titles_in_this_batch = []
             filtered_articles = []
@@ -1131,16 +1130,123 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
         is_unique, msg = check_story_uniqueness(title, headline, keywords, news_url)
         if not is_unique:
             print(f"⚠️ [LOOP] Safeguard: Post-loop uniqueness check failed: {msg}")
-            if headline:
+            if headline and headline not in failed_topics:
                 failed_topics.append(headline)
-            if news_url:
+            if news_url and news_url not in failed_topics:
                 failed_topics.append(news_url)
             return None
             
     return script_data
 
-# Module-level cache for failed Cloudflare models (permanent errors like 400/403/404)
-_FAILED_CLOUDFLARE_MODELS = set()
+def pick_and_generate_script(articles=None, extra_instruction="", forced_article=None, topic_type="research", failed_topics=None, target_country="US"):
+    if failed_topics is None:
+        failed_topics = []
+        
+    articles_base = list(articles) if articles is not None else None
+    if articles_base:
+        print(f"📡 Boosting {len(articles_base)} articles with NewsAPI trending stories...")
+        try:
+            from fetch_research_papers import fetch_trending_from_newsapi
+            trending_boost = fetch_trending_from_newsapi()
+            articles_base += trending_boost
+        except Exception as e:
+            print(f"⚠️ Failed to fetch trending from NewsAPI: {e}")
+            
+    tracker = load_tracker()
+    recent_history = tracker.get("history", [])[-30:]
+    recent_titles = tracker.get("used_titles", [])[-60:]
+    
+    max_gen_attempts = 2
+    gen_attempts = 0
+    
+    while gen_attempts < max_gen_attempts:
+        print(f"🔄 pick_and_generate_script: Selection and generation attempt {gen_attempts+1}/{max_gen_attempts}...")
+        script_data = _pick_and_generate_script_attempt(
+            articles=articles_base,
+            extra_instruction=extra_instruction,
+            forced_article=forced_article,
+            topic_type=topic_type,
+            failed_topics=failed_topics,
+            target_country=target_country,
+            recent_history=recent_history,
+            recent_titles=recent_titles
+        )
+        if script_data:
+            return script_data
+            
+        print(f"⚠️ Attempt {gen_attempts+1} failed to produce a unique script.")
+        gen_attempts += 1
+        
+    print(f"🚨 Failed to generate a unique script after {max_gen_attempts} attempts.")
+    return None
+
+import hashlib
+
+CACHE_FILE = os.path.join("logs", "api_exhaustion_cache.json")
+
+def _hash_key(key):
+    if not key:
+        return ""
+    return hashlib.md5(key.encode("utf-8")).hexdigest()
+
+def _load_cache():
+    if not os.path.exists(CACHE_FILE):
+        return {}
+    try:
+        with open(CACHE_FILE, "r", encoding="utf-8") as f:
+            content = f.read().strip()
+            if not content:
+                return {}
+            if "<<<<<<<" in content or "=======" in content or ">>>>>>>" in content:
+                print("⚠️ Warning: api_exhaustion_cache.json has conflict markers. Resetting cache.")
+                return {}
+            return json.loads(content)
+    except Exception as e:
+        print(f"⚠️ Warning: failed to load api_exhaustion_cache.json ({e}). Resetting cache.")
+        return {}
+
+def _update_cache_entry(category, key, expiry_time):
+    try:
+        os.makedirs("logs", exist_ok=True)
+        data = _load_cache()
+        if category not in data:
+            data[category] = {}
+        data[category][key] = expiry_time
+        
+        tmp_file = CACHE_FILE + ".tmp"
+        with open(tmp_file, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+        os.replace(tmp_file, CACHE_FILE)
+    except Exception as e:
+        print(f"⚠️ Warning: failed to save api_exhaustion_cache.json ({e})")
+        if 'tmp_file' in locals() and os.path.exists(tmp_file):
+            try:
+                os.remove(tmp_file)
+            except:
+                pass
+
+def is_model_exhausted(category, key):
+    cache = _load_cache()
+    now = time.time()
+    exhausted = cache.get(category, {})
+    if key in exhausted:
+        expiry = exhausted[key]
+        if now < expiry:
+            return True
+    return False
+
+def mark_model_exhausted(category, key, error_message):
+    err_upper = str(error_message).upper()
+    is_daily_limit = any(x in err_upper for x in ["RESOURCE_EXHAUSTED", "LIMIT", "QUOTA", "DAILY", "TPD"])
+    
+    if is_daily_limit:
+        ttl = 12 * 3600  # 12 hours
+        print(f"🚫 [CACHE] Caching {category} '{key}' for 12 hours (daily limit hit: {error_message})")
+    else:
+        ttl = 90  # 90 seconds (RPM rate limit)
+        print(f"⚠️ [CACHE] Caching {category} '{key}' for 90 seconds (rate limit hit: {error_message})")
+        
+    _update_cache_entry(category, key, time.time() + ttl)
 
 def call_fallback_model(prompt):
     """
@@ -1176,6 +1282,9 @@ def call_fallback_model(prompt):
             "openai/gpt-oss-120b"
         ]
         for model_name in groq_models:
+            if is_model_exhausted("groq_models", model_name):
+                print(f"⏭️ Skipping known-bad Groq model: {model_name}")
+                continue
             print(f"🔮 Falling back to Groq ({model_name})...")
             try:
                 payload = {
@@ -1190,6 +1299,8 @@ def call_fallback_model(prompt):
                     return clean_and_parse_json(content)
                 else:
                     print(f"⚠️ Groq ({model_name}) failed with code {r.status_code}: {r.text}")
+                    if r.status_code == 429:
+                        mark_model_exhausted("groq_models", model_name, r.text)
             except Exception as e:
                 print(f"⚠️ Groq ({model_name}) fallback failed: {e}")
 
@@ -1219,8 +1330,8 @@ def call_fallback_model(prompt):
         # gpt-oss models use Chat Completions format
         gpt_oss_models = {"@cf/openai/gpt-oss-120b", "@cf/openai/gpt-oss-20b"}
         for model_name in CLOUDFLARE_MODELS:
-            # Skip models that already failed permanently in this run
-            if model_name in _FAILED_CLOUDFLARE_MODELS:
+            # Skip models that already failed
+            if is_model_exhausted("cloudflare_models", model_name):
                 print(f"⏭️ Skipping known-bad Cloudflare model: {model_name}")
                 continue
             print(f"🔮 Falling back to Cloudflare ({model_name})...")
@@ -1256,7 +1367,6 @@ def call_fallback_model(prompt):
                     try:
                         error_data = r.json()
                         if isinstance(error_data, dict):
-                            # Cloudflare Workers AI error format: {"result": null, "success": false, "errors": [{"code": 4006, ...}]}
                             errors = error_data.get("errors", [])
                             if errors and isinstance(errors, list):
                                 error_code = errors[0].get("code")
@@ -1264,15 +1374,13 @@ def call_fallback_model(prompt):
                         pass
                     
                     if r.status_code in (400, 403, 404) or error_code == 4006:
-                        _FAILED_CLOUDFLARE_MODELS.add(model_name)
-                        print(f"🚫 Caching {model_name} as permanently failed for this run")
+                        mark_model_exhausted("cloudflare_models", model_name, r.text)
                         if error_code == 4006:
-                            print(f"🚫 Cloudflare quota exhausted (code 4006) - marking entire provider as dead for this run")
-                            # Mark all Cloudflare models as failed to skip remaining models
+                            print(f"🚫 Cloudflare quota exhausted (code 4006) - marking entire provider as dead")
                             try:
                                 from config import CLOUDFLARE_MODELS
                                 for m in CLOUDFLARE_MODELS:
-                                    _FAILED_CLOUDFLARE_MODELS.add(m)
+                                    mark_model_exhausted("cloudflare_models", m, "Cloudflare quota exhausted (4006)")
                             except ImportError:
                                 pass
             except Exception as e:
