@@ -1,8 +1,8 @@
 {
   "groq_models": {
     "llama-3.3-70b-versatile": 1783373876.087386,
-    "qwen/qwen3-32b": 1783297107.365774,
-    "openai/gpt-oss-20b": 1783297129.0286553,
+    "qwen/qwen3-32b": 1783394948.1917746,
+    "openai/gpt-oss-20b": 1783394952.977384,
     "llama-3.1-8b-instant": 1783297132.5167794,
     "openai/gpt-oss-120b": 1783297306.3076882
   },
