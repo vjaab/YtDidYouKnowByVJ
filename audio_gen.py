@@ -1574,21 +1574,22 @@ class AudioAuditEngine:
                 audio_data = f.read()
             
             # Requesting a technical audit of the audio
-            prompt = f"""AUDIT TASK: Compare this generated AI voiceover with the following technical script.
+            prompt = f"""AUDIT TASK: Compare this generated AI voiceover with the following technical script. Evaluate both technical accuracy and human likeness (Humanizer check).
             
             TECHNICAL SCRIPT:
             {script_text}
             
             CRITERIA:
             1. Correct Pronunciation: Specifically check 'tiktoken', 'GGUF', 'vLLM', 'quantization', 'inference'.
-            2. Pacing: Is it too fast for complex concepts?
-            3. Persona: Does it sound like an authoritative Staff Engineer or a robotic news anchor?
+            2. Pacing & Flow: Check if the pacing is too fast for complex concepts, or too flat and predictable.
+            3. Persona & Vibe: Does it sound like an authoritative, conversational human colleague ("smart friend over coffee"), or a robotic, monotonic news anchor?
+            4. Cadence & Rhythm (Humanizer Audit): Detect and flag artificial-sounding speech rhythms, robotic text-to-speech cadence, or lack of natural inflection/pauses.
             
             Return ONLY a JSON object:
             {{
               "score": 0.0-10.0,
               "mispronunciations": ["word1", "word2"],
-              "critique": "Draft improvements here",
+              "critique": "Draft improvements here, highlighting robotic phrasing or flat delivery",
               "fix_hints": {{"word": "new_phonetic_spelling"}}
             }}"""
 
