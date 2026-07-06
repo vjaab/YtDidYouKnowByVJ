@@ -119,6 +119,11 @@ def trim_audio_silence(path, word_timestamps):
     
     trimmed_audio = audio[start_trim:duration-end_trim]
     
+    # Apply a quick 20ms fade-in/out to prevent boundary pops/clicks
+    fade_boundary_ms = 20
+    if len(trimmed_audio) > fade_boundary_ms * 2:
+        trimmed_audio = trimmed_audio.fade_in(fade_boundary_ms).fade_out(fade_boundary_ms)
+    
     # Boost volume by 8 decibels for better clarity (increased for presence)
     trimmed_audio = trimmed_audio + 8
     
@@ -366,19 +371,20 @@ def _remove_vocal_artifacts(wav_path, word_timestamps, text):
     """
     Clean up AI voice generation artifacts:
     1. Detect and remove common vocal glitches ("tatas", "uh", "um", "eh")
-    2. Fill gaps with cross-faded silence or interpolated audio
-    3. Adjust word timestamps accordingly
+    2. Remove consecutive duplicate stumbles ("but but", "you you")
+    3. Fill gaps with smooth overlapping crossfades to prevent clicks/pops
+    4. Adjust word timestamps accordingly
     """
     from pydub import AudioSegment
     import numpy as np
+    import re
     
-    audio = AudioSegment.from_wav(wav_path)
-    audio_arr = np.array(audio.get_array_of_samples())
-    
-    if audio.channels == 2:
-        audio_arr = audio_arr.reshape((-1, 2))
-    
-    sample_rate = audio.frame_rate
+    try:
+        audio = AudioSegment.from_wav(wav_path)
+    except Exception as e:
+        print(f"   ⚠️ Could not load audio for artifact removal: {e}")
+        return word_timestamps
+
     artifacts_removed = []
     
     # Common AI vocal artifacts to detect (in phonetic form)
@@ -388,85 +394,89 @@ def _remove_vocal_artifacts(wav_path, word_timestamps, text):
         ("ta tas", 0.15, 0.4),  # split "tatas"
     ]
     
-    # Use word timestamps to find suspicious short segments
-    cleaned_timestamps = []
-    accumulated_shift = 0.0
-    
     unconditional_fillers = {
         "uh", "um", "eh", "ah", "er", "hmm", "uhh", "umm", "uhhh", "ummm"
     }
     
+    cleaned_timestamps = []
+    accumulated_shift = 0.0
+    fade_ms = 40  # 40ms crossfade overlap
+    
     for i, wt in enumerate(word_timestamps):
-        word = wt["word"].lower().strip().strip(".,?!:;-\"'_")
+        word = wt["word"]
+        # Clean word to only keep alphabetic characters for robust checks
+        word_clean = re.sub(r'[^a-zA-Z]', '', word).lower()
         duration = wt["end"] - wt["start"]
         
         is_artifact = False
         
-        # 1. Unconditional filler word check
-        if word in unconditional_fillers:
+        # 1. Bracketed or parenthesized non-speech sounds (e.g. [laughter], (music))
+        is_bracketed = (word.startswith('[') and word.endswith(']')) or \
+                       (word.startswith('(') and word.endswith(')')) or \
+                       (word.startswith('{') and word.endswith('}'))
+        if is_bracketed:
             is_artifact = True
             artifacts_removed.append((wt["start"], wt["end"], wt["word"]))
         
-        # 2. Check other artifact patterns with duration constraints (e.g. "tatas")
+        # 2. Unconditional filler word check
+        if not is_artifact and word_clean in unconditional_fillers:
+            is_artifact = True
+            artifacts_removed.append((wt["start"], wt["end"], wt["word"]))
+        
+        # 3. Check other artifact patterns with duration constraints (e.g. "tatas")
         if not is_artifact:
             for pattern, min_dur, max_dur in artifact_patterns:
-                if pattern in word and min_dur <= duration <= max_dur:
-                    # Check if this word is isolated (surrounded by longer words)
+                if pattern in word.lower() and min_dur <= duration <= max_dur:
                     prev_dur = word_timestamps[i-1]["end"] - word_timestamps[i-1]["start"] if i > 0 else 0
                     next_dur = word_timestamps[i+1]["end"] - word_timestamps[i+1]["start"] if i < len(word_timestamps)-1 else 0
-                    
-                    # More aggressive detection: if surrounded by real words (>0.25s) and this is short (<0.4s)
                     if (prev_dur > 0.25 or next_dur > 0.25) and duration < 0.4:
                         is_artifact = True
                         artifacts_removed.append((wt["start"], wt["end"], wt["word"]))
                         break
         
-        # 3. Also detect: any very short word (<0.15s) that's not a common short word
-        common_short = {"a", "i", "in", "on", "at", "to", "of", "the", "and", "or", "but", "for", "as", "is", "it", "he", "she", "we", "you", "my", "me", "by", "do", "go", "no", "so", "up", "us"}
-        if not is_artifact and duration < 0.15 and word not in common_short:
-            # Check if surrounded by normal words
-            prev_dur = word_timestamps[i-1]["end"] - word_timestamps[i-1]["start"] if i > 0 else 0
-            next_dur = word_timestamps[i+1]["end"] - word_timestamps[i+1]["start"] if i < len(word_timestamps)-1 else 0
-            if prev_dur > 0.2 and next_dur > 0.2:
+        # 4. Consecutive duplicate word check (stumble/stutter removal)
+        if not is_artifact and i < len(word_timestamps) - 1:
+            next_wt = word_timestamps[i+1]
+            next_word_clean = re.sub(r'[^a-zA-Z]', '', next_wt["word"]).lower()
+            if word_clean == next_word_clean and len(word_clean) > 0:
                 is_artifact = True
                 artifacts_removed.append((wt["start"], wt["end"], wt["word"]))
         
         if is_artifact:
-            # Shift all subsequent word timestamps by this removed segment's duration
-            accumulated_shift += duration
+            # Shift subsequent words by the net reduction after applying the crossfade overlap
+            fade_sec = fade_ms / 1000.0
+            net_shift = max(0.0, duration - fade_sec)
+            accumulated_shift += net_shift
         else:
             shifted_wt = wt.copy()
             shifted_wt["start"] = max(0.0, round(wt["start"] - accumulated_shift, 3))
             shifted_wt["end"] = max(0.0, round(wt["end"] - accumulated_shift, 3))
             cleaned_timestamps.append(shifted_wt)
-    
+            
     if artifacts_removed:
-        print(f"   🧹 Removed {len(artifacts_removed)} vocal artifacts: {[a[2] for a in artifacts_removed]}")
+        print(f"   🧹 Removed {len(artifacts_removed)} vocal artifacts/stumbles: {[a[2] for a in artifacts_removed]}")
         
-        # Rebuild audio without artifact segments using crossfade.
-        # CRITICAL: Process in REVERSE order (last-to-first) so that each
-        # splice doesn't shift the byte positions of earlier artifacts.
+        # Rebuild audio in reverse order using smooth crossfades
         for start_s, end_s, word in reversed(artifacts_removed):
             start_ms = int(start_s * 1000)
             end_ms = int(end_s * 1000)
             
-            # Guard against positions that exceed current audio length
             if start_ms >= len(audio) or end_ms > len(audio):
                 continue
-            
-            # Create a short crossfade bridge
+                
             before = audio[:start_ms]
             after = audio[end_ms:]
             
-            # Crossfade 50ms
-            fade_ms = 50
             if len(before) > fade_ms and len(after) > fade_ms:
-                before = before.fade_out(fade_ms)
-                after = after.fade_in(fade_ms)
-            audio = before + after
-    
-    audio.export(wav_path, format="wav")
-    return cleaned_timestamps if artifacts_removed else word_timestamps
+                # Use append with crossfade to overlap seamlessly
+                audio = before.append(after, crossfade=fade_ms)
+            else:
+                audio = before + after
+                
+        audio.export(wav_path, format="wav")
+        return cleaned_timestamps
+        
+    return word_timestamps
 
 
 def _inject_human_phrasing(wav_path, word_timestamps, text):

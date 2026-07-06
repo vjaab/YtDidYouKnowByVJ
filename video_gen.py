@@ -3474,7 +3474,7 @@ def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hook
                 sil_factor = smooth_silence[i]
                 
                 # Interpolate volume multiplier: 1.2x (unducked) to 0.25x (ducked)
-                vol_multiplier = (1.2 * (1.0 - duck_factor) + 0.25 * duck_factor) * sil_factor
+                vol_multiplier = (1.5 * (1.0 - duck_factor) + 0.20 * duck_factor) * sil_factor
                 
                 # ── PHASE 4: DYNAMIC BGM ENERGY CURVE ────────────────────────
                 # BGM follows Hook→Body→Payoff→CTA arc instead of flat volume
@@ -3534,7 +3534,7 @@ def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hook
                 rem_chunk = looped_bgm[target_duration_ms - rem_ms:]
                 duck_factor = duck_envelope[-1]
                 sil_factor = smooth_silence[-1]
-                vol_multiplier = (1.2 * (1.0 - duck_factor) + 0.25 * duck_factor) * sil_factor
+                vol_multiplier = (1.5 * (1.0 - duck_factor) + 0.20 * duck_factor) * sil_factor
                 
                 progress_ratio = 1.0
                 ramp_factor = 1.45
