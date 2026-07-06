@@ -96,19 +96,27 @@ def trim_audio_silence(path, word_timestamps):
     """
     Trims silence from the start and end of the audio file 
     and shifts all word timestamps so that the first word starts at 0.0s.
+    Incorporates safety padding to prevent clipping word start/end.
     """
     from pydub import AudioSegment
     from pydub.silence import detect_leading_silence
 
     audio = AudioSegment.from_file(path)
+    duration = len(audio)
     
     # Detect start silence (using a very aggressive -60dBFS threshold for zero latency)
-    start_trim = detect_leading_silence(audio, silence_threshold=-60.0)
+    start_trim_detected = detect_leading_silence(audio, silence_threshold=-60.0)
+    # Pad start trim by 150ms to protect initial consonants
+    start_trim = max(0, start_trim_detected - 150)
+    start_trim = min(start_trim, duration)
+    
     # Detect end silence
     reversed_audio = audio.reverse()
-    end_trim = detect_leading_silence(reversed_audio, silence_threshold=-50.0)
-
-    duration = len(audio)
+    end_trim_detected = detect_leading_silence(reversed_audio, silence_threshold=-50.0)
+    # Pad end trim by 150ms to protect natural decay/trailing consonants
+    end_trim = max(0, end_trim_detected - 150)
+    end_trim = min(end_trim, duration - start_trim)
+    
     trimmed_audio = audio[start_trim:duration-end_trim]
     
     # Boost volume by 8 decibels for better clarity (increased for presence)
@@ -177,10 +185,27 @@ def optimize_audio_gaps(audio_path, word_timestamps, max_gap_s=0.5, target_gap_s
                 gap_ms = next_w_start_ms - w_end_ms
                 
                 if gap_ms > max_gap_s * 1000:
-                    # Compress the gap to target_gap_s
+                    # Compress the gap to target_gap_s with a smooth crossfaded transition
                     target_gap_ms = int(target_gap_s * 1000)
-                    silence_segment = audio[w_end_ms:next_w_start_ms]
-                    new_audio += silence_segment[:target_gap_ms]
+                    fade_ms = 40
+                    
+                    # Solve 2 * pad_ms - fade_ms = target_gap_ms
+                    pad_ms = (target_gap_ms + fade_ms) // 2
+                    
+                    # Guard clauses for edge-case short gaps (bounds check)
+                    pad_ms = min(pad_ms, gap_ms // 2)
+                    fade_ms = min(fade_ms, pad_ms)
+                    
+                    left_seg = audio[w_end_ms : w_end_ms + pad_ms]
+                    right_seg = audio[next_w_start_ms - pad_ms : next_w_start_ms]
+                    
+                    if len(left_seg) > 0 and len(right_seg) > 0 and fade_ms > 0:
+                        # Append with crossfade to eliminate abrupt drops in ambient noise
+                        compressed_gap = left_seg.append(right_seg, crossfade=fade_ms)
+                        new_audio += compressed_gap
+                    else:
+                        # Fallback: if segments are too short, just insert silent room tone
+                        new_audio += AudioSegment.silent(duration=target_gap_ms)
                 else:
                     # Keep original gap
                     if gap_ms > 0:
@@ -306,6 +331,35 @@ def _smart_split_sentences(text, max_chars=80):
     if current:
         chunks.append(current.strip())
     return [c for c in chunks if c]
+def concatenate_with_smooth_fades(segments, fade_ms=25):
+    """
+    Concatenates a list of AudioSegments. If transitioning between
+    silent segments (rms == 0) and non-silent segments (rms > 0),
+    applies an in-place fade to prevent click and pop artifacts.
+    Preserves exact audio duration to maintain timestamp sync.
+    """
+    from pydub import AudioSegment
+    combined = AudioSegment.empty()
+    prev_was_silent = False
+    
+    for i, seg in enumerate(segments):
+        if len(seg) == 0:
+            continue
+        curr_is_silent = (seg.rms == 0)
+        
+        if i == 0:
+            combined = seg
+        else:
+            if prev_was_silent or curr_is_silent:
+                actual_fade = min(fade_ms, len(combined), len(seg))
+                if actual_fade > 0:
+                    combined = combined.fade_out(actual_fade)
+                    seg = seg.fade_in(actual_fade)
+            combined += seg
+            
+        prev_was_silent = curr_is_silent
+        
+    return combined
 
 
 def _remove_vocal_artifacts(wav_path, word_timestamps, text):
@@ -487,9 +541,10 @@ def _inject_human_phrasing(wav_path, word_timestamps, text):
                 accumulated_shift_ms += breath_dur_ms
 
     if segments:
-        new_audio = sum(segments, AudioSegment.empty())
         if current_pos < len(audio):
-            new_audio += audio[current_pos:]
+            segments.append(audio[current_pos:])
+        
+        new_audio = concatenate_with_smooth_fades(segments, fade_ms=25)
         
         # Add very subtle volume variation (±1.5dB) to simulate natural emphasis
         new_audio = _add_natural_volume_variation(new_audio)
@@ -1272,7 +1327,7 @@ def _inject_context_pauses(audio_path, word_timestamps):
             return len(audio) / 1000.0, word_timestamps
         
         # Build new audio with pauses inserted (process front-to-back)
-        new_audio = AudioSegment.empty()
+        segments = []
         prev_end = 0
         cumulative_shift_ms = 0
         new_timestamps = [dict(wt) for wt in word_timestamps]  # deep copy
@@ -1294,17 +1349,19 @@ def _inject_context_pauses(audio_path, word_timestamps):
                 
                 # Match by original end position
                 if abs(orig_end_ms - target_pos_ms) < 50:
-                    # Add audio up to this point
-                    new_audio += audio[prev_end:orig_end_ms]
-                    # Add the pause
-                    new_audio += AudioSegment.silent(duration=pause_ms)
+                    # Add audio segment leading to the pause
+                    segments.append(audio[prev_end:orig_end_ms])
+                    # Add the silent pause
+                    segments.append(AudioSegment.silent(duration=pause_ms))
                     prev_end = orig_end_ms
                     cumulative_shift_ms += pause_ms
                     insert_idx += 1
         
         # Add remaining audio
         if prev_end < len(audio):
-            new_audio += audio[prev_end:]
+            segments.append(audio[prev_end:])
+            
+        new_audio = concatenate_with_smooth_fades(segments, fade_ms=25)
         
         new_audio.export(audio_path, format='wav' if audio_path.endswith('.wav') else 'mp3')
         new_duration = len(new_audio) / 1000.0
