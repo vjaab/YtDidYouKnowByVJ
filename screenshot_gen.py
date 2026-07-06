@@ -209,6 +209,16 @@ def check_screenshot_validity(image_path):
     Returns True if valid, False if it is a captcha/cloudflare/etc.
     """
     import os
+    
+    # Priority 4: Check if disabled in configuration to save Gemini quota
+    try:
+        from config import ENABLE_SCREENSHOT_VALIDATION
+        if not ENABLE_SCREENSHOT_VALIDATION:
+            print("ℹ️ Screenshot validation is disabled in config. Assuming valid.")
+            return True
+    except ImportError:
+        pass
+
     # Get list of API keys
     api_keys_env = os.getenv("GEMINI_API_KEYS", os.getenv("GEMINI_API_KEY", ""))
     api_keys = [k.strip() for k in api_keys_env.split(",") if k.strip()]
@@ -219,8 +229,8 @@ def check_screenshot_validity(image_path):
             print("⚠️ GEMINI_API_KEY not found in config. Skipping screenshot validation.")
             return True
 
-    # Initialize models to try
-    models_to_try = [GEMINI_FLASH_MODEL or "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-1.5-flash"]
+    # Initialize models to try (Priority 5: Remove gemini-1.5-flash as it is decommissioned)
+    models_to_try = [GEMINI_FLASH_MODEL or "gemini-2.5-flash", "gemini-2.5-flash-lite"]
     
     from google import genai
     from PIL import Image
@@ -265,6 +275,13 @@ def check_screenshot_validity(image_path):
             return True
         except Exception as e:
             print(f"⚠️ API call failed with model {current_model} using key index {key_idx % len(api_keys)}: {e}")
+            
+            # Early exit if rate limited / quota exhausted to preserve quota
+            err_str = str(e).upper()
+            if "429" in err_str or "LIMIT" in err_str or "QUOTA" in err_str or "EXHAUSTED" in err_str:
+                print("⚠️ Gemini rate limit or quota exhaustion detected. Skipping screenshot validation to preserve quota.")
+                return True
+                
             attempts += 1
             # Rotate key on every failure, and rotate model after trying all keys
             key_idx += 1

@@ -351,13 +351,21 @@ def call_fallback_model(prompt):
             if is_model_exhausted("groq_models", model_name):
                 print(f"⏭️ Skipping known-bad Groq model: {model_name}")
                 continue
+                
+            # Priority 2: Skip smaller context/TPM models for large prompts to prevent 413 Request Too Large / TPM limits
+            approx_tokens = len(prompt) // 4
+            if approx_tokens > 2000 and model_name in ("llama-3.1-8b-instant", "qwen/qwen3-32b"):
+                print(f"⏭️ Skipping small Groq model {model_name} because prompt is too large (~{approx_tokens} tokens)")
+                continue
+                
             print(f"🔮 Falling back to Groq ({model_name})...")
             try:
                 payload = {
                     "model": model_name,
                     "messages": [{"role": "user", "content": prompt}],
                     "response_format": {"type": "json_object"},
-                    "temperature": 0.7
+                    "temperature": 0.7,
+                    "max_tokens": 4096  # Priority 1: Prevent truncation of JSON output
                 }
                 r = requests.post("https://api.groq.com/openai/v1/chat/completions", json=payload, headers=headers, timeout=30)
                 if r.status_code == 200:
@@ -468,7 +476,7 @@ def call_fallback_model(prompt):
                     "messages": [{"role": "user", "content": prompt}],
                     "temperature": 0.7
                 }
-                r = requests.post("https://opencode.ai/zen/v1/chat/completions", json=payload, headers=headers, timeout=30)
+                r = requests.post("https://opencode.ai/zen/v1/chat/completions", json=payload, headers=headers, timeout=60)
                 if r.status_code == 200:
                     content = r.json()["choices"][0]["message"]["content"].strip()
                     return clean_and_parse_json(content)
