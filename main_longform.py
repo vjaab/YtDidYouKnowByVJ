@@ -422,76 +422,81 @@ def run_longform_pipeline(dry_run=False):
 
     # ── FALLBACK AFTER LOOP (Priority 1) ─────────────────────────────────
     if not audio_path and best_script_data:
-        log_message(f"\n⚠️ [FALLBACK] ALL {LONGFORM_MAX_RETRY_ATTEMPTS} ATTEMPTS EXHAUSTED to reach target {min_dur}s duration.")
-        log_message(f"Attempting to generate assets for the best candidate script ({best_word_count} words, expected ~{best_word_count / 2.33:.1f}s)...")
-        script_data = best_script_data
-        script_data["slot"] = "Slot L (Long-form)"
-        script_data["is_longform"] = True
-        
-        script = script_data.get("script", "")
-        custom_map = script_data.get("phonetic_pronunciation_map", {})
-        topics = script_data.get("longform_topics", [])
-        
-        # 1. Capture article screenshots
-        log_message("STEP 2b [FALLBACK]: Capturing article screenshots for evidence...")
-        screenshots_captured = 0
-        for i, topic in enumerate(topics):
-            url = topic.get("source_url", "")
-            if url:
-                ss_filename = f"screenshot_longform_{i+1}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-                ss_path = capture_article_screenshot(
-                    url, 
-                    ss_filename, 
-                    desktop=True, 
-                    headline=topic.get("headline")
-                )
-                if ss_path:
-                    topic["screenshot_path"] = ss_path
-                    screenshots_captured += 1
-                    if i == 0:
-                        script_data["screenshot_path"] = ss_path
-        log_message(f"✅ Captured {screenshots_captured}/{len(topics)} article screenshots.")
-        
-        # 2. Select avatar
-        intro_videos = glob.glob("assets/video/*.mp4")
-        if not intro_videos:
-            intro_videos = ["assets/video/Firefly_video_final.mp4"]
-        from topic_tracker import get_next_avatar
-        selected_avatar = get_next_avatar(intro_videos, tracker_file=LONGFORM_TRACKER_FILE)
-        script_data["lipsync_face_path"] = selected_avatar
-        
-        # 3. Audio generation (Kaggle/Local)
-        if has_kaggle and not use_local_only:
-            log_message("Attempting Kaggle GPU handover for fallback audio + lip-sync...")
-            results = trigger_kaggle_gpu_job(script_data, custom_map)
+        expected_best_dur = best_word_count / 2.33
+        min_acceptable_dur = 0.7 * min_dur
+        if expected_best_dur < min_acceptable_dur:
+            log_message(f"❌ [FALLBACK REJECTED] Best candidate script length ({best_word_count} words, approx {expected_best_dur:.1f}s) is below 70% threshold ({min_acceptable_dur}s).")
+        else:
+            log_message(f"\n⚠️ [FALLBACK] ALL {LONGFORM_MAX_RETRY_ATTEMPTS} ATTEMPTS EXHAUSTED to reach target {min_dur}s duration.")
+            log_message(f"Attempting to generate assets for the best candidate script ({best_word_count} words, expected ~{expected_best_dur:.1f}s)...")
+            script_data = best_script_data
+            script_data["slot"] = "Slot L (Long-form)"
+            script_data["is_longform"] = True
             
-            kaggle_failed = False
-            if results is None:
-                kaggle_failed = True
-            elif isinstance(results, dict) and "error" in results:
-                kaggle_failed = True
+            script = script_data.get("script", "")
+            custom_map = script_data.get("phonetic_pronunciation_map", {})
+            topics = script_data.get("longform_topics", [])
+            
+            # 1. Capture article screenshots
+            log_message("STEP 2b [FALLBACK]: Capturing article screenshots for evidence...")
+            screenshots_captured = 0
+            for i, topic in enumerate(topics):
+                url = topic.get("source_url", "")
+                if url:
+                    ss_filename = f"screenshot_longform_{i+1}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+                    ss_path = capture_article_screenshot(
+                        url, 
+                        ss_filename, 
+                        desktop=True, 
+                        headline=topic.get("headline")
+                    )
+                    if ss_path:
+                        topic["screenshot_path"] = ss_path
+                        screenshots_captured += 1
+                        if i == 0:
+                            script_data["screenshot_path"] = ss_path
+            log_message(f"✅ Captured {screenshots_captured}/{len(topics)} article screenshots.")
+            
+            # 2. Select avatar
+            intro_videos = glob.glob("assets/video/*.mp4")
+            if not intro_videos:
+                intro_videos = ["assets/video/Firefly_video_final.mp4"]
+            from topic_tracker import get_next_avatar
+            selected_avatar = get_next_avatar(intro_videos, tracker_file=LONGFORM_TRACKER_FILE)
+            script_data["lipsync_face_path"] = selected_avatar
+            
+            # 3. Audio generation (Kaggle/Local)
+            if has_kaggle and not use_local_only:
+                log_message("Attempting Kaggle GPU handover for fallback audio + lip-sync...")
+                results = trigger_kaggle_gpu_job(script_data, custom_map)
                 
-            if not kaggle_failed:
-                audio_path = results.get("audio_path")
-                duration = results.get("duration")
-                word_timestamps = results.get("word_timestamps")
-                script_data["kaggle_lipsync_path"] = results.get("lipsync_path")
-                
-                # Check file existence
-                if not (audio_path and os.path.exists(audio_path)):
+                kaggle_failed = False
+                if results is None:
                     kaggle_failed = True
-            
-            if kaggle_failed:
-                log_message("❌ Kaggle failed on fallback. Generating audio via cloud fallback...")
+                elif isinstance(results, dict) and "error" in results:
+                    kaggle_failed = True
+                    
+                if not kaggle_failed:
+                    audio_path = results.get("audio_path")
+                    duration = results.get("duration")
+                    word_timestamps = results.get("word_timestamps")
+                    script_data["kaggle_lipsync_path"] = results.get("lipsync_path")
+                    
+                    # Check file existence
+                    if not (audio_path and os.path.exists(audio_path)):
+                        kaggle_failed = True
+                
+                if kaggle_failed:
+                    log_message("❌ Kaggle failed on fallback. Generating audio via cloud fallback...")
+                    audio_path, duration, word_timestamps = generate_voiceover(
+                        script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY
+                    )
+                    script_data["kaggle_lipsync_path"] = None
+                    script_data["skip_avatar"] = True
+            else:
                 audio_path, duration, word_timestamps = generate_voiceover(
                     script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY
                 )
-                script_data["kaggle_lipsync_path"] = None
-                script_data["skip_avatar"] = True
-        else:
-            audio_path, duration, word_timestamps = generate_voiceover(
-                script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY
-            )
 
     if not audio_path or not script_data:
         log_message("ERROR: Could not generate valid assets. Aborting.")

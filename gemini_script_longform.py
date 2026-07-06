@@ -272,7 +272,8 @@ Shorten any sentence over 18 words.
 STRICT RETENTION ENFORCEMENTS:
 1. 3-Second Rule: Check that the very first sentence immediately states the stakes (e.g. "This line of code caused a $500 million dollar blackout..."). Strip out any intro greeting.
 2. 4-Second Visual Reset: Make sure visual cues in the visual layout details shift at least every 4 seconds.
-3. Cut the Fluff: Remove any sentences that don't add direct engineering value.
+3. Cut the Fluff: Remove filler words and redundant phrases that don't add direct value, but do NOT delete engineering details or facts.
+4. Length Preservation: The script MUST maintain its target length of 1100–1350 words (approx 8 minutes of speech) to ensure mid-roll ad eligibility. Do NOT summarize, compress, or delete any of the 8 topic segments or facts. Retain all details and explain them in a fast-paced, highly detailed manner.
 
 ASSEMBLED SCRIPT:
 {assembled_script}
@@ -352,11 +353,20 @@ def call_fallback_model(prompt):
                 print(f"⏭️ Skipping known-bad Groq model: {model_name}")
                 continue
                 
-            # Priority 2: Skip smaller context/TPM models for large prompts to prevent 413 Request Too Large / TPM limits
-            approx_tokens = len(prompt) // 4
-            if approx_tokens > 2000 and model_name in ("llama-3.1-8b-instant", "qwen/qwen3-32b"):
-                print(f"⏭️ Skipping small Groq model {model_name} because prompt is too large (~{approx_tokens} tokens)")
-                continue
+            # Determine max_tokens and TPM limit dynamically (Conflict Fix: limit max_tokens on small TPM models)
+            if model_name in ("llama-3.1-8b-instant", "qwen/qwen3-32b"):
+                max_tokens = 1536
+                tpm_limit = 6000
+            else:
+                max_tokens = 4096
+                tpm_limit = None
+                
+            # TPM budget check: skip if combined requested tokens (prompt + max completion tokens) exceeds the limit
+            if tpm_limit:
+                approx_prompt_tokens = len(prompt) // 4
+                if approx_prompt_tokens + max_tokens > tpm_limit:
+                    print(f"⏭️ Skipping Groq model {model_name} because requested budget ({approx_prompt_tokens} prompt + {max_tokens} completion) exceeds TPM limit ({tpm_limit})")
+                    continue
                 
             print(f"🔮 Falling back to Groq ({model_name})...")
             try:
@@ -365,7 +375,7 @@ def call_fallback_model(prompt):
                     "messages": [{"role": "user", "content": prompt}],
                     "response_format": {"type": "json_object"},
                     "temperature": 0.7,
-                    "max_tokens": 4096  # Priority 1: Prevent truncation of JSON output
+                    "max_tokens": max_tokens
                 }
                 r = requests.post("https://api.groq.com/openai/v1/chat/completions", json=payload, headers=headers, timeout=30)
                 if r.status_code == 200:
@@ -717,9 +727,9 @@ class LongformGenerationEngine:
     # ── STEP 1: Research per topic ───────────────────────────────────────────
     def research_topic(self, topic):
         """Deep-research a single topic for fact extraction."""
-        headline = topic.get("headline", "")
-        source_url = topic.get("source_url", "")
-        keywords = topic.get("search_keywords", [])
+        headline = topic.get("headline") or ""
+        source_url = topic.get("source_url") or ""
+        keywords = topic.get("search_keywords") or []
         
         print(f"   🔬 Researching: {headline}")
 
