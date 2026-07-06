@@ -225,14 +225,23 @@ def run_longform_pipeline(dry_run=False):
             log_message(f"⚠️ Failed to import x_trending_fetcher: {ex}")
             x_news = []
             
-        rss_articles = vidiq_news + research_news + ai_tool_news + trending_news + x_news + reddit_news
+        # Fetch GitHub trending AI repos (Conflict Fix: prioritize trending GitHub projects)
+        try:
+            from trending_engine import fetch_github_trending_ai
+            github_news = fetch_github_trending_ai()
+        except Exception as ex:
+            log_message(f"⚠️ GitHub Fetch failed: {ex}")
+            github_news = []
+            
+        rss_articles = github_news + vidiq_news + research_news + ai_tool_news + trending_news + x_news + reddit_news
 
         if not rss_articles:
             log_message("⚠️ All sources returned 0 articles. Pipeline will rely on Gemini Search.")
         else:
             log_message(f"✅ Fetched {len(rss_articles)} total articles "
-                       f"({len(vidiq_news)} vidIQ, {len(research_news)} research, {len(ai_tool_news)} tools, "
-                       f"{len(trending_news)} trending, {len(x_news)} X.com, {len(reddit_news)} Reddit).")
+                       f"({len(github_news)} GitHub, {len(vidiq_news)} vidIQ, {len(research_news)} research, "
+                       f"{len(ai_tool_news)} tools, {len(trending_news)} trending, {len(x_news)} X.com, "
+                       f"{len(reddit_news)} Reddit).")
     except Exception as e:
         log_message(f"⚠️ RSS/X Fetch failed: {e}")
 

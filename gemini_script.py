@@ -513,8 +513,8 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                     is_viral_category = True
                 
                 # Dev-centric or Niche Filtering for General Consumer Appeal (18-70)
-                # Bypassed if the article falls under a viral category.
-                if not is_viral_category:
+                # Bypassed if the article falls under a viral category or is a GitHub trending project.
+                if not is_viral_category and art.get("type") != "github_trending":
                     dev_antikeywords = [
                         "repository", "git commit", "api endpoint", "npm package", "pip install", 
                         "cuda", "pytorch", "fine-tune", "fine-tuning", "weights", "parameters", 
@@ -632,6 +632,8 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
 
                 if is_viral_category:
                     hot_score += 150.0  # Massive score boost to prioritize this topic
+                if art.get("type") == "github_trending":
+                    hot_score += 100.0  # Boost GitHub trending repos to prioritize them for selection
 
                 art['_hot_score'] = round(hot_score, 1)
                 art['_score_breakdown'] = {

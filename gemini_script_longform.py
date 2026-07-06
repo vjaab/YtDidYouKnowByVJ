@@ -77,16 +77,17 @@ TOPIC_DISCOVERY_TEMPLATE = """{persona}
 
 TOPIC DISCOVERY AGENT TASK:
 Search today's AI landscape and discover:
-1. One MAIN BREAKOUT topic (the main_topic): This must be a major AI release, a revolutionary tool, an insane prompt hack, or a life-changing automated workflow with massive utility for professionals or creators.
-2. 5 to 7 SECONDARY topics (news_updates): These must be hot AI updates, tool launches, or interesting tech facts from the last 72 hours.
+1. One MAIN BREAKOUT topic (the main_topic): This must be a major open-source repository release, a trending GitHub project, a revolutionary tool, an insane developer hack, or a life-changing automated coding workflow with massive utility.
+2. 5 to 7 SECONDARY topics (news_updates): These must be hot GitHub breakouts, open-source tool launches, AI repo updates, or interesting tech/coding facts from the last 72 hours.
 
 SOURCES TO ANALYZE:
 {news_context}
 
 SELECTION CRITERIA (in order of priority):
-- High utility: solves a real pain point (saving time, making money, future-proofing jobs).
+- GitHub & Open-Source Focus: Strongly prioritize trending GitHub repositories, open-source AI projects, codebases, and developer tools. Most of the selected topics MUST be active GitHub projects or developer libraries.
+- High utility: solves a real pain point (saving time, writing better code, automation, making money).
 - Urgent/Breaking: happened in the last 24-72 hours.
-- Mass appeal: avoid dry developer-only tutorials, PC overclocking, or academic benchmarks without consumer application.
+- Mass Appeal: Frame developer/GitHub topics so they are extremely exciting, emphasizing their direct utility, features, and how to get started, so they are accessible to tech creators and professionals.
 
 AVOIDANCE LIST (DO NOT select topics similar to these):
 {avoid_list}
@@ -694,11 +695,11 @@ class LongformGenerationEngine:
         """Find the main topic and news updates for today's video."""
         print("🔥 [AGENT 0] Topic Discovery: Finding main breakout topic + news updates...")
 
-        # Enrich context with live search
+        # Enrich context with live search targeting GitHub / Open-Source (Conflict Fix)
         search_text, search_links = self._call_gemini_search(
-            "What are the top 10 most trending, viral, or breakout AI news stories, engineering breakdowns, "
-            "or system design chronicles in the last 48 hours? Include model launches, code archaeology "
-            "deep dives, model vs model comparisons, or massive server scaling secrets (e.g. Netflix, WhatsApp, Git, Spotify, Doom)."
+            "What are the top trending open-source projects, trending GitHub repositories, major AI code releases, "
+            "or breakout developer tools in the last 48 hours? Focus heavily on GitHub breakouts, developer libraries, "
+            "open-source LLMs, code archaeology, and technical developer stories."
         )
         enriched_context = self.news_context
         if search_text:

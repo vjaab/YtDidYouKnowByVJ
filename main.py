@@ -251,7 +251,15 @@ def run_pipeline(topic_type="auto", dry_run=False):
             log_message(f"⚠️ Failed to import x_trending_fetcher: {ex}")
             x_news = []
             
-        rss_articles = vidiq_news + research_news + ai_tool_news + x_news
+        # Fetch GitHub trending AI repos (Conflict Fix: prioritize trending GitHub projects)
+        try:
+            from trending_engine import fetch_github_trending_ai
+            github_news = fetch_github_trending_ai()
+        except Exception as ex:
+            log_message(f"⚠️ GitHub Fetch failed: {ex}")
+            github_news = []
+            
+        rss_articles = github_news + vidiq_news + research_news + ai_tool_news + x_news
         
         # ── TRENDING ENGINE (Phase 1): YouTube, Reddit, GitHub signals ──
         trending_articles = []
@@ -267,7 +275,7 @@ def run_pipeline(topic_type="auto", dry_run=False):
         if not rss_articles:
             log_message("⚠️ All feeds returned 0 articles.")
         else:
-            log_message(f"✅ Fetched {len(rss_articles)} total articles ({len(vidiq_news)} vidIQ, {len(research_news)} research, {len(ai_tool_news)} tools, {len(x_news)} X.com, {len(trending_articles)} trending).")
+            log_message(f"✅ Fetched {len(rss_articles)} total articles ({len(github_news)} GitHub, {len(vidiq_news)} vidIQ, {len(research_news)} research, {len(ai_tool_news)} tools, {len(x_news)} X.com, {len(trending_articles)} trending).")
     except Exception as e:
         log_message(f"⚠️ RSS/Trending Fetch failed: {e}")
 
