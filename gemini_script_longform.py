@@ -630,8 +630,22 @@ def call_fallback_model(prompt):
             "Authorization": f"Bearer {cerebras_key}",
             "Content-Type": "application/json"
         }
-        cerebras_models = ["gpt-oss-120b", "zai-glm-4.7", "gemma-4-31b"]
-        for model_name in cerebras_models:
+        # Dynamically fetch the live list of models from Cerebras
+        live_models = []
+        try:
+            r_models = requests.get("https://api.cerebras.ai/v1/models", headers=headers, timeout=10)
+            if r_models.status_code == 200:
+                models_data = r_models.json().get("data", [])
+                live_models = [m.get("id") for m in models_data if m.get("id")]
+                print(f"ℹ️ Dynamically retrieved live Cerebras models: {live_models}")
+        except Exception as ex:
+            print(f"⚠️ Failed to fetch live Cerebras models dynamically: {ex}")
+
+        # Fallback roster if fetching fails or returns empty
+        if not live_models:
+            live_models = ["gpt-oss-120b", "zai-glm-4.7", "gemma-4-31b"]
+
+        for model_name in live_models:
             if is_model_exhausted("cerebras_models", model_name):
                 print(f"⏭️ Skipping known-bad Cerebras model: {model_name}")
                 continue
@@ -654,6 +668,98 @@ def call_fallback_model(prompt):
                         mark_model_exhausted("cerebras_models", model_name, r.text)
             except Exception as e:
                 print(f"⚠️ Cerebras ({model_name}) fallback failed: {e}")
+
+    # 1.9. NVIDIA NIM
+    nvidia_key = os.getenv("NVIDIA_API_KEY")
+    if nvidia_key:
+        headers = {
+            "Authorization": f"Bearer {nvidia_key}",
+            "Content-Type": "application/json"
+        }
+        nvidia_models = ["nvidia/llama-3.1-nemotron-70b-instruct", "meta/llama3-70b-instruct"]
+        for model_name in nvidia_models:
+            if is_model_exhausted("nvidia_models", model_name):
+                continue
+            print(f"🔮 Falling back to NVIDIA NIM ({model_name})...")
+            try:
+                payload = {
+                    "model": model_name,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "temperature": 0.7
+                }
+                r = requests.post("https://integrate.api.nvidia.com/v1/chat/completions", json=payload, headers=headers, timeout=30)
+                if r.status_code == 200:
+                    content = safe_extract_choices(r, "NVIDIA NIM")
+                    if content:
+                        return clean_and_parse_json(content)
+                else:
+                    print(f"⚠️ NVIDIA NIM ({model_name}) failed with code {r.status_code}: {r.text}")
+                    if r.status_code in (429, 403):
+                        mark_model_exhausted("nvidia_models", model_name, r.text)
+            except Exception as e:
+                print(f"⚠️ NVIDIA NIM ({model_name}) fallback failed: {e}")
+
+    # 1.95. Mistral AI
+    mistral_key = os.getenv("MISTRAL_API_KEY")
+    if mistral_key:
+        headers = {
+            "Authorization": f"Bearer {mistral_key}",
+            "Content-Type": "application/json"
+        }
+        mistral_models = ["mistral-large-latest", "pixtral-large-latest", "codestral-latest"]
+        for model_name in mistral_models:
+            if is_model_exhausted("mistral_models", model_name):
+                continue
+            print(f"🔮 Falling back to Mistral ({model_name})...")
+            try:
+                payload = {
+                    "model": model_name,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "response_format": {"type": "json_object"},
+                    "temperature": 0.7
+                }
+                r = requests.post("https://api.mistral.ai/v1/chat/completions", json=payload, headers=headers, timeout=30)
+                if r.status_code == 200:
+                    content = safe_extract_choices(r, "Mistral")
+                    if content:
+                        return clean_and_parse_json(content)
+                else:
+                    print(f"⚠️ Mistral ({model_name}) failed with code {r.status_code}: {r.text}")
+                    if r.status_code in (429, 403):
+                        mark_model_exhausted("mistral_models", model_name, r.text)
+            except Exception as e:
+                print(f"⚠️ Mistral ({model_name}) fallback failed: {e}")
+
+    # 1.98. GitHub Models
+    github_token = os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN") or os.getenv("GITHUB_API_KEY")
+    if github_token:
+        headers = {
+            "Authorization": f"Bearer {github_token}",
+            "Content-Type": "application/json"
+        }
+        github_models = ["gpt-4o-mini", "meta-llama-3.1-405b-instruct"]
+        for model_name in github_models:
+            if is_model_exhausted("github_models", model_name):
+                continue
+            print(f"🔮 Falling back to GitHub Models ({model_name})...")
+            try:
+                payload = {
+                    "model": model_name,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "response_format": {"type": "json_object"},
+                    "temperature": 0.7
+                }
+                r = requests.post("https://models.inference.ai.azure.com/chat/completions", json=payload, headers=headers, timeout=30)
+                if r.status_code == 200:
+                    content = safe_extract_choices(r, "GitHub Models")
+                    if content:
+                        return clean_and_parse_json(content)
+                else:
+                    print(f"⚠️ GitHub Models ({model_name}) failed with code {r.status_code}: {r.text}")
+                    if r.status_code in (429, 403):
+                        mark_model_exhausted("github_models", model_name, r.text)
+            except Exception as e:
+                print(f"⚠️ GitHub Models ({model_name}) fallback failed: {e}")
 
     # 2. OpenAI
     openai_key = os.getenv("OPENAI_API_KEY")
@@ -733,26 +839,32 @@ def call_fallback_model(prompt):
     # 5. OpenRouter
     openrouter_key = os.getenv("OPENROUTER_API_KEY")
     if openrouter_key:
-        print("🔮 Falling back to OpenRouter (meta-llama/llama-3.3-70b-instruct)...")
-        try:
-            headers = {
-                "Authorization": f"Bearer {openrouter_key}",
-                "Content-Type": "application/json"
-            }
-            payload = {
-                "model": "meta-llama/llama-3.3-70b-instruct",
-                "messages": [{"role": "user", "content": prompt}],
-                "temperature": 0.7
-            }
-            r = requests.post("https://openrouter.ai/api/v1/chat/completions", json=payload, headers=headers, timeout=30)
-            if r.status_code == 200:
-                content = safe_extract_choices(r, "OpenRouter")
-                if content:
-                    return clean_and_parse_json(content)
-            else:
-                print(f"⚠️ OpenRouter API failed with code {r.status_code}: {r.text}")
-        except Exception as e:
-            print(f"⚠️ OpenRouter fallback failed: {e}")
+        openrouter_models = ["openrouter/free", "meta-llama/llama-3.3-70b-instruct"]
+        for model_name in openrouter_models:
+            if is_model_exhausted("openrouter_models", model_name):
+                continue
+            print(f"🔮 Falling back to OpenRouter ({model_name})...")
+            try:
+                headers = {
+                    "Authorization": f"Bearer {openrouter_key}",
+                    "Content-Type": "application/json"
+                }
+                payload = {
+                    "model": model_name,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "temperature": 0.7
+                }
+                r = requests.post("https://openrouter.ai/api/v1/chat/completions", json=payload, headers=headers, timeout=30)
+                if r.status_code == 200:
+                    content = safe_extract_choices(r, "OpenRouter")
+                    if content:
+                        return clean_and_parse_json(content)
+                else:
+                    print(f"⚠️ OpenRouter API ({model_name}) failed with code {r.status_code}: {r.text}")
+                    if r.status_code in (429, 403):
+                        mark_model_exhausted("openrouter_models", model_name, r.text)
+            except Exception as e:
+                print(f"⚠️ OpenRouter fallback failed ({model_name}): {e}")
 
     return None
 
