@@ -173,6 +173,10 @@ def run_longform_pipeline(dry_run=False):
     """Main long-form pipeline: 5 topics → 3-min 16:9 video → YouTube."""
     log_message("=== STARTING DAILY LONG-FORM 'DID YOU KNOW' PIPELINE ===")
 
+    # Initialize Kaggle configuration flags
+    has_kaggle = os.getenv("KAGGLE_USERNAME") is not None or os.path.exists(os.path.expanduser("~/.kaggle/kaggle.json"))
+    use_local_only = os.environ.get("USE_LOCAL_ONLY") == "true"
+
     # ── Clean output folder ──────────────────────────────────────────────
     if os.path.exists(OUTPUT_DIR):
         for f in glob.glob(os.path.join(OUTPUT_DIR, "*")):
