@@ -280,7 +280,7 @@ def _estimate_timestamps(text, duration):
         return []
     interval = duration / len(words)
     return [
-        {"word": w, "start": round(i * interval, 3), "end": round((i + 1) * interval, 3)}
+        {"word": w, "start": round(i * interval, 3), "end": round((i + 1) * interval, 3), "estimated": True}
         for i, w in enumerate(words)
     ]
 
@@ -525,8 +525,7 @@ def _inject_human_phrasing(wav_path, word_timestamps, text):
         if word.rstrip(',;:').endswith((',', ';', ':')):
             pause_ms = random.randint(80, 150)  # 80-150ms micro-pause
             silence = AudioSegment.silent(duration=pause_ms)
-            segments.append(audio[current_pos:start_ms])
-            segments.append(audio[start_ms:end_ms])
+            segments.append(audio[current_pos:end_ms])
             segments.append(silence)
             current_pos = end_ms
             accumulated_shift_ms += pause_ms
@@ -535,8 +534,7 @@ def _inject_human_phrasing(wav_path, word_timestamps, text):
         elif word.rstrip('.!?').endswith(('.', '!', '?')):
             pause_ms = random.randint(200, 350)  # 200-350ms breath pause
             silence = AudioSegment.silent(duration=pause_ms)
-            segments.append(audio[current_pos:start_ms])
-            segments.append(audio[start_ms:end_ms])
+            segments.append(audio[current_pos:end_ms])
             segments.append(silence)
             current_pos = end_ms
             accumulated_shift_ms += pause_ms
@@ -613,14 +611,11 @@ def _add_natural_volume_variation(audio):
     return audio._spawn(new_samples.tobytes())
 
 
-def _postprocess_voice_audio(wav_path, word_timestamps=None, original_text=None):
+def _postprocess_voice_audio(wav_path, word_timestamps=None, original_text=None, skip_slicing=False):
     """
     Professional post-processing chain to enhance clarity and presence:
     1. High-pass filter at 120Hz to remove low-end rumble and mud.
-    2. Three-Band Presence EQ Crossover Network:
-       - Lows (100Hz - 200Hz): warm chest boost (+1.5dB).
-       - Mids (200Hz - 3kHz): vocal core.
-       - Highs (3kHz - 15kHz): crisp sparkle presence boost (+3.5dB) and high-end air.
+    2. Three-Band Presence EQ Crossover Network (REMOVED to prevent phase-cancellation echoes)
     3. Dynamic Range Compression to level out the voice and make it "pop".
     4. Final normalization to -1dB for consistent loudness.
     5. Subtle fade-in/out to prevent clicks.
@@ -631,27 +626,18 @@ def _postprocess_voice_audio(wav_path, word_timestamps=None, original_text=None)
         from pydub import AudioSegment
         from pydub.effects import normalize, compress_dynamic_range
         
-        # Step 0: Clean artifacts if timestamps available
-        if word_timestamps and original_text:
+        # Step 0: Clean artifacts if timestamps available (Skip for cloud TTS, estimated TS, or skip_slicing)
+        is_estimated = any(wt.get("estimated", False) for wt in word_timestamps) if word_timestamps else False
+        if word_timestamps and original_text and not skip_slicing and not is_estimated:
             word_timestamps = _remove_vocal_artifacts(wav_path, word_timestamps, original_text)
             word_timestamps = _inject_human_phrasing(wav_path, word_timestamps, original_text)
         
-        audio = AudioSegment.from_wav(wav_path)
+        audio = AudioSegment.from_file(wav_path)
         
         # 1. High-pass filter (120Hz) - Removes low-frequency room rumble
         audio = audio.high_pass_filter(120)
         
-        # 2. Three-Band Presence EQ Crossover
-        lows = audio.low_pass_filter(200).high_pass_filter(100)
-        mids = audio.high_pass_filter(200).low_pass_filter(3000)
-        highs = audio.high_pass_filter(3000)
-        
-        # Apply premium boosting gains
-        lows = lows + 1.5   # Warmth chest boost
-        highs = highs + 3.5 # Sparkle & presence air boost
-        
-        # Recombine frequency crossover bands
-        audio = lows.overlay(mids).overlay(highs)
+        # 2. Three-Band Presence EQ Crossover - REMOVED to prevent comb filtering/echo phase cancellations
         
         # 3. Dynamic Compression - Makes the voice sound authoritative and professional
         # Threshold -15dB, Ratio 3:1, Attack 5ms, Release 50ms
@@ -663,8 +649,8 @@ def _postprocess_voice_audio(wav_path, word_timestamps=None, original_text=None)
         # 5. Prevent click artifacts
         audio = audio.fade_in(5).fade_out(5)
         
-        audio.export(wav_path, format="wav")
-        print(f"   🎙️ Audio enhanced: 120Hz HPF, 3-band presence EQ, dynamic compression, normalized to -1dB, artifacts cleaned, human phrasing injected")
+        audio.export(wav_path, format="wav" if wav_path.endswith(".wav") else "mp3")
+        print(f"   🎙️ Audio enhanced: 120Hz HPF, dynamic compression, normalized to -1dB, artifacts cleaned, human phrasing injected")
     except Exception as e:
         print(f"   ⚠ Audio post-processing skipped: {e}")
 
@@ -751,8 +737,8 @@ def _generate_edge_tts(text, output_path):
         if not word_timestamps:
             word_timestamps = _estimate_timestamps(text, duration)
         
-        # Post-process for professional voice quality (artifact removal, human phrasing)
-        _postprocess_voice_audio(output_path, word_timestamps, text)
+        # Post-process for professional voice quality (skip slicing/humanizing for cloud TTS)
+        _postprocess_voice_audio(output_path, word_timestamps, text, skip_slicing=True)
         
         return output_path, duration, word_timestamps
     except Exception as e:
@@ -1629,9 +1615,12 @@ def generate_voiceover(text, custom_phonetic_map=None, api_key=None):
         print(f"🎙️ [AUDIO LOOP] Act: Generating iteration {iterations}...")
         
         path, dur, word_timestamps = None, 0, []
+        is_cloud = False
         try:
             # First Priority: ElevenLabs Cloned Voice
             path, dur, word_timestamps = _generate_elevenlabs(text_to_speak, mp3_path)
+            if path:
+                is_cloud = True
         except Exception as e:
             print(f"❌ ElevenLabs failed: {e}")
             
@@ -1643,6 +1632,8 @@ def generate_voiceover(text, custom_phonetic_map=None, api_key=None):
                 if has_gpu:
                     print("🎙️ ElevenLabs failed. Attempting local GPU F5-TTS fallback...")
                     path, dur, word_timestamps = _generate_f5_clone(text_to_speak, mp3_path)
+                    if path:
+                        is_cloud = False
                 else:
                     print("   Local GPU not found. Skipping F5-TTS fallback.")
             except Exception as f5_err:
@@ -1653,6 +1644,8 @@ def generate_voiceover(text, custom_phonetic_map=None, api_key=None):
             # Third Priority: Edge-TTS
             try:
                 path, dur, word_timestamps = _generate_edge_tts(text_to_speak, mp3_path)
+                if path:
+                    is_cloud = True
             except Exception as edge_err:
                 print(f"❌ Edge-TTS failed: {edge_err}")
 
@@ -1662,14 +1655,19 @@ def generate_voiceover(text, custom_phonetic_map=None, api_key=None):
         if word_timestamps:
             word_timestamps = restore_original_words(word_timestamps, original_raw_text, custom_phonetic_map=current_phonetic_map)
         if path and word_timestamps:
+            is_estimated = any(wt.get("estimated", False) for wt in word_timestamps)
             dur, word_timestamps = trim_audio_silence(path, word_timestamps)
-            dur, word_timestamps = optimize_audio_gaps(path, word_timestamps)
+            
+            # Skip aggressive gap optimization and context pauses for cloud TTS and estimated timestamps
+            if not is_cloud and not is_estimated:
+                dur, word_timestamps = optimize_audio_gaps(path, word_timestamps)
             
             # Phase 2: Apply audio pacing & clipping management
             dur, word_timestamps = apply_audio_pacing(path, word_timestamps)
             
-            # Phase 3: Inject context-shift pauses for natural breathing room
-            dur, word_timestamps = _inject_context_pauses(path, word_timestamps)
+            # Phase 3: Inject context-shift pauses (Skip for cloud TTS and estimated timestamps)
+            if not is_cloud and not is_estimated:
+                dur, word_timestamps = _inject_context_pauses(path, word_timestamps)
 
         # 2. OBSERVE & CRITIQUE
         if api_key and iterations < max_iters:
