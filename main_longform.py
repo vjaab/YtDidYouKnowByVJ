@@ -298,7 +298,37 @@ def run_longform_pipeline(dry_run=False):
         for i, t in enumerate(topics):
             log_message(f"  Fact {i+1}: {t.get('headline', 'Unknown')}")
 
-        # ── STEP 2b: Capture Screenshots for Each Topic ──────────────────
+        # ── STEP 3: Generate Audio + Lip-Sync ────────────────────────────
+        log_message("STEP 3: Generating voiceover + word timestamps...")
+        custom_map = script_data.get("phonetic_pronunciation_map", {})
+ 
+        # Select intro video for lip-sync (rotation)
+        intro_videos = glob.glob("assets/video/*.mp4")
+        if not intro_videos:
+            intro_videos = ["assets/video/Firefly_video_final.mp4"]
+        
+        from topic_tracker import get_next_avatar
+        selected_avatar = get_next_avatar(intro_videos, tracker_file=LONGFORM_TRACKER_FILE)
+        script_data["lipsync_face_path"] = selected_avatar
+        log_message(f"Selected Lip-Sync Template: {selected_avatar}")
+ 
+        # ── Word Count Pre-Flight Gate ────────────────────────────────────────
+        script = script_data.get("script", "")
+        word_count = len(script.split())
+        expected_dur = word_count / 2.33  # ~140 WPM (2.33 words per second)
+        
+        if expected_dur < min_dur:
+            log_message(f"⚠️ Script word count too low ({word_count} words, expected ~{expected_dur:.1f}s < {min_dur}s). Retrying script generation early to save GPU time.")
+            attempts += 1
+            script_data = None
+            continue
+        elif expected_dur > max_dur + 30:
+            log_message(f"⚠️ Script word count too high ({word_count} words, expected ~{expected_dur:.1f}s > {max_dur + 30}s). Retrying script generation early to save GPU time.")
+            attempts += 1
+            script_data = None
+            continue
+
+        # ── STEP 2b: Capture Screenshots for Each Topic (Only on validated script) ──
         log_message("STEP 2b: Capturing article screenshots for evidence...")
         screenshots_captured = 0
         for i, topic in enumerate(topics):
@@ -323,36 +353,6 @@ def run_longform_pipeline(dry_run=False):
         # For longform, screenshots are helpful but not mandatory (unlike Shorts)
         if not script_data.get("screenshot_path") and screenshots_captured == 0:
             log_message("⚠️ No screenshots captured. Proceeding anyway (long-form is less dependent).")
-
-        # ── STEP 3: Generate Audio + Lip-Sync ────────────────────────────
-        log_message("STEP 3: Generating voiceover + word timestamps...")
-        custom_map = script_data.get("phonetic_pronunciation_map", {})
-
-        # Select intro video for lip-sync (rotation)
-        intro_videos = glob.glob("assets/video/*.mp4")
-        if not intro_videos:
-            intro_videos = ["assets/video/Firefly_video_final.mp4"]
-        
-        from topic_tracker import get_next_avatar
-        selected_avatar = get_next_avatar(intro_videos, tracker_file=LONGFORM_TRACKER_FILE)
-        script_data["lipsync_face_path"] = selected_avatar
-        log_message(f"Selected Lip-Sync Template: {selected_avatar}")
-
-        # ── Word Count Pre-Flight Gate ────────────────────────────────────────
-        script = script_data.get("script", "")
-        word_count = len(script.split())
-        expected_dur = word_count / 2.33  # ~140 WPM (2.33 words per second)
-        
-        if expected_dur < min_dur:
-            log_message(f"⚠️ Script word count too low ({word_count} words, expected ~{expected_dur:.1f}s < {min_dur}s). Retrying script generation early to save GPU time.")
-            attempts += 1
-            script_data = None
-            continue
-        elif expected_dur > max_dur + 30:
-            log_message(f"⚠️ Script word count too high ({word_count} words, expected ~{expected_dur:.1f}s > {max_dur + 30}s). Retrying script generation early to save GPU time.")
-            attempts += 1
-            script_data = None
-            continue
 
         if has_kaggle and not use_local_only:
             log_message("Attempting Kaggle GPU handover for audio + lip-sync...")

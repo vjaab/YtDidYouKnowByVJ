@@ -168,11 +168,11 @@ RESEARCH CONTEXT:
 {research_context}
 
 STRUCTURE (MANDATORY):
-1. THE COLD OPEN & HOOK (0:00 - 0:45): Challenge a common belief or state a bold, slightly alarming claim about the tool/breakthrough. Make it high stakes. Name the tool immediately. (approx 100-120 words)
-2. THE PROBLEM/GAP (0:45 - 1:30): Explain why the traditional way of doing this task (or using basic AI prompts) is slow, expensive, or outdated. (approx 100-120 words)
-3. THE FRAMEWORK/SECRET SAUCE (1:30 - 2:30): Introduce a specific framework, rule, or concept (e.g. GPS Framework, Loop Engineering, Magic Prompt formula) to solve the problem. Explain the theory simply. (approx 130-150 words)
-4. THE LIVE DEMO/EXECUTION (2:30 - 4:15): Walk through the exact step-by-step prompts, tools, or inputs. Describe the screen action clearly so the video generator can place visuals/mockups. (approx 200-240 words)
-5. THE PAYOFF/RESULT (4:15 - 5:00): Show the concrete result — time saved, money earned, or business automated. (approx 100-120 words)
+1. THE COLD OPEN & HOOK (0:00 - 0:45): Challenge a common belief or state a bold, slightly alarming claim about the tool/breakthrough. Make it high stakes. Name the tool immediately. (approx 130-150 words)
+2. THE PROBLEM/GAP (0:45 - 1:30): Explain why the traditional way of doing this task (or using basic AI prompts) is slow, expensive, or outdated. (approx 130-150 words)
+3. THE FRAMEWORK/SECRET SAUCE (1:30 - 2:30): Introduce a specific framework, rule, or concept (e.g. GPS Framework, Loop Engineering, Magic Prompt formula) to solve the problem. Explain the theory simply. (approx 160-180 words)
+4. THE LIVE DEMO/EXECUTION (2:30 - 4:15): Walk through the exact step-by-step prompts, tools, or inputs. Describe the screen action clearly so the video generator can place visuals/mockups. (approx 260-300 words)
+5. THE PAYOFF/RESULT (4:15 - 5:00): Show the concrete result — time saved, money earned, or business automated. (approx 130-150 words)
 
 VOCAL DYNAMICS:
 - Use heavy punctuation (..., ALL CAPS, exclamation points, commas) to vary TTS pitch/cadence.
@@ -212,7 +212,7 @@ RULES:
 1. Start with a direct signpost like "Next up..." or "In other news...".
 2. Explain the update simply with 1 key metric or detail.
 3. Focus on utility/impact for professionals.
-4. Word count: 40-50 words.
+4. Word count: 65-75 words (highly detailed).
 
 Return ONLY a JSON object:
 {{
@@ -423,6 +423,32 @@ def call_fallback_model(prompt):
             raw = raw[raw.find("```")+3:raw.rfind("```")]
         return json.loads(raw.strip())
 
+    def safe_extract_choices(response_or_json, provider_name):
+        try:
+            data = response_or_json if isinstance(response_or_json, dict) else response_or_json.json()
+            choices = data.get("choices")
+            if choices and len(choices) > 0:
+                msg = choices[0].get("message")
+                if msg and "content" in msg and msg["content"]:
+                    return msg["content"].strip()
+            print(f"⚠️ [{provider_name}] Response structure unexpected: {data}")
+        except Exception as e:
+            print(f"⚠️ [{provider_name}] Failed to parse response JSON: {e}")
+        return None
+
+    def safe_extract_anthropic(response):
+        try:
+            data = response.json()
+            content_list = data.get("content")
+            if content_list and len(content_list) > 0:
+                text = content_list[0].get("text")
+                if text:
+                    return text.strip()
+            print(f"⚠️ [Anthropic] Response structure unexpected: {data}")
+        except Exception as e:
+            print(f"⚠️ [Anthropic] Failed to parse response JSON: {e}")
+        return None
+
     # 0. Groq (fast, reliable, high quota - prioritized first)
     groq_key = os.getenv("GROQ_API_KEY")
     if groq_key:
@@ -477,8 +503,9 @@ def call_fallback_model(prompt):
                     total_tokens = usage.get("total_tokens", 0)
                     if total_tokens > 0:
                         _update_groq_token_usage(model_name, total_tokens)
-                    content = res_json["choices"][0]["message"]["content"].strip()
-                    return clean_and_parse_json(content)
+                    content = safe_extract_choices(res_json, "Groq")
+                    if content:
+                        return clean_and_parse_json(content)
                 else:
                     print(f"⚠️ Groq ({model_name}) failed with code {r.status_code}: {r.text}")
                     if r.status_code == 429:
@@ -534,7 +561,7 @@ def call_fallback_model(prompt):
                     result = r.json()["result"]
                     # Handle different response formats
                     if model_name in gpt_oss_models:
-                        content = result.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                        content = safe_extract_choices(result, "Cloudflare " + model_name)
                     else:
                         content = result.get("response", "").strip()
                     if content:
@@ -586,8 +613,9 @@ def call_fallback_model(prompt):
                 }
                 r = requests.post("https://opencode.ai/zen/v1/chat/completions", json=payload, headers=headers, timeout=60)
                 if r.status_code == 200:
-                    content = r.json()["choices"][0]["message"]["content"].strip()
-                    return clean_and_parse_json(content)
+                    content = safe_extract_choices(r, "OpenCode Zen")
+                    if content:
+                        return clean_and_parse_json(content)
                 else:
                     print(f"⚠️ OpenCode Zen ({model_name}) failed with code {r.status_code}: {r.text}")
                     if r.status_code == 429:
@@ -617,8 +645,9 @@ def call_fallback_model(prompt):
                 }
                 r = requests.post("https://api.cerebras.ai/v1/chat/completions", json=payload, headers=headers, timeout=30)
                 if r.status_code == 200:
-                    content = r.json()["choices"][0]["message"]["content"].strip()
-                    return clean_and_parse_json(content)
+                    content = safe_extract_choices(r, "Cerebras")
+                    if content:
+                        return clean_and_parse_json(content)
                 else:
                     print(f"⚠️ Cerebras API ({model_name}) failed with code {r.status_code}: {r.text}")
                     if r.status_code == 429:
@@ -643,8 +672,9 @@ def call_fallback_model(prompt):
             }
             r = requests.post("https://api.openai.com/v1/chat/completions", json=payload, headers=headers, timeout=30)
             if r.status_code == 200:
-                content = r.json()["choices"][0]["message"]["content"].strip()
-                return clean_and_parse_json(content)
+                content = safe_extract_choices(r, "OpenAI")
+                if content:
+                    return clean_and_parse_json(content)
             else:
                 print(f"⚠️ OpenAI API failed with code {r.status_code}: {r.text}")
         except Exception as e:
@@ -667,8 +697,9 @@ def call_fallback_model(prompt):
             }
             r = requests.post("https://api.anthropic.com/v1/messages", json=payload, headers=headers, timeout=30)
             if r.status_code == 200:
-                content = r.json()["content"][0]["text"].strip()
-                return clean_and_parse_json(content)
+                content = safe_extract_anthropic(r)
+                if content:
+                    return clean_and_parse_json(content)
             else:
                 print(f"⚠️ Anthropic API failed with code {r.status_code}: {r.text}")
         except Exception as e:
@@ -691,8 +722,9 @@ def call_fallback_model(prompt):
             }
             r = requests.post("https://api.deepseek.com/chat/completions", json=payload, headers=headers, timeout=30)
             if r.status_code == 200:
-                content = r.json()["choices"][0]["message"]["content"].strip()
-                return clean_and_parse_json(content)
+                content = safe_extract_choices(r, "DeepSeek")
+                if content:
+                    return clean_and_parse_json(content)
             else:
                 print(f"⚠️ DeepSeek API failed with code {r.status_code}: {r.text}")
         except Exception as e:
@@ -714,8 +746,9 @@ def call_fallback_model(prompt):
             }
             r = requests.post("https://openrouter.ai/api/v1/chat/completions", json=payload, headers=headers, timeout=30)
             if r.status_code == 200:
-                content = r.json()["choices"][0]["message"]["content"].strip()
-                return clean_and_parse_json(content)
+                content = safe_extract_choices(r, "OpenRouter")
+                if content:
+                    return clean_and_parse_json(content)
             else:
                 print(f"⚠️ OpenRouter API failed with code {r.status_code}: {r.text}")
         except Exception as e:
