@@ -3598,22 +3598,8 @@ def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hook
             except Exception as e:
                 print(f"   ⚠️ Failed to load SFX {ctype}: {e}")
                 
-    # Auto-inject transition Woosh SFX for subtitle transitions (every 3rd sentence)
+    # Auto-inject transition Woosh SFX for subtitle transitions - REMOVED to prevent visual change sound distraction
     auto_sfx_count = 0
-    for i, chunk in enumerate(chunks):
-        if i % 3 == 0 or i == 0:
-            cue_ts = chunk["start"]
-            sfx_path_woosh = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "sfx", "woosh.wav")
-            if os.path.exists(sfx_path_woosh) and cue_ts < output_duration:
-                try:
-                    sfx = AudioSegment.from_file(sfx_path_woosh).set_frame_rate(44100).set_channels(2)
-                    # Very subtle woosh for transitions
-                    sfx = sfx - 18
-                    pos_ms = int(cue_ts * 1000)
-                    composite = composite.overlay(sfx, position=pos_ms)
-                    auto_sfx_count += 1
-                except:
-                    pass
                     
     print(f"   🔊 Mixed {sfx_count} explicit SFX cues + {auto_sfx_count} auto-transition wooshes.")
     

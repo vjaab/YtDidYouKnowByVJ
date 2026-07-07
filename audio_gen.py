@@ -877,9 +877,9 @@ def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
     cleaned = re.sub(r'\([^)]*\)', ' ', cleaned)
     
     # 2. Fix pronunciation artifacts (The "Strike" issue)
-    cleaned = cleaned.replace("—", "...")  # Em-dash
-    cleaned = cleaned.replace("–", "...")  # En-dash
-    cleaned = cleaned.replace("--", "...")  # Double hyphen
+    cleaned = cleaned.replace("—", ", ")  # Em-dash
+    cleaned = cleaned.replace("–", ", ")  # En-dash
+    cleaned = cleaned.replace("--", ", ")  # Double hyphen
     cleaned = cleaned.replace("*", " ")     # Asterisks
     cleaned = cleaned.replace("•", " ")     # Bullet point
     cleaned = cleaned.replace("·", " ")     # Middle dot
@@ -890,7 +890,7 @@ def clean_tts_text(text, phonetic=True, custom_phonetic_map=None):
     
     # Standalone hyphens
     cleaned = re.sub(r'\n\s*-\s*', '\n ', cleaned)
-    cleaned = re.sub(r'\s+-\s+', ' ... ', cleaned)
+    cleaned = re.sub(r'\s+-\s+', ' , ', cleaned)
     
     # 3. ENFORCE PHRASING PAUSES & EMPHASIS (Phase 2 Rule 1) - Text-level markers
     # Must run BEFORE phonetic processing to catch urgency words in original form
@@ -1220,17 +1220,8 @@ def _reformat_tech_terminology(text):
 def _enforce_phrasing_pauses(text):
     """
     Phase 2 Rule 1: Enforce phrasing pauses at sentence boundaries.
-    Only adds pauses at sentence endings (., ?, !) — NOT after every
-    comma, colon, or semicolon, which was causing stuttering/run-on feel.
     """
-    # 1. Mandatory pause at sentence boundaries (., ?, !) only
-    # We use ... (ellipsis) which TTS engines typically render as a pause.
-    # Exclude dots that are part of an ellipsis '...' to prevent duplication.
-    text = re.sub(r'(?<!\.)([!?]|\.(?!\.))\s+', r'\1 ... ', text)
-    
-    # 2. DON'T add pauses after commas, colons, semicolons — the TTS engine
-    # handles these naturally. Over-adding "..." was causing stuttering.
-    
+    # Standard sentence pauses are handled naturally by TTS. Returning text unmodified.
     return text
 
 
@@ -1654,6 +1645,11 @@ def generate_voiceover(text, custom_phonetic_map=None, api_key=None):
         # Post-process for alignment check
         if word_timestamps:
             word_timestamps = restore_original_words(word_timestamps, original_raw_text, custom_phonetic_map=current_phonetic_map)
+            # Filter out ellipsis or purely non-alphanumeric words from subtitles/timestamps
+            word_timestamps = [
+                wt for wt in word_timestamps
+                if wt.get("word") and re.sub(r'[^\w]', '', wt["word"]) != ""
+            ]
         if path and word_timestamps:
             is_estimated = any(wt.get("estimated", False) for wt in word_timestamps)
             dur, word_timestamps = trim_audio_silence(path, word_timestamps)
