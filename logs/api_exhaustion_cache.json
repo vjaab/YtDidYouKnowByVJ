@@ -2,9 +2,9 @@
   "groq_models": {
     "llama-3.3-70b-versatile": 1783455236.8621616,
     "qwen/qwen3-32b": 1783475906.3965561,
-    "openai/gpt-oss-20b": 1783394952.977384,
-    "llama-3.1-8b-instant": 1783297132.5167794,
-    "openai/gpt-oss-120b": 1783297306.3076882
+    "openai/gpt-oss-20b": 1783480152.7667108,
+    "llama-3.1-8b-instant": 1783480152.8519783,
+    "openai/gpt-oss-120b": 1783480343.3405511
   },
   "cloudflare_models": {
     "@cf/meta/llama-3.3-70b-instruct": 1783465288.4570453,
@@ -31,5 +31,9 @@
     "@cf/meta/llama-3.2-1b-instruct": 1783465288.4640388,
     "@cf/openai/gpt-oss-20b": 1783465288.4643586,
     "@cf/ibm-granite/granite-4.0-h-micro": 1783465288.4646575
+  },
+  "cerebras_models": {
+    "gpt-oss-120b": 1783481803.5389078,
+    "zai-glm-4.7": 1783481704.575823
   }
 }
