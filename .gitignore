@@ -6,6 +6,7 @@ token.json
 client_secret.json
 output/
 logs/
+!logs/api_exhaustion_cache.json
 
 # Ignore media/weights globally except in assets/
 *.mp4

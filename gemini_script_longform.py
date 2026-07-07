@@ -348,10 +348,66 @@ Return ONLY the final JSON object matching the schema. No markdown wrapping. No 
 # Module-level cache for failed Cloudflare models (permanent errors like 400/403/404)
 _FAILED_CLOUDFLARE_MODELS = set()
 
+# Groq daily tokens limits (verify in Groq Console / Billing page for changes)
+GROQ_TPD_LIMITS = {
+    "llama-3.3-70b-versatile": 1_000_000,
+    "qwen/qwen3-32b": 500_000,
+    "openai/gpt-oss-20b": 500_000,
+    "llama-3.1-8b-instant": 1_000_000,
+    "openai/gpt-oss-120b": 500_000
+}
+
+def is_groq_model_near_limit(model_name):
+    """Returns True if the Groq model has consumed 90%+ of its daily token limit."""
+    try:
+        from gemini_script import _load_cache
+        cache = _load_cache()
+        usage = cache.get("groq_token_usage", {}).get(model_name, {})
+        today_str = datetime.now().strftime("%Y-%m-%d")
+        
+        if usage.get("date") == today_str:
+            tokens_used = usage.get("tokens", 0)
+            limit = GROQ_TPD_LIMITS.get(model_name, 500_000)
+            if tokens_used >= limit * 0.9:
+                print(f"⚠️ [CACHE] {model_name} at {tokens_used}/{limit} TPD ({tokens_used/limit:.1%}) — pre-emptively skipping")
+                return True
+    except Exception as e:
+        print(f"⚠️ Error checking Groq token limit: {e}")
+    return False
+
+def _update_groq_token_usage(model_name, tokens_increment):
+    """Updates the token usage counters in the shared api_exhaustion_cache.json."""
+    try:
+        from gemini_script import _load_cache, CACHE_FILE
+        data = _load_cache()
+        if "groq_token_usage" not in data:
+            data["groq_token_usage"] = {}
+            
+        today_str = datetime.now().strftime("%Y-%m-%d")
+        current = data["groq_token_usage"].get(model_name, {})
+        if current.get("date") == today_str:
+            new_tokens = current.get("tokens", 0) + tokens_increment
+        else:
+            new_tokens = tokens_increment
+            
+        data["groq_token_usage"][model_name] = {
+            "tokens": new_tokens,
+            "date": today_str
+        }
+        
+        tmp_file = CACHE_FILE + ".tmp"
+        with open(tmp_file, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+        os.replace(tmp_file, CACHE_FILE)
+        print(f"📈 [CACHE] Tracked Groq usage for {model_name}: {new_tokens} tokens used today.")
+    except Exception as e:
+        print(f"⚠️ Warning: failed to save Groq token usage to cache ({e})")
+
+
 def call_fallback_model(prompt):
     """
     Attempts to call non-Gemini fallback APIs in sequence:
-    Groq (Llama) -> Cloudflare Workers AI -> OpenAI -> Anthropic (Claude) -> DeepSeek -> OpenRouter.
+    Groq (Llama) -> Cloudflare Workers AI -> OpenCode Zen -> Cerebras -> OpenAI -> Anthropic (Claude) -> DeepSeek -> OpenRouter.
     Returns the parsed JSON response dict or None.
     """
     import os
@@ -387,6 +443,9 @@ def call_fallback_model(prompt):
                 print(f"⏭️ Skipping known-bad Groq model: {model_name}")
                 continue
                 
+            if is_groq_model_near_limit(model_name):
+                continue
+                
             # Determine max_tokens and TPM limit dynamically (Conflict Fix: limit max_tokens on small TPM models)
             if model_name in ("llama-3.1-8b-instant", "qwen/qwen3-32b"):
                 max_tokens = 1536
@@ -413,7 +472,12 @@ def call_fallback_model(prompt):
                 }
                 r = requests.post("https://api.groq.com/openai/v1/chat/completions", json=payload, headers=headers, timeout=30)
                 if r.status_code == 200:
-                    content = r.json()["choices"][0]["message"]["content"].strip()
+                    res_json = r.json()
+                    usage = res_json.get("usage", {})
+                    total_tokens = usage.get("total_tokens", 0)
+                    if total_tokens > 0:
+                        _update_groq_token_usage(model_name, total_tokens)
+                    content = res_json["choices"][0]["message"]["content"].strip()
                     return clean_and_parse_json(content)
                 else:
                     print(f"⚠️ Groq ({model_name}) failed with code {r.status_code}: {r.text}")
@@ -531,6 +595,37 @@ def call_fallback_model(prompt):
             except Exception as e:
                 print(f"⚠️ OpenCode Zen ({model_name}) fallback failed: {e}")
 
+    # 1.8. Cerebras
+    cerebras_key = os.getenv("CEREBRAS_API_KEY")
+    if cerebras_key:
+        headers = {
+            "Authorization": f"Bearer {cerebras_key}",
+            "Content-Type": "application/json"
+        }
+        cerebras_models = ["gpt-oss-120b", "zai-glm-4.7", "gemma-4-31b"]
+        for model_name in cerebras_models:
+            if is_model_exhausted("cerebras_models", model_name):
+                print(f"⏭️ Skipping known-bad Cerebras model: {model_name}")
+                continue
+            print(f"🔮 Falling back to Cerebras ({model_name})...")
+            try:
+                payload = {
+                    "model": model_name,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "response_format": {"type": "json_object"},
+                    "temperature": 0.7
+                }
+                r = requests.post("https://api.cerebras.ai/v1/chat/completions", json=payload, headers=headers, timeout=30)
+                if r.status_code == 200:
+                    content = r.json()["choices"][0]["message"]["content"].strip()
+                    return clean_and_parse_json(content)
+                else:
+                    print(f"⚠️ Cerebras API ({model_name}) failed with code {r.status_code}: {r.text}")
+                    if r.status_code == 429:
+                        mark_model_exhausted("cerebras_models", model_name, r.text)
+            except Exception as e:
+                print(f"⚠️ Cerebras ({model_name}) fallback failed: {e}")
+
     # 2. OpenAI
     openai_key = os.getenv("OPENAI_API_KEY")
     if openai_key:
@@ -628,6 +723,54 @@ def call_fallback_model(prompt):
 
     return None
 
+
+import concurrent.futures
+import re
+
+def get_retry_after(e):
+    """Parses Retry-After header or delay hints from exception string."""
+    err_str = str(e)
+    # Parse generic patterns like "retry after 30s" or "delay: 15 seconds"
+    match = re.search(r'(?:retry|wait|backoff|delay)\s*(?:after|of)?\s*(\d+(?:\.\d+)?)\s*(s|sec|second|ms|millisecond|minute|min)?', err_str, re.IGNORECASE)
+    if match:
+        val = float(match.group(1))
+        unit = match.group(2)
+        if unit in ('ms', 'millisecond'):
+            val = val / 1000.0
+        elif unit in ('minute', 'min'):
+            val = val * 60.0
+        return max(val, 3.0)
+        
+    # Inspect http response headers if present (Requests, HTTPX, Urllib3 compatibility)
+    for attr in ('response', 'http_response', 'http_err'):
+        if hasattr(e, attr):
+            resp = getattr(e, attr)
+            if resp and hasattr(resp, 'headers'):
+                retry_after = resp.headers.get('Retry-After') or resp.headers.get('retry-after')
+                if retry_after:
+                    try:
+                        return max(float(retry_after), 3.0)
+                    except:
+                        pass
+    return 3.0  # Safe default fallback
+
+_TIMEOUT_EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=10)
+
+def execute_with_timeout(func, timeout, *args, **kwargs):
+    """
+    Executes a function in a background thread and enforces a hard wall-clock timeout.
+    Note: The underlying background thread may continue running until it completes or times out.
+    """
+    future = _TIMEOUT_EXECUTOR.submit(func, *args, **kwargs)
+    try:
+        return future.result(timeout=timeout)
+    except concurrent.futures.TimeoutError:
+        print(f"🚨 [TIMEOUT] Execution of {func.__name__} timed out after {timeout} seconds.")
+        return None
+    except Exception as ex:
+        print(f"🚨 [ERROR] Exception in {func.__name__}: {ex}")
+        return None
+
 class LongformGenerationEngine:
     """Multi-agent script generation engine for Vaibhav Sisinty format videos."""
 
@@ -687,40 +830,114 @@ class LongformGenerationEngine:
         print("🚨 All fallback models failed or not configured.")
         return None
 
-    def _call_gemini_search(self, query):
-        """Call Gemini with Google Search grounding (no JSON mode)."""
-        attempts = 0
-        while attempts < 3:
-            try:
-                response = self.client.models.generate_content(
-                    model=GEMINI_FLASH_MODEL,
-                    contents=query,
-                    config=types.GenerateContentConfig(
-                        tools=[{'google_search': {}}]
+    def _call_gemini(self, prompt, model=GEMINI_FLASH_MODEL, use_search=False):
+        """Call Gemini with strict limited retry logic and fast model fallback."""
+        from gemini_script import is_model_exhausted, mark_model_exhausted
+        
+        current_model = model
+        model_sequence = []
+        if current_model == GEMINI_PRO_MODEL:
+            model_sequence = [GEMINI_PRO_MODEL, GEMINI_FLASH_MODEL, GEMINI_FLASH_LITE_MODEL]
+        elif current_model == GEMINI_FLASH_MODEL:
+            model_sequence = [GEMINI_FLASH_MODEL, GEMINI_FLASH_LITE_MODEL]
+        else:
+            model_sequence = [GEMINI_FLASH_LITE_MODEL]
+
+        # Skip exhausted models pre-emptively
+        active_sequence = []
+        for m in model_sequence:
+            if is_model_exhausted("gemini_models", m):
+                print(f"⏭️ Skipping exhausted Gemini model: {m}")
+            else:
+                active_sequence.append(m)
+
+        for m in active_sequence:
+            for attempt in range(2):
+                try:
+                    config_kwargs = {
+                        'temperature': 0.8,
+                        'response_mime_type': 'application/json'
+                    }
+                    if use_search:
+                        config_kwargs['tools'] = [{'google_search': {}}]
+                        del config_kwargs['response_mime_type']
+
+                    response = self.client.models.generate_content(
+                        model=m,
+                        contents=prompt,
+                        config=types.GenerateContentConfig(**config_kwargs)
                     )
-                )
-                # Extract grounding links
-                grounding_links = []
-                if response.candidates and response.candidates[0].grounding_metadata:
-                    gm = response.candidates[0].grounding_metadata
-                    if hasattr(gm, 'grounding_chunks'):
-                        for chunk in gm.grounding_chunks:
-                            if hasattr(chunk, 'web') and chunk.web.uri:
-                                uri = chunk.web.uri
-                                if any(x in uri.lower() for x in ["google.com/search", "bing.com/search", ".pdf"]):
-                                    continue
-                                grounding_links.append(f"{chunk.web.title}: {uri}")
-                return response.text, grounding_links
-            except Exception as e:
-                err_str = str(e).upper()
-                if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
-                    wait = (attempts + 1) * 5
-                    print(f"⚠️ [LONGFORM SEARCH] Rate limited. Retrying in {wait}s...")
-                    time.sleep(wait)
-                else:
-                    print(f"⚠️ [LONGFORM SEARCH] Failed: {e}")
-                    return "", []
-                attempts += 1
+                    raw = response.text.strip()
+                    if "{" in raw and "}" in raw:
+                        raw = raw[raw.find("{"):raw.rfind("}") + 1]
+                    return json.loads(raw)
+                except Exception as e:
+                    err_str = str(e).upper()
+                    is_rate = any(x in err_str for x in ["503", "UNAVAILABLE", "RESOURCE_EXHAUSTED", "429", "OVERLOADED"])
+                    if is_rate:
+                        wait = get_retry_after(e)
+                        print(f"⚠️ [LONGFORM] {m} rate-limited or overloaded. Attempt {attempt+1}/2. Waiting {wait}s...")
+                        mark_model_exhausted("gemini_models", m, err_str)
+                        if attempt == 0:
+                            time.sleep(wait)
+                            continue
+                        else:
+                            break
+                    else:
+                        print(f"⚠️ [LONGFORM] Call failed ({m}): {e}. Retrying after 2s...")
+                        time.sleep(2)
+        
+        print("🚨 Gemini failed all models and attempts. Attempting fallback models...")
+        fallback_res = call_fallback_model(prompt)
+        if fallback_res:
+            return fallback_res
+
+        print("🚨 All fallback models failed or not configured.")
+        return None
+
+    def _call_gemini_search(self, query):
+        """Call Gemini with Google Search grounding and model fallback."""
+        from gemini_script import is_model_exhausted
+        
+        models = [GEMINI_FLASH_MODEL, GEMINI_FLASH_LITE_MODEL]
+        for m in models:
+            if is_model_exhausted("gemini_models", m):
+                continue
+            for attempt in range(2):
+                try:
+                    response = self.client.models.generate_content(
+                        model=m,
+                        contents=query,
+                        config=types.GenerateContentConfig(
+                            tools=[{'google_search': {}}]
+                        )
+                    )
+                    # Extract grounding links
+                    grounding_links = []
+                    if response.candidates and response.candidates[0].grounding_metadata:
+                        gm = response.candidates[0].grounding_metadata
+                        if hasattr(gm, 'grounding_chunks'):
+                            for chunk in gm.grounding_chunks:
+                                if hasattr(chunk, 'web') and chunk.web.uri:
+                                    uri = chunk.web.uri
+                                    if any(x in uri.lower() for x in ["google.com/search", "bing.com/search", ".pdf"]):
+                                        continue
+                                    grounding_links.append(f"{chunk.web.title}: {uri}")
+                    return response.text, grounding_links
+                except Exception as e:
+                    err_str = str(e).upper()
+                    is_rate = any(x in err_str for x in ["429", "RESOURCE_EXHAUSTED", "LIMIT", "OVERLOADED"])
+                    if is_rate:
+                        wait = get_retry_after(e)
+                        print(f"⚠️ [LONGFORM SEARCH] Model {m} rate limited/overloaded on attempt {attempt+1}/2. Waiting {wait}s...")
+                        if attempt == 0:
+                            time.sleep(wait)
+                            continue
+                        else:
+                            break
+                    else:
+                        print(f"⚠️ [LONGFORM SEARCH] Failed: {e}")
+                        break
         return "", []
 
     # ── STEP 0: Topic Discovery ──────────────────────────────────────────────
@@ -854,9 +1071,9 @@ class LongformGenerationEngine:
 
     # ── FULL PIPELINE ────────────────────────────────────────────────────────
     def execute(self):
-        """Run the full multi-agent pipeline end-to-end."""
-        # 0. Discover topics
-        topics_data = self.discover_topics()
+        """Run the full multi-agent pipeline end-to-end with robust safety timeouts."""
+        # 0. Discover topics (90s timeout)
+        topics_data = execute_with_timeout(self.discover_topics, 90)
         if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         if not topics_data or "main_topic" not in topics_data:
             print("❌ [LONGFORM] Could not discover main topic. Aborting.")
@@ -865,21 +1082,25 @@ class LongformGenerationEngine:
         main_topic = topics_data["main_topic"]
         news_updates = topics_data.get("news_updates", [])
 
-        # 1. Research main topic
-        main_research = self.research_topic(main_topic)
-        if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
-        if not main_research:
-            main_research = {"core_narrative": main_topic.get("one_liner", ""), "details": [], "prompts_or_steps": []}
+        # 1 & 2. Research + Generate deep-dive script for main topic with 180s timeout
+        print("🚀 Processing Main Topic with a 180s timeout...")
+        def process_main():
+            res = self.research_topic(main_topic)
+            if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
+            if not res:
+                res = {"core_narrative": main_topic.get("one_liner", ""), "details": [], "prompts_or_steps": []}
+            script = self.generate_deep_dive_script(main_topic, res)
+            return res, script
 
-        # 2. Generate deep-dive script
-        deep_dive_script = self.generate_deep_dive_script(main_topic, main_research)
-        if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
-        if not deep_dive_script:
-            print("❌ [LONGFORM] Deep-dive script generation failed. Aborting.")
+        main_result = execute_with_timeout(process_main, 180)
+        if not main_result or not main_result[1]:
+            print("❌ [LONGFORM] Deep-dive script generation failed or timed out. Aborting.")
             return None
+        
+        main_research, deep_dive_script = main_result
         deep_dive_script["topic"] = main_topic
 
-        # 3. Research + generate scripts for news updates
+        # 3. Research + generate scripts for news updates with 120s timeout per story (Skip-and-Continue on timeout)
         updates_scripts = []
         successful_topics = [main_topic]
         
@@ -889,52 +1110,59 @@ class LongformGenerationEngine:
 
         for i, topic in enumerate(news_updates):
             update_num = i + 1
-            # Research
-            research = self.research_topic(topic)
-            if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
-            if not research:
-                research = {"core_narrative": topic.get("one_liner", ""), "details": [], "facts": []}
+            print(f"🚀 Processing News Update #{update_num} with a 120s timeout...")
             
-            # Generate update script
-            update_script = self.generate_update_script(topic, research)
-            if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
+            def process_story(t):
+                # Research
+                res = self.research_topic(t)
+                if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
+                if not res:
+                    res = {"core_narrative": t.get("one_liner", ""), "details": [], "facts": []}
+                # Generate script
+                script = self.generate_update_script(t, res)
+                return script
+            
+            update_script = execute_with_timeout(process_story, 120, topic)
             if update_script:
                 update_script["topic"] = topic
                 updates_scripts.append(update_script)
                 successful_topics.append(topic)
                 print(f"   ✅ News Update #{update_num} script generated ({len(update_script.get('script', '').split())} words)")
             else:
-                print(f"   ❌ News Update #{update_num} script generation failed. Skipping.")
+                print(f"   ❌ News Update #{update_num} script generation failed or timed out. Skipping.")
 
-        # 4. Assemble compilation
-        compilation = self.assemble_compilation(deep_dive_script, updates_scripts)
+        # 4. Assemble compilation (90s timeout)
+        compilation = execute_with_timeout(lambda: self.assemble_compilation(deep_dive_script, updates_scripts), 90)
         if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         if not compilation or "script" not in compilation:
-            print("❌ [LONGFORM] Compilation assembly failed. Aborting.")
+            print("❌ [LONGFORM] Compilation assembly failed or timed out. Aborting.")
             return None
 
         assembled_script = compilation.get("script", "")
         word_count = len(assembled_script.split())
         print(f"   📊 Assembled script: {word_count} words")
 
-        # 5. Optimize retention
-        optimized = self.optimize_retention(assembled_script)
+        # 5. Optimize retention (90s timeout)
+        optimized = execute_with_timeout(lambda: self.optimize_retention(assembled_script), 90)
         if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         if optimized and "optimized_script" in optimized:
             final_script = optimized["optimized_script"]
             opt_word_count = len(final_script.split())
             print(f"   📊 Optimized script: {opt_word_count} words")
         else:
-            print("   ⚠️ Retention optimization failed. Using assembled script as-is.")
+            print("   ⚠️ Retention optimization failed or timed out. Using assembled script as-is.")
             final_script = assembled_script
 
-        # 6. Humanize and get final JSON
+        # 6. Humanize and get final JSON (120s timeout)
         schema_requirements = COMPILATION_ASSEMBLER_TEMPLATE.split("Return ONLY this exact JSON:")[1] if "Return ONLY this exact JSON:" in COMPILATION_ASSEMBLER_TEMPLATE else ""
-        final_data = self.humanize_and_finalize(final_script, compilation, schema_requirements)
+        final_data = execute_with_timeout(
+            lambda: self.humanize_and_finalize(final_script, compilation, schema_requirements),
+            120
+        )
         if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         
         if not final_data:
-            print("   ⚠️ Humanizer failed. Using compilation data directly.")
+            print("   ⚠️ Humanizer failed or timed out. Using compilation data directly.")
             final_data = compilation
             final_data["script"] = final_script
 
