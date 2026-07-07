@@ -82,3 +82,176 @@
 [13:41:07] Selected Lip-Sync Template: assets/video/C_white.mp4
 [13:41:07] ⚠️ Script word count too low (251 words, expected ~107.7s < 480s). Retrying script generation early to save GPU time.
 [13:41:07] STEP 2 (Attempt 12/12): Generating long-form 5-topic compilation script...
+[16:57:12] === STARTING DAILY LONG-FORM 'DID YOU KNOW' PIPELINE ===
+[16:57:12] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[16:57:12] STEP 1: Fetching RSS articles (Research + Tools + Trending)...
+[16:57:12] 📈 vidIQ: Injected 8 high-signal topics.
+[16:58:26] ✅ Fetched 321 total articles (26 GitHub, 8 vidIQ, 151 research, 105 tools, 18 trending, 9 X.com, 4 Reddit).
+[16:58:26] STEP 2 (Attempt 1/12): Generating long-form 5-topic compilation script...
+[17:11:09] Generated Title: Stop AI Agent Lag: The Performance Optimization Secret ⚡️
+[17:11:09] Script word count: 529
+[17:11:09] Topics covered: 5
+[17:11:09]   Fact 1: ECC: The Agent Harness Performance Optimization System
+[17:11:09]   Fact 2: Claude-mem: Persistent Context for Every Agent
+[17:11:09]   Fact 3: Hermes-Agent: The AI Agent That Grows With You
+[17:11:09]   Fact 4: Strix: Open-Source AI Penetration Testing
+[17:11:09]   Fact 5: Dify: Production-Ready Agentic Workflows
+[17:11:09] STEP 2b: Capturing article screenshots for evidence...
+[17:11:40] ✅ Captured 5/5 article screenshots.
+[17:11:40] STEP 3: Generating voiceover + word timestamps...
+[17:11:40] Selected Lip-Sync Template: assets/video/C_white.mp4
+[17:11:40] ⚠️ Script word count too low (529 words, expected ~227.0s < 480s). Retrying script generation early to save GPU time.
+[17:11:40] STEP 2 (Attempt 2/12): Generating long-form 5-topic compilation script...
+[17:30:45] Generated Title: 30‑Line Cache Slashes $200K AI Bill 💸
+[17:30:45] Script word count: 995
+[17:30:45] Topics covered: 4
+[17:30:45]   Fact 1: ECC – Agent Harness Performance Optimizer
+[17:30:45]   Fact 2: Firecrawl – Scalable Web Scrape API
+[17:30:45]   Fact 3: Ollama – Local LLM Runner for Multiple Models
+[17:30:45]   Fact 4: Open‑WebUI – Plug‑and‑Play AI Frontend
+[17:30:45] STEP 2b: Capturing article screenshots for evidence...
+[17:31:09] ✅ Captured 4/4 article screenshots.
+[17:31:09] STEP 3: Generating voiceover + word timestamps...
+[17:31:09] Selected Lip-Sync Template: assets/video/C_white.mp4
+[17:31:09] ⚠️ Script word count too low (995 words, expected ~427.0s < 480s). Retrying script generation early to save GPU time.
+[17:31:09] STEP 2 (Attempt 3/12): Generating long-form 5-topic compilation script...
+[17:45:17] Generated Title: How ECC Cuts $10M Cloud Waste in 5 Minutes 🚀
+[17:45:17] Script word count: 1089
+[17:45:17] Topics covered: 6
+[17:45:17]   Fact 1: ECC – The Agent Harness Performance Optimization System
+[17:45:17]   Fact 2: Hermes‑Agent – A self‑learning AI assistant
+[17:45:17]   Fact 3: Ollama – Local LLM deployment hub
+[17:45:17]   Fact 4: AutoGPT – Autonomous AI task runner
+[17:45:17]   Fact 5: LangChain – Agent engineering platform
+[17:45:17]   Fact 6: Flowise – Visual AI agent builder
+[17:45:17] STEP 2b: Capturing article screenshots for evidence...
+[17:45:52] ✅ Captured 6/6 article screenshots.
+[17:45:52] STEP 3: Generating voiceover + word timestamps...
+[17:45:52] Selected Lip-Sync Template: assets/video/C_white.mp4
+[17:45:52] ⚠️ Script word count too low (1089 words, expected ~467.4s < 480s). Retrying script generation early to save GPU time.
+[17:45:52] STEP 2 (Attempt 4/12): Generating long-form 5-topic compilation script...
+[18:01:24] Generated Title: Stop Burning API Credits: The AI Agent Stress Test 🚀
+[18:01:24] Script word count: 694
+[18:01:24] Topics covered: 3
+[18:01:24]   Fact 1: ECC: The Agent Harness Performance System
+[18:01:24]   Fact 2: Claude Mem: Persistent Context for Agents
+[18:01:24]   Fact 3: Firecrawl: Scrape the Web at Scale
+[18:01:24] STEP 2b: Capturing article screenshots for evidence...
+[18:01:43] ✅ Captured 3/3 article screenshots.
+[18:01:43] STEP 3: Generating voiceover + word timestamps...
+[18:01:43] Selected Lip-Sync Template: assets/video/C_white.mp4
+[18:01:43] ⚠️ Script word count too low (694 words, expected ~297.9s < 480s). Retrying script generation early to save GPU time.
+[18:01:43] STEP 2 (Attempt 5/12): Generating long-form 5-topic compilation script...
+[18:17:21] Generated Title: Get GPT-4o Power for 1/18th the Cost 🚀
+[18:17:21] Script word count: 521
+[18:17:21] Topics covered: 4
+[18:17:21]   Fact 1: ECC: The Agent Harness Performance Optimization System
+[18:17:21]   Fact 2: Claude Mem: Persistent Context for Every Agent
+[18:17:21]   Fact 3: Firecrawl: The API to Scrape the Web at Scale
+[18:17:21]   Fact 4: Deep Live Cam: Real-Time Face Swap
+[18:17:21] STEP 2b: Capturing article screenshots for evidence...
+[18:17:44] ✅ Captured 4/4 article screenshots.
+[18:17:44] STEP 3: Generating voiceover + word timestamps...
+[18:17:44] Selected Lip-Sync Template: assets/video/C_white.mp4
+[18:17:44] ⚠️ Script word count too low (521 words, expected ~223.6s < 480s). Retrying script generation early to save GPU time.
+[18:17:44] STEP 2 (Attempt 6/12): Generating long-form 5-topic compilation script...
+[18:34:26] Generated Title: Stop Vibe-Coding: The AI Agent Harness for Pros 🚀
+[18:34:26] Script word count: 697
+[18:34:26] Topics covered: 3
+[18:34:26]   Fact 1: ECC: The Agent Harness That Supercharges Claude and Cursor
+[18:34:26]   Fact 2: Firecrawl: The API That Eats the Web
+[18:34:26]   Fact 3: Dify: Visual Agent Workflow Builder
+[18:34:26] STEP 2b: Capturing article screenshots for evidence...
+[18:34:45] ✅ Captured 3/3 article screenshots.
+[18:34:45] STEP 3: Generating voiceover + word timestamps...
+[18:34:45] Selected Lip-Sync Template: assets/video/C_white.mp4
+[18:34:45] ⚠️ Script word count too low (697 words, expected ~299.1s < 480s). Retrying script generation early to save GPU time.
+[18:34:45] STEP 2 (Attempt 7/12): Generating long-form 5-topic compilation script...
+[18:49:16] Generated Title: Stop Bleeding Cash: Optimize Your AI Agents 🚀
+[18:49:16] Script word count: 837
+[18:49:16] Topics covered: 7
+[18:49:16]   Fact 1: ECC: The Agent Harness Performance Optimization System
+[18:49:16]   Fact 2: Hermes Agent: The Agent That Grows With You
+[18:49:16]   Fact 3: Claude Mem: Persistent Context Across Sessions
+[18:49:16]   Fact 4: Strix: Open-Source AI Penetration Testing
+[18:49:16]   Fact 5: Firecrawl: The API to Scrape the Web at Scale
+[18:49:16]   Fact 6: Deep Live Cam: Real-Time Face Swap
+[18:49:16]   Fact 7: OpenBB: Open Data Platform for AI Agents
+[18:49:16] STEP 2b: Capturing article screenshots for evidence...
+[18:49:57] ✅ Captured 7/7 article screenshots.
+[18:49:57] STEP 3: Generating voiceover + word timestamps...
+[18:49:57] Selected Lip-Sync Template: assets/video/C_white.mp4
+[18:49:57] ⚠️ Script word count too low (837 words, expected ~359.2s < 480s). Retrying script generation early to save GPU time.
+[18:49:57] STEP 2 (Attempt 8/12): Generating long-form 5-topic compilation script...
+[19:04:52] Generated Title: Stop Wasting AI Tokens: The ECC Agent Harness 🚀
+[19:04:52] Script word count: 713
+[19:04:52] Topics covered: 4
+[19:04:52]   Fact 1: ECC: The Agent Harness Performance Optimization System
+[19:04:52]   Fact 2: Claude Mem: Persistent Context for Every Session
+[19:04:52]   Fact 3: Firecrawl: The API to Scrape the Web at Scale
+[19:04:52]   Fact 4: Dify: Production-Ready Agentic Workflows
+[19:04:52] STEP 2b: Capturing article screenshots for evidence...
+[19:05:16] ✅ Captured 4/4 article screenshots.
+[19:05:16] STEP 3: Generating voiceover + word timestamps...
+[19:05:16] Selected Lip-Sync Template: assets/video/C_white.mp4
+[19:05:16] ⚠️ Script word count too low (713 words, expected ~306.0s < 480s). Retrying script generation early to save GPU time.
+[19:05:16] STEP 2 (Attempt 9/12): Generating long-form 5-topic compilation script...
+[19:18:44] Generated Title: Stop Trusting Your AI Agents 🛑 (Do This Instead)
+[19:18:44] Script word count: 768
+[19:18:44] Topics covered: 5
+[19:18:44]   Fact 1: affaan-m/ECC: The Agent Performance Optimization System
+[19:18:44]   Fact 2: NousResearch/hermes-agent
+[19:18:44]   Fact 3: ollama/ollama Kimi-K2.6 & DeepSeek Updates
+[19:18:44]   Fact 4: usestrix/strix
+[19:18:44]   Fact 5: langgenius/dify
+[19:18:44] STEP 2b: Capturing article screenshots for evidence...
+[19:19:14] ✅ Captured 5/5 article screenshots.
+[19:19:14] STEP 3: Generating voiceover + word timestamps...
+[19:19:14] Selected Lip-Sync Template: assets/video/C_white.mp4
+[19:19:14] ⚠️ Script word count too low (768 words, expected ~329.6s < 480s). Retrying script generation early to save GPU time.
+[19:19:14] STEP 2 (Attempt 10/12): Generating long-form 5-topic compilation script...
+[19:33:01] Generated Title: Stop Wasting API Credits: AI Agent Performance Hacks 🚀
+[19:33:01] Script word count: 760
+[19:33:01] Topics covered: 6
+[19:33:01]   Fact 1: ECC: The Agent Harness Performance Optimization System
+[19:33:01]   Fact 2: Hermes Agent: The AI That Grows With You
+[19:33:01]   Fact 3: Claude Mem: Persistent Context for Every Agent
+[19:33:01]   Fact 4: Firecrawl: Scrape the Web at Scale
+[19:33:01]   Fact 5: Strix: AI Penetration Testing Tool
+[19:33:01]   Fact 6: Ollama Adds Kimi-K2.6 and GLM-5.1
+[19:33:01] STEP 2b: Capturing article screenshots for evidence...
+[19:33:36] ✅ Captured 6/6 article screenshots.
+[19:33:36] STEP 3: Generating voiceover + word timestamps...
+[19:33:36] Selected Lip-Sync Template: assets/video/C_white.mp4
+[19:33:36] ⚠️ Script word count too low (760 words, expected ~326.2s < 480s). Retrying script generation early to save GPU time.
+[19:33:36] STEP 2 (Attempt 11/12): Generating long-form 5-topic compilation script...
+[19:46:46] Generated Title: Stop Wasting API Credits: Fix Your AI Agents ⚡
+[19:46:46] Script word count: 673
+[19:46:46] Topics covered: 4
+[19:46:46]   Fact 1: ECC: The Agent Harness Performance Optimization System
+[19:46:46]   Fact 2: Claude-mem: Persistent Context for Every Agent
+[19:46:46]   Fact 3: Firecrawl: The API to Scrape the Web at Scale
+[19:46:46]   Fact 4: Strix: Open-Source AI Penetration Testing Tool
+[19:46:46] STEP 2b: Capturing article screenshots for evidence...
+[19:47:10] ✅ Captured 4/4 article screenshots.
+[19:47:10] STEP 3: Generating voiceover + word timestamps...
+[19:47:10] Selected Lip-Sync Template: assets/video/C_white.mp4
+[19:47:10] ⚠️ Script word count too low (673 words, expected ~288.8s < 480s). Retrying script generation early to save GPU time.
+[19:47:10] STEP 2 (Attempt 12/12): Generating long-form 5-topic compilation script...
+[20:01:53] Generated Title: Stop Burning Your API Budget: AI Agent Optimization 🚀
+[20:01:53] Script word count: 739
+[20:01:53] Topics covered: 4
+[20:01:53]   Fact 1: ECC: The Agent Harness Performance Optimization System
+[20:01:53]   Fact 2: Strix: Open-Source AI Penetration Testing
+[20:01:53]   Fact 3: Hermes Agent: The Agent That Grows With You
+[20:01:53]   Fact 4: Deep-Live-Cam: Real-Time Face Swap
+[20:01:53] STEP 2b: Capturing article screenshots for evidence...
+[20:02:17] ✅ Captured 4/4 article screenshots.
+[20:02:17] STEP 3: Generating voiceover + word timestamps...
+[20:02:17] Selected Lip-Sync Template: assets/video/C_white.mp4
+[20:02:17] ⚠️ Script word count too low (739 words, expected ~317.2s < 480s). Retrying script generation early to save GPU time.
+[20:02:17] 
+⚠️ [FALLBACK] ALL 12 ATTEMPTS EXHAUSTED to reach target 480s duration.
+[20:02:17] Attempting to generate assets for the best candidate script (1089 words, expected ~467.4s)...
+[20:02:17] STEP 2b [FALLBACK]: Capturing article screenshots for evidence...
+[20:02:51] ✅ Captured 6/6 article screenshots.
