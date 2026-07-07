@@ -1,0 +1,84 @@
+[08:04:49] === STARTING DAILY LONG-FORM 'DID YOU KNOW' PIPELINE ===
+[08:04:49] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[08:04:49] STEP 1: Fetching RSS articles (Research + Tools + Trending)...
+[08:04:50] 📈 vidIQ: Injected 8 high-signal topics.
+[08:06:23] ✅ Fetched 294 total articles (26 GitHub, 8 vidIQ, 133 research, 95 tools, 20 trending, 9 X.com, 3 Reddit).
+[08:06:23] STEP 2 (Attempt 1/12): Generating long-form 5-topic compilation script...
+[08:27:51] Generated Title: AI Bots Get INFINITE Memory! 🧠
+[08:27:51] Script word count: 966
+[08:27:51] Topics covered: 8
+[08:27:51]   Fact 1: This AI Agent Hack Gives Your Bots INFINITE Memory
+[08:27:51]   Fact 2: Kimi K2.7 Code Hits GitHub Copilot: Your New Go-To Open-Weight LLM
+[08:27:51]   Fact 3: Meetily: The Self-Hosted AI Meeting Assistant That Prioritizes Your Privacy
+[08:27:51]   Fact 4: Strix: The Open-Source AI Tool Hunting Your App's Security Flaws
+[08:27:51]   Fact 5: Caveman Mode: Cut 65% of Your AI Token Costs with This Claude Code Skill
+[08:27:51]   Fact 6: OpenAI Unleashes GPT-Realtime 2.1: Ultra-Low Latency for Voice AI
+[08:27:51]   Fact 7: Agent Skills: Get Production-Grade Engineering for Your AI Bots
+[08:27:51]   Fact 8: OmniRoute: The Free AI Gateway Connecting 160+ Providers, Saving You Tokens
+[08:27:51] STEP 2b: Capturing article screenshots for evidence...
+[08:28:39] ✅ Captured 8/8 article screenshots.
+[08:28:39] STEP 3: Generating voiceover + word timestamps...
+[08:28:39] Selected Lip-Sync Template: assets/video/C_white.mp4
+[08:28:39] ⚠️ Script word count too low (966 words, expected ~414.6s < 480s). Retrying script generation early to save GPU time.
+[08:28:39] STEP 2 (Attempt 2/12): Generating long-form 5-topic compilation script...
+[09:11:53] Generated Title: The ECC Advantage: Unlock the Power of AI
+[09:11:53] Script word count: 278
+[09:11:53] Topics covered: 8
+[09:11:53]   Fact 1: This AI Agent Fixes Every Flaw: Memory, Instincts, Security in One System
+[09:11:53]   Fact 2: Claude-mem: AI Agents Finally Get Persistent Memory
+[09:11:53]   Fact 3: Firecrawl: The API for Web Scraping at Scale
+[09:11:53]   Fact 4: Ollama Adds Support for Kimi-K2.6, DeepSeek, and More LLMs
+[09:11:53]   Fact 5: Strix: Open-Source AI Tool for Penetration Testing
+[09:11:53]   Fact 6: OpenHands: AI-Driven Development Platform Launches
+[09:11:53]   Fact 7: Deep-Live-Cam: Real-Time Face Swap and Deepfake with One Image
+[09:11:53]   Fact 8: Dify Updates Its Agentic Workflow Platform for Production
+[09:11:53] STEP 2b: Capturing article screenshots for evidence...
+[09:12:43] ✅ Captured 8/8 article screenshots.
+[09:12:43] STEP 3: Generating voiceover + word timestamps...
+[09:12:43] Selected Lip-Sync Template: assets/video/C_white.mp4
+[09:12:43] ⚠️ Script word count too low (278 words, expected ~119.3s < 480s). Retrying script generation early to save GPU time.
+[09:12:43] STEP 2 (Attempt 3/12): Generating long-form 5-topic compilation script...
+[09:56:11] Generated Title: The Framework
+[09:56:11] Script word count: 12
+[09:56:11] Topics covered: 6
+[09:56:11]   Fact 1: claude-mem – Persistent Context Across Sessions for Every AI Agent
+[09:56:11]   Fact 2: firecrawl – API for Web Search, Scraping, and Interaction at Scale
+[09:56:11]   Fact 3: ollama – Run Kimi-K2.6, GLM-5.1, and DeepSeek Locally
+[09:56:11]   Fact 4: AutoGPT – Vision of Accessible AI for Everyone
+[09:56:11]   Fact 5: open-webui – User-Friendly Interface for Ollama & OpenAI
+[09:56:11]   Fact 6: dify – Production-Ready Agentic Workflow Platform
+[09:56:11] STEP 2b: Capturing article screenshots for evidence...
+[09:56:47] ✅ Captured 6/6 article screenshots.
+[09:56:47] STEP 3: Generating voiceover + word timestamps...
+[09:56:47] Selected Lip-Sync Template: assets/video/C_white.mp4
+[09:56:47] ⚠️ Script word count too low (12 words, expected ~5.2s < 480s). Retrying script generation early to save GPU time.
+[09:56:47] STEP 2 (Attempt 4/12): Generating long-form 5-topic compilation script...
+[10:35:38] ERROR: Long-form script generation failed.
+[10:35:38] STEP 2 (Attempt 5/12): Generating long-form 5-topic compilation script...
+[11:01:30] ERROR: Long-form script generation failed.
+[11:01:30] STEP 2 (Attempt 6/12): Generating long-form 5-topic compilation script...
+[11:28:16] ERROR: Long-form script generation failed.
+[11:28:16] ⏳ Potential rate limit. Sleeping 60s...
+[11:29:16] STEP 2 (Attempt 7/12): Generating long-form 5-topic compilation script...
+[11:53:43] ERROR: Long-form script generation failed.
+[11:53:43] STEP 2 (Attempt 8/12): Generating long-form 5-topic compilation script...
+[12:18:06] ERROR: Long-form script generation failed.
+[12:18:06] STEP 2 (Attempt 9/12): Generating long-form 5-topic compilation script...
+[12:49:00] ERROR: Long-form script generation failed.
+[12:49:00] ⏳ Potential rate limit. Sleeping 60s...
+[12:50:00] STEP 2 (Attempt 10/12): Generating long-form 5-topic compilation script...
+[13:20:56] ERROR: Long-form script generation failed.
+[13:20:56] STEP 2 (Attempt 11/12): Generating long-form 5-topic compilation script...
+[13:40:41] Generated Title: ECC Agent Harness: The 500x Faster AI Performance Booster 💥
+[13:40:41] Script word count: 251
+[13:40:41] Topics covered: 4
+[13:40:41]   Fact 1: ECC Agent Harness: The 500x Faster AI Performance Booster for Developers
+[13:40:41]   Fact 2: Firecrawl API: Scale Web Scraping & Search with Zero Infrastructure
+[13:40:41]   Fact 3: Ollama 0.3.8: Run Kimi-K2.6, GLM-5.1, and DeepSeek Locally
+[13:40:41]   Fact 4: AutoGPT 0.3.0: Self-Improving AI Agents for Everyone
+[13:40:41] STEP 2b: Capturing article screenshots for evidence...
+[13:41:07] ✅ Captured 4/4 article screenshots.
+[13:41:07] STEP 3: Generating voiceover + word timestamps...
+[13:41:07] Selected Lip-Sync Template: assets/video/C_white.mp4
+[13:41:07] ⚠️ Script word count too low (251 words, expected ~107.7s < 480s). Retrying script generation early to save GPU time.
+[13:41:07] STEP 2 (Attempt 12/12): Generating long-form 5-topic compilation script...
