@@ -128,9 +128,12 @@ class TestGithubTrending(unittest.TestCase):
     @patch("requests.get")
     def test_fetch_github_trending_deduplication(self, mock_api_get, mock_scrape):
         """Verify case-insensitive deduplication of repositories during merging."""
-        # Setup scraper to return mixed casing duplicate
+        # Setup scraper to return mixed casing duplicate + 9 other unique items (to exceed threshold of 10)
         mock_scrape.return_value = [
             {"full_name": "google/Antigravity", "repo": "google/Antigravity", "stars_in_period": 100, "stargazers_count": 1000}
+        ] + [
+            {"full_name": f"user/repo{i}", "repo": f"user/repo{i}", "stars_in_period": 10 + i, "stargazers_count": 500}
+            for i in range(9)
         ]
         # Setup API search to return same slug in different casing
         mock_api_resp = MagicMock()
@@ -144,8 +147,8 @@ class TestGithubTrending(unittest.TestCase):
 
         parsed_results = fetch_github_trending_ai()
         
-        # Verify deduplicated to exactly 1 result (Google/Antigravity and google/antigravity merged)
-        self.assertEqual(len(parsed_results), 1)
+        # Verify deduplicated to exactly 10 results (Google/Antigravity and google/antigravity merged)
+        self.assertEqual(len(parsed_results), 10)
         self.assertEqual(parsed_results[0]["title"].lower(), "github trending: google/antigravity — ")
 
 if __name__ == "__main__":

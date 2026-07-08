@@ -556,11 +556,12 @@ def fetch_github_trending_ai():
             except Exception as e:
                 print(f"  ⚠️ Error scraping language '{lang}' for since '{since_period}': {e}")
             
-    if not scraped_any:
-        print("⚠️ Scraping returned 0 results. Checking cache fallback...")
+    if not scraped_any or len(all_repos) < 10:
+        print(f"⚠️ Scraping returned too few results ({len(all_repos)} repos). Checking cache fallback...")
         cached = load_cached_github_trending()
         if cached:
-            all_repos.extend(cached)
+            all_repos = list(cached)
+            scraped_any = False
             
     # ── Strategy 2: GitHub Search API (Option 2) ──
     headers = {
