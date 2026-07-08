@@ -1,58 +1,62 @@
 {
   "groq_models": {
-    "llama-3.3-70b-versatile": 1783486722.1339972,
-    "qwen/qwen3-32b": 1783486797.359305,
-    "openai/gpt-oss-20b": 1783486804.1217604,
-    "llama-3.1-8b-instant": 1783486804.1994736,
-    "openai/gpt-oss-120b": 1783486809.239337
+    "llama-3.3-70b-versatile": 1783538569.2662487,
+    "qwen/qwen3-32b": 1783538582.3557975,
+    "openai/gpt-oss-20b": 1783538585.7035248,
+    "llama-3.1-8b-instant": 1783538587.5567315,
+    "openai/gpt-oss-120b": 1783538686.1677215
   },
   "cloudflare_models": {
-    "@cf/meta/llama-3.3-70b-instruct": 1783486723.6860194,
-    "@cf/meta/llama-3.3-70b-instruct-fp8-fast": 1783486723.6864161,
-    "@cf/zai-org/glm-4.7-flash": 1783486723.6867301,
-    "@cf/openai/gpt-oss-120b": 1783486723.6870112,
-    "@cf/nvidia/nemotron-3-120b-a12b": 1783486723.687301,
-    "@cf/meta/llama-4-scout-17b-16e-instruct": 1783486723.687595,
-    "@cf/qwen/qwq-32b": 1783486723.6879106,
-    "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b": 1783486723.6882868,
-    "@cf/meta/llama-3.1-70b-instruct": 1783486723.6886768,
-    "@cf/qwen/qwen2.5-72b-instruct": 1783486723.6890562,
-    "@cf/qwen/qwen3-30b-a3b-fp8": 1783486723.689329,
-    "@cf/qwen/qwen2.5-coder-32b-instruct": 1783486723.6898124,
-    "@cf/mistral/mistral-small-3.1-24b-instruct": 1783486723.6900902,
-    "@cf/google/gemma-4-26b-a4b-it": 1783486723.6903622,
-    "@cf/moonshotai/kimi-k2.7-code": 1783486723.6906493,
-    "@cf/moonshotai/kimi-k2.6": 1783486723.690944,
-    "@cf/meta/llama-3.1-8b-instruct": 1783486723.6912098,
-    "@cf/meta/llama-3.1-8b-instruct-fp8": 1783486723.691487,
-    "@cf/meta/llama-3.1-8b-instruct-fast": 1783486723.6917894,
-    "@cf/meta/llama-3.2-3b-instruct": 1783486723.6921058,
-    "@cf/zai-org/glm-5.2": 1783486723.692404,
-    "@cf/meta/llama-3.2-1b-instruct": 1783486723.6927338,
-    "@cf/openai/gpt-oss-20b": 1783486723.6930332,
-    "@cf/ibm-granite/granite-4.0-h-micro": 1783486723.693718
+    "@cf/meta/llama-3.3-70b-instruct": 1783538500.078368,
+    "@cf/meta/llama-3.3-70b-instruct-fp8-fast": 1783538500.078751,
+    "@cf/zai-org/glm-4.7-flash": 1783538500.0791156,
+    "@cf/openai/gpt-oss-120b": 1783538500.0797186,
+    "@cf/nvidia/nemotron-3-120b-a12b": 1783538500.0800755,
+    "@cf/meta/llama-4-scout-17b-16e-instruct": 1783538500.0804558,
+    "@cf/qwen/qwq-32b": 1783538500.0808053,
+    "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b": 1783538500.0811625,
+    "@cf/meta/llama-3.1-70b-instruct": 1783538500.0815501,
+    "@cf/qwen/qwen2.5-72b-instruct": 1783538500.0819016,
+    "@cf/qwen/qwen3-30b-a3b-fp8": 1783538500.0822878,
+    "@cf/qwen/qwen2.5-coder-32b-instruct": 1783538500.0826387,
+    "@cf/mistral/mistral-small-3.1-24b-instruct": 1783538500.0829873,
+    "@cf/google/gemma-4-26b-a4b-it": 1783538500.0833747,
+    "@cf/moonshotai/kimi-k2.7-code": 1783538500.0837183,
+    "@cf/moonshotai/kimi-k2.6": 1783538500.0840645,
+    "@cf/meta/llama-3.1-8b-instruct": 1783538500.0844383,
+    "@cf/meta/llama-3.1-8b-instruct-fp8": 1783538500.084775,
+    "@cf/meta/llama-3.1-8b-instruct-fast": 1783538500.085116,
+    "@cf/meta/llama-3.2-3b-instruct": 1783538500.0854833,
+    "@cf/zai-org/glm-5.2": 1783538500.0858293,
+    "@cf/meta/llama-3.2-1b-instruct": 1783538500.0862346,
+    "@cf/openai/gpt-oss-20b": 1783538500.0865698,
+    "@cf/ibm-granite/granite-4.0-h-micro": 1783538500.0869162
   },
   "gemini_models": {
-    "gemini-2.5-flash": 1783486718.6836252,
-    "gemini-2.5-flash-lite": 1783486721.8781457,
-    "gemini-2.5-pro": 1783486797.272295
+    "gemini-2.5-flash": 1783538441.0482683,
+    "gemini-2.5-flash-lite": 1783539211.714636,
+    "gemini-2.5-pro": 1783538060.3107023
   },
   "cerebras_models": {
-    "gpt-oss-120b": 1783489441.0113215,
-    "zai-glm-4.7": 1783452596.5654724
+    "gpt-oss-120b": 1783538570.1438644,
+    "zai-glm-4.7": 1783502470.1690803
   },
   "groq_token_usage": {
     "qwen/qwen3-32b": {
-      "tokens": 2209,
-      "date": "2026-07-07"
+      "tokens": 5886,
+      "date": "2026-07-08"
     },
     "llama-3.1-8b-instant": {
-      "tokens": 3199,
-      "date": "2026-07-07"
+      "tokens": 4940,
+      "date": "2026-07-08"
     },
     "openai/gpt-oss-120b": {
-      "tokens": 2705,
-      "date": "2026-07-07"
+      "tokens": 3144,
+      "date": "2026-07-08"
+    },
+    "llama-3.3-70b-versatile": {
+      "tokens": 6324,
+      "date": "2026-07-08"
     }
   }
 }
