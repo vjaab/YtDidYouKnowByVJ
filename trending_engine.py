@@ -343,12 +343,141 @@ def fetch_reddit_hot_ai():
 # ─────────────────────────────────────────────────────────────────────────────
 # 3. GITHUB TRENDING REPOS
 # ─────────────────────────────────────────────────────────────────────────────
+USER_AGENTS = [
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_2_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Safari/605.1.15",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0"
+]
+
+GITHUB_TRENDING_CACHE_FILE = os.path.join("logs", "github_trending_cache.json")
+
+def scrape_github_trending(language=None, since="daily"):
+    """
+    Scrapes github.com/trending directly using BeautifulSoup.
+    No API keys/tokens are required.
+    """
+    import random
+    from bs4 import BeautifulSoup
+    
+    url = "https://github.com/trending"
+    if language:
+        url += f"/{language}"
+    url += f"?since={since}"
+    
+    headers = {
+        "User-Agent": random.choice(USER_AGENTS),
+        "Accept-Language": "en-US,en;q=0.9",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+    }
+    
+    try:
+        resp = requests.get(url, headers=headers, timeout=15)
+        if resp.status_code != 200:
+            print(f"  ⚠️ GitHub Scraper HTTP error: {resp.status_code}")
+            return []
+            
+        soup = BeautifulSoup(resp.text, "html.parser")
+        repos = []
+        for article in soup.select("article.Box-row"):
+            # Repo Slug / Name
+            a_tag = article.select_one("h2 a")
+            if not a_tag or not a_tag.get("href"):
+                continue
+            slug = a_tag["href"].strip("/")
+            
+            # Description
+            desc_tag = article.select_one("p")
+            desc = desc_tag.get_text(strip=True) if desc_tag else ""
+            
+            # Language
+            lang_tag = article.select_one("[itemprop='programmingLanguage']")
+            lang = lang_tag.get_text(strip=True) if lang_tag else "Unknown"
+            
+            # Total Stars
+            stars_tag = article.select_one("a[href$='/stargazers']")
+            stars = 0
+            if stars_tag:
+                try:
+                    stars_str = stars_tag.get_text(strip=True).replace(",", "")
+                    stars = int(stars_str)
+                except:
+                    pass
+                    
+            # Total Forks
+            forks_tag = article.select_one("a[href$='/forks']")
+            forks = 0
+            if forks_tag:
+                try:
+                    forks_str = forks_tag.get_text(strip=True).replace(",", "")
+                    forks = int(forks_str)
+                except:
+                    pass
+            
+            # Stars Period (daily/weekly/monthly)
+            stars_period_tag = article.select_one("span.d-inline-block.float-sm-right") or article.select_one("span.float-sm-right")
+            stars_period = 0
+            if stars_period_tag:
+                try:
+                    text = stars_period_tag.get_text(strip=True)
+                    digits = "".join([c for c in text if c.isdigit()])
+                    if digits:
+                        stars_period = int(digits)
+                except:
+                    pass
+                    
+            repos.append({
+                "repo": slug,
+                "full_name": slug,
+                "description": desc,
+                "language": lang,
+                "stargazers_count": stars,
+                "forks_count": forks,
+                "stars_in_period": stars_period,
+                "url": f"https://github.com/{slug}",
+                "html_url": f"https://github.com/{slug}"
+            })
+        return repos
+    except Exception as e:
+        print(f"  ⚠️ GitHub Scraper Exception: {e}")
+        return []
+
+def load_cached_github_trending():
+    """Loads cached GitHub trending results, warning if they are >48 hours stale."""
+    if not os.path.exists(GITHUB_TRENDING_CACHE_FILE):
+        return []
+    try:
+        mtime = os.path.getmtime(GITHUB_TRENDING_CACHE_FILE)
+        age_hours = (time.time() - mtime) / 3600.0
+        if age_hours > 48:
+            print(f"\n⚠️ CRITICAL: GitHub Trending cache is stale (>48 hours)! Age: {age_hours:.1f} hours.\n")
+        else:
+            print(f"📋 Loaded GitHub Trending cache (Age: {age_hours:.1f} hours).")
+        with open(GITHUB_TRENDING_CACHE_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"⚠️ Failed to load github trending cache: {e}")
+        return []
+
+def save_github_trending_cache(repos):
+    """Saves the successfully scraped/fetched GitHub trending results to cache."""
+    if not repos:
+        return
+    try:
+        os.makedirs(os.path.dirname(GITHUB_TRENDING_CACHE_FILE), exist_ok=True)
+        with open(GITHUB_TRENDING_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(repos, f, indent=2)
+        print("💾 GitHub Trending cache updated successfully.")
+    except Exception as e:
+        print(f"⚠️ Failed to save github trending cache: {e}")
+
 def _parse_github_repos(repos, min_stars=50):
-    """Shared parser: converts GitHub API repo objects into trending articles."""
+    """Shared parser: converts GitHub API/scraped repo objects into trending articles."""
     results = []
     for repo in repos:
-        stars = repo.get("stargazers_count", 0)
-        if stars < min_stars:
+        stars = repo.get("stargazers_count", 0) or repo.get("stars", 0)
+        # Scraped repos might have lower total stars initially, but we want to count them if they are trending today
+        if stars < min_stars and repo.get("stars_in_period", 0) < 10:
             continue
         
         # Calculate approximate stars velocity
@@ -361,134 +490,158 @@ def _parse_github_repos(repos, min_stars=50):
             except:
                 pass
         
-        stars_per_day = stars / age_days
+        # Normalize stars velocity according to period
+        stars_in_period = repo.get("stars_in_period", 0)
+        if stars_in_period > 0:
+            stars_per_day = stars_in_period
+        else:
+            stars_per_day = stars / age_days
+        
         desc = repo.get('description', '') or ''
+        
+        # Topical relevance boost
+        title_lower = repo.get('full_name', '').lower()
+        desc_lower = desc.lower()
+        
+        # Broad technical and developer topics list:
+        keywords = [
+            'llm', 'gpt', 'llama', 'agent', 'ai', 'transformer', 'stable-diffusion', 'deepseek', 
+            'compiler', 'terminal', 'database', 'api', 'editor', 'linux', 'rust', 'python', 'go', 
+            'security', 'hack', 'exploit', 'performance', 'git', 'open-source', 'productivity', 
+            'machine-learning', 'dataset', 'nlp', 'vision', 'neural', 'weights', 'inference'
+        ]
+        
+        relevance_score = 0
+        if any(kw in title_lower or kw in desc_lower for kw in keywords):
+            relevance_score = 30
         
         results.append({
             "title": f"GitHub Trending: {repo.get('full_name', '')} — {desc[:100]}",
             "description": f"⭐ {stars} stars ({stars_per_day:.0f}/day) | {repo.get('language', 'Unknown')} | {desc}",
             "source": {"name": f"GitHub ({repo.get('full_name', '')})"},
             "url": repo.get("html_url", ""),
-            "urlToImage": repo.get("owner", {}).get("avatar_url", ""),
-            "publishedAt": created_at,
+            "urlToImage": repo.get("owner", {}).get("avatar_url", "") if isinstance(repo.get("owner"), dict) else "",
+            "publishedAt": created_at or datetime.now(timezone.utc).isoformat(),
             "type": "github_trending",
             "_engagement": {
                 "stars": stars,
                 "stars_per_day": round(stars_per_day, 1),
                 "forks": repo.get("forks_count", 0),
-                "watchers": repo.get("watchers_count", 0)
-            }
+                "watchers": repo.get("watchers_count", 0) or repo.get("stargazers_count", 0)
+            },
+            "_relevance_score": relevance_score
         })
     return results
 
-
 def fetch_github_trending_ai():
     """
-    Fetches trending AI/ML repos from GitHub Search API.
-    Stars velocity = early signal for tool content before mainstream coverage.
-    Falls back to scraping github.com/trending if the API returns 0 results.
-    No API key needed.
+    Fetches trending AI/ML/Developer repos from GitHub.
+    Tries scraping first, falls back to Search API or local cache if blocked/empty.
+    Deduplicates results and ranks by stars velocity.
     """
-    print("🐙 Fetching trending AI repos from GitHub...")
+    import random
+    print("🐙 Fetching trending repos from GitHub...")
+    all_repos = []
     
+    # ── Strategy 1: BeautifulSoup scraping of github.com/trending (Option 1) ──
+    scraped_any = False
+    for since_period in ["daily", "weekly"]:
+        for lang in [None, "python", "typescript"]:
+            try:
+                scraped = scrape_github_trending(language=lang, since=since_period)
+                if scraped:
+                    all_repos.extend(scraped)
+                    scraped_any = True
+                time.sleep(random.uniform(0.5, 1.2))
+            except Exception as e:
+                print(f"  ⚠️ Error scraping language '{lang}' for since '{since_period}': {e}")
+            
+    if not scraped_any:
+        print("⚠️ Scraping returned 0 results. Checking cache fallback...")
+        cached = load_cached_github_trending()
+        if cached:
+            all_repos.extend(cached)
+            
+    # ── Strategy 2: GitHub Search API (Option 2) ──
     headers = {
         "Accept": "application/vnd.github.v3+json",
-        "User-Agent": "VJTechNews/1.0"
+        "User-Agent": random.choice(USER_AGENTS)
     }
-    
-    all_results = []
-    
-    # ── Strategy 1: Broad AI/ML topic search via GitHub Search API ──
     since_date = (datetime.now(timezone.utc) - timedelta(days=7)).strftime("%Y-%m-%d")
-    
     search_queries = [
-        # Broad AI/ML queries that match real repo names and descriptions
         f"topic:machine-learning stars:>50 pushed:>{since_date}",
         f"topic:llm stars:>50 pushed:>{since_date}",
         f"topic:artificial-intelligence stars:>50 pushed:>{since_date}",
         f"(AI OR LLM OR GPT OR \"open source\") stars:>100 pushed:>{since_date}",
     ]
     
-    try:
-        url = "https://api.github.com/search/repositories"
-        seen_repos = set()
-        
-        for query in search_queries:
-            try:
-                params = {
-                    "q": query,
-                    "sort": "stars",
-                    "order": "desc",
-                    "per_page": 10
-                }
+    api_repos = []
+    for query in search_queries:
+        try:
+            url = "https://api.github.com/search/repositories"
+            params = {
+                "q": query,
+                "sort": "stars",
+                "order": "desc",
+                "per_page": 10
+            }
+            token = os.getenv("GITHUB_TOKEN")
+            if token:
+                headers["Authorization"] = f"token {token}"
                 
-                r = requests.get(url, params=params, headers=headers, timeout=15)
-                if r.status_code != 200:
-                    print(f"  ⚠️ GitHub API Error ({r.status_code}) for query: {query[:50]}...")
-                    continue
-                
+            r = requests.get(url, params=params, headers=headers, timeout=15)
+            if r.status_code == 200:
                 data = r.json()
-                repos = data.get("items", [])
-                
-                # Deduplicate across queries
-                new_repos = []
-                for repo in repos:
-                    repo_id = repo.get("id")
-                    if repo_id not in seen_repos:
-                        seen_repos.add(repo_id)
-                        new_repos.append(repo)
-                
-                parsed = _parse_github_repos(new_repos, min_stars=50)
-                all_results.extend(parsed)
-                
-                time.sleep(1)  # GitHub rate limit courtesy
-                
-            except Exception as e:
-                print(f"  ⚠️ GitHub search query failed: {e}")
+                api_repos.extend(data.get("items", []))
+            else:
+                print(f"  ⚠️ GitHub API Error ({r.status_code}) for query: {query[:50]}")
+            time.sleep(0.5)
+        except Exception as e:
+            print(f"  ⚠️ GitHub Search API query failed: {e}")
+            
+    # Merge and deduplicate by lowercased slug (full_name)
+    merged_repos = []
+    seen_lower_slugs = set()
+    
+    # 1. Scraped / Cached
+    for repo in all_repos:
+        slug = repo.get("full_name", "") or repo.get("repo", "")
+        if not slug:
+            continue
+        slug_lower = slug.lower()
+        if slug_lower not in seen_lower_slugs:
+            seen_lower_slugs.add(slug_lower)
+            merged_repos.append(repo)
+            
+    # 2. Search API
+    for repo in api_repos:
+        slug = repo.get("full_name", "")
+        if not slug:
+            continue
+        slug_lower = slug.lower()
+        if slug_lower not in seen_lower_slugs:
+            seen_lower_slugs.add(slug_lower)
+            merged_repos.append({
+                "repo": slug,
+                "full_name": slug,
+                "description": repo.get("description", "") or "",
+                "language": repo.get("language", "Unknown") or "Unknown",
+                "stargazers_count": repo.get("stargazers_count", 0),
+                "forks_count": repo.get("forks_count", 0),
+                "stars_in_period": 0,
+                "url": repo.get("html_url", ""),
+                "html_url": repo.get("html_url", ""),
+                "created_at": repo.get("created_at", "")
+            })
+            
+    if scraped_any:
+        # Cache only the live scraped results (which are our raw source)
+        save_github_trending_cache(all_repos)
         
-        # ── Strategy 2: Fallback — scrape GitHub Trending page if API returned 0 ──
-        if not all_results:
-            print("  📋 GitHub API returned 0 results. Trying GitHub Trending page fallback...")
-            try:
-                trending_url = "https://github.com/trending?since=weekly&spoken_language_code=en"
-                r = requests.get(trending_url, headers={"User-Agent": "VJTechNews/1.0"}, timeout=15)
-                if r.status_code == 200:
-                    # Extract repo slugs from the trending page HTML
-                    repo_slugs = re.findall(r'href="/([\w-]+/[\w.-]+)"\s+class="', r.text)
-                    # Deduplicate while preserving order
-                    seen_slugs = set()
-                    unique_slugs = []
-                    for slug in repo_slugs:
-                        if slug not in seen_slugs:
-                            seen_slugs.add(slug)
-                            unique_slugs.append(slug)
-                    
-                    # Fetch details for top trending repos via API
-                    for slug in unique_slugs[:10]:
-                        try:
-                            repo_r = requests.get(
-                                f"https://api.github.com/repos/{slug}",
-                                headers=headers, timeout=10
-                            )
-                            if repo_r.status_code == 200:
-                                repo_data = repo_r.json()
-                                parsed = _parse_github_repos([repo_data], min_stars=50)
-                                all_results.extend(parsed)
-                            time.sleep(0.5)
-                        except:
-                            continue
-                    
-                    if all_results:
-                        print(f"  ✅ GitHub Trending page fallback: Found {len(all_results)} repos.")
-            except Exception as e:
-                print(f"  ⚠️ GitHub Trending page fallback failed: {e}")
-        
-        all_results.sort(key=lambda x: x["_engagement"]["stars_per_day"], reverse=True)
-        print(f"✅ GitHub: Found {len(all_results)} trending AI repos.")
-        return all_results
-    except Exception as e:
-        print(f"  ⚠️ GitHub trending fetch failed: {e}")
-        return []
+    parsed = _parse_github_repos(merged_repos, min_stars=50)
+    parsed.sort(key=lambda x: x["_engagement"]["stars_per_day"], reverse=True)
+    print(f"✅ GitHub: Found {len(parsed)} trending repos.")
+    return parsed
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 4. PROGRAMMATIC GOOGLE TRENDS TECH MINER (Stream A)

@@ -515,6 +515,16 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
         if articles:
             # Copy to avoid mutating the caller's list
             articles = list(articles)
+            
+            # Enforce selecting GitHub trending repositories always
+            github_articles = [art for art in articles if art.get("type") == "github_trending"]
+            if github_articles:
+                articles = github_articles
+                print(f"📡 Filtered candidates to {len(articles)} GitHub trending repos.")
+            else:
+                print("⚠️ PIPELINE FALLBACK: No unique GitHub candidates found, using general topics.")
+                extra_instruction += "\n⚠️ PIPELINE FALLBACK: No unique GitHub candidates found, using general topics. PRIORITIZE open-source or developer tools if possible.\n"
+            
             print(f"📡 STEP 0: Scoring {len(articles)} articles for viral potential (engagement-weighted)...")
             
             seen_titles_in_this_batch = []
@@ -675,6 +685,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                     hot_score += 150.0  # Massive score boost to prioritize this topic
                 if art.get("type") == "github_trending":
                     hot_score += 100.0  # Boost GitHub trending repos to prioritize them for selection
+                    hot_score += art.get("_relevance_score", 0)  # Boost further if technical topic relevance matches
 
                 art['_hot_score'] = round(hot_score, 1)
                 art['_score_breakdown'] = {
@@ -731,12 +742,9 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
             search_subject = hot_topic_str if hot_topic_str else f"{category}"
             print(f"🔍 STEP 1: Using Gemini Search for '{search_subject}'...")
             search_query = (
-                f"Find the most viral, trending content about: {search_subject}. "
-                "PRIORITIZE finding stories in these high-performing categories if available:\n"
-                "1. Open-Source AI Hacks & Development (e.g. viral GitHub repos, MiniMind, training custom/local LLMs from scratch, democratization/optimization of AI).\n"
-                "2. Device Security & Shadow AI Privacy Risks (e.g. Apple's Significant Locations, hidden tracking settings, shadow AI tools scraping corporate data, codebase leaks via dev extensions).\n"
-                "3. Frontier Tech Gadgets & Privacy-First Hardware (e.g. wearable AR concepts, camera-free AR smart glasses, HUD devices eliminating privacy risks).\n"
-                "If none of these are trending, search for other AI tools, fascinating facts, side hustles, productivity hacks, or free alternatives going viral."
+                f"Find the most viral, trending open-source projects or active GitHub repositories related to: {search_subject}. "
+                "PRIORITIZE finding stories about breakout GitHub repositories, innovative developer tools, local models, "
+                "AI agents, developer hacks, or open-source software packages. Provide the full repository name (owner/repo) and description."
             )
             
             try:

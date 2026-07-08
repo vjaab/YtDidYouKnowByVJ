@@ -92,14 +92,14 @@ TOPIC_DISCOVERY_TEMPLATE = """{persona}
 
 TOPIC DISCOVERY AGENT TASK:
 Search today's AI landscape and discover:
-1. One MAIN BREAKOUT topic (the main_topic): This must be a major open-source repository release, a trending GitHub project, a revolutionary tool, an insane developer hack, or a life-changing automated coding workflow with massive utility.
-2. 5 to 7 SECONDARY topics (news_updates): These must be hot GitHub breakouts, open-source tool launches, AI repo updates, or interesting tech/coding facts from the last 72 hours.
+1. One MAIN BREAKOUT topic (the main_topic): This must be a trending open-source repository release, a trending GitHub project, or an active developer library.
+2. 5 to 7 SECONDARY topics (news_updates): These must be other trending GitHub repositories or open-source developer project releases.
 
 SOURCES TO ANALYZE:
 {news_context}
 
 SELECTION CRITERIA (in order of priority):
-- GitHub & Open-Source Focus: Strongly prioritize trending GitHub repositories, open-source AI projects, codebases, and developer tools. Most of the selected topics MUST be active GitHub projects or developer libraries.
+- CRITICAL - GitHub Repositories Only: Every single selected topic (both the main breakout and all secondary updates) MUST correspond to a real, active GitHub repository. Do not select general articles, news sites, or products without a public repository.
 - High utility: solves a real pain point (saving time, writing better code, automation, making money).
 - Urgent/Breaking: happened in the last 24-72 hours.
 - Mass Appeal: Frame developer/GitHub topics so they are extremely exciting, emphasizing their direct utility, features, and how to get started, so they are accessible to tech creators and professionals.
@@ -1378,7 +1378,17 @@ def generate_longform_script(articles=None, failed_topics=None):
     # ── Build news context from RSS articles ──────────────────────────────
     news_context = ""
     if articles:
-        for idx, art in enumerate(articles[:30]):  # Increased from 25 to 30 for more coverage
+        # Enforce selecting GitHub trending repositories always
+        github_articles = [art for art in articles if art.get("type") == "github_trending"]
+        if github_articles:
+            display_articles = github_articles
+            print(f"📡 Longform: Filtered candidates to {len(display_articles)} GitHub trending repos.")
+        else:
+            display_articles = articles
+            print("⚠️ PIPELINE FALLBACK: No unique GitHub candidates found, using general topics.")
+            news_context = "⚠️ PIPELINE FALLBACK: No unique GitHub candidates found, using general topics.\n"
+            
+        for idx, art in enumerate(display_articles[:30]):  # Increased from 25 to 30 for more coverage
             title = art.get('title', '')
             desc = art.get('description', '')
             source = art.get('source', {}).get('name', '')
