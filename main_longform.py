@@ -64,13 +64,7 @@ def format_longform_description(script_data, hashtags):
     topics = script_data.get("longform_topics", [])
     description_ai = script_data.get("description", "")
     
-    # Target high-RPM regions (USA, UK, Canada, Australia, NZ, Singapore, South Korea, Japan, Europe)
-    target_hashtags = ["#TechUSA", "#TechUK", "#TechCanada", "#TechAustralia", "#TechNZ", "#TechSingapore", "#TechSouthKorea", "#TechJapan", "#TechEurope", "#English"]
-    all_hashtags = list(hashtags) if hashtags else []
-    for tag in target_hashtags:
-        if tag not in all_hashtags:
-            all_hashtags.append(tag)
-    hashtag_str = " ".join(all_hashtags)
+    hashtag_str = " ".join(hashtags) if hashtags else ""
     
     # Build timestamps section
     timestamps_str = "📌 TIMESTAMPS:\n"
@@ -129,8 +123,7 @@ def format_longform_description(script_data, hashtags):
 
 ⚠️ DISCLOSURE: This video uses AI-assisted production tools (TTS voiceover, AI-generated visuals). All editorial opinions, topic selection, and analysis are by VJ.
 
-{hashtag_str}
-#DidYouKnow #AIFacts #TechFacts #ArtificialIntelligence #MachineLearning""",
+{hashtag_str}""",
 
         f"""📲 Join the community for daily AI intelligence:
 🚀 Telegram: https://t.me/technewsbyvj
@@ -145,8 +138,7 @@ def format_longform_description(script_data, hashtags):
 
 ⚠️ DISCLOSURE: AI tools are used in production (voiceover, visuals). Topic selection, research, and commentary by VJ.
 
-{hashtag_str}
-#AI #DidYouKnow #TechNews #DeepLearning #Innovation""",
+{hashtag_str}""",
 
         f"""📲 Direct Links to Communities:
 🚀 Telegram → https://t.me/technewsbyvj
@@ -162,8 +154,7 @@ def format_longform_description(script_data, hashtags):
 
 ⚠️ DISCLOSURE: AI-assisted production (voiceover, visuals). Editorial direction & analysis by VJ.
 
-{hashtag_str}
-#AIDidYouKnow #TechFacts #Coding #Startup #DevTools""",
+{hashtag_str}""",
     ]
 
     return templates[template_idx]
@@ -656,7 +647,8 @@ def run_longform_pipeline(dry_run=False):
         initial_keywords=keywords,
         initial_companies=companies_all,
         initial_people=initial_people,
-        initial_hashtags=hashtags
+        initial_hashtags=hashtags,
+        is_shorts=False
     )
     hashtags = optimized_metadata["hashtags"]
     tags = optimized_metadata["tags"]

@@ -254,7 +254,8 @@ def generate_and_upload_shorts_teaser(script_json, longform_video_id, dry_run=Fa
             initial_keywords=script_json.get("keywords", []),
             initial_companies=script_json.get("companies_mentioned", []),
             initial_people=initial_people,
-            initial_hashtags=script_json.get("hashtags", [])
+            initial_hashtags=script_json.get("hashtags", []),
+            is_shorts=True
         )
         hashtags = optimized_metadata["hashtags"]
         tags = optimized_metadata["tags"]

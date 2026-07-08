@@ -206,6 +206,46 @@ def to_clean_hashtag(s):
         return ""
     return f"#{hashtag}"
 
+
+def get_hyper_targeted_hashtags(title, script, is_shorts=True):
+    """
+    Generates exactly 4 hyper-targeted hashtags adhering strictly to these strategic rules:
+    1. Tag 1 (Platform Core): Must always be exactly #Shorts (or #Longform if is_shorts is False).
+    2. Tag 2 (Global Niche Anchor): Must always be exactly #AI.
+    3. Tag 3 (Specific Subfield): Analyze the content to determine the deep-tech vector.
+    4. Tag 4 (Tech Authority): Appeals to builders and industry followers.
+    """
+    tag1 = "#Shorts" if is_shorts else "#Longform"
+    tag2 = "#AI"
+    
+    text_lower = f"{title} {script}".lower()
+    
+    # Tag 3: Specific Subfield
+    # Check security limitations / guardrail breaks / exploits / vulnerabilities
+    if any(x in text_lower for x in ["jailbreak", "exploit", "vulnerability", "prompt injection", "bypass", "malicious", "attack", "cybersecurity", "hacking", "hacked"]):
+        tag3 = "#AIHacking"
+    # Check unexpected errors / failures / glitches
+    elif any(x in text_lower for x in ["fail", "error", "hallucination", "limitation", "broken", "guardrail break", "meltdown", "glitch", "crash"]):
+        tag3 = "#AIFails"
+    # Check video generation / multimedia breakthroughs
+    elif any(x in text_lower for x in ["video", "multimedia", "sora", "veo", "runway", "image generation", "text to video", "luma dream", "kling"]):
+        tag3 = "#AIVideo"
+    # Check models, research papers, breakthroughs
+    elif any(x in text_lower for x in ["model", "paper", "breakthrough", "llm", "gpt", "claude", "gemini", "llama", "transformer", "neural network", "deep learning"]):
+        tag3 = "#LLM"
+    else:
+        tag3 = "#MachineLearning"
+        
+    # Tag 4: Tech Authority
+    if any(x in text_lower for x in ["code", "developer", "engineering", "programming", "python", "software", "pipeline"]):
+        tag4 = "#SoftwareEngineering"
+    elif any(x in text_lower for x in ["news", "latest", "announced", "released"]):
+        tag4 = "#TechNews"
+    else:
+        tag4 = "#DeepTech"
+        
+    return [tag1, tag2, tag3, tag4]
+
 def get_optimized_metadata(
     title, 
     script, 
@@ -213,10 +253,11 @@ def get_optimized_metadata(
     initial_keywords=None, 
     initial_companies=None, 
     initial_people=None, 
-    initial_hashtags=None
+    initial_hashtags=None,
+    is_shorts=True
 ):
     """
-    Computes an optimized list of 8-15 unique tags and 3-5 unique hashtags
+    Computes an optimized list of 8-15 unique tags and exactly 4 unique hashtags
     based on the content of the video.
     """
     initial_keywords = initial_keywords or []
@@ -249,7 +290,6 @@ def get_optimized_metadata(
     full_text = f"{title} {script} {sub_category}".lower()
     
     matched_tags = []
-    matched_hashtags = []
     
     # 1. Match Prominent People
     for person_key, meta in PEOPLE_METADATA.items():
@@ -261,49 +301,27 @@ def get_optimized_metadata(
         
         if re.search(pattern, full_text) or (len(last_name) > 3 and re.search(last_name_pattern, full_text)):
             matched_tags.extend(meta["tags"])
-            matched_hashtags.append(meta["hashtag"])
             
     # 2. Add Initial Metadata to Tags
     for tag in initial_keywords + initial_companies + initial_people:
         if tag and len(tag) > 1:
             matched_tags.append(tag.strip())
             
-    # Dynamically generate hashtags from companies, people, sub-category and keywords
-    for item in initial_companies + initial_people + initial_keywords:
-        if item:
-            ht = to_clean_hashtag(item)
-            if ht:
-                matched_hashtags.append(ht)
-
-    if sub_category:
-        ht_cat = to_clean_hashtag(sub_category)
-        if ht_cat:
-            matched_hashtags.append(ht_cat)
-
-    for ht in initial_hashtags:
-        ht_clean = to_clean_hashtag(ht)
-        if ht_clean:
-            matched_hashtags.append(ht_clean)
-            
     # 3. Match Specific Tools & Platforms
     for topic in TRENDING_AI_TOPICS:
         if re.search(rf"\b{re.escape(topic.lower())}\b", full_text):
             matched_tags.append(topic)
-            # Add topic hashtag if relevant
-            matched_hashtags.append(f"#{topic.replace(' ', '').replace('-', '')}")
             
     # 4. Match Tech Sub-niches
     for niche in SPECIFIC_TECH_NICHES:
         if re.search(rf"\b{re.escape(niche.lower())}\b", full_text):
             matched_tags.append(niche)
-            matched_hashtags.append(f"#{niche.replace(' ', '').replace('-', '')}")
-
+ 
     # 5. Extract additional category matches to fill tag slots
-    # We will score the category match
     has_ai = any(term in full_text for term in ["ai", "intelligence", "learning", "neural", "chatbot", "model", "llm"])
     has_tech = any(term in full_text for term in ["tech", "coding", "software", "developer", "programming", "python", "automation", "robot"])
     has_facts = any(term in full_text for term in ["fact", "know", "amazing", "discover", "breakthrough", "scary", "secret"])
-
+ 
     if has_ai:
         matched_tags.extend(BROAD_AI_TAGS[:4])
         matched_tags.extend(LONG_TAIL_TAGS[:2])
@@ -317,7 +335,7 @@ def get_optimized_metadata(
     matched_tags.extend(FACTS_STYLE_TAGS[:2])
     matched_tags.extend(BROAD_AI_TAGS[:2])
     matched_tags.extend(TECHNOLOGY_TAGS[:2])
-
+ 
     # 6. Deduplicate and Clean Tags
     seen_tags_lower = set()
     cleaned_tags = []
@@ -342,63 +360,12 @@ def get_optimized_metadata(
                 seen_tags_lower.add(d.lower())
                 if len(final_tags) >= 8:
                     break
-
-    # 7. Deduplicate and Clean Hashtags (Broad, Niche, Specific)
-    seen_ht_lower = set()
-    cleaned_hashtags = []
-    
-    # Standardize matched hashtags
-    for ht in matched_hashtags:
-        ht_clean = to_clean_hashtag(ht)
-        if not ht_clean:
-            continue
-        ht_lower = ht_clean.lower()
-        if ht_lower not in seen_ht_lower:
-            seen_ht_lower.add(ht_lower)
-            cleaned_hashtags.append(ht_clean)
-            
-    # Split into specific (topic-based) and generic hashtags
-    specific_hashtags = [h for h in cleaned_hashtags if h.lower() not in GENERIC_HASHTAGS]
-    generic_matched_hashtags = [h for h in cleaned_hashtags if h.lower() in GENERIC_HASHTAGS]
-    
-    final_hashtags = []
-    
-    # A. Select up to 4 Specific hashtags first (prioritize topic relevance)
-    for sh in specific_hashtags:
-        if len(final_hashtags) < 4:
-            if sh.lower() not in [h.lower() for h in final_hashtags]:
-                final_hashtags.append(sh)
-                
-    # B. Select generic matched hashtags if there's still space under 4
-    for gh in generic_matched_hashtags:
-        if len(final_hashtags) < 4:
-            if gh.lower() not in [h.lower() for h in final_hashtags]:
-                final_hashtags.append(gh)
-                
-    # C. Backfill with Niche hashtags if needed
-    for nh in DEFAULT_NICHE_HASHTAGS:
-        if len(final_hashtags) < 4:
-            if nh.lower() not in [h.lower() for h in final_hashtags]:
-                final_hashtags.append(nh)
-                
-    # D. Backfill with Broad hashtags if needed (up to 5 max)
-    for bh in DEFAULT_BROAD_HASHTAGS:
-        if len(final_hashtags) < 5:
-            if bh.lower() not in [h.lower() for h in final_hashtags]:
-                final_hashtags.append(bh)
-                
-    # E. Fillers if still less than 3
-    if len(final_hashtags) < 3:
-        for nh in DEFAULT_NICHE_HASHTAGS + DEFAULT_BROAD_HASHTAGS:
-            if nh.lower() not in [h.lower() for h in final_hashtags]:
-                final_hashtags.append(nh)
-                if len(final_hashtags) >= 3:
-                    break
-                    
-    # Limit to maximum 5
-    final_hashtags = final_hashtags[:5]
+ 
+    # 7. Generate exactly 4 hyper-targeted hashtags as per the strategic rules
+    final_hashtags = get_hyper_targeted_hashtags(title, script, is_shorts=is_shorts)
     
     return {
         "tags": final_tags,
         "hashtags": final_hashtags
     }
+

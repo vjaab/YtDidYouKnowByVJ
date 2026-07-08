@@ -43,13 +43,7 @@ def log_message(msg):
 
 
 def format_description(ai_description, script, hashtags, slot="Slot A", chunks=None, relevant_links=[], source_url=""):
-    # Target high-RPM regions (USA, UK, Canada, Australia, NZ, Singapore, South Korea, Japan, Europe)
-    target_hashtags = ["#TechUSA", "#TechUK", "#TechCanada", "#TechAustralia", "#TechNZ", "#TechSingapore", "#TechSouthKorea", "#TechJapan", "#TechEurope", "#English"]
-    all_hashtags = list(hashtags) if hashtags else []
-    for tag in target_hashtags:
-        if tag not in all_hashtags:
-            all_hashtags.append(tag)
-    hashtag_str = " ".join(all_hashtags)
+    hashtag_str = " ".join(hashtags) if hashtags else ""
     
     # ── Action-Oriented Summary ──
     clean_summary = ai_description.split(". ")[0] + "."
@@ -108,8 +102,7 @@ Join the community 👇
 
 ⚠️ DISCLOSURE: This video uses AI-assisted production tools (TTS voiceover, AI-generated visuals). All editorial opinions, topic selection, and analysis are by VJ.
 
-{hashtag_str}
-#agenticai #llmops #python #machinelearning #aiarchitecture #shorts""",
+{hashtag_str}""",
 
         # Template 1: Minimalist authority style
         f"""⚡ {clean_summary}
@@ -126,8 +119,7 @@ Join the community 👇
 
 ⚠️ DISCLOSURE: AI tools are used in production (voiceover, visuals). Topic selection, research, and commentary by VJ.
 
-{hashtag_str}
-#ai #deeplearning #techshorts #programming #innovation""",
+{hashtag_str}""",
 
         # Template 2: Newsletter/community style
         f"""What happened: {clean_summary}
@@ -148,8 +140,7 @@ Join engineers getting daily AI research drops:
 
 ⚠️ DISCLOSURE: This video uses AI-assisted tools for production. All editorial decisions and analysis are human-driven by VJ.
 
-{hashtag_str}
-#airesearch #mlops #softwaredevelopment #techtrends #shorts""",
+{hashtag_str}""",
 
         # Template 3: Hook-first engagement style
         f"""👆 If this blew your mind, you need to see what's on Telegram.
@@ -170,8 +161,7 @@ Join engineers getting daily AI research drops:
 
 ⚠️ DISCLOSURE: AI-assisted production (voiceover, visuals). Editorial direction & analysis by VJ.
 
-{hashtag_str}
-#artificialintelligence #coding #startup #devtools #techshorts""",
+{hashtag_str}""",
     ]
 
     return templates[template_idx]
@@ -695,7 +685,8 @@ def run_pipeline(topic_type="auto", dry_run=False):
         initial_keywords=script_data.get("keywords", []),
         initial_companies=script_data.get("companies_mentioned", []),
         initial_people=initial_people,
-        initial_hashtags=script_data.get("hashtags", [])
+        initial_hashtags=script_data.get("hashtags", []),
+        is_shorts=True
     )
     hashtags = optimized_metadata["hashtags"]
     tags = optimized_metadata["tags"]
@@ -741,7 +732,7 @@ def run_pipeline(topic_type="auto", dry_run=False):
     # ── STEP 10c: X.com Auto-Post ─────────────────────────────────────────────
     log_message("STEP 10c: Auto-posting Short to X.com...")
     try:
-        x_post_text = f"🔥 {title}\n\nFull breakdown: {youtube_url}\n\n#AI #TechNews"
+        x_post_text = f"🔥 {title}\n\nFull breakdown: {youtube_url}\n\n" + " ".join(hashtags)
         if dry_run:
             print("🧪 [DRY RUN] Simulating X.com auto-post...")
             x_uploaded, x_result = True, "MOCK_TWEET_ID"

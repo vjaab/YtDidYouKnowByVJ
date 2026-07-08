@@ -55,22 +55,9 @@ def run_test():
     print("Generated Tags:", res["tags"])
     print("Generated Hashtags:", res["hashtags"])
     
-    # Assert that specific, relevant hashtags exist and are prioritized
-    expected_specifics = ["#GoogleColab", "#Minimind", "#LLM", "#Python"]
-    found_any = False
-    lower_hashtags = [h.lower() for h in res["hashtags"]]
-    for exp in expected_specifics:
-        if exp.lower() in lower_hashtags:
-            print(f"✅ Found expected hashtag: {exp}")
-            found_any = True
-        else:
-            print(f"⚠️ Missing expected hashtag: {exp} (This is fine if other specific hashtags filled the limit)")
-            
-    # Also assert that it doesn't just fill with generic ones if specific ones are available
-    if res["hashtags"][:3] != ["#AIHacks", "#TechTips", "#Productivity"]:
-        print("✅ Correctly deprioritized generic initial hashtags.")
-    else:
-        print("❌ Kept generic initial hashtags at high priority.")
+    # Assert exactly 4 hyper-targeted hashtags as per rules
+    assert res["hashtags"] == ["#Shorts", "#AI", "#LLM", "#SoftwareEngineering"], f"Unexpected hashtags: {res['hashtags']}"
+    print("✅ Successfully verified hyper-targeted 4-hashtag output!")
 
 if __name__ == "__main__":
     run_test()
