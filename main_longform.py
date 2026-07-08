@@ -436,9 +436,9 @@ def run_longform_pipeline(dry_run=False):
     # ── FALLBACK AFTER LOOP (Priority 1) ─────────────────────────────────
     if not audio_path and best_script_data:
         expected_best_dur = best_word_count / 2.33
-        min_acceptable_dur = 0.7 * min_dur
+        min_acceptable_dur = 120  # Lowered to 2 minutes to prevent hard-aborts on low candidate/model-rate-limit days
         if expected_best_dur < min_acceptable_dur:
-            log_message(f"❌ [FALLBACK REJECTED] Best candidate script length ({best_word_count} words, approx {expected_best_dur:.1f}s) is below 70% threshold ({min_acceptable_dur}s).")
+            log_message(f"❌ [FALLBACK REJECTED] Best candidate script length ({best_word_count} words, approx {expected_best_dur:.1f}s) is below 2-minute threshold ({min_acceptable_dur}s).")
         else:
             log_message(f"\n⚠️ [FALLBACK] ALL {LONGFORM_MAX_RETRY_ATTEMPTS} ATTEMPTS EXHAUSTED to reach target {min_dur}s duration.")
             log_message(f"Attempting to generate assets for the best candidate script ({best_word_count} words, expected ~{expected_best_dur:.1f}s)...")
