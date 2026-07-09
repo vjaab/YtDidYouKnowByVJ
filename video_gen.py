@@ -4742,65 +4742,30 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         
         # --- LONGFORM 2.5s PACING PATTERN INTERRUPTS ---
         if is_longform:
-            clip_dur = 2.5 + crossfade
-            num_clips_needed = int(audio_duration // 2.5) + 1
-            expanded_visual_paths = []
-            while len(expanded_visual_paths) < num_clips_needed:
-                expanded_visual_paths.extend(visual_paths)
-            expanded_visual_paths = expanded_visual_paths[:num_clips_needed]
-            
-            current_start = 0.0
-            clip_cache = {}
-            
-            for i, vp in enumerate(expanded_visual_paths):
-                try:
-                    if vp.endswith(".mp4"):
-                        if vp in clip_cache:
-                            c_clip = clip_cache[vp].copy()
-                        else:
-                            c_clip = VideoFileClip(vp).without_audio()
-                            clip_cache[vp] = c_clip
-                        
-                        if c_clip.duration < clip_dur:
-                            c_clip = c_clip.with_effects([vfx.Loop(duration=clip_dur)])
-                        else:
-                            c_clip = c_clip.subclipped(0, clip_dur)
-                        
-                        # Standard Resize & Crop (adapts to 16:9 based on longform)
-                        w, h = c_clip.size
-                        # 16:9 landscape crop
-                        target_w_crop = int(h * 16 / 9)
-                        if target_w_crop <= w:
-                            x1 = (w - target_w_crop) // 2
-                            c_clip = c_clip.cropped(x1=x1, y1=0, x2=x1 + target_w_crop, y2=h)
-                        else:
-                            target_h_crop = int(w * 9 / 16)
-                            y1 = (h - target_h_crop) // 2
-                            c_clip = c_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h_crop)
-                        c_clip = c_clip.resized((FRAME_W, FRAME_H))
-                    else:
-                        if vp.endswith(".png"):
+            if os.environ.get("USE_LEGACY_LONGFORM_BG", "0") == "1":
+                clip_dur = 2.5 + crossfade
+                num_clips_needed = int(audio_duration // 2.5) + 1
+                expanded_visual_paths = []
+                while len(expanded_visual_paths) < num_clips_needed:
+                    expanded_visual_paths.extend(visual_paths)
+                expanded_visual_paths = expanded_visual_paths[:num_clips_needed]
+                
+                current_start = 0.0
+                clip_cache = {}
+                
+                for i, vp in enumerate(expanded_visual_paths):
+                    try:
+                        if vp.endswith(".mp4"):
                             if vp in clip_cache:
                                 c_clip = clip_cache[vp].copy()
                             else:
-                                try:
-                                    raw_img = Image.open(vp)
-                                    canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H)
-                                    canvas_arr = np.array(canvas_img.convert("RGB"))
-                                    c_clip = ImageClip(canvas_arr)
-                                    clip_cache[vp] = c_clip
-                                except Exception as e:
-                                    print(f"⚠️ Error preparing screenshot canvas in longform for {vp}: {e}")
-                                    c_clip = ImageClip(vp)
-                                    clip_cache[vp] = c_clip
-                            c_clip = c_clip.with_duration(clip_dur)
-                        else:
-                            if vp in clip_cache:
-                                c_clip = clip_cache[vp].copy()
-                            else:
-                                c_clip = ImageClip(vp)
+                                c_clip = VideoFileClip(vp).without_audio()
                                 clip_cache[vp] = c_clip
-                            c_clip = c_clip.with_duration(clip_dur)
+                            
+                            if c_clip.duration < clip_dur:
+                                c_clip = c_clip.with_effects([vfx.Loop(duration=clip_dur)])
+                            else:
+                                c_clip = c_clip.subclipped(0, clip_dur)
                             
                             # Standard Resize & Crop (adapts to 16:9 based on longform)
                             w, h = c_clip.size
@@ -4814,6 +4779,200 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                                 y1 = (h - target_h_crop) // 2
                                 c_clip = c_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h_crop)
                             c_clip = c_clip.resized((FRAME_W, FRAME_H))
+                        else:
+                            if vp.endswith(".png"):
+                                if vp in clip_cache:
+                                    c_clip = clip_cache[vp].copy()
+                                else:
+                                    try:
+                                        raw_img = Image.open(vp)
+                                        canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H)
+                                        canvas_arr = np.array(canvas_img.convert("RGB"))
+                                        c_clip = ImageClip(canvas_arr)
+                                        clip_cache[vp] = c_clip
+                                    except Exception as e:
+                                        print(f"⚠️ Error preparing screenshot canvas in longform for {vp}: {e}")
+                                        c_clip = ImageClip(vp)
+                                        clip_cache[vp] = c_clip
+                                c_clip = c_clip.with_duration(clip_dur)
+                            else:
+                                if vp in clip_cache:
+                                    c_clip = clip_cache[vp].copy()
+                                else:
+                                    c_clip = ImageClip(vp)
+                                    clip_cache[vp] = c_clip
+                                c_clip = c_clip.with_duration(clip_dur)
+                                
+                                # Standard Resize & Crop (adapts to 16:9 based on longform)
+                                w, h = c_clip.size
+                                # 16:9 landscape crop
+                                target_w_crop = int(h * 16 / 9)
+                                if target_w_crop <= w:
+                                    x1 = (w - target_w_crop) // 2
+                                    c_clip = c_clip.cropped(x1=x1, y1=0, x2=x1 + target_w_crop, y2=h)
+                                else:
+                                    target_h_crop = int(w * 9 / 16)
+                                    y1 = (h - target_h_crop) // 2
+                                    c_clip = c_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h_crop)
+                                c_clip = c_clip.resized((FRAME_W, FRAME_H))
+                        
+                        if i > 0:
+                            retention_map = script_json.get("retention_map", {})
+                            if retention_map:
+                                trans_type = get_transition_type_for_chunk(i, retention_map, len(expanded_visual_paths))
+                                if trans_type == "flash_cut": trans_type = "glitch"
+                                elif trans_type == "zoom_punch": trans_type = "zoom"
+                                elif trans_type == "whip_pan": trans_type = random.choice(["slide_r", "slide_l"])
+                                else: trans_type = random.choice(["zoom", "slide_r", "slide_l", "slide_t", "glitch"])
+                            else:
+                                trans_type = random.choice(["zoom", "slide_r", "slide_l", "slide_t", "glitch"])
+                            
+                            if trans_type == "zoom":
+                                c_clip = c_clip.with_effects([vfx.CrossFadeIn(crossfade)])
+                                c_clip = c_clip.resized(lambda t: 1.3 - (0.3 * min(1, t / crossfade)) if t < crossfade else 1.0)
+                            elif "slide" in trans_type:
+                                c_clip = c_clip.with_effects([vfx.CrossFadeIn(crossfade * 0.5)])
+                                def slide_pos(t):
+                                    if t > crossfade: return ("center", "center")
+                                    prog = t / crossfade
+                                    prog = 1 - (1 - prog)**3 
+                                    if trans_type == "slide_r": return (int(FRAME_W * (1 - prog)), "center")
+                                    if trans_type == "slide_l": return (int(-FRAME_W * (1 - prog)), "center")
+                                    if trans_type == "slide_t": return ("center", int(-FRAME_H * (1 - prog)))
+                                    return ("center", "center")
+                                c_clip = c_clip.with_position(slide_pos)
+                            elif trans_type == "glitch":
+                                c_clip = c_clip.with_effects([vfx.CrossFadeIn(0.1)])
+                                trans_clip = _create_transition_clip("glitch", duration=0.15)
+                                if trans_clip:
+                                    trans_clip = trans_clip.with_start(current_start)
+                                    logo_clips.append(trans_clip)
+
+                            flash = ColorClip(size=(FRAME_W, FRAME_H), color=(255, 255, 255), duration=0.2).with_opacity(0.6)
+                            flash = flash.with_start(current_start).with_effects([vfx.CrossFadeOut(0.15)])
+                            logo_clips.append(flash)
+
+                        scale_factor = 1.0 + random.uniform(0.18, 0.25)
+                        c_clip = c_clip.resized(lambda t, sf=scale_factor, cd=clip_dur: 1.0 + (sf - 1.0) * (t / cd))
+                        c_clip = _apply_handheld_shake(c_clip)
+                        
+                        is_warm = (i % 2 == 0)
+                        def tint_frame(frame, is_w=is_warm):
+                            frame_f = frame.astype(np.float32)
+                            if is_w:
+                                frame_f[:, :, 0] = np.clip(frame_f[:, :, 0] * 1.04 + 3, 0, 255)
+                                frame_f[:, :, 1] = np.clip(frame_f[:, :, 1] * 1.01, 0, 255)
+                                frame_f[:, :, 2] = np.clip(frame_f[:, :, 2] * 0.96 - 3, 0, 255)
+                            else:
+                                frame_f[:, :, 0] = np.clip(frame_f[:, :, 0] * 0.96 - 3, 0, 255)
+                                frame_f[:, :, 1] = np.clip(frame_f[:, :, 1] * 1.01, 0, 255)
+                                frame_f[:, :, 2] = np.clip(frame_f[:, :, 2] * 1.04 + 3, 0, 255)
+                            return frame_f.astype(np.uint8)
+                        c_clip = c_clip.image_transform(tint_frame)
+                        
+                        c_clip = c_clip.with_start(current_start)
+                        bg_layer_clips.append(c_clip)
+                        current_start += (clip_dur - crossfade)
+                    except Exception as e:
+                        print(f"Failed to load background img {vp}: {e}")
+            else:
+                from collections import OrderedDict
+                import psutil
+                
+                clip_dur = 2.5 + crossfade
+                num_clips_needed = int(audio_duration // 2.5) + 1
+                expanded_visual_paths = []
+                while len(expanded_visual_paths) < num_clips_needed:
+                    expanded_visual_paths.extend(visual_paths)
+                expanded_visual_paths = expanded_visual_paths[:num_clips_needed]
+                
+                # Headroom canvas dimensions (1.05x zoom padding)
+                CANVAS_W = int(FRAME_W * 1.05)
+                CANVAS_H = int(FRAME_H * 1.05)
+                
+                def tint_numpy(arr, is_w):
+                    frame_f = arr.astype(np.float32)
+                    if is_w:
+                        frame_f[:, :, 0] = np.clip(frame_f[:, :, 0] * 1.04 + 3, 0, 255)
+                        frame_f[:, :, 1] = np.clip(frame_f[:, :, 1] * 1.01, 0, 255)
+                        frame_f[:, :, 2] = np.clip(frame_f[:, :, 2] * 0.96 - 3, 0, 255)
+                    else:
+                        frame_f[:, :, 0] = np.clip(frame_f[:, :, 0] * 0.96 - 3, 0, 255)
+                        frame_f[:, :, 1] = np.clip(frame_f[:, :, 1] * 1.01, 0, 255)
+                        frame_f[:, :, 2] = np.clip(frame_f[:, :, 2] * 1.04 + 3, 0, 255)
+                    return frame_f.astype(np.uint8)
+
+                # OrderedDict LRU cache (capacity 4)
+                # Cache holds post-crop, post-resized assets at CANVAS size:
+                # - np.ndarray (for images)
+                # - VideoFileClip (for videos)
+                clip_cache = OrderedDict()
+                CACHE_CAPACITY = 4
+                
+                def get_processed_asset(vp, is_warm):
+                    cache_key = (vp, is_warm)
+                    if cache_key in clip_cache:
+                        clip_cache.move_to_end(cache_key)
+                        return clip_cache[cache_key]
+                        
+                    if len(clip_cache) >= CACHE_CAPACITY:
+                        evict_key, evict_val = clip_cache.popitem(last=False)
+                        if isinstance(evict_val, VideoFileClip):
+                            try:
+                                evict_val.close()
+                            except Exception as ex:
+                                print(f"⚠️ Error closing evicted VideoFileClip: {ex}")
+                        del evict_val
+                        
+                    if vp.endswith(".mp4"):
+                        v_clip = VideoFileClip(vp).without_audio()
+                        w, h = v_clip.size
+                        target_w_crop = int(h * 16 / 9)
+                        if target_w_crop <= w:
+                            x1 = (w - target_w_crop) // 2
+                            v_clip = v_clip.cropped(x1=x1, y1=0, x2=x1 + target_w_crop, y2=h)
+                        else:
+                            target_h_crop = int(w * 9 / 16)
+                            y1 = (h - target_h_crop) // 2
+                            v_clip = v_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h_crop)
+                        v_clip = v_clip.resized((CANVAS_W, CANVAS_H))
+                        clip_cache[cache_key] = v_clip
+                        return v_clip
+                    else:
+                        raw_img = Image.open(vp)
+                        w, h = raw_img.size
+                        target_w_crop = int(h * 16 / 9)
+                        if target_w_crop <= w:
+                            x1 = (w - target_w_crop) // 2
+                            canvas_img = raw_img.crop((x1, 0, x1 + target_w_crop, h))
+                        else:
+                            target_h_crop = int(w * 9 / 16)
+                            y1 = (h - target_h_crop) // 2
+                            canvas_img = raw_img.crop((0, y1, w, y1 + target_h_crop))
+                        canvas_img = canvas_img.resize((CANVAS_W, CANVAS_H))
+                        
+                        canvas_arr = np.array(canvas_img.convert("RGB"))
+                        tinted_arr = tint_numpy(canvas_arr, is_warm)
+                        clip_cache[cache_key] = tinted_arr
+                        return tinted_arr
+                
+                # Pre-calculate shake offsets curves (150 frames max)
+                shake_offsets = []
+                for f in range(150):
+                    t = f / 30.0
+                    off_x = math.sin(t * 1.5) * 2 + math.cos(t * 0.8) * 1.5
+                    off_y = math.cos(t * 1.2) * 2 + math.sin(t * 0.9) * 1.5
+                    shake_offsets.append((int(off_x), int(off_y)))
+
+                # Pre-calculate starts, scale factors, and transition types
+                seg_starts = []
+                seg_scale_factors = []
+                seg_trans_types = []
+                
+                current_start = 0.0
+                for i, vp in enumerate(expanded_visual_paths):
+                    seg_starts.append(current_start)
+                    seg_scale_factors.append(1.0 + random.uniform(0.18, 0.25))
                     
                     if i > 0:
                         retention_map = script_json.get("retention_map", {})
@@ -4825,23 +4984,9 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                             else: trans_type = random.choice(["zoom", "slide_r", "slide_l", "slide_t", "glitch"])
                         else:
                             trans_type = random.choice(["zoom", "slide_r", "slide_l", "slide_t", "glitch"])
+                        seg_trans_types.append(trans_type)
                         
-                        if trans_type == "zoom":
-                            c_clip = c_clip.with_effects([vfx.CrossFadeIn(crossfade)])
-                            c_clip = c_clip.resized(lambda t: 1.3 - (0.3 * min(1, t / crossfade)) if t < crossfade else 1.0)
-                        elif "slide" in trans_type:
-                            c_clip = c_clip.with_effects([vfx.CrossFadeIn(crossfade * 0.5)])
-                            def slide_pos(t):
-                                if t > crossfade: return ("center", "center")
-                                prog = t / crossfade
-                                prog = 1 - (1 - prog)**3 
-                                if trans_type == "slide_r": return (int(FRAME_W * (1 - prog)), "center")
-                                if trans_type == "slide_l": return (int(-FRAME_W * (1 - prog)), "center")
-                                if trans_type == "slide_t": return ("center", int(-FRAME_H * (1 - prog)))
-                                return ("center", "center")
-                            c_clip = c_clip.with_position(slide_pos)
-                        elif trans_type == "glitch":
-                            c_clip = c_clip.with_effects([vfx.CrossFadeIn(0.1)])
+                        if trans_type == "glitch":
                             trans_clip = _create_transition_clip("glitch", duration=0.15)
                             if trans_clip:
                                 trans_clip = trans_clip.with_start(current_start)
@@ -4850,30 +4995,110 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                         flash = ColorClip(size=(FRAME_W, FRAME_H), color=(255, 255, 255), duration=0.2).with_opacity(0.6)
                         flash = flash.with_start(current_start).with_effects([vfx.CrossFadeOut(0.15)])
                         logo_clips.append(flash)
-
-                    scale_factor = 1.0 + random.uniform(0.18, 0.25)
-                    c_clip = c_clip.resized(lambda t, sf=scale_factor, cd=clip_dur: 1.0 + (sf - 1.0) * (t / cd))
-                    c_clip = _apply_handheld_shake(c_clip)
-                    
-                    is_warm = (i % 2 == 0)
-                    def tint_frame(frame, is_w=is_warm):
-                        frame_f = frame.astype(np.float32)
-                        if is_w:
-                            frame_f[:, :, 0] = np.clip(frame_f[:, :, 0] * 1.04 + 3, 0, 255)
-                            frame_f[:, :, 1] = np.clip(frame_f[:, :, 1] * 1.01, 0, 255)
-                            frame_f[:, :, 2] = np.clip(frame_f[:, :, 2] * 0.96 - 3, 0, 255)
-                        else:
-                            frame_f[:, :, 0] = np.clip(frame_f[:, :, 0] * 0.96 - 3, 0, 255)
-                            frame_f[:, :, 1] = np.clip(frame_f[:, :, 1] * 1.01, 0, 255)
-                            frame_f[:, :, 2] = np.clip(frame_f[:, :, 2] * 1.04 + 3, 0, 255)
-                        return frame_f.astype(np.uint8)
-                    c_clip = c_clip.image_transform(tint_frame)
-                    
-                    c_clip = c_clip.with_start(current_start)
-                    bg_layer_clips.append(c_clip)
+                    else:
+                        seg_trans_types.append(None)
+                        
                     current_start += (clip_dur - crossfade)
-                except Exception as e:
-                    print(f"Failed to load background img {vp}: {e}")
+
+                process = psutil.Process(os.getpid())
+                frame_counter = [0]
+                
+                def make_bg_frame(t):
+                    frame_counter[0] += 1
+                    if frame_counter[0] % 300 == 0:
+                        rss = process.memory_info().rss / (1024 * 1024)
+                        print(f"🎬 [BG RENDER] Frame {frame_counter[0]} | Video time: {t:.2f}s | Memory RSS: {rss:.2f} MB")
+                        
+                    seg_idx = int(t // 2.5)
+                    t_rel = t % 2.5
+                    
+                    if seg_idx >= len(expanded_visual_paths):
+                        seg_idx = len(expanded_visual_paths) - 1
+                        
+                    vp = expanded_visual_paths[seg_idx]
+                    is_warm = (seg_idx % 2 == 0)
+                    
+                    # 1. Fetch current frame
+                    asset = get_processed_asset(vp, is_warm)
+                    if isinstance(asset, np.ndarray):
+                        curr_canvas = asset
+                    else:
+                        t_v = min(t_rel, asset.duration - 0.01)
+                        raw_frame = asset.get_frame(t_v)
+                        curr_canvas = tint_numpy(raw_frame, is_warm)
+                        
+                    # 2. Zoom & Shake with Headroom
+                    sf = seg_scale_factors[seg_idx]
+                    scale = 1.0 + (sf - 1.0) * (t_rel / clip_dur)
+                    
+                    trans_type = seg_trans_types[seg_idx]
+                    if trans_type == "zoom" and t_rel < crossfade:
+                        scale *= (1.3 - (0.3 * (t_rel / crossfade)))
+                        
+                    crop_w, crop_h = int(CANVAS_W / scale), int(CANVAS_H / scale)
+                    dx, dy = (CANVAS_W - crop_w) // 2, (CANVAS_H - crop_h) // 2
+                    frame = cv2.resize(curr_canvas[dy:dy+crop_h, dx:dx+crop_w], (CANVAS_W, CANVAS_H))
+                    
+                    # Translation via warpAffine
+                    frame_idx = min(149, int(t_rel * 30.0))
+                    off_x, off_y = shake_offsets[frame_idx]
+                    if off_x != 0 or off_y != 0:
+                        T = np.float32([[1, 0, off_x], [0, 1, off_y]])
+                        frame = cv2.warpAffine(frame, T, (CANVAS_W, CANVAS_H), borderMode=cv2.BORDER_REPLICATE)
+                        
+                    # 3. Handle transition boundaries
+                    if seg_idx > 0 and t_rel < crossfade:
+                        prev_vp = expanded_visual_paths[seg_idx - 1]
+                        prev_is_warm = ((seg_idx - 1) % 2 == 0)
+                        prev_asset = get_processed_asset(prev_vp, prev_is_warm)
+                        
+                        if isinstance(prev_asset, np.ndarray):
+                            prev_canvas = prev_asset
+                        else:
+                            t_prev_rel = 2.5 + t_rel
+                            t_v = min(t_prev_rel, prev_asset.duration - 0.01)
+                            raw_frame = prev_asset.get_frame(t_v)
+                            prev_canvas = tint_numpy(raw_frame, prev_is_warm)
+                            
+                        prev_sf = seg_scale_factors[seg_idx - 1]
+                        prev_scale = 1.0 + (prev_sf - 1.0) * ((2.5 + t_rel) / clip_dur)
+                        
+                        pcw, pch = int(CANVAS_W / prev_scale), int(CANVAS_H / prev_scale)
+                        pdx, pdy = (CANVAS_W - pcw) // 2, (CANVAS_H - pch) // 2
+                        prev_frame = cv2.resize(prev_canvas[pdy:pdy+pch, pdx:pdx+pcw], (CANVAS_W, CANVAS_H))
+                        
+                        po_x, po_y = shake_offsets[min(149, int((2.5 + t_rel) * 30.0))]
+                        if po_x != 0 or po_y != 0:
+                            T_p = np.float32([[1, 0, po_x], [0, 1, po_y]])
+                            prev_frame = cv2.warpAffine(prev_frame, T_p, (CANVAS_W, CANVAS_H), borderMode=cv2.BORDER_REPLICATE)
+                            
+                        if trans_type and "slide" in trans_type:
+                            prog = t_rel / crossfade
+                            prog = 1 - (1 - prog)**3
+                            combined = prev_frame.copy()
+                            if trans_type == "slide_r":
+                                x = int(CANVAS_W * (1 - prog))
+                                combined[:, x:] = frame[:, :CANVAS_W-x]
+                            elif trans_type == "slide_l":
+                                x = int(CANVAS_W * (1 - prog))
+                                combined[:, :CANVAS_W-x] = frame[:, x:]
+                            elif trans_type == "slide_t":
+                                y = int(CANVAS_H * (1 - prog))
+                                combined[:CANVAS_H-y, :] = frame[y:, :]
+                            frame = combined
+                        else:
+                            cf_dur = 0.1 if trans_type == "glitch" else crossfade
+                            if t_rel < cf_dur:
+                                alpha = t_rel / cf_dur
+                                frame = cv2.addWeighted(frame, alpha, prev_frame, 1.0 - alpha, 0)
+                                
+                    # 4. Final crop to production dimensions
+                    margin_x = (CANVAS_W - FRAME_W) // 2
+                    margin_y = (CANVAS_H - FRAME_H) // 2
+                    return frame[margin_y:margin_y+FRAME_H, margin_x:margin_x+FRAME_W]
+                    
+                bg_clip = VideoClip(make_bg_frame, duration=audio_duration)
+                bg_layer_clips.append(bg_clip)
         else:
             # --- SHORTS PACING SYNCHRONIZED TO CHUNKS ---
             clip_cache = {}
