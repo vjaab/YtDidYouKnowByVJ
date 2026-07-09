@@ -56,7 +56,7 @@ def run_test():
     print("Generated Hashtags:", res["hashtags"])
     
     # Assert exactly 4 hyper-targeted hashtags as per rules
-    assert res["hashtags"] == ["#Shorts", "#AI", "#LLM", "#SoftwareEngineering"], f"Unexpected hashtags: {res['hashtags']}"
+    assert res["hashtags"] == ["#GoogleColab", "#Minimind", "#Python", "#MiniMindHack"], f"Unexpected hashtags: {res['hashtags']}"
     print("✅ Successfully verified hyper-targeted 4-hashtag output!")
 
 if __name__ == "__main__":

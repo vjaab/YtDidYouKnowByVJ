@@ -1485,8 +1485,8 @@ def _hook_text_overlay(hook_text, accent_color, total_dur):
     clip = VideoClip(lambda t: arr, duration=dur)
     mclip = VideoClip(lambda t: mask * opacity_fn(t), is_mask=True, duration=dur)
     
-    # Center-middle position
-    y_pos = int(FRAME_H * 0.35) - (canvas_h // 2)
+    # Center-middle position (moved down to clear entity logo/name/description)
+    y_pos = int(FRAME_H * 0.48) - (canvas_h // 2)
     return clip.with_mask(mclip).with_position(("center", y_pos)).with_start(0)
 
 

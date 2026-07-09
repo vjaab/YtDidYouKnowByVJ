@@ -173,12 +173,70 @@ DEFAULT_BROAD_HASHTAGS = ["#ArtificialIntelligence", "#Technology", "#MachineLea
 DEFAULT_NICHE_HASHTAGS = ["#AITools", "#TechFacts"]
 
 GENERIC_HASHTAGS = {
-    "#aihacks", "#techtips", "#productivity", "#vaibhavsisinty", "#shorts",
-    "#didyouknow", "#amazingfacts", "#techfacts", "#aifacts", "#futuretech",
-    "#artificialintelligence", "#technology", "#machinelearning", "#aitools",
-    "#techusa", "#techuk", "#techcanada", "#techaustralia", "#technz",
-    "#techsingapore", "#techsouthkorea", "#techjapan", "#techeurope", "#english"
+    "aihacks", "techtips", "productivity", "vaibhavsisinty", "shorts",
+    "didyouknow", "amazingfacts", "techfacts", "aifacts", "futuretech",
+    "artificialintelligence", "technology", "machinelearning", "aitools",
+    "techusa", "techuk", "techcanada", "techaustralia", "technz",
+    "techsingapore", "techsouthkorea", "techjapan", "techeurope", "english",
+    "ai", "longform", "deeptech", "softwareengineering", "technews", "llm",
+    "aivideo", "aifails", "aihacking", "hacks", "tips", "fact", "facts", "tech",
+    "sciencefacts", "interestingtechnology", "youtube", "viral", "video",
+    "trending", "foryou", "fyp", "shortsfeed", "how", "why", "what", "where",
+    "hack", "tip", "tutorial", "explained", "science", "future",
+    "deeplearning", "aitraining", "aitechtools", "techtools"
 }
+
+STOPWORDS = {
+    "a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are", "arent", "as", "at",
+    "be", "because", "been", "before", "being", "below", "between", "both", "but", "by", "cant", "cannot", "could",
+    "couldnt", "did", "didnt", "do", "does", "doesnt", "doing", "dont", "down", "during", "each", "few", "for",
+    "from", "further", "had", "hadnt", "has", "hasnt", "have", "havent", "having", "he", "hed", "hell", "hes",
+    "her", "here", "heres", "hers", "herself", "him", "himself", "his", "how", "hows", "i", "id", "ill", "im",
+    "ive", "if", "in", "into", "is", "isnt", "it", "its", "itself", "lets", "me", "more", "most", "mustnt", "my",
+    "myself", "no", "nor", "not", "of", "off", "on", "once", "only", "or", "other", "ought", "our", "ours",
+    "ourselves", "out", "over", "own", "same", "shant", "she", "shed", "shell", "shes", "should", "shouldnt",
+    "so", "some", "such", "than", "that", "thats", "the", "their", "theirs", "them", "themselves", "then",
+    "there", "theres", "these", "they", "theyd", "theyll", "theyre", "theyve", "this", "those", "through",
+    "to", "too", "under", "until", "up", "very", "was", "wasnt", "we", "wed", "well", "were", "weve", "werent",
+    "what", "whats", "when", "whens", "where", "wheres", "which", "while", "who", "whos", "whom", "why", "whys",
+    "with", "wont", "would", "wouldnt", "you", "youd", "youll", "youre", "youve", "your", "yours", "yourself",
+    "yourselves", "here", "there", "this", "that", "these", "those", "simple", "hidden", "setting", "using", "just",
+    "want", "know", "how", "make", "take", "show", "unveil", "claim", "hint", "skeptical", "critics", "coming",
+    "sooner", "think", "change", "forever", "watch", "moves", "daily", "setting", "settings", "can", "will", "shall", "today", "hours", "project", "looking", "year", "years", "month", "months", "day", "days", "train"
+}
+def extract_capitalized_keywords(title, script):
+    """Extract sequences of capitalized words from the title and script."""
+    text = f"{title} {script}"
+    words = re.findall(r'\b[A-Z][a-zA-Z0-9\-]*\b(?:\s+[A-Z][a-zA-Z0-9\-]*\b)?', text)
+    cleaned = []
+    for w in words:
+        w_strip = w.strip()
+        if not w_strip:
+            continue
+        w_parts = re.split(r'[\s\-]+', w_strip.lower())
+        if all(part in STOPWORDS for part in w_parts):
+            continue
+        cleaned.append(w_strip)
+    return cleaned
+
+def extract_key_phrases(text):
+    """Extract non-stopword words and two-word phrases from the text."""
+    clean_text = re.sub(r'[^\w\s\-]', ' ', text)
+    words = re.findall(r'\b[a-zA-Z0-9\-]+\b', clean_text.lower())
+    candidates = []
+    
+    # 1. Two-word phrases (higher priority)
+    for i in range(len(words) - 1):
+        w1, w2 = words[i], words[i+1]
+        if w1 not in STOPWORDS and w2 not in STOPWORDS:
+            candidates.append(f"{w1} {w2}")
+            
+    # 2. Single words (lower priority)
+    for w in words:
+        if w not in STOPWORDS and len(w) > 2 and not w.isdigit():
+            candidates.append(w)
+            
+    return candidates
 
 def to_clean_hashtag(s):
     """Converts a phrase or tag string into a clean PascalCase hashtag."""
@@ -206,45 +264,100 @@ def to_clean_hashtag(s):
         return ""
     return f"#{hashtag}"
 
+def generate_specific_hashtags(
+    title,
+    script,
+    sub_category="",
+    initial_keywords=None,
+    initial_companies=None,
+    initial_people=None,
+    initial_hashtags=None
+):
+    """
+    Generates specific keyword-based hashtags based on proper nouns, entities,
+    and non-generic phrases found in the content.
+    """
+    initial_keywords = initial_keywords or []
+    initial_companies = initial_companies or []
+    initial_people = initial_people or []
+    initial_hashtags = initial_hashtags or []
+    
+    # Normalize initial lists
+    norm_companies = []
+    for c in initial_companies:
+        if isinstance(c, dict):
+            name = c.get("name")
+            if name: norm_companies.append(name)
+        elif isinstance(c, str):
+            norm_companies.append(c)
+            
+    norm_people = []
+    for p in initial_people:
+        if isinstance(p, dict):
+            name = p.get("name")
+            if name: norm_people.append(name)
+        elif isinstance(p, str):
+            norm_people.append(p)
+
+    full_text = f"{title} {script} {sub_category}".lower()
+    raw_candidates = []
+
+    # 1. Add initial lists (highest priority as they are curated)
+    raw_candidates.extend(norm_people)
+    raw_candidates.extend(norm_companies)
+    raw_candidates.extend(initial_keywords)
+    raw_candidates.extend(initial_hashtags)
+    if sub_category:
+        raw_candidates.append(sub_category)
+
+    # 2. Match Prominent People (PEOPLE_METADATA)
+    for person_key, meta in PEOPLE_METADATA.items():
+        pattern = rf"\b{re.escape(person_key)}\b"
+        last_name = person_key.split()[-1]
+        last_name_pattern = rf"\b{re.escape(last_name)}\b"
+        if re.search(pattern, full_text) or (len(last_name) > 3 and re.search(last_name_pattern, full_text)):
+            raw_candidates.append(meta["hashtag"])
+
+    # 3. Match Specific Tools & Platforms (TRENDING_AI_TOPICS)
+    for topic in TRENDING_AI_TOPICS:
+        if re.search(rf"\b{re.escape(topic.lower())}\b", full_text):
+            raw_candidates.append(topic)
+
+    # 4. Match Tech Sub-niches (SPECIFIC_TECH_NICHES)
+    for niche in SPECIFIC_TECH_NICHES:
+        if re.search(rf"\b{re.escape(niche.lower())}\b", full_text):
+            raw_candidates.append(niche)
+
+    # 5. Extract capitalized proper nouns from title/script
+    cap_keywords = extract_capitalized_keywords(title, script)
+    raw_candidates.extend(cap_keywords)
+
+    # 6. Extract key phrases from title and script (lowest priority)
+    key_phrases = extract_key_phrases(f"{title} {script}")
+    raw_candidates.extend(key_phrases)
+
+    # Clean, normalize, deduplicate, and filter generic hashtags
+    seen_ht_lower = set()
+    final_hashtags = []
+    for item in raw_candidates:
+        ht = to_clean_hashtag(item)
+        if not ht:
+            continue
+        ht_lower = ht.lower()
+        # Remove hash character to check against GENERIC_HASHTAGS
+        clean_word = ht_lower[1:] if ht_lower.startswith("#") else ht_lower
+        if clean_word not in GENERIC_HASHTAGS and ht_lower not in seen_ht_lower:
+            seen_ht_lower.add(ht_lower)
+            final_hashtags.append(ht)
+
+    return final_hashtags[:4]
 
 def get_hyper_targeted_hashtags(title, script, is_shorts=True):
     """
-    Generates exactly 4 hyper-targeted hashtags adhering strictly to these strategic rules:
-    1. Tag 1 (Platform Core): Must always be exactly #Shorts (or #Longform if is_shorts is False).
-    2. Tag 2 (Global Niche Anchor): Must always be exactly #AI.
-    3. Tag 3 (Specific Subfield): Analyze the content to determine the deep-tech vector.
-    4. Tag 4 (Tech Authority): Appeals to builders and industry followers.
+    Generates keyword-based hashtags by extracting proper nouns and key phrases
+    from the title and script.
     """
-    tag1 = "#Shorts" if is_shorts else "#Longform"
-    tag2 = "#AI"
-    
-    text_lower = f"{title} {script}".lower()
-    
-    # Tag 3: Specific Subfield
-    # Check security limitations / guardrail breaks / exploits / vulnerabilities
-    if any(x in text_lower for x in ["jailbreak", "exploit", "vulnerability", "prompt injection", "bypass", "malicious", "attack", "cybersecurity", "hacking", "hacked"]):
-        tag3 = "#AIHacking"
-    # Check unexpected errors / failures / glitches
-    elif any(x in text_lower for x in ["fail", "error", "hallucination", "limitation", "broken", "guardrail break", "meltdown", "glitch", "crash"]):
-        tag3 = "#AIFails"
-    # Check video generation / multimedia breakthroughs
-    elif any(x in text_lower for x in ["video", "multimedia", "sora", "veo", "runway", "image generation", "text to video", "luma dream", "kling"]):
-        tag3 = "#AIVideo"
-    # Check models, research papers, breakthroughs
-    elif any(x in text_lower for x in ["model", "paper", "breakthrough", "llm", "gpt", "claude", "gemini", "llama", "transformer", "neural network", "deep learning"]):
-        tag3 = "#LLM"
-    else:
-        tag3 = "#MachineLearning"
-        
-    # Tag 4: Tech Authority
-    if any(x in text_lower for x in ["code", "developer", "engineering", "programming", "python", "software", "pipeline"]):
-        tag4 = "#SoftwareEngineering"
-    elif any(x in text_lower for x in ["news", "latest", "announced", "released"]):
-        tag4 = "#TechNews"
-    else:
-        tag4 = "#DeepTech"
-        
-    return [tag1, tag2, tag3, tag4]
+    return generate_specific_hashtags(title, script)
 
 def get_optimized_metadata(
     title, 
@@ -361,8 +474,16 @@ def get_optimized_metadata(
                 if len(final_tags) >= 8:
                     break
  
-    # 7. Generate exactly 4 hyper-targeted hashtags as per the strategic rules
-    final_hashtags = get_hyper_targeted_hashtags(title, script, is_shorts=is_shorts)
+    # 7. Generate exactly 4 specific keyword-based hashtags
+    final_hashtags = generate_specific_hashtags(
+        title=title,
+        script=script,
+        sub_category=sub_category,
+        initial_keywords=initial_keywords,
+        initial_companies=initial_companies,
+        initial_people=initial_people,
+        initial_hashtags=initial_hashtags
+    )
     
     return {
         "tags": final_tags,

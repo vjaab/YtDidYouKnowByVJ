@@ -25,7 +25,7 @@ def run_tests():
     
     # Assertions
     assert len(test1["tags"]) >= 8 and len(test1["tags"]) <= 15, f"Tag count {len(test1['tags'])} out of bounds"
-    assert test1["hashtags"] == ["#Shorts", "#AI", "#LLM", "#SoftwareEngineering"], f"Unexpected hashtags: {test1['hashtags']}"
+    assert test1["hashtags"] == ["#SamAltman", "#GaryMarcus", "#GPT5", "#OpenAICEO"], f"Unexpected hashtags: {test1['hashtags']}"
     assert "Sam Altman" in test1["tags"]
     assert "OpenAI CEO" in test1["tags"]
     
@@ -45,7 +45,7 @@ def run_tests():
     
     # Assertions
     assert len(test2["tags"]) >= 8 and len(test2["tags"]) <= 15, f"Tag count {len(test2['tags'])} out of bounds"
-    assert test2["hashtags"] == ["#Shorts", "#AI", "#MachineLearning", "#DeepTech"], f"Unexpected hashtags: {test2['hashtags']}"
+    assert test2["hashtags"] == ["#JensenHuang", "#NVIDIA", "#RubinGPU", "#Computex"], f"Unexpected hashtags: {test2['hashtags']}"
     assert "Jensen Huang" in test2["tags"]
     assert "NVIDIA" in test2["tags"]
     
@@ -65,7 +65,7 @@ def run_tests():
     
     # Assertions
     assert len(test3["tags"]) >= 8 and len(test3["tags"]) <= 15, f"Tag count {len(test3['tags'])} out of bounds"
-    assert test3["hashtags"] == ["#Shorts", "#AI", "#MachineLearning", "#DeepTech"], f"Unexpected hashtags: {test3['hashtags']}"
+    assert test3["hashtags"] == ["#MobileTips", "#TechHack", "#DisableLocation", "#LocationTracking"], f"Unexpected hashtags: {test3['hashtags']}"
     
     print("\n✅ All Optimizer Tests Passed Successfully!")
  
