@@ -5433,7 +5433,6 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
             # ── REFINED "ALIVE" MOTION (Head-Bob & Breathing) ────────────────
             # Apply motion AFTER masking so the mask follows the head movement
-            import math
             # Calculate a slow zoom that increases scale by 10% over the full video
             zoom_speed = 0.10 / max(audio_duration, 1.0)
             
@@ -6067,7 +6066,6 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         if active_chunk and active_chunk.get("is_setting_chunk"):
             enable_mockup = os.environ.get("ENABLE_SETTINGS_MOCKUP", "1") == "1"
             if enable_mockup:
-                import math
                 dur = active_chunk.get("duration", 1.0)
                 if dur > 0.1:
                     t_rel = max(0.0, min(t - active_chunk["start"], dur))
