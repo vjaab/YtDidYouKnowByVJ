@@ -1,10 +1,10 @@
 {
   "groq_models": {
-    "llama-3.3-70b-versatile": 1783667067.6627688,
-    "qwen/qwen3-32b": 1783667076.042546,
-    "openai/gpt-oss-20b": 1783667082.306519,
-    "llama-3.1-8b-instant": 1783667082.391486,
-    "openai/gpt-oss-120b": 1783667086.0674229
+    "llama-3.3-70b-versatile": 1783714359.8971512,
+    "qwen/qwen3-32b": 1783714662.5684695,
+    "openai/gpt-oss-20b": 1783714665.385521,
+    "llama-3.1-8b-instant": 1783714668.3267708,
+    "openai/gpt-oss-120b": 1783714671.8574157
   },
   "cloudflare_models": {
     "@cf/meta/llama-3.3-70b-instruct": 1783695503.8405497,
@@ -33,34 +33,35 @@
     "@cf/ibm-granite/granite-4.0-h-micro": 1783695503.8497057
   },
   "gemini_models": {
-    "gemini-2.5-flash": 1783667059.589354,
-    "gemini-2.5-flash-lite": 1783667063.105786,
-    "gemini-2.5-pro": 1783667075.942145
+    "gemini-2.5-flash": 1783714344.7467418,
+    "gemini-2.5-flash-lite": 1783714890.679359,
+    "gemini-2.5-pro": 1783714029.472753
   },
   "cerebras_models": {
     "gpt-oss-120b": 1783538570.1438644,
-    "zai-glm-4.7": 1783502470.1690803
+    "zai-glm-4.7": 1783502470.1690803,
+    "gemma-4-31b": 1783672633.798515
   },
   "groq_token_usage": {
     "qwen/qwen3-32b": {
-      "tokens": 2394,
+      "tokens": 12290,
       "date": "2026-07-10"
     },
     "llama-3.1-8b-instant": {
-      "tokens": 2828,
+      "tokens": 4612,
       "date": "2026-07-10"
     },
     "openai/gpt-oss-120b": {
-      "tokens": 1908,
+      "tokens": 5170,
       "date": "2026-07-10"
     },
     "llama-3.3-70b-versatile": {
-      "tokens": 5141,
+      "tokens": 9192,
       "date": "2026-07-10"
     },
     "openai/gpt-oss-20b": {
-      "tokens": 9838,
-      "date": "2026-07-09"
+      "tokens": 4097,
+      "date": "2026-07-10"
     }
   }
 }

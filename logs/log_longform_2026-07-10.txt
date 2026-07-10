@@ -1,0 +1,117 @@
+[08:04:17] === STARTING DAILY LONG-FORM 'DID YOU KNOW' PIPELINE ===
+[08:04:17] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[08:04:17] STEP 1: Fetching RSS articles (Research + Tools + Trending)...
+[08:04:17] 📈 vidIQ: Injected 8 high-signal topics.
+[08:05:37] ✅ Fetched 391 total articles (101 GitHub, 8 vidIQ, 150 research, 102 tools, 18 trending, 9 X.com, 3 Reddit).
+[08:05:37] STEP 2 (Attempt 1/12): Generating long-form 5-topic compilation script...
+[08:14:59] Generated Title: AI Agent Studio: Pro Videos for $0.02 🎬
+[08:14:59] Script word count: 528
+[08:14:59] Topics covered: 8
+[08:14:59]   Fact 1: OpenMontage: The AI Agent That Produces Full Videos
+[08:14:59]   Fact 2: OmniRoute: The Free AI Gateway with 231+ Providers
+[08:14:59]   Fact 3: Strix: Open-Source AI Penetration Testing Tool
+[08:14:59]   Fact 4: Meetily: Local, Privacy-First AI Meeting Assistant
+[08:14:59]   Fact 5: OfficeCLI: AI Agents for Word, Excel, PowerPoint
+[08:14:59]   Fact 6: System Prompts Leaks: Uncover Hidden LLM Instructions
+[08:14:59]   Fact 7: Awesome Design MD: AI-Generated UI from Design Docs
+[08:14:59]   Fact 8: ECC: Agent Harness Performance Optimization
+[08:14:59] STEP 3: Generating voiceover + word timestamps...
+[08:14:59] Selected Lip-Sync Template: assets/video/C_white.mp4
+[08:14:59] ⚠️ Script word count too low (528 words, expected ~226.6s < 480s). Retrying script generation early to save GPU time.
+[08:14:59] STEP 2 (Attempt 2/12): Generating long-form 5-topic compilation script...
+[08:16:31] ERROR: Long-form script generation failed.
+[08:16:31] STEP 2 (Attempt 3/12): Generating long-form 5-topic compilation script...
+[08:26:13] Generated Title: Meetily: Private AI Meeting Assistant That Beats the Cloud 💥
+[08:26:13] Script word count: 910
+[08:26:13] Topics covered: 8
+[08:26:13]   Fact 1: Meetily: Your Privacy-First, Local AI Meeting Assistant
+[08:26:13]   Fact 2: Strix: AI-Powered App Vulnerability Scanner
+[08:26:13]   Fact 3: Codex Plugin CC: Leverage Claude Code for Code Review
+[08:26:13]   Fact 4: Herdr: Terminal-Based Agent Multiplexer
+[08:26:13]   Fact 5: Page-Agent: Control Web Interfaces with Natural Language
+[08:26:13]   Fact 6: OmniRoute: Free AI Gateway for Multiple Providers
+[08:26:13]   Fact 7: Astryx: Customizable, Agent-Ready Design System
+[08:26:13]   Fact 8: AI-Era Berkshire: Value Investing with AI Agents
+[08:26:13] STEP 3: Generating voiceover + word timestamps...
+[08:26:13] Selected Lip-Sync Template: assets/video/C_white.mp4
+[08:26:13] ⚠️ Script word count too low (910 words, expected ~390.6s < 480s). Retrying script generation early to save GPU time.
+[08:26:13] STEP 2 (Attempt 4/12): Generating long-form 5-topic compilation script...
+[08:37:42] Generated Title: Cut $200K AI Costs with One Line of Code 🚀
+[08:37:42] Script word count: 1714
+[08:37:42] Topics covered: 8
+[08:37:42]   Fact 1: OmniRoute: One Endpoint, 231+ AI Providers, 95% Token Savings
+[08:37:42]   Fact 2: Meetily: Privacy-First AI Meeting Assistant Runs 4x Faster Than Whisper Locally
+[08:37:42]   Fact 3: Strix: Open-Source AI Penetration Testing Tool Finds and Fixes Vulnerabilities
+[08:37:42]   Fact 4: Herdr: Agent Multiplexer Lives in Your Terminal — Manage Fleets of Coding Agents
+[08:37:42]   Fact 5: Page-Agent: Control Any Web Interface with Natural Language — Alibaba's In-Page GUI Agent
+[08:37:42]   Fact 6: AI-Berkshire: Multi-Agent Value Investing Framework Runs Buffett, Munger, Duan, Li Lu Methodologies in Parallel
+[08:37:42]   Fact 7: RuView: Commodity WiFi Signals Become Real-Time Vital Sign Monitoring — No Cameras Required
+[08:37:42]   Fact 8: CubeSandbox: Instant, Secure, Lightweight Sandbox for AI Agents — Tencent's Agent Runtime
+[08:37:42] STEP 3: Generating voiceover + word timestamps...
+[08:37:42] Selected Lip-Sync Template: assets/video/C_white.mp4
+[08:37:42] ⚠️ Script word count too high (1714 words, expected ~735.6s > 570s). Retrying script generation early to save GPU time.
+[08:37:42] STEP 2 (Attempt 5/12): Generating long-form 5-topic compilation script...
+[08:45:55] Generated Title: Stop Paying for the Same Tokens! 💸 (OmniRoute Guide)
+[08:45:55] Script word count: 1244
+[08:45:55] Topics covered: 8
+[08:45:55]   Fact 1: OmniRoute: Free AI Gateway with 231+ Providers, 95% Token Compression & Smart Fallback
+[08:45:55]   Fact 2: Meetily: Privacy-First AI Meeting Assistant with 4x Faster Local Transcription
+[08:45:55]   Fact 3: Strix: Open-Source AI Penetration Testing Tool Finds & Fixes Vulnerabilities
+[08:45:55]   Fact 4: Codex Plugin for Claude Code: Delegate Tasks & Review Code via OpenAI Codex
+[08:45:55]   Fact 5: Herdr: Agent Multiplexer That Lives in Your Terminal
+[08:45:55]   Fact 6: PageAgent: Alibaba's In-Page GUI Agent Controls Web Interfaces via Natural Language
+[08:45:55]   Fact 7: Astrx: Facebook's Open-Source Design System Built for AI Agents
+[08:45:55]   Fact 8: AI Berkshire: Multi-Agent Value Investing Framework with Buffett/Munger Methodologies
+[08:45:55] STEP 3: Generating voiceover + word timestamps...
+[08:45:55] Selected Lip-Sync Template: assets/video/C_white.mp4
+[08:45:55] STEP 2b: Capturing article screenshots for evidence...
+[08:46:42] ✅ Captured 8/8 article screenshots.
+[08:46:42] Attempting Kaggle GPU handover for audio + lip-sync...
+[09:32:42] ❌ Kaggle Handover failed: [run_timeout] Kaggle job running for 45 min (limit: 45 min). Possibly stuck or processing error.
+[09:32:42] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
+[09:32:42] ⚠️ Lip-sync and avatar will be SKIPPED for this video (requires GPU).
+[09:34:34] Audio too long (617.8s > 570s). Retrying...
+[09:34:34] STEP 2 (Attempt 6/12): Generating long-form 5-topic compilation script...
+[09:43:31] Generated Title: 5 AI Facts!
+[09:43:31] Script word count: 0
+[09:43:31] Topics covered: 8
+[09:43:31]   Fact 1: Meetily: The Open-Source AI Meeting Assistant That Runs 4x Faster Than Whisper Locally
+[09:43:31]   Fact 2: Strix: Open-Source AI Penetration Testing Agent That Finds and Fixes Vulnerabilities
+[09:43:31]   Fact 3: OmniRoute: Free AI Gateway Unifying 231+ Providers With Smart Fallback and Token Compression
+[09:43:31]   Fact 4: Page-Agent: Alibaba's In-Browser GUI Agent That Controls Any Web Interface Via Natural Language
+[09:43:31]   Fact 5: RuView: Turning Commodity WiFi Signals Into Real-Time 3D Spatial Intelligence Without Cameras
+[09:43:31]   Fact 6: Video-Use: Browser-Use's New Framework for Editing Videos With Coding Agents
+[09:43:31]   Fact 7: Herdr: Terminal-Native Agent Multiplexer for Running Parallel AI Coding Agents
+[09:43:31]   Fact 8: CubeSandbox: Tencent's Instant, Lightweight Sandbox for Running Untrusted AI Agent Code
+[09:43:31] STEP 3: Generating voiceover + word timestamps...
+[09:43:31] Selected Lip-Sync Template: assets/video/C_white.mp4
+[09:43:31] ⚠️ Script word count too low (0 words, expected ~0.0s < 480s). Retrying script generation early to save GPU time.
+[09:43:31] STEP 2 (Attempt 7/12): Generating long-form 5-topic compilation script...
+[09:52:37] Generated Title: Meetily: 4x Faster Private Transcripts on Your GPU 🚀
+[09:52:37] Script word count: 1316
+[09:52:37] Topics covered: 8
+[09:52:37]   Fact 1: Meetily – Self‑hosted AI meeting assistant with 4x faster transcription
+[09:52:37]   Fact 2: Strix – AI‑driven penetration testing for any app
+[09:52:37]   Fact 3: Codex Plugin CC – Call OpenAI Codex from Claude Code
+[09:52:37]   Fact 4: herdr – Terminal‑based agent multiplexer
+[09:52:37]   Fact 5: Page‑Agent – Control web pages with natural language
+[09:52:37]   Fact 6: OmniRoute – Unified gateway for 230+ AI providers
+[09:52:37]   Fact 7: Agent‑Skills – Production‑grade skills for coding agents
+[09:52:37]   Fact 8: Graphify – Turn any codebase into a queryable knowledge graph
+[09:52:37] STEP 3: Generating voiceover + word timestamps...
+[09:52:37] Selected Lip-Sync Template: assets/video/C_white.mp4
+[09:52:37] STEP 2b: Capturing article screenshots for evidence...
+[09:53:23] ✅ Captured 8/8 article screenshots.
+[09:53:23] Attempting Kaggle GPU handover for audio + lip-sync...
+[10:39:22] ❌ Kaggle Handover failed: [run_timeout] Kaggle job running for 45 min (limit: 45 min). Possibly stuck or processing error.
+[10:39:22] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
+[10:39:22] ⚠️ Lip-sync and avatar will be SKIPPED for this video (requires GPU).
+[10:40:01] Audio OK: 486.3s | 1283 word timestamps
+[10:40:01] STEP 4: Reserving topics in tracker...
+[10:40:01] STEP 5: Grouping words into visual chunks...
+[10:40:01] Built 60 visual chunks from 1283 words.
+[10:40:01] STEP 6: Fetching entity photos and company logos...
+[10:40:01] STEP 7: Generating visuals using Google Veo and Google Image (16:9, primary option)...
+[11:25:37] ✅ Primary visual generator successfully created 60/60 clips/images.
+[11:25:37] STEP 9: Rendering final 16:9 video with engagement layers...
+[11:25:37] ERROR: Video render failed: cannot access local variable 'math' where it is not associated with a value
