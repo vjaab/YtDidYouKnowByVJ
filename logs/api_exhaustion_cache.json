@@ -7,6 +7,7 @@
     "openai/gpt-oss-120b": 1783714671.8574157
   },
   "cloudflare_models": {
+<<<<<<< Updated upstream
     "@cf/meta/llama-3.3-70b-instruct": 1783741450.974265,
     "@cf/meta/llama-3.3-70b-instruct-fp8-fast": 1783741450.9747596,
     "@cf/zai-org/glm-4.7-flash": 1783741450.9750834,
@@ -31,6 +32,32 @@
     "@cf/meta/llama-3.2-1b-instruct": 1783741450.9824445,
     "@cf/openai/gpt-oss-20b": 1783741450.9827895,
     "@cf/ibm-granite/granite-4.0-h-micro": 1783741450.9831095
+=======
+    "@cf/meta/llama-3.3-70b-instruct": 1783748502.4329793,
+    "@cf/meta/llama-3.3-70b-instruct-fp8-fast": 1783748502.433341,
+    "@cf/zai-org/glm-4.7-flash": 1783748502.4336905,
+    "@cf/openai/gpt-oss-120b": 1783748502.4340425,
+    "@cf/nvidia/nemotron-3-120b-a12b": 1783748502.434377,
+    "@cf/meta/llama-4-scout-17b-16e-instruct": 1783748502.4347048,
+    "@cf/qwen/qwq-32b": 1783748502.4350507,
+    "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b": 1783748502.4353824,
+    "@cf/meta/llama-3.1-70b-instruct": 1783748502.4357173,
+    "@cf/qwen/qwen2.5-72b-instruct": 1783748502.4360738,
+    "@cf/qwen/qwen3-30b-a3b-fp8": 1783748502.4364705,
+    "@cf/qwen/qwen2.5-coder-32b-instruct": 1783748502.4403455,
+    "@cf/mistral/mistral-small-3.1-24b-instruct": 1783748502.4407666,
+    "@cf/google/gemma-4-26b-a4b-it": 1783748502.4411938,
+    "@cf/moonshotai/kimi-k2.7-code": 1783748502.4416032,
+    "@cf/moonshotai/kimi-k2.6": 1783748502.44202,
+    "@cf/meta/llama-3.1-8b-instruct": 1783748502.4423993,
+    "@cf/meta/llama-3.1-8b-instruct-fp8": 1783748502.442782,
+    "@cf/meta/llama-3.1-8b-instruct-fast": 1783748502.4431841,
+    "@cf/meta/llama-3.2-3b-instruct": 1783748502.4435675,
+    "@cf/zai-org/glm-5.2": 1783748502.4439685,
+    "@cf/meta/llama-3.2-1b-instruct": 1783748502.4443493,
+    "@cf/openai/gpt-oss-20b": 1783748502.444736,
+    "@cf/ibm-granite/granite-4.0-h-micro": 1783748502.44514
+>>>>>>> Stashed changes
   },
   "gemini_models": {
     "gemini-2.5-flash": 1783714344.7467418,

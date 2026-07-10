@@ -115,3 +115,127 @@
 [11:25:37] ✅ Primary visual generator successfully created 60/60 clips/images.
 [11:25:37] STEP 9: Rendering final 16:9 video with engagement layers...
 [11:25:37] ERROR: Video render failed: cannot access local variable 'math' where it is not associated with a value
+[17:19:29] === STARTING DAILY LONG-FORM 'DID YOU KNOW' PIPELINE ===
+[17:19:29] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[17:19:29] STEP 1: Fetching RSS articles (Research + Tools + Trending)...
+[17:19:29] 📈 vidIQ: Injected 8 high-signal topics.
+[17:20:59] ✅ Fetched 404 total articles (112 GitHub, 8 vidIQ, 152 research, 103 tools, 19 trending, 9 X.com, 1 Reddit).
+[17:20:59] STEP 2 (Attempt 1/12): Generating long-form 5-topic compilation script...
+[17:24:40] ERROR: Long-form script generation failed.
+[17:24:40] STEP 2 (Attempt 2/12): Generating long-form 5-topic compilation script...
+[17:31:23] ERROR: Long-form script generation failed.
+[17:31:23] STEP 2 (Attempt 3/12): Generating long-form 5-topic compilation script...
+[17:35:14] ERROR: Long-form script generation failed.
+[17:35:14] ⏳ Potential rate limit. Sleeping 60s...
+[17:36:14] STEP 2 (Attempt 4/12): Generating long-form 5-topic compilation script...
+[17:37:46] ERROR: Long-form script generation failed.
+[17:37:46] STEP 2 (Attempt 5/12): Generating long-form 5-topic compilation script...
+[17:46:40] Generated Title: 4x Faster AI Transcripts: Save $15k/Year 🚀
+[17:46:40] Script word count: 1051
+[17:46:40] Topics covered: 6
+[17:46:40]   Fact 1: Meetily: AI Meeting Assistant with 4x Faster Transcription
+[17:46:40]   Fact 2: Strix: Open-Source AI Penetration Testing Tool
+[17:46:40]   Fact 3: Caveman: Claude Code Skill for Token Efficiency
+[17:46:40]   Fact 4: System Prompts Leaks: Extracted Prompts from Anthropic and OpenAI
+[17:46:40]   Fact 5: Graphify: AI Coding Assistant for Querying Knowledge Graphs
+[17:46:40]   Fact 6: OmniRoute: Free AI Gateway for Claude Code and Codex
+[17:46:40] STEP 3: Generating voiceover + word timestamps...
+[17:46:40] Selected Lip-Sync Template: assets/video/C_white.mp4
+[17:46:40] ⚠️ Script word count too low (1051 words, expected ~451.1s < 480s). Retrying script generation early to save GPU time.
+[17:46:40] STEP 2 (Attempt 6/12): Generating long-form 5-topic compilation script...
+[17:57:02] Generated Title: Stop Paying the AI Token Tax: 95% Cost Reduction 💸
+[17:57:02] Script word count: 873
+[17:57:02] Topics covered: 8
+[17:57:02]   Fact 1: OmniRoute: The Free AI Gateway Routing 231+ Providers With 95% Token Compression
+[17:57:02]   Fact 2: Strix: Open-Source AI Penetration Testing That Finds And Fixes Vulnerabilities Automatically
+[17:57:02]   Fact 3: Meetily: Privacy-First AI Meeting Assistant With 4x Faster Local Transcription And Zero Cloud
+[17:57:02]   Fact 4: Caveman: The Claude Code Skill That Cuts 65% Token Usage By Speaking In Primitives
+[17:57:02]   Fact 5: Graphify: Turn Any Codebase, Schema, Or Docs Into A Queryable Knowledge Graph For Agents
+[17:57:02]   Fact 6: Herdr: Terminal-Native Agent Multiplexer For Running Parallel Coding Agents Simultaneously
+[17:57:02]   Fact 7: Page-Agent: Alibaba's In-Page GUI Agent That Controls Web Interfaces Via Natural Language
+[17:57:02]   Fact 8: Claude-Video: Give Any Coding Agent The Ability To Watch, Transcribe, And Reason Over Video Files
+[17:57:02] STEP 3: Generating voiceover + word timestamps...
+[17:57:02] Selected Lip-Sync Template: assets/video/C_white.mp4
+[17:57:02] ⚠️ Script word count too low (873 words, expected ~374.7s < 480s). Retrying script generation early to save GPU time.
+[17:57:02] STEP 2 (Attempt 7/12): Generating long-form 5-topic compilation script...
+[18:09:37] Generated Title: Cut Your LLM Bill by 60% with This AI Gateway 🚀
+[18:09:37] Script word count: 1007
+[18:09:37] Topics covered: 8
+[18:09:37]   Fact 1: OmniRoute: The Free AI Gateway Routing 231+ Providers Through One Endpoint
+[18:09:37]   Fact 2: Caveman: The Claude Code Skill Slashing 65% of Tokens by Talking Like a Caveman
+[18:09:37]   Fact 3: Meetily: Privacy-First AI Meeting Assistant Running 100% Locally on Rust + Whisper
+[18:09:37]   Fact 4: Strix: Open-Source AI Penetration Testing Tool That Finds and Fixes Vulnerabilities
+[18:09:37]   Fact 5: Graphify: Turn Any Codebase, Schema, or Docs Into a Queryable Knowledge Graph for AI Agents
+[18:09:37]   Fact 6: OpenAI Codex Plugin for Claude Code: Delegate Reviews and Tasks to Codex From Inside Claude
+[18:09:37]   Fact 7: Page-Agent: Alibaba's In-Page GUI Agent That Controls Web Interfaces Via Natural Language
+[18:09:37]   Fact 8: Orca: The ADE for Running Fleets of Parallel Coding Agents on Your Own Subscriptions
+[18:09:37] STEP 3: Generating voiceover + word timestamps...
+[18:09:37] Selected Lip-Sync Template: assets/video/C_white.mp4
+[18:09:37] ⚠️ Script word count too low (1007 words, expected ~432.2s < 480s). Retrying script generation early to save GPU time.
+[18:09:37] STEP 2 (Attempt 8/12): Generating long-form 5-topic compilation script...
+[18:21:22] Generated Title: I Cut My AI Bill 10x With This 15MB Binary 💸
+[18:21:22] Script word count: 1338
+[18:21:22] Topics covered: 8
+[18:21:22]   Fact 1: OmniRoute: The Free AI Gateway That Routes 231+ Providers With 95% Token Compression
+[18:21:22]   Fact 2: Caveman: Claude Code Skill That Cuts 65% Token Usage By Talking Like A Caveman
+[18:21:22]   Fact 3: Strix: Open-Source AI Penetration Testing Agent That Finds And Fixes Vulnerabilities
+[18:21:22]   Fact 4: Meetily: Privacy-First AI Meeting Assistant With 4x Faster Local Transcription
+[18:21:22]   Fact 5: Graphify: Turn Any Codebase Into A Queryable Knowledge Graph For AI Agents
+[18:21:22]   Fact 6: Herdr: Terminal-Native Agent Multiplexer For Running Parallel AI Coding Fleets
+[18:21:22]   Fact 7: Page-Agent: Alibaba's In-Browser GUI Agent That Controls Web Interfaces Via Natural Language
+[18:21:22]   Fact 8: Orca: ADE For Managing Fleets Of Parallel Coding Agents On Desktop And Mobile
+[18:21:22] STEP 3: Generating voiceover + word timestamps...
+[18:21:22] Selected Lip-Sync Template: assets/video/C_white.mp4
+[18:21:22] ⚠️ Script word count too high (1338 words, expected ~574.2s > 570s). Retrying script generation early to save GPU time.
+[18:21:22] STEP 2 (Attempt 9/12): Generating long-form 5-topic compilation script...
+[18:30:49] Generated Title: Stop Paying for LLM Tokens: The OmniRoute Hack 🚀
+[18:30:49] Script word count: 943
+[18:30:49] Topics covered: 8
+[18:30:49]   Fact 1: OmniRoute: The Free AI Gateway That Routes 231+ Providers With 95% Token Compression
+[18:30:49]   Fact 2: Caveman: The Claude Code Skill That Slashes 65% of Tokens By Talking Like a Caveman
+[18:30:49]   Fact 3: Strix: Open-Source AI Penetration Testing That Finds and Fixes Your App's Vulnerabilities
+[18:30:49]   Fact 4: Graphify: Turn Any Codebase, Schema, or Docs Into a Queryable Knowledge Graph for Agents
+[18:30:49]   Fact 5: Herdr: The Agent Multiplexer That Lives in Your Terminal and Runs Parallel Coding Fleets
+[18:30:49]   Fact 6: Page-Agent: Alibaba's In-Page GUI Agent That Controls Web Interfaces With Natural Language
+[18:30:49]   Fact 7: RuView: Commodity WiFi Signals Turned Into Real-Time Spatial Intelligence and Vital Signs
+[18:30:49]   Fact 8: CubeSandbox: Tencent's Instant, Secure Sandbox for Running Untrusted AI Agent Code at Scale
+[18:30:49] STEP 3: Generating voiceover + word timestamps...
+[18:30:49] Selected Lip-Sync Template: assets/video/C_white.mp4
+[18:30:49] ⚠️ Script word count too low (943 words, expected ~404.7s < 480s). Retrying script generation early to save GPU time.
+[18:30:49] STEP 2 (Attempt 10/12): Generating long-form 5-topic compilation script...
+[18:39:49] Generated Title: We Reverse-Engineered AI System Prompts 🕵️
+[18:39:49] Script word count: 1294
+[18:39:49] Topics covered: 8
+[18:39:49]   Fact 1: We Reverse-Engineered the System Prompts of Claude, GPT-5, Gemini & Grok — Here's What They Hide
+[18:39:49]   Fact 2: Caveman Mode: This Claude Code Skill Cuts 65% Token Costs by Talking Like a Caveman
+[18:39:49]   Fact 3: Meetily: The Open-Source AI Meeting Assistant That Runs 100% Locally — No Cloud, No Privacy Risk
+[18:39:49]   Fact 4: Strix: AI Penetration Testing Agent That Finds & Fixes Vulnerabilities in Your Codebase Automatically
+[18:39:49]   Fact 5: Graphify: Turn Any Codebase, SQL Schema, or Docs Into a Queryable Knowledge Graph for Your AI Agents
+[18:39:49]   Fact 6: OmniRoute: One API Endpoint, 231+ Providers (50+ Free), Smart Fallback & 95% Token Compression
+[18:39:49]   Fact 7: Orca: The Agent Desktop Environment for Running Fleets of Parallel Coding Agents on Your Own Subscriptions
+[18:39:49]   Fact 8: Page-Agent: Alibaba's In-Browser GUI Agent That Controls Any Web Interface via Natural Language
+[18:39:49] STEP 3: Generating voiceover + word timestamps...
+[18:39:49] Selected Lip-Sync Template: assets/video/C_white.mp4
+[18:39:49] STEP 2b: Capturing article screenshots for evidence...
+[18:40:37] ✅ Captured 8/8 article screenshots.
+[18:40:37] Attempting Kaggle GPU handover for audio + lip-sync...
+[19:26:40] ❌ Kaggle Handover failed: [run_timeout] Kaggle job running for 45 min (limit: 45 min). Possibly stuck or processing error.
+[19:26:40] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
+[19:26:40] ⚠️ Lip-sync and avatar will be SKIPPED for this video (requires GPU).
+[19:28:11] Audio OK: 529.5s | 1296 word timestamps
+[19:28:11] STEP 4: Reserving topics in tracker...
+[19:28:11] STEP 5: Grouping words into visual chunks...
+[19:28:11] Built 51 visual chunks from 1296 words.
+[19:28:11] STEP 6: Fetching entity photos and company logos...
+[19:28:11] STEP 7: Generating visuals using Google Veo and Google Image (16:9, primary option)...
+[19:38:45] ✅ Primary visual generator successfully created 51/51 clips/images.
+[19:38:45] STEP 9: Rendering final 16:9 video with engagement layers...
+[21:12:48] STEP 10: Generating 16:9 thumbnail...
+[21:13:01] STEP 11: Uploading to YouTube...
+[21:13:01] Optimized Tags: ['AI System Prompts', 'Prompt Engineering', 'Claude', 'GPT-5', 'Gemini', 'Grok', 'Injection Triangulation', 'AI Agents', 'Token Optimization', 'Local AI', 'GitHub asgeirtjsystem_prompts_leaks', 'GitHub JuliusBrusseecaveman', 'GitHub Zackriya-Solutionsmeetily', 'GitHub usestrixstrix', 'GitHub Graphify-Labsgraphify']
+[21:13:01] Optimized Hashtags: ['#GitHubUsestrixStrix', '#GitHubStablyaiOrca', '#GitHubAlibabaPageAgent', '#AISystemPrompts']
+[21:13:14] SUCCESS: https://youtu.be/-WT8lw9Op-A
+[21:13:14] STEP 12.5: Generating and uploading Shorts Teaser...
+[21:17:05] STEP 13: Cleaning up output folder...
+[21:17:05] === LONG-FORM PIPELINE COMPLETED SUCCESSFULLY ===
+[21:17:06] STEP 14: Terminating leftover ffmpeg processes...
