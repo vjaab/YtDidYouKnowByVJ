@@ -4,14 +4,9 @@
     "full_name": "wonderwhy-er/DesktopCommanderMCP",
     "description": "This is MCP server for Claude that gives it terminal control, file system search and diff file editing capabilities",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 6981,
-    "forks_count": 895,
-=======
-    "stargazers_count": 7054,
-    "forks_count": 902,
->>>>>>> Stashed changes
-    "stars_in_period": 349,
+    "stargazers_count": 7336,
+    "forks_count": 932,
+    "stars_in_period": 328,
     "url": "https://github.com/wonderwhy-er/DesktopCommanderMCP",
     "html_url": "https://github.com/wonderwhy-er/DesktopCommanderMCP"
   },
@@ -20,14 +15,9 @@
     "full_name": "oven-sh/bun",
     "description": "Incredibly fast JavaScript runtime, bundler, test runner, and package manager \u2013 all in one",
     "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 94010,
-    "forks_count": 4927,
-=======
-    "stargazers_count": 94068,
-    "forks_count": 4929,
->>>>>>> Stashed changes
-    "stars_in_period": 307,
+    "stargazers_count": 94266,
+    "forks_count": 4939,
+    "stars_in_period": 209,
     "url": "https://github.com/oven-sh/bun",
     "html_url": "https://github.com/oven-sh/bun"
   },
@@ -36,15 +26,9 @@
     "full_name": "abseil/abseil-cpp",
     "description": "Abseil Common Libraries (C++)",
     "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 17483,
-    "forks_count": 3190,
-    "stars_in_period": 3,
-=======
-    "stargazers_count": 17489,
-    "forks_count": 3190,
-    "stars_in_period": 106,
->>>>>>> Stashed changes
+    "stargazers_count": 17527,
+    "forks_count": 3193,
+    "stars_in_period": 89,
     "url": "https://github.com/abseil/abseil-cpp",
     "html_url": "https://github.com/abseil/abseil-cpp"
   },
@@ -53,14 +37,9 @@
     "full_name": "addyosmani/agent-skills",
     "description": "Production-grade engineering skills for AI coding agents.",
     "language": "JavaScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 76571,
-    "forks_count": 8222,
-=======
-    "stargazers_count": 76637,
-    "forks_count": 8229,
->>>>>>> Stashed changes
-    "stars_in_period": 1114,
+    "stargazers_count": 76855,
+    "forks_count": 8254,
+    "stars_in_period": 1116,
     "url": "https://github.com/addyosmani/agent-skills",
     "html_url": "https://github.com/addyosmani/agent-skills"
   },
@@ -69,14 +48,9 @@
     "full_name": "jbeder/yaml-cpp",
     "description": "A YAML parser and emitter in C++",
     "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 6060,
-    "forks_count": 2251,
-=======
-    "stargazers_count": 6063,
-    "forks_count": 2252,
->>>>>>> Stashed changes
-    "stars_in_period": 65,
+    "stargazers_count": 6083,
+    "forks_count": 2256,
+    "stars_in_period": 69,
     "url": "https://github.com/jbeder/yaml-cpp",
     "html_url": "https://github.com/jbeder/yaml-cpp"
   },
@@ -85,14 +59,9 @@
     "full_name": "mattpocock/skills",
     "description": "Skills for Real Engineers. Straight from my .claude directory.",
     "language": "Shell",
-<<<<<<< Updated upstream
-    "stargazers_count": 164225,
-    "forks_count": 14128,
-=======
-    "stargazers_count": 164340,
-    "forks_count": 14141,
->>>>>>> Stashed changes
-    "stars_in_period": 1728,
+    "stargazers_count": 164723,
+    "forks_count": 14173,
+    "stars_in_period": 1712,
     "url": "https://github.com/mattpocock/skills",
     "html_url": "https://github.com/mattpocock/skills"
   },
@@ -101,13 +70,9 @@
     "full_name": "obra/superpowers",
     "description": "An agentic skills framework & software development methodology that works.",
     "language": "Shell",
-<<<<<<< Updated upstream
-    "stargazers_count": 251578,
-=======
-    "stargazers_count": 251619,
->>>>>>> Stashed changes
-    "forks_count": 22449,
-    "stars_in_period": 1096,
+    "stargazers_count": 251822,
+    "forks_count": 22472,
+    "stars_in_period": 1013,
     "url": "https://github.com/obra/superpowers",
     "html_url": "https://github.com/obra/superpowers"
   },
@@ -116,13 +81,9 @@
     "full_name": "microsoft/TypeScript",
     "description": "TypeScript is a superset of JavaScript that compiles to clean JavaScript output.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 109708,
-=======
-    "stargazers_count": 109721,
->>>>>>> Stashed changes
-    "forks_count": 13628,
-    "stars_in_period": 166,
+    "stargazers_count": 109785,
+    "forks_count": 13632,
+    "stars_in_period": 177,
     "url": "https://github.com/microsoft/TypeScript",
     "html_url": "https://github.com/microsoft/TypeScript"
   },
@@ -131,13 +92,9 @@
     "full_name": "catchorg/Catch2",
     "description": "A modern, C++-native, test framework for unit-tests, TDD and BDD - using C++14, C++17 and later (C++11 support is in v2.x branch, and C++03 on the Catch1.x branch)",
     "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 20576,
-=======
-    "stargazers_count": 20585,
->>>>>>> Stashed changes
-    "forks_count": 3405,
-    "stars_in_period": 69,
+    "stargazers_count": 20618,
+    "forks_count": 3408,
+    "stars_in_period": 76,
     "url": "https://github.com/catchorg/Catch2",
     "html_url": "https://github.com/catchorg/Catch2"
   },
@@ -146,13 +103,9 @@
     "full_name": "chriskohlhoff/asio",
     "description": "Asio C++ Library",
     "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 6042,
-=======
-    "stargazers_count": 6050,
->>>>>>> Stashed changes
-    "forks_count": 1496,
-    "stars_in_period": 87,
+    "stargazers_count": 6073,
+    "forks_count": 1500,
+    "stars_in_period": 92,
     "url": "https://github.com/chriskohlhoff/asio",
     "html_url": "https://github.com/chriskohlhoff/asio"
   },
@@ -161,14 +114,9 @@
     "full_name": "TencentCloud/TencentDB-Agent-Memory",
     "description": "TencentDB Agent Memory delivers fully local long-term memory for AI Agents via a 4-tier progressive pipeline, with zero external API dependencies.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 8123,
-    "forks_count": 746,
-=======
-    "stargazers_count": 8144,
-    "forks_count": 749,
->>>>>>> Stashed changes
-    "stars_in_period": 134,
+    "stargazers_count": 8258,
+    "forks_count": 760,
+    "stars_in_period": 123,
     "url": "https://github.com/TencentCloud/TencentDB-Agent-Memory",
     "html_url": "https://github.com/TencentCloud/TencentDB-Agent-Memory"
   },
@@ -177,14 +125,9 @@
     "full_name": "davila7/claude-code-templates",
     "description": "CLI tool for configuring and monitoring Claude Code",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 28686,
-    "forks_count": 3148,
-=======
-    "stargazers_count": 28706,
-    "forks_count": 3149,
->>>>>>> Stashed changes
-    "stars_in_period": 104,
+    "stargazers_count": 28779,
+    "forks_count": 3161,
+    "stars_in_period": 118,
     "url": "https://github.com/davila7/claude-code-templates",
     "html_url": "https://github.com/davila7/claude-code-templates"
   },
@@ -193,13 +136,9 @@
     "full_name": "zeux/meshoptimizer",
     "description": "Mesh optimization library that makes meshes smaller and faster to render",
     "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 7985,
-=======
-    "stargazers_count": 7991,
->>>>>>> Stashed changes
-    "forks_count": 778,
-    "stars_in_period": 86,
+    "stargazers_count": 8028,
+    "forks_count": 783,
+    "stars_in_period": 91,
     "url": "https://github.com/zeux/meshoptimizer",
     "html_url": "https://github.com/zeux/meshoptimizer"
   },
@@ -208,14 +147,9 @@
     "full_name": "tailscale/tailscale",
     "description": "The easiest, most secure way to use WireGuard and 2FA.",
     "language": "Go",
-<<<<<<< Updated upstream
-    "stargazers_count": 33513,
-    "forks_count": 2904,
-=======
-    "stargazers_count": 33539,
-    "forks_count": 2906,
->>>>>>> Stashed changes
-    "stars_in_period": 183,
+    "stargazers_count": 33673,
+    "forks_count": 2913,
+    "stars_in_period": 143,
     "url": "https://github.com/tailscale/tailscale",
     "html_url": "https://github.com/tailscale/tailscale"
   },
@@ -224,14 +158,9 @@
     "full_name": "google-labs-code/stitch-skills",
     "description": "A library of Agent Skills designed to work with the Stitch MCP server. Each skill follows the Agent Skills open standard, for compatibility with coding agents such as Antigravity, Gemini CLI, Claude Code, Cursor.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 6608,
-    "forks_count": 917,
-=======
-    "stargazers_count": 6637,
-    "forks_count": 919,
->>>>>>> Stashed changes
-    "stars_in_period": 101,
+    "stargazers_count": 6763,
+    "forks_count": 929,
+    "stars_in_period": 117,
     "url": "https://github.com/google-labs-code/stitch-skills",
     "html_url": "https://github.com/google-labs-code/stitch-skills"
   },
@@ -240,14 +169,9 @@
     "full_name": "iOfficeAI/OfficeCLI",
     "description": "OfficeCLI is the first and best Office suite purpose-built for AI agents to read, edit, and automate Word, Excel, and PowerPoint files. Free, open-source, single binary, no Office installation required.",
     "language": "C#",
-<<<<<<< Updated upstream
-    "stargazers_count": 14209,
-    "forks_count": 963,
-=======
-    "stargazers_count": 14269,
-    "forks_count": 964,
->>>>>>> Stashed changes
-    "stars_in_period": 1210,
+    "stargazers_count": 14477,
+    "forks_count": 988,
+    "stars_in_period": 1224,
     "url": "https://github.com/iOfficeAI/OfficeCLI",
     "html_url": "https://github.com/iOfficeAI/OfficeCLI"
   },
@@ -256,13 +180,9 @@
     "full_name": "hashicorp/terraform",
     "description": "Terraform enables you to safely and predictably create, change, and improve infrastructure. It is a source-available tool that codifies APIs into declarative configuration files that can be shared amongst team members, treated as code, edited, reviewed, and versioned.",
     "language": "Go",
-<<<<<<< Updated upstream
-    "stargazers_count": 49076,
-=======
-    "stargazers_count": 49098,
->>>>>>> Stashed changes
-    "forks_count": 10661,
-    "stars_in_period": 168,
+    "stargazers_count": 49177,
+    "forks_count": 10674,
+    "stars_in_period": 172,
     "url": "https://github.com/hashicorp/terraform",
     "html_url": "https://github.com/hashicorp/terraform"
   },
@@ -271,14 +191,9 @@
     "full_name": "grpc/grpc",
     "description": "C++ based gRPC (C++, Python, Ruby, Objective-C, PHP, C#)",
     "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 45087,
-    "forks_count": 11316,
-=======
-    "stargazers_count": 45102,
-    "forks_count": 11317,
->>>>>>> Stashed changes
-    "stars_in_period": 68,
+    "stargazers_count": 45140,
+    "forks_count": 11321,
+    "stars_in_period": 78,
     "url": "https://github.com/grpc/grpc",
     "html_url": "https://github.com/grpc/grpc"
   },
@@ -287,14 +202,9 @@
     "full_name": "vercel/next.js",
     "description": "The React Framework",
     "language": "JavaScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 140584,
-    "forks_count": 31513,
-=======
-    "stargazers_count": 140608,
-    "forks_count": 31514,
->>>>>>> Stashed changes
-    "stars_in_period": 176,
+    "stargazers_count": 140727,
+    "forks_count": 31525,
+    "stars_in_period": 191,
     "url": "https://github.com/vercel/next.js",
     "html_url": "https://github.com/vercel/next.js"
   },
@@ -303,14 +213,9 @@
     "full_name": "davila7/claude-code-templates",
     "description": "CLI tool for configuring and monitoring Claude Code",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 28686,
-    "forks_count": 3148,
-=======
-    "stargazers_count": 28706,
-    "forks_count": 3149,
->>>>>>> Stashed changes
-    "stars_in_period": 104,
+    "stargazers_count": 28779,
+    "forks_count": 3161,
+    "stars_in_period": 118,
     "url": "https://github.com/davila7/claude-code-templates",
     "html_url": "https://github.com/davila7/claude-code-templates"
   },
@@ -319,14 +224,9 @@
     "full_name": "mvanhorn/last30days-skill",
     "description": "AI agent skill that researches any topic across Reddit, X, YouTube, HN, Polymarket, and the web - then synthesizes a grounded summary",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 51406,
-    "forks_count": 4436,
-=======
-    "stargazers_count": 51425,
-    "forks_count": 4437,
->>>>>>> Stashed changes
-    "stars_in_period": 267,
+    "stargazers_count": 51482,
+    "forks_count": 4442,
+    "stars_in_period": 277,
     "url": "https://github.com/mvanhorn/last30days-skill",
     "html_url": "https://github.com/mvanhorn/last30days-skill"
   },
@@ -335,14 +235,9 @@
     "full_name": "huggingface/speech-to-speech",
     "description": "Build local voice agents with open-source models",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 5968,
-    "forks_count": 837,
-=======
-    "stargazers_count": 5977,
-    "forks_count": 838,
->>>>>>> Stashed changes
-    "stars_in_period": 190,
+    "stargazers_count": 6017,
+    "forks_count": 841,
+    "stars_in_period": 187,
     "url": "https://github.com/huggingface/speech-to-speech",
     "html_url": "https://github.com/huggingface/speech-to-speech"
   },
@@ -351,15 +246,9 @@
     "full_name": "roboflow/supervision",
     "description": "We write your reusable computer vision tools. \ud83d\udc9c",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 47745,
-    "forks_count": 4438,
-    "stars_in_period": 195,
-=======
-    "stargazers_count": 47752,
-    "forks_count": 4441,
-    "stars_in_period": 221,
->>>>>>> Stashed changes
+    "stargazers_count": 47775,
+    "forks_count": 4446,
+    "stars_in_period": 225,
     "url": "https://github.com/roboflow/supervision",
     "html_url": "https://github.com/roboflow/supervision"
   },
@@ -368,14 +257,9 @@
     "full_name": "openai/openai-python",
     "description": "The official Python library for the OpenAI API",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 31215,
-    "forks_count": 5015,
-=======
-    "stargazers_count": 31217,
-    "forks_count": 5016,
->>>>>>> Stashed changes
-    "stars_in_period": 92,
+    "stargazers_count": 31219,
+    "forks_count": 5017,
+    "stars_in_period": 96,
     "url": "https://github.com/openai/openai-python",
     "html_url": "https://github.com/openai/openai-python"
   },
@@ -384,14 +268,9 @@
     "full_name": "NVIDIA/skills",
     "description": "AI agent skills published by NVIDIA",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 2397,
+    "stargazers_count": 2413,
     "forks_count": 274,
-=======
-    "stargazers_count": 2402,
-    "forks_count": 273,
->>>>>>> Stashed changes
-    "stars_in_period": 28,
+    "stars_in_period": 33,
     "url": "https://github.com/NVIDIA/skills",
     "html_url": "https://github.com/NVIDIA/skills"
   },
@@ -400,13 +279,9 @@
     "full_name": "microsoft/agent-governance-toolkit",
     "description": "AI Agent Governance Toolkit \u2014 Policy enforcement, zero-trust identity, execution sandboxing, and reliability engineering for autonomous AI agents. Covers 10/10 OWASP Agentic Top 10.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 4792,
-=======
-    "stargazers_count": 4794,
->>>>>>> Stashed changes
-    "forks_count": 840,
-    "stars_in_period": 81,
+    "stargazers_count": 4803,
+    "forks_count": 841,
+    "stars_in_period": 78,
     "url": "https://github.com/microsoft/agent-governance-toolkit",
     "html_url": "https://github.com/microsoft/agent-governance-toolkit"
   },
@@ -415,14 +290,9 @@
     "full_name": "agentscope-ai/agentscope",
     "description": "Build and run agents you can see, understand and trust.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 27732,
-    "forks_count": 3167,
-=======
-    "stargazers_count": 27736,
+    "stargazers_count": 27745,
     "forks_count": 3168,
->>>>>>> Stashed changes
-    "stars_in_period": 106,
+    "stars_in_period": 77,
     "url": "https://github.com/agentscope-ai/agentscope",
     "html_url": "https://github.com/agentscope-ai/agentscope"
   },
@@ -431,15 +301,9 @@
     "full_name": "LMCache/LMCache",
     "description": "LMCache: Supercharge Your LLM with the Fastest KV Cache Layer",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 10373,
-    "forks_count": 1531,
-    "stars_in_period": 98,
-=======
-    "stargazers_count": 10377,
-    "forks_count": 1531,
+    "stargazers_count": 10397,
+    "forks_count": 1534,
     "stars_in_period": 101,
->>>>>>> Stashed changes
     "url": "https://github.com/LMCache/LMCache",
     "html_url": "https://github.com/LMCache/LMCache"
   },
@@ -448,13 +312,9 @@
     "full_name": "pytorch/pytorch",
     "description": "Tensors and Dynamic neural networks in Python with strong GPU acceleration",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 101713,
-=======
-    "stargazers_count": 101714,
->>>>>>> Stashed changes
-    "forks_count": 28464,
-    "stars_in_period": 106,
+    "stargazers_count": 101719,
+    "forks_count": 28469,
+    "stars_in_period": 102,
     "url": "https://github.com/pytorch/pytorch",
     "html_url": "https://github.com/pytorch/pytorch"
   },
@@ -463,14 +323,9 @@
     "full_name": "AUTOMATIC1111/stable-diffusion-webui",
     "description": "Stable Diffusion web UI",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 164161,
-    "forks_count": 30530,
-=======
-    "stargazers_count": 164162,
-    "forks_count": 30529,
->>>>>>> Stashed changes
-    "stars_in_period": 117,
+    "stargazers_count": 164166,
+    "forks_count": 30528,
+    "stars_in_period": 115,
     "url": "https://github.com/AUTOMATIC1111/stable-diffusion-webui",
     "html_url": "https://github.com/AUTOMATIC1111/stable-diffusion-webui"
   },
@@ -479,9 +334,9 @@
     "full_name": "xerrors/Yuxi",
     "description": "\u7ed3\u5408\u77e5\u8bc6\u5e93\u3001\u77e5\u8bc6\u56fe\u8c31\u7ba1\u7406\u7684 \u591a\u79df\u6237 Agent Harness \u5e73\u53f0\u3002 An agent harness that integrates a LightRAG knowledge base and knowledge graphs. Build with LangChain + Vue + FastAPI, support DeepAgents\u3001MinerU PDF\u3001Neo4j \u3001MCP.",
     "language": "Python",
-    "stargazers_count": 6066,
+    "stargazers_count": 6068,
     "forks_count": 881,
-    "stars_in_period": 25,
+    "stars_in_period": 28,
     "url": "https://github.com/xerrors/Yuxi",
     "html_url": "https://github.com/xerrors/Yuxi"
   },
@@ -490,14 +345,9 @@
     "full_name": "home-assistant/core",
     "description": "\ud83c\udfe1 Open source home automation that puts local control and privacy first.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 88375,
-    "forks_count": 38006,
-=======
-    "stargazers_count": 88378,
-    "forks_count": 38005,
->>>>>>> Stashed changes
-    "stars_in_period": 121,
+    "stargazers_count": 88385,
+    "forks_count": 38007,
+    "stars_in_period": 125,
     "url": "https://github.com/home-assistant/core",
     "html_url": "https://github.com/home-assistant/core"
   },
@@ -506,14 +356,9 @@
     "full_name": "Soju06/codex-lb",
     "description": "Codex/ChatGPT multiple account load balancer & proxy with usage tracking, dashboard, and OpenCode-compatible endpoints",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 2236,
-    "forks_count": 343,
-=======
-    "stargazers_count": 2239,
-    "forks_count": 344,
->>>>>>> Stashed changes
-    "stars_in_period": 22,
+    "stargazers_count": 2249,
+    "forks_count": 345,
+    "stars_in_period": 29,
     "url": "https://github.com/Soju06/codex-lb",
     "html_url": "https://github.com/Soju06/codex-lb"
   },
@@ -522,13 +367,9 @@
     "full_name": "syncable-dev/memtrace-public",
     "description": "Structural memory for AI coding agents. Bi-temporal graph, MCP-native, zero LLM calls. Cursor \u00b7 Claude Code \u00b7 Codex \u00b7 Hermes \u00b7 VS Code \u00b7 Windsurf.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 407,
-=======
-    "stargazers_count": 408,
->>>>>>> Stashed changes
-    "forks_count": 34,
-    "stars_in_period": 25,
+    "stargazers_count": 415,
+    "forks_count": 36,
+    "stars_in_period": 16,
     "url": "https://github.com/syncable-dev/memtrace-public",
     "html_url": "https://github.com/syncable-dev/memtrace-public"
   },
@@ -537,13 +378,9 @@
     "full_name": "python/cpython",
     "description": "The Python programming language",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 73724,
-=======
-    "stargazers_count": 73725,
->>>>>>> Stashed changes
-    "forks_count": 34984,
-    "stars_in_period": 161,
+    "stargazers_count": 73733,
+    "forks_count": 34986,
+    "stars_in_period": 158,
     "url": "https://github.com/python/cpython",
     "html_url": "https://github.com/python/cpython"
   },
@@ -552,13 +389,9 @@
     "full_name": "paperless-ngx/paperless-ngx",
     "description": "A community-supported supercharged document management system: scan, index and archive all your documents",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 42882,
-=======
-    "stargazers_count": 42883,
->>>>>>> Stashed changes
-    "forks_count": 2874,
-    "stars_in_period": 28,
+    "stargazers_count": 42902,
+    "forks_count": 2875,
+    "stars_in_period": 24,
     "url": "https://github.com/paperless-ngx/paperless-ngx",
     "html_url": "https://github.com/paperless-ngx/paperless-ngx"
   },
@@ -567,13 +400,9 @@
     "full_name": "microsoft/graphrag",
     "description": "A modular graph-based Retrieval-Augmented Generation (RAG) system",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 34339,
-=======
-    "stargazers_count": 34342,
->>>>>>> Stashed changes
-    "forks_count": 3630,
-    "stars_in_period": 33,
+    "stargazers_count": 34346,
+    "forks_count": 3633,
+    "stars_in_period": 28,
     "url": "https://github.com/microsoft/graphrag",
     "html_url": "https://github.com/microsoft/graphrag"
   },
@@ -582,14 +411,9 @@
     "full_name": "wonderwhy-er/DesktopCommanderMCP",
     "description": "This is MCP server for Claude that gives it terminal control, file system search and diff file editing capabilities",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 6981,
-    "forks_count": 895,
-=======
-    "stargazers_count": 7054,
-    "forks_count": 902,
->>>>>>> Stashed changes
-    "stars_in_period": 349,
+    "stargazers_count": 7336,
+    "forks_count": 932,
+    "stars_in_period": 328,
     "url": "https://github.com/wonderwhy-er/DesktopCommanderMCP",
     "html_url": "https://github.com/wonderwhy-er/DesktopCommanderMCP"
   },
@@ -598,13 +422,9 @@
     "full_name": "microsoft/TypeScript",
     "description": "TypeScript is a superset of JavaScript that compiles to clean JavaScript output.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 109708,
-=======
-    "stargazers_count": 109721,
->>>>>>> Stashed changes
-    "forks_count": 13628,
-    "stars_in_period": 166,
+    "stargazers_count": 109785,
+    "forks_count": 13632,
+    "stars_in_period": 177,
     "url": "https://github.com/microsoft/TypeScript",
     "html_url": "https://github.com/microsoft/TypeScript"
   },
@@ -613,14 +433,9 @@
     "full_name": "TencentCloud/TencentDB-Agent-Memory",
     "description": "TencentDB Agent Memory delivers fully local long-term memory for AI Agents via a 4-tier progressive pipeline, with zero external API dependencies.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 8123,
-    "forks_count": 746,
-=======
-    "stargazers_count": 8144,
-    "forks_count": 749,
->>>>>>> Stashed changes
-    "stars_in_period": 134,
+    "stargazers_count": 8258,
+    "forks_count": 760,
+    "stars_in_period": 123,
     "url": "https://github.com/TencentCloud/TencentDB-Agent-Memory",
     "html_url": "https://github.com/TencentCloud/TencentDB-Agent-Memory"
   },
@@ -629,14 +444,9 @@
     "full_name": "google-labs-code/stitch-skills",
     "description": "A library of Agent Skills designed to work with the Stitch MCP server. Each skill follows the Agent Skills open standard, for compatibility with coding agents such as Antigravity, Gemini CLI, Claude Code, Cursor.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 6608,
-    "forks_count": 917,
-=======
-    "stargazers_count": 6637,
-    "forks_count": 919,
->>>>>>> Stashed changes
-    "stars_in_period": 101,
+    "stargazers_count": 6763,
+    "forks_count": 929,
+    "stars_in_period": 117,
     "url": "https://github.com/google-labs-code/stitch-skills",
     "html_url": "https://github.com/google-labs-code/stitch-skills"
   },
@@ -647,7 +457,7 @@
     "language": "TypeScript",
     "stargazers_count": 45534,
     "forks_count": 6797,
-    "stars_in_period": 81,
+    "stars_in_period": 79,
     "url": "https://github.com/jestjs/jest",
     "html_url": "https://github.com/jestjs/jest"
   },
@@ -656,13 +466,9 @@
     "full_name": "vuejs/vue",
     "description": "This is the repo for Vue 2. For Vue 3, go tohttps://github.com/vuejs/core",
     "language": "TypeScript",
-    "stargazers_count": 210112,
-<<<<<<< Updated upstream
-    "forks_count": 33897,
-=======
-    "forks_count": 33898,
->>>>>>> Stashed changes
-    "stars_in_period": 163,
+    "stargazers_count": 210118,
+    "forks_count": 33903,
+    "stars_in_period": 162,
     "url": "https://github.com/vuejs/vue",
     "html_url": "https://github.com/vuejs/vue"
   },
@@ -671,13 +477,9 @@
     "full_name": "browseros-ai/BrowserOS",
     "description": "\ud83c\udf10 The open-source Agentic browser; alternative to ChatGPT Atlas, Perplexity Comet, Dia.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 11807,
-=======
     "stargazers_count": 11811,
->>>>>>> Stashed changes
     "forks_count": 1212,
-    "stars_in_period": 68,
+    "stars_in_period": 54,
     "url": "https://github.com/browseros-ai/BrowserOS",
     "html_url": "https://github.com/browseros-ai/BrowserOS"
   },
@@ -686,13 +488,9 @@
     "full_name": "EveryInc/compound-engineering-plugin",
     "description": "Official Compound Engineering plugin for Claude Code, Codex, Cursor, and more",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 22999,
-=======
-    "stargazers_count": 23001,
->>>>>>> Stashed changes
-    "forks_count": 1837,
-    "stars_in_period": 130,
+    "stargazers_count": 23022,
+    "forks_count": 1840,
+    "stars_in_period": 127,
     "url": "https://github.com/EveryInc/compound-engineering-plugin",
     "html_url": "https://github.com/EveryInc/compound-engineering-plugin"
   },
@@ -701,13 +499,9 @@
     "full_name": "grafana/grafana",
     "description": "The open and composable observability and data visualization platform. Visualize metrics, logs, and traces from multiple sources like Prometheus, Loki, Elasticsearch, InfluxDB, Postgres and many more.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 75484,
-=======
-    "stargazers_count": 75486,
->>>>>>> Stashed changes
-    "forks_count": 14342,
-    "stars_in_period": 113,
+    "stargazers_count": 75495,
+    "forks_count": 14343,
+    "stars_in_period": 108,
     "url": "https://github.com/grafana/grafana",
     "html_url": "https://github.com/grafana/grafana"
   },
@@ -716,14 +510,9 @@
     "full_name": "iptv-org/iptv",
     "description": "Collection of publicly available IPTV channels from all over the world",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 132012,
-    "forks_count": 7506,
-=======
-    "stargazers_count": 132022,
-    "forks_count": 7508,
->>>>>>> Stashed changes
-    "stars_in_period": 532,
+    "stargazers_count": 132127,
+    "forks_count": 7518,
+    "stars_in_period": 425,
     "url": "https://github.com/iptv-org/iptv",
     "html_url": "https://github.com/iptv-org/iptv"
   },
@@ -732,9 +521,9 @@
     "full_name": "prisma/prisma",
     "description": "Next-generation ORM for Node.js & TypeScript | PostgreSQL, MySQL, MariaDB, SQL Server, SQLite, MongoDB and CockroachDB",
     "language": "TypeScript",
-    "stargazers_count": 47084,
-    "forks_count": 2456,
-    "stars_in_period": 326,
+    "stargazers_count": 47096,
+    "forks_count": 2457,
+    "stars_in_period": 284,
     "url": "https://github.com/prisma/prisma",
     "html_url": "https://github.com/prisma/prisma"
   },
@@ -743,14 +532,9 @@
     "full_name": "ChromeDevTools/chrome-devtools-mcp",
     "description": "Chrome DevTools for coding agents",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 46611,
-    "forks_count": 3180,
-=======
-    "stargazers_count": 46614,
+    "stargazers_count": 46640,
     "forks_count": 3181,
->>>>>>> Stashed changes
-    "stars_in_period": 156,
+    "stars_in_period": 145,
     "url": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
     "html_url": "https://github.com/ChromeDevTools/chrome-devtools-mcp"
   },
@@ -759,13 +543,9 @@
     "full_name": "angular/angular",
     "description": "Deliver web apps with confidence \ud83d\ude80",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 100589,
-=======
-    "stargazers_count": 100590,
->>>>>>> Stashed changes
-    "forks_count": 27448,
-    "stars_in_period": 142,
+    "stargazers_count": 100594,
+    "forks_count": 27458,
+    "stars_in_period": 140,
     "url": "https://github.com/angular/angular",
     "html_url": "https://github.com/angular/angular"
   },
@@ -774,13 +554,8 @@
     "full_name": "cypress-io/cypress",
     "description": "Fast, easy and reliable testing for anything that runs in a browser.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 50517,
-    "forks_count": 3576,
-=======
-    "stargazers_count": 50518,
+    "stargazers_count": 50520,
     "forks_count": 3577,
->>>>>>> Stashed changes
     "stars_in_period": 75,
     "url": "https://github.com/cypress-io/cypress",
     "html_url": "https://github.com/cypress-io/cypress"
@@ -790,14 +565,9 @@
     "full_name": "jamiepine/voicebox",
     "description": "The open-source AI voice studio. Clone, dictate, create.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 40325,
-    "forks_count": 4860,
-=======
-    "stargazers_count": 40377,
-    "forks_count": 4866,
->>>>>>> Stashed changes
-    "stars_in_period": 541,
+    "stargazers_count": 40493,
+    "forks_count": 4882,
+    "stars_in_period": 515,
     "url": "https://github.com/jamiepine/voicebox",
     "html_url": "https://github.com/jamiepine/voicebox"
   },
@@ -806,13 +576,9 @@
     "full_name": "nrwl/nx",
     "description": "The Monorepo Platform that amplifies both developers and AI agents. Nx optimizes your builds, scales your CI, and fixes failed PRs automatically. Ship in half the time.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 29146,
-=======
-    "stargazers_count": 29147,
->>>>>>> Stashed changes
+    "stargazers_count": 29150,
     "forks_count": 2919,
-    "stars_in_period": 76,
+    "stars_in_period": 79,
     "url": "https://github.com/nrwl/nx",
     "html_url": "https://github.com/nrwl/nx"
   },
@@ -821,9 +587,9 @@
     "full_name": "apollographql/apollo-client",
     "description": "The industry-leading GraphQL client for TypeScript, JavaScript, React, Vue, Angular, and more. Apollo Client delivers powerful caching, intuitive APIs, and comprehensive developer tools to accelerate your app development.",
     "language": "TypeScript",
-    "stargazers_count": 19863,
+    "stargazers_count": 19864,
     "forks_count": 2826,
-    "stars_in_period": 75,
+    "stars_in_period": 74,
     "url": "https://github.com/apollographql/apollo-client",
     "html_url": "https://github.com/apollographql/apollo-client"
   },
@@ -832,13 +598,9 @@
     "full_name": "nestjs/nest",
     "description": "A progressive Node.js framework for building efficient, scalable, and enterprise-grade server-side applications with TypeScript/JavaScript \ud83d\ude80",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 76206,
-=======
-    "stargazers_count": 76209,
->>>>>>> Stashed changes
-    "forks_count": 8446,
-    "stars_in_period": 35,
+    "stargazers_count": 76213,
+    "forks_count": 8445,
+    "stars_in_period": 103,
     "url": "https://github.com/nestjs/nest",
     "html_url": "https://github.com/nestjs/nest"
   },
@@ -847,13 +609,9 @@
     "full_name": "vitejs/vite",
     "description": "Next generation frontend tooling. It's fast!",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 81970,
-=======
-    "stargazers_count": 81973,
->>>>>>> Stashed changes
+    "stargazers_count": 81979,
     "forks_count": 8567,
-    "stars_in_period": 104,
+    "stars_in_period": 99,
     "url": "https://github.com/vitejs/vite",
     "html_url": "https://github.com/vitejs/vite"
   },
@@ -862,30 +620,20 @@
     "full_name": "Zackriya-Solutions/meetily",
     "description": "Privacy first, AI meeting assistant with 4x faster Parakeet/Whisper live transcription, speaker diarization, and Ollama summarization built on Rust. 100% local processing. no cloud required. Meetily (Meetly Ai -https://meetily.ai) is the #1 Self-hosted, Open-source Ai meeting note taker for macOS & Windows. The #1 Ai Meeting Minutes generator.",
     "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 22527,
-    "forks_count": 2366,
-=======
-    "stargazers_count": 22546,
-    "forks_count": 2369,
->>>>>>> Stashed changes
-    "stars_in_period": 8885,
+    "stargazers_count": 22720,
+    "forks_count": 2387,
+    "stars_in_period": 8795,
     "url": "https://github.com/Zackriya-Solutions/meetily",
     "html_url": "https://github.com/Zackriya-Solutions/meetily"
   },
   {
     "repo": "asgeirtj/system_prompts_leaks",
     "full_name": "asgeirtj/system_prompts_leaks",
-    "description": "Extracted system prompts from Anthropic - Claude Fable 5, Opus 4.8, Claude Code, Claude Design. OpenAI - ChatGPT 5.5 Thinking, GPT 5.5 Instant, Codex. Google - Gemini 3.5 Flash, 3.1 Pro, Antigravity. xAI - Grok, Cursor, Copilot, VS Code, Perplexity, and more. Updated regularly.",
+    "description": "Extracted system prompts from Anthropic - Claude Fable 5, Opus 4.8, Claude Code, Claude Design. OpenAI - ChatGPT GPT-5.6, Codex GPT-5.6, GPT-5.5. Google - Gemini 3.5 Flash, 3.1 Pro, Antigravity. xAI - Grok, Cursor, Copilot, VS Code, Perplexity, and more. Updated regularly.",
     "language": "JavaScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 55683,
-    "forks_count": 9183,
-=======
-    "stargazers_count": 55709,
-    "forks_count": 9186,
->>>>>>> Stashed changes
-    "stars_in_period": 7149,
+    "stargazers_count": 55859,
+    "forks_count": 9209,
+    "stars_in_period": 7765,
     "url": "https://github.com/asgeirtj/system_prompts_leaks",
     "html_url": "https://github.com/asgeirtj/system_prompts_leaks"
   },
@@ -894,14 +642,9 @@
     "full_name": "usestrix/strix",
     "description": "Open-source AI penetration testing tool to find and fix your app\u2019s vulnerabilities.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 39969,
-    "forks_count": 4183,
-=======
-    "stargazers_count": 39998,
-    "forks_count": 4187,
->>>>>>> Stashed changes
-    "stars_in_period": 8370,
+    "stargazers_count": 40176,
+    "forks_count": 4212,
+    "stars_in_period": 6443,
     "url": "https://github.com/usestrix/strix",
     "html_url": "https://github.com/usestrix/strix"
   },
@@ -910,14 +653,9 @@
     "full_name": "openai/codex-plugin-cc",
     "description": "Use Codex from Claude Code to review code or delegate tasks.",
     "language": "JavaScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 27356,
-    "forks_count": 1768,
-=======
-    "stargazers_count": 27375,
-    "forks_count": 1771,
->>>>>>> Stashed changes
-    "stars_in_period": 4792,
+    "stargazers_count": 27447,
+    "forks_count": 1777,
+    "stars_in_period": 4484,
     "url": "https://github.com/openai/codex-plugin-cc",
     "html_url": "https://github.com/openai/codex-plugin-cc"
   },
@@ -926,14 +664,9 @@
     "full_name": "ogulcancelik/herdr",
     "description": "agent multiplexer that lives in your terminal.",
     "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 15104,
-    "forks_count": 995,
-=======
-    "stargazers_count": 15132,
-    "forks_count": 998,
->>>>>>> Stashed changes
-    "stars_in_period": 4756,
+    "stargazers_count": 15236,
+    "forks_count": 1010,
+    "stars_in_period": 4714,
     "url": "https://github.com/ogulcancelik/herdr",
     "html_url": "https://github.com/ogulcancelik/herdr"
   },
@@ -942,14 +675,9 @@
     "full_name": "bradautomates/claude-video",
     "description": "Give Claude the ability to watch any video. /watch downloads, extracts frames, transcribes, hands it all to Claude.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 7056,
-    "forks_count": 791,
-=======
-    "stargazers_count": 7083,
-    "forks_count": 794,
->>>>>>> Stashed changes
-    "stars_in_period": 3630,
+    "stargazers_count": 7220,
+    "forks_count": 808,
+    "stars_in_period": 4093,
     "url": "https://github.com/bradautomates/claude-video",
     "html_url": "https://github.com/bradautomates/claude-video"
   },
@@ -958,13 +686,9 @@
     "full_name": "facebook/astryx",
     "description": "An open source design system that's fully customizable and agent ready",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 7657,
-=======
-    "stargazers_count": 7670,
->>>>>>> Stashed changes
-    "forks_count": 640,
-    "stars_in_period": 4087,
+    "stargazers_count": 7758,
+    "forks_count": 648,
+    "stars_in_period": 3582,
     "url": "https://github.com/facebook/astryx",
     "html_url": "https://github.com/facebook/astryx"
   },
@@ -973,14 +697,9 @@
     "full_name": "alibaba/page-agent",
     "description": "JavaScript in-page GUI agent. Control web interfaces with natural language.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 25739,
-    "forks_count": 2364,
-=======
-    "stargazers_count": 25761,
-    "forks_count": 2366,
->>>>>>> Stashed changes
-    "stars_in_period": 4459,
+    "stargazers_count": 25845,
+    "forks_count": 2373,
+    "stars_in_period": 3799,
     "url": "https://github.com/alibaba/page-agent",
     "html_url": "https://github.com/alibaba/page-agent"
   },
@@ -989,14 +708,9 @@
     "full_name": "TencentCloud/CubeSandbox",
     "description": "Instant, Concurrent, Secure & Lightweight Sandbox for AI Agents.",
     "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 9547,
-    "forks_count": 936,
-=======
-    "stargazers_count": 9556,
-    "forks_count": 937,
->>>>>>> Stashed changes
-    "stars_in_period": 2284,
+    "stargazers_count": 9589,
+    "forks_count": 939,
+    "stars_in_period": 2514,
     "url": "https://github.com/TencentCloud/CubeSandbox",
     "html_url": "https://github.com/TencentCloud/CubeSandbox"
   },
@@ -1005,14 +719,9 @@
     "full_name": "diegosouzapw/OmniRoute",
     "description": "Never stop coding. Free AI gateway: one endpoint, 231+ providers (50+ free), connect Claude Code, Codex, Cursor, Cline & Copilot to FREE Claude/GPT/Gemini. RTK+Caveman stacked compression saves 15-95% tokens, smart auto-fallback, MCP/A2A, multimodal APIs, Desktop/PWA.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 14811,
-    "forks_count": 2270,
-=======
-    "stargazers_count": 14877,
-    "forks_count": 2281,
->>>>>>> Stashed changes
-    "stars_in_period": 4119,
+    "stargazers_count": 15107,
+    "forks_count": 2309,
+    "stars_in_period": 4268,
     "url": "https://github.com/diegosouzapw/OmniRoute",
     "html_url": "https://github.com/diegosouzapw/OmniRoute"
   },
@@ -1021,14 +730,9 @@
     "full_name": "stablyai/orca",
     "description": "Orca is the ADE for working with a fleet of parallel agents. Run any coding agent with your own subscription. Available on desktop and mobile.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 15791,
-    "forks_count": 1230,
-=======
-    "stargazers_count": 15834,
-    "forks_count": 1235,
->>>>>>> Stashed changes
-    "stars_in_period": 4111,
+    "stargazers_count": 15983,
+    "forks_count": 1248,
+    "stars_in_period": 4328,
     "url": "https://github.com/stablyai/orca",
     "html_url": "https://github.com/stablyai/orca"
   },
@@ -1037,14 +741,9 @@
     "full_name": "huggingface/speech-to-speech",
     "description": "Build local voice agents with open-source models",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 5968,
-    "forks_count": 837,
-=======
-    "stargazers_count": 5977,
-    "forks_count": 838,
->>>>>>> Stashed changes
-    "stars_in_period": 788,
+    "stargazers_count": 6017,
+    "forks_count": 841,
+    "stars_in_period": 811,
     "url": "https://github.com/huggingface/speech-to-speech",
     "html_url": "https://github.com/huggingface/speech-to-speech"
   },
@@ -1053,14 +752,9 @@
     "full_name": "ruvnet/RuView",
     "description": "\u03c0 RuView turns commodity WiFi signals into real-time spatial intelligence, vital sign monitoring, and presence detection \u2014 all without a single pixel of video.",
     "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 79817,
-    "forks_count": 10743,
-=======
-    "stargazers_count": 79832,
-    "forks_count": 10746,
->>>>>>> Stashed changes
-    "stars_in_period": 3537,
+    "stargazers_count": 79896,
+    "forks_count": 10754,
+    "stars_in_period": 3657,
     "url": "https://github.com/ruvnet/RuView",
     "html_url": "https://github.com/ruvnet/RuView"
   },
@@ -1069,14 +763,9 @@
     "full_name": "tt-a1i/archify",
     "description": "Any agent Skill: generate beautiful architecture diagrams with dark/light theme toggle and PNG/JPEG/WebP/SVG export",
     "language": "JavaScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 3375,
-    "forks_count": 355,
-=======
-    "stargazers_count": 3389,
-    "forks_count": 357,
->>>>>>> Stashed changes
-    "stars_in_period": 1013,
+    "stargazers_count": 3464,
+    "forks_count": 358,
+    "stars_in_period": 1019,
     "url": "https://github.com/tt-a1i/archify",
     "html_url": "https://github.com/tt-a1i/archify"
   },
@@ -1085,14 +774,9 @@
     "full_name": "iOfficeAI/OfficeCLI",
     "description": "OfficeCLI is the first and best Office suite purpose-built for AI agents to read, edit, and automate Word, Excel, and PowerPoint files. Free, open-source, single binary, no Office installation required.",
     "language": "C#",
-<<<<<<< Updated upstream
-    "stargazers_count": 14209,
-    "forks_count": 963,
-=======
-    "stargazers_count": 14269,
-    "forks_count": 964,
->>>>>>> Stashed changes
-    "stars_in_period": 4872,
+    "stargazers_count": 14477,
+    "forks_count": 988,
+    "stars_in_period": 5789,
     "url": "https://github.com/iOfficeAI/OfficeCLI",
     "html_url": "https://github.com/iOfficeAI/OfficeCLI"
   },
@@ -1101,14 +785,9 @@
     "full_name": "xbtlin/ai-berkshire",
     "description": "AI \u65f6\u4ee3\u7684\u4f2f\u514b\u5e0c\u5c14\uff1a\u57fa\u4e8e Claude Code / Codex \u7684\u4ef7\u503c\u6295\u8d44\u7814\u7a76\u6846\u67b6\u3002\u5df4\u83f2\u7279\u00b7\u8292\u683c\u00b7\u6bb5\u6c38\u5e73\u00b7\u674e\u5f55\u56db\u5927\u5e08\u65b9\u6cd5\u8bba + \u591aAgent\u5e76\u884c\u7814\u7a76\u3002| AI-era Berkshire: a value investing research framework built for Claude Code / Codex. 4 masters' methodologies + multi-agent adversarial analysis.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 12595,
-    "forks_count": 1783,
-=======
-    "stargazers_count": 12612,
-    "forks_count": 1785,
->>>>>>> Stashed changes
-    "stars_in_period": 3757,
+    "stargazers_count": 12652,
+    "forks_count": 1787,
+    "stars_in_period": 3596,
     "url": "https://github.com/xbtlin/ai-berkshire",
     "html_url": "https://github.com/xbtlin/ai-berkshire"
   },
@@ -1117,14 +796,9 @@
     "full_name": "wonderwhy-er/DesktopCommanderMCP",
     "description": "This is MCP server for Claude that gives it terminal control, file system search and diff file editing capabilities",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 6981,
-    "forks_count": 895,
-=======
-    "stargazers_count": 7054,
-    "forks_count": 902,
->>>>>>> Stashed changes
-    "stars_in_period": 297,
+    "stargazers_count": 7336,
+    "forks_count": 932,
+    "stars_in_period": 557,
     "url": "https://github.com/wonderwhy-er/DesktopCommanderMCP",
     "html_url": "https://github.com/wonderwhy-er/DesktopCommanderMCP"
   },
@@ -1133,13 +807,9 @@
     "full_name": "dotnet/skills",
     "description": "Repository for skills to assist AI coding agents with .NET and C#",
     "language": "C#",
-<<<<<<< Updated upstream
-    "stargazers_count": 4527,
-=======
-    "stargazers_count": 4531,
->>>>>>> Stashed changes
-    "forks_count": 332,
-    "stars_in_period": 886,
+    "stargazers_count": 4549,
+    "forks_count": 331,
+    "stars_in_period": 914,
     "url": "https://github.com/dotnet/skills",
     "html_url": "https://github.com/dotnet/skills"
   },
@@ -1148,14 +818,9 @@
     "full_name": "alirezarezvani/claude-skills",
     "description": "345 Claude Code skills & agent skills & plugins (30+ Agents, 70+ custom commands, 330+ skills, customizable references, scripts)for Claude Code, Codex, Gemini CLI, Cursor, and 8 more coding agents \u2014 engineering, marketing, product, compliance, C-level advisory, research, business operations, commercial & finance, and your daily productivity skills.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 22014,
-    "forks_count": 3077,
-=======
-    "stargazers_count": 22030,
-    "forks_count": 3079,
->>>>>>> Stashed changes
-    "stars_in_period": 2178,
+    "stargazers_count": 22084,
+    "forks_count": 3086,
+    "stars_in_period": 2230,
     "url": "https://github.com/alirezarezvani/claude-skills",
     "html_url": "https://github.com/alirezarezvani/claude-skills"
   },
@@ -1164,14 +829,9 @@
     "full_name": "JuliusBrussee/caveman",
     "description": "\ud83e\udea8 why use many token when few token do trick \u2014 Claude Code skill that cuts 65% of tokens by talking like caveman",
     "language": "JavaScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 87610,
-    "forks_count": 5028,
-=======
-    "stargazers_count": 87651,
-    "forks_count": 5029,
->>>>>>> Stashed changes
-    "stars_in_period": 7184,
+    "stargazers_count": 87786,
+    "forks_count": 5038,
+    "stars_in_period": 5348,
     "url": "https://github.com/JuliusBrussee/caveman",
     "html_url": "https://github.com/JuliusBrussee/caveman"
   },
@@ -1180,14 +840,9 @@
     "full_name": "addyosmani/agent-skills",
     "description": "Production-grade engineering skills for AI coding agents.",
     "language": "JavaScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 76571,
-    "forks_count": 8222,
-=======
-    "stargazers_count": 76637,
-    "forks_count": 8229,
->>>>>>> Stashed changes
-    "stars_in_period": 7236,
+    "stargazers_count": 76855,
+    "forks_count": 8254,
+    "stars_in_period": 7944,
     "url": "https://github.com/addyosmani/agent-skills",
     "html_url": "https://github.com/addyosmani/agent-skills"
   },
@@ -1196,14 +851,9 @@
     "full_name": "usestrix/strix",
     "description": "Open-source AI penetration testing tool to find and fix your app\u2019s vulnerabilities.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 39969,
-    "forks_count": 4183,
-=======
-    "stargazers_count": 39998,
-    "forks_count": 4187,
->>>>>>> Stashed changes
-    "stars_in_period": 8370,
+    "stargazers_count": 40176,
+    "forks_count": 4212,
+    "stars_in_period": 6443,
     "url": "https://github.com/usestrix/strix",
     "html_url": "https://github.com/usestrix/strix"
   },
@@ -1212,14 +862,9 @@
     "full_name": "bradautomates/claude-video",
     "description": "Give Claude the ability to watch any video. /watch downloads, extracts frames, transcribes, hands it all to Claude.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 7056,
-    "forks_count": 791,
-=======
-    "stargazers_count": 7083,
-    "forks_count": 794,
->>>>>>> Stashed changes
-    "stars_in_period": 3630,
+    "stargazers_count": 7220,
+    "forks_count": 808,
+    "stars_in_period": 4093,
     "url": "https://github.com/bradautomates/claude-video",
     "html_url": "https://github.com/bradautomates/claude-video"
   },
@@ -1228,14 +873,9 @@
     "full_name": "huggingface/speech-to-speech",
     "description": "Build local voice agents with open-source models",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 5968,
-    "forks_count": 837,
-=======
-    "stargazers_count": 5977,
-    "forks_count": 838,
->>>>>>> Stashed changes
-    "stars_in_period": 788,
+    "stargazers_count": 6017,
+    "forks_count": 841,
+    "stars_in_period": 811,
     "url": "https://github.com/huggingface/speech-to-speech",
     "html_url": "https://github.com/huggingface/speech-to-speech"
   },
@@ -1244,14 +884,9 @@
     "full_name": "xbtlin/ai-berkshire",
     "description": "AI \u65f6\u4ee3\u7684\u4f2f\u514b\u5e0c\u5c14\uff1a\u57fa\u4e8e Claude Code / Codex \u7684\u4ef7\u503c\u6295\u8d44\u7814\u7a76\u6846\u67b6\u3002\u5df4\u83f2\u7279\u00b7\u8292\u683c\u00b7\u6bb5\u6c38\u5e73\u00b7\u674e\u5f55\u56db\u5927\u5e08\u65b9\u6cd5\u8bba + \u591aAgent\u5e76\u884c\u7814\u7a76\u3002| AI-era Berkshire: a value investing research framework built for Claude Code / Codex. 4 masters' methodologies + multi-agent adversarial analysis.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 12595,
-    "forks_count": 1783,
-=======
-    "stargazers_count": 12612,
-    "forks_count": 1785,
->>>>>>> Stashed changes
-    "stars_in_period": 3757,
+    "stargazers_count": 12652,
+    "forks_count": 1787,
+    "stars_in_period": 3596,
     "url": "https://github.com/xbtlin/ai-berkshire",
     "html_url": "https://github.com/xbtlin/ai-berkshire"
   },
@@ -1260,14 +895,9 @@
     "full_name": "alirezarezvani/claude-skills",
     "description": "345 Claude Code skills & agent skills & plugins (30+ Agents, 70+ custom commands, 330+ skills, customizable references, scripts)for Claude Code, Codex, Gemini CLI, Cursor, and 8 more coding agents \u2014 engineering, marketing, product, compliance, C-level advisory, research, business operations, commercial & finance, and your daily productivity skills.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 22014,
-    "forks_count": 3077,
-=======
-    "stargazers_count": 22030,
-    "forks_count": 3079,
->>>>>>> Stashed changes
-    "stars_in_period": 2178,
+    "stargazers_count": 22084,
+    "forks_count": 3086,
+    "stars_in_period": 2230,
     "url": "https://github.com/alirezarezvani/claude-skills",
     "html_url": "https://github.com/alirezarezvani/claude-skills"
   },
@@ -1276,14 +906,9 @@
     "full_name": "browser-use/video-use",
     "description": "Edit videos with coding agents",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 16443,
-    "forks_count": 2041,
-=======
-    "stargazers_count": 16458,
-    "forks_count": 2040,
->>>>>>> Stashed changes
-    "stars_in_period": 2645,
+    "stargazers_count": 16500,
+    "forks_count": 2048,
+    "stars_in_period": 2202,
     "url": "https://github.com/browser-use/video-use",
     "html_url": "https://github.com/browser-use/video-use"
   },
@@ -1292,9 +917,9 @@
     "full_name": "harvard-edge/cs249r_book",
     "description": "Machine Learning Systems",
     "language": "Python",
-    "stargazers_count": 27362,
-    "forks_count": 3388,
-    "stars_in_period": 1969,
+    "stargazers_count": 27372,
+    "forks_count": 3389,
+    "stars_in_period": 1395,
     "url": "https://github.com/harvard-edge/cs249r_book",
     "html_url": "https://github.com/harvard-edge/cs249r_book"
   },
@@ -1303,13 +928,9 @@
     "full_name": "hesreallyhim/awesome-claude-code",
     "description": "A hand-picked collection of the finest of resources for the most awesome of agents, Claude Code, the undisputed champion of coding companions, from the unstoppable team at Anthropic PBC. A delectable showcase of top tier skills, ambidextrous agents, scintillating status lines, top notch developer tooling, and also we have plugins",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 49714,
-=======
-    "stargazers_count": 49716,
->>>>>>> Stashed changes
-    "forks_count": 4322,
-    "stars_in_period": 1886,
+    "stargazers_count": 49744,
+    "forks_count": 4325,
+    "stars_in_period": 1888,
     "url": "https://github.com/hesreallyhim/awesome-claude-code",
     "html_url": "https://github.com/hesreallyhim/awesome-claude-code"
   },
@@ -1318,13 +939,9 @@
     "full_name": "Robbyant/lingbot-map",
     "description": "A feed-forward 3D foundation model for reconstructing scenes from streaming data",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 10462,
-=======
-    "stargazers_count": 10464,
->>>>>>> Stashed changes
-    "forks_count": 1186,
-    "stars_in_period": 999,
+    "stargazers_count": 10472,
+    "forks_count": 1189,
+    "stars_in_period": 965,
     "url": "https://github.com/Robbyant/lingbot-map",
     "html_url": "https://github.com/Robbyant/lingbot-map"
   },
@@ -1333,14 +950,9 @@
     "full_name": "kyutai-labs/pocket-tts",
     "description": "A TTS that fits in your CPU (and pocket)",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 7222,
-    "forks_count": 726,
-=======
-    "stargazers_count": 7233,
-    "forks_count": 727,
->>>>>>> Stashed changes
-    "stars_in_period": 2137,
+    "stargazers_count": 7270,
+    "forks_count": 730,
+    "stars_in_period": 2501,
     "url": "https://github.com/kyutai-labs/pocket-tts",
     "html_url": "https://github.com/kyutai-labs/pocket-tts"
   },
@@ -1349,14 +961,9 @@
     "full_name": "rommapp/romm",
     "description": "A beautiful, powerful, self-hosted rom manager and player.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 11061,
-    "forks_count": 652,
-=======
-    "stargazers_count": 11064,
-    "forks_count": 653,
->>>>>>> Stashed changes
-    "stars_in_period": 1510,
+    "stargazers_count": 11083,
+    "forks_count": 655,
+    "stars_in_period": 1437,
     "url": "https://github.com/rommapp/romm",
     "html_url": "https://github.com/rommapp/romm"
   },
@@ -1365,14 +972,9 @@
     "full_name": "cheahjs/free-llm-api-resources",
     "description": "A list of free LLM inference resources accessible via API.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 26700,
-    "forks_count": 2775,
-=======
-    "stargazers_count": 26710,
-    "forks_count": 2777,
->>>>>>> Stashed changes
-    "stars_in_period": 2058,
+    "stargazers_count": 26740,
+    "forks_count": 2780,
+    "stars_in_period": 2159,
     "url": "https://github.com/cheahjs/free-llm-api-resources",
     "html_url": "https://github.com/cheahjs/free-llm-api-resources"
   },
@@ -1381,14 +983,9 @@
     "full_name": "agentskills/agentskills",
     "description": "Specification and documentation for Agent Skills",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 22869,
+    "stargazers_count": 22881,
     "forks_count": 1597,
-=======
-    "stargazers_count": 22871,
-    "forks_count": 1596,
->>>>>>> Stashed changes
-    "stars_in_period": 1099,
+    "stars_in_period": 1019,
     "url": "https://github.com/agentskills/agentskills",
     "html_url": "https://github.com/agentskills/agentskills"
   },
@@ -1397,14 +994,9 @@
     "full_name": "Graphify-Labs/graphify",
     "description": "AI coding assistant skill (Claude Code, Codex, OpenCode, Cursor, Gemini CLI, and more). Turn any folder of code, SQL schemas, R scripts, shell scripts, docs, papers, images, or videos into a queryable knowledge graph. App code + database schema + infrastructure in one graph.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 81744,
-    "forks_count": 8036,
-=======
-    "stargazers_count": 81779,
-    "forks_count": 8041,
->>>>>>> Stashed changes
-    "stars_in_period": 5188,
+    "stargazers_count": 81982,
+    "forks_count": 8064,
+    "stars_in_period": 5103,
     "url": "https://github.com/Graphify-Labs/graphify",
     "html_url": "https://github.com/Graphify-Labs/graphify"
   },
@@ -1413,14 +1005,9 @@
     "full_name": "anthropics/claude-code",
     "description": "Claude Code is an agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster by executing routine tasks, explaining complex code, and handling git workflows - all through natural language commands.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 137274,
-    "forks_count": 22162,
-=======
-    "stargazers_count": 137282,
-    "forks_count": 22164,
->>>>>>> Stashed changes
-    "stars_in_period": 1721,
+    "stargazers_count": 137328,
+    "forks_count": 22169,
+    "stars_in_period": 1736,
     "url": "https://github.com/anthropics/claude-code",
     "html_url": "https://github.com/anthropics/claude-code"
   },
@@ -1429,13 +1016,9 @@
     "full_name": "ai-boost/awesome-harness-engineering",
     "description": "Awesome list for AI agent harness engineering: tools, patterns, evals, memory, MCP, permissions, observability, and orchestration.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 2966,
-=======
-    "stargazers_count": 2969,
->>>>>>> Stashed changes
-    "forks_count": 307,
-    "stars_in_period": 542,
+    "stargazers_count": 2975,
+    "forks_count": 308,
+    "stars_in_period": 405,
     "url": "https://github.com/ai-boost/awesome-harness-engineering",
     "html_url": "https://github.com/ai-boost/awesome-harness-engineering"
   },
@@ -1444,13 +1027,9 @@
     "full_name": "jamwithai/production-agentic-rag-course",
     "description": "",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 7664,
-=======
-    "stargazers_count": 7668,
->>>>>>> Stashed changes
-    "forks_count": 1706,
-    "stars_in_period": 352,
+    "stargazers_count": 7676,
+    "forks_count": 1708,
+    "stars_in_period": 360,
     "url": "https://github.com/jamwithai/production-agentic-rag-course",
     "html_url": "https://github.com/jamwithai/production-agentic-rag-course"
   },
@@ -1459,13 +1038,9 @@
     "full_name": "facebook/astryx",
     "description": "An open source design system that's fully customizable and agent ready",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 7657,
-=======
-    "stargazers_count": 7670,
->>>>>>> Stashed changes
-    "forks_count": 640,
-    "stars_in_period": 4087,
+    "stargazers_count": 7758,
+    "forks_count": 648,
+    "stars_in_period": 3582,
     "url": "https://github.com/facebook/astryx",
     "html_url": "https://github.com/facebook/astryx"
   },
@@ -1474,14 +1049,9 @@
     "full_name": "alibaba/page-agent",
     "description": "JavaScript in-page GUI agent. Control web interfaces with natural language.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 25739,
-    "forks_count": 2364,
-=======
-    "stargazers_count": 25761,
-    "forks_count": 2366,
->>>>>>> Stashed changes
-    "stars_in_period": 4459,
+    "stargazers_count": 25845,
+    "forks_count": 2373,
+    "stars_in_period": 3799,
     "url": "https://github.com/alibaba/page-agent",
     "html_url": "https://github.com/alibaba/page-agent"
   },
@@ -1490,14 +1060,9 @@
     "full_name": "diegosouzapw/OmniRoute",
     "description": "Never stop coding. Free AI gateway: one endpoint, 231+ providers (50+ free), connect Claude Code, Codex, Cursor, Cline & Copilot to FREE Claude/GPT/Gemini. RTK+Caveman stacked compression saves 15-95% tokens, smart auto-fallback, MCP/A2A, multimodal APIs, Desktop/PWA.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 14812,
-    "forks_count": 2270,
-=======
-    "stargazers_count": 14878,
-    "forks_count": 2281,
->>>>>>> Stashed changes
-    "stars_in_period": 4119,
+    "stargazers_count": 15107,
+    "forks_count": 2309,
+    "stars_in_period": 4268,
     "url": "https://github.com/diegosouzapw/OmniRoute",
     "html_url": "https://github.com/diegosouzapw/OmniRoute"
   },
@@ -1506,14 +1071,9 @@
     "full_name": "stablyai/orca",
     "description": "Orca is the ADE for working with a fleet of parallel agents. Run any coding agent with your own subscription. Available on desktop and mobile.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 15791,
-    "forks_count": 1230,
-=======
-    "stargazers_count": 15834,
-    "forks_count": 1235,
->>>>>>> Stashed changes
-    "stars_in_period": 4111,
+    "stargazers_count": 15983,
+    "forks_count": 1248,
+    "stars_in_period": 4328,
     "url": "https://github.com/stablyai/orca",
     "html_url": "https://github.com/stablyai/orca"
   },
@@ -1522,14 +1082,9 @@
     "full_name": "wonderwhy-er/DesktopCommanderMCP",
     "description": "This is MCP server for Claude that gives it terminal control, file system search and diff file editing capabilities",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 6981,
-    "forks_count": 895,
-=======
-    "stargazers_count": 7054,
-    "forks_count": 902,
->>>>>>> Stashed changes
-    "stars_in_period": 297,
+    "stargazers_count": 7336,
+    "forks_count": 932,
+    "stars_in_period": 557,
     "url": "https://github.com/wonderwhy-er/DesktopCommanderMCP",
     "html_url": "https://github.com/wonderwhy-er/DesktopCommanderMCP"
   },
@@ -1538,14 +1093,9 @@
     "full_name": "TencentCloud/TencentDB-Agent-Memory",
     "description": "TencentDB Agent Memory delivers fully local long-term memory for AI Agents via a 4-tier progressive pipeline, with zero external API dependencies.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 8123,
-    "forks_count": 746,
-=======
-    "stargazers_count": 8144,
-    "forks_count": 749,
->>>>>>> Stashed changes
-    "stars_in_period": 1659,
+    "stargazers_count": 8259,
+    "forks_count": 760,
+    "stars_in_period": 1750,
     "url": "https://github.com/TencentCloud/TencentDB-Agent-Memory",
     "html_url": "https://github.com/TencentCloud/TencentDB-Agent-Memory"
   },
@@ -1554,14 +1104,9 @@
     "full_name": "immich-app/immich",
     "description": "High performance self-hosted photo and video management solution.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 107199,
-    "forks_count": 6156,
-=======
-    "stargazers_count": 107206,
-    "forks_count": 6158,
->>>>>>> Stashed changes
-    "stars_in_period": 2194,
+    "stargazers_count": 107242,
+    "forks_count": 6161,
+    "stars_in_period": 2023,
     "url": "https://github.com/immich-app/immich",
     "html_url": "https://github.com/immich-app/immich"
   },
@@ -1570,9 +1115,9 @@
     "full_name": "crynta/terax-ai",
     "description": "Lightweight (7MB) Terminal-first AI-native dev workspace",
     "language": "TypeScript",
-    "stargazers_count": 8428,
-    "forks_count": 895,
-    "stars_in_period": 675,
+    "stargazers_count": 8435,
+    "forks_count": 899,
+    "stars_in_period": 589,
     "url": "https://github.com/crynta/terax-ai",
     "html_url": "https://github.com/crynta/terax-ai"
   },
@@ -1581,14 +1126,9 @@
     "full_name": "jamiepine/voicebox",
     "description": "The open-source AI voice studio. Clone, dictate, create.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 40325,
-    "forks_count": 4860,
-=======
-    "stargazers_count": 40377,
-    "forks_count": 4866,
->>>>>>> Stashed changes
-    "stars_in_period": 3059,
+    "stargazers_count": 40493,
+    "forks_count": 4882,
+    "stars_in_period": 3178,
     "url": "https://github.com/jamiepine/voicebox",
     "html_url": "https://github.com/jamiepine/voicebox"
   },
@@ -1597,13 +1137,9 @@
     "full_name": "JCodesMore/ai-website-cloner-template",
     "description": "Clone any website with one command using AI coding agents",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 27440,
-=======
-    "stargazers_count": 27458,
->>>>>>> Stashed changes
-    "forks_count": 4004,
-    "stars_in_period": 2404,
+    "stargazers_count": 27526,
+    "forks_count": 4012,
+    "stars_in_period": 2295,
     "url": "https://github.com/JCodesMore/ai-website-cloner-template",
     "html_url": "https://github.com/JCodesMore/ai-website-cloner-template"
   },
@@ -1612,14 +1148,9 @@
     "full_name": "ChromeDevTools/chrome-devtools-mcp",
     "description": "Chrome DevTools for coding agents",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 46611,
-    "forks_count": 3180,
-=======
-    "stargazers_count": 46614,
+    "stargazers_count": 46640,
     "forks_count": 3181,
->>>>>>> Stashed changes
-    "stars_in_period": 1521,
+    "stars_in_period": 1255,
     "url": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
     "html_url": "https://github.com/ChromeDevTools/chrome-devtools-mcp"
   },
@@ -1628,13 +1159,9 @@
     "full_name": "chthollyphile/folia-major",
     "description": "\u4e13\u6ce8\u4e8e\u7eda\u4e3d\u7684\u6b4c\u8bcd\u52a8\u753b\u6548\u679c\u7684\u672c\u5730\u97f3\u4e50/navidrome/\u7b2c\u4e09\u65b9\u7f51\u6613\u4e91\u64ad\u653e\u5668",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 1258,
-=======
-    "stargazers_count": 1260,
->>>>>>> Stashed changes
+    "stargazers_count": 1266,
     "forks_count": 91,
-    "stars_in_period": 535,
+    "stars_in_period": 458,
     "url": "https://github.com/chthollyphile/folia-major",
     "html_url": "https://github.com/chthollyphile/folia-major"
   },
@@ -1643,9 +1170,9 @@
     "full_name": "Chocobozzz/PeerTube",
     "description": "ActivityPub-federated video streaming platform using P2P directly in your web browser",
     "language": "TypeScript",
-    "stargazers_count": 15219,
+    "stargazers_count": 15221,
     "forks_count": 1913,
-    "stars_in_period": 308,
+    "stars_in_period": 198,
     "url": "https://github.com/Chocobozzz/PeerTube",
     "html_url": "https://github.com/Chocobozzz/PeerTube"
   },
@@ -1654,14 +1181,9 @@
     "full_name": "google-labs-code/stitch-skills",
     "description": "A library of Agent Skills designed to work with the Stitch MCP server. Each skill follows the Agent Skills open standard, for compatibility with coding agents such as Antigravity, Gemini CLI, Claude Code, Cursor.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 6609,
-    "forks_count": 917,
-=======
-    "stargazers_count": 6637,
-    "forks_count": 919,
->>>>>>> Stashed changes
-    "stars_in_period": 155,
+    "stargazers_count": 6763,
+    "forks_count": 929,
+    "stars_in_period": 296,
     "url": "https://github.com/google-labs-code/stitch-skills",
     "html_url": "https://github.com/google-labs-code/stitch-skills"
   },
@@ -1670,14 +1192,9 @@
     "full_name": "mauriceboe/TREK",
     "description": "A self-hosted travel/trip planner with real-time collaboration, interactive maps, PWA support, SSO, budgets, packing lists, and more.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 9959,
-    "forks_count": 943,
-=======
-    "stargazers_count": 9969,
-    "forks_count": 944,
->>>>>>> Stashed changes
-    "stars_in_period": 964,
+    "stargazers_count": 10011,
+    "forks_count": 945,
+    "stars_in_period": 961,
     "url": "https://github.com/mauriceboe/TREK",
     "html_url": "https://github.com/mauriceboe/TREK"
   },
@@ -1686,9 +1203,9 @@
     "full_name": "lessweb/deepcode-cli",
     "description": "Deep Code \u662f\u4e13\u4e3a deepseek-v4 \u6a21\u578b\u4f18\u5316\u7684\u7ec8\u7aef AI \u7f16\u7801\u52a9\u624b\uff0c\u652f\u6301\u6df1\u5ea6\u601d\u8003\u3001\u63a8\u7406\u5f3a\u5ea6\u63a7\u5236\u4ee5\u53ca Agent Skills\u3002",
     "language": "TypeScript",
-    "stargazers_count": 1793,
-    "forks_count": 161,
-    "stars_in_period": 401,
+    "stargazers_count": 1799,
+    "forks_count": 162,
+    "stars_in_period": 400,
     "url": "https://github.com/lessweb/deepcode-cli",
     "html_url": "https://github.com/lessweb/deepcode-cli"
   },
@@ -1697,13 +1214,9 @@
     "full_name": "actions/checkout",
     "description": "Action for checking out a repo",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 8417,
-=======
-    "stargazers_count": 8418,
->>>>>>> Stashed changes
-    "forks_count": 2707,
-    "stars_in_period": 236,
+    "stargazers_count": 8419,
+    "forks_count": 2708,
+    "stars_in_period": 189,
     "url": "https://github.com/actions/checkout",
     "html_url": "https://github.com/actions/checkout"
   }
