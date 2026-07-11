@@ -109,17 +109,26 @@ def generate_and_upload_shorts_teaser(script_json, longform_video_id, dry_run=Fa
         target_end = 0.0
         found = False
         
-        for i, ft in enumerate(fact_timestamps):
-            f_num = ft.get("fact_number", i + 1)
-            if f_num == best_fact_num:
-                target_start = float(ft.get("approx_start_seconds", 0))
-                if i + 1 < len(fact_timestamps):
-                    target_end = float(fact_timestamps[i + 1].get("approx_start_seconds", target_start + 45))
-                else:
-                    # Default duration to 50 seconds if last fact
-                    target_end = target_start + 50.0
-                found = True
-                break
+        # For chaptered format, use chapter timestamps directly (they use "topic" not "fact_number")
+        is_chaptered = script_json.get("longform_format") == "chaptered"
+        
+        if is_chaptered and len(fact_timestamps) >= 2:
+            # Use the hook chapter (first chapter) as teaser
+            target_start = float(fact_timestamps[0].get("approx_start_seconds", 0))
+            target_end = float(fact_timestamps[1].get("approx_start_seconds", target_start + 45))
+            found = True
+            print(f"   📌 Chaptered format: using hook chapter as teaser")
+        else:
+            for i, ft in enumerate(fact_timestamps):
+                f_num = ft.get("fact_number", i + 1)
+                if f_num == best_fact_num:
+                    target_start = float(ft.get("approx_start_seconds", 0))
+                    if i + 1 < len(fact_timestamps):
+                        target_end = float(fact_timestamps[i + 1].get("approx_start_seconds", target_start + 45))
+                    else:
+                        target_end = target_start + 50.0
+                    found = True
+                    break
                 
         if not found:
             print("⚠️ Fact number not found in timestamps. Using Fact #1 as default.")

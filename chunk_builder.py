@@ -174,3 +174,163 @@ def redistribute_to_audio_duration(chunks, audio_duration):
              chunks[i+1]["duration"] = max(0.1, chunks[i+1]["end"] - chunks[i+1]["start"])
 
     return chunks
+
+
+def build_chapter_aware_chunks(word_timestamps, chapters, subtitle_chunks=None, max_beats_per_chapter=6):
+    """
+    Groups word timestamps into visual chunks using chapter boundaries and visual beats.
+    
+    This produces ~15-30 total chunks instead of ~200+ sentence-level chunks, which is the
+    direct fix for the memory/SIGTERM issue in longform rendering. Each visual beat holds
+    8-15 seconds of narration rather than one sentence.
+    
+    Args:
+        word_timestamps: List of {"word": str, "start": float, "end": float}
+        chapters: List of chapter dicts from the script, each containing:
+            - chapter_number, chapter_title, chapter_text, approx_start_seconds
+            - visual_beats: list of {"beat_text": str, "visual_direction": str}
+        subtitle_chunks: Optional Gemini subtitle_chunks for visual metadata mapping
+        max_beats_per_chapter: Hard cap on visual beats per chapter
+    
+    Returns:
+        List of chunk dicts compatible with the existing visual pipeline
+    """
+    if not word_timestamps or not chapters:
+        print("WARNING: No chapters available for chapter-aware chunking. Falling back to standard chunking.")
+        return build_chunks(word_timestamps, subtitle_chunks or [])
+
+    num_words = len(word_timestamps)
+    total_audio_dur = word_timestamps[-1]["end"] if word_timestamps else 0
+    final_chunks = []
+    
+    def strip_punc(s):
+        return re.sub(r'[^a-zA-Z0-9]', '', s).lower()
+
+    # Calculate chapter time boundaries from approx_start_seconds
+    chapter_boundaries = []
+    for i, ch in enumerate(chapters):
+        start_sec = ch.get("approx_start_seconds", 0)
+        if i + 1 < len(chapters):
+            end_sec = chapters[i + 1].get("approx_start_seconds", total_audio_dur)
+        else:
+            end_sec = total_audio_dur
+        chapter_boundaries.append((start_sec, end_sec))
+
+    # Distribute word timestamps into chapters by time
+    chapter_words = [[] for _ in chapters]
+    for wdata in word_timestamps:
+        w_mid = (wdata["start"] + wdata["end"]) / 2
+        assigned = False
+        for ci, (c_start, c_end) in enumerate(chapter_boundaries):
+            if c_start <= w_mid < c_end:
+                chapter_words[ci].append(wdata)
+                assigned = True
+                break
+        if not assigned:
+            # Assign to last chapter if past all boundaries
+            chapter_words[-1].append(wdata)
+
+    # Within each chapter, group words into visual beats
+    for ci, ch in enumerate(chapters):
+        ch_word_list = chapter_words[ci]
+        if not ch_word_list:
+            continue
+
+        beats = ch.get("visual_beats", [])
+        # Cap beats per chapter
+        beats = beats[:max_beats_per_chapter]
+
+        if not beats:
+            # No visual beats defined for this chapter, create one big chunk
+            chunk = {
+                "chunk_id": len(final_chunks) + 1,
+                "text": " ".join(w["word"] for w in ch_word_list),
+                "words": ch_word_list,
+                "start": ch_word_list[0]["start"],
+                "end": ch_word_list[-1]["end"],
+                "duration": ch_word_list[-1]["end"] - ch_word_list[0]["start"],
+                "chapter_number": ch.get("chapter_number", ci + 1),
+                "chapter_title": ch.get("chapter_title", f"Chapter {ci + 1}"),
+                "nano_visual_prompt": ch.get("visual_beats", [{}])[0].get("visual_direction", "") if ch.get("visual_beats") else "",
+            }
+            final_chunks.append(chunk)
+            continue
+
+        # Distribute chapter words evenly across beats by character count
+        total_chars = sum(len(strip_punc(w["word"])) for w in ch_word_list)
+        beat_char_targets = []
+        for beat in beats:
+            beat_text = beat.get("beat_text", "")
+            beat_chars = sum(len(strip_punc(w)) for w in beat_text.split())
+            beat_char_targets.append(max(beat_chars, 1))
+
+        # Normalize targets to match actual word count
+        target_sum = sum(beat_char_targets)
+        if target_sum > 0:
+            beat_char_targets = [int(t / target_sum * total_chars) for t in beat_char_targets]
+            # Ensure at least some characters per beat
+            beat_char_targets = [max(t, 5) for t in beat_char_targets]
+
+        word_idx = 0
+        for bi, beat in enumerate(beats):
+            target_chars = beat_char_targets[bi] if bi < len(beat_char_targets) else total_chars
+            beat_words = []
+            current_chars = 0
+
+            while word_idx < len(ch_word_list) and current_chars < target_chars * 0.85:
+                beat_words.append(ch_word_list[word_idx])
+                current_chars += len(strip_punc(ch_word_list[word_idx]["word"]))
+                word_idx += 1
+
+            if not beat_words:
+                continue
+
+            chunk = {
+                "chunk_id": len(final_chunks) + 1,
+                "text": " ".join(w["word"] for w in beat_words),
+                "words": beat_words,
+                "start": beat_words[0]["start"],
+                "end": beat_words[-1]["end"],
+                "duration": beat_words[-1]["end"] - beat_words[0]["start"],
+                "chapter_number": ch.get("chapter_number", ci + 1),
+                "chapter_title": ch.get("chapter_title", f"Chapter {ci + 1}"),
+                "nano_visual_prompt": beat.get("visual_direction", ""),
+                "visual_type": "chapter_beat",
+            }
+            final_chunks.append(chunk)
+
+        # Append any remaining words from this chapter to the last beat chunk
+        if word_idx < len(ch_word_list) and final_chunks:
+            remaining = ch_word_list[word_idx:]
+            last = final_chunks[-1]
+            last["words"].extend(remaining)
+            last["text"] += " " + " ".join(w["word"] for w in remaining)
+            last["end"] = remaining[-1]["end"]
+            last["duration"] = last["end"] - last["start"]
+
+    # Map visual metadata from subtitle_chunks if available
+    if subtitle_chunks and final_chunks:
+        num_sc = len(subtitle_chunks)
+        num_fc = len(final_chunks)
+        for idx, fc in enumerate(final_chunks):
+            ratio_idx = min(num_sc - 1, int(idx / num_fc * num_sc))
+            best_sc = subtitle_chunks[ratio_idx]
+            if best_sc:
+                for key in ["pexels_primary", "pexels_fallback", "scene_objective",
+                            "is_setting_chunk", "has_infographic", "infographic_type", "infographic_data"]:
+                    if key in best_sc:
+                        fc[key] = best_sc[key]
+
+    # Enforce non-overlap rule
+    for i in range(len(final_chunks) - 1):
+        if final_chunks[i]["end"] > final_chunks[i + 1]["start"]:
+            final_chunks[i + 1]["start"] = final_chunks[i]["end"]
+            final_chunks[i + 1]["duration"] = max(0.1, final_chunks[i + 1]["end"] - final_chunks[i + 1]["start"])
+
+    if len(final_chunks) < 3:
+        print(f"WARNING: Chapter-aware chunking produced only {len(final_chunks)} chunks. Falling back to standard chunking.")
+        return build_chunks(word_timestamps, subtitle_chunks or [])
+
+    print(f"✅ Chapter-aware chunking: {len(final_chunks)} chunks across {len(chapters)} chapters (vs ~{num_words // 2} sentence-level chunks)")
+    return final_chunks
+

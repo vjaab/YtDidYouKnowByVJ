@@ -1,9 +1,13 @@
 """
-main_longform.py — Daily "Did You Know" Long-Form AI Video Pipeline.
+main_longform.py — Chaptered Deep-Dive Long-Form AI Video Pipeline.
 
-Produces a 3-minute, 16:9 landscape compilation video covering the top 5
-viral AI topics of the day. Mirrors the Shorts pipeline (main.py) but adapted
-for the long-form "Did You Know" format.
+CHAPTERED FORMAT (2026-07):
+  Produces a 5-25 minute, 16:9 landscape deep-dive video. Depth is driven by
+  the story, not a fixed target. Topic depth rotates weekly:
+    Mon/Wed/Fri: 2-3 thematically linked stories
+    Tue/Thu/Sat/Sun: 1 single deep story
+
+  Replaces the old 8-topic "Did You Know" compilation format entirely.
 
 Usage:
   python main_longform.py --now         # Run immediately
@@ -17,7 +21,7 @@ import subprocess
 import time
 import sys
 import socket
-socket.setdefaulttimeout(20) # Prevent network socket calls (e.g. feedparser) from hanging indefinitely
+socket.setdefaulttimeout(20)
 import glob
 import hashlib
 import random
@@ -26,16 +30,17 @@ from datetime import datetime
 
 from config import LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY, MUSIC_DIR
 from config_longform import (
-    LONGFORM_TARGET_AUDIO_DURATION, LONGFORM_NUM_TOPICS,
-    LONGFORM_BGM_VOLUME, LONGFORM_MAX_RETRY_ATTEMPTS,
-    LONGFORM_TRACKER_FILE
+    LONGFORM_TARGET_AUDIO_DURATION, LONGFORM_MAX_CHAPTERS,
+    LONGFORM_VISUAL_BEATS_PER_CHAPTER, LONGFORM_BGM_VOLUME,
+    LONGFORM_MAX_RETRY_ATTEMPTS, LONGFORM_TRACKER_FILE,
+    LONGFORM_WORD_COUNT_TARGET, get_topic_depth_mode
 )
 from fetch_research_papers import fetch_tech_news, fetch_ai_tools, fetch_trending_from_newsapi, fetch_reddit_news
 from kaggle_handover import trigger_kaggle_gpu_job
 from topic_tracker import record_story, update_youtube_url
 from gemini_script_longform import generate_longform_script
 from audio_gen import generate_voiceover, clean_tts_text
-from chunk_builder import build_chunks, redistribute_to_audio_duration
+from chunk_builder import build_chunks, build_chapter_aware_chunks, redistribute_to_audio_duration
 from pexels_fetcher import generate_visual_style_guide
 from nano_scene_gen import generate_nano_scene_visuals
 from video_gen import create_video
@@ -47,7 +52,6 @@ from entity_fetcher import fetch_all_entities, get_retention_layers_config
 from tags_helper import get_optimized_metadata
 
 
-
 def log_message(msg):
     today = datetime.now().strftime("%Y-%m-%d")
     log_path = os.path.join(LOGS_DIR, f"log_longform_{today}.txt")
@@ -57,44 +61,31 @@ def log_message(msg):
 
 
 def format_longform_description(script_data, hashtags):
-    """Generate a rich YouTube description for the long-form compilation."""
+    """Generate a rich YouTube description for the chaptered deep-dive."""
+    chapters = script_data.get("chapters", [])
     fact_timestamps = script_data.get("fact_timestamps", [])
-    num_facts = script_data.get("num_facts") or len(fact_timestamps) or 10
-    title = script_data.get("title", f"{num_facts} AI Facts")
+    title = script_data.get("title", "AI Deep Dive")
     topics = script_data.get("longform_topics", [])
     description_ai = script_data.get("description", "")
-    
+    depth_mode = script_data.get("depth_mode", "single")
+
     hashtag_str = " ".join(hashtags) if hashtags else ""
-    
-    # Build timestamps section
-    timestamps_str = "📌 TIMESTAMPS:\n"
-    is_vaibhav = script_data.get("longform_format") == "vaibhav"
-    
-    if is_vaibhav:
-        last_start = 0
+
+    # Build chapter timestamps
+    timestamps_str = "📌 CHAPTERS:\n"
+    if chapters:
+        for ch in chapters:
+            start_s = ch.get("approx_start_seconds", 0)
+            m, s = divmod(int(start_s), 60)
+            ch_title = ch.get("chapter_title", f"Chapter {ch.get('chapter_number', '?')}")[:60]
+            timestamps_str += f"{m}:{s:02d} — {ch_title}\n"
+    elif fact_timestamps:
         for ft in fact_timestamps:
-            approx_s = ft.get("approx_start_seconds", 0)
-            m, s = divmod(int(approx_s), 60)
-            topic = ft.get("topic", ft.get("section", "Section"))[:60]
+            start_s = ft.get("approx_start_seconds", 0)
+            m, s = divmod(int(start_s), 60)
+            topic = ft.get("topic", "Section")[:60]
             timestamps_str += f"{m}:{s:02d} — {topic}\n"
-            last_start = max(last_start, approx_s)
-    else:
-        timestamps_str += "0:00 — Introduction / Hook\n"
-        last_start = 0
-        for ft in fact_timestamps:
-            approx_s = ft.get("approx_start_seconds", 0)
-            m, s = divmod(int(approx_s), 60)
-            fact_num = ft.get("fact_number", "?")
-            # Skip non-numeric/recap markers
-            if not isinstance(fact_num, int):
-                continue
-            topic = ft.get("topic", f"Fact {fact_num}")[:50]
-            timestamps_str += f"{m}:{s:02d} — Fact {fact_num}: {topic}\n"
-            last_start = max(last_start, approx_s)
-            
-        m_out, s_out = divmod(int(last_start + 35), 60)
-        timestamps_str += f"{m_out}:{s_out:02d} — Outro & Discussion\n"
-    
+
     # Build sources section
     sources_str = "📚 SOURCES:\n"
     for t in topics:
@@ -129,7 +120,7 @@ def format_longform_description(script_data, hashtags):
 🚀 Telegram: https://t.me/technewsbyvj
 💬 WhatsApp: https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
 ━━━━━━━━━━━━━━━━━━━━━━
-⚡ {num_facts} AI facts that will blow your mind — all from the last 48 hours.
+⚡ A deep dive into one of the biggest stories in AI this week.
 
 {timestamps_str}
 {sources_str}
@@ -144,7 +135,7 @@ def format_longform_description(script_data, hashtags):
 🚀 Telegram → https://t.me/technewsbyvj
 💬 WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
 ━━━━━━━━━━━━━━━━━━━━━━
-👆 Which fact shocked you the most? Comment the number!
+👆 What's your take? Drop your thoughts in the comments!
 
 {timestamps_str}
 ━━━━━━━━━━━━━━━━━━━━━━
@@ -161,8 +152,9 @@ def format_longform_description(script_data, hashtags):
 
 
 def run_longform_pipeline(dry_run=False):
-    """Main long-form pipeline: 5 topics → 3-min 16:9 video → YouTube."""
-    log_message("=== STARTING DAILY LONG-FORM 'DID YOU KNOW' PIPELINE ===")
+    """Main chaptered deep-dive pipeline: research → script → render → upload."""
+    depth_mode = get_topic_depth_mode()
+    log_message(f"=== STARTING CHAPTERED DEEP-DIVE PIPELINE (mode={depth_mode}) ===")
 
     # Initialize Kaggle configuration flags
     has_kaggle = os.getenv("KAGGLE_USERNAME") is not None or os.path.exists(os.path.expanduser("~/.kaggle/kaggle.json"))
@@ -179,7 +171,7 @@ def run_longform_pipeline(dry_run=False):
         log_message(f"Output folder cleaned: {OUTPUT_DIR}")
 
     # ── STEP 1: Fetch RSS + NewsAPI Articles ─────────────────────────────
-    log_message("STEP 1: Fetching RSS articles (Research + Tools + Trending)...")
+    log_message("STEP 1: Fetching RSS articles...")
     rss_articles = []
     try:
         # Fetch vidIQ trending topics
@@ -190,57 +182,48 @@ def run_longform_pipeline(dry_run=False):
             for item in vidiq_raw:
                 vidiq_news.append({
                     "title": item["original_title"] if item.get("original_title") else item["title"],
-                    "description": f"vidIQ Opportunity Score: {item.get('score', 60)} (Volume: {item.get('search_volume')}, Competition: {item.get('competition')})",
+                    "description": f"vidIQ Score: {item.get('score', 60)} (Volume: {item.get('search_volume')}, Competition: {item.get('competition')})",
                     "source": {"name": item.get("source", "vidIQ")},
                     "url": item.get("url", ""),
                     "publishedAt": datetime.now().isoformat(),
                     "type": "trending",
                     "_engagement_score": item.get("score", 60)
                 })
-            log_message(f"📈 vidIQ: Injected {len(vidiq_news)} high-signal topics.")
+            log_message(f"📈 vidIQ: {len(vidiq_news)} topics.")
         except Exception as ex:
-            log_message(f"⚠️ vidIQ Fetch failed (non-fatal): {ex}")
+            log_message(f"⚠️ vidIQ failed (non-fatal): {ex}")
 
         research_news = fetch_tech_news(hours=48)
         ai_tool_news = fetch_ai_tools(hours=48)
         trending_news = fetch_trending_from_newsapi()
-        
-        # Fetch Reddit trending AI topics
+
         try:
             reddit_news = fetch_reddit_news(hours=48)
-        except Exception as ex:
-            log_message(f"⚠️ Reddit Fetch failed: {ex}")
+        except Exception:
             reddit_news = []
-        
-        # Fetch X.com trending AI topics
+
         try:
             from fetch_research_papers import fetch_x_trending_ai_topics
             x_news = fetch_x_trending_ai_topics()
-        except Exception as ex:
-            log_message(f"⚠️ Failed to import x_trending_fetcher: {ex}")
+        except Exception:
             x_news = []
-            
-        # Fetch GitHub trending AI repos (Conflict Fix: prioritize trending GitHub projects)
+
         try:
             from trending_engine import fetch_github_trending_ai
             github_news = fetch_github_trending_ai()
-        except Exception as ex:
-            log_message(f"⚠️ GitHub Fetch failed: {ex}")
+        except Exception:
             github_news = []
-            
+
         rss_articles = github_news + vidiq_news + research_news + ai_tool_news + trending_news + x_news + reddit_news
 
         if not rss_articles:
             log_message("⚠️ All sources returned 0 articles. Pipeline will rely on Gemini Search.")
         else:
-            log_message(f"✅ Fetched {len(rss_articles)} total articles "
-                       f"({len(github_news)} GitHub, {len(vidiq_news)} vidIQ, {len(research_news)} research, "
-                       f"{len(ai_tool_news)} tools, {len(trending_news)} trending, {len(x_news)} X.com, "
-                       f"{len(reddit_news)} Reddit).")
+            log_message(f"✅ Fetched {len(rss_articles)} total articles.")
     except Exception as e:
-        log_message(f"⚠️ RSS/X Fetch failed: {e}")
+        log_message(f"⚠️ RSS Fetch failed: {e}")
 
-    # ── STEP 2: Generate Long-Form Script ────────────────────────────────
+    # ── STEP 2: Generate Chaptered Script ────────────────────────────────
     attempts = 0
     script_data = None
     best_script_data = None
@@ -253,7 +236,7 @@ def run_longform_pipeline(dry_run=False):
 
     while attempts < LONGFORM_MAX_RETRY_ATTEMPTS:
         log_message(f"STEP 2 (Attempt {attempts + 1}/{LONGFORM_MAX_RETRY_ATTEMPTS}): "
-                   f"Generating long-form 5-topic compilation script...")
+                   f"Generating chaptered deep-dive script...")
 
         script_data = generate_longform_script(
             articles=rss_articles,
@@ -261,147 +244,122 @@ def run_longform_pipeline(dry_run=False):
         )
 
         if not script_data:
-            log_message("ERROR: Long-form script generation failed.")
+            log_message("ERROR: Script generation failed.")
             attempts += 1
             if attempts % 3 == 0:
                 log_message("⏳ Potential rate limit. Sleeping 60s...")
                 time.sleep(60)
             continue
 
-        # Track the best script candidate in case we exhaust all attempts (Priority 1)
+        # Track best candidate
         script = script_data.get("script", "")
         word_count = len(script.split())
         if word_count > best_word_count:
             best_word_count = word_count
             best_script_data = dict(script_data)
 
-        # Mark as longform for video_gen
+        # Mark as longform
         script_data["slot"] = "Slot L (Long-form)"
         script_data["is_longform"] = True
 
-        title = script_data.get("title", "5 AI Facts!")
-        script = script_data.get("script", "")
+        title = script_data.get("title", "AI Deep Dive")
+        chapters = script_data.get("chapters", [])
         log_message(f"Generated Title: {title}")
-        log_message(f"Script word count: {len(script.split())}")
-        
-        topics = script_data.get("longform_topics", [])
-        log_message(f"Topics covered: {len(topics)}")
-        for i, t in enumerate(topics):
-            log_message(f"  Fact {i+1}: {t.get('headline', 'Unknown')}")
+        log_message(f"Script: {word_count} words, {len(chapters)} chapters")
+        for i, ch in enumerate(chapters):
+            log_message(f"  Ch{i+1}: {ch.get('chapter_title', 'Untitled')} "
+                       f"({len(ch.get('visual_beats', []))} beats)")
 
-        # ── STEP 3: Generate Audio + Lip-Sync ────────────────────────────
-        log_message("STEP 3: Generating voiceover + word timestamps...")
+        # ── STEP 3: Generate Audio ───────────────────────────────────────
+        log_message("STEP 3: Generating voiceover...")
         custom_map = script_data.get("phonetic_pronunciation_map", {})
- 
-        # Select intro video for lip-sync (rotation)
+
+        # Select intro video for lip-sync
         intro_videos = glob.glob("assets/video/*.mp4")
         if not intro_videos:
             intro_videos = ["assets/video/Firefly_video_final.mp4"]
-        
         from topic_tracker import get_next_avatar
         selected_avatar = get_next_avatar(intro_videos, tracker_file=LONGFORM_TRACKER_FILE)
         script_data["lipsync_face_path"] = selected_avatar
-        log_message(f"Selected Lip-Sync Template: {selected_avatar}")
- 
-        # ── Word Count Pre-Flight Gate ────────────────────────────────────────
-        script = script_data.get("script", "")
-        word_count = len(script.split())
-        expected_dur = word_count / 2.33  # ~140 WPM (2.33 words per second)
-        
+
+        # ── Word Count Pre-Flight ────────────────────────────────────────
+        expected_dur = word_count / 2.33  # ~140 WPM
+
         if expected_dur < min_dur:
-            log_message(f"⚠️ Script word count too low ({word_count} words, expected ~{expected_dur:.1f}s < {min_dur}s). Retrying script generation early to save GPU time.")
+            log_message(f"⚠️ Script too short ({word_count} words, ~{expected_dur:.0f}s < {min_dur}s). Retrying...")
             attempts += 1
             script_data = None
             continue
-        elif expected_dur > max_dur + 30:
-            log_message(f"⚠️ Script word count too high ({word_count} words, expected ~{expected_dur:.1f}s > {max_dur + 30}s). Retrying script generation early to save GPU time.")
+        elif expected_dur > max_dur + 60:
+            log_message(f"⚠️ Script too long ({word_count} words, ~{expected_dur:.0f}s > {max_dur + 60}s). Retrying...")
             attempts += 1
             script_data = None
             continue
 
-        # ── STEP 2b: Capture Screenshots for Each Topic (Only on validated script) ──
-        log_message("STEP 2b: Capturing article screenshots for evidence...")
+        # ── STEP 2b: Capture Screenshots ─────────────────────────────────
+        log_message("STEP 2b: Capturing article screenshots...")
+        topics = script_data.get("longform_topics", [])
         screenshots_captured = 0
         for i, topic in enumerate(topics):
             url = topic.get("source_url", "")
             if url:
                 ss_filename = f"screenshot_longform_{i+1}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
                 ss_path = capture_article_screenshot(
-                    url, 
-                    ss_filename, 
-                    desktop=True, 
+                    url, ss_filename, desktop=True,
                     headline=topic.get("headline")
                 )
                 if ss_path:
                     topic["screenshot_path"] = ss_path
                     screenshots_captured += 1
                     if i == 0:
-                        # Use first topic's screenshot as primary
                         script_data["screenshot_path"] = ss_path
-        
-        log_message(f"✅ Captured {screenshots_captured}/{len(topics)} article screenshots.")
-        
-        # For longform, screenshots are helpful but not mandatory (unlike Shorts)
-        if not script_data.get("screenshot_path") and screenshots_captured == 0:
-            log_message("⚠️ No screenshots captured. Proceeding anyway (long-form is less dependent).")
+        log_message(f"✅ Captured {screenshots_captured}/{len(topics)} screenshots.")
 
         if has_kaggle and not use_local_only:
-            log_message("Attempting Kaggle GPU handover for audio + lip-sync...")
+            log_message("Attempting Kaggle GPU handover...")
             results = trigger_kaggle_gpu_job(script_data, custom_map)
-            
-            # Check if Kaggle returned a structured error (dict with "error" key)
+
             kaggle_failed = False
             if results is None:
                 kaggle_failed = True
-                log_message("❌ Kaggle Handover returned None (unexpected failure).")
             elif isinstance(results, dict) and "error" in results:
                 kaggle_failed = True
-                error_type = results["error"]
-                error_msg = results.get("message", "Unknown")
-                log_message(f"❌ Kaggle Handover failed: [{error_type}] {error_msg}")
-            
+                log_message(f"❌ Kaggle failed: [{results['error']}] {results.get('message', '')}")
+
             if not kaggle_failed:
-                # Kaggle succeeded — use its results
                 audio_path = results.get("audio_path")
                 duration = results.get("duration")
                 word_timestamps = results.get("word_timestamps")
                 ls_path = results.get("lipsync_path")
                 script_data["kaggle_lipsync_path"] = ls_path
 
-                # Verify files exist on disk
                 ls_received = ls_path and os.path.exists(ls_path)
                 audio_received = audio_path and os.path.exists(audio_path)
 
                 if audio_received and ls_received:
-                    log_message("✅ Received Audio and Lip-Sync from Kaggle GPU!")
+                    log_message("✅ Audio + Lip-Sync from Kaggle GPU!")
                 elif audio_received:
-                    log_message("✅ Received Audio from Kaggle GPU! (Lip-Sync was missing/failed)")
+                    log_message("✅ Audio from Kaggle (lip-sync missing)")
                 else:
-                    log_message("❌ Kaggle job finished but critical audio output is missing.")
+                    log_message("❌ Kaggle output missing. Retrying...")
                     attempts += 1
                     continue
             else:
-                # ── FALLBACK: Generate audio via cloud TTS (no GPU needed) ──
-                log_message("🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...")
-                log_message("⚠️ Lip-sync and avatar will be SKIPPED for this video (requires GPU).")
-                
+                log_message("🔄 Kaggle unavailable. Using cloud TTS...")
                 try:
                     notify_telegram(
-                        f"🔄 Kaggle GPU fallback activated (Long-form)\n\n"
-                        f"Using cloud TTS instead. Avatar/lip-sync skipped.\n"
+                        f"🔄 Kaggle fallback (Long-form)\n"
                         f"Title: {script_data.get('title', 'Unknown')}",
                         "⚠️"
                     )
                 except Exception:
                     pass
-                
                 audio_path, duration, word_timestamps = generate_voiceover(
                     script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY
                 )
-                script_data["kaggle_lipsync_path"] = None  # No lip-sync available
-                script_data["skip_avatar"] = True           # Skip avatar PiP in video render
+                script_data["kaggle_lipsync_path"] = None
+                script_data["skip_avatar"] = True
         else:
-            # Local fallback: generate audio without Kaggle GPU
             audio_path, duration, word_timestamps = generate_voiceover(
                 script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY
             )
@@ -412,86 +370,50 @@ def run_longform_pipeline(dry_run=False):
             continue
 
         if duration < min_dur:
-            log_message(f"Audio too short ({duration:.1f}s < {min_dur}s). Retrying with longer script...")
+            log_message(f"Audio too short ({duration:.1f}s < {min_dur}s). Retrying...")
             attempts += 1
             continue
 
-        if duration > max_dur + 30:  # Allow 30s grace for long-form
-            log_message(f"Audio too long ({duration:.1f}s > {max_dur + 30}s). Retrying...")
+        if duration > max_dur + 60:
+            log_message(f"Audio too long ({duration:.1f}s > {max_dur + 60}s). Retrying...")
             attempts += 1
             continue
 
         log_message(f"Audio OK: {duration:.1f}s | {len(word_timestamps)} word timestamps")
-        break  # ← Success
+        break
 
-    # ── FALLBACK AFTER LOOP (Priority 1) ─────────────────────────────────
+    # ── FALLBACK ──────────────────────────────────────────────────────────
     if not audio_path and best_script_data:
         expected_best_dur = best_word_count / 2.33
-        min_acceptable_dur = 30  # Lowered to 30 seconds to allow shorter fallback compilations (e.g. < 100s) without aborts
-        if expected_best_dur < min_acceptable_dur:
-            log_message(f"❌ [FALLBACK REJECTED] Best candidate script length ({best_word_count} words, approx {expected_best_dur:.1f}s) is below threshold ({min_acceptable_dur}s).")
+        if expected_best_dur < 30:
+            log_message(f"❌ Best candidate too short ({best_word_count} words). Aborting.")
         else:
-            log_message(f"\n⚠️ [FALLBACK] ALL {LONGFORM_MAX_RETRY_ATTEMPTS} ATTEMPTS EXHAUSTED to reach target {min_dur}s duration.")
-            log_message(f"Attempting to generate assets for the best candidate script ({best_word_count} words, expected ~{expected_best_dur:.1f}s)...")
+            log_message(f"⚠️ [FALLBACK] Using best candidate ({best_word_count} words)...")
             script_data = best_script_data
             script_data["slot"] = "Slot L (Long-form)"
             script_data["is_longform"] = True
-            
+
             script = script_data.get("script", "")
             custom_map = script_data.get("phonetic_pronunciation_map", {})
-            topics = script_data.get("longform_topics", [])
-            
-            # 1. Capture article screenshots
-            log_message("STEP 2b [FALLBACK]: Capturing article screenshots for evidence...")
-            screenshots_captured = 0
-            for i, topic in enumerate(topics):
-                url = topic.get("source_url", "")
-                if url:
-                    ss_filename = f"screenshot_longform_{i+1}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-                    ss_path = capture_article_screenshot(
-                        url, 
-                        ss_filename, 
-                        desktop=True, 
-                        headline=topic.get("headline")
-                    )
-                    if ss_path:
-                        topic["screenshot_path"] = ss_path
-                        screenshots_captured += 1
-                        if i == 0:
-                            script_data["screenshot_path"] = ss_path
-            log_message(f"✅ Captured {screenshots_captured}/{len(topics)} article screenshots.")
-            
-            # 2. Select avatar
+
             intro_videos = glob.glob("assets/video/*.mp4")
             if not intro_videos:
                 intro_videos = ["assets/video/Firefly_video_final.mp4"]
             from topic_tracker import get_next_avatar
             selected_avatar = get_next_avatar(intro_videos, tracker_file=LONGFORM_TRACKER_FILE)
             script_data["lipsync_face_path"] = selected_avatar
-            
-            # 3. Audio generation (Kaggle/Local)
+
             if has_kaggle and not use_local_only:
-                log_message("Attempting Kaggle GPU handover for fallback audio + lip-sync...")
                 results = trigger_kaggle_gpu_job(script_data, custom_map)
-                
-                kaggle_failed = False
-                if results is None:
-                    kaggle_failed = True
-                elif isinstance(results, dict) and "error" in results:
-                    kaggle_failed = True
-                    
+                kaggle_failed = results is None or (isinstance(results, dict) and "error" in results)
                 if not kaggle_failed:
                     audio_path = results.get("audio_path")
                     duration = results.get("duration")
                     word_timestamps = results.get("word_timestamps")
                     script_data["kaggle_lipsync_path"] = results.get("lipsync_path")
-                    
-                    # Check file existence
                     if not (audio_path and os.path.exists(audio_path)):
                         kaggle_failed = True
-                
                 if kaggle_failed:
-                    log_message("❌ Kaggle failed on fallback. Generating audio via cloud fallback...")
                     audio_path, duration, word_timestamps = generate_voiceover(
                         script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY
                     )
@@ -508,50 +430,59 @@ def run_longform_pipeline(dry_run=False):
 
     # ── STEP 4: Reserve Topics in Tracker ────────────────────────────────
     log_message("STEP 4: Reserving topics in tracker...")
-    title = script_data.get("title", "5 AI Facts!")
+    title = script_data.get("title", "AI Deep Dive")
     keywords = script_data.get("keywords", [])
     hashtags = script_data.get("hashtags", [])
 
-    # Record the compilation as a single entry
     companies_all = []
     for t in script_data.get("longform_topics", []):
         companies_all.append(t.get("source_name", ""))
-    
+
     record_story(
         title, script_data.get("original_news_headline"),
-        "AI Did You Know", companies_all, keywords, 7,
-        "compilation", "pending_upload", script_data.get("original_news_url"),
+        "AI Deep Dive", companies_all, keywords, 7,
+        "deep_dive", "pending_upload", script_data.get("original_news_url"),
         avatar_used=script_data.get("lipsync_face_path"),
         tracker_file=LONGFORM_TRACKER_FILE
     )
 
-    # ── STEP 5: Build Visual Chunks ──────────────────────────────────────
-    log_message("STEP 5: Grouping words into visual chunks...")
+    # ── STEP 5: Build Visual Chunks (CHAPTER-AWARE) ──────────────────────
+    log_message("STEP 5: Building visual chunks...")
     sub_chunks = script_data.get("subtitle_chunks", [])
     for sc in sub_chunks:
         if "text" in sc:
             sc["text"] = clean_tts_text(sc["text"], phonetic=False)
 
-    chunks = build_chunks(word_timestamps, sub_chunks)
+    chapters = script_data.get("chapters", [])
+    if chapters:
+        # Chapter-aware chunking: ~15-30 chunks instead of ~200+
+        chunks = build_chapter_aware_chunks(
+            word_timestamps, chapters,
+            subtitle_chunks=sub_chunks,
+            max_beats_per_chapter=LONGFORM_VISUAL_BEATS_PER_CHAPTER
+        )
+    else:
+        # Fallback to standard chunking if no chapters
+        chunks = build_chunks(word_timestamps, sub_chunks)
+
     chunks = redistribute_to_audio_duration(chunks, duration)
     log_message(f"Built {len(chunks)} visual chunks from {len(word_timestamps)} words.")
 
     # ── STEP 6: Fetch Entities ───────────────────────────────────────────
-    log_message("STEP 6: Fetching entity photos and company logos...")
+    log_message("STEP 6: Fetching entity photos and logos...")
     script_data = fetch_all_entities(script_data)
 
     retention_config = get_retention_layers_config()
     script_data["retention_config"] = retention_config
 
-    # ── STEP 7: Google Veo / Google Image Per-Sentence Visual Generation (16:9) ──────
-    log_message("STEP 7: Generating visuals using Google Veo and Google Image (16:9, primary option)...")
-    topic_context = f"Did You Know AI Facts Compilation: {title}"
+    # ── STEP 7: Visual Generation (16:9) ─────────────────────────────────
+    log_message("STEP 7: Generating visuals (16:9)...")
+    topic_context = f"Deep Dive: {title}"
     style_guide = generate_visual_style_guide(topic_context)
 
     from pexels_fetcher import fetch_all_chunk_visuals
     chunks = fetch_all_chunk_visuals(chunks, topic_context=topic_context, script_data=script_data, is_longform=True)
 
-    # Check success rate of the primary generator
     def is_valid_engagement_source(source):
         if not source:
             return False
@@ -559,22 +490,21 @@ def run_longform_pipeline(dry_run=False):
         return any(k in source for k in valid_keywords)
 
     gen_success = sum(1 for c in chunks if c.get("visual_path") and is_valid_engagement_source(c.get("source")))
-    
+
     if gen_success < len(chunks) * 0.5:
-        log_message(f"⚠️ Primary visual generator only generated {gen_success}/{len(chunks)} visuals. Falling back to nano-scene engine (16:9 Imagen)...")
+        log_message(f"⚠️ Primary visuals: {gen_success}/{len(chunks)}. Falling back to nano-scene...")
         chunks = generate_nano_scene_visuals(chunks, topic_context, style_guide=style_guide, aspect_ratio="16:9")
-        
-        # Check if nano-scene engine ALSO failed to produce new visuals (16:9)
+
         final_success = sum(1 for c in chunks if c.get("visual_path") and os.path.exists(c["visual_path"]) and is_valid_engagement_source(c.get("source")))
-        
+
         if final_success < len(chunks) * 0.5:
-            log_message(f"⚠️ Both primary and nano-scene visual generation failed (only {final_success}/{len(chunks)} succeeded). Falling back to whiteboard animation videos!")
+            log_message(f"⚠️ Both generators failed ({final_success}/{len(chunks)}). Using whiteboard fallback.")
             from whiteboard_gen import generate_whiteboard_visuals
             chunks = generate_whiteboard_visuals(chunks, topic_context, is_longform=True)
     else:
-        log_message(f"✅ Primary visual generator successfully created {gen_success}/{len(chunks)} clips/images.")
+        log_message(f"✅ Visuals: {gen_success}/{len(chunks)} generated successfully.")
 
-    # ── STEP 8: Visual Variety (Color Theme) ─────────────────────────────
+    # ── STEP 8: Color Theme ──────────────────────────────────────────────
     title = script_data.get("title", "")
     subcat = script_data.get("sub_category", "")
     keywords = script_data.get("keywords", [])
@@ -583,35 +513,30 @@ def run_longform_pipeline(dry_run=False):
         cat_lower = str(category).lower()
         title_lower = str(title).lower()
         kw_lower = [str(k).lower() for k in keywords]
-        
-        # 1. Cyber Security / Privacy / Threat / Danger / Scam -> Deep Red
-        red_indicators = ["security", "privacy", "hack", "scam", "leak", "danger", "scary", "threat", "cyber", "exploit", "warning", "ban"]
+
+        red_indicators = ["security", "privacy", "hack", "scam", "leak", "danger", "threat", "cyber", "exploit", "warning", "ban"]
         if any(x in cat_lower or x in title_lower for x in red_indicators) or any(x in k for k in kw_lower for x in red_indicators):
-            return {"background": "#1A0000", "accent": "#FF4444", "text": "#ffffff"} # Deep Red
-            
-        # 2. Coding / Development / GitHub / Automation / Tech Tips -> Hacker Green
-        green_indicators = ["code", "coding", "developer", "github", "repo", "automation", "workflow", "tip", "hack", "productivity", "python", "javascript", "programming"]
+            return {"background": "#1A0000", "accent": "#FF4444", "text": "#ffffff"}
+
+        green_indicators = ["code", "coding", "developer", "github", "repo", "automation", "workflow", "python", "javascript", "programming"]
         if any(x in cat_lower or x in title_lower for x in green_indicators) or any(x in k for k in kw_lower for x in green_indicators):
-            return {"background": "#0F1A12", "accent": "#00FF7F", "text": "#ffffff"} # Hacker Green
-            
-        # 3. Business / Finance / Startup / Career / Hustle / Money -> Dark Gold
-        gold_indicators = ["money", "earn", "hustle", "business", "startup", "finance", "career", "job", "salary", "million", "billion", "market", "stock", "cost"]
+            return {"background": "#0F1A12", "accent": "#00FF7F", "text": "#ffffff"}
+
+        gold_indicators = ["money", "earn", "business", "startup", "finance", "career", "job", "salary", "million", "billion", "market"]
         if any(x in cat_lower or x in title_lower for x in gold_indicators) or any(x in k for k in kw_lower for x in gold_indicators):
-            return {"background": "#0D0D1A", "accent": "#FFD700", "text": "#ffffff"} # Dark Gold
-            
-        # 4. Neural Nets / Models / LLMs / Big Tech Giants (OpenAI, Gemini, Meta) -> Neon Purple
+            return {"background": "#0D0D1A", "accent": "#FFD700", "text": "#ffffff"}
+
         purple_indicators = ["model", "llm", "gemini", "openai", "gpt", "claude", "meta", "nvidia", "deepseek", "anthropic", "apple", "microsoft"]
         if any(x in cat_lower or x in title_lower for x in purple_indicators) or any(x in k for k in kw_lower for x in purple_indicators):
-            return {"background": "#10002B", "accent": "#E0AAFF", "text": "#ffffff"} # Neon Purple
+            return {"background": "#10002B", "accent": "#E0AAFF", "text": "#ffffff"}
 
-        # 5. Default/General AI / High-tech -> Cyber Cyan
-        return {"background": "#121212", "accent": "#00E5FF", "text": "#ffffff"} # Cyber Cyan
+        return {"background": "#121212", "accent": "#00E5FF", "text": "#ffffff"}
 
     chosen_style = get_color_theme_for_topic(subcat, title, keywords)
     script_data["color_theme"] = chosen_style
 
     # ── STEP 9: Render Video (16:9) ──────────────────────────────────────
-    log_message("STEP 9: Rendering final 16:9 video with engagement layers...")
+    log_message("STEP 9: Rendering final 16:9 video...")
     try:
         video_path = create_video(audio_path, script_data, chunks)
         if not video_path or not os.path.exists(video_path):
@@ -629,16 +554,17 @@ def run_longform_pipeline(dry_run=False):
         log_message("🏁 DRY RUN complete. Skipping upload.")
         log_message(f"   Video: {video_path}")
         log_message(f"   Thumbnail: {thumbnail_path}")
+        log_message(f"   Chunks: {len(chunks)} (chapters: {len(chapters)})")
+        log_message(f"   Duration: {duration:.1f}s | Words: {len(script.split())}")
         return True
 
     # ── STEP 11: Upload to YouTube ───────────────────────────────────────
     log_message("STEP 11: Uploading to YouTube...")
-    
+
     # Title selection
     if script_data.get("title_options"):
         title = random.choice(script_data["title_options"])
 
-    # Generate dynamic, optimized hashtags and tags
     initial_people = [p.get("name") for p in script_data.get("people", [])] if script_data.get("people") else []
     optimized_metadata = get_optimized_metadata(
         title=title,
@@ -658,7 +584,6 @@ def run_longform_pipeline(dry_run=False):
 
     description = format_longform_description(script_data, hashtags)
 
-
     uploaded, result = upload_video(
         video_path, title, description, tags,
         thumbnail_path=thumbnail_path,
@@ -674,10 +599,10 @@ def run_longform_pipeline(dry_run=False):
     # ── STEP 12: Update Tracker ──────────────────────────────────────────
     update_youtube_url(script_data.get("original_news_headline"), youtube_url, tracker_file=LONGFORM_TRACKER_FILE)
 
-    # ── STEP 12.5: Shorts Cross-Promotion Teaser ──────────────────────────
+    # ── STEP 12.5: Shorts Cross-Promotion Teaser ────────────────────────
     from config_longform import LONGFORM_GENERATE_SHORTS_TEASER
     if LONGFORM_GENERATE_SHORTS_TEASER:
-        log_message("STEP 12.5: Generating and uploading Shorts Teaser...")
+        log_message("STEP 12.5: Generating Shorts Teaser...")
         try:
             from shorts_teaser import generate_and_upload_shorts_teaser
             generate_and_upload_shorts_teaser(script_data, result, dry_run=dry_run)
@@ -696,11 +621,11 @@ def run_longform_pipeline(dry_run=False):
         except Exception:
             pass
 
-    log_message("=== LONG-FORM PIPELINE COMPLETED SUCCESSFULLY ===")
+    log_message("=== CHAPTERED DEEP-DIVE PIPELINE COMPLETED SUCCESSFULLY ===")
 
     notify_telegram(
-        f"✅ Long-Form Video Live!\n\n{title}\n{youtube_url}\n\n"
-        f"📊 Duration: {duration:.0f}s | Topics: {len(script_data.get('longform_topics', []))}\n"
+        f"✅ Deep-Dive Video Live!\n\n{title}\n{youtube_url}\n\n"
+        f"📊 Duration: {duration:.0f}s | Chapters: {len(chapters)} | Mode: {depth_mode}\n"
         f"🧹 Output cleaned ({cleaned} files).",
         "🎬"
     )
@@ -716,7 +641,7 @@ def run_longform_pipeline(dry_run=False):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Daily 'Did You Know' Long-Form AI Video Pipeline")
+    parser = argparse.ArgumentParser(description="Chaptered Deep-Dive Long-Form AI Video Pipeline")
     parser.add_argument("--now", action="store_true", help="Run pipeline immediately.")
     parser.add_argument("--dry-run", action="store_true", help="Run without uploading to YouTube.")
     args = parser.parse_args()
@@ -724,7 +649,7 @@ if __name__ == "__main__":
     if args.now or args.dry_run:
         success = run_longform_pipeline(dry_run=args.dry_run)
         if not success:
-            print("❌ Long-form pipeline failed. Exiting with error code.")
+            print("❌ Pipeline failed.")
             sys.exit(1)
     else:
         print("Usage:")

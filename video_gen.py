@@ -5247,7 +5247,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                     print(f"Failed to load background img {vp} for chunk {i}: {e}")
 
         # ── B-ROLL BURSTS AT FACT BOUNDARIES ──────────────────────────────────────
-        if is_longform and script_json.get("longform_format") in ["did_you_know", "vaibhav"]:
+        if is_longform and script_json.get("longform_format") in ["did_you_know", "vaibhav", "chaptered"]:
             fact_timestamps_lf = script_json.get("fact_timestamps", [])
             for ft in fact_timestamps_lf:
                 start_s = float(ft.get("approx_start_seconds", 0))
@@ -5639,7 +5639,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
     # ── LONGFORM: "FACT X/N" BADGE OVERLAYS ──────────────────────────────────
     longform_badge_clips = []
-    if is_longform and script_json.get("longform_format") in ["did_you_know", "vaibhav"]:
+    if is_longform and script_json.get("longform_format") in ["did_you_know", "vaibhav", "chaptered"]:
         fact_timestamps = script_json.get("fact_timestamps", [])
         total_facts = script_json.get("num_facts", 10)
         is_vaibhav = script_json.get("longform_format") == "vaibhav"
@@ -5834,7 +5834,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             base_layers.append(positioned_ring)
         print("   🔴 Glow ring layer added behind avatar.")
 
-    if is_longform and script_json.get("longform_format") in ["did_you_know", "vaibhav"]:
+    if is_longform and script_json.get("longform_format") in ["did_you_know", "vaibhav", "chaptered"]:
         fact_timestamps_lf = script_json.get("fact_timestamps", [])
 
         # IMPROVEMENT #3: Progress Dot Navigator (top-center)

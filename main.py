@@ -27,6 +27,7 @@ from screenshot_gen import capture_article_screenshot
 from thumbnail_gen import generate_thumbnail
 from youtube_upload import upload_video
 from x_upload import upload_video_to_x
+from instagram_upload import upload_reel_to_instagram
 from telegram_selector import notify_telegram as real_notify_telegram
 from entity_fetcher import fetch_all_entities, get_retention_layers_config
 from kaggle_handover import trigger_kaggle_gpu_job
@@ -745,6 +746,23 @@ def run_pipeline(topic_type="auto", dry_run=False):
             log_message(f"WARNING: X.com posting skipped/failed: {x_result}")
     except Exception as ex:
         log_message(f"WARNING: X.com auto-post failed: {ex}")
+
+    # ── STEP 10d: Instagram Reels Auto-Post ───────────────────────────────────
+    log_message("STEP 10d: Auto-posting Reel to Instagram...")
+    try:
+        ig_caption = f"🔥 {title}\n\n" + " ".join(hashtags[:15])
+        if dry_run:
+            print("🧪 [DRY RUN] Simulating Instagram Reel upload...")
+            ig_uploaded, ig_result = True, "MOCK_IG_REEL_ID"
+        else:
+            ig_uploaded, ig_result = upload_reel_to_instagram(video_path, ig_caption)
+
+        if ig_uploaded:
+            log_message(f"SUCCESS: Posted Reel to Instagram! ID: {ig_result}")
+        else:
+            log_message(f"WARNING: Instagram posting skipped/failed: {ig_result}")
+    except Exception as ex:
+        log_message(f"WARNING: Instagram auto-post failed: {ex}")
 
     # ── STEP 10b: Generate Pinned Comment ───────────────────────────────────
     next_slot = get_next_slot(slot)
