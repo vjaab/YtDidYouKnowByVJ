@@ -178,6 +178,32 @@ def generate_and_upload_shorts_teaser(script_json, longform_video_id, dry_run=Fa
                 return crop
             
             base_visual = VideoClip(make_frame, duration=duration)
+            
+            # Extract audio from the longform source for this fact's time range
+            # (Screenshot path means no audio by default, causing silent Shorts)
+            from datetime import datetime as _dt
+            _today = _dt.now().strftime("%Y-%m-%d")
+            _lf_suffix = script_json.get("output_suffix", "")
+            _suffix_str = f"_{_lf_suffix}" if _lf_suffix else f"_{_today}"
+            _lf_filename = f"video_longform{_suffix_str}.mp4"
+            _lf_path = os.path.join(OUTPUT_DIR, _lf_filename)
+            
+            if not os.path.exists(_lf_path):
+                import glob
+                _mp4s = sorted(glob.glob(os.path.join(OUTPUT_DIR, "*longform*.mp4")))
+                if _mp4s:
+                    _lf_path = _mp4s[-1]
+                    
+            if os.path.exists(_lf_path):
+                try:
+                    from moviepy import AudioFileClip
+                    _lf_audio_clip = VideoFileClip(_lf_path).audio
+                    if _lf_audio_clip:
+                        _audio_slice = _lf_audio_clip.subclipped(target_start, target_end)
+                        base_visual = base_visual.with_audio(_audio_slice)
+                        print("🔊 Audio extracted from longform for teaser.")
+                except Exception as audio_err:
+                    print(f"⚠️ Could not extract audio for teaser: {audio_err}")
         else:
             print("⚠️ No screenshot found. Falling back to longform center-crop.")
             # Locate longform output video file
@@ -252,7 +278,13 @@ def generate_and_upload_shorts_teaser(script_json, longform_video_id, dry_run=Fa
             
         print("🚀 Uploading Shorts Teaser to YouTube...")
         longform_title = script_json.get("title", "10 AI Facts")
-        teaser_title = f"This 1 fact changes everything... 🤯 #Shorts #AIFacts"
+        # Dynamic title from actual fact content (not hardcoded generic)
+        fact_hook = best_fact_info.get("hook_for_shorts", "").strip()
+        if fact_hook and len(fact_hook) > 10:
+            # Truncate to fit YouTube title limit with emoji
+            teaser_title = f"{fact_hook[:55]} 🤯 #Shorts"
+        else:
+            teaser_title = f"{longform_title[:50]} 🤯 #Shorts"
         
         # Generate dynamic, optimized hashtags and tags
         initial_people = [p.get("name") for p in script_json.get("people", [])] if script_json.get("people") else []
@@ -287,12 +319,28 @@ def generate_and_upload_shorts_teaser(script_json, longform_video_id, dry_run=Fa
             f"{hashtag_str}"
         )
         
+        # Generate a thumbnail frame from the teaser video
+        teaser_thumbnail_path = None
+        try:
+            from moviepy import VideoFileClip as _VFC
+            _tc = _VFC(teaser_output_path)
+            # Grab frame at 1/3 of the video (usually the most engaging visual)
+            thumb_time = duration / 3.0
+            thumb_frame = _tc.get_frame(thumb_time)
+            thumb_img = Image.fromarray(thumb_frame)
+            teaser_thumbnail_path = os.path.join(OUTPUT_DIR, f"thumb_teaser{suffix_str}.jpg")
+            thumb_img.save(teaser_thumbnail_path, "JPEG", quality=90)
+            _tc.close()
+            print(f"🖼️ Teaser thumbnail generated: {teaser_thumbnail_path}")
+        except Exception as thumb_err:
+            print(f"⚠️ Teaser thumbnail generation failed (non-fatal): {thumb_err}")
+        
         uploaded, teaser_id = upload_video(
             video_path=teaser_output_path,
             title=teaser_title,
             description=teaser_description,
             tags=tags,
-            thumbnail_path=None
+            thumbnail_path=teaser_thumbnail_path
         )
         
         if uploaded:

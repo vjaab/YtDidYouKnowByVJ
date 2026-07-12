@@ -173,17 +173,19 @@ DEFAULT_BROAD_HASHTAGS = ["#ArtificialIntelligence", "#Technology", "#MachineLea
 DEFAULT_NICHE_HASHTAGS = ["#AITools", "#TechFacts"]
 
 GENERIC_HASHTAGS = {
-    "aihacks", "techtips", "productivity", "vaibhavsisinty", "shorts",
+    "aihacks", "techtips", "productivity", "vaibhavsisinty",
     "didyouknow", "amazingfacts", "techfacts", "aifacts", "futuretech",
     "artificialintelligence", "technology", "machinelearning", "aitools",
     "techusa", "techuk", "techcanada", "techaustralia", "technz",
     "techsingapore", "techsouthkorea", "techjapan", "techeurope", "english",
-    "ai", "longform", "deeptech", "softwareengineering", "technews", "llm",
+    "longform", "deeptech", "softwareengineering", "technews", "llm",
     "aivideo", "aifails", "aihacking", "hacks", "tips", "fact", "facts", "tech",
-    "sciencefacts", "interestingtechnology", "youtube", "viral", "video",
-    "trending", "foryou", "fyp", "shortsfeed", "how", "why", "what", "where",
+    "sciencefacts", "interestingtechnology", "youtube", "video",
+    "how", "why", "what", "where",
     "hack", "tip", "tutorial", "explained", "science", "future",
     "deeplearning", "aitraining", "aitechtools", "techtools"
+    # NOTE: Removed #shorts, #ai, #viral, #trending, #fyp, #foryou, #shortsfeed
+    # from blocklist — these are discovery-critical for Shorts feed algorithm
 }
 
 STOPWORDS = {

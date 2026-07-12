@@ -279,9 +279,9 @@ def run_pipeline(topic_type="auto", dry_run=False):
     duration    = 0
     extra_instruction = ""
     min_dur, max_dur = TARGET_AUDIO_DURATION
-    if topic_type == "vaibhav":
-        min_dur = 45
-        max_dur = 65
+    # NOTE: vaibhav duration override removed — YouTube's algorithm strongly
+    # rewards 15-35s Shorts with higher completion rates. All types now use
+    # the config-level TARGET_AUDIO_DURATION (15, 35).
     failed_topics = []  # Track topics whose screenshots failed so Gemini avoids them
 
     while attempts < MAX_RETRY_ATTEMPTS:
@@ -423,8 +423,7 @@ def run_pipeline(topic_type="auto", dry_run=False):
                 log_message(f"⚠️ Topic '{failed_headline}' repeatedly too short. Skipping.")
                 extra_instruction = ""
             else:
-                target_seconds = "45-60" if topic_type == "vaibhav" else "25-35"
-                extra_instruction = f"The previous script was too short at {word_count} words (expected ~{expected_dur:.0f}s). Make the script longer, aim for at least {int(min_dur * 2.4)} words (approx {target_seconds} seconds)."
+                extra_instruction = f"The previous script was too short at {word_count} words (expected ~{expected_dur:.0f}s). Make the script longer, aim for at least {int(min_dur * 2.4)} words (approx 25-35 seconds)."
             attempts += 1
             script_data = None
             continue
@@ -504,8 +503,7 @@ def run_pipeline(topic_type="auto", dry_run=False):
                 log_message(f"⚠️ Topic '{failed_headline}' repeatedly too short. Skipping.")
                 extra_instruction = ""
             else:
-                target_seconds = "45-60" if topic_type == "vaibhav" else "25-35"
-                extra_instruction = f"The previous script was too short at {duration:.0f}s. Make the script slightly longer, aim for {target_seconds} seconds of speaking."
+                extra_instruction = f"The previous script was too short at {duration:.0f}s. Make the script slightly longer, aim for 25-35 seconds of speaking."
             attempts += 1
             continue
 
@@ -698,15 +696,27 @@ def run_pipeline(topic_type="auto", dry_run=False):
     # ── Output Metadata ──
     relevant_links = script_data.get("relevant_links", [])
     source_url = script_data.get("original_news_url", "")
-    description = format_description(ai_desc, script, hashtags, slot=slot, chunks=chunks, relevant_links=relevant_links, source_url=source_url)
     
-    # Algorithm Optimization: Append primary hashtag to title for Shorts feed boost
-    if hashtags:
-        primary_tag = hashtags[0]
-        if primary_tag.lower() not in title.lower():
-            # Ensure we don't exceed 100 character limit
-            if len(title) + len(primary_tag) < 95:
-                title = f"{title} {primary_tag}"
+    # Shorts-optimized description: put hook + hashtags in first 2-3 visible lines
+    is_shorts_upload = "Slot C" not in slot  # Slot C = longform
+    if is_shorts_upload:
+        hashtag_str = " ".join(hashtags) if hashtags else ""
+        hook_line = script_data.get("hook_text", title)
+        source_line = f"📰 Source: {source_url}\n" if source_url else ""
+        description = (
+            f"{hook_line}\n"
+            f"{hashtag_str}\n\n"
+            f"{ai_desc[:200]}\n\n"
+            f"{source_line}"
+            f"\n🚀 Daily AI News → https://t.me/technewsbyvj\n"
+            f"💬 WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z\n\n"
+            f"⚠️ DISCLOSURE: AI-assisted production (voiceover, visuals). Editorial direction & analysis by VJ."
+        )
+    else:
+        description = format_description(ai_desc, script, hashtags, slot=slot, chunks=chunks, relevant_links=relevant_links, source_url=source_url)
+    
+    # NOTE: Hashtag-to-title appending removed — it looked auto-generated
+    # and could trigger YouTube's spam classifiers.
 
 
     # YouTube Upload

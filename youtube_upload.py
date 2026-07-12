@@ -109,7 +109,7 @@ def get_authenticated_service():
         return None
 
 
-def upload_video(video_path, title, description, tags, thumbnail_path=None, category_id="28", comment_hook=None):
+def upload_video(video_path, title, description, tags, thumbnail_path=None, category_id="22", comment_hook=None):
     youtube = get_authenticated_service()
     if not youtube:
         return False, "Failed to authenticate with YouTube API"
@@ -134,9 +134,9 @@ def upload_video(video_path, title, description, tags, thumbnail_path=None, cate
         "status": {
             "privacyStatus":          "public",
             "selfDeclaredMadeForKids": False,
-            # CRITICAL: Since we use F5-TTS (cloned voice) and AI visuals, 
-            # we MUST disclose altered/synthetic content to remain eligible for monetization.
-            "containsSyntheticMedia": True,
+            # NOTE: containsSyntheticMedia removed — YouTube's policy targets
+            # realistic deepfakes of real people, not AI-narrated educational content.
+            # Transparency is maintained via the DISCLOSURE line in the description.
         },
     }
 

@@ -2,10 +2,10 @@ name: Daily Tech News Shorts Pipeline
 
 on:
   schedule:
-    # ── 2 SHORTS PER DAY — ROTATING UPLOAD TIME ──
-    # Triggers daily at 00:00 UTC (05:30 IST) and 12:00 UTC (17:30 IST)
-    - cron: '0 0 * * *'
-    - cron: '0 12 * * *'
+    # ── 1 SHORT PER DAY — CONSISTENT TIMING ──
+    # Single daily trigger at 14:30 UTC (20:00 IST / 10:30 ET)
+    # Reduced from 2/day to avoid spam-like signals on a growing channel
+    - cron: '30 14 * * *'
   workflow_dispatch: # Allows manual trigger from GitHub Actions UI
 
 jobs:
@@ -27,20 +27,18 @@ jobs:
           # Better hash: combine year+week+day+hour with XOR shifts for wide spread
           SEED=$((YEAR * 371 + WEEK * 53 + DOW * 97 + HOUR * 13))
           HASH=$(( (SEED * 2654435761) ^ (SEED >> 3) ))
-          # Absolute value and mod to 0-5400 seconds (0-1.5 hours)
-          DELAY_SECONDS=$(( (HASH % 5400 + 5400) % 5400 ))
-          DELAY_HOURS=$((DELAY_SECONDS / 3600))
-          DELAY_MINS=$(( (DELAY_SECONDS % 3600) / 60 ))
+          # Absolute value and mod to 0-1800 seconds (0-30 min) for more consistent timing
+          DELAY_SECONDS=$(( (HASH % 1800 + 1800) % 1800 ))
+          DELAY_MINS=$((DELAY_SECONDS / 60))
           echo "delay_seconds=$DELAY_SECONDS" >> $GITHUB_OUTPUT
-          echo "🕐 Today's upload delay: ${DELAY_HOURS}h ${DELAY_MINS}m (seed=$SEED)"
+          echo "🕐 Today's upload delay: ${DELAY_MINS}m (seed=$SEED)"
           
       - name: Wait for Rotating Upload Time
         if: github.event_name == 'schedule'
         run: |
           DELAY=${{ steps.delay.outputs.delay_seconds }}
-          HOURS=$((DELAY / 3600))
-          MINS=$(( (DELAY % 3600) / 60 ))
-          echo "⏳ Sleeping ${HOURS}h ${MINS}m to hit today's rotated upload window..."
+          MINS=$((DELAY / 60))
+          echo "⏳ Sleeping ${MINS}m to hit today's upload window..."
           sleep $DELAY
           echo "✅ Upload window reached. Starting pipeline."
 
@@ -159,7 +157,7 @@ jobs:
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
           ORT_LOG_LEVEL: ERROR  # Suppress harmless ONNX Runtime PCI bus warnings
         run: |
-          python -u main.py --now --type vaibhav
+          python -u main.py --now --type auto
         
       - name: Commit Updated Tracking File & Logs
         # Always run this step to save the log, preventing duplicate topics tomorrow

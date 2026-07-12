@@ -101,7 +101,7 @@ STRICT RULES:
 - Do NOT use emojis in the script text.
 - Do NOT say "In this video" or "Today we're going to".
 - Output must be plain spoken text only — no stage directions, no scene labels.
-- SCRIPT LENGTH: Target a 70-second YouTube Short (approx 170-195 words spoken at natural pace). This raw length is required to hit our 45-65s final audio duration threshold after compression and silence optimization.
+- SCRIPT LENGTH: Target a 35-second YouTube Short (approx 80-120 words spoken at natural pace). SHORTER = HIGHER COMPLETION RATE = MORE ALGORITHMIC PUSH. Keep it extremely tight and punchy.
 
 Visual Director Persona & Visual Selection Logic:
 You are also an expert Visual Director. For each narration segment in the `subtitle_chunks` array, you generate highly engaging, visually rich, and contextually accurate visual prompts at the semantic level (not keyword level).
@@ -876,12 +876,12 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "description": "Full 100+ word rich SEO description for youtube describing the video, including relevant hashtags and the source URL.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
   "title": "Punchy YouTube title max 60 chars — must appeal to professionals and creators",
-  "hook_script": "The Hook (0-6s): Direct, slightly alarming opening hook. 15-20 words.",
-  "problem_context": "The Problem (6-15s): What most people are doing wrong or missing. 20-25 words.",
-  "solution_tech": "The Solution (15-45s): The specific tool, prompt, or workflow in action. 75-85 words.",
-  "retention_loop": "The Proof/Result (45-65s): Concrete outcome: time saved, task automated. 45-55 words.",
-  "outro_cta": "The Outro/CTA (65-70s): Soft CTA (follow for more, save this). 15-20 words.",
-  "script": "The FULL voiceover script. Target 170-195 words total (approx 70 seconds). The last sentence MUST flow back into the first for looping.",
+  "hook_script": "The Hook (0-3s): Direct, slightly alarming opening hook. 8-12 words.",
+  "problem_context": "The Problem (3-10s): What most people are doing wrong or missing. 15-20 words.",
+  "solution_tech": "The Solution (10-25s): The specific tool, prompt, or workflow in action. 30-40 words.",
+  "retention_loop": "The Proof/Result (25-30s): Concrete outcome: time saved, task automated. 15-20 words.",
+  "outro_cta": "The Outro/CTA (30-35s): Soft CTA (follow for more, save this). 8-12 words.",
+  "script": "The FULL voiceover script. Target 80-120 words total (approx 35 seconds). SHORTER = MORE VIEWS. The last sentence MUST flow back into the first for looping.",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://example.com"],
   "phonetic_pronunciation_map": {{}},
