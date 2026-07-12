@@ -53,5 +53,8 @@
     "@cf/meta/llama-3.2-1b-instruct": 1783781445.7030666,
     "@cf/openai/gpt-oss-20b": 1783781445.7033024,
     "@cf/ibm-granite/granite-4.0-h-micro": 1783781445.7035344
+  },
+  "gemini_models": {
+    "gemini-2.5-pro": 1783883742.9489698
   }
 }
