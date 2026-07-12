@@ -1,58 +1,58 @@
 {
   "groq_token_usage": {
     "llama-3.3-70b-versatile": {
-      "tokens": 27696,
-      "date": "2026-07-11"
+      "tokens": 41182,
+      "date": "2026-07-12"
     },
     "qwen/qwen3-32b": {
-      "tokens": 3085,
-      "date": "2026-07-11"
+      "tokens": 5817,
+      "date": "2026-07-12"
     },
     "llama-3.1-8b-instant": {
-      "tokens": 9642,
-      "date": "2026-07-11"
+      "tokens": 10853,
+      "date": "2026-07-12"
     },
     "openai/gpt-oss-20b": {
-      "tokens": 7540,
-      "date": "2026-07-11"
+      "tokens": 7895,
+      "date": "2026-07-12"
     },
     "openai/gpt-oss-120b": {
-      "tokens": 11182,
-      "date": "2026-07-11"
+      "tokens": 4650,
+      "date": "2026-07-12"
     }
   },
   "groq_models": {
-    "llama-3.3-70b-versatile": 1783781276.2578769,
-    "qwen/qwen3-32b": 1783781281.5557947,
-    "openai/gpt-oss-20b": 1783781428.3412194,
-    "llama-3.1-8b-instant": 1783781434.4837499,
+    "llama-3.3-70b-versatile": 1783911121.204728,
+    "qwen/qwen3-32b": 1783911131.4371858,
+    "openai/gpt-oss-20b": 1783911278.9406586,
+    "llama-3.1-8b-instant": 1783911288.534168,
     "openai/gpt-oss-120b": 1783781474.49702
   },
   "cloudflare_models": {
-    "@cf/meta/llama-3.3-70b-instruct": 1783781445.6981442,
-    "@cf/meta/llama-3.3-70b-instruct-fp8-fast": 1783781445.6983728,
-    "@cf/zai-org/glm-4.7-flash": 1783781445.6985924,
-    "@cf/openai/gpt-oss-120b": 1783781445.6988688,
-    "@cf/nvidia/nemotron-3-120b-a12b": 1783781445.6990855,
-    "@cf/meta/llama-4-scout-17b-16e-instruct": 1783781445.6993053,
-    "@cf/qwen/qwq-32b": 1783781445.699525,
-    "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b": 1783781445.6997437,
-    "@cf/meta/llama-3.1-70b-instruct": 1783781445.6999798,
-    "@cf/qwen/qwen2.5-72b-instruct": 1783781445.7001975,
-    "@cf/qwen/qwen3-30b-a3b-fp8": 1783781445.700421,
-    "@cf/qwen/qwen2.5-coder-32b-instruct": 1783781445.7006428,
-    "@cf/mistral/mistral-small-3.1-24b-instruct": 1783781445.700877,
-    "@cf/google/gemma-4-26b-a4b-it": 1783781445.7011034,
-    "@cf/moonshotai/kimi-k2.7-code": 1783781445.701327,
-    "@cf/moonshotai/kimi-k2.6": 1783781445.7015529,
-    "@cf/meta/llama-3.1-8b-instruct": 1783781445.7017777,
-    "@cf/meta/llama-3.1-8b-instruct-fp8": 1783781445.7021346,
-    "@cf/meta/llama-3.1-8b-instruct-fast": 1783781445.7023683,
-    "@cf/meta/llama-3.2-3b-instruct": 1783781445.7025928,
-    "@cf/zai-org/glm-5.2": 1783781445.7028246,
-    "@cf/meta/llama-3.2-1b-instruct": 1783781445.7030666,
-    "@cf/openai/gpt-oss-20b": 1783781445.7033024,
-    "@cf/ibm-granite/granite-4.0-h-micro": 1783781445.7035344
+    "@cf/meta/llama-3.3-70b-instruct": 1783911304.3878539,
+    "@cf/meta/llama-3.3-70b-instruct-fp8-fast": 1783911304.3882034,
+    "@cf/zai-org/glm-4.7-flash": 1783911304.3885589,
+    "@cf/openai/gpt-oss-120b": 1783911304.3888948,
+    "@cf/nvidia/nemotron-3-120b-a12b": 1783911304.3892407,
+    "@cf/meta/llama-4-scout-17b-16e-instruct": 1783911304.3895528,
+    "@cf/qwen/qwq-32b": 1783911304.3898838,
+    "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b": 1783911304.3901982,
+    "@cf/meta/llama-3.1-70b-instruct": 1783911304.3905334,
+    "@cf/qwen/qwen2.5-72b-instruct": 1783911304.3908553,
+    "@cf/qwen/qwen3-30b-a3b-fp8": 1783911304.3911834,
+    "@cf/qwen/qwen2.5-coder-32b-instruct": 1783911304.3915372,
+    "@cf/mistral/mistral-small-3.1-24b-instruct": 1783911304.391865,
+    "@cf/google/gemma-4-26b-a4b-it": 1783911304.3922,
+    "@cf/moonshotai/kimi-k2.7-code": 1783911304.3925304,
+    "@cf/moonshotai/kimi-k2.6": 1783911304.3928564,
+    "@cf/meta/llama-3.1-8b-instruct": 1783911304.3933408,
+    "@cf/meta/llama-3.1-8b-instruct-fp8": 1783911304.393684,
+    "@cf/meta/llama-3.1-8b-instruct-fast": 1783911304.3940098,
+    "@cf/meta/llama-3.2-3b-instruct": 1783911304.3943458,
+    "@cf/zai-org/glm-5.2": 1783911304.3946626,
+    "@cf/meta/llama-3.2-1b-instruct": 1783911304.3949966,
+    "@cf/openai/gpt-oss-20b": 1783911304.395346,
+    "@cf/ibm-granite/granite-4.0-h-micro": 1783911304.3958213
   },
   "gemini_models": {
     "gemini-2.5-pro": 1783883742.9489698
