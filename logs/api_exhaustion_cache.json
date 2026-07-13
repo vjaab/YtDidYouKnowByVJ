@@ -1,8 +1,8 @@
 {
   "groq_token_usage": {
     "llama-3.3-70b-versatile": {
-      "tokens": 41182,
-      "date": "2026-07-12"
+      "tokens": 19645,
+      "date": "2026-07-13"
     },
     "qwen/qwen3-32b": {
       "tokens": 5817,
