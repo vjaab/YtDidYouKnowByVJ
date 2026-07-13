@@ -552,20 +552,29 @@ RULES for the generated prompt:
 
 Output the visual prompt:"""
 
-    try:
-        response = client.models.generate_content(
-            model=target_model,
-            contents=prompt,
-            config=genai.types.GenerateContentConfig(temperature=0.8)
-        )
-        res = response.text.strip().strip('"').strip("'")
-        print(f"   [GEMINI PROMPT GEN] Created prompt: {res[:100]}...")
-        return res
-    except Exception as e:
-        print(f"⚠️ Gemini prompt generation failed: {e}. Using fallback.")
-        vibe = global_style_guide if global_style_guide else "cinematic lighting, photorealistic, 8k"
-        subj = original_visual_prompt_clean if original_visual_prompt_clean else chunk_text_clean
-        return f"{subj}, {vibe}, {orientation}, highly detailed, photorealistic, no text"
+    # Try primary model, then fallback model on 429/rate-limit
+    models_to_try = [target_model, "gemini-2.0-flash-lite"]
+    for model_name in models_to_try:
+        try:
+            response = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+                config=genai.types.GenerateContentConfig(temperature=0.8)
+            )
+            res = response.text.strip().strip('"').strip("'")
+            print(f"   [GEMINI PROMPT GEN] Created prompt ({model_name}): {res[:100]}...")
+            return res
+        except Exception as e:
+            err_str = str(e).upper()
+            if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
+                print(f"⚠️ Gemini prompt generation failed: 429 RESOURCE_EXHAUSTED. Trying fallback model...")
+                continue  # Try the next model in the list
+            print(f"⚠️ Gemini prompt generation failed: {e}. Using hardcoded fallback.")
+            break
+    # All models exhausted — use a hardcoded prompt
+    vibe = global_style_guide if global_style_guide else "cinematic lighting, photorealistic, 8k"
+    subj = original_visual_prompt_clean if original_visual_prompt_clean else chunk_text_clean
+    return f"{subj}, {vibe}, {orientation}, highly detailed, photorealistic, no text"
 
 
 
@@ -708,9 +717,14 @@ def _generate_imagen3(prompt, output_path, topic_context="", global_style_guide=
     """
     print(f"🎨 Generating Imagen Image with prompt: {prompt[:80]}...")
     
-    # Early exit if we already know Imagen is exhausted for this run
+    # Early exit if we already know Imagen is exhausted/unavailable for this run
     if os.environ.get("IMAGEN_QUOTA_EXHAUSTED"):
-         return None
+        print("  ⏭️ Imagen unavailable (paid plan required or quota exhausted). Skipping.")
+        path, fb_source = _generate_fallback_image(prompt, output_path, aspect_ratio=aspect_ratio)
+        if path:
+            print(f"  ✅ Fallback generator ({fb_source}) succeeded.")
+            return path
+        return None
 
     # Actually generate the image using Imagen 4.0
     models_to_try = [
@@ -739,6 +753,12 @@ def _generate_imagen3(prompt, output_path, topic_context="", global_style_guide=
             if "429" in err_str and ("quota" in err_str or "exhausted" in err_str):
                 print(f"  ⚠️ Imagen quota exhausted on {model_name}. Trying next...")
                 continue
+            # Detect "paid plans only" / INVALID_ARGUMENT errors and fast-fail all future calls
+            if "paid plan" in err_str or ("invalid_argument" in err_str and "imagen" in err_str):
+                print(f"  ⚠️ Imagen call failed on {model_name}: {e}")
+                print("  🚨 Imagen requires a paid plan. Setting fast-fail flag for remaining chunks.")
+                os.environ["IMAGEN_QUOTA_EXHAUSTED"] = "true"
+                break
             print(f"  ⚠️ Imagen call failed on {model_name}: {e}")
             break
     # Fallback to HuggingFace/Cloudflare/Pollinations if Imagen fails

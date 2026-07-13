@@ -26,6 +26,7 @@ import random
 import re
 import json
 import threading
+import gc
 import numpy as np
 import cv2
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageOps
@@ -5099,6 +5100,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                     
                 bg_clip = VideoClip(make_bg_frame, duration=audio_duration)
                 bg_layer_clips.append(bg_clip)
+                # Reclaim any garbage from the asset processing phase
+                gc.collect()
         else:
             # --- SHORTS PACING SYNCHRONIZED TO CHUNKS ---
             clip_cache = {}
@@ -5972,6 +5975,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     except Exception as e:
         print(f"HUD Overlay failed: {e}")
 
+    # Free memory before compositing all layers
+    gc.collect()
     base_comp = CompositeVideoClip(base_layers, size=(FRAME_W, FRAME_H)).with_duration(audio_duration)
 
     # ── KINETIC SFX & BGM MASTERING ENGINE (Pydub-driven) ────────────────────
@@ -6445,9 +6450,14 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     except Exception as e:
         print(f"Visibility frames failed: {e}")
 
+    # Free memory before the heavy write operation
+    gc.collect()
+
+    # For longform, use lower thread count to reduce FFmpeg memory pressure
+    thread_count = 2 if is_longform else 4
     final.write_videofile(
         output_path, fps=30, codec="libx264", audio_codec="aac",
-        threads=4, preset="ultrafast", ffmpeg_params=["-pix_fmt", "yuv420p"]
+        threads=thread_count, preset="ultrafast", ffmpeg_params=["-pix_fmt", "yuv420p"]
     )
     
     try:
