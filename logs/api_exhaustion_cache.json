@@ -29,7 +29,7 @@
     "openai/gpt-oss-120b": 1784921207.88991
   },
   "cloudflare_models": {
-    "@cf/meta/llama-3.3-70b-instruct": 1784878638.0863497,
+    "@cf/meta/llama-3.3-70b-instruct": 1784910219.7989733,
     "@cf/meta/llama-3.3-70b-instruct-fp8-fast": 1784694410.6178548,
     "@cf/zai-org/glm-4.7-flash": 1784694410.618132,
     "@cf/openai/gpt-oss-120b": 1784694410.6183968,
