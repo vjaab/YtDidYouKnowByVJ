@@ -1607,38 +1607,25 @@ def generate_voiceover(text, custom_phonetic_map=None, api_key=None):
         
         path, dur, word_timestamps = None, 0, []
         is_cloud = False
+        elevenlabs_error = None
         try:
             # First Priority: ElevenLabs Cloned Voice
             path, dur, word_timestamps = _generate_elevenlabs(text_to_speak, mp3_path)
             if path:
                 is_cloud = True
         except Exception as e:
+            elevenlabs_error = e
             print(f"❌ ElevenLabs failed: {e}")
             
         if not path:
-            # Second Priority: Local F5-TTS Voice Cloning (if GPU and package are available)
-            try:
-                import torch
-                has_gpu = torch.cuda.is_available() or torch.backends.mps.is_available()
-                if has_gpu:
-                    print("🎙️ ElevenLabs failed. Attempting local GPU F5-TTS fallback...")
-                    path, dur, word_timestamps = _generate_f5_clone(text_to_speak, mp3_path)
-                    if path:
-                        is_cloud = False
-                else:
-                    print("   Local GPU not found. Skipping F5-TTS fallback.")
-            except Exception as f5_err:
-                print(f"❌ F5-TTS voice cloning failed: {f5_err}")
-                path = None
-
-        if not path:
-            # Third Priority: Edge-TTS
-            try:
-                path, dur, word_timestamps = _generate_edge_tts(text_to_speak, mp3_path)
-                if path:
-                    is_cloud = True
-            except Exception as edge_err:
-                print(f"❌ Edge-TTS failed: {edge_err}")
+            # HARD FAIL: ElevenLabs voice clone is REQUIRED for brand consistency.
+            # Do NOT fall back to F5-TTS or Edge-TTS — stop the pipeline immediately
+            # so the GitHub Action fails and no non-cloned-voice video gets published.
+            error_detail = f": {elevenlabs_error}" if elevenlabs_error else " (returned empty result)"
+            raise RuntimeError(
+                f"🚨 PIPELINE HALTED: ElevenLabs voice clone failed{error_detail}. "
+                f"Refusing to fall back to alternative TTS to maintain voice consistency."
+            )
 
         if not path: break
         
