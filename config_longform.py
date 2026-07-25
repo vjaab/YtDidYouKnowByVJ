@@ -78,5 +78,5 @@ LONGFORM_INTRO_DURATION = 5
 LONGFORM_OUTRO_DURATION = 5
 
 # ── Shorts Cross-Promotion ───────────────────────────────────────────────────
-LONGFORM_GENERATE_SHORTS_TEASER = True        # Auto-generate 60s Shorts teaser
+LONGFORM_GENERATE_SHORTS_TEASER = False       # Disabled — do not upload Shorts of longform videos
 LONGFORM_SHORTS_TEASER_DURATION = (50, 58)    # Shorts teaser duration range
