@@ -5363,6 +5363,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             from rembg import remove, new_session
             rembg_session_fs = new_session(model_name="u2net_human_seg")
             mask_cache_fs = {}
+            mask_cache_win = {}
             
             # Pre-generate card mask for windowed layout once
             card_mask_img = Image.new("L", (320, 320), 0)
@@ -6287,14 +6288,33 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 win_frame = avatar_win_clip.get_frame(t)
                 win_frame_graded = apply_color_grade(win_frame, bg_accent)
                 
+                # AI background removal for windowed avatar
+                win_frame_idx = int(round(t * 30.0))
+                if win_frame_idx in mask_cache_win:
+                    mask_win = mask_cache_win[win_frame_idx]
+                else:
+                    try:
+                        rgba_win = remove(win_frame, session=rembg_session_fs, alpha_matting=False, post_process_mask=True)
+                        mask_win = (rgba_win[:, :, 3] / 255.0).astype(np.float32)
+                        # Erase bottom 12% watermark
+                        h_wm, w_wm = mask_win.shape
+                        wm_h = int(h_wm * 0.12)
+                        mask_win[-wm_h:, :] = 0.0
+                    except Exception:
+                        mask_win = np.ones((win_frame.shape[0], win_frame.shape[1]), dtype=np.float32)
+                    mask_cache_win[win_frame_idx] = mask_win
+                
+                # Combine rembg mask with rounded card mask
+                combined_mask = mask_win * card_mask_arr
+                
                 card_img = Image.new("RGBA", (320, 320), (0, 0, 0, 0))
                 c_draw = ImageDraw.Draw(card_img)
                 # Glassmorphic rounded rectangle border window
                 c_draw.rounded_rectangle([0, 0, 320, 320], radius=24, fill=(15, 15, 20, 180), outline=(*bg_accent, 180), width=2)
                 
-                # Apply rounded mask to win_frame_graded
+                # Apply combined mask (bg-removed + rounded corners) to avatar
                 win_pil = Image.fromarray(win_frame_graded).convert("RGBA")
-                mask_img = Image.fromarray((card_mask_arr * 255).astype(np.uint8), mode="L")
+                mask_img = Image.fromarray((combined_mask * 255).astype(np.uint8), mode="L")
                 win_pil.putalpha(mask_img)
                 card_img.alpha_composite(win_pil)
                 

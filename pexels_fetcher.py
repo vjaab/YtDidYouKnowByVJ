@@ -24,11 +24,64 @@ client = genai.Client(api_key=GEMINI_API_KEY)
 # ─────────────────────────────────────────────────────────────────────────────
 # RELEVANCE SCORING
 # ─────────────────────────────────────────────────────────────────────────────
-def score_relevance(chunk_text, visual_desc):
+def calculate_local_keyword_score(chunk_text, visual_desc):
     """
-    Calls Gemini to rate relevance 0-10.
+    Calculates a quick keyword overlap relevance score (0-10) locally.
     """
     import re
+    # Clean and tokenize
+    words_chunk = set(re.findall(r'[a-z0-9]+', chunk_text.lower()))
+    words_desc = set(re.findall(r'[a-z0-9]+', visual_desc.lower()))
+    
+    # Remove common stopwords and visual noise words
+    stopwords = {
+        "a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are", "arent", "as", "at", 
+        "be", "because", "been", "before", "being", "below", "between", "both", "but", "by", "cant", "cannot", "could", 
+        "couldnt", "did", "didnt", "do", "does", "doesnt", "doing", "dont", "down", "during", "each", "few", "for", "from", 
+        "further", "had", "hadnt", "has", "hasnt", "have", "havent", "having", "he", "hed", "hell", "hes", "her", "here", 
+        "heres", "hers", "herself", "him", "himself", "his", "how", "hows", "i", "id", "ill", "im", "ive", "if", "in", 
+        "into", "is", "isnt", "it", "its", "itself", "lets", "me", "more", "most", "mustnt", "my", "myself", "no", "nor", 
+        "not", "of", "off", "on", "once", "only", "or", "other", "ought", "our", "ours", "ourselves", "out", "over", "own", 
+        "same", "shant", "she", "shed", "shell", "shes", "should", "shouldnt", "so", "some", "such", "than", "that", "thats", 
+        "the", "their", "theirs", "them", "themselves", "then", "there", "theres", "these", "they", "theyd", "theyll", 
+        "theyre", "theyve", "this", "those", "through", "to", "too", "under", "until", "up", "very", "was", "wasnt", "we", 
+        "wed", "well", "were", "weve", "werent", "what", "whats", "when", "whens", "where", "wheres", "which", "while", 
+        "who", "whos", "whom", "why", "whys", "with", "wont", "would", "wouldnt", "you", "youd", "youll", "youre", "youve", 
+        "your", "yours", "yourself", "yourselves", "of", "in", "the", "on", "close", "closeup", "up", "showing", "shown"
+    }
+    
+    clean_chunk = words_chunk - stopwords
+    clean_desc = words_desc - stopwords
+    
+    if not clean_chunk:
+        return 5
+        
+    overlap = clean_chunk.intersection(clean_desc)
+    
+    if not overlap:
+        return 2
+        
+    # Calculate score based on ratio of overlap
+    ratio = len(overlap) / len(clean_chunk)
+    # Scale to 0-10, with a base of 6 for any matching technical keywords
+    score = int(6 + ratio * 4)
+    return min(10, score)
+
+
+def score_relevance(chunk_text, visual_desc):
+    """
+    Rates the relevance between technical text and visual description (0-10).
+    Uses a fast local keyword heuristic as primary search and rate-limit fallback.
+    """
+    import re
+    
+    # 1. Run local keyword check first
+    local_score = calculate_local_keyword_score(chunk_text, visual_desc)
+    if local_score >= 8:
+        print(f"   [RELEVANCE] Local strong match found (score: {local_score}) for '{visual_desc[:40]}'")
+        return local_score
+
+    # 2. Call Gemini for nuanced semantic understanding
     attempts = 0
     while attempts < 3:
         try:
@@ -49,12 +102,12 @@ Return ONLY the raw integer (0-10)."""
             if match:
                  score = int(match.group())
                  return min(10, max(0, score))
-            return 5
+            break
         except Exception as e:
             err_str = str(e).lower()
             # If rate limited, wait longer (60s) for the minute to reset
             if "429" in err_str or "resource_exhausted" in err_str:
-                wait_time = 60
+                wait_time = 15 * (attempts + 1)  # Progressive backing off: 15s, 30s...
                 print(f"⚠️ Gemini Rate Limit Hit (429). Waiting {wait_time}s...")
             else:
                 wait_time = (2 ** attempts) + 5
@@ -63,7 +116,9 @@ Return ONLY the raw integer (0-10)."""
             attempts += 1
             time.sleep(wait_time)
             
-    return 5  # Return middle score on total failure
+    # Fallback to local score on total API failure to keep rendering robust
+    print(f"   [RELEVANCE] API failed. Falling back to local score: {local_score} for '{visual_desc[:40]}'")
+    return local_score
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -398,60 +453,216 @@ def _download_photo(url, output_path, is_longform=False):
     except Exception as e:
         print(f"Photo download err: {e}")
         return None
+def _extract_clean_search_query(chunk, topic_context=""):
+    """
+    Formulates a clean, high-relevance search query for Pexels based on
+    visual directions (nano_visual_prompt) or chunk text.
+    """
+    import re
+    
+    # 1. Try to extract from visual direction prompt
+    prompt = chunk.get("nano_visual_prompt", "")
+    if prompt:
+        # Lowercase for uniform processing
+        q = prompt.strip().lower()
+        
+        # Remove common introductory filler phrases/prefixes
+        fillers = [
+            r"^what should be shown\s*:\s*",
+            r"^what to show\s*:\s*",
+            r"^visual direction\s*:\s*",
+            r"^b-roll of\s+(a\s+|an\s+|the\s+)?",
+            r"^b-roll showing\s+(a\s+|an\s+|the\s+)?",
+            r"^b-roll\s+(a\s+|an\s+|the\s+)?",
+            r"^close-up of\s+(a\s+|an\s+|the\s+)?",
+            r"^close up of\s+(a\s+|an\s+|the\s+)?",
+            r"^extreme close-up of\s+(a\s+|an\s+|the\s+)?",
+            r"^extreme close up of\s+(a\s+|an\s+|the\s+)?",
+            r"^macro photograph of\s+(a\s+|an\s+|the\s+)?",
+            r"^macro photo of\s+(a\s+|an\s+|the\s+)?",
+            r"^screenshot of\s+(a\s+|an\s+|the\s+)?",
+            r"^diagram showing\s+(a\s+|an\s+|the\s+)?",
+            r"^diagram of\s+(a\s+|an\s+|the\s+)?",
+            r"^sketch of\s+(a\s+|an\s+|the\s+)?",
+            r"^a simple whiteboard marker sketch of\s+(a\s+|an\s+|the\s+)?",
+            r"^whiteboard sketch of\s+(a\s+|an\s+|the\s+)?",
+            r"^a drawing of\s+(a\s+|an\s+|the\s+)?",
+            r"^animated ui mockup showing\s+(a\s+|an\s+|the\s+)?",
+            r"^ui mockup showing\s+(a\s+|an\s+|the\s+)?",
+            r"^mockup of\s+(a\s+|an\s+|the\s+)?",
+            r"^photo of\s+(a\s+|an\s+|the\s+)?",
+            r"^image of\s+(a\s+|an\s+|the\s+)?",
+            r"^video of\s+(a\s+|an\s+|the\s+)?",
+            r"^clip showing\s+(a\s+|an\s+|the\s+)?",
+            r"^show\s+(a\s+|an\s+|the\s+)?",
+            r"^illustration of\s+(a\s+|an\s+|the\s+)?",
+            r"^concept of\s+(a\s+|an\s+|the\s+)?",
+        ]
+        for f in fillers:
+            q = re.sub(f, "", q)
+            
+        # Remove trailing visual style guides/clauses (split on common keywords)
+        style_fillers = [
+            ", cinematic", ", photorealistic", ", realistic", ", futuristic",
+            ", cyberpunk", ", luxury tech", ", minimalist", ", high detail",
+            ", shot on", " with dramatic", " with glowing", " glowing on",
+            " emitting ", " in a dark", " in a modern"
+        ]
+        for sf in style_fillers:
+            if sf in q:
+                q = q.split(sf)[0]
+                
+        q = q.strip().strip(".,:;-")
+        # Keep it reasonably short (max 6 words for Pexels search query efficiency)
+        words = q.split()
+        if 1 <= len(words) <= 7:
+            return q
+        elif len(words) > 7:
+            # Take first 5 words if too long
+            return " ".join(words[:5])
 
-def _fetch_pexels_fallback(chunk, duration, is_video=False, is_longform=False):
+    # 2. Extract from chunk text using keyword matching for tech nouns
+    text = chunk.get("text", "")
+    if text:
+        tech_keywords = [
+            "gpu", "tpu", "semiconductor", "microchip", "silicon", "cleanroom",
+            "server", "data center", "robot", "humanoid", "database", "cybersecurity",
+            "hacker", "firewall", "encryption", "quantum", "neural network",
+            "machine learning", "deep learning", "algorithm", "source code",
+            "terminal", "coding", "programmer", "software", "api", "cloud",
+            "fiber optic", "satellite", "dna", "microscope", "telecom", "supercomputer"
+        ]
+        text_lower = text.lower()
+        found_keywords = []
+        for kw in tech_keywords:
+            if kw in text_lower:
+                found_keywords.append(kw)
+        if found_keywords:
+            # Use found keywords (deduplicated)
+            unique_kws = list(dict.fromkeys(found_keywords))
+            return " ".join(unique_kws[:2])
+
+    # 3. Fallback to topic context or base tech query
+    if topic_context:
+        # Clean topic context slightly
+        clean_topic = topic_context.lower()
+        # Remove common news prefixes
+        clean_topic = re.sub(r"^(deep dive\s*:\s*|news\s*:\s*)", "", clean_topic)
+        # Use first 3 words of topic context + 'technology'
+        words = clean_topic.split()
+        if words:
+            return " ".join(words[:3]) + " technology"
+
+    return "technology"
+
+
+def _filter_and_sort_candidates_by_relevance(chunk_text, candidates):
+    """
+    Scores the relevance of a list of candidates against the chunk text,
+    sorting them by highest score. Returns a list of (score, candidate) tuples.
+    """
+    scored_candidates = []
+    for c in candidates:
+        desc = c.get("desc", "")
+        if not desc:
+            score = 5 # Default middle score if no description
+        else:
+            score = score_relevance(chunk_text, desc)
+        scored_candidates.append((score, c))
+    
+    # Sort by score in descending order
+    scored_candidates.sort(key=lambda x: x[0], reverse=True)
+    return scored_candidates
+
+
+def _fetch_pexels_fallback(chunk, duration, is_video=False, is_longform=False, topic_context=""):
     cid = chunk.get("chunk_id")
-    primary_q = chunk.get("pexels_primary", "technology")
-    fallback_q = chunk.get("pexels_fallback", "innovation")
+    
+    # Formulate search queries
+    smart_query = _extract_clean_search_query(chunk, topic_context)
+    primary_q = smart_query
+    fallback_q = chunk.get("pexels_fallback", "technology")
+    
+    if primary_q == fallback_q:
+        queries = [primary_q]
+    else:
+        queries = [primary_q, fallback_q]
+        
     video_out = os.path.join(OUTPUT_DIR, f"chunk_{cid}_{TODAY}.mp4")
     photo_out = os.path.join(OUTPUT_DIR, f"chunk_{cid}_{TODAY}.jpg")
     
     orientation = "landscape" if is_longform else "portrait"
     
     if is_video:
-        # Try videos first
-        for query in [primary_q, fallback_q]:
+        # 1. Search videos for all queries
+        all_videos = []
+        for query in queries:
             print(f"   Searching Pexels video for '{query}'...")
             videos = _search_pexels_videos(query, duration, {"orientation": orientation})
-            for v in videos:
+            all_videos.extend(videos)
+            
+        # Score and rank videos
+        if all_videos:
+            scored_videos = _filter_and_sort_candidates_by_relevance(chunk.get("text", ""), all_videos)
+            for score, v in scored_videos:
+                print(f"      -> Best video candidate: {v['desc']} (Score: {score}/10)")
                 path = _download_video(v["link"], video_out)
                 if path:
                     with _download_lock:
                         _used_media.add(v["id"])
-                    return path, f"Video ({query})", "video"
+                    return path, f"Video ({v['desc']}) [Score: {score}]", "video"
         
-        # Fallback to photos if no videos found
-        for query in [primary_q, fallback_q]:
+        # 2. Fallback to photos if no videos found
+        all_photos = []
+        for query in queries:
             print(f"   No video found. Searching Pexels photo for '{query}'...")
             photos = _search_pexels_photos(query, orientation=orientation)
-            for p in photos:
+            all_photos.extend(photos)
+            
+        if all_photos:
+            scored_photos = _filter_and_sort_candidates_by_relevance(chunk.get("text", ""), all_photos)
+            for score, p in scored_photos:
+                print(f"      -> Best photo candidate (video fallback): {p['desc']} (Score: {score}/10)")
                 path = _download_photo(p["link"], photo_out, is_longform=is_longform)
                 if path:
                     with _download_lock:
                         _used_media.add(p["id"])
-                    return path, f"Photo ({query})", "photo"
+                    return path, f"Photo ({p['desc']}) [Score: {score}]", "photo"
     else:
-        # Try photos first
-        for query in [primary_q, fallback_q]:
+        # 1. Search photos for all queries
+        all_photos = []
+        for query in queries:
             print(f"   Searching Pexels photo for '{query}'...")
             photos = _search_pexels_photos(query, orientation=orientation)
-            for p in photos:
+            all_photos.extend(photos)
+            
+        # Score and rank photos
+        if all_photos:
+            scored_photos = _filter_and_sort_candidates_by_relevance(chunk.get("text", ""), all_photos)
+            for score, p in scored_photos:
+                print(f"      -> Best photo candidate: {p['desc']} (Score: {score}/10)")
                 path = _download_photo(p["link"], photo_out, is_longform=is_longform)
                 if path:
                     with _download_lock:
                         _used_media.add(p["id"])
-                    return path, f"Photo ({query})", "photo"
+                    return path, f"Photo ({p['desc']}) [Score: {score}]", "photo"
                     
-        # Fallback to videos if no photos found
-        for query in [primary_q, fallback_q]:
+        # 2. Fallback to videos if no photos found
+        all_videos = []
+        for query in queries:
             print(f"   No photo found. Searching Pexels video for '{query}'...")
             videos = _search_pexels_videos(query, duration, {"orientation": orientation})
-            for v in videos:
+            all_videos.extend(videos)
+            
+        if all_videos:
+            scored_videos = _filter_and_sort_candidates_by_relevance(chunk.get("text", ""), all_videos)
+            for score, v in scored_videos:
+                print(f"      -> Best video candidate (photo fallback): {v['desc']} (Score: {score}/10)")
                 path = _download_video(v["link"], video_out)
                 if path:
                     with _download_lock:
                         _used_media.add(v["id"])
-                    return path, f"Video ({query})", "video"
+                    return path, f"Video ({v['desc']}) [Score: {score}]", "video"
                     
     return None, None, None
 
@@ -548,7 +759,8 @@ RULES for the generated prompt:
 4. Describe the camera shot, angle, lighting, and lens details to make it look premium (e.g. "shot on 35mm lens, cinematic split lighting, shallow depth of field, subtle hand-held camera shake, volumetric dust particles").
 5. Use vibrant, harmonious, modern color grading (e.g., cyber-cyan/amber contrast, deep emerald greens and dark charcoal, moody cyberpunk neon).
 6. Format must be {orientation}.
-7. Do NOT include any introductory or concluding text (e.g. "Here is your prompt:"). Return ONLY the raw prompt.
+7. For technical, cloud, coding, hardware, or software development concepts, prioritize concrete and realistic visual assets (e.g., clean code editor windows showing syntax-highlighted code, terminal windows with command line outputs, server rack units inside modern blue/orange data centers, system architecture block diagrams, database table relationships) rather than generic abstract stock concepts like glowing digital brains or neon particle vortexes.
+8. Do NOT include any introductory or concluding text (e.g. "Here is your prompt:"). Return ONLY the raw prompt.
 
 Output the visual prompt:"""
 
@@ -829,7 +1041,7 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
             
         # Pexels fallback for photo mode!
         print(f"Chunk {cid} -> Imagen/Pollinations failed, falling back to Pexels search...")
-        path, source_desc, v_type = _fetch_pexels_fallback(chunk, dur, is_video=False, is_longform=is_longform)
+        path, source_desc, v_type = _fetch_pexels_fallback(chunk, dur, is_video=False, is_longform=is_longform, topic_context=topic_context)
         if path:
             chunk["visual_path"] = path
             chunk["visual_type"] = v_type
@@ -913,7 +1125,7 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
 
         # Pexels fallback for evidence mode!
         print(f"Chunk {cid} -> Imagen/Pollinations evidence failed, falling back to Pexels search...")
-        path, source_desc, v_type = _fetch_pexels_fallback(chunk, dur, is_video=False, is_longform=is_longform)
+        path, source_desc, v_type = _fetch_pexels_fallback(chunk, dur, is_video=False, is_longform=is_longform, topic_context=topic_context)
         if path:
             chunk["visual_path"] = path
             chunk["visual_type"] = v_type
@@ -969,7 +1181,7 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
 
         # Pexels fallback for video mode!
         print(f"Chunk {cid} -> Veo/Imagen/Pollinations failed, falling back to Pexels search...")
-        path, source_desc, v_type = _fetch_pexels_fallback(chunk, dur, is_video=True, is_longform=is_longform)
+        path, source_desc, v_type = _fetch_pexels_fallback(chunk, dur, is_video=True, is_longform=is_longform, topic_context=topic_context)
         if path:
             chunk["visual_path"] = path
             chunk["visual_type"] = v_type
