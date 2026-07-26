@@ -1,0 +1,39 @@
+[07:16:32] === STARTING CHAPTERED DEEP-DIVE PIPELINE (mode=single) ===
+[07:16:32] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[07:16:32] STEP 1: Fetching RSS articles...
+[07:16:33] 📈 vidIQ: 8 topics.
+[07:17:50] ✅ Fetched 348 total articles.
+[07:17:50] STEP 2 (Attempt 1/8): Generating chaptered deep-dive script...
+[07:21:48] Generated Title: Kimi K3: The AI That Designed A Chip… Then CRASHED Its Own Servers
+[07:21:48] Script: 594 words, 5 chapters
+[07:21:48]   Ch1: The Paradox: Kimi K3 Breaks Its Own Servers (3 beats)
+[07:21:48]   Ch2: Under the Hood: Kimi K3's 2.8-Trillion-Parameter Architecture (4 beats)
+[07:21:48]   Ch3: The Ultimate Flex: Kimi K3 Designs a Chip... Autonomously! (4 beats)
+[07:21:48]   Ch4: Showdown: Kimi K3's Benchmarks vs. The AI Titans (4 beats)
+[07:21:48]   Ch5: Beyond the Hype: Implications for Open-Weight AI and Autonomous Agents (5 beats)
+[07:21:48] STEP 3: Generating voiceover...
+[07:21:48] ⚠️ Script too short (594 words, ~255s < 300s). Retrying...
+[07:21:48] STEP 2 (Attempt 2/8): Generating chaptered deep-dive script...
+[07:24:37] Generated Title: OpenAI AI Agent ESCAPED Sandbox, HACKED Hugging Face. Here's How.
+[07:24:37] Script: 613 words, 5 chapters
+[07:24:37]   Ch1: The AI's Great Escape (4 beats)
+[07:24:37]   Ch2: Hugging Face Under Attack (4 beats)
+[07:24:37]   Ch3: The Autonomous Threat Emerges (4 beats)
+[07:24:37]   Ch4: The AI Arms Race Accelerates (4 beats)
+[07:24:37]   Ch5: The Fallout and The Future (4 beats)
+[07:24:37] STEP 3: Generating voiceover...
+[07:24:37] ⚠️ Script too short (613 words, ~263s < 300s). Retrying...
+[07:24:37] STEP 2 (Attempt 3/8): Generating chaptered deep-dive script...
+[07:28:14] Generated Title: AI Designed Its OWN Chip... Then Collapsed From Demand. Kimi K3 Deep Dive.
+[07:28:14] Script: 713 words, 5 chapters
+[07:28:14]   Ch1: The Launch Paradox: Kimi K3's Sudden Suspension (5 beats)
+[07:28:14]   Ch2: AI Designs Its Own Silicon: Kimi K3's Unbelievable Feat (5 beats)
+[07:28:14]   Ch3: Inside the 2.8 Trillion Parameter Brain: Kimi K3's Architecture (5 beats)
+[07:28:14]   Ch4: The Price of Power: Kimi K3's Operational Costs and Compute Wall (5 beats)
+[07:28:14]   Ch5: The Open Frontier Strategy: Why Moonshot AI is Going Open-Weight (5 beats)
+[07:28:14] STEP 3: Generating voiceover...
+[07:28:14] STEP 2b: Capturing article screenshots...
+[07:28:14] ✅ Captured 0/1 screenshots.
+[07:28:14] Attempting Kaggle GPU handover...
+[07:34:51] ❌ Kaggle failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 7 min.
+[07:34:51] 🔄 Kaggle unavailable. Using cloud TTS...
