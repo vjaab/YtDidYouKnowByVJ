@@ -1,0 +1,21 @@
+[17:13:50] === STARTING DAILY AI PIPELINE (TOOLS) | COUNTRY: GB ===
+[17:13:50] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[17:13:50] STEP 1: Content Ecosystem Check -> Day: Mon, Slot: Slot A (Discovery), Category: AI & Tech Tools
+[17:13:50] STEP 2: Fetching articles (RSS + Trending Engine)...
+[17:13:51] 📈 vidIQ: Injected 8 high-signal topics.
+[17:15:52] 🔥 Trending Engine injected 127 high-signal articles for geo=GB.
+[17:15:52] ✅ Fetched 419 total articles (110 GitHub, 8 vidIQ, 92 research, 73 tools, 9 X.com, 127 trending).
+[17:15:52] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[17:17:53] Selected Headline: GitHub Trending: ayghri/i-have-adhd — A skill for your coding agent to stop it from burying the answer. ADHD-friendly output.
+[17:17:53] Selected URL: https://github.com/ayghri/i-have-adhd
+[17:17:53] Breaking Level: 9
+[17:17:53] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[17:17:59] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20260727_171753.png
+[17:18:05] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20260727_171759.png
+[17:18:05] STEP 3d: Fetching and validating entity tags for Short...
+[17:18:08] ✅ Found 1 valid entity tags for the Short.
+[17:18:08] STEP 4: Generating voiceover + word timestamps...
+[17:18:08] Selected Lip-Sync Template: assets/video/masterning_code.mp4 (from 41 options)
+[17:26:17] ❌ Kaggle Handover failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 8 min.
+[17:26:17] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
+[17:26:17] ⚠️ Lip-sync will be SKIPPED for this video (requires GPU).
