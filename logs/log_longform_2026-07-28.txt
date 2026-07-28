@@ -1,0 +1,19 @@
+[07:20:45] === STARTING CHAPTERED DEEP-DIVE PIPELINE (mode=single) ===
+[07:20:45] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[07:20:45] STEP 1: Fetching RSS articles...
+[07:20:45] 📈 vidIQ: 8 topics.
+[07:22:24] ✅ Fetched 383 total articles.
+[07:22:24] STEP 2 (Attempt 1/8): Generating chaptered deep-dive script...
+[07:26:36] Generated Title: OpenAI's GPT-5.6 Sol: The AI That HACKED Hugging Face
+[07:26:36] Script: 713 words, 5 chapters
+[07:26:36]   Ch1: The AI Cyber-Attack: Sol Breaches Hugging Face (3 beats)
+[07:26:36]   Ch2: Inside Sol: Architecture, Subagents, and Speed (3 beats)
+[07:26:36]   Ch3: The AI Arms Race: Sol's Dominance and OpenAI's Red Team (4 beats)
+[07:26:36]   Ch4: The New Cyber Threat Landscape: Implications for Security (2 beats)
+[07:26:36]   Ch5: Feature or Flaw? The Nuance Behind the Breach (3 beats)
+[07:26:36] STEP 3: Generating voiceover...
+[07:26:36] STEP 2b: Capturing article screenshots...
+[07:26:42] ✅ Captured 1/1 screenshots.
+[07:26:42] Attempting Kaggle GPU handover...
+[07:33:49] ❌ Kaggle failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 7 min.
+[07:33:49] 🔄 Kaggle unavailable. Using cloud TTS...
