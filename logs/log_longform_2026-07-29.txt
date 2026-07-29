@@ -1,0 +1,19 @@
+[07:23:58] === STARTING CHAPTERED DEEP-DIVE PIPELINE (mode=multi) ===
+[07:23:58] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[07:23:58] STEP 1: Fetching RSS articles...
+[07:23:58] 📈 vidIQ: 8 topics.
+[07:25:22] ✅ Fetched 386 total articles.
+[07:25:22] STEP 2 (Attempt 1/8): Generating chaptered deep-dive script...
+[07:32:10] Generated Title: AI Just Designed Its OWN Chip: The Agent Revolution Is HERE.
+[07:32:10] Script: 980 words, 5 chapters
+[07:32:10]   Ch1: The AI That Builds Itself: Kimi K3's Autonomous Leap (3 beats)
+[07:32:10]   Ch2: 2.8 Trillion Parameters, Lean & Mean: Architectural Genius (5 beats)
+[07:32:10]   Ch3: The Agent Toolkit Explosion: Building Autonomous AI Infrastructure (5 beats)
+[07:32:10]   Ch4: Engineering Autonomous Intelligence: Skills, Frameworks, and Reality (5 beats)
+[07:32:10]   Ch5: The Autonomous Future: Stakes and Challenges (5 beats)
+[07:32:10] STEP 3: Generating voiceover...
+[07:32:10] STEP 2b: Capturing article screenshots...
+[07:32:22] ✅ Captured 2/3 screenshots.
+[07:32:22] Attempting Kaggle GPU handover...
+[07:40:29] ❌ Kaggle failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 8 min.
+[07:40:29] 🔄 Kaggle unavailable. Using cloud TTS...
