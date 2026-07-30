@@ -1,0 +1,19 @@
+[07:19:53] === STARTING CHAPTERED DEEP-DIVE PIPELINE (mode=single) ===
+[07:19:53] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[07:19:53] STEP 1: Fetching RSS articles...
+[07:19:53] 📈 vidIQ: 8 topics.
+[07:22:10] ✅ Fetched 390 total articles.
+[07:22:10] STEP 2 (Attempt 1/8): Generating chaptered deep-dive script...
+[07:27:28] Generated Title: AI's DARK SECRET: The Breach That FORCED Tech Giants To Unite
+[07:27:28] Script: 739 words, 5 chapters
+[07:27:28]   Ch1: The Breach That Broke AI Security: Hugging Face's Nightmare (4 beats)
+[07:27:28]   Ch2: OSAA: A United Front Forms (2 beats)
+[07:27:28]   Ch3: Architecting Defense: NVIDIA, Microsoft, and the Open Stack (3 beats)
+[07:27:28]   Ch4: Closed vs. Open: Google's Gemini and the Absent Giants (2 beats)
+[07:27:28]   Ch5: Why This Matters: Your AI's Future Security and the Policy Debate (3 beats)
+[07:27:28] STEP 3: Generating voiceover...
+[07:27:28] STEP 2b: Capturing article screenshots...
+[07:27:34] ✅ Captured 1/1 screenshots.
+[07:27:34] Attempting Kaggle GPU handover...
+[07:34:42] ❌ Kaggle failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 7 min.
+[07:34:42] 🔄 Kaggle unavailable. Using cloud TTS...
