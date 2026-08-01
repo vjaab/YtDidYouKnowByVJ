@@ -1,0 +1,19 @@
+[07:08:22] === STARTING CHAPTERED DEEP-DIVE PIPELINE (mode=single) ===
+[07:08:22] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[07:08:22] STEP 1: Fetching RSS articles...
+[07:08:22] 📈 vidIQ: 8 topics.
+[07:10:04] ✅ Fetched 385 total articles.
+[07:10:04] STEP 2 (Attempt 1/8): Generating chaptered deep-dive script...
+[07:15:32] Generated Title: Inkling-Small: How a Tiny AI SHATTERED the 'Bigger is Better' Myth
+[07:15:32] Script: 868 words, 5 chapters
+[07:15:32]   Ch1: The Impossible Win: Smaller AI Beats Giant (0 beats)
+[07:15:32]   Ch2: MoE's Secret Sauce: Inside Inkling-Small (0 beats)
+[07:15:32]   Ch3: Benchmark Breakdown: Where Inkling-Small DOMINATES (0 beats)
+[07:15:32]   Ch4: The New Scaling Law: Efficiency Over Raw Size (0 beats)
+[07:15:32]   Ch5: Multimodal Future, Affordable Power (0 beats)
+[07:15:32] STEP 3: Generating voiceover...
+[07:15:32] STEP 2b: Capturing article screenshots...
+[07:15:38] ✅ Captured 1/1 screenshots.
+[07:15:38] Attempting Kaggle GPU handover...
+[07:22:45] ❌ Kaggle failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 7 min.
+[07:22:45] 🔄 Kaggle unavailable. Using cloud TTS...
