@@ -1,0 +1,19 @@
+[07:12:46] === STARTING CHAPTERED DEEP-DIVE PIPELINE (mode=single) ===
+[07:12:46] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[07:12:46] STEP 1: Fetching RSS articles...
+[07:12:46] 📈 vidIQ: 8 topics.
+[07:14:02] ✅ Fetched 351 total articles.
+[07:14:02] STEP 2 (Attempt 1/8): Generating chaptered deep-dive script...
+[07:19:01] Generated Title: Kimi K3: The 2.8 Trillion Parameter Open-Weight AI That Designed a Chip
+[07:19:01] Script: 965 words, 5 chapters
+[07:19:01]   Ch1: The 2.8 Trillion Parameter SHOCK: Kimi K3's Open-Weight Revolution (3 beats)
+[07:19:01]   Ch2: Inside the Engine: KDA, MoE, and the Architecture of Extreme Efficiency (5 beats)
+[07:19:01]   Ch3: Benchmarking Brawls: Kimi K3 vs. GPT and Claude in Code and Reasoning (5 beats)
+[07:19:01]   Ch4: The AI That Designed a Chip: Kimi K3's Autonomous Engineering Feat (4 beats)
+[07:19:01]   Ch5: The 'So What' for Your Stack: Deployment, Costs, and the New AI License (6 beats)
+[07:19:01] STEP 3: Generating voiceover...
+[07:19:01] STEP 2b: Capturing article screenshots...
+[07:19:06] ✅ Captured 1/1 screenshots.
+[07:19:06] Attempting Kaggle GPU handover...
+[07:26:43] ❌ Kaggle failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 8 min.
+[07:26:43] 🔄 Kaggle unavailable. Using cloud TTS...
