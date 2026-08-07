@@ -2,9 +2,10 @@ name: Daily Tech News Shorts Pipeline
 
 on:
   schedule:
-    # ── 1 SHORT PER DAY — CONSISTENT TIMING ──
-    # Single daily trigger at 14:30 UTC (20:00 IST / 10:30 ET)
-    # Reduced from 2/day to avoid spam-like signals on a growing channel
+    # ── 2 SHORTS PER DAY — MORNING & EVENING IST ──
+    # Morning run: 03:00 UTC (08:30 IST / 22:00 ET)
+    # Evening run: 14:30 UTC (20:00 IST / 10:30 ET)
+    - cron: '0 3 * * *'
     - cron: '30 14 * * *'
   workflow_dispatch: # Allows manual trigger from GitHub Actions UI
 

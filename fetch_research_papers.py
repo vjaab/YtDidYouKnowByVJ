@@ -30,12 +30,15 @@ RSS_FEEDS = [
     "https://www.engadget.com/rss/",
     "https://www.technologyreview.com/feed/",
     
-    # AI Research & Engineering (from Tech News by VJ bot.py)
+    # AI Research, Models & Papers
     "https://openai.com/blog/rss/",
     "https://research.google/blog/rss/", 
     "https://www.anthropic.com/rss",
     "https://huggingface.co/blog/feed.xml",
     "https://aws.amazon.com/blogs/machine-learning/feed/",
+    "https://rss.arxiv.org/rss/cs.AI",
+    "https://rss.arxiv.org/rss/cs.CL",
+    "https://tldr.tech/ai/rss",
 ]
 
 TOOL_RSS_FEEDS = [
@@ -47,6 +50,8 @@ TOOL_RSS_FEEDS = [
     "https://9to5google.com/feed/",
     "https://www.xda-developers.com/feed/",
     "https://www.makeuseof.com/feed/",
+    "https://importai.substack.com/feed",
+    "https://blog.bytebytego.com/feed",
 ]
 
 
@@ -239,8 +244,10 @@ def fetch_reddit_news(hours=24):
     
     REDDIT_SUBREDDITS = [
         "MachineLearning",
-        "artificial",
         "LocalLLaMA", 
+        "AI_Agents",
+        "OpenAI",
+        "ClaudeAI",
         "technology",
         "singularity" 
     ]

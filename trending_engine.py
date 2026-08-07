@@ -236,16 +236,16 @@ def fetch_reddit_hot_ai():
     print("🔴 Fetching hot AI posts from Reddit...")
     
     subreddits = [
-        "LifeProTips",
-        "techsupport",
-        "Android",
-        "iphone",
-        "privacy",
-        "technology",
-        "gadgets",
         "MachineLearning",
-        "ChatGPT",
         "LocalLLaMA",
+        "AI_Agents",
+        "OpenAI",
+        "ClaudeAI",
+        "singularity",
+        "ChatGPT",
+        "technology",
+        "privacy",
+        "gadgets",
     ]
     
     token = _get_reddit_token()
@@ -546,7 +546,7 @@ def fetch_github_trending_ai():
     # ── Strategy 1: BeautifulSoup scraping of github.com/trending (Option 1) ──
     scraped_any = False
     for since_period in ["daily", "weekly"]:
-        for lang in [None, "python", "typescript"]:
+        for lang in [None, "python", "typescript", "rust", "cpp"]:
             try:
                 scraped = scrape_github_trending(language=lang, since=since_period)
                 if scraped:
@@ -570,9 +570,14 @@ def fetch_github_trending_ai():
     }
     since_date = (datetime.now(timezone.utc) - timedelta(days=7)).strftime("%Y-%m-%d")
     search_queries = [
+        f"topic:agentic-ai stars:>10 pushed:>{since_date}",
+        f"topic:mcp stars:>10 pushed:>{since_date}",
+        f"topic:llm-inference stars:>10 pushed:>{since_date}",
+        f"topic:evals stars:>10 pushed:>{since_date}",
         f"topic:machine-learning stars:>50 pushed:>{since_date}",
         f"topic:llm stars:>50 pushed:>{since_date}",
         f"topic:artificial-intelligence stars:>50 pushed:>{since_date}",
+        f"(awesome-mcp-servers OR awesome-ai-tools OR awesome-agentic-ai) stars:>20 pushed:>{since_date}",
         f"(AI OR LLM OR GPT OR \"open source\") stars:>100 pushed:>{since_date}",
     ]
     
@@ -864,7 +869,239 @@ def fetch_youtube_outlier_trends(target_country="US", outlier_threshold=3.0):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 6. UNIFIED TRENDING AGGREGATOR
+# 6. HACKER NEWS TRENDING ENGINE
+# ─────────────────────────────────────────────────────────────────────────────
+def fetch_hacker_news_trending():
+    """
+    Fetches top tech/AI discussions from Hacker News.
+    Uses Official HN Firebase REST API and RSS fallback.
+    """
+    print("🧡 Fetching top AI & developer architecture discussions from Hacker News...")
+    articles = []
+    headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
+    
+    ai_keywords = [
+        'ai', 'llm', 'gpt', 'llama', 'claude', 'deepseek', 'agent', 'mcp',
+        'transformer', 'quantization', 'gpu', 'inference', 'vllm', 'compiler',
+        'rust', 'python', 'c++', 'benchmark', 'model', 'dataset', 'arxiv'
+    ]
+    
+    try:
+        top_url = "https://hacker-news.firebaseio.com/v0/topstories.json"
+        r = requests.get(top_url, headers=headers, timeout=10)
+        if r.status_code == 200:
+            item_ids = r.json()[:35]
+            for item_id in item_ids:
+                try:
+                    item_url = f"https://hacker-news.firebaseio.com/v0/item/{item_id}.json"
+                    ir = requests.get(item_url, headers=headers, timeout=5)
+                    if ir.status_code == 200:
+                        data = ir.json() or {}
+                        title = data.get("title", "")
+                        url = data.get("url") or f"https://news.ycombinator.com/item?id={item_id}"
+                        score = data.get("score", 0)
+                        comments = data.get("descendants", 0)
+                        
+                        title_lower = title.lower()
+                        if any(kw in title_lower for kw in ai_keywords):
+                            articles.append({
+                                "title": f"Hacker News: {title}",
+                                "description": f"🧡 {score} points | 💬 {comments} comments | HN URL: https://news.ycombinator.com/item?id={item_id}",
+                                "source": {"name": "Hacker News"},
+                                "url": url,
+                                "urlToImage": "",
+                                "publishedAt": datetime.fromtimestamp(data.get("time", time.time()), tz=timezone.utc).isoformat(),
+                                "type": "hacker_news",
+                                "_engagement": {
+                                    "points": score,
+                                    "comments": comments,
+                                    "hn_id": item_id
+                                }
+                            })
+                except Exception:
+                    pass
+                time.sleep(0.05)
+    except Exception as e:
+        print(f"  ⚠️ HN Firebase API error: {e}")
+        
+    # RSS Fallback if API returned < 3 articles
+    if len(articles) < 3:
+        try:
+            feed_url = "https://news.ycombinator.com/rss"
+            req = urllib.request.Request(feed_url, headers=headers)
+            with urllib.request.urlopen(req, timeout=10) as response:
+                xml_data = response.read()
+            root = ET.fromstring(xml_data)
+            for item in root.findall('.//item')[:20]:
+                title = item.find('title').text or ""
+                link = item.find('link').text or ""
+                if any(kw in title.lower() for kw in ai_keywords):
+                    articles.append({
+                        "title": f"Hacker News RSS: {title}",
+                        "description": f"Top HN Discussion: {title}",
+                        "source": {"name": "Hacker News (RSS)"},
+                        "url": link,
+                        "urlToImage": "",
+                        "publishedAt": datetime.now(timezone.utc).isoformat(),
+                        "type": "hacker_news",
+                        "_engagement": {"points": 50, "comments": 15}
+                    })
+        except Exception as ex:
+            print(f"  ⚠️ HN RSS Fallback error: {ex}")
+            
+    print(f"✅ Hacker News: Found {len(articles)} AI/engineering discussions.")
+    return articles
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 7. HUGGING FACE TRENDING PAPERS & MODELS ENGINE
+# ─────────────────────────────────────────────────────────────────────────────
+def fetch_huggingface_trending():
+    """
+    Fetches trending daily papers & open-weight model releases from Hugging Face.
+    Uses Hugging Face Daily Papers API (huggingface.co/api/daily_papers).
+    """
+    print("🤗 Fetching daily trending papers & models from Hugging Face...")
+    articles = []
+    headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
+    
+    try:
+        url = "https://huggingface.co/api/daily_papers"
+        r = requests.get(url, headers=headers, timeout=10)
+        if r.status_code == 200:
+            data = r.json()
+            for item in data[:15]:
+                paper = item.get("paper", {})
+                title = paper.get("title", "")
+                summary = paper.get("summary", "") or ""
+                paper_id = paper.get("id", "")
+                num_upvotes = item.get("publishedAt", "")
+                num_upvotes = item.get("upvotes", 0) or paper.get("upvotes", 0) or 10
+                
+                paper_url = f"https://huggingface.co/papers/{paper_id}" if paper_id else "https://huggingface.co/papers"
+                
+                articles.append({
+                    "title": f"Hugging Face Paper: {title}",
+                    "description": f"🤗 HF Trending Paper ({num_upvotes} upvotes) | {summary[:280]}",
+                    "source": {"name": "Hugging Face Daily Papers"},
+                    "url": paper_url,
+                    "urlToImage": f"https://arxiv.org/static/browse/0.3.4/images/arxiv-logo-fb.png",
+                    "publishedAt": paper.get("publishedAt") or datetime.now(timezone.utc).isoformat(),
+                    "type": "huggingface_trending",
+                    "_engagement": {
+                        "upvotes": num_upvotes,
+                        "paper_id": paper_id
+                    }
+                })
+    except Exception as e:
+        print(f"  ⚠️ Hugging Face API error: {e}")
+        
+    print(f"✅ Hugging Face: Found {len(articles)} daily papers/models.")
+    return articles
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 8. ARXIV AI RESEARCH PAPERS ENGINE
+# ─────────────────────────────────────────────────────────────────────────────
+def fetch_arxiv_ai_papers():
+    """
+    Fetches latest AI research papers directly from ArXiv API
+    filtered by cs.AI (Artificial Intelligence) and cs.CL (Computation & Language).
+    """
+    print("📄 Fetching latest research papers from ArXiv (cs.AI & cs.CL)...")
+    articles = []
+    headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
+    
+    try:
+        url = "http://export.arxiv.org/api/query?search_query=cat:cs.AI+OR+cat:cs.CL&sortBy=submittedDate&sortOrder=descending&max_results=12"
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=12) as resp:
+            xml_data = resp.read()
+            
+        root = ET.fromstring(xml_data)
+        namespace = {'atom': 'http://www.w3.org/2005/Atom'}
+        entries = root.findall('atom:entry', namespace)
+        
+        for entry in entries:
+            title = entry.find('atom:title', namespace).text or ""
+            title_clean = " ".join(title.split())
+            summary = entry.find('atom:summary', namespace).text or ""
+            summary_clean = " ".join(summary.split())
+            link = entry.find('atom:id', namespace).text or ""
+            published = entry.find('atom:published', namespace).text or ""
+            
+            authors = [a.find('atom:name', namespace).text for a in entry.findall('atom:author', namespace) if a.find('atom:name', namespace) is not None]
+            authors_str = ", ".join(authors[:3]) + (" et al." if len(authors) > 3 else "")
+            
+            articles.append({
+                "title": f"ArXiv Research: {title_clean}",
+                "description": f"Authors: {authors_str} | Abstract: {summary_clean[:300]}...",
+                "source": {"name": "ArXiv AI (cs.AI / cs.CL)"},
+                "url": link,
+                "urlToImage": "",
+                "publishedAt": published,
+                "type": "arxiv_papers",
+                "_engagement": {
+                    "citations_estimated": 10,
+                    "relevance_boost": 25
+                }
+            })
+    except Exception as e:
+        print(f"  ⚠️ ArXiv API error: {e}")
+        
+    print(f"✅ ArXiv: Found {len(articles)} AI research papers.")
+    return articles
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 9. TLDR AI & TECH NEWSLETTERS ENGINE
+# ─────────────────────────────────────────────────────────────────────────────
+def fetch_tldr_ai_newsletters():
+    """
+    Fetches summarized open-source AI announcements from TLDR AI and curated newsletter RSS.
+    """
+    print("📰 Fetching daily AI announcements from TLDR AI & Newsletters...")
+    articles = []
+    feeds = [
+        ("TLDR Tech", "https://tldr.tech/tech/rss"),
+        ("Import AI", "https://importai.substack.com/feed"),
+        ("ByteByteGo", "https://blog.bytebytego.com/feed")
+    ]
+    
+    headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
+    for name, feed_url in feeds:
+        try:
+            req = urllib.request.Request(feed_url, headers=headers)
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                xml_data = resp.read()
+            root = ET.fromstring(xml_data)
+            items = root.findall('.//item')
+            for item in items[:4]:
+                title = item.find('title').text or ""
+                link = item.find('link').text or ""
+                desc_elem = item.find('description')
+                desc = desc_elem.text if desc_elem is not None else ""
+                clean_desc = re.sub('<[^<]+?>', '', desc)[:300].strip()
+                
+                articles.append({
+                    "title": f"{name}: {title}",
+                    "description": clean_desc if clean_desc else title,
+                    "source": {"name": name},
+                    "url": link,
+                    "urlToImage": "",
+                    "publishedAt": datetime.now(timezone.utc).isoformat(),
+                    "type": "newsletter_ai",
+                    "_engagement": {"curated_score": 30}
+                })
+        except Exception as e:
+            print(f"  ⚠️ Newsletter RSS fetch error ({name}): {e}")
+            
+    print(f"✅ TLDR & Newsletters: Found {len(articles)} curated announcements.")
+    return articles
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 10. UNIFIED TRENDING AGGREGATOR
 # ─────────────────────────────────────────────────────────────────────────────
 def compute_engagement_score(article):
     """
@@ -934,10 +1171,34 @@ def compute_engagement_score(article):
         elif stars > 5000: score += 15
         elif stars > 1000: score += 10
 
-    elif art_type == "google_trends":
-        # Google Trends represents massive search volume/velocity.
+    elif art_type == "hacker_news":
+        pts = eng.get("points", 0)
+        comments = eng.get("comments", 0)
+        if pts >= 300: score += 40
+        elif pts >= 150: score += 30
+        elif pts >= 50: score += 20
+        else: score += 10
+        
+        if comments >= 100: score += 15
+        elif comments >= 30: score += 10
+
+    elif art_type == "huggingface_trending":
+        upvotes = eng.get("upvotes", 0)
         score += 35
-        # Add traffic bonus
+        if upvotes >= 50: score += 15
+        elif upvotes >= 20: score += 10
+
+    elif art_type == "arxiv_papers":
+        score += 30
+        title_desc = (article.get("title", "") + " " + article.get("description", "")).lower()
+        if any(kw in title_desc for kw in ["quantization", "vram", "memory", "inference", "agent", "benchmark", "cost", "speed"]):
+            score += 15
+
+    elif art_type == "newsletter_ai":
+        score += 25
+
+    elif art_type == "google_trends":
+        score += 35
         traffic = eng.get("traffic", "N/A").lower()
         if "m" in traffic:
             score += 25
@@ -968,11 +1229,10 @@ def compute_engagement_score(article):
     else:
         score += 5
     
-    niche_sources = ["reddit_trending", "github_trending", "youtube_outliers"]
+    niche_sources = ["reddit_trending", "github_trending", "youtube_outliers", "hacker_news", "huggingface_trending", "arxiv_papers"]
     if art_type in niche_sources:
         score += TRENDING_NICHE_BIAS * 15
     
-    # Penalize estimated engagement (e.g. Google News RSS fallback for Reddit)
     if eng.get("engagement_estimated"):
         score = int(score * 0.4)
     
@@ -1002,28 +1262,56 @@ def fetch_all_trending_signals(target_country="US"):
     except Exception as e:
         print(f"⚠️ Reddit trending failed: {e}")
     
-    # 3. GitHub Trending Repos
+    # 3. GitHub Trending Repos & Topics
     try:
         github_articles = fetch_github_trending_ai()
         all_articles.extend(github_articles)
     except Exception as e:
         print(f"⚠️ GitHub trending failed: {e}")
 
-    # 4. Google Trends (Stream A)
+    # 4. Hacker News Top Discussions
+    try:
+        hn_articles = fetch_hacker_news_trending()
+        all_articles.extend(hn_articles)
+    except Exception as e:
+        print(f"⚠️ Hacker News fetch failed: {e}")
+
+    # 5. Hugging Face Trending Papers & Models
+    try:
+        hf_articles = fetch_huggingface_trending()
+        all_articles.extend(hf_articles)
+    except Exception as e:
+        print(f"⚠️ Hugging Face fetch failed: {e}")
+
+    # 6. ArXiv AI Research Papers
+    try:
+        arxiv_articles = fetch_arxiv_ai_papers()
+        all_articles.extend(arxiv_articles)
+    except Exception as e:
+        print(f"⚠️ ArXiv AI fetch failed: {e}")
+
+    # 7. TLDR AI & Newsletters
+    try:
+        tldr_articles = fetch_tldr_ai_newsletters()
+        all_articles.extend(tldr_articles)
+    except Exception as e:
+        print(f"⚠️ TLDR AI fetch failed: {e}")
+
+    # 8. Google Trends (Stream A)
     try:
         gt_articles = fetch_google_trending_tech(target_country)
         all_articles.extend(gt_articles)
     except Exception as e:
         print(f"⚠️ Google Trends fetch failed: {e}")
 
-    # 5. YouTube Outlier Hunter (Stream B)
+    # 9. YouTube Outlier Hunter (Stream B)
     try:
         yo_articles = fetch_youtube_outlier_trends(target_country)
         all_articles.extend(yo_articles)
     except Exception as e:
         print(f"⚠️ YouTube Outlier Hunter fetch failed: {e}")
     
-    # 6. Compute unified engagement scores
+    # Compute unified engagement scores
     for art in all_articles:
         art["_engagement_score"] = compute_engagement_score(art)
     
@@ -1035,12 +1323,16 @@ def fetch_all_trending_signals(target_country="US"):
     reddit_count = sum(1 for a in all_articles if a.get("type") == "reddit_trending")
     reddit_estimated = sum(1 for a in all_articles if a.get("type") == "reddit_trending" and a.get("_engagement", {}).get("engagement_estimated"))
     github_count = sum(1 for a in all_articles if a.get("type") == "github_trending")
+    hn_count = sum(1 for a in all_articles if a.get("type") == "hacker_news")
+    hf_count = sum(1 for a in all_articles if a.get("type") == "huggingface_trending")
+    arxiv_count = sum(1 for a in all_articles if a.get("type") == "arxiv_papers")
+    tldr_count = sum(1 for a in all_articles if a.get("type") == "newsletter_ai")
     gt_count = sum(1 for a in all_articles if a.get("type") == "google_trends")
     yo_count = sum(1 for a in all_articles if a.get("type") == "youtube_outliers")
     
     print(f"\n📊 Trending Engine Summary: {len(all_articles)} total signals")
-    print(f"   YouTube Trending: {yt_count} | Reddit: {reddit_count} | GitHub: {github_count}")
-    print(f"   Google Trends: {gt_count} | YouTube Outliers: {yo_count}")
+    print(f"   YouTube: {yt_count} | Reddit: {reddit_count} | GitHub: {github_count} | Hacker News: {hn_count}")
+    print(f"   HuggingFace: {hf_count} | ArXiv: {arxiv_count} | TLDR AI: {tldr_count} | Google Trends: {gt_count} | YouTube Outliers: {yo_count}")
     if all_articles:
         top = all_articles[0]
         print(f"   🏆 Top Signal: '{top['title'][:60]}...' (Score: {top.get('_engagement_score', 0)})")
@@ -1048,22 +1340,25 @@ def fetch_all_trending_signals(target_country="US"):
     # ── Data Source Health Dashboard ──────────────────────────────────────
     yt_status = "✅ Active" if yt_count > 0 else "❌ Offline (YOUTUBE_DATA_API_KEY missing?)"
     reddit_native = reddit_count - reddit_estimated
-    if reddit_native > 0:
-        reddit_status = "✅ Active"
-    elif reddit_estimated > 0:
-        reddit_status = f"⚠️ Degraded (fallback only, {reddit_estimated} estimated)"
-    else:
-        reddit_status = "❌ Offline (REDDIT_CLIENT_ID/SECRET missing?)"
+    reddit_status = "✅ Active" if reddit_native > 0 else ("⚠️ Degraded" if reddit_estimated > 0 else "❌ Offline")
     github_status = "✅ Active" if github_count > 0 else "⚠️ No results"
+    hn_status = "✅ Active" if hn_count > 0 else "⚠️ No results"
+    hf_status = "✅ Active" if hf_count > 0 else "⚠️ No results"
+    arxiv_status = "✅ Active" if arxiv_count > 0 else "⚠️ No results"
+    tldr_status = "✅ Active" if tldr_count > 0 else "⚠️ No results"
     gt_status = "✅ Active" if gt_count > 0 else "⚠️ No results"
     yo_status = "✅ Active" if yo_count > 0 else "⚠️ No results"
     
-    active_count = sum(1 for s in [yt_status, reddit_status, github_status, gt_status, yo_status] if s.startswith("✅"))
-    print(f"\n🏥 Data Source Health: {active_count}/5 sources fully active")
+    active_count = sum(1 for s in [yt_status, reddit_status, github_status, hn_status, hf_status, arxiv_status, tldr_status, gt_status, yo_status] if s.startswith("✅"))
+    print(f"\n🏥 Data Source Health: {active_count}/9 sources fully active")
     print(f"   YouTube Trending : {yt_status}")
     print(f"   Reddit           : {reddit_status}")
-    print(f"   GitHub            : {github_status}")
-    print(f"   Google Trends     : {gt_status}")
-    print(f"   YouTube Outliers  : {yo_status}")
+    print(f"   GitHub           : {github_status}")
+    print(f"   Hacker News      : {hn_status}")
+    print(f"   Hugging Face     : {hf_status}")
+    print(f"   ArXiv AI         : {arxiv_status}")
+    print(f"   TLDR AI          : {tldr_status}")
+    print(f"   Google Trends    : {gt_status}")
+    print(f"   YouTube Outliers : {yo_status}")
     
     return all_articles

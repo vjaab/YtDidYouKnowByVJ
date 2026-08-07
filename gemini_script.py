@@ -142,9 +142,9 @@ You must strictly follow the Humanizer guidelines to remove any robotic AI writi
 RESEARCH_AGENT_TEMPLATE = """{persona}
 
 RESEARCH AGENT TASK:
-Review the following technical news and search context.
-Extract the raw facts, announcements, tweets, controversies, and implications.
-Do NOT write a script. Just extract the core narrative elements.
+Review the technical news context and multi-platform data feeds provided (GitHub repos, Hugging Face papers, ArXiv studies, Hacker News debates, Reddit benchmarks, X leaks).
+Extract the raw technical facts, benchmarks, quantization/memory trade-offs, architecture innovations, community debates, and real-world developer implications.
+Do NOT write a script. Just extract the core technical and narrative elements.
 
 NEWS CONTEXT:
 {news_context}
@@ -152,9 +152,10 @@ NEWS CONTEXT:
 Return ONLY a JSON object:
 {{
   "facts": ["Fact 1", "Fact 2"],
-  "controversies": ["Controversy 1"],
-  "implications": ["Implication 1"],
-  "core_narrative": "A one paragraph summary of the raw narrative"
+  "technical_benchmarks": ["Benchmark 1 (e.g. VRAM reduction, tokens/sec, quantization efficiency)"],
+  "controversies": ["Controversy or community debate point 1"],
+  "implications": ["Practical developer or user implication 1"],
+  "core_narrative": "A one paragraph technical breakdown summarizing the core story or multi-source synthesis"
 }}"""
 
 HOOK_AGENT_TEMPLATE = """{persona}
@@ -274,17 +275,17 @@ Return ONLY a JSON object:
 SELECTOR_AGENT_TEMPLATE = """{persona}
 
 SELECTOR AGENT TASK:
-Analyze the following tech news context and pick the SINGLE most impactful, surprising, and high-retention AI/Tech story for a 60-second video.
+Analyze the following multi-platform tech news context and pick either the SINGLE most impactful high-retention AI/Tech story OR a powerful multi-source combination of stories for a 60-second video.
 
 CRITICAL AVOIDANCE RULE:
 You MUST NOT select any story that is semantically similar to the 'RECENTLY COVERED STORIES' listed in the context. If the hottest trending story matches a recently covered one, SKIP IT and pick the next best unique story.
 
 PRIORITIZATION RULE:
-You MUST give highest priority to unique stories that fall under any of the following 3 high-performing categories:
-1. Open-Source AI Hacks & Development (e.g., viral GitHub repos, MiniMind, training custom/local LLMs from scratch, democratization/optimization of AI).
-2. Device Security & "Shadow AI" Privacy Risks (e.g., Apple's Significant Locations, hidden tracking settings, shadow AI tools scraping corporate data, codebase leaks via dev extensions).
-3. Frontier Tech Gadgets & Privacy-First Hardware (e.g., wearable AR concepts, camera-free AR smart glasses, HUD devices eliminating privacy risks).
-Only select other tech stories if none of these 3 high-performing categories are present in the context.
+You MUST give highest priority to unique stories that fall under any of the following primary tracking categories:
+1. Open-Source AI Frameworks, Agentic Tools & Repos (e.g., viral GitHub trending repos, Model Context Protocol (MCP), agentic-ai, llm-inference, evals, Rust/C++ high-performance AI engines).
+2. Hugging Face Models & ArXiv Paper Teardowns (e.g., daily top Hugging Face papers, open-weight models, lossy quantization, VRAM memory allocation, training/inference speed, architecture benchmarks).
+3. Developer Aggregators & Community Debates (e.g., Hacker News architecture debates, Reddit /r/LocalLLaMA & /r/MachineLearning GPU benchmarks, X/Twitter maintainer leaks, TLDR AI daily announcements).
+4. Multi-Source Combinations: You are explicitly encouraged to select or combine complementary items across sources (e.g., linking a GitHub repo release + Hugging Face paper + Hacker News debate + X benchmark graphs into one high-impact breakdown).
 
 {selection_instruction}
 
@@ -293,10 +294,10 @@ NEWS CONTEXT:
 
 Return ONLY a JSON object:
 {{
-  "selected_headline": "The exact headline or title",
-  "selected_url": "The exact URL",
+  "selected_headline": "The exact headline, title, or multi-source synthesis topic",
+  "selected_url": "The primary article or repository URL",
   "keywords": ["3-5 lowercase keywords representing the key concepts/entities of the story"],
-  "reason": "Briefly why this was picked (focus on viral potential and uniqueness)"
+  "reason": "Briefly why this was picked (focus on viral potential, multi-source richness, and uniqueness)"
 }}"""
 
 HUMANIZER_AGENT_TEMPLATE = """{persona}

@@ -4,12 +4,12 @@ from config import ENABLE_LONGFORM
 def get_slot_info():
     """
     Returns (day_name, slot, category) based on current UTC time and the 2026 Mass-Appeal Strategy.
-    With 1 upload/day, we always use Slot A. Category rotates by weekday.
+    Shorts always use Slot A (Discovery) for maximum mass-appeal viral reach.
     """
     now = datetime.datetime.utcnow()
     day_name = now.strftime("%a") # Mon, Tue, etc.
     
-    # Single daily upload — always Slot A
+    # Shorts are always Slot A (Discovery)
     slot = "Slot A (Discovery)"
         
     # Daily category rotation — High Views & Subscribers Strategy
@@ -29,13 +29,13 @@ def get_slot_info():
 
 def get_longform_slot_info():
     """
-    Returns slot info for the daily long-form "Did You Know" pipeline.
-    Always returns Slot L with a fixed category.
+    Returns slot info for the daily long-form pipeline.
+    Technical deep dives are handled by long-form videos (Slot L).
     """
     now = datetime.datetime.utcnow()
     day_name = now.strftime("%a")
-    slot = "Slot L (Long-form)"
-    category = "AI Did You Know"
+    slot = "Slot L (Technical/Deep Dive)"
+    category = "AI Technical Deep Dive"
     return day_name, slot, category
 
 SERIES_MAP = {
