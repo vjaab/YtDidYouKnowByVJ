@@ -43,7 +43,7 @@ def log_message(msg):
     print(msg)
 
 
-def format_description(ai_description, script, hashtags, slot="Slot A", chunks=None, relevant_links=[], source_url=""):
+def format_description(ai_description, script, hashtags, slot="Slot A", chunks=None, relevant_links=[], source_url="", script_data=None):
     hashtag_str = " ".join(hashtags) if hashtags else ""
     
     # ── Action-Oriented Summary ──
@@ -73,6 +73,37 @@ def format_description(ai_description, script, hashtags, slot="Slot A", chunks=N
         
     source_str = f"📰 SOURCE ARTICLE: {source_url}\n" if source_url else ""
 
+    # ── SHORTS-ONLY: Incentive Loop Elements ──
+    incentive_section = ""
+    is_shorts = "Slot C" not in slot
+    if is_shorts and script_data:
+        comment_keyword = script_data.get("comment_trigger_keyword", "")
+        incentive_type = script_data.get("incentive_cta_type", "")
+        digital_asset = script_data.get("digital_asset_offer", "")
+        
+        incentive_lines = []
+        incentive_lines.append("━━━━━━━━━━━━━━━━━━━━━━")
+        incentive_lines.append("🎁 SUBSCRIBER INCENTIVE LOOP")
+        incentive_lines.append("━━━━━━━━━━━━━━━━━━━━━━")
+        
+        if incentive_type == "digital_vault" or incentive_type == "comment_trigger":
+            incentive_lines.append(f"🎁 DIGITAL VAULT OFFER: {digital_asset}")
+            incentive_lines.append("🔗 Get it free → https://t.me/technewsbyvj")
+            if comment_keyword:
+                incentive_lines.append(f"💬 COMMENT TRIGGER: Comment '{comment_keyword}' below for the direct template link!")
+        elif incentive_type == "benchmark_challenge":
+            incentive_lines.append(f"🏆 BENCHMARK CHALLENGE: {digital_asset}")
+            if comment_keyword:
+                incentive_lines.append(f"💬 Comment '{comment_keyword}' with your hardware specs to enter!")
+        elif incentive_type == "community_audit":
+            incentive_lines.append(f"🏆 COMMUNITY AUDIT & GIVEAWAY: {digital_asset}")
+            incentive_lines.append("💰 Monthly $100 API Credit Giveaway for subscribers!")
+            if comment_keyword:
+                incentive_lines.append(f"💬 Comment '{comment_keyword}' with your setup to enter!")
+        
+        incentive_lines.append("━━━━━━━━━━━━━━━━━━━━━━")
+        incentive_section = "\n".join(incentive_lines) + "\n"
+
     # ── YPP COMPLIANCE: Rotate between 4 description templates ──
     # Deterministic selection via headline hash to avoid identical descriptions
     import hashlib
@@ -101,6 +132,7 @@ Join the community 👇
 💼 LinkedIn → https://www.linkedin.com/in/vijayakumar-j/
 💬 WhatsApp Dev Channel → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
 
+{incentive_section}
 ⚠️ DISCLOSURE: This video uses AI-assisted production tools (TTS voiceover, AI-generated visuals). All editorial opinions, topic selection, and analysis are by VJ.
 
 {hashtag_str}""",
@@ -118,6 +150,7 @@ Join the community 👇
 
 🔧 Full analysis & deep dives → Telegram
 
+{incentive_section}
 ⚠️ DISCLOSURE: AI tools are used in production (voiceover, visuals). Topic selection, research, and commentary by VJ.
 
 {hashtag_str}""",
@@ -139,6 +172,7 @@ Join engineers getting daily AI research drops:
 💬 WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
 🔗 All links → bio
 
+{incentive_section}
 ⚠️ DISCLOSURE: This video uses AI-assisted tools for production. All editorial decisions and analysis are human-driven by VJ.
 
 {hashtag_str}""",
@@ -160,6 +194,7 @@ Join engineers getting daily AI research drops:
 💬 https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
 💼 https://www.linkedin.com/in/vijayakumar-j/
 
+{incentive_section}
 ⚠️ DISCLOSURE: AI-assisted production (voiceover, visuals). Editorial direction & analysis by VJ.
 
 {hashtag_str}""",
@@ -713,7 +748,7 @@ def run_pipeline(topic_type="auto", dry_run=False):
             f"⚠️ DISCLOSURE: AI-assisted production (voiceover, visuals). Editorial direction & analysis by VJ."
         )
     else:
-        description = format_description(ai_desc, script, hashtags, slot=slot, chunks=chunks, relevant_links=relevant_links, source_url=source_url)
+        description = format_description(ai_desc, script, hashtags, slot=slot, chunks=chunks, relevant_links=relevant_links, source_url=source_url, script_data=script_data)
     
     # NOTE: Hashtag-to-title appending removed — it looked auto-generated
     # and could trigger YouTube's spam classifiers.

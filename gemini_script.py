@@ -16,7 +16,7 @@ from ecosystem_logic import get_slot_info, get_category_prompt_enhancement
 # ── PROMPT TEMPLATES (AGENTIC LOOP) ────────────────────────────────────────
 
 SYSTEM_PERSONA = """Role: You are an expert scriptwriter for highly engaging, tech-focused YouTube Shorts.
-Your goal is to write 40-50 second scripts that break down technical concepts, tech news, or tips while maintaining high retention.
+Your goal is to write 40-50 second scripts that break down technical concepts, tech news, or tips while maintaining high retention and driving subscriber conversion through incentive loops.
 Tone: Casual, conversational, peer-to-peer ("smart friend over coffee"). Avoid a rigid, formal, or academic tone. Make it sound completely natural and human to bypass automated content filters.
 Target Audience: Global tech enthusiasts, professionals, and general consumers, specifically targeting viewers in USA, UK, Canada, Australia, New Zealand, Singapore, South Korea, Japan, and European countries. Use standard English, USD ($), and universally understood analogies. Ensure complete gender inclusivity so that topics and scripting appeal equally to men, women, girls, and boys. Use simple, everyday, accessible language that both young adults and older seniors can instantly relate to and understand. Avoid any developer terminology, academic jargon, or tech-bro buzzwords.
 Constraint Checklist:
@@ -33,11 +33,19 @@ Constraint Checklist:
 - LOOP-FRIENDLY: The LAST sentence of the script MUST flow seamlessly back into the FIRST sentence, creating a natural viewing loop. Viewers who reach the end should feel compelled to watch again.
 - SCRIPT LENGTH: STRICT 80-120 words maximum. Target 40-50 seconds of speaking. SHORT = HIGH COMPLETION RATE = MORE VIEWS.
 - DYNAMIC FRAMING: The visual metadata coordinates with the layout archetype. Specify when the scene is showcase-oriented (e.g. system architecture diagrams, terminal outputs, code snippets, or workflows) which uses a split-screen layout, and when it is presenter-focused (showing a full-screen host overlaying a blurred background).
+- SUBSCRIBER INCENTIVE LOOP (SHORTS ONLY): Every Short MUST include ONE incentive CTA at 00:25-00:35. Choose exactly one mode:
+  1. DIGITAL VAULT / CODE BLUEPRINT: "I put the entire Python script & architecture diagram in our Telegram. Link in description."
+  2. SECRET MENU / COMMENT KEYWORD TRIGGER: "Comment 'CONFIG' below and I'll send you my exact evaluation template."
+  3. BEAT THE BENCHMARK CHALLENGE: "I got 45 tokens/sec on an M2 Mac. Comment your hardware specs to beat it."
+  4. COMMUNITY AUDIT & MONTHLY $100 API CREDIT GIVEAWAY: "Sub and comment your setup for our monthly $100 API credit giveaway."
+- SCHEMA EXTENSION: Output must include `comment_trigger_keyword` (e.g. "OLLAMA", "CONFIG", "EVALS"), `incentive_cta_type` (one of: "digital_vault", "comment_trigger", "benchmark_challenge", "community_audit"), and `digital_asset_offer` (description of the asset being offered).
+
 SUCCESS PATTERNS (2026): 
 - HOOKS (0-5s): Start with a compelling, realistic hook grounded in a specific fact, setting, or feature. First 3-5 words must STOP the scroll.
 - CORE PROBLEM & VALUE (5-25s): Clearly state the "Why should I care?" factor.
 - IMMEDIATE SOLUTION (25-40s): Provide the real, actionable fix directly in the Short.
-- CTAs (40-45s): Close with a clean, low-friction request for engagement. Example: "Drop a comment if you keep your history on for convenience, and subscribe for more clean tech breakdowns." Keep it natural and short. 
+- INCENTIVE CTA (40-45s): Deliver the chosen incentive CTA mode to drive subscriber conversion.
+- SEAMLESS LOOP (45-50s): Final sentence flows back to opening hook.
 
 Visual Director Persona & Visual Selection Logic:
 You are also an expert Visual Director. For each narration segment in the `subtitle_chunks` array, you generate highly engaging, visually rich, and contextually accurate visual prompts at the semantic level (not keyword level).
@@ -102,6 +110,17 @@ STRICT RULES:
 - Do NOT say "In this video" or "Today we're going to".
 - Output must be plain spoken text only — no stage directions, no scene labels.
 - SCRIPT LENGTH: Target a 35-second YouTube Short (approx 80-120 words spoken at natural pace). SHORTER = HIGHER COMPLETION RATE = MORE ALGORITHMIC PUSH. Keep it extremely tight and punchy.
+- 4-PART SHORTS ARCHITECTURE (MANDATORY):
+  1. HARD HOOK (0:00 - 0:03): Metric, contradiction, or personal stake. 8-12 words.
+  2. CORE ENGINEERING / PRACTICAL VALUE (0:03 - 0:25): Breakdown with specific, actionable steps.
+  3. INCENTIVE CTA (0:25 - 0:35): Choose ONE mode — Digital Vault, Comment Trigger, Benchmark Challenge, or Community Audit.
+  4. SEAMLESS LOOP (0:35 - 0:45): Final sentence flows back to opening hook.
+- SUBSCRIBER INCENTIVE CTA MODES (pick exactly ONE):
+  1. DIGITAL VAULT / CODE BLUEPRINT: "I put the entire Python script & architecture diagram in our Telegram. Link in description."
+  2. SECRET MENU / COMMENT KEYWORD TRIGGER: "Comment 'CONFIG' below and I'll send you my exact evaluation template."
+  3. BEAT THE BENCHMARK CHALLENGE: "I got 45 tokens/sec on an M2 Mac. Comment your hardware specs to beat it."
+  4. COMMUNITY AUDIT & MONTHLY $100 API CREDIT GIVEAWAY: "Sub and comment your setup for our monthly $100 API credit giveaway."
+- SCHEMA EXTENSION: Output must include `comment_trigger_keyword`, `incentive_cta_type`, and `digital_asset_offer`.
 
 Visual Director Persona & Visual Selection Logic:
 You are also an expert Visual Director. For each narration segment in the `subtitle_chunks` array, you generate highly engaging, visually rich, and contextually accurate visual prompts at the semantic level (not keyword level).
@@ -877,12 +896,13 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "description": "Full 100+ word rich SEO description for youtube describing the video, including relevant hashtags and the source URL.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
   "title": "Punchy YouTube title max 60 chars — must appeal to professionals and creators",
-  "hook_script": "The Hook (0-3s): Direct, slightly alarming opening hook. 8-12 words.",
+  "hook_script": "The Hook (0-3s): Direct, slightly alarming opening hook. 8-12 words. Must be a metric, contradiction, or personal stake.",
   "problem_context": "The Problem (3-10s): What most people are doing wrong or missing. 15-20 words.",
   "solution_tech": "The Solution (10-25s): The specific tool, prompt, or workflow in action. 30-40 words.",
-  "retention_loop": "The Proof/Result (25-30s): Concrete outcome: time saved, task automated. 15-20 words.",
-  "outro_cta": "The Outro/CTA (30-35s): Soft CTA (follow for more, save this). 8-12 words.",
-  "script": "The FULL voiceover script. Target 80-120 words total (approx 35 seconds). SHORTER = MORE VIEWS. The last sentence MUST flow back into the first for looping.",
+  "incentive_cta": "The Incentive CTA (25-35s): Choose EXACTLY ONE mode: 1) Digital Vault: 'I put the entire script & diagram in our Telegram. Link in description.' 2) Comment Trigger: 'Comment \\'KEYWORD\\' below and I'll send you the template.' 3) Benchmark Challenge: 'I got X tokens/sec on [hardware]. Comment your specs to beat it.' 4) Community Audit: 'Sub and comment your setup for our monthly $100 API credit giveaway.'",
+  "retention_loop": "The Loop (35-45s): Final sentence that seamlessly flows back to the opening hook. 8-12 words.",
+  "outro_cta": "Outro: Soft follow/subscribe prompt. 8-10 words.",
+  "script": "The FULL voiceover script combining hook_script, problem_context, solution_tech, incentive_cta, retention_loop, and outro_cta. Target 80-120 words total (approx 35-45 seconds). The last sentence MUST flow back into the first for looping.",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://example.com"],
   "phonetic_pronunciation_map": {{}},
@@ -915,17 +935,21 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "companies": [{{"name": "Company Name", "domain": "domain.com", "description": "2-4 word description of the company"}}],
   "people": [{{"name": "Person Name", "wikipedia_slug": "Wikipedia_Slug", "description": "2-4 word description of the person's role"}}],
   "key_entities": [{{"name": "Entity Name", "type": "COMPANY|PEOPLE|TOOL|OTHER", "description": "2-4 word description of the entity"}}],
-  "comment_hook": "A provocative question: 'What do you think? Drop your comment below! 👇'"
+  "comment_hook": "A provocative question: 'What do you think? Drop your comment below!'",
+  "comment_trigger_keyword": "The exact keyword viewers must comment to trigger the asset delivery (e.g., 'CONFIG', 'OLLAMA', 'EVALS', 'PROMPT'). Uppercase, single word preferred.",
+  "incentive_cta_type": "One of: 'digital_vault', 'comment_trigger', 'benchmark_challenge', 'community_audit'",
+  "digital_asset_offer": "Description of the asset being offered (e.g., 'Python evaluation template', 'Architecture diagram & script', 'Benchmark comparison sheet', 'API credit giveaway entry')"
 }}"""
         elif topic_type == "tech_trends":
             selection_instruction = (
                 f"Analyze the following {content_desc} and pick the SINGLE most breakout, high-velocity tech topic or viral video.\n"
                 f"PRIMARY CATEGORY: {category}\n"
                 "SELECTION FILTERS:\n"
-                "1. MUST follow the high-engagement 3-part micro-script structure precisely.\n"
+                "1. MUST follow the high-engagement 4-part micro-script structure precisely.\n"
                 "2. VISUAL DEMONSTRATION REQUIRED: The `nano_visual_prompt` fields MUST describe the exact screen, code editor, or device showing the tech in action.\n"
                 "3. STRICT DURATION: Enforce a target total word count of 120-140 words, explainable in 45-50 seconds of fast-paced speech. Keep it extremely tight.\n"
-                "4. LOOP-FRIENDLY: The final loop CTA must connect seamlessly back to the visual hook."
+                "4. 4-PART ARCHITECTURE: Hard Hook (0-3s) -> Technical Core (3-25s) -> Incentive CTA (25-35s) -> Seamless Loop (35-45s).\n"
+                "5. INCENTIVE CTA (MANDATORY): Choose exactly one mode: Digital Vault, Comment Trigger, Benchmark Challenge, or Community Audit."
             )
             prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
 {{
@@ -933,11 +957,12 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "description": "Full 100+ word rich SEO description for youtube describing the video, including relevant hashtags.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
   "title": "Punchy YouTube title max 60 chars — must appeal to tech-interested audiences",
-  "hook_script": "The Visual Hook (0:00 - 0:03): State the breakout tech trend/query immediately as a negative or high-stakes claim. Never start with an introduction. 10-15 words.",
-  "solution_tech": "The Technical Core (0:03 - 0:45): Deliver the exact breakout answer or content gap solution. Keep code snippets under 3 lines or focus on UI step-by-step demonstrations. 90-110 words.",
-  "retention_loop": "The Loop/CTA (0:45 - 0:50): End on an incomplete thought or a question that seamlessly loops back to the opening hook script. 15-20 words.",
+  "hook_script": "The Hard Hook (0:00 - 0:03): State the breakout tech trend/query immediately as a negative or high-stakes claim. Metric, contradiction, or personal stake. Never start with an introduction. 10-15 words.",
+  "solution_tech": "The Technical Core (0:03 - 0:25): Deliver the exact breakout answer or content gap solution. Keep code snippets under 3 lines or focus on UI step-by-step demonstrations. 80-100 words.",
+  "incentive_cta": "The Incentive CTA (0:25 - 0:35): Choose EXACTLY ONE mode: 1) Digital Vault: 'I put the entire script & diagram in our Telegram. Link in description.' 2) Comment Trigger: 'Comment \\'KEYWORD\\' below and I'll send you the template.' 3) Benchmark Challenge: 'I got X tokens/sec on [hardware]. Comment your specs to beat it.' 4) Community Audit: 'Sub and comment your setup for our monthly $100 API credit giveaway.'",
+  "retention_loop": "The Seamless Loop (0:35 - 0:45): End on an incomplete thought or question that seamlessly loops back to the opening hook script. 15-20 words.",
   "outro_cta": "CTA: Subscribe/Follow for more daily tech trends. 8-10 words.",
-  "script": "The FULL voiceover script concatenating hook_script, solution_tech, and retention_loop. Target 120-145 words total (approx 45-50s). The final sentence MUST flow back into the first sentence for looping.",
+  "script": "The FULL voiceover script concatenating hook_script, solution_tech, incentive_cta, retention_loop, and outro_cta. Target 120-145 words total (approx 45-50s). The final sentence MUST flow back into the first sentence for looping.",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://example.com"],
   "phonetic_pronunciation_map": {{}},
@@ -970,7 +995,10 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "companies": [{{"name": "Company Name", "domain": "domain.com", "description": "2-4 word description of the company"}}],
   "people": [{{"name": "Person Name", "wikipedia_slug": "Wikipedia_Slug", "description": "2-4 word description of the person's role"}}],
   "key_entities": [{{"name": "Entity Name", "type": "COMPANY|PEOPLE|TOOL|OTHER", "description": "2-4 word description of the entity"}}],
-  "comment_hook": "A provocative question: 'What do you think of this breakout tool? Let me know below! 👇'"
+  "comment_hook": "A provocative question: 'What do you think of this breakout tool? Let me know below!'",
+  "comment_trigger_keyword": "The exact keyword viewers must comment to trigger the asset delivery (e.g., 'CONFIG', 'OLLAMA', 'EVALS', 'PROMPT'). Uppercase, single word preferred.",
+  "incentive_cta_type": "One of: 'digital_vault', 'comment_trigger', 'benchmark_challenge', 'community_audit'",
+  "digital_asset_offer": "Description of the asset being offered (e.g., 'Python evaluation template', 'Architecture diagram & script', 'Benchmark comparison sheet', 'API credit giveaway entry')"
 }}"""
         elif topic_type == "tools":
             selection_instruction = (
@@ -980,9 +1008,10 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 "1. PRIORITIZE: Tips, tricks, hidden features, or free tools that EVERYONE can use immediately. NOT for programmers only. Must be understandable by a 14-year-old.\n"
                 "2. VISUAL DEMONSTRATION REQUIRED: The `nano_visual_prompt` fields MUST describe the exact screen/device showing the tip in action.\n"
                 "3. MUST be explainable in exactly <35s (approx 80-120 words total). Strict 35s limit. SHORTER = MORE VIEWS.\n"
-                "4. FORMAT: Hook (bold claim or surprising result) -> Quick Demo (show it working) -> Payoff (mind-blown moment) -> CTA (follow for more).\n"
-                "5. LOOP-FRIENDLY: The last sentence MUST connect back to the first, creating a natural loop.\n"
-                "6. UNIVERSAL & GENDER-INCLUSIVE DEMOGRAPHIC (18-70): The topic must appeal to all age groups from 18 to 70 and must engage women and girls. Do NOT pick highly technical developer tools or niche male-biased tech (e.g., PC builds, gaming tweaks). Focus on everyday consumer technology: photo/video styling tools, WhatsApp/Instagram/social settings, digital planning and calendar tools, smart home/lifestyle assistants, budget shopping shortcuts, and simple phone tricks."
+                "4. 4-PART ARCHITECTURE: Hook (0-1.5s) -> Setup (2-5s) -> Demo (5-25s) -> Incentive CTA (25-30s) -> Loop Bridge (30-35s) -> CTA (35s).\n"
+                "5. INCENTIVE CTA (MANDATORY): Choose exactly one mode: Digital Vault, Comment Trigger, Benchmark Challenge, or Community Audit.\n"
+                "6. LOOP-FRIENDLY: The last sentence MUST connect back to the first, creating a natural loop.\n"
+                "7. UNIVERSAL & GENDER-INCLUSIVE DEMOGRAPHIC (18-70): The topic must appeal to all age groups from 18 to 70 and must engage women and girls. Do NOT pick highly technical developer tools or niche male-biased tech (e.g., PC builds, gaming tweaks). Focus on everyday consumer technology: photo/video styling tools, WhatsApp/Instagram/social settings, digital planning and calendar tools, smart home/lifestyle assistants, budget shopping shortcuts, and simple phone tricks."
             )
             prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
 {{
@@ -990,12 +1019,13 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "description": "Full 100+ word rich SEO description for youtube describing the video.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
   "title": "Punchy YouTube title max 60 chars — must appeal to EVERYONE not just techies",
-  "hook_script": "The Hook (<1.5s): Bold claim or surprising result. 5-8 words MAX.",
+  "hook_script": "The Hook (<1.5s): Bold claim or surprising result. 5-8 words MAX. Metric, contradiction, or personal stake.",
   "problem_context": "The Setup (2-5s): Why this matters to YOU personally. 10-15 words.",
   "solution_tech": "The Demo (5-25s): Show exactly how it works. Simple steps anyone can follow. 40-60 words.",
-  "retention_loop": "The Loop Bridge (25-30s): Connect back to the opening. 8-12 words.",
+  "incentive_cta": "The Incentive CTA (25-30s): Choose EXACTLY ONE mode: 1) Digital Vault: 'I put the full guide & diagram in our Telegram. Link in description.' 2) Comment Trigger: 'Comment \\'KEYWORD\\' below and I'll send you the template.' 3) Benchmark Challenge: 'I got X result on [device]. Comment your setup to beat it.' 4) Community Audit: 'Sub and comment your setup for our monthly $100 API credit giveaway.'",
+  "retention_loop": "The Loop Bridge (30-35s): Connect back to the opening. 8-12 words.",
   "outro_cta": "CTA: Follow for more tips. Subscribe. 8-10 words.",
-  "script": "The FULL voiceover script. Target 80-120 words total. STRICT MAX 35 seconds. The last sentence MUST flow back into the first for looping.",
+  "script": "The FULL voiceover script combining hook_script, problem_context, solution_tech, incentive_cta, retention_loop, and outro_cta. Target 80-120 words total. STRICT MAX 35 seconds. The last sentence MUST flow back into the first for looping.",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://example.com"],
   "phonetic_pronunciation_map": {{}},
@@ -1028,7 +1058,10 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "companies": [{{"name": "Company Name", "domain": "domain.com", "description": "2-4 word description of the company"}}],
   "people": [{{"name": "Person Name", "wikipedia_slug": "Wikipedia_Slug", "description": "2-4 word description of the person's role"}}],
   "key_entities": [{{"name": "Entity Name", "type": "COMPANY|PEOPLE|TOOL|OTHER", "description": "2-4 word description of the entity"}}],
-  "comment_hook": "A provocative question: 'Did you know about this? Drop a 🤯 if this blew your mind!'"
+  "comment_hook": "A provocative question: 'Did you know about this? Drop a 🤯 if this blew your mind!'",
+  "comment_trigger_keyword": "The exact keyword viewers must comment to trigger the asset delivery (e.g., 'CONFIG', 'OLLAMA', 'EVALS', 'PROMPT'). Uppercase, single word preferred.",
+  "incentive_cta_type": "One of: 'digital_vault', 'comment_trigger', 'benchmark_challenge', 'community_audit'",
+  "digital_asset_offer": "Description of the asset being offered (e.g., 'Python evaluation template', 'Architecture diagram & script', 'Benchmark comparison sheet', 'API credit giveaway entry')"
 }}"""
         elif topic_type == "news":
             selection_instruction = (
@@ -1038,9 +1071,10 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 "1. PRIORITIZE: Privacy warnings, security scares, tech myths being debunked, common mistakes everyone makes. Must make the viewer feel PERSONALLY at risk or enlightened.\n"
                 "2. Must be understandable by ANYONE — no jargon, no technical terms without simple analogies.\n"
                 "3. MUST be explainable in exactly <35s (approx 80-120 words total). Strict 35s limit. SHORTER = MORE VIEWS.\n"
-                "4. FORMAT: Hook (bold scary claim) -> Proof (show evidence) -> Fix/Truth (how to protect yourself) -> CTA (follow for more).\n"
-                "5. LOOP-FRIENDLY: The last sentence MUST connect back to the first, creating a natural loop.\n"
-                "6. UNIVERSAL & GENDER-INCLUSIVE DEMOGRAPHIC (18-70): Ensure the fact is highly relevant to all age groups from 18 to 70 and appeals to women and girls. Focus on privacy/surveillance threats (like location tracking on popular social apps), online security/scam alerts targeting consumers, smart lifestyle tech features, health/safety tech breakthroughs, or debunking common misconceptions about daily devices."
+                "4. 4-PART ARCHITECTURE: Hook (0-1.5s) -> Setup (2-5s) -> Proof (5-25s) -> Incentive CTA (25-30s) -> Loop Bridge (30-35s) -> CTA (35s).\n"
+                "5. INCENTIVE CTA (MANDATORY): Choose exactly one mode: Digital Vault, Comment Trigger, Benchmark Challenge, or Community Audit.\n"
+                "6. LOOP-FRIENDLY: The last sentence MUST connect back to the first, creating a natural loop.\n"
+                "7. UNIVERSAL & GENDER-INCLUSIVE DEMOGRAPHIC (18-70): Ensure the fact is highly relevant to all age groups from 18 to 70 and appeals to women and girls. Focus on privacy/surveillance threats (like location tracking on popular social apps), online security/scam alerts targeting consumers, smart lifestyle tech features, health/safety tech breakthroughs, or debunking common misconceptions about daily devices."
             )
             prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
 {{
@@ -1048,12 +1082,13 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "description": "Full 100+ word rich SEO description for youtube describing the video.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
   "title": "Punchy YouTube title max 60 chars — must trigger FOMO or fear",
-  "hook_script": "The Hook (<1.5s): Scary claim or myth-busting statement. 5-8 words MAX.",
+  "hook_script": "The Hook (<1.5s): Scary claim or myth-busting statement. 5-8 words MAX. Metric, contradiction, or personal stake.",
   "problem_context": "The Setup (2-5s): Why this is terrifying or why you've been wrong. 10-15 words.",
   "solution_tech": "The Proof (5-25s): Show the evidence, explain the truth, or demonstrate the fix. 40-60 words.",
-  "retention_loop": "The Loop Bridge (25-30s): Connect back to the opening claim. 8-12 words.",
+  "incentive_cta": "The Incentive CTA (25-30s): Choose EXACTLY ONE mode: 1) Digital Vault: 'I put the full privacy checklist & diagram in our Telegram. Link in description.' 2) Comment Trigger: 'Comment \\'KEYWORD\\' below and I'll send you the template.' 3) Benchmark Challenge: 'I tested this on [device] and got X result. Comment your setup to beat it.' 4) Community Audit: 'Sub and comment your setup for our monthly $100 API credit giveaway.'",
+  "retention_loop": "The Loop Bridge (30-35s): Connect back to the opening claim. 8-12 words.",
   "outro_cta": "CTA: Follow for more. Subscribe. 8-10 words.",
-  "script": "The FULL voiceover script. Target 80-120 words total. STRICT MAX 35 seconds. Loop-friendly ending.",
+  "script": "The FULL voiceover script combining hook_script, problem_context, solution_tech, incentive_cta, retention_loop, and outro_cta. Target 80-120 words total. STRICT MAX 35 seconds. Loop-friendly ending.",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://example.com"],
   "phonetic_pronunciation_map": {{}},
@@ -1086,7 +1121,10 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "companies": [{{"name": "Company Name", "domain": "domain.com", "description": "2-4 word description of the company"}}],
   "people": [{{"name": "Person Name", "wikipedia_slug": "Wikipedia_Slug", "description": "2-4 word description of the person's role"}}],
   "key_entities": [{{"name": "Entity Name", "type": "COMPANY|PEOPLE|TOOL|OTHER", "description": "2-4 word description of the entity"}}],
-  "comment_hook": "A provocative question: 'Did you know about this? Are you going to change this setting? 👇'"
+  "comment_hook": "A provocative question: 'Did you know about this? Are you going to change this setting?'",
+  "comment_trigger_keyword": "The exact keyword viewers must comment to trigger the asset delivery (e.g., 'CONFIG', 'OLLAMA', 'EVALS', 'PROMPT'). Uppercase, single word preferred.",
+  "incentive_cta_type": "One of: 'digital_vault', 'comment_trigger', 'benchmark_challenge', 'community_audit'",
+  "digital_asset_offer": "Description of the asset being offered (e.g., 'Python evaluation template', 'Architecture diagram & script', 'Benchmark comparison sheet', 'API credit giveaway entry')"
 }}"""
         else: # research / educational / general
             selection_instruction = (
@@ -1096,9 +1134,10 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 "1. PRIORITIZE: Surprising comparisons (free vs paid), hidden features nobody knows about, AI experiments with visual results, or tech facts that make people say 'WHAT?!'\n"
                 "2. Must be understandable by ANYONE — a teenager and a grandparent should both find it useful or amazing.\n"
                 "3. MUST be explainable in exactly <35s (approx 80-120 words total). Strict 35s limit. SHORTER = MORE VIEWS.\n"
-                "4. FORMAT: Hook (surprising claim) -> Evidence/Demo (show it) -> Payoff (the 'wow' moment) -> CTA (follow for more).\n"
-                "5. LOOP-FRIENDLY: The last sentence MUST connect back to the first, creating a natural loop.\n"
-                "6. UNIVERSAL & GENDER-INCLUSIVE DEMOGRAPHIC (18-70): Choose topics that both young adults (18-35) and older adults (50-70) can engage with, ensuring strong appeal to women and girls. Prefer digital lifestyle productivity, design and photo comparisons, smart home convenience, AI's impact on everyday careers/learning, and highly visual, relatable AI applications."
+                "4. 4-PART ARCHITECTURE: Hook (0-1.5s) -> Setup (2-5s) -> Reveal (5-25s) -> Incentive CTA (25-30s) -> Loop Bridge (30-35s) -> CTA (35s).\n"
+                "5. INCENTIVE CTA (MANDATORY): Choose exactly one mode: Digital Vault, Comment Trigger, Benchmark Challenge, or Community Audit.\n"
+                "6. LOOP-FRIENDLY: The last sentence MUST connect back to the first, creating a natural loop.\n"
+                "7. UNIVERSAL & GENDER-INCLUSIVE DEMOGRAPHIC (18-70): Choose topics that both young adults (18-35) and older adults (50-70) can engage with, ensuring strong appeal to women and girls. Prefer digital lifestyle productivity, design and photo comparisons, smart home convenience, AI's impact on everyday careers/learning, and highly visual, relatable AI applications."
             )
             prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
 {{
@@ -1106,12 +1145,13 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "description": "Full 100+ word rich SEO description for youtube describing the video.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
   "title": "Punchy YouTube title max 60 chars — curiosity gap required",
-  "hook_script": "The Hook (<1.5s): Surprising claim or bold statement. 5-8 words MAX.",
+  "hook_script": "The Hook (<1.5s): Surprising claim or bold statement. 5-8 words MAX. Metric, contradiction, or personal stake.",
   "problem_context": "The Setup (2-5s): Why this matters to you. 10-15 words.",
   "solution_tech": "The Reveal (5-25s): Show the evidence, comparison, or demonstration. 40-60 words.",
-  "retention_loop": "The Loop Bridge (25-30s): Connect back to the opening. 8-12 words.",
+  "incentive_cta": "The Incentive CTA (25-30s): Choose EXACTLY ONE mode: 1) Digital Vault: 'I put the full comparison & diagram in our Telegram. Link in description.' 2) Comment Trigger: 'Comment \\'KEYWORD\\' below and I'll send you the template.' 3) Benchmark Challenge: 'I got X result on [device]. Comment your setup to beat it.' 4) Community Audit: 'Sub and comment your setup for our monthly $100 API credit giveaway.'",
+  "retention_loop": "The Loop Bridge (30-35s): Connect back to the opening. 8-12 words.",
   "outro_cta": "CTA: Follow for more. Subscribe. 8-10 words.",
-  "script": "The FULL voiceover script. Target 80-120 words total. STRICT MAX 35 seconds. Loop-friendly ending.",
+  "script": "The FULL voiceover script combining hook_script, problem_context, solution_tech, incentive_cta, retention_loop, and outro_cta. Target 80-120 words total. STRICT MAX 35 seconds. Loop-friendly ending.",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://example.com"],
   "phonetic_pronunciation_map": {{}},
@@ -1144,7 +1184,10 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "companies": [{{"name": "Company Name", "domain": "domain.com", "description": "2-4 word description of the company"}}],
   "people": [{{"name": "Person Name", "wikipedia_slug": "Wikipedia_Slug", "description": "2-4 word description of the person's role"}}],
   "key_entities": [{{"name": "Entity Name", "type": "COMPANY|PEOPLE|TOOL|OTHER", "description": "2-4 word description of the entity"}}],
-  "comment_hook": "A provocative question: 'Which one are YOU using? Drop your answer below! 👇'"
+  "comment_hook": "A provocative question: 'Which one are YOU using? Drop your answer below!'",
+  "comment_trigger_keyword": "The exact keyword viewers must comment to trigger the asset delivery (e.g., 'CONFIG', 'OLLAMA', 'EVALS', 'PROMPT'). Uppercase, single word preferred.",
+  "incentive_cta_type": "One of: 'digital_vault', 'comment_trigger', 'benchmark_challenge', 'community_audit'",
+  "digital_asset_offer": "Description of the asset being offered (e.g., 'Python evaluation template', 'Architecture diagram & script', 'Benchmark comparison sheet', 'API credit giveaway entry')"
 }}"""
 
     # Inject any extra instructions (e.g. screenshot avoidance, length adjustments) into context
