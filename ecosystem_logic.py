@@ -17,10 +17,10 @@ def get_slot_info():
         "Mon": "AI & Tech Tools",             # Massive trend, AI demos
         "Tue": "Tech Gadgets & Inventions",   # Consumer tech gadgets, smart devices, new hardware
         "Wed": "Finance & Tech Economy",      # High-CPC personal finance, Fintech, crypto, market trends
-        "Thu": "Facts & Trivia",              # Binge-worthy, Did you know
+        "Thu": "Quiz & Trivia",               # Interactive quiz format (high engagement)
         "Fri": "Life Hacks & Productivity",   # Clever tips, device optimization
         "Sat": "Agentic AI Facts",            # AI expertise, niche but high CPC
-        "Sun": "Coding & Development Hacks"   # Python/AI shortcuts, developer tools
+        "Sun": "Quiz & Trivia",               # Weekend quiz binge (high shareability)
     }
     
     category = daily_categories.get(day_name, "AI & Tech Tools")
@@ -290,6 +290,37 @@ def get_category_prompt_enhancement(category, slot):
                 4. Diff view: "Red = before. Green = after." (20-22s)
                 5. CTA (22-30s): "Want my prompt library? Comment 'CODE'"
 """,
+        "Quiz & Trivia": f"""
+            CATEGORY: Quiz & Trivia (Interactive, high engagement, binge-worthy).
+            STRATEGY: {base_discovery}
+            AUDIENCE: EVERYONE loves testing their knowledge. Quiz format drives comments + shares.
+            GOAL: Present a surprising tech fact as a multiple-choice question. Viewer pauses to think, then learns the answer.
+            HOOK STYLE: '99% get this wrong: What was the FIRST computer bug?' or 'Can you guess which company invented the smartphone?'
+            EMOTIONAL TRIGGER: Challenge + curiosity + "I knew it!" / "Wait, really?!" payoff.
+            CONTENT FORMAT: Question → Options (A/B/C) → 3s pause → Reveal + fascinating context → CTA.
+            
+            QUIZ_FORMAT (25-35s Short):
+                1. Hook Question (0-2s): Bold claim question on screen + voice. "What was the first computer bug?"
+                2. Options (2-5s): A) Moth in relay B) Software error C) Power surge — show on screen
+                3. Pause (5-8s): "Think about it... 3... 2... 1..." — let viewer guess
+                4. Reveal (8-15s): "It was A! A literal moth in a Harvard Mark II relay, 1947." + context
+                5. Bonus Fact (15-25s): "Grace Hopper taped it in the logbook. First 'debugging'!"
+                6. CTA (25-30s): "Comment your score! Get daily quizzes → Link in bio"
+            
+            QUIZ_HOOKS:
+                1. "99% of engineers get this wrong: What does 'HTTP' actually stand for?"
+                2. "Can you name the ONLY programming language named after a comedy show?"
+                3. "Which tech giant started as a search engine called 'BackRub'?"
+                4. "What was the first video ever uploaded to YouTube?"
+                5. "The first computer virus was created by a 15-year-old. True or False?"
+            
+            QUIZ_SOURCES:
+                • Computer History Museum archives
+                • IEEE Annals of Computing
+                • Tech company founding stories
+                • Programming language etymology
+                • Famous bugs/failures (Mars Climate Orbiter, Ariane 5, etc.)
+""",
     }
     
     return enhancements.get(category, enhancements.get("AI & Tech Tools", ""))
@@ -416,6 +447,23 @@ _AI_HACKS_DATA = {
             "You are a senior engineer. Review this code for: security vulnerabilities, performance issues, maintainability, type safety, test coverage. Return: severity, line, issue, fix.",
             "Generate comprehensive pytest tests for this function. Include: happy path, edge cases, error handling, property-based tests (Hypothesis), mocks. Target 95%+ coverage.",
             "Refactor this legacy code: add type hints, extract functions, remove duplication, add docstrings, modernize patterns. Preserve exact behavior. Return unified diff."
+        ]
+    },
+    "Quiz & Trivia": {
+        "strategy": "Focus on surprising tech history facts formatted as interactive multiple-choice quizzes. Source from Computer History Museum, IEEE Annals, company founding stories, programming language etymology, famous bugs/failures. High comment rate + shareability.",
+        "hooks": [
+            "99% of engineers get this wrong: What does 'HTTP' actually stand for?",
+            "Can you name the ONLY programming language named after a comedy show?",
+            "Which tech giant started as a search engine called 'BackRub'?",
+            "What was the first video ever uploaded to YouTube?",
+            "The first computer virus was created by a 15-year-old. True or False?"
+        ],
+        "demo_format": "Hook Question (0-2s) → Options A/B/C on screen (2-5s) → 3s pause with countdown → Reveal + context (8-15s) → Bonus fact (15-25s) → CTA (25-30s)",
+        "tools": ["Computer History Museum API", "Wikipedia API", "Wikidata", "IEEE Xplore", "GitHub Archive", "TechCrunch Archive"],
+        "prompts": [
+            "Generate a surprising but verified tech history fact formatted as a multiple-choice quiz question with 3 options (1 correct, 2 plausible distractors). Include the fascinating context/reveal.",
+            "Create a 'True or False' tech quiz question with a mind-blowing explanation. Source from computer history archives.",
+            "What's a famous tech bug/failure story that sounds fake but is 100% true? Format as quiz with reveal."
         ]
     }
 }

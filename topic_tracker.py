@@ -180,26 +180,28 @@ def update_youtube_url(news_headline, youtube_url, tracker_file=TRACKER_FILE):
 
 def get_next_topic_type_by_ratio(tracker_file=TRACKER_FILE):
     """
-    Computes the proportion of each topic_type ('tools', 'news', 'research') 
+    Computes the proportion of each topic_type ('tools', 'news', 'research', 'quiz') 
     in recent history (last 30 entries) and returns the type that is most
     in deficit compared to the target ratio:
-      - tools: 50% (0.50) — Hidden features, AI tools, free apps, tips & tricks
-      - news: 30% (0.30) — Tech myths, privacy scares, common mistakes  
-      - research: 20% (0.20) — Comparisons, AI experiments, educational tech facts
+      - tools: 40% (0.40) — Hidden features, AI tools, free apps, tips & tricks
+      - news: 25% (0.25) — Tech myths, privacy scares, common mistakes  
+      - research: 15% (0.15) — Comparisons, AI experiments, educational tech facts
+      - quiz: 20% (0.20) — Interactive tech trivia, history quizzes, multiple choice
     """
     tracker = load_tracker(tracker_file)
     history = tracker.get("history", [])
     
     target_ratios = {
-        "tools": 0.50,
-        "news": 0.30,
-        "research": 0.20
+        "tools": 0.40,
+        "news": 0.25,
+        "research": 0.15,
+        "quiz": 0.20
     }
     
     # Analyze the last 30 entries in history (or as many as exist)
     recent_entries = history[-30:] if history else []
     
-    counts = {"tools": 0, "news": 0, "research": 0}
+    counts = {"tools": 0, "news": 0, "research": 0, "quiz": 0}
     total_counted = 0
     
     for entry in recent_entries:
@@ -220,6 +222,9 @@ def get_next_topic_type_by_ratio(tracker_file=TRACKER_FILE):
                 total_counted += 1
             elif "myth" in sub_cat or "privacy" in sub_cat or "scary" in sub_cat or "wrong" in title or "mistake" in title or "stop" in title or "myth" in title:
                 counts["news"] += 1
+                total_counted += 1
+            elif "quiz" in sub_cat or "trivia" in sub_cat or "quiz" in title or "trivia" in title:
+                counts["quiz"] += 1
                 total_counted += 1
             else:
                 counts["research"] += 1

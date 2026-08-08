@@ -251,6 +251,11 @@ def run_pipeline(topic_type="auto", dry_run=False):
     day_name, slot, category = get_slot_info()
     log_message(f"STEP 1: Content Ecosystem Check -> Day: {day_name}, Slot: {slot}, Category: {category}")
     
+    # ── QUIZ SHORTS: Force quiz topic_type for Quiz & Trivia days ──
+    if category == "Quiz & Trivia":
+        topic_type = "quiz"
+        log_message(f"🎯 QUIZ MODE: Category is 'Quiz & Trivia' — forcing topic_type=quiz")
+    
     # ── STEP 2: Selection Strategy (RSS + Trending Engine) ─────────────────────
     log_message(f"STEP 2: Fetching articles (RSS + Trending Engine)...")
     rss_articles = []

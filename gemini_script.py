@@ -1213,6 +1213,71 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "incentive_cta_type": "One of: 'digital_vault', 'comment_trigger', 'benchmark_challenge', 'community_audit'",
   "digital_asset_offer": "Description of the asset being offered (e.g., 'Python evaluation template', 'Architecture diagram & script', 'Benchmark comparison sheet', 'API credit giveaway entry')"
 }}"""
+        elif topic_type == "quiz":
+            selection_instruction = (
+                f"Analyze the following {content_desc} and pick the SINGLE most surprising, verified tech history fact that works as an interactive multiple-choice quiz.\n"
+                f"PRIMARY CATEGORY: {category}\n"
+                "SELECTION FILTERS:\n"
+                "1. PRIORITIZE: Verified computer history facts, famous bugs/failures, programming language origins, company founding stories, tech etymology — things that sound fake but are 100% true.\n"
+                "2. MUST be formatted as a multiple-choice question with 3 options (A/B/C) — 1 correct, 2 plausible distractors.\n"
+                "3. MUST be understandable by ANYONE — no jargon. The reveal must include fascinating context.\n"
+                "4. MUST be explainable in exactly <35s (approx 80-120 words total). Strict 35s limit.\n"
+                "5. QUIZ FORMAT (MANDATORY): Hook Question → Options A/B/C → 3s pause → Reveal + Context → Bonus Fact → CTA.\n"
+                "6. INCENTIVE CTA (MANDATORY): Choose exactly one mode: Digital Vault, Comment Trigger, Benchmark Challenge, or Community Audit.\n"
+                "7. LOOP-FRIENDLY: Last sentence connects back to the quiz question.\n"
+                "8. UNIVERSAL & GENDER-INCLUSIVE DEMOGRAPHIC (18-70): Tech history appeals to everyone. Ensure strong appeal to women and girls — include diverse figures (Grace Hopper, Ada Lovelace, Margaret Hamilton, etc.).\n"
+                "9. QUIZ SOURCES: Computer History Museum, IEEE Annals, Wikipedia, Wikidata, company archives, famous bug reports (Mars Orbiter, Ariane 5, Therac-25, etc.)."
+            )
+            prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
+{{
+  "title_options": ["Title Case + Emoji + Curiosity Gap 1", "Title Case + Emoji + Curiosity Gap 2"],
+  "description": "Full 100+ word rich SEO description for youtube describing the quiz video.",
+  "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence (Wikipedia, Computer History Museum, etc.).",
+  "title": "Punchy YouTube title max 60 chars — MUST follow quiz formula: '99% Get This Wrong: [Question]?' or 'Can You Guess [Question]? (Answer Will Shock You)' or 'True or False: [Mind-Blowing Tech Fact]'. NO clickbait — must deliver on promise.",
+  "hook_script": "The Hook Question (0-2s): Bold quiz question on screen + voice. 8-12 words. 'What was the FIRST computer bug?' or '99% of engineers get this wrong: What does HTTP stand for?'",
+  "problem_context": "The Options (2-5s): Read A/B/C clearly. 'A) Moth in relay B) Software error C) Power surge' — show on screen simultaneously.",
+  "solution_tech": "The Pause & Reveal (5-15s): 'Think... 3... 2... 1... It was A! A literal moth in a Harvard Mark II relay, 1947. Grace Hopper taped it in the logbook — first debugging!' 40-60 words.",
+  "incentive_cta": "The Incentive CTA (25-30s): Choose EXACTLY ONE mode: 1) Digital Vault: 'I put 50 verified tech quizzes in our Telegram. Link in description.' 2) Comment Trigger: 'Comment \\'QUIZ\\' below for the full quiz pack.' 3) Benchmark Challenge: 'I scored 10/10. Comment your score to beat it!' 4) Community Audit: 'Sub and comment your score for monthly $100 API credit giveaway.'",
+  "retention_loop": "The Loop Bridge (30-35s): Connect back to opening. 'Think you know tech history? Next quiz drops tomorrow.'",
+  "outro_cta": "CTA: Follow for daily quizzes. Subscribe. 8-10 words.",
+  "script": "The FULL voiceover script combining hook_script, problem_context, solution_tech, incentive_cta, retention_loop, and outro_cta. Target 80-120 words total. STRICT MAX 35 seconds. Loop-friendly ending.",
+  "hook_text": "The exact first 5-8 words of the script.",
+  "relevant_links": ["https://example.com"],
+  "phonetic_pronunciation_map": {{}},
+  "hook": "Matches the first sentence of the script",
+  "summary": "One line summary",
+  "sub_category": "{category}",
+  "breaking_news_level": 9,
+  "retention_cues": [{{ "timestamp": 2.0, "effect": "zoom_in", "reason": "hook_impact" }}],
+  "subtitle_chunks": [{{
+      "chunk_id": 1,
+      "text": "Sentence 1",
+      "start": 0.00,
+      "end": 2.50,
+      "scene_objective": "What technical concept must be understood here",
+      "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup|Code Snippet|Screen Recording|Flowchart|Terminal Output|GitHub UI|Side-by-side Comparison|Architecture Diagram",
+      "nano_visual_prompt": "A clean, specific visual for THIS sentence. Example: 'Close-up of Harvard Mark II relay panel with moth trapped, 1947, black and white historical photo, 9:16 vertical'. Photorealistic, 8K. NO text overlays.",
+      "is_setting_chunk": false,
+      "has_infographic": true,
+      "infographic_type": "comparison",
+      "infographic_data": {{"left_label": "A) Moth in relay", "left_val": "✓ CORRECT", "right_label": "B) Software error", "right_val": "✗ WRONG"}},
+      "on_screen_elements": ["labels/arrows/highlights/icons/charts/code"],
+      "camera_motion": "Slow zoom|Dolly-in|Orbit|Pan|Tracking shot|None",
+      "transition": "Match cut|Zoom transition|Morph|Swipe|Data stream transition|Neural network transition"
+  }}],
+  "original_news_headline": "Exact quiz question / tech fact",
+  "original_news_url": "Direct source URL (Wikipedia, Computer History Museum, etc.)",
+  "keywords": ["Tech Quiz", "Computer History", "Tech Trivia", "Did You Know"],
+  "hashtags": ["#TechQuiz", "#ComputerHistory", "#TechTrivia", "#DidYouKnow", "#Quiz"],
+  "companies_mentioned": ["list of company names mentioned in the script"],
+  "companies": [{{"name": "Company Name", "domain": "domain.com", "description": "2-4 word description of the company"}}],
+  "people": [{{"name": "Person Name", "wikipedia_slug": "Wikipedia_Slug", "description": "2-4 word description of the person's role"}}],
+  "key_entities": [{{"name": "Entity Name", "type": "COMPANY|PEOPLE|TOOL|OTHER", "description": "2-4 word description of the entity"}}],
+  "comment_hook": "A provocative question: 'What was YOUR guess? A, B, or C? Drop it below!'",
+  "comment_trigger_keyword": "QUIZ",
+  "incentive_cta_type": "One of: 'digital_vault', 'comment_trigger', 'benchmark_challenge', 'community_audit'",
+  "digital_asset_offer": "Description of the asset being offered (e.g., '50 verified tech quizzes pack', 'Quiz template & sources', 'Score tracker spreadsheet', 'API credit giveaway entry')"
+}}"""
         else: # research / educational / general
             selection_instruction = (
                 f"Analyze the following {content_desc} and pick the SINGLE most surprising, useful, or mind-blowing tech fact or comparison.\n"
