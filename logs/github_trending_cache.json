@@ -4,14 +4,9 @@
     "full_name": "PrimeIntellect-ai/prime-agent",
     "description": "A self-improving RLM agent for coding workflows and long-running autonomous tasks.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 6885,
-    "forks_count": 561,
-=======
-    "stargazers_count": 6947,
-    "forks_count": 564,
->>>>>>> Stashed changes
-    "stars_in_period": 2293,
+    "stargazers_count": 8027,
+    "forks_count": 683,
+    "stars_in_period": 2483,
     "url": "https://github.com/PrimeIntellect-ai/prime-agent",
     "html_url": "https://github.com/PrimeIntellect-ai/prime-agent"
   },
@@ -20,248 +15,130 @@
     "full_name": "addyosmani/agent-skills",
     "description": "Production-grade engineering skills for AI coding agents.",
     "language": "JavaScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 84001,
-    "forks_count": 8975,
-=======
-    "stargazers_count": 84020,
-    "forks_count": 8976,
->>>>>>> Stashed changes
-    "stars_in_period": 1131,
+    "stargazers_count": 84297,
+    "forks_count": 8996,
+    "stars_in_period": 778,
     "url": "https://github.com/addyosmani/agent-skills",
     "html_url": "https://github.com/addyosmani/agent-skills"
   },
   {
-    "repo": "cloudflare/computer",
-    "full_name": "cloudflare/computer",
-    "description": "Give your agent a computer \ud83d\udc7e",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 5918,
-    "forks_count": 298,
-=======
-    "stargazers_count": 5941,
-    "forks_count": 300,
->>>>>>> Stashed changes
-    "stars_in_period": 872,
-    "url": "https://github.com/cloudflare/computer",
-    "html_url": "https://github.com/cloudflare/computer"
+    "repo": "TapXWorld/ChinaTextbook",
+    "full_name": "TapXWorld/ChinaTextbook",
+    "description": "\u6240\u6709\u5c0f\u521d\u9ad8\u3001\u5927\u5b66PDF\u6559\u6750\u3002",
+    "language": "Roff",
+    "stargazers_count": 77757,
+    "forks_count": 17555,
+    "stars_in_period": 591,
+    "url": "https://github.com/TapXWorld/ChinaTextbook",
+    "html_url": "https://github.com/TapXWorld/ChinaTextbook"
+  },
+  {
+    "repo": "google/skills",
+    "full_name": "google/skills",
+    "description": "Agent Skills for Google products and technologies",
+    "language": "Python",
+    "stargazers_count": 16531,
+    "forks_count": 1305,
+    "stars_in_period": 481,
+    "url": "https://github.com/google/skills",
+    "html_url": "https://github.com/google/skills"
   },
   {
     "repo": "mattpocock/skills",
     "full_name": "mattpocock/skills",
     "description": "Skills for Real Engineers. Straight from my .agents directory.",
     "language": "Shell",
-<<<<<<< Updated upstream
-    "stargazers_count": 209028,
-    "forks_count": 18052,
-=======
-    "stargazers_count": 209058,
-    "forks_count": 18056,
->>>>>>> Stashed changes
-    "stars_in_period": 2152,
+    "stargazers_count": 209637,
+    "forks_count": 18109,
+    "stars_in_period": 1354,
     "url": "https://github.com/mattpocock/skills",
     "html_url": "https://github.com/mattpocock/skills"
-  },
-  {
-    "repo": "obra/superpowers",
-    "full_name": "obra/superpowers",
-    "description": "An agentic skills framework & software development methodology that works.",
-    "language": "Shell",
-<<<<<<< Updated upstream
-    "stargazers_count": 268826,
-    "forks_count": 24002,
-=======
-    "stargazers_count": 268847,
-    "forks_count": 24006,
->>>>>>> Stashed changes
-    "stars_in_period": 782,
-    "url": "https://github.com/obra/superpowers",
-    "html_url": "https://github.com/obra/superpowers"
   },
   {
     "repo": "goauthentik/authentik",
     "full_name": "goauthentik/authentik",
     "description": "The authentication glue you need.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 23672,
-    "forks_count": 1813,
-=======
-    "stargazers_count": 23676,
-    "forks_count": 1814,
->>>>>>> Stashed changes
-    "stars_in_period": 530,
+    "stargazers_count": 23858,
+    "forks_count": 1827,
+    "stars_in_period": 467,
     "url": "https://github.com/goauthentik/authentik",
     "html_url": "https://github.com/goauthentik/authentik"
   },
   {
-    "repo": "semantica-agi/semantica",
-    "full_name": "semantica-agi/semantica",
-    "description": "Graph-Native Infrastructure for Context and Accountable AI Systems",
+    "repo": "TauricResearch/TradingAgents",
+    "full_name": "TauricResearch/TradingAgents",
+    "description": "TradingAgents: Multi-Agents LLM Financial Trading Framework",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 2395,
-    "forks_count": 311,
-=======
-    "stargazers_count": 2400,
-    "forks_count": 312,
->>>>>>> Stashed changes
-    "stars_in_period": 122,
-    "url": "https://github.com/semantica-agi/semantica",
-    "html_url": "https://github.com/semantica-agi/semantica"
-  },
-  {
-    "repo": "666ghj/MiroFish",
-    "full_name": "666ghj/MiroFish",
-    "description": "A Simple and Universal Swarm Intelligence Engine, Predicting Anything. \u7b80\u6d01\u901a\u7528\u7684\u7fa4\u4f53\u667a\u80fd\u5f15\u64ce\uff0c\u9884\u6d4b\u4e07\u7269",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 70577,
-    "forks_count": 10997,
-=======
-    "stargazers_count": 70591,
-    "forks_count": 10999,
->>>>>>> Stashed changes
-    "stars_in_period": 141,
-    "url": "https://github.com/666ghj/MiroFish",
-    "html_url": "https://github.com/666ghj/MiroFish"
-  },
-  {
-    "repo": "chenyme/grok2api",
-    "full_name": "chenyme/grok2api",
-    "description": "Multi-account API gateway for Grok Build, Grok Web, and Grok Console",
-    "language": "Go",
-<<<<<<< Updated upstream
-    "stargazers_count": 7159,
-=======
-    "stargazers_count": 7162,
->>>>>>> Stashed changes
-    "forks_count": 2172,
-    "stars_in_period": 55,
-    "url": "https://github.com/chenyme/grok2api",
-    "html_url": "https://github.com/chenyme/grok2api"
-  },
-  {
-    "repo": "jdx/mise",
-    "full_name": "jdx/mise",
-    "description": "dev tools, env vars, task runner",
-    "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 32097,
-=======
-    "stargazers_count": 32102,
->>>>>>> Stashed changes
-    "forks_count": 1337,
-    "stars_in_period": 135,
-    "url": "https://github.com/jdx/mise",
-    "html_url": "https://github.com/jdx/mise"
-  },
-  {
-    "repo": "Significant-Gravitas/AutoGPT",
-    "full_name": "Significant-Gravitas/AutoGPT",
-    "description": "AutoGPT is the vision of accessible AI for everyone, to use and to build on. Our mission is to provide the tools, so that you can focus on what matters.",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 186358,
-    "forks_count": 46061,
-=======
-    "stargazers_count": 186366,
-    "forks_count": 46062,
->>>>>>> Stashed changes
-    "stars_in_period": 355,
-    "url": "https://github.com/Significant-Gravitas/AutoGPT",
-    "html_url": "https://github.com/Significant-Gravitas/AutoGPT"
+    "stargazers_count": 96225,
+    "forks_count": 18623,
+    "stars_in_period": 126,
+    "url": "https://github.com/TauricResearch/TradingAgents",
+    "html_url": "https://github.com/TauricResearch/TradingAgents"
   },
   {
     "repo": "google/guava",
     "full_name": "google/guava",
     "description": "Google core libraries for Java",
     "language": "Java",
-<<<<<<< Updated upstream
-    "stargazers_count": 51776,
+    "stargazers_count": 51814,
     "forks_count": 11177,
-=======
-    "stargazers_count": 51777,
-    "forks_count": 11176,
->>>>>>> Stashed changes
-    "stars_in_period": 152,
+    "stars_in_period": 93,
     "url": "https://github.com/google/guava",
     "html_url": "https://github.com/google/guava"
   },
   {
-    "repo": "unclebob/swarm-forge",
-    "full_name": "unclebob/swarm-forge",
-    "description": "A simple tool for coordinating several AI agents.",
-    "language": "Clojure",
-<<<<<<< Updated upstream
-    "stargazers_count": 1870,
-=======
-    "stargazers_count": 1876,
->>>>>>> Stashed changes
-    "forks_count": 203,
-    "stars_in_period": 81,
-    "url": "https://github.com/unclebob/swarm-forge",
-    "html_url": "https://github.com/unclebob/swarm-forge"
+    "repo": "LadybirdBrowser/ladybird",
+    "full_name": "LadybirdBrowser/ladybird",
+    "description": "Truly independent web browser",
+    "language": "C++",
+    "stargazers_count": 64887,
+    "forks_count": 3098,
+    "stars_in_period": 42,
+    "url": "https://github.com/LadybirdBrowser/ladybird",
+    "html_url": "https://github.com/LadybirdBrowser/ladybird"
   },
   {
     "repo": "denoland/celld",
     "full_name": "denoland/celld",
     "description": "self-hosted, distributed Durable Objects",
     "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 2263,
-=======
-    "stargazers_count": 2272,
->>>>>>> Stashed changes
-    "forks_count": 65,
-    "stars_in_period": 516,
+    "stargazers_count": 2430,
+    "forks_count": 67,
+    "stars_in_period": 432,
     "url": "https://github.com/denoland/celld",
     "html_url": "https://github.com/denoland/celld"
   },
   {
-    "repo": "K2SOsint/Legendary_OSINT",
-    "full_name": "K2SOsint/Legendary_OSINT",
-    "description": "A list of OSINT tools & resources for (fraud-)investigators, CTI-analysts, KYC, AML and more.",
+    "repo": "litu54/DevOps-Interview-Guide",
+    "full_name": "litu54/DevOps-Interview-Guide",
+    "description": "DevOps Interview Guide",
     "language": "Unknown",
-<<<<<<< Updated upstream
-    "stargazers_count": 1510,
-    "forks_count": 196,
-=======
-    "stargazers_count": 1526,
-    "forks_count": 198,
->>>>>>> Stashed changes
-    "stars_in_period": 109,
-    "url": "https://github.com/K2SOsint/Legendary_OSINT",
-    "html_url": "https://github.com/K2SOsint/Legendary_OSINT"
+    "stargazers_count": 624,
+    "forks_count": 863,
+    "stars_in_period": 59,
+    "url": "https://github.com/litu54/DevOps-Interview-Guide",
+    "html_url": "https://github.com/litu54/DevOps-Interview-Guide"
   },
   {
-    "repo": "pranshuparmar/witr",
-    "full_name": "pranshuparmar/witr",
-    "description": "Why is this running? Trace any process, port, container, or file back to what started it - CLI + TUI.",
-    "language": "Go",
-<<<<<<< Updated upstream
-    "stargazers_count": 19846,
-=======
-    "stargazers_count": 19861,
->>>>>>> Stashed changes
-    "forks_count": 646,
-    "stars_in_period": 234,
-    "url": "https://github.com/pranshuparmar/witr",
-    "html_url": "https://github.com/pranshuparmar/witr"
+    "repo": "bannedbook/fanqiang",
+    "full_name": "bannedbook/fanqiang",
+    "description": "\u7ffb\u5899-\u79d1\u5b66\u4e0a\u7f51",
+    "language": "Kotlin",
+    "stargazers_count": 49774,
+    "forks_count": 8244,
+    "stars_in_period": 140,
+    "url": "https://github.com/bannedbook/fanqiang",
+    "html_url": "https://github.com/bannedbook/fanqiang"
   },
   {
     "repo": "google/skills",
     "full_name": "google/skills",
     "description": "Agent Skills for Google products and technologies",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 16321,
-=======
-    "stargazers_count": 16331,
->>>>>>> Stashed changes
-    "forks_count": 1295,
-    "stars_in_period": 327,
+    "stargazers_count": 16531,
+    "forks_count": 1305,
+    "stars_in_period": 481,
     "url": "https://github.com/google/skills",
     "html_url": "https://github.com/google/skills"
   },
@@ -270,713 +147,550 @@
     "full_name": "goauthentik/authentik",
     "description": "The authentication glue you need.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 23672,
-    "forks_count": 1813,
-=======
-    "stargazers_count": 23676,
-    "forks_count": 1814,
->>>>>>> Stashed changes
-    "stars_in_period": 530,
+    "stargazers_count": 23858,
+    "forks_count": 1827,
+    "stars_in_period": 467,
     "url": "https://github.com/goauthentik/authentik",
     "html_url": "https://github.com/goauthentik/authentik"
   },
   {
-    "repo": "semantica-agi/semantica",
-    "full_name": "semantica-agi/semantica",
-    "description": "Graph-Native Infrastructure for Context and Accountable AI Systems",
+    "repo": "TauricResearch/TradingAgents",
+    "full_name": "TauricResearch/TradingAgents",
+    "description": "TradingAgents: Multi-Agents LLM Financial Trading Framework",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 2395,
-    "forks_count": 311,
-=======
-    "stargazers_count": 2400,
-    "forks_count": 312,
->>>>>>> Stashed changes
-    "stars_in_period": 122,
-    "url": "https://github.com/semantica-agi/semantica",
-    "html_url": "https://github.com/semantica-agi/semantica"
+    "stargazers_count": 96226,
+    "forks_count": 18623,
+    "stars_in_period": 126,
+    "url": "https://github.com/TauricResearch/TradingAgents",
+    "html_url": "https://github.com/TauricResearch/TradingAgents"
   },
   {
-    "repo": "666ghj/MiroFish",
-    "full_name": "666ghj/MiroFish",
-    "description": "A Simple and Universal Swarm Intelligence Engine, Predicting Anything. \u7b80\u6d01\u901a\u7528\u7684\u7fa4\u4f53\u667a\u80fd\u5f15\u64ce\uff0c\u9884\u6d4b\u4e07\u7269",
+    "repo": "virgiliojr94/book-to-skill",
+    "full_name": "virgiliojr94/book-to-skill",
+    "description": "Turn any technical book PDF into a Claude Code skill \u2014 ready to study, reference, and use while you work.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 70577,
-    "forks_count": 10997,
-=======
-    "stargazers_count": 70591,
-    "forks_count": 10999,
->>>>>>> Stashed changes
-    "stars_in_period": 141,
-    "url": "https://github.com/666ghj/MiroFish",
-    "html_url": "https://github.com/666ghj/MiroFish"
+    "stargazers_count": 18709,
+    "forks_count": 2015,
+    "stars_in_period": 660,
+    "url": "https://github.com/virgiliojr94/book-to-skill",
+    "html_url": "https://github.com/virgiliojr94/book-to-skill"
+  },
+  {
+    "repo": "practical-tutorials/project-based-learning",
+    "full_name": "practical-tutorials/project-based-learning",
+    "description": "Curated list of project-based tutorials",
+    "language": "Python",
+    "stargazers_count": 277324,
+    "forks_count": 35713,
+    "stars_in_period": 220,
+    "url": "https://github.com/practical-tutorials/project-based-learning",
+    "html_url": "https://github.com/practical-tutorials/project-based-learning"
   },
   {
     "repo": "Significant-Gravitas/AutoGPT",
     "full_name": "Significant-Gravitas/AutoGPT",
     "description": "AutoGPT is the vision of accessible AI for everyone, to use and to build on. Our mission is to provide the tools, so that you can focus on what matters.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 186358,
-    "forks_count": 46061,
-=======
-    "stargazers_count": 186366,
-    "forks_count": 46062,
->>>>>>> Stashed changes
-    "stars_in_period": 355,
+    "stargazers_count": 186436,
+    "forks_count": 46067,
+    "stars_in_period": 240,
     "url": "https://github.com/Significant-Gravitas/AutoGPT",
     "html_url": "https://github.com/Significant-Gravitas/AutoGPT"
   },
   {
-    "repo": "google/skills",
-    "full_name": "google/skills",
-    "description": "Agent Skills for Google products and technologies",
+    "repo": "kyutai-labs/pocket-tts",
+    "full_name": "kyutai-labs/pocket-tts",
+    "description": "A TTS that fits in your CPU (and pocket)",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 16321,
-=======
-    "stargazers_count": 16331,
->>>>>>> Stashed changes
-    "forks_count": 1295,
-    "stars_in_period": 327,
-    "url": "https://github.com/google/skills",
-    "html_url": "https://github.com/google/skills"
+    "stargazers_count": 8162,
+    "forks_count": 826,
+    "stars_in_period": 95,
+    "url": "https://github.com/kyutai-labs/pocket-tts",
+    "html_url": "https://github.com/kyutai-labs/pocket-tts"
   },
   {
-    "repo": "Comfy-Org/ComfyUI",
-    "full_name": "Comfy-Org/ComfyUI",
-    "description": "The most powerful and modular diffusion model GUI, api and backend with a graph/nodes interface.",
+    "repo": "666ghj/MiroFish",
+    "full_name": "666ghj/MiroFish",
+    "description": "A Simple and Universal Swarm Intelligence Engine, Predicting Anything. \u7b80\u6d01\u901a\u7528\u7684\u7fa4\u4f53\u667a\u80fd\u5f15\u64ce\uff0c\u9884\u6d4b\u4e07\u7269",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 124690,
-    "forks_count": 14771,
-=======
-    "stargazers_count": 124698,
-    "forks_count": 14773,
->>>>>>> Stashed changes
-    "stars_in_period": 338,
-    "url": "https://github.com/Comfy-Org/ComfyUI",
-    "html_url": "https://github.com/Comfy-Org/ComfyUI"
+    "stargazers_count": 70715,
+    "forks_count": 11005,
+    "stars_in_period": 441,
+    "url": "https://github.com/666ghj/MiroFish",
+    "html_url": "https://github.com/666ghj/MiroFish"
   },
   {
-    "repo": "donnemartin/system-design-primer",
-    "full_name": "donnemartin/system-design-primer",
-    "description": "Learn how to design large-scale systems. Prep for the system design interview. Includes Anki flashcards.",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 362293,
-=======
-    "stargazers_count": 362297,
->>>>>>> Stashed changes
-    "forks_count": 57716,
-    "stars_in_period": 294,
-    "url": "https://github.com/donnemartin/system-design-primer",
-    "html_url": "https://github.com/donnemartin/system-design-primer"
-  },
-  {
-    "repo": "android/skills",
-    "full_name": "android/skills",
+    "repo": "google-deepmind/weathernext",
+    "full_name": "google-deepmind/weathernext",
     "description": "",
     "language": "Python",
-    "stargazers_count": 6618,
-    "forks_count": 386,
-    "stars_in_period": 47,
-    "url": "https://github.com/android/skills",
-    "html_url": "https://github.com/android/skills"
+    "stargazers_count": 6851,
+    "forks_count": 901,
+    "stars_in_period": 48,
+    "url": "https://github.com/google-deepmind/weathernext",
+    "html_url": "https://github.com/google-deepmind/weathernext"
   },
   {
-    "repo": "tirth8205/code-review-graph",
-    "full_name": "tirth8205/code-review-graph",
-    "description": "Local-first code intelligence graph for MCP and CLI. Builds a persistent map of your codebase so AI coding tools read only what matters, with benchmarked context reductions on reviews and large-repo workflows.",
+    "repo": "superlinked/sie",
+    "full_name": "superlinked/sie",
+    "description": "Open-source inference server and production cluster for all the models your agent needs.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 29369,
-=======
-    "stargazers_count": 29368,
->>>>>>> Stashed changes
-    "forks_count": 2697,
-    "stars_in_period": 450,
-    "url": "https://github.com/tirth8205/code-review-graph",
-    "html_url": "https://github.com/tirth8205/code-review-graph"
-  },
-  {
-    "repo": "harvard-edge/cs249r_book",
-    "full_name": "harvard-edge/cs249r_book",
-    "description": "Machine Learning Systems",
-    "language": "Python",
-    "stargazers_count": 27813,
-    "forks_count": 3497,
+    "stargazers_count": 2684,
+    "forks_count": 261,
     "stars_in_period": 36,
-    "url": "https://github.com/harvard-edge/cs249r_book",
-    "html_url": "https://github.com/harvard-edge/cs249r_book"
+    "url": "https://github.com/superlinked/sie",
+    "html_url": "https://github.com/superlinked/sie"
   },
   {
-    "repo": "p1ngul1n0/blackbird",
-    "full_name": "p1ngul1n0/blackbird",
-    "description": "An OSINT tool to search for accounts by username and email in social networks.",
+    "repo": "harveyai/harvey-labs",
+    "full_name": "harveyai/harvey-labs",
+    "description": "A benchmark built to evaluate and improve agent capabilities for supporting legal work.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 7408,
-=======
-    "stargazers_count": 7409,
->>>>>>> Stashed changes
-    "forks_count": 831,
-    "stars_in_period": 35,
-    "url": "https://github.com/p1ngul1n0/blackbird",
-    "html_url": "https://github.com/p1ngul1n0/blackbird"
+    "stargazers_count": 650,
+    "forks_count": 166,
+    "stars_in_period": 39,
+    "url": "https://github.com/harveyai/harvey-labs",
+    "html_url": "https://github.com/harveyai/harvey-labs"
   },
   {
-    "repo": "anthropics/claude-plugins-official",
-    "full_name": "anthropics/claude-plugins-official",
-    "description": "Official, Anthropic-managed directory of high quality Claude Code Plugins.",
+    "repo": "microsoft/agent-governance-toolkit",
+    "full_name": "microsoft/agent-governance-toolkit",
+    "description": "AI Agent Governance Toolkit \u2014 Policy enforcement, zero-trust identity, execution sandboxing, and reliability engineering for autonomous AI agents. Covers 10/10 OWASP Agentic Top 10.",
     "language": "Python",
-    "stargazers_count": 33256,
-    "forks_count": 3755,
-    "stars_in_period": 55,
-    "url": "https://github.com/anthropics/claude-plugins-official",
-    "html_url": "https://github.com/anthropics/claude-plugins-official"
+    "stargazers_count": 5789,
+    "forks_count": 1004,
+    "stars_in_period": 68,
+    "url": "https://github.com/microsoft/agent-governance-toolkit",
+    "html_url": "https://github.com/microsoft/agent-governance-toolkit"
   },
   {
     "repo": "huangruiteng/loopx",
     "full_name": "huangruiteng/loopx",
     "description": "Lightweight loop engineering state kernel for long-running AI agent teams. Agent-loop agnostic across Codex, Claude Code, and other coding agents, with durable goals, quota-aware auto-wake, executable todos, evidence logs, and verifiable handoffs.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 3440,
-=======
-    "stargazers_count": 3446,
->>>>>>> Stashed changes
-    "forks_count": 276,
-    "stars_in_period": 624,
+    "stargazers_count": 3538,
+    "forks_count": 283,
+    "stars_in_period": 244,
     "url": "https://github.com/huangruiteng/loopx",
     "html_url": "https://github.com/huangruiteng/loopx"
   },
   {
-    "repo": "wshobson/agents",
-    "full_name": "wshobson/agents",
-    "description": "Multi-harness agentic plugin marketplace for Claude Code, Codex CLI, Cursor, OpenCode, GitHub Copilot, and Gemini CLI",
+    "repo": "anthropics/claude-code-security-review",
+    "full_name": "anthropics/claude-code-security-review",
+    "description": "An AI-powered security review GitHub Action using Claude to analyze code changes for security vulnerabilities.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 38603,
-=======
-    "stargazers_count": 38605,
->>>>>>> Stashed changes
-    "forks_count": 4119,
-    "stars_in_period": 58,
-    "url": "https://github.com/wshobson/agents",
-    "html_url": "https://github.com/wshobson/agents"
+    "stargazers_count": 5808,
+    "forks_count": 626,
+    "stars_in_period": 30,
+    "url": "https://github.com/anthropics/claude-code-security-review",
+    "html_url": "https://github.com/anthropics/claude-code-security-review"
   },
   {
-    "repo": "anthropics/claude-code",
-    "full_name": "anthropics/claude-code",
-    "description": "Claude Code is an agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster by executing routine tasks, explaining complex code, and handling git workflows - all through natural language commands.",
+    "repo": "AgriciDaniel/claude-seo",
+    "full_name": "AgriciDaniel/claude-seo",
+    "description": "Universal SEO skill for Claude Code. 25 sub-skills + 18 sub-agents covering technical SEO, E-E-A-T, schema, GEO/AEO, backlinks, local SEO, maps intelligence, semantic clustering, e-commerce SEO, international SEO, Google APIs, and PDF/Excel reporting. Optional DataForSEO, Firecrawl, and Banana extensions.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 140620,
-    "forks_count": 22613,
-=======
-    "stargazers_count": 140626,
-    "forks_count": 22614,
->>>>>>> Stashed changes
-    "stars_in_period": 125,
-    "url": "https://github.com/anthropics/claude-code",
-    "html_url": "https://github.com/anthropics/claude-code"
+    "stargazers_count": 13691,
+    "forks_count": 1999,
+    "stars_in_period": 101,
+    "url": "https://github.com/AgriciDaniel/claude-seo",
+    "html_url": "https://github.com/AgriciDaniel/claude-seo"
   },
   {
-    "repo": "NVIDIA-NeMo/Speech",
-    "full_name": "NVIDIA-NeMo/Speech",
-    "description": "A scalable generative AI framework built for researchers and developers working on Large Language Models, Multimodal, and Speech AI (Automatic Speech Recognition and Text-to-Speech)",
+    "repo": "microsoft/VibeVoice",
+    "full_name": "microsoft/VibeVoice",
+    "description": "Open-Source Frontier Voice AI",
     "language": "Python",
-    "stargazers_count": 18020,
-    "forks_count": 3539,
-    "stars_in_period": 82,
-    "url": "https://github.com/NVIDIA-NeMo/Speech",
-    "html_url": "https://github.com/NVIDIA-NeMo/Speech"
+    "stargazers_count": 52213,
+    "forks_count": 5852,
+    "stars_in_period": 86,
+    "url": "https://github.com/microsoft/VibeVoice",
+    "html_url": "https://github.com/microsoft/VibeVoice"
   },
   {
-    "repo": "kijai/ComfyUI-KJNodes",
-    "full_name": "kijai/ComfyUI-KJNodes",
-    "description": "Various custom nodes for ComfyUI",
+    "repo": "tirth8205/code-review-graph",
+    "full_name": "tirth8205/code-review-graph",
+    "description": "Local-first code intelligence graph for MCP and CLI. Builds a persistent map of your codebase so AI coding tools read only what matters, with benchmarked context reductions on reviews and large-repo workflows.",
     "language": "Python",
-    "stargazers_count": 2992,
-    "forks_count": 330,
-    "stars_in_period": 16,
-    "url": "https://github.com/kijai/ComfyUI-KJNodes",
-    "html_url": "https://github.com/kijai/ComfyUI-KJNodes"
+    "stargazers_count": 29425,
+    "forks_count": 2700,
+    "stars_in_period": 114,
+    "url": "https://github.com/tirth8205/code-review-graph",
+    "html_url": "https://github.com/tirth8205/code-review-graph"
+  },
+  {
+    "repo": "vllm-project/vllm",
+    "full_name": "vllm-project/vllm",
+    "description": "A high-throughput and memory-efficient inference and serving engine for LLMs",
+    "language": "Python",
+    "stargazers_count": 88520,
+    "forks_count": 20433,
+    "stars_in_period": 87,
+    "url": "https://github.com/vllm-project/vllm",
+    "html_url": "https://github.com/vllm-project/vllm"
+  },
+  {
+    "repo": "Universal-Commerce-Protocol/ucp",
+    "full_name": "Universal-Commerce-Protocol/ucp",
+    "description": "Specification and documentation for the Universal Commerce Protocol (UCP)",
+    "language": "Python",
+    "stargazers_count": 3278,
+    "forks_count": 435,
+    "stars_in_period": 2,
+    "url": "https://github.com/Universal-Commerce-Protocol/ucp",
+    "html_url": "https://github.com/Universal-Commerce-Protocol/ucp"
   },
   {
     "repo": "PrimeIntellect-ai/prime-agent",
     "full_name": "PrimeIntellect-ai/prime-agent",
     "description": "A self-improving RLM agent for coding workflows and long-running autonomous tasks.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 6886,
-    "forks_count": 561,
-=======
-    "stargazers_count": 6947,
-    "forks_count": 564,
->>>>>>> Stashed changes
-    "stars_in_period": 2293,
+    "stargazers_count": 8028,
+    "forks_count": 683,
+    "stars_in_period": 2483,
     "url": "https://github.com/PrimeIntellect-ai/prime-agent",
     "html_url": "https://github.com/PrimeIntellect-ai/prime-agent"
+  },
+  {
+    "repo": "pingdotgg/t3code",
+    "full_name": "pingdotgg/t3code",
+    "description": "",
+    "language": "TypeScript",
+    "stargazers_count": 17346,
+    "forks_count": 3922,
+    "stars_in_period": 211,
+    "url": "https://github.com/pingdotgg/t3code",
+    "html_url": "https://github.com/pingdotgg/t3code"
+  },
+  {
+    "repo": "can1357/oh-my-pi",
+    "full_name": "can1357/oh-my-pi",
+    "description": "\u2325 AI Coding agent for the terminal \u2014 hash-anchored edits, optimized tool harness, LSP, Python, browser, subagents, and more",
+    "language": "TypeScript",
+    "stargazers_count": 22921,
+    "forks_count": 2182,
+    "stars_in_period": 232,
+    "url": "https://github.com/can1357/oh-my-pi",
+    "html_url": "https://github.com/can1357/oh-my-pi"
+  },
+  {
+    "repo": "heygen-com/hyperframes",
+    "full_name": "heygen-com/hyperframes",
+    "description": "Write HTML. Render video. Built for agents.",
+    "language": "TypeScript",
+    "stargazers_count": 40046,
+    "forks_count": 3811,
+    "stars_in_period": 158,
+    "url": "https://github.com/heygen-com/hyperframes",
+    "html_url": "https://github.com/heygen-com/hyperframes"
+  },
+  {
+    "repo": "open-metadata/OpenMetadata",
+    "full_name": "open-metadata/OpenMetadata",
+    "description": "The Open Context Layer for Data and AI , OpenMetadata is the open platform for building trusted data context and business semantics for humans, AI assistants, and agents.",
+    "language": "TypeScript",
+    "stargazers_count": 14778,
+    "forks_count": 2303,
+    "stars_in_period": 27,
+    "url": "https://github.com/open-metadata/OpenMetadata",
+    "html_url": "https://github.com/open-metadata/OpenMetadata"
+  },
+  {
+    "repo": "remnawave/panel",
+    "full_name": "remnawave/panel",
+    "description": "A powerful proxy management tool, built on top of Xray-core, with a focus on simplicity and ease of use.",
+    "language": "TypeScript",
+    "stargazers_count": 4798,
+    "forks_count": 276,
+    "stars_in_period": 33,
+    "url": "https://github.com/remnawave/panel",
+    "html_url": "https://github.com/remnawave/panel"
+  },
+  {
+    "repo": "danielmiessler/LifeOS",
+    "full_name": "danielmiessler/LifeOS",
+    "description": "\u26f0\ufe0fA General Hill-climbing AI harness that helps you move from Current State to Ideal State in both Life and Work.",
+    "language": "TypeScript",
+    "stargazers_count": 17272,
+    "forks_count": 2337,
+    "stars_in_period": 70,
+    "url": "https://github.com/danielmiessler/LifeOS",
+    "html_url": "https://github.com/danielmiessler/LifeOS"
   },
   {
     "repo": "cloudflare/computer",
     "full_name": "cloudflare/computer",
     "description": "Give your agent a computer \ud83d\udc7e",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 5918,
-    "forks_count": 298,
-=======
-    "stargazers_count": 5941,
-    "forks_count": 300,
->>>>>>> Stashed changes
-    "stars_in_period": 872,
+    "stargazers_count": 6352,
+    "forks_count": 318,
+    "stars_in_period": 1005,
     "url": "https://github.com/cloudflare/computer",
     "html_url": "https://github.com/cloudflare/computer"
   },
   {
-    "repo": "TencentCloud/TencentDB-Agent-Memory",
-    "full_name": "TencentCloud/TencentDB-Agent-Memory",
-    "description": "TencentDB Agent Memory is a team-level memory hub for AI Agents \u2014 turning conversations, docs, and code into four reusable memory assets (Chat Memory, Skill, LLM-Wiki, Code-Graph) that are governed, shared, and equipped across agents and frameworks.",
+    "repo": "anomalyco/opencode",
+    "full_name": "anomalyco/opencode",
+    "description": "The open source coding agent.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 17606,
-    "forks_count": 1579,
-=======
-    "stargazers_count": 17628,
-    "forks_count": 1582,
->>>>>>> Stashed changes
-    "stars_in_period": 1367,
-    "url": "https://github.com/TencentCloud/TencentDB-Agent-Memory",
-    "html_url": "https://github.com/TencentCloud/TencentDB-Agent-Memory"
+    "stargazers_count": 195000,
+    "forks_count": 24947,
+    "stars_in_period": 379,
+    "url": "https://github.com/anomalyco/opencode",
+    "html_url": "https://github.com/anomalyco/opencode"
   },
   {
     "repo": "tashfeenahmed/freellmapi",
     "full_name": "tashfeenahmed/freellmapi",
     "description": "OpenAI-compatible proxy that stacks the free tiers of 28 LLM providers (~4B tokens/month) behind one /v1 endpoint \u2014 plus any custom OpenAI-compatible endpoint. Smart routing, automatic failover, encrypted keys. Personal experimentation only.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 18050,
-=======
-    "stargazers_count": 18056,
->>>>>>> Stashed changes
-    "forks_count": 2639,
-    "stars_in_period": 114,
+    "stargazers_count": 18090,
+    "forks_count": 2642,
+    "stars_in_period": 96,
     "url": "https://github.com/tashfeenahmed/freellmapi",
     "html_url": "https://github.com/tashfeenahmed/freellmapi"
   },
   {
-    "repo": "iOfficeAI/AionUi",
-    "full_name": "iOfficeAI/AionUi",
-    "description": "Open-source 24/7 Cowork app for OpenClaw, Hermes, Claude Code, Codex, OpenCode and 20+ more CLI Agent | Customize your assistants | Team them up\uff5cStar if you like it!",
+    "repo": "jordanrendric/claude-video-vision",
+    "full_name": "jordanrendric/claude-video-vision",
+    "description": "Give Claude the ability to watch and understand videos \u2014 Claude Code plugin with frame extraction and multimodal audio analysis",
     "language": "TypeScript",
-    "stargazers_count": 31685,
-    "forks_count": 3229,
-    "stars_in_period": 80,
-    "url": "https://github.com/iOfficeAI/AionUi",
-    "html_url": "https://github.com/iOfficeAI/AionUi"
+    "stargazers_count": 1154,
+    "forks_count": 140,
+    "stars_in_period": 22,
+    "url": "https://github.com/jordanrendric/claude-video-vision",
+    "html_url": "https://github.com/jordanrendric/claude-video-vision"
   },
   {
-    "repo": "open-mercato/open-mercato",
-    "full_name": "open-mercato/open-mercato",
-    "description": "AI-Engineering Foundation Framework built with AI and designed for AI. Hundreds of architectural and domain decisions (multi-tenancy, RBAC, event flow, pricing, sales pipeline,CRM/ERP processes) are already made conventions and specs so agents (Cursor, Claude Code, Codex) arch. decisions without reinventing. Ship production grade with AI Agents.",
+    "repo": "Dokploy/dokploy",
+    "full_name": "Dokploy/dokploy",
+    "description": "Open Source Alternative to Vercel, Netlify and Heroku.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 1578,
-=======
-    "stargazers_count": 1579,
->>>>>>> Stashed changes
-    "forks_count": 353,
-    "stars_in_period": 11,
-    "url": "https://github.com/open-mercato/open-mercato",
-    "html_url": "https://github.com/open-mercato/open-mercato"
+    "stargazers_count": 36425,
+    "forks_count": 2834,
+    "stars_in_period": 27,
+    "url": "https://github.com/Dokploy/dokploy",
+    "html_url": "https://github.com/Dokploy/dokploy"
   },
   {
-    "repo": "element-plus/element-plus",
-    "full_name": "element-plus/element-plus",
-    "description": "\ud83c\udf89 A Vue.js 3 UI Library made by Element team",
+    "repo": "clash-verge-rev/clash-verge-rev",
+    "full_name": "clash-verge-rev/clash-verge-rev",
+    "description": "A modern GUI client based on Tauri, designed to run in Windows, macOS and Linux for tailored proxy experience",
     "language": "TypeScript",
-    "stargazers_count": 27662,
-    "forks_count": 19845,
-    "stars_in_period": 3,
-    "url": "https://github.com/element-plus/element-plus",
-    "html_url": "https://github.com/element-plus/element-plus"
-  },
-  {
-    "repo": "payloadcms/payload",
-    "full_name": "payloadcms/payload",
-    "description": "Payload is the open-source, fullstack Next.js framework, giving you instant backend superpowers. Get a full TypeScript backend and admin panel instantly. Use Payload as a headless CMS or for building powerful applications.",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 44043,
-=======
-    "stargazers_count": 44042,
->>>>>>> Stashed changes
-    "forks_count": 4017,
-    "stars_in_period": 19,
-    "url": "https://github.com/payloadcms/payload",
-    "html_url": "https://github.com/payloadcms/payload"
-  },
-  {
-    "repo": "makeplane/plane",
-    "full_name": "makeplane/plane",
-    "description": "\ud83d\udd25\ud83d\udd25\ud83d\udd25 Open-source Jira, Linear, Monday, and ClickUp alternative. Plane is a modern project management platform to manage tasks, sprints, docs, and triage.",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 55704,
-=======
-    "stargazers_count": 55705,
->>>>>>> Stashed changes
-    "forks_count": 5266,
-    "stars_in_period": 65,
-    "url": "https://github.com/makeplane/plane",
-    "html_url": "https://github.com/makeplane/plane"
-  },
-  {
-    "repo": "CodebuffAI/freebuff",
-    "full_name": "CodebuffAI/freebuff",
-    "description": "The free coding agent",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 8590,
-=======
-    "stargazers_count": 8594,
->>>>>>> Stashed changes
-    "forks_count": 1000,
-    "stars_in_period": 105,
-    "url": "https://github.com/CodebuffAI/freebuff",
-    "html_url": "https://github.com/CodebuffAI/freebuff"
+    "stargazers_count": 136405,
+    "forks_count": 9836,
+    "stars_in_period": 319,
+    "url": "https://github.com/clash-verge-rev/clash-verge-rev",
+    "html_url": "https://github.com/clash-verge-rev/clash-verge-rev"
   },
   {
     "repo": "firecrawl/firecrawl",
     "full_name": "firecrawl/firecrawl",
     "description": "The context API to search, scrape, and interact with the web at scale. \ud83d\udd25",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 162963,
-=======
-    "stargazers_count": 162975,
->>>>>>> Stashed changes
-    "forks_count": 9173,
-    "stars_in_period": 583,
+    "stargazers_count": 163219,
+    "forks_count": 9180,
+    "stars_in_period": 533,
     "url": "https://github.com/firecrawl/firecrawl",
     "html_url": "https://github.com/firecrawl/firecrawl"
-  },
-  {
-    "repo": "CopilotKit/CopilotKit",
-    "full_name": "CopilotKit/CopilotKit",
-    "description": "The Frontend Stack for Agents & Generative UI. React, Angular, Mobile, Slack, and more. Makers of the AG-UI Protocol",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 36623,
-    "forks_count": 4525,
-=======
-    "stargazers_count": 36624,
-    "forks_count": 4526,
->>>>>>> Stashed changes
-    "stars_in_period": 74,
-    "url": "https://github.com/CopilotKit/CopilotKit",
-    "html_url": "https://github.com/CopilotKit/CopilotKit"
-  },
-  {
-    "repo": "earendil-works/pi",
-    "full_name": "earendil-works/pi",
-    "description": "AI agent toolkit: unified LLM API, agent loop, TUI, coding agent CLI",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 85352,
-=======
-    "stargazers_count": 85359,
->>>>>>> Stashed changes
-    "forks_count": 10590,
-    "stars_in_period": 492,
-    "url": "https://github.com/earendil-works/pi",
-    "html_url": "https://github.com/earendil-works/pi"
-  },
-  {
-    "repo": "satnaing/shadcn-admin",
-    "full_name": "satnaing/shadcn-admin",
-    "description": "Admin Dashboard UI built with Shadcn and Vite.",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 13727,
-=======
-    "stargazers_count": 13728,
->>>>>>> Stashed changes
-    "forks_count": 2113,
-    "stars_in_period": 210,
-    "url": "https://github.com/satnaing/shadcn-admin",
-    "html_url": "https://github.com/satnaing/shadcn-admin"
-  },
-  {
-    "repo": "deepcoldy/botmux",
-    "full_name": "deepcoldy/botmux",
-    "description": "Bridge Feishu/Lark to AI coding CLIs \u2014 Claude Code, Codex, Gemini, OpenCode\u2026 every DM, group or topic spawns its own live-streaming CLI session",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 999,
-=======
-    "stargazers_count": 1000,
->>>>>>> Stashed changes
-    "forks_count": 190,
-    "stars_in_period": 16,
-    "url": "https://github.com/deepcoldy/botmux",
-    "html_url": "https://github.com/deepcoldy/botmux"
-  },
-  {
-    "repo": "jdx/mise",
-    "full_name": "jdx/mise",
-    "description": "dev tools, env vars, task runner",
-    "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 32097,
-=======
-    "stargazers_count": 32102,
->>>>>>> Stashed changes
-    "forks_count": 1337,
-    "stars_in_period": 135,
-    "url": "https://github.com/jdx/mise",
-    "html_url": "https://github.com/jdx/mise"
   },
   {
     "repo": "denoland/celld",
     "full_name": "denoland/celld",
     "description": "self-hosted, distributed Durable Objects",
     "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 2263,
-=======
-    "stargazers_count": 2272,
->>>>>>> Stashed changes
-    "forks_count": 65,
-    "stars_in_period": 516,
+    "stargazers_count": 2430,
+    "forks_count": 67,
+    "stars_in_period": 432,
     "url": "https://github.com/denoland/celld",
     "html_url": "https://github.com/denoland/celld"
   },
   {
-    "repo": "rustdesk/rustdesk",
-    "full_name": "rustdesk/rustdesk",
-    "description": "An open-source remote desktop application designed for self-hosting, as an alternative to TeamViewer.",
+    "repo": "HakanSeven12/OpenCADStudio",
+    "full_name": "HakanSeven12/OpenCADStudio",
+    "description": "A CAD application built with Rust \u2014 2D/3D drawing, DWG/DXF support, and GPU-accelerated rendering",
     "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 119867,
-=======
-    "stargazers_count": 119870,
->>>>>>> Stashed changes
-    "forks_count": 18336,
-    "stars_in_period": 87,
-    "url": "https://github.com/rustdesk/rustdesk",
-    "html_url": "https://github.com/rustdesk/rustdesk"
+    "stargazers_count": 549,
+    "forks_count": 62,
+    "stars_in_period": 242,
+    "url": "https://github.com/HakanSeven12/OpenCADStudio",
+    "html_url": "https://github.com/HakanSeven12/OpenCADStudio"
   },
   {
-    "repo": "t8y2/dbx",
-    "full_name": "t8y2/dbx",
-    "description": "20 MB lightweight cross-platform database client for 70+ databases, including MySQL, PostgreSQL, SQLite, Redis, MongoDB, DuckDB, SQL Server, and Dameng. Built-in AI, MCP Server, CLI, desktop and Docker. | \u8f7b\u91cf\u7ea7\u8de8\u5e73\u53f0\u6570\u636e\u5e93\u7ba1\u7406\u5de5\u5177\uff0c\u652f\u6301 MySQL\u3001PostgreSQL\u3001SQLite\u3001Redis\u3001MongoDB\u3001\u8fbe\u68a6\u7b49 70+ \u6570\u636e\u5e93\uff0c\u63d0\u4f9b\u684c\u9762\u7aef\u3001Docker\u3001CLI\u3001\u5185\u7f6e AI \u52a9\u624b\u548c MCP Server\u3002",
+    "repo": "malisper/pgrust",
+    "full_name": "malisper/pgrust",
+    "description": "Postgres rewritten in Rust, now faster than Postgres and Clickhouse",
     "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 13664,
-    "forks_count": 1402,
-=======
-    "stargazers_count": 13669,
-    "forks_count": 1403,
->>>>>>> Stashed changes
-    "stars_in_period": 128,
-    "url": "https://github.com/t8y2/dbx",
-    "html_url": "https://github.com/t8y2/dbx"
-  },
-  {
-    "repo": "edwardkim/rhwp",
-    "full_name": "edwardkim/rhwp",
-    "description": "\uc544\ub798\ud55c\uae00 hwp viewer and editor by rust and wasm",
-    "language": "Rust",
-    "stargazers_count": 3650,
-    "forks_count": 663,
-    "stars_in_period": 2,
-    "url": "https://github.com/edwardkim/rhwp",
-    "html_url": "https://github.com/edwardkim/rhwp"
-  },
-  {
-    "repo": "raphamorim/rio",
-    "full_name": "raphamorim/rio",
-    "description": "A hardware-accelerated GPU terminal emulator focusing to run in desktops and browsers.",
-    "language": "Rust",
-    "stargazers_count": 7260,
-    "forks_count": 319,
-    "stars_in_period": 19,
-    "url": "https://github.com/raphamorim/rio",
-    "html_url": "https://github.com/raphamorim/rio"
-  },
-  {
-    "repo": "yvgude/lean-ctx",
-    "full_name": "yvgude/lean-ctx",
-    "description": "Control what your AI can see. LeanCTX (Lean Context) is the context intelligence layer for AI agents \u2014 one local Rust binary that decides what they read, remembers what they learn, guards what they touch, and proves what they save. 60\u201390% fewer tokens as the receipt. 76 MCP tools, 30+ agents, local-first.",
-    "language": "Rust",
-    "stargazers_count": 3544,
-    "forks_count": 324,
-    "stars_in_period": 10,
-    "url": "https://github.com/yvgude/lean-ctx",
-    "html_url": "https://github.com/yvgude/lean-ctx"
-  },
-  {
-    "repo": "glzr-io/glazewm",
-    "full_name": "glzr-io/glazewm",
-    "description": "GlazeWM is a tiling window manager for macOS and Windows inspired by i3wm.",
-    "language": "Rust",
-    "stargazers_count": 12560,
-    "forks_count": 410,
-    "stars_in_period": 25,
-    "url": "https://github.com/glzr-io/glazewm",
-    "html_url": "https://github.com/glzr-io/glazewm"
-  },
-  {
-    "repo": "farion1231/cc-switch",
-    "full_name": "farion1231/cc-switch",
-    "description": "A cross-platform desktop All-in-One assistant for Claude Code, Codex, OpenCode, OpenClaw, Grok Build & Hermes Agent. Only official website: ccswitch.io",
-    "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 125507,
-    "forks_count": 8538,
-=======
-    "stargazers_count": 125512,
-    "forks_count": 8539,
->>>>>>> Stashed changes
-    "stars_in_period": 352,
-    "url": "https://github.com/farion1231/cc-switch",
-    "html_url": "https://github.com/farion1231/cc-switch"
-  },
-  {
-    "repo": "cloudflare/pingora",
-    "full_name": "cloudflare/pingora",
-    "description": "A library for building fast, reliable and evolvable network services.",
-    "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 27153,
-=======
-    "stargazers_count": 27154,
->>>>>>> Stashed changes
-    "forks_count": 1707,
-    "stars_in_period": 14,
-    "url": "https://github.com/cloudflare/pingora",
-    "html_url": "https://github.com/cloudflare/pingora"
-  },
-  {
-    "repo": "openai/codex",
-    "full_name": "openai/codex",
-    "description": "Lightweight coding agent that runs in your terminal",
-    "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 104681,
-=======
-    "stargazers_count": 104684,
->>>>>>> Stashed changes
-    "forks_count": 15834,
-    "stars_in_period": 251,
-    "url": "https://github.com/openai/codex",
-    "html_url": "https://github.com/openai/codex"
-  },
-  {
-    "repo": "cube-js/cube",
-    "full_name": "cube-js/cube",
-    "description": "\ud83d\udcca Cube Core is open-source semantic layer for AI, BI and embedded analytics",
-    "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 20572,
-=======
-    "stargazers_count": 20573,
->>>>>>> Stashed changes
-    "forks_count": 2104,
-    "stars_in_period": 9,
-    "url": "https://github.com/cube-js/cube",
-    "html_url": "https://github.com/cube-js/cube"
-  },
-  {
-    "repo": "pimalaya/himalaya",
-    "full_name": "pimalaya/himalaya",
-    "description": "CLI to manage emails",
-    "language": "Rust",
-    "stargazers_count": 6962,
-    "forks_count": 225,
-    "stars_in_period": 29,
-    "url": "https://github.com/pimalaya/himalaya",
-    "html_url": "https://github.com/pimalaya/himalaya"
+    "stargazers_count": 4204,
+    "forks_count": 159,
+    "stars_in_period": 165,
+    "url": "https://github.com/malisper/pgrust",
+    "html_url": "https://github.com/malisper/pgrust"
   },
   {
     "repo": "cloud-hypervisor/cloud-hypervisor",
     "full_name": "cloud-hypervisor/cloud-hypervisor",
     "description": "A Virtual Machine Monitor for modern Cloud workloads. Features include CPU, memory and device hotplug, support for running Windows and Linux guests, device offload with vhost-user and a minimal compact footprint. Written in Rust with a strong focus on security.",
     "language": "Rust",
-    "stargazers_count": 6063,
-    "forks_count": 732,
+    "stargazers_count": 6069,
+    "forks_count": 733,
     "stars_in_period": 11,
     "url": "https://github.com/cloud-hypervisor/cloud-hypervisor",
     "html_url": "https://github.com/cloud-hypervisor/cloud-hypervisor"
   },
   {
-    "repo": "EFForg/rayhunter",
-    "full_name": "EFForg/rayhunter",
-    "description": "Rust tool to detect cell site simulators on an orbic mobile hotspot",
+    "repo": "rivet-dev/rivet",
+    "full_name": "rivet-dev/rivet",
+    "description": "Rivet Actors are the primitive for stateful workloads. Built for AI agents, collaborative apps, and durable execution.",
     "language": "Rust",
-    "stargazers_count": 5461,
-    "forks_count": 452,
-    "stars_in_period": 10,
-    "url": "https://github.com/EFForg/rayhunter",
-    "html_url": "https://github.com/EFForg/rayhunter"
+    "stargazers_count": 5949,
+    "forks_count": 211,
+    "stars_in_period": 116,
+    "url": "https://github.com/rivet-dev/rivet",
+    "html_url": "https://github.com/rivet-dev/rivet"
+  },
+  {
+    "repo": "jdx/mise",
+    "full_name": "jdx/mise",
+    "description": "dev tools, env vars, task runner",
+    "language": "Rust",
+    "stargazers_count": 32153,
+    "forks_count": 1340,
+    "stars_in_period": 174,
+    "url": "https://github.com/jdx/mise",
+    "html_url": "https://github.com/jdx/mise"
   },
   {
     "repo": "GCWing/BitFun",
     "full_name": "GCWing/BitFun",
     "description": "BitFun combines a high-performance agent runtime written in Rust with a polished desktop application. It pairs the depth of a Code Agent with open, general-purpose capabilities for work beyond software development.",
     "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 1583,
-=======
-    "stargazers_count": 1588,
->>>>>>> Stashed changes
-    "forks_count": 178,
-    "stars_in_period": 70,
+    "stargazers_count": 1604,
+    "forks_count": 179,
+    "stars_in_period": 51,
     "url": "https://github.com/GCWing/BitFun",
     "html_url": "https://github.com/GCWing/BitFun"
   },
   {
-    "repo": "vercel-labs/agent-browser",
-    "full_name": "vercel-labs/agent-browser",
-    "description": "Browser automation CLI for AI agents",
+    "repo": "zed-industries/zed",
+    "full_name": "zed-industries/zed",
+    "description": "Code at the speed of thought \u2013 Zed is a high-performance, multiplayer code editor from the creators of Atom and Tree-sitter.",
     "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 40174,
-=======
-    "stargazers_count": 40175,
->>>>>>> Stashed changes
-    "forks_count": 2638,
-    "stars_in_period": 84,
-    "url": "https://github.com/vercel-labs/agent-browser",
-    "html_url": "https://github.com/vercel-labs/agent-browser"
+    "stargazers_count": 88268,
+    "forks_count": 9935,
+    "stars_in_period": 68,
+    "url": "https://github.com/zed-industries/zed",
+    "html_url": "https://github.com/zed-industries/zed"
   },
   {
-    "repo": "uutils/coreutils",
-    "full_name": "uutils/coreutils",
-    "description": "Cross-platform Rust rewrite of the GNU coreutils",
+    "repo": "iii-hq/iii",
+    "full_name": "iii-hq/iii",
+    "description": "Effortlessly compose, extend, and observe every service in real-time for the first time ever.",
     "language": "Rust",
-    "stargazers_count": 23893,
-    "forks_count": 1982,
-    "stars_in_period": 15,
-    "url": "https://github.com/uutils/coreutils",
-    "html_url": "https://github.com/uutils/coreutils"
+    "stargazers_count": 18574,
+    "forks_count": 1245,
+    "stars_in_period": 10,
+    "url": "https://github.com/iii-hq/iii",
+    "html_url": "https://github.com/iii-hq/iii"
+  },
+  {
+    "repo": "dmtrKovalenko/fff",
+    "full_name": "dmtrKovalenko/fff",
+    "description": "The fastest and the most accurate file search SDK for AI agents, Neovim, Rust, C, Python, Bun and NodeJS",
+    "language": "Rust",
+    "stargazers_count": 9909,
+    "forks_count": 406,
+    "stars_in_period": 8,
+    "url": "https://github.com/dmtrKovalenko/fff",
+    "html_url": "https://github.com/dmtrKovalenko/fff"
+  },
+  {
+    "repo": "farion1231/cc-switch",
+    "full_name": "farion1231/cc-switch",
+    "description": "A cross-platform desktop All-in-One assistant for Claude Code, Codex, OpenCode, OpenClaw, Grok Build & Hermes Agent. Only official website: ccswitch.io",
+    "language": "Rust",
+    "stargazers_count": 125660,
+    "forks_count": 8552,
+    "stars_in_period": 267,
+    "url": "https://github.com/farion1231/cc-switch",
+    "html_url": "https://github.com/farion1231/cc-switch"
+  },
+  {
+    "repo": "swc-project/swc",
+    "full_name": "swc-project/swc",
+    "description": "Rust-based platform for the Web",
+    "language": "Rust",
+    "stargazers_count": 34173,
+    "forks_count": 1535,
+    "stars_in_period": 1,
+    "url": "https://github.com/swc-project/swc",
+    "html_url": "https://github.com/swc-project/swc"
+  },
+  {
+    "repo": "rustdesk/rustdesk",
+    "full_name": "rustdesk/rustdesk",
+    "description": "An open-source remote desktop application designed for self-hosting, as an alternative to TeamViewer.",
+    "language": "Rust",
+    "stargazers_count": 119898,
+    "forks_count": 18347,
+    "stars_in_period": 71,
+    "url": "https://github.com/rustdesk/rustdesk",
+    "html_url": "https://github.com/rustdesk/rustdesk"
+  },
+  {
+    "repo": "rtk-ai/rtk",
+    "full_name": "rtk-ai/rtk",
+    "description": "CLI proxy that reduces LLM token consumption by 60-90% on common dev commands. Single Rust binary, zero dependencies",
+    "language": "Rust",
+    "stargazers_count": 75242,
+    "forks_count": 4735,
+    "stars_in_period": 118,
+    "url": "https://github.com/rtk-ai/rtk",
+    "html_url": "https://github.com/rtk-ai/rtk"
+  },
+  {
+    "repo": "claration/Impactor",
+    "full_name": "claration/Impactor",
+    "description": "Cross-platform & feature rich iOS/iPadOS/tvOS sideloading application.",
+    "language": "Rust",
+    "stargazers_count": 2859,
+    "forks_count": 172,
+    "stars_in_period": 7,
+    "url": "https://github.com/claration/Impactor",
+    "html_url": "https://github.com/claration/Impactor"
+  },
+  {
+    "repo": "ClementTsang/bottom",
+    "full_name": "ClementTsang/bottom",
+    "description": "Yet another cross-platform graphical process/system monitor.",
+    "language": "Rust",
+    "stargazers_count": 13855,
+    "forks_count": 370,
+    "stars_in_period": 11,
+    "url": "https://github.com/ClementTsang/bottom",
+    "html_url": "https://github.com/ClementTsang/bottom"
   },
   {
     "repo": "LadybirdBrowser/ladybird",
     "full_name": "LadybirdBrowser/ladybird",
     "description": "Truly independent web browser",
     "language": "C++",
-    "stargazers_count": 64844,
-    "forks_count": 3096,
+    "stargazers_count": 64887,
+    "forks_count": 3098,
     "stars_in_period": 42,
     "url": "https://github.com/LadybirdBrowser/ladybird",
     "html_url": "https://github.com/LadybirdBrowser/ladybird"
+  },
+  {
+    "repo": "ocornut/imgui",
+    "full_name": "ocornut/imgui",
+    "description": "Dear ImGui: Bloat-free Graphical User interface for C++ with minimal dependencies",
+    "language": "C++",
+    "stargazers_count": 75570,
+    "forks_count": 11995,
+    "stars_in_period": 25,
+    "url": "https://github.com/ocornut/imgui",
+    "html_url": "https://github.com/ocornut/imgui"
   },
   {
     "repo": "google/leveldb",
@@ -984,115 +698,43 @@
     "description": "LevelDB is a fast key-value storage library written at Google that provides an ordered mapping from string keys to string values.",
     "language": "C++",
     "stargazers_count": 39304,
-    "forks_count": 8205,
+    "forks_count": 8206,
     "stars_in_period": 11,
     "url": "https://github.com/google/leveldb",
     "html_url": "https://github.com/google/leveldb"
+  },
+  {
+    "repo": "throneproj/Throne",
+    "full_name": "throneproj/Throne",
+    "description": "Cross-platform GUI proxy utility (Empowered by sing-box)",
+    "language": "C++",
+    "stargazers_count": 6688,
+    "forks_count": 373,
+    "stars_in_period": 18,
+    "url": "https://github.com/throneproj/Throne",
+    "html_url": "https://github.com/throneproj/Throne"
   },
   {
     "repo": "barry-ran/QtScrcpy",
     "full_name": "barry-ran/QtScrcpy",
     "description": "Android real-time display control software",
     "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 31229,
-    "forks_count": 3716,
-=======
-    "stargazers_count": 31232,
+    "stargazers_count": 31240,
     "forks_count": 3717,
->>>>>>> Stashed changes
     "stars_in_period": 174,
     "url": "https://github.com/barry-ran/QtScrcpy",
     "html_url": "https://github.com/barry-ran/QtScrcpy"
   },
   {
-    "repo": "google/perfetto",
-    "full_name": "google/perfetto",
-    "description": "Production-grade client-side tracing, profiling, and analysis for complex software systems.",
+    "repo": "ROCm/rocm-systems",
+    "full_name": "ROCm/rocm-systems",
+    "description": "super repo for rocm systems projects",
     "language": "C++",
-    "stargazers_count": 6320,
-    "forks_count": 854,
-    "stars_in_period": 4,
-    "url": "https://github.com/google/perfetto",
-    "html_url": "https://github.com/google/perfetto"
-  },
-  {
-    "repo": "lemonade-sdk/lemonade",
-    "full_name": "lemonade-sdk/lemonade",
-    "description": "Lemonade helps users discover and run local AI apps by serving optimized LLMs right from their own GPUs and NPUs. Join our discord:https://discord.gg/5xXzkMu8Zk",
-    "language": "C++",
-    "stargazers_count": 5286,
-    "forks_count": 452,
-    "stars_in_period": 14,
-    "url": "https://github.com/lemonade-sdk/lemonade",
-    "html_url": "https://github.com/lemonade-sdk/lemonade"
-  },
-  {
-    "repo": "dyang886/Game-Cheats-Manager",
-    "full_name": "dyang886/Game-Cheats-Manager",
-    "description": "Easily download and manage single-player game cheats for your convenience",
-    "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 13977,
-=======
-    "stargazers_count": 13979,
->>>>>>> Stashed changes
-    "forks_count": 476,
-    "stars_in_period": 29,
-    "url": "https://github.com/dyang886/Game-Cheats-Manager",
-    "html_url": "https://github.com/dyang886/Game-Cheats-Manager"
-  },
-  {
-    "repo": "aseprite/aseprite",
-    "full_name": "aseprite/aseprite",
-    "description": "Animated sprite editor & pixel art tool (Windows, macOS, Linux)",
-    "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 38589,
-=======
-    "stargazers_count": 38591,
->>>>>>> Stashed changes
-    "forks_count": 8601,
-    "stars_in_period": 24,
-    "url": "https://github.com/aseprite/aseprite",
-    "html_url": "https://github.com/aseprite/aseprite"
-  },
-  {
-    "repo": "microsoft/foundry-local",
-    "full_name": "microsoft/foundry-local",
-    "description": "",
-    "language": "C++",
-    "stargazers_count": 2497,
-    "forks_count": 358,
-    "stars_in_period": 1,
-    "url": "https://github.com/microsoft/foundry-local",
-    "html_url": "https://github.com/microsoft/foundry-local"
-  },
-  {
-    "repo": "google/googletest",
-    "full_name": "google/googletest",
-    "description": "GoogleTest - Google Testing and Mocking Framework",
-    "language": "C++",
-    "stargazers_count": 38910,
-    "forks_count": 10839,
-    "stars_in_period": 5,
-    "url": "https://github.com/google/googletest",
-    "html_url": "https://github.com/google/googletest"
-  },
-  {
-    "repo": "cloudflare/workerd",
-    "full_name": "cloudflare/workerd",
-    "description": "The JavaScript / Wasm runtime that powers Cloudflare Workers",
-    "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 8531,
-=======
-    "stargazers_count": 8532,
->>>>>>> Stashed changes
-    "forks_count": 694,
-    "stars_in_period": 15,
-    "url": "https://github.com/cloudflare/workerd",
-    "html_url": "https://github.com/cloudflare/workerd"
+    "stargazers_count": 454,
+    "forks_count": 337,
+    "stars_in_period": 0,
+    "url": "https://github.com/ROCm/rocm-systems",
+    "html_url": "https://github.com/ROCm/rocm-systems"
   },
   {
     "repo": "openvinotoolkit/openvino",
@@ -1100,418 +742,414 @@
     "description": "OpenVINO\u2122 is an open source toolkit for optimizing and deploying AI inference",
     "language": "C++",
     "stargazers_count": 10619,
-    "forks_count": 3307,
+    "forks_count": 3308,
     "stars_in_period": 6,
     "url": "https://github.com/openvinotoolkit/openvino",
     "html_url": "https://github.com/openvinotoolkit/openvino"
   },
   {
-    "repo": "deskflow/deskflow",
-    "full_name": "deskflow/deskflow",
-    "description": "Share a single keyboard and mouse between multiple computers.",
+    "repo": "wolfpld/tracy",
+    "full_name": "wolfpld/tracy",
+    "description": "Frame profiler",
     "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 27919,
-=======
-    "stargazers_count": 27920,
->>>>>>> Stashed changes
-    "forks_count": 4765,
-    "stars_in_period": 23,
-    "url": "https://github.com/deskflow/deskflow",
-    "html_url": "https://github.com/deskflow/deskflow"
-  },
-  {
-    "repo": "daijro/camoufox",
-    "full_name": "daijro/camoufox",
-    "description": "\ud83e\udd8a Anti-detect browser",
-    "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 10913,
-=======
-    "stargazers_count": 10914,
->>>>>>> Stashed changes
-    "forks_count": 928,
-    "stars_in_period": 40,
-    "url": "https://github.com/daijro/camoufox",
-    "html_url": "https://github.com/daijro/camoufox"
-  },
-  {
-    "repo": "tenstorrent/tt-metal",
-    "full_name": "tenstorrent/tt-metal",
-    "description": "\ud83e\udd18 TT-NN operator library, and TT-Metalium low level kernel programming model.",
-    "language": "C++",
-    "stargazers_count": 1617,
-<<<<<<< Updated upstream
-    "forks_count": 572,
-=======
-    "forks_count": 573,
->>>>>>> Stashed changes
-    "stars_in_period": 1,
-    "url": "https://github.com/tenstorrent/tt-metal",
-    "html_url": "https://github.com/tenstorrent/tt-metal"
-  },
-  {
-    "repo": "hyprwm/Hyprland",
-    "full_name": "hyprwm/Hyprland",
-    "description": "Hyprland is an independent, highly customizable, dynamic tiling Wayland compositor that doesn't sacrifice on its looks.",
-    "language": "C++",
-    "stargazers_count": 37763,
-    "forks_count": 1919,
-    "stars_in_period": 19,
-    "url": "https://github.com/hyprwm/Hyprland",
-    "html_url": "https://github.com/hyprwm/Hyprland"
-  },
-  {
-    "repo": "tensorflow/tensorflow",
-    "full_name": "tensorflow/tensorflow",
-    "description": "An Open Source Machine Learning Framework for Everyone",
-    "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 196915,
-    "forks_count": 75922,
-=======
-    "stargazers_count": 196916,
-    "forks_count": 75923,
->>>>>>> Stashed changes
-    "stars_in_period": 21,
-    "url": "https://github.com/tensorflow/tensorflow",
-    "html_url": "https://github.com/tensorflow/tensorflow"
-  },
-  {
-    "repo": "official-stockfish/Stockfish",
-    "full_name": "official-stockfish/Stockfish",
-    "description": "A free and strong UCI chess engine",
-    "language": "C++",
-    "stargazers_count": 16259,
-    "forks_count": 2973,
+    "stargazers_count": 16552,
+    "forks_count": 1211,
     "stars_in_period": 7,
-    "url": "https://github.com/official-stockfish/Stockfish",
-    "html_url": "https://github.com/official-stockfish/Stockfish"
+    "url": "https://github.com/wolfpld/tracy",
+    "html_url": "https://github.com/wolfpld/tracy"
   },
   {
-    "repo": "k2-fsa/sherpa-onnx",
-    "full_name": "k2-fsa/sherpa-onnx",
-    "description": "Speech-to-text, text-to-speech, speaker diarization, speech enhancement, source separation, and VAD using next-gen Kaldi with onnxruntime without Internet connection. Support embedded systems, Android, iOS, HarmonyOS, Raspberry Pi, RISC-V, RK NPU, Axera NPU, Ascend NPU, x86_64 servers, websocket server/client, support 12 programming languages",
+    "repo": "microsoft/WSL",
+    "full_name": "microsoft/WSL",
+    "description": "Windows Subsystem for Linux",
     "language": "C++",
-    "stargazers_count": 14036,
-    "forks_count": 1614,
-    "stars_in_period": 15,
-    "url": "https://github.com/k2-fsa/sherpa-onnx",
-    "html_url": "https://github.com/k2-fsa/sherpa-onnx"
+    "stargazers_count": 33342,
+    "forks_count": 1797,
+    "stars_in_period": 14,
+    "url": "https://github.com/microsoft/WSL",
+    "html_url": "https://github.com/microsoft/WSL"
   },
   {
-    "repo": "78/xiaozhi-esp32",
-    "full_name": "78/xiaozhi-esp32",
-    "description": "An MCP-based chatbot | \u4e00\u4e2a\u57fa\u4e8eMCP\u7684\u804a\u5929\u673a\u5668\u4eba",
+    "repo": "MrNeRF/LichtFeld-Studio",
+    "full_name": "MrNeRF/LichtFeld-Studio",
+    "description": "Train, inspect, edit, automate, and export 3D Gaussian Splatting scenes from a single native application.",
     "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 28736,
-=======
-    "stargazers_count": 28737,
->>>>>>> Stashed changes
-    "forks_count": 6556,
-    "stars_in_period": 31,
-    "url": "https://github.com/78/xiaozhi-esp32",
-    "html_url": "https://github.com/78/xiaozhi-esp32"
-  },
-  {
-    "repo": "LizardByte/Sunshine",
-    "full_name": "LizardByte/Sunshine",
-    "description": "Self-hosted game stream host for Moonlight.",
-    "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 39962,
-=======
-    "stargazers_count": 39966,
->>>>>>> Stashed changes
-    "forks_count": 2006,
-    "stars_in_period": 32,
-    "url": "https://github.com/LizardByte/Sunshine",
-    "html_url": "https://github.com/LizardByte/Sunshine"
+    "stargazers_count": 3494,
+    "forks_count": 421,
+    "stars_in_period": 5,
+    "url": "https://github.com/MrNeRF/LichtFeld-Studio",
+    "html_url": "https://github.com/MrNeRF/LichtFeld-Studio"
   },
   {
     "repo": "nlohmann/json",
     "full_name": "nlohmann/json",
     "description": "JSON for Modern C++",
     "language": "C++",
-    "stargazers_count": 50322,
-    "forks_count": 7458,
+    "stargazers_count": 50325,
+    "forks_count": 7457,
     "stars_in_period": 11,
     "url": "https://github.com/nlohmann/json",
     "html_url": "https://github.com/nlohmann/json"
+  },
+  {
+    "repo": "electron/electron",
+    "full_name": "electron/electron",
+    "description": "Build cross-platform desktop apps with JavaScript, HTML, and CSS",
+    "language": "C++",
+    "stargazers_count": 122384,
+    "forks_count": 17392,
+    "stars_in_period": 6,
+    "url": "https://github.com/electron/electron",
+    "html_url": "https://github.com/electron/electron"
+  },
+  {
+    "repo": "BruceDevices/firmware",
+    "full_name": "BruceDevices/firmware",
+    "description": "Predatory ESP32 Firmware",
+    "language": "C++",
+    "stargazers_count": 6373,
+    "forks_count": 2121,
+    "stars_in_period": 14,
+    "url": "https://github.com/BruceDevices/firmware",
+    "html_url": "https://github.com/BruceDevices/firmware"
+  },
+  {
+    "repo": "microsoft/onnxruntime",
+    "full_name": "microsoft/onnxruntime",
+    "description": "ONNX Runtime: cross-platform, high performance ML inferencing and training accelerator",
+    "language": "C++",
+    "stargazers_count": 21304,
+    "forks_count": 4104,
+    "stars_in_period": 3,
+    "url": "https://github.com/microsoft/onnxruntime",
+    "html_url": "https://github.com/microsoft/onnxruntime"
+  },
+  {
+    "repo": "alibaba/MNN",
+    "full_name": "alibaba/MNN",
+    "description": "MNN: A blazing-fast, lightweight inference engine battle-tested by Alibaba, powering high-performance on-device LLMs and Edge AI.",
+    "language": "C++",
+    "stargazers_count": 15837,
+    "forks_count": 2398,
+    "stars_in_period": 9,
+    "url": "https://github.com/alibaba/MNN",
+    "html_url": "https://github.com/alibaba/MNN"
+  },
+  {
+    "repo": "protocolbuffers/protobuf",
+    "full_name": "protocolbuffers/protobuf",
+    "description": "Protocol Buffers - Google's data interchange format",
+    "language": "C++",
+    "stargazers_count": 71700,
+    "forks_count": 16210,
+    "stars_in_period": 2,
+    "url": "https://github.com/protocolbuffers/protobuf",
+    "html_url": "https://github.com/protocolbuffers/protobuf"
+  },
+  {
+    "repo": "notepad-plus-plus/notepad-plus-plus",
+    "full_name": "notepad-plus-plus/notepad-plus-plus",
+    "description": "Notepad++ official repository",
+    "language": "C++",
+    "stargazers_count": 28936,
+    "forks_count": 5317,
+    "stars_in_period": 11,
+    "url": "https://github.com/notepad-plus-plus/notepad-plus-plus",
+    "html_url": "https://github.com/notepad-plus-plus/notepad-plus-plus"
+  },
+  {
+    "repo": "google-ai-edge/LiteRT",
+    "full_name": "google-ai-edge/LiteRT",
+    "description": "LiteRT, successor to TensorFlow Lite. is Google's On-device framework for high-performance ML & GenAI deployment on edge platforms, via efficient conversion, runtime, and optimization",
+    "language": "C++",
+    "stargazers_count": 3270,
+    "forks_count": 415,
+    "stars_in_period": 5,
+    "url": "https://github.com/google-ai-edge/LiteRT",
+    "html_url": "https://github.com/google-ai-edge/LiteRT"
   },
   {
     "repo": "zhaoxuya520/reverse-skill",
     "full_name": "zhaoxuya520/reverse-skill",
     "description": "Reverse Engineering / Authorized Penetration Testing / Security Research Skill Router Pack AI-powered routing + On-demand toolchain bootstrapping + Self-evolving knowledge base Supports Claude Code, Kiro, Cursor, Cline, and other AI coding clients \u9006\u5411/\u6e17\u900f/\u5b89\u5168\u6280\u80fd\u8def\u7531\u5305 - AI \u81ea\u52a8\u8def\u7531 + \u6309\u9700\u81ea\u4e3e\u5de5\u5177\u94fe + \u81ea\u52a8\u8fdb\u5316\u7ecf\u9a8c\u5e93 | \u652f\u6301 Claude Code / Kiro / Cursor / Cline \u7b49\u4ee3\u7801 AI \u5ba2\u6237\u7aef",
     "language": "PowerShell",
-<<<<<<< Updated upstream
-    "stargazers_count": 20625,
-    "forks_count": 2844,
-=======
-    "stargazers_count": 20642,
-    "forks_count": 2848,
->>>>>>> Stashed changes
+    "stargazers_count": 20983,
+    "forks_count": 2889,
     "stars_in_period": 10400,
     "url": "https://github.com/zhaoxuya520/reverse-skill",
     "html_url": "https://github.com/zhaoxuya520/reverse-skill"
-  },
-  {
-    "repo": "microsoft/AI-For-Beginners",
-    "full_name": "microsoft/AI-For-Beginners",
-    "description": "12 Weeks, 24 Lessons, AI for All!",
-    "language": "Jupyter Notebook",
-<<<<<<< Updated upstream
-    "stargazers_count": 63271,
-    "forks_count": 12260,
-=======
-    "stargazers_count": 63279,
-    "forks_count": 12261,
->>>>>>> Stashed changes
-    "stars_in_period": 8224,
-    "url": "https://github.com/microsoft/AI-For-Beginners",
-    "html_url": "https://github.com/microsoft/AI-For-Beginners"
   },
   {
     "repo": "TencentCloud/TencentDB-Agent-Memory",
     "full_name": "TencentCloud/TencentDB-Agent-Memory",
     "description": "TencentDB Agent Memory is a team-level memory hub for AI Agents \u2014 turning conversations, docs, and code into four reusable memory assets (Chat Memory, Skill, LLM-Wiki, Code-Graph) that are governed, shared, and equipped across agents and frameworks.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 17606,
-    "forks_count": 1579,
-=======
-    "stargazers_count": 17628,
-    "forks_count": 1582,
->>>>>>> Stashed changes
+    "stargazers_count": 18046,
+    "forks_count": 1618,
     "stars_in_period": 7501,
     "url": "https://github.com/TencentCloud/TencentDB-Agent-Memory",
     "html_url": "https://github.com/TencentCloud/TencentDB-Agent-Memory"
-  },
-  {
-    "repo": "usekaneo/kaneo",
-    "full_name": "usekaneo/kaneo",
-    "description": "\ud83c\udfaf All you need. Nothing you don't. Open source project management that works for you, not against you.",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 7639,
-=======
-    "stargazers_count": 7641,
->>>>>>> Stashed changes
-    "forks_count": 611,
-    "stars_in_period": 2925,
-    "url": "https://github.com/usekaneo/kaneo",
-    "html_url": "https://github.com/usekaneo/kaneo"
   },
   {
     "repo": "lyogavin/airllm",
     "full_name": "lyogavin/airllm",
     "description": "AirLLM 70B inference with single 4GB GPU",
     "language": "Jupyter Notebook",
-<<<<<<< Updated upstream
-    "stargazers_count": 29949,
-=======
-    "stargazers_count": 29955,
->>>>>>> Stashed changes
-    "forks_count": 3192,
+    "stargazers_count": 30075,
+    "forks_count": 3198,
     "stars_in_period": 5521,
     "url": "https://github.com/lyogavin/airllm",
     "html_url": "https://github.com/lyogavin/airllm"
+  },
+  {
+    "repo": "microsoft/AI-For-Beginners",
+    "full_name": "microsoft/AI-For-Beginners",
+    "description": "12 Weeks, 24 Lessons, AI for All!",
+    "language": "Jupyter Notebook",
+    "stargazers_count": 63470,
+    "forks_count": 12298,
+    "stars_in_period": 8224,
+    "url": "https://github.com/microsoft/AI-For-Beginners",
+    "html_url": "https://github.com/microsoft/AI-For-Beginners"
   },
   {
     "repo": "esengine/DeepSeek-Reasonix",
     "full_name": "esengine/DeepSeek-Reasonix",
     "description": "DeepSeek-native AI coding agent for your terminal. Engineered around prefix-cache stability \u2014 leave it running.",
     "language": "Go",
-<<<<<<< Updated upstream
-    "stargazers_count": 32931,
-    "forks_count": 2124,
-=======
-    "stargazers_count": 32936,
-    "forks_count": 2125,
->>>>>>> Stashed changes
+    "stargazers_count": 33043,
+    "forks_count": 2134,
     "stars_in_period": 4739,
     "url": "https://github.com/esengine/DeepSeek-Reasonix",
     "html_url": "https://github.com/esengine/DeepSeek-Reasonix"
+  },
+  {
+    "repo": "usekaneo/kaneo",
+    "full_name": "usekaneo/kaneo",
+    "description": "\ud83c\udfaf All you need. Nothing you don't. Open source project management that works for you, not against you.",
+    "language": "TypeScript",
+    "stargazers_count": 7685,
+    "forks_count": 616,
+    "stars_in_period": 2925,
+    "url": "https://github.com/usekaneo/kaneo",
+    "html_url": "https://github.com/usekaneo/kaneo"
   },
   {
     "repo": "virgiliojr94/book-to-skill",
     "full_name": "virgiliojr94/book-to-skill",
     "description": "Turn any technical book PDF into a Claude Code skill \u2014 ready to study, reference, and use while you work.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 18408,
-    "forks_count": 1978,
-=======
-    "stargazers_count": 18424,
-    "forks_count": 1981,
->>>>>>> Stashed changes
+    "stargazers_count": 18709,
+    "forks_count": 2015,
     "stars_in_period": 3957,
     "url": "https://github.com/virgiliojr94/book-to-skill",
     "html_url": "https://github.com/virgiliojr94/book-to-skill"
   },
   {
-    "repo": "block/buzz",
-    "full_name": "block/buzz",
-    "description": "A hive mind communication platform",
-    "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 25034,
-    "forks_count": 2920,
-=======
-    "stargazers_count": 25043,
-    "forks_count": 2921,
->>>>>>> Stashed changes
-    "stars_in_period": 5746,
-    "url": "https://github.com/block/buzz",
-    "html_url": "https://github.com/block/buzz"
-  },
-  {
-    "repo": "paperswithbacktest/awesome-systematic-trading",
-    "full_name": "paperswithbacktest/awesome-systematic-trading",
-    "description": "A curated list of awesome libraries, packages, strategies, books, blogs, tutorials for systematic trading.",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 12972,
-    "forks_count": 1575,
-=======
-    "stargazers_count": 12977,
-    "forks_count": 1577,
->>>>>>> Stashed changes
-    "stars_in_period": 1433,
-    "url": "https://github.com/paperswithbacktest/awesome-systematic-trading",
-    "html_url": "https://github.com/paperswithbacktest/awesome-systematic-trading"
+    "repo": "iv-org/invidious",
+    "full_name": "iv-org/invidious",
+    "description": "Invidious is an alternative front-end to YouTube",
+    "language": "Crystal",
+    "stargazers_count": 22453,
+    "forks_count": 2508,
+    "stars_in_period": 1225,
+    "url": "https://github.com/iv-org/invidious",
+    "html_url": "https://github.com/iv-org/invidious"
   },
   {
     "repo": "different-ai/openwork",
     "full_name": "different-ai/openwork",
     "description": "The open-source alternative to Claude Cowork (powered by opencode)",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 21478,
-=======
-    "stargazers_count": 21487,
->>>>>>> Stashed changes
-    "forks_count": 2103,
+    "stargazers_count": 21538,
+    "forks_count": 2110,
     "stars_in_period": 2367,
     "url": "https://github.com/different-ai/openwork",
     "html_url": "https://github.com/different-ai/openwork"
-  },
-  {
-    "repo": "antirez/ds4",
-    "full_name": "antirez/ds4",
-    "description": "DeepSeek 4 Flash and PRO local inference engine for Metal, CUDA and ROCm",
-    "language": "C",
-<<<<<<< Updated upstream
-    "stargazers_count": 20902,
-=======
-    "stargazers_count": 20904,
->>>>>>> Stashed changes
-    "forks_count": 1867,
-    "stars_in_period": 1341,
-    "url": "https://github.com/antirez/ds4",
-    "html_url": "https://github.com/antirez/ds4"
-  },
-  {
-    "repo": "DataExpert-io/data-engineer-handbook",
-    "full_name": "DataExpert-io/data-engineer-handbook",
-    "description": "This is a repo with links to everything you'd ever want to learn about data engineering",
-    "language": "Jupyter Notebook",
-<<<<<<< Updated upstream
-    "stargazers_count": 43388,
-    "forks_count": 8960,
-=======
-    "stargazers_count": 43389,
-    "forks_count": 8961,
->>>>>>> Stashed changes
-    "stars_in_period": 742,
-    "url": "https://github.com/DataExpert-io/data-engineer-handbook",
-    "html_url": "https://github.com/DataExpert-io/data-engineer-handbook"
   },
   {
     "repo": "unclebob/swarm-forge",
     "full_name": "unclebob/swarm-forge",
     "description": "A simple tool for coordinating several AI agents.",
     "language": "Clojure",
-<<<<<<< Updated upstream
-    "stargazers_count": 1870,
-=======
-    "stargazers_count": 1876,
->>>>>>> Stashed changes
-    "forks_count": 203,
+    "stargazers_count": 1954,
+    "forks_count": 207,
     "stars_in_period": 273,
     "url": "https://github.com/unclebob/swarm-forge",
     "html_url": "https://github.com/unclebob/swarm-forge"
+  },
+  {
+    "repo": "google/skills",
+    "full_name": "google/skills",
+    "description": "Agent Skills for Google products and technologies",
+    "language": "Python",
+    "stargazers_count": 16531,
+    "forks_count": 1305,
+    "stars_in_period": 718,
+    "url": "https://github.com/google/skills",
+    "html_url": "https://github.com/google/skills"
+  },
+  {
+    "repo": "antirez/ds4",
+    "full_name": "antirez/ds4",
+    "description": "DeepSeek 4 Flash and PRO local inference engine for Metal, CUDA and ROCm",
+    "language": "C",
+    "stargazers_count": 20945,
+    "forks_count": 1874,
+    "stars_in_period": 1341,
+    "url": "https://github.com/antirez/ds4",
+    "html_url": "https://github.com/antirez/ds4"
+  },
+  {
+    "repo": "Comfy-Org/ComfyUI",
+    "full_name": "Comfy-Org/ComfyUI",
+    "description": "The most powerful and modular diffusion model GUI, api and backend with a graph/nodes interface.",
+    "language": "Python",
+    "stargazers_count": 124808,
+    "forks_count": 14796,
+    "stars_in_period": 1682,
+    "url": "https://github.com/Comfy-Org/ComfyUI",
+    "html_url": "https://github.com/Comfy-Org/ComfyUI"
+  },
+  {
+    "repo": "DataExpert-io/data-engineer-handbook",
+    "full_name": "DataExpert-io/data-engineer-handbook",
+    "description": "This is a repo with links to everything you'd ever want to learn about data engineering",
+    "language": "Jupyter Notebook",
+    "stargazers_count": 43431,
+    "forks_count": 8992,
+    "stars_in_period": 742,
+    "url": "https://github.com/DataExpert-io/data-engineer-handbook",
+    "html_url": "https://github.com/DataExpert-io/data-engineer-handbook"
+  },
+  {
+    "repo": "donnemartin/system-design-primer",
+    "full_name": "donnemartin/system-design-primer",
+    "description": "Learn how to design large-scale systems. Prep for the system design interview. Includes Anki flashcards.",
+    "language": "Python",
+    "stargazers_count": 362389,
+    "forks_count": 57719,
+    "stars_in_period": 2507,
+    "url": "https://github.com/donnemartin/system-design-primer",
+    "html_url": "https://github.com/donnemartin/system-design-primer"
   },
   {
     "repo": "embabel/embabel-agent",
     "full_name": "embabel/embabel-agent",
     "description": "Agent framework for the JVM. Pronounced Em-BAY-bel /\u025bm\u02c8be\u026ab\u0259l/",
     "language": "Kotlin",
-    "stargazers_count": 4016,
-    "forks_count": 398,
+    "stargazers_count": 4030,
+    "forks_count": 400,
     "stars_in_period": 176,
     "url": "https://github.com/embabel/embabel-agent",
     "html_url": "https://github.com/embabel/embabel-agent"
-  },
-  {
-    "repo": "ayghri/i-have-adhd",
-    "full_name": "ayghri/i-have-adhd",
-    "description": "A skill to stop your coding agent from burying the answer. ADHD-friendly output.",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 18202,
-=======
-    "stargazers_count": 18213,
->>>>>>> Stashed changes
-    "forks_count": 1060,
-    "stars_in_period": 3497,
-    "url": "https://github.com/ayghri/i-have-adhd",
-    "html_url": "https://github.com/ayghri/i-have-adhd"
-  },
-  {
-    "repo": "tailwindlabs/tailwindcss",
-    "full_name": "tailwindlabs/tailwindcss",
-    "description": "A utility-first CSS framework for rapid UI development.",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 97104,
-=======
-    "stargazers_count": 97105,
->>>>>>> Stashed changes
-    "forks_count": 5568,
-    "stars_in_period": 997,
-    "url": "https://github.com/tailwindlabs/tailwindcss",
-    "html_url": "https://github.com/tailwindlabs/tailwindcss"
   },
   {
     "repo": "virgiliojr94/book-to-skill",
     "full_name": "virgiliojr94/book-to-skill",
     "description": "Turn any technical book PDF into a Claude Code skill \u2014 ready to study, reference, and use while you work.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 18408,
-    "forks_count": 1978,
-=======
-    "stargazers_count": 18424,
-    "forks_count": 1981,
->>>>>>> Stashed changes
+    "stargazers_count": 18709,
+    "forks_count": 2015,
     "stars_in_period": 3957,
     "url": "https://github.com/virgiliojr94/book-to-skill",
     "html_url": "https://github.com/virgiliojr94/book-to-skill"
+  },
+  {
+    "repo": "google/skills",
+    "full_name": "google/skills",
+    "description": "Agent Skills for Google products and technologies",
+    "language": "Python",
+    "stargazers_count": 16531,
+    "forks_count": 1305,
+    "stars_in_period": 718,
+    "url": "https://github.com/google/skills",
+    "html_url": "https://github.com/google/skills"
+  },
+  {
+    "repo": "Comfy-Org/ComfyUI",
+    "full_name": "Comfy-Org/ComfyUI",
+    "description": "The most powerful and modular diffusion model GUI, api and backend with a graph/nodes interface.",
+    "language": "Python",
+    "stargazers_count": 124808,
+    "forks_count": 14796,
+    "stars_in_period": 1682,
+    "url": "https://github.com/Comfy-Org/ComfyUI",
+    "html_url": "https://github.com/Comfy-Org/ComfyUI"
+  },
+  {
+    "repo": "donnemartin/system-design-primer",
+    "full_name": "donnemartin/system-design-primer",
+    "description": "Learn how to design large-scale systems. Prep for the system design interview. Includes Anki flashcards.",
+    "language": "Python",
+    "stargazers_count": 362389,
+    "forks_count": 57719,
+    "stars_in_period": 2507,
+    "url": "https://github.com/donnemartin/system-design-primer",
+    "html_url": "https://github.com/donnemartin/system-design-primer"
+  },
+  {
+    "repo": "livekit/agents",
+    "full_name": "livekit/agents",
+    "description": "A framework for building realtime voice AI agents \ud83e\udd16\ud83c\udf99\ufe0f\ud83d\udcf9",
+    "language": "Python",
+    "stargazers_count": 12749,
+    "forks_count": 3519,
+    "stars_in_period": 1149,
+    "url": "https://github.com/livekit/agents",
+    "html_url": "https://github.com/livekit/agents"
+  },
+  {
+    "repo": "goauthentik/authentik",
+    "full_name": "goauthentik/authentik",
+    "description": "The authentication glue you need.",
+    "language": "Python",
+    "stargazers_count": 23858,
+    "forks_count": 1827,
+    "stars_in_period": 843,
+    "url": "https://github.com/goauthentik/authentik",
+    "html_url": "https://github.com/goauthentik/authentik"
+  },
+  {
+    "repo": "vitali87/code-graph-rag",
+    "full_name": "vitali87/code-graph-rag",
+    "description": "The ultimate RAG for your monorepo. Query, understand, and edit multi-language codebases with the power of AI and knowledge graphs",
+    "language": "Python",
+    "stargazers_count": 2597,
+    "forks_count": 428,
+    "stars_in_period": 194,
+    "url": "https://github.com/vitali87/code-graph-rag",
+    "html_url": "https://github.com/vitali87/code-graph-rag"
+  },
+  {
+    "repo": "Significant-Gravitas/AutoGPT",
+    "full_name": "Significant-Gravitas/AutoGPT",
+    "description": "AutoGPT is the vision of accessible AI for everyone, to use and to build on. Our mission is to provide the tools, so that you can focus on what matters.",
+    "language": "Python",
+    "stargazers_count": 186436,
+    "forks_count": 46067,
+    "stars_in_period": 776,
+    "url": "https://github.com/Significant-Gravitas/AutoGPT",
+    "html_url": "https://github.com/Significant-Gravitas/AutoGPT"
+  },
+  {
+    "repo": "android/skills",
+    "full_name": "android/skills",
+    "description": "",
+    "language": "Python",
+    "stargazers_count": 6628,
+    "forks_count": 387,
+    "stars_in_period": 186,
+    "url": "https://github.com/android/skills",
+    "html_url": "https://github.com/android/skills"
   },
   {
     "repo": "paperswithbacktest/awesome-systematic-trading",
     "full_name": "paperswithbacktest/awesome-systematic-trading",
     "description": "A curated list of awesome libraries, packages, strategies, books, blogs, tutorials for systematic trading.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 12972,
-    "forks_count": 1575,
-=======
-    "stargazers_count": 12977,
-    "forks_count": 1577,
->>>>>>> Stashed changes
+    "stargazers_count": 13025,
+    "forks_count": 1584,
     "stars_in_period": 1433,
     "url": "https://github.com/paperswithbacktest/awesome-systematic-trading",
     "html_url": "https://github.com/paperswithbacktest/awesome-systematic-trading"
@@ -1521,237 +1159,85 @@
     "full_name": "ayghri/i-have-adhd",
     "description": "A skill to stop your coding agent from burying the answer. ADHD-friendly output.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 18202,
-=======
-    "stargazers_count": 18213,
->>>>>>> Stashed changes
-    "forks_count": 1060,
+    "stargazers_count": 18417,
+    "forks_count": 1071,
     "stars_in_period": 3497,
     "url": "https://github.com/ayghri/i-have-adhd",
     "html_url": "https://github.com/ayghri/i-have-adhd"
   },
   {
-    "repo": "donnemartin/system-design-primer",
-    "full_name": "donnemartin/system-design-primer",
-    "description": "Learn how to design large-scale systems. Prep for the system design interview. Includes Anki flashcards.",
+    "repo": "SuperClaude-Org/SuperClaude_Framework",
+    "full_name": "SuperClaude-Org/SuperClaude_Framework",
+    "description": "A configuration framework that enhances Claude Code with specialized commands, cognitive personas, and development methodologies.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 362293,
-=======
-    "stargazers_count": 362297,
->>>>>>> Stashed changes
-    "forks_count": 57716,
-    "stars_in_period": 2507,
-    "url": "https://github.com/donnemartin/system-design-primer",
-    "html_url": "https://github.com/donnemartin/system-design-primer"
-  },
-  {
-    "repo": "deepfakes/faceswap",
-    "full_name": "deepfakes/faceswap",
-    "description": "Deepfakes Software For All",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 57386,
-    "forks_count": 13502,
-=======
-    "stargazers_count": 57387,
-    "forks_count": 13503,
->>>>>>> Stashed changes
-    "stars_in_period": 559,
-    "url": "https://github.com/deepfakes/faceswap",
-    "html_url": "https://github.com/deepfakes/faceswap"
-  },
-  {
-    "repo": "Comfy-Org/ComfyUI",
-    "full_name": "Comfy-Org/ComfyUI",
-    "description": "The most powerful and modular diffusion model GUI, api and backend with a graph/nodes interface.",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 124690,
-    "forks_count": 14771,
-=======
-    "stargazers_count": 124698,
-    "forks_count": 14773,
->>>>>>> Stashed changes
-    "stars_in_period": 1682,
-    "url": "https://github.com/Comfy-Org/ComfyUI",
-    "html_url": "https://github.com/Comfy-Org/ComfyUI"
-  },
-  {
-    "repo": "livekit/agents",
-    "full_name": "livekit/agents",
-    "description": "A framework for building realtime voice AI agents \ud83e\udd16\ud83c\udf99\ufe0f\ud83d\udcf9",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 12731,
-=======
-    "stargazers_count": 12732,
->>>>>>> Stashed changes
-    "forks_count": 3519,
-    "stars_in_period": 1149,
-    "url": "https://github.com/livekit/agents",
-    "html_url": "https://github.com/livekit/agents"
-  },
-  {
-    "repo": "android/skills",
-    "full_name": "android/skills",
-    "description": "",
-    "language": "Python",
-    "stargazers_count": 6618,
-    "forks_count": 386,
-    "stars_in_period": 186,
-    "url": "https://github.com/android/skills",
-    "html_url": "https://github.com/android/skills"
-  },
-  {
-    "repo": "google/skills",
-    "full_name": "google/skills",
-    "description": "Agent Skills for Google products and technologies",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 16321,
-=======
-    "stargazers_count": 16331,
->>>>>>> Stashed changes
-    "forks_count": 1295,
-    "stars_in_period": 718,
-    "url": "https://github.com/google/skills",
-    "html_url": "https://github.com/google/skills"
-  },
-  {
-    "repo": "goauthentik/authentik",
-    "full_name": "goauthentik/authentik",
-    "description": "The authentication glue you need.",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 23672,
-    "forks_count": 1813,
-=======
-    "stargazers_count": 23676,
-    "forks_count": 1814,
->>>>>>> Stashed changes
-    "stars_in_period": 843,
-    "url": "https://github.com/goauthentik/authentik",
-    "html_url": "https://github.com/goauthentik/authentik"
+    "stargazers_count": 23801,
+    "forks_count": 2012,
+    "stars_in_period": 212,
+    "url": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+    "html_url": "https://github.com/SuperClaude-Org/SuperClaude_Framework"
   },
   {
     "repo": "huangruiteng/loopx",
     "full_name": "huangruiteng/loopx",
     "description": "Lightweight loop engineering state kernel for long-running AI agent teams. Agent-loop agnostic across Codex, Claude Code, and other coding agents, with durable goals, quota-aware auto-wake, executable todos, evidence logs, and verifiable handoffs.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 3440,
-=======
-    "stargazers_count": 3446,
->>>>>>> Stashed changes
-    "forks_count": 276,
+    "stargazers_count": 3538,
+    "forks_count": 283,
     "stars_in_period": 3154,
     "url": "https://github.com/huangruiteng/loopx",
     "html_url": "https://github.com/huangruiteng/loopx"
-  },
-  {
-    "repo": "vitali87/code-graph-rag",
-    "full_name": "vitali87/code-graph-rag",
-    "description": "The ultimate RAG for your monorepo. Query, understand, and edit multi-language codebases with the power of AI and knowledge graphs",
-    "language": "Python",
-    "stargazers_count": 2568,
-    "forks_count": 425,
-    "stars_in_period": 194,
-    "url": "https://github.com/vitali87/code-graph-rag",
-    "html_url": "https://github.com/vitali87/code-graph-rag"
-  },
-  {
-    "repo": "LibreTranslate/LibreTranslate",
-    "full_name": "LibreTranslate/LibreTranslate",
-    "description": "Free and Open Source Machine Translation API. Self-hosted, offline capable and easy to setup.",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 15928,
-    "forks_count": 1645,
-=======
-    "stargazers_count": 15929,
-    "forks_count": 1646,
->>>>>>> Stashed changes
-    "stars_in_period": 207,
-    "url": "https://github.com/LibreTranslate/LibreTranslate",
-    "html_url": "https://github.com/LibreTranslate/LibreTranslate"
-  },
-  {
-    "repo": "Zipstack/unstract",
-    "full_name": "Zipstack/unstract",
-    "description": "LLM-Driven Extraction of Unstructured Data \u2014 Built for API Deployments & ETL Pipeline Workflows",
-    "language": "Python",
-    "stargazers_count": 7127,
-    "forks_count": 699,
-    "stars_in_period": 91,
-    "url": "https://github.com/Zipstack/unstract",
-    "html_url": "https://github.com/Zipstack/unstract"
-  },
-  {
-    "repo": "abus-aikorea/voice-pro",
-    "full_name": "abus-aikorea/voice-pro",
-    "description": "Gradio WebUI for creators and developers, featuring key TTS (Edge-TTS, kokoro) and zero-shot Voice Cloning (E2 & F5-TTS, CosyVoice), with Whisper audio processing, YouTube download, Demucs vocal isolation, and multilingual translation.",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 12101,
-=======
-    "stargazers_count": 12103,
->>>>>>> Stashed changes
-    "forks_count": 1761,
-    "stars_in_period": 593,
-    "url": "https://github.com/abus-aikorea/voice-pro",
-    "html_url": "https://github.com/abus-aikorea/voice-pro"
-  },
-  {
-    "repo": "SimplifyJobs/Summer2027-Internships",
-    "full_name": "SimplifyJobs/Summer2027-Internships",
-    "description": "Summer 2026 software engineering, data science, AI, quant, product management, and hardware internship postings. Updated daily by Simplify and Pitt CSC.",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 46086,
-=======
-    "stargazers_count": 46087,
->>>>>>> Stashed changes
-    "forks_count": 3220,
-    "stars_in_period": 499,
-    "url": "https://github.com/SimplifyJobs/Summer2027-Internships",
-    "html_url": "https://github.com/SimplifyJobs/Summer2027-Internships"
-  },
-  {
-    "repo": "RVC-Project/Retrieval-based-Voice-Conversion-WebUI",
-    "full_name": "RVC-Project/Retrieval-based-Voice-Conversion-WebUI",
-    "description": "Easily train a good VC model with voice data <= 10 mins!",
-    "language": "Python",
-    "stargazers_count": 37211,
-    "forks_count": 5188,
-    "stars_in_period": 361,
-    "url": "https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI",
-    "html_url": "https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI"
   },
   {
     "repo": "Comfy-Org/workflow_templates",
     "full_name": "Comfy-Org/workflow_templates",
     "description": "ComfyUI template workflows",
     "language": "Python",
-    "stargazers_count": 743,
-    "forks_count": 162,
+    "stargazers_count": 746,
+    "forks_count": 163,
     "stars_in_period": 78,
     "url": "https://github.com/Comfy-Org/workflow_templates",
     "html_url": "https://github.com/Comfy-Org/workflow_templates"
+  },
+  {
+    "repo": "SimplifyJobs/Summer2027-Internships",
+    "full_name": "SimplifyJobs/Summer2027-Internships",
+    "description": "Summer 2026 software engineering, data science, AI, quant, product management, and hardware internship postings. Updated daily by Simplify and Pitt CSC.",
+    "language": "Python",
+    "stargazers_count": 46108,
+    "forks_count": 3220,
+    "stars_in_period": 499,
+    "url": "https://github.com/SimplifyJobs/Summer2027-Internships",
+    "html_url": "https://github.com/SimplifyJobs/Summer2027-Internships"
+  },
+  {
+    "repo": "razzant/ouroboros",
+    "full_name": "razzant/ouroboros",
+    "description": "Ouroboros \u2014 self-creating AI agent. Born Feb 16, 2026.",
+    "language": "Python",
+    "stargazers_count": 1006,
+    "forks_count": 580,
+    "stars_in_period": 162,
+    "url": "https://github.com/razzant/ouroboros",
+    "html_url": "https://github.com/razzant/ouroboros"
+  },
+  {
+    "repo": "abus-aikorea/voice-pro",
+    "full_name": "abus-aikorea/voice-pro",
+    "description": "Gradio WebUI for creators and developers, featuring key TTS (Edge-TTS, kokoro) and zero-shot Voice Cloning (E2 & F5-TTS, CosyVoice), with Whisper audio processing, YouTube download, Demucs vocal isolation, and multilingual translation.",
+    "language": "Python",
+    "stargazers_count": 12118,
+    "forks_count": 1763,
+    "stars_in_period": 593,
+    "url": "https://github.com/abus-aikorea/voice-pro",
+    "html_url": "https://github.com/abus-aikorea/voice-pro"
   },
   {
     "repo": "TencentCloud/TencentDB-Agent-Memory",
     "full_name": "TencentCloud/TencentDB-Agent-Memory",
     "description": "TencentDB Agent Memory is a team-level memory hub for AI Agents \u2014 turning conversations, docs, and code into four reusable memory assets (Chat Memory, Skill, LLM-Wiki, Code-Graph) that are governed, shared, and equipped across agents and frameworks.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 17606,
-    "forks_count": 1579,
-=======
-    "stargazers_count": 17628,
-    "forks_count": 1582,
->>>>>>> Stashed changes
+    "stargazers_count": 18046,
+    "forks_count": 1618,
     "stars_in_period": 7501,
     "url": "https://github.com/TencentCloud/TencentDB-Agent-Memory",
     "html_url": "https://github.com/TencentCloud/TencentDB-Agent-Memory"
@@ -1761,12 +1247,8 @@
     "full_name": "usekaneo/kaneo",
     "description": "\ud83c\udfaf All you need. Nothing you don't. Open source project management that works for you, not against you.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 7639,
-=======
-    "stargazers_count": 7641,
->>>>>>> Stashed changes
-    "forks_count": 611,
+    "stargazers_count": 7685,
+    "forks_count": 616,
     "stars_in_period": 2925,
     "url": "https://github.com/usekaneo/kaneo",
     "html_url": "https://github.com/usekaneo/kaneo"
@@ -1776,12 +1258,8 @@
     "full_name": "different-ai/openwork",
     "description": "The open-source alternative to Claude Cowork (powered by opencode)",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 21478,
-=======
-    "stargazers_count": 21487,
->>>>>>> Stashed changes
-    "forks_count": 2103,
+    "stargazers_count": 21538,
+    "forks_count": 2110,
     "stars_in_period": 2367,
     "url": "https://github.com/different-ai/openwork",
     "html_url": "https://github.com/different-ai/openwork"
@@ -1791,182 +1269,118 @@
     "full_name": "tailwindlabs/tailwindcss",
     "description": "A utility-first CSS framework for rapid UI development.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 97104,
-=======
-    "stargazers_count": 97105,
->>>>>>> Stashed changes
-    "forks_count": 5568,
+    "stargazers_count": 97130,
+    "forks_count": 5570,
     "stars_in_period": 997,
     "url": "https://github.com/tailwindlabs/tailwindcss",
     "html_url": "https://github.com/tailwindlabs/tailwindcss"
-  },
-  {
-    "repo": "Koenkk/zigbee2mqtt",
-    "full_name": "Koenkk/zigbee2mqtt",
-    "description": "Zigbee \ud83d\udc1d to MQTT bridge \ud83c\udf09, get rid of your proprietary Zigbee bridges \ud83d\udd28",
-    "language": "TypeScript",
-    "stargazers_count": 15477,
-    "forks_count": 1978,
-    "stars_in_period": 71,
-    "url": "https://github.com/Koenkk/zigbee2mqtt",
-    "html_url": "https://github.com/Koenkk/zigbee2mqtt"
-  },
-  {
-    "repo": "CherryHQ/cherry-studio",
-    "full_name": "CherryHQ/cherry-studio",
-    "description": "AI productivity studio with smart chat, autonomous agents, and 300+ assistants. Unified access to frontier LLMs",
-    "language": "TypeScript",
-    "stargazers_count": 50046,
-    "forks_count": 4737,
-    "stars_in_period": 887,
-    "url": "https://github.com/CherryHQ/cherry-studio",
-    "html_url": "https://github.com/CherryHQ/cherry-studio"
-  },
-  {
-    "repo": "vuejs/core",
-    "full_name": "vuejs/core",
-    "description": "\ud83d\udd96 Vue.js is a progressive, incrementally-adoptable JavaScript framework for building UI on the web.",
-    "language": "TypeScript",
-    "stargazers_count": 54159,
-    "forks_count": 9173,
-    "stars_in_period": 106,
-    "url": "https://github.com/vuejs/core",
-    "html_url": "https://github.com/vuejs/core"
-  },
-  {
-    "repo": "CyberTimon/RapidRAW",
-    "full_name": "CyberTimon/RapidRAW",
-    "description": "A beautiful, non-destructive, and GPU-accelerated RAW image editor built with performance in mind.",
-    "language": "TypeScript",
-    "stargazers_count": 9247,
-    "forks_count": 477,
-    "stars_in_period": 207,
-    "url": "https://github.com/CyberTimon/RapidRAW",
-    "html_url": "https://github.com/CyberTimon/RapidRAW"
-  },
-  {
-    "repo": "opengeos/GeoLibre",
-    "full_name": "opengeos/GeoLibre",
-    "description": "A lightweight, cloud-native GIS platform for visualizing, exploring, and analyzing geospatial data. It runs in the web browser, on the desktop, on mobile, and inside Jupyter notebooks.",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 5629,
-=======
-    "stargazers_count": 5637,
->>>>>>> Stashed changes
-    "forks_count": 563,
-    "stars_in_period": 937,
-    "url": "https://github.com/opengeos/GeoLibre",
-    "html_url": "https://github.com/opengeos/GeoLibre"
   },
   {
     "repo": "CodebuffAI/freebuff",
     "full_name": "CodebuffAI/freebuff",
     "description": "The free coding agent",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 8590,
-=======
-    "stargazers_count": 8594,
->>>>>>> Stashed changes
-    "forks_count": 1000,
+    "stargazers_count": 8636,
+    "forks_count": 1004,
     "stars_in_period": 461,
     "url": "https://github.com/CodebuffAI/freebuff",
     "html_url": "https://github.com/CodebuffAI/freebuff"
   },
   {
-    "repo": "mifi/lossless-cut",
-    "full_name": "mifi/lossless-cut",
-    "description": "The swiss army knife of lossless video/audio editing",
+    "repo": "vuejs/core",
+    "full_name": "vuejs/core",
+    "description": "\ud83d\udd96 Vue.js is a progressive, incrementally-adoptable JavaScript framework for building UI on the web.",
     "language": "TypeScript",
-    "stargazers_count": 42715,
-    "forks_count": 2110,
-    "stars_in_period": 216,
-    "url": "https://github.com/mifi/lossless-cut",
-    "html_url": "https://github.com/mifi/lossless-cut"
+    "stargazers_count": 54164,
+    "forks_count": 9175,
+    "stars_in_period": 106,
+    "url": "https://github.com/vuejs/core",
+    "html_url": "https://github.com/vuejs/core"
+  },
+  {
+    "repo": "CherryHQ/cherry-studio",
+    "full_name": "CherryHQ/cherry-studio",
+    "description": "AI productivity studio with smart chat, autonomous agents, and 300+ assistants. Unified access to frontier LLMs",
+    "language": "TypeScript",
+    "stargazers_count": 50084,
+    "forks_count": 4745,
+    "stars_in_period": 887,
+    "url": "https://github.com/CherryHQ/cherry-studio",
+    "html_url": "https://github.com/CherryHQ/cherry-studio"
+  },
+  {
+    "repo": "QwenLM/qwen-code",
+    "full_name": "QwenLM/qwen-code",
+    "description": "An open-source AI coding agent that lives in your terminal.",
+    "language": "TypeScript",
+    "stargazers_count": 26851,
+    "forks_count": 2815,
+    "stars_in_period": 387,
+    "url": "https://github.com/QwenLM/qwen-code",
+    "html_url": "https://github.com/QwenLM/qwen-code"
   },
   {
     "repo": "cypress-io/cypress",
     "full_name": "cypress-io/cypress",
     "description": "Fast, easy and reliable testing for anything that runs in a browser.",
     "language": "TypeScript",
-    "stargazers_count": 50934,
+    "stargazers_count": 50938,
     "forks_count": 3645,
     "stars_in_period": 306,
     "url": "https://github.com/cypress-io/cypress",
     "html_url": "https://github.com/cypress-io/cypress"
   },
   {
-    "repo": "diegosouzapw/OmniRoute",
-    "full_name": "diegosouzapw/OmniRoute",
-    "description": "Never stop coding. Free MIT AI gateway: one endpoint, 290+ providers (90+ free), 500+ models \u2014 Kimi, Claude, GPT, OpenAI, Gemini, GLM, DeepSeek, MiniMax. Works with Claude Code, Codex, Cursor, OpenCode, Cline & Copilot. Quota-aware auto-fallback, RTK+Caveman compression saves 15-95% tokens, MCP/A2A, Desktop/PWA. Built by 500+ contributors",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 42683,
-    "forks_count": 5683,
-=======
-    "stargazers_count": 42715,
-    "forks_count": 5689,
->>>>>>> Stashed changes
-    "stars_in_period": 6587,
-    "url": "https://github.com/diegosouzapw/OmniRoute",
-    "html_url": "https://github.com/diegosouzapw/OmniRoute"
-  },
-  {
     "repo": "pingdotgg/t3code",
     "full_name": "pingdotgg/t3code",
     "description": "",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 17275,
-    "forks_count": 3893,
-=======
-    "stargazers_count": 17278,
-    "forks_count": 3895,
->>>>>>> Stashed changes
+    "stargazers_count": 17346,
+    "forks_count": 3922,
     "stars_in_period": 1185,
     "url": "https://github.com/pingdotgg/t3code",
     "html_url": "https://github.com/pingdotgg/t3code"
-  },
-  {
-    "repo": "traycerai/traycer",
-    "full_name": "traycerai/traycer",
-    "description": "Traycer: Nerve Center for Agentic Coding",
-    "language": "TypeScript",
-    "stargazers_count": 1136,
-    "forks_count": 143,
-    "stars_in_period": 293,
-    "url": "https://github.com/traycerai/traycer",
-    "html_url": "https://github.com/traycerai/traycer"
   },
   {
     "repo": "can1357/oh-my-pi",
     "full_name": "can1357/oh-my-pi",
     "description": "\u2325 AI Coding agent for the terminal \u2014 hash-anchored edits, optimized tool harness, LSP, Python, browser, subagents, and more",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 22812,
-=======
-    "stargazers_count": 22820,
->>>>>>> Stashed changes
-    "forks_count": 2169,
+    "stargazers_count": 22921,
+    "forks_count": 2182,
     "stars_in_period": 1900,
     "url": "https://github.com/can1357/oh-my-pi",
     "html_url": "https://github.com/can1357/oh-my-pi"
+  },
+  {
+    "repo": "diegosouzapw/OmniRoute",
+    "full_name": "diegosouzapw/OmniRoute",
+    "description": "Never stop coding. Free MIT AI gateway: one endpoint, 290+ providers (90+ free), 500+ models \u2014 Kimi, Claude, GPT, OpenAI, Gemini, GLM, DeepSeek, MiniMax. Works with Claude Code, Codex, Cursor, OpenCode, Cline & Copilot. Quota-aware auto-fallback, RTK+Caveman compression saves 15-95% tokens, MCP/A2A, Desktop/PWA. Built by 500+ contributors",
+    "language": "TypeScript",
+    "stargazers_count": 43159,
+    "forks_count": 5763,
+    "stars_in_period": 6587,
+    "url": "https://github.com/diegosouzapw/OmniRoute",
+    "html_url": "https://github.com/diegosouzapw/OmniRoute"
+  },
+  {
+    "repo": "CyberTimon/RapidRAW",
+    "full_name": "CyberTimon/RapidRAW",
+    "description": "A beautiful, non-destructive, and GPU-accelerated RAW image editor built with performance in mind.",
+    "language": "TypeScript",
+    "stargazers_count": 9251,
+    "forks_count": 477,
+    "stars_in_period": 207,
+    "url": "https://github.com/CyberTimon/RapidRAW",
+    "html_url": "https://github.com/CyberTimon/RapidRAW"
   },
   {
     "repo": "block/buzz",
     "full_name": "block/buzz",
     "description": "A hive mind communication platform",
     "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 25034,
-    "forks_count": 2920,
-=======
-    "stargazers_count": 25043,
-    "forks_count": 2921,
->>>>>>> Stashed changes
+    "stargazers_count": 25222,
+    "forks_count": 2942,
     "stars_in_period": 5746,
     "url": "https://github.com/block/buzz",
     "html_url": "https://github.com/block/buzz"
@@ -1976,12 +1390,8 @@
     "full_name": "1jehuang/jcode",
     "description": "The most RAM efficient harness",
     "language": "Rust",
-    "stargazers_count": 16378,
-<<<<<<< Updated upstream
-    "forks_count": 1839,
-=======
-    "forks_count": 1840,
->>>>>>> Stashed changes
+    "stargazers_count": 16428,
+    "forks_count": 1847,
     "stars_in_period": 1880,
     "url": "https://github.com/1jehuang/jcode",
     "html_url": "https://github.com/1jehuang/jcode"
@@ -1991,528 +1401,439 @@
     "full_name": "raphamorim/rio",
     "description": "A hardware-accelerated GPU terminal emulator focusing to run in desktops and browsers.",
     "language": "Rust",
-    "stargazers_count": 7260,
-    "forks_count": 319,
+    "stargazers_count": 7270,
+    "forks_count": 321,
     "stars_in_period": 146,
     "url": "https://github.com/raphamorim/rio",
     "html_url": "https://github.com/raphamorim/rio"
-  },
-  {
-    "repo": "sharkdp/bat",
-    "full_name": "sharkdp/bat",
-    "description": "A cat(1) clone with wings.",
-    "language": "Rust",
-    "stargazers_count": 60137,
-    "forks_count": 1629,
-    "stars_in_period": 207,
-    "url": "https://github.com/sharkdp/bat",
-    "html_url": "https://github.com/sharkdp/bat"
-  },
-  {
-    "repo": "agavra/tuicr",
-    "full_name": "agavra/tuicr",
-    "description": "a code review TUI with vim keybindings",
-    "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 2556,
-=======
-    "stargazers_count": 2557,
->>>>>>> Stashed changes
-    "forks_count": 192,
-    "stars_in_period": 480,
-    "url": "https://github.com/agavra/tuicr",
-    "html_url": "https://github.com/agavra/tuicr"
-  },
-  {
-    "repo": "BurntSushi/ripgrep",
-    "full_name": "BurntSushi/ripgrep",
-    "description": "ripgrep recursively searches directories for a regex pattern while respecting your gitignore",
-    "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 67110,
-=======
-    "stargazers_count": 67111,
->>>>>>> Stashed changes
-    "forks_count": 2711,
-    "stars_in_period": 349,
-    "url": "https://github.com/BurntSushi/ripgrep",
-    "html_url": "https://github.com/BurntSushi/ripgrep"
-  },
-  {
-    "repo": "dani-garcia/vaultwarden",
-    "full_name": "dani-garcia/vaultwarden",
-    "description": "Unofficial Bitwarden compatible server written in Rust, formerly known as bitwarden_rs",
-    "language": "Rust",
-    "stargazers_count": 65100,
-    "forks_count": 3098,
-    "stars_in_period": 416,
-    "url": "https://github.com/dani-garcia/vaultwarden",
-    "html_url": "https://github.com/dani-garcia/vaultwarden"
-  },
-  {
-    "repo": "moghtech/komodo",
-    "full_name": "moghtech/komodo",
-    "description": "\ud83e\udd8e a tool to build and deploy software on many servers \ud83e\udd8e",
-    "language": "Rust",
-    "stargazers_count": 11866,
-    "forks_count": 375,
-    "stars_in_period": 113,
-    "url": "https://github.com/moghtech/komodo",
-    "html_url": "https://github.com/moghtech/komodo"
   },
   {
     "repo": "jdx/mise",
     "full_name": "jdx/mise",
     "description": "dev tools, env vars, task runner",
     "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 32097,
-=======
-    "stargazers_count": 32102,
->>>>>>> Stashed changes
-    "forks_count": 1337,
+    "stargazers_count": 32153,
+    "forks_count": 1340,
     "stars_in_period": 643,
     "url": "https://github.com/jdx/mise",
     "html_url": "https://github.com/jdx/mise"
   },
   {
-    "repo": "rustdesk/rustdesk",
-    "full_name": "rustdesk/rustdesk",
-    "description": "An open-source remote desktop application designed for self-hosting, as an alternative to TeamViewer.",
+    "repo": "BurntSushi/ripgrep",
+    "full_name": "BurntSushi/ripgrep",
+    "description": "ripgrep recursively searches directories for a regex pattern while respecting your gitignore",
     "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 119867,
-=======
-    "stargazers_count": 119870,
->>>>>>> Stashed changes
-    "forks_count": 18336,
-    "stars_in_period": 589,
-    "url": "https://github.com/rustdesk/rustdesk",
-    "html_url": "https://github.com/rustdesk/rustdesk"
-  },
-  {
-    "repo": "emilk/egui",
-    "full_name": "emilk/egui",
-    "description": "egui: an easy-to-use immediate mode GUI in Rust that runs on both web and native",
-    "language": "Rust",
-    "stargazers_count": 29999,
-    "forks_count": 2097,
-    "stars_in_period": 93,
-    "url": "https://github.com/emilk/egui",
-    "html_url": "https://github.com/emilk/egui"
-  },
-  {
-    "repo": "servo/servo",
-    "full_name": "servo/servo",
-    "description": "Servo aims to empower developers with a lightweight, high-performance alternative for embedding web technologies in applications.",
-    "language": "Rust",
-    "stargazers_count": 37618,
-<<<<<<< Updated upstream
-    "forks_count": 3738,
-=======
-    "forks_count": 3739,
->>>>>>> Stashed changes
-    "stars_in_period": 89,
-    "url": "https://github.com/servo/servo",
-    "html_url": "https://github.com/servo/servo"
-  },
-  {
-    "repo": "openai/codex",
-    "full_name": "openai/codex",
-    "description": "Lightweight coding agent that runs in your terminal",
-    "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 104681,
-=======
-    "stargazers_count": 104685,
->>>>>>> Stashed changes
-    "forks_count": 15834,
-    "stars_in_period": 1819,
-    "url": "https://github.com/openai/codex",
-    "html_url": "https://github.com/openai/codex"
+    "stargazers_count": 67118,
+    "forks_count": 2712,
+    "stars_in_period": 349,
+    "url": "https://github.com/BurntSushi/ripgrep",
+    "html_url": "https://github.com/BurntSushi/ripgrep"
   },
   {
     "repo": "FalkorDB/FalkorDB",
     "full_name": "FalkorDB/FalkorDB",
     "description": "A super fast Graph Database uses GraphBLAS under the hood for its sparse adjacency matrix graph representation. Our goal is to provide the best Knowledge Graph for LLM (GraphRAG).",
     "language": "Rust",
-    "stargazers_count": 5420,
-    "forks_count": 421,
+    "stargazers_count": 5435,
+    "forks_count": 423,
     "stars_in_period": 552,
     "url": "https://github.com/FalkorDB/FalkorDB",
     "html_url": "https://github.com/FalkorDB/FalkorDB"
   },
   {
-    "repo": "tokio-rs/tokio",
-    "full_name": "tokio-rs/tokio",
-    "description": "A runtime for writing reliable asynchronous applications with Rust. Provides I/O, networking, scheduling, timers, ...",
+    "repo": "moghtech/komodo",
+    "full_name": "moghtech/komodo",
+    "description": "\ud83e\udd8e a tool to build and deploy software on many servers \ud83e\udd8e",
     "language": "Rust",
-    "stargazers_count": 32865,
-    "forks_count": 3190,
-    "stars_in_period": 136,
-    "url": "https://github.com/tokio-rs/tokio",
-    "html_url": "https://github.com/tokio-rs/tokio"
-  },
-  {
-    "repo": "sinelaw/fresh",
-    "full_name": "sinelaw/fresh",
-    "description": "Terminal based IDE & text editor: easy, powerful and fast",
-    "language": "Rust",
-    "stargazers_count": 8146,
-    "forks_count": 300,
-    "stars_in_period": 115,
-    "url": "https://github.com/sinelaw/fresh",
-    "html_url": "https://github.com/sinelaw/fresh"
-  },
-  {
-    "repo": "zed-industries/zed",
-    "full_name": "zed-industries/zed",
-    "description": "Code at the speed of thought \u2013 Zed is a high-performance, multiplayer code editor from the creators of Atom and Tree-sitter.",
-    "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 88233,
-    "forks_count": 9924,
-=======
-    "stargazers_count": 88235,
-    "forks_count": 9925,
->>>>>>> Stashed changes
-    "stars_in_period": 460,
-    "url": "https://github.com/zed-industries/zed",
-    "html_url": "https://github.com/zed-industries/zed"
-  },
-  {
-    "repo": "risingwavelabs/risingwave",
-    "full_name": "risingwavelabs/risingwave",
-    "description": "Event streaming platform for agentic AI. Continuously ingest, transform, and serve event streams in real time, at scale.",
-    "language": "Rust",
-    "stargazers_count": 9229,
-    "forks_count": 810,
-    "stars_in_period": 29,
-    "url": "https://github.com/risingwavelabs/risingwave",
-    "html_url": "https://github.com/risingwavelabs/risingwave"
-  },
-  {
-    "repo": "pimalaya/himalaya",
-    "full_name": "pimalaya/himalaya",
-    "description": "CLI to manage emails",
-    "language": "Rust",
-    "stargazers_count": 6962,
-    "forks_count": 225,
-    "stars_in_period": 163,
-    "url": "https://github.com/pimalaya/himalaya",
-    "html_url": "https://github.com/pimalaya/himalaya"
+    "stargazers_count": 11868,
+    "forks_count": 375,
+    "stars_in_period": 113,
+    "url": "https://github.com/moghtech/komodo",
+    "html_url": "https://github.com/moghtech/komodo"
   },
   {
     "repo": "warp-tech/warpgate",
     "full_name": "warp-tech/warpgate",
     "description": "Fully transparent SSH, HTTPS, Kubernetes, MySQL and Postgres bastion/PAM that doesn't need additional client-side software",
     "language": "Rust",
-    "stargazers_count": 7505,
+    "stargazers_count": 7510,
     "forks_count": 330,
     "stars_in_period": 64,
     "url": "https://github.com/warp-tech/warpgate",
     "html_url": "https://github.com/warp-tech/warpgate"
   },
   {
-    "repo": "microsoft/microsoft-ui-xaml",
-    "full_name": "microsoft/microsoft-ui-xaml",
-    "description": "WinUI: a modern UI framework with a rich set of controls and styles to build dynamic and high-performing Windows applications.",
-    "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 7839,
-    "forks_count": 874,
-=======
-    "stargazers_count": 7840,
-    "forks_count": 875,
->>>>>>> Stashed changes
-    "stars_in_period": 39,
-    "url": "https://github.com/microsoft/microsoft-ui-xaml",
-    "html_url": "https://github.com/microsoft/microsoft-ui-xaml"
+    "repo": "dani-garcia/vaultwarden",
+    "full_name": "dani-garcia/vaultwarden",
+    "description": "Unofficial Bitwarden compatible server written in Rust, formerly known as bitwarden_rs",
+    "language": "Rust",
+    "stargazers_count": 65115,
+    "forks_count": 3097,
+    "stars_in_period": 416,
+    "url": "https://github.com/dani-garcia/vaultwarden",
+    "html_url": "https://github.com/dani-garcia/vaultwarden"
   },
   {
-    "repo": "godotengine/godot",
-    "full_name": "godotengine/godot",
-    "description": "Godot Engine \u2013 Multi-platform 2D and 3D game engine",
-    "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 115330,
-    "forks_count": 26285,
-=======
-    "stargazers_count": 115331,
-    "forks_count": 26286,
->>>>>>> Stashed changes
-    "stars_in_period": 509,
-    "url": "https://github.com/godotengine/godot",
-    "html_url": "https://github.com/godotengine/godot"
+    "repo": "tokio-rs/tokio",
+    "full_name": "tokio-rs/tokio",
+    "description": "A runtime for writing reliable asynchronous applications with Rust. Provides I/O, networking, scheduling, timers, ...",
+    "language": "Rust",
+    "stargazers_count": 32873,
+    "forks_count": 3190,
+    "stars_in_period": 136,
+    "url": "https://github.com/tokio-rs/tokio",
+    "html_url": "https://github.com/tokio-rs/tokio"
   },
   {
-    "repo": "cloudflare/workerd",
-    "full_name": "cloudflare/workerd",
-    "description": "The JavaScript / Wasm runtime that powers Cloudflare Workers",
-    "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 8531,
-=======
-    "stargazers_count": 8532,
->>>>>>> Stashed changes
-    "forks_count": 694,
-    "stars_in_period": 100,
-    "url": "https://github.com/cloudflare/workerd",
-    "html_url": "https://github.com/cloudflare/workerd"
+    "repo": "risingwavelabs/risingwave",
+    "full_name": "risingwavelabs/risingwave",
+    "description": "Event streaming platform for agentic AI. Continuously ingest, transform, and serve event streams in real time, at scale.",
+    "language": "Rust",
+    "stargazers_count": 9230,
+    "forks_count": 810,
+    "stars_in_period": 29,
+    "url": "https://github.com/risingwavelabs/risingwave",
+    "html_url": "https://github.com/risingwavelabs/risingwave"
   },
   {
-    "repo": "FEX-Emu/FEX",
-    "full_name": "FEX-Emu/FEX",
-    "description": "A fast usermode x86 and x86-64 emulator for Arm64 Linux",
-    "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 7831,
-=======
-    "stargazers_count": 7832,
->>>>>>> Stashed changes
-    "forks_count": 315,
-    "stars_in_period": 73,
-    "url": "https://github.com/FEX-Emu/FEX",
-    "html_url": "https://github.com/FEX-Emu/FEX"
+    "repo": "sharkdp/bat",
+    "full_name": "sharkdp/bat",
+    "description": "A cat(1) clone with wings.",
+    "language": "Rust",
+    "stargazers_count": 60141,
+    "forks_count": 1629,
+    "stars_in_period": 207,
+    "url": "https://github.com/sharkdp/bat",
+    "html_url": "https://github.com/sharkdp/bat"
   },
   {
-    "repo": "geo-tp/ESP32-Bit-Pirate",
-    "full_name": "geo-tp/ESP32-Bit-Pirate",
-    "description": "A Hardware Hacking Tool with Web-Based CLI That Speaks Every Protocol",
-    "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 5364,
-=======
-    "stargazers_count": 5365,
->>>>>>> Stashed changes
-    "forks_count": 432,
-    "stars_in_period": 459,
-    "url": "https://github.com/geo-tp/ESP32-Bit-Pirate",
-    "html_url": "https://github.com/geo-tp/ESP32-Bit-Pirate"
+    "repo": "rust-lang/mdBook",
+    "full_name": "rust-lang/mdBook",
+    "description": "Create book from markdown files. Like Gitbook but implemented in Rust",
+    "language": "Rust",
+    "stargazers_count": 22057,
+    "forks_count": 1884,
+    "stars_in_period": 43,
+    "url": "https://github.com/rust-lang/mdBook",
+    "html_url": "https://github.com/rust-lang/mdBook"
+  },
+  {
+    "repo": "agavra/tuicr",
+    "full_name": "agavra/tuicr",
+    "description": "a code review TUI with vim keybindings",
+    "language": "Rust",
+    "stargazers_count": 2570,
+    "forks_count": 193,
+    "stars_in_period": 480,
+    "url": "https://github.com/agavra/tuicr",
+    "html_url": "https://github.com/agavra/tuicr"
+  },
+  {
+    "repo": "pimalaya/himalaya",
+    "full_name": "pimalaya/himalaya",
+    "description": "CLI to manage emails",
+    "language": "Rust",
+    "stargazers_count": 6969,
+    "forks_count": 225,
+    "stars_in_period": 163,
+    "url": "https://github.com/pimalaya/himalaya",
+    "html_url": "https://github.com/pimalaya/himalaya"
+  },
+  {
+    "repo": "ruffle-rs/ruffle",
+    "full_name": "ruffle-rs/ruffle",
+    "description": "A Flash Player emulator written in Rust",
+    "language": "Rust",
+    "stargazers_count": 18400,
+    "forks_count": 1060,
+    "stars_in_period": 38,
+    "url": "https://github.com/ruffle-rs/ruffle",
+    "html_url": "https://github.com/ruffle-rs/ruffle"
+  },
+  {
+    "repo": "zed-industries/zed",
+    "full_name": "zed-industries/zed",
+    "description": "Code at the speed of thought \u2013 Zed is a high-performance, multiplayer code editor from the creators of Atom and Tree-sitter.",
+    "language": "Rust",
+    "stargazers_count": 88268,
+    "forks_count": 9935,
+    "stars_in_period": 460,
+    "url": "https://github.com/zed-industries/zed",
+    "html_url": "https://github.com/zed-industries/zed"
+  },
+  {
+    "repo": "vercel-labs/agent-browser",
+    "full_name": "vercel-labs/agent-browser",
+    "description": "Browser automation CLI for AI agents",
+    "language": "Rust",
+    "stargazers_count": 40199,
+    "forks_count": 2639,
+    "stars_in_period": 552,
+    "url": "https://github.com/vercel-labs/agent-browser",
+    "html_url": "https://github.com/vercel-labs/agent-browser"
+  },
+  {
+    "repo": "modelcontextprotocol/rust-sdk",
+    "full_name": "modelcontextprotocol/rust-sdk",
+    "description": "The official Rust SDK for the Model Context Protocol",
+    "language": "Rust",
+    "stargazers_count": 3772,
+    "forks_count": 593,
+    "stars_in_period": 43,
+    "url": "https://github.com/modelcontextprotocol/rust-sdk",
+    "html_url": "https://github.com/modelcontextprotocol/rust-sdk"
+  },
+  {
+    "repo": "reacherhq/check-if-email-exists",
+    "full_name": "reacherhq/check-if-email-exists",
+    "description": "Check if an email address exists without sending any email, written in Rust. Comes with a \u2699\ufe0f HTTP backend.",
+    "language": "Rust",
+    "stargazers_count": 9263,
+    "forks_count": 674,
+    "stars_in_period": 84,
+    "url": "https://github.com/reacherhq/check-if-email-exists",
+    "html_url": "https://github.com/reacherhq/check-if-email-exists"
+  },
+  {
+    "repo": "servo/servo",
+    "full_name": "servo/servo",
+    "description": "Servo aims to empower developers with a lightweight, high-performance alternative for embedding web technologies in applications.",
+    "language": "Rust",
+    "stargazers_count": 37624,
+    "forks_count": 3740,
+    "stars_in_period": 89,
+    "url": "https://github.com/servo/servo",
+    "html_url": "https://github.com/servo/servo"
   },
   {
     "repo": "MaaAssistantArknights/MaaAssistantArknights",
     "full_name": "MaaAssistantArknights/MaaAssistantArknights",
     "description": "\u300a\u660e\u65e5\u65b9\u821f\u300b\u5c0f\u52a9\u624b\uff0c\u5168\u65e5\u5e38\u4e00\u952e\u957f\u8349\uff01| A one-click tool for the daily tasks of Arknights, supporting all clients.",
     "language": "C++",
-    "stargazers_count": 22371,
-    "forks_count": 2764,
+    "stargazers_count": 22378,
+    "forks_count": 2765,
     "stars_in_period": 178,
     "url": "https://github.com/MaaAssistantArknights/MaaAssistantArknights",
     "html_url": "https://github.com/MaaAssistantArknights/MaaAssistantArknights"
   },
   {
-    "repo": "wazuh/wazuh",
-    "full_name": "wazuh/wazuh",
-    "description": "Wazuh - The Open Source Security Platform. Unified XDR and SIEM protection for endpoints and cloud workloads.",
+    "repo": "FEX-Emu/FEX",
+    "full_name": "FEX-Emu/FEX",
+    "description": "A fast usermode x86 and x86-64 emulator for Arm64 Linux",
     "language": "C++",
-    "stargazers_count": 16457,
-    "forks_count": 2425,
-    "stars_in_period": 105,
-    "url": "https://github.com/wazuh/wazuh",
-    "html_url": "https://github.com/wazuh/wazuh"
+    "stargazers_count": 7835,
+    "forks_count": 316,
+    "stars_in_period": 73,
+    "url": "https://github.com/FEX-Emu/FEX",
+    "html_url": "https://github.com/FEX-Emu/FEX"
   },
   {
-    "repo": "barry-ran/QtScrcpy",
-    "full_name": "barry-ran/QtScrcpy",
-    "description": "Android real-time display control software",
+    "repo": "godotengine/godot",
+    "full_name": "godotengine/godot",
+    "description": "Godot Engine \u2013 Multi-platform 2D and 3D game engine",
     "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 31229,
-    "forks_count": 3716,
-=======
-    "stargazers_count": 31232,
-    "forks_count": 3717,
->>>>>>> Stashed changes
-    "stars_in_period": 443,
-    "url": "https://github.com/barry-ran/QtScrcpy",
-    "html_url": "https://github.com/barry-ran/QtScrcpy"
+    "stargazers_count": 115349,
+    "forks_count": 26295,
+    "stars_in_period": 509,
+    "url": "https://github.com/godotengine/godot",
+    "html_url": "https://github.com/godotengine/godot"
   },
   {
     "repo": "dyang886/Game-Cheats-Manager",
     "full_name": "dyang886/Game-Cheats-Manager",
     "description": "Easily download and manage single-player game cheats for your convenience",
     "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 13977,
-=======
-    "stargazers_count": 13979,
->>>>>>> Stashed changes
+    "stargazers_count": 13989,
     "forks_count": 476,
     "stars_in_period": 346,
     "url": "https://github.com/dyang886/Game-Cheats-Manager",
     "html_url": "https://github.com/dyang886/Game-Cheats-Manager"
   },
   {
-    "repo": "tensorflow/tensorflow",
-    "full_name": "tensorflow/tensorflow",
-    "description": "An Open Source Machine Learning Framework for Everyone",
+    "repo": "cloudflare/workerd",
+    "full_name": "cloudflare/workerd",
+    "description": "The JavaScript / Wasm runtime that powers Cloudflare Workers",
     "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 196915,
-    "forks_count": 75922,
-=======
-    "stargazers_count": 196916,
-    "forks_count": 75923,
->>>>>>> Stashed changes
-    "stars_in_period": 346,
-    "url": "https://github.com/tensorflow/tensorflow",
-    "html_url": "https://github.com/tensorflow/tensorflow"
+    "stargazers_count": 8535,
+    "forks_count": 694,
+    "stars_in_period": 100,
+    "url": "https://github.com/cloudflare/workerd",
+    "html_url": "https://github.com/cloudflare/workerd"
   },
   {
-    "repo": "ClickHouse/ClickHouse",
-    "full_name": "ClickHouse/ClickHouse",
-    "description": "ClickHouse\u00ae is a real-time analytics database management system",
+    "repo": "microsoft/microsoft-ui-xaml",
+    "full_name": "microsoft/microsoft-ui-xaml",
+    "description": "WinUI: a modern UI framework with a rich set of controls and styles to build dynamic and high-performing Windows applications.",
     "language": "C++",
-    "stargazers_count": 49117,
-    "forks_count": 8755,
-    "stars_in_period": 165,
-    "url": "https://github.com/ClickHouse/ClickHouse",
-    "html_url": "https://github.com/ClickHouse/ClickHouse"
+    "stargazers_count": 7842,
+    "forks_count": 875,
+    "stars_in_period": 39,
+    "url": "https://github.com/microsoft/microsoft-ui-xaml",
+    "html_url": "https://github.com/microsoft/microsoft-ui-xaml"
+  },
+  {
+    "repo": "barry-ran/QtScrcpy",
+    "full_name": "barry-ran/QtScrcpy",
+    "description": "Android real-time display control software",
+    "language": "C++",
+    "stargazers_count": 31240,
+    "forks_count": 3717,
+    "stars_in_period": 443,
+    "url": "https://github.com/barry-ran/QtScrcpy",
+    "html_url": "https://github.com/barry-ran/QtScrcpy"
   },
   {
     "repo": "ggml-org/llama.cpp",
     "full_name": "ggml-org/llama.cpp",
     "description": "LLM inference in C/C++",
     "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 123039,
-=======
-    "stargazers_count": 123040,
->>>>>>> Stashed changes
-    "forks_count": 21441,
+    "stargazers_count": 123096,
+    "forks_count": 21454,
     "stars_in_period": 894,
     "url": "https://github.com/ggml-org/llama.cpp",
     "html_url": "https://github.com/ggml-org/llama.cpp"
   },
   {
-    "repo": "aria2/aria2",
-    "full_name": "aria2/aria2",
-    "description": "aria2 is a lightweight multi-protocol & multi-source, cross platform download utility operated in command-line. It supports HTTP/HTTPS, FTP, SFTP, BitTorrent and Metalink.",
+    "repo": "ClickHouse/ClickHouse",
+    "full_name": "ClickHouse/ClickHouse",
+    "description": "ClickHouse\u00ae is a real-time analytics database management system",
     "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 41667,
-=======
-    "stargazers_count": 41668,
->>>>>>> Stashed changes
-    "forks_count": 3888,
-    "stars_in_period": 96,
-    "url": "https://github.com/aria2/aria2",
-    "html_url": "https://github.com/aria2/aria2"
+    "stargazers_count": 49127,
+    "forks_count": 8757,
+    "stars_in_period": 165,
+    "url": "https://github.com/ClickHouse/ClickHouse",
+    "html_url": "https://github.com/ClickHouse/ClickHouse"
+  },
+  {
+    "repo": "tensorflow/tensorflow",
+    "full_name": "tensorflow/tensorflow",
+    "description": "An Open Source Machine Learning Framework for Everyone",
+    "language": "C++",
+    "stargazers_count": 196931,
+    "forks_count": 75943,
+    "stars_in_period": 346,
+    "url": "https://github.com/tensorflow/tensorflow",
+    "html_url": "https://github.com/tensorflow/tensorflow"
   },
   {
     "repo": "argotorg/solidity",
     "full_name": "argotorg/solidity",
     "description": "Solidity, the Smart Contract Programming Language",
     "language": "C++",
-    "stargazers_count": 25692,
-    "forks_count": 6143,
+    "stargazers_count": 25693,
+    "forks_count": 6141,
     "stars_in_period": 25,
     "url": "https://github.com/argotorg/solidity",
     "html_url": "https://github.com/argotorg/solidity"
   },
   {
-    "repo": "RPCS3/rpcs3",
-    "full_name": "RPCS3/rpcs3",
-    "description": "PlayStation 3 emulator and debugger",
+    "repo": "osquery/osquery",
+    "full_name": "osquery/osquery",
+    "description": "SQL powered operating system instrumentation, monitoring, and analytics.",
     "language": "C++",
-    "stargazers_count": 19385,
-<<<<<<< Updated upstream
-    "forks_count": 2370,
-=======
-    "forks_count": 2371,
->>>>>>> Stashed changes
-    "stars_in_period": 77,
-    "url": "https://github.com/RPCS3/rpcs3",
-    "html_url": "https://github.com/RPCS3/rpcs3"
-  },
-  {
-    "repo": "aseprite/aseprite",
-    "full_name": "aseprite/aseprite",
-    "description": "Animated sprite editor & pixel art tool (Windows, macOS, Linux)",
-    "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 38589,
-=======
-    "stargazers_count": 38591,
->>>>>>> Stashed changes
-    "forks_count": 8601,
-    "stars_in_period": 161,
-    "url": "https://github.com/aseprite/aseprite",
-    "html_url": "https://github.com/aseprite/aseprite"
-  },
-  {
-    "repo": "orailnoor/cross-platform-llm-client",
-    "full_name": "orailnoor/cross-platform-llm-client",
-    "description": "A unified cross-platform AI client supporting seamless transitions between standard cloud APIs and on-device, offline execution of custom and uncensored language models.",
-    "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 856,
-=======
-    "stargazers_count": 858,
->>>>>>> Stashed changes
-    "forks_count": 180,
-    "stars_in_period": 160,
-    "url": "https://github.com/orailnoor/cross-platform-llm-client",
-    "html_url": "https://github.com/orailnoor/cross-platform-llm-client"
-  },
-  {
-    "repo": "microsoft/winget-cli",
-    "full_name": "microsoft/winget-cli",
-    "description": "WinGet is the Windows Package Manager. This project includes a CLI (Command Line Interface), PowerShell modules, and a COM (Component Object Model) API (Application Programming Interface).",
-    "language": "C++",
-    "stargazers_count": 26287,
-    "forks_count": 1773,
-    "stars_in_period": 43,
-    "url": "https://github.com/microsoft/winget-cli",
-    "html_url": "https://github.com/microsoft/winget-cli"
-  },
-  {
-    "repo": "lightvector/KataGo",
-    "full_name": "lightvector/KataGo",
-    "description": "GTP engine and self-play learning in Go",
-    "language": "C++",
-    "stargazers_count": 4934,
-    "forks_count": 740,
-    "stars_in_period": 50,
-    "url": "https://github.com/lightvector/KataGo",
-    "html_url": "https://github.com/lightvector/KataGo"
-  },
-  {
-    "repo": "PCSX2/pcsx2",
-    "full_name": "PCSX2/pcsx2",
-    "description": "PCSX2 - The Playstation 2 Emulator",
-    "language": "C++",
-<<<<<<< Updated upstream
-    "stargazers_count": 15273,
-=======
-    "stargazers_count": 15274,
->>>>>>> Stashed changes
-    "forks_count": 2106,
-    "stars_in_period": 38,
-    "url": "https://github.com/PCSX2/pcsx2",
-    "html_url": "https://github.com/PCSX2/pcsx2"
+    "stargazers_count": 23438,
+    "forks_count": 2590,
+    "stars_in_period": 22,
+    "url": "https://github.com/osquery/osquery",
+    "html_url": "https://github.com/osquery/osquery"
   },
   {
     "repo": "google/googletest",
     "full_name": "google/googletest",
     "description": "GoogleTest - Google Testing and Mocking Framework",
     "language": "C++",
-    "stargazers_count": 38910,
+    "stargazers_count": 38911,
     "forks_count": 10839,
     "stars_in_period": 33,
     "url": "https://github.com/google/googletest",
     "html_url": "https://github.com/google/googletest"
   },
   {
+    "repo": "orailnoor/cross-platform-llm-client",
+    "full_name": "orailnoor/cross-platform-llm-client",
+    "description": "A unified cross-platform AI client supporting seamless transitions between standard cloud APIs and on-device, offline execution of custom and uncensored language models.",
+    "language": "C++",
+    "stargazers_count": 867,
+    "forks_count": 182,
+    "stars_in_period": 160,
+    "url": "https://github.com/orailnoor/cross-platform-llm-client",
+    "html_url": "https://github.com/orailnoor/cross-platform-llm-client"
+  },
+  {
+    "repo": "aria2/aria2",
+    "full_name": "aria2/aria2",
+    "description": "aria2 is a lightweight multi-protocol & multi-source, cross platform download utility operated in command-line. It supports HTTP/HTTPS, FTP, SFTP, BitTorrent and Metalink.",
+    "language": "C++",
+    "stargazers_count": 41672,
+    "forks_count": 3889,
+    "stars_in_period": 96,
+    "url": "https://github.com/aria2/aria2",
+    "html_url": "https://github.com/aria2/aria2"
+  },
+  {
     "repo": "official-stockfish/Stockfish",
     "full_name": "official-stockfish/Stockfish",
     "description": "A free and strong UCI chess engine",
     "language": "C++",
-    "stargazers_count": 16259,
+    "stargazers_count": 16261,
     "forks_count": 2973,
     "stars_in_period": 65,
     "url": "https://github.com/official-stockfish/Stockfish",
     "html_url": "https://github.com/official-stockfish/Stockfish"
+  },
+  {
+    "repo": "lightvector/KataGo",
+    "full_name": "lightvector/KataGo",
+    "description": "GTP engine and self-play learning in Go",
+    "language": "C++",
+    "stargazers_count": 4939,
+    "forks_count": 740,
+    "stars_in_period": 50,
+    "url": "https://github.com/lightvector/KataGo",
+    "html_url": "https://github.com/lightvector/KataGo"
+  },
+  {
+    "repo": "aseprite/aseprite",
+    "full_name": "aseprite/aseprite",
+    "description": "Animated sprite editor & pixel art tool (Windows, macOS, Linux)",
+    "language": "C++",
+    "stargazers_count": 38599,
+    "forks_count": 8607,
+    "stars_in_period": 161,
+    "url": "https://github.com/aseprite/aseprite",
+    "html_url": "https://github.com/aseprite/aseprite"
+  },
+  {
+    "repo": "wazuh/wazuh",
+    "full_name": "wazuh/wazuh",
+    "description": "Wazuh - The Open Source Security Platform. Unified XDR and SIEM protection for endpoints and cloud workloads.",
+    "language": "C++",
+    "stargazers_count": 16463,
+    "forks_count": 2425,
+    "stars_in_period": 105,
+    "url": "https://github.com/wazuh/wazuh",
+    "html_url": "https://github.com/wazuh/wazuh"
+  },
+  {
+    "repo": "ceph/ceph",
+    "full_name": "ceph/ceph",
+    "description": "Ceph is a distributed object, block, and file storage platform",
+    "language": "C++",
+    "stargazers_count": 16905,
+    "forks_count": 6470,
+    "stars_in_period": 31,
+    "url": "https://github.com/ceph/ceph",
+    "html_url": "https://github.com/ceph/ceph"
+  },
+  {
+    "repo": "Fincept-Corporation/FinceptTerminal",
+    "full_name": "Fincept-Corporation/FinceptTerminal",
+    "description": "FinceptTerminal is a modern finance application offering advanced market analytics, investment research, and economic data tools, designed for interactive exploration and data-driven decision-making in a user-friendly environment.",
+    "language": "C++",
+    "stargazers_count": 29997,
+    "forks_count": 4222,
+    "stars_in_period": 635,
+    "url": "https://github.com/Fincept-Corporation/FinceptTerminal",
+    "html_url": "https://github.com/Fincept-Corporation/FinceptTerminal"
   }
 ]
