@@ -91,6 +91,10 @@ Constraint Checklist:
   3. BEAT THE BENCHMARK CHALLENGE: "I got 45 tokens/sec on an M2 Mac. Comment your hardware specs to beat it."
   4. COMMUNITY AUDIT & MONTHLY $100 API CREDIT GIVEAWAY: "Sub and comment your setup for our monthly $100 API credit giveaway."
 - SCHEMA EXTENSION: Output must include `comment_trigger_keyword` (e.g. "OLLAMA", "CONFIG", "EVALS"), `incentive_cta_type` (one of: "digital_vault", "comment_trigger", "benchmark_challenge", "community_audit"), and `digital_asset_offer` (description of the asset being offered).
+- RHETORICAL QUESTIONS: Include 2-3 rhetorical questions per script to create open loops and drive engagement. Examples: "What does this mean for your production apps?", "Why should you care?", "But here's the real question — can you trust it?"
+- DIRECT VIEWER ADDRESS: Use "you" and "your" language throughout. Frame every point from the viewer's perspective: "Your data...", "Your production apps...", "What you need to know..."
+- CONVERSATIONAL TRANSITIONS: Replace essay-style transitions with conversational ones: "But here's the thing...", "Now here's where it gets interesting...", "And that's exactly why...", "So what's the takeaway?"
+- MICRO-PAUSE MARKERS: Use ellipses (...) strategically before key revelations, rhetorical questions, and direct address to signal TTS pacing.
 
 SUCCESS PATTERNS (2026): 
 - HOOKS (0-5s): Start with a compelling, realistic hook grounded in a specific fact, setting, or feature. First 3-5 words must STOP the scroll.
@@ -108,6 +112,13 @@ Choose the most suitable visual format:
 4. Infographic when showing stats, benchmarks, lists, performance metrics.
 5. Diagram when showing system architecture or database replication.
 6. Animated UI Mockup when demonstrating app/settings navigation.
+7. Code Snippet when showing actual code, config files, or syntax — render as syntax-highlighted editor view.
+8. Screen Recording when demonstrating a UI workflow, settings change, or live demo — capture actual screen.
+9. Flowchart when showing decision trees, process flows, or branching logic.
+10. Terminal Output when showing CLI commands, logs, or shell interactions.
+11. GitHub UI when showing repo pages, PRs, issues, or code search results.
+12. Side-by-side Comparison when comparing two tools, configs, or outputs.
+13. Architecture Diagram when showing system design, service mesh, or data pipeline topology.
 
 Technology Visualization Rules:
 Never use unrelated visuals (like generic stock footage or random unrelated robots). Map concepts:
@@ -173,6 +184,10 @@ STRICT RULES:
   3. BEAT THE BENCHMARK CHALLENGE: "I got 45 tokens/sec on an M2 Mac. Comment your hardware specs to beat it."
   4. COMMUNITY AUDIT & MONTHLY $100 API CREDIT GIVEAWAY: "Sub and comment your setup for our monthly $100 API credit giveaway."
 - SCHEMA EXTENSION: Output must include `comment_trigger_keyword`, `incentive_cta_type`, and `digital_asset_offer`.
+- RHETORICAL QUESTIONS: Include 2-3 rhetorical questions per script to create open loops. Examples: "What does this mean for your workflow?", "Why should you care?", "But can you actually trust it?"
+- DIRECT VIEWER ADDRESS: Frame every point from the viewer's perspective: "Your data...", "Your production apps...", "What you need to know..."
+- CONVERSATIONAL TRANSITIONS: "But here's the thing...", "Now here's where it gets interesting...", "And that's exactly why...", "So what's the takeaway?"
+- MICRO-PAUSE MARKERS: Use ellipses (...) strategically before key revelations, rhetorical questions, and direct address.
 
 Visual Director Persona & Visual Selection Logic:
 You are also an expert Visual Director. For each narration segment in the `subtitle_chunks` array, you generate highly engaging, visually rich, and contextually accurate visual prompts at the semantic level (not keyword level).
@@ -321,6 +336,22 @@ CRITICAL RETENTION RULES (based on 2026 YouTube Shorts algorithm data):
    - Short sentences (< 8 words) after complex explanations
    - "!" for energy spikes at key reveals
 
+7. RHETORICAL QUESTIONS (MANDATORY): Inject 2-3 rhetorical questions that create open loops.
+   Place them at pattern interrupt points. Examples:
+   - "What does this mean for YOUR production apps?"
+   - "But here's the real question — can you actually trust it?"
+   - "Why should YOU care about this benchmark?"
+   - "What happens to YOUR data when the model changes?"
+
+8. DIRECT VIEWER ADDRESS: Ensure "you" / "your" language appears in EVERY major section.
+   Frame from viewer's perspective: "Your data...", "Your workflow...", "What you need to know...", "Your production apps..."
+
+9. CONVERSATIONAL TRANSITIONS: Replace formal transitions with conversational ones:
+   - "However" → "But here's the thing..."
+   - "Therefore" → "And that's exactly why..."
+   - "In conclusion" → "So what's the takeaway?"
+   - "Moving on" → "Now here's where it gets interesting..."
+
 SCRIPT TO ENHANCE:
 {optimized_script}
 
@@ -334,6 +365,10 @@ Return ONLY a JSON object:
     "pattern_interrupts": [
       {{"type": "contradiction", "text": "But here's the twist...", "at_word": 30}}
     ],
+    "rhetorical_questions": [
+      {{"text": "What does this mean for your production apps?", "at_word": 40}}
+    ],
+    "direct_address_count": 5,
     "curiosity_gap_ratio": 0.65,
     "hook_word_count": 6,
     "payoff_zone_start_word": 120,
@@ -885,7 +920,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "title_options": ["Title idea 1", "Title idea 2", "Title idea 3"],
   "description": "Full 100+ word rich SEO description for youtube describing the video, including timestamps and credits.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
-  "title": "Punchy YouTube title max 60 chars",
+  "title": "Punchy YouTube title max 60 chars — MUST follow outcome/curiosity-gap formula: 'I [Tested/Built/Found] [Specific Thing] — Here's What Happened' or 'Why [Common Assumption] Is Wrong (And What Actually Works)' or 'The [Specific Result] You Get When You [Action]'. NO clickbait. MUST deliver on promise.",
   "hook_script": "15-second high stakes intro (approx 30 words). Stark contrast, direct eye contact feel.",
   "news_roundup": "Rapid-fire coverage of 3-5 news updates. Use bold transitions like 'UPDATE 1...' (approx 150 words).",
   "deep_dive_tutorial": "A step-by-step breakdown or workflow of the main story/tool. Fast paced (approx 200 words).",
@@ -905,7 +940,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
       "start": 0.00,
       "end": 3.50, 
       "scene_objective": "What technical concept must be understood here",
-      "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup",
+      "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup|Code Snippet|Screen Recording|Flowchart|Terminal Output|GitHub UI|Side-by-side Comparison|Architecture Diagram",
       "nano_visual_prompt": "A highly specific, cinematic visual description for THIS sentence. Must depict the exact subject/entity/concept spoken in this sentence. Example: 'Satellite view of Earth at night showing glowing city lights and data center hotspots, cinematic 9:16, dark background'. NO TEXT in the image. NO faces of real people. Photorealistic, 8K.",
       "is_setting_chunk": false,
       "has_infographic": false,
@@ -947,7 +982,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "title_options": ["Title Case + Emoji + Curiosity Gap 1", "Title Case + Emoji + Curiosity Gap 2"],
   "description": "Full 100+ word rich SEO description for youtube describing the video, including relevant hashtags and the source URL.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
-  "title": "Punchy YouTube title max 60 chars — must appeal to professionals and creators",
+  "title": "Punchy YouTube title max 60 chars — MUST follow outcome/curiosity-gap formula: 'I [Tested/Built/Found] [Specific Thing] — Here's What Happened' or 'Why [Common Assumption] Is Wrong (And What Actually Works)' or 'The [Specific Result] You Get When You [Action]'. NO clickbait. MUST deliver on promise.",
   "hook_script": "The Hook (0-3s): Direct, slightly alarming opening hook. 8-12 words. Must be a metric, contradiction, or personal stake.",
   "problem_context": "The Problem (3-10s): What most people are doing wrong or missing. 15-20 words.",
   "solution_tech": "The Solution (10-25s): The specific tool, prompt, or workflow in action. 30-40 words.",
@@ -969,7 +1004,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
       "start": 0.00,
       "end": 2.50,
       "scene_objective": "What technical concept must be understood here",
-      "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup",
+      "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup|Code Snippet|Screen Recording|Flowchart|Terminal Output|GitHub UI|Side-by-side Comparison|Architecture Diagram",
       "nano_visual_prompt": "A clean, specific visual for THIS sentence. Vertical 9:16. Photorealistic, 8K. NO text overlays.",
       "is_setting_chunk": false,
       "has_infographic": false,
@@ -1008,7 +1043,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "title_options": ["Title Case + Emoji + Curiosity Gap 1", "Title Case + Emoji + Curiosity Gap 2"],
   "description": "Full 100+ word rich SEO description for youtube describing the video, including relevant hashtags.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
-  "title": "Punchy YouTube title max 60 chars — must appeal to tech-interested audiences",
+  "title": "Punchy YouTube title max 60 chars — MUST follow outcome/curiosity-gap formula: 'I [Tested/Built/Found] [Specific Thing] — Here's What Happened' or 'Why [Common Assumption] Is Wrong (And What Actually Works)' or 'The [Specific Result] You Get When You [Action]'. NO clickbait. MUST deliver on promise.",
   "hook_script": "The Hard Hook (0:00 - 0:03): State the breakout tech trend/query immediately as a negative or high-stakes claim. Metric, contradiction, or personal stake. Never start with an introduction. 10-15 words.",
   "solution_tech": "The Technical Core (0:03 - 0:25): Deliver the exact breakout answer or content gap solution. Keep code snippets under 3 lines or focus on UI step-by-step demonstrations. 80-100 words.",
   "incentive_cta": "The Incentive CTA (0:25 - 0:35): Choose EXACTLY ONE mode: 1) Digital Vault: 'I put the entire script & diagram in our Telegram. Link in description.' 2) Comment Trigger: 'Comment \\'KEYWORD\\' below and I'll send you the template.' 3) Benchmark Challenge: 'I got X tokens/sec on [hardware]. Comment your specs to beat it.' 4) Community Audit: 'Sub and comment your setup for our monthly $100 API credit giveaway.'",
@@ -1029,7 +1064,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
       "start": 0.00,
       "end": 3.00,
       "scene_objective": "What technical concept must be understood here",
-      "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup",
+      "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup|Code Snippet|Screen Recording|Flowchart|Terminal Output|GitHub UI|Side-by-side Comparison|Architecture Diagram",
       "nano_visual_prompt": "A clean, specific visual for THIS sentence. Example: 'Close-up of a code editor showing a python script executing, dark mode, 9:16 vertical'. Photorealistic, 8K. NO text overlays.",
       "is_setting_chunk": false,
       "has_infographic": false,
@@ -1070,7 +1105,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "title_options": ["Title Case + Emoji + Curiosity Gap 1", "Title Case + Emoji + Curiosity Gap 2"],
   "description": "Full 100+ word rich SEO description for youtube describing the video.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
-  "title": "Punchy YouTube title max 60 chars — must appeal to EVERYONE not just techies",
+  "title": "Punchy YouTube title max 60 chars — MUST follow outcome/curiosity-gap formula: 'I [Tested/Built/Found] [Specific Thing] — Here's What Happened' or 'Why [Common Assumption] Is Wrong (And What Actually Works)' or 'The [Specific Result] You Get When You [Action]'. NO clickbait. MUST deliver on promise.",
   "hook_script": "The Hook (<1.5s): Bold claim or surprising result. 5-8 words MAX. Metric, contradiction, or personal stake.",
   "problem_context": "The Setup (2-5s): Why this matters to YOU personally. 10-15 words.",
   "solution_tech": "The Demo (5-25s): Show exactly how it works. Simple steps anyone can follow. 40-60 words.",
@@ -1092,7 +1127,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
       "start": 0.00,
       "end": 2.50,
       "scene_objective": "What technical concept must be understood here",
-      "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup",
+      "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup|Code Snippet|Screen Recording|Flowchart|Terminal Output|GitHub UI|Side-by-side Comparison|Architecture Diagram",
       "nano_visual_prompt": "A clean, specific visual for THIS sentence. Example: 'Close-up of an iPhone settings screen showing the hidden menu option highlighted, dark mode, 9:16 vertical'. Photorealistic, 8K. NO text overlays.",
       "is_setting_chunk": false,
       "has_infographic": false,
@@ -1133,7 +1168,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "title_options": ["Title Case + Emoji + Curiosity Gap 1", "Title Case + Emoji + Curiosity Gap 2"],
   "description": "Full 100+ word rich SEO description for youtube describing the video.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
-  "title": "Punchy YouTube title max 60 chars — must trigger FOMO or fear",
+  "title": "Punchy YouTube title max 60 chars — MUST follow outcome/curiosity-gap formula: 'I [Tested/Built/Found] [Specific Thing] — Here's What Happened' or 'Why [Common Assumption] Is Wrong (And What Actually Works)' or 'The [Specific Result] You Get When You [Action]'. NO clickbait. MUST deliver on promise.",
   "hook_script": "The Hook (<1.5s): Scary claim or myth-busting statement. 5-8 words MAX. Metric, contradiction, or personal stake.",
   "problem_context": "The Setup (2-5s): Why this is terrifying or why you've been wrong. 10-15 words.",
   "solution_tech": "The Proof (5-25s): Show the evidence, explain the truth, or demonstrate the fix. 40-60 words.",
@@ -1155,7 +1190,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
       "start": 0.00,
       "end": 2.50,
       "scene_objective": "What technical concept must be understood here",
-      "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup",
+      "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup|Code Snippet|Screen Recording|Flowchart|Terminal Output|GitHub UI|Side-by-side Comparison|Architecture Diagram",
       "nano_visual_prompt": "A dramatic, cinematic visual for THIS sentence. Example: 'Close-up of a smartphone screen showing location tracking data, dark moody lighting, 9:16 vertical'. Photorealistic, 8K. NO text overlays.",
       "is_setting_chunk": false,
       "has_infographic": false,
@@ -1196,7 +1231,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "title_options": ["Title Case + Emoji + Curiosity Gap 1", "Title Case + Emoji + Curiosity Gap 2"],
   "description": "Full 100+ word rich SEO description for youtube describing the video.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
-  "title": "Punchy YouTube title max 60 chars — curiosity gap required",
+  "title": "Punchy YouTube title max 60 chars — MUST follow outcome/curiosity-gap formula: 'I [Tested/Built/Found] [Specific Thing] — Here's What Happened' or 'Why [Common Assumption] Is Wrong (And What Actually Works)' or 'The [Specific Result] You Get When You [Action]'. NO clickbait. MUST deliver on promise.",
   "hook_script": "The Hook (<1.5s): Surprising claim or bold statement. 5-8 words MAX. Metric, contradiction, or personal stake.",
   "problem_context": "The Setup (2-5s): Why this matters to you. 10-15 words.",
   "solution_tech": "The Reveal (5-25s): Show the evidence, comparison, or demonstration. 40-60 words.",
@@ -1218,7 +1253,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
       "start": 0.00,
       "end": 2.50,
       "scene_objective": "What technical concept must be understood here",
-      "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup",
+      "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup|Code Snippet|Screen Recording|Flowchart|Terminal Output|GitHub UI|Side-by-side Comparison|Architecture Diagram",
       "nano_visual_prompt": "A clean, specific visual for THIS sentence. Example: 'Split screen showing a free app vs expensive app side by side, clean modern UI, 9:16 vertical'. Photorealistic, 8K. NO text overlays.",
       "is_setting_chunk": false,
       "has_infographic": false,

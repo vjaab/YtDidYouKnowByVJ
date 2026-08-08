@@ -1220,8 +1220,74 @@ def _reformat_tech_terminology(text):
 def _enforce_phrasing_pauses(text):
     """
     Phase 2 Rule 1: Enforce phrasing pauses at sentence boundaries.
+    Inject SSML-style break tags for ElevenLabs and natural pauses for other TTS.
     """
-    # Standard sentence pauses are handled naturally by TTS. Returning text unmodified.
+    # Add micro-pauses for emphasis and natural rhythm
+    # 1. Add 300ms pause after sentence endings
+    text = re.sub(r'([.!?])\s+', r'\1 <break time="300ms"/> ', text)
+    
+    # 2. Add 450ms pause at major context shifts
+    CONTEXT_SHIFT_WORDS = [
+        'but', 'however', 'now', "here's", 'so', 'meanwhile',
+        'instead', 'yet', 'still', 'actually', 'seriously',
+        'basically', 'look', 'think', 'imagine', 'remember',
+        'worse', 'better', 'first', 'second', 'finally',
+        'why', 'how', 'what', 'therefore', 'meanwhile',
+        'consequently', 'furthermore', 'moreover', 'nevertheless'
+    ]
+    # Match word at start of sentence followed by comma
+    for word in CONTEXT_SHIFT_WORDS:
+        pattern = rf'(?<=^|\.\s+)({re.escape(word)})\b\s*,'
+        text = re.sub(pattern, rf'\1 <break time="450ms"/>,', text, flags=re.IGNORECASE)
+    
+    # 3. Add 200ms pause before rhetorical questions
+    text = re.sub(r'\s+(what|how|why|who|when|where)\s+(is|are|was|were|does|do|did|can|could|would|should)\b', 
+                  r' <break time="200ms"/> \1 \2', text, flags=re.IGNORECASE)
+    
+    # 4. Add emphasis pauses around key technical terms (3+ syllables)
+    # This forces TTS to slow down for complex concepts
+    TECH_EMPHASIS_WORDS = [
+        'quantization', 'inference', 'architecture', 'implementation',
+        'optimization', 'orchestration', 'virtualization', 'containerization',
+        'distributed', 'asynchronous', 'synchronous', 'authentication',
+        'authorization', 'encryption', 'decryption', 'serialization',
+        'deserialization', 'configuration', 'observability', 'reliability',
+        'scalability', 'maintainability', 'interoperability'
+    ]
+    for word in TECH_EMPHASIS_WORDS:
+        pattern = rf'\b({re.escape(word)})\b'
+        text = re.sub(pattern, r'<break time="150ms"/> \1 <break time="150ms"/>', text, flags=re.IGNORECASE)
+    
+    # 5. Add dramatic pause before "But here's the thing" / "The reality is" patterns
+    text = re.sub(r'\s+(but here\'s the thing|the reality is|don\'t get me wrong|in practice|actually)\b', 
+                  r' <break time="500ms"/> \1', text, flags=re.IGNORECASE)
+    
+    # 6. Add pause before direct viewer address
+    text = re.sub(r'\s+(you need to|you should|you can|you\'ll|your)\b', 
+                  r' <break time="200ms"/> \1', text, flags=re.IGNORECASE)
+    
+    # Clean up multiple consecutive breaks
+    text = re.sub(r'(<break time="[^"]*"/>\s*){2,}', r'<break time="500ms"/> ', text)
+    
+    return text
+
+
+def _enhance_tts_prosody(text):
+    """
+    Add prosody markers for dynamic pitch/speed variation.
+    ElevenLabs supports some SSML-like controls via voice_settings.
+    """
+    # Mark emphasis words for potential pitch variation
+    EMPHASIS_PATTERNS = [
+        (r'\b(critical|crucial|essential|vital|must|never|always)\b', 'high'),
+        (r'\b(but|however|actually|surprisingly|shockingly)\b', 'contrast'),
+        (r'\b(first|second|finally|lastly)\b', 'structural'),
+        (r'\$(?:\d+\.?\d*)?[MBK]?', 'metric'),
+        (r'\b\d+%', 'metric'),
+    ]
+    
+    # For now, we'll use text-level markers that ElevenLabs may interpret
+    # In the future, we could segment and apply different voice_settings per segment
     return text
 
 
@@ -1512,13 +1578,16 @@ def _generate_elevenlabs(text, output_path):
             "xi-api-key": ELEVENLABS_API_KEY
         }
         
+        # Dynamic voice settings based on content analysis
+        # Lower stability = more expressive, higher = more consistent
+        # Style = expressiveness (0-1)
         data = {
             "text": text,
             "model_id": "eleven_turbo_v2_5",
             "voice_settings": {
-                "stability": 0.3,
+                "stability": 0.25,        # Slightly lower for more natural variation
                 "similarity_boost": 0.85,
-                "style": 0.3,
+                "style": 0.4,             # Higher for more expressive delivery
                 "use_speaker_boost": True
             }
         }
@@ -1544,7 +1613,7 @@ class AudioAuditEngine:
     def __init__(self, api_key):
         self.client = genai.Client(api_key=api_key)
 
-    def _call_gemini_audio(self, audio_path, script_text):
+def _call_gemini_audio(self, audio_path, script_text):
         try:
             # Upload the audio file
             with open(audio_path, 'rb') as f:
@@ -1552,15 +1621,20 @@ class AudioAuditEngine:
             
             # Requesting a technical audit of the audio
             prompt = f"""AUDIT TASK: Compare this generated AI voiceover with the following technical script. Evaluate both technical accuracy and human likeness (Humanizer check).
-            
+
             TECHNICAL SCRIPT:
             {script_text}
             
             CRITERIA:
             1. Correct Pronunciation: Specifically check 'tiktoken', 'GGUF', 'vLLM', 'quantization', 'inference'.
             2. Pacing & Flow: Check if the pacing is too fast for complex concepts, or too flat and predictable.
+               - Are there natural pauses at sentence boundaries? (300ms)
+               - Are there longer pauses at context shifts? (450ms)  
+               - Do technical terms have breathing room? (150ms before/after)
+               - Are rhetorical questions given space to land? (200ms before)
             3. Persona & Vibe: Does it sound like an authoritative, conversational human colleague ("smart friend over coffee"), or a robotic, monotonic news anchor?
             4. Cadence & Rhythm (Humanizer Audit): Detect and flag artificial-sounding speech rhythms, robotic text-to-speech cadence, or lack of natural inflection/pauses.
+            5. Direct Address Energy: When saying "you" / "your" / "you need to" — does it sound personal and engaging?
             
             Return ONLY a JSON object:
             {{
@@ -1603,6 +1677,9 @@ def generate_voiceover(text, custom_phonetic_map=None, api_key=None):
         text_to_speak = clean_tts_text(text, phonetic=True, custom_phonetic_map=current_phonetic_map)
         # Pre-TTS symbol sanitization to prevent glitchy artifacts
         text_to_speak = _sanitize_tts_symbols(text_to_speak)
+        # Apply enhanced phrasing pauses and prosody markers
+        text_to_speak = _enforce_phrasing_pauses(text_to_speak)
+        text_to_speak = _enhance_tts_prosody(text_to_speak)
         print(f"🎙️ [AUDIO LOOP] Act: Generating iteration {iterations}...")
         
         path, dur, word_timestamps = None, 0, []

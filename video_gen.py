@@ -3892,6 +3892,167 @@ def _outro_clip(duration, accent_color):
     bg = ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=duration)
     return bg.with_duration(duration)
 
+# ── MID-VIDEO RE-ENGAGEMENT HOOKS ─────────────────────────────────────────
+def _summary_slide_clip(summary_text, accent_color, audio_duration, start_time, duration=4.0):
+    """
+    Creates a summary slide overlay that appears at key transition points
+    to reset viewer attention and reinforce key takeaways.
+    """
+    try:
+        f = gf(36, bold=True)
+        # Wrap text to fit width
+        max_chars = 35
+        words = summary_text.split()
+        lines = []
+        current_line = []
+        current_len = 0
+        for w in words:
+            if current_len + len(w) + 1 > max_chars:
+                lines.append(" ".join(current_line))
+                current_line = [w]
+                current_len = len(w)
+            else:
+                current_line.append(w)
+                current_len += len(w) + 1
+        if current_line:
+            lines.append(" ".join(current_line))
+        
+        line_height = 50
+        padding_x, padding_y = 40, 30
+        text_w = max(f.getbbox(l)[2] for l in lines)
+        text_h = len(lines) * line_height
+        img_w = min(text_w + padding_x * 2, FRAME_W - 100)
+        img_h = text_h + padding_y * 2
+        
+        img = Image.new("RGBA", (img_w, img_h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        
+        # Background with accent border
+        draw.rounded_rectangle([0, 0, img_w - 1, img_h - 1], radius=16, 
+                              fill=(10, 10, 15, 230), outline=(*accent_color, 200), width=3)
+        
+        # "KEY TAKEAWAY" label
+        label_f = gf(20, bold=True)
+        draw.text((img_w // 2, padding_y), "KEY TAKEAWAY", font=label_f, fill=(*accent_color, 255), anchor="mm")
+        
+        # Summary text lines
+        y_start = padding_y + 35
+        for i, line in enumerate(lines):
+            draw.text((padding_x, y_start + i * line_height), line, font=f, fill=(255, 255, 255, 255))
+        
+        arr = np.array(img.convert("RGB"))
+        mask = np.array(img.split()[3]).astype(float) / 255.0
+        
+        clip = ImageClip(arr, duration=duration)
+        mclip = VideoClip(lambda t: mask, is_mask=True, duration=duration)
+        
+        # Position center screen, slightly above center
+        return clip.with_mask(mclip).with_position(("center", int(FRAME_H * 0.35))).with_start(start_time).with_effects([vfx.CrossFadeIn(0.5), vfx.CrossFadeOut(0.5)])
+    except Exception as e:
+        print(f"⚠️ Summary slide error: {e}")
+        return None
+
+
+def _quiz_prompt_clip(question, accent_color, audio_duration, start_time, duration=3.0):
+    """
+    Creates an interactive quiz/poll overlay to re-engage viewers at mid-video points.
+    """
+    try:
+        f = gf(32, bold=True)
+        max_chars = 40
+        words = question.split()
+        lines = []
+        current_line = []
+        current_len = 0
+        for w in words:
+            if current_len + len(w) + 1 > max_chars:
+                lines.append(" ".join(current_line))
+                current_line = [w]
+                current_len = len(w)
+            else:
+                current_line.append(w)
+                current_len += len(w) + 1
+        if current_line:
+            lines.append(" ".join(current_line))
+        
+        line_height = 45
+        padding_x, padding_y = 40, 30
+        text_w = max(f.getbbox(l)[2] for l in lines)
+        text_h = len(lines) * line_height
+        img_w = min(text_w + padding_x * 2, FRAME_W - 100)
+        img_h = text_h + padding_y * 2 + 60  # Extra space for "💬 Comment below"
+        
+        img = Image.new("RGBA", (img_w, img_h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        
+        # Background with pulsing accent border
+        draw.rounded_rectangle([0, 0, img_w - 1, img_h - 1], radius=16,
+                              fill=(15, 15, 25, 240), outline=(*accent_color, 255), width=4)
+        
+        # Question lines
+        y_start = padding_y
+        for i, line in enumerate(lines):
+            draw.text((padding_x, y_start + i * line_height), line, font=f, fill=(255, 255, 255, 255))
+        
+        # CTA at bottom
+        cta_f = gf(22, bold=True)
+        draw.text((img_w // 2, img_h - padding_y - 25), "💬 Drop your answer in comments!", font=cta_f, fill=(*accent_color, 255), anchor="mm")
+        
+        arr = np.array(img.convert("RGB"))
+        mask = np.array(img.split()[3]).astype(float) / 255.0
+        
+        clip = ImageClip(arr, duration=duration)
+        mclip = VideoClip(lambda t: mask, is_mask=True, duration=duration)
+        
+        # Position lower third
+        return clip.with_mask(mclip).with_position(("center", int(FRAME_H * 0.65))).with_start(start_time).with_effects([vfx.CrossFadeIn(0.3)])
+    except Exception as e:
+        print(f"⚠️ Quiz prompt error: {e}")
+        return None
+
+
+def _pattern_interrupt_marker(accent_color, audio_duration, start_time, marker_type="shift", duration=1.5):
+    """
+    Creates a brief visual marker at pattern interrupt points (topic transitions, etc.)
+    Types: 'shift' (topic change), 'payoff' (key insight coming), 'recap' (summary incoming)
+    """
+    try:
+        markers = {
+            "shift": ("⚡ TOPIC SHIFT", "NEXT: "),
+            "payoff": ("🎯 KEY INSIGHT", "PAY ATTENTION: "),
+            "recap": ("📋 QUICK RECAP", "SO FAR: "),
+            "loop": ("🔄 LOOPING BACK", "REMEMBER: ")
+        }
+        label, prefix = markers.get(marker_type, markers["shift"])
+        
+        f = gf(40, bold=True)
+        padding_x, padding_y = 50, 25
+        text_w = f.getbbox(label)[2]
+        img_w = text_w + padding_x * 2
+        img_h = 80
+        
+        img = Image.new("RGBA", (img_w, img_h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        
+        # Animated background
+        draw.rounded_rectangle([0, 0, img_w - 1, img_h - 1], radius=12,
+                              fill=(*accent_color, 200), outline=(255, 255, 255, 100), width=2)
+        
+        draw.text((img_w // 2, img_h // 2), label, font=f, fill=(255, 255, 255, 255), anchor="mm")
+        
+        arr = np.array(img.convert("RGB"))
+        mask = np.array(img.split()[3]).astype(float) / 255.0
+        
+        clip = ImageClip(arr, duration=duration)
+        mclip = VideoClip(lambda t: mask, is_mask=True, duration=duration)
+        
+        # Top center, animate in/out
+        pos = ("center", 80)
+        return clip.with_mask(mclip).with_position(pos).with_start(start_time).with_effects([vfx.CrossFadeIn(0.2), vfx.CrossFadeOut(0.3)])
+    except Exception as e:
+        print(f"⚠️ Pattern interrupt marker error: {e}")
+        return None
+
 def apply_pattern_interrupts(frame_np, t, cues):
     """Applies visual disruption effects based on retention cues (glitches, zooms, shakes)."""
     if not cues:
@@ -5600,6 +5761,66 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     hook_overlay = _hook_text_overlay(hook_text, accent_color, audio_duration)
     if hook_overlay:
         engagement_clips.append(hook_overlay)
+
+    # ── MID-VIDEO RE-ENGAGEMENT HOOKS ──────────────────────────────────────
+    # Add summary slides, quiz prompts, and pattern interrupt markers at strategic points
+    if is_longform:
+        # Summary slides at 30%, 50%, 70% of video
+        summary_points = [
+            (0.30, "Core concept explained — now diving into implementation"),
+            (0.50, "Key insight: the architecture scales differently than expected"),
+            (0.70, "Putting it all together — here's the complete workflow"),
+        ]
+        for pct, summary_text in summary_points:
+            start_time = audio_duration * pct
+            if start_time < audio_duration - 5:
+                slide = _summary_slide_clip(summary_text, accent_color, audio_duration, start_time)
+                if slide:
+                    engagement_clips.append(slide)
+        
+        # Quiz prompts at natural pause points (topic transitions)
+        chapters = script_json.get("chapters", [])
+        if chapters:
+            for i, ch in enumerate(chapters):
+                if i > 0 and i < len(chapters) - 1:
+                    start_s = float(ch.get("approx_start_seconds", 0))
+                    if start_s > 10 and start_s < audio_duration - 10:
+                        question = f"What's your take on {ch.get('chapter_title', 'this section')[:30]}?"
+                        quiz = _quiz_prompt_clip(question, accent_color, audio_duration, start_s + 2.0)
+                        if quiz:
+                            engagement_clips.append(quiz)
+                        
+                        # Pattern interrupt marker
+                        marker = _pattern_interrupt_marker(accent_color, audio_duration, start_s, "shift")
+                        if marker:
+                            engagement_clips.append(marker)
+        
+        # Payoff zone marker at 70%
+        payoff_start = audio_duration * 0.70
+        if payoff_start < audio_duration - 10:
+            marker = _pattern_interrupt_marker(accent_color, audio_duration, payoff_start, "payoff")
+            if marker:
+                engagement_clips.append(marker)
+            
+            # Final recap before outro
+            recap_start = audio_duration * 0.85
+            if recap_start < audio_duration - 8:
+                marker = _pattern_interrupt_marker(accent_color, audio_duration, recap_start, "recap")
+                if marker:
+                    engagement_clips.append(marker)
+    else:
+        # For Shorts: single mid-point engagement
+        mid_point = audio_duration * 0.50
+        if mid_point < audio_duration - 3:
+            # Quick summary
+            slide = _summary_slide_clip("Here's the key takeaway...", accent_color, audio_duration, mid_point, duration=2.5)
+            if slide:
+                engagement_clips.append(slide)
+            
+            # Pattern interrupt
+            marker = _pattern_interrupt_marker(accent_color, audio_duration, mid_point, "shift", duration=1.0)
+            if marker:
+                engagement_clips.append(marker)
 
     # Phased scans removed in favor of full-screen loops as requested
     pass

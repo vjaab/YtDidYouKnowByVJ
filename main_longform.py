@@ -84,15 +84,23 @@ def format_longform_description(script_data, hashtags):
     if chapters:
         for ch in chapters:
             start_s = ch.get("approx_start_seconds", 0)
-            m, s = divmod(int(start_s), 60)
+            h, rem = divmod(int(start_s), 3600)
+            m, s = divmod(rem, 60)
             ch_title = ch.get("chapter_title", f"Chapter {ch.get('chapter_number', '?')}")[:60]
-            timestamps_str += f"{m}:{s:02d} — {ch_title}\n"
+            if h > 0:
+                timestamps_str += f"{h:02d}:{m:02d}:{s:02d} — {ch_title}\n"
+            else:
+                timestamps_str += f"{m:02d}:{s:02d} — {ch_title}\n"
     elif fact_timestamps:
         for ft in fact_timestamps:
             start_s = ft.get("approx_start_seconds", 0)
-            m, s = divmod(int(start_s), 60)
+            h, rem = divmod(int(start_s), 3600)
+            m, s = divmod(rem, 60)
             topic = ft.get("topic", "Section")[:60]
-            timestamps_str += f"{m}:{s:02d} — {topic}\n"
+            if h > 0:
+                timestamps_str += f"{h:02d}:{m:02d}:{s:02d} — {topic}\n"
+            else:
+                timestamps_str += f"{m:02d}:{s:02d} — {topic}\n"
 
     # Build sources section
     sources_str = "📚 SOURCES:\n"

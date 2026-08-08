@@ -80,7 +80,7 @@ Return ONLY a JSON array of objects, one per sentence, in order:
   {{
     "chunk_id": 1,
     "scene_objective": "What technical concept must be understood here",
-    "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup",
+    "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup|Code Snippet|Screen Recording|Flowchart|Terminal Output|GitHub UI|Side-by-side Comparison|Architecture Diagram",
     "nano_visual_prompt": "Cinematic close-up of...",
     "on_screen_elements": ["labels", "arrows", "highlights", "icons", "charts", "code snippets"],
     "camera_motion": "Slow zoom|Dolly-in|Orbit|Pan|Tracking shot|None",
