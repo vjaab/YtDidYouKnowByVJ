@@ -369,7 +369,9 @@ def get_optimized_metadata(
     initial_companies=None, 
     initial_people=None, 
     initial_hashtags=None,
-    is_shorts=True
+    is_shorts=True,
+    editorial_perspective=None,
+    content_fingerprint=None
 ):
     """
     Computes an optimized list of 8-15 unique tags and exactly 4 unique hashtags
@@ -401,6 +403,12 @@ def get_optimized_metadata(
         elif isinstance(p, str):
             norm_people.append(p)
     initial_people = norm_people
+    
+    # Add editorial perspective to keywords for metadata diversity
+    if editorial_perspective:
+        initial_keywords.append(editorial_perspective.lower().replace(" ", "_"))
+    if content_fingerprint:
+        initial_keywords.append(f"fp_{content_fingerprint[:8]}")
     
     full_text = f"{title} {script} {sub_category}".lower()
     

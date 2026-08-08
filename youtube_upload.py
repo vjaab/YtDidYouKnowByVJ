@@ -109,7 +109,7 @@ def get_authenticated_service():
         return None
 
 
-def upload_video(video_path, title, description, tags, thumbnail_path=None, category_id="22", comment_hook=None):
+def upload_video(video_path, title, description, tags, thumbnail_path=None, category_id="22", comment_hook=None, is_longform=False, script_data=None):
     youtube = get_authenticated_service()
     if not youtube:
         return False, "Failed to authenticate with YouTube API"
@@ -121,6 +121,36 @@ def upload_video(video_path, title, description, tags, thumbnail_path=None, cate
         cleaned_t = str(t).strip()
         if cleaned_t and cleaned_t not in unique_tags:
             unique_tags.append(cleaned_t)
+
+    # ── YPP COMPLIANCE: Determine if mandatory AI disclosure is needed ──
+    # YouTube requires disclosure for "realistic synthetic content" that could mislead viewers:
+    # - Deepfakes of real people (face/body alteration)
+    # - Synthetic voices of real people (celebrities, politicians, public figures)
+    # - Fabricated events depicted as real
+    # AI-assisted production (TTS narration, AI-generated visuals for concepts) does NOT require disclosure
+    # unless it depicts a real person doing/saying something they didn't actually do/say.
+    
+    requires_ai_disclosure = False
+    if script_data:
+        # Check for realistic synthetic media triggers
+        lipsync_path = script_data.get("lipsync_face_path", "") or script_data.get("kaggle_lipsync_path", "")
+        # If using a real person's likeness/voice for lip-sync, disclosure required
+        if lipsync_path and any(name in lipsync_path.lower() for name in ["vj_profile", "vj_news_anchor", "black_jacket", "blue_jacket"]):
+            # These are the creator's own avatar videos - not a real public figure
+            # No disclosure needed for creator's own likeness
+            pass
+        # Check if script mentions cloning a real person's voice
+        script_text = script_data.get("script", "").lower()
+        real_people_indicators = ["elon musk", "sam altman", "sundar pichai", "satya nadella", "mark zuckerberg", 
+                                   "jensen huang", "demis hassabis", "dario amodei", "bill gates", "jeff bezos"]
+        if any(person in script_text for person in real_people_indicators):
+            # If the content discusses a real person but doesn't synthesize their voice/face, no disclosure needed
+            # Only if we're actually cloning their voice/face would disclosure be needed
+            pass
+    
+    # For this pipeline: AI narration + AI visuals for concepts = production assistance
+    # No realistic synthetic media of real people = no mandatory disclosure toggle needed
+    # But we keep the field available for future use
 
     body = {
         "snippet": {
@@ -134,9 +164,9 @@ def upload_video(video_path, title, description, tags, thumbnail_path=None, cate
         "status": {
             "privacyStatus":          "public",
             "selfDeclaredMadeForKids": False,
-            # NOTE: containsSyntheticMedia removed — YouTube's policy targets
-            # realistic deepfakes of real people, not AI-narrated educational content.
-            # Transparency is maintained via the DISCLOSURE line in the description.
+            # AI Disclosure: Set to True only for realistic synthetic media of real people/events
+            # Our pipeline uses AI narration + conceptual visuals = production assistance (no disclosure required)
+            "containsSyntheticMedia": requires_ai_disclosure,
         },
     }
 

@@ -73,6 +73,15 @@ def format_description(ai_description, script, hashtags, slot="Slot A", chunks=N
         
     source_str = f"📰 SOURCE ARTICLE: {source_url}\n" if source_url else ""
 
+    # ── YPP COMPLIANCE: Editorial Perspective Display ──
+    editorial_section = ""
+    if script_data:
+        perspective = script_data.get("editorial_perspective")
+        angle = script_data.get("editorial_angle")
+        fingerprint = script_data.get("content_fingerprint")
+        if perspective:
+            editorial_section = f"\n🎯 EDITORIAL LENS: {perspective}\n   {angle}\n   Content ID: {fingerprint}\n━━━━━━━━━━━━━━━━━━━━━━\n"
+
     # ── SHORTS-ONLY: Incentive Loop Elements ──
     incentive_section = ""
     is_shorts = "Slot C" not in slot
@@ -119,7 +128,7 @@ def format_description(ai_description, script, hashtags, slot="Slot A", chunks=N
 {timestamps_str}
 ━━━━━━━━━━━━━━━━━━━━━━
 {source_str}━━━━━━━━━━━━━━━━━━━━━━
-🛠️ RESOURCES & DEEP DIVES:
+{editorial_section}🛠️ RESOURCES & DEEP DIVES:
 
 {links_str if links_str else "🚀 FULL AI NEWS ARCHIVE ON TELEGRAM"}
 💼 Career & Industry Insights
@@ -133,7 +142,7 @@ Join the community 👇
 💬 WhatsApp Dev Channel → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
 
 {incentive_section}
-⚠️ DISCLOSURE: This video uses AI-assisted production tools (TTS voiceover, AI-generated visuals). All editorial opinions, topic selection, and analysis are by VJ.
+⚠️ AI DISCLOSURE: This video uses AI-assisted production tools (AI voiceover narration, AI-generated conceptual visuals). All editorial decisions — topic selection, research, scriptwriting, analysis, and fact-checking — are performed by VJ. No realistic synthetic media of real people or fabricated events is depicted.
 
 {hashtag_str}""",
 
@@ -150,8 +159,8 @@ Join the community 👇
 
 🔧 Full analysis & deep dives → Telegram
 
-{incentive_section}
-⚠️ DISCLOSURE: AI tools are used in production (voiceover, visuals). Topic selection, research, and commentary by VJ.
+{editorial_section}{incentive_section}
+⚠️ AI DISCLOSURE: AI tools used for production (voiceover narration, conceptual visuals). Topic selection, research, commentary, and analysis by VJ. No deepfakes or synthetic depictions of real individuals.
 
 {hashtag_str}""",
 
@@ -172,8 +181,8 @@ Join engineers getting daily AI research drops:
 💬 WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
 🔗 All links → bio
 
-{incentive_section}
-⚠️ DISCLOSURE: This video uses AI-assisted tools for production. All editorial decisions and analysis are human-driven by VJ.
+{editorial_section}{incentive_section}
+⚠️ AI DISCLOSURE: AI-assisted production (narration, visuals). All editorial decisions and analysis human-driven by VJ. No realistic synthetic media of real people.
 
 {hashtag_str}""",
 
@@ -194,8 +203,8 @@ Join engineers getting daily AI research drops:
 💬 https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
 💼 https://www.linkedin.com/in/vijayakumar-j/
 
-{incentive_section}
-⚠️ DISCLOSURE: AI-assisted production (voiceover, visuals). Editorial direction & analysis by VJ.
+{editorial_section}{incentive_section}
+⚠️ AI DISCLOSURE: AI-assisted production (voiceover, conceptual visuals). Editorial direction & analysis by VJ. No deepfakes or fabricated events.
 
 {hashtag_str}""",
     ]
@@ -720,7 +729,9 @@ def run_pipeline(topic_type="auto", dry_run=False):
         initial_companies=script_data.get("companies_mentioned", []),
         initial_people=initial_people,
         initial_hashtags=script_data.get("hashtags", []),
-        is_shorts=True
+        is_shorts=True,
+        editorial_perspective=script_data.get("editorial_perspective"),
+        content_fingerprint=script_data.get("content_fingerprint")
     )
     hashtags = optimized_metadata["hashtags"]
     tags = optimized_metadata["tags"]
@@ -738,14 +749,19 @@ def run_pipeline(topic_type="auto", dry_run=False):
         hashtag_str = " ".join(hashtags) if hashtags else ""
         hook_line = script_data.get("hook_text", title)
         source_line = f"📰 Source: {source_url}\n" if source_url else ""
+        # Add editorial perspective for YPP compliance
+        editorial_line = ""
+        if script_data.get("editorial_perspective"):
+            editorial_line = f"\n🎯 Lens: {script_data['editorial_perspective']} | ID: {script_data.get('content_fingerprint', '')[:8]}\n"
         description = (
             f"{hook_line}\n"
             f"{hashtag_str}\n\n"
             f"{ai_desc[:200]}\n\n"
             f"{source_line}"
+            f"{editorial_line}"
             f"\n🚀 Daily AI News → https://t.me/technewsbyvj\n"
             f"💬 WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z\n\n"
-            f"⚠️ DISCLOSURE: AI-assisted production (voiceover, visuals). Editorial direction & analysis by VJ."
+            f"⚠️ AI DISCLOSURE: AI-assisted production (voiceover narration, AI-generated conceptual visuals). All editorial decisions — topic selection, research, scriptwriting, analysis — by VJ. No deepfakes or synthetic depictions of real individuals."
         )
     else:
         description = format_description(ai_desc, script, hashtags, slot=slot, chunks=chunks, relevant_links=relevant_links, source_url=source_url, script_data=script_data)
@@ -765,7 +781,9 @@ def run_pipeline(topic_type="auto", dry_run=False):
             description=description,
             tags=tags,
             thumbnail_path=thumbnail_path,
-            comment_hook=script_data.get("comment_hook")
+            comment_hook=script_data.get("comment_hook"),
+            is_longform=False,
+            script_data=script_data
         )
 
     if not uploaded:

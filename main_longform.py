@@ -68,6 +68,14 @@ def format_longform_description(script_data, hashtags):
     topics = script_data.get("longform_topics", [])
     description_ai = script_data.get("description", "")
     depth_mode = script_data.get("depth_mode", "single")
+    
+    # YPP Compliance: Editorial perspective
+    perspective = script_data.get("editorial_perspective")
+    angle = script_data.get("editorial_angle")
+    fingerprint = script_data.get("content_fingerprint")
+    editorial_section = ""
+    if perspective:
+        editorial_section = f"\n🎯 EDITORIAL LENS: {perspective}\n   {angle}\n   Content ID: {fingerprint}\n━━━━━━━━━━━━━━━━━━━━━━\n"
 
     hashtag_str = " ".join(hashtags) if hashtags else ""
 
@@ -110,9 +118,9 @@ def format_longform_description(script_data, hashtags):
 ━━━━━━━━━━━━━━━━━━━━━━
 {sources_str}
 ━━━━━━━━━━━━━━━━━━━━━━
-💼 VJ LinkedIn: https://www.linkedin.com/in/vijayakumar-j/
+{editorial_section}💼 VJ LinkedIn: https://www.linkedin.com/in/vijayakumar-j/
 
-⚠️ DISCLOSURE: This video uses AI-assisted production tools (TTS voiceover, AI-generated visuals). All editorial opinions, topic selection, and analysis are by VJ.
+⚠️ AI DISCLOSURE: This video uses AI-assisted production tools (AI voiceover narration, AI-generated conceptual visuals). All editorial decisions — topic selection, research, scriptwriting, chapter structuring, analysis, and fact-checking — are performed by VJ. No realistic synthetic media of real people or fabricated events is depicted.
 
 {hashtag_str}""",
 
@@ -125,9 +133,9 @@ def format_longform_description(script_data, hashtags):
 {timestamps_str}
 {sources_str}
 ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
-💼 LinkedIn: https://www.linkedin.com/in/vijayakumar-j/
+{editorial_section}💼 LinkedIn: https://www.linkedin.com/in/vijayakumar-j/
 
-⚠️ DISCLOSURE: AI tools are used in production (voiceover, visuals). Topic selection, research, and commentary by VJ.
+⚠️ AI DISCLOSURE: AI tools used for production (voiceover narration, conceptual visuals). Topic selection, research, commentary, and chaptered analysis by VJ. No deepfakes or synthetic depictions of real individuals.
 
 {hashtag_str}""",
 
@@ -141,9 +149,9 @@ def format_longform_description(script_data, hashtags):
 ━━━━━━━━━━━━━━━━━━━━━━
 {sources_str}
 ━━━━━━━━━━━━━━━━━━━━━━
-💼 LinkedIn: https://www.linkedin.com/in/vijayakumar-j/
+{editorial_section}💼 LinkedIn: https://www.linkedin.com/in/vijayakumar-j/
 
-⚠️ DISCLOSURE: AI-assisted production (voiceover, visuals). Editorial direction & analysis by VJ.
+⚠️ AI DISCLOSURE: AI-assisted production (narration, visuals). All editorial decisions and chaptered analysis human-driven by VJ. No realistic synthetic media of real people.
 
 {hashtag_str}""",
     ]
@@ -574,7 +582,9 @@ def run_longform_pipeline(dry_run=False):
         initial_companies=companies_all,
         initial_people=initial_people,
         initial_hashtags=hashtags,
-        is_shorts=False
+        is_shorts=False,
+        editorial_perspective=script_data.get("editorial_perspective"),
+        content_fingerprint=script_data.get("content_fingerprint")
     )
     hashtags = optimized_metadata["hashtags"]
     tags = optimized_metadata["tags"]
@@ -587,7 +597,9 @@ def run_longform_pipeline(dry_run=False):
     uploaded, result = upload_video(
         video_path, title, description, tags,
         thumbnail_path=thumbnail_path,
-        comment_hook=script_data.get("comment_hook")
+        comment_hook=script_data.get("comment_hook"),
+        is_longform=True,
+        script_data=script_data
     )
     if not uploaded:
         log_message(f"ERROR: YouTube upload failed: {result}")

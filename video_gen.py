@@ -95,13 +95,13 @@ def get_vibrant_dominant_color(img_path):
         print(f"⚠️ Error extracting dominant color: {e}")
         return None
 
-def _generate_layout_profile(headline, dominant_color=None):
+def _generate_layout_profile(seed_string, dominant_color=None):
     """
     YPP Compliance: Generate a deterministic-but-unique visual layout
     for each video based on its headline hash. This breaks the
     'template fingerprint' that YouTube's Inauthentic Content policy flags.
     """
-    seed = int(_hashlib.md5(headline.encode('utf-8')).hexdigest(), 16)
+    seed = int(_hashlib.md5(seed_string.encode('utf-8')).hexdigest(), 16)
     rng = random.Random(seed)
 
     # Legacy defaults (if flag is off)
@@ -4618,6 +4618,11 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     # ── YPP COMPLIANCE: Per-Video Layout Randomization ────────────────────
     headline = script_json.get("original_news_headline", script_json.get("title", "Tech News"))
     
+    # Include editorial perspective in layout seed for additional variation
+    editorial_perspective = script_json.get("editorial_perspective", "")
+    fingerprint = script_json.get("content_fingerprint", "")
+    layout_seed = f"{headline}|{editorial_perspective}|{fingerprint}"
+    
     # Extract dominant color from first valid visual path
     first_visual_path = None
     for chunk in chunks:
@@ -4634,7 +4639,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         else:
             print(f"🎨 No vibrant dominant color found in {first_visual_path}, using default accents.")
 
-    layout = _generate_layout_profile(headline, dominant_color=dominant_color)
+    layout = _generate_layout_profile(layout_seed, dominant_color=dominant_color)
     # Merge layout jitter into subtitle shift
     subtitle_y_shift += layout["subtitle_y_jitter"]
 
