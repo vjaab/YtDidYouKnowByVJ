@@ -1,0 +1,29 @@
+[05:34:18] === STARTING CHAPTERED DEEP-DIVE PIPELINE (mode=single) ===
+[05:34:18] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[05:34:18] STEP 1: Fetching RSS articles...
+[05:34:19] 📈 vidIQ: 8 topics.
+[05:35:51] ✅ Fetched 444 total articles.
+[05:35:51] STEP 2 (Attempt 1/8): Generating chaptered deep-dive script...
+[05:37:18] Generated Title: OpenAI's $300 Smart Speaker: The AI Agent Revolution Has Begun
+[05:37:18] Script: 583 words, 5 chapters
+[05:37:18]   Ch1: OpenAI's Hardware Bet: Beyond the LLM (3 beats)
+[05:37:18]   Ch2: The 'Agentic' Future: What It Actually Means (4 beats)
+[05:37:18]   Ch3: Smart Speakers Evolved: From Alexa to AI Companions (5 beats)
+[05:37:18]   Ch4: Privacy, Proactivity, and the $300 AI Brain (5 beats)
+[05:37:18]   Ch5: The Next Computing Platform? OpenAI vs. Big Tech (4 beats)
+[05:37:18] STEP 3: Generating voiceover...
+[05:37:18] ⚠️ Script too short (583 words, ~250s < 300s). Retrying...
+[05:37:18] STEP 2 (Attempt 2/8): Generating chaptered deep-dive script...
+[05:38:25] Generated Title: OmniRoute: 500 AI Models, 290 Providers, 1 FREE Gateway?
+[05:38:25] Script: 855 words, 5 chapters
+[05:38:25]   Ch1: The AI Model Zoo is Broken. OmniRoute's Radical Fix. (5 beats)
+[05:38:25]   Ch2: How OmniRoute Routes, Compresses, and Fails Over. (5 beats)
+[05:38:25]   Ch3: The Billion-Token Gamble: Unlocking Free AI Power. (5 beats)
+[05:38:25]   Ch4: Beyond OpenAI: Building Your Own AI Infrastructure. (5 beats)
+[05:38:25]   Ch5: Future-Proofing AI: Resilience, Cost, and the Open Source Edge. (5 beats)
+[05:38:25] STEP 3: Generating voiceover...
+[05:38:25] STEP 2b: Capturing article screenshots...
+[05:38:32] ✅ Captured 1/1 screenshots.
+[05:38:32] Attempting Kaggle GPU handover...
+[05:46:09] ❌ Kaggle failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 8 min.
+[05:46:09] 🔄 Kaggle unavailable. Using cloud TTS...
