@@ -1237,8 +1237,8 @@ def _enforce_phrasing_pauses(text):
     ]
     # Match word at start of sentence followed by comma
     for word in CONTEXT_SHIFT_WORDS:
-        pattern = rf'(?<=^|\.\s+)({re.escape(word)})\b\s*,'
-        text = re.sub(pattern, rf'\1 <break time="450ms"/>,', text, flags=re.IGNORECASE)
+        pattern = rf'(^|\.\s+)({re.escape(word)})\b\s*,'
+        text = re.sub(pattern, rf'\1\2 <break time="450ms"/>,', text, flags=re.IGNORECASE)
     
     # 3. Add 200ms pause before rhetorical questions
     text = re.sub(r'\s+(what|how|why|who|when|where)\s+(is|are|was|were|does|do|did|can|could|would|should)\b', 
