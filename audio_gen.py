@@ -1627,7 +1627,7 @@ class AudioAuditEngine:
     def __init__(self, api_key):
         self.client = genai.Client(api_key=api_key)
 
-def _call_gemini_audio(self, audio_path, script_text):
+    def _call_gemini_audio(self, audio_path, script_text):
         try:
             # Upload the audio file
             with open(audio_path, 'rb') as f:
