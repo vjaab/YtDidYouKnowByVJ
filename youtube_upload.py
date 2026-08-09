@@ -129,28 +129,12 @@ def upload_video(video_path, title, description, tags, thumbnail_path=None, cate
     # - Fabricated events depicted as real
     # AI-assisted production (TTS narration, AI-generated visuals for concepts) does NOT require disclosure
     # unless it depicts a real person doing/saying something they didn't actually do/say.
-    
-    requires_ai_disclosure = False
-    if script_data:
-        # Check for realistic synthetic media triggers
-        lipsync_path = script_data.get("lipsync_face_path", "") or script_data.get("kaggle_lipsync_path", "")
-        # If using a real person's likeness/voice for lip-sync, disclosure required
-        if lipsync_path and any(name in lipsync_path.lower() for name in ["vj_profile", "vj_news_anchor", "black_jacket", "blue_jacket"]):
-            # These are the creator's own avatar videos - not a real public figure
-            # No disclosure needed for creator's own likeness
-            pass
-        # Check if script mentions cloning a real person's voice
-        script_text = script_data.get("script", "").lower()
-        real_people_indicators = ["elon musk", "sam altman", "sundar pichai", "satya nadella", "mark zuckerberg", 
-                                   "jensen huang", "demis hassabis", "dario amodei", "bill gates", "jeff bezos"]
-        if any(person in script_text for person in real_people_indicators):
-            # If the content discusses a real person but doesn't synthesize their voice/face, no disclosure needed
-            # Only if we're actually cloning their voice/face would disclosure be needed
-            pass
-    
-    # For this pipeline: AI narration + AI visuals for concepts = production assistance
-    # No realistic synthetic media of real people = no mandatory disclosure toggle needed
-    # But we keep the field available for future use
+    #
+    # However, per YouTube's updated policy, we declare ALL videos from this pipeline as containing
+    # synthetic media since they use AI-generated voice (ElevenLabs cloned voice), AI-generated visuals
+    # (Pexels/whiteboard/infographics), and AI-written scripts.
+
+    requires_ai_disclosure = True  # All videos from this pipeline use AI-generated content
 
     body = {
         "snippet": {
