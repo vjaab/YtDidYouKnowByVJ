@@ -10,7 +10,7 @@ import requests
 from PIL import Image
 from datetime import datetime
 from google import genai
-from config import GEMINI_API_KEY, OUTPUT_DIR, VEO_MODEL_ID
+from config import GEMINI_API_KEY, OUTPUT_DIR, VEO_MODEL_ID, HF_TOKEN, CF_ACCOUNT_ID, CF_API_TOKEN, HAS_HF_FALLBACK, HAS_CF_FALLBACK
 import random
 
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")
@@ -792,8 +792,7 @@ Output the visual prompt:"""
 
 def _generate_huggingface_image(prompt, output_path, aspect_ratio="9:16"):
     """Generate an image using Hugging Face FLUX.1 Schnell (free tier, needs HF_TOKEN)."""
-    from config import HF_TOKEN
-    if not HF_TOKEN:
+    if not HAS_HF_FALLBACK:
         return None
     
     if aspect_ratio == "9:16":
@@ -863,8 +862,7 @@ def _generate_pollinations_image(prompt, output_path, aspect_ratio="9:16"):
 
 def _generate_cloudflare_image(prompt, output_path, aspect_ratio="9:16"):
     """Generate an image using Cloudflare Workers AI FLUX.1 Schnell (free tier, needs CF credentials)."""
-    from config import CF_ACCOUNT_ID, CF_API_TOKEN
-    if not CF_ACCOUNT_ID or not CF_API_TOKEN:
+    if not HAS_CF_FALLBACK:
         return None
     
     try:
@@ -874,7 +872,7 @@ def _generate_cloudflare_image(prompt, output_path, aspect_ratio="9:16"):
             headers={
                 "Authorization": f"Bearer {CF_API_TOKEN}",
                 "Content-Type": "application/json"
-			},
+            },
             json={"prompt": prompt},
             timeout=60
         )

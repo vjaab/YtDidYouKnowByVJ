@@ -1113,7 +1113,7 @@ def _ambient_particles(duration, accent_color, particle_style="bokeh"):
         sm_w, sm_h = FRAME_W // scale_down, FRAME_H // scale_down
         mask = np.zeros((sm_h, sm_w), dtype=np.uint8)
         
-        for px, py, speed, offset, p_size, streak_len in particles:
+        for px, py, speed, offset, p_size, streak_len, angle, rotation_speed in particles:
             y = (py + speed * t * 45 + offset) % FRAME_H
             
             if particle_style == "lens_dust":
@@ -5305,6 +5305,79 @@ def create_video(audio_path, script_json, chunks, output_path=None):
         
     return best_video_path
 
+# These would be pre-recorded clips: pointing, surprised, thinking, nodding, etc.
+AVATAR_EXPRESSIONS = {
+    "pointing": ["look at this", "check this out", "see here", "notice"],
+    "surprised": ["wow", "amazing", "incredible", "unbelievable", "shocking", "mind blown"],
+    "thinking": ["think about", "consider", "imagine", "what if", "puzzle"],
+    "nodding": ["exactly", "right", "correct", "yes", "absolutely", "precisely"],
+    "shrugging": ["who knows", "maybe", "perhaps", "unclear", "uncertain"],
+}
+
+# Expression video paths (would need to be created - using main avatar as fallback)
+EXPRESSION_VIDEO_MAP = {
+    "pointing": "assets/video/expressions/pointing.mp4",
+    "surprised": "assets/video/expressions/surprised.mp4",
+    "thinking": "assets/video/expressions/thinking.mp4",
+    "nodding": "assets/video/expressions/nodding.mp4",
+    "shrugging": "assets/video/expressions/shrugging.mp4",
+}
+
+# Dual Avatar / Interview Mode
+DUAL_AVATAR_CONFIG = {
+    "enabled": False,
+    "host_avatar": "assets/video/host.mp4",      # Primary presenter
+    "guest_avatar": "assets/video/guest.mp4",    # Interview guest
+    "host_position": "left",                     # left/right
+    "switch_on_speaker": True,                   # Auto-switch based on script markers
+}
+
+
+
+def _get_avatar_expression_segments(script_text, audio_duration, word_timestamps):
+    """
+    Analyzes script for trigger words and returns time segments where
+    specific expressions should play. Returns list of (start, end, expression_type).
+    """
+    segments = []
+    script_lower = script_text.lower()
+    
+    # Find trigger words and their approximate timestamps
+    for expr_type, triggers in AVATAR_EXPRESSIONS.items():
+        for trigger in triggers:
+            # Find all occurrences in script
+            idx = 0
+            while True:
+                idx = script_lower.find(trigger, idx)
+                if idx == -1:
+                    break
+                
+                # Estimate timestamp from word position
+                word_idx = len(script_lower[:idx].split())
+                if word_idx < len(word_timestamps):
+                    start_time = word_timestamps[word_idx][0] if word_timestamps[word_idx] else 0
+                    end_time = min(start_time + 3.0, audio_duration)  # 3 second expression
+                    segments.append((start_time, end_time, expr_type))
+                
+                idx += len(trigger)
+    
+    # Sort by start time and merge overlapping
+    segments.sort(key=lambda x: x[0])
+    merged = []
+    for seg in segments:
+        if not merged or seg[0] > merged[-1][1]:
+            merged.append(list(seg))
+        else:
+            merged[-1][1] = max(merged[-1][1], seg[1])
+            # Priority: surprised > pointing > thinking > nodding > shrugging
+            priority = {"surprised": 5, "pointing": 4, "thinking": 3, "nodding": 2, "shrugging": 1}
+            if priority.get(seg[2], 0) > priority.get(merged[-1][2], 0):
+                merged[-1][2] = seg[2]
+    
+    return [(s, e, t) for s, e, t in merged]
+
+
+
 def _create_video_internal(audio_path, script_json, chunks, output_path=None, dynamic_params=None):
     """The original heavy-lifting render logic."""
     if dynamic_params is None: dynamic_params = {}
@@ -5430,6 +5503,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         vpath = chunk.get("visual_path")
         if vpath and os.path.exists(vpath) and vpath not in visual_paths:
             visual_paths.append(vpath)
+        elif vpath and not os.path.exists(vpath):
+            print(f"⚠️ Visual path missing on disk: {vpath}")
 
     bg_layer_clips = []
     particle_clips = []
@@ -5439,12 +5514,16 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     reminder_clips = []
     
     if not visual_paths:
+        print("⚠️ No valid visual paths found! Using solid color background.")
         bg_layer_clips.append(ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=audio_duration))
     else:
+        print(f"✅ Using {len(visual_paths)} unique visual assets for background")
+        print(f"DEBUG: is_longform={is_longform}, about to check if is_longform")
         crossfade = 0.4 if not is_longform else 0.6 # Longer crossfade for longform smoothness
         
         # --- LONGFORM 2.5s PACING PATTERN INTERRUPTS ---
         if is_longform:
+            print("DEBUG: Entering is_longform=True branch")
             if os.environ.get("USE_LEGACY_LONGFORM_BG", "0") == "1":
                 clip_dur = 2.5 + crossfade
                 num_clips_needed = int(audio_duration // 2.5) + 1
@@ -5805,11 +5884,15 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 # Reclaim any garbage from the asset processing phase
                 gc.collect()
         else:
+            print("DEBUG: Entering is_longform=False (SHORTS) branch")
             # --- SHORTS PACING SYNCHRONIZED TO CHUNKS ---
+            print("DEBUG: Starting SHORTS chunk loop")
             clip_cache = {}
             for i, chunk in enumerate(chunks):
+                print(f"DEBUG: Processing chunk {i}")
                 vp = chunk.get("visual_path")
                 if not vp or not os.path.exists(vp):
+                    print(f"DEBUG: Chunk {i} has no valid vp, skipping")
                     continue
                 
                 start_t = chunk["start"]
@@ -5971,77 +6054,6 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
     # ── AVATAR EXPRESSION/GESTURE TRIGGERS ──────────────────────────────────────
 # Maps trigger words to avatar expression video segments
-# These would be pre-recorded clips: pointing, surprised, thinking, nodding, etc.
-AVATAR_EXPRESSIONS = {
-    "pointing": ["look at this", "check this out", "see here", "notice"],
-    "surprised": ["wow", "amazing", "incredible", "unbelievable", "shocking", "mind blown"],
-    "thinking": ["think about", "consider", "imagine", "what if", "puzzle"],
-    "nodding": ["exactly", "right", "correct", "yes", "absolutely", "precisely"],
-    "shrugging": ["who knows", "maybe", "perhaps", "unclear", "uncertain"],
-}
-
-# Expression video paths (would need to be created - using main avatar as fallback)
-EXPRESSION_VIDEO_MAP = {
-    "pointing": "assets/video/expressions/pointing.mp4",
-    "surprised": "assets/video/expressions/surprised.mp4",
-    "thinking": "assets/video/expressions/thinking.mp4",
-    "nodding": "assets/video/expressions/nodding.mp4",
-    "shrugging": "assets/video/expressions/shrugging.mp4",
-}
-
-# Dual Avatar / Interview Mode
-DUAL_AVATAR_CONFIG = {
-    "enabled": False,
-    "host_avatar": "assets/video/host.mp4",      # Primary presenter
-    "guest_avatar": "assets/video/guest.mp4",    # Interview guest
-    "host_position": "left",                     # left/right
-    "switch_on_speaker": True,                   # Auto-switch based on script markers
-}
-
-
-def _get_avatar_expression_segments(script_text, audio_duration, word_timestamps):
-    """
-    Analyzes script for trigger words and returns time segments where
-    specific expressions should play. Returns list of (start, end, expression_type).
-    """
-    segments = []
-    script_lower = script_text.lower()
-    
-    # Find trigger words and their approximate timestamps
-    for expr_type, triggers in AVATAR_EXPRESSIONS.items():
-        for trigger in triggers:
-            # Find all occurrences in script
-            idx = 0
-            while True:
-                idx = script_lower.find(trigger, idx)
-                if idx == -1:
-                    break
-                
-                # Estimate timestamp from word position
-                word_idx = len(script_lower[:idx].split())
-                if word_idx < len(word_timestamps):
-                    start_time = word_timestamps[word_idx][0] if word_timestamps[word_idx] else 0
-                    end_time = min(start_time + 3.0, audio_duration)  # 3 second expression
-                    segments.append((start_time, end_time, expr_type))
-                
-                idx += len(trigger)
-    
-    # Sort by start time and merge overlapping
-    segments.sort(key=lambda x: x[0])
-    merged = []
-    for seg in segments:
-        if not merged or seg[0] > merged[-1][1]:
-            merged.append(list(seg))
-        else:
-            merged[-1][1] = max(merged[-1][1], seg[1])
-            # Priority: surprised > pointing > thinking > nodding > shrugging
-            priority = {"surprised": 5, "pointing": 4, "thinking": 3, "nodding": 2, "shrugging": 1}
-            if priority.get(seg[2], 0) > priority.get(merged[-1][2], 0):
-                merged[-1][2] = seg[2]
-    
-    return [(s, e, t) for s, e, t in merged]
-
-
 # ── AVATAR VIDEO PiP ──────────────────────────────────────────────────
     # Skip avatar entirely when Kaggle GPU fallback was used (no lip-sync available)
     skip_avatar = script_json.get("skip_avatar", False)
@@ -7488,12 +7500,43 @@ def _get_avatar_expression_segments(script_text, audio_duration, word_timestamps
     # Free memory before the heavy write operation
     gc.collect()
 
-    # For longform, use lower thread count to reduce FFmpeg memory pressure
-    thread_count = 2 if is_longform else 4
-    final.write_videofile(
-        output_path, fps=30, codec="libx264", audio_codec="aac",
-        threads=thread_count, preset="ultrafast", ffmpeg_params=["-pix_fmt", "yuv420p"]
-    )
+    # CI/CD environment detection for memory-optimized rendering
+    is_ci = os.environ.get("CI") == "true" or os.environ.get("GITHUB_ACTIONS") == "true"
+    
+    if is_ci:
+        # Aggressive memory savings for CI runners
+        thread_count = 1
+        preset = "ultrafast"
+        # Reduce resolution for CI if needed (can be enabled via env var)
+        reduce_resolution = os.environ.get("REDUCE_CI_RESOLUTION") == "true"
+        if reduce_resolution and not is_longform:
+            print("⚠️ CI mode: Reducing resolution to 720x1280 for memory")
+            # This would require resizing the final clip, skip for now
+    else:
+        # For longform, use lower thread count to reduce FFmpeg memory pressure
+        thread_count = 2 if is_longform else 4
+        preset = "ultrafast"
+    
+    print(f"🎬 Rendering video: threads={thread_count}, preset={preset}, CI={is_ci}")
+    
+    # Add timeout and error handling for write_videofile
+    try:
+        final.write_videofile(
+            output_path, fps=30, codec="libx264", audio_codec="aac",
+            threads=thread_count, preset=preset, ffmpeg_params=["-pix_fmt", "yuv420p"]
+        )
+    except Exception as e:
+        print(f"❌ Video write failed: {e}")
+        # Try with even lower settings as last resort
+        if thread_count > 1:
+            print("🔄 Retrying with single thread...")
+            gc.collect()
+            final.write_videofile(
+                output_path, fps=30, codec="libx264", audio_codec="aac",
+                threads=1, preset="ultrafast", ffmpeg_params=["-pix_fmt", "yuv420p"]
+            )
+        else:
+            raise
     
     try:
         final.close()

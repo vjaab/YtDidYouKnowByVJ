@@ -78,6 +78,22 @@ TRENDING_NICHE_BIAS = 0.15         # 0=prefer broad topics, 1=prefer niche topic
 # Cloudflare Workers AI
 CLOUDFLARE_API_TOKEN = os.getenv("CLOUDFLARE_API_TOKEN", "")
 CLOUDFLARE_ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID", "")
+CF_ACCOUNT_ID = CLOUDFLARE_ACCOUNT_ID
+CF_API_TOKEN = CLOUDFLARE_API_TOKEN
+
+# HuggingFace
+HF_TOKEN = os.getenv("HF_TOKEN", "")
+
+# Fallback availability flags
+HAS_HF_FALLBACK = bool(HF_TOKEN)
+HAS_CF_FALLBACK = bool(CF_ACCOUNT_ID and CF_API_TOKEN)
+HAS_PEXELS = bool(os.getenv("PEXELS_API_KEY", ""))
+
+def log_fallback_status():
+    """Log which fallback generators are available."""
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info(f"Fallback generators: HF={HAS_HF_FALLBACK}, CF={HAS_CF_FALLBACK}, Pexels={HAS_PEXELS}, Pollinations=True")
 
 # Text Generation Models (LLMs)
 CLOUDFLARE_TEXT_MODELS = [

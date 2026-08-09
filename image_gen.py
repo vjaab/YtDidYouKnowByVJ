@@ -6,7 +6,7 @@ from PIL import Image
 from datetime import datetime
 from google import genai
 from google.genai import types
-from config import GEMINI_API_KEY, OUTPUT_DIR
+from config import GEMINI_API_KEY, OUTPUT_DIR, HF_TOKEN, CF_ACCOUNT_ID, CF_API_TOKEN, HAS_HF_FALLBACK, HAS_CF_FALLBACK
 
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")
 TODAY = datetime.now().strftime("%Y-%m-%d")
@@ -15,8 +15,7 @@ TODAY = datetime.now().strftime("%Y-%m-%d")
 
 def _generate_huggingface_image(prompt, output_path, aspect_ratio="9:16"):
     """Generate an image using Hugging Face FLUX.1 Schnell (free tier, needs HF_TOKEN)."""
-    from config import HF_TOKEN
-    if not HF_TOKEN:
+    if not HAS_HF_FALLBACK:
         return None
     
     width, height = (1080, 1920) if aspect_ratio == "9:16" else (1920, 1080)
@@ -76,8 +75,7 @@ def _generate_pollinations_image(prompt, output_path, aspect_ratio="9:16"):
 
 def _generate_cloudflare_image(prompt, output_path, aspect_ratio="9:16"):
     """Generate an image using Cloudflare Workers AI FLUX.1 Schnell (free tier, needs CF credentials)."""
-    from config import CF_ACCOUNT_ID, CF_API_TOKEN
-    if not CF_ACCOUNT_ID or not CF_API_TOKEN:
+    if not HAS_CF_FALLBACK:
         return None
     
     try:

@@ -648,6 +648,45 @@ def run_pipeline(topic_type="auto", dry_run=False):
     else:
         log_message(f"✅ Primary visual generator successfully created {gen_success}/{len(chunks)} clips/images.")
 
+    # ── STEP 7.5: Validate Visual Assets Before Render ──────────────────────────
+    log_message("STEP 7.5: Validating visual assets exist on disk...")
+    validated_chunks = []
+    screenshot_fallback = script_data.get("screenshot_path")
+    for chunk in chunks:
+        vp = chunk.get("visual_path")
+        if vp and os.path.exists(vp):
+            validated_chunks.append(chunk)
+        else:
+            chunk_id = chunk.get("chunk_id", "unknown")
+            log_message(f"⚠️ Chunk {chunk_id} missing visual asset: {vp}")
+            # Try to use screenshot as fallback
+            if screenshot_fallback and os.path.exists(screenshot_fallback):
+                log_message(f"   → Using main screenshot as fallback for chunk {chunk_id}")
+                chunk["visual_path"] = screenshot_fallback
+                chunk["visual_type"] = "photo"
+                chunk["source"] = "Screenshot fallback"
+                validated_chunks.append(chunk)
+            elif chunk.get("source", "").startswith("Real Article Screenshot") or chunk.get("source", "").startswith("Evidence Screenshot"):
+                # Screenshot was expected but file missing - try evidence screenshot
+                evidence_fallback = script_data.get("evidence_screenshot_path")
+                if evidence_fallback and os.path.exists(evidence_fallback):
+                    log_message(f"   → Using evidence screenshot as fallback for chunk {chunk_id}")
+                    chunk["visual_path"] = evidence_fallback
+                    chunk["visual_type"] = "photo"
+                    chunk["source"] = "Evidence screenshot fallback"
+                    validated_chunks.append(chunk)
+                else:
+                    log_message(f"❌ Chunk {chunk_id} has no valid visual fallback!")
+            else:
+                log_message(f"❌ Chunk {chunk_id} has no valid visual fallback!")
+    
+    if not validated_chunks:
+        log_message("ERROR: No chunks have valid visual assets after validation. Aborting.")
+        return False
+    
+    chunks = validated_chunks
+    log_message(f"✅ Validated {len(chunks)}/{len(chunks)} chunks have visual assets.")
+    
     # ── STEP 8: Render Video ──────────────────────────────────────────────────
     log_message("STEP 8: Rendering final video with all engagement layers...")
     try:
@@ -701,9 +740,36 @@ def run_pipeline(topic_type="auto", dry_run=False):
         chosen_style = get_color_theme_for_topic(subcat, title, keywords)
         script_data["color_theme"] = chosen_style
 
-        video_path = create_video(audio_path, script_data, chunks)
-        if not video_path or not os.path.exists(video_path):
-            raise Exception("Video file not created.")
+        log_message("STEP 8: Calling video renderer...")
+        try:
+            video_path = create_video(audio_path, script_data, chunks)
+        except MemoryError as e:
+            log_message(f"❌ OUT OF MEMORY during video render: {e}")
+            log_message("💡 Try reducing video resolution or chunk count")
+            return False
+        except Exception as e:
+            log_message(f"❌ Video render exception: {type(e).__name__}: {e}")
+            traceback.print_exc()
+            return False
+        
+        if not video_path:
+            log_message("ERROR: create_video returned None")
+            return False
+            
+        if not os.path.exists(video_path):
+            log_message(f"ERROR: Video file not created at expected path: {video_path}")
+            # Check output directory for any video files
+            output_files = glob.glob(os.path.join(OUTPUT_DIR, "*.mp4"))
+            if output_files:
+                log_message(f"   Found other video files in output: {output_files}")
+            return False
+            
+        file_size = os.path.getsize(video_path)
+        if file_size == 0:
+            log_message(f"ERROR: Video file is empty (0 bytes): {video_path}")
+            return False
+            
+        log_message(f"✅ Video rendered successfully: {video_path} ({file_size/1024/1024:.1f} MB)")
     except Exception as e:
         traceback.print_exc()
         log_message(f"ERROR: Video render failed: {e}")

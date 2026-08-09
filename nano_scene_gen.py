@@ -216,8 +216,8 @@ def _generate_pollinations_image(prompt, output_path, aspect_ratio="9:16"):
 
 def _generate_cloudflare_image(prompt, output_path, aspect_ratio="9:16"):
     """Generate an image using Cloudflare Workers AI FLUX.1 Schnell (free tier, needs CF credentials)."""
-    from config import CF_ACCOUNT_ID, CF_API_TOKEN
-    if not CF_ACCOUNT_ID or not CF_API_TOKEN:
+    from config import HAS_CF_FALLBACK, CF_ACCOUNT_ID, CF_API_TOKEN
+    if not HAS_CF_FALLBACK:
         return None
     
     import requests
