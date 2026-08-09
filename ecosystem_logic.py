@@ -13,13 +13,14 @@ def get_slot_info():
     slot = "Slot A (Discovery)"
         
     # Daily category rotation — High Views & Subscribers Strategy
+    # Quiz & Trivia on alternate days (Mon, Wed, Fri, Sun) for quiz-style shorts
     daily_categories = {
-        "Mon": "AI & Tech Tools",             # Massive trend, AI demos
-        "Tue": "Tech Gadgets & Inventions",   # Consumer tech gadgets, smart devices, new hardware
-        "Wed": "Finance & Tech Economy",      # High-CPC personal finance, Fintech, crypto, market trends
-        "Thu": "Quiz & Trivia",               # Interactive quiz format (high engagement)
-        "Fri": "Life Hacks & Productivity",   # Clever tips, device optimization
-        "Sat": "Agentic AI Facts",            # AI expertise, niche but high CPC
+        "Mon": "Quiz & Trivia",               # Interactive quiz format (high engagement)
+        "Tue": "AI & Tech Tools",             # Massive trend, AI demos
+        "Wed": "Quiz & Trivia",               # Interactive quiz format (high engagement)
+        "Thu": "Tech Gadgets & Inventions",   # Consumer tech gadgets, smart devices, new hardware
+        "Fri": "Quiz & Trivia",               # Interactive quiz format (high engagement)
+        "Sat": "Finance & Tech Economy",      # High-CPC personal finance, Fintech, crypto, market trends
         "Sun": "Quiz & Trivia",               # Weekend quiz binge (high shareability)
     }
     
