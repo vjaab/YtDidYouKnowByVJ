@@ -1,0 +1,22 @@
+[04:31:28] === STARTING DAILY AI PIPELINE (QUIZ) | COUNTRY: FR ===
+[04:31:28] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[04:31:28] STEP 1: Content Ecosystem Check -> Day: Sun, Slot: Slot A (Discovery), Category: Quiz & Trivia
+[04:31:28] 🎯 QUIZ MODE: Category is 'Quiz & Trivia' — forcing topic_type=quiz
+[04:31:28] STEP 2: Fetching articles (RSS + Trending Engine)...
+[04:31:28] 📈 vidIQ: Injected 8 high-signal topics.
+[04:34:03] 🔥 Trending Engine injected 198 high-signal articles for geo=FR.
+[04:34:03] ✅ Fetched 529 total articles (207 GitHub, 8 vidIQ, 56 research, 51 tools, 9 X.com, 198 trending).
+[04:34:03] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[04:35:33] Selected Headline: The First Computer 'Bug' Was a Real Bug! Tech History Quiz
+[04:35:33] Selected URL: https://en.wikipedia.org/wiki/Software_bug#Etymology
+[04:35:33] Breaking Level: 9
+[04:35:33] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[04:35:38] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20260809_043533.png
+[04:35:43] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20260809_043538.png
+[04:35:43] STEP 3d: Fetching and validating entity tags for Short...
+[04:37:15] ✅ Found 3 valid entity tags for the Short.
+[04:37:15] STEP 4: Generating voiceover + word timestamps...
+[04:37:15] Selected Lip-Sync Template: assets/video/red_google.mp4 (from 41 options)
+[04:44:23] ❌ Kaggle Handover failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 7 min.
+[04:44:23] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
+[04:44:23] ⚠️ Lip-sync will be SKIPPED for this video (requires GPU).
