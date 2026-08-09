@@ -13,15 +13,15 @@ def get_slot_info():
     slot = "Slot A (Discovery)"
         
     # Daily category rotation — High Views & Subscribers Strategy
-    # Quiz & Trivia on alternate days (Mon, Wed, Fri, Sun) for quiz-style shorts
+    # Each day has a distinct niche; Quiz & Trivia anchors 3 days for engagement
     daily_categories = {
-        "Mon": "Quiz & Trivia",               # Interactive quiz format (high engagement)
-        "Tue": "AI & Tech Tools",             # Massive trend, AI demos
-        "Wed": "Quiz & Trivia",               # Interactive quiz format (high engagement)
-        "Thu": "Tech Gadgets & Inventions",   # Consumer tech gadgets, smart devices, new hardware
-        "Fri": "Quiz & Trivia",               # Interactive quiz format (high engagement)
-        "Sat": "Finance & Tech Economy",      # High-CPC personal finance, Fintech, crypto, market trends
-        "Sun": "Quiz & Trivia",               # Weekend quiz binge (high shareability)
+        "Mon": "Quiz & Trivia",                    # Interactive quiz format (high engagement)
+        "Tue": "Programming Language Origins",     # Python/Ruby/JS origin stories, creator facts
+        "Wed": "Quiz & Trivia",                    # Interactive quiz format (high engagement)
+        "Thu": "Tech Company Founding Stories",    # Garage stories, near-bankruptcies, name origins
+        "Fri": "Quiz & Trivia",                    # Interactive quiz format (high engagement)
+        "Sat": "Famous Bugs & Glitches",           # Y2K, Ariane 5, Knight Capital, Therac-25
+        "Sun": "Quiz & Trivia",                    # Weekend quiz binge (high shareability)
     }
     
     category = daily_categories.get(day_name, "AI & Tech Tools")
@@ -59,13 +59,13 @@ def get_next_slot(current_slot):
 # ─── Layout Archetypes per Day ──────────────────────────────────────────────
 # Maps day to layout variation for visual variety
 DAILY_LAYOUTS = {
-    "Mon": "split_screen",      # Quiz: options on left, avatar top-right
-    "Tue": "hero_center",       # Tools: demo center, avatar bottom-right
-    "Wed": "side_strip",        # Quiz: vertical strip left
-    "Thu": "asymmetric",        # Gadgets: full-screen presenter
-    "Fri": "top_center",        # Quiz: news ticker style top
-    "Sat": "split_screen",      # Finance: data left, avatar top-right
-    "Sun": "hero_center",       # Quiz: relaxed bottom-right
+    "Mon": "split_screen",                    # Quiz: options on left, avatar top-right
+    "Tue": "hero_center",                     # Language Origins: demo center, avatar bottom-right
+    "Wed": "side_strip",                      # Quiz: vertical strip left
+    "Thu": "asymmetric",                      # Founding Stories: full-screen presenter
+    "Fri": "top_center",                      # Quiz: news ticker style top
+    "Sat": "split_screen",                    # Bugs: data left, avatar top-right
+    "Sun": "hero_center",                     # Quiz: relaxed bottom-right
 }
 
 def get_daily_layout(day_name=None):
