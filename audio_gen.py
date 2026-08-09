@@ -1272,6 +1272,20 @@ def _enforce_phrasing_pauses(text):
     return text
 
 
+def _strip_ssml_for_elevenlabs(text):
+    """
+    Remove SSML break tags for ElevenLabs turbo v2.5 which doesn't support them.
+    The tags would otherwise be spoken aloud as literal text.
+    """
+    if not text:
+        return text
+    # Remove all <break time="..."/> tags
+    cleaned = re.sub(r'<break time="[^"]*"/>', '', text)
+    # Clean up any double spaces left behind
+    cleaned = re.sub(r'\s{2,}', ' ', cleaned)
+    return cleaned.strip()
+
+
 def _enhance_tts_prosody(text):
     """
     Add prosody markers for dynamic pitch/speed variation.
@@ -1680,6 +1694,10 @@ def generate_voiceover(text, custom_phonetic_map=None, api_key=None):
         # Apply enhanced phrasing pauses and prosody markers
         text_to_speak = _enforce_phrasing_pauses(text_to_speak)
         text_to_speak = _enhance_tts_prosody(text_to_speak)
+        
+        # Strip SSML tags for ElevenLabs (turbo v2.5 doesn't support <break> tags)
+        text_to_speak = _strip_ssml_for_elevenlabs(text_to_speak)
+        
         print(f"🎙️ [AUDIO LOOP] Act: Generating iteration {iterations}...")
         
         path, dur, word_timestamps = None, 0, []

@@ -1795,6 +1795,109 @@ def _identity_cta_overlay(identity_text, accent_color, total_dur):
     return clip.with_mask(mclip).with_position((x_pos, y_pos)).with_start(start)
 
 
+# ── LAYER QUIZ: Quiz CTA Overlay (Last 5s) ─────────────────────────────────────
+def _quiz_cta_overlay(comment_hook, incentive_cta_type, digital_asset_offer, accent_color, total_dur):
+    """Quiz-specific CTA for the final moments - simplified, focused on engagement."""
+    dur = 4.0
+    start = total_dur - dur
+    if start < 0:
+        return None
+
+    f_main = gf(38, bold=True)
+    f_sub = gf(28)
+    
+    # Build CTA text based on incentive type
+    cta_lines = []
+    
+    if incentive_cta_type == "comment_trigger":
+        cta_lines = [
+            f"Comment '{comment_hook or 'QUIZ'}' for {digital_asset_offer or 'the quiz pack'}!",
+            "👇 Drop your answer below"
+        ]
+    elif incentive_cta_type == "benchmark_challenge":
+        cta_lines = [
+            "Think you know tech? Comment your score!",
+            "🏆 Beat the high score"
+        ]
+    elif incentive_cta_type == "digital_vault":
+        cta_lines = [
+            f"Get {digital_asset_offer or '50 tech quizzes'} free!",
+            "🔗 Link in bio →"
+        ]
+    else:  # community_audit
+        cta_lines = [
+            "Sub & comment your score for monthly giveaway!",
+            "💰 $100 API credits up for grabs"
+        ]
+    
+    max_w = FRAME_W - 120
+    lines = []
+    for line in cta_lines:
+        words = line.split()
+        cur = []
+        for w in words:
+            test = " ".join(cur + [w])
+            if ts(test, f_main if len(lines) == 0 else f_sub)[0] > max_w and cur:
+                lines.append(" ".join(cur))
+                cur = [w]
+            else:
+                cur.append(w)
+        if cur:
+            lines.append(" ".join(cur))
+    
+    # Calculate dimensions
+    lh_main = ts("Ag", f_main)[1]
+    lh_sub = ts("Ag", f_sub)[1]
+    lsp_main = int(lh_main * 1.3)
+    lsp_sub = int(lh_sub * 1.3)
+    
+    total_h = 0
+    for i, line in enumerate(lines):
+        if i == 0:
+            total_h += lh_main
+        else:
+            total_h += lsp_sub
+    total_h += 20 * (len(lines) - 1)  # Extra gap
+    
+    box_h = total_h + 60
+    box_w = FRAME_W - 80
+    
+    img = Image.new("RGBA", (box_w, box_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    
+    # Glassmorphism card with accent border
+    draw.rounded_rectangle([0, 0, box_w - 1, box_h - 1], radius=20, fill=(10, 15, 25, 220))
+    draw.rounded_rectangle([0, 0, box_w - 1, box_h - 1], radius=20, outline=(*accent_color, 200), width=3)
+    # Accent top bar
+    draw.rectangle([0, 0, box_w, 4], fill=(*accent_color, 255))
+    
+    y = 30
+    for i, line in enumerate(lines):
+        font = f_main if i == 0 else f_sub
+        lw, _ = ts(line, font)
+        tx = (box_w - lw) // 2
+        color = (*accent_color, 255) if i == 0 else (255, 255, 255, 230)
+        draw.text((tx, y), line, font=font, fill=color)
+        y += lsp_main if i == 0 else lsp_sub
+        y += 15  # Gap between lines
+    
+    arr = np.array(img.convert("RGB"))
+    mask_arr = np.array(img.split()[3]).astype(float) / 255.0
+    
+    def opacity_fn(t):
+        if t < 0.4:
+            return t / 0.4
+        elif t > dur - 0.5:
+            return max(0, (dur - t) / 0.5)
+        return 1.0
+    
+    clip = VideoClip(lambda t: arr, duration=dur)
+    mclip = VideoClip(lambda t: mask_arr * opacity_fn(t), is_mask=True, duration=dur)
+    x_pos = 40
+    y_pos = int(FRAME_H - TITLE_BOTTOM_GAP - box_h - 100)
+    return clip.with_mask(mclip).with_position((x_pos, y_pos)).with_start(start)
+
+
 # ── VISUAL UNDERSTANDING LAYER: Infographic Cards ─────────────────────────────
 
 def _render_definition_card(term, definition, accent_color, width=900):
@@ -1887,6 +1990,156 @@ def _render_comparison_card(left_label, left_val, right_label, right_val,
     draw.text((half + 6 + (half - 6 - rw_v) // 2, 70), right_val,
               font=f_val, fill=(255, 255, 255, 255))
 
+    return img
+
+
+def _render_quiz_options_card(option_a, option_b, option_c, accent_color, width=960):
+    """Render three quiz options (A, B, C) as vertical cards for mobile viewing."""
+    f_label = gf(28, bold=True)
+    f_text = gf(32)
+    
+    card_w = width - 80
+    card_h = 110
+    gap = 20
+    total_h = card_h * 3 + gap * 2
+    
+    img = Image.new("RGBA", (width, total_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    
+    options = [
+        ("A", option_a, (255, 215, 0)),  # Gold for A
+        ("B", option_b, (100, 200, 255)),  # Blue for B
+        ("C", option_c, (255, 120, 120)),  # Red/pink for C
+    ]
+    
+    for i, (letter, text, label_color) in enumerate(options):
+        y = i * (card_h + gap)
+        # Card background
+        draw.rounded_rectangle([40, y, width - 40, y + card_h], radius=16,
+                               fill=(15, 15, 25, 230), outline=(*label_color, 180), width=3)
+        
+        # Option letter circle
+        circle_x = 80
+        circle_y = y + card_h // 2
+        draw.ellipse([circle_x - 28, circle_y - 28, circle_x + 28, circle_y + 28],
+                     fill=(*label_color, 255))
+        draw.text((circle_x, circle_y), letter, font=gf(36, bold=True),
+                  fill=(15, 15, 25, 255), anchor="mm")
+        
+        # Option text
+        # Wrap text if too long
+        max_text_w = card_w - 100
+        words = text.split()
+        lines = []
+        current_line = []
+        current_len = 0
+        for w in words:
+            test_line = " ".join(current_line + [w])
+            tw, _ = ts(test_line, f_text)
+            if tw > max_text_w and current_line:
+                lines.append(" ".join(current_line))
+                current_line = [w]
+            else:
+                current_line.append(w)
+        if current_line:
+            lines.append(" ".join(current_line))
+        
+        line_h = 38
+        text_y_start = y + (card_h - len(lines) * line_h) // 2
+        for li, line in enumerate(lines):
+            draw.text((circle_x + 50, text_y_start + li * line_h), line,
+                      font=f_text, fill=(240, 240, 250, 255))
+    
+    return img
+
+
+def _render_quiz_reveal_card(correct_letter, correct_text, accent_color, width=960):
+    """Render the answer reveal with correct option highlighted in green."""
+    f_title = gf(36, bold=True)
+    f_text = gf(40, bold=True)
+    f_desc = gf(26)
+    
+    card_w = width - 80
+    card_h = 160
+    
+    img = Image.new("RGBA", (width, card_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    
+    # Green highlight for correct answer
+    green = (48, 209, 88)
+    
+    # Background card
+    draw.rounded_rectangle([40, 0, width - 40, card_h], radius=18,
+                           fill=(10, 25, 15, 240), outline=(*green, 255), width=4)
+    
+    # "CORRECT ANSWER" label
+    draw.text((width // 2, 30), "✅  CORRECT ANSWER", font=f_title,
+              fill=(*green, 255), anchor="mm")
+    
+    # Option letter in large circle
+    circle_x = width // 2 - 100
+    circle_y = card_h // 2 + 10
+    draw.ellipse([circle_x - 40, circle_y - 40, circle_x + 40, circle_y + 40],
+                 fill=(*green, 255))
+    draw.text((circle_x, circle_y), correct_letter, font=gf(56, bold=True),
+              fill=(255, 255, 255, 255), anchor="mm")
+    
+    # Correct option text
+    max_text_w = card_w - 160
+    words = correct_text.split()
+    lines = []
+    current_line = []
+    for w in words:
+        test_line = " ".join(current_line + [w])
+        tw, _ = ts(test_line, f_text)
+        if tw > max_text_w and current_line:
+            lines.append(" ".join(current_line))
+            current_line = [w]
+        else:
+            current_line.append(w)
+    if current_line:
+        lines.append(" ".join(current_line))
+    
+    line_h = 48
+    text_y_start = card_h // 2 - (len(lines) * line_h) // 2 + 10
+    for li, line in enumerate(lines):
+        draw.text((circle_x + 60, text_y_start + li * line_h), line,
+                  font=f_text, fill=(255, 255, 255, 255))
+    
+    return img
+
+
+def _render_quiz_countdown(number, accent_color, width=960):
+    """Render a large countdown number (3, 2, 1) for the quiz pause."""
+    f_num = gf(180, bold=True)
+    
+    img = Image.new("RGBA", (width, 300), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    
+    # Glowing background circle
+    center_x = width // 2
+    center_y = 150
+    radius = 100
+    
+    # Outer glow
+    for r in range(radius + 20, radius, -2):
+        alpha = int(30 * (radius + 20 - r) / 20)
+        draw.ellipse([center_x - r, center_y - r, center_x + r, center_y + r],
+                     outline=(*accent_color, alpha), width=2)
+    
+    # Main circle
+    draw.ellipse([center_x - radius, center_y - radius, center_x + radius, center_y + radius],
+                 fill=(15, 15, 25, 240), outline=(*accent_color, 255), width=6)
+    
+    # Countdown number
+    draw.text((center_x, center_y), str(number), font=f_num,
+              fill=(255, 255, 255, 255), anchor="mm")
+    
+    # "THINK..." label below
+    f_label = gf(36, bold=True)
+    draw.text((center_x, center_y + radius + 30), "THINK...", font=f_label,
+              fill=(*accent_color, 255), anchor="mm")
+    
     return img
 
 
@@ -2206,12 +2459,14 @@ def _infographic_card_clip(infographic_type, infographic_data,
     and returns a positioned, animated MoviePy clip (or None).
 
     Expected infographic_data shapes:
-      definition  → {"term": "RAG", "definition": "Retrieval-Augmented Generation..."}
-      stat        → {"value": "$4.6B", "label": "OpenAI 2025 Revenue"}
-      comparison  → {"left_label": "GPT-4", "left_val": "128K ctx",
-                     "right_label": "GPT-5", "right_val": "1M ctx"}
-      process     → {"steps": ["Fetch", "Embed", "Retrieve", "Generate"]}
-      flowchart   → {"steps": ["Step A", "Step B", "Step C"]}
+      definition       → {"term": "RAG", "definition": "Retrieval-Augmented Generation..."}
+      stat             → {"value": "$4.6B", "label": "OpenAI 2025 Revenue"}
+      comparison       → {"left_label": "GPT-4", "left_val": "128K ctx",
+                         "right_label": "GPT-5", "right_val": "1M ctx"}
+      process          → {"steps": ["Fetch", "Embed", "Retrieve", "Generate"]}
+      flowchart        → {"steps": ["Step A", "Step B", "Step C"]}
+      quiz_options     → {"option_a": "Moth in relay", "option_b": "Software error", "option_c": "Power surge"}
+      quiz_reveal      → {"correct_letter": "A", "correct_text": "Moth in relay"}
     """
     if not infographic_data or start_time >= audio_duration:
         return None
@@ -2262,6 +2517,19 @@ def _infographic_card_clip(infographic_type, infographic_data,
                     current_data.get("bullet_points", []),
                     accent_color,
                     is_longform=is_longform
+                )
+            elif itype == "quiz_options":
+                pil = _render_quiz_options_card(
+                    current_data.get("option_a", "Option A"),
+                    current_data.get("option_b", "Option B"),
+                    current_data.get("option_c", "Option C"),
+                    accent_color
+                )
+            elif itype == "quiz_reveal":
+                pil = _render_quiz_reveal_card(
+                    current_data.get("correct_letter", "A"),
+                    current_data.get("correct_text", "Correct Answer"),
+                    accent_color
                 )
             else:
                 return None
@@ -4053,6 +4321,54 @@ def _pattern_interrupt_marker(accent_color, audio_duration, start_time, marker_t
         print(f"⚠️ Pattern interrupt marker error: {e}")
         return None
 
+
+def _quiz_countdown_overlay(accent_color, start_time, audio_duration, duration=3.0):
+    """
+    Creates a 3-2-1 countdown overlay for quiz answer pause.
+    Each number appears for 1 second with pulsing animation.
+    """
+    clips = []
+    try:
+        for num in [3, 2, 1]:
+            num_start = start_time + (3 - num) * 1.0
+            if num_start >= audio_duration:
+                break
+                
+            pil = _render_quiz_countdown(num, accent_color)
+            arr = np.array(pil.convert("RGB"))
+            mask_arr = np.array(pil.split()[3]).astype(float) / 255.0
+            
+            clip_dur = 1.0
+            clip = VideoClip(lambda t, _arr=arr: _arr, duration=clip_dur)
+            mclip = VideoClip(lambda t, _m=mask_arr: _m, is_mask=True, duration=clip_dur)
+            
+            # Pulse animation
+            def make_pulse(t, _dur=clip_dur):
+                progress = t / _dur
+                # Pulse: scale up and down
+                scale = 1.0 + 0.1 * math.sin(progress * 2 * math.pi * 2)
+                return scale
+            
+            clip = clip.with_mask(mclip).with_position("center").with_start(num_start)
+            clips.append(clip)
+        
+        # Add "REVEAL!" flash at the end
+        reveal_start = start_time + 3.0
+        if reveal_start < audio_duration:
+            reveal_pil = _render_quiz_countdown("✓", accent_color)  # Reuse with checkmark
+            reveal_arr = np.array(reveal_pil.convert("RGB"))
+            reveal_mask = np.array(reveal_pil.split()[3]).astype(float) / 255.0
+            reveal_clip = VideoClip(lambda t, _arr=reveal_arr: _arr, duration=0.5)
+            reveal_mclip = VideoClip(lambda t, _m=reveal_mask: _m, is_mask=True, duration=0.5)
+            reveal_clip = reveal_clip.with_mask(reveal_mclip).with_position("center").with_start(reveal_start).with_effects([vfx.CrossFadeIn(0.1)])
+            clips.append(reveal_clip)
+        
+        return clips
+    except Exception as e:
+        print(f"⚠️ Quiz countdown error: {e}")
+        return []
+
+
 def apply_pattern_interrupts(frame_np, t, cues):
     """Applies visual disruption effects based on retention cues (glitches, zooms, shakes)."""
     if not cues:
@@ -5824,6 +6140,43 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
     # Phased scans removed in favor of full-screen loops as requested
     pass
+    # ── LAYER QUIZ: Quiz Countdown & CTA ──────────────────────────────────────
+    is_quiz = sub_category.lower() in ["quiz", "quiz & trivia", "trivia"]
+    if is_quiz:
+        print("🎯 QUIZ MODE: Adding quiz-specific visual layers")
+        
+        # Find the quiz reveal chunk to time the countdown
+        # The countdown should appear ~3 seconds before the answer reveal
+        reveal_chunk = None
+        options_chunk = None
+        for chunk in chunks:
+            if chunk.get("infographic_type") == "quiz_reveal":
+                reveal_chunk = chunk
+            elif chunk.get("infographic_type") == "quiz_options":
+                options_chunk = chunk
+        
+        # Add countdown before reveal
+        if reveal_chunk:
+            reveal_start = reveal_chunk.get("start", 0)
+            countdown_start = max(0, reveal_start - 3.5)  # 3.5s before for 3-2-1
+            countdown_clips = _quiz_countdown_overlay(accent_color, countdown_start, audio_duration)
+            if countdown_clips:
+                engagement_clips.extend(countdown_clips)
+        
+        # Add quiz-specific CTA at the end
+        comment_hook = script_json.get("comment_hook", "QUIZ")
+        incentive_cta_type = script_json.get("incentive_cta_type", "comment_trigger")
+        digital_asset_offer = script_json.get("digital_asset_offer", "the quiz pack")
+        quiz_cta = _quiz_cta_overlay(comment_hook, incentive_cta_type, digital_asset_offer, accent_color, audio_duration)
+        if quiz_cta:
+            engagement_clips.append(quiz_cta)
+    else:
+        # Standard CTA for non-quiz videos (identity-based)
+        identity_text = script_json.get("identity_cta", "")
+        identity_cta = _identity_cta_overlay(identity_text, accent_color, audio_duration)
+        if identity_cta:
+            engagement_clips.append(identity_cta)
+
     # ── LAYER 12: Telegram CTA card (Last 6 seconds) ──────────────────────────
     # Disabled full-screen sequential CTA as requested; keeping only the 3s cropped outro.
     # telegram_cta = _telegram_cta_overlay(audio_duration)

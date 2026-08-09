@@ -1222,11 +1222,15 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 "2. MUST be formatted as a multiple-choice question with 3 options (A/B/C) — 1 correct, 2 plausible distractors.\n"
                 "3. MUST be understandable by ANYONE — no jargon. The reveal must include fascinating context.\n"
                 "4. MUST be explainable in exactly <35s (approx 80-120 words total). Strict 35s limit.\n"
-                "5. QUIZ FORMAT (MANDATORY): Hook Question → Options A/B/C → 3s pause → Reveal + Context → Bonus Fact → CTA.\n"
+                "5. QUIZ VISUAL FORMAT (MANDATORY - 3 CHUNKS):\n"
+                "   Chunk 1 (0-2.5s): Hook Question — Show historical photo/visual, NO infographic\n"
+                "   Chunk 2 (2.5-6s): Options A/B/C — Use infographic_type='quiz_options' with option_a, option_b, option_c\n"
+                "   Chunk 3 (6-15s): Pause & Reveal — Add retention_cue at 5s with effect='pause' reason='quiz_think_time', then use infographic_type='quiz_reveal' with correct_letter and correct_text\n"
                 "6. INCENTIVE CTA (MANDATORY): Choose exactly one mode: Digital Vault, Comment Trigger, Benchmark Challenge, or Community Audit.\n"
                 "7. LOOP-FRIENDLY: Last sentence connects back to the quiz question.\n"
                 "8. UNIVERSAL & GENDER-INCLUSIVE DEMOGRAPHIC (18-70): Tech history appeals to everyone. Ensure strong appeal to women and girls — include diverse figures (Grace Hopper, Ada Lovelace, Margaret Hamilton, etc.).\n"
-                "9. QUIZ SOURCES: Computer History Museum, IEEE Annals, Wikipedia, Wikidata, company archives, famous bug reports (Mars Orbiter, Ariane 5, Therac-25, etc.)."
+                "9. QUIZ SOURCES: Computer History Museum, IEEE Annals, Wikipedia, Wikidata, company archives, famous bug reports (Mars Orbiter, Ariane 5, Therac-25, etc.).\n"
+                "10. VISUAL EVIDENCE: use_case_evidence_url MUST point to a historical photo (e.g., the actual moth photo from 1947), NOT a Wikipedia text page."
             )
             prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
 {{
@@ -1247,24 +1251,59 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "hook": "Matches the first sentence of the script",
   "summary": "One line summary",
   "sub_category": "{category}",
-  "breaking_news_level": 9,
-  "retention_cues": [{{ "timestamp": 2.0, "effect": "zoom_in", "reason": "hook_impact" }}],
-  "subtitle_chunks": [{{
+"breaking_news_level": 9,
+  "retention_cues": [{{ "timestamp": 2.0, "effect": "zoom_in", "reason": "hook_impact" }},
+                     {{ "timestamp": 5.0, "effect": "pause", "reason": "quiz_think_time" }}],
+  "subtitle_chunks": [
+    {{
       "chunk_id": 1,
-      "text": "Sentence 1",
+      "text": "Sentence 1 - Hook question",
       "start": 0.00,
       "end": 2.50,
-      "scene_objective": "What technical concept must be understood here",
-      "visual_type": "Video|AI Image|Whiteboard|Infographic|Diagram|Animated UI Mockup|Code Snippet|Screen Recording|Flowchart|Terminal Output|GitHub UI|Side-by-side Comparison|Architecture Diagram",
-      "nano_visual_prompt": "A clean, specific visual for THIS sentence. Example: 'Close-up of Harvard Mark II relay panel with moth trapped, 1947, black and white historical photo, 9:16 vertical'. Photorealistic, 8K. NO text overlays.",
+      "scene_objective": "Display the quiz question visually",
+      "visual_type": "AI Image",
+      "nano_visual_prompt": "A clean, specific visual for the quiz question. Example: 'Close-up of Harvard Mark II relay panel with moth trapped, 1947, black and white historical photo, 9:16 vertical'. Photorealistic, 8K. NO text overlays.",
+      "is_setting_chunk": false,
+      "has_infographic": false,
+      "infographic_type": null,
+      "infographic_data": null,
+      "on_screen_elements": [],
+      "camera_motion": "Slow zoom",
+      "transition": "None"
+    }},
+    {{
+      "chunk_id": 2,
+      "text": "Options A, B, C read aloud",
+      "start": 2.50,
+      "end": 6.00,
+      "scene_objective": "Display three quiz options as cards for viewer to choose",
+      "visual_type": "Infographic",
+      "nano_visual_prompt": "Three option cards A/B/C displayed vertically",
       "is_setting_chunk": false,
       "has_infographic": true,
-      "infographic_type": "comparison",
-      "infographic_data": {{"left_label": "A) Moth in relay", "left_val": "✓ CORRECT", "right_label": "B) Software error", "right_val": "✗ WRONG"}},
-      "on_screen_elements": ["labels/arrows/highlights/icons/charts/code"],
-      "camera_motion": "Slow zoom|Dolly-in|Orbit|Pan|Tracking shot|None",
-      "transition": "Match cut|Zoom transition|Morph|Swipe|Data stream transition|Neural network transition"
-  }}],
+      "infographic_type": "quiz_options",
+      "infographic_data": {{"option_a": "Moth in relay", "option_b": "Software error", "option_c": "Power surge"}},
+      "on_screen_elements": ["labels/arrows/highlights"],
+      "camera_motion": "None",
+      "transition": "None"
+    }},
+    {{
+      "chunk_id": 3,
+      "text": "Think about it... 3... 2... 1... It was A! A literal moth in a Harvard Mark II relay, 1947. Grace Hopper taped it in the logbook — first debugging!",
+      "start": 6.00,
+      "end": 15.00,
+      "scene_objective": "Reveal correct answer with context",
+      "visual_type": "Infographic",
+      "nano_visual_prompt": "Answer reveal with correct option highlighted in green",
+      "is_setting_chunk": false,
+      "has_infographic": true,
+      "infographic_type": "quiz_reveal",
+      "infographic_data": {{"correct_letter": "A", "correct_text": "Moth in relay"}},
+      "on_screen_elements": ["labels/arrows/highlights"],
+      "camera_motion": "Slow zoom",
+      "transition": "Zoom transition"
+    }}
+  ],
   "original_news_headline": "Exact quiz question / tech fact",
   "original_news_url": "Direct source URL (Wikipedia, Computer History Museum, etc.)",
   "keywords": ["Tech Quiz", "Computer History", "Tech Trivia", "Did You Know"],
