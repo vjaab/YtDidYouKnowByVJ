@@ -109,7 +109,7 @@ def _generate_layout_profile(seed_string, dominant_color=None):
     layout_variation_enabled = os.environ.get("ENABLE_LAYOUT_VARIATION", "0") == "1"
     
     force_layout = os.environ.get("FORCE_LAYOUT_TYPE")
-    if force_layout in ["split_screen", "hero_center", "asymmetric"]:
+    if force_layout in ["split_screen", "hero_center", "asymmetric", "side_strip", "top_center", "corner_cycling"]:
         layout_type = force_layout
         layout_variation_enabled = True
 
@@ -124,8 +124,17 @@ def _generate_layout_profile(seed_string, dominant_color=None):
     }
 
     if layout_variation_enabled:
-        if not force_layout or force_layout not in ["split_screen", "hero_center", "asymmetric"]:
-            layout_type = rng.choice(["split_screen", "hero_center", "asymmetric"])
+        if not force_layout or force_layout not in ["split_screen", "hero_center", "asymmetric", "side_strip", "top_center", "corner_cycling"]:
+            # Daily layout from ecosystem_logic (if available) or random
+            try:
+                from ecosystem_logic import get_daily_layout
+                daily_layout = get_daily_layout()
+                if daily_layout in ["split_screen", "hero_center", "asymmetric", "side_strip", "top_center", "corner_cycling"]:
+                    layout_type = daily_layout
+                else:
+                    layout_type = rng.choice(["split_screen", "hero_center", "asymmetric", "side_strip", "top_center", "corner_cycling"])
+            except Exception:
+                layout_type = rng.choice(["split_screen", "hero_center", "asymmetric", "side_strip", "top_center", "corner_cycling"])
         
         # Tech-focused color palettes (Cyberpunk Neon, Clean Minimalist, Dark Mode Terminal, Retro Synthwave, Electric Cyan)
         PALETTES = [
@@ -937,53 +946,163 @@ def _gradient_clip(duration, height_pct=0.45, position="bottom", is_longform=Fal
     return clip.with_mask(mask).with_position(("center", position))
 
 
-# ── LAYER 4: Ambient "Obsidian" particles ──────────────────────────────────────
-# ── LAYER 4: Ambient "Obsidian" particles ──────────────────────────────────────
+# ─── Themed Background Images per Category ──────────────────────────────────
+THEMED_BACKGROUNDS = {
+    "Quiz & Trivia": "assets/backgrounds/quiz_bg.jpg",
+    "AI & Tech Tools": "assets/backgrounds/ai_tools_bg.jpg",
+    "Tech Gadgets & Inventions": "assets/backgrounds/gadgets_bg.jpg",
+    "Finance & Tech Economy": "assets/backgrounds/finance_bg.jpg",
+    "Life Hacks & Productivity": "assets/backgrounds/productivity_bg.jpg",
+    "Agentic AI Facts": "assets/backgrounds/agentic_bg.jpg",
+    "Facts & Trivia": "assets/backgrounds/facts_bg.jpg",
+    "Coding & Development Hacks": "assets/backgrounds/coding_bg.jpg",
+}
+
+def _themed_background_clip(duration, category, accent_color, opacity=0.15):
+    """
+    Creates a themed background image clip with subtle animation and color overlay.
+    Falls back to gradient if image not found.
+    """
+    import os
+    bg_path = THEMED_BACKGROUNDS.get(category)
+    if not bg_path or not os.path.exists(bg_path):
+        return _dual_directional_gradient_clip(duration)
+    
+    try:
+        raw_img = Image.open(bg_path).convert("RGB")
+        # Resize to cover frame (Ken Burns style)
+        img_w, img_h = raw_img.size
+        target_ratio = FRAME_W / FRAME_H
+        img_ratio = img_w / img_h
+        
+        if img_ratio > target_ratio:
+            # Image wider - crop sides
+            new_w = int(img_h * target_ratio)
+            x1 = (img_w - new_w) // 2
+            raw_img = raw_img.crop((x1, 0, x1 + new_w, img_h))
+        else:
+            # Image taller - crop top/bottom
+            new_h = int(img_w / target_ratio)
+            y1 = (img_h - new_h) // 2
+            raw_img = raw_img.crop((0, y1, img_w, y1 + new_h))
+        
+        raw_img = raw_img.resize((FRAME_W, FRAME_H), Image.Resampling.LANCZOS)
+        canvas_arr = np.array(raw_img)
+        
+        # Apply color overlay (accent color at low opacity)
+        accent_rgb = tuple(int(accent_color.lstrip("#")[i:i+2], 16) for i in (0, 2, 4))
+        overlay = np.full_like(canvas_arr, accent_rgb, dtype=np.uint8)
+        canvas_arr = cv2.addWeighted(canvas_arr, 1 - opacity, overlay, opacity, 0)
+        
+        clip = ImageClip(canvas_arr, duration=duration)
+        
+        # Subtle Ken Burns zoom (1.0 to 1.05)
+        clip = clip.resized(lambda t, d=duration: 1.0 + 0.05 * (t / d))
+        
+        return clip
+    except Exception as e:
+        print(f"⚠️ Themed background failed: {e}. Using gradient fallback.")
+        return _dual_directional_gradient_clip(duration)
+
+
+# Particle styles per category for thematic variety
+PARTICLE_STYLES = {
+    "Quiz & Trivia": "sparkles",        # Golden sparkles for quiz excitement
+    "AI & Tech Tools": "digital_rain",   # Matrix-style code rain
+    "Tech Gadgets & Inventions": "circuit",  # Circuit board traces
+    "Finance & Tech Economy": "coins",    # Floating coins/gold particles
+    "Life Hacks & Productivity": "gears", # Rotating gears
+    "Agentic AI Facts": "neural",        # Neural network nodes
+    "Facts & Trivia": "stars",           # Twinkling stars
+    "Coding & Development Hacks": "brackets",  # Code brackets/symbols
+}
+
 def _ambient_particles(duration, accent_color, particle_style="bokeh"):
     n = 35
     random.seed(42)
     
-    # Pre-generate particle properties: (x, y, speed, offset, size, streak_len)
+    # Pre-generate particle properties: (x, y, speed, offset, size, streak_len, angle, rotation_speed)
     particles = []
     for _ in range(n):
         px = random.uniform(0, FRAME_W)
         py = random.uniform(0, FRAME_H)
-        speed = random.uniform(0.15, 0.55) # falling speed
+        speed = random.uniform(0.15, 0.55)
         offset = random.uniform(0, FRAME_H)
-        p_size = random.uniform(4, 15) if particle_style in ["bokeh", "lens_dust"] else random.uniform(8, 25)
+        p_size = random.uniform(4, 15) if particle_style in ["bokeh", "lens_dust", "sparkles", "stars", "coins"] else random.uniform(8, 25)
         streak_len = random.uniform(15, 40)
-        particles.append((px, py, speed, offset, p_size, streak_len))
+        angle = random.uniform(0, 2 * math.pi)
+        rotation_speed = random.uniform(-0.5, 0.5)
+        particles.append((px, py, speed, offset, p_size, streak_len, angle, rotation_speed))
 
     def make_frame(t):
-        scale_down = 4 if particle_style in ["bokeh", "lens_dust"] else 2
+        scale_down = 4 if particle_style in ["bokeh", "lens_dust", "sparkles", "stars", "coins"] else 2
         sm_w, sm_h = FRAME_W // scale_down, FRAME_H // scale_down
         img = np.zeros((sm_h, sm_w, 3), dtype=np.uint8)
         
-        for px, py, speed, offset, p_size, streak_len in particles:
-            # Fall downward: add speed instead of subtract
+        for px, py, speed, offset, p_size, streak_len, angle, rot_speed in particles:
+            # Fall downward with slight horizontal drift
             y = (py + speed * t * 45 + offset) % FRAME_H
+            x = (px + math.sin(t * 0.3 + offset) * 20) % FRAME_W
             
-            # Horizontal drift for lens_dust
-            if particle_style == "lens_dust":
-                x = (px + math.sin(t * 0.4 + offset) * 15) % FRAME_W
-            else:
-                x = px
-                
             sm_px = int(x / scale_down)
             sm_py = int(y / scale_down)
             sm_size = max(1, int(p_size / scale_down))
+            curr_angle = angle + rot_speed * t
             
-            if particle_style == "digital":
-                cv2.rectangle(img, (sm_px, sm_py), (sm_px+sm_size, sm_py+max(1, 2//scale_down)), accent_color, -1)
-            elif particle_style == "digital_rain":
+            if particle_style == "digital_rain":
+                # Matrix-style falling characters
                 sm_streak = max(2, int(streak_len / scale_down))
-                cv2.line(img, (sm_px, sm_py), (sm_px, sm_py + sm_streak), accent_color, max(1, 2//scale_down))
+                cv2.line(img, (sm_px, sm_py), (sm_px, sm_py + sm_streak), accent_color, max(1, 1//scale_down))
+            elif particle_style == "sparkles":
+                # Golden sparkles with twinkle
+                alpha = 0.5 + 0.5 * math.sin(t * 3 + offset)
+                color = tuple(int(c * alpha) for c in accent_color)
+                cv2.circle(img, (sm_px, sm_py), sm_size, color, -1)
+                # Cross sparkle
+                cv2.line(img, (sm_px - sm_size*2, sm_py), (sm_px + sm_size*2, sm_py), color, 1)
+                cv2.line(img, (sm_px, sm_py - sm_size*2), (sm_px, sm_py + sm_size*2), color, 1)
+            elif particle_style == "circuit":
+                # Circuit board traces - horizontal/vertical lines with nodes
+                cv2.line(img, (sm_px, sm_py), (sm_px + sm_size*3, sm_py), accent_color, 1)
+                cv2.circle(img, (sm_px, sm_py), 2, accent_color, -1)
+                cv2.circle(img, (sm_px + sm_size*3, sm_py), 2, accent_color, -1)
+            elif particle_style == "coins":
+                # Floating gold coins
+                coin_color = (0, 215, 255)  # Gold in BGR
+                cv2.circle(img, (sm_px, sm_py), sm_size, coin_color, -1)
+                cv2.circle(img, (sm_px, sm_py), sm_size, accent_color, 2)
+                # Dollar sign
+                cv2.putText(img, "$", (sm_px - 3, sm_py + 3), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 0, 0), 1)
+            elif particle_style == "gears":
+                # Rotating gear shapes
+                cv2.circle(img, (sm_px, sm_py), sm_size, accent_color, 1)
+                cv2.circle(img, (sm_px, sm_py), sm_size - 3, accent_color, 1)
+                # Gear teeth
+                for i in range(8):
+                    a = curr_angle + i * math.pi / 4
+                    x1 = int(sm_px + (sm_size - 2) * math.cos(a))
+                    y1 = int(sm_py + (sm_size - 2) * math.sin(a))
+                    x2 = int(sm_px + sm_size * math.cos(a))
+                    y2 = int(sm_py + sm_size * math.sin(a))
+                    cv2.line(img, (x1, y1), (x2, y2), accent_color, 1)
+            elif particle_style == "neural":
+                # Neural network nodes with connections
+                cv2.circle(img, (sm_px, sm_py), max(1, sm_size//2), accent_color, -1)
+                # Draw connection to next particle (simplified)
+            elif particle_style == "brackets":
+                # Code brackets and symbols
+                symbols = ["{", "}", "[", "]", "()", "=>", "//", "/*", "*/"]
+                sym = symbols[random.randint(0, len(symbols)-1)]
+                cv2.putText(img, sym, (sm_px, sm_py), cv2.FONT_HERSHEY_SIMPLEX, 0.4, accent_color, 1)
             elif particle_style == "stars":
-                cv2.circle(img, (sm_px, sm_py), max(1, 2//scale_down), (255, 255, 255), -1)
-            else: # bokeh, lens_dust
+                # Twinkling stars
+                alpha = 0.3 + 0.7 * (math.sin(t * 2 + offset) + 1) / 2
+                color = tuple(int(c * alpha) for c in (255, 255, 255))
+                cv2.circle(img, (sm_px, sm_py), max(1, 2//scale_down), color, -1)
+            else:  # bokeh, lens_dust
                 cv2.circle(img, (sm_px, sm_py), sm_size, accent_color, -1)
         
-        if particle_style not in ["stars", "digital_rain"]:
+        if particle_style not in ["stars", "digital_rain", "sparkles", "circuit", "coins", "gears", "neural", "brackets"]:
             blur_size = 19 if particle_style in ["bokeh", "lens_dust"] else 7
             img = cv2.GaussianBlur(img, (blur_size, blur_size), 0)
             
@@ -3532,6 +3651,107 @@ def render_emoji_popup(emoji, frame_width=1080):
     draw.text((200, 200), emoji, font=f, fill=(255,255,255,255), anchor="mm")
     return img
 
+
+# ─── ENTITY LOGO PAIRING NEAR AVATAR ─────────────────────────────────────────
+def _create_entity_logo_pip_clips(script_json, avatar_pip_func, audio_duration, cur_w, cur_h, accent_color):
+    """
+    Creates logo clips that appear near the avatar when entities are mentioned.
+    Returns list of (clip, start_time, end_time) for compositing.
+    """
+    import os
+    from moviepy import VideoClip, ImageClip
+    
+    # Collect all entities with logos
+    entities = []
+    for key in ["companies_mentioned", "tools_mentioned", "key_entities", "people"]:
+        for ent in script_json.get(key, []):
+            name = ent.get("name") if isinstance(ent, dict) else ent
+            logo_path = ent.get("local_logo_path") or ent.get("local_hq_path") or ent.get("local_image_path")
+            if name and logo_path and os.path.exists(logo_path):
+                entities.append({"name": name, "logo_path": logo_path, "type": key})
+    
+    if not entities:
+        return []
+    
+    # Get word timestamps to find when entities are mentioned
+    script_text = script_json.get("script", "").lower()
+    word_timestamps = script_json.get("word_timestamps", [])
+    
+    logo_clips = []
+    logo_size = int(min(cur_w, cur_h) * 0.6)  # 60% of avatar size
+    
+    for ent in entities:
+        name = ent["name"].lower()
+        # Find mentions in script
+        idx = 0
+        while True:
+            idx = script_text.find(name, idx)
+            if idx == -1:
+                break
+            
+            word_idx = len(script_text[:idx].split())
+            if word_idx < len(word_timestamps):
+                mention_time = word_timestamps[word_idx][0] if word_timestamps[word_idx] else 0
+                start_time = max(0, mention_time - 0.5)
+                end_time = min(audio_duration, mention_time + 3.0)
+                
+                # Load and prepare logo
+                try:
+                    logo_img = Image.open(ent["logo_path"]).convert("RGBA")
+                    # Make square
+                    lw, lh = logo_img.size
+                    if lw != lh:
+                        size = max(lw, lh)
+                        new_img = Image.new("RGBA", (size, size), (0,0,0,0))
+                        new_img.paste(logo_img, ((size-lw)//2, (size-lh)//2))
+                        logo_img = new_img
+                    logo_img = logo_img.resize((logo_size, logo_size), Image.LANCZOS)
+                    logo_arr = np.array(logo_img)
+                    
+                    # Create clip that follows avatar position
+                    def make_logo_frame(t, start=start_time, end=end_time, avatar_func=avatar_pip_func):
+                        if start <= t < end:
+                            ax, ay = avatar_func(t)
+                            # Position logo to the right of avatar
+                            return logo_arr
+                        return np.zeros((logo_size, logo_size, 4), dtype=np.uint8)
+                    
+                    def make_logo_mask(t, start=start_time, end=end_time):
+                        if start <= t < end:
+                            # Circular mask with fade
+                            progress = (t - start) / (end - start)
+                            fade = 1.0
+                            if progress < 0.2:
+                                fade = progress / 0.2
+                            elif progress > 0.8:
+                                fade = (1.0 - progress) / 0.2
+                            mask = np.ones((logo_size, logo_size), dtype=np.float32) * fade
+                            # Circular mask
+                            y, x = np.ogrid[:logo_size, :logo_size]
+                            center = logo_size // 2
+                            dist = np.sqrt((x - center)**2 + (y - center)**2)
+                            mask[dist > center] = 0
+                            return mask
+                        return np.zeros((logo_size, logo_size), dtype=np.float32)
+                    
+                    logo_clip = VideoClip(make_logo_frame, duration=audio_duration)
+                    logo_clip = logo_clip.with_mask(VideoClip(make_logo_mask, is_mask=True, duration=audio_duration))
+                    
+                    # Position function - to the right of avatar
+                    def logo_position(t, avatar_func=avatar_pip_func):
+                        ax, ay = avatar_func(t)
+                        return (ax + cur_w + 20, ay + (cur_h - logo_size) // 2)
+                    
+                    logo_clips.append((logo_clip.with_position(logo_position).with_start(0), start_time, end_time))
+                    
+                except Exception as e:
+                    print(f"⚠️ Failed to create logo clip for {ent['name']}: {e}")
+            
+            idx += len(name)
+    
+    return logo_clips
+
+
 def insert_easter_egg(frame_width=1080, frame_height=1920):
     """Creates a 1-frame high-contrast tech glitch for retention hacking."""
     img = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
@@ -5749,7 +5969,80 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                     except:
                         pass
 
-    # ── AVATAR VIDEO PiP ──────────────────────────────────────────────────
+    # ── AVATAR EXPRESSION/GESTURE TRIGGERS ──────────────────────────────────────
+# Maps trigger words to avatar expression video segments
+# These would be pre-recorded clips: pointing, surprised, thinking, nodding, etc.
+AVATAR_EXPRESSIONS = {
+    "pointing": ["look at this", "check this out", "see here", "notice"],
+    "surprised": ["wow", "amazing", "incredible", "unbelievable", "shocking", "mind blown"],
+    "thinking": ["think about", "consider", "imagine", "what if", "puzzle"],
+    "nodding": ["exactly", "right", "correct", "yes", "absolutely", "precisely"],
+    "shrugging": ["who knows", "maybe", "perhaps", "unclear", "uncertain"],
+}
+
+# Expression video paths (would need to be created - using main avatar as fallback)
+EXPRESSION_VIDEO_MAP = {
+    "pointing": "assets/video/expressions/pointing.mp4",
+    "surprised": "assets/video/expressions/surprised.mp4",
+    "thinking": "assets/video/expressions/thinking.mp4",
+    "nodding": "assets/video/expressions/nodding.mp4",
+    "shrugging": "assets/video/expressions/shrugging.mp4",
+}
+
+# Dual Avatar / Interview Mode
+DUAL_AVATAR_CONFIG = {
+    "enabled": False,
+    "host_avatar": "assets/video/host.mp4",      # Primary presenter
+    "guest_avatar": "assets/video/guest.mp4",    # Interview guest
+    "host_position": "left",                     # left/right
+    "switch_on_speaker": True,                   # Auto-switch based on script markers
+}
+
+
+def _get_avatar_expression_segments(script_text, audio_duration, word_timestamps):
+    """
+    Analyzes script for trigger words and returns time segments where
+    specific expressions should play. Returns list of (start, end, expression_type).
+    """
+    segments = []
+    script_lower = script_text.lower()
+    
+    # Find trigger words and their approximate timestamps
+    for expr_type, triggers in AVATAR_EXPRESSIONS.items():
+        for trigger in triggers:
+            # Find all occurrences in script
+            idx = 0
+            while True:
+                idx = script_lower.find(trigger, idx)
+                if idx == -1:
+                    break
+                
+                # Estimate timestamp from word position
+                word_idx = len(script_lower[:idx].split())
+                if word_idx < len(word_timestamps):
+                    start_time = word_timestamps[word_idx][0] if word_timestamps[word_idx] else 0
+                    end_time = min(start_time + 3.0, audio_duration)  # 3 second expression
+                    segments.append((start_time, end_time, expr_type))
+                
+                idx += len(trigger)
+    
+    # Sort by start time and merge overlapping
+    segments.sort(key=lambda x: x[0])
+    merged = []
+    for seg in segments:
+        if not merged or seg[0] > merged[-1][1]:
+            merged.append(list(seg))
+        else:
+            merged[-1][1] = max(merged[-1][1], seg[1])
+            # Priority: surprised > pointing > thinking > nodding > shrugging
+            priority = {"surprised": 5, "pointing": 4, "thinking": 3, "nodding": 2, "shrugging": 1}
+            if priority.get(seg[2], 0) > priority.get(merged[-1][2], 0):
+                merged[-1][2] = seg[2]
+    
+    return [(s, e, t) for s, e, t in merged]
+
+
+# ── AVATAR VIDEO PiP ──────────────────────────────────────────────────
     # Skip avatar entirely when Kaggle GPU fallback was used (no lip-sync available)
     skip_avatar = script_json.get("skip_avatar", False)
     avatar_pip = None
@@ -5858,6 +6151,41 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         else:
             avatar_clip = vid_clip.resized((cur_w, cur_h)).without_audio()
             
+            # ── AVATAR EXPRESSION TRIGGERS ──────────────────────────────────
+            # Detect trigger words in script and prepare expression overlay clips
+            expression_segments = []
+            if not is_longform and script_json.get("enable_expressions", True):
+                script_text = script_json.get("script", "")
+                word_timestamps = script_json.get("word_timestamps", [])
+                expression_segments = _get_avatar_expression_segments(script_text, audio_duration, word_timestamps)
+                if expression_segments:
+                    print(f"🎭 Avatar expressions triggered: {len(expression_segments)} segments")
+            
+            # Pre-load expression video clips (fallback to main avatar if not found)
+            expression_clips = {}
+            for expr_type, expr_path in EXPRESSION_VIDEO_MAP.items():
+                if os.path.exists(expr_path):
+                    try:
+                        expr_clip = VideoFileClip(expr_path)
+                        if expr_clip.duration < audio_duration:
+                            expr_clip = expr_clip.with_effects([vfx.Loop(duration=audio_duration)])
+                        else:
+                            expr_clip = expr_clip.subclipped(0, audio_duration)
+                        # Apply same crop/resize as main avatar
+                        ew, eh = expr_clip.size
+                        if ew/eh > target_aspect:
+                            new_w = int(eh * target_aspect)
+                            x1 = (ew - new_w) // 2
+                            expr_clip = expr_clip.cropped(x1=x1, y1=0, x2=x1+new_w, y2=eh)
+                        else:
+                            new_h = int(ew / target_aspect)
+                            y1 = int((eh - new_h) * 0.12) if eh > new_h else 0
+                            expr_clip = expr_clip.cropped(x1=0, y1=y1, x2=ew, y2=y1+new_h)
+                        expr_clip = expr_clip.resized((cur_w, cur_h)).without_audio()
+                        expression_clips[expr_type] = expr_clip
+                    except Exception as e:
+                        print(f"⚠️ Failed to load expression clip {expr_type}: {e}")
+            
             # ── AI BACKGROUND REMOVAL (Premium Mode - Highly Optimized & Dynamic) ───────
             try:
                 from rembg import remove, new_session
@@ -5928,18 +6256,32 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 if is_longform:
                     return base_scale
                     
-                # Glide/shrink logic for Shorts
-                glide_dur = 3.5
-                scale_start = 1080.0 / cur_w
-                scale_end = 1.0
-                
-                if t < glide_dur:
-                    p = t / glide_dur
-                    p = 1.0 - (1.0 - p)**3 # cubic ease-out
-                    intro_scale = scale_start + (scale_end - scale_start) * p
+                # Zoom-reveal: start full-screen, zoom to PiP at hook (2.5s)
+                # Only for asymmetric layout (full-screen presenter)
+                layout_type = layout.get("layout_type", "asymmetric")
+                if layout_type == "asymmetric" and layout.get("zoom_reveal", True):
+                    reveal_time = 2.5
+                    if t < reveal_time:
+                        # Start at full-screen scale (cover 9:16 frame), ease to normal
+                        fullscreen_scale = max(FRAME_W / cur_w, FRAME_H / cur_h) * 1.1
+                        p = t / reveal_time
+                        p = 1.0 - (1.0 - p)**4  # quartic ease-out for dramatic slowdown
+                        intro_scale = fullscreen_scale + (1.0 - fullscreen_scale) * p
+                    else:
+                        intro_scale = 1.0
                 else:
-                    intro_scale = scale_end
+                    # Standard glide/shrink logic for Shorts
+                    glide_dur = 3.5
+                    scale_start = 1080.0 / cur_w
+                    scale_end = 1.0
                     
+                    if t < glide_dur:
+                        p = t / glide_dur
+                        p = 1.0 - (1.0 - p)**3  # cubic ease-out
+                        intro_scale = scale_start + (scale_end - scale_start) * p
+                    else:
+                        intro_scale = scale_end
+                        
                 return intro_scale * base_scale
 
             avatar_clip = avatar_clip.with_effects([
@@ -5978,41 +6320,99 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                     # Glide/shrink position interpolation for Shorts
                     layout_type = layout.get("layout_type", "asymmetric")
                     
+                    # Corner cycling for extra variety (uses daily tracker)
+                    corner_index = layout.get("corner_index", 0)
+                    corners = [
+                        (40.0, 120.0),                                    # top-left
+                        (FRAME_W - scaled_w - 40.0, 120.0),              # top-right
+                        (40.0, FRAME_H - scaled_h - 180.0),              # bottom-left
+                        (FRAME_W - scaled_w - 40.0, FRAME_H - scaled_h - 180.0),  # bottom-right
+                    ]
+                    
+                    # Home position (where avatar returns when not in transition)
                     if layout_variation_enabled:
                         if layout_type == "split_screen":
-                            # Position circular facecam at top-right
-                            x_end = FRAME_W - scaled_w - 40.0
-                            y_end = 120.0
+                            home_x = FRAME_W - scaled_w - 40.0
+                            home_y = 120.0
                         elif layout_type == "hero_center":
-                            # Position circular facecam at bottom-right
-                            x_end = FRAME_W - scaled_w - 40.0
-                            y_end = FRAME_H - scaled_h - 180.0
-                        else: # asymmetric (full-screen presenter)
-                            # Center horizontally, position at bottom
-                            x_end = (FRAME_W - scaled_w) / 2.0
-                            y_end = FRAME_H - scaled_h
-                            
-                        # For full-screen asymmetric layout, no glide is needed, it remains centered
-                        if layout_type == "asymmetric":
-                            return (int(x_end), int(y_end))
+                            home_x = FRAME_W - scaled_w - 40.0
+                            home_y = FRAME_H - scaled_h - 180.0
+                        elif layout_type == "side_strip":
+                            home_x = 20.0
+                            home_y = (FRAME_H - scaled_h) / 2.0
+                        elif layout_type == "top_center":
+                            home_x = (FRAME_W - scaled_w) / 2.0
+                            home_y = 80.0
+                        elif layout_type == "corner_cycling":
+                            home_x, home_y = corners[corner_index % 4]
+                        else:  # asymmetric
+                            home_x = (FRAME_W - scaled_w) / 2.0
+                            home_y = FRAME_H - scaled_h
                     else:
-                        # Legacy default
-                        x_end = (FRAME_W - scaled_w) / 2.0 + layout["avatar_x_offset"]
-                        y_end = FRAME_H - scaled_h - 30.0
+                        home_x = (FRAME_W - scaled_w) / 2.0 + layout["avatar_x_offset"]
+                        home_y = FRAME_H - scaled_h - 30.0
+                    
+                    # Screenshot-aware positioning: glide to top-right corner before screenshot, fade during, return after
+                    # Screenshot typically shows 4.0-12.0s
+                    ss_start = 4.0
+                    ss_end = min(12.0, audio_duration - 2.0)
+                    transition_dur = 1.5  # Time to glide to/from corner
+                    
+                    # Check if we're in screenshot transition period
+                    if ss_start - transition_dur <= t < ss_start:
+                        # Glide from home to top-right corner before screenshot
+                        corner_x = FRAME_W - scaled_w - 40.0
+                        corner_y = 120.0
+                        p = (t - (ss_start - transition_dur)) / transition_dur
+                        p = 1.0 - (1.0 - p)**3  # ease-out
+                        x_pos = home_x + (corner_x - home_x) * p
+                        y_pos = home_y + (corner_y - home_y) * p
+                        return (int(x_pos), int(y_pos))
+                    elif ss_start <= t < ss_end:
+                        # During screenshot: stay at corner (will be faded out by mask)
+                        return (int(FRAME_W - scaled_w - 40.0), int(120.0))
+                    elif ss_end <= t < ss_end + transition_dur:
+                        # Glide back from corner to home after screenshot
+                        corner_x = FRAME_W - scaled_w - 40.0
+                        corner_y = 120.0
+                        p = (t - ss_end) / transition_dur
+                        p = p * p * (3 - 2 * p)  # ease-in-out (smoothstep)
+                        x_pos = corner_x + (home_x - corner_x) * p
+                        y_pos = corner_y + (home_y - corner_y) * p
+                        return (int(x_pos), int(y_pos))
+                    
+                    # Normal positioning (outside screenshot transitions)
+                    if layout_variation_enabled:
+                        if layout_type == "asymmetric":
+                            return (int(home_x), int(home_y))
+                    else:
+                        # Legacy default with glide from bottom-left
+                        glide_dur = 3.5
+                        x_start = 0.0
+                        y_start = 350.0
+                        x_end = home_x
+                        y_end = home_y
                         
-                    # Apply legacy glide animation for split_screen / hero_center (reaches target pos in 3.5s)
+                        if t < glide_dur:
+                            p = t / glide_dur
+                            p = 1.0 - (1.0 - p)**3
+                            x_pos = x_start + (x_end - x_start) * p
+                            y_pos = y_start + (y_end - y_start) * p
+                            return (int(x_pos), int(y_pos))
+                        return (int(x_end), int(y_end))
+                    
+                    # Layout variations with glide from bottom-left
                     glide_dur = 3.5
                     x_start = 0.0
                     y_start = 350.0
                     
                     if t < glide_dur:
                         p = t / glide_dur
-                        p = 1.0 - (1.0 - p)**3 # cubic ease-out
-                        x_pos = x_start + (x_end - x_start) * p
-                        y_pos = y_start + (y_end - y_start) * p
+                        p = 1.0 - (1.0 - p)**3
+                        x_pos = x_start + (home_x - x_start) * p
+                        y_pos = y_start + (home_y - y_start) * p
                         return (int(x_pos), int(y_pos))
-                    else:
-                        return (int(x_end), int(y_end))
+                    return (int(home_x), int(home_y))
 
             if not is_longform:
                 def hide_avatar_during_screenshots(t):
@@ -6047,6 +6447,27 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 # Center the ring around the avatar (ring is slightly larger)
                 offset = (ring_size - min(cur_w, cur_h)) // 2
                 return (ax - offset, ay - offset)
+
+            # ── EXPRESSION COMPOSITING ─────────────────────────────────────────
+            # Composite expression clips over base avatar at trigger times
+            if expression_segments and expression_clips:
+                def make_expression_frame(t):
+                    # Check if any expression should be active at time t
+                    for start, end, expr_type in expression_segments:
+                        if start <= t < end and expr_type in expression_clips:
+                            return expression_clips[expr_type].get_frame(t)
+                    return avatar_clip.get_frame(t)
+                
+                def make_expression_mask(t):
+                    # Use avatar's mask for expressions too (same face shape)
+                    if avatar_clip.mask:
+                        return avatar_clip.mask.get_frame(t)
+                    return np.ones((cur_h, cur_w), dtype=np.float32)
+                
+                expr_clip = VideoClip(make_expression_frame, duration=audio_duration)
+                expr_clip = expr_clip.with_mask(VideoClip(make_expression_mask, is_mask=True, duration=audio_duration))
+                avatar_clip = expr_clip
+                print(f"   ✅ Expression compositing applied: {len(expression_segments)} segments")
 
             avatar_pip = avatar_clip.with_position(pip_position).with_start(0)
 
@@ -6399,9 +6820,24 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     base_layers.append(disclosure)
     base_layers.extend(engagement_clips)
 
-    # ══════════════════════════════════════════════════════════════════════
+    # ── ENTITY LOGO PIP (near avatar) ──────────────────────────────────────
+    if not is_longform and avatar_pip:
+        try:
+            entity_logo_clips = _create_entity_logo_pip_clips(
+                script_json, pip_position, audio_duration, cur_w, cur_h, accent_color
+            )
+            for logo_clip, start_t, end_t in entity_logo_clips:
+                # Trim clip to active interval
+                logo_clip = logo_clip.subclipped(start_t, end_t).with_start(start_t)
+                base_layers.append(logo_clip)
+            if entity_logo_clips:
+                print(f"   🏷️ Entity logo PIP clips added: {len(entity_logo_clips)}")
+        except Exception as e:
+            print(f"   ⚠️ Entity logo PIP failed (non-fatal): {e}")
+
+    # ═════════════════════════════════════════════════════════════════════
     # LONGFORM RETENTION UPGRADE: Wire in new premium visual layers
-    # ══════════════════════════════════════════════════════════════════════
+    # ═════════════════════════════════════════════════════════════════════
     snap_zoom_timestamps = []  # Used per-frame in make_final_frame
     
     # IMPROVEMENT #1: Glow ring behind avatar PiP

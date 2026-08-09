@@ -55,6 +55,54 @@ def get_next_slot(current_slot):
     if "Slot A" in current_slot: return "Slot B"
     return "Slot A"
 
+
+# ─── Layout Archetypes per Day ──────────────────────────────────────────────
+# Maps day to layout variation for visual variety
+DAILY_LAYOUTS = {
+    "Mon": "split_screen",      # Quiz: options on left, avatar top-right
+    "Tue": "hero_center",       # Tools: demo center, avatar bottom-right
+    "Wed": "side_strip",        # Quiz: vertical strip left
+    "Thu": "asymmetric",        # Gadgets: full-screen presenter
+    "Fri": "top_center",        # Quiz: news ticker style top
+    "Sat": "split_screen",      # Finance: data left, avatar top-right
+    "Sun": "hero_center",       # Quiz: relaxed bottom-right
+}
+
+def get_daily_layout(day_name=None):
+    """Returns layout_type for the given day (or current UTC day)."""
+    if day_name is None:
+        day_name = datetime.datetime.utcnow().strftime("%a")
+    return DAILY_LAYOUTS.get(day_name, "asymmetric")
+
+
+def get_corner_rotation_index(tracker_file=None):
+    """Returns corner index (0-3) for avatar corner cycling, increments daily."""
+    import json
+    import os
+    if tracker_file is None:
+        tracker_file = os.path.join(os.path.dirname(__file__), "layout_tracker.json")
+    
+    tracker = {"corner_index": 0, "last_date": ""}
+    if os.path.exists(tracker_file):
+        try:
+            with open(tracker_file, "r") as f:
+                tracker = json.load(f)
+        except Exception:
+            pass
+    
+    today = datetime.datetime.utcnow().strftime("%Y-%m-%d")
+    if tracker.get("last_date") != today:
+        tracker["corner_index"] = (tracker.get("corner_index", 0) + 1) % 4
+        tracker["last_date"] = today
+        try:
+            with open(tracker_file, "w") as f:
+                json.dump(tracker, f)
+        except Exception:
+            pass
+    
+    return tracker["corner_index"]
+
+
 def get_category_prompt_enhancement(category, slot):
     """
     Returns specific instructions and formatting for the given category/slot.
