@@ -1579,11 +1579,13 @@ def _generate_elevenlabs(text, output_path):
     if not ELEVENLABS_API_KEY:
         print("   ✗ ElevenLabs API Key missing.")
         return None, 0, []
+    if not ELEVENLABS_VOICE_ID:
+        print("   ✗ ElevenLabs Voice ID missing. Set ELEVENLABS_VOICE_ID in config/env.")
+        return None, 0, []
     
     try:
         import requests
-        # Voice ID for VJ-like tech persona or custom voice ID from config
-        VOICE_ID = ELEVENLABS_VOICE_ID if ELEVENLABS_VOICE_ID else "EXAVITQu4vr4xnSDxMaL"
+        VOICE_ID = ELEVENLABS_VOICE_ID
         url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
         
         headers = {
