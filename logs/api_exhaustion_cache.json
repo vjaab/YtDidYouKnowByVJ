@@ -1,58 +1,58 @@
 {
   "groq_token_usage": {
     "llama-3.3-70b-versatile": {
-      "tokens": 26649,
-      "date": "2026-08-09"
+      "tokens": 9990,
+      "date": "2026-08-10"
     },
     "qwen/qwen3-32b": {
       "tokens": 4958,
       "date": "2026-07-17"
     },
     "llama-3.1-8b-instant": {
-      "tokens": 3958,
-      "date": "2026-08-09"
+      "tokens": 12951,
+      "date": "2026-08-10"
     },
     "openai/gpt-oss-20b": {
-      "tokens": 2671,
-      "date": "2026-07-21"
+      "tokens": 8287,
+      "date": "2026-08-10"
     },
     "openai/gpt-oss-120b": {
-      "tokens": 7745,
-      "date": "2026-08-09"
+      "tokens": 9010,
+      "date": "2026-08-10"
     }
   },
   "groq_models": {
-    "llama-3.3-70b-versatile": 1786332013.9159398,
+    "llama-3.3-70b-versatile": 1786380598.9876564,
     "qwen/qwen3-32b": 1784314011.1046333,
-    "openai/gpt-oss-20b": 1786332177.7275429,
-    "llama-3.1-8b-instant": 1786332023.248074,
-    "openai/gpt-oss-120b": 1786332177.7879975
+    "openai/gpt-oss-20b": 1786380745.8173382,
+    "llama-3.1-8b-instant": 1786380755.2911177,
+    "openai/gpt-oss-120b": 1786380767.8588066
   },
   "cloudflare_models": {
-    "@cf/meta/llama-3.3-70b-instruct": 1786332030.5980422,
-    "@cf/meta/llama-3.3-70b-instruct-fp8-fast": 1786332030.5985057,
-    "@cf/zai-org/glm-4.7-flash": 1786332030.5989418,
-    "@cf/openai/gpt-oss-120b": 1786332030.599397,
-    "@cf/nvidia/nemotron-3-120b-a12b": 1786332030.5997458,
-    "@cf/meta/llama-4-scout-17b-16e-instruct": 1786332030.6000924,
-    "@cf/qwen/qwq-32b": 1786332030.6004584,
-    "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b": 1786332030.6008124,
-    "@cf/meta/llama-3.1-70b-instruct": 1786332030.6011553,
-    "@cf/qwen/qwen2.5-72b-instruct": 1786332030.6015337,
-    "@cf/qwen/qwen3-30b-a3b-fp8": 1786332030.6018927,
-    "@cf/qwen/qwen2.5-coder-32b-instruct": 1786332030.6022666,
-    "@cf/mistral/mistral-small-3.1-24b-instruct": 1786332030.6027668,
-    "@cf/google/gemma-4-26b-a4b-it": 1786332030.6031132,
-    "@cf/moonshotai/kimi-k2.7-code": 1786332030.6034856,
-    "@cf/moonshotai/kimi-k2.6": 1786332030.6038282,
-    "@cf/meta/llama-3.1-8b-instruct": 1786332030.6041706,
-    "@cf/meta/llama-3.1-8b-instruct-fp8": 1786332030.604545,
-    "@cf/meta/llama-3.1-8b-instruct-fast": 1786332030.6048915,
-    "@cf/meta/llama-3.2-3b-instruct": 1786332030.6052616,
-    "@cf/zai-org/glm-5.2": 1786332030.6056147,
-    "@cf/meta/llama-3.2-1b-instruct": 1786332030.6059544,
-    "@cf/openai/gpt-oss-20b": 1786332030.6063118,
-    "@cf/ibm-granite/granite-4.0-h-micro": 1786332030.6066537
+    "@cf/meta/llama-3.3-70b-instruct": 1786380768.5042708,
+    "@cf/meta/llama-3.3-70b-instruct-fp8-fast": 1786380768.504599,
+    "@cf/zai-org/glm-4.7-flash": 1786380768.5049157,
+    "@cf/openai/gpt-oss-120b": 1786380768.505244,
+    "@cf/nvidia/nemotron-3-120b-a12b": 1786380768.5055566,
+    "@cf/meta/llama-4-scout-17b-16e-instruct": 1786380768.5058775,
+    "@cf/qwen/qwq-32b": 1786380768.5061903,
+    "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b": 1786380768.5064893,
+    "@cf/meta/llama-3.1-70b-instruct": 1786380768.5068023,
+    "@cf/qwen/qwen2.5-72b-instruct": 1786380768.5071287,
+    "@cf/qwen/qwen3-30b-a3b-fp8": 1786380768.5074446,
+    "@cf/qwen/qwen2.5-coder-32b-instruct": 1786380768.5077505,
+    "@cf/mistral/mistral-small-3.1-24b-instruct": 1786380768.508086,
+    "@cf/google/gemma-4-26b-a4b-it": 1786380768.508394,
+    "@cf/moonshotai/kimi-k2.7-code": 1786380768.5088322,
+    "@cf/moonshotai/kimi-k2.6": 1786380768.5091498,
+    "@cf/meta/llama-3.1-8b-instruct": 1786380768.5094495,
+    "@cf/meta/llama-3.1-8b-instruct-fp8": 1786380768.5097451,
+    "@cf/meta/llama-3.1-8b-instruct-fast": 1786380768.510057,
+    "@cf/meta/llama-3.2-3b-instruct": 1786380768.510356,
+    "@cf/zai-org/glm-5.2": 1786380768.5106606,
+    "@cf/meta/llama-3.2-1b-instruct": 1786380768.5109746,
+    "@cf/openai/gpt-oss-20b": 1786380768.5112743,
+    "@cf/ibm-granite/granite-4.0-h-micro": 1786380768.5115702
   },
   "gemini_models": {
     "gemini-2.5-pro": 1786296979.4337883,
@@ -62,6 +62,6 @@
   "cerebras_models": {
     "gpt-oss-120b": 1785006337.8771272,
     "gemma-4-31b": 1784921479.2708664,
-    "zai-glm-4.7": 1784921470.6457777
+    "zai-glm-4.7": 1786338239.307353
   }
 }
