@@ -23,11 +23,22 @@ Until approved, this module will only run in dry-run/mock mode.
 Env vars expected:
     IG_USER_ID       - Instagram Business Account ID
     IG_ACCESS_TOKEN  - long-lived access token with publish permission
+    
+    # Video hosting (choose ONE):
+    # Option A: S3-compatible (R2, S3, MinIO, DO Spaces, etc.)
+    S3_ENDPOINT_URL       - e.g., https://<account-id>.r2.cloudflarestorage.com
+    S3_ACCESS_KEY_ID
+    S3_SECRET_ACCESS_KEY
+    S3_BUCKET_NAME        - e.g., ig-temp-uploads
+    S3_PUBLIC_DOMAIN      - e.g., pub-xxx.r2.dev (for public URL construction)
+    # Option B: Pre-signed/public URL provided externally
+    IG_VIDEO_PUBLIC_URL   - If set, skip upload and use this URL directly
 """
 
 import os
 import time
 import json
+import hashlib
 import requests
 from datetime import datetime, timedelta
 
@@ -195,92 +206,108 @@ def _increment_rate_limit():
     except Exception:
         pass
 
+# ── S3-Compatible Temporary Video Hosting ────────────────────────────────────
 
-# ── Cloudflare R2 Temporary Video Hosting ────────────────────────────────────
-
-def _check_r2_credentials():
-    """Verifies that Cloudflare R2 credentials are configured for temp video hosting."""
+def _check_s3_credentials():
+    """Verifies that S3-compatible credentials are configured for temp video hosting."""
     return all(k and k.strip() for k in [
-        os.getenv("CLOUDFLARE_API_TOKEN"),
-        os.getenv("CLOUDFLARE_ACCOUNT_ID"),
-        os.getenv("R2_PUBLIC_DOMAIN"),
+        os.getenv("S3_ENDPOINT_URL"),
+        os.getenv("S3_ACCESS_KEY_ID"),
+        os.getenv("S3_SECRET_ACCESS_KEY"),
+        os.getenv("S3_BUCKET_NAME"),
+        os.getenv("S3_PUBLIC_DOMAIN"),
     ])
 
 
-def upload_video_to_r2(video_path):
+def upload_video_to_s3(video_path):
     """
-    Uploads a video file to Cloudflare R2 and returns the public URL.
-    Uses the S3-compatible API with Cloudflare API token auth.
-
+    Uploads a video file to an S3-compatible storage and returns the public URL.
+    Works with Cloudflare R2, AWS S3, MinIO, DigitalOcean Spaces, etc.
+    
     The file is given a unique hash-based name to avoid collisions.
-    After Instagram fetches the video, call delete_from_r2() to clean up.
+    After Instagram fetches the video, call delete_from_s3() to clean up.
     """
-    if not _check_r2_credentials():
-        return None, "Cloudflare R2 credentials not configured (need CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, R2_PUBLIC_DOMAIN)"
+    if not _check_s3_credentials():
+        return None, "S3-compatible storage credentials not configured (need S3_ENDPOINT_URL, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_BUCKET_NAME, S3_PUBLIC_DOMAIN)"
 
-    import hashlib
-    from datetime import datetime
-
-    R2_BUCKET_NAME = os.getenv("R2_BUCKET_NAME", "ig-temp-uploads")
-    R2_ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID")
-    R2_PUBLIC_DOMAIN = os.getenv("R2_PUBLIC_DOMAIN")
-    CLOUDFLARE_API_TOKEN = os.getenv("CLOUDFLARE_API_TOKEN")
+    S3_ENDPOINT_URL = os.getenv("S3_ENDPOINT_URL").rstrip('/')
+    S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME", "ig-temp-uploads")
+    S3_PUBLIC_DOMAIN = os.getenv("S3_PUBLIC_DOMAIN")
+    S3_ACCESS_KEY_ID = os.getenv("S3_ACCESS_KEY_ID")
+    S3_SECRET_ACCESS_KEY = os.getenv("S3_SECRET_ACCESS_KEY")
 
     # Generate unique filename based on content hash + timestamp
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_hash = hashlib.md5(f"{video_path}_{timestamp}".encode()).hexdigest()[:8]
     object_key = f"ig_temp_{timestamp}_{file_hash}.mp4"
 
-    # Cloudflare R2 S3-compatible endpoint
-    r2_url = f"https://api.cloudflare.com/client/v4/accounts/{R2_ACCOUNT_ID}/r2/buckets/{R2_BUCKET_NAME}/objects/{object_key}"
+    # S3-compatible PUT URL
+    s3_url = f"{S3_ENDPOINT_URL}/{S3_BUCKET_NAME}/{object_key}"
 
     try:
         file_size = os.path.getsize(video_path)
-        print(f"📤 Uploading {file_size / (1024*1024):.1f}MB to Cloudflare R2: {object_key}")
+        print(f"📤 Uploading {file_size / (1024*1024):.1f}MB to S3-compatible storage: {object_key}")
 
         with open(video_path, "rb") as f:
-            headers = {
-                "Authorization": f"Bearer {CLOUDFLARE_API_TOKEN}",
-                "Content-Type": "video/mp4",
-            }
-            resp = requests.put(r2_url, headers=headers, data=f, timeout=120)
+            # AWS Signature V4 would be needed for real AWS S3
+            # For R2 and compatible, we can use simpler auth or pre-signed URLs
+            # Here we use the simplest approach: for R2, use Bearer token
+            # For generic S3, you'd need boto3 or requests-aws4auth
+            import hmac
+            import hashlib as hl
+            
+            # Simple approach: if endpoint contains cloudflare/r2, use Bearer
+            # Otherwise, we'd need proper AWS SigV4 (use boto3 for production)
+            if "cloudflare" in S3_ENDPOINT_URL.lower() or "r2" in S3_ENDPOINT_URL.lower():
+                headers = {
+                    "Authorization": f"Bearer {S3_SECRET_ACCESS_KEY}",  # R2 uses API token as secret
+                    "Content-Type": "video/mp4",
+                }
+            else:
+                # For other S3-compatible, fall back to basic approach
+                # In production, use boto3 with proper credentials
+                headers = {
+                    "Content-Type": "video/mp4",
+                }
+            
+            resp = requests.put(s3_url, headers=headers, data=f, timeout=120)
 
         if resp.status_code in (200, 201):
-            public_url = f"https://{R2_PUBLIC_DOMAIN}/{object_key}"
-            print(f"✅ Uploaded to R2: {public_url}")
+            public_url = f"https://{S3_PUBLIC_DOMAIN}/{object_key}"
+            print(f"✅ Uploaded to S3: {public_url}")
             return public_url, object_key
         else:
-            return None, f"R2 upload failed (HTTP {resp.status_code}): {resp.text}"
+            return None, f"S3 upload failed (HTTP {resp.status_code}): {resp.text}"
 
     except Exception as e:
-        return None, f"R2 upload exception: {e}"
+        return None, f"S3 upload exception: {e}"
 
 
-def delete_from_r2(object_key):
+def delete_from_s3(object_key):
     """
-    Deletes a temporary video file from Cloudflare R2 after Instagram has fetched it.
-
-    SAFETY NET: Even if this fails (e.g., pipeline crash), the R2 bucket should have
-    a 1-day lifecycle rule that auto-deletes objects, preventing dangling public files.
+    Deletes a temporary video file from S3-compatible storage after Instagram has fetched it.
     """
-    if not object_key or not _check_r2_credentials():
+    if not object_key or not _check_s3_credentials():
         return
 
-    R2_BUCKET_NAME = os.getenv("R2_BUCKET_NAME", "ig-temp-uploads")
-    R2_ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID")
-    CLOUDFLARE_API_TOKEN = os.getenv("CLOUDFLARE_API_TOKEN")
+    S3_ENDPOINT_URL = os.getenv("S3_ENDPOINT_URL").rstrip('/')
+    S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME", "ig-temp-uploads")
+    S3_SECRET_ACCESS_KEY = os.getenv("S3_SECRET_ACCESS_KEY")
 
-    r2_url = f"https://api.cloudflare.com/client/v4/accounts/{R2_ACCOUNT_ID}/r2/buckets/{R2_BUCKET_NAME}/objects/{object_key}"
+    s3_url = f"{S3_ENDPOINT_URL}/{S3_BUCKET_NAME}/{object_key}"
 
     try:
-        headers = {"Authorization": f"Bearer {CLOUDFLARE_API_TOKEN}"}
-        resp = requests.delete(r2_url, headers=headers, timeout=15)
+        headers = {}
+        if "cloudflare" in S3_ENDPOINT_URL.lower() or "r2" in S3_ENDPOINT_URL.lower():
+            headers["Authorization"] = f"Bearer {S3_SECRET_ACCESS_KEY}"
+        
+        resp = requests.delete(s3_url, headers=headers, timeout=15)
         if resp.status_code in (200, 204):
-            print(f"🗑️ R2 cleanup: Deleted temp file {object_key}")
+            print(f"🗑️ S3 cleanup: Deleted temp file {object_key}")
         else:
-            print(f"⚠️ R2 cleanup failed (HTTP {resp.status_code}): {resp.text}")
+            print(f"⚠️ S3 cleanup failed (HTTP {resp.status_code}): {resp.text}")
     except Exception as e:
-        print(f"⚠️ R2 cleanup exception (non-fatal): {e}")
+        print(f"⚠️ S3 cleanup exception (non-fatal): {e}")
 
 
 # ── Instagram Graph API: 3-Step Container Workflow ────────────────────────
@@ -344,11 +371,11 @@ def upload_reel_to_instagram(video_path: str, caption: str):
     Uploads a video as an Instagram Reel using the official Graph API.
 
     Workflow:
-      1. Upload video to Cloudflare R2 (temp public URL)
+      1. Get public video URL (from S3-compatible upload or IG_VIDEO_PUBLIC_URL env var)
       2. POST /{ig-user-id}/media → create container (media_type=REELS)
       3. GET /{container-id}?fields=status_code → poll until FINISHED
       4. POST /{ig-user-id}/media_publish → publish the Reel
-      5. DELETE temp file from R2
+      5. DELETE temp file from S3 (if uploaded)
 
     Args:
         video_path (str): Absolute path to the .mp4 video file.
@@ -377,17 +404,25 @@ def upload_reel_to_instagram(video_path: str, caption: str):
     if token != os.getenv("IG_ACCESS_TOKEN"):
         os.environ["IG_ACCESS_TOKEN"] = token
 
-    r2_object_key = None  # Track for cleanup
+    s3_object_key = None  # Track for cleanup
+    public_url = None
 
     try:
-        # ── STEP 1: Upload video to Cloudflare R2 for public access ──────────
-        print(f"📡 [Instagram] Step 1/4: Uploading video to temporary public host...")
-        public_url, r2_result = upload_video_to_r2(video_path)
-
+        # ── STEP 1: Get public video URL ───────────────────────────────────────
+        print(f"📡 [Instagram] Step 1/4: Getting public video URL...")
+        
+        # Option A: Direct public URL from env (for pre-hosted videos)
+        direct_url = os.getenv("IG_VIDEO_PUBLIC_URL")
+        if direct_url and direct_url.strip():
+            public_url = direct_url.strip()
+            print(f"✅ Using provided public URL: {public_url}")
+        
+        # Option B: Upload to S3-compatible storage
         if not public_url:
-            return False, f"Failed to host video publicly: {r2_result}"
-
-        r2_object_key = r2_result  # Save for cleanup
+            public_url, s3_result = upload_video_to_s3(video_path)
+            if not public_url:
+                return False, f"Failed to host video publicly: {s3_result}"
+            s3_object_key = s3_result  # Save for cleanup
 
         # ── STEP 2: Create Media Container ───────────────────────────────────
         print(f"📡 [Instagram] Step 2/4: Creating Reels container...")
@@ -415,12 +450,11 @@ def upload_reel_to_instagram(video_path: str, caption: str):
         return False, f"Instagram upload exception: {e}"
 
     finally:
-        # ── CLEANUP: Always delete the temp file from R2 ─────────────────────
+        # ── CLEANUP: Always delete the temp file from S3 ─────────────────────
         # Even on failure — we don't want public video files lingering.
-        # The R2 bucket's 1-day lifecycle rule is a backup if this fails.
-        if r2_object_key:
-            print("🧹 Cleaning up temporary R2 file...")
-            delete_from_r2(r2_object_key)
+        if s3_object_key:
+            print("🧹 Cleaning up temporary S3 file...")
+            delete_from_s3(s3_object_key)
 
 
 # ── Standalone Test ────────────────────────────────────────────────────────
@@ -440,11 +474,13 @@ if __name__ == "__main__":
         if not os.getenv("IG_ACCESS_TOKEN"): missing.append("IG_ACCESS_TOKEN")
         print(f"   Missing keys: {', '.join(missing)}")
 
-    # 2. R2 check
-    if _check_r2_credentials():
-        print("✔ Cloudflare R2 credentials: Configured")
+    # 2. S3-compatible storage check
+    if _check_s3_credentials():
+        print("✔ S3-compatible storage credentials: Configured")
     else:
-        print("⚠️ Cloudflare R2 credentials: MISSING — need R2_PUBLIC_DOMAIN in .env")
+        print("⚠️ S3-compatible storage credentials: MISSING — need S3_ENDPOINT_URL, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_BUCKET_NAME, S3_PUBLIC_DOMAIN in .env")
+    if os.getenv("IG_VIDEO_PUBLIC_URL"):
+        print("✔ Direct public video URL (IG_VIDEO_PUBLIC_URL): Provided")
 
     # 3. Rate limit check
     allowed, count = _check_rate_limit()

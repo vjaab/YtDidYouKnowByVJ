@@ -74,6 +74,25 @@ jobs:
           echo "X_ACCESS_TOKEN=${{ secrets.X_ACCESS_TOKEN }}" >> .env
           echo "X_ACCESS_TOKEN_SECRET=${{ secrets.X_ACCESS_TOKEN_SECRET }}" >> .env
           echo "X_BEARER_TOKEN=${{ secrets.X_BEARER_TOKEN }}" >> .env
+          # S3-compatible storage for Instagram video hosting
+          if [ ! -z "${{ secrets.S3_ENDPOINT_URL }}" ]; then
+            echo "S3_ENDPOINT_URL=${{ secrets.S3_ENDPOINT_URL }}" >> .env
+          fi
+          if [ ! -z "${{ secrets.S3_ACCESS_KEY_ID }}" ]; then
+            echo "S3_ACCESS_KEY_ID=${{ secrets.S3_ACCESS_KEY_ID }}" >> .env
+          fi
+          if [ ! -z "${{ secrets.S3_SECRET_ACCESS_KEY }}" ]; then
+            echo "S3_SECRET_ACCESS_KEY=${{ secrets.S3_SECRET_ACCESS_KEY }}" >> .env
+          fi
+          if [ ! -z "${{ secrets.S3_BUCKET_NAME }}" ]; then
+            echo "S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}" >> .env
+          fi
+          if [ ! -z "${{ secrets.S3_PUBLIC_DOMAIN }}" ]; then
+            echo "S3_PUBLIC_DOMAIN=${{ secrets.S3_PUBLIC_DOMAIN }}" >> .env
+          fi
+          if [ ! -z "${{ secrets.IG_VIDEO_PUBLIC_URL }}" ]; then
+            echo "IG_VIDEO_PUBLIC_URL=${{ secrets.IG_VIDEO_PUBLIC_URL }}" >> .env
+          fi
           if [ ! -z "${{ secrets.OPENAI_API_KEY }}" ]; then
             echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
           fi
