@@ -50,7 +50,6 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-          YOUTUBE_CLIENT_SECRET_FILE: ${{ secrets.YOUTUBE_CLIENT_SECRET_FILE }}
           YOUTUBE_DATA_API_KEY: ${{ secrets.YOUTUBE_DATA_API_KEY }}
           REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
           REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
@@ -64,8 +63,8 @@ jobs:
           INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
           INSTAGRAM_BUSINESS_ACCOUNT_ID: ${{ secrets.INSTAGRAM_BUSINESS_ACCOUNT_ID }}
         run: |
-          # Write client_secret.json for YouTube auth
-          echo '${{ secrets.YOUTUBE_CLIENT_SECRET_FILE }}' > client_secret.json
+          # Write client_secret.json for YouTube auth (use same secret as shorts pipeline)
+          echo '${{ secrets.CLIENT_SECRET_JSON }}' > client_secret.json
           
           # Create .env file
           cat > .env << EOF
