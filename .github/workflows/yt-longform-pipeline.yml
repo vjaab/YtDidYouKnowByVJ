@@ -90,6 +90,10 @@ jobs:
           if [ ! -z "${{ secrets.S3_PUBLIC_DOMAIN }}" ]; then
             echo "S3_PUBLIC_DOMAIN=${{ secrets.S3_PUBLIC_DOMAIN }}" >> .env
           fi
+          # file.io for simple temporary hosting
+          if [ ! -z "${{ secrets.FILE_IO_API_KEY }}" ]; then
+            echo "FILE_IO_API_KEY=${{ secrets.FILE_IO_API_KEY }}" >> .env
+          fi
           if [ ! -z "${{ secrets.IG_VIDEO_PUBLIC_URL }}" ]; then
             echo "IG_VIDEO_PUBLIC_URL=${{ secrets.IG_VIDEO_PUBLIC_URL }}" >> .env
           fi

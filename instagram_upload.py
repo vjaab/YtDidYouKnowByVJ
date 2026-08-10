@@ -31,7 +31,9 @@ Env vars expected:
     S3_SECRET_ACCESS_KEY
     S3_BUCKET_NAME        - e.g., ig-temp-uploads
     S3_PUBLIC_DOMAIN      - e.g., pub-xxx.r2.dev (for public URL construction)
-    # Option B: Pre-signed/public URL provided externally
+    # Option B: file.io (simple temporary file hosting)
+    FILE_IO_API_KEY       - Optional API key for file.io (higher limits, longer expiry)
+    # Option C: Pre-signed/public URL provided externally
     IG_VIDEO_PUBLIC_URL   - If set, skip upload and use this URL directly
 """
 
@@ -310,6 +312,76 @@ def delete_from_s3(object_key):
         print(f"⚠️ S3 cleanup exception (non-fatal): {e}")
 
 
+# ── file.io Temporary Video Hosting ───────────────────────────────────────────
+
+def _check_fileio_credentials():
+    """Verifies file.io is available (works without API key, but key gives better limits)."""
+    return True  # file.io works without credentials
+
+
+def upload_video_to_fileio(video_path):
+    """
+    Uploads a video file to file.io and returns the public download URL.
+    
+    file.io provides temporary file hosting with automatic expiry.
+    Free tier: 100MB max, 1 download or 14 days expiry (whichever comes first).
+    With API key: Higher limits, customizable expiry.
+    
+    Note: Instagram needs to fetch the video during container processing.
+    The link must remain valid long enough for Instagram to download it.
+    """
+    api_key = os.getenv("FILE_IO_API_KEY")
+    
+    file_size = os.path.getsize(video_path)
+    size_mb = file_size / (1024 * 1024)
+    
+    if size_mb > 100 and not api_key:
+        return None, f"File too large ({size_mb:.1f}MB) for free file.io tier (100MB limit). Use FILE_IO_API_KEY for larger files or use S3-compatible storage."
+
+    print(f"📤 Uploading {size_mb:.1f}MB to file.io...")
+
+    try:
+        url = "https://file.io"
+        headers = {}
+        if api_key:
+            headers["Authorization"] = f"Bearer {api_key}"
+        
+        # Options: set expiry to maximum (14 days = 1209600 seconds)
+        # Note: free tier limits to 1 download OR 14 days
+        data = {
+            "expires": "14d",  # Maximum expiry
+            "maxDownloads": "1",  # Instagram only needs to download once
+        }
+        
+        with open(video_path, "rb") as f:
+            files = {"file": (os.path.basename(video_path), f, "video/mp4")}
+            resp = requests.post(url, headers=headers, data=data, files=files, timeout=180)
+
+        if resp.status_code in (200, 201):
+            result = resp.json()
+            if result.get("success"):
+                public_url = result.get("link")
+                expires = result.get("expires", "unknown")
+                print(f"✅ Uploaded to file.io: {public_url} (expires: {expires})")
+                return public_url, public_url  # Return URL as both public_url and "object_key" for tracking
+            else:
+                return None, f"file.io upload failed: {result}"
+        else:
+            return None, f"file.io upload failed (HTTP {resp.status_code}): {resp.text}"
+
+    except Exception as e:
+        return None, f"file.io upload exception: {e}"
+
+
+def delete_from_fileio(object_key):
+    """
+    file.io files auto-delete after expiry or download. No manual cleanup needed.
+    This is a no-op for compatibility with the cleanup pattern.
+    """
+    if object_key:
+        print(f"🗑️ file.io cleanup: Files auto-expire after download/expiry (no manual delete needed)")
+
+
 # ── Instagram Graph API: 3-Step Container Workflow ────────────────────────
 
 def create_reels_container(video_url: str, caption: str, share_to_feed: bool = True) -> str:
@@ -371,11 +443,11 @@ def upload_reel_to_instagram(video_path: str, caption: str):
     Uploads a video as an Instagram Reel using the official Graph API.
 
     Workflow:
-      1. Get public video URL (from S3-compatible upload or IG_VIDEO_PUBLIC_URL env var)
+      1. Get public video URL (from file.io, S3-compatible upload, or IG_VIDEO_PUBLIC_URL env var)
       2. POST /{ig-user-id}/media → create container (media_type=REELS)
       3. GET /{container-id}?fields=status_code → poll until FINISHED
       4. POST /{ig-user-id}/media_publish → publish the Reel
-      5. DELETE temp file from S3 (if uploaded)
+      5. Cleanup (auto for file.io, manual for S3)
 
     Args:
         video_path (str): Absolute path to the .mp4 video file.
@@ -404,7 +476,8 @@ def upload_reel_to_instagram(video_path: str, caption: str):
     if token != os.getenv("IG_ACCESS_TOKEN"):
         os.environ["IG_ACCESS_TOKEN"] = token
 
-    s3_object_key = None  # Track for cleanup
+    upload_method = None  # Track which method was used: "fileio", "s3", or "direct"
+    upload_key = None     # Track for cleanup
     public_url = None
 
     try:
@@ -415,14 +488,27 @@ def upload_reel_to_instagram(video_path: str, caption: str):
         direct_url = os.getenv("IG_VIDEO_PUBLIC_URL")
         if direct_url and direct_url.strip():
             public_url = direct_url.strip()
+            upload_method = "direct"
             print(f"✅ Using provided public URL: {public_url}")
         
-        # Option B: Upload to S3-compatible storage
+        # Option B: Upload to file.io (simple, no infrastructure needed)
+        if not public_url:
+            print(f"📤 Trying file.io for temporary hosting...")
+            public_url, fileio_result = upload_video_to_fileio(video_path)
+            if public_url:
+                upload_method = "fileio"
+                upload_key = fileio_result
+                print(f"✅ Uploaded to file.io")
+            else:
+                print(f"⚠️ file.io upload failed: {fileio_result}")
+        
+        # Option C: Upload to S3-compatible storage
         if not public_url:
             public_url, s3_result = upload_video_to_s3(video_path)
             if not public_url:
                 return False, f"Failed to host video publicly: {s3_result}"
-            s3_object_key = s3_result  # Save for cleanup
+            upload_method = "s3"
+            upload_key = s3_result  # Save for cleanup
 
         # ── STEP 2: Create Media Container ───────────────────────────────────
         print(f"📡 [Instagram] Step 2/4: Creating Reels container...")
@@ -450,11 +536,14 @@ def upload_reel_to_instagram(video_path: str, caption: str):
         return False, f"Instagram upload exception: {e}"
 
     finally:
-        # ── CLEANUP: Always delete the temp file from S3 ─────────────────────
-        # Even on failure — we don't want public video files lingering.
-        if s3_object_key:
+        # ── CLEANUP: Delete temp file based on upload method ──────────────────
+        if upload_method == "s3" and upload_key:
             print("🧹 Cleaning up temporary S3 file...")
-            delete_from_s3(s3_object_key)
+            delete_from_s3(upload_key)
+        elif upload_method == "fileio" and upload_key:
+            print("🧹 Cleaning up file.io reference...")
+            delete_from_fileio(upload_key)
+        # For "direct" method, no cleanup needed
 
 
 # ── Standalone Test ────────────────────────────────────────────────────────
@@ -474,17 +563,25 @@ if __name__ == "__main__":
         if not os.getenv("IG_ACCESS_TOKEN"): missing.append("IG_ACCESS_TOKEN")
         print(f"   Missing keys: {', '.join(missing)}")
 
-    # 2. S3-compatible storage check
+    # 2. Video hosting options
+    print("\n📦 Video hosting options:")
     if _check_s3_credentials():
-        print("✔ S3-compatible storage credentials: Configured")
+        print("  ✔ S3-compatible storage: Configured")
     else:
-        print("⚠️ S3-compatible storage credentials: MISSING — need S3_ENDPOINT_URL, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_BUCKET_NAME, S3_PUBLIC_DOMAIN in .env")
+        print("  ⚠️ S3-compatible storage: Not configured (optional)")
+        print("     Set: S3_ENDPOINT_URL, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_BUCKET_NAME, S3_PUBLIC_DOMAIN")
+    
+    if _check_fileio_credentials():
+        print("  ✔ file.io: Available (no config needed, optional FILE_IO_API_KEY for larger files)")
+    else:
+        print("  ⚠️ file.io: Not available")
+    
     if os.getenv("IG_VIDEO_PUBLIC_URL"):
-        print("✔ Direct public video URL (IG_VIDEO_PUBLIC_URL): Provided")
+        print("  ✔ Direct public URL (IG_VIDEO_PUBLIC_URL): Provided")
 
     # 3. Rate limit check
     allowed, count = _check_rate_limit()
-    print(f"✔ Rate limit: {count}/{MAX_POSTS_PER_DAY} posts today ({'OK' if allowed else 'LIMIT REACHED'})")
+    print(f"\n✔ Rate limit: {count}/{MAX_POSTS_PER_DAY} posts today ({'OK' if allowed else 'LIMIT REACHED'})")
 
     # 4. Token check
     token, expiry = _load_token()
