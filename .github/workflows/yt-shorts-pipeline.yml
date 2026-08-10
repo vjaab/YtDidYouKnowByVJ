@@ -135,6 +135,12 @@ jobs:
           if [ ! -z "${{ secrets.OPENCODE_API_KEY }}" ]; then
             echo "OPENCODE_API_KEY=${{ secrets.OPENCODE_API_KEY }}" >> .env
           fi
+          if [ ! -z "${{ secrets.IG_USER_ID }}" ]; then
+            echo "IG_USER_ID=${{ secrets.IG_USER_ID }}" >> .env
+          fi
+          if [ ! -z "${{ secrets.IG_ACCESS_TOKEN }}" ]; then
+            echo "IG_ACCESS_TOKEN=${{ secrets.IG_ACCESS_TOKEN }}" >> .env
+          fi
           
       - name: Setup YouTube Auth Files
         # We restore the JSON files from GitHub Secrets
