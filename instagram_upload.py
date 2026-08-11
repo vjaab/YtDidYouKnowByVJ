@@ -4,11 +4,11 @@ instagram_upload.py — Official Instagram Reels Upload Module via Meta Graph AP
 
 Implements the 3-step container workflow:
   1. Create IG media container (media_type=REELS) with a public video URL
-  2. Poll until FINISHED → Publish
+  2. Poll until FINISHED -> Publish
   3. Return published media ID
 
 Rate Limit: Instagram allows max 25 published posts per 24-hour window per account.
-At the current pipeline cadence (2 Shorts/day), this is not a concern — but if you
+At the current pipeline cadence (2 Shorts/day), this is not a concern -- but if you
 scale to bulk publishing, add a counter/lockfile to enforce this ceiling.
 
 Token Lifecycle: Long-lived tokens expire after 60 days. The module auto-refreshes
@@ -26,11 +26,12 @@ Env vars expected:
     
     # Video hosting (choose ONE):
     # Option A: S3-compatible (R2, S3, MinIO, DO Spaces, etc.)
-    S3_ENDPOINT_URL       - e.g., https://<account-id>.r2.cloudflarestorage.com
-    S3_ACCESS_KEY_ID
-    S3_SECRET_ACCESS_KEY
-    S3_BUCKET_NAME        - e.g., ig-temp-uploads
-    S3_PUBLIC_DOMAIN      - e.g., pub-xxx.r2.dev (for public URL construction)
+    # Supports both S3_* and R2_* (Cloudflare R2) naming conventions:
+    S3_ENDPOINT_URL / R2_ENDPOINT_URL   - e.g., https://<account-id>.r2.cloudflarestorage.com
+    S3_ACCESS_KEY_ID / R2_ACCESS_KEY_ID
+    S3_SECRET_ACCESS_KEY / R2_SECRET_ACCESS_KEY
+    S3_BUCKET_NAME / R2_BUCKET_NAME     - e.g., ig-temp-uploads
+    S3_PUBLIC_DOMAIN / R2_PUBLIC_DOMAIN - e.g., pub-xxx.r2.dev (for public URL construction)
     # Option B: file.io (simple temporary file hosting)
     FILE_IO_API_KEY       - Optional API key for file.io (higher limits, longer expiry)
     # Option C: Pre-signed/public URL provided externally
@@ -211,14 +212,18 @@ def _increment_rate_limit():
 # ── S3-Compatible Temporary Video Hosting ────────────────────────────────────
 
 def _check_s3_credentials():
-    """Verifies that S3-compatible credentials are configured for temp video hosting."""
-    return all(k and k.strip() for k in [
-        os.getenv("S3_ENDPOINT_URL"),
-        os.getenv("S3_ACCESS_KEY_ID"),
-        os.getenv("S3_SECRET_ACCESS_KEY"),
-        os.getenv("S3_BUCKET_NAME"),
-        os.getenv("S3_PUBLIC_DOMAIN"),
-    ])
+    """Verifies that S3-compatible credentials are configured for temp video hosting.
+    
+    Supports both S3_* and R2_* (Cloudflare R2) environment variable naming conventions.
+    """
+    # Try S3_* first, then fall back to R2_*
+    endpoint = os.getenv("S3_ENDPOINT_URL") or os.getenv("R2_ENDPOINT_URL")
+    access_key = os.getenv("S3_ACCESS_KEY_ID") or os.getenv("R2_ACCESS_KEY_ID")
+    secret_key = os.getenv("S3_SECRET_ACCESS_KEY") or os.getenv("R2_SECRET_ACCESS_KEY")
+    bucket = os.getenv("S3_BUCKET_NAME") or os.getenv("R2_BUCKET_NAME")
+    public_domain = os.getenv("S3_PUBLIC_DOMAIN") or os.getenv("R2_PUBLIC_DOMAIN")
+    
+    return all(k and k.strip() for k in [endpoint, access_key, secret_key, bucket, public_domain])
 
 
 def upload_video_to_s3(video_path):
@@ -229,14 +234,15 @@ def upload_video_to_s3(video_path):
     The file is given a unique hash-based name to avoid collisions.
     After Instagram fetches the video, call delete_from_s3() to clean up.
     """
-    if not _check_s3_credentials():
-        return None, "S3-compatible storage credentials not configured (need S3_ENDPOINT_URL, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_BUCKET_NAME, S3_PUBLIC_DOMAIN)"
+    # Support both S3_* and R2_* env var naming conventions
+    S3_ENDPOINT_URL = (os.getenv("S3_ENDPOINT_URL") or os.getenv("R2_ENDPOINT_URL", "")).rstrip('/')
+    S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME") or os.getenv("R2_BUCKET_NAME", "ig-temp-uploads")
+    S3_PUBLIC_DOMAIN = os.getenv("S3_PUBLIC_DOMAIN") or os.getenv("R2_PUBLIC_DOMAIN")
+    S3_ACCESS_KEY_ID = os.getenv("S3_ACCESS_KEY_ID") or os.getenv("R2_ACCESS_KEY_ID")
+    S3_SECRET_ACCESS_KEY = os.getenv("S3_SECRET_ACCESS_KEY") or os.getenv("R2_SECRET_ACCESS_KEY")
 
-    S3_ENDPOINT_URL = os.getenv("S3_ENDPOINT_URL").rstrip('/')
-    S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME", "ig-temp-uploads")
-    S3_PUBLIC_DOMAIN = os.getenv("S3_PUBLIC_DOMAIN")
-    S3_ACCESS_KEY_ID = os.getenv("S3_ACCESS_KEY_ID")
-    S3_SECRET_ACCESS_KEY = os.getenv("S3_SECRET_ACCESS_KEY")
+    if not all(k and k.strip() for k in [S3_ENDPOINT_URL, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_BUCKET_NAME, S3_PUBLIC_DOMAIN]):
+        return None, "S3-compatible storage credentials not configured (need S3_ENDPOINT_URL/R2_ENDPOINT_URL, S3_ACCESS_KEY_ID/R2_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY/R2_SECRET_ACCESS_KEY, S3_BUCKET_NAME/R2_BUCKET_NAME, S3_PUBLIC_DOMAIN/R2_PUBLIC_DOMAIN)"
 
     # Generate unique filename based on content hash + timestamp
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -289,12 +295,13 @@ def delete_from_s3(object_key):
     """
     Deletes a temporary video file from S3-compatible storage after Instagram has fetched it.
     """
-    if not object_key or not _check_s3_credentials():
-        return
+    # Support both S3_* and R2_* env var naming conventions
+    S3_ENDPOINT_URL = (os.getenv("S3_ENDPOINT_URL") or os.getenv("R2_ENDPOINT_URL", "")).rstrip('/')
+    S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME") or os.getenv("R2_BUCKET_NAME", "ig-temp-uploads")
+    S3_SECRET_ACCESS_KEY = os.getenv("S3_SECRET_ACCESS_KEY") or os.getenv("R2_SECRET_ACCESS_KEY")
 
-    S3_ENDPOINT_URL = os.getenv("S3_ENDPOINT_URL").rstrip('/')
-    S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME", "ig-temp-uploads")
-    S3_SECRET_ACCESS_KEY = os.getenv("S3_SECRET_ACCESS_KEY")
+    if not object_key or not all(k and k.strip() for k in [S3_ENDPOINT_URL, S3_BUCKET_NAME, S3_SECRET_ACCESS_KEY]):
+        return
 
     s3_url = f"{S3_ENDPOINT_URL}/{S3_BUCKET_NAME}/{object_key}"
 
@@ -355,10 +362,19 @@ def upload_video_to_fileio(video_path):
         
         with open(video_path, "rb") as f:
             files = {"file": (os.path.basename(video_path), f, "video/mp4")}
-            resp = requests.post(url, headers=headers, data=data, files=files, timeout=180)
+            # allow_redirects=True is needed because file.io returns 301 to Cloudflare
+            resp = requests.post(url, headers=headers, data=data, files=files, timeout=180, allow_redirects=True)
+
+        # Handle case where response might not be JSON (e.g., HTML error page)
+        content_type = resp.headers.get('Content-Type', '')
+        if 'application/json' not in content_type:
+            return None, f"file.io returned non-JSON response (HTTP {resp.status_code}): {resp.text[:200]}"
 
         if resp.status_code in (200, 201):
-            result = resp.json()
+            try:
+                result = resp.json()
+            except json.JSONDecodeError as e:
+                return None, f"file.io upload failed: Invalid JSON response: {e}"
             if result.get("success"):
                 public_url = result.get("link")
                 expires = result.get("expires", "unknown")
@@ -566,10 +582,12 @@ if __name__ == "__main__":
     # 2. Video hosting options
     print("\n📦 Video hosting options:")
     if _check_s3_credentials():
-        print("  ✔ S3-compatible storage: Configured")
+        print("  ✔ S3-compatible storage (S3_* or R2_*): Configured")
     else:
         print("  ⚠️ S3-compatible storage: Not configured (optional)")
-        print("     Set: S3_ENDPOINT_URL, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_BUCKET_NAME, S3_PUBLIC_DOMAIN")
+        print("     Set: S3_ENDPOINT_URL/R2_ENDPOINT_URL, S3_ACCESS_KEY_ID/R2_ACCESS_KEY_ID,")
+        print("          S3_SECRET_ACCESS_KEY/R2_SECRET_ACCESS_KEY, S3_BUCKET_NAME/R2_BUCKET_NAME,")
+        print("          S3_PUBLIC_DOMAIN/R2_PUBLIC_DOMAIN")
     
     if _check_fileio_credentials():
         print("  ✔ file.io: Available (no config needed, optional FILE_IO_API_KEY for larger files)")
