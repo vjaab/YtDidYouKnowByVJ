@@ -57,6 +57,207 @@ TITLE_BOTTOM_GAP = 192  # Default; overridden per-video by LayoutProfile
 
 import hashlib as _hashlib
 
+# ══════════════════════════════════════════════════════════════════════════════
+# SAFE ZONE CALCULATOR — Prevents overlay collisions (badges, captions, branding)
+# ══════════════════════════════════════════════════════════════════════════════
+class SafeZoneCalculator:
+    """
+    Calculates and manages safe zones for all overlay elements to prevent collisions.
+    Divides the frame into reserved zones and available zones for each element type.
+    """
+    
+    def __init__(self, frame_w, frame_h, layout=None, is_longform=False):
+        self.frame_w = frame_w
+        self.frame_h = frame_h
+        self.layout = layout or {}
+        self.is_longform = is_longform
+        self.reserved_zones = []  # List of (x1, y1, x2, y2, name) tuples
+        self.element_positions = {}  # element_type -> (x, y, w, h)
+        
+        # Initialize default reserved zones
+        self._init_default_zones()
+    
+    def _init_default_zones(self):
+        """Initialize zones that are always reserved based on layout type."""
+        # YouTube UI safe zones (bottom for progress bar, top for notch/status bar)
+        self.reserve_zone(0, 0, self.frame_w, 80, "youtube_top_ui")
+        self.reserve_zone(0, self.frame_h - 120, self.frame_w, self.frame_h, "youtube_bottom_ui")
+        
+        # Title area (bottom)
+        title_gap = self.layout.get("title_bottom_gap", 192)
+        self.reserve_zone(
+            0, self.frame_h - title_gap - 200, 
+            self.frame_w, self.frame_h - title_gap, 
+            "title_area"
+        )
+        
+        # Avatar/talking head zone - dedicated corner
+        if self.is_longform:
+            # Longform: center-bottom presenter area
+            self.reserve_zone(
+                self.frame_w // 2 - 300, self.frame_h - 950,
+                self.frame_w // 2 + 300, self.frame_h - 50,
+                "longform_presenter"
+            )
+        else:
+            # Shorts: dedicated corner (bottom-right by default)
+            layout_type = self.layout.get("layout_type", "asymmetric")
+            if layout_type == "split_screen":
+                # Right side, upper area
+                self.reserve_zone(
+                    self.frame_w - 320, 100,
+                    self.frame_w - 20, 420,
+                    "avatar_corner"
+                )
+            elif layout_type == "hero_center":
+                # Right side, lower area
+                self.reserve_zone(
+                    self.frame_w - 320, self.frame_h - 420,
+                    self.frame_w - 20, self.frame_h - 100,
+                    "avatar_corner"
+                )
+            elif layout_type == "side_strip":
+                # Left strip
+                self.reserve_zone(20, self.frame_h // 2 - 160, 340, self.frame_h // 2 + 160, "avatar_corner")
+            elif layout_type == "top_center":
+                # Top center
+                self.reserve_zone(self.frame_w // 2 - 160, 80, self.frame_w // 2 + 160, 400, "avatar_corner")
+            elif layout_type == "corner_cycling":
+                # Will be set per-video based on corner_index
+                corner_idx = self.layout.get("corner_index", 0)
+                corners = [
+                    (20, 100, 340, 420),  # top-left
+                    (self.frame_w - 340, 100, self.frame_w - 20, 420),  # top-right
+                    (20, self.frame_h - 420, 340, self.frame_h - 100),  # bottom-left
+                    (self.frame_w - 340, self.frame_h - 420, self.frame_w - 20, self.frame_h - 100),  # bottom-right
+                ]
+                x1, y1, x2, y2 = corners[corner_idx % 4]
+                self.reserve_zone(x1, y1, x2, y2, "avatar_corner")
+            else:  # asymmetric - full screen presenter bottom center
+                self.reserve_zone(
+                    self.frame_w // 2 - 160, self.frame_h - 420,
+                    self.frame_w // 2 + 160, self.frame_h - 100,
+                    "avatar_corner"
+                )
+    
+    def reserve_zone(self, x1, y1, x2, y2, name):
+        """Reserve a rectangular zone so no other element can overlap it."""
+        x1, y1 = max(0, x1), max(0, y1)
+        x2, y2 = min(self.frame_w, x2), min(self.frame_h, y2)
+        if x2 > x1 and y2 > y1:
+            self.reserved_zones.append((x1, y1, x2, y2, name))
+    
+    def check_overlap(self, x1, y1, x2, y2, margin=20):
+        """Check if a proposed zone overlaps any reserved zone."""
+        x1, y1 = max(0, x1 - margin), max(0, y1 - margin)
+        x2, y2 = min(self.frame_w, x2 + margin), min(self.frame_h, y2 + margin)
+        
+        for rz_x1, rz_y1, rz_x2, rz_y2, name in self.reserved_zones:
+            if not (x2 <= rz_x1 or x1 >= rz_x2 or y2 <= rz_y1 or y1 >= rz_y2):
+                return True, name
+        return False, None
+    
+    def find_safe_position(self, element_w, element_h, preferred_positions=None, element_type="overlay"):
+        """
+        Find a safe position for an element of given dimensions.
+        Returns (x, y) coordinates or None if no safe position found.
+        """
+        if preferred_positions is None:
+            preferred_positions = self._get_default_preferred_positions(element_type)
+        
+        for pos in preferred_positions:
+            if isinstance(pos, str):
+                # Named position
+                x, y = self._resolve_named_position(pos, element_w, element_h)
+            else:
+                x, y = pos
+            
+            x2, y2 = x + element_w, y + element_h
+            overlaps, zone_name = self.check_overlap(x, y, x2, y2)
+            
+            if not overlaps:
+                self.reserve_zone(x, y, x2, y2, element_type)
+                self.element_positions[element_type] = (x, y, element_w, element_h)
+                return (x, y)
+        
+        # Fallback: try grid search
+        return self._grid_search_fallback(element_w, element_h, element_type)
+    
+    def _get_default_preferred_positions(self, element_type):
+        """Get default preferred positions for each element type."""
+        positions = {
+            "badge": [
+                ("top_left", {"margin": 40}),
+                ("top_right", {"margin": 40}),
+                ("bottom_left", {"margin": 40}),
+            ],
+            "caption": [
+                ("lower_third_center", {}),
+                ("upper_middle_center", {}),
+            ],
+            "stat_callout": [
+                ("center_left", {"margin": 100}),
+                ("center_right", {"margin": 100}),
+                ("upper_center", {"margin": 100}),
+            ],
+            "chapter_card": [
+                ("center", {}),
+            ],
+            "code_snippet": [
+                ("center_left", {"margin": 60}),
+                ("center_right", {"margin": 60}),
+            ],
+            "diagram": [
+                ("center", {}),
+            ],
+            "cta_card": [
+                ("bottom_left", {"margin": 40}),
+                ("bottom_right", {"margin": 40}),
+            ],
+        }
+        return positions.get(element_type, [("center", {})])
+    
+    def _resolve_named_position(self, name, w, h):
+        """Resolve named position to coordinates."""
+        positions = {
+            "top_left": (40, 100),
+            "top_right": (self.frame_w - w - 40, 100),
+            "bottom_left": (40, self.frame_h - h - 180),
+            "bottom_right": (self.frame_w - w - 40, self.frame_h - h - 180),
+            "center": ((self.frame_w - w) // 2, (self.frame_h - h) // 2),
+            "center_left": (60, (self.frame_h - h) // 2),
+            "center_right": (self.frame_w - w - 60, (self.frame_h - h) // 2),
+            "upper_center": ((self.frame_w - w) // 2, 150),
+            "lower_third_center": ((self.frame_w - w) // 2, int(self.frame_h * 0.65)),
+            "upper_middle_center": ((self.frame_w - w) // 2, int(self.frame_h * 0.35)),
+        }
+        return positions.get(name, ((self.frame_w - w) // 2, (self.frame_h - h) // 2))
+    
+    def _grid_search_fallback(self, w, h, element_type):
+        """Last resort: grid search for any available position."""
+        step = 50
+        for y in range(100, self.frame_h - h - 100, step):
+            for x in range(50, self.frame_w - w - 50, step):
+                overlaps, _ = self.check_overlap(x, y, x + w, y + h)
+                if not overlaps:
+                    self.reserve_zone(x, y, x + w, y + h, element_type)
+                    self.element_positions[element_type] = (x, y, w, h)
+                    return (x, y)
+        return None
+    
+    def get_position(self, element_type):
+        """Get the reserved position for an element type."""
+        return self.element_positions.get(element_type)
+    
+    def clear_element(self, element_type):
+        """Clear an element's reservation (for dynamic elements)."""
+        if element_type in self.element_positions:
+            x, y, w, h = self.element_positions[element_type]
+            # Remove from reserved zones
+            self.reserved_zones = [z for z in self.reserved_zones if z[4] != element_type]
+            del self.element_positions[element_type]
+
+
 def get_vibrant_dominant_color(img_path):
     """
     Analyzes an image cheaply by resizing it to 32x32, converting to HSV, and
@@ -4824,140 +5025,51 @@ def wrap_text_to_lines(words, word_widths, max_width, font):
         lines.append(current_line)
     return lines
 
-_WRAP_CACHE = {}
+# ══════════════════════════════════════════════════════════════════════════════
+# KINETIC CAPTIONS (Hormozi Style) — Word-by-word active highlighting
+# ══════════════════════════════════════════════════════════════════════════════
 
-def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), frame_width=1080, frame_height=1920, y_shift=0):
-    """Viral 'High Energy' captions: Large tilted words with pop sounds.
-    
-    Revised: Locked static line rendering (kinetic text), safe-zone positioning,
-    dimmed past words, and precomputed wrap caching for high rendering performance.
+def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, y_shift=0):
     """
-    img = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
+    Renders Hormozi-style kinetic captions:
+    - Single line locked in safe zone (lower third for landscape, upper-middle for portrait)
+    - Active word: enlarged, bold, accent color, pop animation
+    - Spoken words: dimmed white
+    - Future words: normal white
+    - Black stroke for contrast on any background
+    """
+    img = Image.new('RGBA', (frame_width, frame_height), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 
     scale_ratio = frame_width / 1080.0 if frame_width < frame_height else frame_width / 1920.0
     is_landscape = frame_width > frame_height
-    if is_landscape:
-        base_size = int(72 * scale_ratio)
-    else:
-        base_size = int(58 * scale_ratio)
+    base_size = int(72 * scale_ratio) if is_landscape else int(58 * scale_ratio)
 
     f_main = gf(base_size, bold=True)
+    f_active = gf(int(base_size * 1.18), bold=True)  # 18% larger for active word
 
-    # Feature flag to switch to new kinetic style
-    enable_kinetic = os.environ.get("ENABLE_KINETIC_CAPTIONS", "1") == "1"
-
-    if not enable_kinetic:
-        # ORIGINAL FALLBACK LOGIC
-        active_word_data = [wd for wd in word_data if not wd.get("is_spoken", False)]
-        if not active_word_data:
-            return img
-
-        words = [wd["word"] for wd in active_word_data]
-        word_widths = []
-        fake_draw = ImageDraw.Draw(Image.new("RGBA", (1,1)))
-        for i, wd in enumerate(active_word_data):
-            word_widths.append(fake_draw.textbbox((0,0), words[i], font=f_main)[2] - fake_draw.textbbox((0,0), words[i], font=f_main)[0])
-
-        if is_landscape:
-            max_sub_width = int(frame_width * 0.65)
-        else:
-            max_sub_width = int(frame_width * 0.80)
-        lines = wrap_text_to_lines(words, word_widths, max_sub_width, f_main)
-        lines = lines[:1]
-        line_h = int(90 * scale_ratio)
-        
-        y_pos_pct = 0.80 if is_landscape else 0.60
-        start_y = int(frame_height * y_pos_pct) - (len(lines) * line_h // 2) + y_shift
-        
-        max_line_w = 0
-        temp_idx = 0
-        for line in lines:
-            line_w = sum(word_widths[temp_idx:temp_idx+len(line)]) + 22 * (len(line)-1)
-            if line_w > max_line_w:
-                max_line_w = line_w
-            temp_idx += len(line)
-        
-        bg_pad_x, bg_pad_y = 30, 18
-        block_x1 = (frame_width - max_line_w) // 2 - bg_pad_x
-        block_x2 = (frame_width + max_line_w) // 2 + bg_pad_x
-        block_y1 = start_y - bg_pad_y
-        block_y2 = start_y + len(lines) * line_h - (line_h - base_size) + bg_pad_y
-
-        draw.rounded_rectangle(
-            [block_x1, block_y1, block_x2, block_y2],
-            radius=12,
-            fill=(0, 0, 0, 215)
-        )
-
-        word_idx = 0
-        for i, line in enumerate(lines):
-            line_y = start_y + i * line_h
-            line_w = sum(word_widths[word_idx:word_idx+len(line)]) + 22 * (len(line)-1)
-            cur_x = (frame_width - line_w) // 2
-
-            for word_text in line:
-                wd = active_word_data[word_idx]
-                is_active = wd["is_active"]
-
-                if is_active:
-                    c_fill = (204, 255, 0, 255) # Electric Yellow
-                    f_word = gf(int(base_size * 1.12), bold=True)
-                    w_w, w_h = ts(word_text, f_word)
-                    word_img = Image.new("RGBA", (w_w + 60, w_h + 60), (0,0,0,0))
-                    word_draw = ImageDraw.Draw(word_img)
-
-                    stroke = 5
-                    for dx in range(-stroke, stroke+1):
-                        for dy in range(-stroke, stroke+1):
-                            if dx*dx + dy*dy <= stroke*stroke:
-                                word_draw.text((30+dx, 30+dy), word_text, font=f_word, fill=(0,0,0,255))
-
-                    word_draw.text((34, 34), word_text, font=f_word, fill=(0,0,0,180))
-                    word_draw.text((30, 30), word_text, font=f_word, fill=c_fill)
-
-                    rotated = word_img.rotate(0, resample=Image.BICUBIC, expand=True)
-                    orig_w = word_widths[word_idx]
-                    target_x = int(cur_x - (rotated.width - orig_w)//2)
-                    target_y = int(line_y - (rotated.height - base_size)//2 + 2)
-                    img.alpha_composite(rotated, (target_x, target_y))
-                else:
-                    c_fill = (255, 255, 255, 255)
-                    for dx in range(-3, 4):
-                        for dy in range(-3, 4):
-                            draw.text((cur_x+dx, line_y+2+dy), word_text, font=f_main, fill=(0,0,0,255))
-                    draw.text((cur_x+3, line_y+5), word_text, font=f_main, fill=(0,0,0,160))
-                    draw.text((cur_x, line_y + 2), word_text, font=f_main, fill=c_fill)
-
-                cur_x += word_widths[word_idx] + 22
-                word_idx += 1
-
+    words = [wd["word"] for wd in word_data]
+    if not words:
         return img
 
-    # NEW KINETIC STYLE (Safe Zone, Locked Static Line, Dimmed Past, Electric Accent)
-    words = [wd["word"] for wd in word_data]
-    if is_landscape:
-        max_sub_width = int(frame_width * 0.65)
-    else:
-        max_sub_width = int(frame_width * 0.85)
+    # Calculate word widths
+    fake_draw = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    word_widths_main = [fake_draw.textbbox((0, 0), w, font=f_main)[2] - fake_draw.textbbox((0, 0), w, font=f_main)[0] for w in words]
+    word_widths_active = [fake_draw.textbbox((0, 0), w, font=f_active)[2] - fake_draw.textbbox((0, 0), w, font=f_active)[0] for w in words]
 
-    # Wrap cache retrieval to save CPU cycles
-    cache_key = (tuple(words), base_size, max_sub_width)
-    if cache_key in _WRAP_CACHE:
-        lines, word_widths = _WRAP_CACHE[cache_key]
-    else:
-        word_widths = []
-        fake_draw = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
-        for w in words:
-            bbox = fake_draw.textbbox((0, 0), w, font=f_main)
-            word_widths.append(bbox[2] - bbox[0])
-        lines = wrap_text_to_lines(words, word_widths, max_sub_width, f_main)
-        _WRAP_CACHE[cache_key] = (lines, word_widths)
-
+    max_sub_width = int(frame_width * 0.75) if is_landscape else int(frame_width * 0.85)
+    
+    # Wrap to lines using main font widths
+    lines = wrap_text_to_lines(words, word_widths_main, max_sub_width, f_main)
+    lines = lines[:1]  # Kinetic style: single line only
+    
     if not lines:
         return img
-
-    # Find the active word index in the full list
+    
+    target_line = lines[0]
+    line_word_count = len(target_line)
+    
+    # Find active word index
     active_idx = -1
     for idx, wd in enumerate(word_data):
         if wd.get("is_active", False):
@@ -4971,32 +5083,34 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     if active_idx == -1:
         active_idx = len(word_data) - 1
 
-    # Locate the active line index and starting index of words in that line
+    # Find which word in the target line is active
     word_counter = 0
-    active_line_idx = 0
-    for line_idx, line in enumerate(lines):
-        line_len = len(line)
-        if word_counter <= active_idx < word_counter + line_len:
-            active_line_idx = line_idx
+    active_in_line = -1
+    for i, wd in enumerate(word_data):
+        if word_counter <= i < word_counter + line_word_count:
+            if i == active_idx:
+                active_in_line = i - word_counter
+                break
+        if i >= word_counter + line_word_count:
             break
-        word_counter += line_len
 
-    active_line_idx = min(active_line_idx, len(lines) - 1)
-    target_line = lines[active_line_idx]
+    # Calculate total line width with active word enlarged
+    line_w = 0
+    for i, word in enumerate(target_line):
+        if i == active_in_line:
+            line_w += word_widths_active[word_counter + i]
+        else:
+            line_w += word_widths_main[word_counter + i]
+        if i < line_word_count - 1:
+            line_w += 22  # space
 
-    # Recalculate word_counter for the actual selected line
-    word_counter = sum(len(l) for l in lines[:active_line_idx])
-
-    line_h = int(90 * scale_ratio)
-    # Safe Zone Rule: Move text overlays to upper-middle third (y_pos_pct=0.38)
+    # Safe Zone: lower third for landscape, upper-middle for portrait
     y_pos_pct = 0.80 if is_landscape else 0.38
+    line_h = int(90 * scale_ratio)
     start_y = int(frame_height * y_pos_pct) - (line_h // 2) + y_shift
 
-    target_word_widths = word_widths[word_counter : word_counter + len(target_line)]
-    line_w = sum(target_word_widths) + 22 * (len(target_line) - 1)
-
-    # Tightened Obsidian Background Block for the single active line
-    bg_pad_x, bg_pad_y = 30, 18
+    # Background block (obsidian with rounded corners)
+    bg_pad_x, bg_pad_y = 35, 20
     block_x1 = (frame_width - line_w) // 2 - bg_pad_x
     block_x2 = (frame_width + line_w) // 2 + bg_pad_x
     block_y1 = start_y - bg_pad_y
@@ -5004,52 +5118,609 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
 
     draw.rounded_rectangle(
         [block_x1, block_y1, block_x2, block_y2],
-        radius=12,
-        fill=(0, 0, 0, 215)
+        radius=16,
+        fill=(0, 0, 0, 220)
     )
 
+    # Accent top edge line
+    draw.rectangle([block_x1, block_y1, block_x2, block_y1 + 3], fill=(*accent_color, 255))
+
+    # Render words
     cur_x = (frame_width - line_w) // 2
     for offset, word_text in enumerate(target_line):
         global_idx = word_counter + offset
         wd = word_data[global_idx]
-        
-        is_active = wd.get("is_active", False)
+        is_active = (offset == active_in_line)
         is_spoken = wd.get("is_spoken", False)
 
         if is_active:
-            # Highlight current word in Electric Yellow with 1.15x Pop Zoom
-            c_fill = (204, 255, 0, 255)
-            f_word = gf(int(base_size * 1.15), bold=True)
-            w_w, w_h = ts(word_text, f_word)
-            word_img = Image.new("RGBA", (w_w + 60, w_h + 60), (0,0,0,0))
+            # Active word: accent color, enlarged, pop effect
+            c_fill = (*accent_color, 255)
+            f_word = f_active
+            w_w = word_widths_active[global_idx]
+            
+            # Create word image for pop animation
+            w_h = fake_draw.textbbox((0, 0), word_text, font=f_word)[3] - fake_draw.textbbox((0, 0), word_text, font=f_word)[1]
+            word_img = Image.new("RGBA", (w_w + 80, w_h + 80), (0, 0, 0, 0))
             word_draw = ImageDraw.Draw(word_img)
-
-            # High-Contrast Edge: 5px black stroke
-            stroke = 5
-            for dx in range(-stroke, stroke+1):
-                for dy in range(-stroke, stroke+1):
-                    if dx*dx + dy*dy <= stroke*stroke:
-                        word_draw.text((30+dx, 30+dy), word_text, font=f_word, fill=(0,0,0,255))
-            word_draw.text((34, 34), word_text, font=f_word, fill=(0,0,0,180)) # shadow
-            word_draw.text((30, 30), word_text, font=f_word, fill=c_fill)
-
-            rotated = word_img.rotate(0, resample=Image.BICUBIC, expand=True)
-            orig_w = target_word_widths[offset]
-            target_x = int(cur_x - (rotated.width - orig_w)//2)
-            target_y = int(start_y - (rotated.height - base_size)//2 + 2)
+            
+            # Thick black stroke (6px) for maximum contrast
+            stroke = 6
+            for dx in range(-stroke, stroke + 1):
+                for dy in range(-stroke, stroke + 1):
+                    if dx * dx + dy * dy <= stroke * stroke:
+                        word_draw.text((40 + dx, 40 + dy), word_text, font=f_word, fill=(0, 0, 0, 255))
+            
+            # Accent glow behind
+            word_draw.text((42, 42), word_text, font=f_word, fill=(*accent_color, 100))
+            # Main text
+            word_draw.text((40, 40), word_text, font=f_word, fill=c_fill)
+            
+            # Subtle rotation for energy (±2 degrees based on word index)
+            angle = 2.0 * math.sin(active_idx * 0.5) if active_idx >= 0 else 0
+            rotated = word_img.rotate(angle, resample=Image.BICUBIC, expand=True)
+            
+            target_x = int(cur_x - (rotated.width - w_w) // 2)
+            target_y = int(start_y - (rotated.height - base_size) // 2 + 3)
             img.alpha_composite(rotated, (target_x, target_y))
         else:
-            # Dimmed white for spoken past words (140 opacity), normal white for future words
+            # Inactive words: dimmed if spoken, bright white if future
             opacity = 140 if is_spoken else 255
             c_fill = (255, 255, 255, opacity)
+            f_word = f_main
+            w_w = word_widths_main[global_idx]
+            w_h = fake_draw.textbbox((0, 0), word_text, font=f_word)[3] - fake_draw.textbbox((0, 0), word_text, font=f_word)[1]
+            
+            # Black stroke
+            for dx in range(-4, 5):
+                for dy in range(-4, 5):
+                    if dx * dx + dy * dy <= 16:
+                        draw.text((cur_x + dx, start_y + 3 + dy), word_text, font=f_word, fill=(0, 0, 0, opacity))
+            draw.text((cur_x, start_y + 3), word_text, font=f_word, fill=c_fill)
 
-            # Draw inactive word with outline matching opacity
-            for dx in range(-3, 4):
-                for dy in range(-3, 4):
-                    draw.text((cur_x+dx, start_y+2+dy), word_text, font=f_main, fill=(0,0,0,opacity))
-            draw.text((cur_x, start_y + 2), word_text, font=f_main, fill=c_fill)
+        # Advance cursor
+        if offset == active_in_line:
+            cur_x += word_widths_active[global_idx] + 22
+        else:
+            cur_x += word_widths_main[global_idx] + 22
 
-        cur_x += target_word_widths[offset] + 22
+    return img
+
+
+_WRAP_CACHE = {}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# STAT CALLOUT GRAPHICS — Metrics display (%, latency, throughput, etc.)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _render_stat_callout(stat_text, stat_label, accent_color, frame_width, frame_height):
+    """
+    Renders a metric callout card for displaying statistics like:
+    - "99.9%" latency
+    - "45ms" p99 latency  
+    - "10K req/s" throughput
+    - "3.2x" speedup
+    """
+    img = Image.new('RGBA', (frame_width, frame_height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    is_landscape = frame_width > frame_height
+    scale = frame_width / 1920.0 if is_landscape else frame_width / 1080.0
+    
+    # Stat value - large and prominent
+    f_stat = gf(int(96 * scale), bold=True)
+    f_label = gf(int(32 * scale), bold=True)
+    
+    stat_w, stat_h = draw.textbbox((0, 0), stat_text, font=f_stat)[2:4]
+    label_w, label_h = draw.textbbox((0, 0), stat_label, font=f_label)[2:4]
+    
+    pad_x, pad_y = int(60 * scale), int(30 * scale)
+    card_w = max(stat_w, label_w) + pad_x * 2
+    card_h = stat_h + label_h + pad_y * 2 + int(20 * scale)
+    
+    # Center horizontally, position in upper-middle safe zone
+    x1 = (frame_width - card_w) // 2
+    y1 = int(frame_height * (0.25 if is_landscape else 0.30)) - card_h // 2
+    x2 = x1 + card_w
+    y2 = y1 + card_h
+    
+    # Glassmorphic background with accent border
+    draw.rounded_rectangle([x1, y1, x2, y2], radius=int(20 * scale), 
+                           fill=(10, 10, 18, 230), outline=(*accent_color, 200), width=3)
+    # Accent top bar
+    draw.rectangle([x1, y1, x2, y1 + int(4 * scale)], fill=(*accent_color, 255))
+    
+    # Stat value - accent color
+    stat_x = (frame_width - stat_w) // 2
+    stat_y = y1 + pad_y
+    # Glow effect
+    for dx, dy in [(-2, 0), (2, 0), (0, -2), (0, 2)]:
+        draw.text((stat_x + dx, stat_y + dy), stat_text, font=f_stat, fill=(*accent_color, 100))
+    draw.text((stat_x, stat_y), stat_text, font=f_stat, fill=(255, 255, 255, 255))
+    
+    # Label - dimmed white
+    label_x = (frame_width - label_w) // 2
+    label_y = stat_y + stat_h + int(15 * scale)
+    draw.text((label_x, label_y), stat_label, font=f_label, fill=(200, 200, 210, 220))
+    
+    return img
+
+
+def _stat_callout_clip(stat_text, stat_label, start_time, accent_color, audio_duration, hold=2.5):
+    """Creates an animated stat callout clip with pop-in animation."""
+    if start_time >= audio_duration:
+        return None
+    dur = min(hold + 0.4, audio_duration - start_time)
+    if dur < 0.5:
+        return None
+    
+    img = _render_stat_callout(stat_text, stat_label, accent_color, FRAME_W, FRAME_H)
+    arr = np.array(img.convert("RGB"))
+    mask_arr = np.array(img.split()[3]).astype(float) / 255.0
+    
+    def opacity_fn(t):
+        if t < 0.2:
+            return t / 0.2
+        elif t > dur - 0.3:
+            return max(0, (dur - t) / 0.3)
+        return 1.0
+    
+    def scale_fn(t):
+        if t < 0.15:
+            progress = t / 0.15
+            return 0.5 + 0.5 * progress - 0.1 * math.sin(progress * math.pi)
+        elif t < 0.3:
+            settle = (t - 0.15) / 0.15
+            return 1.0 + 0.05 * math.exp(-settle * 5) * math.sin(settle * 10)
+        return 1.0
+    
+    def make_frame(t):
+        s = scale_fn(t)
+        if abs(s - 1.0) < 0.01:
+            return arr
+        iw, ih = img.size
+        sw, sh = max(1, int(iw * s)), max(1, int(ih * s))
+        scaled = Image.fromarray(arr).resize((sw, sh), Image.LANCZOS)
+        cx, cy = (sw - iw) // 2, (sh - ih) // 2
+        cropped = np.array(scaled)[cy:cy + ih, cx:cx + iw]
+        if cropped.shape[0] < ih or cropped.shape[1] < iw:
+            result = np.zeros((ih, iw, 3), dtype=np.uint8)
+            result[:cropped.shape[0], :cropped.shape[1]] = cropped
+            return result
+        return cropped
+    
+    def make_mask(t):
+        s = scale_fn(t)
+        o = opacity_fn(t)
+        if abs(s - 1.0) < 0.01:
+            return mask_arr * o
+        iw, ih = img.size
+        sw, sh = max(1, int(iw * s)), max(1, int(ih * s))
+        scaled = Image.fromarray((mask_arr * 255).astype(np.uint8)).resize((sw, sh), Image.LANCZOS)
+        cx, cy = max(0, (sw - iw) // 2), max(0, (sh - ih) // 2)
+        cropped = np.array(scaled)[cy:cy + ih, cx:cx + iw].astype(float) / 255.0
+        if cropped.shape[0] < ih or cropped.shape[1] < iw:
+            result = np.zeros((ih, iw), dtype=float)
+            result[:cropped.shape[0], :cropped.shape[1]] = cropped
+            return result * o
+        return cropped * o
+    
+    clip = VideoClip(make_frame, duration=dur)
+    mclip = VideoClip(make_mask, is_mask=True, duration=dur)
+    return clip.with_mask(mclip).with_position("center").with_start(start_time).with_effects([vfx.CrossFadeOut(0.2)])
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CHAPTER TRANSITIONS / TITLE CARDS — Topic shift markers
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _chapter_transition_card(chapter_title, chapter_num, total_chapters, accent_color, start_time, audio_duration, hold=3.0):
+    """Creates a cinematic chapter transition title card."""
+    if start_time >= audio_duration:
+        return None
+    dur = min(hold, audio_duration - start_time)
+    if dur < 1.0:
+        return None
+    
+    is_landscape = FRAME_W > FRAME_H
+    scale = FRAME_W / 1920.0 if is_landscape else FRAME_W / 1080.0
+    
+    img = Image.new('RGBA', (FRAME_W, FRAME_H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    
+    # Full-screen dark overlay
+    draw.rectangle([0, 0, FRAME_W, FRAME_H], fill=(0, 0, 0, 240))
+    
+    # Chapter number indicator
+    f_num = gf(int(48 * scale), bold=True)
+    num_text = f"CHAPTER {chapter_num} / {total_chapters}"
+    num_w, num_h = draw.textbbox((0, 0), num_text, font=f_num)[2:4]
+    draw.text(((FRAME_W - num_w) // 2, int(FRAME_H * 0.25)), num_text, font=f_num, fill=(*accent_color, 255))
+    
+    # Divider line
+    div_y = int(FRAME_H * 0.25) + num_h + int(30 * scale)
+    draw.line([(FRAME_W // 4, div_y), (3 * FRAME_W // 4, div_y)], fill=(*accent_color, 200), width=3)
+    
+    # Chapter title - large, centered
+    f_title = gf(int(72 * scale), bold=True)
+    # Wrap title
+    max_w = FRAME_W - int(120 * scale)
+    words = chapter_title.split()
+    lines, cur = [], []
+    for w in words:
+        test = " ".join(cur + [w])
+        tw = draw.textbbox((0, 0), test, font=f_title)[2]
+        if tw > max_w and cur:
+            lines.append(" ".join(cur))
+            cur = [w]
+        else:
+            cur.append(w)
+    if cur:
+        lines.append(" ".join(cur))
+    lines = lines[:2]
+    
+    lh = draw.textbbox((0, 0), "Ag", font=f_title)[3]
+    lsp = int(lh * 1.3)
+    start_y = div_y + int(60 * scale)
+    
+    for i, line in enumerate(lines):
+        lw = draw.textbbox((0, 0), line, font=f_title)[2]
+        lx = (FRAME_W - lw) // 2
+        ly = start_y + i * lsp
+        # Shadow
+        for dx, dy in [(-3, -3), (3, -3), (-3, 3), (3, 3)]:
+            draw.text((lx + dx, ly + dy), line, font=f_title, fill=(0, 0, 0, 255))
+        draw.text((lx, ly), line, font=f_title, fill=(255, 255, 255, 255))
+    
+    arr = np.array(img.convert("RGB"))
+    mask_arr = np.array(img.split()[3]).astype(float) / 255.0
+    
+    def opacity_fn(t):
+        if t < 0.3:
+            return t / 0.3
+        elif t > dur - 0.4:
+            return max(0, (dur - t) / 0.4)
+        return 1.0
+    
+    def scale_fn(t):
+        if t < 0.2:
+            progress = t / 0.2
+            return 0.95 + 0.05 * progress
+        return 1.0
+    
+    def make_frame(t):
+        s = scale_fn(t)
+        if abs(s - 1.0) < 0.01:
+            return arr
+        iw, ih = img.size
+        sw, sh = max(1, int(iw * s)), max(1, int(ih * s))
+        scaled = Image.fromarray(arr).resize((sw, sh), Image.LANCZOS)
+        cx, cy = (sw - iw) // 2, (sh - ih) // 2
+        cropped = np.array(scaled)[cy:cy + ih, cx:cx + iw]
+        if cropped.shape[0] < ih or cropped.shape[1] < iw:
+            result = np.zeros((ih, iw, 3), dtype=np.uint8)
+            result[:cropped.shape[0], :cropped.shape[1]] = cropped
+            return result
+        return cropped
+    
+    def make_mask(t):
+        s = scale_fn(t)
+        o = opacity_fn(t)
+        if abs(s - 1.0) < 0.01:
+            return mask_arr * o
+        iw, ih = img.size
+        sw, sh = max(1, int(iw * s)), max(1, int(ih * s))
+        scaled = Image.fromarray((mask_arr * 255).astype(np.uint8)).resize((sw, sh), Image.LANCZOS)
+        cx, cy = max(0, (sw - iw) // 2), max(0, (sh - ih) // 2)
+        cropped = np.array(scaled)[cy:cy + ih, cx:cx + iw].astype(float) / 255.0
+        if cropped.shape[0] < ih or cropped.shape[1] < iw:
+            result = np.zeros((ih, iw), dtype=float)
+            result[:cropped.shape[0], :cropped.shape[1]] = cropped
+            return result * o
+        return cropped * o
+    
+    clip = VideoClip(make_frame, duration=dur)
+    mclip = VideoClip(make_mask, is_mask=True, duration=dur)
+    return clip.with_mask(mclip).with_position("center").with_start(start_time).with_effects([vfx.CrossFadeIn(0.4), vfx.CrossFadeOut(0.4)])
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CODE SNIPPET / DIAGRAM DISPLAY — Technical content visualization
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _render_code_snippet(code_text, language, accent_color, frame_width, frame_height):
+    """Renders a code snippet with syntax highlighting simulation."""
+    img = Image.new('RGBA', (frame_width, frame_height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    
+    is_landscape = frame_width > frame_height
+    scale = frame_width / 1920.0 if is_landscape else frame_width / 1080.0
+    
+    # Monospace font for code
+    f_code = gf(int(28 * scale))
+    
+    # Split into lines
+    lines = code_text.split('\n')
+    lines = lines[:20]  # Max 20 lines
+    
+    # Calculate dimensions
+    line_heights = [draw.textbbox((0, 0), line, font=f_code)[3] for line in lines]
+    lh = max(line_heights) if line_heights else draw.textbbox((0, 0), "Ag", font=f_code)[3]
+    lsp = int(lh * 1.4)
+    code_h = len(lines) * lsp + int(40 * scale)
+    code_w = max([draw.textbbox((0, 0), line, font=f_code)[2] for line in lines] + [0])
+    code_w = min(code_w + int(80 * scale), frame_width - int(80 * scale))
+    
+    pad_x, pad_y = int(40 * scale), int(30 * scale)
+    card_w = code_w + pad_x * 2
+    card_h = code_h + pad_y * 2
+    
+    x1 = (frame_width - card_w) // 2
+    y1 = int(frame_height * (0.35 if is_landscape else 0.30)) - card_h // 2
+    x2 = x1 + card_w
+    y2 = y1 + card_h
+    
+    # Dark editor background
+    draw.rounded_rectangle([x1, y1, x2, y2], radius=int(12 * scale), fill=(20, 20, 30, 240))
+    
+    # Top bar (editor chrome)
+    draw.rounded_rectangle([x1, y1, x2, y1 + int(40 * scale)], radius=int(12 * scale), fill=(35, 35, 45, 255))
+    # Window dots
+    dot_colors = [(255, 95, 87), (254, 188, 46), (40, 200, 64)]
+    for i, dc in enumerate(dot_colors):
+        draw.ellipse([x1 + int(20 * scale) + i * int(25 * scale), y1 + int(12 * scale),
+                      x1 + int(32 * scale) + i * int(25 * scale), y1 + int(24 * scale)], fill=(*dc, 255))
+    # Language label
+    draw.text((x1 + int(100 * scale), y1 + int(8 * scale)), language.upper(), font=gf(int(14 * scale)), fill=(150, 150, 160, 255))
+    
+    # Code lines with line numbers
+    line_num_color = (100, 100, 120, 255)
+    for i, line in enumerate(lines):
+        ly = y1 + int(50 * scale) + i * lsp
+        # Line number
+        draw.text((x1 + int(20 * scale), ly), str(i + 1), font=f_code, fill=line_num_color)
+        # Code text - simple highlighting simulation
+        draw.text((x1 + int(70 * scale), ly), line, font=f_code, fill=(220, 220, 230, 255))
+    
+    return img
+
+
+def _code_snippet_clip(code_text, language, start_time, accent_color, audio_duration, hold=4.0):
+    """Creates an animated code snippet display clip."""
+    if start_time >= audio_duration:
+        return None
+    dur = min(hold, audio_duration - start_time)
+    if dur < 1.0:
+        return None
+    
+    img = _render_code_snippet(code_text, language, accent_color, FRAME_W, FRAME_H)
+    arr = np.array(img.convert("RGB"))
+    mask_arr = np.array(img.split()[3]).astype(float) / 255.0
+    
+    def opacity_fn(t):
+        if t < 0.3:
+            return t / 0.3
+        elif t > dur - 0.4:
+            return max(0, (dur - t) / 0.4)
+        return 1.0
+    
+    def make_frame(t):
+        return arr
+    
+    def make_mask(t):
+        return mask_arr * opacity_fn(t)
+    
+    clip = VideoClip(make_frame, duration=dur)
+    mclip = VideoClip(make_mask, is_mask=True, duration=dur)
+    return clip.with_mask(mclip).with_position("center").with_start(start_time).with_effects([vfx.CrossFadeIn(0.5), vfx.CrossFadeOut(0.5)])
+
+
+def _render_architecture_diagram(components, connections, accent_color, frame_width, frame_height):
+    """Renders a simple architecture diagram with boxes and arrows."""
+    img = Image.new('RGBA', (frame_width, frame_height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    
+    is_landscape = frame_width > frame_height
+    scale = frame_width / 1920.0 if is_landscape else frame_width / 1080.0
+    
+    f_box = gf(int(32 * scale), bold=True)
+    f_label = gf(int(20 * scale))
+    
+    # Layout components in a horizontal flow
+    n = len(components)
+    if n == 0:
+        return img
+    
+    box_w = int(200 * scale)
+    box_h = int(80 * scale)
+    gap = int(60 * scale)
+    total_w = n * box_w + (n - 1) * gap
+    start_x = (frame_width - total_w) // 2
+    start_y = int(frame_height * 0.40)
+    
+    # Draw connections (arrows between boxes)
+    for i in range(n - 1):
+        x1 = start_x + i * (box_w + gap) + box_w
+        y1 = start_y + box_h // 2
+        x2 = start_x + (i + 1) * (box_w + gap)
+        y2 = start_y + box_h // 2
+        # Arrow line
+        draw.line([(x1, y1), (x2, y2)], fill=(*accent_color, 180), width=3)
+        # Arrow head
+        head_size = int(12 * scale)
+        draw.polygon([(x2 - head_size, y2 - head_size), (x2, y2), (x2 - head_size, y2 + head_size)], fill=(*accent_color, 180))
+    
+    # Draw component boxes
+    for i, comp in enumerate(components):
+        x = start_x + i * (box_w + gap)
+        y = start_y
+        
+        # Box type determines style
+        comp_type = comp.get("type", "service")
+        if comp_type == "database":
+            # Cylinder shape
+            draw.ellipse([x, y, x + box_w, y + int(20 * scale)], fill=(30, 144, 255, 200), outline=(*accent_color, 200), width=2)
+            draw.rectangle([x, y + int(10 * scale), x + box_w, y + box_h - int(10 * scale)], fill=(30, 144, 255, 200), outline=(*accent_color, 200), width=2)
+            draw.ellipse([x, y + box_h - int(20 * scale), x + box_w, y + box_h], fill=(30, 144, 255, 200), outline=(*accent_color, 200), width=2)
+        elif comp_type == "queue":
+            # Rounded rectangle with vertical lines
+            draw.rounded_rectangle([x, y, x + box_w, y + box_h], radius=int(10 * scale), fill=(255, 165, 0, 200), outline=(*accent_color, 200), width=2)
+            for j in range(3):
+                lx = x + box_w // 4 + j * box_w // 4
+                draw.line([(lx, y + int(10 * scale)), (lx, y + box_h - int(10 * scale))], fill=(255, 255, 255, 100), width=1)
+        else:
+            # Standard service box
+            draw.rounded_rectangle([x, y, x + box_w, y + box_h], radius=int(12 * scale), fill=(40, 40, 60, 230), outline=(*accent_color, 200), width=2)
+        
+        # Component name
+        name = comp.get("name", f"Service {i+1}")
+        tw = draw.textbbox((0, 0), name, font=f_box)[2]
+        draw.text((x + (box_w - tw) // 2, y + box_h // 2 - int(10 * scale)), name, font=f_box, fill=(255, 255, 255, 255))
+        
+        # Tech label
+        tech = comp.get("tech", "")
+        if tech:
+            lw = draw.textbbox((0, 0), tech, font=f_label)[2]
+            draw.text((x + (box_w - lw) // 2, y + box_h // 2 + int(20 * scale)), tech, font=f_label, fill=(180, 180, 200, 255))
+    
+    return img
+
+
+def _architecture_diagram_clip(components, connections, start_time, accent_color, audio_duration, hold=5.0):
+    """Creates an animated architecture diagram clip."""
+    if start_time >= audio_duration:
+        return None
+    dur = min(hold, audio_duration - start_time)
+    if dur < 1.0:
+        return None
+    
+    img = _render_architecture_diagram(components, connections, accent_color, FRAME_W, FRAME_H)
+    arr = np.array(img.convert("RGB"))
+    mask_arr = np.array(img.split()[3]).astype(float) / 255.0
+    
+    def opacity_fn(t):
+        if t < 0.4:
+            return t / 0.4
+        elif t > dur - 0.5:
+            return max(0, (dur - t) / 0.5)
+        return 1.0
+    
+    def make_frame(t):
+        return arr
+    
+    def make_mask(t):
+        return mask_arr * opacity_fn(t)
+    
+    clip = VideoClip(make_frame, duration=dur)
+    mclip = VideoClip(make_mask, is_mask=True, duration=dur)
+    return clip.with_mask(mclip).with_position("center").with_start(start_time).with_effects([vfx.CrossFadeIn(0.5), vfx.CrossFadeOut(0.5)])
+
+
+def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), frame_width=1080, frame_height=1920, y_shift=0):
+    """Viral 'High Energy' captions: Large tilted words with pop sounds.
+    
+    Revised: Locked static line rendering (kinetic text), safe-zone positioning,
+    dimmed past words, and precomputed wrap caching for high rendering performance.
+    """
+    # Use kinetic captions if enabled
+    enable_kinetic = os.environ.get("ENABLE_KINETIC_CAPTIONS", "1") == "1"
+    if enable_kinetic:
+        return _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, y_shift)
+
+    img = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
+    draw = ImageDraw.Draw(img)
+
+    scale_ratio = frame_width / 1080.0 if frame_width < frame_height else frame_width / 1920.0
+    is_landscape = frame_width > frame_height
+    if is_landscape:
+        base_size = int(72 * scale_ratio)
+    else:
+        base_size = int(58 * scale_ratio)
+
+    f_main = gf(base_size, bold=True)
+
+    active_word_data = [wd for wd in word_data if not wd.get("is_spoken", False)]
+    if not active_word_data:
+        return img
+
+    words = [wd["word"] for wd in active_word_data]
+    word_widths = []
+    fake_draw = ImageDraw.Draw(Image.new("RGBA", (1,1)))
+    for i, wd in enumerate(active_word_data):
+        word_widths.append(fake_draw.textbbox((0,0), words[i], font=f_main)[2] - fake_draw.textbbox((0,0), words[i], font=f_main)[0])
+
+    if is_landscape:
+        max_sub_width = int(frame_width * 0.65)
+    else:
+        max_sub_width = int(frame_width * 0.80)
+    lines = wrap_text_to_lines(words, word_widths, max_sub_width, f_main)
+    lines = lines[:1]
+    line_h = int(90 * scale_ratio)
+    
+    y_pos_pct = 0.80 if is_landscape else 0.60
+    start_y = int(frame_height * y_pos_pct) - (len(lines) * line_h // 2) + y_shift
+    
+    max_line_w = 0
+    temp_idx = 0
+    for line in lines:
+        line_w = sum(word_widths[temp_idx:temp_idx+len(line)]) + 22 * (len(line)-1)
+        if line_w > max_line_w:
+            max_line_w = line_w
+        temp_idx += len(line)
+    
+    bg_pad_x, bg_pad_y = 30, 18
+    block_x1 = (frame_width - max_line_w) // 2 - bg_pad_x
+    block_x2 = (frame_width + max_line_w) // 2 + bg_pad_x
+    block_y1 = start_y - bg_pad_y
+    block_y2 = start_y + len(lines) * line_h - (line_h - base_size) + bg_pad_y
+
+    draw.rounded_rectangle(
+        [block_x1, block_y1, block_x2, block_y2],
+        radius=12,
+        fill=(0, 0, 0, 215)
+    )
+
+    word_idx = 0
+    for i, line in enumerate(lines):
+        line_y = start_y + i * line_h
+        line_w = sum(word_widths[word_idx:word_idx+len(line)]) + 22 * (len(line)-1)
+        cur_x = (frame_width - line_w) // 2
+
+        for word_text in line:
+            wd = active_word_data[word_idx]
+            is_active = wd["is_active"]
+
+            if is_active:
+                c_fill = (204, 255, 0, 255) # Electric Yellow
+                f_word = gf(int(base_size * 1.12), bold=True)
+                w_w, w_h = ts(word_text, f_word)
+                word_img = Image.new("RGBA", (w_w + 60, w_h + 60), (0,0,0,0))
+                word_draw = ImageDraw.Draw(word_img)
+
+                stroke = 5
+                for dx in range(-stroke, stroke+1):
+                    for dy in range(-stroke, stroke+1):
+                        if dx*dx + dy*dy <= stroke*stroke:
+                            word_draw.text((30+dx, 30+dy), word_text, font=f_word, fill=(0,0,0,255))
+
+                word_draw.text((34, 34), word_text, font=f_word, fill=(0,0,0,180))
+                word_draw.text((30, 30), word_text, font=f_word, fill=c_fill)
+
+                rotated = word_img.rotate(0, resample=Image.BICUBIC, expand=True)
+                orig_w = word_widths[word_idx]
+                target_x = int(cur_x - (rotated.width - orig_w)//2)
+                target_y = int(line_y - (rotated.height - base_size)//2 + 2)
+                img.alpha_composite(rotated, (target_x, target_y))
+            else:
+                c_fill = (255, 255, 255, 255)
+                for dx in range(-3, 4):
+                    for dy in range(-3, 4):
+                        draw.text((cur_x+dx, line_y+2+dy), word_text, font=f_main, fill=(0,0,0,255))
+                draw.text((cur_x+3, line_y+5), word_text, font=f_main, fill=(0,0,0,160))
+                draw.text((cur_x, line_y + 2), word_text, font=f_main, fill=c_fill)
+
+            cur_x += word_widths[word_idx] + 22
+            word_idx += 1
 
     return img
 
@@ -5471,6 +6142,11 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         return None
 
     chunks = _sync_checks(chunks, audio_duration)
+
+    # ── SAFE ZONE CALCULATOR ──────────────────────────────────────────────────
+    # Initialize early so all overlay systems can use it
+    safe_zones = SafeZoneCalculator(FRAME_W, FRAME_H, layout, is_longform)
+    print(f"🛡️ SafeZoneCalculator initialized: {len(safe_zones.reserved_zones)} reserved zones")
 
     # Meta
     title          = script_json.get("title", "Tech News")
@@ -6163,6 +6839,13 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         else:
             avatar_clip = vid_clip.resized((cur_w, cur_h)).without_audio()
             
+            # ── SAFE ZONE: Dedicated corner for talking head with clean backdrop ────────
+            # Reserve the avatar corner zone in SafeZoneCalculator
+            avatar_zone = safe_zones.get_position("avatar_corner")
+            if avatar_zone:
+                av_x, av_y, av_w, av_h = avatar_zone
+                print(f"🎯 Talking head assigned to dedicated corner: ({av_x}, {av_y}) size {av_w}x{av_h}")
+            
             # ── AVATAR EXPRESSION TRIGGERS ──────────────────────────────────
             # Detect trigger words in script and prepare expression overlay clips
             expression_segments = []
@@ -6329,40 +7012,47 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                     base_y = FRAME_H - scaled_h
                     return (base_x, base_y)
                 else:
-                    # Glide/shrink position interpolation for Shorts
-                    layout_type = layout.get("layout_type", "asymmetric")
-                    
-                    # Corner cycling for extra variety (uses daily tracker)
-                    corner_index = layout.get("corner_index", 0)
-                    corners = [
-                        (40.0, 120.0),                                    # top-left
-                        (FRAME_W - scaled_w - 40.0, 120.0),              # top-right
-                        (40.0, FRAME_H - scaled_h - 180.0),              # bottom-left
-                        (FRAME_W - scaled_w - 40.0, FRAME_H - scaled_h - 180.0),  # bottom-right
-                    ]
-                    
-                    # Home position (where avatar returns when not in transition)
-                    if layout_variation_enabled:
-                        if layout_type == "split_screen":
-                            home_x = FRAME_W - scaled_w - 40.0
-                            home_y = 120.0
-                        elif layout_type == "hero_center":
-                            home_x = FRAME_W - scaled_w - 40.0
-                            home_y = FRAME_H - scaled_h - 180.0
-                        elif layout_type == "side_strip":
-                            home_x = 20.0
-                            home_y = (FRAME_H - scaled_h) / 2.0
-                        elif layout_type == "top_center":
-                            home_x = (FRAME_W - scaled_w) / 2.0
-                            home_y = 80.0
-                        elif layout_type == "corner_cycling":
-                            home_x, home_y = corners[corner_index % 4]
-                        else:  # asymmetric
-                            home_x = (FRAME_W - scaled_w) / 2.0
-                            home_y = FRAME_H - scaled_h
+                    # Use SafeZoneCalculator for dedicated talking head corner
+                    avatar_pos = safe_zones.get_position("avatar_corner")
+                    if avatar_pos:
+                        av_x, av_y, av_w, av_h = avatar_pos
+                        # Position avatar in its reserved zone
+                        home_x = av_x + (av_w - scaled_w) // 2
+                        home_y = av_y + (av_h - scaled_h) // 2
                     else:
-                        home_x = (FRAME_W - scaled_w) / 2.0 + layout["avatar_x_offset"]
-                        home_y = FRAME_H - scaled_h - 30.0
+                        # Fallback to layout-based positioning
+                        layout_type = layout.get("layout_type", "asymmetric")
+                        # Corner cycling for extra variety (uses daily tracker)
+                        corner_index = layout.get("corner_index", 0)
+                        corners = [
+                            (40.0, 120.0),                                    # top-left
+                            (FRAME_W - scaled_w - 40.0, 120.0),              # top-right
+                            (40.0, FRAME_H - scaled_h - 180.0),              # bottom-left
+                            (FRAME_W - scaled_w - 40.0, FRAME_H - scaled_h - 180.0),  # bottom-right
+                        ]
+                        
+                        # Home position (where avatar returns when not in transition)
+                        if layout_variation_enabled:
+                            if layout_type == "split_screen":
+                                home_x = FRAME_W - scaled_w - 40.0
+                                home_y = 120.0
+                            elif layout_type == "hero_center":
+                                home_x = FRAME_W - scaled_w - 40.0
+                                home_y = FRAME_H - scaled_h - 180.0
+                            elif layout_type == "side_strip":
+                                home_x = 20.0
+                                home_y = (FRAME_H - scaled_h) / 2.0
+                            elif layout_type == "top_center":
+                                home_x = (FRAME_W - scaled_w) / 2.0
+                                home_y = 80.0
+                            elif layout_type == "corner_cycling":
+                                home_x, home_y = corners[corner_index % 4]
+                            else:  # asymmetric
+                                home_x = (FRAME_W - scaled_w) / 2.0
+                                home_y = FRAME_H - scaled_h
+                        else:
+                            home_x = (FRAME_W - scaled_w) / 2.0 + layout["avatar_x_offset"]
+                            home_y = FRAME_H - scaled_h - 30.0
                     
                     # Screenshot-aware positioning: glide to top-right corner before screenshot, fade during, return after
                     # Screenshot typically shows 4.0-12.0s
@@ -6573,6 +7263,119 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
     # Phased scans removed in favor of full-screen loops as requested
     pass
+    
+    # ── CHAPTER TRANSITIONS / TITLE CARDS ──────────────────────────────────────
+    # Add cinematic chapter transitions at topic shifts (for longform)
+    if is_longform:
+        chapters = script_json.get("chapters", [])
+        if chapters:
+            for i, ch in enumerate(chapters):
+                if i > 0:  # Skip first chapter (has intro)
+                    start_s = float(ch.get("approx_start_seconds", 0))
+                    if start_s > 5 and start_s < audio_duration - 5:
+                        chapter_title = ch.get("chapter_title", f"Chapter {i+1}")
+                        trans_clip = _chapter_transition_card(
+                            chapter_title, i + 1, len(chapters),
+                            accent_color, start_s, audio_duration, hold=3.0
+                        )
+                        if trans_clip:
+                            engagement_clips.append(trans_clip)
+                            print(f"   📖 Chapter transition added: {chapter_title} at {start_s:.1f}s")
+    
+    # ── STAT CALLOUT GRAPHICS ──────────────────────────────────────────────────
+    # Add metric callouts from script data (%, latency, throughput, etc.)
+    metric_popups = script_json.get("metric_popups", [])
+    # Also extract from fact_scripts and key_stats
+    fact_scripts = script_json.get("fact_scripts", [])
+    for fs in fact_scripts:
+        key_stat = fs.get("key_stat", "")
+        fact_num = fs.get("fact_number", 0)
+        if key_stat and fact_num > 0:
+            # Parse stat value and label
+            import re
+            match = re.match(r'([\d\.]+[%BMKx]?)\s*(.*)', key_stat.strip())
+            if match:
+                stat_val, stat_lbl = match.groups()
+                metric_popups.append({
+                    "value": stat_val,
+                    "label": stat_lbl.strip() or "Metric",
+                    "timestamp": float(fs.get("approx_start_seconds", 5.0 + fact_num * 30))
+                })
+    
+    for mp in metric_popups:
+        ts_val = mp.get("timestamp", 0)
+        if ts_val > 3 and ts_val < audio_duration - 3:
+            callout = _stat_callout_clip(
+                mp.get("value", ""), mp.get("label", "Metric"),
+                ts_val, accent_color, audio_duration, hold=2.5
+            )
+            if callout:
+                engagement_clips.append(callout)
+                print(f"   📊 Stat callout added: {mp.get('value')} {mp.get('label')} at {ts_val:.1f}s")
+    
+    # ── CODE SNIPPET / DIAGRAM DISPLAY ────────────────────────────────────────
+    # Add code snippets and architecture diagrams for technical content
+    code_snippets = script_json.get("code_snippets", [])
+    for cs in code_snippets:
+        ts_val = cs.get("timestamp", 0)
+        if ts_val > 5 and ts_val < audio_duration - 5:
+            code_clip = _code_snippet_clip(
+                cs.get("code", ""), cs.get("language", "python"),
+                ts_val, accent_color, audio_duration, hold=cs.get("duration", 4.0)
+            )
+            if code_clip:
+                engagement_clips.append(code_clip)
+                print(f"   💻 Code snippet added at {ts_val:.1f}s")
+    
+    arch_diagrams = script_json.get("architecture_diagrams", [])
+    for ad in arch_diagrams:
+        ts_val = ad.get("timestamp", 0)
+        if ts_val > 5 and ts_val < audio_duration - 5:
+            arch_clip = _architecture_diagram_clip(
+                ad.get("components", []), ad.get("connections", []),
+                ts_val, accent_color, audio_duration, hold=ad.get("duration", 5.0)
+            )
+            if arch_clip:
+                engagement_clips.append(arch_clip)
+                print(f"   🏗️ Architecture diagram added at {ts_val:.1f}s")
+    
+    # ── AUDIO-DRIVEN PATTERN INTERRUPTS (Every 4-6 seconds) ──────────────────
+    # Generate visual cuts synchronized to audio beats/pace
+    interrupt_interval = 5.0  # Every 5 seconds
+    if is_longform:
+        interrupt_interval = 6.0  # Slightly longer for longform
+    
+    pattern_interrupt_times = []
+    t = interrupt_interval
+    while t < audio_duration - 5:
+        # Avoid chapter boundaries
+        at_boundary = False
+        for ch in script_json.get("chapters", []):
+            ch_start = float(ch.get("approx_start_seconds", 0))
+            if abs(t - ch_start) < 3.0:
+                at_boundary = True
+                break
+        if not at_boundary:
+            pattern_interrupt_times.append(t)
+        t += interrupt_interval
+    
+    # Add snap-zoom and flash effects at these intervals
+    for pi_t in pattern_interrupt_times:
+        # Snap-zoom punch
+        from config import ENABLE_CINEMATIC_TRANSITIONS
+        if ENABLE_CINEMATIC_TRANSITIONS:
+            trans_clip = _create_transition_clip("zoom_punch", duration=0.2)
+            if trans_clip:
+                trans_clip = trans_clip.with_start(pi_t)
+                engagement_clips.append(trans_clip)
+            
+            # Accent flash
+            flash = ColorClip(size=(FRAME_W, FRAME_H), color=accent_color, duration=0.15).with_opacity(0.4)
+            flash = flash.with_start(pi_t).with_effects([vfx.CrossFadeOut(0.1)])
+            engagement_clips.append(flash)
+    
+    print(f"   ⚡ Pattern interrupts added: {len(pattern_interrupt_times)} cuts every {interrupt_interval}s")
+    
     # ── LAYER QUIZ: Quiz Countdown & CTA ──────────────────────────────────────
     is_quiz = sub_category.lower() in ["quiz", "quiz & trivia", "trivia"]
     if is_quiz:
@@ -6660,6 +7463,13 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         total_facts = script_json.get("num_facts", 10)
         is_vaibhav = script_json.get("longform_format") == "vaibhav"
         
+        # Reserve badge zone in safe zones
+        badge_pos = safe_zones.find_safe_position(300, 80, element_type="badge")
+        if badge_pos:
+            badge_x, badge_y = badge_pos
+        else:
+            badge_x, badge_y = 40, 40  # fallback
+        
         for i, ft in enumerate(fact_timestamps):
             fact_num = ft.get("fact_number", i + 1)
             
@@ -6703,7 +7513,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             
             b_clip = VideoClip(lambda t, _arr=badge_arr: _arr, duration=fact_dur)
             b_mask = VideoClip(lambda t, _m=badge_mask, _dur=fact_dur: _m * make_badge_opacity(t, _dur), is_mask=True, duration=fact_dur)
-            b_clip = b_clip.with_mask(b_mask).with_position((40, 40)).with_start(start_s)
+            # Use safe zone position for badge
+            b_clip = b_clip.with_mask(b_mask).with_position((badge_x, badge_y)).with_start(start_s)
             b_clip = b_clip.with_effects([vfx.CrossFadeIn(0.3)])
             longform_badge_clips.append(b_clip)
 
@@ -6796,9 +7607,16 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 if lp and os.path.exists(lp):
                     branding_entities.append((ent.get("name", "Entity"), lp, ent_list_key == "people"))
         
+        # Use safe zone for branding stack position
+        branding_pos = safe_zones.find_safe_position(80, 300, element_type="branding_stack")
+        if branding_pos:
+            brand_x, brand_y = branding_pos
+        else:
+            brand_x, brand_y = FRAME_W - 80, 40  # fallback top-right
+        
         card_size = 65 # Slightly smaller for stack
         margin = 15
-        current_y = 40
+        current_y = brand_y
         
         for i, (name, path, is_person) in enumerate(branding_entities):
             try:
@@ -6947,6 +7765,11 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     # Applying dynamic color using simple VideoClip
     pb_h = layout["progress_bar_height"]
     pb_pos = layout["progress_bar_position"]
+    
+    # Use safe zone to position progress bar above YouTube bottom UI (120px from bottom)
+    yt_bottom_ui_start = FRAME_H - 120
+    safe_bottom_y = yt_bottom_ui_start - pb_h - 10  # 10px margin above YouTube UI
+    
     def make_progress_frame(t):
         color = get_progress_color(t)
         base_img = np.zeros((pb_h, FRAME_W, 3), dtype=np.uint8)
@@ -6955,9 +7778,11 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         
     progress = VideoClip(make_progress_frame, duration=audio_duration)
     if pb_pos == "top":
-        progress = progress.with_position(lambda t: (int((t / max(audio_duration, 0.01)) * FRAME_W) - FRAME_W, 0))
+        # Top position: below YouTube top UI (80px from top)
+        progress = progress.with_position(lambda t: (int((t / max(audio_duration, 0.01)) * FRAME_W) - FRAME_W, 90))
     else:
-        progress = progress.with_position(lambda t: (int((t / max(audio_duration, 0.01)) * FRAME_W) - FRAME_W, FRAME_H - pb_h))
+        # Bottom position: above YouTube bottom UI
+        progress = progress.with_position(lambda t: (int((t / max(audio_duration, 0.01)) * FRAME_W) - FRAME_W, safe_bottom_y))
     base_layers.append(progress)
     
     # ── INFINITE LOOP VISUAL SYNC ─────────────────────────────────────────────
@@ -6975,8 +7800,12 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         if ep_ts < audio_duration:
             e_img = render_emoji_popup(ep.get("emoji", "🚀"))
             e_clip = ImageClip(np.array(e_img)).with_duration(1.0).with_start(ep_ts)
-            # Center-ish position with a little random offset
-            pos = (FRAME_W//2 - 200 + random.randint(-50, 50), FRAME_H//2 - 400)
+            # Use safe zone for emoji position (center but avoiding avatar/badge zones)
+            emoji_pos = safe_zones.find_safe_position(400, 400, element_type="emoji")
+            if emoji_pos:
+                pos = emoji_pos
+            else:
+                pos = (FRAME_W//2 - 200, FRAME_H//2 - 400)
             e_clip = e_clip.with_position(pos).with_effects([vfx.CrossFadeIn(0.2)])
             base_layers.append(e_clip)
 

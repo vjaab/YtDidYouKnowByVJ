@@ -14,6 +14,7 @@ import math
 import random
 import textwrap
 import hashlib
+import json
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 from datetime import datetime
@@ -805,7 +806,195 @@ def generate_thumbnail(script_json):
         print(f"✅ Premium Thumbnails Generated: {out_yt}")
         return out_yt
 
+# ══════════════════════════════════════════════════════════════════════════════
+# AI IMAGE PROMPT GENERATOR (Midjourney / DALL-E)
+# Generates a single-line text-to-image prompt for thumbnail creation
+# ══════════════════════════════════════════════════════════════════════════════
+
+def generate_thumbnail_prompt(script_json: dict) -> str:
+    """
+    Generates a Midjourney/DALL-E compatible prompt for long-form video thumbnails.
+    
+    Rules:
+    - 16:9 aspect ratio, rule of thirds, high contrast
+    - Max 3-4 words bold text (Yellow/White on dark)
+    - Left: "Old/Broken" visual | Right: "New/Upgraded" visual
+    - Dark neon blue/black bg with Cyan/Yellow/Neon Red accents
+    - Sleek 3D render, clean typography, minimal clutter
+    
+    Args:
+        script_json: The video script data containing title, summary, topics, etc.
+        
+    Returns:
+        Single-line image generation prompt string
+    """
+    title = script_json.get("title", "AI Breakthrough")
+    summary = script_json.get("description", script_json.get("script", ""))[:500]
+    topics = script_json.get("longform_topics", [])
+    subcat = script_json.get("sub_category", "AI & Tech")
+    
+    # Extract key entities for visual metaphor
+    companies = [c.get("name", "") for c in script_json.get("companies_mentioned", [])]
+    tools = [t.get("name", "") for t in script_json.get("tools_mentioned", [])]
+    entities = companies + tools
+    
+    # Determine the "Old vs New" visual metaphor based on content
+    old_metaphors = {
+        "security": "cracked padlock, shattered firewall, data leaking",
+        "privacy": "open window, exposed documents, surveillance camera",
+        "legacy": "old server rack, tangled cables, dusty hardware, floppy disk",
+        "slow": "hourglass, loading spinner, snail, tortoise",
+        "broken": "glitching screen, error 404, crashed system, blue screen",
+        "outdated": "typewriter, fax machine, CRT monitor, punch cards",
+        "vulnerable": "open vault, broken shield, warning signs, red alerts",
+        "inefficient": "paperwork pile, manual process, clipboard, bureaucracy",
+        "centralized": "single point of failure, monolith, bottleneck",
+        "expensive": "burning money, gold bars leaking, expensive contract",
+    }
+    
+    new_metaphors = {
+        "security": "quantum encryption shield, biometric fortress, zero-trust architecture",
+        "privacy": "encrypted vault, anonymous mask, zero-knowledge proof, local-first",
+        "modern": "sleek serverless cloud, clean fiber optics, edge computing nodes",
+        "fast": "lightning bolt, warp speed tunnel, instant sync, real-time stream",
+        "fixed": "green checkmark, healed system, seamless flow, auto-recovery",
+        "ai-powered": "neural network brain, glowing synapses, AI assistant hologram",
+        "efficient": "automated pipeline, one-click deploy, streamlined workflow",
+        "decentralized": "distributed mesh, blockchain nodes, peer-to-peer network",
+        "cost-effective": "rocket ship growth, compound interest, efficient scaling",
+        "breakthrough": "lightbulb moment, eureka spark, paradigm shift portal",
+    }
+    
+    # Analyze content to pick metaphors
+    content_lower = (title + " " + summary).lower()
+    
+    # Pick old metaphor
+    old_visual = "legacy monolith server, tangled cables, warning lights"
+    for key, val in old_metaphors.items():
+        if key in content_lower:
+            old_visual = val
+            break
+    
+    # Pick new metaphor
+    new_visual = "sleek AI-powered cloud, glowing neural pathways"
+    for key, val in new_metaphors.items():
+        if key in content_lower:
+            new_visual = val
+            break
+    
+    # If specific entities mentioned, incorporate them
+    entity_visual = ""
+    if entities:
+        top_entity = entities[0]
+        entity_visual = f", subtle {top_entity} logo/icon integration"
+    
+    # Determine accent color based on subcategory
+    accent_map = {
+        "security": "Neon Red",
+        "privacy": "Electric Cyan", 
+        "coding": "Matrix Green",
+        "finance": "Gold Yellow",
+        "ai": "Neon Purple",
+        "tools": "Electric Blue",
+        "gadgets": "Vibrant Orange",
+    }
+    accent = "Electric Cyan"
+    for key, val in accent_map.items():
+        if key in subcat.lower():
+            accent = val
+            break
+    
+    # Generate the hook text (3-4 words max)
+    hook_words = _extract_hook_words(title, summary)
+    
+    # Build the prompt
+    prompt_parts = [
+        "YouTube thumbnail 16:9, rule of thirds composition",
+        "split diagonal: LEFT side old/broken, RIGHT side new/upgraded",
+        f"LEFT: {old_visual}, dark ominous lighting, crumbling aesthetic",
+        f"RIGHT: {new_visual}{entity_visual}, bright hopeful lighting, pristine",
+        f"center vertical divider: glowing {accent} energy beam separating two worlds",
+        f"bold text overlay: '{hook_words}' in massive Montserrat Black font",
+        "text color: Bright Yellow / Pure White on dark bg, high contrast stroke",
+        "background: deep neon blue-black (#0A0A15), cyberpunk noir atmosphere",
+        f"accent palette: {accent}, Bright Yellow (#FFD600), Neon Red (#FF2020)",
+        "style: hyper-realistic 3D render, Unreal Engine 5, octane render, 8k",
+        "clean typography, minimal visual clutter, professional thumbnail design",
+        "dramatic volumetric lighting, ray-traced reflections, depth of field",
+        "--ar 16:9 --stylize 750 --v 6.1"
+    ]
+    
+    return " | ".join(prompt_parts)
+
+
+def _extract_hook_words(title: str, summary: str) -> str:
+    """Extract 3-4 word hook from title/summary for thumbnail text."""
+    # Common high-CTR patterns
+    patterns = [
+        (r"(don't|never|stop|avoid|warning)\s+\w+", "DON'T USE THIS"),
+        (r"(how to|why you should|you must)\s+\w+", "DO THIS NOW"),
+        (r"(secret|hidden|revealed|exposed)", "SECRET REVEALED"),
+        (r"(best|top|ultimate|complete)\s+\w+", "ULTIMATE GUIDE"),
+        (r"(new|just launched|breaking|announced)", "JUST LAUNCHED"),
+        (r"(vs|versus|compared|beats)", "THIS BEATS THAT"),
+        (r"(free|open source|no cost)", "COMPLETELY FREE"),
+        (r"(fast|instant|seconds|lightning)", "INSTANT RESULTS"),
+        (r"(ai|artificial intelligence|llm|gpt)", "AI CHANGES EVERYTHING"),
+    ]
+    
+    content = (title + " " + summary).lower()
+    for pattern, hook in patterns:
+        import re
+        if re.search(pattern, content):
+            return hook
+    
+    # Fallback: extract key nouns from title
+    words = title.split()
+    key_words = [w for w in words if len(w) > 3 and w.lower() not in 
+                 {"the", "and", "for", "with", "this", "that", "your", "how", "why", "what"}]
+    if key_words:
+        return " ".join(key_words[:3]).upper()
+    
+    return "AI BREAKTHROUGH"
+
+
+def generate_midjourney_prompt(script_json: dict) -> str:
+    """Alias for generate_thumbnail_prompt for clarity."""
+    return generate_thumbnail_prompt(script_json)
+
+
+def generate_dalle_prompt(script_json: dict) -> str:
+    """Generates a DALL-E 3 optimized prompt (more natural language)."""
+    base_prompt = generate_thumbnail_prompt(script_json)
+    # Convert Midjourney parameters to natural language for DALL-E
+    dalle_prompt = base_prompt.replace("| ", ", ").replace("--ar 16:9", "16:9 aspect ratio").replace("--stylize 750", "highly stylized").replace("--v 6.1", "photorealistic")
+    return f"Create a professional YouTube thumbnail: {dalle_prompt}. Professional photography lighting, commercial quality."
+
+
 if __name__ == "__main__":
-    # Test run
-    test_json = {"title": "OpenAI Search is finally here...", "color_theme": {"accent": "#00E5FF"}}
-    generate_thumbnail(test_json)
+    # Test the prompt generator
+    test_script = {
+        "title": "Google's New AI Search Kills Traditional SEO Forever",
+        "description": "Google just launched AI Overviews that completely changes how search works. Traditional SEO tactics are dead. Here's what replaces them.",
+        "sub_category": "AI & Tech Tools",
+        "companies_mentioned": [{"name": "Google"}, {"name": "OpenAI"}],
+        "tools_mentioned": [{"name": "Gemini"}, {"name": "Search Console"}],
+        "longform_topics": [
+            {"headline": "AI Overviews Launch", "source_name": "Google"},
+            {"headline": "SEO Is Dead", "source_name": "Search Engine Journal"},
+        ]
+    }
+    
+    print("=" * 80)
+    print("MIDJOURNEY PROMPT:")
+    print("=" * 80)
+    print(generate_thumbnail_prompt(test_script))
+    print()
+    print("=" * 80)
+    print("DALL-E 3 PROMPT:")
+    print("=" * 80)
+    print(generate_dalle_prompt(test_script))
+
+# ── TEST RUN ─────────────────────────────────────────────────────────────────
+# test_json = {"title": "OpenAI Search is finally here...", "color_theme": {"accent": "#00E5FF"}}
+# generate_thumbnail(test_json)
