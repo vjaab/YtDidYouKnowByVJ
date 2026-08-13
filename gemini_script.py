@@ -777,6 +777,11 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                     type_score += sum(15 for kw in research_keywords if kw in title_lower)
                     if art.get("type") in ["reddit_trending", "youtube_trending"]:
                         type_score += 25
+                elif topic_type == "interview_questions":
+                    interview_keywords = ["interview", "question", "answer", "java", "javascript", "spring boot", "aws", "python", "kubernetes", "docker", "coding", "system design", "algorithm", "data structure"]
+                    type_score += sum(15 for kw in interview_keywords if kw in title_lower)
+                    if art.get("type") in ["github_trending", "reddit_trending", "youtube_trending"]:
+                        type_score += 25
                 
                 # ── COMPOSITE VIRAL SCORE (weighted blend) ──
                 hot_score = (
@@ -898,6 +903,8 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
         content_desc = "fascinating tech facts, AI industry shifts, motivation and success stories, and viral tech updates"
     elif topic_type == "tech_trends":
         content_desc = "high-velocity Google tech search trends and viral YouTube breakout videos"
+    elif topic_type == "interview_questions":
+        content_desc = "technical interview questions and answers for Java, JavaScript, Spring Boot, AWS, Python, Kubernetes, Docker"
     else:
         content_desc = "surprising tech facts, agentic AI facts, AI coding shortcuts, and AI transformation experiments"
 
@@ -1312,10 +1319,109 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "companies": [{{"name": "Company Name", "domain": "domain.com", "description": "2-4 word description of the company"}}],
   "people": [{{"name": "Person Name", "wikipedia_slug": "Wikipedia_Slug", "description": "2-4 word description of the person's role"}}],
   "key_entities": [{{"name": "Entity Name", "type": "COMPANY|PEOPLE|TOOL|OTHER", "description": "2-4 word description of the entity"}}],
-  "comment_hook": "A provocative question: 'What was YOUR guess? A, B, or C? Drop it below!'",
-  "comment_trigger_keyword": "QUIZ",
+      "comment_hook": "A provocative question: 'What was YOUR guess? A, B, or C? Drop it below!'",
+      "comment_trigger_keyword": "QUIZ",
+      "incentive_cta_type": "One of: 'digital_vault', 'comment_trigger', 'benchmark_challenge', 'community_audit'",
+      "digital_asset_offer": "Description of the asset being offered (e.g., '50 verified tech quizzes pack', 'Quiz template & sources', 'Score tracker spreadsheet', 'API credit giveaway entry')"
+}}"""
+        elif topic_type == "interview_questions":
+            selection_instruction = (
+                f"Analyze the following {content_desc} and pick the SINGLE most commonly asked technical interview question with a clear, concise answer.\n"
+                f"PRIMARY CATEGORY: {category}\n"
+                "SELECTION FILTERS:\n"
+                "1. PRIORITIZE: Frequently asked interview questions for Java, JavaScript, Spring Boot, AWS, Python, Kubernetes, Docker.\n"
+                "2. Each video covers ONE specific question with a complete answer.\n"
+                "3. Format: Hook (question) -> Context (why it's asked) -> Answer (clear explanation with code/config example) -> Key Takeaway.\n"
+                "4. MUST be explainable in exactly <35s (approx 80-120 words total). Strict 35s limit.\n"
+                "5. 4-PART ARCHITECTURE: Hook Question (0-2s) -> Why This Matters (2-5s) -> Answer with Code/Config (5-25s) -> Incentive CTA (25-30s) -> Loop Bridge (30-35s) -> CTA (35s).\n"
+                "6. INCENTIVE CTA (MANDATORY): Choose exactly one mode: Digital Vault, Comment Trigger, Benchmark Challenge, or Community Audit.\n"
+                "7. LOOP-FRIENDLY: Last sentence connects back to the opening question.\n"
+                "8. UNIVERSAL & GENDER-INCLUSIVE DEMOGRAPHIC (18-70): Interview prep appeals to all. Use clear explanations, avoid gatekeeping language.\n"
+                "9. VISUAL FORMAT: Show code snippets, config files, architecture diagrams, or terminal output as appropriate for the question.\n"
+                "10. SOURCE: use_case_evidence_url MUST point to official documentation, reputable tech blogs, or GitHub repos with examples."
+            )
+            prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
+{{
+  "title_options": ["Title Case + Emoji + Curiosity Gap 1", "Title Case + Emoji + Curiosity Gap 2"],
+  "description": "Full 100+ word rich SEO description for youtube describing the interview question video.",
+  "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence (official docs, GitHub, tech blog).",
+  "title": "Punchy YouTube title max 60 chars — MUST follow interview formula: 'Interview Q: [Question]? [Language/Tech] Explained' or 'Senior Devs Know This: [Concept] in [Tech] — Here is the Answer' or 'Stop Guessing: How [Concept] Works in [Tech]'. NO clickbait — must deliver on promise.",
+  "hook_script": "The Hook Question (0-2s): Bold interview question on screen + voice. 8-12 words. 'What happens when you call spring-boot:run?' or 'Java Interview: Explain String immutability — why does it matter?'",
+  "problem_context": "The Context (2-5s): Why interviewers ask this. What it reveals about the candidate. 10-15 words.",
+  "solution_tech": "The Answer (5-25s): Clear explanation with code snippet, config, or diagram. Show the exact answer a senior dev would give. 40-60 words.",
+  "incentive_cta": "The Incentive CTA (25-30s): Choose EXACTLY ONE mode: 1) Digital Vault: 'I put 50 interview Q&A with code in our Telegram. Link in description.' 2) Comment Trigger: 'Comment \\'INTERVIEW\\' below for the full prep pack.' 3) Benchmark Challenge: 'I answered this in 30 seconds. Comment your time to beat it!' 4) Community Audit: 'Sub and comment your answer for monthly $100 API credit giveaway.'",
+  "retention_loop": "The Loop Bridge (30-35s): Connect back to opening. 'Think you nailed this one? Next question drops tomorrow.'",
+  "outro_cta": "CTA: Follow for daily interview prep. Subscribe. 8-10 words.",
+  "script": "The FULL voiceover script combining hook_script, problem_context, solution_tech, incentive_cta, retention_loop, and outro_cta. Target 80-120 words total. STRICT MAX 35 seconds. Loop-friendly ending.",
+  "hook_text": "The exact first 5-8 words of the script.",
+  "relevant_links": ["https://example.com"],
+  "phonetic_pronunciation_map": {{}},
+  "hook": "Matches the first sentence of the script",
+  "summary": "One line summary",
+  "sub_category": "{category}",
+  "breaking_news_level": 9,
+  "retention_cues": [{{ "timestamp": 2.0, "effect": "zoom_in", "reason": "hook_impact" }}],
+  "subtitle_chunks": [{{
+      "chunk_id": 1,
+      "text": "Sentence 1 - Hook question",
+      "start": 0.00,
+      "end": 2.00,
+      "scene_objective": "Display the interview question visually",
+      "visual_type": "AI Image|Code Snippet|Diagram|Terminal Output",
+      "nano_visual_prompt": "A clean, specific visual for the interview question. Example: 'Code editor showing Java String pool diagram with string literals, dark mode, 9:16 vertical'. Photorealistic, 8K. NO text overlays.",
+      "is_setting_chunk": false,
+      "has_infographic": false,
+      "infographic_type": null,
+      "infographic_data": null,
+      "on_screen_elements": ["labels/arrows/highlights/icons/code"],
+      "camera_motion": "Slow zoom",
+      "transition": "None"
+    }},
+    {{
+      "chunk_id": 2,
+      "text": "Context and answer explanation",
+      "start": 2.00,
+      "end": 6.00,
+      "scene_objective": "Explain why this question is asked and show the answer",
+      "visual_type": "Code Snippet|Diagram|Terminal Output|Architecture Diagram",
+      "nano_visual_prompt": "Visual showing the answer - code, config, or diagram. Example: 'Terminal showing Spring Boot startup logs with auto-configuration highlighted, dark theme, 9:16 vertical'. Photorealistic, 8K.",
+      "is_setting_chunk": false,
+      "has_infographic": true,
+      "infographic_type": "code_explanation",
+      "infographic_data": {{"language": "java", "focus": "key_concept"}},
+      "on_screen_elements": ["labels/arrows/highlights/code"],
+      "camera_motion": "Dolly-in",
+      "transition": "Match cut"
+    }},
+    {{
+      "chunk_id": 3,
+      "text": "Key takeaway and incentive CTA",
+      "start": 6.00,
+      "end": 15.00,
+      "scene_objective": "Summarize the key insight and deliver CTA",
+      "visual_type": "Infographic|AI Image",
+      "nano_visual_prompt": "Summary card with key takeaway bullet points",
+      "is_setting_chunk": false,
+      "has_infographic": true,
+      "infographic_type": "key_takeaway",
+      "infographic_data": {{"points": ["Point 1", "Point 2", "Point 3"]}},
+      "on_screen_elements": ["labels/arrows/highlights"],
+      "camera_motion": "Slow zoom",
+      "transition": "Zoom transition"
+    }}
+  ],
+  "original_news_headline": "Exact interview question / tech concept",
+  "original_news_url": "Direct source URL (official docs, GitHub, tech blog)",
+  "keywords": ["Interview Questions", "Java", "JavaScript", "Spring Boot", "AWS", "Python", "Kubernetes", "Docker", "Tech Interview"],
+  "hashtags": ["#InterviewPrep", "#JavaInterview", "#JavaScriptInterview", "#SpringBoot", "#AWS", "#Python", "#Kubernetes", "#Docker", "#TechInterview", "#CodingInterview"],
+  "companies_mentioned": ["list of company names mentioned in the script"],
+  "companies": [{{"name": "Company Name", "domain": "domain.com", "description": "2-4 word description of the company"}}],
+  "people": [{{"name": "Person Name", "wikipedia_slug": "Wikipedia_Slug", "description": "2-4 word description of the person's role"}}],
+  "key_entities": [{{"name": "Entity Name", "type": "COMPANY|PEOPLE|TOOL|OTHER", "description": "2-4 word description of the entity"}}],
+  "comment_hook": "A provocative question: 'How would YOU answer this? Drop your answer below!'",
+  "comment_trigger_keyword": "INTERVIEW",
   "incentive_cta_type": "One of: 'digital_vault', 'comment_trigger', 'benchmark_challenge', 'community_audit'",
-  "digital_asset_offer": "Description of the asset being offered (e.g., '50 verified tech quizzes pack', 'Quiz template & sources', 'Score tracker spreadsheet', 'API credit giveaway entry')"
+  "digital_asset_offer": "Description of the asset being offered (e.g., '50 interview Q&A with code examples', 'Interview prep checklist & cheat sheet', 'Mock interview score tracker', 'API credit giveaway entry')"
 }}"""
         else: # research / educational / general
             selection_instruction = (

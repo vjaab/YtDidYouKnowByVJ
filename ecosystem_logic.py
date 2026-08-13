@@ -370,6 +370,37 @@ def get_category_prompt_enhancement(category, slot):
                 • Programming language etymology
                 • Famous bugs/failures (Mars Climate Orbiter, Ariane 5, etc.)
 """,
+        "Interview Questions": f"""
+            CATEGORY: Interview Questions (High intent, career-focused, highly shareable).
+            STRATEGY: {base_discovery}
+            AUDIENCE: Developers, students, career switchers, anyone preparing for tech interviews. Massive global demand.
+            GOAL: Present ONE real interview question with a complete, senior-level answer. Cover Java, JavaScript, Spring Boot, AWS, Python, Kubernetes, Docker.
+            HOOK STYLE: 'Senior Devs Know This: How does Spring Boot auto-configuration ACTUALLY work?' or 'Stop Guessing: This Java Interview Question Separates Juniors from Seniors.'
+            EMOTIONAL TRIGGER: Career anxiety + authority trust + "I need to know this" + shareability with peers.
+            CONTENT FORMAT: Hook Question → Why Interviewers Ask This → Complete Answer with Code/Config/Diagram → Key Takeaway → CTA.
+            
+            INTERVIEW_FORMAT (25-35s Short):
+                1. Hook Question (0-2s): Bold interview question on screen + voice. "What happens when you call spring-boot:run?"
+                2. Context (2-5s): "This tests if you understand Spring's startup sequence..." — show on screen
+                3. Answer (5-25s): Live code/config/diagram demo — "SpringApplication.run() triggers..." with visual
+                4. Key Insight (25-28s): "The ONE thing 80% of candidates miss..."
+                5. CTA (28-35s): "Want 50 more? Comment 'INTERVIEW' for the full prep pack."
+            
+            INTERVIEW_HOOKS:
+                1. "Java Interview: Why is String immutable? (The answer isn't just 'security')"
+                2. "JavaScript: What's the ACTUAL difference between == and ===? (Type coercion trap)"
+                3. "Spring Boot: How does @EnableAutoConfiguration actually work? (The Conditionals)"
+                4. "AWS: When would you choose Lambda over ECS Fargate? (Cost vs Control)"
+                5. "Python: Why is GIL a bottleneck for CPU-bound tasks? (And how to bypass it)"
+                6. "Kubernetes: What happens when a pod gets OOMKilled? (The OOM Score)"
+                7. "Docker: Why does my image rebuild EVERY layer when I change one line? (Cache Invalidation)"
+            
+            INTERVIEW_SOURCES:
+                • Official documentation (Oracle, MDN, Spring, AWS, Python, Kubernetes, Docker)
+                • LeetCode / NeetCode / Blind 75 discussion threads
+                • Staff engineer blog posts (Netflix, Uber, Airbnb, Google tech blogs)
+                • System design interview repositories (Grokking, Design Gurus)
+""",
     }
     
     return enhancements.get(category, enhancements.get("AI & Tech Tools", ""))
@@ -514,6 +545,25 @@ _AI_HACKS_DATA = {
             "Create a 'True or False' tech quiz question with a mind-blowing explanation. Source from computer history archives.",
             "What's a famous tech bug/failure story that sounds fake but is 100% true? Format as quiz with reveal."
         ]
+    },
+    "Interview Questions": {
+        "strategy": "Focus on real technical interview questions with senior-level answers for Java, JavaScript, Spring Boot, AWS, Python, Kubernetes, Docker. Source from official docs, LeetCode discussions, staff engineer blogs, system design repos. High intent audience = high CPC + shares.",
+        "hooks": [
+            "Java Interview: Why is String immutable? (The answer isn't just 'security')",
+            "JavaScript: What's the ACTUAL difference between == and ===? (Type coercion trap)",
+            "Spring Boot: How does @EnableAutoConfiguration actually work? (The Conditionals)",
+            "AWS: When would you choose Lambda over ECS Fargate? (Cost vs Control)",
+            "Python: Why is GIL a bottleneck for CPU-bound tasks? (And how to bypass it)",
+            "Kubernetes: What happens when a pod gets OOMKilled? (The OOM Score)",
+            "Docker: Why does my image rebuild EVERY layer when I change one line? (Cache Invalidation)"
+        ],
+        "demo_format": "Hook Question (0-2s) → Context: Why this is asked (2-5s) → Complete Answer with Code/Config/Diagram (5-25s) → Key Insight (25-28s) → CTA (28-35s)",
+        "tools": ["Oracle Java Docs", "MDN Web Docs", "Spring.io Reference", "AWS Docs", "Python.org Docs", "Kubernetes.io Docs", "Docker Docs", "LeetCode", "Blind 75", "System Design Primer"],
+        "prompts": [
+            "You are a staff engineer conducting a technical interview. Provide the complete answer to this {topic} interview question: {question}. Include: 1) Direct answer, 2) Code/config/diagram example, 3) Why interviewers ask this, 4) Common wrong answers, 5) Follow-up questions. Keep it concise for a 30-second Short.",
+            "Generate a senior-level technical interview question for {topic} with a complete answer. The question should test deep understanding, not just syntax. Include a code snippet or architecture diagram description.",
+            "What are the top 5 most commonly asked {topic} interview questions that separate junior from senior candidates? Format as a Short script with hook, context, answer, and key takeaway."
+        ]
     }
 }
 
@@ -548,7 +598,12 @@ def validate_ai_hacks_coverage():
         "Facts & Trivia",
         "Life Hacks & Productivity",
         "Agentic AI Facts",
-        "Coding & Development Hacks"
+        "Coding & Development Hacks",
+        "Quiz & Trivia",
+        "Interview Questions",
+        "Programming Language Origins",
+        "Tech Company Founding Stories",
+        "Famous Bugs & Glitches"
     ]
     covered = list(_AI_HACKS_DATA.keys())
     missing = [c for c in daily_cats if c not in covered]

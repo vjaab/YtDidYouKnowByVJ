@@ -944,7 +944,7 @@ def run_local(topic_type="auto", dry_run=False):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--now", action="store_true", help="Run pipeline immediately.")
-    parser.add_argument("--type", type=str, choices=["auto", "research", "tools", "news", "tech_trends", "vaibhav"], default="auto", help="Content type mapped to the schedule")
+    parser.add_argument("--type", type=str, choices=["auto", "research", "tools", "news", "tech_trends", "vaibhav", "interview_questions"], default="auto", help="Content type mapped to the schedule")
     parser.add_argument("--dry-run", action="store_true", help="Run without uploading to YouTube/X.com/Telegram.")
     args = parser.parse_args()
 
