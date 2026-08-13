@@ -16,7 +16,7 @@ def get_slot_info():
     # Each day has a distinct niche; Quiz & Trivia anchors 3 days for engagement
     daily_categories = {
         "Mon": "Quiz & Trivia",                    # Interactive quiz format (high engagement)
-        "Tue": "Programming Language Origins",     # Python/Ruby/JS origin stories, creator facts
+        "Tue": "Interview Questions",              # Java/JS/Spring Boot/AWS/Python/K8s/Docker Q&A (high intent, career-focused)
         "Wed": "Quiz & Trivia",                    # Interactive quiz format (high engagement)
         "Thu": "Tech Company Founding Stories",    # Garage stories, near-bankruptcies, name origins
         "Fri": "Quiz & Trivia",                    # Interactive quiz format (high engagement)
