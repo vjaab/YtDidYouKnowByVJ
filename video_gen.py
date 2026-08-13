@@ -169,8 +169,26 @@ class SafeZoneCalculator:
             if isinstance(pos, str):
                 # Named position
                 x, y = self._resolve_named_position(pos, element_w, element_h)
+            elif isinstance(pos, (list, tuple)) and len(pos) == 2:
+                if isinstance(pos[0], str):
+                    # Named position with options: ("top_left", {"margin": 40})
+                    name, options = pos
+                    margin = options.get("margin", 0) if isinstance(options, dict) else 0
+                    x, y = self._resolve_named_position(name, element_w, element_h)
+                    if margin:
+                        if "left" in name:
+                            x += margin
+                        elif "right" in name:
+                            x -= margin
+                        if "top" in name:
+                            y += margin
+                        elif "bottom" in name:
+                            y -= margin
+                else:
+                    # Coordinate tuple: (x, y)
+                    x, y = pos
             else:
-                x, y = pos
+                continue
             
             x2, y2 = x + element_w, y + element_h
             overlaps, zone_name = self.check_overlap(x, y, x2, y2)
