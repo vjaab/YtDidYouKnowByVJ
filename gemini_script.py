@@ -583,7 +583,7 @@ def _get_active_gemini_key():
             return k
     return api_keys[0]
 
-def _pick_and_generate_script_attempt(articles=None, extra_instruction="", forced_article=None, topic_type="research", failed_topics=None, target_country="US", recent_history=None, recent_titles=None):
+def _pick_and_generate_script_attempt(articles=None, extra_instruction="", forced_article=None, topic_type="research", failed_topics=None, target_country="US", recent_history=None, recent_titles=None, run_index=0):
     if failed_topics is None:
         failed_topics = []
     if recent_history is None:
@@ -594,7 +594,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
     active_key = _get_active_gemini_key()
     client = genai.Client(api_key=active_key)
     
-    day_name, slot, category = get_slot_info()
+    day_name, slot, category = get_slot_info(run_index=run_index)
     strategy_enhancement = get_category_prompt_enhancement(category, slot)
     
     # ── STEP -2: REPETITION AVOIDANCE (Moved Up) ────────────────────────────────────────
@@ -1575,19 +1575,19 @@ This perspective MUST shape your hook, analysis, and solution framing. Do NOT ju
             
     return script_data
 
-def pick_and_generate_script(articles=None, extra_instruction="", forced_article=None, topic_type="research", failed_topics=None, target_country="US"):
+def pick_and_generate_script(articles=None, extra_instruction="", forced_article=None, topic_type="research", failed_topics=None, target_country="US", run_index=0):
     if failed_topics is None:
         failed_topics = []
         
     articles_base = list(articles) if articles is not None else None
     if articles_base:
-        print(f"📡 Boosting {len(articles_base)} articles with NewsAPI trending stories...")
+        print(f"���� Boosting {len(articles_base)} articles with NewsAPI trending stories...")
         try:
             from fetch_research_papers import fetch_trending_from_newsapi
             trending_boost = fetch_trending_from_newsapi()
             articles_base += trending_boost
         except Exception as e:
-            print(f"⚠️ Failed to fetch trending from NewsAPI: {e}")
+            print(f"������ Failed to fetch trending from NewsAPI: {e}")
             
     tracker = load_tracker()
     recent_history = tracker.get("history", [])[-30:]
@@ -1597,7 +1597,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
     gen_attempts = 0
     
     while gen_attempts < max_gen_attempts:
-        print(f"🔄 pick_and_generate_script: Selection and generation attempt {gen_attempts+1}/{max_gen_attempts}...")
+        print(f"���� pick_and_generate_script: Selection and generation attempt {gen_attempts+1}/{max_gen_attempts}...")
         script_data = _pick_and_generate_script_attempt(
             articles=articles_base,
             extra_instruction=extra_instruction,
@@ -1606,15 +1606,16 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
             failed_topics=failed_topics,
             target_country=target_country,
             recent_history=recent_history,
-            recent_titles=recent_titles
+            recent_titles=recent_titles,
+            run_index=run_index
         )
         if script_data:
             return script_data
             
-        print(f"⚠️ Attempt {gen_attempts+1} failed to produce a unique script.")
+        print(f"������ Attempt {gen_attempts+1} failed to produce a unique script.")
         gen_attempts += 1
         
-    print(f"🚨 Failed to generate a unique script after {max_gen_attempts} attempts.")
+    print(f"���� Failed to generate a unique script after {max_gen_attempts} attempts.")
     return None
 
 import hashlib

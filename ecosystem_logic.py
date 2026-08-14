@@ -1,30 +1,74 @@
 import datetime
-from config import ENABLE_LONGFORM
+import os
+import json
+from config import ENABLE_LONGFORM, UPLOAD_TIMES
 
-def get_slot_info():
+ALL_CATEGORIES = [
+    "AI & Tech Tools",
+    "Tech Gadgets & Inventions",
+    "Finance & Tech Economy",
+    "Facts & Trivia",
+    "Coding & Development Hacks",
+    "Quiz & Trivia",
+    "Interview Questions",
+    "Programming Language Origins",
+    "Tech Company Founding Stories",
+    "Famous Bugs & Glitches",
+]
+
+WEEKLY_SCHEDULE = {
+    "Mon": ["Quiz & Trivia", "AI & Tech Tools"],
+    "Tue": ["Interview Questions", "Tech Gadgets & Inventions"],
+    "Wed": ["Finance & Tech Economy", "Facts & Trivia"],
+    "Thu": ["Tech Company Founding Stories", "Programming Language Origins"],
+    "Fri": ["Quiz & Trivia", "Interview Questions"],
+    "Sat": ["Famous Bugs & Glitches", "Interview Questions"],
+    "Sun": ["Coding & Development Hacks", "Interview Questions"],
+}
+
+SCHEDULE_TRACKER_FILE = os.path.join(os.path.dirname(__file__), "schedule_tracker.json")
+
+def _load_schedule_tracker():
+    if os.path.exists(SCHEDULE_TRACKER_FILE):
+        try:
+            with open(SCHEDULE_TRACKER_FILE, "r") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {"last_date": "", "run_index": 0}
+
+def _save_schedule_tracker(tracker):
+    try:
+        with open(SCHEDULE_TRACKER_FILE, "w") as f:
+            json.dump(tracker, f)
+    except Exception:
+        pass
+
+def get_slot_info(run_index=None):
     """
     Returns (day_name, slot, category) based on current UTC time and the 2026 Mass-Appeal Strategy.
     Shorts always use Slot A (Discovery) for maximum mass-appeal viral reach.
+    
+    Two runs per day (morning/evening) get different categories from WEEKLY_SCHEDULE.
     """
     now = datetime.datetime.utcnow()
-    day_name = now.strftime("%a") # Mon, Tue, etc.
+    day_name = now.strftime("%a")
     
-    # Shorts are always Slot A (Discovery)
     slot = "Slot A (Discovery)"
-        
-    # Daily category rotation — High Views & Subscribers Strategy
-    # Each day has a distinct niche; Quiz & Trivia anchors 3 days for engagement
-    daily_categories = {
-        "Mon": "Quiz & Trivia",                    # Interactive quiz format (high engagement)
-        "Tue": "Interview Questions",              # Java/JS/Spring Boot/AWS/Python/K8s/Docker Q&A (high intent, career-focused)
-        "Wed": "Quiz & Trivia",                    # Interactive quiz format (high engagement)
-        "Thu": "Tech Company Founding Stories",    # Garage stories, near-bankruptcies, name origins
-        "Fri": "Quiz & Trivia",                    # Interactive quiz format (high engagement)
-        "Sat": "Famous Bugs & Glitches",           # Y2K, Ariane 5, Knight Capital, Therac-25
-        "Sun": "Quiz & Trivia",                    # Weekend quiz binge (high shareability)
-    }
     
-    category = daily_categories.get(day_name, "AI & Tech Tools")
+    if run_index is None:
+        tracker = _load_schedule_tracker()
+        today = now.strftime("%Y-%m-%d")
+        if tracker.get("last_date") != today:
+            tracker["last_date"] = today
+            tracker["run_index"] = 0
+        else:
+            tracker["run_index"] = (tracker.get("run_index", 0) + 1) % len(UPLOAD_TIMES)
+        _save_schedule_tracker(tracker)
+        run_index = tracker["run_index"]
+    
+    day_schedule = WEEKLY_SCHEDULE.get(day_name, ["AI & Tech Tools", "Tech Gadgets & Inventions"])
+    category = day_schedule[run_index % len(day_schedule)]
     
     return day_name, slot, category
 

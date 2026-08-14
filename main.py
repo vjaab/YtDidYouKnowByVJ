@@ -248,8 +248,15 @@ def run_pipeline(topic_type="auto", dry_run=False):
         log_message(f"Output folder cleaned: {OUTPUT_DIR}")
 
     # ── STEP 1: Content Ecosystem Check ───────────────────────────────────────
-    day_name, slot, category = get_slot_info()
-    log_message(f"STEP 1: Content Ecosystem Check -> Day: {day_name}, Slot: {slot}, Category: {category}")
+    from config import UPLOAD_TIMES, TIMEZONE
+    import pytz
+    now = datetime.datetime.now(pytz.timezone(TIMEZONE))
+    current_time_str = now.strftime("%H:%M")
+    run_index = 0
+    if current_time_str in UPLOAD_TIMES:
+        run_index = UPLOAD_TIMES.index(current_time_str)
+    day_name, slot, category = get_slot_info(run_index=run_index)
+    log_message(f"STEP 1: Content Ecosystem Check -> Day: {day_name}, Slot: {slot}, Category: {category} (Run {run_index+1}/{len(UPLOAD_TIMES)})")
     
     # ── QUIZ SHORTS: Force quiz topic_type for Quiz & Trivia days ──
     if category == "Quiz & Trivia":
@@ -348,7 +355,7 @@ def run_pipeline(topic_type="auto", dry_run=False):
         combined_instruction = extra_instruction + screenshot_avoid
         
         script_data = pick_and_generate_script(
-            articles=rss_articles, extra_instruction=combined_instruction, forced_article=None, topic_type=topic_type, failed_topics=failed_topics, target_country=target_country
+            articles=rss_articles, extra_instruction=combined_instruction, forced_article=None, topic_type=topic_type, failed_topics=failed_topics, target_country=target_country, run_index=run_index
         )
 
         if not script_data:

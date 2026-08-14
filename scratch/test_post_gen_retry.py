@@ -12,7 +12,7 @@ def test_post_gen_retry():
     # Track calls and simulate return values
     call_records = []
     
-    def mock_attempt(articles=None, extra_instruction="", forced_article=None, topic_type="research", failed_topics=None, target_country="US", recent_history=None, recent_titles=None):
+    def mock_attempt(articles=None, extra_instruction="", forced_article=None, topic_type="research", failed_topics=None, target_country="US", recent_history=None, recent_titles=None, run_index=0):
         if failed_topics is None:
             failed_topics = []
         call_records.append(dict(failed_topics=list(failed_topics)))
@@ -61,7 +61,7 @@ def test_post_gen_retry_terminal_failure():
     
     call_records = []
     
-    def mock_attempt_fail_always(articles=None, extra_instruction="", forced_article=None, topic_type="research", failed_topics=None, target_country="US", recent_history=None, recent_titles=None):
+    def mock_attempt_fail_always(articles=None, extra_instruction="", forced_article=None, topic_type="research", failed_topics=None, target_country="US", recent_history=None, recent_titles=None, run_index=0):
         if failed_topics is None:
             failed_topics = []
         call_records.append(dict(failed_topics=list(failed_topics)))

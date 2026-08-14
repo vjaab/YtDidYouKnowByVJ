@@ -313,7 +313,7 @@ def run_longform_pipeline(dry_run=False):
             continue
 
         # ── STEP 2b: Capture Screenshots ─────────────────────────────────
-        log_message("STEP 2b: Capturing article screenshots...")
+        log_message("STEP 2b: Capturing article screenshots (MANDATORY)...")
         topics = script_data.get("longform_topics", [])
         screenshots_captured = 0
         for i, topic in enumerate(topics):
@@ -330,6 +330,15 @@ def run_longform_pipeline(dry_run=False):
                     if i == 0:
                         script_data["screenshot_path"] = ss_path
         log_message(f"✅ Captured {screenshots_captured}/{len(topics)} screenshots.")
+        
+        if screenshots_captured == 0:
+            # Screenshot is MANDATORY — reject this topic and try another
+            failed_headline = script_data.get("longform_topics", [{}])[0].get("headline", "Unknown")
+            failed_topics.append(failed_headline)
+            log_message(f"❌ Article screenshot FAILED for all topics. Rejecting...")
+            script_data = None
+            attempts += 1
+            continue
 
         if has_kaggle and not use_local_only:
             log_message("Attempting Kaggle GPU handover...")
