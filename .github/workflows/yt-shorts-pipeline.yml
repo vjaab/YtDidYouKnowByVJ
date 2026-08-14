@@ -13,6 +13,8 @@ jobs:
   run-pipeline:
     runs-on: ubuntu-latest
     timeout-minutes: 360 # 6h max: up to 4.5h rotating delay + 1.5h render
+    permissions:
+      contents: write  # Required for GITHUB_TOKEN to create releases (Instagram video hosting)
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     
@@ -134,6 +136,9 @@ jobs:
           if [ ! -z "${{ secrets.IG_VIDEO_PUBLIC_URL }}" ]; then
             echo "IG_VIDEO_PUBLIC_URL=${{ secrets.IG_VIDEO_PUBLIC_URL }}" >> .env
           fi
+          # GitHub Releases for Instagram video hosting (free, 2GB limit, works in CI)
+          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env
+          echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .env
           if [ ! -z "${{ secrets.OPENAI_API_KEY }}" ]; then
             echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
           fi
