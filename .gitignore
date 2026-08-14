@@ -4,6 +4,8 @@ __pycache__/
 *.pyc
 token.json
 client_secret.json
+.ig_token.json
+.ig_rate_limit.json
 output/
 logs/*
 !logs/api_exhaustion_cache.json

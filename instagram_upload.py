@@ -73,6 +73,13 @@ def _check_credentials():
     return all(k and k.strip() for k in [ig_user_id, ig_access_token])
 
 
+def _check_facebook_credentials():
+    """Verifies that Facebook Page credentials are configured for cross-posting."""
+    fb_page_id = os.getenv("FB_PAGE_ID")
+    fb_page_access_token = os.getenv("FB_PAGE_ACCESS_TOKEN")
+    return all(k and k.strip() for k in [fb_page_id, fb_page_access_token])
+
+
 # ── Token Management ────────────────────────────────────────────────────────
 
 def _load_token():
@@ -568,6 +575,118 @@ def publish_container(container_id: str) -> str:
     return resp.json()["id"]
 
 
+def post_video_to_facebook_page(video_url: str, caption: str) -> str:
+    """
+    Posts a video to Facebook Page as a Reel/Video.
+    Uses the public video URL (same as Instagram) and Facebook Page access token.
+    Implements the video_reels API with upload_phase workflow.
+    """
+    fb_page_id = os.getenv("FB_PAGE_ID")
+    fb_page_access_token = os.getenv("FB_PAGE_ACCESS_TOKEN")
+    
+    if not fb_page_id or not fb_page_access_token:
+        return None, "Facebook Page credentials not configured (FB_PAGE_ID, FB_PAGE_ACCESS_TOKEN)"
+    
+    try:
+        # Step 1: Start upload - get video_id and upload_url
+        print("📡 [Facebook] Starting video upload...")
+        resp = requests.post(
+            f"{GRAPH_API_BASE}/{fb_page_id}/video_reels",
+            data={
+                "video_url": video_url,
+                "description": caption[:2200],
+                "upload_phase": "start",
+                "access_token": fb_page_access_token,
+            },
+            timeout=30,
+        )
+        resp.raise_for_status()
+        start_data = resp.json()
+        video_id = start_data["video_id"]
+        upload_url = start_data["upload_url"]
+        print(f"✔ Upload initiated. Video ID: {video_id}")
+        
+        # Step 2: Download video and upload to Facebook's upload URL
+        print("📤 [Facebook] Downloading video and uploading to Facebook...")
+        video_resp = requests.get(video_url, timeout=60)
+        video_resp.raise_for_status()
+        video_data = video_resp.content
+        file_size = len(video_data)
+        
+        upload_headers = {
+            "Content-Type": "video/mp4",
+            "Authorization": f"OAuth {fb_page_access_token}",
+            "offset": "0",
+            "file_size": str(file_size),
+        }
+        
+        upload_resp = requests.post(
+            upload_url,
+            data=video_data,
+            headers=upload_headers,
+            timeout=180,
+        )
+        upload_resp.raise_for_status()
+        print("✔ Video uploaded to Facebook")
+        
+        # Step 3: Finish upload
+        print("📡 [Facebook] Finishing upload...")
+        resp = requests.post(
+            f"{GRAPH_API_BASE}/{fb_page_id}/video_reels",
+            data={
+                "video_id": video_id,
+                "upload_phase": "finish",
+                "access_token": fb_page_access_token,
+            },
+            timeout=30,
+        )
+        resp.raise_for_status()
+        print("✔ Upload finished")
+        
+        # Step 4: Poll for processing status
+        deadline = time.time() + 300  # 5 min timeout
+        while time.time() < deadline:
+            resp = requests.get(
+                f"{GRAPH_API_BASE}/{video_id}",
+                params={"fields": "status", "access_token": fb_page_access_token},
+                timeout=30,
+            )
+            resp.raise_for_status()
+            status = resp.json().get("status", {})
+            processing_phase = status.get("processing_phase", {}).get("status")
+            if processing_phase == "complete":
+                break
+            if processing_phase == "error":
+                raise RuntimeError(f"Facebook Reel {video_id} failed processing")
+            time.sleep(5)
+        else:
+            raise TimeoutError(f"Facebook Reel {video_id} still processing after 300s")
+        
+        # Step 5: Publish the Reel (POST to video_id with published=true)
+        print("📡 [Facebook] Publishing Reel...")
+        resp = requests.post(
+            f"{GRAPH_API_BASE}/{video_id}",
+            data={
+                "published": "true",
+                "access_token": fb_page_access_token,
+            },
+            timeout=30,
+        )
+        resp.raise_for_status()
+        print(f"🎉 Facebook Reel published! ID: {video_id}")
+        reel_id = video_id
+        
+        return reel_id, None
+        
+    except requests.HTTPError as e:
+        error_text = e.response.text if e.response else str(e)
+        print(f"⚠️ video_reels endpoint failed: {error_text}")
+        return None, f"video_reels API failed: {error_text}"
+    except Exception as e:
+        print(f"⚠️ Facebook upload exception: {e}")
+        return None, f"Facebook upload exception: {e}"
+
+
 def upload_reel_to_instagram(video_path: str, caption: str):
     """
     Uploads a video as an Instagram Reel using the official Graph API.
@@ -665,6 +784,20 @@ def upload_reel_to_instagram(video_path: str, caption: str):
         reel_id = publish_container(container_id)
         print(f"🎉 Instagram Reel published! ID: {reel_id}")
 
+        # ── STEP 5: Cross-post to Facebook Page (if configured) ──────────────
+        if _check_facebook_credentials():
+            print(f"📡 [Facebook] Cross-posting to Facebook Page...")
+            try:
+                fb_reel_id, fb_error = post_video_to_facebook_page(public_url, caption)
+                if fb_reel_id:
+                    print(f"🎉 Facebook Reel published! ID: {fb_reel_id}")
+                else:
+                    print(f"⚠️ Facebook cross-post skipped: {fb_error}")
+            except Exception as e:
+                print(f"⚠️ Facebook cross-post failed (non-fatal): {e}")
+        else:
+            print("⚠️ Facebook Page credentials not configured — skipping cross-post")
+
         # Track rate limit
         _increment_rate_limit()
 
@@ -732,6 +865,14 @@ if __name__ == "__main__":
     
     if os.getenv("IG_VIDEO_PUBLIC_URL"):
         print("  ✔ Direct public URL (IG_VIDEO_PUBLIC_URL): Provided")
+
+    # Facebook cross-posting
+    print("\n📘 Facebook cross-posting:")
+    if _check_facebook_credentials():
+        print("  ✔ Facebook Page: Configured (FB_PAGE_ID, FB_PAGE_ACCESS_TOKEN)")
+    else:
+        print("  ⚠️ Facebook Page: Not configured (optional)")
+        print("     Set: FB_PAGE_ID, FB_PAGE_ACCESS_TOKEN")
 
     # 3. Rate limit check
     allowed, count = _check_rate_limit()
