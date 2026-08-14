@@ -250,7 +250,7 @@ def run_pipeline(topic_type="auto", dry_run=False):
     # ── STEP 1: Content Ecosystem Check ───────────────────────────────────────
     from config import UPLOAD_TIMES, TIMEZONE
     import pytz
-    now = datetime.datetime.now(pytz.timezone(TIMEZONE))
+    now = datetime.now(pytz.timezone(TIMEZONE))
     current_time_str = now.strftime("%H:%M")
     run_index = 0
     if current_time_str in UPLOAD_TIMES:
