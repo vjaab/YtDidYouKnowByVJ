@@ -389,6 +389,120 @@ def upload_video_to_fileio(video_path):
         return None, f"file.io upload exception: {e}"
 
 
+def upload_video_to_github_releases(video_path):
+    """
+    Uploads a video file to GitHub Releases as a temporary asset and returns the public URL.
+    
+    Uses GITHUB_TOKEN (provided by GitHub Actions) and GITHUB_REPOSITORY.
+    The repo must be PUBLIC for Meta's Graph API to fetch the URL.
+    
+    Returns (public_url, release_id) or (None, error_message).
+    The release_id is returned for cleanup.
+    """
+    token = os.getenv("GITHUB_TOKEN")
+    repo = os.getenv("GITHUB_REPOSITORY")  # e.g., "owner/repo"
+    
+    if not token or not repo:
+        return None, "GitHub credentials not configured (need GITHUB_TOKEN and GITHUB_REPOSITORY)"
+    
+    if "/" not in repo:
+        return None, f"Invalid GITHUB_REPOSITORY format: {repo} (expected 'owner/repo')"
+    
+    file_size = os.path.getsize(video_path)
+    size_mb = file_size / (1024 * 1024)
+    
+    if size_mb > 2048:
+        return None, f"File too large ({size_mb:.1f}MB) for GitHub Releases (2GB limit)"
+
+    print(f"📤 Uploading {size_mb:.1f}MB to GitHub Releases...")
+
+    try:
+        owner, repo_name = repo.split("/")
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
+
+        tag = f"media-temp-{int(time.time())}"  # unique per run, easy to prune later
+        filename = os.path.basename(video_path)
+
+        # Create release
+        release_resp = requests.post(
+            f"https://api.github.com/repos/{owner}/{repo_name}/releases",
+            headers=headers,
+            json={
+                "tag_name": tag,
+                "name": f"Temp media {tag}",
+                "body": "Auto-generated for Instagram publish step. Safe to delete.",
+                "prerelease": True,
+            },
+            timeout=30,
+        )
+        release_resp.raise_for_status()
+        release_data = release_resp.json()
+        release_id = release_data["id"]
+        upload_url = release_data["upload_url"].split("{")[0]
+
+        # Upload asset
+        with open(video_path, "rb") as f:
+            asset_resp = requests.post(
+                upload_url,
+                headers={**headers, "Content-Type": "video/mp4"},
+                params={"name": filename},
+                data=f,
+                timeout=120,
+            )
+        asset_resp.raise_for_status()
+        public_url = asset_resp.json()["browser_download_url"]
+
+        # Let CDN edge catch up before Graph API tries to fetch
+        time.sleep(3)
+        print(f"✅ Uploaded to GitHub Releases: {public_url}")
+        return public_url, str(release_id)
+
+    except Exception as e:
+        return None, f"GitHub Releases upload exception: {e}"
+
+
+def delete_github_release(release_id):
+    """Deletes a GitHub Release and its tag after Instagram has fetched the video."""
+    token = os.getenv("GITHUB_TOKEN")
+    repo = os.getenv("GITHUB_REPOSITORY")
+    
+    if not token or not repo or not release_id:
+        return
+    
+    owner, repo_name = repo.split("/")
+    headers = {"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json"}
+    
+    try:
+        # Get release to find tag name
+        rel_resp = requests.get(
+            f"https://api.github.com/repos/{owner}/{repo_name}/releases/{release_id}",
+            headers=headers, timeout=15
+        )
+        tag_name = ""
+        if rel_resp.status_code == 200:
+            tag_name = rel_resp.json().get("tag_name", "")
+        
+        # Delete release
+        requests.delete(
+            f"https://api.github.com/repos/{owner}/{repo_name}/releases/{release_id}",
+            headers=headers, timeout=30
+        )
+        
+        # Delete tag if we found it
+        if tag_name:
+            requests.delete(
+                f"https://api.github.com/repos/{owner}/{repo_name}/git/refs/tags/{tag_name}",
+                headers=headers, timeout=30
+            )
+        print(f"🗑️ GitHub Releases cleanup: Deleted release {release_id}")
+    except Exception as e:
+        print(f"⚠️ GitHub Releases cleanup exception (non-fatal): {e}")
+
+
 def delete_from_fileio(object_key):
     """
     file.io files auto-delete after expiry or download. No manual cleanup needed.
@@ -518,7 +632,17 @@ def upload_reel_to_instagram(video_path: str, caption: str):
             else:
                 print(f"⚠️ file.io upload failed: {fileio_result}")
         
-        # Option C: Upload to S3-compatible storage
+        # Option C: Upload to GitHub Releases (free, 2GB limit, works in CI)
+        if not public_url:
+            public_url, gh_result = upload_video_to_github_releases(video_path)
+            if public_url:
+                upload_method = "github"
+                upload_key = gh_result  # release_id for cleanup
+                print(f"✅ Uploaded to GitHub Releases")
+            else:
+                print(f"⚠️ GitHub Releases upload failed: {gh_result}")
+        
+        # Option D: Upload to S3-compatible storage
         if not public_url:
             public_url, s3_result = upload_video_to_s3(video_path)
             if not public_url:
@@ -559,6 +683,9 @@ def upload_reel_to_instagram(video_path: str, caption: str):
         elif upload_method == "fileio" and upload_key:
             print("🧹 Cleaning up file.io reference...")
             delete_from_fileio(upload_key)
+        elif upload_method == "github" and upload_key:
+            print("🧹 Cleaning up GitHub Release...")
+            delete_github_release(int(upload_key))
         # For "direct" method, no cleanup needed
 
 
@@ -593,6 +720,15 @@ if __name__ == "__main__":
         print("  ✔ file.io: Available (no config needed, optional FILE_IO_API_KEY for larger files)")
     else:
         print("  ⚠️ file.io: Not available")
+    
+    gh_token = os.getenv("GITHUB_TOKEN")
+    gh_repo = os.getenv("GITHUB_REPOSITORY")
+    if gh_token and gh_repo and "/" in gh_repo:
+        print(f"  ✔ GitHub Releases: Available ({gh_repo})")
+    else:
+        print("  ⚠️ GitHub Releases: Not configured (optional)")
+        print("     Set: GITHUB_TOKEN and GITHUB_REPOSITORY (e.g., 'owner/repo')")
+        print("     Note: Repo must be PUBLIC for Instagram to fetch the video")
     
     if os.getenv("IG_VIDEO_PUBLIC_URL"):
         print("  ✔ Direct public URL (IG_VIDEO_PUBLIC_URL): Provided")
