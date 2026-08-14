@@ -132,6 +132,26 @@ jobs:
           if [ ! -z "${{ secrets.IG_ACCESS_TOKEN }}" ]; then
             echo "IG_ACCESS_TOKEN=${{ secrets.IG_ACCESS_TOKEN }}" >> .env
           fi
+          # Instagram Graph API credentials (for token refresh)
+          if [ ! -z "${{ secrets.INSTAGRAM_APP_ID }}" ]; then
+            echo "INSTAGRAM_APP_ID=${{ secrets.INSTAGRAM_APP_ID }}" >> .env
+          fi
+          if [ ! -z "${{ secrets.INSTAGRAM_APP_SECRET }}" ]; then
+            echo "INSTAGRAM_APP_SECRET=${{ secrets.INSTAGRAM_APP_SECRET }}" >> .env
+          fi
+          if [ ! -z "${{ secrets.INSTAGRAM_ACCESS_TOKEN }}" ]; then
+            echo "INSTAGRAM_ACCESS_TOKEN=${{ secrets.INSTAGRAM_ACCESS_TOKEN }}" >> .env
+          fi
+          if [ ! -z "${{ secrets.INSTAGRAM_BUSINESS_ACCOUNT_ID }}" ]; then
+            echo "INSTAGRAM_BUSINESS_ACCOUNT_ID=${{ secrets.INSTAGRAM_BUSINESS_ACCOUNT_ID }}" >> .env
+          fi
+          # Facebook Page cross-posting
+          if [ ! -z "${{ secrets.FB_PAGE_ID }}" ]; then
+            echo "FB_PAGE_ID=${{ secrets.FB_PAGE_ID }}" >> .env
+          fi
+          if [ ! -z "${{ secrets.FB_PAGE_ACCESS_TOKEN }}" ]; then
+            echo "FB_PAGE_ACCESS_TOKEN=${{ secrets.FB_PAGE_ACCESS_TOKEN }}" >> .env
+          fi
           
       - name: Setup YouTube Auth Files
         run: |
