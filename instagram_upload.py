@@ -83,7 +83,10 @@ def _check_facebook_credentials():
 # ── Facebook API Helpers ──────────────────────────────────────────────────────
 
 def _parse_meta_error(response_text: str) -> dict:
-    """Parse Meta Graph API error response into structured dict."""
+    """Parse Meta Graph API error response into structured dict.
+    Handles malformed JSON with unescaped quotes in error messages.
+    """
+    # First try normal parsing
     try:
         data = json.loads(response_text)
         error = data.get("error", {})
@@ -96,7 +99,37 @@ def _parse_meta_error(response_text: str) -> dict:
             "raw": data
         }
     except json.JSONDecodeError:
-        return {"message": response_text, "type": "ParseError", "code": 0, "error_subcode": None, "fbtrace_id": None, "raw": {}}
+        pass
+    
+    # Fallback: extract fields using regex (handles malformed JSON from Meta)
+    try:
+        import re
+        
+        # Extract error object content
+        error_match = re.search(r'"error"\s*:\s*(\{.*?\})\s*[},\]]', response_text, re.DOTALL)
+        if error_match:
+            error_content = error_match.group(1)
+        else:
+            error_content = response_text
+        
+        # Extract individual fields
+        code_match = re.search(r'"code"\s*:\s*(\d+)', error_content)
+        # Use lookahead to capture message including unescaped quotes
+        message_match = re.search(r'"message"\s*:\s*"(.+?)(?:\"\s*,\s*"|\"\s*})', error_content)
+        type_match = re.search(r'"type"\s*:\s*"([^"]*)"', error_content)
+        fbtrace_match = re.search(r'"fbtrace_id"\s*:\s*"([^"]*)"', error_content)
+        subcode_match = re.search(r'"error_subcode"\s*:\s*(\d+)', error_content)
+        
+        return {
+            "message": message_match.group(1) if message_match else "Unknown error",
+            "type": type_match.group(1) if type_match else "Unknown",
+            "code": int(code_match.group(1)) if code_match else 0,
+            "error_subcode": int(subcode_match.group(1)) if subcode_match else None,
+            "fbtrace_id": fbtrace_match.group(1) if fbtrace_match else None,
+            "raw": {"parse_method": "regex_fallback"}
+        }
+    except Exception as e:
+        return {"message": response_text[:200], "type": "ParseError", "code": 0, "error_subcode": None, "fbtrace_id": None, "raw": {"parse_error": str(e)}}
 
 
 def _is_retryable_error(error_code: int, error_subcode: int = None) -> bool:
@@ -114,7 +147,9 @@ def _retry_with_backoff(func, max_attempts=3, base_delay=2, *args, **kwargs):
             return func(*args, **kwargs)
         except requests.HTTPError as e:
             last_error = e
-            error_data = _parse_meta_error(e.response.text if e.response else "")
+            # Use captured response_text if available, fallback to e.response.text
+            response_text = getattr(e, 'response_text', None) or (e.response.text if e.response else "")
+            error_data = _parse_meta_error(response_text)
             if not _is_retryable_error(error_data["code"], error_data["error_subcode"]):
                 raise
             if attempt < max_attempts:
@@ -683,7 +718,7 @@ def post_video_to_facebook_page(video_url: str, caption: str) -> str:
         print("📡 [Facebook] Starting video upload session...")
         start_payload = {
             "upload_phase": "start",
-            "video_state": "UNPUBLISHED",
+            "video_state": "DRAFT",
             "description": caption[:2200],
             "access_token": fb_page_access_token,
         }
@@ -695,8 +730,14 @@ def post_video_to_facebook_page(video_url: str, caption: str) -> str:
                 data=start_payload,
                 timeout=30,
             )
-            print(f"📡 [Facebook] Start phase response: {resp.status_code} - {resp.text}")
-            resp.raise_for_status()
+            response_text = resp.text
+            print(f"📡 [Facebook] Start phase response: {resp.status_code} - {response_text}")
+            try:
+                resp.raise_for_status()
+            except requests.HTTPError as e:
+                # Attach response text to exception for later parsing
+                e.response_text = response_text
+                raise
             return resp.json()
         
         start_data = _retry_with_backoff(_start_phase)
@@ -721,8 +762,13 @@ def post_video_to_facebook_page(video_url: str, caption: str) -> str:
                 headers=upload_headers,
                 timeout=180,
             )
-            print(f"📤 [Facebook] Upload phase response: {upload_resp.status_code} - {upload_resp.text}")
-            upload_resp.raise_for_status()
+            response_text = upload_resp.text
+            print(f"📤 [Facebook] Upload phase response: {upload_resp.status_code} - {response_text}")
+            try:
+                upload_resp.raise_for_status()
+            except requests.HTTPError as e:
+                e.response_text = response_text
+                raise
             return upload_resp.json()
         
         upload_result = _retry_with_backoff(_upload_phase)
@@ -745,8 +791,13 @@ def post_video_to_facebook_page(video_url: str, caption: str) -> str:
                 data=finish_payload,
                 timeout=30,
             )
-            print(f"📡 [Facebook] Finish phase response: {resp.status_code} - {resp.text}")
-            resp.raise_for_status()
+            response_text = resp.text
+            print(f"📡 [Facebook] Finish phase response: {resp.status_code} - {response_text}")
+            try:
+                resp.raise_for_status()
+            except requests.HTTPError as e:
+                e.response_text = response_text
+                raise
             return resp.json()
         
         finish_result = _retry_with_backoff(_finish_phase)
@@ -779,7 +830,8 @@ def post_video_to_facebook_page(video_url: str, caption: str) -> str:
         return video_id, None
         
     except requests.HTTPError as e:
-        error_data = _parse_meta_error(e.response.text if e.response else "")
+        response_text = getattr(e, 'response_text', None) or (e.response.text if e.response else "")
+        error_data = _parse_meta_error(response_text)
         print(f"⚠️ video_reels endpoint failed: code={error_data['code']}, message={error_data['message']}, subcode={error_data['error_subcode']}, fbtrace_id={error_data['fbtrace_id']}")
         return None, f"video_reels API failed: {error_data['message']} (code {error_data['code']}, subcode {error_data['error_subcode']})"
     except Exception as e:
@@ -811,8 +863,13 @@ def post_video_to_facebook_page_fallback(video_url: str, caption: str) -> tuple:
                 data=fallback_payload,
                 timeout=60
             )
-            print(f"📡 [Facebook Fallback] Response: {resp.status_code} - {resp.text}")
-            resp.raise_for_status()
+            response_text = resp.text
+            print(f"📡 [Facebook Fallback] Response: {resp.status_code} - {response_text}")
+            try:
+                resp.raise_for_status()
+            except requests.HTTPError as e:
+                e.response_text = response_text
+                raise
             return resp.json()
         
         result = _retry_with_backoff(_fallback_post)
@@ -820,7 +877,8 @@ def post_video_to_facebook_page_fallback(video_url: str, caption: str) -> tuple:
         print(f"🎉 Facebook Video published (fallback)! ID: {video_id}")
         return video_id, None
     except requests.HTTPError as e:
-        error_data = _parse_meta_error(e.response.text if e.response else "")
+        response_text = getattr(e, 'response_text', None) or (e.response.text if e.response else "")
+        error_data = _parse_meta_error(response_text)
         print(f"⚠️ Fallback /videos failed: code={error_data['code']}, message={error_data['message']}")
         return None, f"Fallback /videos failed: {error_data['message']} (code {error_data['code']})"
     except Exception as e:
@@ -948,7 +1006,8 @@ def upload_reel_to_instagram(video_path: str, caption: str):
         return True, reel_id
 
     except requests.HTTPError as e:
-        return False, f"Instagram API error (HTTP {e.response.status_code}): {e.response.text}"
+        response_text = getattr(e, 'response_text', None) or (e.response.text if e.response else "")
+        return False, f"Instagram API error (HTTP {e.response.status_code}): {response_text}"
     except Exception as e:
         return False, f"Instagram upload exception: {e}"
 
