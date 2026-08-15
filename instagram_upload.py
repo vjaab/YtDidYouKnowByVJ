@@ -164,6 +164,7 @@ def _retry_with_backoff(func, max_attempts=3, base_delay=2, *args, **kwargs):
 def _validate_fb_token(fb_page_id: str, fb_page_access_token: str) -> dict:
     """Validate Facebook Page token has required permissions."""
     try:
+        # Try with permissions field first
         resp = requests.get(
             f"{GRAPH_API_BASE}/me",
             params={
@@ -174,7 +175,10 @@ def _validate_fb_token(fb_page_id: str, fb_page_access_token: str) -> dict:
         )
         if resp.status_code == 200:
             data = resp.json()
-            perms = {p["permission"] for p in data.get("permissions", {}).get("data", [])}
+            perms = set()
+            permissions_data = data.get("permissions", {}).get("data", [])
+            if permissions_data:
+                perms = {p["permission"] for p in permissions_data}
             required = {"pages_show_list", "pages_read_engagement", "pages_manage_posts", "pages_manage_metadata"}
             missing = required - perms
             return {
@@ -184,6 +188,25 @@ def _validate_fb_token(fb_page_id: str, fb_page_access_token: str) -> dict:
                 "missing_permissions": list(missing),
                 "all_permissions": list(perms)
             }
+        # If permissions field fails, try without it
+        if "Tried accessing nonexisting field" in resp.text:
+            resp = requests.get(
+                f"{GRAPH_API_BASE}/me",
+                params={
+                    "fields": "id,name",
+                    "access_token": fb_page_access_token
+                },
+                timeout=15
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                return {
+                    "valid": True,
+                    "page_id": data.get("id"),
+                    "page_name": data.get("name"),
+                    "missing_permissions": ["permissions field not accessible"],
+                    "all_permissions": []
+                }
         return {"valid": False, "error": f"HTTP {resp.status_code}: {resp.text}"}
     except Exception as e:
         return {"valid": False, "error": str(e)}
