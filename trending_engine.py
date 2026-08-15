@@ -25,34 +25,216 @@ from config import (
 )
 
 # ─────────────────────────────────────────────────────────────────────────────
+# CATEGORY → SIGNAL MAPPINGS
+# Maps each WEEKLY_SCHEDULE category to source-specific keywords, subreddits, queries
+# ─────────────────────────────────────────────────────────────────────────────
+CATEGORY_SIGNALS = {
+    "AI & Tech Tools": {
+        "youtube_queries": [
+            "AI tools free productivity 2026",
+            "best free AI tools for students",
+            "ChatGPT alternatives free",
+            "AI productivity hacks",
+            "local LLM tools Ollama LM Studio",
+        ],
+        "reddit_subs": ["LocalLLaMA", "MachineLearning", "OpenAI", "ClaudeAI", "ChatGPT", "AI_Agents"],
+        "github_topics": ["llm", "ai-agent", "mcp", "rag", "llm-inference", "evals", "local-llm", "ollama"],
+        "github_languages": ["python", "typescript", "rust"],
+        "hn_keywords": ['llm', 'gpt', 'llama', 'claude', 'deepseek', 'agent', 'mcp', 'rag', 'ollama', 'vllm', 'inference', 'local'],
+        "hf_tasks": ["text-generation", "conversational", "text2text-generation", "summarization"],
+        "arxiv_cats": ["cs.AI", "cs.CL", "cs.LG"],
+        "google_trends_whitelist": {'ai', 'tool', 'chatgpt', 'llm', 'ollama', 'local', 'free', 'productivity'},
+        "youtube_outlier_keywords": ["new AI tool", "free AI", "local LLM", "AI productivity"],
+    },
+    "Tech Gadgets & Inventions": {
+        "youtube_queries": [
+            "new tech gadgets 2026",
+            "smart glasses AR VR review",
+            "wearable tech review",
+            "smart home devices 2026",
+            "cool gadgets you didn't know existed",
+        ],
+        "reddit_subs": ["gadgets", "hardware", "technology", "smartHome", "wearables", "VR"],
+        "github_topics": ["iot", "home-assistant", "esp32", "raspberry-pi", "arduino", "embedded", "robotics"],
+        "github_languages": ["cpp", "rust", "python", "c"],
+        "hn_keywords": ['gadget', 'hardware', 'wearable', 'ar', 'vr', 'smart-glasses', 'iot', 'raspberry-pi', 'esp32', 'robotics'],
+        "hf_tasks": ["computer-vision", "audio-classification", "object-detection"],
+        "arxiv_cats": ["cs.HC", "cs.RO", "cs.CV", "eess.SP"],
+        "google_trends_whitelist": {'gadget', 'smart', 'glasses', 'wearable', 'ar', 'vr', 'home', 'robot'},
+        "youtube_outlier_keywords": ["new gadget", "smart glasses", "wearable", "robot", "smart home"],
+    },
+    "Finance & Tech Economy": {
+        "youtube_queries": [
+            "AI finance tools budgeting",
+            "fintech apps save money",
+            "crypto trading AI bot",
+            "stock analysis AI tools",
+            "personal finance automation",
+        ],
+        "reddit_subs": ["personalfinance", "financialindependence", "CryptoCurrency", "stocks", "fintech", "algotrading"],
+        "github_topics": ["fintech", "trading-bot", "quantitative-finance", "portfolio-optimization", "crypto-trading"],
+        "github_languages": ["python", "rust", "typescript"],
+        "hn_keywords": ['fintech', 'crypto', 'trading', 'finance', 'portfolio', 'quantitative', 'yield', 'defi'],
+        "hf_tasks": ["tabular-classification", "time-series-forecasting"],
+        "arxiv_cats": ["q-fin", "econ.GN", "cs.CY"],
+        "google_trends_whitelist": {'finance', 'crypto', 'trading', 'stock', 'money', 'invest', 'fintech', 'budget'},
+        "youtube_outlier_keywords": ["finance AI", "crypto bot", "trading AI", "budget app", "fintech"],
+    },
+    "Facts & Trivia": {
+        "youtube_queries": [
+            "tech facts you didn't know",
+            "computer history trivia",
+            "AI facts mind blown",
+            "tech myths debunked",
+            "weird tech history",
+        ],
+        "reddit_subs": ["todayilearned", "technology", "computerscience", "programminghorror", "retrobattlestations"],
+        "github_topics": ["awesome", "computer-history", "tech-trivia", "fun-facts"],
+        "github_languages": None,
+        "hn_keywords": ['history', 'trivia', 'fact', 'origin', 'first', 'invented', 'moth', 'grace-hopper', 'backrub'],
+        "hf_tasks": [],
+        "arxiv_cats": ["cs.HC", "physics.hist-ph"],
+        "google_trends_whitelist": {'fact', 'trivia', 'history', 'myth', 'did-you-know', 'origin', 'invented'},
+        "youtube_outlier_keywords": ["tech fact", "history", "trivia", "myth busted", "did you know"],
+    },
+    "Coding & Development Hacks": {
+        "youtube_queries": [
+            "coding productivity tips 2026",
+            "VS Code extensions must have",
+            "Python tricks you didn't know",
+            "GitHub Copilot tips",
+            "developer workflow automation",
+        ],
+        "reddit_subs": ["programming", "learnprogramming", "cscareerquestions", "webdev", "rust", "python", "golang"],
+        "github_topics": ["developer-tools", "productivity", "vscode-extension", "cli", "automation", "code-generation", "refactoring"],
+        "github_languages": ["python", "typescript", "rust", "go", "javascript"],
+        "hn_keywords": ['coding', 'programming', 'developer', 'vscode', 'github', 'copilot', 'refactor', 'debug', 'cli', 'terminal'],
+        "hf_tasks": ["code-generation", "fill-mask"],
+        "arxiv_cats": ["cs.SE", "cs.PL", "cs.MS"],
+        "google_trends_whitelist": {'code', 'coding', 'programming', 'developer', 'vscode', 'github', 'python', 'rust', 'trick', 'hack'},
+        "youtube_outlier_keywords": ["coding hack", "developer tip", "VS Code", "GitHub Copilot", "Python trick"],
+    },
+    "Quiz & Trivia": {
+        "youtube_queries": [
+            "tech quiz questions",
+            "programming trivia challenge",
+            "computer science quiz",
+            "AI history quiz",
+            "guess the tech company",
+        ],
+        "reddit_subs": ["trivia", "quiz", "computerscience", "programminghorror", "todayilearned"],
+        "github_topics": ["quiz", "trivia", "interview-prep", "coding-challenges"],
+        "github_languages": None,
+        "hn_keywords": ['quiz', 'trivia', 'interview', 'question', 'challenge', 'puzzle'],
+        "hf_tasks": [],
+        "arxiv_cats": None,
+        "google_trends_whitelist": {'quiz', 'trivia', 'question', 'challenge', 'test', 'guess'},
+        "youtube_outlier_keywords": ["tech quiz", "trivia", "interview question", "can you guess"],
+    },
+    "Interview Questions": {
+        "youtube_queries": [
+            "software engineering interview questions 2026",
+            "system design interview",
+            "Java interview questions",
+            "Python interview questions",
+            "Kubernetes Docker interview",
+        ],
+        "reddit_subs": ["cscareerquestions", "programming", "leetcode", "systemdesign", "java", "python", "kubernetes"],
+        "github_topics": ["interview-prep", "system-design", "leetcode", "cracking-the-coding-interview", "algorithms"],
+        "github_languages": ["java", "python", "javascript", "go", "cpp"],
+        "hn_keywords": ['interview', 'leetcode', 'system-design', 'algorithm', 'data-structure', 'coding-interview', 'spring-boot', 'kubernetes', 'docker'],
+        "hf_tasks": [],
+        "arxiv_cats": None,
+        "google_trends_whitelist": {'interview', 'leetcode', 'system-design', 'algorithm', 'spring', 'kubernetes', 'docker', 'java', 'python'},
+        "youtube_outlier_keywords": ["interview question", "system design", "LeetCode", "coding interview", "Spring Boot", "Kubernetes"],
+    },
+    "Programming Language Origins": {
+        "youtube_queries": [
+            "programming language history",
+            "why was Python created",
+            "history of JavaScript",
+            "Rust language origin",
+            "programming language design",
+        ],
+        "reddit_subs": ["programming", "computerscience", "rust", "python", "golang", "javascript", "java"],
+        "github_topics": ["language-design", "compiler", "programming-language", "history"],
+        "github_languages": ["rust", "go", "python", "javascript", "java", "cpp"],
+        "hn_keywords": ['language', 'origin', 'history', 'design', 'creator', 'guido', 'brendan-eich', 'graydon-hoare'],
+        "hf_tasks": [],
+        "arxiv_cats": ["cs.PL"],
+        "google_trends_whitelist": {'language', 'origin', 'history', 'python', 'javascript', 'rust', 'java', 'go', 'creator'},
+        "youtube_outlier_keywords": ["language origin", "history of", "creator of", "why was", "designed"],
+    },
+    "Tech Company Founding Stories": {
+        "youtube_queries": [
+            "how Google started",
+            "Apple founding story",
+            "Microsoft early days",
+            "startup founder story",
+            "tech company history",
+        ],
+        "reddit_subs": ["technology", "startups", "entrepreneur", "business", "YCombinator"],
+        "github_topics": ["startup", "business", "entrepreneurship", "founder"],
+        "github_languages": None,
+        "hn_keywords": ['founder', 'startup', 'ycombinator', 'google', 'apple', 'microsoft', 'amazon', 'meta', 'nvidia', 'history'],
+        "hf_tasks": [],
+        "arxiv_cats": ["cs.CY", "econ.GN"],
+        "google_trends_whitelist": {'founder', 'startup', 'google', 'apple', 'microsoft', 'amazon', 'nvidia', 'history', 'billion'},
+        "youtube_outlier_keywords": ["founder story", "how started", "early days", "Y Combinator", "billion dollar"],
+    },
+    "Famous Bugs & Glitches": {
+        "youtube_queries": [
+            "famous software bugs",
+            "worst programming mistakes",
+            "Mars Climate Orbiter bug",
+            "Ariane 5 explosion software",
+            "biggest tech failures",
+        ],
+        "reddit_subs": ["programminghorror", "computerscience", "softwareengineering", "devops", "sysadmin"],
+        "github_topics": ["bug", "postmortem", "incident", "failure", "debugging", "outage"],
+        "github_languages": None,
+        "hn_keywords": ['bug', 'glitch', 'failure', 'outage', 'postmortem', 'incident', 'mars', 'ariane', 'therac', 'overflow'],
+        "hf_tasks": [],
+        "arxiv_cats": ["cs.SE", "cs.CR"],
+        "google_trends_whitelist": {'bug', 'glitch', 'failure', 'outage', 'crash', 'error', 'mistake', 'disaster'},
+        "youtube_outlier_keywords": ["famous bug", "software disaster", "worst bug", "Mars Orbiter", "Ariane 5"],
+    },
+    "Agentic AI Facts": {
+        "youtube_queries": [
+            "AI agents explained",
+            "autonomous AI agents 2026",
+            "AutoGen CrewAI LangGraph",
+            "AI agent workflow",
+            "multi-agent systems",
+        ],
+        "reddit_subs": ["AI_Agents", "MachineLearning", "LocalLLaMA", "OpenAI", "LangChain"],
+        "github_topics": ["agent", "autogen", "crewai", "langgraph", "multi-agent", "agentic", "autogpt", "babyagi"],
+        "github_languages": ["python", "typescript"],
+        "hn_keywords": ['agent', 'autogen', 'crewai', 'langgraph', 'autogpt', 'babyagi', 'metaGPT', 'swarm', 'reflexion'],
+        "hf_tasks": ["text-generation", "conversational"],
+        "arxiv_cats": ["cs.AI", "cs.MA", "cs.LG"],
+        "google_trends_whitelist": {'agent', 'autogen', 'crewai', 'langgraph', 'autonomous', 'multi-agent', 'reflexion'},
+        "youtube_outlier_keywords": ["AI agent", "AutoGen", "CrewAI", "LangGraph", "autonomous agent", "multi-agent"],
+    },
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
 # 1. YOUTUBE TRENDING SHORTS ANALYSIS
 # ─────────────────────────────────────────────────────────────────────────────
-def fetch_youtube_trending_shorts(target_country="US"):
+def fetch_youtube_trending_shorts(target_country="US", category="AI & Tech Tools"):
     """
-    Uses YouTube Data API v3 to find recently uploaded AI Shorts
-    with high view counts — topics proven to get views in Shorts format.
+    Uses YouTube Data API v3 to find recently uploaded Shorts
+    with high view counts for the given category.
     """
     if not YOUTUBE_DATA_API_KEY:
         print("⚠️ YouTube Data API key missing. Skipping YouTube trending fetch.")
         return []
 
-    print(f"📺 Fetching trending AI Shorts from YouTube Data API for region={target_country}...")
+    signals = CATEGORY_SIGNALS.get(category, CATEGORY_SIGNALS["AI & Tech Tools"])
+    search_queries = signals.get("youtube_queries", [])
     
-    search_queries = [
-        "tech tips hidden features",
-        "iPhone Android tricks 2026",
-        "AI tools free productivity",
-        "privacy security phone settings",
-        "tech myths debunked",
-        "free app alternative paid",
-        "Windows shortcuts tricks",
-        "online scam alerts identity theft",
-        "smartphone battery saving tricks",
-        "everyday life tech hacks",
-        "photo video editing tricks viral",
-        "shopping hacks budget apps",
-        "smart home lifestyle organization",
-    ]
+    cat_display = category
+    print(f"📺 Fetching trending Shorts from YouTube Data API for category='{cat_display}', region={target_country}...")
     
     all_results = []
     
@@ -174,16 +356,20 @@ def _get_reddit_token():
     return None
 
 
-def fetch_reddit_via_google_news(sub):
+def fetch_reddit_via_google_news(sub, category="AI & Tech Tools"):
     """
     Fallback: Query Google News RSS for hot posts in a specific subreddit
     since GHA IPs are blocked by Reddit directly.
+    Filters by category-specific keywords.
     Engagement values are estimated baselines (not real), flagged accordingly.
     """
+    signals = CATEGORY_SIGNALS.get(category, CATEGORY_SIGNALS["AI & Tech Tools"])
+    filter_keywords = signals.get("hn_keywords", [])
+    
     import urllib.parse
     import xml.etree.ElementTree as ET
     
-    print(f"  🔍 Reddit Fallback: Querying Google News RSS for r/{sub}...")
+    print(f"  🔍 Reddit Fallback: Querying Google News RSS for r/{sub} (category='{category}')...")
     articles = []
     
     try:
@@ -203,6 +389,12 @@ def fetch_reddit_via_google_news(sub):
             title_clean = re.sub(r'\s+-\s+.*$', '', title).strip()
             link = item.find('link').text or ""
             pub_date = item.find('pubDate').text or ""
+            
+            # Filter by category keywords
+            title_lower = title_clean.lower()
+            if filter_keywords:
+                if not any(kw in title_lower for kw in filter_keywords):
+                    continue
             
             # Low baseline engagement — flagged as estimated so scoring can penalize
             articles.append({
@@ -228,25 +420,16 @@ def fetch_reddit_via_google_news(sub):
     return articles
 
 
-def fetch_reddit_hot_ai():
+def fetch_reddit_hot_ai(category="AI & Tech Tools"):
     """
     Fetches hot posts from AI subreddits. Uses OAuth if credentials available,
     falls back to old.reddit.com public JSON API otherwise.
+    Filters by category-specific subreddits.
     """
-    print("🔴 Fetching hot AI posts from Reddit...")
+    signals = CATEGORY_SIGNALS.get(category, CATEGORY_SIGNALS["AI & Tech Tools"])
+    subreddits = signals.get("reddit_subs", ["MachineLearning", "LocalLLaMA", "AI_Agents", "OpenAI", "ClaudeAI", "singularity", "ChatGPT", "technology", "privacy", "gadgets"])
     
-    subreddits = [
-        "MachineLearning",
-        "LocalLLaMA",
-        "AI_Agents",
-        "OpenAI",
-        "ClaudeAI",
-        "singularity",
-        "ChatGPT",
-        "technology",
-        "privacy",
-        "gadgets",
-    ]
+    print(f"🔴 Fetching hot posts from Reddit for category='{category}'...")
     
     token = _get_reddit_token()
     headers = {"User-Agent": "VJTechNews/1.0 (by /u/vjaab)"}
@@ -270,7 +453,7 @@ def fetch_reddit_hot_ai():
             
             # Fall back to Google News for the remaining subreddits
             for fallback_sub in subreddits[subreddits.index(sub):]:
-                all_posts.extend(fetch_reddit_via_google_news(fallback_sub))
+                all_posts.extend(fetch_reddit_via_google_news(fallback_sub, category))
             break
         
         try:
@@ -280,7 +463,7 @@ def fetch_reddit_hot_ai():
             if r.status_code != 200:
                 print(f"  ⚠️ Reddit r/{sub} failed ({r.status_code})")
                 consecutive_failures += 1
-                all_posts.extend(fetch_reddit_via_google_news(sub))
+                all_posts.extend(fetch_reddit_via_google_news(sub, category))
                 continue
             
             # Success — reset consecutive failure counter
@@ -471,8 +654,16 @@ def save_github_trending_cache(repos):
     except Exception as e:
         print(f"⚠️ Failed to save github trending cache: {e}")
 
-def _parse_github_repos(repos, min_stars=50):
+def _parse_github_repos(repos, min_stars=50, keywords=None):
     """Shared parser: converts GitHub API/scraped repo objects into trending articles."""
+    if keywords is None:
+        keywords = [
+            'llm', 'gpt', 'llama', 'agent', 'ai', 'transformer', 'stable-diffusion', 'deepseek', 
+            'compiler', 'terminal', 'database', 'api', 'editor', 'linux', 'rust', 'python', 'go', 
+            'security', 'hack', 'exploit', 'performance', 'git', 'open-source', 'productivity', 
+            'machine-learning', 'dataset', 'nlp', 'vision', 'neural', 'weights', 'inference'
+        ]
+    
     results = []
     for repo in repos:
         stars = repo.get("stargazers_count", 0) or repo.get("stars", 0)
@@ -503,14 +694,6 @@ def _parse_github_repos(repos, min_stars=50):
         title_lower = repo.get('full_name', '').lower()
         desc_lower = desc.lower()
         
-        # Broad technical and developer topics list:
-        keywords = [
-            'llm', 'gpt', 'llama', 'agent', 'ai', 'transformer', 'stable-diffusion', 'deepseek', 
-            'compiler', 'terminal', 'database', 'api', 'editor', 'linux', 'rust', 'python', 'go', 
-            'security', 'hack', 'exploit', 'performance', 'git', 'open-source', 'productivity', 
-            'machine-learning', 'dataset', 'nlp', 'vision', 'neural', 'weights', 'inference'
-        ]
-        
         relevance_score = 0
         if any(kw in title_lower or kw in desc_lower for kw in keywords):
             relevance_score = 30
@@ -533,20 +716,29 @@ def _parse_github_repos(repos, min_stars=50):
         })
     return results
 
-def fetch_github_trending_ai():
+def fetch_github_trending_ai(category="AI & Tech Tools"):
     """
     Fetches trending AI/ML/Developer repos from GitHub.
+    Filters by category-specific topics and languages.
     Tries scraping first, falls back to Search API or local cache if blocked/empty.
     Deduplicates results and ranks by stars velocity.
     """
     import random
-    print("🐙 Fetching trending repos from GitHub...")
+    signals = CATEGORY_SIGNALS.get(category, CATEGORY_SIGNALS["AI & Tech Tools"])
+    github_topics = signals.get("github_topics", ['llm', 'gpt', 'llama', 'agent', 'ai', 'transformer', 'stable-diffusion', 'deepseek', 
+        'compiler', 'terminal', 'database', 'api', 'editor', 'linux', 'rust', 'python', 'go', 
+        'security', 'hack', 'exploit', 'performance', 'git', 'open-source', 'productivity', 
+        'machine-learning', 'dataset', 'nlp', 'vision', 'neural', 'weights', 'inference'])
+    github_languages = signals.get("github_languages", [None, "python", "typescript", "rust", "cpp"])
+    keywords = signals.get("hn_keywords", ['llm', 'gpt', 'llama', 'claude', 'deepseek', 'agent', 'mcp', 'transformer', 'quantization', 'gpu', 'inference', 'vllm', 'compiler', 'rust', 'python', 'c++', 'benchmark', 'model', 'dataset', 'arxiv'])
+    
+    print(f"🐙 Fetching trending repos from GitHub for category='{category}'...")
     all_repos = []
     
     # ── Strategy 1: BeautifulSoup scraping of github.com/trending (Option 1) ──
     scraped_any = False
     for since_period in ["daily", "weekly"]:
-        for lang in [None, "python", "typescript", "rust", "cpp"]:
+        for lang in github_languages:
             try:
                 scraped = scrape_github_trending(language=lang, since=since_period)
                 if scraped:
@@ -570,16 +762,13 @@ def fetch_github_trending_ai():
     }
     since_date = (datetime.now(timezone.utc) - timedelta(days=7)).strftime("%Y-%m-%d")
     search_queries = [
-        f"topic:agentic-ai stars:>10 pushed:>{since_date}",
-        f"topic:mcp stars:>10 pushed:>{since_date}",
-        f"topic:llm-inference stars:>10 pushed:>{since_date}",
-        f"topic:evals stars:>10 pushed:>{since_date}",
-        f"topic:machine-learning stars:>50 pushed:>{since_date}",
-        f"topic:llm stars:>50 pushed:>{since_date}",
-        f"topic:artificial-intelligence stars:>50 pushed:>{since_date}",
-        f"(awesome-mcp-servers OR awesome-ai-tools OR awesome-agentic-ai) stars:>20 pushed:>{since_date}",
-        f"(AI OR LLM OR GPT OR \"open source\") stars:>100 pushed:>{since_date}",
+        f"topic:{topic} stars:>10 pushed:>{since_date}" for topic in github_topics[:8]
     ]
+    # Add broader queries
+    search_queries.extend([
+        f"(AI OR LLM OR GPT OR \"open source\") stars:>100 pushed:>{since_date}",
+        f"awesome-{github_topics[0]}-servers OR awesome-ai-tools OR awesome-agentic-ai stars:>20 pushed:>{since_date}",
+    ])
     
     api_repos = []
     for query in search_queries:
@@ -644,24 +833,26 @@ def fetch_github_trending_ai():
         # Cache only the live scraped results (which are our raw source)
         save_github_trending_cache(all_repos)
         
-    parsed = _parse_github_repos(merged_repos, min_stars=50)
+    parsed = _parse_github_repos(merged_repos, min_stars=50, keywords=keywords)
     parsed.sort(key=lambda x: x["_engagement"]["stars_per_day"], reverse=True)
-    print(f"✅ GitHub: Found {len(parsed)} trending repos.")
+    print(f"✅ GitHub: Found {len(parsed)} trending repos for category='{category}'.")
     return parsed
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 4. PROGRAMMATIC GOOGLE TRENDS TECH MINER (Stream A)
 # ─────────────────────────────────────────────────────────────────────────────
-def fetch_google_trending_tech(target_country="US"):
+def fetch_google_trending_tech(target_country="US", category="AI & Tech Tools"):
     """
     Fetches the active Google Trends RSS feed for the target region and filters
     terms against a whitelist of tech trigger words.
+    Filters by category-specific whitelist.
     """
-    print(f"📈 Fetching daily trends from Google Trends RSS for geo={target_country}...")
+    signals = CATEGORY_SIGNALS.get(category, CATEGORY_SIGNALS["AI & Tech Tools"])
+    whitelist = signals.get("google_trends_whitelist", {'ai', 'open-source', 'github', 'ios', 'android', 'nvidia', 'code', 'tool', 'software', 'chatgpt', 'dev', 'leak', 'hack'})
+    
+    print(f"📈 Fetching daily trends from Google Trends RSS for geo={target_country}, category='{category}'...")
     url = f"https://trends.google.com/trending/rss?geo={target_country}"
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0'}
-    
-    whitelist = {'ai', 'open-source', 'github', 'ios', 'android', 'nvidia', 'code', 'tool', 'software', 'chatgpt', 'dev', 'leak', 'hack'}
     tech_trends = []
     
     try:
@@ -717,18 +908,20 @@ def fetch_google_trending_tech(target_country="US"):
 # ─────────────────────────────────────────────────────────────────────────────
 # 5. YOUTUBE OUTLIER HUNTER (Stream B)
 # ─────────────────────────────────────────────────────────────────────────────
-def fetch_youtube_outlier_trends(target_country="US", outlier_threshold=3.0):
+def fetch_youtube_outlier_trends(target_country="US", category="AI & Tech Tools", outlier_threshold=3.0):
     """
     YouTube Data API (The Outlier Hunter).
-    Queries search.list endpoint daily using broad tech keywords,
+    Queries search.list endpoint daily using category-specific keywords,
     then uses channels.list to pull subscriber counts and computes view-to-sub ratio.
     """
     if not YOUTUBE_DATA_API_KEY:
         print("⚠️ YouTube Data API key missing. Skipping YouTube Outlier Hunter.")
         return []
 
-    print(f"📺 Running YouTube Outlier Hunter for region={target_country}...")
-    keywords = ["new AI tool", "developer update", "github open source", "coding hack"]
+    signals = CATEGORY_SIGNALS.get(category, CATEGORY_SIGNALS["AI & Tech Tools"])
+    keywords = signals.get("youtube_outlier_keywords", ["new AI tool", "developer update", "github open source", "coding hack"])
+    
+    print(f"📺 Running YouTube Outlier Hunter for region={target_country}, category='{category}'...")
     published_after = (datetime.now(timezone.utc) - timedelta(hours=48)).strftime("%Y-%m-%dT%H:%M:%SZ")
     
     video_candidates = {}
@@ -871,20 +1064,20 @@ def fetch_youtube_outlier_trends(target_country="US", outlier_threshold=3.0):
 # ─────────────────────────────────────────────────────────────────────────────
 # 6. HACKER NEWS TRENDING ENGINE
 # ─────────────────────────────────────────────────────────────────────────────
-def fetch_hacker_news_trending():
+def fetch_hacker_news_trending(category="AI & Tech Tools"):
     """
     Fetches top tech/AI discussions from Hacker News.
     Uses Official HN Firebase REST API and RSS fallback.
+    Filters by category-specific keywords.
     """
-    print("🧡 Fetching top AI & developer architecture discussions from Hacker News...")
+    signals = CATEGORY_SIGNALS.get(category, CATEGORY_SIGNALS["AI & Tech Tools"])
+    ai_keywords = signals.get("hn_keywords", ['ai', 'llm', 'gpt', 'llama', 'claude', 'deepseek', 'agent', 'mcp',
+        'transformer', 'quantization', 'gpu', 'inference', 'vllm', 'compiler',
+        'rust', 'python', 'c++', 'benchmark', 'model', 'dataset', 'arxiv'])
+    
+    print(f"🧡 Fetching top discussions from Hacker News for category='{category}'...")
     articles = []
     headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
-    
-    ai_keywords = [
-        'ai', 'llm', 'gpt', 'llama', 'claude', 'deepseek', 'agent', 'mcp',
-        'transformer', 'quantization', 'gpu', 'inference', 'vllm', 'compiler',
-        'rust', 'python', 'c++', 'benchmark', 'model', 'dataset', 'arxiv'
-    ]
     
     try:
         top_url = "https://hacker-news.firebaseio.com/v0/topstories.json"
@@ -956,12 +1149,16 @@ def fetch_hacker_news_trending():
 # ─────────────────────────────────────────────────────────────────────────────
 # 7. HUGGING FACE TRENDING PAPERS & MODELS ENGINE
 # ─────────────────────────────────────────────────────────────────────────────
-def fetch_huggingface_trending():
+def fetch_huggingface_trending(category="AI & Tech Tools"):
     """
     Fetches trending daily papers & open-weight model releases from Hugging Face.
     Uses Hugging Face Daily Papers API (huggingface.co/api/daily_papers).
+    Filters by category-relevant tasks.
     """
-    print("🤗 Fetching daily trending papers & models from Hugging Face...")
+    signals = CATEGORY_SIGNALS.get(category, CATEGORY_SIGNALS["AI & Tech Tools"])
+    hf_tasks = signals.get("hf_tasks", ["text-generation", "conversational", "text2text-generation", "summarization"])
+    
+    print(f"🤗 Fetching daily trending papers & models from Hugging Face for category='{category}'...")
     articles = []
     headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
     
@@ -977,6 +1174,12 @@ def fetch_huggingface_trending():
                 paper_id = paper.get("id", "")
                 num_upvotes = item.get("publishedAt", "")
                 num_upvotes = item.get("upvotes", 0) or paper.get("upvotes", 0) or 10
+                
+                # Filter by task relevance if task info available
+                paper_tags = paper.get("tags", [])
+                if hf_tasks and paper_tags:
+                    if not any(task in paper_tags for task in hf_tasks):
+                        continue
                 
                 paper_url = f"https://huggingface.co/papers/{paper_id}" if paper_id else "https://huggingface.co/papers"
                 
@@ -996,24 +1199,32 @@ def fetch_huggingface_trending():
     except Exception as e:
         print(f"  ⚠️ Hugging Face API error: {e}")
         
-    print(f"✅ Hugging Face: Found {len(articles)} daily papers/models.")
+    print(f"✅ Hugging Face: Found {len(articles)} daily papers/models for category='{category}'.")
     return articles
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 8. ARXIV AI RESEARCH PAPERS ENGINE
 # ─────────────────────────────────────────────────────────────────────────────
-def fetch_arxiv_ai_papers():
+def fetch_arxiv_ai_papers(category="AI & Tech Tools"):
     """
     Fetches latest AI research papers directly from ArXiv API
-    filtered by cs.AI (Artificial Intelligence) and cs.CL (Computation & Language).
+    filtered by category-specific categories.
     """
-    print("📄 Fetching latest research papers from ArXiv (cs.AI & cs.CL)...")
+    signals = CATEGORY_SIGNALS.get(category, CATEGORY_SIGNALS["AI & Tech Tools"])
+    arxiv_cats = signals.get("arxiv_cats", ["cs.AI", "cs.CL", "cs.LG"])
+    
+    if not arxiv_cats:
+        print(f"⚠️ No ArXiv categories defined for '{category}', skipping.")
+        return []
+    
+    cat_query = "+OR+".join([f"cat:{c}" for c in arxiv_cats])
+    print(f"📄 Fetching latest research papers from ArXiv ({', '.join(arxiv_cats)}) for category='{category}'...")
     articles = []
     headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
     
     try:
-        url = "http://export.arxiv.org/api/query?search_query=cat:cs.AI+OR+cat:cs.CL&sortBy=submittedDate&sortOrder=descending&max_results=12"
+        url = f"http://export.arxiv.org/api/query?search_query={cat_query}&sortBy=submittedDate&sortOrder=descending&max_results=12"
         req = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(req, timeout=12) as resp:
             xml_data = resp.read()
@@ -1036,7 +1247,7 @@ def fetch_arxiv_ai_papers():
             articles.append({
                 "title": f"ArXiv Research: {title_clean}",
                 "description": f"Authors: {authors_str} | Abstract: {summary_clean[:300]}...",
-                "source": {"name": "ArXiv AI (cs.AI / cs.CL)"},
+                "source": {"name": f"ArXiv ({', '.join(arxiv_cats)})"},
                 "url": link,
                 "urlToImage": "",
                 "publishedAt": published,
@@ -1049,18 +1260,22 @@ def fetch_arxiv_ai_papers():
     except Exception as e:
         print(f"  ⚠️ ArXiv API error: {e}")
         
-    print(f"✅ ArXiv: Found {len(articles)} AI research papers.")
+    print(f"✅ ArXiv: Found {len(articles)} research papers for category='{category}'.")
     return articles
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 9. TLDR AI & TECH NEWSLETTERS ENGINE
 # ─────────────────────────────────────────────────────────────────────────────
-def fetch_tldr_ai_newsletters():
+def fetch_tldr_ai_newsletters(category="AI & Tech Tools"):
     """
     Fetches summarized open-source AI announcements from TLDR AI and curated newsletter RSS.
+    Filters by category-relevant keywords.
     """
-    print("📰 Fetching daily AI announcements from TLDR AI & Newsletters...")
+    signals = CATEGORY_SIGNALS.get(category, CATEGORY_SIGNALS["AI & Tech Tools"])
+    filter_keywords = signals.get("hn_keywords", [])  # Reuse HN keywords as filter
+    
+    print(f"📰 Fetching daily announcements from TLDR AI & Newsletters for category='{category}'...")
     articles = []
     feeds = [
         ("TLDR Tech", "https://tldr.tech/tech/rss"),
@@ -1083,6 +1298,13 @@ def fetch_tldr_ai_newsletters():
                 desc = desc_elem.text if desc_elem is not None else ""
                 clean_desc = re.sub('<[^<]+?>', '', desc)[:300].strip()
                 
+                # Filter by category keywords
+                title_lower = title.lower()
+                desc_lower = clean_desc.lower()
+                if filter_keywords:
+                    if not any(kw in title_lower or kw in desc_lower for kw in filter_keywords):
+                        continue
+                
                 articles.append({
                     "title": f"{name}: {title}",
                     "description": clean_desc if clean_desc else title,
@@ -1096,7 +1318,7 @@ def fetch_tldr_ai_newsletters():
         except Exception as e:
             print(f"  ⚠️ Newsletter RSS fetch error ({name}): {e}")
             
-    print(f"✅ TLDR & Newsletters: Found {len(articles)} curated announcements.")
+    print(f"✅ TLDR & Newsletters: Found {len(articles)} curated announcements for category='{category}'.")
     return articles
 
 
@@ -1239,74 +1461,75 @@ def compute_engagement_score(article):
     return min(100, score)
 
 
-def fetch_all_trending_signals(target_country="US"):
+def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools"):
     """
     Master aggregator: fetches from all trending sources and returns
     a unified, scored article list ready for the pipeline.
+    Filters all sources by the given category.
     """
-    print(f"\n🔥 === TRENDING ENGINE: Fetching Multi-Platform Signals for region={target_country} === 🔥")
+    print(f"\n🔥 === TRENDING ENGINE: Fetching Multi-Platform Signals for region={target_country}, category='{category}' === 🔥")
     
     all_articles = []
     
     # 1. YouTube Trending Shorts
     try:
-        yt_articles = fetch_youtube_trending_shorts(target_country)
+        yt_articles = fetch_youtube_trending_shorts(target_country, category)
         all_articles.extend(yt_articles)
     except Exception as e:
         print(f"⚠️ YouTube trending failed: {e}")
     
     # 2. Reddit Hot Posts
     try:
-        reddit_articles = fetch_reddit_hot_ai()
+        reddit_articles = fetch_reddit_hot_ai(category)
         all_articles.extend(reddit_articles)
     except Exception as e:
         print(f"⚠️ Reddit trending failed: {e}")
     
     # 3. GitHub Trending Repos & Topics
     try:
-        github_articles = fetch_github_trending_ai()
+        github_articles = fetch_github_trending_ai(category)
         all_articles.extend(github_articles)
     except Exception as e:
         print(f"⚠️ GitHub trending failed: {e}")
-
+    
     # 4. Hacker News Top Discussions
     try:
-        hn_articles = fetch_hacker_news_trending()
+        hn_articles = fetch_hacker_news_trending(category)
         all_articles.extend(hn_articles)
     except Exception as e:
         print(f"⚠️ Hacker News fetch failed: {e}")
-
+    
     # 5. Hugging Face Trending Papers & Models
     try:
-        hf_articles = fetch_huggingface_trending()
+        hf_articles = fetch_huggingface_trending(category)
         all_articles.extend(hf_articles)
     except Exception as e:
         print(f"⚠️ Hugging Face fetch failed: {e}")
-
+    
     # 6. ArXiv AI Research Papers
     try:
-        arxiv_articles = fetch_arxiv_ai_papers()
+        arxiv_articles = fetch_arxiv_ai_papers(category)
         all_articles.extend(arxiv_articles)
     except Exception as e:
         print(f"⚠️ ArXiv AI fetch failed: {e}")
-
+    
     # 7. TLDR AI & Newsletters
     try:
-        tldr_articles = fetch_tldr_ai_newsletters()
+        tldr_articles = fetch_tldr_ai_newsletters(category)
         all_articles.extend(tldr_articles)
     except Exception as e:
         print(f"⚠️ TLDR AI fetch failed: {e}")
-
+    
     # 8. Google Trends (Stream A)
     try:
-        gt_articles = fetch_google_trending_tech(target_country)
+        gt_articles = fetch_google_trending_tech(target_country, category)
         all_articles.extend(gt_articles)
     except Exception as e:
         print(f"⚠️ Google Trends fetch failed: {e}")
-
+    
     # 9. YouTube Outlier Hunter (Stream B)
     try:
-        yo_articles = fetch_youtube_outlier_trends(target_country)
+        yo_articles = fetch_youtube_outlier_trends(target_country, category)
         all_articles.extend(yo_articles)
     except Exception as e:
         print(f"⚠️ YouTube Outlier Hunter fetch failed: {e}")

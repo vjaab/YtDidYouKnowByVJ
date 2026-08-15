@@ -1171,7 +1171,6 @@ THEMED_BACKGROUNDS = {
     "AI & Tech Tools": "assets/backgrounds/ai_tools_bg.jpg",
     "Tech Gadgets & Inventions": "assets/backgrounds/gadgets_bg.jpg",
     "Finance & Tech Economy": "assets/backgrounds/finance_bg.jpg",
-    "Life Hacks & Productivity": "assets/backgrounds/productivity_bg.jpg",
     "Agentic AI Facts": "assets/backgrounds/agentic_bg.jpg",
     "Facts & Trivia": "assets/backgrounds/facts_bg.jpg",
     "Coding & Development Hacks": "assets/backgrounds/coding_bg.jpg",
@@ -1230,7 +1229,6 @@ PARTICLE_STYLES = {
     "AI & Tech Tools": "digital_rain",   # Matrix-style code rain
     "Tech Gadgets & Inventions": "circuit",  # Circuit board traces
     "Finance & Tech Economy": "coins",    # Floating coins/gold particles
-    "Life Hacks & Productivity": "gears", # Rotating gears
     "Agentic AI Facts": "neural",        # Neural network nodes
     "Facts & Trivia": "stars",           # Twinkling stars
     "Coding & Development Hacks": "brackets",  # Code brackets/symbols

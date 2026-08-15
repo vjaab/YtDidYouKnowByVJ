@@ -20,31 +20,31 @@ from fetch_research_papers import fetch_tech_news, fetch_ai_tools
 class TestMultiSourcePipeline(unittest.TestCase):
     def test_github_trending(self):
         print("\n--- Testing GitHub Trending (Languages + Topics + Awesome Lists) ---")
-        repos = fetch_github_trending_ai()
+        repos = fetch_github_trending_ai("AI & Tech Tools")
         self.assertIsInstance(repos, list)
         print(f"Retrieved {len(repos)} GitHub repos.")
 
     def test_hacker_news_trending(self):
         print("\n--- Testing Hacker News Trending ---")
-        hn_articles = fetch_hacker_news_trending()
+        hn_articles = fetch_hacker_news_trending("AI & Tech Tools")
         self.assertIsInstance(hn_articles, list)
         print(f"Retrieved {len(hn_articles)} Hacker News items.")
 
     def test_huggingface_trending(self):
         print("\n--- Testing Hugging Face Papers & Models ---")
-        hf_articles = fetch_huggingface_trending()
+        hf_articles = fetch_huggingface_trending("AI & Tech Tools")
         self.assertIsInstance(hf_articles, list)
         print(f"Retrieved {len(hf_articles)} Hugging Face items.")
 
     def test_arxiv_ai_papers(self):
         print("\n--- Testing ArXiv AI Research Papers ---")
-        arxiv_articles = fetch_arxiv_ai_papers()
+        arxiv_articles = fetch_arxiv_ai_papers("AI & Tech Tools")
         self.assertIsInstance(arxiv_articles, list)
         print(f"Retrieved {len(arxiv_articles)} ArXiv papers.")
 
     def test_tldr_ai_newsletters(self):
         print("\n--- Testing TLDR AI Newsletters ---")
-        tldr_articles = fetch_tldr_ai_newsletters()
+        tldr_articles = fetch_tldr_ai_newsletters("AI & Tech Tools")
         self.assertIsInstance(tldr_articles, list)
         print(f"Retrieved {len(tldr_articles)} Newsletter items.")
 
@@ -77,7 +77,7 @@ class TestMultiSourcePipeline(unittest.TestCase):
 
     def test_fetch_all_trending_signals(self):
         print("\n--- Testing Master Aggregator across all 9 data feeds ---")
-        all_signals = fetch_all_trending_signals(target_country="US")
+        all_signals = fetch_all_trending_signals(target_country="US", category="AI & Tech Tools")
         self.assertIsInstance(all_signals, list)
         self.assertGreater(len(all_signals), 0)
         print(f"Master Aggregator returned {len(all_signals)} total scored signals.")

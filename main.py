@@ -313,9 +313,9 @@ def run_pipeline(topic_type="auto", dry_run=False):
         if ENABLE_TRENDING_ENGINE:
             try:
                 from trending_engine import fetch_all_trending_signals
-                trending_articles = fetch_all_trending_signals(target_country=target_country)
+                trending_articles = fetch_all_trending_signals(target_country=target_country, category=category)
                 rss_articles = trending_articles + rss_articles  # Trending FIRST for priority
-                log_message(f"🔥 Trending Engine injected {len(trending_articles)} high-signal articles for geo={target_country}.")
+                log_message(f"🔥 Trending Engine injected {len(trending_articles)} high-signal articles for geo={target_country}, category={category}.")
             except Exception as ex:
                 log_message(f"⚠️ Trending Engine failed (non-fatal): {ex}")
             

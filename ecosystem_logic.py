@@ -283,39 +283,6 @@ def get_category_prompt_enhancement(category, slot):
                 4. "Zero hallucinations. Here's the source." (20-22s)
                 5. CTA (22-30s): "Want the fact-checking prompt? Comment 'VERIFY'"
 """,
-        "Life Hacks & Productivity": f"""
-            CATEGORY: Life Hacks & Productivity (Universal appeal for efficiency).
-            STRATEGY: {base_discovery}
-            AUDIENCE: EVERYONE. Universal appeal for device optimization and time-saving workflows.
-            GOAL: Share a clever phone/computer tip, productivity system, or workflow hack that saves hours.
-            HOOK STYLE: 'Turn this setting off immediately to double your battery life.' or 'This 30-second workflow hack saves 5 hours of work.'
-            EMOTIONAL TRIGGER: Immediate utility + FOMO.
-            CONTENT FORMAT: Fast-paced, result-first. Show the settings/trick step-by-step immediately.
-            
-            AI_HACK_STRATEGY: Focus on AI-powered capture, organization, summarization, and automation.
-                • Voice Capture → Notion/Obsidian: Whisper (local/Cloud) + LLM structuring + API = hands-free second brain
-                • Email Triage Agent: Gmail API + LLM = auto-label, draft replies, unsubscribe, summarize threads
-                • Meeting Summarizer: Whisper.cpp (local STT) + Llama 3.1 = action items, decisions, transcript
-                • Calendar Optimization: LLM analyzes calendar → suggests focus blocks, buffers, meeting prep
-                • Obsidian + RAG: Local vault + embeddings = "Ask my notes anything" + auto-linking
-                • RSS/Newsletter → AI Digest: Feedparser + LLM = daily 3-min personalized briefing
-                • Browser Automation: Browser-use / Stagehand + LLM = form filling, research, data extraction
-                • Screenpipe / Rewind.ai alternative: Local screen recording + OCR + LLM = full recall
-            
-            AI_HACK_HOOKS:
-                1. "I haven't typed a note in 6 months. My voice AI organizes everything automatically."
-                2. "This AI reads my emails, drafts replies, and unsubscribes me from spam. Zero inbox."
-                3. "My meetings summarize THEMSELVES now. Whisper + Llama = magic."
-                4. "Obsidian + Local LLM = a second brain that ANSWERS questions from my notes."
-                5. "I automated my entire morning briefing. AI reads 50 newsletters, gives me 3 mins of gold."
-            
-            AI_TOOL_DEMO_FORMAT (15-30s Short):
-                1. Hook (0-1s): Show result — clean Notion page / empty inbox / meeting summary
-                2. "The 3-tool stack" (1-3s): Whisper → LLM → Notion API (logos on screen)
-                3. Live demo (3-20s): Speak → text appears organized in Notion / email drafted
-                4. "Runs locally. Private. Free." (20-22s)
-                5. CTA (22-30s): "My n8n workflow / Python script? Comment 'CAPTURE'"
-""",
         "Agentic AI Facts": f"""
             CATEGORY: Agentic AI Facts (Niche but High CPC, AI/ML Background).
             STRATEGY: Leverage your Senior AI Engineer expertise while keeping it accessible.
@@ -522,23 +489,6 @@ _AI_HACKS_DATA = {
             "Is this tech myth true or false? Provide evidence from primary sources."
         ]
     },
-    "Life Hacks & Productivity": {
-        "strategy": "Focus on AI-powered capture, organization, summarization, and automation. Voice→Notion/Obsidian (Whisper+LLM+API), Email triage (Gmail API+LLM), Meeting summarizer (Whisper.cpp+Llama), Calendar optimization (LLM analysis), Obsidian+RAG (local vault+embeddings), RSS→AI digest, Browser automation (Browser-use/Stagehand+LLM), Screenpipe/Rewind alternative (local screen+OCR+LLM).",
-        "hooks": [
-            "I haven't typed a note in 6 months. My voice AI organizes everything automatically.",
-            "This AI reads my emails, drafts replies, and unsubscribes me from spam. Zero inbox.",
-            "My meetings summarize THEMSELVES now. Whisper + Llama = magic.",
-            "Obsidian + Local LLM = a second brain that ANSWERS questions from my notes.",
-            "I automated my entire morning briefing. AI reads 50 newsletters, gives me 3 mins of gold."
-        ],
-        "demo_format": "Hook (clean result) → 3-tool stack logos → Live voice→organized demo → 'Local/private/free' → CTA",
-        "tools": ["Whisper.cpp", "Whisper API", "Ollama", "Notion API", "Obsidian", "Gmail API", "Calendar API", "n8n", "Zapier", "Browser-use", "Stagehand", "Screenpipe", "Feedparser", "RSS", "Piper TTS"],
-        "prompts": [
-            "Convert this voice transcript into structured notes with: title, tags, action items, key insights, related topics.",
-            "Triage this email: categorize (urgent/action/later/spam), draft reply if needed, extract tasks.",
-            "Summarize this meeting transcript: decisions made, action items (owner+due), key discussion points, next steps."
-        ]
-    },
     "Agentic AI Facts": {
         "strategy": "Focus on practical agent patterns, frameworks, and debugging techniques. AutoGen (multi-agent chat), CrewAI (role-based), LangGraph (stateful graphs), OpenAI Assistants API. Core patterns: Planning→Execution→Reflection (Reflexion), Tool Use (function calling), Memory (short/long-term), Multi-agent debate. Reflexion: agent critiques own output→revises. Tool-use schemas: Pydantic for structured calling. Human-in-loop: approval gates, clarification, escalation. Debugging: LangSmith/LangFuse/Arize Phoenix. Agent swarms: hierarchical, peer-to-peer, sequential.",
         "hooks": [
@@ -640,7 +590,6 @@ def validate_ai_hacks_coverage():
         "Tech Gadgets & Inventions", 
         "Finance & Tech Economy",
         "Facts & Trivia",
-        "Life Hacks & Productivity",
         "Agentic AI Facts",
         "Coding & Development Hacks",
         "Quiz & Trivia",
