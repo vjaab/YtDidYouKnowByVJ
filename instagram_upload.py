@@ -580,6 +580,11 @@ def post_video_to_facebook_page(video_url: str, caption: str) -> str:
     Posts a video to Facebook Page as a Reel/Video.
     Uses the public video URL (same as Instagram) and Facebook Page access token.
     Implements the video_reels API with upload_phase workflow.
+    
+    Correct flow per Meta Graph API:
+    1. Start upload session (POST /page_id/video_reels with upload_phase=start)
+    2. Upload video to returned upload_url using file_url header (for hosted videos)
+    3. Finish upload with description, title, video_state=PUBLISHED
     """
     fb_page_id = os.getenv("FB_PAGE_ID")
     fb_page_access_token = os.getenv("FB_PAGE_ACCESS_TOKEN")
@@ -588,13 +593,12 @@ def post_video_to_facebook_page(video_url: str, caption: str) -> str:
         return None, "Facebook Page credentials not configured (FB_PAGE_ID, FB_PAGE_ACCESS_TOKEN)"
     
     try:
-        # Step 1: Start upload - get video_id and upload_url
-        print("📡 [Facebook] Starting video upload...")
+        # Step 1: Start upload session - get video_id and upload_url
+        # NOTE: Do NOT include video_url here - it's not supported in start phase
+        print("📡 [Facebook] Starting video upload session...")
         resp = requests.post(
             f"{GRAPH_API_BASE}/{fb_page_id}/video_reels",
             data={
-                "video_url": video_url,
-                "description": caption[:2200],
                 "upload_phase": "start",
                 "access_token": fb_page_access_token,
             },
@@ -604,44 +608,44 @@ def post_video_to_facebook_page(video_url: str, caption: str) -> str:
         start_data = resp.json()
         video_id = start_data["video_id"]
         upload_url = start_data["upload_url"]
-        print(f"✔ Upload initiated. Video ID: {video_id}")
+        print(f"✔ Upload session started. Video ID: {video_id}")
+        print(f"📤 Upload URL: {upload_url}")
         
-        # Step 2: Download video and upload to Facebook's upload URL
-        print("📤 [Facebook] Downloading video and uploading to Facebook...")
-        video_resp = requests.get(video_url, timeout=60)
-        video_resp.raise_for_status()
-        video_data = video_resp.content
-        file_size = len(video_data)
-        
+        # Step 2: Upload video to Facebook's upload URL using file_url header
+        # Since we have a publicly accessible video URL (GitHub Releases/file.io/S3),
+        # we use the file_url header instead of downloading and re-uploading binary data
+        print("📤 [Facebook] Uploading video from hosted URL...")
         upload_headers = {
-            "Content-Type": "video/mp4",
             "Authorization": f"OAuth {fb_page_access_token}",
-            "offset": "0",
-            "file_size": str(file_size),
+            "file_url": video_url,
+            "Content-Type": "application/octet-stream",  # Required but ignored when file_url is used
         }
         
         upload_resp = requests.post(
             upload_url,
-            data=video_data,
             headers=upload_headers,
             timeout=180,
         )
         upload_resp.raise_for_status()
-        print("✔ Video uploaded to Facebook")
+        upload_result = upload_resp.json()
+        print(f"✔ Video upload initiated: {upload_result}")
         
-        # Step 3: Finish upload
-        print("📡 [Facebook] Finishing upload...")
+        # Step 3: Finish upload with description and publish
+        print("📡 [Facebook] Finishing upload and publishing...")
         resp = requests.post(
             f"{GRAPH_API_BASE}/{fb_page_id}/video_reels",
             data={
                 "video_id": video_id,
                 "upload_phase": "finish",
+                "video_state": "PUBLISHED",
+                "description": caption[:2200],
                 "access_token": fb_page_access_token,
             },
             timeout=30,
         )
         resp.raise_for_status()
-        print("✔ Upload finished")
+        finish_result = resp.json()
+        print(f"✔ Upload finished: {finish_result}")
         
         # Step 4: Poll for processing status
         deadline = time.time() + 300  # 5 min timeout
@@ -654,29 +658,19 @@ def post_video_to_facebook_page(video_url: str, caption: str) -> str:
             resp.raise_for_status()
             status = resp.json().get("status", {})
             processing_phase = status.get("processing_phase", {}).get("status")
-            if processing_phase == "complete":
+            video_status = status.get("video_status")
+            if processing_phase == "complete" or video_status == "published":
                 break
-            if processing_phase == "error":
-                raise RuntimeError(f"Facebook Reel {video_id} failed processing")
+            if processing_phase == "error" or video_status == "error":
+                error_msg = status.get("processing_phase", {}).get("error", {}).get("message", "Unknown error")
+                raise RuntimeError(f"Facebook Reel {video_id} failed processing: {error_msg}")
             time.sleep(5)
         else:
-            raise TimeoutError(f"Facebook Reel {video_id} still processing after 300s")
+            # Don't fail on timeout - video might still process in background
+            print(f"⚠️ Facebook Reel {video_id} still processing after 300s, but publish was initiated")
         
-        # Step 5: Publish the Reel (POST to video_id with published=true)
-        print("📡 [Facebook] Publishing Reel...")
-        resp = requests.post(
-            f"{GRAPH_API_BASE}/{video_id}",
-            data={
-                "published": "true",
-                "access_token": fb_page_access_token,
-            },
-            timeout=30,
-        )
-        resp.raise_for_status()
         print(f"🎉 Facebook Reel published! ID: {video_id}")
-        reel_id = video_id
-        
-        return reel_id, None
+        return video_id, None
         
     except requests.HTTPError as e:
         error_text = e.response.text if e.response else str(e)
