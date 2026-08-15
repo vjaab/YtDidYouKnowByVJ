@@ -566,15 +566,15 @@ def upload_video_to_github_releases(video_path):
         tag = f"media-temp-{int(time.time())}"  # unique per run, easy to prune later
         filename = os.path.basename(video_path)
 
-        # Create release
+        # Create release (public, not prerelease, for better accessibility)
         release_resp = requests.post(
             f"https://api.github.com/repos/{owner}/{repo_name}/releases",
             headers=headers,
             json={
                 "tag_name": tag,
                 "name": f"Temp media {tag}",
-                "body": "Auto-generated for Instagram publish step. Safe to delete.",
-                "prerelease": True,
+                "body": "Auto-generated for Instagram/Facebook publish step. Safe to delete after 24h.",
+                "prerelease": False,
             },
             timeout=30,
         )
@@ -595,8 +595,22 @@ def upload_video_to_github_releases(video_path):
         asset_resp.raise_for_status()
         public_url = asset_resp.json()["browser_download_url"]
 
-        # Let CDN edge catch up before Graph API tries to fetch
-        time.sleep(3)
+        # Let CDN edge catch up before Graph API tries to fetch (increased for video)
+        print(f"⏳ Waiting for GitHub CDN propagation...")
+        time.sleep(10)
+        
+        # Verify URL is accessible with HEAD request
+        try:
+            verify_resp = requests.head(public_url, allow_redirects=True, timeout=15)
+            if verify_resp.status_code == 200:
+                content_type = verify_resp.headers.get("content-type", "")
+                content_length = verify_resp.headers.get("content-length", "unknown")
+                print(f"✅ URL verified: {content_type}, {content_length} bytes")
+            else:
+                print(f"⚠️ URL verification returned {verify_resp.status_code}: {verify_resp.text[:200]}")
+        except Exception as e:
+            print(f"⚠️ URL verification failed: {e}")
+        
         print(f"✅ Uploaded to GitHub Releases: {public_url}")
         return public_url, str(release_id)
 
@@ -1043,8 +1057,10 @@ def upload_reel_to_instagram(video_path: str, caption: str):
             print("🧹 Cleaning up file.io reference...")
             delete_from_fileio(upload_key)
         elif upload_method == "github" and upload_key:
-            print("🧹 Cleaning up GitHub Release...")
-            delete_github_release(int(upload_key))
+            # NOTE: Skip GitHub Release deletion to allow async Facebook video fetch
+            # Releases are tagged as 'media-temp-*' for periodic manual cleanup
+            print(f"ℹ️ Keeping GitHub Release {upload_key} for async video processing (tagged for later cleanup)")
+            # delete_github_release(int(upload_key))  # Disabled for async fetch compatibility
         # For "direct" method, no cleanup needed
 
 
