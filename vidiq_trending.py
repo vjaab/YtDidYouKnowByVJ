@@ -4,44 +4,161 @@ and keyword opportunities using the YouTube Data API and Google Autocomplete Sug
 """
 import os
 import re
+import time
 import requests
 from datetime import datetime
 
-def get_trending_videos(api_key=None, region="IN"):
+# Category-specific YouTube search queries for trending videos
+CATEGORY_YOUTUBE_QUERIES = {
+    "AI & Tech Tools": [
+        "AI tools free productivity 2026",
+        "best free AI tools for students",
+        "ChatGPT alternatives free",
+        "AI productivity hacks",
+        "local LLM tools Ollama LM Studio",
+    ],
+    "Tech Gadgets & Inventions": [
+        "new tech gadgets 2026",
+        "smart glasses AR VR review",
+        "wearable tech review",
+        "smart home devices 2026",
+        "cool gadgets you didn't know existed",
+    ],
+    "Finance & Tech Economy": [
+        "AI finance tools budgeting",
+        "fintech apps save money",
+        "crypto trading AI bot",
+        "stock analysis AI tools",
+        "personal finance automation",
+    ],
+    "Facts & Trivia": [
+        "tech facts you didn't know",
+        "computer history trivia",
+        "AI facts mind blown",
+        "tech myths debunked",
+        "weird tech history",
+    ],
+    "Coding & Development Hacks": [
+        "coding productivity tips 2026",
+        "VS Code extensions must have",
+        "Python tricks you didn't know",
+        "GitHub Copilot tips",
+        "developer workflow automation",
+    ],
+    "Quiz & Trivia": [
+        "tech quiz questions",
+        "programming trivia challenge",
+        "computer science quiz",
+        "AI history quiz",
+        "guess the tech company",
+    ],
+    "Interview Questions": [
+        "software engineering interview questions 2026",
+        "system design interview",
+        "Java interview questions",
+        "Python interview questions",
+        "Kubernetes Docker interview",
+    ],
+    "Programming Language Origins": [
+        "programming language history",
+        "why was Python created",
+        "history of JavaScript",
+        "Rust language origin",
+        "programming language design",
+    ],
+    "Tech Company Founding Stories": [
+        "how Google started",
+        "Apple founding story",
+        "Microsoft early days",
+        "startup founder story",
+        "tech company history",
+    ],
+    "Famous Bugs & Glitches": [
+        "famous software bugs",
+        "worst programming mistakes",
+        "Mars Climate Orbiter bug",
+        "Ariane 5 explosion software",
+        "biggest tech failures",
+    ],
+    "Agentic AI Facts": [
+        "AI agents explained",
+        "autonomous AI agents 2026",
+        "AutoGen CrewAI LangGraph",
+        "AI agent workflow",
+        "multi-agent systems",
+    ],
+}
+
+
+def get_trending_videos(category="AI & Tech Tools", region="IN"):
     """
     Fetches live trending tech videos from YouTube Data API v3 (Category 28: Science & Technology).
+    Uses category-specific search queries.
     """
     yt_key = os.getenv("YOUTUBE_DATA_API_KEY")
     if yt_key:
-        print(f"📡 Querying YouTube Data API for trending Science & Tech videos (region={region})...")
-        try:
-            url = "https://www.googleapis.com/youtube/v3/videos"
-            params = {
-                "part": "snippet,statistics",
-                "chart": "mostPopular",
-                "videoCategoryId": "28", # Science & Technology
-                "maxResults": 10,
-                "regionCode": region,
+        queries = CATEGORY_YOUTUBE_QUERIES.get(category, CATEGORY_YOUTUBE_QUERIES["AI & Tech Tools"])
+        all_videos = []
+        
+        for query in queries:
+            print(f"📡 Querying YouTube Data API for '{query}' (region={region})...")
+            try:
+                url = "https://www.googleapis.com/youtube/v3/search"
+                params = {
+                    "part": "snippet",
+                    "q": query,
+                    "type": "video",
+                    "videoCategoryId": "28",  # Science & Technology
+                    "order": "viewCount",
+                    "publishedAfter": (datetime.utcnow().replace(microsecond=0).isoformat() + "Z")[:19] + "Z",
+                    "maxResults": 5,
+                    "regionCode": region,
+                    "key": yt_key,
+                    "relevanceLanguage": "en",
+                }
+                r = requests.get(url, params=params, timeout=15)
+                if r.status_code == 200:
+                    for item in r.json().get("items", []):
+                        snippet = item.get("snippet", {})
+                        vid_id = item.get("id", {}).get("videoId")
+                        if vid_id:
+                            all_videos.append({
+                                "title": snippet.get("title", ""),
+                                "id": vid_id,
+                                "url": f"https://youtube.com/watch?v={vid_id}"
+                            })
+                time.sleep(0.3)
+            except Exception as e:
+                print(f"  ⚠️ YouTube search failed for '{query}': {e}")
+        
+        if all_videos:
+            # Get statistics for engagement
+            video_ids = [v["id"] for v in all_videos[:20]]
+            stats_url = "https://www.googleapis.com/youtube/v3/videos"
+            stats_params = {
+                "part": "statistics,snippet",
+                "id": ",".join(video_ids),
                 "key": yt_key
             }
-            r = requests.get(url, params=params, timeout=15)
-            if r.status_code == 200:
-                videos = []
-                for item in r.json().get("items", []):
+            stats_r = requests.get(stats_url, params=stats_params, timeout=15)
+            if stats_r.status_code == 200:
+                stats_data = stats_r.json()
+                enriched = []
+                for item in stats_data.get("items", []):
                     snippet = item.get("snippet", {})
-                    vid_id = item.get("id")
-                    videos.append({
-                        "title": snippet.get("title", ""),
-                        "id": vid_id,
-                        "url": f"https://youtube.com/watch?v={vid_id}"
-                    })
-                if videos:
-                    return videos
-            else:
-                print(f"⚠️ YouTube trending API returned {r.status_code}. Using fallbacks.")
-        except Exception as e:
-            print(f"⚠️ YouTube trending API failed: {e}. Using fallbacks.")
-            
+                    stats = item.get("statistics", {})
+                    views = int(stats.get("viewCount", 0))
+                    if views >= 1000:
+                        enriched.append({
+                            "title": snippet.get("title", ""),
+                            "id": item.get("id"),
+                            "url": f"https://youtube.com/watch?v={item.get('id')}",
+                            "views": views,
+                            "likes": int(stats.get("likeCount", 0)),
+                            "comments": int(stats.get("commentCount", 0)),
+                        })
+                return enriched
+        
     return _get_fallback_trending_videos()
 
 def get_keyword_research(seed_term, api_key=None):
@@ -125,7 +242,7 @@ def get_pipeline_topics(category="AI & Tech Tools"):
     api_key = os.getenv("VIDIQ_API_KEY")
     
     print(f"📡 Querying YouTube and Autocomplete Pipeline for category: {category}...")
-    trending_vids = get_trending_videos(api_key, region="IN")
+    trending_vids = get_trending_videos(category=category, region="IN")
     competitor_channels = get_breakout_channels(api_key, category=category)
     
     ranked_topics = []

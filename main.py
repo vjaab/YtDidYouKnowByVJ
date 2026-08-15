@@ -301,7 +301,7 @@ def run_pipeline(topic_type="auto", dry_run=False):
         # Fetch GitHub trending AI repos (Conflict Fix: prioritize trending GitHub projects)
         try:
             from trending_engine import fetch_github_trending_ai
-            github_news = fetch_github_trending_ai()
+            github_news = fetch_github_trending_ai(category)
         except Exception as ex:
             log_message(f"⚠️ GitHub Fetch failed: {ex}")
             github_news = []

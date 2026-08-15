@@ -316,19 +316,30 @@ def fetch_reddit_news(hours=24):
     print(f"✅ Reddit Search: Retrieved {len(news_items)} posts from the last {hours} hours.")
     return news_items
 
-def _fetch_xcom_via_google_news():
+def _fetch_xcom_via_google_news(category="AI & Tech Tools"):
     """
-    Fallback: Query Google News RSS for viral AI tweets from X.com
+    Fallback: Query Google News RSS for viral tweets from X.com
     when the X.com API is unavailable (credits depleted, rate limited, etc.)
+    Uses category-specific queries.
     """
-    print("  🔍 X.com Fallback: Querying Google News RSS for viral AI tweets...")
+    x_google_queries = {
+        "AI & Tech Tools": ["site:x.com AI tools", "site:x.com LLM local AI", "site:x.com Ollama AI"],
+        "Tech Gadgets & Inventions": ["site:x.com smart glasses", "site:x.com AR VR gadget", "site:x.com raspberry pi"],
+        "Finance & Tech Economy": ["site:x.com fintech AI", "site:x.com crypto trading bot", "site:x.com personal finance"],
+        "Facts & Trivia": ["site:x.com tech facts", "site:x.com did you know tech", "site:x.com computer history"],
+        "Coding & Development Hacks": ["site:x.com coding tips", "site:x.com vscode github", "site:x.com python rust"],
+        "Quiz & Trivia": ["site:x.com tech quiz", "site:x.com programming trivia"],
+        "Interview Questions": ["site:x.com system design interview", "site:x.com leetcode kubernetes"],
+        "Programming Language Origins": ["site:x.com programming language history", "site:x.com python rust origin"],
+        "Tech Company Founding Stories": ["site:x.com startup founder", "site:x.com YCombinator tech"],
+        "Famous Bugs & Glitches": ["site:x.com software bug postmortem", "site:x.com outage incident"],
+        "Agentic AI Facts": ["site:x.com AI agents", "site:x.com autogen crewai", "site:x.com langgraph"],
+    }
+    
+    print(f"  🔍 X.com Fallback: Querying Google News RSS for category='{category}'...")
     articles = []
     
-    queries = [
-        "site:x.com AI artificial intelligence",
-        "site:x.com LLM machine learning viral",
-        "site:x.com OpenAI Google DeepMind",
-    ]
+    queries = x_google_queries.get(category, x_google_queries["AI & Tech Tools"])
     
     for query in queries:
         try:
@@ -366,22 +377,36 @@ def _fetch_xcom_via_google_news():
     return articles
 
 
-def fetch_x_trending_ai_topics():
+# Category-specific X/Twitter search queries
+X_CATEGORY_QUERIES = {
+    "AI & Tech Tools": "(#AItools OR #LLM OR #GenerativeAI OR #Ollama OR #LocalLLM OR #AIproductivity) -is:retweet lang:en",
+    "Tech Gadgets & Inventions": "(#smartglasses OR #AR OR #VR OR #wearabletech OR #IoT OR #raspberrypi) -is:retweet lang:en",
+    "Finance & Tech Economy": "(#fintech OR #crypto OR #trading OR #AItrading OR #defi OR #personalfinance) -is:retweet lang:en",
+    "Facts & Trivia": "(#techfacts OR #didyouknow OR #computerscience OR #techhistory) -is:retweet lang:en",
+    "Coding & Development Hacks": "(#coding OR #programming OR #vscode OR #github OR #copilot OR #rustlang OR #python) -is:retweet lang:en",
+    "Quiz & Trivia": "(#techquiz OR #programmingquiz OR #interviewquestions) -is:retweet lang:en",
+    "Interview Questions": "(#systemdesign OR #leetcode OR #codinginterview OR #kubernetes OR #docker) -is:retweet lang:en",
+    "Programming Language Origins": "(#programminglanguages OR #pythonhistory OR #rustlang OR #javascript) -is:retweet lang:en",
+    "Tech Company Founding Stories": "(#startup OR #founder OR #YCombinator OR #techhistory) -is:retweet lang:en",
+    "Famous Bugs & Glitches": "(#softwarebugs OR #programminghorror OR #postmortem OR #outage) -is:retweet lang:en",
+    "Agentic AI Facts": "(#AIagents OR #AutoGen OR #CrewAI OR #LangGraph OR #multiagent) -is:retweet lang:en",
+}
+
+
+def fetch_x_trending_ai_topics(category="AI & Tech Tools"):
     """
     Fetches trending AI topics from X.com (Twitter) using the search recent API v2.
-    Sorts by engagement to return the most popular/viral tweets on AI.
-    Falls back to Google News RSS if API credits are depleted.
+    Uses category-specific queries. Falls back to Google News RSS if API credits are depleted.
     """
     from config import X_BEARER_TOKEN
     if not X_BEARER_TOKEN or "XXX" in X_BEARER_TOKEN or not X_BEARER_TOKEN.strip():
         print("⚠️ X.com Bearer Token missing. Trying Google News fallback...")
-        return _fetch_xcom_via_google_news()
+        return _fetch_xcom_via_google_news(category)
         
-    print("📡 Fetching viral trending AI topics from X.com...")
-    url = "https://api.twitter.com/2/tweets/search/recent"
+    query = X_CATEGORY_QUERIES.get(category, X_CATEGORY_QUERIES["AI & Tech Tools"])
     
-    # Query for popular AI tweets in English from last 7 days
-    query = "(#AI OR #LLM OR #GenerativeAI OR OpenAI OR DeepMind OR Claude3 OR Gemini1.5) -is:retweet lang:en"
+    print(f"📡 Fetching viral trending topics from X.com for category='{category}'...")
+    url = "https://api.twitter.com/2/tweets/search/recent"
     
     params = {
         "query": query,
@@ -404,7 +429,7 @@ def fetch_x_trending_ai_topics():
                 print("⚠️ X.com API Error (HTTP 429): Rate Limited. Falling back to Google News RSS...")
             else:
                 print(f"⚠️ X.com API Error (HTTP {response.status_code}): {response.text[:200]}. Falling back to Google News RSS...")
-            return _fetch_xcom_via_google_news()
+            return _fetch_xcom_via_google_news(category)
             
         data = response.json()
         tweets = data.get("data", [])
@@ -420,7 +445,7 @@ def fetch_x_trending_ai_topics():
             # Clean text for title
             clean_text = re.sub(r"https://t.co/\S+", "", text).strip()
             clean_text = clean_text.replace("\n", " ")
-            title = f"X.com Alert: @{username} on AI"
+            title = f"X.com Alert: @{username} on {category}"
             
             # Format public metrics
             metrics = t.get("public_metrics", {})
@@ -440,9 +465,9 @@ def fetch_x_trending_ai_topics():
                 "type": "trending"
             })
             
-        print(f"✅ X.com Search: Retrieved {len(articles)} viral AI topics.")
+        print(f"✅ X.com Search: Retrieved {len(articles)} viral topics for category='{category}'.")
         return articles
     except Exception as e:
         print(f"⚠️ X.com Search fetch failed: {e}. Trying Google News fallback...")
-        return _fetch_xcom_via_google_news()
+        return _fetch_xcom_via_google_news(category)
 
