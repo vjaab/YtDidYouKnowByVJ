@@ -6071,6 +6071,11 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     """The original heavy-lifting render logic."""
     if dynamic_params is None: dynamic_params = {}
     
+    # ── CI-LITE MODE: Simplified rendering for GitHub Actions (low resources) ────────
+    CI_LITE = os.environ.get("CI_LITE", "0") == "1"
+    if CI_LITE:
+        print("🔧 CI-LITE mode enabled: simplified rendering for CI environment")
+    
     avatar_scale_mult = dynamic_params.get("avatar_scale_mult", 1.0)
     subtitle_y_shift = dynamic_params.get("subtitle_y_shift", 0)
 
@@ -6215,8 +6220,41 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         print(f"DEBUG: is_longform={is_longform}, about to check if is_longform")
         crossfade = 0.4 if not is_longform else 0.6 # Longer crossfade for longform smoothness
         
+        # --- CI-LITE: Skip complex background rendering ---
+        if CI_LITE and is_longform:
+            print("🔧 CI-LITE: Using simplified static background for longform")
+            # Just use a single static background
+            vp = visual_paths[0]
+            try:
+                if vp.endswith(".mp4"):
+                    c_clip = VideoFileClip(vp).without_audio()
+                    if c_clip.duration < audio_duration:
+                        c_clip = c_clip.with_effects([vfx.Loop(duration=audio_duration)])
+                    else:
+                        c_clip = c_clip.subclipped(0, audio_duration)
+                    w, h = c_clip.size
+                    target_w_crop = int(h * 16 / 9)
+                    if target_w_crop <= w:
+                        x1 = (w - target_w_crop) // 2
+                        c_clip = c_clip.cropped(x1=x1, y1=0, x2=x1 + target_w_crop, y2=h)
+                    else:
+                        target_h_crop = int(w * 9 / 16)
+                        y1 = (h - target_h_crop) // 2
+                        c_clip = c_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h_crop)
+                    c_clip = c_clip.resized((FRAME_W, FRAME_H))
+                else:
+                    raw_img = Image.open(vp).convert("RGB")
+                    bg_img = ImageOps.fit(raw_img, (FRAME_W, FRAME_H), Image.LANCZOS)
+                    bg_arr = np.array(bg_img)
+                    bg_arr = cv2.GaussianBlur(bg_arr, (71, 71), 0)
+                    c_clip = ImageClip(bg_arr, duration=audio_duration)
+                bg_layer_clips.append(c_clip)
+            except Exception as e:
+                print(f"⚠️ CI-LITE background failed: {e}")
+                bg_layer_clips.append(ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=audio_duration))
+        
         # --- LONGFORM 2.5s PACING PATTERN INTERRUPTS ---
-        if is_longform:
+        elif is_longform:
             print("DEBUG: Entering is_longform=True branch")
             if os.environ.get("USE_LEGACY_LONGFORM_BG", "0") == "1":
                 clip_dur = 2.5 + crossfade
@@ -7199,13 +7237,19 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         screenshot_clips = _article_screenshot_clip(screenshot_path, audio_duration)
     gradient = _gradient_clip(audio_duration, height_pct=layout["gradient_height_pct"], position=layout["gradient_position"], is_longform=is_longform)
     
-    # Ambient Particles
-    bg_accent = layout["theme"]["accent"] if (layout.get("theme") and os.environ.get("ENABLE_LAYOUT_VARIATION", "0") == "1") else accent_color
-    particle_layer = _ambient_particles(audio_duration, bg_accent, particle_style=layout["particle_style"])
+    # ── CI-LITE: Skip heavy overlay layers in CI environment ───────────────────
+    if not CI_LITE:
+        # Ambient Particles
+        bg_accent = layout["theme"]["accent"] if (layout.get("theme") and os.environ.get("ENABLE_LAYOUT_VARIATION", "0") == "1") else accent_color
+        particle_layer = _ambient_particles(audio_duration, bg_accent, particle_style=layout["particle_style"])
 
-    # ── HUMAN REALISM OVERLAYS ───────────────────────────────────────────────
-    grain_layer = _generate_film_grain(audio_duration, FRAME_W, FRAME_H)
-    flare_layer = None  # Disabled lens flare circle drifting left-to-right as requested
+        # ── HUMAN REALISM OVERLAYS ───────────────────────────────────────────────
+        grain_layer = _generate_film_grain(audio_duration, FRAME_W, FRAME_H)
+        flare_layer = None  # Disabled lens flare circle drifting left-to-right as requested
+    else:
+        particle_layer = None
+        grain_layer = None
+        flare_layer = None
     
     # ── COMPLIANCE & BRANDING ────────────────────────────────────────────────
     disclosure = _ai_disclosure_overlay(audio_duration)
@@ -7221,7 +7265,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
     # ── MID-VIDEO RE-ENGAGEMENT HOOKS ──────────────────────────────────────
     # Add summary slides, quiz prompts, and pattern interrupt markers at strategic points
-    if is_longform:
+    if is_longform and not CI_LITE:
         # Summary slides at 30%, 50%, 70% of video
         summary_points = [
             (0.30, "Core concept explained — now diving into implementation"),
@@ -7300,103 +7344,107 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                             engagement_clips.append(trans_clip)
                             print(f"   📖 Chapter transition added: {chapter_title} at {start_s:.1f}s")
     
-    # ── STAT CALLOUT GRAPHICS ──────────────────────────────────────────────────
-    # Add metric callouts from script data (%, latency, throughput, etc.)
-    metric_popups = script_json.get("metric_popups", [])
-    # Also extract from fact_scripts and key_stats
-    fact_scripts = script_json.get("fact_scripts", [])
-    for fs in fact_scripts:
-        key_stat = fs.get("key_stat", "")
-        fact_num = fs.get("fact_number", 0)
-        if key_stat and fact_num > 0:
-            # Parse stat value and label
-            import re
-            match = re.match(r'([\d\.]+[%BMKx]?)\s*(.*)', key_stat.strip())
-            if match:
-                stat_val, stat_lbl = match.groups()
-                metric_popups.append({
-                    "value": stat_val,
-                    "label": stat_lbl.strip() or "Metric",
-                    "timestamp": float(fs.get("approx_start_seconds", 5.0 + fact_num * 30))
-                })
-    
-    for mp in metric_popups:
-        ts_val = mp.get("timestamp", 0)
-        if ts_val > 3 and ts_val < audio_duration - 3:
-            callout = _stat_callout_clip(
-                mp.get("value", ""), mp.get("label", "Metric"),
-                ts_val, accent_color, audio_duration, hold=2.5
-            )
-            if callout:
-                engagement_clips.append(callout)
-                print(f"   📊 Stat callout added: {mp.get('value')} {mp.get('label')} at {ts_val:.1f}s")
-    
-    # ── CODE SNIPPET / DIAGRAM DISPLAY ────────────────────────────────────────
-    # Add code snippets and architecture diagrams for technical content
-    code_snippets = script_json.get("code_snippets", [])
-    for cs in code_snippets:
-        ts_val = cs.get("timestamp", 0)
-        if ts_val > 5 and ts_val < audio_duration - 5:
-            code_clip = _code_snippet_clip(
-                cs.get("code", ""), cs.get("language", "python"),
-                ts_val, accent_color, audio_duration, hold=cs.get("duration", 4.0)
-            )
-            if code_clip:
-                engagement_clips.append(code_clip)
-                print(f"   💻 Code snippet added at {ts_val:.1f}s")
-    
-    arch_diagrams = script_json.get("architecture_diagrams", [])
-    for ad in arch_diagrams:
-        ts_val = ad.get("timestamp", 0)
-        if ts_val > 5 and ts_val < audio_duration - 5:
-            arch_clip = _architecture_diagram_clip(
-                ad.get("components", []), ad.get("connections", []),
-                ts_val, accent_color, audio_duration, hold=ad.get("duration", 5.0)
-            )
-            if arch_clip:
-                engagement_clips.append(arch_clip)
-                print(f"   🏗️ Architecture diagram added at {ts_val:.1f}s")
-    
-    # ── AUDIO-DRIVEN PATTERN INTERRUPTS (Every 4-6 seconds) ──────────────────
-    # Generate visual cuts synchronized to audio beats/pace
-    interrupt_interval = 5.0  # Every 5 seconds
-    if is_longform:
-        interrupt_interval = 6.0  # Slightly longer for longform
-    
-    pattern_interrupt_times = []
-    t = interrupt_interval
-    while t < audio_duration - 5:
-        # Avoid chapter boundaries
-        at_boundary = False
-        for ch in script_json.get("chapters", []):
-            ch_start = float(ch.get("approx_start_seconds", 0))
-            if abs(t - ch_start) < 3.0:
-                at_boundary = True
-                break
-        if not at_boundary:
-            pattern_interrupt_times.append(t)
-        t += interrupt_interval
-    
-    # Add snap-zoom and flash effects at these intervals
-    for pi_t in pattern_interrupt_times:
-        # Snap-zoom punch
-        from config import ENABLE_CINEMATIC_TRANSITIONS
-        if ENABLE_CINEMATIC_TRANSITIONS:
-            trans_clip = _create_transition_clip("zoom_punch", duration=0.2)
-            if trans_clip:
-                trans_clip = trans_clip.with_start(pi_t)
-                engagement_clips.append(trans_clip)
-            
-            # Accent flash
-            flash = ColorClip(size=(FRAME_W, FRAME_H), color=accent_color, duration=0.15).with_opacity(0.4)
-            flash = flash.with_start(pi_t).with_effects([vfx.CrossFadeOut(0.1)])
-            engagement_clips.append(flash)
-    
-    print(f"   ⚡ Pattern interrupts added: {len(pattern_interrupt_times)} cuts every {interrupt_interval}s")
+    # ── CI-LITE: Skip heavy overlay layers in CI environment ───────────────────
+    if not CI_LITE:
+        # ── STAT CALLOUT GRAPHICS ──────────────────────────────────────────────────
+        # Add metric callouts from script data (%, latency, throughput, etc.)
+        metric_popups = script_json.get("metric_popups", [])
+        # Also extract from fact_scripts and key_stats
+        fact_scripts = script_json.get("fact_scripts", [])
+        for fs in fact_scripts:
+            key_stat = fs.get("key_stat", "")
+            fact_num = fs.get("fact_number", 0)
+            if key_stat and fact_num > 0:
+                # Parse stat value and label
+                import re
+                match = re.match(r'([\d\.]+[%BMKx]?)\s*(.*)', key_stat.strip())
+                if match:
+                    stat_val, stat_lbl = match.groups()
+                    metric_popups.append({
+                        "value": stat_val,
+                        "label": stat_lbl.strip() or "Metric",
+                        "timestamp": float(fs.get("approx_start_seconds", 5.0 + fact_num * 30))
+                    })
+        
+        for mp in metric_popups:
+            ts_val = mp.get("timestamp", 0)
+            if ts_val > 3 and ts_val < audio_duration - 3:
+                callout = _stat_callout_clip(
+                    mp.get("value", ""), mp.get("label", "Metric"),
+                    ts_val, accent_color, audio_duration, hold=2.5
+                )
+                if callout:
+                    engagement_clips.append(callout)
+                    print(f"   📊 Stat callout added: {mp.get('value')} {mp.get('label')} at {ts_val:.1f}s")
+        
+        # ── CODE SNIPPET / DIAGRAM DISPLAY ────────────────────────────────────────
+        # Add code snippets and architecture diagrams for technical content
+        code_snippets = script_json.get("code_snippets", [])
+        for cs in code_snippets:
+            ts_val = cs.get("timestamp", 0)
+            if ts_val > 5 and ts_val < audio_duration - 5:
+                code_clip = _code_snippet_clip(
+                    cs.get("code", ""), cs.get("language", "python"),
+                    ts_val, accent_color, audio_duration, hold=cs.get("duration", 4.0)
+                )
+                if code_clip:
+                    engagement_clips.append(code_clip)
+                    print(f"   💻 Code snippet added at {ts_val:.1f}s")
+        
+        arch_diagrams = script_json.get("architecture_diagrams", [])
+        for ad in arch_diagrams:
+            ts_val = ad.get("timestamp", 0)
+            if ts_val > 5 and ts_val < audio_duration - 5:
+                arch_clip = _architecture_diagram_clip(
+                    ad.get("components", []), ad.get("connections", []),
+                    ts_val, accent_color, audio_duration, hold=ad.get("duration", 5.0)
+                )
+                if arch_clip:
+                    engagement_clips.append(arch_clip)
+                    print(f"   🏗️ Architecture diagram added at {ts_val:.1f}s")
+        
+        # ── AUDIO-DRIVEN PATTERN INTERRUPTS (Every 4-6 seconds) ──────────────────
+        # Generate visual cuts synchronized to audio beats/pace
+        interrupt_interval = 5.0  # Every 5 seconds
+        if is_longform:
+            interrupt_interval = 6.0  # Slightly longer for longform
+        
+        pattern_interrupt_times = []
+        t = interrupt_interval
+        while t < audio_duration - 5:
+            # Avoid chapter boundaries
+            at_boundary = False
+            for ch in script_json.get("chapters", []):
+                ch_start = float(ch.get("approx_start_seconds", 0))
+                if abs(t - ch_start) < 3.0:
+                    at_boundary = True
+                    break
+            if not at_boundary:
+                pattern_interrupt_times.append(t)
+            t += interrupt_interval
+        
+        # Add snap-zoom and flash effects at these intervals
+        for pi_t in pattern_interrupt_times:
+            # Snap-zoom punch
+            from config import ENABLE_CINEMATIC_TRANSITIONS
+            if ENABLE_CINEMATIC_TRANSITIONS:
+                trans_clip = _create_transition_clip("zoom_punch", duration=0.2)
+                if trans_clip:
+                    trans_clip = trans_clip.with_start(pi_t)
+                    engagement_clips.append(trans_clip)
+                
+                # Accent flash
+                flash = ColorClip(size=(FRAME_W, FRAME_H), color=accent_color, duration=0.15).with_opacity(0.4)
+                flash = flash.with_start(pi_t).with_effects([vfx.CrossFadeOut(0.1)])
+                engagement_clips.append(flash)
+        
+        print(f"   ⚡ Pattern interrupts added: {len(pattern_interrupt_times)} cuts every {interrupt_interval}s")
+    else:
+        print("   🔧 CI-LITE: Skipping stat callouts, code snippets, diagrams, pattern interrupts")
     
     # ── LAYER QUIZ: Quiz Countdown & CTA ──────────────────────────────────────
     is_quiz = sub_category.lower() in ["quiz", "quiz & trivia", "trivia"]
-    if is_quiz:
+    if is_quiz and not CI_LITE:
         print("🎯 QUIZ MODE: Adding quiz-specific visual layers")
         
         # Find the quiz reveal chunk to time the countdown
@@ -7424,6 +7472,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         quiz_cta = _quiz_cta_overlay(comment_hook, incentive_cta_type, digital_asset_offer, accent_color, audio_duration)
         if quiz_cta:
             engagement_clips.append(quiz_cta)
+    elif is_quiz and CI_LITE:
+        print("   🔧 CI-LITE: Skipping quiz CTA layers")
     else:
         # Standard CTA for non-quiz videos (identity-based)
         identity_text = script_json.get("identity_cta", "")
@@ -7444,7 +7494,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     # Collect infographics logic — ENABLED if feature flag is active
     infographic_clips = []
     enable_infographics = os.environ.get("ENABLE_INFOGRAPHICS", "1") == "1"
-    if enable_infographics:
+    if enable_infographics and not CI_LITE:
         for chunk in chunks:
             if chunk.get("has_infographic") and chunk.get("infographic_type"):
                 iclip = _infographic_card_clip(
@@ -7457,11 +7507,13 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 )
                 if iclip:
                     infographic_clips.append(iclip)
+    elif enable_infographics and CI_LITE:
+        print("   🔧 CI-LITE: Skipping infographics")
 
     # Collect settings mockup clips
     settings_mockup_clips = []
     enable_mockup = os.environ.get("ENABLE_SETTINGS_MOCKUP", "1") == "1"
-    if enable_mockup:
+    if enable_mockup and not CI_LITE:
         for chunk in chunks:
             if chunk.get("is_setting_chunk"):
                 sclip = _create_settings_mockup_clip(
@@ -7473,10 +7525,12 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 )
                 if sclip:
                     settings_mockup_clips.append(sclip)
+    elif enable_mockup and CI_LITE:
+        print("   🔧 CI-LITE: Skipping settings mockup")
 
     # ── LONGFORM: "FACT X/N" BADGE OVERLAYS ──────────────────────────────────
     longform_badge_clips = []
-    if is_longform and script_json.get("longform_format") in ["did_you_know", "vaibhav", "chaptered"]:
+    if is_longform and not CI_LITE and script_json.get("longform_format") in ["did_you_know", "vaibhav", "chaptered"]:
         fact_timestamps = script_json.get("fact_timestamps", [])
         total_facts = script_json.get("num_facts", 10)
         is_vaibhav = script_json.get("longform_format") == "vaibhav"
@@ -7683,90 +7737,94 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         except Exception as e:
             print(f"   ⚠️ Entity logo PIP failed (non-fatal): {e}")
 
-    # ═════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════
     # LONGFORM RETENTION UPGRADE: Wire in new premium visual layers
-    # ═════════════════════════════════════════════════════════════════════
-    snap_zoom_timestamps = []  # Used per-frame in make_final_frame
-    
-    # IMPROVEMENT #1: Glow ring behind avatar PiP
-    if ring_clip is not None:
-        positioned_ring = ring_clip.with_position(ring_position).with_start(0)
-        # Insert ring BEFORE avatar in the layer stack (so it renders behind)
-        # Find avatar_pip index and insert ring before it
-        # Find index using identity check to avoid MoviePy's buggy Clip.__eq__
-        idx = next((i for i, clip in enumerate(base_layers) if clip is avatar_pip), -1)
-        if idx != -1:
-            base_layers.insert(idx, positioned_ring)
-        else:
-            base_layers.append(positioned_ring)
-        print("   🔴 Glow ring layer added behind avatar.")
+    # ════════════════════════════════════════════════════════════════════
+    if not CI_LITE:
+        snap_zoom_timestamps = []  # Used per-frame in make_final_frame
+        
+        # IMPROVEMENT #1: Glow ring behind avatar PiP
+        if ring_clip is not None:
+            positioned_ring = ring_clip.with_position(ring_position).with_start(0)
+            # Insert ring BEFORE avatar in the layer stack (so it renders behind)
+            # Find avatar_pip index and insert ring before it
+            # Find index using identity check to avoid MoviePy's buggy Clip.__eq__
+            idx = next((i for i, clip in enumerate(base_layers) if clip is avatar_pip), -1)
+            if idx != -1:
+                base_layers.insert(idx, positioned_ring)
+            else:
+                base_layers.append(positioned_ring)
+            print("   🔴 Glow ring layer added behind avatar.")
 
-    if is_longform and script_json.get("longform_format") in ["did_you_know", "vaibhav", "chaptered"]:
-        fact_timestamps_lf = script_json.get("fact_timestamps", [])
+        if is_longform and script_json.get("longform_format") in ["did_you_know", "vaibhav", "chaptered"]:
+            fact_timestamps_lf = script_json.get("fact_timestamps", [])
 
-        # IMPROVEMENT #3: Progress Dot Navigator (top-center)
-        try:
-            progress_dot_clips = _longform_progress_dots(fact_timestamps_lf, accent_color, audio_duration)
-            base_layers.extend(progress_dot_clips)
-            print(f"   ⏺ Progress dot navigator added ({len(progress_dot_clips)} segments).")
-        except Exception as e:
-            print(f"   ⚠️ Progress dots failed (non-fatal): {e}")
+            # IMPROVEMENT #3: Progress Dot Navigator (top-center)
+            try:
+                progress_dot_clips = _longform_progress_dots(fact_timestamps_lf, accent_color, audio_duration)
+                base_layers.extend(progress_dot_clips)
+                print(f"   ⏺ Progress dot navigator added ({len(progress_dot_clips)} segments).")
+            except Exception as e:
+                print(f"   ⚠️ Progress dots failed (non-fatal): {e}")
 
-        # IMPROVEMENT #2: Kinetic Metric Pop-Ups
-        try:
-            metric_popups = script_json.get("metric_popups", [])
-            # Fallback: extract key_stat from each fact script if no metric_popups
-            if not metric_popups:
-                fact_scripts = script_json.get("fact_scripts", [])
-                for fs in fact_scripts:
-                    key_stat = fs.get("key_stat", "")
-                    # Estimate timestamp from fact number
-                    fact_num = fs.get("fact_number", 0)
-                    est_ts = 5.0 + (fact_num - 1) * 30.0  # Rough estimate
-                    if key_stat and est_ts < audio_duration:
-                        metric_popups.append({"text": key_stat, "timestamp": est_ts})
-            
-            metric_popup_clips = []
-            for mp in metric_popups:
-                mp_clip = _kinetic_metric_popup(
-                    mp.get("text", ""), float(mp.get("timestamp", 0)),
-                    accent_color, audio_duration
-                )
-                if mp_clip:
-                    metric_popup_clips.append(mp_clip)
-            base_layers.extend(metric_popup_clips)
-            print(f"   📊 Kinetic metric pop-ups added ({len(metric_popup_clips)} metrics).")
-        except Exception as e:
-            print(f"   ⚠️ Metric pop-ups failed (non-fatal): {e}")
+            # IMPROVEMENT #2: Kinetic Metric Pop-Ups
+            try:
+                metric_popups = script_json.get("metric_popups", [])
+                # Fallback: extract key_stat from each fact script if no metric_popups
+                if not metric_popups:
+                    fact_scripts = script_json.get("fact_scripts", [])
+                    for fs in fact_scripts:
+                        key_stat = fs.get("key_stat", "")
+                        # Estimate timestamp from fact number
+                        fact_num = fs.get("fact_number", 0)
+                        est_ts = 5.0 + (fact_num - 1) * 30.0  # Rough estimate
+                        if key_stat and est_ts < audio_duration:
+                            metric_popups.append({"text": key_stat, "timestamp": est_ts})
+                
+                metric_popup_clips = []
+                for mp in metric_popups:
+                    mp_clip = _kinetic_metric_popup(
+                        mp.get("text", ""), float(mp.get("timestamp", 0)),
+                        accent_color, audio_duration
+                    )
+                    if mp_clip:
+                        metric_popup_clips.append(mp_clip)
+                base_layers.extend(metric_popup_clips)
+                print(f"   📊 Kinetic metric pop-ups added ({len(metric_popup_clips)} metrics).")
+            except Exception as e:
+                print(f"   ⚠️ Metric pop-ups failed (non-fatal): {e}")
 
-        # IMPROVEMENT #6: Value Loop Montage (Intro Teasers)
-        try:
-            value_loop_clips = _value_loop_montage_clips(script_json, accent_color, audio_duration)
-            base_layers.extend(value_loop_clips)
-            print(f"   🎬 Value loop montage added ({len(value_loop_clips)} teasers).")
-        except Exception as e:
-            print(f"   ⚠️ Value loop montage failed (non-fatal): {e}")
+            # IMPROVEMENT #6: Value Loop Montage (Intro Teasers)
+            try:
+                value_loop_clips = _value_loop_montage_clips(script_json, accent_color, audio_duration)
+                base_layers.extend(value_loop_clips)
+                print(f"   🎬 Value loop montage added ({len(value_loop_clips)} teasers).")
+            except Exception as e:
+                print(f"   ⚠️ Value loop montage failed (non-fatal): {e}")
 
-        # IMPROVEMENT #7: Mid-Video Subscribe CTA
-        try:
-            subscribe_cta = _mid_video_subscribe_prompt(accent_color, audio_duration)
-            if subscribe_cta:
-                base_layers.append(subscribe_cta)
-                print("   🔔 Mid-video subscribe CTA added at 75% mark.")
-        except Exception as e:
-            print(f"   ⚠️ Subscribe CTA failed (non-fatal): {e}")
+            # IMPROVEMENT #7: Mid-Video Subscribe CTA
+            try:
+                subscribe_cta = _mid_video_subscribe_prompt(accent_color, audio_duration)
+                if subscribe_cta:
+                    base_layers.append(subscribe_cta)
+                    print("   🔔 Mid-video subscribe CTA added at 75% mark.")
+            except Exception as e:
+                print(f"   ⚠️ Subscribe CTA failed (non-fatal): {e}")
 
-        # IMPROVEMENT #4: Fact Boundary Darkeners (chapter breaks)
-        try:
-            boundary_clips = _fact_boundary_darkener(fact_timestamps_lf, accent_color, audio_duration)
-            base_layers.extend(boundary_clips)
-            print(f"   🌑 Fact boundary darkeners added ({len(boundary_clips)} boundaries).")
-        except Exception as e:
-            print(f"   ⚠️ Boundary darkeners failed (non-fatal): {e}")
+            # IMPROVEMENT #4: Fact Boundary Darkeners (chapter breaks)
+            try:
+                boundary_clips = _fact_boundary_darkener(fact_timestamps_lf, accent_color, audio_duration)
+                base_layers.extend(boundary_clips)
+                print(f"   🌑 Fact boundary darkeners added ({len(boundary_clips)} boundaries).")
+            except Exception as e:
+                print(f"   ⚠️ Boundary darkeners failed (non-fatal): {e}")
 
-        # IMPROVEMENT #4: Generate snap-zoom timestamps for per-frame processing
-        snap_zoom_timestamps = _generate_snap_zoom_interrupts(chunks, audio_duration, interval=5.0)
-        print(f"   ⚡ Snap-zoom interrupts scheduled ({len(snap_zoom_timestamps)} zooms every 5s).")
+            # IMPROVEMENT #4: Generate snap-zoom timestamps for per-frame processing
+            snap_zoom_timestamps = _generate_snap_zoom_interrupts(chunks, audio_duration, interval=5.0)
+            print(f"   ⚡ Snap-zoom interrupts scheduled ({len(snap_zoom_timestamps)} zooms every 5s).")
+    else:
+        snap_zoom_timestamps = []
+        print("   🔧 CI-LITE: Skipping LONGFORM RETENTION UPGRADE layers")
 
 
 
@@ -7803,52 +7861,56 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         progress = progress.with_position(lambda t: (int((t / max(audio_duration, 0.01)) * FRAME_W) - FRAME_W, safe_bottom_y))
     base_layers.append(progress)
     
-    # ── INFINITE LOOP VISUAL SYNC ─────────────────────────────────────────────
-    # If the script is a loop, we force the last 0.5s to crossfade into the first frame
-    if script_json.get("loop_score", 0) >= 8:
-        print("Enabling Infinite Loop Visual Sync...")
-        first_frame = bg_layer_clips[0].get_frame(0)
-        finish_img = ImageClip(first_frame).with_duration(0.5).with_start(audio_duration - 0.5).with_effects([vfx.CrossFadeIn(0.4)])
-        base_layers.append(finish_img)
+    # ── CI-LITE: Skip remaining optional layers in CI environment ────────────
+    if not CI_LITE:
+        # ── INFINITE LOOP VISUAL SYNC ─────────────────────────────────────────────
+        # If the script is a loop, we force the last 0.5s to crossfade into the first frame
+        if script_json.get("loop_score", 0) >= 8:
+            print("Enabling Infinite Loop Visual Sync...")
+            first_frame = bg_layer_clips[0].get_frame(0)
+            finish_img = ImageClip(first_frame).with_duration(0.5).with_start(audio_duration - 0.5).with_effects([vfx.CrossFadeIn(0.4)])
+            base_layers.append(finish_img)
 
-    # ── EMOJI POPUPS ─────────────────────────────────────────────────────────
-    emoji_popups = script_json.get("emoji_popups", [])
-    for ep in emoji_popups:
-        ep_ts = float(ep.get("timestamp", 0))
-        if ep_ts < audio_duration:
-            e_img = render_emoji_popup(ep.get("emoji", "🚀"))
-            e_clip = ImageClip(np.array(e_img)).with_duration(1.0).with_start(ep_ts)
-            # Use safe zone for emoji position (center but avoiding avatar/badge zones)
-            emoji_pos = safe_zones.find_safe_position(400, 400, element_type="emoji")
-            if emoji_pos:
-                pos = emoji_pos
-            else:
-                pos = (FRAME_W//2 - 200, FRAME_H//2 - 400)
-            e_clip = e_clip.with_position(pos).with_effects([vfx.CrossFadeIn(0.2)])
-            base_layers.append(e_clip)
+        # ── EMOJI POPUPS ─────────────────────────────────────────────────────────
+        emoji_popups = script_json.get("emoji_popups", [])
+        for ep in emoji_popups:
+            ep_ts = float(ep.get("timestamp", 0))
+            if ep_ts < audio_duration:
+                e_img = render_emoji_popup(ep.get("emoji", "🚀"))
+                e_clip = ImageClip(np.array(e_img)).with_duration(1.0).with_start(ep_ts)
+                # Use safe zone for emoji position (center but avoiding avatar/badge zones)
+                emoji_pos = safe_zones.find_safe_position(400, 400, element_type="emoji")
+                if emoji_pos:
+                    pos = emoji_pos
+                else:
+                    pos = (FRAME_W//2 - 200, FRAME_H//2 - 400)
+                e_clip = e_clip.with_position(pos).with_effects([vfx.CrossFadeIn(0.2)])
+                base_layers.append(e_clip)
 
-    # ── EASTER EGG FRAME (0.05s) ─────────────────────────────────────────────
-    egg_ts = random.uniform(audio_duration * 0.4, audio_duration * 0.7)
-    egg_img = insert_easter_egg()
-    egg_clip = ImageClip(np.array(egg_img)).with_duration(0.05).with_start(egg_ts)
-    base_layers.append(egg_clip)
+        # ── EASTER EGG FRAME (0.05s) ─────────────────────────────────────────────
+        egg_ts = random.uniform(audio_duration * 0.4, audio_duration * 0.7)
+        egg_img = insert_easter_egg()
+        egg_clip = ImageClip(np.array(egg_img)).with_duration(0.05).with_start(egg_ts)
+        base_layers.append(egg_clip)
 
-    # ── UNIVERSAL LAYOUT: HUD OVERLAYS ──
-    try:
-        from efficiency_engine import render_value_header, render_efficiency_scale, render_evidence_card
-        
-        # 1. Zone A (0%-30%): Value Headers (Every chunk/sentence) - DISABLED as requested
-        pass
-        
-        # 2. Zone B (30%-50%): Evidence & Efficiency - DISABLED as requested
-        # for i in range(int(audio_duration // 15)):
-        #     ...
-        # for chunk in chunks:
-        #     ...
-        pass
-                
-    except Exception as e:
-        print(f"HUD Overlay failed: {e}")
+        # ── UNIVERSAL LAYOUT: HUD OVERLAYS ──
+        try:
+            from efficiency_engine import render_value_header, render_efficiency_scale, render_evidence_card
+            
+            # 1. Zone A (0%-30%): Value Headers (Every chunk/sentence) - DISABLED as requested
+            pass
+            
+            # 2. Zone B (30%-50%): Evidence & Efficiency - DISABLED as requested
+            # for i in range(int(audio_duration // 15)):
+            #     ...
+            # for chunk in chunks:
+            #     ...
+            pass
+                    
+        except Exception as e:
+            print(f"HUD Overlay failed: {e}")
+    else:
+        print("   🔧 CI-LITE: Skipping infinite loop, emoji popups, easter egg, HUD overlays")
 
     # Free memory before compositing all layers
     gc.collect()

@@ -172,6 +172,7 @@ jobs:
           FAL_KEY: ${{ secrets.FAL_KEY }}
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+          CI_LITE: "1"
         run: |
           python -u main_longform.py --now
         
