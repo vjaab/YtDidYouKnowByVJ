@@ -783,20 +783,33 @@ def post_video_to_facebook_page(video_url: str, caption: str) -> str:
         print(f"✔ Upload session started. Video ID: {video_id}")
         print(f"📤 Upload URL: {upload_url}")
         
-        # Step 2: Upload video to Facebook's upload URL using file_url header
-        # Since we have a publicly accessible video URL (GitHub Releases/file.io/S3),
-        # we use the file_url header instead of downloading and re-uploading binary data
-        print("📤 [Facebook] Uploading video from hosted URL...")
+        # Step 2: Upload video to Facebook's upload URL (rupload.facebook.com)
+        # The rupload endpoint requires binary upload with Offset/Content-Length headers
+        print("📤 [Facebook] Downloading video for binary upload...")
+        try:
+            video_resp = requests.get(video_url, timeout=120, stream=True)
+            video_resp.raise_for_status()
+            video_data = video_resp.content
+            video_size = len(video_data)
+            print(f"✔ Downloaded video: {video_size:,} bytes ({video_size/1024/1024:.1f} MB)")
+        except Exception as e:
+            print(f"⚠️ [Facebook] Download failed: {e}")
+            raise
+        
+        print("📤 [Facebook] Uploading video binary to rupload.facebook.com...")
         upload_headers = {
             "Authorization": f"OAuth {fb_page_access_token}",
-            "file_url": video_url,
-            "Content-Type": "application/octet-stream",  # Required but ignored when file_url is used
+            "Offset": "0",
+            "Content-Length": str(video_size),
+            "X-Entity-Length": str(video_size),
+            "Content-Type": "video/mp4",
         }
         
         def _upload_phase():
             upload_resp = requests.post(
                 upload_url,
                 headers=upload_headers,
+                data=video_data,
                 timeout=180,
             )
             response_text = upload_resp.text
