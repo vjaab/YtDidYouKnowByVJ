@@ -7596,7 +7596,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     if is_longform:
         topic_transition_clips = _longform_topic_transition_clips(script_json, audio_duration)
         
-    base_layers = bg_layer_clips + burst_clips + [particle_layer] + screenshot_clips + topic_transition_clips + infographic_clips + settings_mockup_clips
+    base_layers = bg_layer_clips + burst_clips + ([particle_layer] if particle_layer else []) + screenshot_clips + topic_transition_clips + infographic_clips + settings_mockup_clips
     
     # Add overlays
     base_layers.append(gradient)
@@ -7606,6 +7606,9 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     if grain_layer: base_layers.append(grain_layer)
     if avatar_pip: base_layers.append(avatar_pip)
     base_layers.extend(longform_badge_clips)
+    
+    # Filter out any None values that may have been added
+    base_layers = [clip for clip in base_layers if clip is not None]
     # ── LOGO BRANDING OVERLAY STACK ────────────────────────────────────
     # Render entity tags on the left side below the title for Shorts, or use the right-side logo stack for longform
     entities_list = []
