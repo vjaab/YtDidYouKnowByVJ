@@ -25,16 +25,10 @@ Env vars expected:
     IG_ACCESS_TOKEN  - long-lived access token with publish permission
     
     # Video hosting (choose ONE):
-    # Option A: S3-compatible (R2, S3, MinIO, DO Spaces, etc.)
-    # Supports both S3_* and R2_* (Cloudflare R2) naming conventions:
-    S3_ENDPOINT_URL / R2_ENDPOINT_URL   - e.g., https://<account-id>.r2.cloudflarestorage.com
-    S3_ACCESS_KEY_ID / R2_ACCESS_KEY_ID
-    S3_SECRET_ACCESS_KEY / R2_SECRET_ACCESS_KEY
-    S3_BUCKET_NAME / R2_BUCKET_NAME     - e.g., ig-temp-uploads
-    S3_PUBLIC_DOMAIN / R2_PUBLIC_DOMAIN - e.g., pub-xxx.r2.dev (for public URL construction)
-    # Option B: file.io (simple temporary file hosting)
-    FILE_IO_API_KEY       - Optional API key for file.io (higher limits, longer expiry)
-    # Option C: Pre-signed/public URL provided externally
+    # Option A: GitHub Releases (free, 2GB limit, works in CI)
+    GITHUB_TOKEN          - Provided by GitHub Actions
+    GITHUB_REPOSITORY     - e.g., "owner/repo" (repo must be PUBLIC)
+    # Option B: Pre-signed/public URL provided externally
     IG_VIDEO_PUBLIC_URL   - If set, skip upload and use this URL directly
 """
 
@@ -47,6 +41,11 @@ from datetime import datetime, timedelta
 
 from config import (
     BASE_DIR,
+)
+
+from facebook_upload import (
+    post_video_to_facebook_page,
+    post_video_to_facebook_page_fallback,
 )
 
 # ── Constants ────────────────────────────────────────────────────────────────
@@ -78,138 +77,6 @@ def _check_facebook_credentials():
     fb_page_id = os.getenv("FB_PAGE_ID")
     fb_page_access_token = os.getenv("FB_PAGE_ACCESS_TOKEN")
     return all(k and k.strip() for k in [fb_page_id, fb_page_access_token])
-
-
-# ── Facebook API Helpers ──────────────────────────────────────────────────────
-
-def _parse_meta_error(response_text: str) -> dict:
-    """Parse Meta Graph API error response into structured dict.
-    Handles malformed JSON with unescaped quotes in error messages.
-    """
-    # First try normal parsing
-    try:
-        data = json.loads(response_text)
-        error = data.get("error", {})
-        return {
-            "message": error.get("message", "Unknown error"),
-            "type": error.get("type", "Unknown"),
-            "code": error.get("code", 0),
-            "error_subcode": error.get("error_subcode"),
-            "fbtrace_id": error.get("fbtrace_id"),
-            "raw": data
-        }
-    except json.JSONDecodeError:
-        pass
-    
-    # Fallback: extract fields using regex (handles malformed JSON from Meta)
-    try:
-        import re
-        
-        # Extract error object content
-        error_match = re.search(r'"error"\s*:\s*(\{.*?\})\s*[},\]]', response_text, re.DOTALL)
-        if error_match:
-            error_content = error_match.group(1)
-        else:
-            error_content = response_text
-        
-        # Extract individual fields
-        code_match = re.search(r'"code"\s*:\s*(\d+)', error_content)
-        # Use lookahead to capture message including unescaped quotes
-        message_match = re.search(r'"message"\s*:\s*"(.+?)(?:\"\s*,\s*"|\"\s*})', error_content)
-        type_match = re.search(r'"type"\s*:\s*"([^"]*)"', error_content)
-        fbtrace_match = re.search(r'"fbtrace_id"\s*:\s*"([^"]*)"', error_content)
-        subcode_match = re.search(r'"error_subcode"\s*:\s*(\d+)', error_content)
-        
-        return {
-            "message": message_match.group(1) if message_match else "Unknown error",
-            "type": type_match.group(1) if type_match else "Unknown",
-            "code": int(code_match.group(1)) if code_match else 0,
-            "error_subcode": int(subcode_match.group(1)) if subcode_match else None,
-            "fbtrace_id": fbtrace_match.group(1) if fbtrace_match else None,
-            "raw": {"parse_method": "regex_fallback"}
-        }
-    except Exception as e:
-        return {"message": response_text[:200], "type": "ParseError", "code": 0, "error_subcode": None, "fbtrace_id": None, "raw": {"parse_error": str(e)}}
-
-
-def _is_retryable_error(error_code: int, error_subcode: int = None) -> bool:
-    """Check if error is transient and worth retrying."""
-    retryable_codes = {4, 17, 32, 80000, 80001, 80004, 80006}
-    retryable_subcodes = {2446079, 2446071}
-    return error_code in retryable_codes or error_subcode in retryable_subcodes
-
-
-def _retry_with_backoff(func, max_attempts=3, base_delay=2, *args, **kwargs):
-    """Execute function with exponential backoff retry for transient errors."""
-    last_error = None
-    for attempt in range(1, max_attempts + 1):
-        try:
-            return func(*args, **kwargs)
-        except requests.HTTPError as e:
-            last_error = e
-            # Use captured response_text if available, fallback to e.response.text
-            response_text = getattr(e, 'response_text', None) or (e.response.text if e.response else "")
-            error_data = _parse_meta_error(response_text)
-            if not _is_retryable_error(error_data["code"], error_data["error_subcode"]):
-                raise
-            if attempt < max_attempts:
-                delay = base_delay * (2 ** (attempt - 1))
-                print(f"⚠️ Retryable error (attempt {attempt}/{max_attempts}): {error_data['message']} (code {error_data['code']}). Waiting {delay}s...")
-                time.sleep(delay)
-            else:
-                raise
-    raise last_error
-
-
-def _validate_fb_token(fb_page_id: str, fb_page_access_token: str) -> dict:
-    """Validate Facebook Page token has required permissions."""
-    try:
-        # Try with permissions field first
-        resp = requests.get(
-            f"{GRAPH_API_BASE}/me",
-            params={
-                "fields": "id,name,permissions",
-                "access_token": fb_page_access_token
-            },
-            timeout=15
-        )
-        if resp.status_code == 200:
-            data = resp.json()
-            perms = set()
-            permissions_data = data.get("permissions", {}).get("data", [])
-            if permissions_data:
-                perms = {p["permission"] for p in permissions_data}
-            required = {"pages_show_list", "pages_read_engagement", "pages_manage_posts", "pages_manage_metadata"}
-            missing = required - perms
-            return {
-                "valid": True,
-                "page_id": data.get("id"),
-                "page_name": data.get("name"),
-                "missing_permissions": list(missing),
-                "all_permissions": list(perms)
-            }
-        # If permissions field fails, try without it
-        if "Tried accessing nonexisting field" in resp.text:
-            resp = requests.get(
-                f"{GRAPH_API_BASE}/me",
-                params={
-                    "fields": "id,name",
-                    "access_token": fb_page_access_token
-                },
-                timeout=15
-            )
-            if resp.status_code == 200:
-                data = resp.json()
-                return {
-                    "valid": True,
-                    "page_id": data.get("id"),
-                    "page_name": data.get("name"),
-                    "missing_permissions": ["permissions field not accessible"],
-                    "all_permissions": []
-                }
-        return {"valid": False, "error": f"HTTP {resp.status_code}: {resp.text}"}
-    except Exception as e:
-        return {"valid": False, "error": str(e)}
 
 
 # ── Token Management ────────────────────────────────────────────────────────
@@ -348,185 +215,8 @@ def _increment_rate_limit():
     except Exception:
         pass
 
-# ── S3-Compatible Temporary Video Hosting ────────────────────────────────────
 
-def _check_s3_credentials():
-    """Verifies that S3-compatible credentials are configured for temp video hosting.
-    
-    Supports both S3_* and R2_* (Cloudflare R2) environment variable naming conventions.
-    """
-    # Try S3_* first, then fall back to R2_*
-    endpoint = os.getenv("S3_ENDPOINT_URL") or os.getenv("R2_ENDPOINT_URL")
-    access_key = os.getenv("S3_ACCESS_KEY_ID") or os.getenv("R2_ACCESS_KEY_ID")
-    secret_key = os.getenv("S3_SECRET_ACCESS_KEY") or os.getenv("R2_SECRET_ACCESS_KEY")
-    bucket = os.getenv("S3_BUCKET_NAME") or os.getenv("R2_BUCKET_NAME")
-    public_domain = os.getenv("S3_PUBLIC_DOMAIN") or os.getenv("R2_PUBLIC_DOMAIN")
-    
-    return all(k and k.strip() for k in [endpoint, access_key, secret_key, bucket, public_domain])
-
-
-def upload_video_to_s3(video_path):
-    """
-    Uploads a video file to an S3-compatible storage and returns the public URL.
-    Works with Cloudflare R2, AWS S3, MinIO, DigitalOcean Spaces, etc.
-    
-    The file is given a unique hash-based name to avoid collisions.
-    After Instagram fetches the video, call delete_from_s3() to clean up.
-    """
-    # Support both S3_* and R2_* env var naming conventions
-    S3_ENDPOINT_URL = (os.getenv("S3_ENDPOINT_URL") or os.getenv("R2_ENDPOINT_URL", "")).rstrip('/')
-    S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME") or os.getenv("R2_BUCKET_NAME", "ig-temp-uploads")
-    S3_PUBLIC_DOMAIN = os.getenv("S3_PUBLIC_DOMAIN") or os.getenv("R2_PUBLIC_DOMAIN")
-    S3_ACCESS_KEY_ID = os.getenv("S3_ACCESS_KEY_ID") or os.getenv("R2_ACCESS_KEY_ID")
-    S3_SECRET_ACCESS_KEY = os.getenv("S3_SECRET_ACCESS_KEY") or os.getenv("R2_SECRET_ACCESS_KEY")
-
-    if not all(k and k.strip() for k in [S3_ENDPOINT_URL, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_BUCKET_NAME, S3_PUBLIC_DOMAIN]):
-        return None, "S3-compatible storage credentials not configured (need S3_ENDPOINT_URL/R2_ENDPOINT_URL, S3_ACCESS_KEY_ID/R2_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY/R2_SECRET_ACCESS_KEY, S3_BUCKET_NAME/R2_BUCKET_NAME, S3_PUBLIC_DOMAIN/R2_PUBLIC_DOMAIN)"
-
-    # Generate unique filename based on content hash + timestamp
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    file_hash = hashlib.md5(f"{video_path}_{timestamp}".encode()).hexdigest()[:8]
-    object_key = f"ig_temp_{timestamp}_{file_hash}.mp4"
-
-    # S3-compatible PUT URL
-    s3_url = f"{S3_ENDPOINT_URL}/{S3_BUCKET_NAME}/{object_key}"
-
-    try:
-        file_size = os.path.getsize(video_path)
-        print(f"📤 Uploading {file_size / (1024*1024):.1f}MB to S3-compatible storage: {object_key}")
-
-        with open(video_path, "rb") as f:
-            # AWS Signature V4 would be needed for real AWS S3
-            # For R2 and compatible, we can use simpler auth or pre-signed URLs
-            # Here we use the simplest approach: for R2, use Bearer token
-            # For generic S3, you'd need boto3 or requests-aws4auth
-            import hmac
-            import hashlib as hl
-            
-            # Simple approach: if endpoint contains cloudflare/r2, use Bearer
-            # Otherwise, we'd need proper AWS SigV4 (use boto3 for production)
-            if "cloudflare" in S3_ENDPOINT_URL.lower() or "r2" in S3_ENDPOINT_URL.lower():
-                headers = {
-                    "Authorization": f"Bearer {S3_SECRET_ACCESS_KEY}",  # R2 uses API token as secret
-                    "Content-Type": "video/mp4",
-                }
-            else:
-                # For other S3-compatible, fall back to basic approach
-                # In production, use boto3 with proper credentials
-                headers = {
-                    "Content-Type": "video/mp4",
-                }
-            
-            resp = requests.put(s3_url, headers=headers, data=f, timeout=120)
-
-        if resp.status_code in (200, 201):
-            public_url = f"https://{S3_PUBLIC_DOMAIN}/{object_key}"
-            print(f"✅ Uploaded to S3: {public_url}")
-            return public_url, object_key
-        else:
-            return None, f"S3 upload failed (HTTP {resp.status_code}): {resp.text}"
-
-    except Exception as e:
-        return None, f"S3 upload exception: {e}"
-
-
-def delete_from_s3(object_key):
-    """
-    Deletes a temporary video file from S3-compatible storage after Instagram has fetched it.
-    """
-    # Support both S3_* and R2_* env var naming conventions
-    S3_ENDPOINT_URL = (os.getenv("S3_ENDPOINT_URL") or os.getenv("R2_ENDPOINT_URL", "")).rstrip('/')
-    S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME") or os.getenv("R2_BUCKET_NAME", "ig-temp-uploads")
-    S3_SECRET_ACCESS_KEY = os.getenv("S3_SECRET_ACCESS_KEY") or os.getenv("R2_SECRET_ACCESS_KEY")
-
-    if not object_key or not all(k and k.strip() for k in [S3_ENDPOINT_URL, S3_BUCKET_NAME, S3_SECRET_ACCESS_KEY]):
-        return
-
-    s3_url = f"{S3_ENDPOINT_URL}/{S3_BUCKET_NAME}/{object_key}"
-
-    try:
-        headers = {}
-        if "cloudflare" in S3_ENDPOINT_URL.lower() or "r2" in S3_ENDPOINT_URL.lower():
-            headers["Authorization"] = f"Bearer {S3_SECRET_ACCESS_KEY}"
-        
-        resp = requests.delete(s3_url, headers=headers, timeout=15)
-        if resp.status_code in (200, 204):
-            print(f"🗑️ S3 cleanup: Deleted temp file {object_key}")
-        else:
-            print(f"⚠️ S3 cleanup failed (HTTP {resp.status_code}): {resp.text}")
-    except Exception as e:
-        print(f"⚠️ S3 cleanup exception (non-fatal): {e}")
-
-
-# ── file.io Temporary Video Hosting ───────────────────────────────────────────
-
-def _check_fileio_credentials():
-    """Verifies file.io is available (works without API key, but key gives better limits)."""
-    return True  # file.io works without credentials
-
-
-def upload_video_to_fileio(video_path):
-    """
-    Uploads a video file to file.io and returns the public download URL.
-    
-    file.io provides temporary file hosting with automatic expiry.
-    Free tier: 100MB max, 1 download or 14 days expiry (whichever comes first).
-    With API key: Higher limits, customizable expiry.
-    
-    Note: Instagram needs to fetch the video during container processing.
-    The link must remain valid long enough for Instagram to download it.
-    """
-    api_key = os.getenv("FILE_IO_API_KEY")
-    
-    file_size = os.path.getsize(video_path)
-    size_mb = file_size / (1024 * 1024)
-    
-    if size_mb > 100 and not api_key:
-        return None, f"File too large ({size_mb:.1f}MB) for free file.io tier (100MB limit). Use FILE_IO_API_KEY for larger files or use S3-compatible storage."
-
-    print(f"📤 Uploading {size_mb:.1f}MB to file.io...")
-
-    try:
-        url = "https://file.io"
-        headers = {}
-        if api_key:
-            headers["Authorization"] = f"Bearer {api_key}"
-        
-        # Options: set expiry to maximum (14 days = 1209600 seconds)
-        # Note: free tier limits to 1 download OR 14 days
-        data = {
-            "expires": "14d",  # Maximum expiry
-            "maxDownloads": "1",  # Instagram only needs to download once
-        }
-        
-        with open(video_path, "rb") as f:
-            files = {"file": (os.path.basename(video_path), f, "video/mp4")}
-            # allow_redirects=True is needed because file.io returns 301 to Cloudflare
-            resp = requests.post(url, headers=headers, data=data, files=files, timeout=180, allow_redirects=True)
-
-        # Handle case where response might not be JSON (e.g., HTML error page)
-        content_type = resp.headers.get('Content-Type', '')
-        if 'application/json' not in content_type:
-            return None, f"file.io returned non-JSON response (HTTP {resp.status_code}): {resp.text[:200]}"
-
-        if resp.status_code in (200, 201):
-            try:
-                result = resp.json()
-            except json.JSONDecodeError as e:
-                return None, f"file.io upload failed: Invalid JSON response: {e}"
-            if result.get("success"):
-                public_url = result.get("link")
-                expires = result.get("expires", "unknown")
-                print(f"✅ Uploaded to file.io: {public_url} (expires: {expires})")
-                return public_url, public_url  # Return URL as both public_url and "object_key" for tracking
-            else:
-                return None, f"file.io upload failed: {result}"
-        else:
-            return None, f"file.io upload failed (HTTP {resp.status_code}): {resp.text}"
-
-    except Exception as e:
-        return None, f"file.io upload exception: {e}"
-
+# ── GitHub Releases Temporary Video Hosting ──────────────────────────────────
 
 def upload_video_to_github_releases(video_path):
     """
@@ -656,15 +346,6 @@ def delete_github_release(release_id):
         print(f"⚠️ GitHub Releases cleanup exception (non-fatal): {e}")
 
 
-def delete_from_fileio(object_key):
-    """
-    file.io files auto-delete after expiry or download. No manual cleanup needed.
-    This is a no-op for compatibility with the cleanup pattern.
-    """
-    if object_key:
-        print(f"🗑️ file.io cleanup: Files auto-expire after download/expiry (no manual delete needed)")
-
-
 # ── Instagram Graph API: 3-Step Container Workflow ────────────────────────
 
 def create_reels_container(video_url: str, caption: str, share_to_feed: bool = True) -> str:
@@ -721,231 +402,16 @@ def publish_container(container_id: str) -> str:
     return resp.json()["id"]
 
 
-def post_video_to_facebook_page(video_url: str, caption: str) -> str:
-    """
-    Posts a video to Facebook Page as a Reel/Video.
-    Uses the public video URL (same as Instagram) and Facebook Page access token.
-    Implements the video_reels API with upload_phase workflow.
-    
-    Correct flow per Meta Graph API:
-    1. Start upload session (POST /page_id/video_reels with upload_phase=start)
-    2. Upload video to returned upload_url using file_url header (for hosted videos)
-    3. Finish upload with description, title, video_state=PUBLISHED
-    """
-    fb_page_id = os.getenv("FB_PAGE_ID")
-    fb_page_access_token = os.getenv("FB_PAGE_ACCESS_TOKEN")
-    
-    if not fb_page_id or not fb_page_access_token:
-        return None, "Facebook Page credentials not configured (FB_PAGE_ID, FB_PAGE_ACCESS_TOKEN)"
-    
-    # Validate token permissions
-    print("📡 [Facebook] Validating Page token permissions...")
-    token_info = _validate_fb_token(fb_page_id, fb_page_access_token)
-    if not token_info["valid"]:
-        print(f"⚠️ [Facebook] Token validation failed: {token_info['error']}")
-        return None, f"Token validation failed: {token_info['error']}"
-    
-    print(f"✔ [Facebook] Token valid for Page: {token_info['page_name']} ({token_info['page_id']})")
-    if token_info["missing_permissions"]:
-        print(f"⚠️ [Facebook] Missing recommended permissions: {token_info['missing_permissions']}")
-    
-    try:
-        # Step 1: Start upload session - get video_id and upload_url
-        # NOTE: Do NOT include video_url here - it's not supported in start phase
-        print("📡 [Facebook] Starting video upload session...")
-        start_payload = {
-            "upload_phase": "start",
-            "video_state": "DRAFT",
-            "description": caption[:2200],
-            "access_token": fb_page_access_token,
-        }
-        print(f"📡 [Facebook] Start phase payload: {start_payload}")
-        
-        def _start_phase():
-            resp = requests.post(
-                f"{GRAPH_API_BASE}/{fb_page_id}/video_reels",
-                data=start_payload,
-                timeout=30,
-            )
-            response_text = resp.text
-            print(f"📡 [Facebook] Start phase response: {resp.status_code} - {response_text}")
-            try:
-                resp.raise_for_status()
-            except requests.HTTPError as e:
-                # Attach response text to exception for later parsing
-                e.response_text = response_text
-                raise
-            return resp.json()
-        
-        start_data = _retry_with_backoff(_start_phase)
-        video_id = start_data["video_id"]
-        upload_url = start_data["upload_url"]
-        print(f"✔ Upload session started. Video ID: {video_id}")
-        print(f"📤 Upload URL: {upload_url}")
-        
-        # Step 2: Upload video to Facebook's upload URL (rupload.facebook.com)
-        # The rupload endpoint requires binary upload with Offset/Content-Length headers
-        print("📤 [Facebook] Downloading video for binary upload...")
-        try:
-            video_resp = requests.get(video_url, timeout=120, stream=True)
-            video_resp.raise_for_status()
-            video_data = video_resp.content
-            video_size = len(video_data)
-            print(f"✔ Downloaded video: {video_size:,} bytes ({video_size/1024/1024:.1f} MB)")
-        except Exception as e:
-            print(f"⚠️ [Facebook] Download failed: {e}")
-            raise
-        
-        print("📤 [Facebook] Uploading video binary to rupload.facebook.com...")
-        upload_headers = {
-            "Authorization": f"OAuth {fb_page_access_token}",
-            "Offset": "0",
-            "Content-Length": str(video_size),
-            "X-Entity-Length": str(video_size),
-            "Content-Type": "video/mp4",
-        }
-        
-        def _upload_phase():
-            upload_resp = requests.post(
-                upload_url,
-                headers=upload_headers,
-                data=video_data,
-                timeout=180,
-            )
-            response_text = upload_resp.text
-            print(f"📤 [Facebook] Upload phase response: {upload_resp.status_code} - {response_text}")
-            try:
-                upload_resp.raise_for_status()
-            except requests.HTTPError as e:
-                e.response_text = response_text
-                raise
-            return upload_resp.json()
-        
-        upload_result = _retry_with_backoff(_upload_phase)
-        print(f"✔ Video upload initiated: {upload_result}")
-        
-        # Step 3: Finish upload with description and publish
-        print("📡 [Facebook] Finishing upload and publishing...")
-        finish_payload = {
-            "video_id": video_id,
-            "upload_phase": "finish",
-            "video_state": "PUBLISHED",
-            "description": caption[:2200],
-            "access_token": fb_page_access_token,
-        }
-        print(f"📡 [Facebook] Finish phase payload: {finish_payload}")
-        
-        def _finish_phase():
-            resp = requests.post(
-                f"{GRAPH_API_BASE}/{fb_page_id}/video_reels",
-                data=finish_payload,
-                timeout=30,
-            )
-            response_text = resp.text
-            print(f"📡 [Facebook] Finish phase response: {resp.status_code} - {response_text}")
-            try:
-                resp.raise_for_status()
-            except requests.HTTPError as e:
-                e.response_text = response_text
-                raise
-            return resp.json()
-        
-        finish_result = _retry_with_backoff(_finish_phase)
-        print(f"✔ Upload finished: {finish_result}")
-        
-        # Step 4: Poll for processing status
-        deadline = time.time() + 300  # 5 min timeout
-        while time.time() < deadline:
-            resp = requests.get(
-                f"{GRAPH_API_BASE}/{video_id}",
-                params={"fields": "status", "access_token": fb_page_access_token},
-                timeout=30,
-            )
-            resp.raise_for_status()
-            status = resp.json().get("status", {})
-            processing_phase = status.get("processing_phase", {}).get("status")
-            video_status = status.get("video_status")
-            print(f"📊 [Facebook] Polling status: processing_phase={processing_phase}, video_status={video_status}")
-            if processing_phase == "complete" or video_status == "published":
-                break
-            if processing_phase == "error" or video_status == "error":
-                error_msg = status.get("processing_phase", {}).get("error", {}).get("message", "Unknown error")
-                raise RuntimeError(f"Facebook Reel {video_id} failed processing: {error_msg}")
-            time.sleep(5)
-        else:
-            # Don't fail on timeout - video might still process in background
-            print(f"⚠️ Facebook Reel {video_id} still processing after 300s, but publish was initiated")
-        
-        print(f"🎉 Facebook Reel published! ID: {video_id}")
-        return video_id, None
-        
-    except requests.HTTPError as e:
-        response_text = getattr(e, 'response_text', None) or (e.response.text if e.response else "")
-        error_data = _parse_meta_error(response_text)
-        print(f"⚠️ video_reels endpoint failed: code={error_data['code']}, message={error_data['message']}, subcode={error_data['error_subcode']}, fbtrace_id={error_data['fbtrace_id']}")
-        return None, f"video_reels API failed: {error_data['message']} (code {error_data['code']}, subcode {error_data['error_subcode']})"
-    except Exception as e:
-        print(f"⚠️ Facebook upload exception: {e}")
-        return None, f"Facebook upload exception: {e}"
-
-
-def post_video_to_facebook_page_fallback(video_url: str, caption: str) -> tuple:
-    """Fallback: Post as regular video via /videos endpoint (not Reel)."""
-    fb_page_id = os.getenv("FB_PAGE_ID")
-    fb_page_access_token = os.getenv("FB_PAGE_ACCESS_TOKEN")
-    
-    if not fb_page_id or not fb_page_access_token:
-        return None, "Facebook Page credentials not configured"
-    
-    try:
-        print("📡 [Facebook Fallback] Posting via /videos endpoint...")
-        fallback_payload = {
-            "file_url": video_url,
-            "description": caption[:2200],
-            "published": "true",
-            "access_token": fb_page_access_token,
-        }
-        print(f"📡 [Facebook Fallback] Payload: {fallback_payload}")
-        
-        def _fallback_post():
-            resp = requests.post(
-                f"{GRAPH_API_BASE}/{fb_page_id}/videos",
-                data=fallback_payload,
-                timeout=60
-            )
-            response_text = resp.text
-            print(f"📡 [Facebook Fallback] Response: {resp.status_code} - {response_text}")
-            try:
-                resp.raise_for_status()
-            except requests.HTTPError as e:
-                e.response_text = response_text
-                raise
-            return resp.json()
-        
-        result = _retry_with_backoff(_fallback_post)
-        video_id = result.get("id")
-        print(f"🎉 Facebook Video published (fallback)! ID: {video_id}")
-        return video_id, None
-    except requests.HTTPError as e:
-        response_text = getattr(e, 'response_text', None) or (e.response.text if e.response else "")
-        error_data = _parse_meta_error(response_text)
-        print(f"⚠️ Fallback /videos failed: code={error_data['code']}, message={error_data['message']}")
-        return None, f"Fallback /videos failed: {error_data['message']} (code {error_data['code']})"
-    except Exception as e:
-        print(f"⚠️ Fallback exception: {e}")
-        return None, f"Fallback exception: {e}"
-
-
 def upload_reel_to_instagram(video_path: str, caption: str):
     """
     Uploads a video as an Instagram Reel using the official Graph API.
 
     Workflow:
-      1. Get public video URL (from file.io, S3-compatible upload, or IG_VIDEO_PUBLIC_URL env var)
+      1. Get public video URL (from GitHub Releases, or IG_VIDEO_PUBLIC_URL env var)
       2. POST /{ig-user-id}/media → create container (media_type=REELS)
       3. GET /{container-id}?fields=status_code → poll until FINISHED
       4. POST /{ig-user-id}/media_publish → publish the Reel
-      5. Cleanup (auto for file.io, manual for S3)
+      5. Cleanup (GitHub Release kept for async Facebook video fetch)
 
     Args:
         video_path (str): Absolute path to the .mp4 video file.
@@ -974,7 +440,7 @@ def upload_reel_to_instagram(video_path: str, caption: str):
     if token != os.getenv("IG_ACCESS_TOKEN"):
         os.environ["IG_ACCESS_TOKEN"] = token
 
-    upload_method = None  # Track which method was used: "fileio", "s3", or "direct"
+    upload_method = None  # Track which method was used: "github", or "direct"
     upload_key = None     # Track for cleanup
     public_url = None
 
@@ -989,18 +455,7 @@ def upload_reel_to_instagram(video_path: str, caption: str):
             upload_method = "direct"
             print(f"✅ Using provided public URL: {public_url}")
         
-        # Option B: Upload to file.io (simple, no infrastructure needed)
-        if not public_url:
-            print(f"📤 Trying file.io for temporary hosting...")
-            public_url, fileio_result = upload_video_to_fileio(video_path)
-            if public_url:
-                upload_method = "fileio"
-                upload_key = fileio_result
-                print(f"✅ Uploaded to file.io")
-            else:
-                print(f"⚠️ file.io upload failed: {fileio_result}")
-        
-        # Option C: Upload to GitHub Releases (free, 2GB limit, works in CI)
+        # Option B: Upload to GitHub Releases (free, 2GB limit, works in CI)
         if not public_url:
             public_url, gh_result = upload_video_to_github_releases(video_path)
             if public_url:
@@ -1008,15 +463,7 @@ def upload_reel_to_instagram(video_path: str, caption: str):
                 upload_key = gh_result  # release_id for cleanup
                 print(f"✅ Uploaded to GitHub Releases")
             else:
-                print(f"⚠️ GitHub Releases upload failed: {gh_result}")
-        
-        # Option D: Upload to S3-compatible storage
-        if not public_url:
-            public_url, s3_result = upload_video_to_s3(video_path)
-            if not public_url:
-                return False, f"Failed to host video publicly: {s3_result}"
-            upload_method = "s3"
-            upload_key = s3_result  # Save for cleanup
+                return False, f"Failed to host video publicly: {gh_result}"
 
         # ── STEP 2: Create Media Container ───────────────────────────────────
         print(f"📡 [Instagram] Step 2/4: Creating Reels container...")
@@ -1063,13 +510,7 @@ def upload_reel_to_instagram(video_path: str, caption: str):
 
     finally:
         # ── CLEANUP: Delete temp file based on upload method ──────────────────
-        if upload_method == "s3" and upload_key:
-            print("🧹 Cleaning up temporary S3 file...")
-            delete_from_s3(upload_key)
-        elif upload_method == "fileio" and upload_key:
-            print("🧹 Cleaning up file.io reference...")
-            delete_from_fileio(upload_key)
-        elif upload_method == "github" and upload_key:
+        if upload_method == "github" and upload_key:
             # NOTE: Skip GitHub Release deletion to allow async Facebook video fetch
             # Releases are tagged as 'media-temp-*' for periodic manual cleanup
             print(f"ℹ️ Keeping GitHub Release {upload_key} for async video processing (tagged for later cleanup)")
@@ -1096,19 +537,6 @@ if __name__ == "__main__":
 
     # 2. Video hosting options
     print("\n📦 Video hosting options:")
-    if _check_s3_credentials():
-        print("  ✔ S3-compatible storage (S3_* or R2_*): Configured")
-    else:
-        print("  ⚠️ S3-compatible storage: Not configured (optional)")
-        print("     Set: S3_ENDPOINT_URL/R2_ENDPOINT_URL, S3_ACCESS_KEY_ID/R2_ACCESS_KEY_ID,")
-        print("          S3_SECRET_ACCESS_KEY/R2_SECRET_ACCESS_KEY, S3_BUCKET_NAME/R2_BUCKET_NAME,")
-        print("          S3_PUBLIC_DOMAIN/R2_PUBLIC_DOMAIN")
-    
-    if _check_fileio_credentials():
-        print("  ✔ file.io: Available (no config needed, optional FILE_IO_API_KEY for larger files)")
-    else:
-        print("  ⚠️ file.io: Not available")
-    
     gh_token = os.getenv("GITHUB_TOKEN")
     gh_repo = os.getenv("GITHUB_REPOSITORY")
     if gh_token and gh_repo and "/" in gh_repo:
