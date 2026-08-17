@@ -34,23 +34,20 @@ def get_authenticated_service():
             scopes=SCOPES
         )
         creds.refresh(Request())
-    else:
-        # Local development: use token file or browser flow
-        if os.path.exists(token_path):
-            creds = Credentials.from_authorized_user_file(token_path, SCOPES)
-            
+    elif os.path.exists(token_path):
+        # Use pre-stored token.json (restored from GitHub Secrets in CI)
+        creds = Credentials.from_authorized_user_file(token_path, SCOPES)
+        
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 creds.refresh(Request())
             else:
-                flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(
-                    YOUTUBE_CLIENT_SECRET_FILE, SCOPES
-                )
-                creds = flow.run_local_server(port=8080, prompt='consent')
-                
-            with open(token_path, "w") as token:
-                token.write(creds.to_json())
-            
+                print("token.json invalid or expired, and no refresh token available.")
+                return None
+    else:
+        print("No token.json found and no refresh token available.")
+        return None
+    
     try:
         from googleapiclient.discovery import build
         youtube = build("youtube", "v3", credentials=creds)
