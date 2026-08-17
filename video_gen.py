@@ -6223,6 +6223,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             print("🔧 CI-LITE: Using simplified static background for longform")
             # Just use a single static background
             vp = visual_paths[0]
+            # Define expanded_visual_paths for B-roll bursts later
+            expanded_visual_paths = visual_paths[:]
             try:
                 if vp.endswith(".mp4"):
                     c_clip = VideoFileClip(vp).without_audio()
