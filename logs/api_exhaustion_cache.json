@@ -25,12 +25,12 @@
     "openai/gpt-oss-120b": 1786987182.1582532
   },
   "cloudflare_models": {
-    "@cf/meta/llama-3.3-70b-instruct": 1786946140.2939913,
-    "@cf/qwen/qwen2.5-72b-instruct": 1786946142.7393115,
-    "@cf/mistral/mistral-small-3.1-24b-instruct": 1786946143.0941622,
-    "@cf/moonshotai/kimi-k2.7-code": 1786946143.34997,
-    "@cf/moonshotai/kimi-k2.6": 1786946143.7018645,
-    "@cf/zai-org/glm-5.2": 1786946144.381075
+    "@cf/meta/llama-3.3-70b-instruct": 1786961859.6876247,
+    "@cf/qwen/qwen2.5-72b-instruct": 1786961861.4213684,
+    "@cf/mistral/mistral-small-3.1-24b-instruct": 1786961861.846818,
+    "@cf/moonshotai/kimi-k2.7-code": 1786961862.139672,
+    "@cf/moonshotai/kimi-k2.6": 1786961862.8310323,
+    "@cf/zai-org/glm-5.2": 1786961863.3749824
   },
   "cerebras_models": {
     "gpt-oss-120b": 1786987695.8295078,
