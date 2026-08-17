@@ -79,17 +79,44 @@ class SafeZoneCalculator:
     
     def _init_default_zones(self):
         """Initialize zones that are always reserved based on layout type."""
-        # YouTube UI safe zones (bottom for progress bar, top for notch/status bar)
-        self.reserve_zone(0, 0, self.frame_w, 80, "youtube_top_ui")
-        self.reserve_zone(0, self.frame_h - 120, self.frame_w, self.frame_h, "youtube_bottom_ui")
+        # YouTube UI safe zones - STRICT per feedback
+        # Top 15% for platform headers/notch (192px on 1080p, 162px on 1920p)
+        top_ui_h = int(self.frame_h * 0.15)
+        self.reserve_zone(0, 0, self.frame_w, top_ui_h, "youtube_top_ui")
+        # Bottom 20% for player controls, captions, engagement buttons (384px on 1080p, 216px on 1920p)
+        bottom_ui_h = int(self.frame_h * 0.20)
+        self.reserve_zone(0, self.frame_h - bottom_ui_h, self.frame_w, self.frame_h, "youtube_bottom_ui")
         
-        # Title area (bottom)
+        # Title area (bottom) - positioned above bottom UI zone
         title_gap = self.layout.get("title_bottom_gap", 192)
+        title_y_start = self.frame_h - title_gap - 200
+        title_y_end = self.frame_h - title_gap
+        # Ensure title doesn't overlap with bottom UI
+        if title_y_end > self.frame_h - bottom_ui_h:
+            title_y_end = self.frame_h - bottom_ui_h
+            title_y_start = title_y_end - 200
         self.reserve_zone(
-            0, self.frame_h - title_gap - 200, 
-            self.frame_w, self.frame_h - title_gap, 
+            0, title_y_start, 
+            self.frame_w, title_y_end, 
             "title_area"
         )
+        
+        # Define STRICT safe caption zone - center 60% vertical viewport (20%-80%)
+        # This ensures captions stay in the middle area, away from top/bottom UI
+        caption_top = int(self.frame_h * 0.20)
+        caption_bottom = int(self.frame_h * 0.80)
+        self.reserve_zone(0, caption_top, self.frame_w, caption_bottom, "caption_safe_zone")
+        
+        # Define UPPER-MIDDLE safe zone for kinetic captions (30%-55% of frame)
+        # This is the "lower third" equivalent for vertical video - above presenter, below top UI
+        upper_middle_top = int(self.frame_h * 0.30)
+        upper_middle_bottom = int(self.frame_h * 0.55)
+        self.reserve_zone(0, upper_middle_top, self.frame_w, upper_middle_bottom, "upper_middle_safe_zone")
+        
+        # Define LOWER-MIDDLE safe zone for stat callouts (55%-75% of frame)
+        lower_middle_top = int(self.frame_h * 0.55)
+        lower_middle_bottom = int(self.frame_h * 0.75)
+        self.reserve_zone(0, lower_middle_top, self.frame_w, lower_middle_bottom, "lower_middle_safe_zone")
         
         # Avatar/talking head zone - dedicated corner
         if self.is_longform:
@@ -579,12 +606,16 @@ def ts(text, font):
     bb = font.getbbox(text)
     return bb[2] - bb[0], bb[3] - bb[1]
 
-def _prepare_screenshot_canvas(img, target_w, target_h, url=None):
+def _prepare_screenshot_canvas(img, target_w, target_h, url=None, apply_vignette=False):
     """
     Creates a premium 'Blurred Backdrop' canvas for wide screenshots.
     - Longform (16:9): Clean frosted glass card with rounded corners + drop shadow (no browser mockup)
     - Shorts (9:16): Elegant macOS dark-mode browser mockup with controls, outline, and domain name.
     Also automatically crops the top 80px of captured screenshots for longform to remove any browser chrome.
+    
+    Args:
+        apply_vignette: If True, applies a 35% opacity dark vignette overlay on the screenshot content
+                       to reduce visual clutter and keep focus on presenter/captions.
     """
     is_longform = target_w > target_h
 
@@ -607,6 +638,25 @@ def _prepare_screenshot_canvas(img, target_w, target_h, url=None):
     
     # Resize original screenshot
     fg_resized = img.resize((fw, fh), Image.LANCZOS).convert("RGBA")
+    
+    # ── OPTIONAL: Apply vignette/dimming overlay on screenshot content ─────────
+    # Reduces visual clutter from dense web pages (small text, busy UI)
+    if apply_vignette:
+        # Create a dark overlay with 35% opacity
+        vignette = Image.new("RGBA", (fw, fh), (0, 0, 0, int(255 * 0.35)))
+        # Apply vignette with gradient - darker at edges, lighter in center
+        vignette_arr = np.array(vignette)
+        h_v, w_v = vignette_arr.shape[:2]
+        Y, X = np.ogrid[:h_v, :w_v]
+        center_y, center_x = h_v // 2, w_v // 2
+        max_dist = np.sqrt(center_x**2 + center_y**2)
+        dist = np.sqrt((X - center_x)**2 + (Y - center_y)**2)
+        # Normalize distance and invert (center = 1.0, edges = 0.0)
+        vignette_alpha = 1.0 - (dist / max_dist)
+        # Apply 35% opacity at edges, 15% at center
+        vignette_arr[:, :, 3] = (vignette_arr[:, :, 3] * (0.15 + 0.20 * vignette_alpha)).astype(np.uint8)
+        vignette = Image.fromarray(vignette_arr, "RGBA")
+        fg_resized = Image.alpha_composite(fg_resized, vignette)
     
     # Overall window dimensions
     win_w = fw
@@ -1873,7 +1923,8 @@ def _create_settings_mockup_clip(text, start_time, duration, accent_color, audio
     # Dimensions
     card_w, card_h = 920, 200
     card_x1 = (FRAME_W - card_w) // 2
-    card_y1 = 1100  # Lower-middle third (subtitles are at 0.38)
+    # Use lower-middle safe zone (55%-75%)
+    card_y1 = int(FRAME_H * 0.65)
     card_x2 = card_x1 + card_w
     card_y2 = card_y1 + card_h
 
@@ -2012,7 +2063,8 @@ def _micro_cliffhanger_overlay(cliffhangers, accent_color, total_dur):
         def make_pos(t, _dur=dur):
             slide = min(t / 0.3, 1.0)
             x = int(FRAME_W - (FRAME_W * 0.9) * slide)
-            return (min(x, FRAME_W - 50), int(FRAME_H * 0.45))
+            # Use upper-middle safe zone
+            return (min(x, FRAME_W - 50), int(FRAME_H * 0.425))
 
         clip = VideoClip(lambda t: arr, duration=dur)
         mclip = VideoClip(lambda t, _dur=dur: mask_arr * make_opacity(t, _dur), is_mask=True, duration=dur)
@@ -2067,7 +2119,8 @@ def _interactive_challenge_overlay(challenge_data, accent_color, total_dur):
     clip = VideoClip(make_frame, duration=dur)
     mclip = VideoClip(make_mask, is_mask=True, duration=dur)
     x_pos = (FRAME_W - box_w) // 2
-    y_pos = int(FRAME_H * 0.28) # Moved up to clear the new lower-third subtitles
+    # Use upper-middle safe zone (30%-55%)
+    y_pos = int(FRAME_H * 0.425)
     return clip.with_mask(mclip).with_position((x_pos, y_pos)).with_start(ch_ts)
 
 
@@ -2231,6 +2284,127 @@ def _quiz_cta_overlay(comment_hook, incentive_cta_type, digital_asset_offer, acc
     mclip = VideoClip(lambda t: mask_arr * opacity_fn(t), is_mask=True, duration=dur)
     x_pos = 40
     y_pos = int(FRAME_H - TITLE_BOTTOM_GAP - box_h - 100)
+    return clip.with_mask(mclip).with_position((x_pos, y_pos)).with_start(start)
+
+
+# ── ANIMATED COMMENT CTA GRAPHIC ───────────────────────────────────────────────
+def _animated_comment_cta(comment_keyword, accent_color, total_dur):
+    """
+    Creates an animated callout graphic showing a chat box with the keyword highlighted.
+    Appears in the last 5 seconds of the video.
+    Reference: Feedback recommendation for visual "Comment 'ROBOT'" cue.
+    """
+    dur = 5.0
+    start = total_dur - dur
+    if start < 0:
+        return None
+    
+    f_main = gf(42, bold=True)
+    f_keyword = gf(48, bold=True)
+    f_sub = gf(28)
+    
+    # Chat bubble dimensions
+    bubble_w = int(FRAME_W * 0.85)
+    bubble_h = 180
+    
+    # Create animated frames
+    fps = 15
+    total_frames = int(dur * fps)
+    
+    rgb_frames = []
+    alpha_masks = []
+    
+    for frame_idx in range(total_frames):
+        t = frame_idx / fps
+        progress = t / dur
+        
+        img = Image.new("RGBA", (bubble_w, bubble_h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        
+        # Glassmorphic chat bubble background
+        draw.rounded_rectangle([0, 0, bubble_w - 1, bubble_h - 1], radius=24, 
+                               fill=(10, 15, 25, 230), outline=(*accent_color, 200), width=3)
+        
+        # Animated pulse border
+        pulse = 1.0 + 0.1 * math.sin(t * 6)
+        border_w = max(2, int(3 * pulse))
+        draw.rounded_rectangle([0, 0, bubble_w - 1, bubble_h - 1], radius=24, 
+                               outline=(*accent_color, int(255 * pulse)), width=border_w)
+        
+        # Chat icon
+        icon_size = 40
+        icon_x = 30
+        icon_y = (bubble_h - icon_size) // 2
+        draw.ellipse([icon_x, icon_y, icon_x + icon_size, icon_y + icon_size], 
+                     fill=(*accent_color, 200))
+        draw.text((icon_x + icon_size // 2, icon_y + icon_size // 2), "💬", 
+                  font=gf(24), fill=(255, 255, 255, 255), anchor="mm")
+        
+        # "Comment:" label
+        label_x = icon_x + icon_size + 20
+        label_y = 25
+        draw.text((label_x, label_y), "Comment:", font=f_sub, fill=(180, 180, 200, 255))
+        
+        # Keyword with highlight animation
+        keyword_x = label_x
+        keyword_y = label_y + 35
+        
+        # Animate keyword: scale up slightly, color pulse
+        keyword_scale = 1.0 + 0.05 * math.sin(t * 8)
+        keyword_color = (*accent_color, 255)
+        
+        # Draw keyword with highlight background
+        kw_text = f"'{comment_keyword}'"
+        kw_w = draw.textbbox((0, 0), kw_text, font=f_keyword)[2]
+        kw_h = draw.textbbox((0, 0), kw_text, font=f_keyword)[3]
+        
+        # Highlight pill behind keyword
+        pill_pad = 12
+        pill_x1 = keyword_x - pill_pad
+        pill_y1 = keyword_y - 4
+        pill_x2 = keyword_x + kw_w + pill_pad
+        pill_y2 = keyword_y + kw_h + 4
+        
+        # Pulsing highlight
+        highlight_alpha = int(180 + 75 * math.sin(t * 8))
+        draw.rounded_rectangle([pill_x1, pill_y1, pill_x2, pill_y2], radius=12, 
+                               fill=(*accent_color, highlight_alpha))
+        
+        draw.text((keyword_x, keyword_y), kw_text, font=f_keyword, fill=(255, 255, 255, 255))
+        
+        # Sub-text
+        sub_text = "to get the quiz pack!"
+        draw.text((keyword_x, keyword_y + kw_h + 15), sub_text, font=f_sub, fill=(200, 200, 220, 255))
+        
+        # Animated arrow pointing down
+        arrow_y = bubble_h - 35 + int(8 * math.sin(t * 4))
+        draw.text((bubble_w // 2, arrow_y), "▼", font=gf(28), fill=(*accent_color, 255), anchor="mm")
+        
+        # Store frame
+        rgb_frames.append(np.array(img.convert("RGB")))
+        alpha_masks.append(np.array(img.split()[3]).astype(float) / 255.0)
+    
+    def make_frame(t):
+        idx = min(int(t * fps), len(rgb_frames) - 1)
+        return rgb_frames[idx]
+    
+    def make_mask(t):
+        idx = min(int(t * fps), len(alpha_masks) - 1)
+        # Fade in/out
+        opacity = 1.0
+        if t < 0.4:
+            opacity = t / 0.4
+        elif t > dur - 0.5:
+            opacity = max(0, (dur - t) / 0.5)
+        return alpha_masks[idx] * opacity
+    
+    clip = VideoClip(make_frame, duration=dur)
+    mclip = VideoClip(make_mask, is_mask=True, duration=dur)
+    
+    # Position in lower-middle safe zone (above bottom UI, below presenter)
+    x_pos = (FRAME_W - bubble_w) // 2
+    y_pos = int(FRAME_H * 0.68)  # Lower-middle safe zone
+    
     return clip.with_mask(mclip).with_position((x_pos, y_pos)).with_start(start)
 
 
@@ -4353,7 +4527,8 @@ def _article_screenshot_clip(screenshot_path, duration):
         
     try:
         raw_img = Image.open(screenshot_path)
-        canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H)
+        # Apply vignette to reduce visual clutter from dense web page screenshots
+        canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H, apply_vignette=True)
         canvas_arr = np.array(canvas_img.convert("RGB"))
         
         # Show from 4.0 to 12.0 (8s duration)
@@ -4511,7 +4686,8 @@ def _evidence_screenshot_clip(evidence_path, duration):
     try:
         img = Image.open(evidence_path).convert("RGB")
         target_h, target_w = FRAME_H, FRAME_W
-        canvas = _prepare_screenshot_canvas(img, target_w, target_h, evidence_path)
+        # Apply vignette to evidence screenshots too
+        canvas = _prepare_screenshot_canvas(img, target_w, target_h, evidence_path, apply_vignette=True)
         
         arr_rgba = np.array(canvas.convert("RGBA"))
         arr_rgb = arr_rgba[:, :, :3]
@@ -5120,8 +5296,15 @@ def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, 
         if i < line_word_count - 1:
             line_w += 22  # space
 
-    # Safe Zone: lower third for landscape, upper-middle for portrait
-    y_pos_pct = 0.80 if is_landscape else 0.38
+    # Safe Zone: center 60% vertical viewport (20%-80%)
+    # For Shorts (portrait): use upper-middle zone (30%-55%) - avoids top UI and presenter area
+    # For Longform (landscape): use lower-middle zone (55%-75%) - avoids bottom UI
+    if is_landscape:
+        # Landscape: lower third area
+        y_pos_pct = 0.70
+    else:
+        # Portrait: upper-middle zone (center of safe 60%)
+        y_pos_pct = 0.425  # Middle of 30%-55% range
     line_h = int(90 * scale_ratio)
     start_y = int(frame_height * y_pos_pct) - (line_h // 2) + y_shift
 
@@ -5673,7 +5856,11 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     lines = lines[:1]
     line_h = int(90 * scale_ratio)
     
-    y_pos_pct = 0.80 if is_landscape else 0.60
+    # Safe Zone: center 60% vertical viewport
+    if is_landscape:
+        y_pos_pct = 0.70
+    else:
+        y_pos_pct = 0.425  # Upper-middle zone
     start_y = int(frame_height * y_pos_pct) - (len(lines) * line_h // 2) + y_shift
     
     max_line_w = 0
@@ -6300,7 +6487,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                                 else:
                                     try:
                                         raw_img = Image.open(vp)
-                                        canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H)
+                                        canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H, apply_vignette=True)
                                         canvas_arr = np.array(canvas_img.convert("RGB"))
                                         c_clip = ImageClip(canvas_arr)
                                         clip_cache[vp] = c_clip
@@ -6672,7 +6859,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                                 else:
                                     try:
                                         raw_img = Image.open(vp)
-                                        canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H)
+                                        canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H, apply_vignette=True)
                                         canvas_arr = np.array(canvas_img.convert("RGB"))
                                         c_clip = ImageClip(canvas_arr)
                                         clip_cache[vp] = c_clip
@@ -6950,6 +7137,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 
                 # Memoize computed masks to avoid redundant rembg processing
                 mask_cache = {}
+                shadow_cache = {}
                 fps = getattr(vid_clip, "fps", 30.0) or 30.0
                 
                 def make_mask_frame(t):
@@ -6975,12 +7163,61 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                     watermark_height = int(h_mask * 0.12)
                     mask[-watermark_height:, :] = 0.0
                     
+                    # ── EDGE FEATHERING: Eliminate haloing around shoulders/head ──────
+                    # Erode mask slightly to remove fringe, then feather edges
+                    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+                    mask = cv2.erode(mask, kernel, iterations=1)
+                    # Gaussian blur for soft edge transition (feathering)
+                    mask = cv2.GaussianBlur(mask, (5, 5), 0)
+                    
                     mask_cache[frame_idx] = mask
                     return mask
                 
+                def make_shadow_frame(t):
+                    """Generate a drop shadow for the presenter to ground them against background."""
+                    frame_idx = int(round(t * fps))
+                    if frame_idx in shadow_cache:
+                        return shadow_cache[frame_idx]
+                    
+                    # Get the base mask
+                    frame = unmasked_avatar.get_frame(t)
+                    rgba = remove(
+                        frame,
+                        session=rembg_session,
+                        alpha_matting=False,
+                        post_process_mask=True
+                    )
+                    mask = (rgba[:, :, 3] / 255.0).astype(np.float32)
+                    
+                    # Erase watermark area
+                    h_mask, w_mask = mask.shape
+                    watermark_height = int(h_mask * 0.12)
+                    mask[-watermark_height:, :] = 0.0
+                    
+                    # Create shadow: offset down-right, blur heavily, reduce opacity
+                    shadow = cv2.GaussianBlur(mask, (21, 21), 0)
+                    # Offset shadow (5px down, 3px right)
+                    M = np.float32([[1, 0, 3], [0, 1, 5]])
+                    shadow = cv2.warpAffine(shadow, M, (w_mask, h_mask), borderMode=cv2.BORDER_CONSTANT)
+                    # Reduce opacity to 30%
+                    shadow = shadow * 0.3
+                    
+                    shadow_cache[frame_idx] = shadow
+                    return shadow
+                
                 mclip = VideoClip(make_mask_frame, is_mask=True, duration=audio_duration)
                 avatar_clip = avatar_clip.with_mask(mclip)
-                print("   ✅ Dynamic AI background removal mask applied successfully (frame-by-frame).")
+                
+                # Create shadow clip (rendered behind avatar)
+                shadow_clip = VideoClip(lambda t: np.zeros((cur_h, cur_w, 3), dtype=np.uint8), duration=audio_duration)
+                shadow_mask_clip = VideoClip(make_shadow_frame, is_mask=True, duration=audio_duration)
+                shadow_clip = shadow_clip.with_mask(shadow_mask_clip)
+                
+                # Store shadow clip for later compositing (will be added to base_layers)
+                # We'll return it via a closure or attach to avatar_clip
+                avatar_clip.shadow_clip = shadow_clip
+                
+                print("   ✅ Dynamic AI background removal with edge feathering & drop shadow applied.")
                 
             except Exception as e:
                 print(f"⚠️ rembg failed: {e}. Falling back to Rounded Authority Card.")
@@ -7036,10 +7273,15 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 return intro_scale * base_scale
 
             avatar_clip = avatar_clip.with_effects([
-                # Continuous dynamic zoom-in + Micro-Breathing + intro glide resize
-                vfx.Resize(avatar_resize_fn), 
-                # Natural Head Tilt: Very subtle +/- 0.5 degree swing
-                vfx.Rotate(lambda t: 0.6 * math.sin(t * 1.4 + 0.5))
+# Continuous dynamic zoom-in + Micro-Breathing + intro glide resize
+            vfx.Resize(avatar_resize_fn), 
+            # Natural Head Tilt: Very subtle +/- 0.5 degree swing
+            vfx.Rotate(lambda t: 0.6 * math.sin(t * 1.4 + 0.5)),
+            # Color Matching: Subtle tint to match background accent (12% blend)
+            vfx.Lambda(lambda frame: cv2.addWeighted(
+                frame, 0.88, 
+                np.full_like(frame, accent_color, dtype=np.uint8), 0.12, 0
+            ))
             ])
 
             # ── IMPROVEMENT #1: Circular Face-Cam Frame (Premium PiP) ─────────
@@ -7472,6 +7714,11 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         quiz_cta = _quiz_cta_overlay(comment_hook, incentive_cta_type, digital_asset_offer, accent_color, audio_duration)
         if quiz_cta:
             engagement_clips.append(quiz_cta)
+        
+        # Add animated "Comment 'KEYWORD'" CTA graphic (visual callout)
+        animated_cta = _animated_comment_cta(comment_hook, accent_color, audio_duration)
+        if animated_cta:
+            engagement_clips.append(animated_cta)
     elif is_quiz and CI_LITE:
         print("   🔧 CI-LITE: Skipping quiz CTA layers")
     else:
@@ -7606,6 +7853,9 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     
     if flare_layer: base_layers.append(flare_layer)
     if grain_layer: base_layers.append(grain_layer)
+    # Add presenter drop shadow BEFORE avatar (renders behind)
+    if avatar_pip and hasattr(avatar_pip, 'clip') and hasattr(avatar_pip.clip, 'shadow_clip'):
+        base_layers.append(avatar_pip.clip.shadow_clip.with_position(pip_position).with_start(0))
     if avatar_pip: base_layers.append(avatar_pip)
     base_layers.extend(longform_badge_clips)
     

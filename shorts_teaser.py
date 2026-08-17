@@ -158,7 +158,7 @@ def generate_and_upload_shorts_teaser(script_json, longform_video_id, dry_run=Fa
             from video_gen import _prepare_screenshot_canvas
             
             img = Image.open(screenshot_path)
-            canvas = _prepare_screenshot_canvas(img, 1080, 1920, url=script_json.get("original_news_url"))
+            canvas = _prepare_screenshot_canvas(img, 1080, 1920, url=script_json.get("original_news_url"), apply_vignette=True)
             
             # Ken Burns on the screenshot canvas
             bg_arr = np.array(canvas)
