@@ -28,6 +28,7 @@ from thumbnail_gen import generate_thumbnail
 from youtube_upload import upload_video
 from x_upload import upload_video_to_x
 from instagram_upload import upload_reel_to_instagram
+from facebook_upload import post_video_to_facebook_page
 from telegram_selector import notify_telegram as real_notify_telegram
 from entity_fetcher import fetch_all_entities, get_retention_layers_config
 from kaggle_handover import trigger_kaggle_gpu_job
@@ -893,7 +894,8 @@ def run_pipeline(topic_type="auto", dry_run=False):
     # ── STEP 10d: Instagram Reels Auto-Post ───────────────────────────────────
     log_message("STEP 10d: Auto-posting Reel to Instagram...")
     try:
-        ig_caption = f"🔥 {title}\n\n" + " ".join(hashtags[:15])
+        # Use the same description as YouTube (truncated for IG's 2200 char limit)
+        ig_caption = description[:2200]
         if dry_run:
             print("🧪 [DRY RUN] Simulating Instagram Reel upload...")
             ig_uploaded, ig_result = True, "MOCK_IG_REEL_ID"
@@ -906,6 +908,25 @@ def run_pipeline(topic_type="auto", dry_run=False):
             log_message(f"WARNING: Instagram posting skipped/failed: {ig_result}")
     except Exception as ex:
         log_message(f"WARNING: Instagram auto-post failed: {ex}")
+
+    # ── STEP 10e: Facebook Reels Auto-Post ───────────────────────────────────
+    log_message("STEP 10e: Auto-posting Reel to Facebook...")
+    try:
+        # Use the same description as YouTube (truncated for FB's 2200 char limit)
+        fb_caption = description[:2200]
+        if dry_run:
+            print("🧪 [DRY RUN] Simulating Facebook Reel upload...")
+            fb_uploaded, fb_result = True, "MOCK_FB_REEL_ID"
+        else:
+            # Facebook requires a public video URL - use YouTube URL after upload
+            fb_uploaded, fb_result = post_video_to_facebook_page(youtube_url, fb_caption)
+
+        if fb_uploaded:
+            log_message(f"SUCCESS: Posted Reel to Facebook! ID: {fb_result}")
+        else:
+            log_message(f"WARNING: Facebook posting skipped/failed: {fb_result}")
+    except Exception as ex:
+        log_message(f"WARNING: Facebook auto-post failed: {ex}")
 
     # ── STEP 10b: Generate Pinned Comment ───────────────────────────────────
     next_slot = get_next_slot(slot)
