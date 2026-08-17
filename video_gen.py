@@ -2408,6 +2408,212 @@ def _animated_comment_cta(comment_keyword, accent_color, total_dur):
     return clip.with_mask(mclip).with_position((x_pos, y_pos)).with_start(start)
 
 
+# ── SAVE/SHARE VISUAL CUES ────────────────────────────────────────────────────
+# Animated on-screen prompts for Save and Share CTAs (appears at CTA moment)
+
+def _save_cta_overlay(accent_color, total_dur, cta_text="Save this for later!"):
+    """
+    Creates an animated 'Save' icon with text that appears at the CTA moment.
+    Uses a bookmark/flag icon with pulse animation.
+    """
+    dur = 4.0
+    start = total_dur - dur
+    if start < 0:
+        return None
+    
+    f_main = gf(42, bold=True)
+    f_sub = gf(28)
+    
+    # Card dimensions
+    card_w = int(FRAME_W * 0.8)
+    card_h = 140
+    
+    fps = 15
+    total_frames = int(dur * fps)
+    
+    rgb_frames = []
+    alpha_masks = []
+    
+    for frame_idx in range(total_frames):
+        t = frame_idx / fps
+        progress = t / dur
+        
+        img = Image.new("RGBA", (card_w, card_h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        
+        # Glassmorphic card background
+        draw.rounded_rectangle([0, 0, card_w - 1, card_h - 1], radius=20, 
+                               fill=(10, 15, 25, 230), outline=(*accent_color, 200), width=3)
+        
+        # Animated pulse border
+        pulse = 1.0 + 0.12 * math.sin(t * 5)
+        border_w = max(2, int(3 * pulse))
+        draw.rounded_rectangle([0, 0, card_w - 1, card_h - 1], radius=20, 
+                               outline=(*accent_color, int(255 * pulse)), width=border_w)
+        
+        # Bookmark/Save icon
+        icon_size = 50
+        icon_x = 30
+        icon_y = (card_h - icon_size) // 2
+        # Draw bookmark shape
+        draw.rounded_rectangle([icon_x, icon_y, icon_x + icon_size, icon_y + icon_size], radius=8, 
+                               fill=(*accent_color, 200))
+        # Bookmark cutout
+        draw.polygon([
+            (icon_x + 15, icon_y + 8),
+            (icon_x + 35, icon_y + 8),
+            (icon_x + 25, icon_y + 20),
+            (icon_x + 35, icon_y + 32),
+            (icon_x + 15, icon_y + 32),
+        ], fill=(255, 255, 255, 255))
+        
+        # Main text
+        text_x = icon_x + icon_size + 20
+        text_y = 20
+        draw.text((text_x, text_y), "📌 SAVE THIS", font=f_main, fill=(255, 255, 255, 255))
+        
+        # Sub text
+        draw.text((text_x, text_y + 55), cta_text, font=f_sub, fill=(200, 200, 220, 255))
+        
+        # Animated arrow/indicator
+        arrow_x = card_w - 60
+        arrow_y = card_h // 2 + int(10 * math.sin(t * 4))
+        draw.text((arrow_x, arrow_y), "▶", font=gf(32), fill=(*accent_color, 255), anchor="mm")
+        
+        # Sparkle particles
+        for i in range(3):
+            sparkle_x = card_w - 100 + i * 25 + int(5 * math.sin(t * 3 + i))
+            sparkle_y = 30 + int(5 * math.cos(t * 3 + i))
+            sparkle_alpha = int(200 + 55 * math.sin(t * 6 + i))
+            draw.text((sparkle_x, sparkle_y), "✨", font=gf(20), fill=(255, 255, 200, sparkle_alpha), anchor="mm")
+        
+        # Store frame
+        rgb_frames.append(np.array(img.convert("RGB")))
+        alpha_masks.append(np.array(img.split()[3]).astype(float) / 255.0)
+    
+    def make_frame(t):
+        idx = min(int(t * fps), len(rgb_frames) - 1)
+        return rgb_frames[idx]
+    
+    def make_mask(t):
+        idx = min(int(t * fps), len(alpha_masks) - 1)
+        opacity = 1.0
+        if t < 0.3:
+            opacity = t / 0.3
+        elif t > dur - 0.4:
+            opacity = max(0, (dur - t) / 0.4)
+        return alpha_masks[idx] * opacity
+    
+    clip = VideoClip(make_frame, duration=dur)
+    mclip = VideoClip(make_mask, is_mask=True, duration=dur)
+    
+    # Position in lower-middle safe zone
+    x_pos = (FRAME_W - card_w) // 2
+    y_pos = int(FRAME_H * 0.65)
+    
+    return clip.with_mask(mclip).with_position((x_pos, y_pos)).with_start(start)
+
+
+def _share_cta_overlay(accent_color, total_dur, cta_text="Send this to a developer!"):
+    """
+    Creates an animated 'Share' icon with text that appears at the CTA moment.
+    Uses a share arrow icon with pulse animation.
+    """
+    dur = 4.0
+    start = total_dur - dur
+    if start < 0:
+        return None
+    
+    f_main = gf(42, bold=True)
+    f_sub = gf(28)
+    
+    # Card dimensions
+    card_w = int(FRAME_W * 0.8)
+    card_h = 140
+    
+    fps = 15
+    total_frames = int(dur * fps)
+    
+    rgb_frames = []
+    alpha_masks = []
+    
+    for frame_idx in range(total_frames):
+        t = frame_idx / fps
+        progress = t / dur
+        
+        img = Image.new("RGBA", (card_w, card_h), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        
+        # Glassmorphic card background
+        draw.rounded_rectangle([0, 0, card_w - 1, card_h - 1], radius=20, 
+                               fill=(10, 15, 25, 230), outline=(*accent_color, 200), width=3)
+        
+        # Animated pulse border - different color for share
+        share_color = (255, 100, 100)  # Coral/pink for share
+        pulse = 1.0 + 0.12 * math.sin(t * 5)
+        border_w = max(2, int(3 * pulse))
+        draw.rounded_rectangle([0, 0, card_w - 1, card_h - 1], radius=20, 
+                               outline=(*share_color, int(255 * pulse)), width=border_w)
+        
+        # Share icon (three dots connected)
+        icon_size = 50
+        icon_x = 30
+        icon_y = (card_h - icon_size) // 2
+        # Draw three circles with connecting lines
+        for i in range(3):
+            cx = icon_x + 10 + i * 18
+            cy = icon_y + 25
+            draw.ellipse([cx - 8, cy - 8, cx + 8, cy + 8], fill=(*share_color, 200))
+            if i < 2:
+                draw.line([cx + 8, cy, cx + 10, cy], fill=(*share_color, 200), width=3)
+        
+        # Main text
+        text_x = icon_x + icon_size + 20
+        text_y = 20
+        draw.text((text_x, text_y), "📤 SHARE THIS", font=f_main, fill=(255, 255, 255, 255))
+        
+        # Sub text
+        draw.text((text_x, text_y + 55), cta_text, font=f_sub, fill=(200, 200, 220, 255))
+        
+        # Animated share arrow
+        arrow_x = card_w - 60
+        arrow_y = card_h // 2 + int(10 * math.sin(t * 4))
+        draw.text((arrow_x, arrow_y), "➤", font=gf(32), fill=(*share_color, 255), anchor="mm")
+        
+        # Sparkle particles
+        for i in range(3):
+            sparkle_x = card_w - 100 + i * 25 + int(5 * math.sin(t * 3 + i))
+            sparkle_y = 30 + int(5 * math.cos(t * 3 + i))
+            sparkle_alpha = int(200 + 55 * math.sin(t * 6 + i))
+            draw.text((sparkle_x, sparkle_y), "✨", font=gf(20), fill=(255, 200, 200, sparkle_alpha), anchor="mm")
+        
+        # Store frame
+        rgb_frames.append(np.array(img.convert("RGB")))
+        alpha_masks.append(np.array(img.split()[3]).astype(float) / 255.0)
+    
+    def make_frame(t):
+        idx = min(int(t * fps), len(rgb_frames) - 1)
+        return rgb_frames[idx]
+    
+    def make_mask(t):
+        idx = min(int(t * fps), len(alpha_masks) - 1)
+        opacity = 1.0
+        if t < 0.3:
+            opacity = t / 0.3
+        elif t > dur - 0.4:
+            opacity = max(0, (dur - t) / 0.4)
+        return alpha_masks[idx] * opacity
+    
+    clip = VideoClip(make_frame, duration=dur)
+    mclip = VideoClip(make_mask, is_mask=True, duration=dur)
+    
+    # Position in lower-middle safe zone
+    x_pos = (FRAME_W - card_w) // 2
+    y_pos = int(FRAME_H * 0.65)
+    
+    return clip.with_mask(mclip).with_position((x_pos, y_pos)).with_start(start)
+
+
 # ── VISUAL UNDERSTANDING LAYER: Infographic Cards ─────────────────────────────
 
 def _render_definition_card(term, definition, accent_color, width=900):
@@ -7727,6 +7933,20 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         identity_cta = _identity_cta_overlay(identity_text, accent_color, audio_duration)
         if identity_cta:
             engagement_clips.append(identity_cta)
+    
+    # ── SAVE/SHARE VISUAL CUES ─────────────────────────────────────────────────
+    # Add animated Save/Share overlays based on incentive_cta_type
+    incentive_cta_type = script_json.get("incentive_cta_type", "")
+    if incentive_cta_type == "save_trigger":
+        save_cta = _save_cta_overlay(accent_color, audio_duration, "Save this for later!")
+        if save_cta:
+            engagement_clips.append(save_cta)
+            print("   ✨ Added Save CTA visual cue")
+    elif incentive_cta_type == "share_trigger":
+        share_cta = _share_cta_overlay(accent_color, audio_duration, "Send this to a developer!")
+        if share_cta:
+            engagement_clips.append(share_cta)
+            print("   ✨ Added Share CTA visual cue")
 
     # ── LAYER 12: Telegram CTA card (Last 6 seconds) ──────────────────────────
     # Disabled full-screen sequential CTA as requested; keeping only the 3s cropped outro.

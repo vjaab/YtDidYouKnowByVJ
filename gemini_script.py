@@ -12,7 +12,7 @@ from config import (
     GEMINI_RPM_SLEEP
 )
 from topic_tracker import load_tracker, check_story_uniqueness, check_cooldowns
-from ecosystem_logic import get_slot_info, get_category_prompt_enhancement
+from ecosystem_logic import get_slot_info, get_category_prompt_enhancement, get_series_for_category, get_series_info
 
 # ── YPP COMPLIANCE: Editorial Perspective Rotation ──
 # Each video gets a unique editorial "lens" to break mass-produced template patterns
@@ -263,46 +263,50 @@ Return ONLY a JSON object:
 HOOK_AGENT_TEMPLATE = """{persona}
 
 HOOK AGENT TASK:
-Generate 10 hooks (<1.5s each). First 3 words MUST stop the scroll.
+Generate 3 distinct A/B TEST HOOK VARIANTS for YouTube Shorts A/B testing.
+Each variant must use a DIFFERENT viral pattern from the 5 proven patterns below.
+Each variant should contain 3-4 hooks using that same pattern (different angles).
+
 NO greetings. NO "Today we..." NO "In this video..." NO "Hey guys..."
 
+5 PROVEN VIRAL PATTERNS (use ONE pattern per variant):
+  VARIANT A — Negative/Warning: "You're probably using [Tool] wrong.", "Stop paying for [Tool].", "Don't make this [Tool] mistake."
+  VARIANT B — Result-First Reveal: "This AI tool saves developers hours.", "I found a free alternative to [Paid Tool].", "This GitHub repo replaces [Popular Tool]."
+  VARIANT C — Stat/Contradiction: "Google just killed [Feature].", "$4.2B wasted on [Thing].", "90% of developers don't know this."
+  VARIANT D — Curiosity Gap: "Most developers don't know this GitHub feature.", "Your [App] is secretly doing [Thing].", "What [Company] doesn't want you to know."
+  VARIANT E — Personal Stake: "Your code has this security flaw.", "This AI reads your private data.", "You're overpaying for [Service]."
+
 RULES:
-- Lead with: specific stat, contradiction, "You" + immediate stakes, or result-first reveal
+- First 3 words MUST stop the scroll
 - Max 8 words. One clause only.
-- Use these PROVEN viral patterns for tech/AI content:
-
-  PATTERN 1 — Negative/Warning Hook:
-  "You're probably using [Tool] wrong."
-  "Stop paying for [Tool]."
-  "Don't make this [Tool] mistake."
-
-  PATTERN 2 — Result-First Reveal:
-  "This AI tool saves developers hours."
-  "I found a free alternative to [Paid Tool]."
-  "This GitHub repo replaces [Popular Tool]."
-
-  PATTERN 3 — Specific Stat/Contradiction:
-  "Google just killed [Feature]."
-  "$4.2B wasted on [Thing]."
-  "90% of developers don't know this."
-
-  PATTERN 4 — Curiosity Gap:
-  "Most developers don't know this GitHub feature."
-  "Your [App] is secretly doing [Thing]."
-  "What [Company] doesn't want you to know."
-
-  PATTERN 5 — Personal Stake:
-  "Your code has this security flaw."
-  "This AI reads your private data."
-  "You're overpaying for [Service]."
+- Pick 3 distinct patterns (e.g., A, B, D or A, C, E)
+- Each variant = same pattern, different angles on the topic
 
 RESEARCH:
 {research_json}
 
 Return ONLY JSON:
 {{
-  "hooks": [
-    {{"text": "Hook text", "curiosity_score": 1-10, "emotional_trigger_score": 1-10, "reason": "Why it works"}}
+  "ab_test_variants": [
+    {{
+      "variant_id": "A",
+      "pattern": "Negative/Warning",
+      "hooks": [
+        {{"text": "Hook 1", "curiosity_score": 1-10, "emotional_trigger_score": 1-10, "reason": "Why it works"}},
+        {{"text": "Hook 2", "curiosity_score": 1-10, "emotional_trigger_score": 1-10, "reason": "Why it works"}},
+        {{"text": "Hook 3", "curiosity_score": 1-10, "emotional_trigger_score": 1-10, "reason": "Why it works"}}
+      ]
+    }},
+    {{
+      "variant_id": "B",
+      "pattern": "Result-First Reveal",
+      "hooks": [...]
+    }},
+    {{
+      "variant_id": "C",
+      "pattern": "Curiosity Gap",
+      "hooks": [...]
+    }}
   ]
 }}"""
 
@@ -645,6 +649,35 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
     
     day_name, slot, category = get_slot_info(run_index=run_index)
     strategy_enhancement = get_category_prompt_enhancement(category, slot)
+    
+    # ── SERIES TRACKING: Get recurring series for this category ──────────────────────
+    series_info = get_series_for_category(category)
+    if series_info:
+        series_name = series_info.get("name", "")
+        series_episode = series_info.get("episode", 1)
+        series_hook_template = series_info.get("hook_template", "")
+        series_cta_template = series_info.get("cta_template", "")
+        print(f"📺 Series matched: {series_name} (Episode #{series_episode})")
+    else:
+        series_name = ""
+        series_episode = 0
+        series_hook_template = ""
+        series_cta_template = ""
+        print(f"📺 No series matched for category: {category}")
+    
+    # Build series instruction for prompt injection
+    if series_name:
+        series_instruction = f"""
+        ─── RECURRING SERIES: {series_name} (Episode #{series_episode}) ───
+        This video is part of a recurring series. Use the series format:
+        - Hook template: {series_hook_template}
+        - CTA template: {series_cta_template}
+        - The hook MUST follow the series pattern (e.g., "GitHub Gem #1: RepoName — One liner")
+        - The CTA MUST follow the series pattern (e.g., "Follow so you don't miss Day 2")
+        - This builds audience loyalty — viewers expect the next episode.
+        """
+    else:
+        series_instruction = ""
     
     # ── STEP -2: REPETITION AVOIDANCE (Moved Up) ────────────────────────────────────────
     avoid_items = [h.get('news_headline', h.get('title')) for h in recent_history] + recent_titles
@@ -1021,6 +1054,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
             selection_instruction = (
                 f"Analyze the following {content_desc} and pick the SINGLE most breakout AI/tech story that matches the Vaibhav Sisinty content pillars:\n"
                 f"PRIMARY CATEGORY: {category}\n"
+                f"{series_instruction}"
                 "CONTENT PILLARS:\n"
                 "1. AI Tool Spotlight — newly launched/underrated AI tools with specific use cases.\n"
                 "2. Prompt Hack — specific copy-paste prompts that solve real tasks.\n"
@@ -1087,6 +1121,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
             selection_instruction = (
                 f"Analyze the following {content_desc} and pick the SINGLE most breakout, high-velocity tech topic or viral video.\n"
                 f"PRIMARY CATEGORY: {category}\n"
+                f"{series_instruction}"
                 "SELECTION FILTERS:\n"
                 "1. MUST follow the high-engagement 4-part micro-script structure precisely.\n"
                 "2. VISUAL DEMONSTRATION REQUIRED: The `nano_visual_prompt` fields MUST describe the exact screen, code editor, or device showing the tech in action.\n"
@@ -1147,6 +1182,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
             selection_instruction = (
                 f"Analyze the following {content_desc} and pick the SINGLE most useful, surprising tip or tool for EVERYDAY smartphone/computer users.\n"
                 f"PRIMARY CATEGORY: {category}\n"
+                f"{series_instruction}"
                 "SELECTION FILTERS:\n"
                 "1. PRIORITIZE: Tips, tricks, hidden features, or free tools that EVERYONE can use immediately. NOT for programmers only. Must be understandable by a 14-year-old.\n"
                 "2. VISUAL DEMONSTRATION REQUIRED: The `nano_visual_prompt` fields MUST describe the exact screen/device showing the tip in action.\n"
@@ -1210,6 +1246,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
             selection_instruction = (
                 f"Analyze the following {content_desc} and pick the SINGLE most shocking, scary, or mind-blowing tech fact for EVERYDAY people.\n"
                 f"PRIMARY CATEGORY: {category}\n"
+                f"{series_instruction}"
                 "SELECTION FILTERS:\n"
                 "1. PRIORITIZE: Privacy warnings, security scares, tech myths being debunked, common mistakes everyone makes. Must make the viewer feel PERSONALLY at risk or enlightened.\n"
                 "2. Must be understandable by ANYONE — no jargon, no technical terms without simple analogies.\n"
@@ -1377,6 +1414,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
             selection_instruction = (
                 f"Analyze the following {content_desc} and pick the SINGLE most commonly asked technical interview question with a clear, concise answer.\n"
                 f"PRIMARY CATEGORY: {category}\n"
+                f"{series_instruction}"
                 "SELECTION FILTERS:\n"
                 "1. PRIORITIZE: Frequently asked interview questions for Java, JavaScript, Spring Boot, AWS, Python, Kubernetes, Docker.\n"
                 "2. Each video covers ONE specific question with a complete answer.\n"
@@ -2466,24 +2504,54 @@ class MultiAgentGenerationEngine:
         if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         if not research: return None
 
-        print("🪝 [AGENT 2] Hook Agent: Generating high-retention hooks...")
+        print("🪝 [AGENT 2] Hook Agent: Generating A/B test hook variants...")
         hook_prompt = HOOK_AGENT_TEMPLATE.format(
             persona=self.persona,
             research_json=json.dumps(research)
         )
         hooks_data = self._call_gemini(hook_prompt)
         if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
-        if not hooks_data or "hooks" not in hooks_data: return None
+        if not hooks_data: return None
         
-        # Pick best hook (highest combined score including swipe-stop power)
-        best_hook = max(hooks_data["hooks"], key=lambda h: (
-            h.get("curiosity_score", 0) + 
-            h.get("emotional_trigger_score", 0) + 
-            h.get("swipe_stop_score", h.get("curiosity_score", 0))  # Backward-compatible
-        ))
-        hook_text = best_hook.get('text', '')
-        hook_words = len(hook_text.split())
-        print(f"🎯 Selected Hook ({hook_words} words): {hook_text}")
+        # Handle both old format ("hooks") and new A/B format ("ab_test_variants")
+        if "ab_test_variants" in hooks_data:
+            # New A/B test format - pick best hook across all variants
+            all_hooks = []
+            for variant in hooks_data["ab_test_variants"]:
+                for hook in variant.get("hooks", []):
+                    hook["variant_id"] = variant.get("variant_id", "")
+                    hook["pattern"] = variant.get("pattern", "")
+                    all_hooks.append(hook)
+            
+            # Store A/B variants for YouTube testing
+            script_data_ab_variants = hooks_data["ab_test_variants"]
+            
+            best_hook = max(all_hooks, key=lambda h: (
+                h.get("curiosity_score", 0) + 
+                h.get("emotional_trigger_score", 0) + 
+                h.get("swipe_stop_score", h.get("curiosity_score", 0))
+            ))
+            hook_text = best_hook.get('text', '')
+            hook_variant = best_hook.get('variant_id', '')
+            hook_pattern = best_hook.get('pattern', '')
+            hook_words = len(hook_text.split())
+            print(f"🎯 Selected Hook ({hook_words} words) [Variant {hook_variant} - {hook_pattern}]: {hook_text}")
+            
+            # Print all variants for reference
+            for v in hooks_data["ab_test_variants"]:
+                print(f"   📊 Variant {v['variant_id']} ({v['pattern']}): {len(v['hooks'])} hooks")
+        else:
+            # Legacy format fallback
+            script_data_ab_variants = None
+            if "hooks" not in hooks_data: return None
+            best_hook = max(hooks_data["hooks"], key=lambda h: (
+                h.get("curiosity_score", 0) + 
+                h.get("emotional_trigger_score", 0) + 
+                h.get("swipe_stop_score", h.get("curiosity_score", 0))
+            ))
+            hook_text = best_hook.get('text', '')
+            hook_words = len(hook_text.split())
+            print(f"🎯 Selected Hook ({hook_words} words): {hook_text}")
 
         print("📝 [AGENT 3] Fact Script Generator: Writing the unified retention-optimized script...")
         narrative_prompt = NARRATIVE_AGENT_TEMPLATE.format(
@@ -2547,6 +2615,11 @@ class MultiAgentGenerationEngine:
                 final_script["original_news_headline"] = selected_headline
             if not final_script.get("original_news_url") or final_script.get("original_news_url") == "Direct article URL":
                 final_script["original_news_url"] = selected_url
+            
+            # Attach A/B test hook variants for YouTube A/B testing
+            if 'script_data_ab_variants' in locals() and script_data_ab_variants:
+                final_script["ab_test_hook_variants"] = script_data_ab_variants
+                print(f"📊 A/B Test Variants attached: {len(script_data_ab_variants)} variants")
             
             # ── PHASE 2: Attach retention_map to the final script for downstream use ──
             if retention_map:

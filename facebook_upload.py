@@ -175,13 +175,14 @@ def _validate_fb_token(fb_page_id: str, fb_page_access_token: str) -> dict:
 
 # ── Main Upload Function ──────────────────────────────────────────────────────
 
-def post_video_to_facebook_page(video_url: str, caption: str) -> tuple:
+def post_video_to_facebook_page(video_url: str, caption: str, first_comment: str = None) -> tuple:
     """
     Posts a video to Facebook Page as a Reel using the video_reels API.
     
     Args:
         video_url: Public URL to the video file
         caption: Caption/description for the video
+        first_comment: Optional first comment to post on the video (e.g., YouTube link)
         
     Returns:
         tuple: (video_id, error_message) - video_id is None on failure
@@ -330,6 +331,27 @@ def post_video_to_facebook_page(video_url: str, caption: str) -> tuple:
             print(f"⚠️ Facebook Reel {video_id} still processing after 300s, but publish was initiated")
         
         print(f"🎉 Facebook Reel published! ID: {video_id}")
+        
+        # Step 6: Post first comment (YouTube link)
+        if first_comment:
+            try:
+                print("💬 [Facebook] Posting first comment with YouTube link...")
+                comment_payload = {
+                    "message": first_comment,
+                    "access_token": fb_page_access_token,
+                }
+                comment_resp = requests.post(
+                    f"{GRAPH_API_BASE}/{video_id}/comments",
+                    data=comment_payload,
+                    timeout=30,
+                )
+                if comment_resp.status_code == 200:
+                    print("✔ First comment posted successfully")
+                else:
+                    print(f"⚠️ First comment failed: {comment_resp.status_code} - {comment_resp.text}")
+            except Exception as e:
+                print(f"⚠️ First comment exception: {e}")
+        
         return video_id, None
         
     except requests.HTTPError as e:

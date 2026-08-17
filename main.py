@@ -225,6 +225,72 @@ def generate_pinned_comment(script_data, next_series_slot):
         f"👇 {cta}"
     )
 
+
+def format_instagram_caption(description, hashtags, youtube_url):
+    """
+    Instagram Reels caption: line breaks, 3-5 hashtags, community-focused.
+    Max 2200 chars.
+    """
+    # Extract the hook/first line
+    lines = description.split('\n')
+    hook_line = lines[0] if lines else ""
+    
+    # Pick 3-5 most relevant hashtags
+    ig_hashtags = hashtags[:5] if hashtags else ["#AI", "#TechNews", "#Developer"]
+    hashtag_str = " ".join(ig_hashtags)
+    
+    # Build Instagram-native caption with line breaks
+    ig_caption = f"""🔥 {hook_line}
+
+{description[:1500]}
+
+👇 Full breakdown on YouTube: {youtube_url}
+
+📲 Join the community:
+• Telegram → https://t.me/technewsbyvj
+• WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
+
+{hashtag_str}
+
+#AI #TechNews #Developer #Coding #ArtificialIntelligence"""
+    
+    return ig_caption[:2200]
+
+
+def format_facebook_caption(description, hashtags, youtube_url):
+    """
+    Facebook Reels caption: longer text, link in first comment.
+    Max 2200 chars for caption, link goes in comment.
+    """
+    lines = description.split('\n')
+    hook_line = lines[0] if lines else ""
+    
+    # Use more hashtags on FB (algorithm likes them)
+    fb_hashtags = hashtags[:10] if hashtags else ["#AI", "#TechNews", "#Developer", "#Coding", "#ArtificialIntelligence", "#MachineLearning", "#TechTrends", "#OpenSource", "#Innovation", "#FutureTech"]
+    hashtag_str = " ".join(fb_hashtags)
+    
+    fb_caption = f"""🔥 {hook_line}
+
+{description[:1800]}
+
+🎥 Full video on YouTube → Link in comments!
+
+📲 Follow for daily AI insights:
+• Telegram → https://t.me/technewsbyvj
+• WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
+• LinkedIn → https://www.linkedin.com/in/vijayakumar-j/
+
+{hashtag_str}
+
+#AI #TechNews #Developer #Coding #ArtificialIntelligence #MachineLearning #TechTrends #OpenSource #Innovation #FutureTech"""
+    
+    return fb_caption[:2200]
+
+
+def get_facebook_first_comment(youtube_url, hashtags):
+    """First comment on Facebook post with the YouTube link."""
+    return f"🔗 Full video: {youtube_url}\n\n#VJTechNews #AIResearch #DailyTechUpdates"
+
 def run_pipeline(topic_type="auto", dry_run=False):
     # Local mock or real Telegram notification based on dry_run
     def notify_telegram(msg, emoji=""):
@@ -894,8 +960,8 @@ def run_pipeline(topic_type="auto", dry_run=False):
     # ── STEP 10d: Instagram Reels Auto-Post ───────────────────────────────────
     log_message("STEP 10d: Auto-posting Reel to Instagram...")
     try:
-        # Use the same description as YouTube (truncated for IG's 2200 char limit)
-        ig_caption = description[:2200]
+        # Use platform-native Instagram caption (line breaks, 3-5 hashtags)
+        ig_caption = format_instagram_caption(description, hashtags, youtube_url)
         if dry_run:
             print("🧪 [DRY RUN] Simulating Instagram Reel upload...")
             ig_uploaded, ig_result = True, "MOCK_IG_REEL_ID"
@@ -912,14 +978,15 @@ def run_pipeline(topic_type="auto", dry_run=False):
     # ── STEP 10e: Facebook Reels Auto-Post ───────────────────────────────────
     log_message("STEP 10e: Auto-posting Reel to Facebook...")
     try:
-        # Use the same description as YouTube (truncated for FB's 2200 char limit)
-        fb_caption = description[:2200]
+        # Use platform-native Facebook caption (longer text, link in comment)
+        fb_caption = format_facebook_caption(description, hashtags, youtube_url)
+        fb_first_comment = get_facebook_first_comment(youtube_url, hashtags)
         if dry_run:
             print("🧪 [DRY RUN] Simulating Facebook Reel upload...")
             fb_uploaded, fb_result = True, "MOCK_FB_REEL_ID"
         else:
             # Facebook requires a public video URL - use YouTube URL after upload
-            fb_uploaded, fb_result = post_video_to_facebook_page(youtube_url, fb_caption)
+            fb_uploaded, fb_result = post_video_to_facebook_page(youtube_url, fb_caption, fb_first_comment)
 
         if fb_uploaded:
             log_message(f"SUCCESS: Posted Reel to Facebook! ID: {fb_result}")
