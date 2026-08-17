@@ -14,6 +14,10 @@ CF_API_TOKEN = os.getenv("CF_API_TOKEN", "")
 YOUTUBE_CLIENT_SECRET_FILE = os.getenv("YOUTUBE_CLIENT_SECRET_FILE", "client_secret.json")
 VEO_MODEL_ID = "veo-3.1-generate-preview"
 
+# YouTube Analytics API (for performance feedback loop)
+YOUTUBE_ANALYTICS_API_KEY = os.getenv("YOUTUBE_ANALYTICS_API_KEY", "")
+YOUTUBE_CHANNEL_ID = os.getenv("YOUTUBE_CHANNEL_ID", "")
+
 # X.com (Twitter) API Credentials
 X_API_KEY = os.getenv("X_API_KEY", "")
 X_API_SECRET = os.getenv("X_API_SECRET", "")
@@ -86,6 +90,8 @@ VISUAL_CUT_TARGET_SECONDS = 2.0   # Target visual change frequency (was ~4s, now
 ENABLE_CINEMATIC_TRANSITIONS = True  # Whip pan, zoom punch, flash cut, glitch
 ENABLE_STRATEGIC_SFX = True       # Whoosh/bass at pattern interrupts
 ENABLE_DYNAMIC_BGM_CURVE = True   # BGM energy follows Hook→Body→Payoff→CTA
+ENABLE_LAYOUT_VARIATION = True    # Enable deterministic layout variety per video
+FORCE_LAYOUT_TYPE = ""            # Force specific layout: "split_screen", "hero_center", "asymmetric", etc.
 TRENDING_NICHE_BIAS = 0.15         # 0=prefer broad topics, 1=prefer niche topics
 
 # Cloudflare Workers AI

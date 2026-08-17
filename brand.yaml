@@ -1,0 +1,478 @@
+# brand.yaml — Brand Identity Configuration
+# Single source of truth for all visual/verbal brand elements
+
+brand:
+  name: "VJ Tech Tips"
+  tagline: "Daily AI intelligence for developers"
+  handle: "@vjtechtips"
+  
+  # Color palette (used across all platforms)
+  colors:
+    primary:
+      hex: "#00E5FF"      # Electric Cyan
+      rgb: [0, 229, 255]
+      usage: "Primary CTAs, highlights, accent elements"
+    
+    secondary:
+      hex: "#FF0080"      # Neon Pink
+      rgb: [255, 0, 128]
+      usage: "Secondary accents, alerts, special CTAs"
+    
+    accent_gold:
+      hex: "#FFD700"      # Gold
+      rgb: [255, 215, 0]
+      usage: "Premium badges, subscriber milestones"
+    
+    accent_green:
+      hex: "#32FF32"      # Matrix Green
+      rgb: [50, 255, 50]
+      usage: "Success states, free/open-source indicators"
+    
+    accent_coral:
+      hex: "#FF6464"      # Coral
+      rgb: [255, 100, 100]
+      usage: "Warning/error states, delete actions"
+    
+    accent_purple:
+      hex: "#B482FF"      # Purple
+      rgb: [180, 130, 255]
+      usage: "Pro/advanced features, AI-generated content"
+    
+    background:
+      dark:
+        hex: "#0F0F15"
+        rgb: [15, 15, 21]
+      card:
+        hex: "#1A1A2E"
+        rgb: [26, 26, 46]
+      overlay:
+        hex: "#0A0A12"
+        rgb: [10, 10, 18]
+    
+    text:
+      primary:
+        hex: "#FFFFFF"
+        rgb: [255, 255, 255]
+      secondary:
+        hex: "#B0B0C8"
+        rgb: [176, 176, 200]
+      muted:
+        hex: "#6A6A8A"
+        rgb: [106, 106, 138]
+
+  # Gradients (for backgrounds, overlays, buttons)
+  gradients:
+    primary:
+      - "#00E5FF"
+      - "#0080FF"
+    secondary:
+      - "#FF0080"
+      - "#FF6B35"
+    gold:
+      - "#FFD700"
+      - "#FFA500"
+    dark:
+      - "#0F0F15"
+      - "#1A1A2E"
+    cyan_to_purple:
+      - "#00E5FF"
+      - "#B482FF"
+
+  # Typography
+  typography:
+    fonts:
+      primary:
+        family: "Montserrat"
+        weights:
+          regular: 400
+          medium: 500
+          semibold: 600
+          bold: 700
+          extrabold: 800
+        files:
+          regular: "Montserrat-Regular.ttf"
+          medium: "Montserrat-Medium.ttf"
+          semibold: "Montserrat-SemiBold.ttf"
+          bold: "Montserrat-Bold.ttf"
+          extrabold: "Montserrat-ExtraBold.ttf"
+      
+      mono:
+        family: "JetBrains Mono"
+        weights:
+          regular: 400
+          medium: 500
+          bold: 700
+        files:
+          regular: "JetBrainsMono-Regular.ttf"
+          medium: "JetBrainsMono-Medium.ttf"
+          bold: "JetBrainsMono-Bold.ttf"
+      
+      fallback:
+        family: "Roboto"
+        weights:
+          regular: 400
+          bold: 700
+        files:
+          regular: "Roboto-Regular.ttf"
+          bold: "Roboto-Bold.ttf"
+    
+    sizes:
+      # Shorts (9:16, 1080x1920)
+      shorts:
+        hook_title: 72
+        hook_subtitle: 48
+        body: 42
+        caption: 32
+        cta_button: 40
+        timestamp: 28
+        hashtag: 28
+      
+      # Longform (16:9, 1920x1080)
+      longform:
+        title: 64
+        subtitle: 40
+        body: 36
+        caption: 28
+        cta_button: 36
+        timestamp: 24
+      
+      # Thumbnails (1280x720)
+      thumbnail:
+        main: 96
+        sub: 56
+        badge: 48
+    
+    line_heights:
+      tight: 1.1
+      normal: 1.3
+      relaxed: 1.5
+    
+    letter_spacing:
+      tight: -0.02
+      normal: 0
+      wide: 0.05
+
+  # Logo
+  logo:
+    primary: "assets/brand/logo_primary.png"
+    secondary: "assets/brand/logo_secondary.png"
+    icon_only: "assets/brand/logo_icon.png"
+    watermark: "assets/brand/logo_watermark.png"
+    safe_zone_ratio: 0.15  # 15% padding around logo
+    
+    # Animation
+    animation:
+      entrance:
+        type: "scale_fade"
+        duration: 0.6
+        easing: "cubic_out"
+      pulse:
+        enabled: true
+        interval: 8.0
+        scale: 1.05
+      glow:
+        enabled: true
+        color: "#00E5FF"
+        intensity: 0.4
+
+  # Avatar / Presenter
+  avatar:
+    default: "assets/avatar/vj_default.png"
+    expressions:
+      neutral: "assets/avatar/expr_neutral.png"
+      excited: "assets/avatar/expr_excited.png"
+      thinking: "assets/avatar/expr_thinking.png"
+      surprised: "assets/avatar/expr_surprised.confused"
+    frame:
+      shape: "circle"  # circle, rounded_square, hexagon
+      border_width: 4
+      border_color: "#00E5FF"
+      glow: true
+      glow_color: "#00E5FF"
+      glow_blur: 20
+    position:
+      shorts:
+        split_screen: "top_right"
+        hero_center: "bottom_center"
+        asymmetric: "bottom_right"
+        side_strip: "top_left"
+        top_center: "bottom_center"
+        corner_cycling: "cycle"
+      longform:
+        default: "center_bottom"
+
+  # UI Components
+  components:
+    cta_button:
+      variants:
+        primary:
+          background: "#00E5FF"
+          text: "#0F0F15"
+          border: none
+        secondary:
+          background: "transparent"
+          text: "#00E5FF"
+          border: "2px solid #00E5FF"
+        gold:
+          background: "#FFD700"
+          text: "#0F0F15"
+          border: none
+      border_radius: 16
+      padding:
+        x: 32
+        y: 16
+      font_weight: "extrabold"
+      animation:
+        hover_scale: 1.05
+        press_scale: 0.98
+      
+    card:
+      background: "#1A1A2E"
+      border: "1px solid #2A2A4A"
+      border_radius: 20
+      shadow: "0 8px 32px rgba(0, 229, 255, 0.1)"
+      padding: 24
+    
+    badge:
+      variants:
+        new:
+          background: "#FF0080"
+          text: "#FFFFFF"
+        free:
+          background: "#32FF32"
+          text: "#0F0F15"
+        pro:
+          background: "#B482FF"
+          text: "#FFFFFF"
+        hot:
+          background: "#FF6B35"
+          text: "#FFFFFF"
+        live:
+          background: "#FF0000"
+          text: "#FFFFFF"
+          animation: "pulse"
+      border_radius: 8
+      font_size: 20
+      font_weight: "bold"
+      padding:
+        x: 16
+        y: 8
+    
+    progress_bar:
+      height: 6
+      background: "#1A1A2E"
+      fill_color: "#00E5FF"
+      border_radius: 3
+      glow: true
+    
+    tooltip:
+      background: "#0F0F15"
+      border: "1px solid #2A2A4A"
+      border_radius: 12
+      text_color: "#FFFFFF"
+      font_size: 24
+      padding: 16
+      shadow: "0 4px 24px rgba(0, 0, 0, 0.5)"
+
+  # Particle Effects
+  particles:
+    styles:
+      bokeh:
+        colors: ["#00E5FF", "#FF0080", "#FFD700", "#FFFFFF"]
+        sizes: [4, 8, 12, 16]
+        count: 30
+        speed: 0.5
+        blur: true
+      digital_rain:
+        characters: "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン"
+        color: "#00E5FF"
+        font_size: 16
+        columns: 40
+        speed: 2.0
+      lens_dust:
+        color: "#FFFFFF"
+        opacity: 0.3
+        sizes: [2, 4, 6]
+        count: 50
+        drift: 0.2
+      stars:
+        colors: ["#FFFFFF", "#00E5FF", "#FFD700"]
+        sizes: [2, 3, 4, 5]
+        count: 40
+        twinkle: true
+      digital:
+        shapes: ["square", "circle", "triangle"]
+        colors: ["#00E5FF", "#FF0080", "#32FF32"]
+        sizes: [6, 10, 14]
+        count: 25
+        rotation: true
+
+  # Transitions
+  transitions:
+    default: "match_cut"
+    options:
+      - "match_cut"
+      - "zoom_transition"
+      - "morph"
+      - "swipe"
+      - "data_stream"
+      - "neural_network"
+      - "glitch"
+      - "flash_cut"
+    durations:
+      fast: 0.15
+      normal: 0.3
+      slow: 0.5
+
+  # Video Structure Templates
+  video_templates:
+    shorts_35s:
+      segments:
+        - name: "hook"
+          duration_range: [0, 3]
+          visual_weight: "maximum"
+          cta: false
+        - name: "result_reveal"
+          duration_range: [3, 10]
+          visual_weight: "high"
+          cta: false
+        - name: "how_to"
+          duration_range: [10, 25]
+          visual_weight: "high"
+          cta: false
+        - name: "why_matters_cta"
+          duration_range: [25, 35]
+          visual_weight: "medium"
+          cta: true
+    
+    shorts_50s:
+      segments:
+        - name: "hook"
+          duration_range: [0, 3]
+        - name: "problem"
+          duration_range: [3, 10]
+        - name: "solution"
+          duration_range: [10, 35]
+        - name: "incentive_cta"
+          duration_range: [35, 42]
+        - name: "loop_bridge"
+          duration_range: [42, 50]
+    
+    longform_8min:
+      segments:
+        - name: "hook"
+          duration_range: [0, 15]
+        - name: "news_roundup"
+          duration_range: [15, 90]
+        - name: "deep_dive"
+          duration_range: [90, 420]
+        - name: "outro_cta"
+          duration_range: [420, 480]
+
+  # Platform-specific overrides
+  platforms:
+    youtube:
+      thumbnail:
+        resolution: [1280, 720]
+        safe_zone: [0.1, 0.1, 0.9, 0.9]  # x1, y1, x2, y2 as fractions
+        text_max_lines: 3
+        font_weight: "extrabold"
+      shorts:
+        resolution: [1080, 1920]
+        caption_max_chars: 100
+        hashtags_max: 3
+      longform:
+        resolution: [1920, 1080]
+        chapters_enabled: true
+        end_screen_template: "default"
+    
+    instagram:
+      reels:
+        resolution: [1080, 1920]
+        caption_max_chars: 2200
+        hashtags_max: 5
+        cover_frame: "auto"
+      feed:
+        resolution: [1080, 1080]
+    
+    facebook:
+      reels:
+        resolution: [1080, 1920]
+        caption_max_chars: 2200
+        first_comment_link: true
+    
+    tiktok:
+      resolution: [1080, 1920]
+      caption_max_chars: 150
+      hashtags_max: 5
+      sound_required: true
+    
+    linkedin:
+      resolution: [1920, 1080]
+      caption_max_chars: 3000
+      hashtags_max: 5
+
+  # Audio branding
+  audio:
+    bgm:
+      default_volume: 0.045
+      ducking:
+        attack_ms: 80
+        release_ms: 500
+      energy_curve:
+        hook: 1.4
+        body: 0.85
+        payoff: 1.25
+        cta: 0.6
+    sfx:
+      volumes:
+        woosh: -12
+        pop: -6
+        glitch: -4
+        bass: -2
+    voice:
+      preferred: "elevenlabs"
+      fallback: "edge_tts"
+      stability: 0.25
+      similarity_boost: 0.85
+      style: 0.4
+
+  # Content pillars (for topic selection)
+  content_pillars:
+    - name: "AI Tool Spotlights"
+      weight: 0.40
+      series: "Free AI Alternatives"
+      hashtags: ["#AITools", "#FreeAI", "#Productivity"]
+    
+    - name: "GitHub Gems"
+      weight: 0.25
+      series: "GitHub Repo You Should Know"
+      hashtags: ["#GitHub", "#OpenSource", "#DevTools"]
+    
+    - name: "Dev Productivity Hacks"
+      weight: 0.20
+      series: "Dev Productivity Hacks"
+      hashtags: ["#DevHacks", "#CodingTips", "#Workflow"]
+    
+    - name: "Interview Prep"
+      weight: 0.10
+      series: "Interview Question of the Day"
+      hashtags: ["#InterviewPrep", "#CodingInterview", "#TechCareers"]
+    
+    - name: "Bug Hunters"
+      weight: 0.05
+      series: "Famous Bugs & Glitches"
+      hashtags: ["#TechHistory", "#Bugs", "#Debugging"]
+
+  # Community links
+  community:
+    telegram: "https://t.me/technewsbyvj"
+    whatsapp: "https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z"
+    linkedin: "https://www.linkedin.com/in/vijayakumar-j/"
+    github: "https://github.com/vjaab"
+    newsletter: "https://vjtechtips.substack.com"
+
+# Export for Python usage
+# from yaml import safe_load
+# with open("brand.yaml") as f:
+#     BRAND = safe_load(f)
