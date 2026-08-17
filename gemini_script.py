@@ -85,22 +85,29 @@ Constraint Checklist:
 - LOOP-FRIENDLY: The LAST sentence of the script MUST flow seamlessly back into the FIRST sentence, creating a natural viewing loop. Viewers who reach the end should feel compelled to watch again.
 - SCRIPT LENGTH: STRICT 80-120 words maximum. Target 40-50 seconds of speaking. SHORT = HIGH COMPLETION RATE = MORE VIEWS.
 - DYNAMIC FRAMING: The visual metadata coordinates with the layout archetype. Specify when the scene is showcase-oriented (e.g. system architecture diagrams, terminal outputs, code snippets, or workflows) which uses a split-screen layout, and when it is presenter-focused (showing a full-screen host overlaying a blurred background).
+- RESULT-FIRST STRUCTURE (PROVEN HIGHER RETENTION):
+  1. HOOK (0-3s): Stop the scroll with a specific claim, stat, or contradiction.
+  2. RESULT REVEAL (3-10s): Show the payoff immediately — the working demo, the generated code, the saved time.
+  3. HOW-TO / PROOF (10-30s): Quick steps or live demo. "Here's the exact prompt..." "Run this command..."
+  4. WHY IT MATTERS + CTA (30-45s): "Saves you 5 hours/week." + Save/share CTA.
 - SUBSCRIBER INCENTIVE LOOP (SHORTS ONLY): Every Short MUST include ONE incentive CTA at 00:25-00:35. Choose exactly one mode:
   1. DIGITAL VAULT / CODE BLUEPRINT: "I put the entire Python script & architecture diagram in our Telegram. Link in description."
   2. SECRET MENU / COMMENT KEYWORD TRIGGER: "Comment 'CONFIG' below and I'll send you my exact evaluation template."
   3. BEAT THE BENCHMARK CHALLENGE: "I got 45 tokens/sec on an M2 Mac. Comment your hardware specs to beat it."
   4. COMMUNITY AUDIT & MONTHLY $100 API CREDIT GIVEAWAY: "Sub and comment your setup for our monthly $100 API credit giveaway."
-- SCHEMA EXTENSION: Output must include `comment_trigger_keyword` (e.g. "OLLAMA", "CONFIG", "EVALS"), `incentive_cta_type` (one of: "digital_vault", "comment_trigger", "benchmark_challenge", "community_audit"), and `digital_asset_offer` (description of the asset being offered).
+  5. SAVE-TRIGGER: "Save this before it disappears. You'll need it later."
+  6. SHARE-TRIGGER: "Send this to a developer who needs this."
+- SCHEMA EXTENSION: Output must include `comment_trigger_keyword` (e.g. "OLLAMA", "CONFIG", "EVALS"), `incentive_cta_type` (one of: "digital_vault", "comment_trigger", "benchmark_challenge", "community_audit", "save_trigger", "share_trigger"), and `digital_asset_offer` (description of the asset being offered).
 - RHETORICAL QUESTIONS: Include 2-3 rhetorical questions per script to create open loops and drive engagement. Examples: "What does this mean for your production apps?", "Why should you care?", "But here's the real question — can you trust it?"
 - DIRECT VIEWER ADDRESS: Use "you" and "your" language throughout. Frame every point from the viewer's perspective: "Your data...", "Your production apps...", "What you need to know..."
 - CONVERSATIONAL TRANSITIONS: Replace essay-style transitions with conversational ones: "But here's the thing...", "Now here's where it gets interesting...", "And that's exactly why...", "So what's the takeaway?"
 - MICRO-PAUSE MARKERS: Use ellipses (...) strategically before key revelations, rhetorical questions, and direct address to signal TTS pacing.
 
 SUCCESS PATTERNS (2026): 
-- HOOKS (0-5s): Start with a compelling, realistic hook grounded in a specific fact, setting, or feature. First 3-5 words must STOP the scroll.
-- CORE PROBLEM & VALUE (5-25s): Clearly state the "Why should I care?" factor.
-- IMMEDIATE SOLUTION (25-40s): Provide the real, actionable fix directly in the Short.
-- INCENTIVE CTA (40-45s): Deliver the chosen incentive CTA mode to drive subscriber conversion.
+- HOOKS (0-3s): Start with a compelling, realistic hook grounded in a specific fact, setting, or feature. First 3-5 words must STOP the scroll.
+- RESULT REVEAL (3-10s): Show the payoff immediately. The working output. The generated code.
+- HOW-TO / PROOF (10-30s): Actionable steps. Exact commands. Live demo.
+- WHY IT MATTERS + CTA (30-45s): Personal stake + Save/Share/Follow.
 - SEAMLESS LOOP (45-50s): Final sentence flows back to opening hook.
 
 Visual Director Persona & Visual Selection Logic:
@@ -173,16 +180,18 @@ STRICT RULES:
 - Do NOT say "In this video" or "Today we're going to".
 - Output must be plain spoken text only — no stage directions, no scene labels.
 - SCRIPT LENGTH: Target a 35-second YouTube Short (approx 80-120 words spoken at natural pace). SHORTER = HIGHER COMPLETION RATE = MORE ALGORITHMIC PUSH. Keep it extremely tight and punchy.
-- 4-PART SHORTS ARCHITECTURE (MANDATORY):
-  1. HARD HOOK (0:00 - 0:03): Metric, contradiction, or personal stake. 8-12 words.
-  2. CORE ENGINEERING / PRACTICAL VALUE (0:03 - 0:25): Breakdown with specific, actionable steps.
-  3. INCENTIVE CTA (0:25 - 0:35): Choose ONE mode — Digital Vault, Comment Trigger, Benchmark Challenge, or Community Audit.
-  4. SEAMLESS LOOP (0:35 - 0:45): Final sentence flows back to opening hook.
+- RESULT-FIRST 4-PART SHORTS ARCHITECTURE (MANDATORY):
+  1. HARD HOOK (0:00 - 0:03): Metric, contradiction, or personal stake. 8-12 words. First 3 words stop the scroll.
+  2. RESULT REVEAL (0:03 - 0:10): Show the payoff immediately. "It built the full API in 30 seconds." "The code works on first try."
+  3. HOW-TO / PROOF (0:10 - 0:30): Quick demo or exact steps. "Here's the prompt: ..." "Run this command: ..."
+  4. WHY IT MATTERS + CTA (0:30 - 0:35): "Saves you 5 hours a week." + "Save this. Follow for more."
 - SUBSCRIBER INCENTIVE CTA MODES (pick exactly ONE):
   1. DIGITAL VAULT / CODE BLUEPRINT: "I put the entire Python script & architecture diagram in our Telegram. Link in description."
   2. SECRET MENU / COMMENT KEYWORD TRIGGER: "Comment 'CONFIG' below and I'll send you my exact evaluation template."
   3. BEAT THE BENCHMARK CHALLENGE: "I got 45 tokens/sec on an M2 Mac. Comment your hardware specs to beat it."
   4. COMMUNITY AUDIT & MONTHLY $100 API CREDIT GIVEAWAY: "Sub and comment your setup for our monthly $100 API credit giveaway."
+  5. SAVE-TRIGGER: "Save this before it disappears. You'll need it later."
+  6. SHARE-TRIGGER: "Send this to a developer who needs this."
 - SCHEMA EXTENSION: Output must include `comment_trigger_keyword`, `incentive_cta_type`, and `digital_asset_offer`.
 - RHETORICAL QUESTIONS: Include 2-3 rhetorical questions per script to create open loops. Examples: "What does this mean for your workflow?", "Why should you care?", "But can you actually trust it?"
 - DIRECT VIEWER ADDRESS: Frame every point from the viewer's perspective: "Your data...", "Your production apps...", "What you need to know..."
@@ -198,6 +207,13 @@ Choose the most suitable visual format:
 4. Infographic when showing stats, benchmarks, lists, performance metrics.
 5. Diagram when showing system architecture or database replication.
 6. Animated UI Mockup when demonstrating app/settings navigation.
+7. Code Snippet when showing actual code, config files, or syntax — render as syntax-highlighted editor view.
+8. Screen Recording when demonstrating a UI workflow, settings change, or live demo — capture actual screen.
+9. Flowchart when showing decision trees, process flows, or branching logic.
+10. Terminal Output when showing CLI commands, logs, or shell interactions.
+11. GitHub UI when showing repo pages, PRs, issues, or code search results.
+12. Side-by-side Comparison when comparing two tools, configs, or outputs.
+13. Architecture Diagram when showing system design, service mesh, or data pipeline topology.
 
 Quality & Mobile Standards:
 Every visual must be high-contrast, readable in 1 second on mobile screens, and educational (passing the Muted Viewer Test: a viewer must understand the key idea even if audio is muted).
@@ -248,12 +264,37 @@ HOOK_AGENT_TEMPLATE = """{persona}
 
 HOOK AGENT TASK:
 Generate 10 hooks (<1.5s each). First 3 words MUST stop the scroll.
-NO greetings. NO "Today we..." NO "In this video..."
+NO greetings. NO "Today we..." NO "In this video..." NO "Hey guys..."
 
 RULES:
-- Lead with: specific stat, contradiction, or "You" + immediate stakes
-- Examples: "Your iPhone records this..." / "Google just killed..." / "$4.2B wasted..."
+- Lead with: specific stat, contradiction, "You" + immediate stakes, or result-first reveal
 - Max 8 words. One clause only.
+- Use these PROVEN viral patterns for tech/AI content:
+
+  PATTERN 1 — Negative/Warning Hook:
+  "You're probably using [Tool] wrong."
+  "Stop paying for [Tool]."
+  "Don't make this [Tool] mistake."
+
+  PATTERN 2 — Result-First Reveal:
+  "This AI tool saves developers hours."
+  "I found a free alternative to [Paid Tool]."
+  "This GitHub repo replaces [Popular Tool]."
+
+  PATTERN 3 — Specific Stat/Contradiction:
+  "Google just killed [Feature]."
+  "$4.2B wasted on [Thing]."
+  "90% of developers don't know this."
+
+  PATTERN 4 — Curiosity Gap:
+  "Most developers don't know this GitHub feature."
+  "Your [App] is secretly doing [Thing]."
+  "What [Company] doesn't want you to know."
+
+  PATTERN 5 — Personal Stake:
+  "Your code has this security flaw."
+  "This AI reads your private data."
+  "You're overpaying for [Service]."
 
 RESEARCH:
 {research_json}
@@ -270,10 +311,18 @@ NARRATIVE_AGENT_TEMPLATE = """{persona}
 NARRATIVE AGENT TASK:
 Write 4-part script using SELECTED HOOK exactly as-is.
 
-1. HOOK (0-5s): {selected_hook}  ← USE VERBATIM
-2. PROBLEM (5-20s): Why viewer is personally affected. Name exact feature/app. "Your [app] does [specific thing]..."
-3. SOLUTION (20-45s): Actionable steps. "To fix: Open [app] > [setting] > Toggle [X] off." Max 2 sentences per step.
-4. CTA (45-50s): Soft loop. "Save this if you use [app]. Follow for more."
+STRUCTURE — RESULT-FIRST FORMAT (proven higher retention):
+1. HOOK (0-3s): {selected_hook}  ← USE VERBATIM
+2. RESULT REVEAL (3-10s): Show the payoff immediately. "I gave it this prompt and it built the entire API in 30 seconds." / "The tool generates working code instantly — watch."
+3. HOW-TO / PROOF (10-30s): Quick demo or steps. "Here's the exact prompt..." / "Install: pip install xyz. Run: xyz --prompt '...'." Keep it under 20 seconds.
+4. WHY IT MATTERS + CTA (30-45s): "This saves you 5 hours a week." / "Your team should know this." + Soft CTA: "Save this for later. Follow for more tools like this."
+
+RULES:
+- NO "In this video," "Today I'll show you," "Let me explain"
+- Show the RESULT first, then explain how
+- Max 2 sentences per step
+- Use "you" / "your" language throughout
+- End with save/share-worthy CTA: "Send this to a developer" / "Save this" / "Follow for more"
 
 VISUAL PROMPT RULE: The FIRST nano_visual_prompt (hook segment) MUST depict the EXACT product/tool/feature named in the hook. Example: if hook says 'MemoMind One glasses', prompt = 'Close-up of MemoMind One smart glasses on desk, transparent AR lenses showing notifications, photorealistic 9:16, dark background'. NO generic 'person holding box'.
 

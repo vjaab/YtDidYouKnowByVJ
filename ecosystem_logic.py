@@ -613,3 +613,134 @@ def validate_ai_hacks_coverage():
         "extra": extra,
         "all_covered": len(missing) == 0
     }
+
+
+# ─── Series Tracking for Recurring Formats ─────────────────────────────────────
+# Enables "Day 1", "Day 2", "Part 3" style series that build audience loyalty
+
+SERIES_DEFINITIONS = {
+    "github_gems": {
+        "name": "GitHub Gems",
+        "tagline": "Insane GitHub repos you missed",
+        "hook_template": "GitHub Gem #{episode}: {repo_name} — {one_liner}",
+        "categories": ["AI & Tech Tools", "Coding & Development Hacks", "Tech Gadgets & Inventions"],
+        "cta_template": "Save this repo. Follow for daily GitHub gems."
+    },
+    "ai_tool_alternatives": {
+        "name": "Free AI Alternatives",
+        "tagline": "Stop paying for premium AI tools",
+        "hook_template": "Free alternative to {paid_tool}: {free_tool} — {benefit}",
+        "categories": ["AI & Tech Tools", "Finance & Tech Economy"],
+        "cta_template": "Comment the tool you want replaced next."
+    },
+    "dev_productivity_hacks": {
+        "name": "Dev Productivity Hacks",
+        "tagline": "Workflow shortcuts that save hours",
+        "hook_template": "Dev Hack #{episode}: {tool_name} — {time_saved}",
+        "categories": ["Coding & Development Hacks", "AI & Tech Tools"],
+        "cta_template": "Save this hack. Your future self will thank you."
+    },
+    "github_repo_series": {
+        "name": "GitHub Repo You Should Know",
+        "tagline": "Daily repo discoveries",
+        "hook_template": "GitHub Repo You Should Know — Day {episode}: {repo_name}",
+        "categories": ["AI & Tech Tools", "Coding & Development Hacks"],
+        "cta_template": "Follow so you don't miss Day {next_episode}."
+    },
+    "ai_fact_series": {
+        "name": "AI Fact of the Day",
+        "tagline": "Mind-blowing AI facts daily",
+        "hook_template": "AI Fact #{episode}: {fact_hook}",
+        "categories": ["Facts & Trivia", "Agentic AI Facts"],
+        "cta_template": "Save this fact. Share with your team."
+    },
+    "interview_prep_series": {
+        "name": "Interview Question of the Day",
+        "tagline": "Real questions from top companies",
+        "hook_template": "Interview Question #{episode}: {company} asks — {question_short}",
+        "categories": ["Interview Questions"],
+        "cta_template": "Comment your answer. Follow for daily prep."
+    },
+    "bug_hunter_series": {
+        "name": "Famous Bugs & Glitches",
+        "tagline": "The bugs that changed history",
+        "hook_template": "Bug Hunter #{episode}: {bug_name} — {impact}",
+        "categories": ["Famous Bugs & Glitches"],
+        "cta_template": "Save this. Every dev should know this story."
+    },
+    "founding_stories_series": {
+        "name": "Tech Founding Stories",
+        "tagline": "How the giants started",
+        "hook_template": "Founding Story #{episode}: {company} — {twist}",
+        "categories": ["Tech Company Founding Stories"],
+        "cta_template": "Follow for more untold tech histories."
+    }
+}
+
+SERIES_TRACKER_FILE = os.path.join(os.path.dirname(__file__), "series_tracker.json")
+
+def _load_series_tracker():
+    if os.path.exists(SERIES_TRACKER_FILE):
+        try:
+            with open(SERIES_TRACKER_FILE, "r") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
+
+def _save_series_tracker(tracker):
+    try:
+        with open(SERIES_TRACKER_FILE, "w") as f:
+            json.dump(tracker, f)
+    except Exception:
+        pass
+
+def get_next_series_episode(series_key):
+    """Returns the next episode number for a series and increments the tracker."""
+    tracker = _load_series_tracker()
+    series_data = tracker.get(series_key, {"episode": 0, "last_date": ""})
+    today = datetime.datetime.utcnow().strftime("%Y-%m-%d")
+    
+    # Increment episode if it's a new day (or first run)
+    if series_data.get("last_date") != today:
+        series_data["episode"] = series_data.get("episode", 0) + 1
+        series_data["last_date"] = today
+        tracker[series_key] = series_data
+        _save_series_tracker(tracker)
+    
+    return series_data["episode"]
+
+def get_series_info(series_key):
+    """Returns series definition with current episode number."""
+    if series_key not in SERIES_DEFINITIONS:
+        return None
+    episode = get_next_series_episode(series_key)
+    series_def = SERIES_DEFINITIONS[series_key].copy()
+    series_def["episode"] = episode
+    series_def["next_episode"] = episode + 1
+    return series_def
+
+def get_series_for_category(category):
+    """Returns the best matching series for a category, or None."""
+    for key, defn in SERIES_DEFINITIONS.items():
+        if category in defn["categories"]:
+            return get_series_info(key)
+    return None
+
+def format_series_hook(series_key, **kwargs):
+    """Formats a hook using the series template."""
+    series_info = get_series_info(series_key)
+    if not series_info:
+        return ""
+    template = series_info.get("hook_template", "")
+    kwargs["episode"] = series_info["episode"]
+    kwargs["next_episode"] = series_info["next_episode"]
+    return template.format(**kwargs)
+
+def format_series_cta(series_key):
+    """Formats a CTA using the series template."""
+    series_info = get_series_info(series_key)
+    if not series_info:
+        return ""
+    template = series_info.get("cta_template", "")
+    return template.format(episode=series_info["episode"], next_episode=series_info["next_episode"])
