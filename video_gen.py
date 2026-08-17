@@ -7592,16 +7592,17 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 return intro_scale * base_scale
 
             avatar_clip = avatar_clip.with_effects([
-# Continuous dynamic zoom-in + Micro-Breathing + intro glide resize
-            vfx.Resize(avatar_resize_fn), 
-            # Natural Head Tilt: Very subtle +/- 0.5 degree swing
-            vfx.Rotate(lambda t: 0.6 * math.sin(t * 1.4 + 0.5)),
-            # Color Matching: Subtle tint to match background accent (12% blend)
-            vfx.Lambda(lambda frame: cv2.addWeighted(
-                frame, 0.88, 
-                np.full_like(frame, accent_color, dtype=np.uint8), 0.12, 0
-            ))
+                # Continuous dynamic zoom-in + Micro-Breathing + intro glide resize
+                vfx.Resize(avatar_resize_fn), 
+                # Natural Head Tilt: Very subtle +/- 0.5 degree swing
+                vfx.Rotate(lambda t: 0.6 * math.sin(t * 1.4 + 0.5)),
             ])
+            # Color Matching: Subtle tint to match background accent (12% blend)
+            # Apply via fl_image for moviepy 2.x compatibility
+            accent_arr = np.full((FRAME_H, FRAME_W, 3), accent_color, dtype=np.uint8)
+            avatar_clip = avatar_clip.fl_image(lambda frame: cv2.addWeighted(
+                frame, 0.88, accent_arr, 0.12, 0
+            ))
 
             # ── IMPROVEMENT #1: Circular Face-Cam Frame (Premium PiP) ─────────
             ring_clip = None
