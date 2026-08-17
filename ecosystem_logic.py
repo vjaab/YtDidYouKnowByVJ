@@ -147,6 +147,83 @@ def get_corner_rotation_index(tracker_file=None):
                 json.dump(tracker, f)
         except Exception:
             pass
+
+
+# ─── Dynamic Layout Selection ────────────────────────────────────────────────
+# Maps content category + visual type to optimal layout
+
+CONTENT_LAYOUT_MAP = {
+    # Category-based default layouts
+    "AI & Tech Tools": "split_screen",           # Tool demo + presenter
+    "Tech Gadgets & Inventions": "hero_center",  # Product showcase
+    "Finance & Tech Economy": "side_strip",      # Data + presenter
+    "Facts & Trivia": "top_center",              # Fact card style
+    "Coding & Development Hacks": "split_screen", # Code + terminal
+    "Quiz & Trivia": "split_screen",             # Options + avatar
+    "Interview Questions": "hero_center",        # Question card + presenter
+    "Programming Language Origins": "asymmetric", # Storytelling
+    "Tech Company Founding Stories": "asymmetric", # Storytelling
+    "Famous Bugs & Glitches": "side_strip",      # Bug details + avatar
+    "Agentic AI Facts": "hero_center",           # Concept visualization
+}
+
+# Visual type to layout mapping (overrides category default)
+VISUAL_TYPE_LAYOUT_MAP = {
+    "Code Snippet": "split_screen",              # Code needs side-by-side
+    "Terminal Output": "split_screen",           # Terminal + explanation
+    "Screen Recording": "hero_center",           # Full-screen demo
+    "Animated UI Mockup": "hero_center",         # Full-screen UI
+    "Side-by-side Comparison": "split_screen",   # Natural fit
+    "Architecture Diagram": "side_strip",        # Diagram + labels
+    "Flowchart": "side_strip",                   # Flow + explanation
+    "Diagram": "side_strip",                     # Diagram + labels
+    "Whiteboard": "asymmetric",                  # Full-screen teaching
+    "Infographic": "top_center",                 # Data visualization
+    "GitHub UI": "split_screen",                 # Repo + explanation
+    "Video": "hero_center",                      # Full-screen video
+    "AI Image": "asymmetric",                    # Concept art + presenter
+}
+
+def get_dynamic_layout(category, visual_type=None, chunk_index=0, total_chunks=1):
+    """
+    Returns optimal layout_type based on category, visual_type, and position in video.
+    
+    Args:
+        category: Content category (e.g., "AI & Tech Tools")
+        visual_type: Visual type from nano_scene_gen (e.g., "Code Snippet", "Screen Recording")
+        chunk_index: Current chunk index (0-based)
+        total_chunks: Total number of chunks in video
+    
+    Returns:
+        layout_type string
+    """
+    # Hook zone (first 15%): Use hero_center for impact
+    if total_chunks > 0 and chunk_index / max(1, total_chunks) < 0.15:
+        return "hero_center"
+    
+    # CTA zone (last 15%): Use asymmetric for presenter focus
+    if total_chunks > 0 and chunk_index / max(1, total_chunks) > 0.85:
+        return "asymmetric"
+    
+    # Visual type override (most specific)
+    if visual_type and visual_type in VISUAL_TYPE_LAYOUT_MAP:
+        return VISUAL_TYPE_LAYOUT_MAP[visual_type]
+    
+    # Category default
+    if category in CONTENT_LAYOUT_MAP:
+        return CONTENT_LAYOUT_MAP[category]
+    
+    # Fallback to daily layout
+    day_name = datetime.datetime.utcnow().strftime("%a")
+    return get_daily_layout(day_name)
+
+
+def get_layout_for_chunk(chunk, category, chunk_index=0, total_chunks=1):
+    """
+    Determines layout for a specific chunk based on its visual_type and position.
+    """
+    visual_type = chunk.get("visual_type", "")
+    return get_dynamic_layout(category, visual_type, chunk_index, total_chunks)
     
     return tracker["corner_index"]
 

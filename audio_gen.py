@@ -1449,6 +1449,82 @@ def _inject_context_pauses(audio_path, word_timestamps):
             return 0, word_timestamps
 
 
+def _apply_variable_pacing(audio, word_timestamps, pacing_hints=None):
+    """
+    Applies variable playback speed based on content zones:
+    - Hook (0-3s): 1.15x faster for energy
+    - Body (3-20s): 1.0x normal
+    - Explanation/Technical (20-40s): 0.9x slower for comprehension
+    - Payoff/CTA (last 10s): 1.0x normal
+    """
+    if pacing_hints is None:
+        # Default pacing zones based on typical Short structure
+        duration_s = len(audio) / 1000.0
+        pacing_hints = [
+            {"start": 0, "end": min(3.0, duration_s * 0.15), "speed": 1.15, "zone": "hook"},
+            {"start": min(3.0, duration_s * 0.15), "end": min(20.0, duration_s * 0.5), "speed": 1.0, "zone": "body"},
+            {"start": min(20.0, duration_s * 0.5), "end": max(0, duration_s - 5.0), "speed": 0.9, "zone": "explanation"},
+            {"start": max(0, duration_s - 5.0), "end": duration_s, "speed": 1.0, "zone": "cta"}
+        ]
+    
+    # Split audio into zones and apply speed
+    output = AudioSegment.empty()
+    current_pos_ms = 0
+    
+    for zone in pacing_hints:
+        zone_start_ms = int(zone["start"] * 1000)
+        zone_end_ms = int(zone["end"] * 1000)
+        speed = zone.get("speed", 1.0)
+        
+        # Handle any gap before this zone
+        if zone_start_ms > current_pos_ms:
+            gap_audio = audio[current_pos_ms:zone_start_ms]
+            output += gap_audio
+        
+        zone_audio = audio[zone_start_ms:zone_end_ms]
+        
+        # Apply speed change by resampling
+        if abs(speed - 1.0) > 0.01:
+            # Change playback speed without changing pitch (using frame rate trick)
+            new_frame_rate = int(zone_audio.frame_rate * speed)
+            zone_audio = zone_audio._spawn(zone_audio.raw_data, overrides={"frame_rate": new_frame_rate})
+            zone_audio = zone_audio.set_frame_rate(audio.frame_rate)
+        
+        output += zone_audio
+        current_pos_ms = zone_end_ms
+    
+    # Add any remaining audio
+    if current_pos_ms < len(audio):
+        output += audio[current_pos_ms:]
+    
+    # Update timestamps proportionally
+    new_timestamps = []
+    for wt in word_timestamps:
+        word_start = wt["start"]
+        word_end = wt["end"]
+        word_mid = (word_start + word_end) / 2
+        
+        # Find which zone this word belongs to
+        for zone in pacing_hints:
+            if zone["start"] <= word_mid <= zone["end"]:
+                speed = zone.get("speed", 1.0)
+                # Adjust timestamps
+                time_in_zone = word_start - zone["start"]
+                adjusted_start = zone["start"] + time_in_zone / speed
+                adjusted_end = zone["start"] + (word_end - zone["start"]) / speed
+                new_timestamps.append({
+                    "word": wt["word"],
+                    "start": round(adjusted_start, 3),
+                    "end": round(adjusted_end, 3)
+                })
+                break
+        else:
+            new_timestamps.append(wt)
+    
+    print(f"   🎯 Variable Pacing Applied: {len(pacing_hints)} zones")
+    return output, new_timestamps
+
+
 def apply_audio_pacing(audio_path, word_timestamps):
     """
     Phase 2 Rule 2: Prevent coda accordioning & track clipping.
@@ -1465,6 +1541,9 @@ def apply_audio_pacing(audio_path, word_timestamps):
     from pydub import AudioSegment
     
     audio = AudioSegment.from_file(audio_path)
+    
+    # Apply variable pacing based on content zones
+    audio, word_timestamps = _apply_variable_pacing(audio, word_timestamps)
     
     # 1. Ensure final trailing consonants are fully rendered
     # The TTS sometimes cuts off the last word's ending consonants
@@ -1503,7 +1582,7 @@ def apply_audio_pacing(audio_path, word_timestamps):
     updated_timestamps = word_timestamps.copy()
     # The safety tail is at the end, so no timestamp shifts needed for words
     
-    print(f"   🔊 Audio pacing applied: +{SAFETY_TAIL_MS}ms safety tail, normalized, fade in/out. Duration: {new_duration:.2f}s")
+    print(f"   🔊 Audio pacing applied: +{SAFETY_TAIL_MS}ms safety tail, variable speed zones, normalized, fade in/out. Duration: {new_duration:.2f}s")
     
     return new_duration, updated_timestamps
 

@@ -4249,6 +4249,224 @@ def render_emoji_popup(emoji, frame_width=1080):
     return img
 
 
+# ─── DYNAMIC LAYOUT VISUAL ELEMENTS ───────────────────────────────────────────
+def _create_layout_visual_clip(layout_type, visual_type, chunk, accent_color, audio_duration):
+    """
+    Creates layout-aware visual elements for a chunk based on its dynamic layout.
+    Returns a VideoClip that adds layout-specific visual treatment.
+    """
+    start_time = chunk.get("start", 0)
+    duration = chunk.get("duration", 2.0)
+    
+    if start_time >= audio_duration or duration <= 0:
+        return None
+    
+    # Clamp duration
+    end_time = min(start_time + duration, audio_duration)
+    clip_duration = end_time - start_time
+    
+    if clip_duration < 0.5:
+        return None
+    
+    # Layout-specific visual treatments
+    if layout_type == "split_screen":
+        # Split screen: Add vertical divider accent
+        return _create_split_screen_accent(accent_color, clip_duration).with_start(start_time)
+    
+    elif layout_type == "hero_center":
+        # Hero center: Add center glow/pulse
+        return _create_hero_center_glow(accent_color, clip_duration).with_start(start_time)
+    
+    elif layout_type == "side_strip":
+        # Side strip: Add vertical strip indicator
+        return _create_side_strip_indicator(accent_color, clip_duration).with_start(start_time)
+    
+    elif layout_type == "top_center":
+        # Top center: Add top banner accent
+        return _create_top_center_banner(accent_color, clip_duration).with_start(start_time)
+    
+    elif layout_type == "asymmetric":
+        # Asymmetric: Add corner accent
+        return _create_asymmetric_corner(accent_color, clip_duration).with_start(start_time)
+    
+    return None
+
+
+def _create_split_screen_accent(accent_color, duration):
+    """Vertical divider line for split_screen layout."""
+    from moviepy import VideoClip
+    import numpy as np
+    
+    line_w = 4
+    line_h = FRAME_H
+    line_x = FRAME_W // 2
+    
+    fps = 15
+    total_frames = int(duration * fps)
+    
+    def make_frame(t):
+        img = np.zeros((FRAME_H, FRAME_W, 4), dtype=np.uint8)
+        # Animated vertical line
+        pulse = 1.0 + 0.3 * np.sin(t * 4)
+        alpha = int(180 * pulse)
+        color = (*accent_color, alpha)
+        img[:, line_x - line_w//2:line_x + line_w//2] = color
+        return img
+    
+    def make_mask(t):
+        img = np.zeros((FRAME_H, FRAME_W), dtype=np.float32)
+        img[:, line_x - line_w//2:line_x + line_w//2] = 1.0
+        return img
+    
+    clip = VideoClip(make_frame, duration=duration)
+    mclip = VideoClip(make_mask, is_mask=True, duration=duration)
+    return clip.with_mask(mclip)
+
+
+def _create_hero_center_glow(accent_color, duration):
+    """Center glow pulse for hero_center layout."""
+    from moviepy import VideoClip
+    import numpy as np
+    
+    center_x = FRAME_W // 2
+    center_y = FRAME_H // 2
+    max_radius = min(FRAME_W, FRAME_H) // 2
+    
+    def make_frame(t):
+        img = np.zeros((FRAME_H, FRAME_W, 4), dtype=np.uint8)
+        # Pulsing radial gradient
+        pulse = 0.5 + 0.5 * np.sin(t * 3)
+        radius = int(max_radius * (0.3 + 0.4 * pulse))
+        
+        y, x = np.ogrid[:FRAME_H, :FRAME_W]
+        dist = np.sqrt((x - center_x)**2 + (y - center_y)**2)
+        mask = dist < radius
+        alpha = (1.0 - dist[mask] / radius) * 60
+        img[mask] = (*accent_color, alpha.astype(np.uint8))
+        return img
+    
+    def make_mask(t):
+        img = np.zeros((FRAME_H, FRAME_W), dtype=np.float32)
+        pulse = 0.5 + 0.5 * np.sin(t * 3)
+        radius = int(max_radius * (0.3 + 0.4 * pulse))
+        y, x = np.ogrid[:FRAME_H, :FRAME_W]
+        dist = np.sqrt((x - center_x)**2 + (y - center_y)**2)
+        img[dist < radius] = (1.0 - dist[dist < radius] / radius) * 0.3
+        return img
+    
+    clip = VideoClip(make_frame, duration=duration)
+    mclip = VideoClip(make_mask, is_mask=True, duration=duration)
+    return clip.with_mask(mclip)
+
+
+def _create_side_strip_indicator(accent_color, duration):
+    """Vertical strip on left side for side_strip layout."""
+    from moviepy import VideoClip
+    import numpy as np
+    
+    strip_w = 80
+    
+    def make_frame(t):
+        img = np.zeros((FRAME_H, FRAME_W, 4), dtype=np.uint8)
+        # Animated vertical strip
+        pulse = 1.0 + 0.2 * np.sin(t * 5)
+        alpha = int(150 * pulse)
+        color = (*accent_color, alpha)
+        img[:, :strip_w] = color
+        
+        # Add subtle pattern
+        for y in range(0, FRAME_H, 40):
+            accent_y = y + int(20 * np.sin(t * 4 + y * 0.1))
+            if 0 <= accent_y < FRAME_H:
+                img[max(0, accent_y-5):accent_y+5, :strip_w] = (*accent_color, min(255, alpha + 50))
+        return img
+    
+    def make_mask(t):
+        img = np.zeros((FRAME_H, FRAME_W), dtype=np.float32)
+        img[:, :strip_w] = 0.4
+        return img
+    
+    clip = VideoClip(make_frame, duration=duration)
+    mclip = VideoClip(make_mask, is_mask=True, duration=duration)
+    return clip.with_mask(mclip)
+
+
+def _create_top_center_banner(accent_color, duration):
+    """Top banner accent for top_center layout."""
+    from moviepy import VideoClip
+    import numpy as np
+    
+    banner_h = 120
+    
+    def make_frame(t):
+        img = np.zeros((FRAME_H, FRAME_W, 4), dtype=np.uint8)
+        # Top banner with animated gradient
+        for y in range(banner_h):
+            grad = y / banner_h
+            alpha = int(180 * (1.0 - grad))
+            pulse = 1.0 + 0.3 * np.sin(t * 3 + grad * 10)
+            alpha = int(alpha * pulse)
+            img[y, :] = (*accent_color, alpha)
+        return img
+    
+    def make_mask(t):
+        img = np.zeros((FRAME_H, FRAME_W), dtype=np.float32)
+        for y in range(banner_h):
+            grad = y / banner_h
+            img[y, :] = 0.5 * (1.0 - grad)
+        return img
+    
+    clip = VideoClip(make_frame, duration=duration)
+    mclip = VideoClip(make_mask, is_mask=True, duration=duration)
+    return clip.with_mask(mclip)
+
+
+def _create_asymmetric_corner(accent_color, duration):
+    """Corner accent for asymmetric layout."""
+    from moviepy import VideoClip
+    import numpy as np
+    
+    corner_size = 100
+    
+    def make_frame(t):
+        img = np.zeros((FRAME_H, FRAME_W, 4), dtype=np.uint8)
+        # Four corners with pulsing accents
+        corners = [
+            (0, 0),                           # Top-left
+            (FRAME_W - corner_size, 0),       # Top-right
+            (0, FRAME_H - corner_size),       # Bottom-left
+            (FRAME_W - corner_size, FRAME_H - corner_size)  # Bottom-right
+        ]
+        
+        for i, (cx, cy) in enumerate(corners):
+            pulse = 1.0 + 0.4 * np.sin(t * 4 + i * 1.5)
+            alpha = int(120 * pulse)
+            
+            for y in range(corner_size):
+                for x in range(corner_size):
+                    if x + y < corner_size:  # Triangle corner
+                        grad = (x + y) / corner_size
+                        a = int(alpha * (1.0 - grad))
+                        if cy + y < FRAME_H and cx + x < FRAME_W:
+                            img[cy + y, cx + x] = (*accent_color, a)
+        return img
+    
+    def make_mask(t):
+        img = np.zeros((FRAME_H, FRAME_W), dtype=np.float32)
+        for cx, cy in [(0, 0), (FRAME_W - corner_size, 0), (0, FRAME_H - corner_size), (FRAME_W - corner_size, FRAME_H - corner_size)]:
+            for y in range(corner_size):
+                for x in range(corner_size):
+                    if x + y < corner_size:
+                        grad = (x + y) / corner_size
+                        if cy + y < FRAME_H and cx + x < FRAME_W:
+                            img[cy + y, cx + x] = 0.3 * (1.0 - grad)
+        return img
+    
+    clip = VideoClip(make_frame, duration=duration)
+    mclip = VideoClip(make_mask, is_mask=True, duration=duration)
+    return clip.with_mask(mclip)
+
+
 # ─── ENTITY LOGO PAIRING NEAR AVATAR ─────────────────────────────────────────
 def _create_entity_logo_pip_clips(script_json, avatar_pip_func, audio_duration, cur_w, cur_h, accent_color):
     """
@@ -4603,6 +4821,29 @@ def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hook
                             vol_multiplier *= 0.15  # Deep duck for impact
                             break
                 
+                # ── PHASE 5: FACT BOUNDARY DUCKING (Enhanced) ─────────────────────
+                # Additional duck at fact transitions for clear mental separation
+                if fact_timestamps:
+                    for ft in fact_timestamps:
+                        start_s = float(ft.get("approx_start_seconds", 0))
+                        if start_s > 2.0:
+                            fact_start_ms = int(start_s * 1000)
+                            # 300ms before fact start
+                            if fact_start_ms - 300 <= chunk_start <= fact_start_ms:
+                                vol_multiplier *= 0.2  # Moderate duck for mental separation
+                                break
+                
+                # ── PHASE 6: HOOK ZONE ENHANCEMENT ──────────────────────────────
+                # First 3 seconds: Keep BGM higher energy, less ducked for impact
+                if chunk_start < 3000:
+                    # Reduce ducking in hook zone for more energy
+                    vol_multiplier = max(vol_multiplier, 0.6)
+                
+                # ── PHASE 7: CTA ZONE ───────────────────────────────────────────
+                # Last 5 seconds: Drop BGM significantly for CTA authority
+                if chunk_start > target_duration_ms - 5000:
+                    vol_multiplier *= 0.3
+                
                 if vol_multiplier < 0.0001 or base_bgm_gain_db < -90.0:
                     gain_db = -100.0
                 else:
@@ -4675,6 +4916,10 @@ def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hook
                     sfx = sfx - 10  # Moderate woosh volume
                 elif ctype == "pop":
                     sfx = sfx - 6   # Crispy pop volume
+                elif ctype == "glitch":
+                    sfx = sfx - 4   # Glitch needs to cut through
+                elif ctype == "bass":
+                    sfx = sfx - 2   # Bass hit for impact moments
                 else:
                     sfx = sfx - 8   # Default volume
                 
@@ -4684,6 +4929,44 @@ def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hook
             except Exception as e:
                 print(f"   ⚠️ Failed to load SFX {ctype}: {e}")
                 
+    # ── ENHANCED: Auto-inject SFX at pattern interrupts (retention_map driven) ──
+    from config import ENABLE_STRATEGIC_SFX
+    if ENABLE_STRATEGIC_SFX and retention_map and not CI_LITE:
+        pi_timestamps = retention_map.get("pattern_interrupts", [])
+        for pi in pi_timestamps:
+            pi_word = pi.get("at_word", 0)
+            pi_type = pi.get("type", "contradiction")
+            pi_time_s = pi_word / 3.0
+            
+            if pi_time_s < output_duration:
+                # Map pattern interrupt type to SFX
+                if pi_type in ["contradiction", "stat_bomb"]:
+                    sfx_type = "glitch"  # Sharp impact
+                elif pi_type in ["rhetorical_question", "direct_address"]:
+                    sfx_type = "pop"     # Crisp attention grabber
+                elif pi_type in ["emotional_pivot", "curiosity_gap"]:
+                    sfx_type = "woosh"   # Smooth transition
+                else:
+                    sfx_type = "woosh"
+                
+                sfx_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "sfx", f"{sfx_type}.wav")
+                if os.path.exists(sfx_path) and os.path.getsize(sfx_path) > 0:
+                    try:
+                        sfx = AudioSegment.from_file(sfx_path).set_frame_rate(44100).set_channels(2)
+                        if sfx_type == "woosh":
+                            sfx = sfx - 12
+                        elif sfx_type == "pop":
+                            sfx = sfx - 6
+                        elif sfx_type == "glitch":
+                            sfx = sfx - 4
+                        else:
+                            sfx = sfx - 8
+                        pos_ms = int(pi_time_s * 1000)
+                        composite = composite.overlay(sfx, position=pos_ms)
+                        sfx_count += 1
+                    except Exception as e:
+                        print(f"   ⚠️ Failed to auto-inject SFX {sfx_type}: {e}")
+    
     # Auto-inject transition Woosh SFX for subtitle transitions - REMOVED to prevent visual change sound distraction
     auto_sfx_count = 0
                     
@@ -7992,6 +8275,31 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 )
                 if sclip:
                     settings_mockup_clips.append(sclip)
+
+    # ── DYNAMIC LAYOUT VISUAL ELEMENTS ─────────────────────────────────────────
+    # Add layout-aware visual treatments per chunk based on dynamic layout
+    layout_visual_clips = []
+    enable_dynamic_layout = os.environ.get("ENABLE_DYNAMIC_LAYOUT", "1") == "1"
+    if enable_dynamic_layout and not CI_LITE:
+        try:
+            from ecosystem_logic import get_layout_for_chunk
+            category = script_json.get("sub_category", "AI & Tech Tools")
+            total_chunks = len(chunks)
+            
+            for i, chunk in enumerate(chunks):
+                layout_type = get_layout_for_chunk(chunk, category, i, total_chunks)
+                visual_type = chunk.get("visual_type", "")
+                
+                # Add layout-specific visual element
+                layout_clip = _create_layout_visual_clip(
+                    layout_type, visual_type, chunk, accent_color, audio_duration
+                )
+                if layout_clip:
+                    layout_visual_clips.append(layout_clip)
+                    
+            print(f"   🎨 Dynamic Layout Visuals: {len(layout_visual_clips)} clips added")
+        except Exception as e:
+            print(f"   ⚠️ Dynamic layout visuals failed: {e}")
     elif enable_mockup and CI_LITE:
         print("   🔧 CI-LITE: Skipping settings mockup")
 

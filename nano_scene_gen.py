@@ -372,7 +372,8 @@ def generate_nano_scene_visuals(chunks, headline, style_guide="", aspect_ratio="
 
         if path:
             chunk["visual_path"] = path
-            chunk["visual_type"] = "photo"
+            # Use the visual_type from the AI prompt, fallback to "photo"
+            chunk["visual_type"] = chunk.get("visual_type", "photo")
             chunk["source"] = source_name
             chunk["relevance_score"] = relevance
             last_successful_path = path
@@ -400,6 +401,12 @@ def generate_nano_scene_visuals(chunks, headline, style_guide="", aspect_ratio="
 
     # Fill any remaining gaps (chunks that failed and had no predecessor)
     _fill_visual_gaps(chunks)
+    
+    # Ensure visual type diversity
+    _ensure_visual_type_diversity(chunks)
+    
+    # Apply visual type specific styling metadata
+    _apply_visual_type_styling(chunks)
 
     return chunks
 
@@ -428,3 +435,138 @@ def _fill_visual_gaps(chunks):
             c["visual_path"] = last_path
             c["visual_type"] = last_type
             c["source"] = c.get("source") or "Nano-Scene (gap-filled)"
+
+
+def _ensure_visual_type_diversity(chunks):
+    """
+    Post-process chunks to ensure visual type diversity.
+    Forces a mix of visual types to prevent monotony.
+    """
+    # Visual types that should be distributed throughout
+    visual_types = [
+        "Video", "AI Image", "Whiteboard", "Infographic", 
+        "Diagram", "Animated UI Mockup", "Code Snippet", 
+        "Screen Recording", "Flowchart", "Terminal Output", 
+        "GitHub UI", "Side-by-side Comparison", "Architecture Diagram"
+    ]
+    
+    # Track used types
+    used_types = set()
+    type_counts = {}
+    
+    for i, chunk in enumerate(chunks):
+        current_type = chunk.get("visual_type", "photo")
+        used_types.add(current_type)
+        type_counts[current_type] = type_counts.get(current_type, 0) + 1
+    
+    # If we only have 1-2 types, diversify
+    if len(used_types) <= 2 and len(chunks) > 3:
+        print(f"   🔄 Diversifying visual types (currently: {used_types})")
+        
+        # Assign types in a round-robin fashion for better distribution
+        target_types = visual_types[:min(len(chunks), len(visual_types))]
+        random.shuffle(target_types)
+        
+        for i, chunk in enumerate(chunks):
+            if i < len(target_types):
+                chunk["visual_type"] = target_types[i]
+                chunk["source"] = chunk.get("source", "").replace("(photo)", f"({target_types[i]})")
+    
+    # Log diversity stats
+    final_types = [c.get("visual_type", "photo") for c in chunks]
+    type_dist = {}
+    for t in final_types:
+        type_dist[t] = type_dist.get(t, 0) + 1
+    print(f"   📊 Visual Type Distribution: {type_dist}")
+
+
+def _apply_visual_type_styling(chunks):
+    """
+    Apply visual type specific metadata for downstream rendering.
+    This helps video_gen.py apply appropriate styling per visual type.
+    """
+    type_styles = {
+        "Screen Recording": {
+            "render_style": "screen_recording",
+            "overlay_elements": ["cursor", "window_chrome", "highlight_region"],
+            "camera_motion": "Pan"
+        },
+        "Terminal Output": {
+            "render_style": "terminal",
+            "overlay_elements": ["prompt", "command", "output", "cursor_blink"],
+            "camera_motion": "None"
+        },
+        "Code Snippet": {
+            "render_style": "code_editor",
+            "overlay_elements": ["syntax_highlight", "line_numbers", "highlight_line"],
+            "camera_motion": "Slow zoom"
+        },
+        "Terminal Output": {
+            "render_style": "terminal",
+            "overlay_elements": ["prompt", "command", "output"],
+            "camera_motion": "None"
+        },
+        "Whiteboard": {
+            "render_style": "whiteboard",
+            "overlay_elements": ["hand_drawn", "arrows", "annotations"],
+            "camera_motion": "Orbit"
+        },
+        "Diagram": {
+            "render_style": "diagram",
+            "overlay_elements": ["labels", "connections", "highlight_path"],
+            "camera_motion": "Dolly-in"
+        },
+        "Architecture Diagram": {
+            "render_style": "architecture",
+            "overlay_elements": ["service_boxes", "data_flow", "legend"],
+            "camera_motion": "Orbit"
+        },
+        "Flowchart": {
+            "render_style": "flowchart",
+            "overlay_elements": ["decision_diamonds", "process_boxes", "flow_arrows"],
+            "camera_motion": "Pan"
+        },
+        "Screen Recording": {
+            "render_style": "screen_recording",
+            "overlay_elements": ["cursor", "click_highlight", "window_chrome"],
+            "camera_motion": "Tracking shot"
+        },
+        "GitHub UI": {
+            "render_style": "github_ui",
+            "overlay_elements": ["repo_header", "file_tree", "code_view"],
+            "camera_motion": "Slow zoom"
+        },
+        "Side-by-side Comparison": {
+            "render_style": "comparison",
+            "overlay_elements": ["vs_divider", "left_labels", "right_labels"],
+            "camera_motion": "None"
+        },
+        "Animated UI Mockup": {
+            "render_style": "ui_mockup",
+            "overlay_elements": ["tap_indicators", "screen_transitions"],
+            "camera_motion": "Match cut"
+        },
+        "Infographic": {
+            "render_style": "infographic",
+            "overlay_elements": ["charts", "icons", "stat_highlights"],
+            "camera_motion": "Dolly-in"
+        }
+    }
+    
+    for chunk in chunks:
+        vtype = chunk.get("visual_type", "photo")
+        if vtype in type_styles:
+            chunk["render_style"] = type_styles[vtype]["render_style"]
+            chunk["overlay_elements"] = type_styles[vtype]["overlay_elements"]
+            chunk["camera_motion"] = type_styles[vtype]["camera_motion"]
+
+
+# Call diversity enforcement after generation
+def generate_nano_scene_visuals(chunks, headline, style_guide="", aspect_ratio="9:16"):
+    # ... existing code ...
+    
+    # At the end of the function, before returning:
+    _ensure_visual_type_diversity(chunks)
+    _apply_visual_type_styling(chunks)
+    
+    return chunks
