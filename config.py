@@ -49,7 +49,20 @@ for d in [OUTPUT_DIR, LOGS_DIR, FONTS_DIR, MUSIC_DIR, SFX_DIR]:
 
 # Application Settings
 TIMEZONE = "Asia/Kolkata"
-UPLOAD_TIMES = ["08:30", "20:00"]  # 2/day schedule (Morning and Evening IST)
+
+# Day-specific upload schedule (IST) - 2 Reels per day
+UPLOAD_SCHEDULE = {
+    "Mon": ["09:00", "19:30"],  # Monday: 9:00 AM, 7:30 PM
+    "Tue": ["08:00", "20:00"],  # Tuesday: 8:00 AM, 8:00 PM
+    "Wed": ["08:00", "20:00"],  # Wednesday: 8:00 AM, 8:00 PM
+    "Thu": ["10:00", "20:00"],  # Thursday: 10:00 AM, 8:00 PM
+    "Fri": ["09:00", "20:00"],  # Friday: 9:00 AM, 8:00 PM
+    "Sat": ["11:00", "20:00"],  # Saturday: 11:00 AM, 8:00 PM
+    "Sun": ["11:00", "19:30"],  # Sunday: 11:00 AM, 7:30 PM
+}
+
+# Legacy: Keep for backward compatibility (uses Mon schedule as default)
+UPLOAD_TIMES = UPLOAD_SCHEDULE["Mon"]
 MAX_RETRY_ATTEMPTS = 10
 SIMILARITY_THRESHOLD = 75
 CATEGORY_COOLDOWN_DAYS = 3

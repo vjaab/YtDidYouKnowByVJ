@@ -2,49 +2,23 @@ name: Daily Tech News Shorts Pipeline
 
 on:
   schedule:
-    # ── 2 SHORTS PER DAY — MORNING & EVENING IST ──
-    # Morning run: 03:00 UTC (08:30 IST / 22:00 ET)
-    # Evening run: 14:30 UTC (20:00 IST / 10:30 ET)
-    - cron: '0 3 * * *'
-    - cron: '30 14 * * *'
+    # ── RUN HOURLY — Python checks day-specific schedule (IST) ──
+    # Covers all day-specific slots: Mon-Sun 2 slots/day at varying times
+    # UTC times: Runs at minute 0 every hour (00:00, 01:00, 02:00... 23:00 UTC)
+    - cron: '0 * * * *'
   workflow_dispatch: # Allows manual trigger from GitHub Actions UI
 
 jobs:
   run-pipeline:
     runs-on: ubuntu-latest
-    timeout-minutes: 360 # 6h max: up to 4.5h rotating delay + 1.5h render
+    timeout-minutes: 180 # 3h max (no rotating delay needed)
     permissions:
       contents: write  # Required for GITHUB_TOKEN to create releases (Instagram video hosting)
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      TIMEZONE: "Asia/Kolkata"
     
     steps:
-      - name: Compute Upload Delay (Rotating Schedule)
-        id: delay
-        run: |
-          # Deterministic but rotating delay with good mixing
-          WEEK=$(date -u +%V)
-          DOW=$(date -u +%u)
-          YEAR=$(date -u +%Y)
-          HOUR=$(date -u +%H)
-          # Better hash: combine year+week+day+hour with XOR shifts for wide spread
-          SEED=$((YEAR * 371 + WEEK * 53 + DOW * 97 + HOUR * 13))
-          HASH=$(( (SEED * 2654435761) ^ (SEED >> 3) ))
-          # Absolute value and mod to 0-1800 seconds (0-30 min) for more consistent timing
-          DELAY_SECONDS=$(( (HASH % 1800 + 1800) % 1800 ))
-          DELAY_MINS=$((DELAY_SECONDS / 60))
-          echo "delay_seconds=$DELAY_SECONDS" >> $GITHUB_OUTPUT
-          echo "🕐 Today's upload delay: ${DELAY_MINS}m (seed=$SEED)"
-          
-      - name: Wait for Rotating Upload Time
-        if: github.event_name == 'schedule'
-        run: |
-          DELAY=${{ steps.delay.outputs.delay_seconds }}
-          MINS=$((DELAY / 60))
-          echo "⏳ Sleeping ${MINS}m to hit today's upload window..."
-          sleep $DELAY
-          echo "✅ Upload window reached. Starting pipeline."
-
       - name: Checkout Code
         uses: actions/checkout@v4
         

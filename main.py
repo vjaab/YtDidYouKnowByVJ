@@ -248,15 +248,17 @@ def run_pipeline(topic_type="auto", dry_run=False):
         log_message(f"Output folder cleaned: {OUTPUT_DIR}")
 
     # ── STEP 1: Content Ecosystem Check ───────────────────────────────────────
-    from config import UPLOAD_TIMES, TIMEZONE
+    from config import UPLOAD_SCHEDULE, TIMEZONE
     import pytz
     now = datetime.now(pytz.timezone(TIMEZONE))
+    day_name = now.strftime("%a")
     current_time_str = now.strftime("%H:%M")
+    day_times = UPLOAD_SCHEDULE.get(day_name, UPLOAD_SCHEDULE["Mon"])
     run_index = 0
-    if current_time_str in UPLOAD_TIMES:
-        run_index = UPLOAD_TIMES.index(current_time_str)
+    if current_time_str in day_times:
+        run_index = day_times.index(current_time_str)
     day_name, slot, category = get_slot_info(run_index=run_index)
-    log_message(f"STEP 1: Content Ecosystem Check -> Day: {day_name}, Slot: {slot}, Category: {category} (Run {run_index+1}/{len(UPLOAD_TIMES)})")
+    log_message(f"STEP 1: Content Ecosystem Check -> Day: {day_name}, Slot: {slot}, Category: {category} (Run {run_index+1}/{len(day_times)})")
     
     # ── QUIZ SHORTS: Force quiz topic_type for Quiz & Trivia days ──
     if category == "Quiz & Trivia":

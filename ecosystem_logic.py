@@ -1,7 +1,7 @@
 import datetime
 import os
 import json
-from config import ENABLE_LONGFORM, UPLOAD_TIMES
+from config import ENABLE_LONGFORM, UPLOAD_TIMES, UPLOAD_SCHEDULE
 
 ALL_CATEGORIES = [
     "AI & Tech Tools",
@@ -46,15 +46,19 @@ def _save_schedule_tracker(tracker):
 
 def get_slot_info(run_index=None):
     """
-    Returns (day_name, slot, category) based on current UTC time and the 2026 Mass-Appeal Strategy.
+    Returns (day_name, slot, category) based on current IST time and the 2026 Mass-Appeal Strategy.
     Shorts always use Slot A (Discovery) for maximum mass-appeal viral reach.
     
-    Two runs per day (morning/evening) get different categories from WEEKLY_SCHEDULE.
+    Two runs per day (day-specific schedule) get different categories from WEEKLY_SCHEDULE.
     """
-    now = datetime.datetime.utcnow()
+    import pytz
+    ist = pytz.timezone("Asia/Kolkata")
+    now = datetime.datetime.now(ist)
     day_name = now.strftime("%a")
     
     slot = "Slot A (Discovery)"
+    
+    day_times = UPLOAD_SCHEDULE.get(day_name, UPLOAD_TIMES)
     
     if run_index is None:
         tracker = _load_schedule_tracker()
@@ -63,7 +67,7 @@ def get_slot_info(run_index=None):
             tracker["last_date"] = today
             tracker["run_index"] = 0
         else:
-            tracker["run_index"] = (tracker.get("run_index", 0) + 1) % len(UPLOAD_TIMES)
+            tracker["run_index"] = (tracker.get("run_index", 0) + 1) % len(day_times)
         _save_schedule_tracker(tracker)
         run_index = tracker["run_index"]
     
