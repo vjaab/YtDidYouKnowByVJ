@@ -9,8 +9,8 @@
       "date": "2026-08-17"
     },
     "openai/gpt-oss-120b": {
-      "tokens": 6663,
-      "date": "2026-08-17"
+      "tokens": 6413,
+      "date": "2026-08-18"
     }
   },
   "gemini_models": {
@@ -22,10 +22,10 @@
     "llama-3.3-70b-versatile": 1786987162.8149407,
     "openai/gpt-oss-20b": 1786987172.8629875,
     "llama-3.1-8b-instant": 1786987172.9666724,
-    "openai/gpt-oss-120b": 1786987182.1582532
+    "openai/gpt-oss-120b": 1787077451.4799883
   },
   "cloudflare_models": {
-    "@cf/meta/llama-3.3-70b-instruct": 1786961859.6876247,
+    "@cf/meta/llama-3.3-70b-instruct": 1787034341.595356,
     "@cf/qwen/qwen2.5-72b-instruct": 1786961861.4213684,
     "@cf/mistral/mistral-small-3.1-24b-instruct": 1786961861.846818,
     "@cf/moonshotai/kimi-k2.7-code": 1786961862.139672,
