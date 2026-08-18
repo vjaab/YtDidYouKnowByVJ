@@ -9,7 +9,7 @@
       "date": "2026-08-17"
     },
     "openai/gpt-oss-120b": {
-      "tokens": 6413,
+      "tokens": 14578,
       "date": "2026-08-18"
     },
     "openai/gpt-oss-20b": {
@@ -26,15 +26,33 @@
     "llama-3.3-70b-versatile": 1786987162.8149407,
     "openai/gpt-oss-20b": 1787117214.8027897,
     "llama-3.1-8b-instant": 1786987172.9666724,
-    "openai/gpt-oss-120b": 1787077451.4799883
+    "openai/gpt-oss-120b": 1787121216.8495963
   },
   "cloudflare_models": {
-    "@cf/meta/llama-3.3-70b-instruct": 1787074204.6711035,
-    "@cf/qwen/qwen2.5-72b-instruct": 1787073167.5226202,
-    "@cf/mistral/mistral-small-3.1-24b-instruct": 1787073216.7072835,
-    "@cf/moonshotai/kimi-k2.7-code": 1787073258.9646957,
-    "@cf/moonshotai/kimi-k2.6": 1787073259.0572245,
-    "@cf/zai-org/glm-5.2": 1787073323.4551961
+    "@cf/meta/llama-3.3-70b-instruct": 1787120510.7063637,
+    "@cf/qwen/qwen2.5-72b-instruct": 1787120510.7102902,
+    "@cf/mistral/mistral-small-3.1-24b-instruct": 1787120510.711281,
+    "@cf/moonshotai/kimi-k2.7-code": 1787120510.7118828,
+    "@cf/moonshotai/kimi-k2.6": 1787120510.7121658,
+    "@cf/zai-org/glm-5.2": 1787120510.713634,
+    "@cf/openai/gpt-oss-120b": 1787120510.7074127,
+    "@cf/meta/llama-3.3-70b-instruct-fp8-fast": 1787120510.706795,
+    "@cf/zai-org/glm-4.7-flash": 1787120510.7071202,
+    "@cf/nvidia/nemotron-3-120b-a12b": 1787120510.707727,
+    "@cf/meta/llama-4-scout-17b-16e-instruct": 1787120510.708,
+    "@cf/qwen/qwq-32b": 1787120510.708274,
+    "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b": 1787120510.708554,
+    "@cf/meta/llama-3.1-70b-instruct": 1787120510.7088752,
+    "@cf/qwen/qwen3-30b-a3b-fp8": 1787120510.710581,
+    "@cf/qwen/qwen2.5-coder-32b-instruct": 1787120510.7109678,
+    "@cf/google/gemma-4-26b-a4b-it": 1787120510.711569,
+    "@cf/meta/llama-3.1-8b-instruct": 1787120510.7124467,
+    "@cf/meta/llama-3.1-8b-instruct-fp8": 1787120510.712782,
+    "@cf/meta/llama-3.1-8b-instruct-fast": 1787120510.7130857,
+    "@cf/meta/llama-3.2-3b-instruct": 1787120510.7133653,
+    "@cf/meta/llama-3.2-1b-instruct": 1787120510.714007,
+    "@cf/openai/gpt-oss-20b": 1787120510.7143142,
+    "@cf/ibm-granite/granite-4.0-h-micro": 1787120510.7146156
   },
   "cerebras_models": {
     "gpt-oss-120b": 1786987695.8295078,
