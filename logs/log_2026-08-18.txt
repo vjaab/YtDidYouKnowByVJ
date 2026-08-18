@@ -63,3 +63,24 @@
 [06:48:23] STEP 8: Calling video renderer...
 [06:48:28] ❌ Video render exception: error: OpenCV(4.11.0) /io/opencv/modules/core/src/arithm.cpp:662: error: (-209:Sizes of input arguments do not match) The operation is neither 'array op array' (where arrays have the same size and the same number of channels), nor 'array op scalar', nor 'scalar op array' in function 'arithm_op'
 
+[15:07:09] === STARTING DAILY AI PIPELINE (TOOLS) | COUNTRY: US ===
+[15:07:09] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[15:07:09] STEP 1: Content Ecosystem Check -> Day: Tue, Slot: Slot A (Discovery), Category: Interview Questions (Run 1/2)
+[15:07:09] STEP 2: Fetching articles (RSS + Trending Engine)...
+[15:07:10] 📈 vidIQ: Injected 8 high-signal topics.
+[15:09:53] 🔥 Trending Engine injected 207 high-signal articles for geo=US, category=Interview Questions.
+[15:09:53] ✅ Fetched 674 total articles (192 GitHub, 8 vidIQ, 159 research, 99 tools, 9 X.com, 207 trending).
+[15:09:53] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[15:14:00] Selected Headline: Interview Question #3: Amazon asks — Is a string a palindrome?
+[15:14:00] Selected URL: https://github.com/trekhleb/javascript-algorithms
+[15:14:00] Breaking Level: 9
+[15:14:00] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[15:14:11] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20260818_151400.png
+[15:14:21] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20260818_151411.png
+[15:14:21] STEP 3d: Fetching and validating entity tags for Short...
+[15:14:59] ✅ Found 4 valid entity tags for the Short.
+[15:14:59] STEP 4: Generating voiceover + word timestamps...
+[15:14:59] Selected Lip-Sync Template: assets/video/dark_green_hoodie.mp4 (from 41 options)
+[15:22:07] ❌ Kaggle Handover failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 7 min.
+[15:22:07] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
+[15:22:07] ⚠️ Lip-sync will be SKIPPED for this video (requires GPU).
