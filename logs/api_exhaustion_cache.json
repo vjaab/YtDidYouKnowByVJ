@@ -25,7 +25,7 @@
     "openai/gpt-oss-120b": 1787077451.4799883
   },
   "cloudflare_models": {
-    "@cf/meta/llama-3.3-70b-instruct": 1787034341.595356,
+    "@cf/meta/llama-3.3-70b-instruct": 1787067312.7440891,
     "@cf/qwen/qwen2.5-72b-instruct": 1786961861.4213684,
     "@cf/mistral/mistral-small-3.1-24b-instruct": 1786961861.846818,
     "@cf/moonshotai/kimi-k2.7-code": 1786961862.139672,

@@ -84,3 +84,24 @@
 [15:22:07] ❌ Kaggle Handover failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 7 min.
 [15:22:07] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
 [15:22:07] ⚠️ Lip-sync will be SKIPPED for this video (requires GPU).
+[15:29:55] === STARTING DAILY AI PIPELINE (TOOLS) | COUNTRY: US ===
+[15:29:55] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[15:29:55] STEP 1: Content Ecosystem Check -> Day: Tue, Slot: Slot A (Discovery), Category: Interview Questions (Run 1/2)
+[15:29:55] STEP 2: Fetching articles (RSS + Trending Engine)...
+[15:29:56] 📈 vidIQ: Injected 8 high-signal topics.
+[15:32:05] 🔥 Trending Engine injected 207 high-signal articles for geo=US, category=Interview Questions.
+[15:32:05] ✅ Fetched 673 total articles (192 GitHub, 8 vidIQ, 159 research, 98 tools, 9 X.com, 207 trending).
+[15:32:05] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[15:35:56] Selected Headline: Interview Question #2: Google asks — Design a Rate Limiter!
+[15:35:56] Selected URL: https://github.com/DrHazemAli/enterprise-system-design
+[15:35:56] Breaking Level: 9
+[15:35:56] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[15:36:02] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20260818_153556.png
+[15:36:07] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20260818_153602.png
+[15:36:07] STEP 3d: Fetching and validating entity tags for Short...
+[15:36:10] ✅ Found 2 valid entity tags for the Short.
+[15:36:10] STEP 4: Generating voiceover + word timestamps...
+[15:36:10] Selected Lip-Sync Template: assets/video/dark_green_hoodie.mp4 (from 41 options)
+[15:43:18] ❌ Kaggle Handover failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 7 min.
+[15:43:18] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
+[15:43:18] ⚠️ Lip-sync will be SKIPPED for this video (requires GPU).
