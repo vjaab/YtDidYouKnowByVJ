@@ -262,14 +262,14 @@ Educational objective: Viewer understands {topic} and why it matters by looking 
 
 High-resolution 16:9 educational infographic for LinkedIn, Instagram, YouTube, educational blogs."""
     
-    # Use the image generation function
-    result = generate_ai_image(
-        prompt=educational_prompt,
-        output_path=image_path
+    # Use the image generation function (returns list of paths)
+    results = generate_images(
+        prompts=[educational_prompt],
+        aspect_ratio="16:9"
     )
     
-    if result and os.path.exists(result):
-        final_image = result
+    if results and len(results) > 0 and results[0] and os.path.exists(results[0]):
+        final_image = results[0]
     else:
         # Fallback: create a professional 16:9 educational infographic
         from PIL import Image, ImageDraw, ImageFont

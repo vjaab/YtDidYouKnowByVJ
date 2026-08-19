@@ -200,7 +200,7 @@ def _search_pexels_multi(keywords, total=4):
     return urls[:total]
 
 
-def generate_images(prompts, image_url=None, keywords=None):
+def generate_images(prompts, image_url=None, keywords=None, aspect_ratio="9:16"):
     """
     Image strategy (priority order):
     1. Direct news article image URL (already downloaded previously)
@@ -283,7 +283,7 @@ def generate_images(prompts, image_url=None, keywords=None):
                     prompt=prompt + style_suffix,
                     config=types.GenerateImagesConfig(
                         number_of_images=1,
-                        aspect_ratio="9:16",
+                        aspect_ratio=aspect_ratio,
                         output_mime_type="image/jpeg",
                     )
                 )
@@ -310,11 +310,11 @@ def generate_images(prompts, image_url=None, keywords=None):
         if not success:
             # Fallback chain: HuggingFace FLUX → Cloudflare FLUX → Pollinations AI
             print(f"Imagen failed for image {i+1}, trying HuggingFace/Cloudflare/Pollinations fallback...")
-            path = _generate_huggingface_image(prompt + style_suffix, out, aspect_ratio="9:16")
+            path = _generate_huggingface_image(prompt + style_suffix, out, aspect_ratio=aspect_ratio)
             if not path:
-                path = _generate_cloudflare_image(prompt + style_suffix, out, aspect_ratio="9:16")
+                path = _generate_cloudflare_image(prompt + style_suffix, out, aspect_ratio=aspect_ratio)
             if not path:
-                path = _generate_pollinations_image(prompt + style_suffix, out, aspect_ratio="9:16")
+                path = _generate_pollinations_image(prompt + style_suffix, out, aspect_ratio=aspect_ratio)
             if path:
                 generated_paths.append(path)
                 previous_path = path
