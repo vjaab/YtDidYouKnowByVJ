@@ -1656,7 +1656,7 @@ This perspective MUST shape your hook, analysis, and solution framing. Do NOT ju
         selection_instruction += perspective_instruction
         print(f"🎯 Editorial Perspective Applied: {perspective['name']}")
 
-    engine = MultiAgentGenerationEngine(client, news_context, slot, category, strategy_enhancement, is_longform, raw_articles=articles, topic_type=topic_type, failed_topics=failed_topics)
+    engine = MultiAgentGenerationEngine(client, news_context, slot, category, strategy_enhancement, is_longform, raw_articles=articles, topic_type=topic_type, failed_topics=failed_topics, run_index=run_index)
     script_data = engine.execute(selection_instruction, prompt_requirements)
     
     if script_data:
@@ -2312,7 +2312,7 @@ def call_fallback_model(prompt):
     return None
 
 class MultiAgentGenerationEngine:
-    def __init__(self, client, context, slot, category, strategy_enhancement, is_longform, raw_articles=None, topic_type=None, failed_topics=None):
+    def __init__(self, client, context, slot, category, strategy_enhancement, is_longform, raw_articles=None, topic_type=None, failed_topics=None, run_index=0):
         self.client = client
         self.context = context
         self.slot = slot
@@ -2321,6 +2321,7 @@ class MultiAgentGenerationEngine:
         self.is_longform = is_longform
         self.raw_articles = raw_articles
         self.failed_topics = failed_topics if failed_topics is not None else []
+        self.run_index = run_index
         if topic_type == "vaibhav":
             self.persona = VAIBHAV_SYSTEM_PERSONA
         else:
@@ -2392,6 +2393,8 @@ class MultiAgentGenerationEngine:
         return None
 
     def execute(self, selection_instruction, prompt_requirements):
+        # Use self.run_index for A/B testing format selection
+        run_index = self.run_index
         max_selection_attempts = 3
         selection_attempts = 0
         local_failed_topics = []
