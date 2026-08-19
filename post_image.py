@@ -655,14 +655,14 @@ def run_image_post_pipeline(dry_run=False):
     # 4. Build caption
     caption = build_image_caption(articles)
 
-    # 5. Post to Instagram (carousel if multiple images)
-    print("\n📸 Posting to Instagram...")
-    as_carousel = len(image_paths) > 1
-    ig_success, ig_result = post_image_to_instagram(image_paths, caption, as_carousel=as_carousel)
-    if ig_success:
-        print(f"✅ Instagram: {ig_result}")
-    else:
-        print(f"❌ Instagram failed: {ig_result}")
+    # 5. Post to Instagram (DISABLED - only Telegram)
+    # print("\n📸 Posting to Instagram...")
+    # as_carousel = len(image_paths) > 1
+    # ig_success, ig_result = post_image_to_instagram(image_paths, caption, as_carousel=as_carousel)
+    # if ig_success:
+    #     print(f"✅ Instagram: {ig_result}")
+    # else:
+    #     print(f"❌ Instagram failed: {ig_result}")
 
     # 6. Send to Telegram (send first image or all)
     print("\n📱 Sending to Telegram...")
@@ -674,12 +674,10 @@ def run_image_post_pipeline(dry_run=False):
             send_image_to_telegram(img_path, "📸 More from today's tech visual")
 
     # 7. Notify Telegram
-    status_emoji = "✅" if ig_success else "❌"
     send_telegram_message(
-        f"{status_emoji} Image Post Pipeline Complete\n"
-        f"Instagram: {'Success' if ig_success else 'Failed'}\n"
+        f"✅ Image Post Pipeline Complete\n"
         f"Images: {len(image_paths)}\n"
-        f"Type: {'Carousel' if as_carousel else 'Single'}",
+        f"Telegram: Sent",
         emoji="🤖"
     )
 
