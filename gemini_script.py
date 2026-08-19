@@ -85,11 +85,12 @@ Constraint Checklist:
 - LOOP-FRIENDLY: The LAST sentence of the script MUST flow seamlessly back into the FIRST sentence, creating a natural viewing loop. Viewers who reach the end should feel compelled to watch again.
 - SCRIPT LENGTH: STRICT 80-120 words maximum. Target 40-50 seconds of speaking. SHORT = HIGH COMPLETION RATE = MORE VIEWS.
 - DYNAMIC FRAMING: The visual metadata coordinates with the layout archetype. Specify when the scene is showcase-oriented (e.g. system architecture diagrams, terminal outputs, code snippets, or workflows) which uses a split-screen layout, and when it is presenter-focused (showing a full-screen host overlaying a blurred background).
-- RESULT-FIRST STRUCTURE (PROVEN HIGHER RETENTION):
+- PROBLEM → SOLUTION → EXAMPLES STRUCTURE (PROVEN HIGHER RETENTION):
   1. HOOK (0-3s): Stop the scroll with a specific claim, stat, or contradiction.
-  2. RESULT REVEAL (3-10s): Show the payoff immediately — the working demo, the generated code, the saved time.
-  3. HOW-TO / PROOF (10-30s): Quick steps or live demo. "Here's the exact prompt..." "Run this command..."
-  4. WHY IT MATTERS + CTA (30-45s): "Saves you 5 hours/week." + Save/share CTA.
+  2. THE PROBLEM (3-10s): State the specific pain point. "Developers lose 5+ hrs/week debugging memory leaks." Make it personal — "your" language.
+  3. THE SOLUTION (10-20s): Present the exact fix. Name the tool, command, or config. "This open-source tool auto-patches leaks in seconds."
+  4. REAL EXAMPLES (20-35s): Give 1-2 concrete examples with real companies, exact commands, measurable results. "Shopify cut debug time 6hrs→12min." "Run: npx leak-finder --fix."
+  5. WHY IT MATTERS + CTA (35-45s): "Saves you hours every sprint." + Save/share CTA.
 - SUBSCRIBER INCENTIVE LOOP (SHORTS ONLY): Every Short MUST include ONE incentive CTA at 00:25-00:35. Choose exactly one mode:
   1. DIGITAL VAULT / CODE BLUEPRINT: "I put the entire Python script & architecture diagram in our Telegram. Link in description."
   2. SECRET MENU / COMMENT KEYWORD TRIGGER: "Comment 'CONFIG' below and I'll send you my exact evaluation template."
@@ -105,9 +106,10 @@ Constraint Checklist:
 
 SUCCESS PATTERNS (2026): 
 - HOOKS (0-3s): Start with a compelling, realistic hook grounded in a specific fact, setting, or feature. First 3-5 words must STOP the scroll.
-- RESULT REVEAL (3-10s): Show the payoff immediately. The working output. The generated code.
-- HOW-TO / PROOF (10-30s): Actionable steps. Exact commands. Live demo.
-- WHY IT MATTERS + CTA (30-45s): Personal stake + Save/Share/Follow.
+- THE PROBLEM (3-10s): State the pain point clearly and personally. "Your API keys leak in CI logs."
+- THE SOLUTION (10-20s): Name the exact tool/command/fix. "Add this one line to encrypt keys at rest."
+- REAL EXAMPLES (20-35s): Specific companies, commands, numbers. "Stripe uses this. Run: npx secret-scan --fix."
+- WHY IT MATTERS + CTA (35-45s): Personal stake + Save/Share/Follow.
 - SEAMLESS LOOP (45-50s): Final sentence flows back to opening hook.
 
 Visual Director Persona & Visual Selection Logic:
@@ -180,11 +182,12 @@ STRICT RULES:
 - Do NOT say "In this video" or "Today we're going to".
 - Output must be plain spoken text only — no stage directions, no scene labels.
 - SCRIPT LENGTH: Target a 35-second YouTube Short (approx 80-120 words spoken at natural pace). SHORTER = HIGHER COMPLETION RATE = MORE ALGORITHMIC PUSH. Keep it extremely tight and punchy.
-- RESULT-FIRST 4-PART SHORTS ARCHITECTURE (MANDATORY):
+- PROBLEM → SOLUTION → EXAMPLES 5-PART SHORTS ARCHITECTURE (MANDATORY):
   1. HARD HOOK (0:00 - 0:03): Metric, contradiction, or personal stake. 8-12 words. First 3 words stop the scroll.
-  2. RESULT REVEAL (0:03 - 0:10): Show the payoff immediately. "It built the full API in 30 seconds." "The code works on first try."
-  3. HOW-TO / PROOF (0:10 - 0:30): Quick demo or exact steps. "Here's the prompt: ..." "Run this command: ..."
-  4. WHY IT MATTERS + CTA (0:30 - 0:35): "Saves you 5 hours a week." + "Save this. Follow for more."
+  2. THE PROBLEM (0:03 - 0:10): State the pain point personally. "Your API keys leak in CI logs."
+  3. THE SOLUTION (0:10 - 0:20): Name the exact tool/command/fix. "Add this one line to encrypt keys at rest."
+  4. REAL EXAMPLES (0:20 - 0:30): Specific companies, commands, numbers. "Stripe uses this. Run: npx secret-scan --fix."
+  5. WHY IT MATTERS + CTA (0:30 - 0:35): "Saves you 5 hours a week." + "Save this. Follow for more."
 - SUBSCRIBER INCENTIVE CTA MODES (pick exactly ONE):
   1. DIGITAL VAULT / CODE BLUEPRINT: "I put the entire Python script & architecture diagram in our Telegram. Link in description."
   2. SECRET MENU / COMMENT KEYWORD TRIGGER: "Comment 'CONFIG' below and I'll send you my exact evaluation template."
@@ -313,20 +316,22 @@ Return ONLY JSON:
 NARRATIVE_AGENT_TEMPLATE = """{persona}
 
 NARRATIVE AGENT TASK:
-Write 4-part script using SELECTED HOOK exactly as-is.
+Write 5-part script using SELECTED HOOK exactly as-is.
 
-STRUCTURE — RESULT-FIRST FORMAT (proven higher retention):
+STRUCTURE — PROBLEM → SOLUTION → EXAMPLES FORMAT (proven higher retention):
 1. HOOK (0-3s): {selected_hook}  ← USE VERBATIM
-2. RESULT REVEAL (3-10s): Show the payoff immediately. "I gave it this prompt and it built the entire API in 30 seconds." / "The tool generates working code instantly — watch."
-3. HOW-TO / PROOF (10-30s): Quick demo or steps. "Here's the exact prompt..." / "Install: pip install xyz. Run: xyz --prompt '...'." Keep it under 20 seconds.
-4. WHY IT MATTERS + CTA (30-45s): "This saves you 5 hours a week." / "Your team should know this." + Soft CTA: "Save this for later. Follow for more tools like this."
+2. THE PROBLEM (3-10s): State the specific pain point clearly. "Developers waste 5+ hours/week debugging memory leaks." / "Your API keys are exposed in plain text in CI logs." Make it personal — use "your" language.
+3. THE SOLUTION (10-20s): Present the fix immediately. "This open-source tool auto-detects and patches leaks in seconds." / "Add this one config line and keys are encrypted at rest." Name the exact tool, command, or feature.
+4. REAL EXAMPLES (20-35s): Give 1-2 concrete, specific examples. "Team at Shopify cut debug time from 6hrs to 12min." / "Run: npx leak-finder --fix. It patched 3 leaks in my auth service." Use real companies, real numbers, exact commands.
+5. WHY IT MATTERS + CTA (35-45s): "This saves you hours every sprint." / "Your production data stays safe." + Soft CTA: "Save this for later. Follow for more tools like this."
 
 RULES:
 - NO "In this video," "Today I'll show you," "Let me explain"
-- Show the RESULT first, then explain how
-- Max 2 sentences per step
-- Use "you" / "your" language throughout
+- State the PROBLEM first, then SOLUTION, then EXAMPLES
+- Max 2 sentences per section
+- Use "you" / "your" language throughout — frame from viewer's perspective
 - End with save/share-worthy CTA: "Send this to a developer" / "Save this" / "Follow for more"
+- EXAMPLES must be specific: real company names, exact commands, measurable results
 
 VISUAL PROMPT RULE: The FIRST nano_visual_prompt (hook segment) MUST depict the EXACT product/tool/feature named in the hook. Example: if hook says 'MemoMind One glasses', prompt = 'Close-up of MemoMind One smart glasses on desk, transparent AR lenses showing notifications, photorealistic 9:16, dark background'. NO generic 'person holding box'.
 
