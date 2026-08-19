@@ -614,35 +614,23 @@ def _add_natural_volume_variation(audio):
 
 def _postprocess_voice_audio(wav_path, word_timestamps=None, original_text=None, skip_slicing=False):
     """
-    Minimal post-processing to preserve original voice character for cloning:
-    1. High-pass filter at 120Hz to remove low-end rumble.
-    2. Light normalization to -1dB for consistent loudness.
-    3. Subtle fade-in/out to prevent clicks.
+    Zero post-processing to preserve original F5-TTS cloned voice character exactly.
+    Only prevents click artifacts at boundaries.
     """
     try:
         from pydub import AudioSegment
-        from pydub.effects import normalize
         
-        # Step 0: Clean artifacts if timestamps available (Skip for cloud TTS, estimated TS, or skip_slicing)
-        is_estimated = any(wt.get("estimated", False) for wt in word_timestamps) if word_timestamps else False
-        if word_timestamps and original_text and not skip_slicing and not is_estimated:
-            word_timestamps = _remove_vocal_artifacts(wav_path, word_timestamps, original_text)
-            # Skip human phrasing injection to preserve original voice timing
-            # word_timestamps = _inject_human_phrasing(wav_path, word_timestamps, original_text)
+        # Skip ALL artifact removal and phrasing injection - preserve raw F5-TTS output
+        # if word_timestamps and original_text and not skip_slicing and not is_estimated:
+        #     word_timestamps = _remove_vocal_artifacts(wav_path, word_timestamps, original_text)
         
         audio = AudioSegment.from_file(wav_path)
         
-        # 1. High-pass filter (120Hz) - Removes low-frequency room rumble
-        audio = audio.high_pass_filter(120)
-        
-        # 2. Light Normalization (no compression - preserves voice dynamics)
-        audio = normalize(audio, headroom=1.0)
-        
-        # 3. Prevent click artifacts
+        # ONLY: Prevent click artifacts at start/end (5ms fade)
         audio = audio.fade_in(5).fade_out(5)
         
         audio.export(wav_path, format="wav" if wav_path.endswith(".wav") else "mp3")
-        print(f"   🎙️ Audio enhanced: 120Hz HPF, light normalization to -1dB (voice dynamics preserved)")
+        print(f"   🎙️ Audio preserved: raw F5-TTS output (only 5ms click prevention)")
     except Exception as e:
         print(f"   ⚠ Audio post-processing skipped: {e}")
 
@@ -1807,18 +1795,20 @@ def generate_voiceover(text, custom_phonetic_map=None, api_key=None):
             ]
         if path and word_timestamps:
             is_estimated = any(wt.get("estimated", False) for wt in word_timestamps)
-            dur, word_timestamps = trim_audio_silence(path, word_timestamps)
             
-            # Skip aggressive gap optimization and context pauses for cloud TTS and estimated timestamps
-            if not is_cloud and not is_estimated:
-                dur, word_timestamps = optimize_audio_gaps(path, word_timestamps)
-            
-            # Phase 2: Apply audio pacing & clipping management
-            dur, word_timestamps = apply_audio_pacing(path, word_timestamps)
-            
-            # Phase 3: Inject context-shift pauses (Skip for cloud TTS and estimated timestamps)
-            if not is_cloud and not is_estimated:
-                dur, word_timestamps = _inject_context_pauses(path, word_timestamps)
+            # For F5-TTS (local voice cloning): PRESERVE ORIGINAL VOICE - NO MODIFICATIONS
+            # Only skip silence trimming and gap optimization for cloud TTS
+            if is_cloud:
+                dur, word_timestamps = trim_audio_silence(path, word_timestamps)
+                if not is_estimated:
+                    dur, word_timestamps = optimize_audio_gaps(path, word_timestamps)
+                    dur, word_timestamps = apply_audio_pacing(path, word_timestamps)
+                    dur, word_timestamps = _inject_context_pauses(path, word_timestamps)
+            else:
+                # F5-TTS: Keep raw output, only update duration
+                from audio_gen import get_audio_duration
+                dur = get_audio_duration(path)
+                print(f"   🎙️ F5-TTS: Preserving raw voice (no trimming, no gap optimization, no pacing injection)")
 
         # 2. OBSERVE & CRITIQUE
         if api_key and iterations < max_iters:
