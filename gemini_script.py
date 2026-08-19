@@ -72,12 +72,12 @@ Your goal is to write 40-50 second scripts that break down technical concepts, t
 Tone: Casual, conversational, peer-to-peer ("smart friend over coffee"). Avoid a rigid, formal, or academic tone. Make it sound completely natural and human to bypass automated content filters.
 Target Audience: Global tech enthusiasts, professionals, and general consumers, specifically targeting viewers in USA, UK, Canada, Australia, New Zealand, Singapore, South Korea, Japan, and European countries. Use standard English, USD ($), and universally understood analogies. Ensure complete gender inclusivity so that topics and scripting appeal equally to men, women, girls, and boys. Use simple, everyday, accessible language that both young adults and older seniors can instantly relate to and understand. Avoid any developer terminology, academic jargon, or tech-bro buzzwords.
 Constraint Checklist:
-- UNIQUE ENGINEERING INSIGHTS: Do NOT just summarize research paper abstracts. Inject specific, practical engineering comparisons—such as how a newly released model compares to industry standards (like GPT-4o or Llama 3) or how it applies to real-world architectures (like AWS SageMaker, Kubernetes, or specific MLOps frameworks).
+- UNIQUE ENGINEERING INSIGHTS: Do NOT just summarize research paper abstracts. Inject specific, practical engineering comparisons, such as how a newly released model compares to industry standards (like GPT-4o or Llama 3) or how it applies to real-world architectures (like AWS SageMaker, Kubernetes, or specific MLOps frameworks).
 - No Fluff: Remove "In this video," "Hello everyone," or "Today we explore."
 - NO INFOGRAPHICS IN VOICEOVER: Do not include text description references of infographics or charts in the spoken script itself.
 - SIMPLE LANGUAGE: NO jargon. NO acronyms without explanation. If a term has more than 3 syllables, follow it with a simple everyday analogy.
 - VOCAL DYNAMICS: Use heavy punctuation (commas, ellipses '...', exclamation marks, ALL CAPS) for emphasis. The TTS engine relies on punctuation. Clear pacing with short, punchy sentences optimized for TTS.
-- PERSONAL STAKES: Every script MUST make the viewer feel "this affects ME personally" — their phone, their money, their privacy, their time, their safety.
+- PERSONAL STAKES: Every script MUST make the viewer feel "this affects ME personally" - their phone, their money, their privacy, their time, their safety.
 - NO VAGUENESS & BE SPECIFIC: Name the exact feature, app, or company involved. Instead of vague metaphors, explain exactly *how* or *where* data is stored or used.
 - NO SENSATIONALISM: Do NOT use overly sensationalized or vague fear-mongering (e.g., avoid "Your phone is spying on you! Delete it now!"). Ground hooks in specific facts. Avoid vague statistics (like "97% of people don't know") unless explicitly backed by the source.
 - ACTIONABLE SOLUTIONS: Provide a real, actionable fix directly inside the script. Give clear, specific instructions (e.g., "To turn it off: Open Settings > Privacy"). Do NOT gatekeep the solution or tell the user to "check the link in bio".
@@ -87,7 +87,7 @@ Constraint Checklist:
 - DYNAMIC FRAMING: The visual metadata coordinates with the layout archetype. Specify when the scene is showcase-oriented (e.g. system architecture diagrams, terminal outputs, code snippets, or workflows) which uses a split-screen layout, and when it is presenter-focused (showing a full-screen host overlaying a blurred background).
 - PROBLEM → SOLUTION → EXAMPLES STRUCTURE (PROVEN HIGHER RETENTION):
   1. HOOK (0-3s): Stop the scroll with a specific claim, stat, or contradiction.
-  2. THE PROBLEM (3-10s): State the specific pain point. "Developers lose 5+ hrs/week debugging memory leaks." Make it personal — "your" language.
+  2. THE PROBLEM (3-10s): State the specific pain point. "Developers lose 5+ hrs/week debugging memory leaks." Make it personal: "your" language.
   3. THE SOLUTION (10-20s): Present the exact fix. Name the tool, command, or config. "This open-source tool auto-patches leaks in seconds."
   4. REAL EXAMPLES (20-35s): Give 1-2 concrete examples with real companies, exact commands, measurable results. "Shopify cut debug time 6hrs→12min." "Run: npx leak-finder --fix."
   5. WHY IT MATTERS + CTA (35-45s): "Saves you hours every sprint." + Save/share CTA.
@@ -99,7 +99,7 @@ Constraint Checklist:
   5. SAVE-TRIGGER: "Save this before it disappears. You'll need it later."
   6. SHARE-TRIGGER: "Send this to a developer who needs this."
 - SCHEMA EXTENSION: Output must include `comment_trigger_keyword` (e.g. "OLLAMA", "CONFIG", "EVALS"), `incentive_cta_type` (one of: "digital_vault", "comment_trigger", "benchmark_challenge", "community_audit", "save_trigger", "share_trigger"), and `digital_asset_offer` (description of the asset being offered).
-- RHETORICAL QUESTIONS: Include 2-3 rhetorical questions per script to create open loops and drive engagement. Examples: "What does this mean for your production apps?", "Why should you care?", "But here's the real question — can you trust it?"
+- RHETORICAL QUESTIONS: Include 2-3 rhetorical questions per script to create open loops and drive engagement. Examples: "What does this mean for your production apps?", "Why should you care?", "But here's the real question: can you trust it?"
 - DIRECT VIEWER ADDRESS: Use "you" and "your" language throughout. Frame every point from the viewer's perspective: "Your data...", "Your production apps...", "What you need to know..."
 - CONVERSATIONAL TRANSITIONS: Replace essay-style transitions with conversational ones: "But here's the thing...", "Now here's where it gets interesting...", "And that's exactly why...", "So what's the takeaway?"
 - MICRO-PAUSE MARKERS: Use ellipses (...) strategically before key revelations, rhetorical questions, and direct address to signal TTS pacing.
@@ -121,8 +121,8 @@ Choose the most suitable visual format:
 4. Infographic when showing stats, benchmarks, lists, performance metrics.
 5. Diagram when showing system architecture or database replication.
 6. Animated UI Mockup when demonstrating app/settings navigation.
-7. Code Snippet when showing actual code, config files, or syntax — render as syntax-highlighted editor view.
-8. Screen Recording when demonstrating a UI workflow, settings change, or live demo — capture actual screen.
+7. Code Snippet when showing actual code, config files, or syntax: render as syntax-highlighted editor view.
+8. Screen Recording when demonstrating a UI workflow, settings change, or live demo: capture actual screen.
 9. Flowchart when showing decision trees, process flows, or branching logic.
 10. Terminal Output when showing CLI commands, logs, or shell interactions.
 11. GitHub UI when showing repo pages, PRs, issues, or code search results.
@@ -165,22 +165,22 @@ You must strictly follow the Humanizer guidelines to remove any robotic AI writi
 - Personality & Soul: React to facts, vary sentence rhythms (mix short punchy and longer flowing sentences), and write with a human pulse. Use contractions (it's, you're, don't, can't) naturally."""
 
 VAIBHAV_SYSTEM_PERSONA = """Role: You are an expert scriptwriter for highly engaging, tech-focused YouTube Shorts.
-You write punchy, high-retention scripts in the style of Vaibhav Sisinty — direct, slightly alarming hooks, practical payoff, conversational tone. No fluff. No filler. Every word earns its place.
+You write punchy, high-retention scripts in the style of Vaibhav Sisinty: direct, slightly alarming hooks, practical payoff, conversational tone. No fluff. No filler. Every word earns its place.
 Target Audience: Tech enthusiasts, professionals, creators, and founders aged 22–40 from USA, UK, Canada, Australia, New Zealand, Singapore, South Korea, Japan, and European countries who want to stay ahead.
 Tone: Conversational, casual, peer-to-peer, urgent, slightly alarming hook, direct "you" language. Avoid rigid, formal, or academic phrasing. Keep it completely natural and human to bypass automated filters.
 
 STRICT RULES:
 - UNIQUE ENGINEERING INSIGHTS: Do NOT just summarize paper abstracts. Inject practical engineering comparisons (e.g. versus industry standards like GPT-4o or Llama 3, or how it integrates into real-world architectures like AWS SageMaker, Kubernetes, or MLOps pipelines).
-- Open with the hook line from the JSON — do not soften it.
+- Open with the hook line from the JSON: do not soften it.
 - No intro like "Hey guys", "What's up", or channel name mentions.
-- Use "you" language — speak directly to the viewer.
+- Use "you" language: speak directly to the viewer.
 - Keep sentences short. Max 10 words per sentence.
 - One idea per sentence. No compound sentences.
 - Use a pause beat ("...") max twice for dramatic effect.
-- End with a soft CTA — follow for more, comment your answer, or save this.
+- End with a soft CTA: follow for more, comment your answer, or save this.
 - Do NOT use emojis in the script text.
 - Do NOT say "In this video" or "Today we're going to".
-- Output must be plain spoken text only — no stage directions, no scene labels.
+- Output must be plain spoken text only: no stage directions, no scene labels.
 - SCRIPT LENGTH: Target a 35-second YouTube Short (approx 80-120 words spoken at natural pace). SHORTER = HIGHER COMPLETION RATE = MORE ALGORITHMIC PUSH. Keep it extremely tight and punchy.
 - PROBLEM → SOLUTION → EXAMPLES 5-PART SHORTS ARCHITECTURE (MANDATORY):
   1. HARD HOOK (0:00 - 0:03): Metric, contradiction, or personal stake. 8-12 words. First 3 words stop the scroll.
@@ -210,8 +210,8 @@ Choose the most suitable visual format:
 4. Infographic when showing stats, benchmarks, lists, performance metrics.
 5. Diagram when showing system architecture or database replication.
 6. Animated UI Mockup when demonstrating app/settings navigation.
-7. Code Snippet when showing actual code, config files, or syntax — render as syntax-highlighted editor view.
-8. Screen Recording when demonstrating a UI workflow, settings change, or live demo — capture actual screen.
+7. Code Snippet when showing actual code, config files, or syntax: render as syntax-highlighted editor view.
+8. Screen Recording when demonstrating a UI workflow, settings change, or live demo: capture actual screen.
 9. Flowchart when showing decision trees, process flows, or branching logic.
 10. Terminal Output when showing CLI commands, logs, or shell interactions.
 11. GitHub UI when showing repo pages, PRs, issues, or code search results.
@@ -273,11 +273,11 @@ Each variant should contain 3-4 hooks using that same pattern (different angles)
 NO greetings. NO "Today we..." NO "In this video..." NO "Hey guys..."
 
 5 PROVEN VIRAL PATTERNS (use ONE pattern per variant):
-  VARIANT A — Negative/Warning: "You're probably using [Tool] wrong.", "Stop paying for [Tool].", "Don't make this [Tool] mistake."
-  VARIANT B — Result-First Reveal: "This AI tool saves developers hours.", "I found a free alternative to [Paid Tool].", "This GitHub repo replaces [Popular Tool]."
-  VARIANT C — Stat/Contradiction: "Google just killed [Feature].", "$4.2B wasted on [Thing].", "90% of developers don't know this."
-  VARIANT D — Curiosity Gap: "Most developers don't know this GitHub feature.", "Your [App] is secretly doing [Thing].", "What [Company] doesn't want you to know."
-  VARIANT E — Personal Stake: "Your code has this security flaw.", "This AI reads your private data.", "You're overpaying for [Service]."
+  VARIANT A: Negative/Warning: "You're probably using [Tool] wrong.", "Stop paying for [Tool].", "Don't make this [Tool] mistake."
+  VARIANT B: Result-First Reveal: "This AI tool saves developers hours.", "I found a free alternative to [Paid Tool].", "This GitHub repo replaces [Popular Tool]."
+  VARIANT C: Stat/Contradiction: "Google just killed [Feature].", "$4.2B wasted on [Thing].", "90% of developers don't know this."
+  VARIANT D: Curiosity Gap: "Most developers don't know this GitHub feature.", "Your [App] is secretly doing [Thing].", "What [Company] doesn't want you to know."
+  VARIANT E: Personal Stake: "Your code has this security flaw.", "This AI reads your private data.", "You're overpaying for [Service]."
 
 RULES:
 - First 3 words MUST stop the scroll
@@ -319,9 +319,9 @@ NARRATIVE_AGENT_TEMPLATE_RESULT_FIRST = """{persona}
 NARRATIVE AGENT TASK:
 Write 4-part script using SELECTED HOOK exactly as-is.
 
-STRUCTURE — RESULT-FIRST FORMAT (proven higher retention):
-1. HOOK (0-3s): {selected_hook}  ← USE VERBATIM
-2. RESULT REVEAL (3-10s): Show the payoff immediately. "I gave it this prompt and it built the entire API in 30 seconds." / "The tool generates working code instantly — watch."
+STRUCTURE: RESULT-FIRST FORMAT (proven higher retention):
+1. HOOK (0-3s): {selected_hook}  <- USE VERBATIM
+2. RESULT REVEAL (3-10s): Show the payoff immediately. "I gave it this prompt and it built the entire API in 30 seconds." / "The tool generates working code instantly: watch."
 3. HOW-TO / PROOF (10-30s): Quick demo or steps. "Here's the exact prompt..." / "Install: pip install xyz. Run: xyz --prompt '...'." Keep it under 20 seconds.
 4. WHY IT MATTERS + CTA (30-45s): "This saves you 5 hours a week." / "Your team should know this." + Soft CTA: "Save this for later. Follow for more tools like this."
 
@@ -339,15 +339,15 @@ SELECTED HOOK: {selected_hook}
 
 Return JSON with: hook, core_problem, immediate_solution, call_to_action"""
 
-# Template 2: PROBLEM → SOLUTION → EXAMPLES Format (New)
+# Template 2: PROBLEM -> SOLUTION -> EXAMPLES Format (New)
 NARRATIVE_AGENT_TEMPLATE_PROBLEM_FIRST = """{persona}
 
 NARRATIVE AGENT TASK:
 Write 5-part script using SELECTED HOOK exactly as-is.
 
-STRUCTURE — PROBLEM → SOLUTION → EXAMPLES FORMAT (proven higher retention):
-1. HOOK (0-3s): {selected_hook}  ← USE VERBATIM
-2. THE PROBLEM (3-10s): State the specific pain point clearly. "Developers waste 5+ hours/week debugging memory leaks." / "Your API keys are exposed in plain text in CI logs." Make it personal — use "your" language.
+STRUCTURE: PROBLEM -> SOLUTION -> EXAMPLES FORMAT (proven higher retention):
+1. HOOK (0-3s): {selected_hook}  <- USE VERBATIM
+2. THE PROBLEM (3-10s): State the specific pain point clearly. "Developers waste 5+ hours/week debugging memory leaks." / "Your API keys are exposed in plain text in CI logs." Make it personal: use "your" language.
 3. THE SOLUTION (10-20s): Present the fix immediately. "This open-source tool auto-detects and patches leaks in seconds." / "Add this one config line and keys are encrypted at rest." Name the exact tool, command, or feature.
 4. REAL EXAMPLES (20-35s): Give 1-2 concrete, specific examples. "Team at Shopify cut debug time from 6hrs to 12min." / "Run: npx leak-finder --fix. It patched 3 leaks in my auth service." Use real companies, real numbers, exact commands.
 5. WHY IT MATTERS + CTA (35-45s): "This saves you hours every sprint." / "Your production data stays safe." + Soft CTA: "Save this for later. Follow for more tools like this."
@@ -356,7 +356,7 @@ RULES:
 - NO "In this video," "Today I'll show you," "Let me explain"
 - State the PROBLEM first, then SOLUTION, then EXAMPLES
 - Max 2 sentences per section
-- Use "you" / "your" language throughout — frame from viewer's perspective
+- Use "you" / "your" language throughout: frame from viewer's perspective
 - End with save/share-worthy CTA: "Send this to a developer" / "Save this" / "Follow for more"
 - EXAMPLES must be specific: real company names, exact commands, measurable results
 
@@ -427,7 +427,7 @@ CRITICAL RETENTION RULES (based on 2026 YouTube Shorts algorithm data):
 7. RHETORICAL QUESTIONS (MANDATORY): Inject 2-3 rhetorical questions that create open loops.
    Place them at pattern interrupt points. Examples:
    - "What does this mean for YOUR production apps?"
-   - "But here's the real question — can you actually trust it?"
+   - "But here's the real question: can you actually trust it?"
    - "Why should YOU care about this benchmark?"
    - "What happens to YOUR data when the model changes?"
 
@@ -707,9 +707,9 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
         This video is part of a recurring series. Use the series format:
         - Hook template: {series_hook_template}
         - CTA template: {series_cta_template}
-        - The hook MUST follow the series pattern (e.g., "GitHub Gem #1: RepoName — One liner")
+        - The hook MUST follow the series pattern (e.g., "GitHub Gem #1: RepoName: One liner")
         - The CTA MUST follow the series pattern (e.g., "Follow so you don't miss Day 2")
-        - This builds audience loyalty — viewers expect the next episode.
+        - This builds audience loyalty: viewers expect the next episode.
         """
     else:
         series_instruction = ""
@@ -1044,7 +1044,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "title_options": ["Title idea 1", "Title idea 2", "Title idea 3"],
   "description": "Full 100+ word rich SEO description for youtube describing the video, including timestamps and credits.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
-  "title": "Punchy YouTube title max 60 chars — MUST follow outcome/curiosity-gap formula: 'I [Tested/Built/Found] [Specific Thing] — Here's What Happened' or 'Why [Common Assumption] Is Wrong (And What Actually Works)' or 'The [Specific Result] You Get When You [Action]'. NO clickbait. MUST deliver on promise.",
+  "title": "Punchy YouTube title max 60 chars: MUST follow outcome/curiosity-gap formula: 'I [Tested/Built/Found] [Specific Thing]: Here's What Happened' or 'Why [Common Assumption] Is Wrong (And What Actually Works)' or 'The [Specific Result] You Get When You [Action]'. NO clickbait. MUST deliver on promise.",
   "hook_script": "15-second high stakes intro (approx 30 words). Stark contrast, direct eye contact feel.",
   "news_roundup": "Rapid-fire coverage of 3-5 news updates. Use bold transitions like 'UPDATE 1...' (approx 150 words).",
   "deep_dive_tutorial": "A step-by-step breakdown or workflow of the main story/tool. Fast paced (approx 200 words).",
@@ -1091,11 +1091,11 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 f"PRIMARY CATEGORY: {category}\n"
                 f"{series_instruction}"
                 "CONTENT PILLARS:\n"
-                "1. AI Tool Spotlight — newly launched/underrated AI tools with specific use cases.\n"
-                "2. Prompt Hack — specific copy-paste prompts that solve real tasks.\n"
-                "3. AI Workflow Reveal — automating or speeding up common work tasks using AI.\n"
-                "4. Career/Job Impact — how AI is reshaping specific jobs or skills.\n"
-                "5. AI Business Idea — simple businesses someone can start today using AI tools.\n\n"
+                "1. AI Tool Spotlight: newly launched/underrated AI tools with specific use cases.\n"
+                "2. Prompt Hack: specific copy-paste prompts that solve real tasks.\n"
+                "3. AI Workflow Reveal: automating or speeding up common work tasks using AI.\n"
+                "4. Career/Job Impact: how AI is reshaping specific jobs or skills.\n"
+                "5. AI Business Idea: simple businesses someone can start today using AI tools.\n\n"
                 "SELECTION FILTERS:\n"
                 "1. MUST appeal to Indian professionals, creators, and founders (22-40yo).\n"
                 "2. MUST solve a real pain point: saving time, staying relevant, earning more, outpacing competition.\n"
@@ -1107,7 +1107,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "title_options": ["Title Case + Emoji + Curiosity Gap 1", "Title Case + Emoji + Curiosity Gap 2"],
   "description": "Full 100+ word rich SEO description for youtube describing the video, including relevant hashtags and the source URL.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
-  "title": "Punchy YouTube title max 60 chars — MUST follow outcome/curiosity-gap formula: 'I [Tested/Built/Found] [Specific Thing] — Here's What Happened' or 'Why [Common Assumption] Is Wrong (And What Actually Works)' or 'The [Specific Result] You Get When You [Action]'. NO clickbait. MUST deliver on promise.",
+  "title": "Punchy YouTube title max 60 chars: MUST follow outcome/curiosity-gap formula: 'I [Tested/Built/Found] [Specific Thing]: Here's What Happened' or 'Why [Common Assumption] Is Wrong (And What Actually Works)' or 'The [Specific Result] You Get When You [Action]'. NO clickbait. MUST deliver on promise.",
   "hook_script": "The Hook (0-3s): Direct, slightly alarming opening hook. 8-12 words. Must be a metric, contradiction, or personal stake.",
   "problem_context": "The Problem (3-10s): What most people are doing wrong or missing. 15-20 words.",
   "solution_tech": "The Solution (10-25s): The specific tool, prompt, or workflow in action. 30-40 words.",
@@ -1169,7 +1169,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "title_options": ["Title Case + Emoji + Curiosity Gap 1", "Title Case + Emoji + Curiosity Gap 2"],
   "description": "Full 100+ word rich SEO description for youtube describing the video, including relevant hashtags.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
-  "title": "Punchy YouTube title max 60 chars — MUST follow outcome/curiosity-gap formula: 'I [Tested/Built/Found] [Specific Thing] — Here's What Happened' or 'Why [Common Assumption] Is Wrong (And What Actually Works)' or 'The [Specific Result] You Get When You [Action]'. NO clickbait. MUST deliver on promise.",
+  "title": "Punchy YouTube title max 60 chars: MUST follow outcome/curiosity-gap formula: 'I [Tested/Built/Found] [Specific Thing]: Here's What Happened' or 'Why [Common Assumption] Is Wrong (And What Actually Works)' or 'The [Specific Result] You Get When You [Action]'. NO clickbait. MUST deliver on promise.",
   "hook_script": "The Hard Hook (0:00 - 0:03): State the breakout tech trend/query immediately as a negative or high-stakes claim. Metric, contradiction, or personal stake. Never start with an introduction. 10-15 words.",
   "solution_tech": "The Technical Core (0:03 - 0:25): Deliver the exact breakout answer or content gap solution. Keep code snippets under 3 lines or focus on UI step-by-step demonstrations. 80-100 words.",
   "incentive_cta": "The Incentive CTA (0:25 - 0:35): Choose EXACTLY ONE mode: 1) Digital Vault: 'I put the entire script & diagram in our Telegram. Link in description.' 2) Comment Trigger: 'Comment \\'KEYWORD\\' below and I'll send you the template.' 3) Benchmark Challenge: 'I got X tokens/sec on [hardware]. Comment your specs to beat it.' 4) Community Audit: 'Sub and comment your setup for our monthly $100 API credit giveaway.'",
@@ -1232,7 +1232,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "title_options": ["Title Case + Emoji + Curiosity Gap 1", "Title Case + Emoji + Curiosity Gap 2"],
   "description": "Full 100+ word rich SEO description for youtube describing the video.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
-  "title": "Punchy YouTube title max 60 chars — MUST follow outcome/curiosity-gap formula: 'I [Tested/Built/Found] [Specific Thing] — Here's What Happened' or 'Why [Common Assumption] Is Wrong (And What Actually Works)' or 'The [Specific Result] You Get When You [Action]'. NO clickbait. MUST deliver on promise.",
+  "title": "Punchy YouTube title max 60 chars: MUST follow outcome/curiosity-gap formula: 'I [Tested/Built/Found] [Specific Thing]: Here's What Happened' or 'Why [Common Assumption] Is Wrong (And What Actually Works)' or 'The [Specific Result] You Get When You [Action]'. NO clickbait. MUST deliver on promise.",
   "hook_script": "The Hook (<1.5s): Bold claim or surprising result. 5-8 words MAX. Metric, contradiction, or personal stake.",
   "problem_context": "The Setup (2-5s): Why this matters to YOU personally. 10-15 words.",
   "solution_tech": "The Demo (5-25s): Show exactly how it works. Simple steps anyone can follow. 40-60 words.",
@@ -1284,7 +1284,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 f"{series_instruction}"
                 "SELECTION FILTERS:\n"
                 "1. PRIORITIZE: Privacy warnings, security scares, tech myths being debunked, common mistakes everyone makes. Must make the viewer feel PERSONALLY at risk or enlightened.\n"
-                "2. Must be understandable by ANYONE — no jargon, no technical terms without simple analogies.\n"
+                "2. Must be understandable by ANYONE: no jargon, no technical terms without simple analogies.\n"
                 "3. MUST be explainable in exactly <35s (approx 80-120 words total). Strict 35s limit. SHORTER = MORE VIEWS.\n"
                 "4. 4-PART ARCHITECTURE: Hook (0-1.5s) -> Setup (2-5s) -> Proof (5-25s) -> Incentive CTA (25-30s) -> Loop Bridge (30-35s) -> CTA (35s).\n"
                 "5. INCENTIVE CTA (MANDATORY): Choose exactly one mode: Digital Vault, Comment Trigger, Benchmark Challenge, or Community Audit.\n"
@@ -1296,7 +1296,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "title_options": ["Title Case + Emoji + Curiosity Gap 1", "Title Case + Emoji + Curiosity Gap 2"],
   "description": "Full 100+ word rich SEO description for youtube describing the video.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
-  "title": "Punchy YouTube title max 60 chars — MUST follow outcome/curiosity-gap formula: 'I [Tested/Built/Found] [Specific Thing] — Here's What Happened' or 'Why [Common Assumption] Is Wrong (And What Actually Works)' or 'The [Specific Result] You Get When You [Action]'. NO clickbait. MUST deliver on promise.",
+  "title": "Punchy YouTube title max 60 chars: MUST follow outcome/curiosity-gap formula: 'I [Tested/Built/Found] [Specific Thing]: Here's What Happened' or 'Why [Common Assumption] Is Wrong (And What Actually Works)' or 'The [Specific Result] You Get When You [Action]'. NO clickbait. MUST deliver on promise.",
   "hook_script": "The Hook (<1.5s): Scary claim or myth-busting statement. 5-8 words MAX. Metric, contradiction, or personal stake.",
   "problem_context": "The Setup (2-5s): Why this is terrifying or why you've been wrong. 10-15 words.",
   "solution_tech": "The Proof (5-25s): Show the evidence, explain the truth, or demonstrate the fix. 40-60 words.",
@@ -1346,17 +1346,17 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 f"Analyze the following {content_desc} and pick the SINGLE most surprising, verified tech history fact that works as an interactive multiple-choice quiz.\n"
                 f"PRIMARY CATEGORY: {category}\n"
                 "SELECTION FILTERS:\n"
-                "1. PRIORITIZE: Verified computer history facts, famous bugs/failures, programming language origins, company founding stories, tech etymology — things that sound fake but are 100% true.\n"
-                "2. MUST be formatted as a multiple-choice question with 3 options (A/B/C) — 1 correct, 2 plausible distractors.\n"
-                "3. MUST be understandable by ANYONE — no jargon. The reveal must include fascinating context.\n"
+                "1. PRIORITIZE: Verified computer history facts, famous bugs/failures, programming language origins, company founding stories, tech etymology: things that sound fake but are 100% true.\n"
+                "2. MUST be formatted as a multiple-choice question with 3 options (A/B/C): 1 correct, 2 plausible distractors.\n"
+                "3. MUST be understandable by ANYONE: no jargon. The reveal must include fascinating context.\n"
                 "4. MUST be explainable in exactly <35s (approx 80-120 words total). Strict 35s limit.\n"
                 "5. QUIZ VISUAL FORMAT (MANDATORY - 3 CHUNKS):\n"
-                "   Chunk 1 (0-2.5s): Hook Question — Show historical photo/visual, NO infographic\n"
-                "   Chunk 2 (2.5-6s): Options A/B/C — Use infographic_type='quiz_options' with option_a, option_b, option_c\n"
-                "   Chunk 3 (6-15s): Pause & Reveal — Add retention_cue at 5s with effect='pause' reason='quiz_think_time', then use infographic_type='quiz_reveal' with correct_letter and correct_text\n"
+                "   Chunk 1 (0-2.5s): Hook Question: Show historical photo/visual, NO infographic\n"
+                "   Chunk 2 (2.5-6s): Options A/B/C: Use infographic_type='quiz_options' with option_a, option_b, option_c\n"
+                "   Chunk 3 (6-15s): Pause & Reveal: Add retention_cue at 5s with effect='pause' reason='quiz_think_time', then use infographic_type='quiz_reveal' with correct_letter and correct_text\n"
                 "6. INCENTIVE CTA (MANDATORY): Choose exactly one mode: Digital Vault, Comment Trigger, Benchmark Challenge, or Community Audit.\n"
                 "7. LOOP-FRIENDLY: Last sentence connects back to the quiz question.\n"
-                "8. UNIVERSAL & GENDER-INCLUSIVE DEMOGRAPHIC (18-70): Tech history appeals to everyone. Ensure strong appeal to women and girls — include diverse figures (Grace Hopper, Ada Lovelace, Margaret Hamilton, etc.).\n"
+                "8. UNIVERSAL & GENDER-INCLUSIVE DEMOGRAPHIC (18-70): Tech history appeals to everyone. Ensure strong appeal to women and girls: include diverse figures (Grace Hopper, Ada Lovelace, Margaret Hamilton, etc.).\n"
                 "9. QUIZ SOURCES: Computer History Museum, IEEE Annals, Wikipedia, Wikidata, company archives, famous bug reports (Mars Orbiter, Ariane 5, Therac-25, etc.).\n"
                 "10. VISUAL EVIDENCE: use_case_evidence_url MUST point to a historical photo (e.g., the actual moth photo from 1947), NOT a Wikipedia text page."
             )
@@ -1365,10 +1365,10 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "title_options": ["Title Case + Emoji + Curiosity Gap 1", "Title Case + Emoji + Curiosity Gap 2"],
   "description": "Full 100+ word rich SEO description for youtube describing the quiz video.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence (Wikipedia, Computer History Museum, etc.).",
-  "title": "Punchy YouTube title max 60 chars — MUST follow quiz formula: '99% Get This Wrong: [Question]?' or 'Can You Guess [Question]? (Answer Will Shock You)' or 'True or False: [Mind-Blowing Tech Fact]'. NO clickbait — must deliver on promise.",
+  "title": "Punchy YouTube title max 60 chars: MUST follow quiz formula: '99% Get This Wrong: [Question]?' or 'Can You Guess [Question]? (Answer Will Shock You)' or 'True or False: [Mind-Blowing Tech Fact]'. NO clickbait: must deliver on promise.",
   "hook_script": "The Hook Question (0-2s): Bold quiz question on screen + voice. 8-12 words. 'What was the FIRST computer bug?' or '99% of engineers get this wrong: What does HTTP stand for?'",
-  "problem_context": "The Options (2-5s): Read A/B/C clearly. 'A) Moth in relay B) Software error C) Power surge' — show on screen simultaneously.",
-  "solution_tech": "The Pause & Reveal (5-15s): 'Think... 3... 2... 1... It was A! A literal moth in a Harvard Mark II relay, 1947. Grace Hopper taped it in the logbook — first debugging!' 40-60 words.",
+  "problem_context": "The Options (2-5s): Read A/B/C clearly. 'A) Moth in relay B) Software error C) Power surge': show on screen simultaneously.",
+  "solution_tech": "The Pause & Reveal (5-15s): 'Think... 3... 2... 1... It was A! A literal moth in a Harvard Mark II relay, 1947. Grace Hopper taped it in the logbook: first debugging!' 40-60 words.",
   "incentive_cta": "The Incentive CTA (25-30s): Choose EXACTLY ONE mode: 1) Digital Vault: 'I put 50 verified tech quizzes in our Telegram. Link in description.' 2) Comment Trigger: 'Comment \\'QUIZ\\' below for the full quiz pack.' 3) Benchmark Challenge: 'I scored 10/10. Comment your score to beat it!' 4) Community Audit: 'Sub and comment your score for monthly $100 API credit giveaway.'",
   "retention_loop": "The Loop Bridge (30-35s): Connect back to opening. 'Think you know tech history? Next quiz drops tomorrow.'",
   "outro_cta": "CTA: Follow for daily quizzes. Subscribe. 8-10 words.",
@@ -1417,7 +1417,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
     }},
     {{
       "chunk_id": 3,
-      "text": "Think about it... 3... 2... 1... It was A! A literal moth in a Harvard Mark II relay, 1947. Grace Hopper taped it in the logbook — first debugging!",
+      "text": "Think about it... 3... 2... 1... It was A! A literal moth in a Harvard Mark II relay, 1947. Grace Hopper taped it in the logbook: first debugging!",
       "start": 6.00,
       "end": 15.00,
       "scene_objective": "Reveal correct answer with context",
@@ -1467,8 +1467,8 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "title_options": ["Title Case + Emoji + Curiosity Gap 1", "Title Case + Emoji + Curiosity Gap 2"],
   "description": "Full 100+ word rich SEO description for youtube describing the interview question video.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence (official docs, GitHub, tech blog).",
-  "title": "Punchy YouTube title max 60 chars — MUST follow interview formula: 'Interview Q: [Question]? [Language/Tech] Explained' or 'Senior Devs Know This: [Concept] in [Tech] — Here is the Answer' or 'Stop Guessing: How [Concept] Works in [Tech]'. NO clickbait — must deliver on promise.",
-  "hook_script": "The Hook Question (0-2s): Bold interview question on screen + voice. 8-12 words. 'What happens when you call spring-boot:run?' or 'Java Interview: Explain String immutability — why does it matter?'",
+  "title": "Punchy YouTube title max 60 chars: MUST follow interview formula: 'Interview Q: [Question]? [Language/Tech] Explained' or 'Senior Devs Know This: [Concept] in [Tech]: Here is the Answer' or 'Stop Guessing: How [Concept] Works in [Tech]'. NO clickbait: must deliver on promise.",
+  "hook_script": "The Hook Question (0-2s): Bold interview question on screen + voice. 8-12 words. 'What happens when you call spring-boot:run?' or 'Java Interview: Explain String immutability: why does it matter?'",
   "problem_context": "The Context (2-5s): Why interviewers ask this. What it reveals about the candidate. 10-15 words.",
   "solution_tech": "The Answer (5-25s): Clear explanation with code snippet, config, or diagram. Show the exact answer a senior dev would give. 40-60 words.",
   "incentive_cta": "The Incentive CTA (25-30s): Choose EXACTLY ONE mode: 1) Digital Vault: 'I put 50 interview Q&A with code in our Telegram. Link in description.' 2) Comment Trigger: 'Comment \\'INTERVIEW\\' below for the full prep pack.' 3) Benchmark Challenge: 'I answered this in 30 seconds. Comment your time to beat it!' 4) Community Audit: 'Sub and comment your answer for monthly $100 API credit giveaway.'",
@@ -1551,7 +1551,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 f"PRIMARY CATEGORY: {category}\n"
                 "SELECTION FILTERS:\n"
                 "1. PRIORITIZE: Surprising comparisons (free vs paid), hidden features nobody knows about, AI experiments with visual results, or tech facts that make people say 'WHAT?!'\n"
-                "2. Must be understandable by ANYONE — a teenager and a grandparent should both find it useful or amazing.\n"
+                "2. Must be understandable by ANYONE: a teenager and a grandparent should both find it useful or amazing.\n"
                 "3. MUST be explainable in exactly <35s (approx 80-120 words total). Strict 35s limit. SHORTER = MORE VIEWS.\n"
                 "4. 4-PART ARCHITECTURE: Hook (0-1.5s) -> Setup (2-5s) -> Reveal (5-25s) -> Incentive CTA (25-30s) -> Loop Bridge (30-35s) -> CTA (35s).\n"
                 "5. INCENTIVE CTA (MANDATORY): Choose exactly one mode: Digital Vault, Comment Trigger, Benchmark Challenge, or Community Audit.\n"
@@ -1563,7 +1563,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "title_options": ["Title Case + Emoji + Curiosity Gap 1", "Title Case + Emoji + Curiosity Gap 2"],
   "description": "Full 100+ word rich SEO description for youtube describing the video.",
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
-  "title": "Punchy YouTube title max 60 chars — MUST follow outcome/curiosity-gap formula: 'I [Tested/Built/Found] [Specific Thing] — Here's What Happened' or 'Why [Common Assumption] Is Wrong (And What Actually Works)' or 'The [Specific Result] You Get When You [Action]'. NO clickbait. MUST deliver on promise.",
+  "title": "Punchy YouTube title max 60 chars: MUST follow outcome/curiosity-gap formula: 'I [Tested/Built/Found] [Specific Thing]: Here's What Happened' or 'Why [Common Assumption] Is Wrong (And What Actually Works)' or 'The [Specific Result] You Get When You [Action]'. NO clickbait. MUST deliver on promise.",
   "hook_script": "The Hook (<1.5s): Surprising claim or bold statement. 5-8 words MAX. Metric, contradiction, or personal stake.",
   "problem_context": "The Setup (2-5s): Why this matters to you. 10-15 words.",
   "solution_tech": "The Reveal (5-25s): Show the evidence, comparison, or demonstration. 40-60 words.",
@@ -1651,7 +1651,7 @@ EDITORIAL PERSPECTIVE (MANDATORY - Apply this lens throughout):
 Perspective: {perspective['name']}
 Angle: {perspective['angle']}
 Tone Markers to weave in naturally: {', '.join(perspective['tone_markers'])}
-This perspective MUST shape your hook, analysis, and solution framing. Do NOT just summarize — analyze through THIS specific lens.
+This perspective MUST shape your hook, analysis, and solution framing. Do NOT just summarize: analyze through THIS specific lens.
 """
         selection_instruction += perspective_instruction
         print(f"🎯 Editorial Perspective Applied: {perspective['name']}")
@@ -1829,7 +1829,7 @@ def is_groq_model_near_limit(model_name):
         if usage.get("date") == today_str:
             tokens_used = usage.get("tokens", 0)
             if tokens_used >= limit * 0.90:
-                print(f"⚠️ [CACHE] {model_name} at {tokens_used}/{limit} TPD ({tokens_used/limit*100:.1f}%) — pre-emptively skipping")
+                print(f"⚠️ [CACHE] {model_name} at {tokens_used}/{limit} TPD ({tokens_used/limit*100:.1f}%): pre-emptively skipping")
                 return True
     except Exception as e:
         print(f"⚠️ Warning checking Groq token cache: {e}")
