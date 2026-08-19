@@ -7601,6 +7601,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             # Apply via image_transform for moviepy 2.x compatibility
             def apply_accent_tint(frame):
                 tint_arr = np.full(frame.shape, accent_color, dtype=np.uint8)
+                if frame.dtype != np.uint8:
+                    frame = (frame * 255).astype(np.uint8)
                 return cv2.addWeighted(frame, 0.88, tint_arr, 0.12, 0)
             avatar_clip = avatar_clip.image_transform(apply_accent_tint)
 
