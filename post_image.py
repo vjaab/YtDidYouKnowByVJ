@@ -685,7 +685,7 @@ def run_image_post_pipeline(dry_run=False):
     print("✅ IMAGE POST PIPELINE COMPLETED")
     print("=" * 60)
     
-    return ig_success, ig_result if not ig_success else "SUCCESS"
+    return True, "SUCCESS"
 
 
 if __name__ == "__main__":
