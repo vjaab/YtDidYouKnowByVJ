@@ -1,0 +1,428 @@
+name: Instagram & Facebook AI Content Post
+
+on:
+  schedule:
+    # Daily at 10:00 AM IST (04:30 UTC) - prime engagement time for AI/tech content
+    - cron: '30 4 * * *'
+  workflow_dispatch:
+    inputs:
+      image_path:
+        description: 'Path to image/video to post (relative to repo root)'
+        required: false
+        type: string
+      caption:
+        description: 'Custom caption for the post'
+        required: false
+        type: string
+      post_to_instagram:
+        description: 'Post to Instagram?'
+        required: false
+        type: boolean
+        default: true
+      post_to_facebook:
+        description: 'Post to Facebook?'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  generate-content:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    outputs:
+      image_path: ${{ steps.generate.outputs.image_path }}
+      caption: ${{ steps.generate.outputs.caption }}
+      post_to_instagram: ${{ steps.generate.outputs.post_to_instagram }}
+      post_to_facebook: ${{ steps.generate.outputs.post_to_facebook }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Free Disk Space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          df -h
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-roboto libglib2.0-0 libsm6 libxext6 libxrender1 espeak-ng wget
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install "numpy<2.0"
+          pip install -r requirements.txt
+
+      - name: Setup Environment Secrets
+        run: |
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
+          echo "ELEVENLABS_API_KEY=${{ secrets.ELEVENLABS_API_KEY }}" >> .env
+          echo "ELEVENLABS_VOICE_ID=${{ secrets.ELEVENLABS_VOICE_ID }}" >> .env
+          echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> .env
+          echo "CF_ACCOUNT_ID=${{ secrets.CF_ACCOUNT_ID }}" >> .env
+          echo "CF_API_TOKEN=${{ secrets.CF_API_TOKEN }}" >> .env
+          echo "CLOUDFLARE_ACCOUNT_ID=${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" >> .env
+          echo "CLOUDFLARE_API_TOKEN=${{ secrets.CLOUDFLARE_API_TOKEN }}" >> .env
+          echo "FAL_KEY=${{ secrets.FAL_KEY }}" >> .env
+          # Instagram credentials
+          echo "IG_USER_ID=${{ secrets.IG_USER_ID }}" >> .env
+          echo "IG_ACCESS_TOKEN=${{ secrets.IG_ACCESS_TOKEN }}" >> .env
+          echo "INSTAGRAM_APP_ID=${{ secrets.INSTAGRAM_APP_ID }}" >> .env
+          echo "INSTAGRAM_APP_SECRET=${{ secrets.INSTAGRAM_APP_SECRET }}" >> .env
+          # Facebook credentials
+          echo "FB_PAGE_ID=${{ secrets.FB_PAGE_ID }}" >> .env
+          echo "FB_PAGE_ACCESS_TOKEN=${{ secrets.FB_PAGE_ACCESS_TOKEN }}" >> .env
+
+      - name: Generate AI Content (Image/Video)
+        id: generate
+        run: |
+          python -c "
+import os
+import sys
+sys.path.append('.')
+import random
+from datetime import datetime
+
+# Import our content generation modules
+try:
+    from image_gen import generate_ai_image
+    from gemini_script import pick_and_generate_script
+    from config import OUTPUT_DIR
+    import json
+    
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    
+    # Generate AI-themed content
+    ai_topics = [
+        'AI agents automating daily workflows',
+        'Local LLMs running on consumer hardware', 
+        'Open-source AI tools replacing paid SaaS',
+        'AI coding assistants boosting productivity',
+        'Multimodal AI: vision + language models',
+        'RAG systems with local embeddings',
+        'AI-generated video from text prompts',
+        'Small language models beating GPT-4 on benchmarks',
+        'AI privacy: running models locally',
+        'Future of AI agents and autonomous workflows'
+    ]
+    
+    topic = random.choice(ai_topics)
+    print(f'Generating content for: {topic}')
+    
+    # Generate an AI image using our image generation pipeline
+    image_path = os.path.join(OUTPUT_DIR, f'ai_content_{datetime.now().strftime(\"%Y%m%d_%H%M%S\")}.png')
+    
+    # Use the image generation function
+    result = generate_ai_image(
+        prompt=f'{topic}, professional tech illustration, clean modern style, vibrant colors, 1080x1080',
+        output_path=image_path
+    )
+    
+    if result and os.path.exists(result):
+        final_image = result
+    else:
+        # Fallback: create a simple AI-themed image
+        from PIL import Image, ImageDraw, ImageFont
+        img = Image.new('RGB', (1080, 1080), color='#0d1117')
+        draw = ImageDraw.Draw(img)
+        # Draw gradient background
+        for y in range(1080):
+            r = int(13 + (88 - 13) * y / 1080)
+            g = int(17 + (166 - 17) * y / 1080)
+            b = int(23 + (255 - 23) * y / 1080)
+            draw.line([(0, y), (1080, y)], fill=(r, g, b))
+        # Add text
+        try:
+            font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 48)
+        except:
+            font = ImageFont.load_default()
+        text = 'AI Content Daily'
+        bbox = draw.textbbox((0, 0), text, font=font)
+        tw = bbox[2] - bbox[0]
+        th = bbox[3] - bbox[1]
+        draw.text(((1080-tw)//2, (1080-th)//2), text, font=font, fill='white')
+        img.save(final_image)
+        print(f'Created fallback image: {final_image}')
+    
+    # Generate caption
+    captions = [
+        f'🚀 {topic.title()} is changing everything!\n\n#AI #ArtificialIntelligence #MachineLearning #TechNews #Innovation #OpenSource #LLM #AITools #FutureOfTech #DailyAI',
+        f'💡 Did you know? {topic}.\n\nThe AI landscape is moving fast. Stay ahead.\n\n#AI #MachineLearning #DeepLearning #TechTrends #AIRevolution #OpenSourceAI #LLM #GenerativeAI #TechDaily',
+        f'⚡ {topic.title()} - The future is here.\n\nWhat do you think about this?\n\n#AI #ArtificialIntelligence #TechNews #Innovation #AITools #MachineLearning #OpenSource #LLM #GenerativeAI #FutureTech'
+    ]
+    
+    caption = random.choice(captions)
+    
+    # Set outputs
+    with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+        f.write(f'image_path={final_image}\n')
+        f.write(f'caption={caption}\n')
+        f.write(f'post_to_instagram=true\n')
+        f.write(f'post_to_facebook=true\n')
+    print(f'Generated: {final_image}')
+    print(f'Caption: {caption[:100]}...')
+    
+except Exception as e:
+    print(f'Error generating content: {e}')
+    # Create a simple fallback
+    from PIL import Image, ImageDraw, ImageFont
+    OUTPUT_DIR = os.getenv('OUTPUT_DIR', 'output')
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    final_image = os.path.join(OUTPUT_DIR, f'ai_daily_{datetime.now().strftime(\"%Y%m%d\")}.png')
+    img = Image.new('RGB', (1080, 1080), color='#0d1117')
+    draw = ImageDraw.Draw(img)
+    for y in range(1080):
+        r = int(13 + (88 - 13) * y / 1080)
+        g = int(17 + (166 - 17) * y / 1080)
+        b = int(23 + (255 - 23) * y / 1080)
+        draw.line([(0, y), (1080, y)], fill=(r, g, b))
+    try:
+        font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 48)
+    except:
+        font = ImageFont.load_default()
+    text = 'AI Daily'
+    bbox = draw.textbbox((0, 0), text, font=font)
+    tw = bbox[2] - bbox[0]
+    th = bbox[3] - bbox[1]
+    draw.text(((1080-tw)//2, (1080-th)//2), text, font=font, fill='white')
+    img.save(final_image)
+    
+    caption = '🚀 Daily AI Content: The future of technology is unfolding before our eyes. AI agents, local LLMs, and open-source tools are democratizing innovation. What are you building?\n\n#AI #ArtificialIntelligence #MachineLearning #TechNews #OpenSource #LLM #AITools #FutureTech #DailyAI #Innovation'
+    
+    with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+        f.write(f'image_path={final_image}\n')
+        f.write(f'caption={caption}\n')
+        f.write(f'post_to_instagram=true\n')
+        f.write(f'post_to_facebook=true\n'
+"
+
+  post-to-instagram:
+    needs: generate-content
+    if: needs.generate-content.outputs.post_to_instagram == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    env:
+      IG_USER_ID: ${{ secrets.IG_USER_ID }}
+      IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+      INSTAGRAM_APP_ID: ${{ secrets.INSTAGRAM_APP_ID }}
+      INSTAGRAM_APP_SECRET: ${{ secrets.INSTAGRAM_APP_SECRET }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          pip install requests pillow
+
+      - name: Upload Image to Instagram
+        run: |
+          python -c "
+import os
+import sys
+sys.path.append('.')
+from instagram_upload import upload_reel_to_instagram
+
+# For images, we use the same Reels endpoint with image_url
+# But Instagram requires video for Reels, so we'll use the image as a carousel post
+# Let's use the image directly via the media endpoint
+
+image_path = '${{ needs.generate-content.outputs.image_path }}'
+caption = '''${{ needs.generate-content.outputs.caption }}'''
+
+print(f'Posting to Instagram: {image_path}')
+print(f'Caption: {caption[:100]}...')
+
+# The instagram_upload module uses video upload via GitHub Releases
+# For images, we can use the same hosting approach but with image content type
+# Or use the IG_VIDEO_PUBLIC_URL if we have a pre-hosted image
+
+# Since our module is designed for video Reels, let's adapt it for image
+# We'll upload the image to GitHub Releases and use the image container endpoint
+
+import requests
+import time
+
+ig_user_id = os.getenv('IG_USER_ID')
+access_token = os.getenv('IG_ACCESS_TOKEN')
+GRAPH_API_BASE = 'https://graph.facebook.com/v25.0'
+
+# First, upload image to GitHub Releases for public URL
+import subprocess
+result = subprocess.run(['gh', 'release', 'create', f'ai-img-{int(time.time())}', image_path, 
+    '--repo', os.getenv('GITHUB_REPOSITORY'),
+    '--title', 'AI Daily Image',
+    '--notes', 'Auto-generated for Instagram image post'],
+    capture_output=True, text=True, env={**os.environ, 'GH_TOKEN': os.getenv('GITHUB_TOKEN')})
+
+if result.returncode != 0:
+    print(f'GitHub release failed: {result.stderr}')
+    sys.exit(1)
+
+# Get the asset URL
+import json
+releases = subprocess.run(['gh', 'release', 'list', '--repo', os.getenv('GITHUB_REPOSITORY'), '--json', 'assets'],
+    capture_output=True, text=True, env={**os.environ, 'GH_TOKEN': os.getenv('GITHUB_TOKEN')})
+releases_data = json.loads(releases.stdout)
+latest_release = releases_data[0] if releases_data else None
+if not latest_release or not latest_release.get('assets'):
+    print('No assets found')
+    sys.exit(1)
+
+image_url = latest_release['assets'][0]['url']
+print(f'Image URL: {image_url}')
+
+# Create IMAGE container (not REELS)
+container_resp = requests.post(
+    f'{GRAPH_API_BASE}/{ig_user_id}/media',
+    data={
+        'media_type': 'IMAGE',
+        'image_url': image_url,
+        'caption': caption[:2200],
+        'access_token': access_token,
+    },
+    timeout=30
+)
+container_resp.raise_for_status()
+container_id = container_resp.json()['id']
+print(f'Container created: {container_id}')
+
+# Publish
+publish_resp = requests.post(
+    f'{GRAPH_API_BASE}/{ig_user_id}/media_publish',
+    data={'creation_id': container_id, 'access_token': access_token},
+    timeout=30
+)
+publish_resp.raise_for_status()
+media_id = publish_resp.json()['id']
+print(f'Instagram Image published! ID: {media_id}')
+"
+
+  post-to-facebook:
+    needs: generate-content
+    if: needs.generate-content.outputs.post_to_facebook == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+      FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          pip install requests pillow
+
+      - name: Post to Facebook Page
+        run: |
+          python -c "
+import os
+import sys
+import subprocess
+import json
+import time
+import requests
+sys.path.append('.')
+
+from facebook_upload import post_video_to_facebook_page_fallback
+
+image_path = '${{ needs.generate-content.outputs.image_path }}'
+caption = '''${{ needs.generate-content.outputs.caption }}'''
+
+print(f'Posting to Facebook: {image_path}')
+
+# Upload image to GitHub Releases for public URL
+result = subprocess.run(['gh', 'release', 'create', f'ai-fb-img-{int(time.time())}', image_path, 
+    '--repo', os.getenv('GITHUB_REPOSITORY'),
+    '--title', 'AI Daily FB Image',
+    '--notes', 'Auto-generated for Facebook image post'],
+    capture_output=True, text=True, env={**os.environ, 'GH_TOKEN': os.getenv('GITHUB_TOKEN')})
+
+if result.returncode != 0:
+    print(f'GitHub release failed: {result.stderr}')
+    sys.exit(1)
+
+# Get the asset URL
+releases = subprocess.run(['gh', 'release', 'list', '--repo', os.getenv('GITHUB_REPOSITORY'), '--json', 'assets'],
+    capture_output=True, text=True, env={**os.environ, 'GH_TOKEN': os.getenv('GITHUB_TOKEN')})
+releases_data = json.loads(releases.stdout)
+latest_release = releases_data[0] if releases_data else None
+if not latest_release or not latest_release.get('assets'):
+    print('No assets found')
+    sys.exit(1)
+
+image_url = latest_release['assets'][0]['url']
+print(f'Image URL: {image_url}')
+
+# Use fallback /videos endpoint for image (will post as photo)
+# Facebook's /videos endpoint with file_url works for images too
+fb_page_id = os.getenv('FB_PAGE_ID')
+fb_page_access_token = os.getenv('FB_PAGE_ACCESS_TOKEN')
+GRAPH_API_BASE = 'https://graph.facebook.com/v25.0'
+
+fallback_payload = {
+    'file_url': image_url,
+    'description': caption[:2200],
+    'published': 'true',
+    'access_token': fb_page_access_token,
+}
+
+resp = requests.post(
+    f'{GRAPH_API_BASE}/{fb_page_id}/videos',
+    data=fallback_payload,
+    timeout=60
+)
+print(f'Facebook response: {resp.status_code} - {resp.text}')
+if resp.status_code == 200:
+    video_id = resp.json().get('id')
+    print(f'Facebook post published! ID: {video_id}')
+else:
+    print(f'Failed: {resp.text}')
+    sys.exit(1)
+"
+
+  cleanup:
+    needs: [post-to-instagram, post-to-facebook]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Cleanup old GitHub Releases (older than 7 days)
+        run: |
+          # Clean up old media-temp-* and ai-img-* releases
+          gh release list --repo ${{ github.repository }} --json tagName,createdAt --limit 100 | \
+          jq -r '.[] | select(.tagName | startswith("media-temp-") or startswith("ai-img-") or startswith("ai-fb-img-")) | select((now - (.createdAt | fromdateiso8601)) > 604800) | .tagName' | \
+          xargs -r -I {} gh release delete {} --repo ${{ github.repository }} --yes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
