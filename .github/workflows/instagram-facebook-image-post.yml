@@ -1,50 +1,300 @@
-name: Instagram & Facebook AI Content Post
+name: Daily AI Image to Telegram (Multi-Agent)
 
 on:
   schedule:
-    # Daily at 10:00 AM IST (04:30 UTC) - prime engagement time for AI/tech content
     - cron: '30 4 * * *'
   workflow_dispatch:
     inputs:
-      image_path:
-        description: 'Path to image/video to post (relative to repo root)'
+      force_topic:
+        description: 'Force a specific topic (optional)'
         required: false
         type: string
-      caption:
-        description: 'Custom caption for the post'
-        required: false
-        type: string
-      post_to_instagram:
-        description: 'Post to Instagram?'
+      skip_verification:
+        description: 'Skip image verification'
         required: false
         type: boolean
-        default: true
-      post_to_facebook:
-        description: 'Post to Facebook?'
-        required: false
-        type: boolean
-        default: true
+        default: false
 
 jobs:
-  generate-content:
+  # Agent 1: Topic Selection (with deduplication)
+  select-topic:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 10
+    outputs:
+      topic: ${{ steps.select.outputs.topic }}
+      audience: ${{ steps.select.outputs.audience }}
+      key_points: ${{ steps.select.outputs.key_points }}
+      visual_prompt: ${{ steps.select.outputs.visual_prompt }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          pip install requests python-dotenv
+
+      - name: Setup Environment Secrets
+        run: |
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
+          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env
+          echo "TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}" >> .env
+
+      - name: Agent - Select Unique Topic
+        id: select
+        run: |
+          python -c "
+import os
+import sys
+import json
+import random
+from datetime import datetime, timedelta
+
+sys.path.append('.')
+from config import OUTPUT_DIR
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+# Load previously used topics from a tracking file
+TRACKING_FILE = os.path.join(OUTPUT_DIR, 'used_topics.json')
+used_topics = set()
+if os.path.exists(TRACKING_FILE):
+    try:
+        with open(TRACKING_FILE, 'r') as f:
+            data = json.load(f)
+            used_topics = set(data.get('topics', []))
+    except:
+        pass
+
+# All available topics
+all_topics = [
+    {
+        'topic': 'What is RAG in Generative AI?',
+        'audience': 'Students and software professionals',
+        'key_points': [
+            'User Query → Embedding Model → Vector Search',
+            'Document Retrieval from Knowledge Base',
+            'Vector Database stores embeddings',
+            'Relevant Context passed to LLM',
+            'LLM generates Grounded Answer',
+            'Citations & Sources for verification'
+        ]
+    },
+    {
+        'topic': 'How AI Agents Automate Workflows',
+        'audience': 'Software engineers and IT professionals',
+        'key_points': [
+            'Planning: Task decomposition & strategy',
+            'Tools: APIs, code execution, web search',
+            'Memory: Short-term + long-term context',
+            'Execution: Step-by-step with feedback loops',
+            'Reflection: Self-correction & improvement',
+            'Output: Deliverable + audit trail'
+        ]
+    },
+    {
+        'topic': 'Local LLMs on Consumer Hardware',
+        'audience': 'Developers and AI enthusiasts',
+        'key_points': [
+            'Quantization: 4-bit / 8-bit compression',
+            'GGUF format for CPU/GPU offloading',
+            'llama.cpp / Ollama / LM Studio',
+            'Hardware: Apple Silicon, NVIDIA RTX, CPU',
+            'Models: Llama 3, Phi-3, Qwen 2.5, Gemma 2',
+            'Privacy: 100% local, no data leaves device'
+        ]
+    },
+    {
+        'topic': 'RAG vs Fine-Tuning: When to Use Which',
+        'audience': 'ML engineers and tech leads',
+        'key_points': [
+            'RAG: Dynamic knowledge, lower cost, easy updates',
+            'Fine-tuning: Style/tone, domain behavior, fixed knowledge',
+            'RAG latency: retrieval + generation',
+            'Fine-tuning: one-time compute, fast inference',
+            'Hybrid: RAG for facts + fine-tune for style',
+            'Decision: Data volatility vs. behavior customization'
+        ]
+    },
+    {
+        'topic': 'Vector Databases Explained Simply',
+        'audience': 'Backend developers and data engineers',
+        'key_points': [
+            'Embeddings: text → high-dimensional vectors',
+            'Similarity: cosine / dot product / L2 distance',
+            'Index types: HNSW, IVF, Flat, PQ',
+            'Popular DBs: Pinecone, Weaviate, Qdrant, Chroma',
+            'Filtering: metadata + vector hybrid search',
+            'Scaling: sharding, replication, multi-tenancy'
+        ]
+    },
+    {
+        'topic': 'Building AI Coding Assistants',
+        'audience': 'Software engineers and students',
+        'key_points': [
+            'Context: repo map, open files, git history',
+            'Completion: in-line suggestions, multi-line',
+            'Chat: explain, refactor, debug, test gen',
+            'RAG: codebase indexing + semantic search',
+            'Agents: autonomous task execution',
+            'Evaluation: HumanEval, MBPP, real-world benchmarks'
+        ]
+    },
+    {
+        'topic': 'Multimodal AI: Vision + Language',
+        'audience': 'AI researchers and product builders',
+        'key_points': [
+            'Architecture: vision encoder + LLM adapter',
+            'Training: image-text pairs, interleaved data',
+            'Capabilities: OCR, chart reading, UI understanding',
+            'Models: GPT-4V, Claude 3, Llava, Qwen-VL',
+            'Use cases: document QA, code from screenshots',
+            'Challenges: hallucination, resolution, latency'
+        ]
+    },
+    {
+        'topic': 'AI Privacy: Local-First Architecture',
+        'audience': 'Security engineers and privacy advocates',
+        'key_points': [
+            'On-device inference: no cloud API calls',
+            'Data never leaves user machine',
+            'Federated learning: train locally, aggregate globally',
+            'TEEs: hardware enclaves for sensitive compute',
+            'Private RAG: local vector DB + local LLM',
+            'Compliance: GDPR, HIPAA, SOC2 by design'
+        ]
+    },
+    {
+        'topic': 'System Design for AI Applications',
+        'audience': 'Senior engineers and architects',
+        'key_points': [
+            'Ingestion: chunking, embedding, indexing pipeline',
+            'Serving: model serving, batching, caching',
+            'Observability: latency, token usage, quality metrics',
+            'Guardrails: PII detection, hallucination checks',
+            'Cost optimization: model routing, caching, quantization',
+            'CI/CD: eval pipelines, regression testing, canary'
+        ]
+    },
+    {
+        'topic': 'Interview Prep: AI System Design Questions',
+        'audience': 'Job seekers and interview candidates',
+        'key_points': [
+            'Clarify: scale, latency, accuracy requirements',
+            'Data: sources, volume, freshness, privacy',
+            'Model: build vs buy, open vs closed, eval criteria',
+            'Architecture: RAG, agents, fine-tuning, hybrid',
+            'Scaling: sharding, caching, async processing',
+            'Monitoring: drift detection, A/B testing, feedback loops'
+        ]
+    },
+    {
+        'topic': 'Chain-of-Thought Prompting Explained',
+        'audience': 'Prompt engineers and AI practitioners',
+        'key_points': [
+            'Step-by-step reasoning before answer',
+            'Zero-shot CoT: \"Let\\'s think step by step\"',
+            'Few-shot CoT: exemplars with reasoning traces',
+            'Self-consistency: majority vote over samples',
+            'Tree-of-Thought: branching reasoning paths',
+            'When it helps: math, logic, multi-step tasks'
+        ]
+    },
+    {
+        'topic': 'Mixture of Experts (MoE) Architecture',
+        'audience': 'ML engineers and model architects',
+        'key_points': [
+            'Sparse activation: only subset of experts per token',
+            'Router: learned gating network',
+            'Expert specialization: domain/skill partitioning',
+            'Training: load balancing + capacity factors',
+            'Models: Mixtral, DeepSeek-MoE, GLaM',
+            'Tradeoff: compute efficiency vs. communication overhead'
+        ]
+    },
+    {
+        'topic': 'Evaluating LLMs: Beyond Benchmarks',
+        'audience': 'AI product teams and researchers',
+        'key_points': [
+            'Static benchmarks: MMLU, HumanEval, GSM8K',
+            'Limitations: contamination, narrow scope',
+            'Human evaluation: pairwise comparison, rubrics',
+            'Red-teaming: safety, robustness, jailbreaks',
+            'Production metrics: latency, cost, user satisfaction',
+            'Eval-driven development: continuous assessment'
+        ]
+    }
+]
+
+# Filter out recently used topics (last 30 days)
+recent_cutoff = datetime.now() - timedelta(days=30)
+available = [t for t in all_topics if t['topic'] not in used_topics]
+
+if not available:
+    # Reset if all topics used
+    available = all_topics
+    used_topics = set()
+
+# Force topic if provided via workflow_dispatch
+force_topic = '${{ github.event.inputs.force_topic }}'
+if force_topic and force_topic.strip():
+    selected = next((t for t in all_topics if t['topic'] == force_topic.strip()), None)
+    if not selected:
+        print(f'Forced topic not found: {force_topic}')
+        sys.exit(1)
+else:
+    selected = random.choice(available)
+
+topic = selected['topic']
+audience = selected['audience']
+key_points = selected['key_points']
+
+# Create visual prompt optimized for image generation
+visual_prompt = (
+    f"Professional educational infographic: {topic}. "
+    f"Clean technical diagram showing: {', '.join(key_points[:4])}. "
+    f"Modern tech/education aesthetic, 16:9 landscape, sharp, uncluttered, "
+    f"labeled flow diagrams with arrows, icons, professional color palette, "
+    f"no text rendering artifacts, high readability, vector-style illustration."
+)
+
+# Save selected topic to tracking
+used_topics.add(topic)
+with open(TRACKING_FILE, 'w') as f:
+    json.dump({
+        'topics': list(used_topics),
+        'last_updated': datetime.now().isoformat()
+    }, f)
+
+# Output for next jobs
+with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+    f.write(f'topic={topic}\n')
+    f.write(f'audience={audience}\n')
+    f.write(f'key_points={json.dumps(key_points)}\n')
+    f.write(f'visual_prompt={visual_prompt}\n')
+
+print(f'Selected topic: {topic}')
+print(f'Visual prompt: {visual_prompt[:100]}...')
+"
+
+  # Agent 2: Image Generation (with multiple attempts)
+  generate-image:
+    needs: select-topic
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
     outputs:
       image_path: ${{ steps.generate.outputs.image_path }}
-      caption: ${{ steps.generate.outputs.caption }}
-      post_to_instagram: ${{ steps.generate.outputs.post_to_instagram }}
-      post_to_facebook: ${{ steps.generate.outputs.post_to_facebook }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Free Disk Space
         run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "/usr/local/share/boost"
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc "/usr/local/share/boost" "$AGENT_TOOLSDIRECTORY"
           df -h
 
       - name: Set up Python
@@ -75,228 +325,455 @@ jobs:
           echo "CLOUDFLARE_ACCOUNT_ID=${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" >> .env
           echo "CLOUDFLARE_API_TOKEN=${{ secrets.CLOUDFLARE_API_TOKEN }}" >> .env
           echo "FAL_KEY=${{ secrets.FAL_KEY }}" >> .env
-          # Instagram credentials
-          echo "IG_USER_ID=${{ secrets.IG_USER_ID }}" >> .env
-          echo "IG_ACCESS_TOKEN=${{ secrets.IG_ACCESS_TOKEN }}" >> .env
-          echo "INSTAGRAM_APP_ID=${{ secrets.INSTAGRAM_APP_ID }}" >> .env
-          echo "INSTAGRAM_APP_SECRET=${{ secrets.INSTAGRAM_APP_SECRET }}" >> .env
-          # Facebook credentials
-          echo "FB_PAGE_ID=${{ secrets.FB_PAGE_ID }}" >> .env
-          echo "FB_PAGE_ACCESS_TOKEN=${{ secrets.FB_PAGE_ACCESS_TOKEN }}" >> .env
 
-      - name: Generate AI Content (Image/Video)
+      - name: Agent - Generate Image with Quality Iteration
         id: generate
         run: |
           python -c "
 import os
 import sys
 sys.path.append('.')
-import random
 from datetime import datetime
+from config import OUTPUT_DIR
+from image_gen import generate_images
 
-# Import our content generation modules
-try:
-    from image_gen import generate_ai_image
-    from gemini_script import pick_and_generate_script
-    from config import OUTPUT_DIR
-    import json
-    
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    
-# Generate AI-themed content
-    ai_topics = [
-        {
-            'topic': 'What is RAG in Generative AI?',
-            'audience': 'Students and software professionals',
-            'key_points': [
-                'User Query → Embedding Model → Vector Search',
-                'Document Retrieval from Knowledge Base',
-                'Vector Database stores embeddings',
-                'Relevant Context passed to LLM',
-                'LLM generates Grounded Answer',
-                'Citations & Sources for verification'
-            ]
-        },
-        {
-            'topic': 'How AI Agents Automate Workflows',
-            'audience': 'Software engineers and IT professionals',
-            'key_points': [
-                'Planning: Task decomposition & strategy',
-                'Tools: APIs, code execution, web search',
-                'Memory: Short-term + long-term context',
-                'Execution: Step-by-step with feedback loops',
-                'Reflection: Self-correction & improvement',
-                'Output: Deliverable + audit trail'
-            ]
-        },
-        {
-            'topic': 'Local LLMs on Consumer Hardware',
-            'audience': 'Developers and AI enthusiasts',
-            'key_points': [
-                'Quantization: 4-bit / 8-bit compression',
-                'GGUF format for CPU/GPU offloading',
-                'llama.cpp / Ollama / LM Studio',
-                'Hardware: Apple Silicon, NVIDIA RTX, CPU',
-                'Models: Llama 3, Phi-3, Qwen 2.5, Gemma 2',
-                'Privacy: 100% local, no data leaves device'
-            ]
-        },
-        {
-            'topic': 'RAG vs Fine-Tuning: When to Use Which',
-            'audience': 'ML engineers and tech leads',
-            'key_points': [
-                'RAG: Dynamic knowledge, lower cost, easy updates',
-                'Fine-tuning: Style/tone, domain behavior, fixed knowledge',
-                'RAG latency: retrieval + generation',
-                'Fine-tuning: one-time compute, fast inference',
-                'Hybrid: RAG for facts + fine-tune for style',
-                'Decision: Data volatility vs. behavior customization'
-            ]
-        },
-        {
-            'topic': 'Vector Databases Explained Simply',
-            'audience': 'Backend developers and data engineers',
-            'key_points': [
-                'Embeddings: text → high-dimensional vectors',
-                'Similarity: cosine / dot product / L2 distance',
-                'Index types: HNSW, IVF, Flat, PQ',
-                'Popular DBs: Pinecone, Weaviate, Qdrant, Chroma',
-                'Filtering: metadata + vector hybrid search',
-                'Scaling: sharding, replication, multi-tenancy'
-            ]
-        },
-        {
-            'topic': 'Building AI Coding Assistants',
-            'audience': 'Software engineers and students',
-            'key_points': [
-                'Context: repo map, open files, git history',
-                'Completion: in-line suggestions, multi-line',
-                'Chat: explain, refactor, debug, test gen',
-                'RAG: codebase indexing + semantic search',
-                'Agents: autonomous task execution',
-                'Evaluation: HumanEval, MBPP, real-world benchmarks'
-            ]
-        },
-        {
-            'topic': 'Multimodal AI: Vision + Language',
-            'audience': 'AI researchers and product builders',
-            'key_points': [
-                'Architecture: vision encoder + LLM adapter',
-                'Training: image-text pairs, interleaved data',
-                'Capabilities: OCR, chart reading, UI understanding',
-                'Models: GPT-4V, Claude 3, Llava, Qwen-VL',
-                'Use cases: document QA, code from screenshots',
-                'Challenges: hallucination, resolution, latency'
-            ]
-        },
-        {
-            'topic': 'AI Privacy: Local-First Architecture',
-            'audience': 'Security engineers and privacy advocates',
-            'key_points': [
-                'On-device inference: no cloud API calls',
-                'Data never leaves user machine',
-                'Federated learning: train locally, aggregate globally',
-                'TEEs: hardware enclaves for sensitive compute',
-                'Private RAG: local vector DB + local LLM',
-                'Compliance: GDPR, HIPAA, SOC2 by design'
-            ]
-        },
-        {
-            'topic': 'System Design for AI Applications',
-            'audience': 'Senior engineers and architects',
-            'key_points': [
-                'Ingestion: chunking, embedding, indexing pipeline',
-                'Serving: model serving, batching, caching',
-                'Observability: latency, token usage, quality metrics',
-                'Guardrails: PII detection, hallucination checks',
-                'Cost optimization: model routing, caching, quantization',
-                'CI/CD: eval pipelines, regression testing, canary'
-            ]
-        },
-        {
-            'topic': 'Interview Prep: AI System Design Questions',
-            'audience': 'Job seekers and interview candidates',
-            'key_points': [
-                'Clarify: scale, latency, accuracy requirements',
-                'Data: sources, volume, freshness, privacy',
-                'Model: build vs buy, open vs closed, eval criteria',
-                'Architecture: RAG, agents, fine-tuning, hybrid',
-                'Scaling: sharding, caching, async processing',
-                'Monitoring: drift detection, A/B testing, feedback loops'
-            ]
-        }
-    ]
-    
-    selected = random.choice(ai_topics)
-    topic = selected['topic']
-    audience = selected['audience']
-    key_points = selected['key_points']
-    print(f'Generating content for: {topic}')
-    
-    # Generate an AI image using our image generation pipeline
-    image_path = os.path.join(OUTPUT_DIR, f'ai_content_{datetime.now().strftime("%Y%m%d_%H%M%S")}.png')
-    
-    # Create concise visual prompt for image generation API (shorter for URL limits)
-    # Full educational context goes into caption
-    visual_prompt = f"Professional educational infographic: {topic}. Clean diagram showing: {', '.join(key_points[:4])}. Modern tech/education aesthetic, 16:9, sharp, uncluttered, labeled flow diagrams, icons, arrows, professional color palette."
-    
-    # Use the image generation function (returns list of paths)
+topic = '''${{ needs.select-topic.outputs.topic }}'''
+audience = '''${{ needs.select-topic.outputs.audience }}'''
+key_points = ${{ needs.select-topic.outputs.key_points }}
+visual_prompt = '''${{ needs.select-topic.outputs.visual_prompt }}'''
+
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+image_path = os.path.join(OUTPUT_DIR, f'ai_content_{datetime.now().strftime(\"%Y%m%d_%H%M%S\")}.png')
+
+print(f'Generating image for: {topic}')
+print(f'Prompt: {visual_prompt}')
+
+# Try multiple generation attempts with different fallback chains
+max_attempts = 3
+final_image = None
+
+for attempt in range(1, max_attempts + 1):
+    print(f'--- Generation attempt {attempt}/{max_attempts} ---')
     results = generate_images(
         prompts=[visual_prompt],
-        aspect_ratio="16:9"
+        aspect_ratio='16:9'
     )
     
     if results and len(results) > 0 and results[0] and os.path.exists(results[0]):
         final_image = results[0]
+        print(f'Attempt {attempt} succeeded: {final_image}')
+        break
     else:
-        # Fallback: create a professional 16:9 educational infographic
-        from PIL import Image, ImageDraw, ImageFont
-        # 16:9 aspect ratio for digital publishing
-        img = Image.new('RGB', (1920, 1080), color='#0d1117')
-        draw = ImageDraw.Draw(img)
-        # Draw professional gradient background
-        for y in range(1080):
-            r = int(13 + (30 - 13) * y / 1080)
-            g = int(17 + (58 - 17) * y / 1080)
-            b = int(23 + (138 - 23) * y / 1080)
-            draw.line([(0, y), (1920, y)], fill=(r, g, b))
-        # Add topic headline
-        try:
-            font_title = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 56)
-            font_body = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 28)
-        except:
-            font_title = ImageFont.load_default()
-            font_body = ImageFont.load_default()
-        # Title
-        title_text = topic
-        bbox = draw.textbbox((0, 0), title_text, font=font_title)
-        tw = bbox[2] - bbox[0]
-        draw.text(((1920-tw)//2, 120), title_text, font=font_title, fill='white')
-        # Subtitle
-        sub_text = f"Target: {audience}"
-        bbox = draw.textbbox((0, 0), sub_text, font=font_body)
-        tw = bbox[2] - bbox[0]
-        draw.text(((1920-tw)//2, 200), sub_text, font=font_body, fill='#a5b4fc')
-        # Key points as visual list
-        y_pos = 300
-        for i, point in enumerate(key_points[:5]):
-            # Bullet point
-            draw.circle([150, y_pos + 14], 8, fill='#60a5fa')
-            # Text
-            point_text = point[:80] + ('...' if len(point) > 80 else '')
-            draw.text((180, y_pos), point_text, font=font_body, fill='#e0e7ff')
-            y_pos += 60
-        # Footer
-        footer = "AI Education Daily | Understand AI in seconds"
-        bbox = draw.textbbox((0, 0), footer, font=font_body)
-        tw = bbox[2] - bbox[0]
-        draw.text(((1920-tw)//2, 980), footer, font=font_body, fill='#64748b')
-        img.save(image_path)
-        final_image = image_path
-        print(f'Created fallback 16:9 educational infographic: {final_image}')
+        print(f'Attempt {attempt} failed, retrying...')
+
+if not final_image:
+    # Final fallback: create high-quality programmatic infographic
+    print('All AI generations failed, creating programmatic fallback...')
+    from PIL import Image, ImageDraw, ImageFont
+    img = Image.new('RGB', (1920, 1080), color='#0d1117')
+    draw = ImageDraw.Draw(img)
     
-    # Generate educational caption matching the topic
-    caption = f"""🎓 {topic}
+    # Professional gradient background
+    for y in range(1080):
+        r = int(13 + (30 - 13) * y / 1080)
+        g = int(17 + (58 - 17) * y / 1080)
+        b = int(23 + (138 - 23) * y / 1080)
+        draw.line([(0, y), (1920, y)], fill=(r, g, b))
+    
+    try:
+        font_title = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 56)
+        font_body = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 28)
+    except:
+        font_title = ImageFont.load_default()
+        font_body = ImageFont.load_default()
+    
+    # Title (wrapped if needed)
+    title_text = topic
+    bbox = draw.textbbox((0, 0), title_text, font=font_title)
+    tw = bbox[2] - bbox[0]
+    draw.text(((1920-tw)//2, 120), title_text, font=font_title, fill='white')
+    
+    # Subtitle
+    sub_text = f'Target: {audience}'
+    bbox = draw.textbbox((0, 0), sub_text, font=font_body)
+    tw = bbox[2] - bbox[0]
+    draw.text(((1920-tw)//2, 200), sub_text, font=font_body, fill='#a5b4fc')
+    
+    # Key points as clean visual list
+    y_pos = 300
+    for i, point in enumerate(key_points[:5]):
+        draw.circle([150, y_pos + 14], 8, fill='#60a5fa')
+        point_text = point[:80] + ('...' if len(point) > 80 else '')
+        draw.text((180, y_pos), point_text, font=font_body, fill='#e0e7ff')
+        y_pos += 60
+    
+    # Footer
+    footer = 'AI Education Daily | Understand AI in seconds'
+    bbox = draw.textbbox((0, 0), footer, font=font_body)
+    tw = bbox[2] - bbox[0]
+    draw.text(((1920-tw)//2, 980), footer, font=font_body, fill='#64748b')
+    
+    img.save(image_path)
+    final_image = image_path
+    print(f'Created programmatic fallback: {final_image}')
+
+with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+    f.write(f'image_path={final_image}\n')
+"
+
+  # Agent 3: Image Verification (Quality Check)
+  verify-image:
+    needs: [select-topic, generate-image]
+    if: ${{ !inputs.skip_verification }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      passed: ${{ steps.verify.outputs.passed }}
+      issues: ${{ steps.verify.outputs.issues }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          pip install pillow requests python-dotenv
+
+      - name: Agent - Verify Image Quality
+        id: verify
+        run: |
+          python -c "
+import os
+import sys
+import json
+from PIL import Image, ImageDraw, ImageFont
+
+sys.path.append('.')
+image_path = '${{ needs.generate-image.outputs.image_path }}'
+topic = '''${{ needs.select-topic.outputs.topic }}'''
+key_points = ${{ needs.select-topic.outputs.key_points }}
+
+print(f'Verifying image: {image_path}')
+
+if not os.path.exists(image_path):
+    print('Image not found!')
+    with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+        f.write('passed=false\n')
+        f.write('issues=Image file not found\n')
+    sys.exit(1)
+
+issues = []
+warnings = []
+
+try:
+    img = Image.open(image_path)
+    width, height = img.size
+    
+    # Check 1: Aspect ratio (16:9 = 1.777...)
+    aspect_ratio = width / height
+    expected_ratio = 16 / 9
+    if abs(aspect_ratio - expected_ratio) > 0.05:
+        issues.append(f'Wrong aspect ratio: {aspect_ratio:.3f} (expected 1.778)')
+    
+    # Check 2: Minimum resolution
+    if width < 1280 or height < 720:
+        issues.append(f'Resolution too low: {width}x{height} (min 1280x720)')
+    
+    # Check 3: File size (not empty, not corrupted)
+    file_size = os.path.getsize(image_path)
+    if file_size < 10000:
+        issues.append(f'File suspiciously small: {file_size} bytes')
+    
+    # Check 4: Image mode
+    if img.mode not in ('RGB', 'RGBA'):
+        warnings.append(f'Unusual image mode: {img.mode}')
+    
+    # Check 5: Brightness/contrast (not all black/white)
+    import numpy as np
+    arr = np.array(img.convert('L'))
+    mean_brightness = arr.mean()
+    std_brightness = arr.std()
+    if mean_brightness < 20:
+        warnings.append('Image very dark (possible generation failure)')
+    elif mean_brightness > 235:
+        warnings.append('Image very bright (possible generation failure)')
+    if std_brightness < 5:
+        warnings.append('Very low contrast (possible solid color)')
+    
+    # Check 6: Text readability areas (sample regions where text should be)
+    # Title area (top center)
+    title_region = arr[80:200, 600:1320]
+    if title_region.size > 0 and title_region.std() < 10:
+        warnings.append('Title area appears uniform (text may not render)')
+    
+    # Body area (middle)
+    body_region = arr[280:600, 150:1770]
+    if body_region.size > 0 and body_region.std() < 15:
+        warnings.append('Body area appears uniform (bullet points may not render)')
+    
+    # Check 7: Color diversity (not grayscale)
+    arr_color = np.array(img.convert('RGB'))
+    if arr_color.shape[2] == 3:
+        r_var = arr_color[:,:,0].var()
+        g_var = arr_color[:,:,1].var()
+        b_var = arr_color[:,:,2].var()
+        if r_var < 10 and g_var < 10 and b_var < 10:
+            warnings.append('Low color variance (near grayscale)')
+    
+    print(f'Dimensions: {width}x{height} (aspect: {aspect_ratio:.3f})')
+    print(f'File size: {file_size:,} bytes')
+    print(f'Brightness: {mean_brightness:.1f}, Contrast: {std_brightness:.1f}')
+    print(f'Issues: {len(issues)}, Warnings: {len(warnings)}')
+    
+    for issue in issues:
+        print(f'  ❌ {issue}')
+    for warn in warnings:
+        print(f'  ⚠️ {warn}')
+    
+    passed = len(issues) == 0
+    
+    with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+        f.write(f'passed={str(passed).lower()}\n')
+        f.write(f'issues={json.dumps(issues + warnings)}\n')
+
+except Exception as e:
+    print(f'Verification error: {e}')
+    with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+        f.write('passed=false\n')
+        f.write(f'issues=[\"Verification exception: {str(e)}\"]\n')
+    sys.exit(1)
+"
+
+  # Agent 4: Regenerate if verification failed (loop back)
+  regenerate-on-failure:
+    needs: [select-topic, generate-image, verify-image]
+    if: ${{ needs.verify-image.outputs.passed == 'false' && !inputs.skip_verification }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      image_path: ${{ steps.regen.outputs.image_path }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Free Disk Space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc "/usr/local/share/boost" "$AGENT_TOOLSDIRECTORY"
+          df -h
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-roboto libglib2.0-0 libsm6 libxext6 libxrender1 espeak-ng wget
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install "numpy<2.0"
+          pip install -r requirements.txt
+
+      - name: Setup Environment Secrets
+        run: |
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
+          echo "ELEVENLABS_API_KEY=${{ secrets.ELEVENLABS_API_KEY }}" >> .env
+          echo "ELEVENLABS_VOICE_ID=${{ secrets.ELEVENLABS_VOICE_ID }}" >> .env
+          echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> .env
+          echo "CF_ACCOUNT_ID=${{ secrets.CF_ACCOUNT_ID }}" >> .env
+          echo "CF_API_TOKEN=${{ secrets.CF_API_TOKEN }}" >> .env
+          echo "CLOUDFLARE_ACCOUNT_ID=${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" >> .env
+          echo "CLOUDFLARE_API_TOKEN=${{ secrets.CLOUDFLARE_API_TOKEN }}" >> .env
+          echo "FAL_KEY=${{ secrets.FAL_KEY }}" >> .env
+
+      - name: Agent - Regenerate with Improved Prompt
+        id: regen
+        run: |
+          python -c "
+import os
+import sys
+import json
+from datetime import datetime
+
+sys.path.append('.')
+from config import OUTPUT_DIR
+from image_gen import generate_images
+
+topic = '''${{ needs.select-topic.outputs.topic }}'''
+audience = '''${{ needs.select-topic.outputs.audience }}'''
+key_points = ${{ needs.select-topic.outputs.key_points }}
+previous_issues = ${{ needs.verify-image.outputs.issues }}
+
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+image_path = os.path.join(OUTPUT_DIR, f'ai_content_{datetime.now().strftime(\"%Y%m%d_%H%M%S\")}_v2.png')
+
+# Build improved prompt based on issues
+issue_str = ', '.join(previous_issues) if previous_issues else 'unknown'
+enhanced_prompt = (
+    f'Professional educational infographic: {topic}. '
+    f'Clean technical diagram showing: {', '.join(key_points[:4])}. '
+    f'16:9 landscape, high resolution, sharp text rendering, '
+    f'no artifacts, no blurry text, no solid color regions, '
+    f'good contrast, vibrant professional colors, vector-style, '
+    f'labeled flow diagrams with arrows and icons, readable fonts. '
+    f'FIX THESE ISSUES: {issue_str}'
+)
+
+print(f'Regenerating with enhanced prompt...')
+print(f'Previous issues: {issue_str}')
+
+results = generate_images(
+    prompts=[enhanced_prompt],
+    aspect_ratio='16:9'
+)
+
+final_image = None
+if results and len(results) > 0 and results[0] and os.path.exists(results[0]):
+    final_image = results[0]
+    print(f'Regeneration succeeded: {final_image}')
+else:
+    print('Regeneration failed, using programmatic fallback')
+    from PIL import Image, ImageDraw, ImageFont
+    img = Image.new('RGB', (1920, 1080), color='#0d1117')
+    draw = ImageDraw.Draw(img)
+    for y in range(1080):
+        r = int(13 + (30 - 13) * y / 1080)
+        g = int(17 + (58 - 17) * y / 1080)
+        b = int(23 + (138 - 23) * y / 1080)
+        draw.line([(0, y), (1920, y)], fill=(r, g, b))
+    try:
+        font_title = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 56)
+        font_body = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 28)
+    except:
+        font_title = ImageFont.load_default()
+        font_body = ImageFont.load_default()
+    title_text = topic
+    bbox = draw.textbbox((0, 0), title_text, font=font_title)
+    tw = bbox[2] - bbox[0]
+    draw.text(((1920-tw)//2, 120), title_text, font=font_title, fill='white')
+    sub_text = f'Target: {audience}'
+    bbox = draw.textbbox((0, 0), sub_text, font=font_body)
+    tw = bbox[2] - bbox[0]
+    draw.text(((1920-tw)//2, 200), sub_text, font=font_body, fill='#a5b4fc')
+    y_pos = 300
+    for i, point in enumerate(key_points[:5]):
+        draw.circle([150, y_pos + 14], 8, fill='#60a5fa')
+        point_text = point[:80] + ('...' if len(point) > 80 else '')
+        draw.text((180, y_pos), point_text, font=font_body, fill='#e0e7ff')
+        y_pos += 60
+    footer = 'AI Education Daily | Understand AI in seconds'
+    bbox = draw.textbbox((0, 0), footer, font=font_body)
+    tw = bbox[2] - bbox[0]
+    draw.text(((1920-tw)//2, 980), footer, font=font_body, fill='#64748b')
+    img.save(image_path)
+    final_image = image_path
+
+with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+    f.write(f'image_path={final_image}\n')
+"
+
+  # Agent 5: Final Verification (on regenerated image)
+  final-verification:
+    needs: [select-topic, generate-image, verify-image, regenerate-on-failure]
+    if: ${{ needs.verify-image.outputs.passed == 'false' && !inputs.skip_verification }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      final_image_path: ${{ steps.final.outputs.final_image_path }}
+      passed: ${{ steps.final.outputs.passed }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: pip install pillow numpy
+
+      - name: Agent - Final Verification
+        id: final
+        run: |
+          python -c "
+import os
+import sys
+import json
+import numpy as np
+from PIL import Image
+
+# Use regenerated image if exists, else original
+regen_path = '${{ needs.regenerate-on-failure.outputs.image_path }}'
+orig_path = '${{ needs.generate-image.outputs.image_path }}'
+
+if regen_path and os.path.exists(regen_path):
+    image_path = regen_path
+    print(f'Verifying regenerated image: {image_path}')
+else:
+    image_path = orig_path
+    print(f'Verifying original image: {image_path}')
+
+issues = []
+if not os.path.exists(image_path):
+    issues.append('Image file not found')
+else:
+    img = Image.open(image_path)
+    width, height = img.size
+    aspect_ratio = width / height
+    
+    if abs(aspect_ratio - 16/9) > 0.05:
+        issues.append(f'Wrong aspect ratio: {aspect_ratio:.3f}')
+    if width < 1280 or height < 720:
+        issues.append(f'Resolution too low: {width}x{height}')
+    if os.path.getsize(image_path) < 10000:
+        issues.append('File too small')
+    
+    arr = np.array(img.convert('L'))
+    mean_brightness = arr.mean()
+    std_brightness = arr.std()
+    if mean_brightness < 20 or mean_brightness > 235:
+        issues.append(f'Brightness out of range: {mean_brightness:.1f}')
+    if std_brightness < 5:
+        issues.append('Very low contrast')
+
+passed = len(issues) == 0
+print(f'Final verification: {\"PASSED\" if passed else \"FAILED\"} - Issues: {issues}')
+
+with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+    f.write(f'final_image_path={image_path}\n')
+    f.write(f'passed={str(passed).lower()}\n')
+"
+
+  # Agent 6: Compose Caption (separate from generation)
+  compose-caption:
+    needs: select-topic
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      caption: ${{ steps.compose.outputs.caption }}
+    steps:
+      - name: Agent - Compose Educational Caption
+        id: compose
+        run: |
+          python -c "
+import json
+
+topic = '''${{ needs.select-topic.outputs.topic }}'''
+audience = '''${{ needs.select-topic.outputs.audience }}'''
+key_points = ${{ needs.select-topic.outputs.key_points }}
+
+caption = f'''🎓 {topic}
 
 {chr(10).join(f'🔹 {point}' for point in key_points[:4])}
 
@@ -304,267 +781,88 @@ Understanding this concept is essential for {audience.lower()}. The visual break
 
 Save this for your learning journey! 📚
 
-#AI #ArtificialIntelligence #MachineLearning #AIEducation #TechEducation #LearnAI #SoftwareEngineering #DataScience #GenerativeAI #LLM #RAG #VectorDatabase #SystemDesign #InterviewPrep #DailyLearning #TechEducation"""
-    
-    # Set outputs
-    with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
-        f.write(f'image_path={final_image}\n')
-        f.write(f'caption={caption}\n')
-        f.write(f'post_to_instagram=true\n')
-        f.write(f'post_to_facebook=true\n')
-    print(f'Generated: {final_image}')
-    print(f'Caption: {caption[:100]}...')
-    
-except Exception as e:
-    print(f'Error generating content: {e}')
-    # Create a simple fallback
-    from PIL import Image, ImageDraw, ImageFont
-    OUTPUT_DIR = os.getenv('OUTPUT_DIR', 'output')
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    final_image = os.path.join(OUTPUT_DIR, f'ai_daily_{datetime.now().strftime(\"%Y%m%d\")}.png')
-    img = Image.new('RGB', (1080, 1080), color='#0d1117')
-    draw = ImageDraw.Draw(img)
-    for y in range(1080):
-        r = int(13 + (88 - 13) * y / 1080)
-        g = int(17 + (166 - 17) * y / 1080)
-        b = int(23 + (255 - 23) * y / 1080)
-        draw.line([(0, y), (1080, y)], fill=(r, g, b))
-    try:
-        font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 48)
-    except:
-        font = ImageFont.load_default()
-    text = 'AI Daily'
-    bbox = draw.textbbox((0, 0), text, font=font)
-    tw = bbox[2] - bbox[0]
-    th = bbox[3] - bbox[1]
-    draw.text(((1080-tw)//2, (1080-th)//2), text, font=font, fill='white')
-    img.save(final_image)
-    
-    caption = '🚀 Daily AI Content: The future of technology is unfolding before our eyes. AI agents, local LLMs, and open-source tools are democratizing innovation. What are you building?\n\n#AI #ArtificialIntelligence #MachineLearning #TechNews #OpenSource #LLM #AITools #FutureTech #DailyAI #Innovation'
-    
-    with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
-        f.write(f'image_path={final_image}\n')
-        f.write(f'caption={caption}\n')
-        f.write(f'post_to_instagram=true\n')
-        f.write(f'post_to_facebook=true\n'
+#AI #ArtificialIntelligence #MachineLearning #AIEducation #TechEducation #LearnAI #SoftwareEngineering #DataScience #GenerativeAI #LLM #RAG #VectorDatabase #SystemDesign #InterviewPrep #DailyLearning #TechEducation'''
+
+with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+    f.write(f'caption={caption}\n')
+print(f'Caption composed ({len(caption)} chars)')
 "
 
-  post-to-instagram:
-    needs: generate-content
-    if: needs.generate-content.outputs.post_to_instagram == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    permissions:
-      contents: write
-    env:
-      IG_USER_ID: ${{ secrets.IG_USER_ID }}
-      IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
-      INSTAGRAM_APP_ID: ${{ secrets.INSTAGRAM_APP_ID }}
-      INSTAGRAM_APP_SECRET: ${{ secrets.INSTAGRAM_APP_SECRET }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      GITHUB_REPOSITORY: ${{ github.repository }}
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-
-      - name: Install Dependencies
-        run: |
-          pip install requests pillow
-
-      - name: Upload Image to Instagram
-        run: |
-          python -c "
-import os
-import sys
-sys.path.append('.')
-from instagram_upload import upload_reel_to_instagram
-
-# For images, we use the same Reels endpoint with image_url
-# But Instagram requires video for Reels, so we'll use the image as a carousel post
-# Let's use the image directly via the media endpoint
-
-image_path = '${{ needs.generate-content.outputs.image_path }}'
-caption = '''${{ needs.generate-content.outputs.caption }}'''
-
-print(f'Posting to Instagram: {image_path}')
-print(f'Caption: {caption[:100]}...')
-
-# The instagram_upload module uses video upload via GitHub Releases
-# For images, we can use the same hosting approach but with image content type
-# Or use the IG_VIDEO_PUBLIC_URL if we have a pre-hosted image
-
-# Since our module is designed for video Reels, let's adapt it for image
-# We'll upload the image to GitHub Releases and use the image container endpoint
-
-import requests
-import time
-
-ig_user_id = os.getenv('IG_USER_ID')
-access_token = os.getenv('IG_ACCESS_TOKEN')
-GRAPH_API_BASE = 'https://graph.facebook.com/v25.0'
-
-# First, upload image to GitHub Releases for public URL
-import subprocess
-result = subprocess.run(['gh', 'release', 'create', f'ai-img-{int(time.time())}', image_path, 
-    '--repo', os.getenv('GITHUB_REPOSITORY'),
-    '--title', 'AI Daily Image',
-    '--notes', 'Auto-generated for Instagram image post'],
-    capture_output=True, text=True, env={**os.environ, 'GH_TOKEN': os.getenv('GITHUB_TOKEN')})
-
-if result.returncode != 0:
-    print(f'GitHub release failed: {result.stderr}')
-    sys.exit(1)
-
-# Get the asset URL
-import json
-releases = subprocess.run(['gh', 'release', 'list', '--repo', os.getenv('GITHUB_REPOSITORY'), '--json', 'assets'],
-    capture_output=True, text=True, env={**os.environ, 'GH_TOKEN': os.getenv('GITHUB_TOKEN')})
-releases_data = json.loads(releases.stdout)
-latest_release = releases_data[0] if releases_data else None
-if not latest_release or not latest_release.get('assets'):
-    print('No assets found')
-    sys.exit(1)
-
-image_url = latest_release['assets'][0]['url']
-print(f'Image URL: {image_url}')
-
-# Create IMAGE container (not REELS)
-container_resp = requests.post(
-    f'{GRAPH_API_BASE}/{ig_user_id}/media',
-    data={
-        'media_type': 'IMAGE',
-        'image_url': image_url,
-        'caption': caption[:2200],
-        'access_token': access_token,
-    },
-    timeout=30
-)
-container_resp.raise_for_status()
-container_id = container_resp.json()['id']
-print(f'Container created: {container_id}')
-
-# Publish
-publish_resp = requests.post(
-    f'{GRAPH_API_BASE}/{ig_user_id}/media_publish',
-    data={'creation_id': container_id, 'access_token': access_token},
-    timeout=30
-)
-publish_resp.raise_for_status()
-media_id = publish_resp.json()['id']
-print(f'Instagram Image published! ID: {media_id}')
-"
-
-  post-to-facebook:
-    needs: generate-content
-    if: needs.generate-content.outputs.post_to_facebook == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    env:
-      FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
-      FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      GITHUB_REPOSITORY: ${{ github.repository }}
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-
-      - name: Install Dependencies
-        run: |
-          pip install requests pillow
-
-      - name: Post to Facebook Page
-        run: |
-          python -c "
-import os
-import sys
-import subprocess
-import json
-import time
-import requests
-sys.path.append('.')
-
-from facebook_upload import post_video_to_facebook_page_fallback
-
-image_path = '${{ needs.generate-content.outputs.image_path }}'
-caption = '''${{ needs.generate-content.outputs.caption }}'''
-
-print(f'Posting to Facebook: {image_path}')
-
-# Upload image to GitHub Releases for public URL
-result = subprocess.run(['gh', 'release', 'create', f'ai-fb-img-{int(time.time())}', image_path, 
-    '--repo', os.getenv('GITHUB_REPOSITORY'),
-    '--title', 'AI Daily FB Image',
-    '--notes', 'Auto-generated for Facebook image post'],
-    capture_output=True, text=True, env={**os.environ, 'GH_TOKEN': os.getenv('GITHUB_TOKEN')})
-
-if result.returncode != 0:
-    print(f'GitHub release failed: {result.stderr}')
-    sys.exit(1)
-
-# Get the asset URL
-releases = subprocess.run(['gh', 'release', 'list', '--repo', os.getenv('GITHUB_REPOSITORY'), '--json', 'assets'],
-    capture_output=True, text=True, env={**os.environ, 'GH_TOKEN': os.getenv('GITHUB_TOKEN')})
-releases_data = json.loads(releases.stdout)
-latest_release = releases_data[0] if releases_data else None
-if not latest_release or not latest_release.get('assets'):
-    print('No assets found')
-    sys.exit(1)
-
-image_url = latest_release['assets'][0]['url']
-print(f'Image URL: {image_url}')
-
-# Use fallback /videos endpoint for image (will post as photo)
-# Facebook's /videos endpoint with file_url works for images too
-fb_page_id = os.getenv('FB_PAGE_ID')
-fb_page_access_token = os.getenv('FB_PAGE_ACCESS_TOKEN')
-GRAPH_API_BASE = 'https://graph.facebook.com/v25.0'
-
-fallback_payload = {
-    'file_url': image_url,
-    'description': caption[:2200],
-    'published': 'true',
-    'access_token': fb_page_access_token,
-}
-
-resp = requests.post(
-    f'{GRAPH_API_BASE}/{fb_page_id}/videos',
-    data=fallback_payload,
-    timeout=60
-)
-print(f'Facebook response: {resp.status_code} - {resp.text}')
-if resp.status_code == 200:
-    video_id = resp.json().get('id')
-    print(f'Facebook post published! ID: {video_id}')
-else:
-    print(f'Failed: {resp.text}')
-    sys.exit(1)
-"
-
-  cleanup:
-    needs: [post-to-instagram, post-to-facebook]
-    if: always()
+  # Agent 7: Send to Telegram (final delivery)
+  send-to-telegram:
+    needs: [select-topic, generate-image, verify-image, regenerate-on-failure, final-verification, compose-caption]
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    permissions:
-      contents: write
+    env:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
     steps:
-      - name: Cleanup old GitHub Releases (older than 7 days)
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: pip install requests python-dotenv
+
+      - name: Agent - Send to Telegram
         run: |
-          # Clean up old media-temp-* and ai-img-* releases
-          gh release list --repo ${{ github.repository }} --json tagName,createdAt --limit 100 | \
-          jq -r '.[] | select(.tagName | startswith("media-temp-") or startswith("ai-img-") or startswith("ai-fb-img-")) | select((now - (.createdAt | fromdateiso8601)) > 604800) | .tagName' | \
-          xargs -r -I {} gh release delete {} --repo ${{ github.repository }} --yes
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          python -c "
+import os
+import sys
+sys.path.append('.')
+
+# Determine final image path
+regen_path = '${{ needs.regenerate-on-failure.outputs.image_path }}'
+orig_path = '${{ needs.generate-image.outputs.image_path }}'
+final_verify_path = '${{ needs.final-verification.outputs.final_image_path }}'
+final_verify_passed = '${{ needs.final-verification.outputs.passed }}' == 'true'
+
+# Priority: regenerated verified > original verified > regenerated > original
+if final_verify_passed and final_verify_path and os.path.exists(final_verify_path):
+    image_path = final_verify_path
+    source = 'final-verification (regenerated & passed)'
+elif '${{ needs.verify-image.outputs.passed }}' == 'true' and os.path.exists(orig_path):
+    image_path = orig_path
+    source = 'original (passed verification)'
+elif regen_path and os.path.exists(regen_path):
+    image_path = regen_path
+    source = 'regenerated (verification failed but using anyway)'
+else:
+    image_path = orig_path
+    source = 'original (fallback)'
+
+caption = '''${{ needs.compose-caption.outputs.caption }}'''
+
+print(f'Using image from: {source}')
+print(f'Image path: {image_path}')
+
+# Use the existing telegram_selector module
+from telegram_selector import _send_photo, BOT_TOKEN, CHAT_ID
+
+if not BOT_TOKEN or not CHAT_ID:
+    print('Telegram not configured — skipping.')
+    sys.exit(0)
+
+if not os.path.exists(image_path):
+    print(f'Image not found: {image_path}')
+    sys.exit(1)
+
+try:
+    result = _send_photo(image_path, caption)
+    print(f'Telegram response: {result}')
+    print('✅ Image sent to Telegram successfully!')
+    
+    # Send verification summary
+    from telegram_selector import notify_telegram
+    verify_status = '✅ Passed' if ('${{ needs.verify-image.outputs.passed }}' == 'true' or final_verify_passed) else '⚠️ Had issues (sent anyway)'
+    notify_telegram(f'📊 Quality Check: {verify_status}\nSource: {source}', '📋')
+    
+except Exception as e:
+    print(f'Failed to send to Telegram: {e}')
+    sys.exit(1)
+"
