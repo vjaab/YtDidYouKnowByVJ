@@ -236,7 +236,7 @@ ASSETS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
 # ── F5-TTS Config ─────────────────────────────────────────────────────────────
 VJ_REF_WAV = os.path.join(ASSETS_DIR, "vj.wav")
 VJ_REF_TEXT = (
-    "Welcome you are listening to your channel, we bring you the best insights, ideas and stories. Drafted just for you Stay tuned and let's get started."
+    "Hey there, welcome to the channel. Today we are diving into something pretty cool that I think you are gonna want to hear about. Let's get right into it."
 )
 
 _f5_instance = None
@@ -302,11 +302,12 @@ def get_audio_duration(path):
 # PRIMARY: F5-TTS (0 Rs / Local Voice Cloning) — High-Quality Pipeline
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _smart_split_sentences(text, max_chars=80):
+def _smart_split_sentences(text, max_chars=200):
     """
     Split text into natural sentence-boundary chunks for F5-TTS.
     Keeps chunks under max_chars to prevent the 12s clipping issue.
     Splits at sentence boundaries (.?!) then at clause boundaries (,;:—) as fallback.
+    Increased max_chars to reduce splits and preserve prosody.
     """
     import re
     # First split into sentences
@@ -665,9 +666,9 @@ def _generate_f5_clone(text, output_path):
             ref_text=VJ_REF_TEXT,
             gen_text=chunk,
             file_wave=seg_path,
-            nfe_step=64,
-            remove_silence=True,
-            speed=1.02
+            nfe_step=128,        # Higher quality (was 64)
+            remove_silence=False, # Disable to avoid pitch artifacts at boundaries
+            speed=1.0            # Natural pacing (was 1.02)
         )
         segment_paths.append(seg_path)
         
