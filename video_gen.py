@@ -7598,16 +7598,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 # Natural Head Tilt: Very subtle +/- 0.5 degree swing
                 vfx.Rotate(lambda t: 0.6 * math.sin(t * 1.4 + 0.5)),
             ])
-            # Color Matching: Subtle tint to match background accent (12% blend)
-            # Apply via image_transform for moviepy 2.x compatibility
-            # Only apply for longform; keep avatar intact for shorts (lip sync)
-            if is_longform:
-                def apply_accent_tint(frame):
-                    tint_arr = np.full(frame.shape, accent_color, dtype=np.uint8)
-                    if frame.dtype != np.uint8:
-                        frame = (frame * 255).astype(np.uint8)
-                    return cv2.addWeighted(frame, 0.88, tint_arr, 0.12, 0)
-                avatar_clip = avatar_clip.image_transform(apply_accent_tint)
+            # Color Matching: Disabled to keep avatar look intact (lip sync)
 
             # ── IMPROVEMENT #1: Circular Face-Cam Frame (Premium PiP) ─────────
             ring_clip = None
