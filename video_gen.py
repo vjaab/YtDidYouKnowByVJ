@@ -44,6 +44,8 @@ import imageio_ffmpeg
 from pydub import AudioSegment
 AudioSegment.converter = imageio_ffmpeg.get_ffmpeg_exe()
 
+CI_LITE = os.environ.get("CI_LITE", "0") == "1"
+
 FRAME_W, FRAME_H = 1080, 1920 # Default for Shorts
 IS_LONGFORM_ACTIVE = False
 def set_resolutions(is_longform=False):
@@ -6576,7 +6578,6 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     if dynamic_params is None: dynamic_params = {}
     
     # ── CI-LITE MODE: Simplified rendering for GitHub Actions (low resources) ────────
-    CI_LITE = os.environ.get("CI_LITE", "0") == "1"
     if CI_LITE:
         print("🔧 CI-LITE mode enabled: simplified rendering for CI environment")
     
