@@ -103,66 +103,230 @@ try:
     
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
-    # Generate AI-themed content
+# Generate AI-themed content
     ai_topics = [
-        'AI agents automating daily workflows',
-        'Local LLMs running on consumer hardware', 
-        'Open-source AI tools replacing paid SaaS',
-        'AI coding assistants boosting productivity',
-        'Multimodal AI: vision + language models',
-        'RAG systems with local embeddings',
-        'AI-generated video from text prompts',
-        'Small language models beating GPT-4 on benchmarks',
-        'AI privacy: running models locally',
-        'Future of AI agents and autonomous workflows'
+        {
+            'topic': 'What is RAG in Generative AI?',
+            'audience': 'Students and software professionals',
+            'key_points': [
+                'User Query → Embedding Model → Vector Search',
+                'Document Retrieval from Knowledge Base',
+                'Vector Database stores embeddings',
+                'Relevant Context passed to LLM',
+                'LLM generates Grounded Answer',
+                'Citations & Sources for verification'
+            ]
+        },
+        {
+            'topic': 'How AI Agents Automate Workflows',
+            'audience': 'Software engineers and IT professionals',
+            'key_points': [
+                'Planning: Task decomposition & strategy',
+                'Tools: APIs, code execution, web search',
+                'Memory: Short-term + long-term context',
+                'Execution: Step-by-step with feedback loops',
+                'Reflection: Self-correction & improvement',
+                'Output: Deliverable + audit trail'
+            ]
+        },
+        {
+            'topic': 'Local LLMs on Consumer Hardware',
+            'audience': 'Developers and AI enthusiasts',
+            'key_points': [
+                'Quantization: 4-bit / 8-bit compression',
+                'GGUF format for CPU/GPU offloading',
+                'llama.cpp / Ollama / LM Studio',
+                'Hardware: Apple Silicon, NVIDIA RTX, CPU',
+                'Models: Llama 3, Phi-3, Qwen 2.5, Gemma 2',
+                'Privacy: 100% local, no data leaves device'
+            ]
+        },
+        {
+            'topic': 'RAG vs Fine-Tuning: When to Use Which',
+            'audience': 'ML engineers and tech leads',
+            'key_points': [
+                'RAG: Dynamic knowledge, lower cost, easy updates',
+                'Fine-tuning: Style/tone, domain behavior, fixed knowledge',
+                'RAG latency: retrieval + generation',
+                'Fine-tuning: one-time compute, fast inference',
+                'Hybrid: RAG for facts + fine-tune for style',
+                'Decision: Data volatility vs. behavior customization'
+            ]
+        },
+        {
+            'topic': 'Vector Databases Explained Simply',
+            'audience': 'Backend developers and data engineers',
+            'key_points': [
+                'Embeddings: text → high-dimensional vectors',
+                'Similarity: cosine / dot product / L2 distance',
+                'Index types: HNSW, IVF, Flat, PQ',
+                'Popular DBs: Pinecone, Weaviate, Qdrant, Chroma',
+                'Filtering: metadata + vector hybrid search',
+                'Scaling: sharding, replication, multi-tenancy'
+            ]
+        },
+        {
+            'topic': 'Building AI Coding Assistants',
+            'audience': 'Software engineers and students',
+            'key_points': [
+                'Context: repo map, open files, git history',
+                'Completion: in-line suggestions, multi-line',
+                'Chat: explain, refactor, debug, test gen',
+                'RAG: codebase indexing + semantic search',
+                'Agents: autonomous task execution',
+                'Evaluation: HumanEval, MBPP, real-world benchmarks'
+            ]
+        },
+        {
+            'topic': 'Multimodal AI: Vision + Language',
+            'audience': 'AI researchers and product builders',
+            'key_points': [
+                'Architecture: vision encoder + LLM adapter',
+                'Training: image-text pairs, interleaved data',
+                'Capabilities: OCR, chart reading, UI understanding',
+                'Models: GPT-4V, Claude 3, Llava, Qwen-VL',
+                'Use cases: document QA, code from screenshots',
+                'Challenges: hallucination, resolution, latency'
+            ]
+        },
+        {
+            'topic': 'AI Privacy: Local-First Architecture',
+            'audience': 'Security engineers and privacy advocates',
+            'key_points': [
+                'On-device inference: no cloud API calls',
+                'Data never leaves user machine',
+                'Federated learning: train locally, aggregate globally',
+                'TEEs: hardware enclaves for sensitive compute',
+                'Private RAG: local vector DB + local LLM',
+                'Compliance: GDPR, HIPAA, SOC2 by design'
+            ]
+        },
+        {
+            'topic': 'System Design for AI Applications',
+            'audience': 'Senior engineers and architects',
+            'key_points': [
+                'Ingestion: chunking, embedding, indexing pipeline',
+                'Serving: model serving, batching, caching',
+                'Observability: latency, token usage, quality metrics',
+                'Guardrails: PII detection, hallucination checks',
+                'Cost optimization: model routing, caching, quantization',
+                'CI/CD: eval pipelines, regression testing, canary'
+            ]
+        },
+        {
+            'topic': 'Interview Prep: AI System Design Questions',
+            'audience': 'Job seekers and interview candidates',
+            'key_points': [
+                'Clarify: scale, latency, accuracy requirements',
+                'Data: sources, volume, freshness, privacy',
+                'Model: build vs buy, open vs closed, eval criteria',
+                'Architecture: RAG, agents, fine-tuning, hybrid',
+                'Scaling: sharding, caching, async processing',
+                'Monitoring: drift detection, A/B testing, feedback loops'
+            ]
+        }
     ]
     
-    topic = random.choice(ai_topics)
+    selected = random.choice(ai_topics)
+    topic = selected['topic']
+    audience = selected['audience']
+    key_points = selected['key_points']
     print(f'Generating content for: {topic}')
     
     # Generate an AI image using our image generation pipeline
-    image_path = os.path.join(OUTPUT_DIR, f'ai_content_{datetime.now().strftime(\"%Y%m%d_%H%M%S\")}.png')
+    image_path = os.path.join(OUTPUT_DIR, f'ai_content_{datetime.now().strftime("%Y%m%d_%H%M%S")}.png')
+    
+    # Create professional educational infographic prompt
+    key_points_str = chr(10).join(f'- {point}' for point in key_points)
+    educational_prompt = f"""Create a professional educational infographic for AI-powered learning content platform.
+
+Topic: {topic}
+Target audience: {audience}
+
+Key concepts to visualize:
+{key_points_str}
+
+Design requirements:
+- Clean, premium technology/education aesthetic
+- Modern educational infographic, understandable within seconds
+- Strong visual hierarchy: Topic → Core Concept → Key Points → Practical Takeaway
+- Clear headline, simple diagrams, icons, flow arrows, visual metaphors
+- Short labels instead of paragraphs, technically accurate terminology
+- Professional color palette for technology and education
+- AI/technology elements: neural networks, code snippets, data flows, cloud architecture
+- Uncluttered, high-quality, sharp, polished appearance
+- 16:9 aspect ratio optimized for digital publishing
+- No watermarks, stock-photo aesthetics, or irrelevant objects
+
+Educational objective: Viewer understands {topic} and why it matters by looking at the image.
+
+High-resolution 16:9 educational infographic for LinkedIn, Instagram, YouTube, educational blogs."""
     
     # Use the image generation function
     result = generate_ai_image(
-        prompt=f'{topic}, professional tech illustration, clean modern style, vibrant colors, 1080x1080',
+        prompt=educational_prompt,
         output_path=image_path
     )
     
     if result and os.path.exists(result):
         final_image = result
     else:
-        # Fallback: create a simple AI-themed image
+        # Fallback: create a professional 16:9 educational infographic
         from PIL import Image, ImageDraw, ImageFont
-        img = Image.new('RGB', (1080, 1080), color='#0d1117')
+        # 16:9 aspect ratio for digital publishing
+        img = Image.new('RGB', (1920, 1080), color='#0d1117')
         draw = ImageDraw.Draw(img)
-        # Draw gradient background
+        # Draw professional gradient background
         for y in range(1080):
-            r = int(13 + (88 - 13) * y / 1080)
-            g = int(17 + (166 - 17) * y / 1080)
-            b = int(23 + (255 - 23) * y / 1080)
-            draw.line([(0, y), (1080, y)], fill=(r, g, b))
-        # Add text
+            r = int(13 + (30 - 13) * y / 1080)
+            g = int(17 + (58 - 17) * y / 1080)
+            b = int(23 + (138 - 23) * y / 1080)
+            draw.line([(0, y), (1920, y)], fill=(r, g, b))
+        # Add topic headline
         try:
-            font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 48)
+            font_title = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 56)
+            font_body = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 28)
         except:
-            font = ImageFont.load_default()
-        text = 'AI Content Daily'
-        bbox = draw.textbbox((0, 0), text, font=font)
+            font_title = ImageFont.load_default()
+            font_body = ImageFont.load_default()
+        # Title
+        title_text = topic
+        bbox = draw.textbbox((0, 0), title_text, font=font_title)
         tw = bbox[2] - bbox[0]
-        th = bbox[3] - bbox[1]
-        draw.text(((1080-tw)//2, (1080-th)//2), text, font=font, fill='white')
-        img.save(final_image)
-        print(f'Created fallback image: {final_image}')
+        draw.text(((1920-tw)//2, 120), title_text, font=font_title, fill='white')
+        # Subtitle
+        sub_text = f"Target: {audience}"
+        bbox = draw.textbbox((0, 0), sub_text, font=font_body)
+        tw = bbox[2] - bbox[0]
+        draw.text(((1920-tw)//2, 200), sub_text, font=font_body, fill='#a5b4fc')
+        # Key points as visual list
+        y_pos = 300
+        for i, point in enumerate(key_points[:5]):
+            # Bullet point
+            draw.circle([150, y_pos + 14], 8, fill='#60a5fa')
+            # Text
+            point_text = point[:80] + ('...' if len(point) > 80 else '')
+            draw.text((180, y_pos), point_text, font=font_body, fill='#e0e7ff')
+            y_pos += 60
+        # Footer
+        footer = "AI Education Daily | Understand AI in seconds"
+        bbox = draw.textbbox((0, 0), footer, font=font_body)
+        tw = bbox[2] - bbox[0]
+        draw.text(((1920-tw)//2, 980), footer, font=font_body, fill='#64748b')
+        img.save(image_path)
+        final_image = image_path
+        print(f'Created fallback 16:9 educational infographic: {final_image}')
     
-    # Generate caption
-    captions = [
-        f'🚀 {topic.title()} is changing everything!\n\n#AI #ArtificialIntelligence #MachineLearning #TechNews #Innovation #OpenSource #LLM #AITools #FutureOfTech #DailyAI',
-        f'💡 Did you know? {topic}.\n\nThe AI landscape is moving fast. Stay ahead.\n\n#AI #MachineLearning #DeepLearning #TechTrends #AIRevolution #OpenSourceAI #LLM #GenerativeAI #TechDaily',
-        f'⚡ {topic.title()} - The future is here.\n\nWhat do you think about this?\n\n#AI #ArtificialIntelligence #TechNews #Innovation #AITools #MachineLearning #OpenSource #LLM #GenerativeAI #FutureTech'
-    ]
-    
-    caption = random.choice(captions)
+    # Generate educational caption matching the topic
+    caption = f"""🎓 {topic}
+
+{chr(10).join(f'🔹 {point}' for point in key_points[:4])}
+
+Understanding this concept is essential for {audience.lower()}. The visual breaks down the core components so you can grasp it in seconds.
+
+Save this for your learning journey! 📚
+
+#AI #ArtificialIntelligence #MachineLearning #AIEducation #TechEducation #LearnAI #SoftwareEngineering #DataScience #GenerativeAI #LLM #RAG #VectorDatabase #SystemDesign #InterviewPrep #DailyLearning #TechEducation"""
     
     # Set outputs
     with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
