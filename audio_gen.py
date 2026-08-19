@@ -1796,14 +1796,13 @@ def generate_voiceover(text, custom_phonetic_map=None, api_key=None):
         if path and word_timestamps:
             is_estimated = any(wt.get("estimated", False) for wt in word_timestamps)
             
-            # For F5-TTS (local voice cloning): PRESERVE ORIGINAL VOICE - NO MODIFICATIONS
-            # Only skip silence trimming and gap optimization for cloud TTS
+            # For ALL voice cloning (F5-TTS + ElevenLabs): PRESERVE ORIGINAL VOICE - NO MODIFICATIONS
+            # Skip silence trimming, gap optimization, pacing, context pauses for cloned voices
             if is_cloud:
-                dur, word_timestamps = trim_audio_silence(path, word_timestamps)
-                if not is_estimated:
-                    dur, word_timestamps = optimize_audio_gaps(path, word_timestamps)
-                    dur, word_timestamps = apply_audio_pacing(path, word_timestamps)
-                    dur, word_timestamps = _inject_context_pauses(path, word_timestamps)
+                # ElevenLabs: Keep raw output, only update duration
+                from audio_gen import get_audio_duration
+                dur = get_audio_duration(path)
+                print(f"   🎙️ ElevenLabs: Preserving raw cloned voice (no trimming, no gap optimization, no pacing injection)")
             else:
                 # F5-TTS: Keep raw output, only update duration
                 from audio_gen import get_audio_duration
