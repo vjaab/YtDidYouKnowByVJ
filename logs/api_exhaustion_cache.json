@@ -9,8 +9,8 @@
       "date": "2026-08-17"
     },
     "openai/gpt-oss-120b": {
-      "tokens": 14578,
-      "date": "2026-08-18"
+      "tokens": 11160,
+      "date": "2026-08-19"
     },
     "openai/gpt-oss-20b": {
       "tokens": 8892,
@@ -24,35 +24,35 @@
   },
   "groq_models": {
     "llama-3.3-70b-versatile": 1786987162.8149407,
-    "openai/gpt-oss-20b": 1787117214.8027897,
+    "openai/gpt-oss-20b": 1787165059.1065416,
     "llama-3.1-8b-instant": 1786987172.9666724,
-    "openai/gpt-oss-120b": 1787121216.8495963
+    "openai/gpt-oss-120b": 1787165059.264498
   },
   "cloudflare_models": {
-    "@cf/meta/llama-3.3-70b-instruct": 1787120510.7063637,
-    "@cf/qwen/qwen2.5-72b-instruct": 1787120510.7102902,
-    "@cf/mistral/mistral-small-3.1-24b-instruct": 1787120510.711281,
-    "@cf/moonshotai/kimi-k2.7-code": 1787120510.7118828,
-    "@cf/moonshotai/kimi-k2.6": 1787120510.7121658,
-    "@cf/zai-org/glm-5.2": 1787120510.713634,
-    "@cf/openai/gpt-oss-120b": 1787120510.7074127,
-    "@cf/meta/llama-3.3-70b-instruct-fp8-fast": 1787120510.706795,
-    "@cf/zai-org/glm-4.7-flash": 1787120510.7071202,
-    "@cf/nvidia/nemotron-3-120b-a12b": 1787120510.707727,
-    "@cf/meta/llama-4-scout-17b-16e-instruct": 1787120510.708,
-    "@cf/qwen/qwq-32b": 1787120510.708274,
-    "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b": 1787120510.708554,
-    "@cf/meta/llama-3.1-70b-instruct": 1787120510.7088752,
-    "@cf/qwen/qwen3-30b-a3b-fp8": 1787120510.710581,
-    "@cf/qwen/qwen2.5-coder-32b-instruct": 1787120510.7109678,
-    "@cf/google/gemma-4-26b-a4b-it": 1787120510.711569,
-    "@cf/meta/llama-3.1-8b-instruct": 1787120510.7124467,
-    "@cf/meta/llama-3.1-8b-instruct-fp8": 1787120510.712782,
-    "@cf/meta/llama-3.1-8b-instruct-fast": 1787120510.7130857,
-    "@cf/meta/llama-3.2-3b-instruct": 1787120510.7133653,
-    "@cf/meta/llama-3.2-1b-instruct": 1787120510.714007,
-    "@cf/openai/gpt-oss-20b": 1787120510.7143142,
-    "@cf/ibm-granite/granite-4.0-h-micro": 1787120510.7146156
+    "@cf/meta/llama-3.3-70b-instruct": 1787165059.6850352,
+    "@cf/qwen/qwen2.5-72b-instruct": 1787165059.6905487,
+    "@cf/mistral/mistral-small-3.1-24b-instruct": 1787165059.6913543,
+    "@cf/moonshotai/kimi-k2.7-code": 1787165059.6919255,
+    "@cf/moonshotai/kimi-k2.6": 1787165059.6922703,
+    "@cf/zai-org/glm-5.2": 1787165059.6944103,
+    "@cf/openai/gpt-oss-120b": 1787165059.6860719,
+    "@cf/meta/llama-3.3-70b-instruct-fp8-fast": 1787165059.6854525,
+    "@cf/zai-org/glm-4.7-flash": 1787165059.6857648,
+    "@cf/nvidia/nemotron-3-120b-a12b": 1787165059.6891444,
+    "@cf/meta/llama-4-scout-17b-16e-instruct": 1787165059.689528,
+    "@cf/qwen/qwq-32b": 1787165059.6898146,
+    "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b": 1787165059.6900618,
+    "@cf/meta/llama-3.1-70b-instruct": 1787165059.690304,
+    "@cf/qwen/qwen3-30b-a3b-fp8": 1787165059.690783,
+    "@cf/qwen/qwen2.5-coder-32b-instruct": 1787165059.6910398,
+    "@cf/google/gemma-4-26b-a4b-it": 1787165059.6916375,
+    "@cf/meta/llama-3.1-8b-instruct": 1787165059.6925356,
+    "@cf/meta/llama-3.1-8b-instruct-fp8": 1787165059.6934688,
+    "@cf/meta/llama-3.1-8b-instruct-fast": 1787165059.6938171,
+    "@cf/meta/llama-3.2-3b-instruct": 1787165059.6941144,
+    "@cf/meta/llama-3.2-1b-instruct": 1787165059.6946838,
+    "@cf/openai/gpt-oss-20b": 1787165059.6949556,
+    "@cf/ibm-granite/granite-4.0-h-micro": 1787165059.6952105
   },
   "cerebras_models": {
     "gpt-oss-120b": 1786987695.8295078,
