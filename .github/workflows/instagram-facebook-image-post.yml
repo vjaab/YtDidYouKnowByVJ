@@ -236,35 +236,13 @@ try:
     # Generate an AI image using our image generation pipeline
     image_path = os.path.join(OUTPUT_DIR, f'ai_content_{datetime.now().strftime("%Y%m%d_%H%M%S")}.png')
     
-    # Create professional educational infographic prompt
-    key_points_str = chr(10).join(f'- {point}' for point in key_points)
-    educational_prompt = f"""Create a professional educational infographic for AI-powered learning content platform.
-
-Topic: {topic}
-Target audience: {audience}
-
-Key concepts to visualize:
-{key_points_str}
-
-Design requirements:
-- Clean, premium technology/education aesthetic
-- Modern educational infographic, understandable within seconds
-- Strong visual hierarchy: Topic → Core Concept → Key Points → Practical Takeaway
-- Clear headline, simple diagrams, icons, flow arrows, visual metaphors
-- Short labels instead of paragraphs, technically accurate terminology
-- Professional color palette for technology and education
-- AI/technology elements: neural networks, code snippets, data flows, cloud architecture
-- Uncluttered, high-quality, sharp, polished appearance
-- 16:9 aspect ratio optimized for digital publishing
-- No watermarks, stock-photo aesthetics, or irrelevant objects
-
-Educational objective: Viewer understands {topic} and why it matters by looking at the image.
-
-High-resolution 16:9 educational infographic for LinkedIn, Instagram, YouTube, educational blogs."""
+    # Create concise visual prompt for image generation API (shorter for URL limits)
+    # Full educational context goes into caption
+    visual_prompt = f"Professional educational infographic: {topic}. Clean diagram showing: {', '.join(key_points[:4])}. Modern tech/education aesthetic, 16:9, sharp, uncluttered, labeled flow diagrams, icons, arrows, professional color palette."
     
     # Use the image generation function (returns list of paths)
     results = generate_images(
-        prompts=[educational_prompt],
+        prompts=[visual_prompt],
         aspect_ratio="16:9"
     )
     
