@@ -313,7 +313,34 @@ Return ONLY JSON:
   ]
 }}"""
 
-NARRATIVE_AGENT_TEMPLATE = """{persona}
+# Template 1: RESULT-FIRST Format (Original)
+NARRATIVE_AGENT_TEMPLATE_RESULT_FIRST = """{persona}
+
+NARRATIVE AGENT TASK:
+Write 4-part script using SELECTED HOOK exactly as-is.
+
+STRUCTURE — RESULT-FIRST FORMAT (proven higher retention):
+1. HOOK (0-3s): {selected_hook}  ← USE VERBATIM
+2. RESULT REVEAL (3-10s): Show the payoff immediately. "I gave it this prompt and it built the entire API in 30 seconds." / "The tool generates working code instantly — watch."
+3. HOW-TO / PROOF (10-30s): Quick demo or steps. "Here's the exact prompt..." / "Install: pip install xyz. Run: xyz --prompt '...'." Keep it under 20 seconds.
+4. WHY IT MATTERS + CTA (30-45s): "This saves you 5 hours a week." / "Your team should know this." + Soft CTA: "Save this for later. Follow for more tools like this."
+
+RULES:
+- NO "In this video," "Today I'll show you," "Let me explain"
+- Show the RESULT first, then explain how
+- Max 2 sentences per step
+- Use "you" / "your" language throughout
+- End with save/share-worthy CTA: "Send this to a developer" / "Save this" / "Follow for more"
+
+VISUAL PROMPT RULE: The FIRST nano_visual_prompt (hook segment) MUST depict the EXACT product/tool/feature named in the hook. Example: if hook says 'MemoMind One glasses', prompt = 'Close-up of MemoMind One smart glasses on desk, transparent AR lenses showing notifications, photorealistic 9:16, dark background'. NO generic 'person holding box'.
+
+RESEARCH: {research_json}
+SELECTED HOOK: {selected_hook}
+
+Return JSON with: hook, core_problem, immediate_solution, call_to_action"""
+
+# Template 2: PROBLEM → SOLUTION → EXAMPLES Format (New)
+NARRATIVE_AGENT_TEMPLATE_PROBLEM_FIRST = """{persona}
 
 NARRATIVE AGENT TASK:
 Write 5-part script using SELECTED HOOK exactly as-is.
@@ -339,6 +366,9 @@ RESEARCH: {research_json}
 SELECTED HOOK: {selected_hook}
 
 Return JSON with: hook, core_problem, immediate_solution, call_to_action"""
+
+# Default to alternating between formats based on run_index for A/B testing
+NARRATIVE_AGENT_TEMPLATE = NARRATIVE_AGENT_TEMPLATE_PROBLEM_FIRST
 
 RETENTION_OPTIMIZER_TEMPLATE = """{persona}
 
@@ -2558,8 +2588,11 @@ class MultiAgentGenerationEngine:
             hook_words = len(hook_text.split())
             print(f"🎯 Selected Hook ({hook_words} words): {hook_text}")
 
-        print("📝 [AGENT 3] Fact Script Generator: Writing the unified retention-optimized script...")
-        narrative_prompt = NARRATIVE_AGENT_TEMPLATE.format(
+        # Alternate between formats for A/B testing (even=Result-First, odd=Problem-First)
+        script_format = "Result-First" if (run_index % 2 == 0) else "Problem-First"
+        narrative_template = NARRATIVE_AGENT_TEMPLATE_RESULT_FIRST if (run_index % 2 == 0) else NARRATIVE_AGENT_TEMPLATE_PROBLEM_FIRST
+        print(f"📝 [AGENT 3] Fact Script Generator: Writing {script_format} script (run_index={run_index})...")
+        narrative_prompt = narrative_template.format(
             persona=self.persona,
             research_json=json.dumps(research),
             selected_hook=hook_text,
@@ -2629,6 +2662,11 @@ class MultiAgentGenerationEngine:
             # ── PHASE 2: Attach retention_map to the final script for downstream use ──
             if retention_map:
                 final_script["retention_map"] = retention_map
+            
+            # Track which script format was used for A/B testing analytics
+            script_format = "Result-First" if (run_index % 2 == 0) else "Problem-First"
+            final_script["script_format"] = script_format
+            print(f"📊 Script format: {script_format} (run_index={run_index})")
             
             print("⭐ [PIPELINE] Multi-Agent script generation completed successfully.")
         return final_script
