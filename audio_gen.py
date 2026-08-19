@@ -124,8 +124,8 @@ def trim_audio_silence(path, word_timestamps):
     if len(trimmed_audio) > fade_boundary_ms * 2:
         trimmed_audio = trimmed_audio.fade_in(fade_boundary_ms).fade_out(fade_boundary_ms)
     
-    # Boost volume by 8 decibels for better clarity (increased for presence)
-    trimmed_audio = trimmed_audio + 8
+    # Keep original volume to preserve voice character for cloning
+    # trimmed_audio = trimmed_audio + 8
     
     trimmed_audio.export(path, format="wav" if path.endswith(".wav") else "mp3")
     
@@ -613,44 +613,35 @@ def _add_natural_volume_variation(audio):
 
 def _postprocess_voice_audio(wav_path, word_timestamps=None, original_text=None, skip_slicing=False):
     """
-    Professional post-processing chain to enhance clarity and presence:
-    1. High-pass filter at 120Hz to remove low-end rumble and mud.
-    2. Three-Band Presence EQ Crossover Network (REMOVED to prevent phase-cancellation echoes)
-    3. Dynamic Range Compression to level out the voice and make it "pop".
-    4. Final normalization to -1dB for consistent loudness.
-    5. Subtle fade-in/out to prevent clicks.
-    6. NEW: Remove vocal artifacts (glitches, filler sounds)
-    7. NEW: Inject human-like phrasing variation
+    Minimal post-processing to preserve original voice character for cloning:
+    1. High-pass filter at 120Hz to remove low-end rumble.
+    2. Light normalization to -1dB for consistent loudness.
+    3. Subtle fade-in/out to prevent clicks.
     """
     try:
         from pydub import AudioSegment
-        from pydub.effects import normalize, compress_dynamic_range
+        from pydub.effects import normalize
         
         # Step 0: Clean artifacts if timestamps available (Skip for cloud TTS, estimated TS, or skip_slicing)
         is_estimated = any(wt.get("estimated", False) for wt in word_timestamps) if word_timestamps else False
         if word_timestamps and original_text and not skip_slicing and not is_estimated:
             word_timestamps = _remove_vocal_artifacts(wav_path, word_timestamps, original_text)
-            word_timestamps = _inject_human_phrasing(wav_path, word_timestamps, original_text)
+            # Skip human phrasing injection to preserve original voice timing
+            # word_timestamps = _inject_human_phrasing(wav_path, word_timestamps, original_text)
         
         audio = AudioSegment.from_file(wav_path)
         
         # 1. High-pass filter (120Hz) - Removes low-frequency room rumble
         audio = audio.high_pass_filter(120)
         
-        # 2. Three-Band Presence EQ Crossover - REMOVED to prevent comb filtering/echo phase cancellations
-        
-        # 3. Dynamic Compression - Makes the voice sound authoritative and professional
-        # Threshold -15dB, Ratio 3:1, Attack 5ms, Release 50ms
-        audio = compress_dynamic_range(audio, threshold=-15.0, ratio=3.0, attack=5.0, release=50.0)
-        
-        # 4. Final Normalization
+        # 2. Light Normalization (no compression - preserves voice dynamics)
         audio = normalize(audio, headroom=1.0)
         
-        # 5. Prevent click artifacts
+        # 3. Prevent click artifacts
         audio = audio.fade_in(5).fade_out(5)
         
         audio.export(wav_path, format="wav" if wav_path.endswith(".wav") else "mp3")
-        print(f"   🎙️ Audio enhanced: 120Hz HPF, dynamic compression, normalized to -1dB, artifacts cleaned, human phrasing injected")
+        print(f"   🎙️ Audio enhanced: 120Hz HPF, light normalization to -1dB (voice dynamics preserved)")
     except Exception as e:
         print(f"   ⚠ Audio post-processing skipped: {e}")
 
