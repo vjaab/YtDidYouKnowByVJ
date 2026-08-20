@@ -67,7 +67,7 @@ def normalize_llm_response(data: Dict[str, Any], required_fields: Optional[List[
                 elif isinstance(step, str):
                     normalized_steps.append({"label": step, "description": ""})
             fc["steps"] = normalized_steps[:7]
-    # Normalize comparison table - handle various formats
+# Normalize comparison table - handle various formats
     # First, ensure comparison is a dict
     if "comparison" in data:
         if isinstance(data["comparison"], list):
@@ -83,10 +83,22 @@ def normalize_llm_response(data: Dict[str, Any], required_fields: Optional[List[
                         option_a = row.get("option_a", row.get("a", row.get("left", row.get("traditional", row.get("without_rag", row.get("before", ""))))))
                         option_b = row.get("option_b", row.get("b", row.get("right", row.get("modern", row.get("with_rag", row.get("after", ""))))))
                         normalized_rows.append({"feature": feature, "option_a": option_a, "option_b": option_b})
-                    elif isinstance(row, (list, tuple)) and len(row) >= 2:
-                        normalized_rows.append({"feature": str(row[0]), "option_a": str(row[1]), "option_b": str(row[2]) if len(row) > 2 else ""})
+                    elif isinstance(row, (list, tuple)):
+                        if len(row) >= 3:
+                            # ['Feature', 'OptionA', 'OptionB'] or ['feature', 'optA', 'optB', 'optC']
+                            normalized_rows.append({"feature": str(row[0]), "option_a": str(row[1]), "option_b": str(row[2])})
+                        elif len(row) == 2:
+                            # ['feature', 'option'] - treat as feature with single option
+                            normalized_rows.append({"feature": str(row[0]), "option_a": str(row[1]), "option_b": ""})
+                        else:
+                            continue
                     else:
                         continue
+                # Skip header row if it looks like one (first row has generic names)
+                if normalized_rows and len(normalized_rows) > 1:
+                    first = normalized_rows[0]
+                    if first.get("feature", "").lower() in ("feature", "criteria", "key", "parameter", "property", "name", "type"):
+                        normalized_rows = normalized_rows[1:]
                 comp["rows"] = normalized_rows[:6]
             # Ensure headers have defaults
             if "header_a" not in comp:
@@ -95,7 +107,6 @@ def normalize_llm_response(data: Dict[str, Any], required_fields: Optional[List[
                 comp["header_b"] = "Modern"
             if "title" not in comp:
                 comp["title"] = "Comparison"
-    
     
     # Normalize architecture components
     if "architecture" in data and isinstance(data["architecture"], dict):
