@@ -108,3 +108,13 @@ jobs:
           name: image-post-logs
           path: logs/
           retention-days: 7
+
+      - name: Upload generated images
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-images
+          path: |
+            output/facebook/
+            output/instagram/
+          retention-days: 7
