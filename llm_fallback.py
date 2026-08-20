@@ -67,30 +67,35 @@ def normalize_llm_response(data: Dict[str, Any], required_fields: Optional[List[
                 elif isinstance(step, str):
                     normalized_steps.append({"label": step, "description": ""})
             fc["steps"] = normalized_steps[:7]
+    # Normalize comparison table - handle various formats
+    # First, ensure comparison is a dict
+    if "comparison" in data:
+        if isinstance(data["comparison"], list):
+            # If comparison is a list, convert to dict with rows
+            data["comparison"] = {"rows": data["comparison"], "title": "Comparison"}
+        if isinstance(data["comparison"], dict):
+            comp = data["comparison"]
+            if "rows" in comp and isinstance(comp["rows"], list):
+                normalized_rows = []
+                for row in comp["rows"]:
+                    if isinstance(row, dict):
+                        feature = row.get("feature", row.get("criteria", row.get("key", "Feature")))
+                        option_a = row.get("option_a", row.get("a", row.get("left", row.get("traditional", row.get("without_rag", row.get("before", ""))))))
+                        option_b = row.get("option_b", row.get("b", row.get("right", row.get("modern", row.get("with_rag", row.get("after", ""))))))
+                        normalized_rows.append({"feature": feature, "option_a": option_a, "option_b": option_b})
+                    elif isinstance(row, (list, tuple)) and len(row) >= 2:
+                        normalized_rows.append({"feature": str(row[0]), "option_a": str(row[1]), "option_b": str(row[2]) if len(row) > 2 else ""})
+                    else:
+                        continue
+                comp["rows"] = normalized_rows[:6]
+            # Ensure headers have defaults
+            if "header_a" not in comp:
+                comp["header_a"] = "Traditional"
+            if "header_b" not in comp:
+                comp["header_b"] = "Modern"
+            if "title" not in comp:
+                comp["title"] = "Comparison"
     
-    # Normalize comparison table
-    if "comparison" in data and isinstance(data["comparison"], dict):
-        comp = data["comparison"]
-        if "rows" in comp and isinstance(comp["rows"], list):
-            normalized_rows = []
-            for row in comp["rows"]:
-                if isinstance(row, dict):
-                    # Handle different field names from various models
-                    feature = row.get("feature", row.get("criteria", row.get("key", "Feature")))
-                    # Handle Mistral's "traditional" field and other variations
-                    option_a = row.get("option_a", row.get("a", row.get("left", row.get("traditional", row.get("without_rag", row.get("before", ""))))))
-                    option_b = row.get("option_b", row.get("b", row.get("right", row.get("modern", row.get("with_rag", row.get("after", ""))))))
-                    normalized_rows.append({"feature": feature, "option_a": option_a, "option_b": option_b})
-                elif isinstance(row, (list, tuple)) and len(row) >= 2:
-                    normalized_rows.append({"feature": str(row[0]), "option_a": str(row[1]), "option_b": str(row[2]) if len(row) > 2 else ""})
-            comp["rows"] = normalized_rows[:6]
-        # Ensure headers have defaults
-        if "header_a" not in comp:
-            comp["header_a"] = "Traditional"
-        if "header_b" not in comp:
-            comp["header_b"] = "Modern"
-        if "title" not in comp:
-            comp["title"] = "Comparison"
     
     # Normalize architecture components
     if "architecture" in data and isinstance(data["architecture"], dict):
@@ -189,6 +194,8 @@ def call_groq(user_prompt: str) -> Optional[Dict[str, Any]]:
         "llama-3.1-8b-instant",
         "mixtral-8x7b-32768",
         "gemma2-9b-it",
+        "qwen-qwq-32b",
+        "deepseek-r1-distill-llama-70b",
     ]
     
     headers = {
