@@ -20,6 +20,9 @@ class TemplateRenderer:
         
         # Add custom filters
         self.env.filters['int_to_letter'] = lambda i: chr(65 + i) if 0 <= i < 26 else '?'
+        
+        # Add enumerate as global for templates
+        self.env.globals['enumerate'] = enumerate
 
     def _get_theme_vars(self, config: RenderConfig) -> dict:
         base = FACEBOOK_CONFIG.to_dict() if config.platform == "facebook" else INSTAGRAM_CONFIG.to_dict()
