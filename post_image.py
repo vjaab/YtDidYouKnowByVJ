@@ -121,7 +121,8 @@ async def run_education_pipeline(dry_run=False, topic=None, topics=None, audienc
     elif topics:
         topic_list = topics
     else:
-        topic_list = load_topics_from_file() or DEFAULT_TOPICS[:4]  # Use 4 per run
+        all_topics = load_topics_from_file() or DEFAULT_TOPICS
+        topic_list = all_topics[:4]  # Use 4 per run
     
     if audience is None:
         audience = ["students", "developers"]
