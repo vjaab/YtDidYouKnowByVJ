@@ -140,6 +140,10 @@ async def run_education_pipeline(dry_run=False, topic=None, topics=None, audienc
         output_dir=str(OUTPUT_DIR),
     )
 
+    if not GEMINI_API_KEY:
+        print("❌ GEMINI_API_KEY not set! Please add it to GitHub secrets.")
+        return False, "GEMINI_API_KEY not configured"
+
     if dry_run:
         print("\n🤖 Generating content (dry run)...")
         contents = pipeline.generate_batch(topic_list, audience, difficulty)
