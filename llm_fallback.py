@@ -543,7 +543,16 @@ def call_openrouter(user_prompt: str) -> Optional[Dict[str, Any]]:
 
 FALLBACK_CHAIN = [
     ("OpenCode Zen", call_opencode),
+    ("Cerebras", call_cerebras),
+    ("NVIDIA NIM", call_nvidia),
+    ("Mistral", call_mistral),
     ("Groq", call_groq),
+    ("Cloudflare", call_cloudflare),
+    ("OpenRouter", call_openrouter),
+    ("GitHub Models", call_github_models),
+    ("OpenAI", call_openai),
+    ("Anthropic", call_anthropic),
+    ("DeepSeek", call_deepseek),
 ]
 
 
