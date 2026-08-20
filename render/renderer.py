@@ -130,19 +130,28 @@ class PlaywrightRenderer:
         self.template_renderer = TemplateRenderer()
         self._browser = None
         self._context = None
+        self._playwright = None
 
     async def _get_browser(self):
         if self._browser is None:
             from playwright.async_api import async_playwright
-            self._playwright = await async_playwright().start()
-            self._browser = await self._playwright.chromium.launch(
-                headless=True,
-                args=['--no-sandbox', '--disable-setuid-sandbox']
-            )
-            self._context = await self._browser.new_context(
-                viewport={'width': 1080, 'height': 1350},
-                device_scale_factor=2,
-            )
+            try:
+                self._playwright = await async_playwright().start()
+                self._browser = await self._playwright.chromium.launch(
+                    headless=True,
+                    args=['--no-sandbox', '--disable-setuid-sandbox']
+                )
+                self._context = await self._browser.new_context(
+                    viewport={'width': 1080, 'height': 1350},
+                    device_scale_factor=2,
+                )
+            except Exception as e:
+                # Clean up on failure
+                if self._playwright:
+                    await self._playwright.stop()
+                self._playwright = None
+                self._browser = None
+                raise
         return self._context
 
     async def close(self):
