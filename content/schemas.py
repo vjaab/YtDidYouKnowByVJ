@@ -62,8 +62,8 @@ class FlowchartStep(BaseModel):
 
 
 class Flowchart(BaseModel):
-    title: str
-    steps: List[FlowchartStep] = Field(min_length=3, max_length=7)
+    title: str = ""
+    steps: List[FlowchartStep] = Field(default_factory=list)
     visual_type: VisualType = VisualType.FLOWCHART
 
 
@@ -74,8 +74,8 @@ class InfographicPoint(BaseModel):
 
 
 class Infographic(BaseModel):
-    title: str
-    points: List[InfographicPoint] = Field(min_length=3, max_length=6)
+    title: str = ""
+    points: List[InfographicPoint] = Field(default_factory=list)
     visual_type: VisualType = VisualType.INFOGRAPHIC
 
 
@@ -94,8 +94,8 @@ class ArchitectureComponent(BaseModel):
 
 
 class ArchitectureDiagram(BaseModel):
-    title: str
-    components: List[ArchitectureComponent] = Field(min_length=3, max_length=8)
+    title: str = ""
+    components: List[ArchitectureComponent] = Field(default_factory=list)
     visual_type: VisualType = VisualType.ARCHITECTURE
 
 
@@ -106,10 +106,10 @@ class ComparisonRow(BaseModel):
 
 
 class ComparisonTable(BaseModel):
-    title: str
-    header_a: str
-    header_b: str
-    rows: List[ComparisonRow] = Field(min_length=3, max_length=6)
+    title: str = ""
+    header_a: str = "Traditional"
+    header_b: str = "Modern"
+    rows: List[ComparisonRow] = Field(default_factory=list)
     visual_type: VisualType = VisualType.COMPARISON
 
 
