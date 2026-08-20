@@ -57,7 +57,7 @@ class Quiz(BaseModel):
 
 
 class FlowchartStep(BaseModel):
-    label: str
+    label: str = Field(max_length=40)
     description: Optional[str] = None
 
 
@@ -82,13 +82,13 @@ class Infographic(BaseModel):
 class CodeSnippet(BaseModel):
     language: str
     title: str
-    content: str
+    content: str = Field(max_length=500)
     highlight_lines: List[int] = []
 
 
 class ArchitectureComponent(BaseModel):
     name: str
-    description: str
+    description: str = Field(min_length=10, max_length=100)
     icon: Optional[str] = None
     connections: List[str] = []
 
@@ -100,9 +100,9 @@ class ArchitectureDiagram(BaseModel):
 
 
 class ComparisonRow(BaseModel):
-    feature: str
-    option_a: str
-    option_b: str
+    feature: str = Field(max_length=40)
+    option_a: str = Field(max_length=50)
+    option_b: str = Field(max_length=50)
 
 
 class ComparisonTable(BaseModel):
