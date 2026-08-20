@@ -198,7 +198,7 @@ class ContentGenerator:
         ]
 
     def _call_gemini(self, user_prompt: str) -> Optional[Dict[str, Any]]:
-        """Try Gemini models in order."""
+        """Try Gemini models in order. Returns None immediately on quota exhaustion."""
         for model_name in self.gemini_models_to_try:
             try:
                 print(f"🤖 Trying Gemini ({model_name})...")
@@ -218,8 +218,8 @@ class ContentGenerator:
                 err_str = str(e).lower()
                 print(f"⚠️ Gemini ({model_name}) failed: {e}")
                 if "429" in err_str or "quota" in err_str or "exhausted" in err_str:
-                    print(f"   Quota exceeded, trying next model...")
-                    continue
+                    print(f"   🚫 Quota exhausted - skipping remaining Gemini models, falling back to other providers...")
+                    return None  # Immediately skip to fallback providers
                 break
         return None
 

@@ -194,6 +194,25 @@ def safe_extract_anthropic(response) -> Optional[str]:
 
 # ─── Provider Callers ──────────────────────────────────────────────────────────
 
+import time
+
+def _retry_with_backoff(func, max_retries=3, base_delay=2.0):
+    """Retry a function with exponential backoff for transient errors."""
+    for attempt in range(max_retries):
+        try:
+            return func()
+        except Exception as e:
+            err_str = str(e).lower()
+            if "429" in err_str or "rate limit" in err_str or "rate_limit" in err_str:
+                if attempt < max_retries - 1:
+                    delay = base_delay * (2 ** attempt)
+                    print(f"   ⏳ Rate limited, retrying in {delay}s (attempt {attempt + 1}/{max_retries})...")
+                    time.sleep(delay)
+                    continue
+            raise
+    return None
+
+
 def call_groq(user_prompt: str) -> Optional[Dict[str, Any]]:
     groq_key = os.getenv("GROQ_API_KEY")
     if not groq_key:
@@ -205,8 +224,6 @@ def call_groq(user_prompt: str) -> Optional[Dict[str, Any]]:
         "llama-3.1-8b-instant",
         "mixtral-8x7b-32768",
         "gemma2-9b-it",
-        "qwen-qwq-32b",
-        "deepseek-r1-distill-llama-70b",
     ]
     
     headers = {
@@ -223,13 +240,15 @@ def call_groq(user_prompt: str) -> Optional[Dict[str, Any]]:
                 "response_format": {"type": "json_object"},
                 "temperature": 0.3,
             }
-            r = requests.post("https://api.groq.com/openai/v1/chat/completions", json=payload, headers=headers, timeout=30)
-            if r.status_code == 200:
-                content = safe_extract_choices(r.json(), f"Groq {model_name}")
+            result = _retry_with_backoff(
+                lambda: requests.post("https://api.groq.com/openai/v1/chat/completions", json=payload, headers=headers, timeout=30)
+            )
+            if result and result.status_code == 200:
+                content = safe_extract_choices(result.json(), f"Groq {model_name}")
                 if content:
                     return clean_and_parse_json(content)
-            else:
-                print(f"⚠️ Groq ({model_name}) failed: {r.status_code}")
+            elif result:
+                print(f"⚠️ Groq ({model_name}) failed: {result.status_code}")
         except Exception as e:
             print(f"⚠️ Groq ({model_name}) exception: {e}")
     return None
