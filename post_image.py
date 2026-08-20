@@ -556,24 +556,39 @@ def fetch_latest_news_for_image_post():
 
 
 def generate_image_prompts_from_news(articles, count=4):
-    """Generate image generation prompts from news articles."""
-    if not articles:
-        return [
-            "Futuristic AI technology concept, neural networks visualization, digital art",
-            "Cutting-edge machine learning research, data visualization, sci-fi aesthetic",
-            "Advanced robotics and automation, modern tech laboratory, cinematic lighting",
-            "Quantum computing breakthrough, abstract technology art, photorealistic"
-        ]
-
+    """Generate educational infographic prompts for tech topics."""
+    educational_topics = [
+        "Python Programming Fundamentals",
+        "Java Object-Oriented Programming",
+        "AWS Cloud Architecture & Services",
+        "Artificial Intelligence & Machine Learning",
+        "Generative AI & Large Language Models",
+        "System Design & Scalable Architecture",
+        "Cloud Computing Fundamentals",
+        "Cybersecurity Best Practices",
+        "Data Structures & Algorithms",
+        "Technical Interview Preparation"
+    ]
+    
+    base_prompt = (
+        "Modern educational infographic, 4:5 ratio, clean premium technology/education aesthetic. "
+        "Clear headline at top, strong visual hierarchy: Topic -> Core Concept -> Key Points -> Practical Takeaway. "
+        "Use simple diagrams, icons, flow arrows, visual metaphors. Minimal text, short labels only. "
+        "Professional color palette: blues, teals, whites, subtle accents. High-quality, sharp, polished. "
+        "Include subtle AI/tech elements: neural networks, code snippets, cloud architecture, data flows where relevant. "
+        "Technically accurate, no invented concepts. Watermark 'Vijayakumarj_ai' bottom right corner. "
+        "Optimized for LinkedIn, Instagram, YouTube, educational blogs."
+    )
+    
     prompts = []
-    for art in articles[:count]:
-        title = art.get("title", "Tech News")
-        desc = art.get("description", "")[:200]
-        prompt = f"Tech news illustration: {title}. {desc}. Futuristic digital art, cinematic lighting, photorealistic, no text"
+    for topic in educational_topics[:count]:
+        prompt = f"{base_prompt} Topic: {topic}. Create a clear educational infographic explaining the core concepts, key components, and practical applications of {topic}."
         prompts.append(prompt)
-
+    
     while len(prompts) < count:
-        prompts.append("Technology innovation concept, AI and future tech, digital art")
+        extra_topic = educational_topics[len(prompts) % len(educational_topics)]
+        prompt = f"{base_prompt} Topic: {extra_topic}. Create a clear educational infographic explaining the core concepts, key components, and practical applications of {extra_topic}."
+        prompts.append(prompt)
 
     return prompts[:count]
 
@@ -634,7 +649,7 @@ def run_image_post_pipeline(dry_run=False):
         prompts=prompts,
         image_url=None,
         keywords=keywords[:6],
-        aspect_ratio="9:16"  # Instagram portrait format
+        aspect_ratio="4:5"  # Educational Instagram image format (4:5 ratio)
     )
 
     if not image_paths:
