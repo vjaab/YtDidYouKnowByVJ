@@ -146,9 +146,9 @@ class PlaywrightRenderer:
         return self._context
 
     async def close(self):
-        if self._browser:
+        if getattr(self, '_browser', None):
             await self._browser.close()
-        if self._playwright:
+        if getattr(self, '_playwright', None):
             await self._playwright.stop()
 
     async def render_html_to_image(self, html: str, output_path: str, width: int = 1080, height: int = 1350) -> str:
