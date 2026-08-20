@@ -12,7 +12,7 @@ from content.schemas import (
 )
 
 from content.validator import validate_content
-from content.schemas import EducationalContent, TopicCategory, DifficultyLevel, VisualType, ComparisonTable
+from llm_fallback import call_fallback_chain, normalize_llm_response
 
 
 CATEGORY_KEYWORDS = {
@@ -319,15 +319,14 @@ class ContentGenerator:
         if "infographic" in invalid_sections:
             sections_to_fix.append("infographic points")
         
-        fix_prompt = f"""The previous response had validation errors in: {', '.join(sections_to_fix)}.
-
-Generate ONLY the corrected JSON for these sections. Output a partial JSON object with ONLY the corrected fields.
-
-Example format for comparison:
-  "comparison": {{"title": "X vs Y", "header_a": "A", "header_b": "B", "rows": [{{"feature": "Feature", "option_a": "A", "option_b": "B"}}]}}
-
-Example for flowchart:
-  "flowchart": {{"title": "Flow", "steps": [{{"label": "Step 1"}, {{"label": "Step 2"}}]}}"""
+        fix_prompt = (
+            "The previous response had validation errors in: {sections}.\n\n"
+            "Generate ONLY the corrected JSON for these sections. Output a partial JSON object with ONLY the corrected fields.\n\n"
+            'Example format for comparison:\n'
+            '  "comparison": {"title": "X vs Y", "header_a": "A", "header_b": "B", "rows": [{"feature": "Feature", "option_a": "A", "option_b": "B"}]}\n\n'
+            'Example for flowchart:\n'
+            '  "flowchart": {"title": "Flow", "steps": [{"label": "Step 1"}, {"label": "Step 2"}]}'
+        ).format(sections=', '.join(sections_to_fix))
 
         focused_prompt = user_prompt + "\n\n" + fix_prompt + "\n\nOutput ONLY the corrected JSON fields."
         
