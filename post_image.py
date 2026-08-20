@@ -106,6 +106,38 @@ def load_topics_from_file() -> list:
     return []
 
 
+def get_next_topic_round_robin() -> str:
+    """Get the next topic in round-robin fashion."""
+    all_topics = load_topics_from_file() or DEFAULT_TOPICS
+    if not all_topics:
+        return DEFAULT_TOPICS[0]
+    
+    # Track file for round-robin state
+    state_file = Path(BASE_DIR) / ".topic_index.json"
+    
+    current_index = 0
+    if state_file.exists():
+        try:
+            with open(state_file) as f:
+                state = json.load(f)
+                current_index = state.get("index", 0)
+        except Exception:
+            current_index = 0
+    
+    # Get current topic
+    topic = all_topics[current_index % len(all_topics)]
+    
+    # Update index for next run
+    next_index = (current_index + 1) % len(all_topics)
+    try:
+        with open(state_file, "w") as f:
+            json.dump({"index": next_index}, f)
+    except Exception as e:
+        print(f"⚠️ Failed to save topic index: {e}")
+    
+    return topic
+
+
 async def run_education_pipeline(dry_run=False, topic=None, topics=None, audience=None, difficulty=None):
     """Main pipeline using the new education content system."""
     print("=" * 60)
@@ -121,17 +153,15 @@ async def run_education_pipeline(dry_run=False, topic=None, topics=None, audienc
     elif topics:
         topic_list = topics
     else:
-        all_topics = load_topics_from_file() or DEFAULT_TOPICS
-        topic_list = all_topics[:4]  # Use 4 per run
+        # Round-robin: pick one topic per run
+        topic_list = [get_next_topic_round_robin()]
     
     if audience is None:
         audience = ["students", "developers"]
     if difficulty is None:
         difficulty = DifficultyLevel.INTERMEDIATE
 
-    print(f"\n📋 Topics to process: {len(topic_list)}")
-    for i, t in enumerate(topic_list, 1):
-        print(f"  {i}. {t}")
+    print(f"\n📋 Topic to process: {topic_list[0]}")
     print(f"👥 Audience: {', '.join(audience)}")
     print(f"📊 Difficulty: {difficulty.value}")
 
