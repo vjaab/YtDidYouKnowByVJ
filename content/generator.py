@@ -1,7 +1,8 @@
 import json
 import os
+import re
 import requests
-from typing import Optional, List
+from typing import Optional, List, Any, Dict
 from google import genai
 from google.genai import types
 
@@ -10,6 +11,100 @@ from content.schemas import (
     Quiz, QuizOption, Flowchart, FlowchartStep, Infographic, InfographicPoint,
     CodeSnippet, ArchitectureDiagram, ArchitectureComponent, ComparisonTable, ComparisonRow
 )
+
+
+def normalize_llm_response(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Normalize LLM response to match EducationalContent schema."""
+    if not isinstance(data, dict):
+        return data
+    
+    # Normalize quiz options: strings -> objects
+    if "quiz" in data and isinstance(data["quiz"], dict):
+        quiz = data["quiz"]
+        if "options" in quiz and isinstance(quiz["options"], list):
+            normalized_options = []
+            for i, opt in enumerate(quiz["options"]):
+                if isinstance(opt, str):
+                    # Parse string like "A. Option text" or just "Option text"
+                    text = opt
+                    # Remove leading letter if present (A., B., etc.)
+                    text = re.sub(r'^[A-D][\.\)]\s*', '', text).strip()
+                    is_correct = (i == 0)  # Default first as correct
+                    normalized_options.append({"text": text, "is_correct": is_correct})
+                elif isinstance(opt, dict):
+                    # Ensure required fields
+                    normalized_options.append({
+                        "text": opt.get("text", opt.get("option", str(opt))),
+                        "is_correct": opt.get("is_correct", opt.get("correct", False))
+                    })
+                else:
+                    normalized_options.append({"text": str(opt), "is_correct": (i == 0)})
+            quiz["options"] = normalized_options[:4]  # Max 4
+    
+    # Normalize infographic points: ensure label/value structure
+    if "infographic" in data and isinstance(data["infographic"], dict):
+        infographic = data["infographic"]
+        if "points" in infographic and isinstance(infographic["points"], list):
+            normalized_points = []
+            for point in infographic["points"]:
+                if isinstance(point, dict):
+                    # If point has 'title' and 'description' instead of 'label' and 'value'
+                    label = point.get("label", point.get("title", point.get("key", "Point")))
+                    value = point.get("value", point.get("description", point.get("detail", "")))
+                    normalized_points.append({"label": label, "value": value, "icon": point.get("icon")})
+                elif isinstance(point, str):
+                    normalized_points.append({"label": "Point", "value": point})
+            infographic["points"] = normalized_points[:6]  # Max 6
+    
+    # Normalize flowchart steps
+    if "flowchart" in data and isinstance(data["flowchart"], dict):
+        fc = data["flowchart"]
+        if "steps" in fc and isinstance(fc["steps"], list):
+            normalized_steps = []
+            for step in fc["steps"]:
+                if isinstance(step, dict):
+                    label = step.get("label", step.get("title", step.get("step", "Step")))
+                    desc = step.get("description", step.get("detail", ""))
+                    normalized_steps.append({"label": label, "description": desc})
+                elif isinstance(step, str):
+                    normalized_steps.append({"label": step, "description": ""})
+            fc["steps"] = normalized_steps[:7]  # Max 7
+    
+    # Normalize architecture components
+    if "architecture" in data and isinstance(data["architecture"], dict):
+        arch = data["architecture"]
+        if "components" in arch and isinstance(arch["components"], list):
+            normalized_comps = []
+            for comp in arch["components"]:
+                if isinstance(comp, dict):
+                    name = comp.get("name", comp.get("title", comp.get("component", "Component")))
+                    desc = comp.get("description", comp.get("detail", ""))
+                    icon = comp.get("icon", "⚙️")
+                    conns = comp.get("connections", comp.get("connects_to", []))
+                    normalized_comps.append({"name": name, "description": desc, "icon": icon, "connections": conns})
+                elif isinstance(comp, str):
+                    normalized_comps.append({"name": comp, "description": "", "icon": "⚙️", "connections": []})
+            arch["components"] = normalized_comps[:8]  # Max 8
+    
+    # Normalize code snippet
+    if "code" in data and isinstance(data["code"], dict):
+        code = data["code"]
+        if "content" in code and not isinstance(code["content"], str):
+            code["content"] = str(code["content"])
+        if "language" not in code:
+            code["language"] = "python"
+    
+    # Ensure required fields have defaults
+    if "takeaway" not in data or not data["takeaway"]:
+        data["takeaway"] = "Key concept understood."
+    if "cta" not in data or not data["cta"]:
+        data["cta"] = "Save this for later!"
+    if "hook" not in data or not data["hook"]:
+        data["hook"] = "Learn this essential concept."
+    if "visual_strategy" not in data:
+        data["visual_strategy"] = ["infographic", "flowchart", "quiz"]
+    
+    return data
 
 
 CATEGORY_KEYWORDS = {
@@ -227,11 +322,13 @@ class ContentGenerator:
         if not groq_key:
             return None
         
+        # Updated Groq model names (as of 2024/2025)
         groq_models = [
             "llama-3.3-70b-versatile",
-            "qwen/qwen3-32b",
-            "openai/gpt-oss-20b",
+            "llama-3.1-70b-versatile",
             "llama-3.1-8b-instant",
+            "mixtral-8x7b-32768",
+            "gemma2-9b-it",
         ]
         
         headers = {
@@ -310,7 +407,7 @@ class ContentGenerator:
                 print(f"⚠️ Cloudflare ({model_name}) exception: {e}")
         return None
 
-    def _call_opencode(self, user_prompt: str) -> Optional[EducationalContent]:
+    def _call_opencode(self, user_prompt: str) -> Optional[Dict[str, Any]]:
         """Try OpenCode Zen."""
         opencode_key = os.getenv("OPENCODE_API_KEY")
         if not opencode_key:
@@ -326,9 +423,10 @@ class ContentGenerator:
             payload = {
                 "model": model_name,
                 "messages": [{"role": "user", "content": user_prompt}],
+                "response_format": {"type": "json_object"},
                 "temperature": 0.3,
             }
-            r = requests.post("https://opencode.ai/zen/v1/chat/completions", json=payload, headers=headers, timeout=60)
+            r = requests.post("https://opencode.ai/zen/v1/chat/completions", json=payload, headers=headers, timeout=90)
             if r.status_code == 200:
                 content = safe_extract_choices(r.json(), "OpenCode Zen")
                 if content:
@@ -545,14 +643,14 @@ class ContentGenerator:
                 print(f"⚠️ OpenRouter ({model_name}) exception: {e}")
         return None
 
-    def _generate_with_fallback(self, user_prompt: str) -> Optional[EducationalContent]:
-        """Try all providers in order until one succeeds."""
+    def _generate_with_fallback(self, user_prompt: str) -> Optional[Dict[str, Any]]:
+        """Try all providers in order until one succeeds. Returns normalized dict."""
         
         # 1. Try Gemini first
         result = self._call_gemini(user_prompt)
         if result:
             print("✅ Gemini succeeded")
-            return result
+            return normalize_llm_response(result)
         
         print("🚨 Gemini failed all models. Attempting fallback providers...")
         
@@ -576,7 +674,7 @@ class ContentGenerator:
                 result = func(user_prompt)
                 if result:
                     print(f"✅ {name} succeeded")
-                    return result
+                    return normalize_llm_response(result)
             except Exception as e:
                 print(f"⚠️ {name} fallback failed: {e}")
         
@@ -613,7 +711,12 @@ class ContentGenerator:
         if not content_json:
             raise RuntimeError(f"All LLM providers failed for topic: {topic}")
         
+        # Ensure visual_strategy is set
         content_json["visual_strategy"] = [s.value for s in visual_strategy]
+        content_json["category"] = category.value
+        content_json["difficulty"] = difficulty.value
+        content_json["audience"] = audience
+        
         return EducationalContent(**content_json)
 
     def generate_batch(self, topics: list, audience: list = None, difficulty: DifficultyLevel = None) -> list[EducationalContent]:
