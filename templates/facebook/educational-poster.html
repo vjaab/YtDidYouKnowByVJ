@@ -1,0 +1,160 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<div class="facebook-poster" style="height: 100%; display: flex; flex-direction: column;">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <span class="header-badge">{{ category_display }}</span>
+            <h1 class="header-title">{{ topic }}</h1>
+            {% if difficulty %}
+            <span class="header-subtitle">{{ difficulty_display }} • {{ reading_time }} min read</span>
+            {% endif %}
+        </div>
+    </header>
+
+    <!-- Hook -->
+    <div class="hook-card">
+        <p class="hook-text">{{ hook }}</p>
+    </div>
+
+    <!-- Main Content Scroll Area -->
+    <main style="flex: 1; overflow-y: auto; padding: var(--spacing-lg);">
+        
+        <!-- Infographic Section -->
+        {% if infographic %}
+        <div class="section-title">
+            <span>💡 Key Concepts</span>
+        </div>
+        <div class="infographic-card">
+            {% for point in infographic.points %}
+            <div class="infographic-item">
+                <div class="infographic-icon">{{ point.icon or '📌' }}</div>
+                <div class="infographic-label">{{ point.label }}</div>
+                <div class="infographic-value">{{ point.value }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Code Section -->
+        {% if code %}
+        <div class="section-title">
+            <span>💻 Code Example</span>
+        </div>
+        <div class="code-card">
+            <div class="code-header">
+                <span class="code-language">{{ code.language }}</span>
+                <div class="code-actions">
+                    <button class="code-copy">Copy</button>
+                </div>
+            </div>
+            <pre class="code-content"><code>{{ code.content }}</code></pre>
+        </div>
+        {% endif %}
+
+        <!-- Architecture Section -->
+        {% if architecture %}
+        <div class="section-title">
+            <span>🏗️ {{ architecture.title }}</span>
+        </div>
+        <div class="architecture-diagram">
+            {% for i, component in enumerate(architecture.components) %}
+            {% if i > 0 and i % 3 == 0 %}
+            </div><div class="arch-row">
+            {% elif i > 0 %}
+            <div class="arch-connection">→</div>
+            {% endif %}
+            <div class="arch-component">
+                <div class="arch-component-icon">{{ component.icon or '⚙️' }}</div>
+                <div class="arch-component-name">{{ component.name }}</div>
+                <div class="arch-component-description">{{ component.description }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Flowchart Section -->
+        {% if flowchart %}
+        <div class="section-title">
+            <span>🔄 {{ flowchart.title }}</span>
+        </div>
+        <div class="flowchart">
+            {% for step in flowchart.steps %}
+            <div class="flow-step">
+                <div class="flow-step-content">
+                    <div class="flow-step-label">{{ step.label }}</div>
+                    {% if step.description %}
+                    <div class="flow-step-description">{{ step.description }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Comparison Section -->
+        {% if comparison %}
+        <div class="section-title">
+            <span>⚖️ {{ comparison.title }}</span>
+        </div>
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>{{ comparison.header_a }}</th>
+                    <th>{{ comparison.header_b }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in comparison.rows %}
+                <tr>
+                    <td>{{ row.feature }}</td>
+                    <td>{{ row.option_a }}</td>
+                    <td>{{ row.option_b }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        <!-- Quiz Section -->
+        {% if quiz %}
+        <div class="section-title">
+            <span>🧠 Quick Quiz</span>
+        </div>
+        <div class="quiz-card">
+            <div class="quiz-header">Test Your Understanding</div>
+            <div class="quiz-question">{{ quiz.question }}</div>
+            <div class="quiz-options">
+                {% for option in quiz.options %}
+                <div class="quiz-option {% if option.is_correct %}correct{% endif %}" data-correct="{{ option.is_correct }}">
+                    <span class="quiz-option-letter">{{ loop.index0 | int_to_letter }}</span>
+                    <span class="quiz-option-text">{{ option.text }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="quiz-explanation">
+                <strong>Explanation:</strong> {{ quiz.explanation }}
+            </div>
+        </div>
+        {% endif %}
+
+    </main>
+
+    <!-- Takeaway -->
+    <div class="takeaway-card" style="margin: var(--spacing-lg);">
+        <div class="takeaway-icon">💡</div>
+        <div class="takeaway-text">{{ takeaway }}</div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-brand">
+            <div class="footer-logo">VJ</div>
+            <span class="footer-handle">{{ brand_handle }}</span>
+        </div>
+        <div class="footer-cta">{{ cta }}</div>
+    </footer>
+</div>
+{% endblock %}

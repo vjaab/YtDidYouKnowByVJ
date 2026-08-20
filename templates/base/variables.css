@@ -1,0 +1,38 @@
+:root {
+    --width: {{ width }}px;
+    --height: {{ height }}px;
+    --theme-color: {{ theme_color }};
+    --theme-color-light: {{ theme_color_light }};
+    --theme-color-dark: {{ theme_color_dark }};
+    --font-family: '{{ font_family }}', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-size-base: {{ font_size_base }}px;
+    --font-size-sm: {{ font_size_sm }}px;
+    --font-size-lg: {{ font_size_lg }}px;
+    --font-size-xl: {{ font_size_xl }}px;
+    --font-size-2xl: {{ font_size_2xl }}px;
+    --spacing-xs: {{ spacing_xs }}px;
+    --spacing-sm: {{ spacing_sm }}px;
+    --spacing-md: {{ spacing_md }}px;
+    --spacing-lg: {{ spacing_lg }}px;
+    --spacing-xl: {{ spacing_xl }}px;
+    --radius-sm: {{ radius_sm }}px;
+    --radius-md: {{ radius_md }}px;
+    --radius-lg: {{ radius_lg }}px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F8FAFC;
+    --bg-tertiary: #F1F5F9;
+    --text-primary: #0F172A;
+    --text-secondary: #334155;
+    --text-muted: #64748B;
+    --border-color: #E2E8F0;
+    --accent-color: var(--theme-color);
+    --accent-bg: {{ theme_color_bg }};
+    --success-color: #10B981;
+    --warning-color: #F59E0B;
+    --error-color: #EF4444;
+    --code-bg: #0F172A;
+    --code-text: #E2E8F0;
+}

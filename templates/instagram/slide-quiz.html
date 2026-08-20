@@ -1,0 +1,80 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<div class="instagram-slide slide-quiz" style="height: 100%; display: flex; flex-direction: column; padding: var(--spacing-lg);">
+    <!-- Top bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+        <span class="header-badge" style="background: var(--accent-bg); color: var(--theme-color);">{{ category_display }}</span>
+        <div class="slide-indicator">
+            <span>Slide 4 of {{ total_slides }}</span>
+            <div class="slide-dots">
+                <div class="slide-dot"></div>
+                <div class="slide-dot"></div>
+                <div class="slide-dot"></div>
+                <div class="slide-dot active"></div>
+                {% for i in range(5, total_slides + 1) %}
+                <div class="slide-dot"></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Header -->
+    <div style="text-align: center; margin-bottom: var(--spacing-lg); padding: var(--spacing-md); background: var(--theme-color); color: white; border-radius: var(--radius-lg);">
+        <div style="font-size: 32px; margin-bottom: var(--spacing-xs);">🧠</div>
+        <div style="font-weight: 700; font-size: var(--font-size-lg);">Quick Quiz</div>
+    </div>
+
+    <!-- Question -->
+    <div class="quiz-question" style="text-align: center; margin-bottom: var(--spacing-lg); font-size: var(--font-size-lg);">
+        {{ quiz.question if quiz else 'What does this concept do?' }}
+    </div>
+
+    <!-- Options -->
+    <div class="quiz-options" style="flex: 1; display: flex; flex-direction: column; gap: var(--spacing-md); justify-content: center;">
+        {% if quiz %}
+        {% for option in quiz.options %}
+        <button class="quiz-option" style="text-align: left; width: 100%; padding: var(--spacing-lg); font-size: var(--font-size-base);">
+            <span class="quiz-option-letter" style="width: 40px; height: 40px; font-size: var(--font-size-base);">{{ loop.index0 | int_to_letter }}</span>
+            <span class="quiz-option-text">{{ option.text }}</span>
+        </button>
+        {% endfor %}
+        {% else %}
+        <button class="quiz-option" style="text-align: left; width: 100%; padding: var(--spacing-lg); font-size: var(--font-size-base);">
+            <span class="quiz-option-letter">A</span>
+            <span class="quiz-option-text">Option A</span>
+        </button>
+        <button class="quiz-option" style="text-align: left; width: 100%; padding: var(--spacing-lg); font-size: var(--font-size-base);">
+            <span class="quiz-option-letter">B</span>
+            <span class="quiz-option-text">Option B</span>
+        </button>
+        <button class="quiz-option" style="text-align: left; width: 100%; padding: var(--spacing-lg); font-size: var(--font-size-base);">
+            <span class="quiz-option-letter">C</span>
+            <span class="quiz-option-text">Option C</span>
+        </button>
+        <button class="quiz-option" style="text-align: left; width: 100%; padding: var(--spacing-lg); font-size: var(--font-size-base);">
+            <span class="quiz-option-letter">D</span>
+            <span class="quiz-option-text">Option D</span>
+        </button>
+        {% endif %}
+    </div>
+
+    <!-- Swipe hint -->
+    <div style="text-align: center; color: var(--text-muted); font-size: var(--font-size-sm); margin-top: var(--spacing-md); animation: pulse 2s infinite;">
+        Swipe for answer →
+    </div>
+
+    <!-- Footer brand -->
+    <div class="footer-brand" style="justify-content: center;">
+        <div class="footer-logo">VJ</div>
+        <span class="footer-handle">{{ brand_handle }}</span>
+    </div>
+
+    <style>
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+    </style>
+</div>
+{% endblock %}

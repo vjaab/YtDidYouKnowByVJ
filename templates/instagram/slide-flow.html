@@ -1,0 +1,102 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<div class="instagram-slide slide-flow" style="height: 100%; display: flex; flex-direction: column; padding: var(--spacing-lg);">
+    <!-- Top bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+        <span class="header-badge" style="background: var(--accent-bg); color: var(--theme-color);">{{ category_display }}</span>
+        <div class="slide-indicator">
+            <span>Slide 3 of {{ total_slides }}</span>
+            <div class="slide-dots">
+                <div class="slide-dot"></div>
+                <div class="slide-dot"></div>
+                <div class="slide-dot active"></div>
+                {% for i in range(4, total_slides + 1) %}
+                <div class="slide-dot"></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Title -->
+    <h2 class="section-title" style="margin-top: 0; text-align: center;">{{ flowchart.title if flowchart else 'How It Works' }}</h2>
+
+    <!-- Flowchart -->
+    <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: var(--spacing-md); padding: var(--spacing-md);">
+        
+        {% if flowchart %}
+        {% if flowchart.steps | length <= 4 %}
+        <!-- Vertical flowchart for mobile -->
+        <div class="flowchart">
+            {% for step in flowchart.steps %}
+            <div class="flow-step">
+                <div class="flow-step-content">
+                    <div class="flow-step-label">{{ step.label }}</div>
+                    {% if step.description %}
+                    <div class="flow-step-description">{{ step.description }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- Horizontal flowchart for more steps -->
+        <div class="flowchart-horizontal" style="overflow-x: auto; padding-bottom: var(--spacing-md);">
+            {% for step in flowchart.steps %}
+            <div class="flow-node {% if loop.first %}active{% endif %}">
+                <div class="flow-node-label">{{ step.label }}</div>
+                {% if step.description %}
+                <div class="flow-node-description">{{ step.description }}</div>
+                {% endif %}
+            </div>
+            {% if not loop.last %}
+            <div class="flow-arrow">→</div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="flowchart">
+            <div class="flow-step">
+                <div class="flow-step-content">
+                    <div class="flow-step-label">Define Concept</div>
+                </div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-step-content">
+                    <div class="flow-step-label">Apply Pattern</div>
+                </div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-step-content">
+                    <div class="flow-step-label">Execute</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if architecture %}
+        <div class="architecture-diagram" style="margin-top: var(--spacing-lg);">
+            {% for i, component in enumerate(architecture.components[:4]) %}
+            {% if i > 0 and i % 2 == 0 %}
+            </div><div class="arch-row">
+            {% elif i > 0 %}
+            <div class="arch-connection">→</div>
+            {% endif %}
+            <div class="arch-component">
+                <div class="arch-component-icon">{{ component.icon or '⚙️' }}</div>
+                <div class="arch-component-name">{{ component.name }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- Footer brand -->
+    <div class="footer-brand" style="justify-content: center; margin-top: auto;">
+        <div class="footer-logo">VJ</div>
+        <span class="footer-handle">{{ brand_handle }}</span>
+    </div>
+</div>
+{% endblock %}

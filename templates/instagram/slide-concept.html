@@ -1,0 +1,63 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<div class="instagram-slide slide-concept" style="height: 100%; display: flex; flex-direction: column; padding: var(--spacing-lg);">
+    <!-- Top bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+        <span class="header-badge" style="background: var(--accent-bg); color: var(--theme-color);">{{ category_display }}</span>
+        <div class="slide-indicator">
+            <span>Slide 2 of {{ total_slides }}</span>
+            <div class="slide-dots">
+                <div class="slide-dot"></div>
+                <div class="slide-dot active"></div>
+                {% for i in range(3, total_slides + 1) %}
+                <div class="slide-dot"></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Title -->
+    <h2 class="section-title" style="margin-top: 0; text-align: center;">What is {{ topic }}?</h2>
+
+    <!-- Content -->
+    <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: var(--spacing-lg);">
+        
+        {% if infographic %}
+        <div class="infographic-card" style="grid-template-columns: 1fr;">
+            {% for point in infographic.points[:3] %}
+            <div class="infographic-item" style="flex-direction: row; text-align: left; gap: var(--spacing-md);">
+                <div class="infographic-icon">{{ point.icon or '📌' }}</div>
+                <div>
+                    <div class="infographic-label">{{ point.label }}</div>
+                    <div class="infographic-value">{{ point.value }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: var(--spacing-lg);">
+            <p style="font-size: var(--font-size-lg); line-height: 1.6; color: var(--text-secondary);">
+                {{ hook }}
+            </p>
+        </div>
+        {% endif %}
+
+        {% if code %}
+        <div class="code-card">
+            <div class="code-header">
+                <span class="code-language">{{ code.language }}</span>
+            </div>
+            <pre class="code-content"><code>{{ code.content }}</code></pre>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- Footer brand -->
+    <div class="footer-brand" style="justify-content: center; margin-top: auto;">
+        <div class="footer-logo">VJ</div>
+        <span class="footer-handle">{{ brand_handle }}</span>
+    </div>
+</div>
+{% endblock %}

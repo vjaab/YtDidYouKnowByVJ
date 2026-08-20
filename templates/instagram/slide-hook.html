@@ -1,0 +1,40 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<div class="instagram-slide slide-hook" style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: var(--spacing-xl);">
+    <!-- Top badge -->
+    <div style="position: absolute; top: var(--spacing-lg); left: var(--spacing-lg); right: var(--spacing-lg); display: flex; justify-content: space-between; align-items: flex-start; z-index: 10;">
+        <span class="header-badge" style="background: rgba(255,255,255,0.9); color: var(--theme-color);">{{ category_display }}</span>
+        <div class="slide-indicator">
+            <span>Slide 1 of {{ total_slides }}</span>
+            <div class="slide-dots">
+                <div class="slide-dot active"></div>
+                {% for i in range(2, total_slides + 1) %}
+                <div class="slide-dot"></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Hook content -->
+    <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; max-width: 90%;">
+        <div style="font-size: 64px; margin-bottom: var(--spacing-lg); opacity: 0.9;">🎯</div>
+        <h1 style="font-size: var(--font-size-2xl); font-weight: 800; color: white; line-height: 1.2; margin-bottom: var(--spacing-md);">{{ topic }}</h1>
+        <p style="font-size: var(--font-size-xl); font-weight: 500; color: rgba(255,255,255,0.95); line-height: 1.4;">{{ hook }}</p>
+    </div>
+
+    <!-- Swipe indicator -->
+    <div style="position: absolute; bottom: var(--spacing-xl); left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm); color: rgba(255,255,255,0.8);">
+        <div style="animation: bounce 2s infinite;">👇</div>
+        <span style="font-size: var(--font-size-sm); font-weight: 500;">Swipe to learn →</span>
+    </div>
+
+    <style>
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+    </style>
+</div>
+{% endblock %}

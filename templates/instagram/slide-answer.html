@@ -1,0 +1,86 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<div class="instagram-slide slide-answer" style="height: 100%; display: flex; flex-direction: column; padding: var(--spacing-lg);">
+    <!-- Top bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+        <span class="header-badge" style="background: #ECFDF5; color: #10B981;">✅ Answer</span>
+        <div class="slide-indicator">
+            <span>Slide 5 of {{ total_slides }}</span>
+            <div class="slide-dots">
+                <div class="slide-dot"></div>
+                <div class="slide-dot"></div>
+                <div class="slide-dot"></div>
+                <div class="slide-dot"></div>
+                <div class="slide-dot active"></div>
+                {% for i in range(6, total_slides + 1) %}
+                <div class="slide-dot"></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Answer Header -->
+    <div style="text-align: center; margin-bottom: var(--spacing-lg); padding: var(--spacing-md); background: #ECFDF5; border-radius: var(--radius-lg); border: 2px solid #10B981;">
+        <div style="font-size: 48px; margin-bottom: var(--spacing-xs);">✅</div>
+        <div style="font-weight: 800; font-size: var(--font-size-xl); color: #10B981;">Correct Answer</div>
+    </div>
+
+    <!-- Explanation -->
+    <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: var(--spacing-lg); text-align: center;">
+        
+        {% if quiz %}
+        <div style="padding: var(--spacing-lg); background: var(--bg-secondary); border-radius: var(--radius-lg); border: 2px solid var(--theme-color);">
+            <div style="font-weight: 700; font-size: var(--font-size-lg); color: var(--theme-color); margin-bottom: var(--spacing-sm);">
+                {{ quiz.options | selectattr('is_correct') | map(attribute='text') | first | default('Option B') }}
+            </div>
+            <div style="font-size: var(--font-size-base); color: var(--text-secondary); line-height: 1.6;">
+                {{ quiz.explanation }}
+            </div>
+        </div>
+
+        <!-- Related concepts -->
+        <div style="padding: var(--spacing-md); background: var(--accent-bg); border-radius: var(--radius-lg); border: 1px solid var(--theme-color);">
+            <div style="font-weight: 700; font-size: var(--font-size-sm); color: var(--theme-color); margin-bottom: var(--spacing-xs);">
+                💡 Decorators can add:
+            </div>
+            <div style="font-size: var(--font-size-sm); color: var(--text-secondary); display: flex; flex-wrap: wrap; justify-content: center; gap: var(--spacing-sm);">
+                <span>• Caching</span>
+                <span>• Logging</span>
+                <span>• Auth</span>
+                <span>• Monitoring</span>
+            </div>
+        </div>
+        {% else %}
+        <div style="padding: var(--spacing-lg); background: var(--bg-secondary); border-radius: var(--radius-lg); border: 2px solid var(--theme-color);">
+            <div style="font-weight: 700; font-size: var(--font-size-lg); color: var(--theme-color); margin-bottom: var(--spacing-sm);">
+                Option B
+            </div>
+            <div style="font-size: var(--font-size-base); color: var(--text-secondary); line-height: 1.6;">
+                This is the correct answer because it accurately describes the concept.
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Takeaway -->
+        <div class="takeaway-card">
+            <div class="takeaway-icon">💡</div>
+            <div class="takeaway-text">{{ takeaway }}</div>
+        </div>
+
+    </div>
+
+    <!-- CTA -->
+    <div style="text-align: center; margin-top: auto; padding: var(--spacing-lg); background: linear-gradient(135deg, var(--theme-color), var(--theme-color-dark)); border-radius: var(--radius-lg); color: white;">
+        <div style="font-size: 32px; margin-bottom: var(--spacing-sm);">📌</div>
+        <div style="font-weight: 700; font-size: var(--font-size-lg); margin-bottom: var(--spacing-xs);">{{ cta }}</div>
+        <div style="font-size: var(--font-size-sm); opacity: 0.9;">Follow for more tech tips!</div>
+    </div>
+
+    <!-- Footer brand -->
+    <div class="footer-brand" style="justify-content: center; margin-top: var(--spacing-md);">
+        <div class="footer-logo">VJ</div>
+        <span class="footer-handle">{{ brand_handle }}</span>
+    </div>
+</div>
+{% endblock %}

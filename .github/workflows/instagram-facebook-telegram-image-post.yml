@@ -36,7 +36,10 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install "numpy<2.0"
           pip install "grpcio==1.62.2"
-          pip install google-genai google-generativeai requests pillow python-dotenv
+          pip install google-genai google-generativeai requests pillow python-dotenv pydantic jinja2 playwright
+
+      - name: Install Playwright Browsers
+        run: python -m playwright install --with-deps chromium
 
       - name: Setup Environment Secrets (.env)
         run: |
