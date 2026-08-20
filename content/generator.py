@@ -1,6 +1,7 @@
 import json
 import os
-from typing import Optional
+import requests
+from typing import Optional, List
 from google import genai
 from google.genai import types
 
@@ -143,10 +144,444 @@ Generate JSON with these fields:
 Make content technically accurate, concise, and educational. Output ONLY JSON."""
 
 
+def clean_and_parse_json(content: str) -> dict:
+    """Extract and parse JSON from LLM response."""
+    raw = content.strip()
+    if "```json" in raw:
+        raw = raw[raw.find("```json")+7:raw.rfind("```")]
+    elif "```" in raw:
+        raw = raw[raw.find("```")+3:raw.rfind("```")]
+    return json.loads(raw.strip())
+
+
+def safe_extract_choices(response_or_json, provider_name: str) -> Optional[str]:
+    """Safely extract content from OpenAI-compatible response."""
+    try:
+        data = response_or_json if isinstance(response_or_json, dict) else response_or_json.json()
+        choices = data.get("choices")
+        if choices and len(choices) > 0:
+            msg = choices[0].get("message")
+            if msg and "content" in msg and msg["content"]:
+                return msg["content"].strip()
+        print(f"⚠️ [{provider_name}] Response structure unexpected")
+    except Exception as e:
+        print(f"⚠️ [{provider_name}] Failed to parse response: {e}")
+    return None
+
+
+def safe_extract_anthropic(response) -> Optional[str]:
+    """Safely extract content from Anthropic response."""
+    try:
+        data = response.json()
+        content_list = data.get("content")
+        if content_list and len(content_list) > 0:
+            text = content_list[0].get("text")
+            if text:
+                return text.strip()
+        print(f"⚠️ [Anthropic] Response structure unexpected")
+    except Exception as e:
+        print(f"⚠️ [Anthropic] Failed to parse response: {e}")
+    return None
+
+
 class ContentGenerator:
     def __init__(self, api_key: str, model: str = "gemini-2.5-flash"):
-        self.client = genai.Client(api_key=api_key)
+        self.api_key = api_key
         self.model = model
+        self.gemini_client = genai.Client(api_key=api_key)
+        self.gemini_models_to_try = [
+            "gemini-2.5-flash",
+            "gemini-2.5-pro",
+            "gemini-2.5-flash-lite",
+        ]
+
+    def _call_gemini(self, user_prompt: str) -> Optional[EducationalContent]:
+        """Try Gemini models in order."""
+        for model_name in self.gemini_models_to_try:
+            try:
+                print(f"🤖 Trying Gemini ({model_name})...")
+                response = self.gemini_client.models.generate_content(
+                    model=model_name,
+                    contents=[types.Content(role="user", parts=[types.Part(text=user_prompt)])],
+                    config=types.GenerateContentConfig(
+                        system_instruction=SYSTEM_PROMPT,
+                        temperature=0.3,
+                        response_mime_type="application/json",
+                    )
+                )
+                if response.text:
+                    content_json = json.loads(response.text)
+                    return content_json
+            except Exception as e:
+                err_str = str(e).lower()
+                print(f"⚠️ Gemini ({model_name}) failed: {e}")
+                if "429" in err_str or "quota" in err_str or "exhausted" in err_str:
+                    print(f"   Quota exceeded, trying next model...")
+                    continue
+                break
+        return None
+
+    def _call_groq(self, user_prompt: str) -> Optional[EducationalContent]:
+        """Try Groq models."""
+        groq_key = os.getenv("GROQ_API_KEY")
+        if not groq_key:
+            return None
+        
+        groq_models = [
+            "llama-3.3-70b-versatile",
+            "qwen/qwen3-32b",
+            "openai/gpt-oss-20b",
+            "llama-3.1-8b-instant",
+        ]
+        
+        headers = {
+            "Authorization": f"Bearer {groq_key}",
+            "Content-Type": "application/json"
+        }
+        
+        for model_name in groq_models:
+            print(f"🔮 Falling back to Groq ({model_name})...")
+            try:
+                payload = {
+                    "model": model_name,
+                    "messages": [{"role": "user", "content": user_prompt}],
+                    "response_format": {"type": "json_object"},
+                    "temperature": 0.3,
+                }
+                r = requests.post("https://api.groq.com/openai/v1/chat/completions", json=payload, headers=headers, timeout=30)
+                if r.status_code == 200:
+                    content = safe_extract_choices(r.json(), f"Groq {model_name}")
+                    if content:
+                        return clean_and_parse_json(content)
+                else:
+                    print(f"⚠️ Groq ({model_name}) failed: {r.status_code} - {r.text}")
+            except Exception as e:
+                print(f"⚠️ Groq ({model_name}) exception: {e}")
+        return None
+
+    def _call_cloudflare(self, user_prompt: str) -> Optional[EducationalContent]:
+        """Try Cloudflare Workers AI models."""
+        cf_token = os.getenv("CF_API_TOKEN") or os.getenv("CLOUDFLARE_API_TOKEN")
+        cf_account = os.getenv("CF_ACCOUNT_ID") or os.getenv("CLOUDFLARE_ACCOUNT_ID")
+        if not cf_token or not cf_account:
+            return None
+        
+        cf_models = [
+            "@cf/meta/llama-3.3-70b-instruct",
+            "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+            "@cf/zai-org/glm-4.7-flash",
+            "@cf/openai/gpt-oss-120b",
+            "@cf/nvidia/nemotron-3-120b-a12b",
+            "@cf/meta/llama-4-scout-17b-16e-instruct",
+            "@cf/qwen/qwq-32b",
+            "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+        ]
+        
+        headers = {
+            "Authorization": f"Bearer {cf_token}",
+            "Content-Type": "application/json"
+        }
+        gpt_oss_models = {"@cf/openai/gpt-oss-120b", "@cf/openai/gpt-oss-20b"}
+        
+        for model_name in cf_models:
+            print(f"🔮 Falling back to Cloudflare ({model_name})...")
+            try:
+                payload = {
+                    "messages": [{"role": "user", "content": user_prompt}],
+                    "response_format": {"type": "json_object"},
+                    "temperature": 0.3,
+                    "max_tokens": 4096
+                }
+                r = requests.post(
+                    f"https://api.cloudflare.com/client/v4/accounts/{cf_account}/ai/run/{model_name}",
+                    json=payload, headers=headers, timeout=60
+                )
+                if r.status_code == 200:
+                    result = r.json().get("result", {})
+                    if model_name in gpt_oss_models:
+                        content = safe_extract_choices(result, f"Cloudflare {model_name}")
+                    else:
+                        content = result.get("response", "").strip()
+                    if content:
+                        return clean_and_parse_json(content)
+                else:
+                    print(f"⚠️ Cloudflare ({model_name}) failed: {r.status_code}")
+            except Exception as e:
+                print(f"⚠️ Cloudflare ({model_name}) exception: {e}")
+        return None
+
+    def _call_opencode(self, user_prompt: str) -> Optional[EducationalContent]:
+        """Try OpenCode Zen."""
+        opencode_key = os.getenv("OPENCODE_API_KEY")
+        if not opencode_key:
+            return None
+        
+        model_name = "nemotron-3-ultra-free"
+        print(f"🔮 Falling back to OpenCode Zen ({model_name})...")
+        try:
+            headers = {
+                "Authorization": f"Bearer {opencode_key}",
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "model": model_name,
+                "messages": [{"role": "user", "content": user_prompt}],
+                "temperature": 0.3,
+            }
+            r = requests.post("https://opencode.ai/zen/v1/chat/completions", json=payload, headers=headers, timeout=60)
+            if r.status_code == 200:
+                content = safe_extract_choices(r.json(), "OpenCode Zen")
+                if content:
+                    return clean_and_parse_json(content)
+        except Exception as e:
+            print(f"⚠️ OpenCode Zen exception: {e}")
+        return None
+
+    def _call_cerebras(self, user_prompt: str) -> Optional[EducationalContent]:
+        """Try Cerebras models."""
+        cerebras_key = os.getenv("CEREBRAS_API_KEY")
+        if not cerebras_key:
+            return None
+        
+        cerebras_models = ["gpt-oss-120b", "zai-glm-4.7", "gemma-4-31b"]
+        headers = {"Authorization": f"Bearer {cerebras_key}", "Content-Type": "application/json"}
+        
+        for model_name in cerebras_models:
+            print(f"🔮 Falling back to Cerebras ({model_name})...")
+            try:
+                payload = {
+                    "model": model_name,
+                    "messages": [{"role": "user", "content": user_prompt}],
+                    "response_format": {"type": "json_object"},
+                    "temperature": 0.3,
+                }
+                r = requests.post("https://api.cerebras.ai/v1/chat/completions", json=payload, headers=headers, timeout=30)
+                if r.status_code == 200:
+                    content = safe_extract_choices(r.json(), "Cerebras")
+                    if content:
+                        return clean_and_parse_json(content)
+            except Exception as e:
+                print(f"⚠️ Cerebras ({model_name}) exception: {e}")
+        return None
+
+    def _call_nvidia(self, user_prompt: str) -> Optional[EducationalContent]:
+        """Try NVIDIA NIM."""
+        nvidia_key = os.getenv("NVIDIA_API_KEY")
+        if not nvidia_key:
+            return None
+        
+        nvidia_models = ["nvidia/llama-3.1-nemotron-70b-instruct", "meta/llama3-70b-instruct"]
+        headers = {"Authorization": f"Bearer {nvidia_key}", "Content-Type": "application/json"}
+        
+        for model_name in nvidia_models:
+            print(f"🔮 Falling back to NVIDIA NIM ({model_name})...")
+            try:
+                payload = {
+                    "model": model_name,
+                    "messages": [{"role": "user", "content": user_prompt}],
+                    "temperature": 0.3,
+                }
+                r = requests.post("https://integrate.api.nvidia.com/v1/chat/completions", json=payload, headers=headers, timeout=30)
+                if r.status_code == 200:
+                    content = safe_extract_choices(r.json(), "NVIDIA NIM")
+                    if content:
+                        return clean_and_parse_json(content)
+            except Exception as e:
+                print(f"⚠️ NVIDIA NIM ({model_name}) exception: {e}")
+        return None
+
+    def _call_mistral(self, user_prompt: str) -> Optional[EducationalContent]:
+        """Try Mistral AI."""
+        mistral_key = os.getenv("MISTRAL_API_KEY")
+        if not mistral_key:
+            return None
+        
+        mistral_models = ["mistral-large-latest", "pixtral-large-latest", "codestral-latest"]
+        headers = {"Authorization": f"Bearer {mistral_key}", "Content-Type": "application/json"}
+        
+        for model_name in mistral_models:
+            print(f"🔮 Falling back to Mistral ({model_name})...")
+            try:
+                payload = {
+                    "model": model_name,
+                    "messages": [{"role": "user", "content": user_prompt}],
+                    "response_format": {"type": "json_object"},
+                    "temperature": 0.3,
+                }
+                r = requests.post("https://api.mistral.ai/v1/chat/completions", json=payload, headers=headers, timeout=30)
+                if r.status_code == 200:
+                    content = safe_extract_choices(r.json(), "Mistral")
+                    if content:
+                        return clean_and_parse_json(content)
+            except Exception as e:
+                print(f"⚠️ Mistral ({model_name}) exception: {e}")
+        return None
+
+    def _call_github_models(self, user_prompt: str) -> Optional[EducationalContent]:
+        """Try GitHub Models."""
+        github_token = os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
+        if not github_token:
+            return None
+        
+        github_models = ["gpt-4o-mini", "meta-llama-3.1-405b-instruct"]
+        headers = {"Authorization": f"Bearer {github_token}", "Content-Type": "application/json"}
+        
+        for model_name in github_models:
+            print(f"🔮 Falling back to GitHub Models ({model_name})...")
+            try:
+                payload = {
+                    "model": model_name,
+                    "messages": [{"role": "user", "content": user_prompt}],
+                    "response_format": {"type": "json_object"},
+                    "temperature": 0.3,
+                }
+                r = requests.post("https://models.inference.ai.azure.com/chat/completions", json=payload, headers=headers, timeout=30)
+                if r.status_code == 200:
+                    content = safe_extract_choices(r.json(), "GitHub Models")
+                    if content:
+                        return clean_and_parse_json(content)
+            except Exception as e:
+                print(f"⚠️ GitHub Models ({model_name}) exception: {e}")
+        return None
+
+    def _call_openai(self, user_prompt: str) -> Optional[EducationalContent]:
+        """Try OpenAI."""
+        openai_key = os.getenv("OPENAI_API_KEY")
+        if not openai_key:
+            return None
+        
+        print("🔮 Falling back to OpenAI (gpt-4o-mini)...")
+        try:
+            headers = {"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"}
+            payload = {
+                "model": "gpt-4o-mini",
+                "messages": [{"role": "user", "content": user_prompt}],
+                "response_format": {"type": "json_object"},
+                "temperature": 0.3,
+            }
+            r = requests.post("https://api.openai.com/v1/chat/completions", json=payload, headers=headers, timeout=30)
+            if r.status_code == 200:
+                content = safe_extract_choices(r.json(), "OpenAI")
+                if content:
+                    return clean_and_parse_json(content)
+        except Exception as e:
+            print(f"⚠️ OpenAI exception: {e}")
+        return None
+
+    def _call_anthropic(self, user_prompt: str) -> Optional[EducationalContent]:
+        """Try Anthropic Claude."""
+        anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+        if not anthropic_key:
+            return None
+        
+        print("🔮 Falling back to Anthropic (claude-3-5-haiku-20241022)...")
+        try:
+            headers = {
+                "x-api-key": anthropic_key,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json"
+            }
+            payload = {
+                "model": "claude-3-5-haiku-20241022",
+                "max_tokens": 4000,
+                "messages": [{"role": "user", "content": user_prompt}]
+            }
+            r = requests.post("https://api.anthropic.com/v1/messages", json=payload, headers=headers, timeout=30)
+            if r.status_code == 200:
+                content = safe_extract_anthropic(r)
+                if content:
+                    return clean_and_parse_json(content)
+        except Exception as e:
+            print(f"⚠️ Anthropic exception: {e}")
+        return None
+
+    def _call_deepseek(self, user_prompt: str) -> Optional[EducationalContent]:
+        """Try DeepSeek."""
+        deepseek_key = os.getenv("DEEPSEEK_API_KEY")
+        if not deepseek_key:
+            return None
+        
+        print("🔮 Falling back to DeepSeek (deepseek-chat)...")
+        try:
+            headers = {"Authorization": f"Bearer {deepseek_key}", "Content-Type": "application/json"}
+            payload = {
+                "model": "deepseek-chat",
+                "messages": [{"role": "user", "content": user_prompt}],
+                "response_format": {"type": "json_object"},
+                "temperature": 0.3,
+            }
+            r = requests.post("https://api.deepseek.com/chat/completions", json=payload, headers=headers, timeout=30)
+            if r.status_code == 200:
+                content = safe_extract_choices(r.json(), "DeepSeek")
+                if content:
+                    return clean_and_parse_json(content)
+        except Exception as e:
+            print(f"⚠️ DeepSeek exception: {e}")
+        return None
+
+    def _call_openrouter(self, user_prompt: str) -> Optional[EducationalContent]:
+        """Try OpenRouter."""
+        openrouter_key = os.getenv("OPENROUTER_API_KEY")
+        if not openrouter_key:
+            return None
+        
+        openrouter_models = ["openrouter/free", "meta-llama/llama-3.3-70b-instruct"]
+        headers = {"Authorization": f"Bearer {openrouter_key}", "Content-Type": "application/json"}
+        
+        for model_name in openrouter_models:
+            print(f"🔮 Falling back to OpenRouter ({model_name})...")
+            try:
+                payload = {
+                    "model": model_name,
+                    "messages": [{"role": "user", "content": user_prompt}],
+                    "temperature": 0.3,
+                }
+                r = requests.post("https://openrouter.ai/api/v1/chat/completions", json=payload, headers=headers, timeout=30)
+                if r.status_code == 200:
+                    content = safe_extract_choices(r.json(), "OpenRouter")
+                    if content:
+                        return clean_and_parse_json(content)
+            except Exception as e:
+                print(f"⚠️ OpenRouter ({model_name}) exception: {e}")
+        return None
+
+    def _generate_with_fallback(self, user_prompt: str) -> Optional[EducationalContent]:
+        """Try all providers in order until one succeeds."""
+        
+        # 1. Try Gemini first
+        result = self._call_gemini(user_prompt)
+        if result:
+            print("✅ Gemini succeeded")
+            return result
+        
+        print("🚨 Gemini failed all models. Attempting fallback providers...")
+        
+        # 2. Fallback chain
+        fallbacks = [
+            ("Groq", self._call_groq),
+            ("Cloudflare", self._call_cloudflare),
+            ("OpenCode Zen", self._call_opencode),
+            ("Cerebras", self._call_cerebras),
+            ("NVIDIA NIM", self._call_nvidia),
+            ("Mistral", self._call_mistral),
+            ("GitHub Models", self._call_github_models),
+            ("OpenAI", self._call_openai),
+            ("Anthropic", self._call_anthropic),
+            ("DeepSeek", self._call_deepseek),
+            ("OpenRouter", self._call_openrouter),
+        ]
+        
+        for name, func in fallbacks:
+            try:
+                result = func(user_prompt)
+                if result:
+                    print(f"✅ {name} succeeded")
+                    return result
+            except Exception as e:
+                print(f"⚠️ {name} fallback failed: {e}")
+        
+        print("🚨 All fallback providers failed or not configured")
+        return None
 
     def detect_category(self, topic: str) -> TopicCategory:
         topic_lower = topic.lower()
@@ -174,21 +609,11 @@ class ContentGenerator:
 
         user_prompt = build_user_prompt(topic, category, difficulty, audience)
 
-        response = self.client.models.generate_content(
-            model=self.model,
-            contents=[
-                types.Content(role="user", parts=[types.Part(text=user_prompt)])
-            ],
-            config=types.GenerateContentConfig(
-                system_instruction=SYSTEM_PROMPT,
-                temperature=0.3,
-                response_mime_type="application/json",
-            )
-        )
-
-        content_json = json.loads(response.text)
-        content_json["visual_strategy"] = [s.value for s in visual_strategy]
+        content_json = self._generate_with_fallback(user_prompt)
+        if not content_json:
+            raise RuntimeError(f"All LLM providers failed for topic: {topic}")
         
+        content_json["visual_strategy"] = [s.value for s in visual_strategy]
         return EducationalContent(**content_json)
 
     def generate_batch(self, topics: list, audience: list = None, difficulty: DifficultyLevel = None) -> list[EducationalContent]:
