@@ -53,7 +53,6 @@ class TemplateRenderer:
             quiz=content.quiz,
             takeaway=content.takeaway,
             cta=content.cta,
-            brand_handle=config.brand_handle,
             **self._get_theme_vars(config)
         )
 
@@ -68,7 +67,7 @@ class TemplateRenderer:
             category_display=content.category.value.upper().replace("_", " "),
             hook=content.hook,
             total_slides=total_slides,
-            brand_handle=config.brand_handle,
+            
             **self._get_theme_vars(config)
         ))
         
@@ -81,7 +80,7 @@ class TemplateRenderer:
             infographic=content.infographic,
             code=content.code,
             total_slides=total_slides,
-            brand_handle=config.brand_handle,
+            
             **self._get_theme_vars(config)
         ))
         
@@ -93,7 +92,7 @@ class TemplateRenderer:
             flowchart=content.flowchart,
             architecture=content.architecture,
             total_slides=total_slides,
-            brand_handle=config.brand_handle,
+            
             **self._get_theme_vars(config)
         ))
         
@@ -104,7 +103,7 @@ class TemplateRenderer:
             category_display=content.category.value.upper().replace("_", " "),
             quiz=content.quiz,
             total_slides=total_slides,
-            brand_handle=config.brand_handle,
+            
             **self._get_theme_vars(config)
         ))
         
@@ -117,7 +116,7 @@ class TemplateRenderer:
             takeaway=content.takeaway,
             cta=content.cta,
             total_slides=total_slides,
-            brand_handle=config.brand_handle,
+            
             **self._get_theme_vars(config)
         ))
         

@@ -1857,7 +1857,7 @@ def _update_groq_token_usage(model_name, tokens_increment):
         
         tmp_file = CACHE_FILE + ".tmp"
         with open(tmp_file, "w", encoding="utf-8") as f:
-json.dump(data, f, indent=2)
+            json.dump(data, f, indent=2)
         os.replace(tmp_file, CACHE_FILE)
         print(f"📈 [CACHE] Tracked Groq usage for {model_name}: {new_tokens} tokens used today.")
     except Exception as e:

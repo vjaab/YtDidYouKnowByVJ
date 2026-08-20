@@ -197,7 +197,7 @@ class ContentGenerator:
             "gemini-2.5-flash-lite",
         ]
 
-def _call_gemini(self, user_prompt: str) -> Optional[Dict[str, Any]]:
+    def _call_gemini(self, user_prompt: str) -> Optional[Dict[str, Any]]:
         """Try Gemini models in order."""
         for model_name in self.gemini_models_to_try:
             try:
