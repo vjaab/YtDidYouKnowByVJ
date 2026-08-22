@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  @font-face { font-family:'Space Grotesk'; font-weight:600; src:url('{{ fonts.sg600 }}') format('woff2'); }
+  @font-face { font-family:'Space Grotesk'; font-weight:700; src:url('{{ fonts.sg700 }}') format('woff2'); }
+  @font-face { font-family:'JetBrains Mono'; font-weight:500; src:url('{{ fonts.jb500 }}') format('woff2'); }
+  @font-face { font-family:'JetBrains Mono'; font-weight:600; src:url('{{ fonts.jb600 }}') format('woff2'); }
+  @font-face { font-family:'Inter'; font-weight:400; src:url('{{ fonts.in400 }}') format('woff2'); }
+  @font-face { font-family:'Inter'; font-weight:500; src:url('{{ fonts.in500 }}') format('woff2'); }
+
+  :root{
+    /* Variant-specific CSS variables (overridden by variant_styles) */
+    --bg: {{ variant_styles.bg_primary }};
+    --surface: {{ variant_styles.bg_secondary }};
+    --surface-2: {{ variant_styles.bg_secondary }};
+    --border: {% if variant == 'minimal' %}#E0E0E0{% else %}#232A38{% endif %};
+    --ink: {% if variant == 'minimal' %}#1A1A1A{% else %}#F1F3F8{% endif %};
+    --ink-dim: {% if variant == 'minimal' %}#666666{% else %}#8A93A8{% endif %};
+    --accent-glow: {% if variant_styles.accent_glow %}block{% else %}none{% endif %};
+    --dots-opacity: {{ variant_styles.dots_opacity }};
+    --watermark-opacity: {{ variant_styles.watermark_opacity }};
+    --chrome-bg: {% if variant == 'minimal' %}#FFFFFF{% else %}var(--surface){% endif %};
+    --pill-topic-bg: {% if variant == 'minimal' %}rgba(197,121,230,0.16){% else %}rgba(197,121,230,0.16){% endif %};
+    --pill-topic-color: {% if variant == 'minimal' %}#C879E6{% else %}#D9A6EF{% endif %};
+    --pill-slide-bg: {% if variant == 'minimal' %}#F5F5F5{% else %}var(--surface-2){% endif %};
+    --pill-slide-color: {% if variant == 'minimal' %}#666666{% else %}var(--ink-dim){% endif %};
+    --eyebrow-color: {% if variant == 'minimal' %}#C879E6{% else %}#86D9A0{% endif %};
+    --code-chip-bg: {% if variant == 'minimal' %}#F5F5F5{% else %}var(--surface){% endif %};
+    --code-chip-border: {% if variant == 'minimal' %}#E0E0E0{% else %}var(--border){% endif %};
+    --code-chip-color: {% if variant == 'minimal' %}#666666{% else %}var(--ink-dim){% endif %};
+    --code-chip-bold: {% if variant == 'minimal' %}#C879E6{% else %}#D9A6EF{% endif %};
+    --step-bg-mix: {% if variant == 'minimal' %}color-mix(in srgb, var(--accent) 3%, var(--surface)){% else %}color-mix(in srgb, var(--accent) 5%, var(--surface)){% endif %};
+    --icon-chip-bg: {% if variant == 'minimal' %}color-mix(in srgb, var(--accent) 15%, transparent){% else %}color-mix(in srgb, var(--accent) 22%, transparent){% endif %};
+    --connector-opacity: {% if variant == 'minimal' %}0.6{% else %}0.85{% endif %};
+    --footer-border: {% if variant == 'minimal' %}#E0E0E0{% else %}var(--border){% endif %};
+    --avatar-gradient: linear-gradient(135deg,#C879E6,#5FB3F0);
+    --avatar-text: #0B0E14;
+    --mark-color: {% if variant == 'minimal' %}#CCCCCC{% else %}var(--ink-dim){% endif %};
+    --mark-opacity: {% if variant == 'minimal' %}0.6{% else %}0.45{% endif %};
+    --flow-end-color: {% if variant == 'minimal' %}#C879E6{% else %}#86D9A0{% endif %};
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{width:{{ canvas_w }}px; height:{{ canvas_h }}px; background:var(--bg); overflow:hidden;}
+  body{font-family:'Inter',sans-serif; position:relative;}
+
+  .bg-dots{
+    position:absolute; inset:0;
+    background-image: radial-gradient(circle, rgba(255,255,255,var(--dots-opacity)) 1.4px, transparent 1.4px);
+    background-size: 26px 26px;
+    background-position: -6px -6px;
+    display: {% if variant_styles.dots_opacity > 0 %}block{% else %}none{% endif %};
+  }
+  .bg-glow{
+    position:absolute; top:-180px; right:-160px; width:620px; height:620px; border-radius:50%;
+    background: radial-gradient(circle, rgba(197,120,230,0.10), rgba(197,120,230,0) 70%);
+    display: var(--accent-glow);
+  }
+  .watermark{
+    position:absolute; right:34px; bottom:96px; font-family:'JetBrains Mono'; font-weight:600;
+    font-size:220px; color:rgba(255,255,255,var(--watermark-opacity)); line-height:1; letter-spacing:-6px; user-select:none;
+    display: {% if variant_styles.watermark_opacity > 0 %}block{% else %}none{% endif %};
+  }
+
+  .stage{ position:relative; width:100%; height:100%; display:flex; flex-direction:column; }
+
+  /* --- chrome bar --- */
+  .chrome{
+    height:64px; flex:0 0 auto; display:flex; align-items:center; justify-content:space-between;
+    padding:0 44px; border-bottom:1px solid var(--border); position:relative; z-index:2;
+    background: var(--chrome-bg);
+  }
+  .chrome-left{ display:flex; align-items:center; gap:16px; }
+  .dots{ display:flex; gap:7px; }
+  .dot{ width:11px; height:11px; border-radius:50%; }
+  .filename{ font-family:'JetBrains Mono'; font-weight:500; font-size:16px; color:var(--ink-dim); }
+  .chrome-right{ display:flex; align-items:center; gap:10px; }
+  .pill{ font-family:'JetBrains Mono'; font-weight:600; font-size:14px; letter-spacing:1.5px; padding:6px 14px; border-radius:20px; }
+  .pill-topic{ background:var(--pill-topic-bg); color:var(--pill-topic-color); }
+  .pill-slide{ background:var(--pill-slide-bg); color:var(--pill-slide-color); border:1px solid var(--border); }
+
+  /* --- hero --- */
+  .hero{ padding:36px 52px 20px; position:relative; z-index:2; flex:0 0 auto; }
+  .eyebrow{ font-family:'JetBrains Mono'; font-weight:500; font-size:15px; letter-spacing:2px; color:var(--eyebrow-color); }
+  .title{ font-family:'Space Grotesk'; font-weight:700; font-size:58px; line-height:1.06; color:var(--ink); margin-top:12px; letter-spacing:-1px;}
+  .subtitle-row{ margin-top:18px; display:flex; }
+  .code-chip{ font-family:'JetBrains Mono'; font-weight:500; font-size:18px; color:var(--code-chip-color);
+    background:var(--code-chip-bg); border:1px solid var(--code-chip-border); border-radius:10px; padding:9px 16px; }
+  .code-chip b{ color:var(--code-chip-bold); font-weight:600; }
+
+  /* --- flow --- */
+  .flow{ padding:6px 52px 0; position:relative; z-index:2; flex:1 1 auto; display:flex; flex-direction:column; justify-content:center; gap:2px; }
+  .step{
+    position:relative; overflow:hidden;
+    background: var(--step-bg-mix);
+    border:1px solid var(--border); border-left:6px solid var(--accent);
+    border-radius:16px; padding:17px 24px; display:flex; align-items:flex-start; gap:18px;
+  }
+  .step::after{
+    content:""; position:absolute; top:0; right:0; width:0; height:0;
+    border-style:solid; border-width:0 52px 52px 0; border-color:transparent var(--accent) transparent transparent;
+    opacity:0.12;
+  }
+  .icon-chip{
+    flex:0 0 auto; width:50px; height:50px; border-radius:14px; display:flex; align-items:center; justify-content:center;
+    background: var(--icon-chip-bg); position:relative; z-index:1;
+  }
+  .icon-chip svg{ width:26px; height:26px; stroke:var(--accent); }
+  .step-body{ flex:1 1 auto; padding-top:1px; position:relative; z-index:1; }
+  .step-tag{
+    display:inline-block; font-family:'JetBrains Mono'; font-weight:600; font-size:12.5px; letter-spacing:1.5px;
+    color:var(--accent); background:color-mix(in srgb, var(--accent) 16%, transparent);
+    padding:3px 9px; border-radius:6px;
+  }
+  .step-title{ font-family:'Space Grotesk'; font-weight:600; font-size:25px; color:var(--ink); margin-top:8px; }
+  .step-desc{ font-family:'Inter'; font-weight:400; font-size:17px; color:var(--ink-dim); margin-top:5px; line-height:1.38; }
+  .connector{ display:flex; align-items:center; height:26px; margin-left:77px; }
+  .connector .line{ width:2px; height:100%; background:repeating-linear-gradient(to bottom, var(--accent) 0 4px, transparent 4px 8px); opacity:var(--connector-opacity); }
+  .connector svg{ width:18px; height:18px; stroke:var(--accent); margin-left:-8px; }
+  .flow-end{ display:flex; align-items:center; gap:10px; margin-left:77px; margin-top:14px; }
+  .flow-end svg{ width:18px; height:18px; stroke:var(--flow-end-color); margin-left:-8px; }
+  .flow-end span{ font-family:'JetBrains Mono'; font-weight:500; font-size:15px; color:var(--ink-dim); }
+
+  /* --- footer --- */
+  .footer{
+    flex:0 0 auto; height:88px; border-top:1px solid var(--footer-border); display:flex; align-items:center;
+    justify-content:space-between; padding:0 52px; position:relative; z-index:2;
+  }
+  .brand{ display:flex; align-items:center; gap:13px; }
+  .avatar{ width:42px; height:42px; border-radius:12px; background:var(--avatar-gradient);
+    display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk'; font-weight:700; font-size:16px; color:var(--avatar-text); }
+  .brand-name{ font-family:'Space Grotesk'; font-weight:600; font-size:16px; color:var(--ink); }
+  .brand-handle{ font-family:'JetBrains Mono'; font-weight:500; font-size:14px; color:var(--ink-dim); margin-top:1px; }
+  .mark{ font-family:'JetBrains Mono'; font-weight:600; font-size:22px; color:var(--mark-color); opacity:var(--mark-opacity); }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="bg-glow"></div>
+    <div class="bg-dots"></div>
+    <div class="watermark">{ }</div>
+
+    <div class="chrome">
+      <div class="chrome-left">
+        <div class="dots">
+          <div class="dot" style="background:#FF5F56"></div>
+          <div class="dot" style="background:#FFBD2E"></div>
+          <div class="dot" style="background:#27C93F"></div>
+        </div>
+        <div class="filename">{{ filename }}</div>
+      </div>
+      <div class="chrome-right">
+        <div class="pill pill-topic">{{ topic }}</div>
+        <div class="pill pill-slide">SLIDE {{ slide_current }}/{{ slide_total }}</div>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="eyebrow">// {{ eyebrow }}</div>
+      <div class="title">{{ title }}</div>
+      <div class="subtitle-row">
+        <div class="code-chip">{{ subtitle_pre }}<b>{{ subtitle_bold }}</b>{{ subtitle_post }}</div>
+      </div>
+    </div>
+
+    <div class="flow">
+      {% for step in steps %}
+      <div class="step" style="--accent:{{ step.accent }};">
+        <div class="icon-chip">{{ step.icon_svg | safe }}</div>
+        <div class="step-body">
+          <div class="step-tag">STEP {{ '%02d' % loop.index }}</div>
+          <div class="step-title">{{ step.title }}</div>
+          <div class="step-desc">{{ step.desc }}</div>
+        </div>
+      </div>
+      {% if not loop.last %}
+      <div class="connector" style="--accent:{{ steps[loop.index0 + 1].accent }};">
+        <div class="line"></div>
+        {{ arrow_svg | safe }}
+      </div>
+      {% endif %}
+      {% endfor %}
+      <div class="flow-end">
+        {{ check_svg | safe }}
+        <span>{{ closing_line }}</span>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="brand">
+        <div class="avatar">VJ</div>
+        <div>
+          <div class="brand-name">VJ</div>
+          <div class="brand-handle">@Vijayakumarj_ai</div>
+        </div>
+      </div>
+      <div class="mark"></></div>
+    </div>
+  </div>
+</body>
+</html>

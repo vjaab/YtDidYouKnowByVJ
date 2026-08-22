@@ -3,6 +3,7 @@
 """
 generate_decorator_images.py — Generate educational images using decorator_flow_template
 for Instagram (4:5), Facebook (16:9), and send to Telegram for review.
+Supports multiple variants: modern, minimal, code-focused
 """
 
 import os
@@ -30,10 +31,39 @@ ICONS_DIR = ASSETS_DIR / "icons"
 INSTAGRAM_W, INSTAGRAM_H = 1080, 1350  # 4:5
 FACEBOOK_W, FACEBOOK_H = 1200, 628     # 1.91:1 (FB link post)
 
+# Variant configurations
+VARIANTS = {
+    "modern": {
+        "name": "Modern Gradient",
+        "bg_primary": "#0B0E14",
+        "bg_secondary": "#12161F",
+        "accent_glow": True,
+        "dots_opacity": 0.05,
+        "watermark_opacity": 0.025,
+    },
+    "minimal": {
+        "name": "Clean Minimal",
+        "bg_primary": "#FFFFFF",
+        "bg_secondary": "#F5F5F5",
+        "accent_glow": False,
+        "dots_opacity": 0.0,
+        "watermark_opacity": 0.0,
+    },
+    "code-focused": {
+        "name": "Code Focused",
+        "bg_primary": "#1E1E2E",
+        "bg_secondary": "#282A36",
+        "accent_glow": False,
+        "dots_opacity": 0.03,
+        "watermark_opacity": 0.02,
+    },
+}
+
 # Topics to rotate through
 DEFAULT_TOPICS = [
     {
         "topic": "Python Decorators",
+        "category": "python",
         "filename": "decorators.py",
         "eyebrow": "CONCEPT WALKTHROUGH",
         "title": "How Python Decorators Work",
@@ -52,6 +82,7 @@ DEFAULT_TOPICS = [
     },
     {
         "topic": "AWS Lambda",
+        "category": "aws",
         "filename": "lambda_handler.py",
         "eyebrow": "SERVERLESS ARCHITECTURE",
         "title": "AWS Lambda Execution Model",
@@ -69,6 +100,7 @@ DEFAULT_TOPICS = [
     },
     {
         "topic": "RAG Pipeline",
+        "category": "ai_ml",
         "filename": "rag_pipeline.py",
         "eyebrow": "AI ARCHITECTURE",
         "title": "Retrieval-Augmented Generation Pipeline",
@@ -86,6 +118,7 @@ DEFAULT_TOPICS = [
     },
     {
         "topic": "Kubernetes Pods",
+        "category": "kubernetes",
         "filename": "pod.yaml",
         "eyebrow": "K8S FUNDAMENTALS",
         "title": "Kubernetes Pod Lifecycle",
@@ -103,6 +136,7 @@ DEFAULT_TOPICS = [
     },
     {
         "topic": "Docker Multi-stage",
+        "category": "devops",
         "filename": "Dockerfile",
         "eyebrow": "CONTAINER OPTIMIZATION",
         "title": "Docker Multi-Stage Builds",
@@ -128,7 +162,6 @@ def font_data_uri(filename: str) -> str:
         data = path.read_bytes()
         b64 = base64.b64encode(data).decode("ascii")
         return f"data:font/woff2;base64,{b64}"
-    # Fallback to Google Fonts CDN
     return ""
 
 
@@ -153,13 +186,17 @@ def get_fonts_dict():
     return fonts
 
 
+def get_variant_styles(variant: str) -> dict:
+    """Get CSS variables for a variant."""
+    return VARIANTS.get(variant, VARIANTS["modern"])
+
+
 def render_image(template_name: str, context: dict, output_path: Path, width: int, height: int):
     """Render HTML template to PNG using Playwright."""
     env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)))
     tpl = env.get_template(template_name)
     html = tpl.render(**context)
     
-    # Write HTML for debugging
     html_path = output_path.with_suffix(".html")
     html_path.write_text(html)
     
@@ -175,23 +212,22 @@ def render_image(template_name: str, context: dict, output_path: Path, width: in
     return output_path
 
 
-def generate_instagram_post(topic_data: dict, output_dir: Path) -> Path:
-    """Generate Instagram 4:5 image."""
+def generate_variant_images(topic_data: dict, output_dir: Path, variant: str) -> tuple:
+    """Generate Instagram and Facebook images for a specific variant."""
     fonts = get_fonts_dict()
+    variant_styles = get_variant_styles(variant)
     
-    # Add icon SVGs to steps
-    for i, step in enumerate(topic_data["steps"]):
+    for step in topic_data["steps"]:
         step["icon_svg"] = icon_svg(step["icon"])
     
     arrow_svg = icon_svg("arrow-down")
     check_svg = icon_svg("check-circle-2")
     
-    context = {
-        "canvas_w": INSTAGRAM_W,
-        "canvas_h": INSTAGRAM_H,
+    # Base context
+    base_context = {
         "fonts": fonts,
         "filename": topic_data["filename"],
-        "topic": "PYTHON",
+        "topic": topic_data["category"].upper(),
         "slide_current": "01",
         "slide_total": "01",
         "eyebrow": topic_data["eyebrow"],
@@ -203,45 +239,97 @@ def generate_instagram_post(topic_data: dict, output_dir: Path) -> Path:
         "arrow_svg": arrow_svg,
         "check_svg": check_svg,
         "closing_line": topic_data["closing_line"],
+        "variant": variant,
+        "variant_styles": variant_styles,
     }
     
-    output_path = output_dir / f"instagram_{topic_data['topic'].lower().replace(' ', '_')}.png"
-    return render_image("decorator_flow.html.j2", context, output_path, INSTAGRAM_W, INSTAGRAM_H)
+    # Instagram 4:5
+    ig_context = {**base_context, "canvas_w": INSTAGRAM_W, "canvas_h": INSTAGRAM_H}
+    ig_path = output_dir / f"instagram_{topic_data['topic'].lower().replace(' ', '_')}_{variant}.png"
+    render_image("decorator_flow.html.j2", ig_context, ig_path, INSTAGRAM_W, INSTAGRAM_H)
+    
+    # Facebook 1.91:1
+    fb_context = {**base_context, "canvas_w": FACEBOOK_W, "canvas_h": FACEBOOK_H}
+    fb_path = output_dir / f"facebook_{topic_data['topic'].lower().replace(' ', '_')}_{variant}.png"
+    render_image("decorator_flow.html.j2", fb_context, fb_path, FACEBOOK_W, FACEBOOK_H)
+    
+    return ig_path, fb_path
 
 
-def generate_facebook_post(topic_data: dict, output_dir: Path) -> Path:
-    """Generate Facebook 1.91:1 image."""
-    fonts = get_fonts_dict()
+def generate_caption(topic_data: dict, hashtags: str) -> str:
+    """Generate caption for social media posts."""
+    return f"""📚 {topic_data['topic']}
+
+{topic_data['closing_line'].capitalize()}.
+
+Follow @Vijayakumarj_ai for more tech concepts explained visually!
+
+{hashtags}"""
+
+
+def generate_poll_data(topic_data: dict, output_dir: Path) -> Path:
+    """Generate poll/quiz data for Instagram Stories."""
+    topic_key = topic_data["topic"].lower().replace(" ", "_").replace("-", "_")
     
-    # Add icon SVGs to steps
-    for i, step in enumerate(topic_data["steps"]):
-        step["icon_svg"] = icon_svg(step["icon"])
-    
-    arrow_svg = icon_svg("arrow-down")
-    check_svg = icon_svg("check-circle-2")
-    
-    # Facebook uses slightly different layout (wider)
-    context = {
-        "canvas_w": FACEBOOK_W,
-        "canvas_h": FACEBOOK_H,
-        "fonts": fonts,
-        "filename": topic_data["filename"],
-        "topic": "PYTHON",
-        "slide_current": "01",
-        "slide_total": "01",
-        "eyebrow": topic_data["eyebrow"],
-        "title": topic_data["title"],
-        "subtitle_pre": topic_data["subtitle_pre"],
-        "subtitle_bold": topic_data["subtitle_bold"],
-        "subtitle_post": topic_data["subtitle_post"],
-        "steps": topic_data["steps"],
-        "arrow_svg": arrow_svg,
-        "check_svg": check_svg,
-        "closing_line": topic_data["closing_line"],
+    poll_templates = {
+        "python_decorators": {
+            "quiz": {"question": "What does @decorator do?", "options": ["Wraps a function", "Deletes a function", "Creates a class", "Imports a module"], "correct": 0},
+            "poll": {"question": "How often do you use decorators?", "options": ["Daily", "Weekly", "Rarely", "Never heard of them"]},
+        },
+        "aws_lambda": {
+            "quiz": {"question": "What triggers AWS Lambda?", "options": ["API Gateway, S3, DynamoDB", "Only manual invocation", "Only CloudWatch events", "Only SNS topics"], "correct": 0},
+            "poll": {"question": "What's your Lambda experience?", "options": ["Production use", "Learning", "Tried once", "Never used"]},
+        },
+        "rag_pipeline": {
+            "quiz": {"question": "What does RAG stand for?", "options": ["Retrieval-Augmented Generation", "Random Access Generation", "Recursive Algorithm Generation", "Real-time AI Generation"], "correct": 0},
+            "poll": {"question": "Have you built a RAG system?", "options": ["Yes, in production", "Experimenting", "Planning to", "No"]},
+        },
+        "kubernetes_pods": {
+            "quiz": {"question": "What comes after 'Pending' in pod lifecycle?", "options": ["ContainerCreating → Running", "Running → Terminated", "Failed → Succeeded", "Succeeded → Failed"], "correct": 0},
+            "poll": {"question": "How do you debug pod issues?", "options": ["kubectl logs", "kubectl describe", "Events", "All of the above"]},
+        },
+        "docker_multistage": {
+            "quiz": {"question": "What's the main benefit of multi-stage builds?", "options": ["Smaller final image size", "Faster build time", "More layers", "Larger attack surface"], "correct": 0},
+            "poll": {"question": "What's your Docker image size?", "options": ["<100MB", "100-500MB", "500MB-1GB", ">1GB"]},
+        },
     }
     
-    output_path = output_dir / f"facebook_{topic_data['topic'].lower().replace(' ', '_')}.png"
-    return render_image("decorator_flow.html.j2", context, output_path, FACEBOOK_W, FACEBOOK_H)
+    template = poll_templates.get(topic_key, poll_templates["python_decorators"])
+    
+    poll_data = {
+        "topic": topic_data["topic"],
+        "quiz_poll": template["quiz"],
+        "opinion_poll": template["poll"],
+    }
+    
+    poll_path = output_dir / f"poll_{topic_data['topic'].lower().replace(' ', '_')}.json"
+    with open(poll_path, "w") as f:
+        json.dump(poll_data, f, indent=2)
+    
+    print(f"✅ Poll data saved: {poll_path}")
+    return poll_path
+
+
+def save_metadata(output_dir: Path, topic_data: dict, variants: list, ig_paths: list, fb_paths: list, caption: str, hashtags: str, poll_path: Path):
+    """Save metadata JSON for workflow consumption."""
+    meta = {
+        "topic": topic_data["topic"],
+        "category": topic_data["category"],
+        "variants": variants,
+        "instagram_images": [str(p) for p in ig_paths],
+        "facebook_images": [str(p) for p in fb_paths],
+        "caption": caption,
+        "hashtags": hashtags,
+        "poll_file": str(poll_path),
+        "generated_at": __import__("datetime").datetime.utcnow().isoformat(),
+    }
+    
+    meta_path = output_dir / f"metadata_{topic_data['topic'].lower().replace(' ', '_')}.json"
+    with open(meta_path, "w") as f:
+        json.dump(meta, f, indent=2)
+    
+    print(f"✅ Metadata saved: {meta_path}")
+    return meta_path
 
 
 def send_image_to_telegram(image_path: Path, caption: str = "") -> bool:
@@ -282,7 +370,6 @@ def send_telegram_message(message: str, emoji: str = "ℹ️"):
 
 
 def load_topic_index() -> int:
-    """Load current topic index."""
     state_file = Path(__file__).parent / ".topic_index.json"
     if state_file.exists():
         try:
@@ -294,7 +381,6 @@ def load_topic_index() -> int:
 
 
 def save_topic_index(index: int):
-    """Save topic index."""
     state_file = Path(__file__).parent / ".topic_index.json"
     try:
         with open(state_file, "w") as f:
@@ -304,11 +390,18 @@ def save_topic_index(index: int):
 
 
 def get_next_topic() -> dict:
-    """Get next topic in round-robin."""
     index = load_topic_index()
     topic = DEFAULT_TOPICS[index % len(DEFAULT_TOPICS)]
     save_topic_index((index + 1) % len(DEFAULT_TOPICS))
     return topic
+
+
+def load_hashtags(hashtags_file: str) -> str:
+    """Load hashtags from file."""
+    if Path(hashtags_file).exists():
+        with open(hashtags_file) as f:
+            return f.read().strip()
+    return ""
 
 
 def main():
@@ -316,12 +409,14 @@ def main():
     parser.add_argument("--now", action="store_true", help="Run immediately")
     parser.add_argument("--dry-run", action="store_true", help="Preview without posting to Telegram")
     parser.add_argument("--topic", type=str, help="Specific topic to generate")
+    parser.add_argument("--variant", choices=["modern", "minimal", "code-focused", "all"], default="all", help="Template variant")
+    parser.add_argument("--hashtags-file", type=str, help="Path to hashtags file")
     args = parser.parse_args()
 
     if not args.now and not args.dry_run:
         print("Usage: python generate_decorator_images.py --now       # Generate and send to Telegram")
         print("       python generate_decorator_images.py --dry-run   # Generate only")
-        print("       python generate_decorator_images.py --now --topic 'Python Decorators'")
+        print("       python generate_decorator_images.py --now --topic 'Python Decorators' --variant modern")
         sys.exit(1)
 
     # Get topic
@@ -333,37 +428,86 @@ def main():
     else:
         topic_data = get_next_topic()
 
+    # Determine variants
+    if args.variant == "all":
+        variants = ["modern", "minimal", "code-focused"]
+    else:
+        variants = [args.variant]
+
+    # Load hashtags
+    hashtags = ""
+    if args.hashtags_file:
+        hashtags = load_hashtags(args.hashtags_file)
+
     print(f"🎨 Generating images for: {topic_data['topic']}")
+    print(f"   Variants: {', '.join(variants)}")
 
     output_dir = Path(__file__).parent / "output" / "social_images"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     try:
-        # Generate Instagram image (4:5)
-        ig_path = generate_instagram_post(topic_data, output_dir)
+        all_ig_paths = []
+        all_fb_paths = []
         
-        # Generate Facebook image (1.91:1)
-        fb_path = generate_facebook_post(topic_data, output_dir)
+        for variant in variants:
+            print(f"\n🎨 Generating {variant} variant...")
+            ig_path, fb_path = generate_variant_images(topic_data, output_dir, variant)
+            all_ig_paths.append(ig_path)
+            all_fb_paths.append(fb_path)
+        
+        # Generate caption
+        caption = generate_caption(topic_data, hashtags)
+        caption_path = output_dir / f"caption_{topic_data['topic'].lower().replace(' ', '_')}.txt"
+        caption_path.write_text(caption)
+        print(f"✅ Caption saved: {caption_path}")
+        
+        # Generate poll data
+        poll_path = generate_poll_data(topic_data, output_dir)
+        
+        # Save metadata
+        meta_path = save_metadata(
+            output_dir, topic_data, variants, 
+            all_ig_paths, all_fb_paths, 
+            caption, hashtags, poll_path
+        )
 
         if args.dry_run:
             print(f"\n✅ DRY RUN COMPLETE")
-            print(f"   Instagram: {ig_path}")
-            print(f"   Facebook:  {fb_path}")
+            print(f"   Instagram: {', '.join(str(p.name) for p in all_ig_paths)}")
+            print(f"   Facebook:  {', '.join(str(p.name) for p in all_fb_paths)}")
+            print(f"   Caption: {caption_path}")
+            print(f"   Poll: {poll_path}")
+            print(f"   Metadata: {meta_path}")
+            
+            # Output for GitHub Actions
+            print(f"IG_IMAGES={','.join(str(p) for p in all_ig_paths)}")
+            print(f"FB_IMAGES={','.join(str(p) for p in all_fb_paths)}")
+            print(f"CAPTION_FILE={caption_path}")
+            print(f"POLL_FILE={poll_path}")
+            print(f"HASHTAGS={hashtags}")
             return
 
-        # Send to Telegram for review
-        caption = f"📚 <b>{topic_data['topic']}</b>\n\nReady for review. Approve for posting?\n\nFollow @Vijayakumarj_ai for more!"
+        # Send to Telegram for review (send first variant)
+        caption_text = f"📚 <b>{topic_data['topic']}</b> ({variants[0]})\n\nReady for review. Approve for posting?\n\nFollow @Vijayakumarj_ai for more!"
         
-        send_image_to_telegram(ig_path, caption)
-        send_image_to_telegram(fb_path, caption)
+        send_image_to_telegram(all_ig_paths[0], caption_text)
+        send_image_to_telegram(all_fb_paths[0], caption_text)
         
         send_telegram_message(
             f"✅ Images generated for: {topic_data['topic']}\n"
-            f"Instagram (4:5): {ig_path.name}\n"
-            f"Facebook (1.91:1): {fb_path.name}\n\nReply to approve for posting.",
+            f"Variants: {', '.join(variants)}\n"
+            f"Instagram (4:5): {len(all_ig_paths)} images\n"
+            f"Facebook (1.91:1): {len(all_fb_paths)} images\n\nReply to approve for posting.",
             emoji="🤖"
         )
 
+        # Output for GitHub Actions
+        print(f"IG_IMAGES={','.join(str(p) for p in all_ig_paths)}")
+        print(f"FB_IMAGES={','.join(str(p) for p in all_fb_paths)}")
+        print(f"CAPTION_FILE={caption_path}")
+        print(f"POLL_FILE={poll_path}")
+        print(f"HASHTAGS={hashtags}")
+        
         print("\n✅ Generation complete. Images sent to Telegram for review.")
 
     except Exception as e:

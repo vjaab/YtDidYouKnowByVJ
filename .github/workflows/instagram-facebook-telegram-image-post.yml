@@ -2,19 +2,47 @@ name: Instagram Facebook Telegram Image Post
 
 on:
   schedule:
-    # Daily at 9:00 AM IST (03:30 UTC)
-    - cron: '30 3 * * *'
-    # Daily at 7:00 PM IST (13:30 UTC)
-    - cron: '30 13 * * *'
-  workflow_dispatch:  # Allow manual trigger
+    # Peak engagement windows (IST)
+    # Weekday mornings (commute) + afternoons + evenings
+    - cron: '0 2 * * 1-5'   # 7:30 AM IST Mon-Fri
+    - cron: '0 10 * * 1-5'  # 3:30 PM IST Mon-Fri
+    - cron: '0 14 * * 1-5'  # 7:30 PM IST Mon-Fri
+    # Weekend: later mornings, earlier evenings
+    - cron: '0 4 * * 6,0'   # 9:30 AM IST Sat-Sun
+    - cron: '0 12 * * 6,0'  # 5:30 PM IST Sat-Sun
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'Specific topic to generate'
+        required: false
+        type: string
+      variant:
+        description: 'Template variant'
+        required: false
+        type: choice
+        options: [modern, minimal, code-focused, all]
+        default: 'all'
+      auto_post:
+        description: 'Auto-post after Telegram approval'
+        required: false
+        type: boolean
+        default: true
 
 permissions:
-  contents: write  # Required for GITHUB_TOKEN to create releases (Instagram image hosting)
+  contents: write
+  id-token: write
 
 jobs:
-  post-image:
+  generate-images:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 30
+    outputs:
+      topic: ${{ steps.gen.outputs.topic }}
+      ig_images: ${{ steps.gen.outputs.ig_images }}
+      fb_images: ${{ steps.gen.outputs.fb_images }}
+      caption_file: ${{ steps.gen.outputs.caption_file }}
+      hashtags: ${{ steps.hashtags.outputs.hashtags }}
+      poll_file: ${{ steps.gen.outputs.poll_file }}
 
     steps:
       - name: Checkout Code
@@ -29,79 +57,146 @@ jobs:
       - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget
+          sudo apt-get install -y wget ffmpeg
 
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
           pip install "numpy<2.0"
           pip install "grpcio==1.62.2"
-          pip install requests pillow python-dotenv pydantic jinja2 playwright
+          pip install requests pillow python-dotenv pydantic jinja2 playwright python-telegram-bot aiohttp
 
       - name: Install Playwright Browsers
         run: python -m playwright install --with-deps chromium
 
-- name: Setup Environment Secrets (.env)
+      - name: Setup Environment Secrets
         run: |
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env
           echo "TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}" >> .env
+          echo "IG_USER_ID=${{ secrets.IG_USER_ID }}" >> .env
+          echo "IG_ACCESS_TOKEN=${{ secrets.IG_ACCESS_TOKEN }}" >> .env
+          echo "FB_PAGE_ID=${{ secrets.FB_PAGE_ID }}" >> .env
+          echo "FB_PAGE_ACCESS_TOKEN=${{ secrets.FB_PAGE_ACCESS_TOKEN }}" >> .env
+          echo "X_API_KEY=${{ secrets.X_API_KEY }}" >> .env
+          echo "X_API_SECRET=${{ secrets.X_API_SECRET }}" >> .env
+          echo "X_ACCESS_TOKEN=${{ secrets.X_ACCESS_TOKEN }}" >> .env
+          echo "X_ACCESS_SECRET=${{ secrets.X_ACCESS_SECRET }}" >> .env
+          echo "LINKEDIN_ACCESS_TOKEN=${{ secrets.LINKEDIN_ACCESS_TOKEN }}" >> .env
           echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env
           echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .env
 
-      - name: Run Decorator Flow Image Generation
+      - name: Fetch Trending Hashtags
+        id: hashtags
+        run: |
+          python -u fetch_trending_hashtags.py --category "tech" > hashtags.txt
+          echo "hashtags=$(cat hashtags.txt)" >> $GITHUB_OUTPUT
+
+      - name: Generate Multi-Variant Images
+        id: gen
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          VARIANT: ${{ github.event.inputs.variant || 'all' }}
+          TOPIC: ${{ github.event.inputs.topic || '' }}
+        run: |
+          python -u generate_decorator_images.py --now \
+            --variant "${{ github.event.inputs.variant || 'all' }}" \
+            --topic "${{ github.event.inputs.topic || '' }}" \
+            --hashtags-file hashtags.txt
+
+      - name: Send to Telegram for Approval
+        if: github.event.inputs.auto_post == 'true'
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          python -u generate_decorator_images.py --now
+          python -u telegram_approval_handler.py --send-for-approval \
+            --topic "${{ steps.gen.outputs.topic }}" \
+            --ig-images "${{ steps.gen.outputs.ig_images }}" \
+            --fb-images "${{ steps.gen.outputs.fb_images }}" \
+            --caption-file "${{ steps.gen.outputs.caption_file }}" \
+            --poll-file "${{ steps.gen.outputs.poll_file }}"
+
+      - name: Upload Generated Images
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-images
+          path: output/social_images/
+          retention-days: 7
+
+  auto-post:
+    needs: generate-images
+    if: github.event.inputs.auto_post == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    # Wait for Telegram approval (polling)
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests python-dotenv aiohttp
+
+      - name: Wait for Telegram Approval & Post
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+        run: |
+          python -u telegram_approval_handler.py --wait-and-post \
+            --topic "${{ needs.generate-images.outputs.topic }}" \
+            --ig-images "${{ needs.generate-images.outputs.ig_images }}" \
+            --fb-images "${{ needs.generate-images.outputs.fb_images }}" \
+            --caption-file "${{ needs.generate-images.outputs.caption_file }}" \
+            --hashtags "${{ needs.generate-images.outputs.hashtags }}" \
+            --poll-file "${{ needs.generate-images.outputs.poll_file }}" \
+            --timeout 3600
+
+      - name: Track Engagement (after 1 hour)
+        run: |
+          python -u track_engagement.py --topic "${{ needs.generate-images.outputs.topic }}" --delay 3600
+
+  commit-logs:
+    needs: [generate-images, auto-post]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
       - name: Commit Updated Logs
-        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Pull latest changes
           git pull origin main --rebase --autostash || true
-          
-          # Add any log files that may have been generated
-          if [ -d "logs" ]; then
-            git add -f logs/*.txt logs/*.json 2>/dev/null || true
-          fi
-          
-          # Only commit if there are actual changes
+          if [ -d "logs" ]; then git add -f logs/*.txt logs/*.json 2>/dev/null || true; fi
+          if [ -d "output/social_images" ]; then git add -f output/social_images/*.json 2>/dev/null || true; fi
           if ! git diff --cached --quiet; then
-            git commit -m "[Bot] Auto-update image post logs"
-            
-            # Retry push up to 3 times
-            for i in {1..3}; do
-              echo "Attempt $i to push changes..."
-              if git push origin main; then
-                echo "✅ Successfully pushed logs."
-                exit 0
-              fi
-              echo "⚠️ Push failed, syncing and retrying..."
-              sleep 10
-              git pull origin main --rebase || true
-            done
-            echo "❌ Failed to push logs after 3 attempts."
-          else
-            echo "✅ No changes to commit."
+            git commit -m "[Bot] Auto-update image post logs & metadata"
+            for i in {1..3}; do git push origin main && exit 0; sleep 10; git pull origin main --rebase || true; done
           fi
 
-      - name: Upload logs on failure
+      - name: Upload Logs on Failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: image-post-logs
           path: logs/
-          retention-days: 7
-
-      - name: Upload generated images
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: generated-images
-          path: |
-            output/social_images/
           retention-days: 7
