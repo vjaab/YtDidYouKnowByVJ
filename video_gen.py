@@ -139,10 +139,10 @@ class SafeZoneCalculator:
                     "avatar_corner"
                 )
             elif layout_type == "hero_center":
-                # Right side, lower area
+                # Left side, lower area (changed from right side)
                 self.reserve_zone(
-                    self.frame_w - 320, self.frame_h - 420,
-                    self.frame_w - 20, self.frame_h - 100,
+                    20, self.frame_h - 420,
+                    340, self.frame_h - 100,
                     "avatar_corner"
                 )
             elif layout_type == "side_strip":
@@ -158,7 +158,7 @@ class SafeZoneCalculator:
                     (20, 100, 340, 420),  # top-left
                     (self.frame_w - 340, 100, self.frame_w - 20, 420),  # top-right
                     (20, self.frame_h - 420, 340, self.frame_h - 100),  # bottom-left
-                    (self.frame_w - 340, self.frame_h - 420, self.frame_w - 20, self.frame_h - 100),  # bottom-right
+                    (20, self.frame_h - 420, 340, self.frame_h - 100),  # bottom-left (changed from bottom-right)
                 ]
                 x1, y1, x2, y2 = corners[corner_idx % 4]
                 self.reserve_zone(x1, y1, x2, y2, "avatar_corner")
@@ -7823,7 +7823,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                             (40.0, 120.0),                                    # top-left
                             (FRAME_W - scaled_w - 40.0, 120.0),              # top-right
                             (40.0, FRAME_H - scaled_h - 180.0),              # bottom-left
-                            (FRAME_W - scaled_w - 40.0, FRAME_H - scaled_h - 180.0),  # bottom-right
+                            (40.0, FRAME_H - scaled_h - 180.0),              # bottom-left (changed from bottom-right)
                         ]
                         
                         # Home position (where avatar returns when not in transition)
@@ -7832,7 +7832,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                                 home_x = FRAME_W - scaled_w - 40.0
                                 home_y = 120.0
                             elif layout_type == "hero_center":
-                                home_x = FRAME_W - scaled_w - 40.0
+                                home_x = 40.0
                                 home_y = FRAME_H - scaled_h - 180.0
                             elif layout_type == "side_strip":
                                 home_x = 20.0
