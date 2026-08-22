@@ -175,6 +175,8 @@ class SafeZoneCalculator:
         x2, y2 = min(self.frame_w, x2), min(self.frame_h, y2)
         if x2 > x1 and y2 > y1:
             self.reserved_zones.append((x1, y1, x2, y2, name))
+            # Track element position for get_position()
+            self.element_positions[name] = (x1, y1, x2 - x1, y2 - y1)
     
     def check_overlap(self, x1, y1, x2, y2, margin=20):
         """Check if a proposed zone overlaps any reserved zone."""
