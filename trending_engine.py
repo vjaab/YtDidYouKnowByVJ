@@ -1224,7 +1224,7 @@ def fetch_arxiv_ai_papers(category="AI & Tech Tools"):
     headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
     
     try:
-        url = f"http://export.arxiv.org/api/query?search_query={cat_query}&sortBy=submittedDate&sortOrder=descending&max_results=12"
+        url = f"https://export.arxiv.org/api/query?search_query={cat_query}&sortBy=submittedDate&sortOrder=descending&max_results=12"
         req = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(req, timeout=12) as resp:
             xml_data = resp.read()
