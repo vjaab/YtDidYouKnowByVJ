@@ -3580,18 +3580,12 @@ def _get_category_avatar_style(category: str, is_shorts: bool = False) -> dict:
     return styles.get(category, default)
 
 
-# ── Avatar frame with circular mask, entrance animation & glow ring ──────────────
+# ── Avatar frame (circular mask only - no entrance, no border, no accent) ────────────
 def _apply_circular_facecam_frame(avatar_clip, cur_w, cur_h, accent_color, audio_duration, is_longform=False, cat_style=None):
     """
-    Wraps the avatar PiP in a premium circular frame with entrance animation
-    and category-specific glow style. Returns a new composite clip.
+    Returns avatar clip with circular mask only (no entrance, no border, no accent).
+    Kept for API compatibility with calling code.
     """
-    # Use category-specific accent tint if available
-    if cat_style and cat_style.get("accent_tint"):
-        ring_accent_color = cat_style["accent_tint"]
-    else:
-        ring_accent_color = accent_color
-    
     # Determine circle diameter (use the smaller dimension)
     diameter = min(cur_w, cur_h)
 
@@ -3610,150 +3604,8 @@ def _apply_circular_facecam_frame(avatar_clip, cur_w, cur_h, accent_color, audio
     mask_clip = VideoClip(lambda t: circle_mask, is_mask=True, duration=audio_duration)
     avatar_clip = avatar_clip.with_mask(mask_clip)
 
-    # ── ENTRANCE ANIMATION ─────────────────────────────────────
-    entrance_style = cat_style.get("entrance_style", "fade_in") if cat_style else "fade_in"
-    
-    def entrance_transform(t):
-        """Returns (scale, opacity, x_offset, y_offset) for entrance animation"""
-        progress = min(t / 0.8, 1.0)  # 800ms entrance duration
-        
-        if entrance_style == "pop_in":
-            # Quick pop with bounce (cubic ease-out + overshoot)
-            p = 1.0 - (1.0 - progress) ** 3
-            scale = 0.3 + 0.7 * p + 0.15 * math.sin(progress * 4 * math.pi) * (1 - progress)
-            return scale, progress, 0, 0
-            
-        elif entrance_style == "slide_right":
-            # Slide in from right
-            p = 1.0 - (1.0 - progress) ** 2
-            scale = 1.0
-            x_offset = (cur_w * 0.5) * (1 - p)
-            return scale, p, x_offset, 0
-            
-        elif entrance_style == "zoom_reveal":
-            # Zoom from center
-            p = progress ** 2
-            scale = 0.1 + 0.9 * p
-            return scale, p, 0, 0
-            
-        elif entrance_style == "slide_up":
-            # Professional slide up
-            p = 1.0 - (1.0 - progress) ** 2
-            y_offset = (cur_h * 0.3) * (1 - p)
-            return 1.0, p, 0, y_offset
-            
-        elif entrance_style == "slide_left":
-            # Slide in from left
-            p = 1.0 - (1.0 - progress) ** 2
-            x_offset = (-cur_w * 0.5) * (1 - p)
-            return 1.0, p, x_offset, 0
-            
-        elif entrance_style == "glitch_in":
-            # Glitch effect - rapid position jitter
-            glitch_intensity = (1 - progress) * 0.15
-            jitter_x = glitch_intensity * cur_w * math.sin(t * 50) * (1 - progress)
-            jitter_y = glitch_intensity * cur_h * math.cos(t * 47) * (1 - progress)
-            return 1.0, progress, jitter_x, jitter_y
-            
-        elif entrance_style == "typewriter":
-            # Typewriter - character by character reveal
-            p = progress
-            return 1.0, p, 0, 0
-            
-        else:  # fade_in default
-            return 1.0, progress, 0, 0
-    
-    # Apply entrance transform to avatar clip using Resize effect
-    def entrance_scale_fn(t):
-        scale, _, _, _ = entrance_transform(t)
-        return scale
-    
-    def entrance_opacity_fn(t):
-        _, opacity, _, _ = entrance_transform(t)
-        return opacity
-    
-    avatar_clip = avatar_clip.with_effects([
-        vfx.Resize(entrance_scale_fn),
-    ])
-    
-    # Apply opacity animation via mask
-    entrance_mask = VideoClip(lambda t: circle_mask * entrance_opacity_fn(t), is_mask=True, duration=audio_duration)
-    avatar_clip = avatar_clip.with_mask(entrance_mask)
-
-    # ── GLOW RING WITH CATEGORY-SPECIFIC STYLE ──────────────────────────────
-    # Create glow ring overlay
-    ring_size = diameter + 16  # Slightly larger than avatar
-    ring_img = Image.new("RGBA", (ring_size, ring_size), (0, 0, 0, 0))
-    ring_draw = ImageDraw.Draw(ring_img)
-
-    # Outer glow (soft, large)
-    for glow_r in range(8, 0, -1):
-        alpha = int(25 * (glow_r / 8))
-        ring_draw.ellipse([8 - glow_r, 8 - glow_r, ring_size - 8 + glow_r, ring_size - 8 + glow_r],
-                          outline=(*ring_accent_color, alpha), width=2)
-
-    # Main border ring - apply category-specific border style
-    border_style = cat_style.get("border_style", "single_ring") if cat_style else "single_ring"
-    ring_accent = (*ring_accent_color, 200)
-    
-    if border_style == "double_ring":
-        # Double ring for quiz vibe
-        ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4], outline=ring_accent, width=3)
-        ring_draw.ellipse([10, 10, ring_size - 10, ring_size - 10], outline=(*ring_accent_color, 100), width=2)
-    elif border_style == "neon_cyan":
-        # Neon cyan for tech
-        ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4], outline=(*ring_accent_color, 200), width=3)
-        ring_draw.ellipse([8, 8, ring_size - 8, ring_size - 8], outline=(0, 255, 255, 100), width=1)
-    elif border_style == "gradient_ring":
-        # Multi-color gradient ring
-        ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4], outline=(*ring_accent_color, 200), width=3)
-        ring_draw.ellipse([8, 8, ring_size - 8, ring_size - 8], outline=(255, 110, 0, 150), width=2)
-    elif border_style == "gold_ring":
-        # Gold ring for finance
-        ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4], outline=(255, 215, 0, 200), width=3)
-        ring_draw.ellipse([8, 8, ring_size - 8, ring_size - 8], outline=(255, 255, 255, 80), width=1)
-    elif border_style == "terminal_green":
-        # Terminal green for coding
-        ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4], outline=(50, 255, 50, 200), width=3)
-        ring_draw.ellipse([8, 8, ring_size - 8, ring_size - 8], outline=(0, 200, 0, 100), width=1)
-    elif border_style == "red_ring":
-        # Red ring for bugs
-        ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4], outline=(255, 80, 80, 200), width=3)
-        ring_draw.ellipse([8, 8, ring_size - 8, ring_size - 8], outline=(255, 255, 255, 80), width=1)
-    else:
-        # Default single ring
-        ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4], outline=ring_accent, width=3)
-    
-    # Inner subtle white ring
-    ring_draw.ellipse([7, 7, ring_size - 7, ring_size - 7],
-                      outline=(255, 255, 255, 60), width=1)
-
-    ring_arr = np.array(ring_img.convert("RGB"))
-    ring_mask = np.array(ring_img.split()[3]).astype(float) / 255.0
-
-    # Pulsing glow opacity - use category-specific glow style
-    glow_style = cat_style.get("glow_style", "pulse_medium") if cat_style else "pulse_medium"
-    if glow_style == "pulse_fast":
-        pulse_freq = 4.0
-    elif glow_style == "pulse_slow":
-        pulse_freq = 1.0
-    elif glow_style == "steady":
-        pulse_freq = 0.0
-    else:
-        pulse_freq = 2.0
-    
-    def ring_opacity(t):
-        if pulse_freq > 0:
-            pulse = 0.7 + 0.3 * math.sin(t * pulse_freq)
-        else:
-            pulse = 1.0
-        return ring_mask * pulse
-
-    ring_clip = VideoClip(lambda t: ring_arr, duration=audio_duration)
-    ring_mclip = VideoClip(ring_opacity, is_mask=True, duration=audio_duration)
-    ring_clip = ring_clip.with_mask(ring_mclip)
-
-    return avatar_clip, ring_clip, ring_size
+    # No entrance animation, no border, no accent, no glow ring
+    return avatar_clip, None, 0
 
 
 # ── IMPROVEMENT #7: Mid-Video Subscribe CTA ──────────────────────────────────
@@ -7887,12 +7739,11 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             )
             if enable_circular_for_shorts:
                 try:
-                    # Pass category-specific style to circular frame
                     avatar_clip, ring_clip, ring_size = _apply_circular_facecam_frame(
                         avatar_clip, cur_w, cur_h, accent_color, audio_duration, 
-                        is_longform=False, cat_style=cat_style
+                        is_longform=False, cat_style=None
                     )
-                    print(f"   ✅ Circular face-cam frame applied ({cat_style.get('entrance_style', 'default')})")
+                    print(f"   ✅ Circular face-cam frame applied")
                 except Exception as e:
                     print(f"   ⚠️ Circular frame failed (non-fatal): {e}")
 
