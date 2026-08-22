@@ -3480,82 +3480,6 @@ def _longform_progress_dots(fact_timestamps, accent_color, audio_duration):
     return clips
 
 
-# ── CATEGORY-SPECIFIC AVATAR STYLE ─────────────────────────────────────────────
-def _get_category_avatar_style(category: str, is_shorts: bool = False) -> dict:
-    """
-    Returns category-specific visual style for avatar PiP.
-    Adds visual variety while keeping layout-based positioning.
-    """
-    category = category.lower().strip()
-    
-    styles = {
-        "quiz & trivia": {
-            "scale_mult": 1.0,
-            "entrance_style": "pop_in",      # Quick pop with bounce
-            "glow_style": "pulse_fast",      # Fast pulse for energy
-        },
-        "ai & tech tools": {
-            "scale_mult": 1.0,
-            "entrance_style": "slide_right", # Tech slide-in
-            "glow_style": "pulse_medium",
-        },
-        "tech gadgets & inventions": {
-            "scale_mult": 1.05,
-            "entrance_style": "zoom_reveal", # Zoom from center
-            "glow_style": "pulse_slow",
-        },
-        "finance & tech economy": {
-            "scale_mult": 0.95,
-            "entrance_style": "slide_up",    # Professional slide up
-            "glow_style": "pulse_medium",
-        },
-        "facts & trivia": {
-            "scale_mult": 1.0,
-            "entrance_style": "fade_in",     # Clean fade
-            "glow_style": "steady",          # Steady glow for facts
-        },
-        "coding & development hacks": {
-            "scale_mult": 1.0,
-            "entrance_style": "typewriter",  # Type-on effect
-            "glow_style": "pulse_medium",
-        },
-        "interview questions": {
-            "scale_mult": 1.0,
-            "entrance_style": "slide_left",  # Question from left
-            "glow_style": "pulse_fast",
-        },
-        "programming language origins": {
-            "scale_mult": 1.0,
-            "entrance_style": "zoom_reveal",
-            "glow_style": "pulse_slow",
-        },
-        "tech company founding stories": {
-            "scale_mult": 1.0,
-            "entrance_style": "fade_in",
-            "glow_style": "steady",
-        },
-        "famous bugs & glitches": {
-            "scale_mult": 1.0,
-            "entrance_style": "glitch_in",   # Glitch effect for bugs
-            "glow_style": "pulse_fast",
-        },
-        "agentic ai facts": {
-            "scale_mult": 1.05,
-            "entrance_style": "slide_right",
-            "glow_style": "pulse_medium",
-        },
-    }
-    
-    # Default fallback
-    default = {
-        "scale_mult": 1.0,
-        "entrance_style": "fade_in",
-        "glow_style": "pulse_medium",
-    }
-    
-    return styles.get(category, default)
-
-
 # ── Avatar frame (no circular mask - show as-is) ───────────────────────────────
 def _apply_circular_facecam_frame(avatar_clip, cur_w, cur_h, accent_color, audio_duration, is_longform=False, cat_style=None):
     """
@@ -7669,23 +7593,14 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             ])
             # Color Matching: Disabled to keep avatar look intact (lip sync)
 
-            # ── CATEGORY-SPECIFIC AVATAR STYLE ────────────────────────────────────
-            # Get category-specific visual style for visual variety
-            category = script_json.get("sub_category", "").lower()
-            is_shorts = not is_longform
-            cat_style = _get_category_avatar_style(category, is_shorts)
-            
-            # Apply category-specific scale multiplier
-            avatar_scale_mult *= cat_style.get("scale_mult", 1.0)
-            
-            # Recalculate dimensions with category scale
+            # Recalculate dimensions
             cur_w = max(1, int(width_pip * avatar_scale_mult))
             cur_h = max(1, int(height_pip * avatar_scale_mult))
 
-            # ── IMPROVEMENT #1: Circular Face-Cam Frame with Category-Specific Style ─────────
+            # ── IMPROVEMENT #1: Circular Face-Cam Frame ─────────
             ring_clip = None
             ring_size = 0
-            # Enable circular face-cam for shorts with category-specific styling
+            # Enable circular face-cam for shorts
             enable_circular_for_shorts = (
                 not is_longform 
                 and layout_variation_enabled 
@@ -7693,12 +7608,11 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             )
             if enable_circular_for_shorts:
                 try:
-                    # Pass category-specific style to circular frame
                     avatar_clip, ring_clip, ring_size = _apply_circular_facecam_frame(
                         avatar_clip, cur_w, cur_h, accent_color, audio_duration, 
-                        is_longform=False, cat_style=cat_style
+                        is_longform=False, cat_style=None
                     )
-                    print(f"   ✅ Circular face-cam frame applied ({cat_style.get('border_style', 'default')})")
+                    print(f"   ✅ Circular face-cam frame applied")
                 except Exception as e:
                     print(f"   ⚠️ Circular frame failed (non-fatal): {e}")
 
