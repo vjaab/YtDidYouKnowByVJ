@@ -267,6 +267,12 @@ def main():
     parser.add_argument("--timeout", type=int, default=3600, help="Approval timeout (seconds)")
     args = parser.parse_args()
     
+    def set_gha_output(key: str, value: str):
+        github_output = os.getenv("GITHUB_OUTPUT")
+        if github_output:
+            with open(github_output, "a") as f:
+                f.write(f"{key}={value}\n")
+    
     if args.send_for_approval:
         # Parse image lists
         ig_images = args.ig_images or []
@@ -288,6 +294,8 @@ def main():
         state = wait_for_approval(args.timeout)
         
         action = state.get("action", "timeout")
+        set_gha_output("approval_action", action)
+        
         if action == "timeout":
             print("⏰ Timeout - no approval received")
             # Send timeout notification

@@ -153,6 +153,7 @@ jobs:
           pip install requests python-dotenv aiohttp
 
       - name: Wait for Telegram Approval & Post
+        id: approval
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -175,7 +176,27 @@ jobs:
             --poll-file "${{ needs.generate-images.outputs.poll_file }}" \
             --timeout 3600
 
+      - name: Check Approval Result
+        if: always()
+        run: |
+          ACTION="${{ steps.approval.outputs.approval_action }}"
+          echo "Approval action: $ACTION"
+          if [ "$ACTION" = "reject" ]; then
+            echo "❌ Posting rejected by user"
+            exit 1
+          elif [ "$ACTION" = "timeout" ]; then
+            echo "⏰ Approval timed out"
+            exit 1
+          elif [ "$ACTION" = "regenerate" ]; then
+            echo "🔄 Regeneration requested"
+            exit 2
+          elif [ -z "$ACTION" ]; then
+            echo "⚠️ No approval action recorded"
+            exit 1
+          fi
+
       - name: Track Engagement (after 1 hour)
+        if: success()
         run: |
           python -u track_engagement.py --topic "${{ needs.generate-images.outputs.topic }}" --delay 3600
 
