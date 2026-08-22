@@ -36,55 +36,24 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install "numpy<2.0"
           pip install "grpcio==1.62.2"
-          pip install google-genai google-generativeai requests pillow python-dotenv pydantic jinja2 playwright
+          pip install requests pillow python-dotenv pydantic jinja2 playwright
 
       - name: Install Playwright Browsers
         run: python -m playwright install --with-deps chromium
 
-      - name: Setup Environment Secrets (.env)
+- name: Setup Environment Secrets (.env)
         run: |
-          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
-          echo "PEXELS_API_KEY=${{ secrets.PEXELS_API_KEY }}" >> .env
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env
           echo "TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}" >> .env
-          echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> .env
-          echo "CF_ACCOUNT_ID=${{ secrets.CF_ACCOUNT_ID }}" >> .env
-          echo "CF_API_TOKEN=${{ secrets.CF_API_TOKEN }}" >> .env
           echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env
           echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .env
-          # Fallback LLM providers (optional)
-          if [ ! -z "${{ secrets.GROQ_API_KEY }}" ]; then echo "GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}" >> .env; fi
-          if [ ! -z "${{ secrets.OPENCODE_API_KEY }}" ]; then echo "OPENCODE_API_KEY=${{ secrets.OPENCODE_API_KEY }}" >> .env; fi
-          if [ ! -z "${{ secrets.CEREBRAS_API_KEY }}" ]; then echo "CEREBRAS_API_KEY=${{ secrets.CEREBRAS_API_KEY }}" >> .env; fi
-          if [ ! -z "${{ secrets.NVIDIA_API_KEY }}" ]; then echo "NVIDIA_API_KEY=${{ secrets.NVIDIA_API_KEY }}" >> .env; fi
-          if [ ! -z "${{ secrets.MISTRAL_API_KEY }}" ]; then echo "MISTRAL_API_KEY=${{ secrets.MISTRAL_API_KEY }}" >> .env; fi
-          if [ ! -z "${{ secrets.OPENAI_API_KEY }}" ]; then echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env; fi
-          if [ ! -z "${{ secrets.ANTHROPIC_API_KEY }}" ]; then echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> .env; fi
-          if [ ! -z "${{ secrets.DEEPSEEK_API_KEY }}" ]; then echo "DEEPSEEK_API_KEY=${{ secrets.DEEPSEEK_API_KEY }}" >> .env; fi
-          if [ ! -z "${{ secrets.OPENROUTER_API_KEY }}" ]; then echo "OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}" >> .env; fi
-          # Instagram/Facebook credentials for image/carousel posting (commented out)
-          # if [ ! -z "${{ secrets.IG_USER_ID }}" ]; then echo "IG_USER_ID=${{ secrets.IG_USER_ID }}" >> .env; fi
-          # if [ ! -z "${{ secrets.IG_ACCESS_TOKEN }}" ]; then echo "IG_ACCESS_TOKEN=${{ secrets.IG_ACCESS_TOKEN }}" >> .env; fi
-          # if [ ! -z "${{ secrets.FB_PAGE_ID }}" ]; then echo "FB_PAGE_ID=${{ secrets.FB_PAGE_ID }}" >> .env; fi
-          # if [ ! -z "${{ secrets.FB_PAGE_ACCESS_TOKEN }}" ]; then echo "FB_PAGE_ACCESS_TOKEN=${{ secrets.FB_PAGE_ACCESS_TOKEN }}" >> .env; fi
 
-      - name: Run Image Generation & Posting Pipeline
+      - name: Run Decorator Flow Image Generation
         env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
-          CEREBRAS_API_KEY: ${{ secrets.CEREBRAS_API_KEY }}
-          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          ORT_LOG_LEVEL: ERROR
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          python -u post_image.py --now
+          python -u generate_decorator_images.py --now
 
       - name: Commit Updated Logs
         if: always()
@@ -134,6 +103,5 @@ jobs:
         with:
           name: generated-images
           path: |
-            output/facebook/
-            output/instagram/
+            output/social_images/
           retention-days: 7
