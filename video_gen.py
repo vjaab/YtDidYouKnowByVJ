@@ -3611,79 +3611,8 @@ def _apply_circular_facecam_frame(avatar_clip, cur_w, cur_h, accent_color, audio
     mask_clip = VideoClip(lambda t: circle_mask, is_mask=True, duration=audio_duration)
     avatar_clip = avatar_clip.with_mask(mask_clip)
 
-    # Create glow ring overlay
-    ring_size = diameter + 16  # Slightly larger than avatar
-    ring_img = Image.new("RGBA", (ring_size, ring_size), (0, 0, 0, 0))
-    ring_draw = ImageDraw.Draw(ring_img)
-
-    # Outer glow (soft, large)
-    for glow_r in range(8, 0, -1):
-        alpha = int(25 * (glow_r / 8))
-        ring_draw.ellipse([8 - glow_r, 8 - glow_r, ring_size - 8 + glow_r, ring_size - 8 + glow_r],
-                          outline=(*ring_accent_color, alpha), width=2)
-
-    # Main border ring - apply category-specific border style
-    border_style = cat_style.get("border_style", "single_ring") if cat_style else "single_ring"
-    ring_accent = (*ring_accent_color, 200)
-    
-    if border_style == "double_ring":
-        # Double ring for quiz vibe
-        ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4], outline=ring_accent, width=3)
-        ring_draw.ellipse([10, 10, ring_size - 10, ring_size - 10], outline=(*ring_accent_color, 100), width=2)
-    elif border_style == "neon_cyan":
-        # Neon cyan for tech
-        ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4], outline=(*ring_accent_color, 200), width=3)
-        ring_draw.ellipse([8, 8, ring_size - 8, ring_size - 8], outline=(0, 255, 255, 100), width=1)
-    elif border_style == "gradient_ring":
-        # Multi-color gradient ring
-        ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4], outline=(*ring_accent_color, 200), width=3)
-        ring_draw.ellipse([8, 8, ring_size - 8, ring_size - 8], outline=(255, 110, 0, 150), width=2)
-    elif border_style == "gold_ring":
-        # Gold ring for finance
-        ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4], outline=(255, 215, 0, 200), width=3)
-        ring_draw.ellipse([8, 8, ring_size - 8, ring_size - 8], outline=(255, 255, 255, 80), width=1)
-    elif border_style == "terminal_green":
-        # Terminal green for coding
-        ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4], outline=(50, 255, 50, 200), width=3)
-        ring_draw.ellipse([8, 8, ring_size - 8, ring_size - 8], outline=(0, 200, 0, 100), width=1)
-    elif border_style == "red_ring":
-        # Red ring for bugs
-        ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4], outline=(255, 80, 80, 200), width=3)
-        ring_draw.ellipse([8, 8, ring_size - 8, ring_size - 8], outline=(255, 255, 255, 80), width=1)
-    else:
-        # Default single ring
-        ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4], outline=ring_accent, width=3)
-    
-    # Inner subtle white ring
-    ring_draw.ellipse([7, 7, ring_size - 7, ring_size - 7],
-                      outline=(255, 255, 255, 60), width=1)
-
-    ring_arr = np.array(ring_img.convert("RGB"))
-    ring_mask = np.array(ring_img.split()[3]).astype(float) / 255.0
-
-    # Pulsing glow opacity - use category-specific glow style
-    glow_style = cat_style.get("glow_style", "pulse_medium") if cat_style else "pulse_medium"
-    if glow_style == "pulse_fast":
-        pulse_freq = 4.0
-    elif glow_style == "pulse_slow":
-        pulse_freq = 1.0
-    elif glow_style == "steady":
-        pulse_freq = 0.0
-    else:
-        pulse_freq = 2.0
-    
-    def ring_opacity(t):
-        if pulse_freq > 0:
-            pulse = 0.7 + 0.3 * math.sin(t * pulse_freq)
-        else:
-            pulse = 1.0
-        return ring_mask * pulse
-
-    ring_clip = VideoClip(lambda t: ring_arr, duration=audio_duration)
-    ring_mclip = VideoClip(ring_opacity, is_mask=True, duration=audio_duration)
-    ring_clip = ring_clip.with_mask(ring_mclip)
-
-    return avatar_clip, ring_clip, ring_size
+    # No border/ring - return clean circular avatar
+    return avatar_clip, None, 0
 
 
 # ── IMPROVEMENT #7: Mid-Video Subscribe CTA ──────────────────────────────────
