@@ -168,6 +168,31 @@ class SafeZoneCalculator:
                     self.frame_w // 2 + 160, self.frame_h - 100,
                     "avatar_corner"
                 )
+
+        # Entity logo zone (to the right of avatar corner) - reserve space to prevent collision
+        # Only reserve for layouts where avatar is on the LEFT side (so logo can go to the right)
+        # Layouts with avatar on LEFT: hero_center, top_center, side_strip, corner_cycling (indices 0,2,3), asymmetric
+        # Layouts with avatar on RIGHT: split_screen, corner_cycling index 1 (top-right)
+        layout_type = self.layout.get("layout_type", "asymmetric")
+        corner_idx = self.layout.get("corner_index", 0)
+        avatar_on_left = layout_type in ["hero_center", "top_center", "side_strip", "asymmetric"] or \
+                         (layout_type == "corner_cycling" and corner_idx in [0, 2, 3])
+        
+        if avatar_on_left:
+            # Entity logo zone (to the right of avatar corner) - reserve space to prevent collision
+            # Entity logo appears to the right of avatar: ax + cur_w + 20, size = 0.6 * avatar_size
+            # Reserve space for avatar + padding + logo
+            avatar_max_w = 340  # max avatar width
+            logo_max_w = int(avatar_max_w * 0.6)
+            padding = 20
+            # Entity logo zone: to the right of avatar corner
+            self.reserve_zone(
+                self.frame_w - 320 - logo_max_w - padding,  # left edge
+                100,  # top
+                self.frame_w - 20,  # right edge
+                420,  # bottom
+                "entity_logo_zone"
+            )
     
     def reserve_zone(self, x1, y1, x2, y2, name):
         """Reserve a rectangular zone so no other element can overlap it."""
@@ -7849,6 +7874,17 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                         else:
                             home_x = (FRAME_W - scaled_w) / 2.0 + layout["avatar_x_offset"]
                             home_y = FRAME_H - scaled_h - 30.0
+                    
+                    # Check for collision with entity logo zone and adjust if needed
+                    entity_logo_pos = safe_zones.get_position("entity_logo_zone")
+                    if entity_logo_pos:
+                        ez_x, ez_y, ez_w, ez_h = entity_logo_pos
+                        # Check if avatar would overlap with entity logo zone
+                        # Avatar right edge: home_x + scaled_w
+                        # Entity logo zone left edge: ez_x
+                        if home_x + scaled_w > ez_x:
+                            # Move avatar left to avoid collision (with 10px padding)
+                            home_x = ez_x - scaled_w - 10
                     
                     # Screenshot-aware positioning: glide to top-right corner before screenshot, fade during, return after
                     # Screenshot typically shows 4.0-12.0s
