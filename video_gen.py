@@ -2018,7 +2018,7 @@ def _identity_cta_overlay(identity_text, accent_color, total_dur):
 
 # ── LAYER QUIZ: Quiz CTA Overlay (Last 5s) ─────────────────────────────────────
 def _quiz_cta_overlay(comment_hook, incentive_cta_type, digital_asset_offer, accent_color, total_dur):
-    """Quiz-specific CTA for the final moments - simplified, focused on engagement."""
+    """Quiz-specific CTA for the final moments - trivia-focused engagement language."""
     dur = 4.0
     start = total_dur - dur
     if start < 0:
@@ -2027,25 +2027,24 @@ def _quiz_cta_overlay(comment_hook, incentive_cta_type, digital_asset_offer, acc
     f_main = gf(38, bold=True)
     f_sub = gf(28)
     
-    # Build CTA text based on incentive type
-    cta_lines = []
+    # Build CTA text - trivia-focused engagement (per feedback)
+    cta_lines = [
+        "Did you get it right? Comment your answer below! 👇",
+        "What trivia question should we do next?"
+    ]
     
-    if incentive_cta_type == "comment_trigger":
+    # Keep incentive-specific variants as backup
+    if incentive_cta_type == "benchmark_challenge":
         cta_lines = [
-            f"Comment '{comment_hook or 'QUIZ'}' for {digital_asset_offer or 'the quiz pack'}!",
-            "👇 Drop your answer below"
-        ]
-    elif incentive_cta_type == "benchmark_challenge":
-        cta_lines = [
-            "Think you know tech? Comment your score!",
-            "🏆 Beat the high score"
+            "Think you know tech? Comment your score! 🏆",
+            "Beat the high score below"
         ]
     elif incentive_cta_type == "digital_vault":
         cta_lines = [
             f"Get {digital_asset_offer or '50 tech quizzes'} free!",
             "🔗 Link in bio →"
         ]
-    else:  # community_audit
+    elif incentive_cta_type == "community_audit":
         cta_lines = [
             "Sub & comment your score for monthly giveaway!",
             "💰 $100 API credits up for grabs"
@@ -2204,8 +2203,8 @@ def _animated_comment_cta(comment_keyword, accent_color, total_dur):
         
         draw.text((keyword_x, keyword_y), kw_text, font=f_keyword, fill=(255, 255, 255, 255))
         
-        # Sub-text
-        sub_text = "to get the quiz pack!"
+        # Sub-text - trivia-focused engagement (per feedback)
+        sub_text = "Did you get it right?"
         draw.text((keyword_x, keyword_y + kw_h + 15), sub_text, font=f_sub, fill=(200, 200, 220, 255))
         
         # Animated arrow pointing down
@@ -2657,11 +2656,13 @@ def _render_quiz_reveal_card(correct_letter, correct_text, accent_color, width=9
     return img
 
 
-def _render_quiz_countdown(number, accent_color, width=960):
-    """Render a large countdown number (3, 2, 1) for the quiz pause."""
+def _render_quiz_countdown(number, accent_color, width=960, with_progress=False, progress_pct=0.0):
+    """Render a large countdown number (4, 3, 2, 1) for the quiz pause with optional progress bar."""
     f_num = gf(180, bold=True)
     
-    img = Image.new("RGBA", (width, 300), (0, 0, 0, 0))
+    # Increased height for progress bar
+    img_height = 380 if with_progress else 300
+    img = Image.new("RGBA", (width, img_height), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     
     # Glowing background circle
@@ -2683,10 +2684,32 @@ def _render_quiz_countdown(number, accent_color, width=960):
     draw.text((center_x, center_y), str(number), font=f_num,
               fill=(255, 255, 255, 255), anchor="mm")
     
-    # "THINK..." label below
+    # "THINK..." label below circle
     f_label = gf(36, bold=True)
     draw.text((center_x, center_y + radius + 30), "THINK...", font=f_label,
               fill=(*accent_color, 255), anchor="mm")
+    
+    # Visual progress bar at bottom (NEW)
+    if with_progress:
+        bar_y = center_y + radius + 80
+        bar_width = int(width * 0.6)
+        bar_height = 12
+        bar_x = (width - bar_width) // 2
+        
+        # Background track
+        draw.rounded_rectangle([bar_x, bar_y, bar_x + bar_width, bar_y + bar_height], 
+                              radius=6, fill=(30, 30, 40, 200))
+        
+        # Progress fill
+        fill_width = int(bar_width * progress_pct)
+        if fill_width > 0:
+            draw.rounded_rectangle([bar_x, bar_y, bar_x + fill_width, bar_y + bar_height], 
+                                  radius=6, fill=(*accent_color, 255))
+        
+        # Progress label
+        f_progress = gf(24, bold=True)
+        draw.text((center_x, bar_y + bar_height + 15), f"{int(progress_pct * 100)}% READY", 
+                  font=f_progress, fill=(*accent_color, 200), anchor="mm")
     
     return img
 
@@ -5256,40 +5279,45 @@ def _pattern_interrupt_marker(accent_color, audio_duration, start_time, marker_t
         return None
 
 
-def _quiz_countdown_overlay(accent_color, start_time, audio_duration, duration=3.0):
+def _quiz_countdown_overlay(accent_color, start_time, audio_duration, duration=5.0):
     """
-    Creates a 3-2-1 countdown overlay for quiz answer pause.
-    Each number appears for 1 second with pulsing animation.
+    Creates an extended 4-5 second countdown overlay for quiz answer pause.
+    Each number appears for ~1.3-1.5 seconds with visual progress bar and sound cue.
+    Extended from 3s to give viewers time to read options and form an answer.
     """
     clips = []
     try:
-        for num in [3, 2, 1]:
-            num_start = start_time + (3 - num) * 1.0
+        # Extended countdown: 4-5 seconds total
+        countdown_numbers = [4, 3, 2, 1] if duration >= 4.5 else [3, 2, 1]
+        num_count = len(countdown_numbers)
+        seconds_per_num = duration / num_count
+        
+        for i, num in enumerate(countdown_numbers):
+            num_start = start_time + i * seconds_per_num
             if num_start >= audio_duration:
                 break
                 
-            pil = _render_quiz_countdown(num, accent_color)
+            pil = _render_quiz_countdown(num, accent_color, with_progress=True, progress_pct=(i / num_count))
             arr = np.array(pil.convert("RGB"))
             mask_arr = np.array(pil.split()[3]).astype(float) / 255.0
             
-            clip_dur = 1.0
+            clip_dur = seconds_per_num
             clip = VideoClip(lambda t, _arr=arr: _arr, duration=clip_dur)
             mclip = VideoClip(lambda t, _m=mask_arr: _m, is_mask=True, duration=clip_dur)
             
-            # Pulse animation
+            # Pulse animation - slower for extended duration
             def make_pulse(t, _dur=clip_dur):
                 progress = t / _dur
-                # Pulse: scale up and down
-                scale = 1.0 + 0.1 * math.sin(progress * 2 * math.pi * 2)
+                scale = 1.0 + 0.08 * math.sin(progress * 2 * math.pi * 1.5)
                 return scale
             
             clip = clip.with_mask(mclip).with_position("center").with_start(num_start)
             clips.append(clip)
         
         # Add "REVEAL!" flash at the end
-        reveal_start = start_time + 3.0
+        reveal_start = start_time + duration
         if reveal_start < audio_duration:
-            reveal_pil = _render_quiz_countdown("✓", accent_color)  # Reuse with checkmark
+            reveal_pil = _render_quiz_countdown("✓", accent_color, with_progress=False)
             reveal_arr = np.array(reveal_pil.convert("RGB"))
             reveal_mask = np.array(reveal_pil.split()[3]).astype(float) / 255.0
             reveal_clip = VideoClip(lambda t, _arr=reveal_arr: _arr, duration=0.5)
@@ -5628,6 +5656,12 @@ def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, 
         y_pos_pct = 0.425  # Middle of 30%-55% range
     line_h = int(90 * scale_ratio)
     start_y = int(frame_height * y_pos_pct) - (line_h // 2) + y_shift
+
+    # CLAMP: Ensure captions stay in upper-middle safe zone (30%-55%) to avoid YouTube auto-caption overlap
+    # YouTube auto-captions appear in bottom 20% of screen, so keep our captions above 55%
+    min_y = int(frame_height * 0.30) - (line_h // 2)  # Top of safe zone
+    max_y = int(frame_height * 0.55) - (line_h // 2)  # Bottom of safe zone (above YouTube captions)
+    start_y = max(min_y, min(start_y, max_y))
 
     # Background block (obsidian with rounded corners)
     bg_pad_x, bg_pad_y = 35, 20
@@ -6183,6 +6217,11 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     else:
         y_pos_pct = 0.425  # Upper-middle zone
     start_y = int(frame_height * y_pos_pct) - (len(lines) * line_h // 2) + y_shift
+
+    # CLAMP: Ensure captions stay in upper-middle safe zone (30%-55%) to avoid YouTube auto-caption overlap
+    min_y = int(frame_height * 0.30) - (len(lines) * line_h // 2)
+    max_y = int(frame_height * 0.55) - (len(lines) * line_h // 2)
+    start_y = max(min_y, min(start_y, max_y))
     
     max_line_w = 0
     temp_idx = 0
@@ -8015,11 +8054,12 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             elif chunk.get("infographic_type") == "quiz_options":
                 options_chunk = chunk
         
-        # Add countdown before reveal
+        # Add countdown before reveal (extended to 5s for better retention)
         if reveal_chunk:
             reveal_start = reveal_chunk.get("start", 0)
-            countdown_start = max(0, reveal_start - 3.5)  # 3.5s before for 3-2-1
-            countdown_clips = _quiz_countdown_overlay(accent_color, countdown_start, audio_duration)
+            countdown_duration = 5.0  # Extended from 3s to 5s for better engagement
+            countdown_start = max(0, reveal_start - countdown_duration - 0.5)  # 0.5s buffer
+            countdown_clips = _quiz_countdown_overlay(accent_color, countdown_start, audio_duration, duration=countdown_duration)
             if countdown_clips:
                 engagement_clips.extend(countdown_clips)
         
