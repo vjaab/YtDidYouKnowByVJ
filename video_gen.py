@@ -3580,38 +3580,13 @@ def _get_category_avatar_style(category: str, is_shorts: bool = False) -> dict:
     return styles.get(category, default)
 
 
-# ── IMPROVEMENT #1: Floating Circular Face-Cam Frame ─────────────────────────
+# ── Avatar frame (no circular mask - show as-is) ───────────────────────────────
 def _apply_circular_facecam_frame(avatar_clip, cur_w, cur_h, accent_color, audio_duration, is_longform=False, cat_style=None):
     """
-    Wraps the avatar PiP in a premium circular frame with neon glow ring
-    and drop shadow. Returns a new composite clip.
-    Reference: Vaibhav Sisinty floating circular face-cam.
+    Returns avatar clip as-is (no circular mask, no ring).
+    Kept for API compatibility with calling code.
     """
-    # Use category-specific accent tint if available
-    if cat_style and cat_style.get("accent_tint"):
-        ring_accent_color = cat_style["accent_tint"]
-    else:
-        ring_accent_color = accent_color
-    
-    # Determine circle diameter (use the smaller dimension)
-    diameter = min(cur_w, cur_h)
-
-    # Create circular mask
-    circle_mask = np.zeros((cur_h, cur_w), dtype=np.float32)
-    cy, cx = cur_h // 2, cur_w // 2
-    Y, X = np.ogrid[:cur_h, :cur_w]
-    r = diameter // 2 - 4  # Slight inset for border
-    dist = np.sqrt((X - cx) ** 2 + (Y - cy) ** 2)
-    circle_mask[dist <= r] = 1.0
-    # Smooth edge (anti-alias)
-    edge_band = 3.0
-    circle_mask[(dist > r) & (dist <= r + edge_band)] = 1.0 - (dist[(dist > r) & (dist <= r + edge_band)] - r) / edge_band
-
-    # Apply circular mask to the avatar
-    mask_clip = VideoClip(lambda t: circle_mask, is_mask=True, duration=audio_duration)
-    avatar_clip = avatar_clip.with_mask(mask_clip)
-
-    # No border/ring - return clean circular avatar
+    # No circular mask - show avatar as-is
     return avatar_clip, None, 0
 
 
