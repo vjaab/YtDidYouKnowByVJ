@@ -149,8 +149,8 @@ class SafeZoneCalculator:
                 # Left strip
                 self.reserve_zone(20, self.frame_h // 2 - 160, 340, self.frame_h // 2 + 160, "avatar_corner")
             elif layout_type == "top_center":
-                # Top center
-                self.reserve_zone(self.frame_w // 2 - 160, 80, self.frame_w // 2 + 160, 400, "avatar_corner")
+                # Left middle (changed from top center)
+                self.reserve_zone(20, self.frame_h // 2 - 160, 340, self.frame_h // 2 + 160, "avatar_corner")
             elif layout_type == "corner_cycling":
                 # Will be set per-video based on corner_index
                 corner_idx = self.layout.get("corner_index", 0)
@@ -7838,8 +7838,9 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                                 home_x = 20.0
                                 home_y = (FRAME_H - scaled_h) / 2.0
                             elif layout_type == "top_center":
-                                home_x = (FRAME_W - scaled_w) / 2.0
-                                home_y = 80.0
+                                # Left middle (changed from top center)
+                                home_x = 20.0
+                                home_y = (FRAME_H - scaled_h) / 2.0
                             elif layout_type == "corner_cycling":
                                 home_x, home_y = corners[corner_index % 4]
                             else:  # asymmetric
