@@ -3478,13 +3478,119 @@ def _longform_progress_dots(fact_timestamps, accent_color, audio_duration):
     return clips
 
 
+# ── CATEGORY-SPECIFIC AVATAR STYLE ─────────────────────────────────────────────
+def _get_category_avatar_style(category: str, is_shorts: bool = False) -> dict:
+    """
+    Returns category-specific visual style for avatar PiP.
+    Adds visual variety while keeping layout-based positioning.
+    """
+    category = category.lower().strip()
+    
+    styles = {
+        "quiz & trivia": {
+            "scale_mult": 1.0,
+            "entrance_style": "pop_in",      # Quick pop with bounce
+            "glow_style": "pulse_fast",      # Fast pulse for energy
+            "border_style": "double_ring",   # Double ring for quiz vibe
+            "accent_tint": (255, 215, 0),    # Gold accent
+        },
+        "ai & tech tools": {
+            "scale_mult": 1.0,
+            "entrance_style": "slide_right", # Tech slide-in
+            "glow_style": "pulse_medium",
+            "border_style": "neon_cyan",     # Cyan neon for tech
+            "accent_tint": (0, 230, 255),
+        },
+        "tech gadgets & inventions": {
+            "scale_mult": 1.05,
+            "entrance_style": "zoom_reveal", # Zoom from center
+            "glow_style": "pulse_slow",
+            "border_style": "gradient_ring", # Colorful gradient
+            "accent_tint": (255, 110, 0),    # Orange for excitement
+        },
+        "finance & tech economy": {
+            "scale_mult": 0.95,
+            "entrance_style": "slide_up",    # Professional slide up
+            "glow_style": "pulse_medium",
+            "border_style": "gold_ring",     # Gold for finance
+            "accent_tint": (255, 215, 0),
+        },
+        "facts & trivia": {
+            "scale_mult": 1.0,
+            "entrance_style": "fade_in",     # Clean fade
+            "glow_style": "steady",          # Steady glow for facts
+            "border_style": "single_ring",
+            "accent_tint": (86, 217, 160),   # Green for knowledge
+        },
+        "coding & development hacks": {
+            "scale_mult": 1.0,
+            "entrance_style": "typewriter",  # Type-on effect
+            "glow_style": "pulse_medium",
+            "border_style": "terminal_green", # Terminal aesthetic
+            "accent_tint": (50, 255, 50),
+        },
+        "interview questions": {
+            "scale_mult": 1.0,
+            "entrance_style": "slide_left",  # Question from left
+            "glow_style": "pulse_fast",
+            "border_style": "double_ring",
+            "accent_tint": (197, 121, 230),  # Purple for questions
+        },
+        "programming language origins": {
+            "scale_mult": 1.0,
+            "entrance_style": "zoom_reveal",
+            "glow_style": "pulse_slow",
+            "border_style": "gradient_ring",
+            "accent_tint": (95, 158, 255),   # Cornflower blue
+        },
+        "tech company founding stories": {
+            "scale_mult": 1.0,
+            "entrance_style": "fade_in",
+            "glow_style": "steady",
+            "border_style": "single_ring",
+            "accent_tint": (255, 182, 193),  # Light pink for stories
+        },
+        "famous bugs & glitches": {
+            "scale_mult": 1.0,
+            "entrance_style": "glitch_in",   # Glitch effect for bugs
+            "glow_style": "pulse_fast",
+            "border_style": "red_ring",      # Red for bugs
+            "accent_tint": (255, 80, 80),
+        },
+        "agentic ai facts": {
+            "scale_mult": 1.05,
+            "entrance_style": "slide_right",
+            "glow_style": "pulse_medium",
+            "border_style": "neon_cyan",
+            "accent_tint": (0, 230, 255),
+        },
+    }
+    
+    # Default fallback
+    default = {
+        "scale_mult": 1.0,
+        "entrance_style": "fade_in",
+        "glow_style": "pulse_medium",
+        "border_style": "single_ring",
+        "accent_tint": None,  # Use layout accent
+    }
+    
+    return styles.get(category, default)
+
+
 # ── IMPROVEMENT #1: Floating Circular Face-Cam Frame ─────────────────────────
-def _apply_circular_facecam_frame(avatar_clip, cur_w, cur_h, accent_color, audio_duration, is_longform=False):
+def _apply_circular_facecam_frame(avatar_clip, cur_w, cur_h, accent_color, audio_duration, is_longform=False, cat_style=None):
     """
     Wraps the avatar PiP in a premium circular frame with neon glow ring
     and drop shadow. Returns a new composite clip.
     Reference: Vaibhav Sisinty floating circular face-cam.
     """
+    # Use category-specific accent tint if available
+    if cat_style and cat_style.get("accent_tint"):
+        ring_accent_color = cat_style["accent_tint"]
+    else:
+        ring_accent_color = accent_color
+    
     # Determine circle diameter (use the smaller dimension)
     diameter = min(cur_w, cur_h)
 
@@ -3512,11 +3618,40 @@ def _apply_circular_facecam_frame(avatar_clip, cur_w, cur_h, accent_color, audio
     for glow_r in range(8, 0, -1):
         alpha = int(25 * (glow_r / 8))
         ring_draw.ellipse([8 - glow_r, 8 - glow_r, ring_size - 8 + glow_r, ring_size - 8 + glow_r],
-                          outline=(*accent_color, alpha), width=2)
+                          outline=(*ring_accent_color, alpha), width=2)
 
-    # Main border ring
-    ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4],
-                      outline=(*accent_color, 200), width=3)
+    # Main border ring - apply category-specific border style
+    border_style = cat_style.get("border_style", "single_ring") if cat_style else "single_ring"
+    ring_accent = (*ring_accent_color, 200)
+    
+    if border_style == "double_ring":
+        # Double ring for quiz vibe
+        ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4], outline=ring_accent, width=3)
+        ring_draw.ellipse([10, 10, ring_size - 10, ring_size - 10], outline=(*ring_accent_color, 100), width=2)
+    elif border_style == "neon_cyan":
+        # Neon cyan for tech
+        ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4], outline=(*ring_accent_color, 200), width=3)
+        ring_draw.ellipse([8, 8, ring_size - 8, ring_size - 8], outline=(0, 255, 255, 100), width=1)
+    elif border_style == "gradient_ring":
+        # Multi-color gradient ring
+        ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4], outline=(*ring_accent_color, 200), width=3)
+        ring_draw.ellipse([8, 8, ring_size - 8, ring_size - 8], outline=(255, 110, 0, 150), width=2)
+    elif border_style == "gold_ring":
+        # Gold ring for finance
+        ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4], outline=(255, 215, 0, 200), width=3)
+        ring_draw.ellipse([8, 8, ring_size - 8, ring_size - 8], outline=(255, 255, 255, 80), width=1)
+    elif border_style == "terminal_green":
+        # Terminal green for coding
+        ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4], outline=(50, 255, 50, 200), width=3)
+        ring_draw.ellipse([8, 8, ring_size - 8, ring_size - 8], outline=(0, 200, 0, 100), width=1)
+    elif border_style == "red_ring":
+        # Red ring for bugs
+        ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4], outline=(255, 80, 80, 200), width=3)
+        ring_draw.ellipse([8, 8, ring_size - 8, ring_size - 8], outline=(255, 255, 255, 80), width=1)
+    else:
+        # Default single ring
+        ring_draw.ellipse([4, 4, ring_size - 4, ring_size - 4], outline=ring_accent, width=3)
+    
     # Inner subtle white ring
     ring_draw.ellipse([7, 7, ring_size - 7, ring_size - 7],
                       outline=(255, 255, 255, 60), width=1)
@@ -3524,9 +3659,22 @@ def _apply_circular_facecam_frame(avatar_clip, cur_w, cur_h, accent_color, audio
     ring_arr = np.array(ring_img.convert("RGB"))
     ring_mask = np.array(ring_img.split()[3]).astype(float) / 255.0
 
-    # Pulsing glow opacity
+    # Pulsing glow opacity - use category-specific glow style
+    glow_style = cat_style.get("glow_style", "pulse_medium") if cat_style else "pulse_medium"
+    if glow_style == "pulse_fast":
+        pulse_freq = 4.0
+    elif glow_style == "pulse_slow":
+        pulse_freq = 1.0
+    elif glow_style == "steady":
+        pulse_freq = 0.0
+    else:
+        pulse_freq = 2.0
+    
     def ring_opacity(t):
-        pulse = 0.7 + 0.3 * math.sin(t * 2.0)
+        if pulse_freq > 0:
+            pulse = 0.7 + 0.3 * math.sin(t * pulse_freq)
+        else:
+            pulse = 1.0
         return ring_mask * pulse
 
     ring_clip = VideoClip(lambda t: ring_arr, duration=audio_duration)
@@ -7639,17 +7787,36 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             ])
             # Color Matching: Disabled to keep avatar look intact (lip sync)
 
-            # ── IMPROVEMENT #1: Circular Face-Cam Frame (Premium PiP) ─────────
+            # ── CATEGORY-SPECIFIC AVATAR STYLE ────────────────────────────────────
+            # Get category-specific visual style for visual variety
+            category = script_json.get("sub_category", "").lower()
+            is_shorts = not is_longform
+            cat_style = _get_category_avatar_style(category, is_shorts)
+            
+            # Apply category-specific scale multiplier
+            avatar_scale_mult *= cat_style.get("scale_mult", 1.0)
+            
+            # Recalculate dimensions with category scale
+            cur_w = max(1, int(width_pip * avatar_scale_mult))
+            cur_h = max(1, int(height_pip * avatar_scale_mult))
+
+            # ── IMPROVEMENT #1: Circular Face-Cam Frame with Category-Specific Style ─────────
             ring_clip = None
             ring_size = 0
-            # Disabled circular facecam for longform to create a centered talking-head presenter
-            # standing in front of background visuals, matching the explainer style of the reference video.
-            if is_longform and False:
+            # Enable circular face-cam for shorts with category-specific styling
+            enable_circular_for_shorts = (
+                not is_longform 
+                and layout_variation_enabled 
+                and layout.get("layout_type") in ["split_screen", "hero_center", "corner_cycling", "top_center", "side_strip"]
+            )
+            if enable_circular_for_shorts:
                 try:
+                    # Pass category-specific style to circular frame
                     avatar_clip, ring_clip, ring_size = _apply_circular_facecam_frame(
-                        avatar_clip, cur_w, cur_h, accent_color, audio_duration, is_longform=True
+                        avatar_clip, cur_w, cur_h, accent_color, audio_duration, 
+                        is_longform=False, cat_style=cat_style
                     )
-                    print("   ✅ Circular face-cam frame with glow ring applied.")
+                    print(f"   ✅ Circular face-cam frame applied ({cat_style.get('border_style', 'default')})")
                 except Exception as e:
                     print(f"   ⚠️ Circular frame failed (non-fatal): {e}")
 
