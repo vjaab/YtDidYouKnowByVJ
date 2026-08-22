@@ -3493,78 +3493,56 @@ def _get_category_avatar_style(category: str, is_shorts: bool = False) -> dict:
             "scale_mult": 1.0,
             "entrance_style": "pop_in",      # Quick pop with bounce
             "glow_style": "pulse_fast",      # Fast pulse for energy
-            "border_style": "double_ring",   # Double ring for quiz vibe
-            "accent_tint": (255, 215, 0),    # Gold accent
         },
         "ai & tech tools": {
             "scale_mult": 1.0,
             "entrance_style": "slide_right", # Tech slide-in
             "glow_style": "pulse_medium",
-            "border_style": "neon_cyan",     # Cyan neon for tech
-            "accent_tint": (0, 230, 255),
         },
         "tech gadgets & inventions": {
             "scale_mult": 1.05,
             "entrance_style": "zoom_reveal", # Zoom from center
             "glow_style": "pulse_slow",
-            "border_style": "gradient_ring", # Colorful gradient
-            "accent_tint": (255, 110, 0),    # Orange for excitement
         },
         "finance & tech economy": {
             "scale_mult": 0.95,
             "entrance_style": "slide_up",    # Professional slide up
             "glow_style": "pulse_medium",
-            "border_style": "gold_ring",     # Gold for finance
-            "accent_tint": (255, 215, 0),
         },
         "facts & trivia": {
             "scale_mult": 1.0,
             "entrance_style": "fade_in",     # Clean fade
             "glow_style": "steady",          # Steady glow for facts
-            "border_style": "single_ring",
-            "accent_tint": (86, 217, 160),   # Green for knowledge
         },
         "coding & development hacks": {
             "scale_mult": 1.0,
             "entrance_style": "typewriter",  # Type-on effect
             "glow_style": "pulse_medium",
-            "border_style": "terminal_green", # Terminal aesthetic
-            "accent_tint": (50, 255, 50),
         },
         "interview questions": {
             "scale_mult": 1.0,
             "entrance_style": "slide_left",  # Question from left
             "glow_style": "pulse_fast",
-            "border_style": "double_ring",
-            "accent_tint": (197, 121, 230),  # Purple for questions
         },
         "programming language origins": {
             "scale_mult": 1.0,
             "entrance_style": "zoom_reveal",
             "glow_style": "pulse_slow",
-            "border_style": "gradient_ring",
-            "accent_tint": (95, 158, 255),   # Cornflower blue
         },
         "tech company founding stories": {
             "scale_mult": 1.0,
             "entrance_style": "fade_in",
             "glow_style": "steady",
-            "border_style": "single_ring",
-            "accent_tint": (255, 182, 193),  # Light pink for stories
         },
         "famous bugs & glitches": {
             "scale_mult": 1.0,
             "entrance_style": "glitch_in",   # Glitch effect for bugs
             "glow_style": "pulse_fast",
-            "border_style": "red_ring",      # Red for bugs
-            "accent_tint": (255, 80, 80),
         },
         "agentic ai facts": {
             "scale_mult": 1.05,
             "entrance_style": "slide_right",
             "glow_style": "pulse_medium",
-            "border_style": "neon_cyan",
-            "accent_tint": (0, 230, 255),
         },
     }
     
@@ -3573,8 +3551,6 @@ def _get_category_avatar_style(category: str, is_shorts: bool = False) -> dict:
         "scale_mult": 1.0,
         "entrance_style": "fade_in",
         "glow_style": "pulse_medium",
-        "border_style": "single_ring",
-        "accent_tint": None,  # Use layout accent
     }
     
     return styles.get(category, default)
