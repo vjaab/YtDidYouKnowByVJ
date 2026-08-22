@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 generate_decorator_images.py — Generate educational images using decorator_flow_template
-for Instagram (4:5), Facebook (16:9), and send to Telegram for review.
-Supports multiple variants: modern, minimal, code-focused
+for Instagram (4:5), Facebook (1.91:1), and send to Telegram for review.
+Single variant: modern
 """
 
 import os
@@ -41,32 +41,14 @@ ICONS_DIR = ASSETS_DIR / "icons"
 INSTAGRAM_W, INSTAGRAM_H = 1080, 1350  # 4:5
 FACEBOOK_W, FACEBOOK_H = 1200, 628     # 1.91:1 (FB link post)
 
-# Variant configurations
-VARIANTS = {
-    "modern": {
-        "name": "Modern Gradient",
-        "bg_primary": "#0B0E14",
-        "bg_secondary": "#12161F",
-        "accent_glow": True,
-        "dots_opacity": 0.05,
-        "watermark_opacity": 0.025,
-    },
-    "minimal": {
-        "name": "Clean Minimal",
-        "bg_primary": "#FFFFFF",
-        "bg_secondary": "#F5F5F5",
-        "accent_glow": False,
-        "dots_opacity": 0.0,
-        "watermark_opacity": 0.0,
-    },
-    "code-focused": {
-        "name": "Code Focused",
-        "bg_primary": "#1E1E2E",
-        "bg_secondary": "#282A36",
-        "accent_glow": False,
-        "dots_opacity": 0.03,
-        "watermark_opacity": 0.02,
-    },
+# Single variant configuration (modern)
+VARIANT = {
+    "name": "Modern Gradient",
+    "bg_primary": "#0B0E14",
+    "bg_secondary": "#12161F",
+    "accent_glow": True,
+    "dots_opacity": 0.05,
+    "watermark_opacity": 0.025,
 }
 
 # Topics to rotate through
@@ -196,9 +178,9 @@ def get_fonts_dict():
     return fonts
 
 
-def get_variant_styles(variant: str) -> dict:
-    """Get CSS variables for a variant."""
-    return VARIANTS.get(variant, VARIANTS["modern"])
+def get_variant_styles() -> dict:
+    """Get CSS variables for the modern variant."""
+    return VARIANT
 
 
 def render_image(template_name: str, context: dict, output_path: Path, width: int, height: int):
@@ -222,10 +204,10 @@ def render_image(template_name: str, context: dict, output_path: Path, width: in
     return output_path
 
 
-def generate_variant_images(topic_data: dict, output_dir: Path, variant: str) -> tuple:
-    """Generate Instagram and Facebook images for a specific variant."""
+def generate_images(topic_data: dict, output_dir: Path) -> tuple:
+    """Generate Instagram and Facebook images (single variant)."""
     fonts = get_fonts_dict()
-    variant_styles = get_variant_styles(variant)
+    variant_styles = get_variant_styles()
     
     for step in topic_data["steps"]:
         step["icon_svg"] = icon_svg(step["icon"])
@@ -249,18 +231,18 @@ def generate_variant_images(topic_data: dict, output_dir: Path, variant: str) ->
         "arrow_svg": arrow_svg,
         "check_svg": check_svg,
         "closing_line": topic_data["closing_line"],
-        "variant": variant,
+        "variant": "modern",
         "variant_styles": variant_styles,
     }
     
     # Instagram 4:5
     ig_context = {**base_context, "canvas_w": INSTAGRAM_W, "canvas_h": INSTAGRAM_H}
-    ig_path = output_dir / f"instagram_{topic_data['topic'].lower().replace(' ', '_')}_{variant}.png"
+    ig_path = output_dir / f"instagram_{topic_data['topic'].lower().replace(' ', '_')}.png"
     render_image("decorator_flow.html.j2", ig_context, ig_path, INSTAGRAM_W, INSTAGRAM_H)
     
     # Facebook 1.91:1
     fb_context = {**base_context, "canvas_w": FACEBOOK_W, "canvas_h": FACEBOOK_H}
-    fb_path = output_dir / f"facebook_{topic_data['topic'].lower().replace(' ', '_')}_{variant}.png"
+    fb_path = output_dir / f"facebook_{topic_data['topic'].lower().replace(' ', '_')}.png"
     render_image("decorator_flow.html.j2", fb_context, fb_path, FACEBOOK_W, FACEBOOK_H)
     
     return ig_path, fb_path
@@ -325,13 +307,13 @@ def save_metadata(output_dir: Path, topic_data: dict, variants: list, ig_paths: 
     meta = {
         "topic": topic_data["topic"],
         "category": topic_data["category"],
-        "variants": variants,
+        "variant": "modern",
         "instagram_images": [str(p) for p in ig_paths],
         "facebook_images": [str(p) for p in fb_paths],
         "caption": caption,
         "hashtags": hashtags,
         "poll_file": str(poll_path),
-        "generated_at": __import__("datetime").datetime.utcnow().isoformat(),
+        "generated_at": __import__("datetime").datetime.now(datetime.timezone.utc).isoformat(),
     }
     
     meta_path = output_dir / f"metadata_{topic_data['topic'].lower().replace(' ', '_')}.json"
@@ -419,14 +401,13 @@ def main():
     parser.add_argument("--now", action="store_true", help="Run immediately")
     parser.add_argument("--dry-run", action="store_true", help="Preview without posting to Telegram")
     parser.add_argument("--topic", type=str, help="Specific topic to generate")
-    parser.add_argument("--variant", choices=["modern", "minimal", "code-focused", "all"], default="all", help="Template variant")
     parser.add_argument("--hashtags-file", type=str, help="Path to hashtags file")
     args = parser.parse_args()
 
     if not args.now and not args.dry_run:
         print("Usage: python generate_decorator_images.py --now       # Generate and send to Telegram")
         print("       python generate_decorator_images.py --dry-run   # Generate only")
-        print("       python generate_decorator_images.py --now --topic 'Python Decorators' --variant modern")
+        print("       python generate_decorator_images.py --now --topic 'Python Decorators'")
         sys.exit(1)
 
     # Get topic
@@ -438,32 +419,22 @@ def main():
     else:
         topic_data = get_next_topic()
 
-    # Determine variants
-    if args.variant == "all":
-        variants = ["modern", "minimal", "code-focused"]
-    else:
-        variants = [args.variant]
-
     # Load hashtags
     hashtags = ""
     if args.hashtags_file:
         hashtags = load_hashtags(args.hashtags_file)
 
     print(f"🎨 Generating images for: {topic_data['topic']}")
-    print(f"   Variants: {', '.join(variants)}")
 
     output_dir = Path(__file__).parent / "output" / "social_images"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     try:
-        all_ig_paths = []
-        all_fb_paths = []
-        
-        for variant in variants:
-            print(f"\n🎨 Generating {variant} variant...")
-            ig_path, fb_path = generate_variant_images(topic_data, output_dir, variant)
-            all_ig_paths.append(ig_path)
-            all_fb_paths.append(fb_path)
+        # Generate single variant images
+        print(f"\n🎨 Generating modern variant...")
+        ig_path, fb_path = generate_images(topic_data, output_dir)
+        all_ig_paths = [ig_path]
+        all_fb_paths = [fb_path]
         
         # Generate caption
         caption = generate_caption(topic_data, hashtags)
@@ -476,7 +447,7 @@ def main():
         
         # Save metadata
         meta_path = save_metadata(
-            output_dir, topic_data, variants, 
+            output_dir, topic_data, ["modern"], 
             all_ig_paths, all_fb_paths, 
             caption, hashtags, poll_path
         )
@@ -498,17 +469,16 @@ def main():
             set_gha_output("hashtags", hashtags)
             return
 
-        # Send to Telegram for review (send first variant)
-        caption_text = f"📚 <b>{topic_data['topic']}</b> ({variants[0]})\n\nReady for review. Approve for posting?\n\nFollow @Vijayakumarj_ai for more!"
+        # Send to Telegram for review
+        caption_text = f"📚 <b>{topic_data['topic']}</b> (modern)\n\nReady for review. Approve for posting?\n\nFollow @Vijayakumarj_ai for more!"
         
         send_image_to_telegram(all_ig_paths[0], caption_text)
         send_image_to_telegram(all_fb_paths[0], caption_text)
         
         send_telegram_message(
             f"✅ Images generated for: {topic_data['topic']}\n"
-            f"Variants: {', '.join(variants)}\n"
-            f"Instagram (4:5): {len(all_ig_paths)} images\n"
-            f"Facebook (1.91:1): {len(all_fb_paths)} images\n\nReply to approve for posting.",
+            f"Instagram (4:5): {len(all_ig_paths)} image\n"
+            f"Facebook (1.91:1): {len(all_fb_paths)} image\n\nReply to approve for posting.",
             emoji="🤖"
         )
 

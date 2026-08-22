@@ -61,12 +61,11 @@ def send_approval_request(topic: str, ig_images: list, fb_images: list, caption_
     keyboard = {
         "inline_keyboard": [
             [
-                {"text": "✅ Approve & Post All", "callback_data": f"approve_all:{topic}"},
+                {"text": "✅ Approve & Post Both", "callback_data": f"approve_all:{topic}"},
                 {"text": "✅ Approve Instagram Only", "callback_data": f"approve_ig:{topic}"},
             ],
             [
                 {"text": "✅ Approve Facebook Only", "callback_data": f"approve_fb:{topic}"},
-                {"text": "✅ Approve + X/LinkedIn", "callback_data": f"approve_all_cross:{topic}"},
             ],
             [
                 {"text": "❌ Reject", "callback_data": f"reject:{topic}"},
@@ -204,53 +203,30 @@ def post_to_platforms(state: dict):
     
     results = {}
     
-    # Determine which platforms to post to
-    post_ig = action in ["approve_all", "approve_ig", "approve_all_cross"]
-    post_fb = action in ["approve_all", "approve_fb", "approve_all_cross"]
-    post_x = action in ["approve_all_cross"]
-    post_linkedin = action in ["approve_all_cross"]
+    # Determine which platforms to post to (only Instagram and Facebook)
+    post_ig = action in ["approve_all", "approve_ig"]
+    post_fb = action in ["approve_all", "approve_fb"]
     
     if post_ig and ig_images:
         print("📸 Posting to Instagram...")
-        # Import and call post_to_instagram
         sys.path.insert(0, str(Path(__file__).parent))
         from post_to_instagram import post_to_instagram
-        for img in ig_images:
-            try:
-                post_id = post_to_instagram(img, caption)
-                results["instagram"] = post_id
-            except Exception as e:
-                results["instagram"] = f"ERROR: {e}"
+        # Use first image only
+        try:
+            post_id = post_to_instagram(ig_images[0], caption)
+            results["instagram"] = post_id
+        except Exception as e:
+            results["instagram"] = f"ERROR: {e}"
     
     if post_fb and fb_images:
         print("📘 Posting to Facebook...")
         from post_to_facebook import post_to_facebook
-        for img in fb_images:
-            try:
-                post_id = post_to_facebook(img, caption)
-                results["facebook"] = post_id
-            except Exception as e:
-                results["facebook"] = f"ERROR: {e}"
-    
-    if post_x and ig_images:
-        print("🐦 Posting to X...")
-        from post_to_x import post_to_x
-        for img in ig_images:
-            try:
-                post_id = post_to_x(img, caption)
-                results["x"] = post_id
-            except Exception as e:
-                results["x"] = f"ERROR: {e}"
-    
-    if post_linkedin and fb_images:
-        print("💼 Posting to LinkedIn...")
-        from post_to_linkedin import post_to_linkedin
-        for img in fb_images:
-            try:
-                post_id = post_to_linkedin(img, caption)
-                results["linkedin"] = post_id
-            except Exception as e:
-                results["linkedin"] = f"ERROR: {e}"
+        # Use first image only
+        try:
+            post_id = post_to_facebook(fb_images[0], caption)
+            results["facebook"] = post_id
+        except Exception as e:
+            results["facebook"] = f"ERROR: {e}"
     
     return results
 

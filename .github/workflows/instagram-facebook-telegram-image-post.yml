@@ -77,11 +77,12 @@ jobs:
           echo "IG_ACCESS_TOKEN=${{ secrets.IG_ACCESS_TOKEN }}" >> .env
           echo "FB_PAGE_ID=${{ secrets.FB_PAGE_ID }}" >> .env
           echo "FB_PAGE_ACCESS_TOKEN=${{ secrets.FB_PAGE_ACCESS_TOKEN }}" >> .env
-          echo "X_API_KEY=${{ secrets.X_API_KEY }}" >> .env
-          echo "X_API_SECRET=${{ secrets.X_API_SECRET }}" >> .env
-          echo "X_ACCESS_TOKEN=${{ secrets.X_ACCESS_TOKEN }}" >> .env
-          echo "X_ACCESS_SECRET=${{ secrets.X_ACCESS_SECRET }}" >> .env
-          echo "LINKEDIN_ACCESS_TOKEN=${{ secrets.LINKEDIN_ACCESS_TOKEN }}" >> .env
+          # X/Twitter and LinkedIn posting disabled
+          # echo "X_API_KEY=${{ secrets.X_API_KEY }}" >> .env
+          # echo "X_API_SECRET=${{ secrets.X_API_SECRET }}" >> .env
+          # echo "X_ACCESS_TOKEN=${{ secrets.X_ACCESS_TOKEN }}" >> .env
+          # echo "X_ACCESS_SECRET=${{ secrets.X_ACCESS_SECRET }}" >> .env
+          # echo "LINKEDIN_ACCESS_TOKEN=${{ secrets.LINKEDIN_ACCESS_TOKEN }}" >> .env
           echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env
           echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .env
 
@@ -161,11 +162,12 @@ jobs:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
-          X_API_KEY: ${{ secrets.X_API_KEY }}
-          X_API_SECRET: ${{ secrets.X_API_SECRET }}
-          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
-          X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
-          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          # X/Twitter and LinkedIn posting disabled
+          # X_API_KEY: ${{ secrets.X_API_KEY }}
+          # X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          # X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          # X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+          # LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
         run: |
           python -u telegram_approval_handler.py --wait-and-post \
             --topic "${{ needs.generate-images.outputs.topic }}" \
