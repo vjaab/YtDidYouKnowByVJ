@@ -15,6 +15,16 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 from playwright.sync_api import sync_playwright
 import requests
+import datetime
+
+# ── GitHub Actions Output Helper ───────────────────────────────────────────────
+def set_gha_output(key: str, value: str):
+    """Set GitHub Actions output."""
+    github_output = os.getenv("GITHUB_OUTPUT")
+    if github_output:
+        with open(github_output, "a") as f:
+            f.write(f"{key}={value}\n")
+    print(f"{key}={value}")  # Also print for visibility
 
 # ── Config ──────────────────────────────────────────────────────────────────────
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
@@ -480,11 +490,12 @@ def main():
             print(f"   Metadata: {meta_path}")
             
             # Output for GitHub Actions
-            print(f"IG_IMAGES={','.join(str(p) for p in all_ig_paths)}")
-            print(f"FB_IMAGES={','.join(str(p) for p in all_fb_paths)}")
-            print(f"CAPTION_FILE={caption_path}")
-            print(f"POLL_FILE={poll_path}")
-            print(f"HASHTAGS={hashtags}")
+            set_gha_output("topic", topic_data["topic"])
+            set_gha_output("ig_images", ','.join(str(p) for p in all_ig_paths))
+            set_gha_output("fb_images", ','.join(str(p) for p in all_fb_paths))
+            set_gha_output("caption_file", str(caption_path))
+            set_gha_output("poll_file", str(poll_path))
+            set_gha_output("hashtags", hashtags)
             return
 
         # Send to Telegram for review (send first variant)
@@ -502,11 +513,12 @@ def main():
         )
 
         # Output for GitHub Actions
-        print(f"IG_IMAGES={','.join(str(p) for p in all_ig_paths)}")
-        print(f"FB_IMAGES={','.join(str(p) for p in all_fb_paths)}")
-        print(f"CAPTION_FILE={caption_path}")
-        print(f"POLL_FILE={poll_path}")
-        print(f"HASHTAGS={hashtags}")
+        set_gha_output("topic", topic_data["topic"])
+        set_gha_output("ig_images", ','.join(str(p) for p in all_ig_paths))
+        set_gha_output("fb_images", ','.join(str(p) for p in all_fb_paths))
+        set_gha_output("caption_file", str(caption_path))
+        set_gha_output("poll_file", str(poll_path))
+        set_gha_output("hashtags", hashtags)
         
         print("\n✅ Generation complete. Images sent to Telegram for review.")
 

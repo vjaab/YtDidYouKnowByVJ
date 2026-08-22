@@ -135,6 +135,12 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Download Generated Images
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-images
+          path: output/social_images/
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
