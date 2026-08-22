@@ -3580,17 +3580,83 @@ def _get_category_avatar_style(category: str, is_shorts: bool = False) -> dict:
     return styles.get(category, default)
 
 
-# ── Avatar frame (show as-is, no circular mask, no border, no ring) ───────────────
+# ── Avatar frame with entrance animations (no circular mask, no border, no ring) ────────────
 def _apply_circular_facecam_frame(avatar_clip, cur_w, cur_h, accent_color, audio_duration, is_longform=False, cat_style=None):
     """
-    Returns avatar clip as-is (no circular mask, no border, no ring).
+    Returns avatar clip with entrance animation only (no circular mask, no border, no ring).
     Kept for API compatibility with calling code.
     """
-    # Show avatar as-is (rectangular), no circular mask, no border, no ring
+    entrance_style = cat_style.get("entrance_style", "fade_in") if cat_style else "fade_in"
+    
+    def entrance_transform(t):
+        """Returns (scale, opacity, x_offset, y_offset) for entrance animation"""
+        progress = min(t / 0.8, 1.0)  # 800ms entrance duration
+        
+        if entrance_style == "pop_in":
+            # Quick pop with bounce (cubic ease-out + overshoot)
+            p = 1.0 - (1.0 - progress) ** 3
+            scale = 0.3 + 0.7 * p + 0.15 * math.sin(progress * 4 * math.pi) * (1 - progress)
+            return scale, progress, 0, 0
+            
+        elif entrance_style == "slide_right":
+            # Slide in from right
+            p = 1.0 - (1.0 - progress) ** 2
+            scale = 1.0
+            x_offset = (cur_w * 0.5) * (1 - p)
+            return scale, p, x_offset, 0
+            
+        elif entrance_style == "zoom_reveal":
+            # Zoom from center
+            p = progress ** 2
+            scale = 0.1 + 0.9 * p
+            return scale, p, 0, 0
+            
+        elif entrance_style == "slide_up":
+            # Professional slide up
+            p = 1.0 - (1.0 - progress) ** 2
+            y_offset = (cur_h * 0.3) * (1 - p)
+            return 1.0, p, 0, y_offset
+            
+        elif entrance_style == "slide_left":
+            # Slide in from left
+            p = 1.0 - (1.0 - progress) ** 2
+            x_offset = (-cur_w * 0.5) * (1 - p)
+            return 1.0, p, x_offset, 0
+            
+        elif entrance_style == "glitch_in":
+            # Glitch effect - rapid position jitter
+            glitch_intensity = (1 - progress) * 0.15
+            jitter_x = glitch_intensity * cur_w * math.sin(t * 50) * (1 - progress)
+            jitter_y = glitch_intensity * cur_h * math.cos(t * 47) * (1 - progress)
+            return 1.0, progress, jitter_x, jitter_y
+            
+        elif entrance_style == "typewriter":
+            # Typewriter - character by character reveal
+            p = progress
+            return 1.0, p, 0, 0
+            
+        else:  # fade_in default
+            return 1.0, progress, 0, 0
+    
+    # Apply entrance transform to avatar clip using Resize effect
+    def entrance_scale_fn(t):
+        scale, _, _, _ = entrance_transform(t)
+        return scale
+    
+    def entrance_opacity_fn(t):
+        _, opacity, _, _ = entrance_transform(t)
+        return opacity
+    
+    avatar_clip = avatar_clip.with_effects([
+        vfx.Resize(entrance_scale_fn),
+    ])
+    
+    # Apply opacity animation via a simple fade-in mask (full frame, not circular)
+    entrance_mask = VideoClip(lambda t: np.full((cur_h, cur_w), entrance_opacity_fn(t)), is_mask=True, duration=audio_duration)
+    avatar_clip = avatar_clip.with_mask(entrance_mask)
+
+    # No border, no ring, no glow - just entrance animation
     return avatar_clip, None, 0
-
-
-# ── IMPROVEMENT #7: Mid-Video Subscribe CTA ──────────────────────────────────
 def _mid_video_subscribe_prompt(accent_color, audio_duration):
     """
     Visual-only subscribe prompt that appears at 75% of the video.
