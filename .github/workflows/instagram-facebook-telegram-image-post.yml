@@ -16,12 +16,6 @@ on:
         description: 'Specific topic to generate'
         required: false
         type: string
-      variant:
-        description: 'Template variant'
-        required: false
-        type: choice
-        options: [modern, minimal, code-focused, all]
-        default: 'all'
       auto_post:
         description: 'Auto-post after Telegram approval'
         required: false
@@ -92,16 +86,14 @@ jobs:
           python -u fetch_trending_hashtags.py --category "tech" > hashtags.txt
           echo "hashtags=$(cat hashtags.txt)" >> $GITHUB_OUTPUT
 
-      - name: Generate Multi-Variant Images
+      - name: Generate Images
         id: gen
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          VARIANT: ${{ github.event.inputs.variant || 'all' }}
           TOPIC: ${{ github.event.inputs.topic || '' }}
         run: |
           python -u generate_decorator_images.py --now \
-            --variant "${{ github.event.inputs.variant || 'all' }}" \
             --topic "${{ github.event.inputs.topic || '' }}" \
             --hashtags-file hashtags.txt
 
