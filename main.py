@@ -1165,8 +1165,8 @@ def run_pipeline(topic_type="auto", dry_run=False, resume=False, start_stage=Non
     # ── STEP 10g: Threads Auto-Post ────────────────────────────────────────────
     log_message("STEP 10g: Auto-posting to Threads...")
     try:
-        # Use dedicated Threads caption for Shorts
-        threads_caption = format_threads_caption(title, description, hashtags, youtube_url, script_data)
+        # Use dedicated Threads caption for Shorts (pass ai_desc to avoid duplicate hook)
+        threads_caption = format_threads_caption(title, ai_desc, hashtags, youtube_url, script_data)
         if dry_run:
             print("🧪 [DRY RUN] Simulating Threads upload...")
             threads_uploaded, threads_result = True, "MOCK_THREADS_POST_ID"
