@@ -249,7 +249,13 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
           # 1. Pull latest changes first using rebase and autostash
-          if ! git pull origin main --rebase --autostash; then
+          # Capture output to detect stash application conflicts
+          PULL_OUTPUT=$(git pull origin main --rebase --autostash 2>&1)
+          PULL_EXIT_CODE=$?
+          echo "$PULL_OUTPUT"
+          
+          # Check if pull failed
+          if [ $PULL_EXIT_CODE -ne 0 ]; then
             echo "⚠️ Rebase pull failed. Checking for merge conflicts..."
             if [ -n "$(git diff --name-only --diff-filter=U)" ]; then
               echo "❌ Merge conflicts detected! Aborting rebase to prevent committing conflicts."
@@ -258,6 +264,13 @@ jobs:
             else
               echo "Pull failed for other reasons, proceeding..."
             fi
+          fi
+          
+          # Check if stash application resulted in conflicts (git outputs warning but exits 0)
+          if echo "$PULL_OUTPUT" | grep -q "applying them resulted in conflicts"; then
+            echo "⚠️ Stash application had conflicts. Resetting to pulled state and discarding local changes..."
+            git reset --hard HEAD
+            git stash drop || echo "No stash to drop"
           fi
           
           # 2. Add tracking files and technical logs (force add since logs/ is gitignored)
