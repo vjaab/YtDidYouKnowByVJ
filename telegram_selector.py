@@ -252,6 +252,66 @@ def send_upload_consent(thumbnail_path, title, duration_sec):
     return False
 
 
+def _send_video(video_path, caption="", supports_streaming=True):
+    """Send a local video file to Telegram using sendVideo."""
+    with open(video_path, "rb") as f:
+        r = requests.post(
+            f"{BASE_URL}/sendVideo",
+            data={
+                "chat_id": CHAT_ID,
+                "caption": caption,
+                "parse_mode": "HTML",
+                "supports_streaming": str(supports_streaming).lower(),
+            },
+            files={"video": f},
+            timeout=300  # 5 min for video upload
+        )
+    r.raise_for_status()
+    return r.json().get("result", {})
+
+
+def send_video_to_telegram(video_path: str, caption: str = "", dry_run: bool = False):
+    """
+    Uploads a video file directly to Telegram channel using Bot API sendVideo.
+    
+    Args:
+        video_path (str): Absolute path to the .mp4 video file.
+        caption (str): Caption text for the video (HTML parse mode).
+        dry_run (bool): If True, simulate the upload without actually sending.
+    
+    Returns:
+        tuple: (bool success, str result_message_or_video_id)
+    """
+    if dry_run:
+        print("🧪 [DRY RUN] Simulating Telegram video upload...")
+        return True, "MOCK_TELEGRAM_VIDEO_ID"
+
+    if not BOT_TOKEN or not CHAT_ID:
+        return False, "Skipped: Telegram credentials not configured (TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID)"
+
+    if not os.path.exists(video_path):
+        return False, f"Error: Video file not found at {video_path}"
+
+    file_size = os.path.getsize(video_path)
+    size_mb = file_size / (1024 * 1024)
+    
+    # Telegram Bot API limit is 50MB for bots (2GB for local server)
+    if size_mb > 50:
+        return False, f"Video too large ({size_mb:.1f}MB) for Telegram Bot API (50MB limit)"
+
+    try:
+        print(f"📡 [Telegram] Uploading video ({size_mb:.1f}MB)...")
+        result = _send_video(video_path, caption)
+        video_id = result.get("video", {}).get("file_id", "unknown")
+        print(f"🎉 Telegram video sent! File ID: {video_id}")
+        return True, video_id
+    except requests.HTTPError as e:
+        response_text = e.response.text if e.response else ""
+        return False, f"Telegram API error (HTTP {e.response.status_code}): {response_text}"
+    except Exception as e:
+        return False, f"Telegram upload exception: {e}"
+
+
 def notify_telegram(message, emoji="ℹ️"):
     """Send a plain notification message to Telegram."""
     if BOT_TOKEN and CHAT_ID:

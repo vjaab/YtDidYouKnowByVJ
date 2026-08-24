@@ -88,6 +88,14 @@ jobs:
           echo "PEXELS_API_KEY=${{ secrets.PEXELS_API_KEY }}" >> .env
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env
           echo "TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}" >> .env
+          echo "THREADS_USER_ID=${{ secrets.THREADS_USER_ID }}" >> .env
+          echo "THREADS_ACCESS_TOKEN=${{ secrets.THREADS_ACCESS_TOKEN }}" >> .env
+          if [ ! -z "${{ secrets.THREADS_APP_ID }}" ]; then
+            echo "THREADS_APP_ID=${{ secrets.THREADS_APP_ID }}" >> .env
+          fi
+          if [ ! -z "${{ secrets.THREADS_APP_SECRET }}" ]; then
+            echo "THREADS_APP_SECRET=${{ secrets.THREADS_APP_SECRET }}" >> .env
+          fi
           echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> .env
           echo "CF_ACCOUNT_ID=${{ secrets.CF_ACCOUNT_ID }}" >> .env
           echo "CF_API_TOKEN=${{ secrets.CF_API_TOKEN }}" >> .env

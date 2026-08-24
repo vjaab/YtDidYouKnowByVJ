@@ -29,7 +29,8 @@ from youtube_upload import upload_video
 from x_upload import upload_video_to_x
 from instagram_upload import upload_reel_to_instagram
 from facebook_upload import post_video_to_facebook_page
-from telegram_selector import notify_telegram as real_notify_telegram
+from telegram_selector import notify_telegram as real_notify_telegram, send_video_to_telegram
+from threads_upload import upload_video_to_threads
 from entity_fetcher import fetch_all_entities, get_retention_layers_config
 from kaggle_handover import trigger_kaggle_gpu_job
 from tags_helper import get_optimized_metadata
@@ -994,6 +995,60 @@ def run_pipeline(topic_type="auto", dry_run=False):
             log_message(f"WARNING: Facebook posting skipped/failed: {fb_result}")
     except Exception as ex:
         log_message(f"WARNING: Facebook auto-post failed: {ex}")
+
+    # ── STEP 10f: Telegram Video Auto-Post ───────────────────────────────────
+    log_message("STEP 10f: Auto-posting video to Telegram...")
+    try:
+        # Telegram caption: concise with link
+        tg_caption = f"""🔥 <b>{title}</b>
+
+{description[:500]}
+
+🎥 <a href="{youtube_url}">Watch on YouTube</a>
+
+📲 Join: <a href="https://t.me/technewsbyvj">Telegram</a> | <a href="https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z">WhatsApp</a>
+
+{' '.join(hashtags[:5])}"""
+        if dry_run:
+            print("🧪 [DRY RUN] Simulating Telegram video upload...")
+            tg_uploaded, tg_result = True, "MOCK_TELEGRAM_VIDEO_ID"
+        else:
+            tg_uploaded, tg_result = send_video_to_telegram(video_path, tg_caption)
+
+        if tg_uploaded:
+            log_message(f"SUCCESS: Posted video to Telegram! File ID: {tg_result}")
+        else:
+            log_message(f"WARNING: Telegram posting skipped/failed: {tg_result}")
+    except Exception as ex:
+        log_message(f"WARNING: Telegram auto-post failed: {ex}")
+
+    # ── STEP 10g: Threads Auto-Post ────────────────────────────────────────────
+    log_message("STEP 10g: Auto-posting to Threads...")
+    try:
+        # Threads caption: native format with line breaks
+        threads_caption = f"""🔥 {title}
+
+{description[:800]}
+
+🎥 Full breakdown: {youtube_url}
+
+📲 Follow for daily AI insights:
+• Telegram → https://t.me/technewsbyvj
+• WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
+
+{' '.join(hashtags[:5])}"""
+        if dry_run:
+            print("🧪 [DRY RUN] Simulating Threads upload...")
+            threads_uploaded, threads_result = True, "MOCK_THREADS_POST_ID"
+        else:
+            threads_uploaded, threads_result = upload_video_to_threads(video_path, threads_caption)
+
+        if threads_uploaded:
+            log_message(f"SUCCESS: Posted to Threads! ID: {threads_result}")
+        else:
+            log_message(f"WARNING: Threads posting skipped/failed: {threads_result}")
+    except Exception as ex:
+        log_message(f"WARNING: Threads auto-post failed: {ex}")
 
     # ── STEP 10b: Generate Pinned Comment ───────────────────────────────────
     next_slot = get_next_slot(slot)

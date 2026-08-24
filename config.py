@@ -31,6 +31,10 @@ INSTAGRAM_APP_SECRET = os.getenv("INSTAGRAM_APP_SECRET", "")
 INSTAGRAM_ACCESS_TOKEN = os.getenv("INSTAGRAM_ACCESS_TOKEN", "")
 INSTAGRAM_BUSINESS_ACCOUNT_ID = os.getenv("INSTAGRAM_BUSINESS_ACCOUNT_ID", "")
 
+# Threads API Credentials (Official Threads Publishing)
+THREADS_APP_ID = os.getenv("THREADS_APP_ID", "")
+THREADS_APP_SECRET = os.getenv("THREADS_APP_SECRET", "")
+
 # Trending Engine API Keys (Phase 1)
 YOUTUBE_DATA_API_KEY = os.getenv("YOUTUBE_DATA_API_KEY", "")
 REDDIT_CLIENT_ID = os.getenv("REDDIT_CLIENT_ID", "")
