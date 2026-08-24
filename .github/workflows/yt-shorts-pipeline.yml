@@ -183,6 +183,14 @@ jobs:
           echo '{"username":"${{ secrets.KAGGLE_USERNAME }}","key":"${{ secrets.KAGGLE_KEY }}"}' > ~/.kaggle/kaggle.json
           chmod 600 ~/.kaggle/kaggle.json
           
+      - name: Download Checkpoints Artifact
+        if: always()
+        uses: actions/download-artifact@v4
+        with:
+          name: shorts-pipeline-checkpoints
+          path: .pipeline_checkpoints
+          fail-on-error: false
+
       - name: Run Pipeline (Kaggle GPU Priority)
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -194,7 +202,15 @@ jobs:
           ORT_LOG_LEVEL: ERROR  # Suppress harmless ONNX Runtime PCI bus warnings
           CI_LITE: "1"
         run: |
-          python -u main.py --now --type auto
+          python -u main.py --now --type auto --resume
+         
+      - name: Upload Checkpoints Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shorts-pipeline-checkpoints
+          path: .pipeline_checkpoints/
+          retention-days: 7
         
       - name: Commit Updated Tracking File & Logs
         # Always run this step to save the log, preventing duplicate topics tomorrow

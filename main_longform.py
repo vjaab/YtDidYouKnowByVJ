@@ -28,12 +28,16 @@ import random
 import traceback
 from datetime import datetime
 
-from config import LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY, MUSIC_DIR
+from config import LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY, MUSIC_DIR, BASE_DIR
 from config_longform import (
     LONGFORM_TARGET_AUDIO_DURATION, LONGFORM_MAX_CHAPTERS,
     LONGFORM_VISUAL_BEATS_PER_CHAPTER, LONGFORM_BGM_VOLUME,
     LONGFORM_MAX_RETRY_ATTEMPTS, LONGFORM_TRACKER_FILE,
     LONGFORM_WORD_COUNT_TARGET, get_topic_depth_mode
+)
+from pipeline_checkpoint import (
+    save_checkpoint, load_checkpoint, clear_checkpoints,
+    get_resume_stage, list_checkpoints, STAGES
 )
 from fetch_research_papers import fetch_tech_news, fetch_ai_tools, fetch_trending_from_newsapi, fetch_reddit_news
 from kaggle_handover import trigger_kaggle_gpu_job
@@ -167,7 +171,7 @@ def format_longform_description(script_data, hashtags):
     return templates[template_idx]
 
 
-def run_longform_pipeline(dry_run=False):
+def run_longform_pipeline(dry_run=False, resume=False, start_stage=None):
     """Main chaptered deep-dive pipeline: research → script → render → upload."""
     depth_mode = get_topic_depth_mode()
     log_message(f"=== STARTING CHAPTERED DEEP-DIVE PIPELINE (mode={depth_mode}) ===")
@@ -176,251 +180,166 @@ def run_longform_pipeline(dry_run=False):
     has_kaggle = os.getenv("KAGGLE_USERNAME") is not None or os.path.exists(os.path.expanduser("~/.kaggle/kaggle.json"))
     use_local_only = os.environ.get("USE_LOCAL_ONLY") == "true"
 
-    # ── Clean output folder ──────────────────────────────────────────────
-    if os.path.exists(OUTPUT_DIR):
-        for f in glob.glob(os.path.join(OUTPUT_DIR, "*")):
-            try:
-                if os.path.isfile(f):
-                    os.remove(f)
-            except Exception:
-                pass
-        log_message(f"Output folder cleaned: {OUTPUT_DIR}")
-
-    # ── STEP 1: Fetch RSS + NewsAPI Articles ─────────────────────────────
-    log_message("STEP 1: Fetching RSS articles...")
+    # ── Resume logic ─────────────────────────────────────────────────────
     rss_articles = []
-    try:
-        # Fetch vidIQ trending topics
-        vidiq_news = []
-        try:
-            from vidiq_trending import get_pipeline_topics
-            vidiq_raw = get_pipeline_topics(category="AI Did You Know")
-            for item in vidiq_raw:
-                vidiq_news.append({
-                    "title": item["original_title"] if item.get("original_title") else item["title"],
-                    "description": f"vidIQ Score: {item.get('score', 60)} (Volume: {item.get('search_volume')}, Competition: {item.get('competition')})",
-                    "source": {"name": item.get("source", "vidIQ")},
-                    "url": item.get("url", ""),
-                    "publishedAt": datetime.now().isoformat(),
-                    "type": "trending",
-                    "_engagement_score": item.get("score", 60)
-                })
-            log_message(f"📈 vidIQ: {len(vidiq_news)} topics.")
-        except Exception as ex:
-            log_message(f"⚠️ vidIQ failed (non-fatal): {ex}")
-
-        research_news = fetch_tech_news(hours=48)
-        ai_tool_news = fetch_ai_tools(hours=48)
-        trending_news = fetch_trending_from_newsapi()
-
-        try:
-            reddit_news = fetch_reddit_news(hours=48)
-        except Exception:
-            reddit_news = []
-
-        try:
-            from fetch_research_papers import fetch_x_trending_ai_topics
-            x_news = fetch_x_trending_ai_topics()
-        except Exception:
-            x_news = []
-
-        try:
-            from trending_engine import fetch_github_trending_ai
-            github_news = fetch_github_trending_ai()
-        except Exception:
-            github_news = []
-
-        rss_articles = github_news + vidiq_news + research_news + ai_tool_news + trending_news + x_news + reddit_news
-
-        if not rss_articles:
-            log_message("⚠️ All sources returned 0 articles. Pipeline will rely on Gemini Search.")
-        else:
-            log_message(f"✅ Fetched {len(rss_articles)} total articles.")
-    except Exception as e:
-        log_message(f"⚠️ RSS Fetch failed: {e}")
-
-    # ── STEP 2: Generate Chaptered Script ────────────────────────────────
-    attempts = 0
     script_data = None
-    best_script_data = None
-    best_word_count = 0
     audio_path = None
     word_timestamps = []
     duration = 0
-    min_dur, max_dur = LONGFORM_TARGET_AUDIO_DURATION
-    failed_topics = []
+    chunks = []
+    video_path = None
+    thumbnail_path = None
 
-    while attempts < LONGFORM_MAX_RETRY_ATTEMPTS:
-        log_message(f"STEP 2 (Attempt {attempts + 1}/{LONGFORM_MAX_RETRY_ATTEMPTS}): "
-                   f"Generating chaptered deep-dive script...")
-
-        script_data = generate_longform_script(
-            articles=rss_articles,
-            failed_topics=failed_topics
-        )
-
-        if not script_data:
-            log_message("ERROR: Script generation failed.")
-            attempts += 1
-            if attempts % 3 == 0:
-                log_message("⏳ Potential rate limit. Sleeping 60s...")
-                time.sleep(60)
-            continue
-
-        # Track best candidate
-        script = script_data.get("script", "")
-        word_count = len(script.split())
-        if word_count > best_word_count:
-            best_word_count = word_count
-            best_script_data = dict(script_data)
-
-        # Mark as longform
-        script_data["slot"] = "Slot L (Long-form)"
-        script_data["is_longform"] = True
-
-        title = script_data.get("title", "AI Deep Dive")
-        chapters = script_data.get("chapters", [])
-        log_message(f"Generated Title: {title}")
-        log_message(f"Script: {word_count} words, {len(chapters)} chapters")
-        for i, ch in enumerate(chapters):
-            log_message(f"  Ch{i+1}: {ch.get('chapter_title', 'Untitled')} "
-                       f"({len(ch.get('visual_beats', []))} beats)")
-
-        # ── STEP 3: Generate Audio ───────────────────────────────────────
-        log_message("STEP 3: Generating voiceover...")
-        custom_map = script_data.get("phonetic_pronunciation_map", {})
-
-        # Select intro video for lip-sync
-        intro_videos = glob.glob("assets/video/*.mp4")
-        if not intro_videos:
-            intro_videos = ["assets/video/Firefly_video_final.mp4"]
-        from topic_tracker import get_next_avatar
-        selected_avatar = get_next_avatar(intro_videos, tracker_file=LONGFORM_TRACKER_FILE)
-        script_data["lipsync_face_path"] = selected_avatar
-
-        # ── Word Count Pre-Flight ────────────────────────────────────────
-        expected_dur = word_count / 2.33  # ~140 WPM
-
-        if expected_dur < min_dur:
-            log_message(f"⚠️ Script too short ({word_count} words, ~{expected_dur:.0f}s < {min_dur}s). Retrying...")
-            attempts += 1
-            script_data = None
-            continue
-        elif expected_dur > max_dur + 60:
-            log_message(f"⚠️ Script too long ({word_count} words, ~{expected_dur:.0f}s > {max_dur + 60}s). Retrying...")
-            attempts += 1
-            script_data = None
-            continue
-
-        # ── STEP 2b: Capture Screenshots ─────────────────────────────────
-        log_message("STEP 2b: Capturing article screenshots (MANDATORY)...")
-        topics = script_data.get("longform_topics", [])
-        screenshots_captured = 0
-        for i, topic in enumerate(topics):
-            url = topic.get("source_url", "")
-            if url:
-                ss_filename = f"screenshot_longform_{i+1}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-                ss_path = capture_article_screenshot(
-                    url, ss_filename, desktop=True,
-                    headline=topic.get("headline")
-                )
-                if ss_path:
-                    topic["screenshot_path"] = ss_path
-                    screenshots_captured += 1
-                    if i == 0:
-                        script_data["screenshot_path"] = ss_path
-        log_message(f"✅ Captured {screenshots_captured}/{len(topics)} screenshots.")
-        
-        if screenshots_captured == 0:
-            # Screenshot is MANDATORY — reject this topic and try another
-            failed_headline = script_data.get("longform_topics", [{}])[0].get("headline", "Unknown")
-            failed_topics.append(failed_headline)
-            log_message(f"❌ Article screenshot FAILED for all topics. Rejecting...")
-            script_data = None
-            attempts += 1
-            continue
-
-        if has_kaggle and not use_local_only:
-            log_message("Attempting Kaggle GPU handover...")
-            results = trigger_kaggle_gpu_job(script_data, custom_map)
-
-            kaggle_failed = False
-            if results is None:
-                kaggle_failed = True
-            elif isinstance(results, dict) and "error" in results:
-                kaggle_failed = True
-                log_message(f"❌ Kaggle failed: [{results['error']}] {results.get('message', '')}")
-
-            if not kaggle_failed:
-                audio_path = results.get("audio_path")
-                duration = results.get("duration")
-                word_timestamps = results.get("word_timestamps")
-                ls_path = results.get("lipsync_path")
-                script_data["kaggle_lipsync_path"] = ls_path
-
-                ls_received = ls_path and os.path.exists(ls_path)
-                audio_received = audio_path and os.path.exists(audio_path)
-
-                if audio_received and ls_received:
-                    log_message("✅ Audio + Lip-Sync from Kaggle GPU!")
-                elif audio_received:
-                    log_message("✅ Audio from Kaggle (lip-sync missing)")
-                else:
-                    log_message("❌ Kaggle output missing. Retrying...")
-                    attempts += 1
-                    continue
+    if resume:
+        if start_stage:
+            resume_from = start_stage
+            log_message(f"🔄 Resuming from specified stage: {resume_from}")
+        else:
+            resume_from = get_resume_stage()
+            if resume_from:
+                log_message(f"🔄 Resuming from checkpoint: {resume_from}")
             else:
-                log_message("🔄 Kaggle unavailable. Using cloud TTS...")
+                log_message("🔄 No checkpoint found, starting fresh.")
+                resume_from = None
+
+        # Load checkpoints for completed stages
+        if resume_from:
+            completed_idx = STAGES.index(resume_from)
+            for stage in STAGES[:completed_idx]:
+                cp = load_checkpoint(stage)
+                if cp:
+                    if stage == "fetch_articles":
+                        rss_articles = cp.get("rss_articles", [])
+                    elif stage == "generate_script":
+                        script_data = cp.get("script_data")
+                    elif stage == "generate_audio":
+                        audio_path = cp.get("audio_path")
+                        word_timestamps = cp.get("word_timestamps", [])
+                        duration = cp.get("duration", 0)
+                    elif stage == "build_chunks":
+                        chunks = cp.get("chunks", [])
+                    elif stage == "render_video":
+                        video_path = cp.get("video_path")
+                    elif stage == "generate_thumbnail":
+                        thumbnail_path = cp.get("thumbnail_path")
+            log_message(f"✅ Loaded checkpoints up to: {STAGES[completed_idx - 1] if completed_idx > 0 else 'none'}")
+    else:
+        resume_from = None
+        # Clean output folder on fresh run
+        if os.path.exists(OUTPUT_DIR):
+            for f in glob.glob(os.path.join(OUTPUT_DIR, "*")):
                 try:
-                    notify_telegram(
-                        f"🔄 Kaggle fallback (Long-form)\n"
-                        f"Title: {script_data.get('title', 'Unknown')}",
-                        "⚠️"
-                    )
+                    if os.path.isfile(f):
+                        os.remove(f)
                 except Exception:
                     pass
-                audio_path, duration, word_timestamps = generate_voiceover(
-                    script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY
-                )
-                script_data["kaggle_lipsync_path"] = None
-                script_data["skip_avatar"] = True
-        else:
-            audio_path, duration, word_timestamps = generate_voiceover(
-                script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY
+            log_message(f"Output folder cleaned: {OUTPUT_DIR}")
+
+    # ── STEP 1: Fetch RSS + NewsAPI Articles ─────────────────────────────
+    if not resume_from or resume_from == "fetch_articles":
+        log_message("STEP 1: Fetching RSS articles...")
+        try:
+            # Fetch vidIQ trending topics
+            vidiq_news = []
+            try:
+                from vidiq_trending import get_pipeline_topics
+                vidiq_raw = get_pipeline_topics(category="AI Did You Know")
+                for item in vidiq_raw:
+                    vidiq_news.append({
+                        "title": item["original_title"] if item.get("original_title") else item["title"],
+                        "description": f"vidIQ Score: {item.get('score', 60)} (Volume: {item.get('search_volume')}, Competition: {item.get('competition')})",
+                        "source": {"name": item.get("source", "vidIQ")},
+                        "url": item.get("url", ""),
+                        "publishedAt": datetime.now().isoformat(),
+                        "type": "trending",
+                        "_engagement_score": item.get("score", 60)
+                    })
+                log_message(f"📈 vidIQ: {len(vidiq_news)} topics.")
+            except Exception as ex:
+                log_message(f"⚠️ vidIQ failed (non-fatal): {ex}")
+
+            research_news = fetch_tech_news(hours=48)
+            ai_tool_news = fetch_ai_tools(hours=48)
+            trending_news = fetch_trending_from_newsapi()
+
+            try:
+                reddit_news = fetch_reddit_news(hours=48)
+            except Exception:
+                reddit_news = []
+
+            try:
+                from fetch_research_papers import fetch_x_trending_ai_topics
+                x_news = fetch_x_trending_ai_topics()
+            except Exception:
+                x_news = []
+
+            try:
+                from trending_engine import fetch_github_trending_ai
+                github_news = fetch_github_trending_ai()
+            except Exception:
+                github_news = []
+
+            rss_articles = github_news + vidiq_news + research_news + ai_tool_news + trending_news + x_news + reddit_news
+
+            if not rss_articles:
+                log_message("⚠️ All sources returned 0 articles. Pipeline will rely on Gemini Search.")
+            else:
+                log_message(f"✅ Fetched {len(rss_articles)} total articles.")
+        except Exception as e:
+            log_message(f"⚠️ RSS Fetch failed: {e}")
+
+        save_checkpoint("fetch_articles", {"rss_articles": rss_articles})
+        resume_from = None  # Continue to next stage
+
+    # ── STEP 2: Generate Chaptered Script ────────────────────────────────
+    if not resume_from or resume_from == "generate_script":
+        attempts = 0
+        best_script_data = None
+        best_word_count = 0
+        min_dur, max_dur = LONGFORM_TARGET_AUDIO_DURATION
+        failed_topics = []
+
+        while attempts < LONGFORM_MAX_RETRY_ATTEMPTS:
+            log_message(f"STEP 2 (Attempt {attempts + 1}/{LONGFORM_MAX_RETRY_ATTEMPTS}): "
+                       f"Generating chaptered deep-dive script...")
+
+            script_data = generate_longform_script(
+                articles=rss_articles,
+                failed_topics=failed_topics
             )
 
-        if not audio_path:
-            log_message("ERROR: Audio generation failed.")
-            attempts += 1
-            continue
+            if not script_data:
+                log_message("ERROR: Script generation failed.")
+                attempts += 1
+                if attempts % 3 == 0:
+                    log_message("⏳ Potential rate limit. Sleeping 60s...")
+                    time.sleep(60)
+                continue
 
-        if duration < min_dur:
-            log_message(f"Audio too short ({duration:.1f}s < {min_dur}s). Retrying...")
-            attempts += 1
-            continue
+            # Track best candidate
+            script = script_data.get("script", "")
+            word_count = len(script.split())
+            if word_count > best_word_count:
+                best_word_count = word_count
+                best_script_data = dict(script_data)
 
-        if duration > max_dur + 60:
-            log_message(f"Audio too long ({duration:.1f}s > {max_dur + 60}s). Retrying...")
-            attempts += 1
-            continue
-
-        log_message(f"Audio OK: {duration:.1f}s | {len(word_timestamps)} word timestamps")
-        break
-
-    # ── FALLBACK ──────────────────────────────────────────────────────────
-    if not audio_path and best_script_data:
-        expected_best_dur = best_word_count / 2.33
-        if expected_best_dur < 30:
-            log_message(f"❌ Best candidate too short ({best_word_count} words). Aborting.")
-        else:
-            log_message(f"⚠️ [FALLBACK] Using best candidate ({best_word_count} words)...")
-            script_data = best_script_data
+            # Mark as longform
             script_data["slot"] = "Slot L (Long-form)"
             script_data["is_longform"] = True
 
-            script = script_data.get("script", "")
+            title = script_data.get("title", "AI Deep Dive")
+            chapters = script_data.get("chapters", [])
+            log_message(f"Generated Title: {title}")
+            log_message(f"Script: {word_count} words, {len(chapters)} chapters")
+            for i, ch in enumerate(chapters):
+                log_message(f"  Ch{i+1}: {ch.get('chapter_title', 'Untitled')} "
+                           f"({len(ch.get('visual_beats', []))} beats)")
+
+            # ── STEP 3: Generate Audio ───────────────────────────────────────
+            log_message("STEP 3: Generating voiceover...")
             custom_map = script_data.get("phonetic_pronunciation_map", {})
 
+            # Select intro video for lip-sync
             intro_videos = glob.glob("assets/video/*.mp4")
             if not intro_videos:
                 intro_videos = ["assets/video/Firefly_video_final.mp4"]
@@ -428,17 +347,87 @@ def run_longform_pipeline(dry_run=False):
             selected_avatar = get_next_avatar(intro_videos, tracker_file=LONGFORM_TRACKER_FILE)
             script_data["lipsync_face_path"] = selected_avatar
 
+            # ── Word Count Pre-Flight ────────────────────────────────────────
+            expected_dur = word_count / 2.33  # ~140 WPM
+
+            if expected_dur < min_dur:
+                log_message(f"⚠️ Script too short ({word_count} words, ~{expected_dur:.0f}s < {min_dur}s). Retrying...")
+                attempts += 1
+                script_data = None
+                continue
+            elif expected_dur > max_dur + 60:
+                log_message(f"⚠️ Script too long ({word_count} words, ~{expected_dur:.0f}s > {max_dur + 60}s). Retrying...")
+                attempts += 1
+                script_data = None
+                continue
+
+            # ── STEP 2b: Capture Screenshots ─────────────────────────────────
+            log_message("STEP 2b: Capturing article screenshots (MANDATORY)...")
+            topics = script_data.get("longform_topics", [])
+            screenshots_captured = 0
+            for i, topic in enumerate(topics):
+                url = topic.get("source_url", "")
+                if url:
+                    ss_filename = f"screenshot_longform_{i+1}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+                    ss_path = capture_article_screenshot(
+                        url, ss_filename, desktop=True,
+                        headline=topic.get("headline")
+                    )
+                    if ss_path:
+                        topic["screenshot_path"] = ss_path
+                        screenshots_captured += 1
+                        if i == 0:
+                            script_data["screenshot_path"] = ss_path
+            log_message(f"✅ Captured {screenshots_captured}/{len(topics)} screenshots.")
+            
+            if screenshots_captured == 0:
+                # Screenshot is MANDATORY — reject this topic and try another
+                failed_headline = script_data.get("longform_topics", [{}])[0].get("headline", "Unknown")
+                failed_topics.append(failed_headline)
+                log_message(f"❌ Article screenshot FAILED for all topics. Rejecting...")
+                script_data = None
+                attempts += 1
+                continue
+
             if has_kaggle and not use_local_only:
+                log_message("Attempting Kaggle GPU handover...")
                 results = trigger_kaggle_gpu_job(script_data, custom_map)
-                kaggle_failed = results is None or (isinstance(results, dict) and "error" in results)
+
+                kaggle_failed = False
+                if results is None:
+                    kaggle_failed = True
+                elif isinstance(results, dict) and "error" in results:
+                    kaggle_failed = True
+                    log_message(f"❌ Kaggle failed: [{results['error']}] {results.get('message', '')}")
+
                 if not kaggle_failed:
                     audio_path = results.get("audio_path")
                     duration = results.get("duration")
                     word_timestamps = results.get("word_timestamps")
-                    script_data["kaggle_lipsync_path"] = results.get("lipsync_path")
-                    if not (audio_path and os.path.exists(audio_path)):
-                        kaggle_failed = True
-                if kaggle_failed:
+                    ls_path = results.get("lipsync_path")
+                    script_data["kaggle_lipsync_path"] = ls_path
+
+                    ls_received = ls_path and os.path.exists(ls_path)
+                    audio_received = audio_path and os.path.exists(audio_path)
+
+                    if audio_received and ls_received:
+                        log_message("✅ Audio + Lip-Sync from Kaggle GPU!")
+                    elif audio_received:
+                        log_message("✅ Audio from Kaggle (lip-sync missing)")
+                    else:
+                        log_message("❌ Kaggle output missing. Retrying...")
+                        attempts += 1
+                        continue
+                else:
+                    log_message("🔄 Kaggle unavailable. Using cloud TTS...")
+                    try:
+                        notify_telegram(
+                            f"🔄 Kaggle fallback (Long-form)\n"
+                            f"Title: {script_data.get('title', 'Unknown')}",
+                            "⚠️"
+                        )
+                    except Exception:
+                        pass
                     audio_path, duration, word_timestamps = generate_voiceover(
                         script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY
                     )
@@ -449,85 +438,163 @@ def run_longform_pipeline(dry_run=False):
                     script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY
                 )
 
-    if not audio_path or not script_data:
-        log_message("ERROR: Could not generate valid assets. Aborting.")
-        return False
+            if not audio_path:
+                log_message("ERROR: Audio generation failed.")
+                attempts += 1
+                continue
+
+            if duration < min_dur:
+                log_message(f"Audio too short ({duration:.1f}s < {min_dur}s). Retrying...")
+                attempts += 1
+                continue
+
+            if duration > max_dur + 60:
+                log_message(f"Audio too long ({duration:.1f}s > {max_dur + 60}s). Retrying...")
+                attempts += 1
+                continue
+
+            log_message(f"Audio OK: {duration:.1f}s | {len(word_timestamps)} word timestamps")
+            break
+
+        # ── FALLBACK ──────────────────────────────────────────────────────────
+        if not audio_path and best_script_data:
+            expected_best_dur = best_word_count / 2.33
+            if expected_best_dur < 30:
+                log_message(f"❌ Best candidate too short ({best_word_count} words). Aborting.")
+            else:
+                log_message(f"⚠️ [FALLBACK] Using best candidate ({best_word_count} words)...")
+                script_data = best_script_data
+                script_data["slot"] = "Slot L (Long-form)"
+                script_data["is_longform"] = True
+
+                script = script_data.get("script", "")
+                custom_map = script_data.get("phonetic_pronunciation_map", {})
+
+                intro_videos = glob.glob("assets/video/*.mp4")
+                if not intro_videos:
+                    intro_videos = ["assets/video/Firefly_video_final.mp4"]
+                from topic_tracker import get_next_avatar
+                selected_avatar = get_next_avatar(intro_videos, tracker_file=LONGFORM_TRACKER_FILE)
+                script_data["lipsync_face_path"] = selected_avatar
+
+                if has_kaggle and not use_local_only:
+                    results = trigger_kaggle_gpu_job(script_data, custom_map)
+                    kaggle_failed = results is None or (isinstance(results, dict) and "error" in results)
+                    if not kaggle_failed:
+                        audio_path = results.get("audio_path")
+                        duration = results.get("duration")
+                        word_timestamps = results.get("word_timestamps")
+                        script_data["kaggle_lipsync_path"] = results.get("lipsync_path")
+                        if not (audio_path and os.path.exists(audio_path)):
+                            kaggle_failed = True
+                    if kaggle_failed:
+                        audio_path, duration, word_timestamps = generate_voiceover(
+                            script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY
+                        )
+                        script_data["kaggle_lipsync_path"] = None
+                        script_data["skip_avatar"] = True
+                else:
+                    audio_path, duration, word_timestamps = generate_voiceover(
+                        script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY
+                    )
+
+        if not audio_path or not script_data:
+            log_message("ERROR: Could not generate valid assets. Aborting.")
+            return False
+
+        save_checkpoint("generate_script", {"script_data": script_data})
+        save_checkpoint("generate_audio", {
+            "audio_path": audio_path,
+            "word_timestamps": word_timestamps,
+            "duration": duration
+        })
+        save_checkpoint("capture_screenshots", {"script_data": script_data})
+        resume_from = None
 
     # ── STEP 4: Reserve Topics in Tracker ────────────────────────────────
-    log_message("STEP 4: Reserving topics in tracker...")
-    title = script_data.get("title", "AI Deep Dive")
-    keywords = script_data.get("keywords", [])
-    hashtags = script_data.get("hashtags", [])
+    if not resume_from or resume_from == "fetch_articles" or resume_from == "generate_script" or resume_from == "generate_audio" or resume_from == "capture_screenshots":
+        log_message("STEP 4: Reserving topics in tracker...")
+        title = script_data.get("title", "AI Deep Dive")
+        keywords = script_data.get("keywords", [])
+        hashtags = script_data.get("hashtags", [])
 
-    companies_all = []
-    for t in script_data.get("longform_topics", []):
-        companies_all.append(t.get("source_name", ""))
+        companies_all = []
+        for t in script_data.get("longform_topics", []):
+            companies_all.append(t.get("source_name", ""))
 
-    record_story(
-        title, script_data.get("original_news_headline"),
-        "AI Deep Dive", companies_all, keywords, 7,
-        "deep_dive", "pending_upload", script_data.get("original_news_url"),
-        avatar_used=script_data.get("lipsync_face_path"),
-        tracker_file=LONGFORM_TRACKER_FILE
-    )
+        record_story(
+            title, script_data.get("original_news_headline"),
+            "AI Deep Dive", companies_all, keywords, 7,
+            "deep_dive", "pending_upload", script_data.get("original_news_url"),
+            avatar_used=script_data.get("lipsync_face_path"),
+            tracker_file=LONGFORM_TRACKER_FILE
+        )
+        resume_from = None
 
     # ── STEP 5: Build Visual Chunks (CHAPTER-AWARE) ──────────────────────
-    log_message("STEP 5: Building visual chunks...")
-    sub_chunks = script_data.get("subtitle_chunks", [])
-    for sc in sub_chunks:
-        if "text" in sc:
-            sc["text"] = clean_tts_text(sc["text"], phonetic=False)
+    if not resume_from or resume_from == "build_chunks":
+        log_message("STEP 5: Building visual chunks...")
+        sub_chunks = script_data.get("subtitle_chunks", [])
+        for sc in sub_chunks:
+            if "text" in sc:
+                sc["text"] = clean_tts_text(sc["text"], phonetic=False)
 
-    chapters = script_data.get("chapters", [])
-    if chapters:
-        # Chapter-aware chunking: ~15-30 chunks instead of ~200+
-        chunks = build_chapter_aware_chunks(
-            word_timestamps, chapters,
-            subtitle_chunks=sub_chunks,
-            max_beats_per_chapter=LONGFORM_VISUAL_BEATS_PER_CHAPTER
-        )
-    else:
-        # Fallback to standard chunking if no chapters
-        chunks = build_chunks(word_timestamps, sub_chunks)
+        chapters = script_data.get("chapters", [])
+        if chapters:
+            chunks = build_chapter_aware_chunks(
+                word_timestamps, chapters,
+                subtitle_chunks=sub_chunks,
+                max_beats_per_chapter=LONGFORM_VISUAL_BEATS_PER_CHAPTER
+            )
+        else:
+            chunks = build_chunks(word_timestamps, sub_chunks)
 
-    chunks = redistribute_to_audio_duration(chunks, duration)
-    log_message(f"Built {len(chunks)} visual chunks from {len(word_timestamps)} words.")
+        chunks = redistribute_to_audio_duration(chunks, duration)
+        log_message(f"Built {len(chunks)} visual chunks from {len(word_timestamps)} words.")
+        save_checkpoint("build_chunks", {"chunks": chunks, "script_data": script_data})
+        resume_from = None
 
     # ── STEP 6: Fetch Entities ───────────────────────────────────────────
-    log_message("STEP 6: Fetching entity photos and logos...")
-    script_data = fetch_all_entities(script_data)
+    if not resume_from or resume_from == "fetch_entities":
+        log_message("STEP 6: Fetching entity photos and logos...")
+        script_data = fetch_all_entities(script_data)
 
-    retention_config = get_retention_layers_config()
-    script_data["retention_config"] = retention_config
+        retention_config = get_retention_layers_config()
+        script_data["retention_config"] = retention_config
+        save_checkpoint("fetch_entities", {"script_data": script_data, "chunks": chunks})
+        resume_from = None
 
     # ── STEP 7: Visual Generation (16:9) ─────────────────────────────────
-    log_message("STEP 7: Generating visuals (16:9)...")
-    topic_context = f"Deep Dive: {title}"
-    style_guide = generate_visual_style_guide(topic_context)
+    if not resume_from or resume_from == "generate_visuals":
+        log_message("STEP 7: Generating visuals (16:9)...")
+        topic_context = f"Deep Dive: {title}"
+        style_guide = generate_visual_style_guide(topic_context)
 
-    from pexels_fetcher import fetch_all_chunk_visuals
-    chunks = fetch_all_chunk_visuals(chunks, topic_context=topic_context, script_data=script_data, is_longform=True)
+        from pexels_fetcher import fetch_all_chunk_visuals
+        chunks = fetch_all_chunk_visuals(chunks, topic_context=topic_context, script_data=script_data, is_longform=True)
 
-    def is_valid_engagement_source(source):
-        if not source:
-            return False
-        valid_keywords = ["Veo", "Imagen", "Screenshot", "HuggingFace", "Cloudflare", "Pollinations", "Nano-Scene", "Pexels"]
-        return any(k in source for k in valid_keywords)
+        def is_valid_engagement_source(source):
+            if not source:
+                return False
+            valid_keywords = ["Veo", "Imagen", "Screenshot", "HuggingFace", "Cloudflare", "Pollinations", "Nano-Scene", "Pexels"]
+            return any(k in source for k in valid_keywords)
 
-    gen_success = sum(1 for c in chunks if c.get("visual_path") and is_valid_engagement_source(c.get("source")))
+        gen_success = sum(1 for c in chunks if c.get("visual_path") and is_valid_engagement_source(c.get("source")))
 
-    if gen_success < len(chunks) * 0.5:
-        log_message(f"⚠️ Primary visuals: {gen_success}/{len(chunks)}. Falling back to nano-scene...")
-        chunks = generate_nano_scene_visuals(chunks, topic_context, style_guide=style_guide, aspect_ratio="16:9")
+        if gen_success < len(chunks) * 0.5:
+            log_message(f"⚠️ Primary visuals: {gen_success}/{len(chunks)}. Falling back to nano-scene...")
+            chunks = generate_nano_scene_visuals(chunks, topic_context, style_guide=style_guide, aspect_ratio="16:9")
 
-        final_success = sum(1 for c in chunks if c.get("visual_path") and os.path.exists(c["visual_path"]) and is_valid_engagement_source(c.get("source")))
+            final_success = sum(1 for c in chunks if c.get("visual_path") and os.path.exists(c["visual_path"]) and is_valid_engagement_source(c.get("source")))
 
-        if final_success < len(chunks) * 0.5:
-            log_message(f"⚠️ Both generators failed ({final_success}/{len(chunks)}). Using whiteboard fallback.")
-            from whiteboard_gen import generate_whiteboard_visuals
-            chunks = generate_whiteboard_visuals(chunks, topic_context, is_longform=True)
-    else:
-        log_message(f"✅ Visuals: {gen_success}/{len(chunks)} generated successfully.")
+            if final_success < len(chunks) * 0.5:
+                log_message(f"⚠️ Both generators failed ({final_success}/{len(chunks)}). Using whiteboard fallback.")
+                from whiteboard_gen import generate_whiteboard_visuals
+                chunks = generate_whiteboard_visuals(chunks, topic_context, is_longform=True)
+        else:
+            log_message(f"✅ Visuals: {gen_success}/{len(chunks)} generated successfully.")
+        save_checkpoint("generate_visuals", {"chunks": chunks, "script_data": script_data})
+        resume_from = None
 
     # ── STEP 8: Color Theme ──────────────────────────────────────────────
     title = script_data.get("title", "")
@@ -561,19 +628,25 @@ def run_longform_pipeline(dry_run=False):
     script_data["color_theme"] = chosen_style
 
     # ── STEP 9: Render Video (16:9) ──────────────────────────────────────
-    log_message("STEP 9: Rendering final 16:9 video...")
-    try:
-        video_path = create_video(audio_path, script_data, chunks)
-        if not video_path or not os.path.exists(video_path):
-            raise Exception("Video file not created.")
-    except Exception as e:
-        traceback.print_exc()
-        log_message(f"ERROR: Video render failed: {e}")
-        return False
+    if not resume_from or resume_from == "render_video":
+        log_message("STEP 9: Rendering final 16:9 video...")
+        try:
+            video_path = create_video(audio_path, script_data, chunks)
+            if not video_path or not os.path.exists(video_path):
+                raise Exception("Video file not created.")
+        except Exception as e:
+            traceback.print_exc()
+            log_message(f"ERROR: Video render failed: {e}")
+            return False
+        save_checkpoint("render_video", {"video_path": video_path, "script_data": script_data})
+        resume_from = None
 
     # ── STEP 10: Generate Thumbnail (16:9) ───────────────────────────────
-    log_message("STEP 10: Generating 16:9 thumbnail...")
-    thumbnail_path = generate_thumbnail(script_data)
+    if not resume_from or resume_from == "generate_thumbnail":
+        log_message("STEP 10: Generating 16:9 thumbnail...")
+        thumbnail_path = generate_thumbnail(script_data)
+        save_checkpoint("generate_thumbnail", {"thumbnail_path": thumbnail_path, "script_data": script_data})
+        resume_from = None
 
     if dry_run:
         log_message("🏁 DRY RUN complete. Skipping upload.")
@@ -584,60 +657,66 @@ def run_longform_pipeline(dry_run=False):
         return True
 
     # ── STEP 11: Upload to YouTube ───────────────────────────────────────
-    log_message("STEP 11: Uploading to YouTube...")
+    if not resume_from or resume_from == "upload_youtube":
+        log_message("STEP 11: Uploading to YouTube...")
 
-    # Title selection
-    if script_data.get("title_options"):
-        title = random.choice(script_data["title_options"])
+        # Title selection
+        if script_data.get("title_options"):
+            title = random.choice(script_data["title_options"])
 
-    initial_people = [p.get("name") for p in script_data.get("people", [])] if script_data.get("people") else []
-    optimized_metadata = get_optimized_metadata(
-        title=title,
-        script=script,
-        sub_category=script_data.get("sub_category", ""),
-        initial_keywords=keywords,
-        initial_companies=companies_all,
-        initial_people=initial_people,
-        initial_hashtags=hashtags,
-        is_shorts=False,
-        editorial_perspective=script_data.get("editorial_perspective"),
-        content_fingerprint=script_data.get("content_fingerprint")
-    )
-    hashtags = optimized_metadata["hashtags"]
-    tags = optimized_metadata["tags"]
+        initial_people = [p.get("name") for p in script_data.get("people", [])] if script_data.get("people") else []
+        optimized_metadata = get_optimized_metadata(
+            title=title,
+            script=script,
+            sub_category=script_data.get("sub_category", ""),
+            initial_keywords=keywords,
+            initial_companies=companies_all,
+            initial_people=initial_people,
+            initial_hashtags=hashtags,
+            is_shorts=False,
+            editorial_perspective=script_data.get("editorial_perspective"),
+            content_fingerprint=script_data.get("content_fingerprint")
+        )
+        hashtags = optimized_metadata["hashtags"]
+        tags = optimized_metadata["tags"]
 
-    log_message(f"Optimized Tags: {tags}")
-    log_message(f"Optimized Hashtags: {hashtags}")
+        log_message(f"Optimized Tags: {tags}")
+        log_message(f"Optimized Hashtags: {hashtags}")
 
-    description = format_longform_description(script_data, hashtags)
+        description = format_longform_description(script_data, hashtags)
 
-    uploaded, result = upload_video(
-        video_path, title, description, tags,
-        thumbnail_path=thumbnail_path,
-        comment_hook=script_data.get("comment_hook"),
-        is_longform=True,
-        script_data=script_data
-    )
-    if not uploaded:
-        log_message(f"ERROR: YouTube upload failed: {result}")
-        return False
+        uploaded, result = upload_video(
+            video_path, title, description, tags,
+            thumbnail_path=thumbnail_path,
+            comment_hook=script_data.get("comment_hook"),
+            is_longform=True,
+            script_data=script_data
+        )
+        if not uploaded:
+            log_message(f"ERROR: YouTube upload failed: {result}")
+            return False
 
-    youtube_url = f"https://youtu.be/{result}"
-    log_message(f"SUCCESS: {youtube_url}")
+        youtube_url = f"https://youtu.be/{result}"
+        log_message(f"SUCCESS: {youtube_url}")
+        save_checkpoint("upload_youtube", {"youtube_url": youtube_url, "result": result, "script_data": script_data})
+        resume_from = None
 
     # ── STEP 12: Update Tracker ──────────────────────────────────────────
     update_youtube_url(script_data.get("original_news_headline"), youtube_url, tracker_file=LONGFORM_TRACKER_FILE)
 
     # ── STEP 12.5: Shorts Cross-Promotion Teaser ────────────────────────
-    from config_longform import LONGFORM_GENERATE_SHORTS_TEASER
-    if LONGFORM_GENERATE_SHORTS_TEASER:
-        log_message("STEP 12.5: Generating Shorts Teaser...")
-        try:
-            from shorts_teaser import generate_and_upload_shorts_teaser
-            generate_and_upload_shorts_teaser(script_data, result, dry_run=dry_run)
-        except Exception as e:
-            log_message(f"⚠️ Shorts teaser failed: {e}")
-            traceback.print_exc()
+    if not resume_from or resume_from == "generate_shorts_teaser":
+        from config_longform import LONGFORM_GENERATE_SHORTS_TEASER
+        if LONGFORM_GENERATE_SHORTS_TEASER:
+            log_message("STEP 12.5: Generating Shorts Teaser...")
+            try:
+                from shorts_teaser import generate_and_upload_shorts_teaser
+                generate_and_upload_shorts_teaser(script_data, result, dry_run=dry_run)
+            except Exception as e:
+                log_message(f"⚠️ Shorts teaser failed: {e}")
+                traceback.print_exc()
+        save_checkpoint("generate_shorts_teaser", {"script_data": script_data})
+        resume_from = None
 
     # ── STEP 13: Cleanup ─────────────────────────────────────────────────
     log_message("STEP 13: Cleaning up output folder...")
@@ -666,6 +745,8 @@ def run_longform_pipeline(dry_run=False):
     except Exception:
         pass
 
+    # Clear checkpoints on success
+    clear_checkpoints()
     return True
 
 
@@ -673,14 +754,41 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Chaptered Deep-Dive Long-Form AI Video Pipeline")
     parser.add_argument("--now", action="store_true", help="Run pipeline immediately.")
     parser.add_argument("--dry-run", action="store_true", help="Run without uploading to YouTube.")
+    parser.add_argument("--resume", action="store_true", help="Resume from latest checkpoint.")
+    parser.add_argument("--stage", type=str, choices=STAGES, help="Start from specific stage (implies --resume).")
+    parser.add_argument("--clear-checkpoints", action="store_true", help="Clear all checkpoints and start fresh.")
+    parser.add_argument("--list-checkpoints", action="store_true", help="List existing checkpoints and exit.")
     args = parser.parse_args()
 
-    if args.now or args.dry_run:
-        success = run_longform_pipeline(dry_run=args.dry_run)
+    if args.list_checkpoints:
+        checkpoints = list_checkpoints()
+        if checkpoints:
+            print("📋 Existing checkpoints:")
+            for stage, meta in checkpoints.items():
+                print(f"  ✅ {stage}: {meta.get('timestamp', 'unknown')}")
+        else:
+            print("📋 No checkpoints found.")
+        sys.exit(0)
+
+    if args.clear_checkpoints:
+        clear_checkpoints()
+        print("🗑️ All checkpoints cleared.")
+        sys.exit(0)
+
+    if args.stage:
+        args.resume = True
+        clear_checkpoints(args.stage)
+
+    if args.now or args.dry_run or args.resume:
+        success = run_longform_pipeline(dry_run=args.dry_run, resume=args.resume, start_stage=args.stage)
         if not success:
             print("❌ Pipeline failed.")
             sys.exit(1)
     else:
         print("Usage:")
-        print("  python main_longform.py --now        # Run immediately")
-        print("  python main_longform.py --dry-run    # Test without upload")
+        print("  python main_longform.py --now              # Run immediately")
+        print("  python main_longform.py --dry-run          # Test without upload")
+        print("  python main_longform.py --resume           # Resume from latest checkpoint")
+        print("  python main_longform.py --stage <stage>    # Resume from specific stage")
+        print("  python main_longform.py --list-checkpoints # List checkpoints")
+        print("  python main_longform.py --clear-checkpoints # Clear all checkpoints")
