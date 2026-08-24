@@ -31,8 +31,8 @@ from datetime import datetime, timedelta
 from config import BASE_DIR
 
 # ── Constants ────────────────────────────────────────────────────────────────
-GRAPH_API_VERSION = "v25.0"
-GRAPH_API_BASE = f"https://graph.facebook.com/{GRAPH_API_VERSION}"
+GRAPH_API_VERSION = "v1.0"
+GRAPH_API_BASE = f"https://graph.threads.net/{GRAPH_API_VERSION}"
 
 # Token persistence path (for auto-refresh)
 TOKEN_FILE = os.path.join(BASE_DIR, ".threads_token.json")
@@ -82,46 +82,17 @@ def _save_token(token, expires_in_seconds):
 
 
 def _refresh_token_if_needed(current_token, expiry_str):
-    """Refreshes the long-lived token if it's within 7 days of expiry."""
+    """Thread tokens are already long-lived (60 days) and don't use fb_exchange_token.
+    They need to be manually regenerated via the app dashboard when expired.
+    This function just returns the current token."""
     if expiry_str:
         try:
             expiry = datetime.fromisoformat(expiry_str)
             days_left = (expiry - datetime.now()).days
-            if days_left > 7:
-                return current_token
-            print(f"⚠️ Threads token expires in {days_left} days. Attempting refresh...")
+            if days_left <= 7:
+                print(f"⚠️ Threads token expires in {days_left} days. Please regenerate via Meta App Dashboard.")
         except Exception:
-            print("⚠️ Could not parse token expiry. Attempting refresh as precaution...")
-    else:
-        print("ℹ️ No token expiry info found. Attempting refresh...")
-
-    try:
-        from config import THREADS_APP_ID, THREADS_APP_SECRET
-        if not THREADS_APP_ID or not THREADS_APP_SECRET:
-            print("⚠️ App ID/Secret not configured. Skipping token refresh.")
-            return current_token
-
-        url = f"{GRAPH_API_BASE}/oauth/access_token"
-        params = {
-            "grant_type": "fb_exchange_token",
-            "client_id": THREADS_APP_ID,
-            "client_secret": THREADS_APP_SECRET,
-            "fb_exchange_token": current_token,
-        }
-        resp = requests.get(url, params=params, timeout=15)
-        if resp.status_code == 200:
-            data = resp.json()
-            new_token = data.get("access_token")
-            expires_in = data.get("expires_in", 5184000)
-            if new_token:
-                _save_token(new_token, expires_in)
-                print("✅ Threads token refreshed successfully.")
-                return new_token
-
-        print(f"⚠️ Token refresh failed (HTTP {resp.status_code}): {resp.text}")
-    except Exception as e:
-        print(f"⚠️ Token refresh exception (non-fatal): {e}")
-
+            pass
     return current_token
 
 
