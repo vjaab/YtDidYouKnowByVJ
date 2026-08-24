@@ -292,6 +292,69 @@ def get_facebook_first_comment(youtube_url, hashtags):
     """First comment on Facebook post with the YouTube link."""
     return f"🔗 Full video: {youtube_url}\n\n#VJTechNews #AIResearch #DailyTechUpdates"
 
+
+def format_telegram_caption(title, description, hashtags, youtube_url, script_data=None):
+    """
+    Telegram caption for Shorts: concise, HTML formatting, clickable link.
+    Max 1024 chars for caption.
+    """
+    # Extract hook from description or script_data
+    hook = script_data.get("hook_text", title) if script_data else title
+    if len(hook) > 100:
+        hook = hook[:97] + "..."
+    
+    # 3-5 relevant hashtags
+    tg_hashtags = hashtags[:5] if hashtags else ["#AI", "#TechNews", "#Shorts"]
+    hashtag_str = " ".join(tg_hashtags)
+    
+    # Short description snippet
+    desc_snippet = description[:300] if description else ""
+    
+    tg_caption = f"""🔥 <b>{hook}</b>
+
+{desc_snippet}
+
+🎥 <a href="{youtube_url}">Watch on YouTube</a>
+
+📲 <a href="https://t.me/technewsbyvj">Telegram</a> | <a href="https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z">WhatsApp</a>
+
+{hashtag_str}"""
+    
+    return tg_caption[:1024]
+
+
+def format_threads_caption(title, description, hashtags, youtube_url, script_data=None):
+    """
+    Threads caption for Shorts: native text format, line breaks, no HTML.
+    Max 500 chars recommended for engagement.
+    """
+    # Extract hook
+    hook = script_data.get("hook_text", title) if script_data else title
+    if len(hook) > 80:
+        hook = hook[:77] + "..."
+    
+    # 3-5 relevant hashtags
+    th_hashtags = hashtags[:5] if hashtags else ["#AI", "#TechNews", "#Shorts"]
+    hashtag_str = " ".join(th_hashtags)
+    
+    # Short description snippet
+    desc_snippet = description[:400] if description else ""
+    
+    threads_caption = f"""🔥 {hook}
+
+{desc_snippet}
+
+🎥 Full breakdown: {youtube_url}
+
+📲 Follow for daily AI insights:
+• Telegram → https://t.me/technewsbyvj
+• WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
+
+{hashtag_str}"""
+    
+    return threads_caption[:500]
+
+
 def run_pipeline(topic_type="auto", dry_run=False):
     # Local mock or real Telegram notification based on dry_run
     def notify_telegram(msg, emoji=""):
@@ -999,16 +1062,8 @@ def run_pipeline(topic_type="auto", dry_run=False):
     # ── STEP 10f: Telegram Video Auto-Post ───────────────────────────────────
     log_message("STEP 10f: Auto-posting video to Telegram...")
     try:
-        # Telegram caption: concise with link
-        tg_caption = f"""🔥 <b>{title}</b>
-
-{description[:500]}
-
-🎥 <a href="{youtube_url}">Watch on YouTube</a>
-
-📲 Join: <a href="https://t.me/technewsbyvj">Telegram</a> | <a href="https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z">WhatsApp</a>
-
-{' '.join(hashtags[:5])}"""
+        # Use dedicated Telegram caption for Shorts
+        tg_caption = format_telegram_caption(title, description, hashtags, youtube_url, script_data)
         if dry_run:
             print("🧪 [DRY RUN] Simulating Telegram video upload...")
             tg_uploaded, tg_result = True, "MOCK_TELEGRAM_VIDEO_ID"
@@ -1025,18 +1080,8 @@ def run_pipeline(topic_type="auto", dry_run=False):
     # ── STEP 10g: Threads Auto-Post ────────────────────────────────────────────
     log_message("STEP 10g: Auto-posting to Threads...")
     try:
-        # Threads caption: native format with line breaks
-        threads_caption = f"""🔥 {title}
-
-{description[:800]}
-
-🎥 Full breakdown: {youtube_url}
-
-📲 Follow for daily AI insights:
-• Telegram → https://t.me/technewsbyvj
-• WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
-
-{' '.join(hashtags[:5])}"""
+        # Use dedicated Threads caption for Shorts
+        threads_caption = format_threads_caption(title, description, hashtags, youtube_url, script_data)
         if dry_run:
             print("🧪 [DRY RUN] Simulating Threads upload...")
             threads_uploaded, threads_result = True, "MOCK_THREADS_POST_ID"
