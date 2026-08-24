@@ -24,7 +24,31 @@ on:
     # Sunday: 11:00 AM, 7:30 PM IST → 05:30, 14:00 UTC
     - cron: '30 5 * * 0'   # Sun 11:00 AM IST
     - cron: '0 14 * * 0'   # Sun 7:30 PM IST
-  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      resume_stage:
+        description: 'Resume from specific pipeline stage (downloads checkpoints artifact)'
+        required: false
+        type: choice
+        options:
+          - "auto"      # Resume from last checkpoint automatically
+          - "fetch_articles"
+          - "generate_script"
+          - "capture_screenshots"
+          - "fetch_entities"
+          - "generate_audio"
+          - "build_chunks"
+          - "generate_visuals"
+          - "validate_visuals"
+          - "render_video"
+          - "generate_thumbnail"
+          - "upload_youtube"
+          - "upload_x"
+          - "upload_instagram"
+          - "upload_facebook"
+          - "upload_telegram"
+          - "upload_threads"
+        default: "auto"
 
 jobs:
   run-pipeline:
@@ -202,7 +226,12 @@ jobs:
           ORT_LOG_LEVEL: ERROR  # Suppress harmless ONNX Runtime PCI bus warnings
           CI_LITE: "1"
         run: |
-          python -u main.py --now --type auto --resume
+          STAGE="${{ github.event.inputs.resume_stage }}"
+          if [ "$STAGE" = "auto" ]; then
+            python -u main.py --now --type auto --resume
+          else
+            python -u main.py --now --type auto --stage "$STAGE"
+          fi
          
       - name: Upload Checkpoints Artifact
         if: always()

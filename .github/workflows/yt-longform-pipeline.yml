@@ -5,7 +5,26 @@ on:
   #   # ── 1 LONG-FORM EVERY DAY ──
   #   # Triggers daily at 04:30 UTC (10:00 AM IST)
   #   - cron: '30 4 * * *'
-  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      resume_stage:
+        description: 'Resume from specific pipeline stage (downloads checkpoints artifact)'
+        required: false
+        type: choice
+        options:
+          - "auto"      # Resume from last checkpoint automatically
+          - "fetch_articles"
+          - "generate_script"
+          - "generate_audio"
+          - "capture_screenshots"
+          - "build_chunks"
+          - "fetch_entities"
+          - "generate_visuals"
+          - "render_video"
+          - "generate_thumbnail"
+          - "upload_youtube"
+          - "generate_shorts_teaser"
+        default: "auto"
 
 jobs:
   run-pipeline:
@@ -163,7 +182,12 @@ jobs:
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
           CI_LITE: "1"
         run: |
-          python -u main_longform.py --now --resume
+          STAGE="${{ github.event.inputs.resume_stage }}"
+          if [ "$STAGE" = "auto" ]; then
+            python -u main_longform.py --now --resume
+          else
+            python -u main_longform.py --now --stage "$STAGE"
+          fi
 
       - name: Upload Checkpoints Artifact
         if: always()
