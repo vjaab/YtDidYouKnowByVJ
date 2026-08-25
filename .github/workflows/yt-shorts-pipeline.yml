@@ -209,11 +209,11 @@ jobs:
           
       - name: Download Checkpoints Artifact
         if: always()
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: shorts-pipeline-checkpoints
           path: .pipeline_checkpoints
-          fail-on-error: false
 
       - name: Run Pipeline (Kaggle GPU Priority)
         env:
