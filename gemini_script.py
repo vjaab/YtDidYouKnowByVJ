@@ -6,6 +6,8 @@ import hashlib
 from datetime import datetime
 import time
 import random
+
+CI_LITE = os.environ.get("CI_LITE", "0") == "1"
 from config import (
     GEMINI_API_KEY, LOGS_DIR,
     GEMINI_PRO_MODEL, GEMINI_FLASH_MODEL, GEMINI_FLASH_LITE_MODEL,
@@ -605,6 +607,10 @@ COUNTRY_NAMES = {
 
 def get_hottest_tech_topic(client, target_country="US", avoid_list=""):
     """Uses Gemini Search grounding to find today's most VIRAL tech tip, hidden feature, or tech fact for the target country."""
+    if CI_LITE:
+        print("⚡ CI_LITE: Skipping Google Trends (using RSS only)")
+        return None
+        
     country_name = COUNTRY_NAMES.get(target_country, "USA")
     print(f"🔥 Fetching hottest tech topic for today in {country_name} (Google Trends Analysis)...")
     

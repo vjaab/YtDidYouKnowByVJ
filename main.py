@@ -14,6 +14,8 @@ import traceback
 from datetime import datetime
 
 from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY, ENABLE_TRENDING_ENGINE, BASE_DIR
+
+CI_LITE = os.environ.get("CI_LITE", "0") == "1"
 from fetch_research_papers import fetch_tech_news, fetch_ai_tools
 from topic_tracker import record_story, update_youtube_url, get_next_topic_type_by_ratio, get_next_target_country, get_next_avatar
 from gemini_script import pick_and_generate_script
@@ -586,11 +588,20 @@ def run_pipeline(topic_type="auto", dry_run=False, resume=False, start_stage=Non
             
             if news_url:
                 screenshot_filename = f"screenshot_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-                screenshot_path = capture_article_screenshot(
-                    news_url, 
-                    screenshot_filename, 
-                    headline=script_data.get("original_news_headline")
-                )
+                if CI_LITE:
+                    # CI_LITE: Use lightweight PIL fallback directly (skip Playwright)
+                    from screenshot_gen import generate_fallback_screenshot
+                    screenshot_path = generate_fallback_screenshot(
+                        news_url, 
+                        os.path.join(ASSETS_DIR, "screenshots", screenshot_filename),
+                        headline=script_data.get("original_news_headline")
+                    )
+                else:
+                    screenshot_path = capture_article_screenshot(
+                        news_url, 
+                        screenshot_filename, 
+                        headline=script_data.get("original_news_headline")
+                    )
                 if screenshot_path:
                     script_data["screenshot_path"] = screenshot_path
                     log_message(f"✅ Main screenshot captured: {screenshot_path}")
@@ -616,11 +627,19 @@ def run_pipeline(topic_type="auto", dry_run=False, resume=False, start_stage=Non
             evidence_url = script_data.get("use_case_evidence_url")
             if evidence_url and "http" in evidence_url:
                 evidence_filename = f"evidence_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-                evidence_path = capture_article_screenshot(
-                    evidence_url, 
-                    evidence_filename, 
-                    headline=script_data.get("title")
-                )
+                if CI_LITE:
+                    from screenshot_gen import generate_fallback_screenshot
+                    evidence_path = generate_fallback_screenshot(
+                        evidence_url,
+                        os.path.join(ASSETS_DIR, "screenshots", evidence_filename),
+                        headline=script_data.get("title")
+                    )
+                else:
+                    evidence_path = capture_article_screenshot(
+                        evidence_url,
+                        evidence_filename,
+                        headline=script_data.get("title")
+                    )
                 if evidence_path:
                     script_data["evidence_screenshot_path"] = evidence_path
                     log_message(f"Evidence screenshot captured: {evidence_path}")
@@ -631,18 +650,42 @@ def run_pipeline(topic_type="auto", dry_run=False, resume=False, start_stage=Non
             is_longform = "Slot C" in slot
             if not is_longform:
                 log_message("STEP 3d: Fetching and validating entity tags for Short...")
-                script_data = fetch_all_entities(script_data)
-                
-                # Find entities with name, description, and successfully downloaded logo
-                valid_entities = []
-                for ent_list_key in ["companies", "people", "key_entities"]:
-                    for ent in script_data.get(ent_list_key, []):
-                        name = ent.get("name")
-                        desc = ent.get("description")
-                        logo_path = ent.get("local_logo_path") or ent.get("local_hq_path") or ent.get("local_image_path")
-                        if name and desc and logo_path and os.path.exists(logo_path):
-                            if not any(e.get("name") == name for e in valid_entities):
-                                valid_entities.append(ent)
+                if CI_LITE:
+                    # CI_LITE: Skip logo generation, use placeholder validation
+                    from entity_fetcher import resolve_tech_entity
+                    for ent_list_key in ["companies", "people", "key_entities"]:
+                        for ent in script_data.get(ent_list_key, []):
+                            if isinstance(ent, dict) and ent.get("name"):
+                                resolved = resolve_tech_entity(ent["name"])
+                                if resolved:
+                                    if "description" in resolved:
+                                        ent["description"] = resolved["description"]
+                                    if "type" in resolved:
+                                        ent["type"] = resolved["type"]
+                                    # Add placeholder logo path for CI_LITE
+                                    ent["local_logo_path"] = os.path.join(ASSETS_DIR, "logo.png")
+                    # Validate entities have name + description (logo path exists as placeholder)
+                    valid_entities = []
+                    for ent_list_key in ["companies", "people", "key_entities"]:
+                        for ent in script_data.get(ent_list_key, []):
+                            name = ent.get("name")
+                            desc = ent.get("description")
+                            if name and desc:
+                                if not any(e.get("name") == name for e in valid_entities):
+                                    valid_entities.append(ent)
+                else:
+                    script_data = fetch_all_entities(script_data)
+                    
+                    # Find entities with name, description, and successfully downloaded logo
+                    valid_entities = []
+                    for ent_list_key in ["companies", "people", "key_entities"]:
+                        for ent in script_data.get(ent_list_key, []):
+                            name = ent.get("name")
+                            desc = ent.get("description")
+                            logo_path = ent.get("local_logo_path") or ent.get("local_hq_path") or ent.get("local_image_path")
+                            if name and desc and logo_path and os.path.exists(logo_path):
+                                if not any(e.get("name") == name for e in valid_entities):
+                                    valid_entities.append(ent)
                 
                 if not valid_entities:
                     log_message("❌ Short validation FAILED: No valid entity tags (logo + name + description) found.")
