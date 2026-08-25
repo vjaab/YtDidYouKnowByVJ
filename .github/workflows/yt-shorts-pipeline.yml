@@ -227,7 +227,7 @@ jobs:
           CI_LITE: "1"
         run: |
           STAGE="${{ github.event.inputs.resume_stage }}"
-          if [ "$STAGE" = "auto" ]; then
+          if [ -z "$STAGE" ] || [ "$STAGE" = "auto" ]; then
             python -u main.py --now --type auto --resume
           else
             python -u main.py --now --type auto --stage "$STAGE"
