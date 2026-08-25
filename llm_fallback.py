@@ -321,9 +321,13 @@ def call_opencode(user_prompt: str) -> Optional[Dict[str, Any]]:
             "response_format": {"type": "json_object"},
             "temperature": 0.3,
         }
-        r = requests.post("https://opencode.ai/zen/v1/chat/completions", json=payload, headers=headers, timeout=90)
+        r = requests.post("https://opencode.ai/zen/v1/chat/completions", json=payload, headers=headers, timeout=60)
         if r.status_code == 200:
             data = r.json()
+            # Check for error response
+            if "error" in data:
+                print(f"⚠️ [OpenCode Zen] API error: {data['error']}")
+                return None
             # Try multiple response formats for compatibility
             content = None
             # Format 1: OpenAI standard
