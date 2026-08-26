@@ -6,7 +6,6 @@ Used by: shorts (gemini_script.py), longform (gemini_script_longform.py), educat
 import json
 import os
 import re
-import time
 import requests
 from typing import Optional, Dict, Any, List
 
@@ -564,60 +563,6 @@ def call_openrouter(user_prompt: str) -> Optional[Dict[str, Any]]:
     return None
 
 
-def generate_local_fallback_script(user_prompt: str, required_fields: Optional[List[str]] = None) -> Dict[str, Any]:
-    """Generate a minimal valid script structure when all LLM providers fail."""
-    import re
-    
-    # Extract topic from prompt
-    topic_match = re.search(r'(?:STORY|TOPIC|HEADLINE)[:\s]+([^\n]+)', user_prompt, re.IGNORECASE)
-    headline = topic_match.group(1).strip() if topic_match else "AI Tech Breakthrough"
-    
-    url_match = re.search(r'(?:SOURCE|URL)[:\s]+(https?://\S+)', user_prompt, re.IGNORECASE)
-    url = url_match.group(1).strip() if url_match else ""
-    
-    # Generate a basic but valid script
-    script = f"Did you know {headline}? This changes everything for developers. " \
-             f"The tool automates complex workflows that used to take hours. " \
-             f"Here's why it matters: it runs locally, no cloud costs, full privacy. " \
-             f"But here's the twist — it's completely open source. " \
-             f"What does this mean for your production apps? You can customize everything. " \
-             f"Save this for your next project. Link in bio."
-    
-    base = {
-        "script": script,
-        "original_news_headline": headline,
-        "original_news_url": url,
-        "title": headline[:80],
-        "ai_description": f"Discover {headline.lower()} — a game-changing open-source alternative.",
-        "hashtags": ["#AI", "#OpenSource", "#DevTools", "#TechNews"],
-        "retention_map": {
-            "open_loops": [{"text": "changes everything for developers", "planted_at_word": 5, "resolved_at_word": 25}],
-            "pattern_interrupts": [{"type": "contradiction", "text": "But here's the twist", "at_word": 30}],
-            "rhetorical_questions": [{"text": "What does this mean for your production apps?", "at_word": 40}],
-            "direct_address_count": 3,
-            "curiosity_gap_ratio": 0.6,
-            "hook_word_count": 6,
-            "payoff_zone_start_word": 50,
-            "retention_risk_zones": []
-        },
-        "script_format": "Result-First",
-        "comment_trigger_keyword": "TOOL",
-        "incentive_cta_type": "save",
-        "digital_asset_offer": "GitHub repo link",
-        "editorial_perspective": "Cost Optimizer",
-        "editorial_angle": "Focus on free alternatives to expensive proprietary tools",
-        "content_fingerprint": f"local_fallback_{hash(headline) % 10000}"
-    }
-    
-    # Ensure required fields are present
-    if required_fields:
-        for field in required_fields:
-            if field not in base:
-                base[field] = ""
-    
-    return base
-
-
 # ─── Main Fallback Chain ───────────────────────────────────────────────────────
 
 FALLBACK_CHAIN = [
@@ -628,7 +573,7 @@ FALLBACK_CHAIN = [
     ("Groq", call_groq),
     ("Cloudflare", call_cloudflare),
     ("OpenRouter", call_openrouter),
-    # ("GitHub Models", call_github_models),  # DNS fails in GitHub Actions
+    ("GitHub Models", call_github_models),
     ("OpenAI", call_openai),
     ("Anthropic", call_anthropic),
     ("DeepSeek", call_deepseek),
@@ -648,21 +593,15 @@ def call_fallback_chain(user_prompt: str, normalize: bool = True, required_field
         Normalized dict or None if all providers fail
     """
     for name, func in FALLBACK_CHAIN:
-        for attempt in range(2):  # Retry once on transient failures
-            try:
-                result = func(user_prompt)
-                if result:
-                    print(f"✅ {name} succeeded")
-                    if normalize:
-                        return normalize_llm_response(result, required_fields)
-                    return result
-            except Exception as e:
-                if attempt == 0:
-                    print(f"⚠️ {name} fallback failed (attempt 1/2): {e}. Retrying...")
-                    time.sleep(2)
-                else:
-                    print(f"⚠️ {name} fallback failed after retries: {e}")
+        try:
+            result = func(user_prompt)
+            if result:
+                print(f"✅ {name} succeeded")
+                if normalize:
+                    return normalize_llm_response(result, required_fields)
+                return result
+        except Exception as e:
+            print(f"⚠️ {name} fallback failed: {e}")
     
-    # Last resort: Generate a minimal valid script structure locally
-    print("🔧 All providers failed. Generating minimal local fallback script...")
-    return generate_local_fallback_script(user_prompt, required_fields)
+    print("🚨 All fallback providers failed or not configured")
+    return None
