@@ -17,6 +17,8 @@ from playwright.sync_api import sync_playwright
 import requests
 import datetime
 import hashlib
+import io
+from PIL import Image
 
 # Add parent directory to path for trending_engine import
 sys.path.insert(0, str(Path(__file__).parent))
@@ -27,6 +29,12 @@ try:
 except ImportError:
     TRENDING_ENGINE_AVAILABLE = False
     print("⚠️ trending_engine not available, using fallback topics")
+
+# AI Image Generation configs
+AI_IMAGE_PROVIDER = os.getenv("AI_IMAGE_PROVIDER", "template")  # template, dall-e-3, stable-diffusion, recraft
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+STABLE_DIFFUSION_API_URL = os.getenv("STABLE_DIFFUSION_API_URL", "")  # e.g., local SD WebUI or Replicate
+RECRAFT_API_KEY = os.getenv("RECRAFT_API_KEY", "")
 
 # ── GitHub Actions Output Helper ───────────────────────────────────────────────
 def set_gha_output(key: str, value: str):
@@ -215,8 +223,157 @@ def render_image(template_name: str, context: dict, output_path: Path, width: in
     return output_path
 
 
-def generate_images(topic_data: dict, output_dir: Path) -> tuple:
-    """Generate Instagram and Facebook images (single variant)."""
+def generate_ai_image_dalle3(prompt: str, output_path: Path, width: int, height: int) -> Path:
+    """Generate image using OpenAI DALL-E 3."""
+    if not OPENAI_API_KEY:
+        raise ValueError("OPENAI_API_KEY not set")
+    
+    import openai
+    client = openai.OpenAI(api_key=OPENAI_API_KEY)
+    
+    # DALL-E 3 supports specific sizes
+    size_map = {
+        (1080, 1350): "1024x1024",  # Instagram 4:5 - closest
+        (1200, 628): "1792x1024",   # Facebook 1.91:1 - closest
+    }
+    size = size_map.get((width, height), "1024x1024")
+    
+    response = client.images.generate(
+        model="dall-e-3",
+        prompt=prompt,
+        size=size,
+        quality="hd",
+        n=1,
+    )
+    
+    image_url = response.data[0].url
+    img_response = requests.get(image_url, timeout=60)
+    img_response.raise_for_status()
+    
+    img = Image.open(io.BytesIO(img_response.content))
+    img = img.resize((width, height), Image.LANCZOS)
+    img.save(output_path)
+    
+    print(f"✅ DALL-E 3 generated: {output_path}")
+    return output_path
+
+
+def generate_ai_image_stable_diffusion(prompt: str, output_path: Path, width: int, height: int) -> Path:
+    """Generate image using Stable Diffusion (local WebUI API or Replicate)."""
+    if not STABLE_DIFFUSION_API_URL:
+        raise ValueError("STABLE_DIFFUSION_API_URL not set")
+    
+    payload = {
+        "prompt": prompt,
+        "negative_prompt": "text, watermark, signature, blurry, low quality, distorted",
+        "width": width,
+        "height": height,
+        "steps": 30,
+        "cfg_scale": 7,
+        "sampler_name": "DPM++ 2M Karras",
+    }
+    
+    response = requests.post(f"{STABLE_DIFFUSION_API_URL}/sdapi/v1/txt2img", json=payload, timeout=120)
+    response.raise_for_status()
+    
+    import base64
+    result = response.json()
+    img_data = base64.b64decode(result["images"][0])
+    img = Image.open(io.BytesIO(img_data))
+    img.save(output_path)
+    
+    print(f"✅ Stable Diffusion generated: {output_path}")
+    return output_path
+
+
+def generate_ai_image_recraft(prompt: str, output_path: Path, width: int, height: int) -> Path:
+    """Generate image using Recraft API."""
+    if not RECRAFT_API_KEY:
+        raise ValueError("RECRAFT_API_KEY not set")
+    
+    # Recraft supports specific aspect ratios
+    aspect_ratio = f"{width}:{height}"
+    
+    headers = {
+        "Authorization": f"Bearer {RECRAFT_API_KEY}",
+        "Content-Type": "application/json",
+    }
+    payload = {
+        "prompt": prompt,
+        "style": "digital_illustration",
+        "aspect_ratio": aspect_ratio,
+    }
+    
+    response = requests.post("https://external.api.recraft.ai/v1/images/generations", 
+                           json=payload, headers=headers, timeout=60)
+    response.raise_for_status()
+    
+    result = response.json()
+    image_url = result["data"][0]["url"]
+    
+    img_response = requests.get(image_url, timeout=60)
+    img_response.raise_for_status()
+    
+    img = Image.open(io.BytesIO(img_response.content))
+    img = img.resize((width, height), Image.LANCZOS)
+    img.save(output_path)
+    
+    print(f"✅ Recraft generated: {output_path}")
+    return output_path
+
+
+def build_ai_prompt(topic_data: dict, platform: str) -> str:
+    """Build AI image generation prompt from topic data."""
+    title = topic_data.get("title", "")
+    category = topic_data.get("category", "")
+    steps = topic_data.get("steps", [])
+    closing = topic_data.get("closing_line", "")
+    
+    step_descriptions = " → ".join([s.get("desc", "") for s in steps[:3]])
+    
+    style_guides = {
+        "instagram": "Instagram educational carousel style, 4:5 aspect, clean modern design, tech aesthetic, vibrant gradient backgrounds, minimal text space, professional typography",
+        "facebook": "Facebook link post image, 1.91:1 aspect, eye-catching thumbnail, tech blog style, bold colors, clear visual hierarchy",
+    }
+    
+    style = style_guides.get(platform, style_guides["instagram"])
+    
+    prompt = f"""Educational tech illustration for social media: "{title}"
+Category: {category}
+Key concepts: {step_descriptions}
+Takeaway: {closing}
+Style: {style}
+No text, no watermarks, no logos, clean background, high quality, 4K"""
+    
+    return prompt
+
+
+def generate_image_with_provider(topic_data: dict, output_path: Path, width: int, height: int, platform: str) -> Path:
+    """Generate image using configured AI provider, fallback to template."""
+    provider = AI_IMAGE_PROVIDER.lower()
+    
+    if provider == "template":
+        return render_image("decorator_flow.html.j2", build_template_context(topic_data, width, height), output_path, width, height)
+    
+    prompt = build_ai_prompt(topic_data, platform)
+    
+    try:
+        if provider == "dall-e-3":
+            return generate_ai_image_dalle3(prompt, output_path, width, height)
+        elif provider == "stable-diffusion":
+            return generate_ai_image_stable_diffusion(prompt, output_path, width, height)
+        elif provider == "recraft":
+            return generate_ai_image_recraft(prompt, output_path, width, height)
+        else:
+            print(f"⚠️ Unknown AI_IMAGE_PROVIDER: {provider}, falling back to template")
+            return render_image("decorator_flow.html.j2", build_template_context(topic_data, width, height), output_path, width, height)
+    except Exception as e:
+        print(f"⚠️ AI image generation failed ({provider}): {e}, falling back to template")
+        return render_image("decorator_flow.html.j2", build_template_context(topic_data, width, height), output_path, width, height)
+
+
+def build_template_context(topic_data: dict, width: int, height: int) -> dict:
+    """Build context for template rendering (extracted from generate_images)."""
     fonts = get_fonts_dict()
     variant_styles = get_variant_styles()
     
@@ -226,8 +383,7 @@ def generate_images(topic_data: dict, output_dir: Path) -> tuple:
     arrow_svg = icon_svg("arrow-down")
     check_svg = icon_svg("check-circle-2")
     
-    # Base context
-    base_context = {
+    return {
         "fonts": fonts,
         "filename": topic_data["filename"],
         "topic": topic_data["category"].upper(),
@@ -244,17 +400,22 @@ def generate_images(topic_data: dict, output_dir: Path) -> tuple:
         "closing_line": topic_data["closing_line"],
         "variant": "modern",
         "variant_styles": variant_styles,
+        "canvas_w": width,
+        "canvas_h": height,
     }
+
+
+def generate_images(topic_data: dict, output_dir: Path) -> tuple:
+    """Generate Instagram and Facebook images using configured provider (template or AI)."""
+    print(f"🎨 Generating images with provider: {AI_IMAGE_PROVIDER}")
     
     # Instagram 4:5
-    ig_context = {**base_context, "canvas_w": INSTAGRAM_W, "canvas_h": INSTAGRAM_H}
     ig_path = output_dir / f"instagram_{topic_data['topic'].lower().replace(' ', '_')}.png"
-    render_image("decorator_flow.html.j2", ig_context, ig_path, INSTAGRAM_W, INSTAGRAM_H)
+    generate_image_with_provider(topic_data, ig_path, INSTAGRAM_W, INSTAGRAM_H, "instagram")
     
     # Facebook 1.91:1
-    fb_context = {**base_context, "canvas_w": FACEBOOK_W, "canvas_h": FACEBOOK_H}
     fb_path = output_dir / f"facebook_{topic_data['topic'].lower().replace(' ', '_')}.png"
-    render_image("decorator_flow.html.j2", fb_context, fb_path, FACEBOOK_W, FACEBOOK_H)
+    generate_image_with_provider(topic_data, fb_path, FACEBOOK_W, FACEBOOK_H, "facebook")
     
     return ig_path, fb_path
 

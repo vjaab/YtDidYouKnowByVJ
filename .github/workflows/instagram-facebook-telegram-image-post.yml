@@ -21,6 +21,16 @@ on:
         required: false
         type: string
         default: 'AI & Tech Tools'
+      ai_image_provider:
+        description: 'Image generation provider'
+        required: false
+        type: choice
+        default: 'template'
+        options:
+          - template
+          - dall-e-3
+          - stable-diffusion
+          - recraft
       auto_post:
         description: 'Auto-post after Telegram approval'
         required: false
@@ -84,6 +94,11 @@ jobs:
           # echo "LINKEDIN_ACCESS_TOKEN=${{ secrets.LINKEDIN_ACCESS_TOKEN }}" >> .env
           echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env
           echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .env
+          # AI Image Generation (optional)
+          echo "AI_IMAGE_PROVIDER=${{ secrets.AI_IMAGE_PROVIDER || 'template' }}" >> .env
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+          echo "STABLE_DIFFUSION_API_URL=${{ secrets.STABLE_DIFFUSION_API_URL }}" >> .env
+          echo "RECRAFT_API_KEY=${{ secrets.RECRAFT_API_KEY }}" >> .env
 
       - name: Determine Trending Category
         id: category
@@ -142,6 +157,7 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TOPIC: ${{ github.event.inputs.topic || '' }}
           TRENDING_CATEGORY: ${{ steps.category.outputs.category }}
+          AI_IMAGE_PROVIDER: ${{ github.event.inputs.ai_image_provider || 'template' }}
         run: |
           python -u generate_decorator_images.py --now \
             --topic "${{ github.event.inputs.topic || '' }}" \
