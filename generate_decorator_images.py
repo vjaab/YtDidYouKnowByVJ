@@ -31,10 +31,21 @@ except ImportError:
     print("⚠️ trending_engine not available, using fallback topics")
 
 # AI Image Generation configs
-AI_IMAGE_PROVIDER = os.getenv("AI_IMAGE_PROVIDER", "template")  # template, dall-e-3, stable-diffusion, recraft
+AI_IMAGE_PROVIDER = os.getenv("AI_IMAGE_PROVIDER", "template")  # template, dall-e-3, stable-diffusion, recraft, imagen, flux
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 STABLE_DIFFUSION_API_URL = os.getenv("STABLE_DIFFUSION_API_URL", "")  # e.g., local SD WebUI or Replicate
 RECRAFT_API_KEY = os.getenv("RECRAFT_API_KEY", "")
+
+# Fallback chain providers (in order)
+IMAGE_FALLBACK_CHAIN = [
+    ("DALL-E 3", "dall-e-3"),
+    ("Stable Diffusion", "stable-diffusion"),
+    ("Recraft", "recraft"),
+    ("Imagen (Gemini)", "imagen"),
+    ("HuggingFace FLUX", "flux-hf"),
+    ("Cloudflare FLUX", "flux-cf"),
+    ("Pollinations", "pollinations"),
+]
 
 # ── GitHub Actions Output Helper ───────────────────────────────────────────────
 def set_gha_output(key: str, value: str):
@@ -364,12 +375,164 @@ def generate_image_with_provider(topic_data: dict, output_path: Path, width: int
             return generate_ai_image_stable_diffusion(prompt, output_path, width, height)
         elif provider == "recraft":
             return generate_ai_image_recraft(prompt, output_path, width, height)
+        elif provider == "imagen":
+            return generate_ai_image_imagen(prompt, output_path, width, height)
+        elif provider == "flux-hf":
+            return generate_ai_image_flux_hf(prompt, output_path, width, height)
+        elif provider == "flux-cf":
+            return generate_ai_image_flux_cf(prompt, output_path, width, height)
+        elif provider == "pollinations":
+            return generate_ai_image_pollinations(prompt, output_path, width, height)
         else:
             print(f"⚠️ Unknown AI_IMAGE_PROVIDER: {provider}, falling back to template")
             return render_image("decorator_flow.html.j2", build_template_context(topic_data, width, height), output_path, width, height)
     except Exception as e:
         print(f"⚠️ AI image generation failed ({provider}): {e}, falling back to template")
         return render_image("decorator_flow.html.j2", build_template_context(topic_data, width, height), output_path, width, height)
+
+
+def generate_image_with_fallback_chain(topic_data: dict, output_path: Path, width: int, height: int, platform: str) -> Path:
+    """Try image generation providers in fallback chain order."""
+    prompt = build_ai_prompt(topic_data, platform)
+    
+    # If user specified a provider, try it first
+    if AI_IMAGE_PROVIDER != "template":
+        try:
+            return generate_image_with_provider(topic_data, output_path, width, height, platform)
+        except Exception as e:
+            print(f"⚠️ Primary provider {AI_IMAGE_PROVIDER} failed: {e}")
+    
+    # Try fallback chain
+    for name, provider_key in IMAGE_FALLBACK_CHAIN:
+        try:
+            print(f"🔮 Trying fallback: {name}...")
+            # Temporarily set provider
+            old_provider = os.environ.get("AI_IMAGE_PROVIDER")
+            os.environ["AI_IMAGE_PROVIDER"] = provider_key
+            return generate_image_with_provider(topic_data, output_path, width, height, platform)
+        except Exception as e:
+            print(f"⚠️ {name} fallback failed: {e}")
+            continue
+    
+    # Final fallback to template
+    print("🎨 All AI providers failed, using template fallback")
+    return render_image("decorator_flow.html.j2", build_template_context(topic_data, width, height), output_path, width, height)
+
+
+def generate_ai_image_imagen(prompt: str, output_path: Path, width: int, height: int) -> Path:
+    """Generate image using Google Imagen via Gemini API."""
+    try:
+        from google import genai
+        from config import GEMINI_API_KEY
+    except ImportError:
+        raise ValueError("google-genai not installed or GEMINI_API_KEY not configured")
+    
+    if not GEMINI_API_KEY:
+        raise ValueError("GEMINI_API_KEY not set")
+    
+    client = genai.Client(api_key=GEMINI_API_KEY)
+    
+    # Use fast model first
+    models = ["imagen-4.0-fast-generate-001", "imagen-4.0-generate-001"]
+    
+    # Adjust aspect ratio for Imagen
+    aspect_ratio = "1:1" if width == height else ("4:5" if width < height else "16:9")
+    
+    for model in models:
+        try:
+            print(f"🎨 Generating with Imagen ({model})...")
+            result = client.models.generate_images(
+                model=model,
+                prompt=prompt,
+                config=genai.types.GenerateImagesConfig(
+                    number_of_images=1,
+                    aspect_ratio=aspect_ratio,
+                    output_mime_type="image/jpeg",
+                )
+            )
+            for gen_img in result.generated_images:
+                img = Image.open(io.BytesIO(gen_img.image.image_bytes))
+                img = img.resize((width, height), Image.LANCZOS)
+                img.save(output_path)
+                print(f"✅ Imagen generated: {output_path}")
+                return output_path
+        except Exception as e:
+            print(f"⚠️ Imagen ({model}) failed: {e}")
+            continue
+    
+    raise RuntimeError("All Imagen models failed")
+
+
+def generate_ai_image_flux_hf(prompt: str, output_path: Path, width: int, height: int) -> Path:
+    """Generate image using HuggingFace FLUX.1."""
+    from config import HF_TOKEN
+    if not HF_TOKEN:
+        raise ValueError("HF_TOKEN not set")
+    
+    resp = requests.post(
+        "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell",
+        headers={"Authorization": f"Bearer {HF_TOKEN}"},
+        json={"inputs": prompt, "parameters": {"width": width, "height": height}},
+        timeout=60
+    )
+    if resp.status_code == 200 and resp.headers.get("content-type", "").startswith("image"):
+        img = Image.open(io.BytesIO(resp.content)).convert("RGB")
+        img.save(output_path)
+        print(f"✅ HuggingFace FLUX generated: {output_path}")
+        return output_path
+    else:
+        raise RuntimeError(f"HuggingFace FLUX failed: {resp.status_code}")
+
+
+def generate_ai_image_flux_cf(prompt: str, output_path: Path, width: int, height: int) -> Path:
+    """Generate image using Cloudflare Workers AI FLUX.1."""
+    from config import CF_ACCOUNT_ID, CF_API_TOKEN
+    if not CF_ACCOUNT_ID or not CF_API_TOKEN:
+        raise ValueError("CF_ACCOUNT_ID or CF_API_TOKEN not set")
+    
+    resp = requests.post(
+        f"https://api.cloudflare.com/client/v4/accounts/{CF_ACCOUNT_ID}/ai/run/@cf/black-forest-labs/flux-1-schnell",
+        headers={
+            "Authorization": f"Bearer {CF_API_TOKEN}",
+            "Content-Type": "application/json"
+        },
+        json={"prompt": prompt},
+        timeout=60
+    )
+    if resp.status_code == 200:
+        content_type = resp.headers.get("content-type", "")
+        if content_type.startswith("image"):
+            img = Image.open(io.BytesIO(resp.content)).convert("RGB")
+            img.save(output_path)
+            print(f"✅ Cloudflare FLUX generated: {output_path}")
+            return output_path
+        else:
+            import base64
+            data = resp.json()
+            if data.get("success") and data.get("result", {}).get("image"):
+                img_bytes = base64.b64decode(data["result"]["image"])
+                img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
+                img.save(output_path)
+                print(f"✅ Cloudflare FLUX generated (base64): {output_path}")
+                return output_path
+    raise RuntimeError(f"Cloudflare FLUX failed: {resp.status_code}")
+
+
+def generate_ai_image_pollinations(prompt: str, output_path: Path, width: int, height: int) -> Path:
+    """Generate image using Pollinations AI (free, no API key)."""
+    import urllib.parse
+    encoded_prompt = urllib.parse.quote(prompt)
+    url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&nologo=true&private=true"
+    resp = requests.get(url, timeout=45)
+    if resp.status_code == 200:
+        img = Image.open(io.BytesIO(resp.content)).convert("RGB")
+        img.save(output_path)
+        print(f"✅ Pollinations generated: {output_path}")
+        return output_path
+    elif resp.status_code == 429:
+        raise RuntimeError("Pollinations rate limited (429)")
+    else:
+        raise RuntimeError(f"Pollinations failed: {resp.status_code}")
 
 
 def build_template_context(topic_data: dict, width: int, height: int) -> dict:
@@ -406,16 +569,16 @@ def build_template_context(topic_data: dict, width: int, height: int) -> dict:
 
 
 def generate_images(topic_data: dict, output_dir: Path) -> tuple:
-    """Generate Instagram and Facebook images using configured provider (template or AI)."""
-    print(f"🎨 Generating images with provider: {AI_IMAGE_PROVIDER}")
+    """Generate Instagram and Facebook images using configured provider with fallback chain."""
+    print(f"🎨 Generating images with provider: {AI_IMAGE_PROVIDER} (fallback chain enabled)")
     
     # Instagram 4:5
     ig_path = output_dir / f"instagram_{topic_data['topic'].lower().replace(' ', '_')}.png"
-    generate_image_with_provider(topic_data, ig_path, INSTAGRAM_W, INSTAGRAM_H, "instagram")
+    generate_image_with_fallback_chain(topic_data, ig_path, INSTAGRAM_W, INSTAGRAM_H, "instagram")
     
     # Facebook 1.91:1
     fb_path = output_dir / f"facebook_{topic_data['topic'].lower().replace(' ', '_')}.png"
-    generate_image_with_provider(topic_data, fb_path, FACEBOOK_W, FACEBOOK_H, "facebook")
+    generate_image_with_fallback_chain(topic_data, fb_path, FACEBOOK_W, FACEBOOK_H, "facebook")
     
     return ig_path, fb_path
 

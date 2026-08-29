@@ -99,6 +99,11 @@ jobs:
           echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
           echo "STABLE_DIFFUSION_API_URL=${{ secrets.STABLE_DIFFUSION_API_URL }}" >> .env
           echo "RECRAFT_API_KEY=${{ secrets.RECRAFT_API_KEY }}" >> .env
+          # Image Fallback Chain (uses existing providers in codebase)
+          echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> .env
+          echo "CF_API_TOKEN=${{ secrets.CF_API_TOKEN }}" >> .env
+          echo "CF_ACCOUNT_ID=${{ secrets.CF_ACCOUNT_ID }}" >> .env
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
 
       - name: Determine Trending Category
         id: category
