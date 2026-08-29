@@ -34,7 +34,7 @@ except ImportError:
 SCOPES = ['https://www.googleapis.com/auth/yt-analytics.readonly', 'https://www.googleapis.com/auth/youtube.readonly']
 
 TOKEN_FILE = Path(__file__).parent / "token_youtube_analytics.json"
-CREDENTIALS_FILE = Path(__file__).parent / "credentials_youtube.json"
+CREDENTIALS_FILE = Path(__file__).parent / "client_secret.json"
 
 
 def get_youtube_analytics_service():
@@ -56,12 +56,13 @@ def get_youtube_analytics_service():
                 print("   Download from Google Cloud Console > APIs & Services > Credentials")
                 return None
             flow = InstalledAppFlow.from_client_secrets_file(str(CREDENTIALS_FILE), SCOPES)
-            creds = flow.run_local_server(port=0)
+            # Use fixed port matching authorized redirect URI in Google Cloud Console
+            creds = flow.run_local_server(port=54630)
         
         with open(TOKEN_FILE, "w") as token:
             token.write(creds.to_json())
     
-    return build('youtubeAnalytics', 'v2', credentials=creds)
+    return creds
 
 
 def fetch_video_analytics(service, video_id, start_date: str, end_date: str) -> dict:
@@ -106,19 +107,27 @@ def fetch_recent_videos_analytics(days_back: int = 7) -> dict:
     if not YOUTUBE_API_AVAILABLE:
         return {}
     
-    service = get_youtube_analytics_service()
-    if not service:
+    creds = get_youtube_analytics_service()
+    if not creds:
         return {}
+    
+    # Build both services from credentials
+    analytics_service = build('youtubeAnalytics', 'v2', credentials=creds)
+    yt_service = build('youtube', 'v3', credentials=creds)
     
     end_date = datetime.now().strftime("%Y-%m-%d")
     start_date = (datetime.now() - timedelta(days=days_back)).strftime("%Y-%m-%d")
     
+    # Get channel ID first
+    channel_response = yt_service.channels().list(part="id", mine=True).execute()
+    channel_id = channel_response["items"][0]["id"]
+    print(f"📺 Channel ID: {channel_id}")
+    
     # First get list of recent videos
     try:
-        yt_service = build('youtube', 'v3', credentials=service._credentials)
         response = yt_service.search().list(
             part="id",
-            channelId="UC_x5XG1OV2P6uZZ5FSM9Ttw",  # Replace with actual channel ID
+            channelId=channel_id,
             order="date",
             publishedAfter=(datetime.now() - timedelta(days=days_back)).isoformat("T") + "Z",
             maxResults=50,
@@ -131,7 +140,7 @@ def fetch_recent_videos_analytics(days_back: int = 7) -> dict:
         # Fetch analytics for each video
         results = {}
         for vid in video_ids:
-            analytics = fetch_video_analytics(service, vid, start_date, end_date)
+            analytics = fetch_video_analytics(analytics_service, vid, start_date, end_date)
             if analytics:
                 results[vid] = analytics
         
