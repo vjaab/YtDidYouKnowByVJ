@@ -905,6 +905,91 @@ def fetch_google_trending_tech(target_country="US", category="AI & Tech Tools"):
     return tech_trends
 
 
+# YouTube videoCategoryId mapping for chart=mostPopular
+YOUTUBE_CATEGORY_MAP = {
+    "AI & Tech Tools": 28,          # Science & Technology
+    "Tech Gadgets & Inventions": 28, # Science & Technology
+    "Finance & Tech Economy": 28,   # Science & Technology
+    "Coding & Development Hacks": 28, # Science & Technology
+    "Agentic AI Facts": 28,         # Science & Technology
+    "Facts & Trivia": 28,           # Science & Technology
+    "Quiz & Trivia": 28,            # Science & Technology
+}
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 5a. YOUTUBE MOST POPULAR (Cheap Trending - 1 unit/call vs 100 for search)
+# ─────────────────────────────────────────────────────────────────────────────
+def fetch_youtube_most_popular(target_country="US", category="AI & Tech Tools", max_results=25):
+    """
+    Fetch trending videos using videos.list?chart=mostPopular.
+    Costs 1 unit/call vs 100 for search.list.
+    Returns top videos in the category for the region.
+    """
+    if not YOUTUBE_DATA_API_KEY:
+        print("⚠️ YouTube Data API key missing. Skipping YouTube Most Popular.")
+        return []
+
+    video_category_id = YOUTUBE_CATEGORY_MAP.get(category, 28)
+
+    print(f"📺 Fetching YouTube Most Popular for region={target_country}, category={category} (catId={video_category_id})...")
+
+    try:
+        url = "https://www.googleapis.com/youtube/v3/videos"
+        params = {
+            "part": "snippet,statistics",
+            "chart": "mostPopular",
+            "regionCode": target_country,
+            "videoCategoryId": str(video_category_id),
+            "maxResults": max_results,
+            "key": YOUTUBE_DATA_API_KEY,
+        }
+        r = requests.get(url, params=params, timeout=15)
+        if r.status_code != 200:
+            print(f"  ⚠️ YouTube Most Popular failed: {r.text[:200]}")
+            return []
+
+        data = r.json()
+        trending = []
+
+        for item in data.get("items", []):
+            vid = item.get("id")
+            snippet = item.get("snippet", {})
+            stats = item.get("statistics", {})
+            views = int(stats.get("viewCount", 0))
+
+            trending.append({
+                "title": snippet.get("title", ""),
+                "description": snippet.get("description", ""),
+                "channelId": snippet.get("channelId", ""),
+                "channelTitle": snippet.get("channelTitle", ""),
+                "publishedAt": snippet.get("publishedAt", ""),
+                "videoId": vid,
+                "views": views,
+                "likes": int(stats.get("likeCount", 0)),
+                "comments": int(stats.get("commentCount", 0)),
+                "tags": snippet.get("tags", []),
+                "source": {"name": f"YouTube Trending ({snippet.get('channelTitle', '')})"},
+                "url": f"https://youtube.com/watch?v={vid}",
+                "urlToImage": snippet.get("thumbnails", {}).get("high", {}).get("url", ""),
+                "type": "youtube_most_popular",
+                "_engagement": {
+                    "views": views,
+                    "likes": int(stats.get("likeCount", 0)),
+                    "comments": int(stats.get("commentCount", 0)),
+                    "tags": snippet.get("tags", []),
+                }
+            })
+
+        trending.sort(key=lambda x: x["_engagement"]["views"], reverse=True)
+        print(f"✅ YouTube Most Popular: Found {len(trending)} trending videos.")
+        return trending
+
+    except Exception as e:
+        print(f"  ⚠️ YouTube Most Popular error: {e}")
+        return []
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # 5. YOUTUBE OUTLIER HUNTER (Stream B)
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1527,7 +1612,14 @@ def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools"):
     except Exception as e:
         print(f"⚠️ Google Trends fetch failed: {e}")
     
-    # 9. YouTube Outlier Hunter (Stream B)
+    # 9. YouTube Most Popular (Cheap - 1 unit/call via chart=mostPopular)
+    try:
+        ymp_articles = fetch_youtube_most_popular(target_country, category)
+        all_articles.extend(ymp_articles)
+    except Exception as e:
+        print(f"⚠️ YouTube Most Popular fetch failed: {e}")
+
+    # 10. YouTube Outlier Hunter (Stream B - 100 units/call via search.list)
     try:
         yo_articles = fetch_youtube_outlier_trends(target_country, category)
         all_articles.extend(yo_articles)
@@ -1543,6 +1635,7 @@ def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools"):
     
     # Summary
     yt_count = sum(1 for a in all_articles if a.get("type") == "youtube_trending")
+    ymp_count = sum(1 for a in all_articles if a.get("type") == "youtube_most_popular")
     reddit_count = sum(1 for a in all_articles if a.get("type") == "reddit_trending")
     reddit_estimated = sum(1 for a in all_articles if a.get("type") == "reddit_trending" and a.get("_engagement", {}).get("engagement_estimated"))
     github_count = sum(1 for a in all_articles if a.get("type") == "github_trending")
@@ -1554,7 +1647,7 @@ def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools"):
     yo_count = sum(1 for a in all_articles if a.get("type") == "youtube_outliers")
     
     print(f"\n📊 Trending Engine Summary: {len(all_articles)} total signals")
-    print(f"   YouTube: {yt_count} | Reddit: {reddit_count} | GitHub: {github_count} | Hacker News: {hn_count}")
+    print(f"   YouTube: {yt_count} | Most Popular: {ymp_count} | Reddit: {reddit_count} | GitHub: {github_count} | Hacker News: {hn_count}")
     print(f"   HuggingFace: {hf_count} | ArXiv: {arxiv_count} | TLDR AI: {tldr_count} | Google Trends: {gt_count} | YouTube Outliers: {yo_count}")
     if all_articles:
         top = all_articles[0]
@@ -1562,6 +1655,7 @@ def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools"):
     
     # ── Data Source Health Dashboard ──────────────────────────────────────
     yt_status = "✅ Active" if yt_count > 0 else "❌ Offline (YOUTUBE_DATA_API_KEY missing?)"
+    ymp_status = "✅ Active" if ymp_count > 0 else "❌ Offline (YOUTUBE_DATA_API_KEY missing?)"
     reddit_native = reddit_count - reddit_estimated
     reddit_status = "✅ Active" if reddit_native > 0 else ("⚠️ Degraded" if reddit_estimated > 0 else "❌ Offline")
     github_status = "✅ Active" if github_count > 0 else "⚠️ No results"
@@ -1572,16 +1666,17 @@ def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools"):
     gt_status = "✅ Active" if gt_count > 0 else "⚠️ No results"
     yo_status = "✅ Active" if yo_count > 0 else "⚠️ No results"
     
-    active_count = sum(1 for s in [yt_status, reddit_status, github_status, hn_status, hf_status, arxiv_status, tldr_status, gt_status, yo_status] if s.startswith("✅"))
-    print(f"\n🏥 Data Source Health: {active_count}/9 sources fully active")
-    print(f"   YouTube Trending : {yt_status}")
-    print(f"   Reddit           : {reddit_status}")
-    print(f"   GitHub           : {github_status}")
-    print(f"   Hacker News      : {hn_status}")
-    print(f"   Hugging Face     : {hf_status}")
-    print(f"   ArXiv AI         : {arxiv_status}")
-    print(f"   TLDR AI          : {tldr_status}")
-    print(f"   Google Trends    : {gt_status}")
-    print(f"   YouTube Outliers : {yo_status}")
+    active_count = sum(1 for s in [yt_status, ymp_status, reddit_status, github_status, hn_status, hf_status, arxiv_status, tldr_status, gt_status, yo_status] if s.startswith("✅"))
+    print(f"\n🏥 Data Source Health: {active_count}/10 sources fully active")
+    print(f"   YouTube Trending    : {yt_status}")
+    print(f"   YouTube Most Popular: {ymp_status}")
+    print(f"   Reddit              : {reddit_status}")
+    print(f"   GitHub              : {github_status}")
+    print(f"   Hacker News         : {hn_status}")
+    print(f"   Hugging Face        : {hf_status}")
+    print(f"   ArXiv AI            : {arxiv_status}")
+    print(f"   TLDR AI             : {tldr_status}")
+    print(f"   Google Trends       : {gt_status}")
+    print(f"   YouTube Outliers    : {yo_status}")
     
     return all_articles
