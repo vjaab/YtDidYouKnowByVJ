@@ -11,6 +11,7 @@ import sys
 import json
 import base64
 import argparse
+import re
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 from playwright.sync_api import sync_playwright
@@ -19,6 +20,26 @@ import datetime
 import hashlib
 import io
 from PIL import Image
+
+
+def sanitize_filename(name: str, max_len: int = 100) -> str:
+    """Sanitize a string for use as a filename."""
+    # Replace em dashes and special dashes
+    name = name.replace('—', '-').replace('–', '-')
+    # Replace colons and semicolons
+    name = name.replace(':', '-').replace(';', '-')
+    # Replace forward/back slashes
+    name = name.replace('/', '-').replace('\\', '-')
+    # Replace other problematic characters
+    name = re.sub(r'[<>|"*?]', '-', name)
+    # Replace multiple dashes/spaces with single underscore
+    name = re.sub(r'[\s\-]+', '_', name)
+    # Remove leading/trailing underscores/dots
+    name = name.strip('_.')
+    # Truncate
+    if len(name) > max_len:
+        name = name[:max_len].rstrip('_.')
+    return name.lower()
 
 # Add parent directory to path for trending_engine import
 sys.path.insert(0, str(Path(__file__).parent))
@@ -572,12 +593,14 @@ def generate_images(topic_data: dict, output_dir: Path) -> tuple:
     """Generate Instagram and Facebook images using configured provider with fallback chain."""
     print(f"🎨 Generating images with provider: {AI_IMAGE_PROVIDER} (fallback chain enabled)")
     
+    safe_topic = sanitize_filename(topic_data['topic'])
+    
     # Instagram 4:5
-    ig_path = output_dir / f"instagram_{topic_data['topic'].lower().replace(' ', '_')}.png"
+    ig_path = output_dir / f"instagram_{safe_topic}.png"
     generate_image_with_fallback_chain(topic_data, ig_path, INSTAGRAM_W, INSTAGRAM_H, "instagram")
     
     # Facebook 1.91:1
-    fb_path = output_dir / f"facebook_{topic_data['topic'].lower().replace(' ', '_')}.png"
+    fb_path = output_dir / f"facebook_{safe_topic}.png"
     generate_image_with_fallback_chain(topic_data, fb_path, FACEBOOK_W, FACEBOOK_H, "facebook")
     
     return ig_path, fb_path
@@ -629,7 +652,8 @@ def generate_poll_data(topic_data: dict, output_dir: Path) -> Path:
         "opinion_poll": template["poll"],
     }
     
-    poll_path = output_dir / f"poll_{topic_data['topic'].lower().replace(' ', '_')}.json"
+    safe_topic = sanitize_filename(topic_data['topic'])
+    poll_path = output_dir / f"poll_{safe_topic}.json"
     with open(poll_path, "w") as f:
         json.dump(poll_data, f, indent=2)
     
@@ -639,6 +663,7 @@ def generate_poll_data(topic_data: dict, output_dir: Path) -> Path:
 
 def save_metadata(output_dir: Path, topic_data: dict, variants: list, ig_paths: list, fb_paths: list, caption: str, hashtags: str, poll_path: Path):
     """Save metadata JSON for workflow consumption."""
+    safe_topic = sanitize_filename(topic_data['topic'])
     meta = {
         "topic": topic_data["topic"],
         "category": topic_data["category"],
@@ -651,7 +676,7 @@ def save_metadata(output_dir: Path, topic_data: dict, variants: list, ig_paths: 
         "generated_at": __import__("datetime").datetime.now(datetime.timezone.utc).isoformat(),
     }
     
-    meta_path = output_dir / f"metadata_{topic_data['topic'].lower().replace(' ', '_')}.json"
+    meta_path = output_dir / f"metadata_{safe_topic}.json"
     with open(meta_path, "w") as f:
         json.dump(meta, f, indent=2)
     
@@ -919,7 +944,8 @@ def main():
         
         # Generate caption
         caption = generate_caption(topic_data, hashtags)
-        caption_path = output_dir / f"caption_{topic_data['topic'].lower().replace(' ', '_')}.txt"
+        safe_topic = sanitize_filename(topic_data['topic'])
+        caption_path = output_dir / f"caption_{safe_topic}.txt"
         caption_path.write_text(caption)
         print(f"✅ Caption saved: {caption_path}")
         
