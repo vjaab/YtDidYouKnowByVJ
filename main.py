@@ -308,11 +308,16 @@ def format_telegram_caption(title, description, hashtags, youtube_url, script_da
     hashtag_str = " ".join(tg_hashtags)
     
     # Short description snippet
-    desc_snippet = description[:300] if description else ""
+    desc_snippet = description[:200] if description else ""
+    
+    # Source article URL (from script_data)
+    source_url = script_data.get("original_news_url", "") if script_data else ""
+    source_line = f'\n📰 <a href="{source_url}">Source Article</a>' if source_url else ""
     
     tg_caption = f"""🔥 <b>{hook}</b>
 
 {desc_snippet}
+{source_line}
 
 🎥 <a href="{youtube_url}">Watch on YouTube</a>
 
@@ -338,11 +343,16 @@ def format_threads_caption(title, description, hashtags, youtube_url, script_dat
     hashtag_str = " ".join(th_hashtags)
     
     # Short description snippet
-    desc_snippet = description[:400] if description else ""
+    desc_snippet = description[:300] if description else ""
+    
+    # Source article URL (from script_data)
+    source_url = script_data.get("original_news_url", "") if script_data else ""
+    source_line = f"\n📰 Source: {source_url}" if source_url else ""
     
     threads_caption = f"""🔥 {hook}
 
 {desc_snippet}
+{source_line}
 
 🎥 Full breakdown: {youtube_url}
 
