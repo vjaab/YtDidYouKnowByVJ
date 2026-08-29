@@ -13,7 +13,7 @@ import random
 import traceback
 from datetime import datetime
 
-from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY, ENABLE_TRENDING_ENGINE, BASE_DIR
+from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY, ENABLE_TRENDING_ENGINE
 from fetch_research_papers import fetch_tech_news, fetch_ai_tools
 from topic_tracker import record_story, update_youtube_url, get_next_topic_type_by_ratio, get_next_target_country, get_next_avatar
 from gemini_script import pick_and_generate_script
@@ -34,10 +34,6 @@ from threads_upload import upload_video_to_threads
 from entity_fetcher import fetch_all_entities, get_retention_layers_config
 from kaggle_handover import trigger_kaggle_gpu_job
 from tags_helper import get_optimized_metadata
-from pipeline_checkpoint import (
-    save_checkpoint, load_checkpoint, clear_checkpoints,
-    get_resume_stage, list_checkpoints, SHORTS_STAGES
-)
 
 
 
@@ -359,7 +355,7 @@ def format_threads_caption(title, description, hashtags, youtube_url, script_dat
     return threads_caption[:500]
 
 
-def run_pipeline(topic_type="auto", dry_run=False, resume=False, start_stage=None):
+def run_pipeline(topic_type="auto", dry_run=False):
     # Local mock or real Telegram notification based on dry_run
     def notify_telegram(msg, emoji=""):
         if dry_run:
@@ -367,87 +363,20 @@ def run_pipeline(topic_type="auto", dry_run=False, resume=False, start_stage=Non
         else:
             real_notify_telegram(msg, emoji)
 
-    # ── Resume logic ─────────────────────────────────────────────────────
-    rss_articles = []
-    script_data = None
-    audio_path  = None
-    word_timestamps = []
-    duration    = 0
-    chunks = []
-    video_path = None
-    thumbnail_path = None
-    youtube_url = None
-    result = None
-
-    if resume:
-        if start_stage:
-            resume_from = start_stage
-            log_message(f"🔄 Resuming from specified stage: {resume_from}")
-        else:
-            resume_from = get_resume_stage("shorts")
-            if resume_from:
-                log_message(f"🔄 Resuming from checkpoint: {resume_from}")
-            else:
-                log_message("🔄 No checkpoint found, starting fresh.")
-                resume_from = None
-
-        # Load checkpoints for completed stages
-        if resume_from:
-            completed_idx = SHORTS_STAGES.index(resume_from)
-            for stage in SHORTS_STAGES[:completed_idx]:
-                cp = load_checkpoint(stage, "shorts")
-                if cp:
-                    if stage == "fetch_articles":
-                        rss_articles = cp.get("rss_articles", [])
-                    elif stage == "generate_script":
-                        script_data = cp.get("script_data")
-                    elif stage == "capture_screenshots":
-                        script_data = cp.get("script_data") or script_data
-                    elif stage == "fetch_entities":
-                        script_data = cp.get("script_data") or script_data
-                    elif stage == "generate_audio":
-                        audio_path = cp.get("audio_path")
-                        word_timestamps = cp.get("word_timestamps", [])
-                        duration = cp.get("duration", 0)
-                        script_data = cp.get("script_data") or script_data
-                    elif stage == "build_chunks":
-                        chunks = cp.get("chunks", [])
-                        script_data = cp.get("script_data") or script_data
-                    elif stage == "generate_visuals":
-                        chunks = cp.get("chunks", [])
-                        script_data = cp.get("script_data") or script_data
-                    elif stage == "validate_visuals":
-                        chunks = cp.get("chunks", [])
-                        script_data = cp.get("script_data") or script_data
-                    elif stage == "render_video":
-                        video_path = cp.get("video_path")
-                        script_data = cp.get("script_data") or script_data
-                    elif stage == "generate_thumbnail":
-                        thumbnail_path = cp.get("thumbnail_path")
-                        script_data = cp.get("script_data") or script_data
-                    elif stage == "upload_youtube":
-                        result = cp.get("result")
-                        youtube_url = cp.get("youtube_url")
-                        script_data = cp.get("script_data") or script_data
-            log_message(f"✅ Loaded checkpoints up to: {SHORTS_STAGES[completed_idx - 1] if completed_idx > 0 else 'none'}")
-    else:
-        resume_from = None
-
     if topic_type == "auto":
         topic_type = get_next_topic_type_by_ratio()
     target_country = get_next_target_country()
     log_message(f"=== STARTING DAILY AI PIPELINE ({topic_type.upper()}) | COUNTRY: {target_country} ===")
 
-    # ── Clean output folder before starting (only on fresh run) ───────────────────
-    if not resume:
-        if os.path.exists(OUTPUT_DIR):
-            for f in glob.glob(os.path.join(OUTPUT_DIR, "*")):
-                try:
-                    if os.path.isfile(f):
-                        os.remove(f)
-                except Exception:
-                    pass
-            log_message(f"Output folder cleaned: {OUTPUT_DIR}")
+    # ── Clean output folder before starting ───────────────────────────────────
+    if os.path.exists(OUTPUT_DIR):
+        for f in glob.glob(os.path.join(OUTPUT_DIR, "*")):
+            try:
+                if os.path.isfile(f):
+                    os.remove(f)
+            except Exception:
+                pass
+        log_message(f"Output folder cleaned: {OUTPUT_DIR}")
 
     # ── STEP 1: Content Ecosystem Check ───────────────────────────────────────
     from config import UPLOAD_SCHEDULE, TIMEZONE
@@ -466,201 +395,196 @@ def run_pipeline(topic_type="auto", dry_run=False, resume=False, start_stage=Non
     if category == "Quiz & Trivia":
         topic_type = "quiz"
         log_message(f"🎯 QUIZ MODE: Category is 'Quiz & Trivia' — forcing topic_type=quiz")
-
+    
     # ── STEP 2: Selection Strategy (RSS + Trending Engine) ─────────────────────
-    if not resume_from or resume_from == "fetch_articles":
-        log_message(f"STEP 2: Fetching articles (RSS + Trending Engine)...")
-        rss_articles = []
+    log_message(f"STEP 2: Fetching articles (RSS + Trending Engine)...")
+    rss_articles = []
+    try:
+        # Fetch vidIQ trending topics
+        vidiq_news = []
         try:
-            # Fetch vidIQ trending topics
-            vidiq_news = []
-            try:
-                from vidiq_trending import get_pipeline_topics
-                vidiq_raw = get_pipeline_topics(category=category)
-                for item in vidiq_raw:
-                    vidiq_news.append({
-                        "title": item["original_title"] if item.get("original_title") else item["title"],
-                        "description": f"vidIQ Opportunity Score: {item.get('score', 60)} (Volume: {item.get('search_volume')}, Competition: {item.get('competition')})",
-                        "source": {"name": item.get("source", "vidIQ")},
-                        "url": item.get("url", ""),
-                        "publishedAt": datetime.now().isoformat(),
-                        "type": "trending",
-                        "_engagement_score": item.get("score", 60)
-                    })
-                log_message(f"📈 vidIQ: Injected {len(vidiq_news)} high-signal topics.")
-            except Exception as ex:
-                log_message(f"⚠️ vidIQ Fetch failed (non-fatal): {ex}")
+            from vidiq_trending import get_pipeline_topics
+            vidiq_raw = get_pipeline_topics(category=category)
+            for item in vidiq_raw:
+                vidiq_news.append({
+                    "title": item["original_title"] if item.get("original_title") else item["title"],
+                    "description": f"vidIQ Opportunity Score: {item.get('score', 60)} (Volume: {item.get('search_volume')}, Competition: {item.get('competition')})",
+                    "source": {"name": item.get("source", "vidIQ")},
+                    "url": item.get("url", ""),
+                    "publishedAt": datetime.now().isoformat(),
+                    "type": "trending",
+                    "_engagement_score": item.get("score", 60)
+                })
+            log_message(f"📈 vidIQ: Injected {len(vidiq_news)} high-signal topics.")
+        except Exception as ex:
+            log_message(f"⚠️ vidIQ Fetch failed (non-fatal): {ex}")
 
-            # Fetch both to give Gemini more options
-            research_news = fetch_tech_news()
-            ai_tool_news = fetch_ai_tools()
+        # Fetch both to give Gemini more options
+        research_news = fetch_tech_news()
+        ai_tool_news = fetch_ai_tools()
+        
+        # Fetch X.com trending AI topics
+        try:
+            from fetch_research_papers import fetch_x_trending_ai_topics
+            x_news = fetch_x_trending_ai_topics()
+        except Exception as ex:
+            log_message(f"⚠️ Failed to import x_trending_fetcher: {ex}")
+            x_news = []
             
-            # Fetch X.com trending AI topics
-            try:
-                from fetch_research_papers import fetch_x_trending_ai_topics
-                x_news = fetch_x_trending_ai_topics()
-            except Exception as ex:
-                log_message(f"⚠️ Failed to import x_trending_fetcher: {ex}")
-                x_news = []
-                
-            # Fetch GitHub trending AI repos (Conflict Fix: prioritize trending GitHub projects)
-            try:
-                from trending_engine import fetch_github_trending_ai
-                github_news = fetch_github_trending_ai(category)
-            except Exception as ex:
-                log_message(f"⚠️ GitHub Fetch failed: {ex}")
-                github_news = []
-                
-            rss_articles = github_news + vidiq_news + research_news + ai_tool_news + x_news
+        # Fetch GitHub trending AI repos (Conflict Fix: prioritize trending GitHub projects)
+        try:
+            from trending_engine import fetch_github_trending_ai
+            github_news = fetch_github_trending_ai(category)
+        except Exception as ex:
+            log_message(f"⚠️ GitHub Fetch failed: {ex}")
+            github_news = []
             
-            # ── TRENDING ENGINE (Phase 1): YouTube, Reddit, GitHub signals ──
-            trending_articles = []
-            if ENABLE_TRENDING_ENGINE:
-                try:
-                    from trending_engine import fetch_all_trending_signals
-                    trending_articles = fetch_all_trending_signals(target_country=target_country, category=category)
-                    rss_articles = trending_articles + rss_articles  # Trending FIRST for priority
-                    log_message(f"🔥 Trending Engine injected {len(trending_articles)} high-signal articles for geo={target_country}, category={category}.")
-                except Exception as ex:
-                    log_message(f"⚠️ Trending Engine failed (non-fatal): {ex}")
-                
-            if not rss_articles:
-                log_message("⚠️ All feeds returned 0 articles.")
-            else:
-                log_message(f"✅ Fetched {len(rss_articles)} total articles ({len(github_news)} GitHub, {len(vidiq_news)} vidIQ, {len(research_news)} research, {len(ai_tool_news)} tools, {len(x_news)} X.com, {len(trending_articles)} trending).")
-        except Exception as e:
-            log_message(f"⚠️ RSS/Trending Fetch failed: {e}")
-
-        save_checkpoint("fetch_articles", {"rss_articles": rss_articles}, "shorts")
-        resume_from = None
+        rss_articles = github_news + vidiq_news + research_news + ai_tool_news + x_news
+        
+        # ── TRENDING ENGINE (Phase 1): YouTube, Reddit, GitHub signals ──
+        trending_articles = []
+        if ENABLE_TRENDING_ENGINE:
+            try:
+                from trending_engine import fetch_all_trending_signals
+                trending_articles = fetch_all_trending_signals(target_country=target_country, category=category)
+                rss_articles = trending_articles + rss_articles  # Trending FIRST for priority
+                log_message(f"🔥 Trending Engine injected {len(trending_articles)} high-signal articles for geo={target_country}, category={category}.")
+            except Exception as ex:
+                log_message(f"⚠️ Trending Engine failed (non-fatal): {ex}")
+            
+        if not rss_articles:
+            log_message("⚠️ All feeds returned 0 articles.")
+        else:
+            log_message(f"✅ Fetched {len(rss_articles)} total articles ({len(github_news)} GitHub, {len(vidiq_news)} vidIQ, {len(research_news)} research, {len(ai_tool_news)} tools, {len(x_news)} X.com, {len(trending_articles)} trending).")
+    except Exception as e:
+        log_message(f"⚠️ RSS/Trending Fetch failed: {e}")
 
     # ── STEP 3: Script Generation (with retry) ────────────────────────────────
     # Screenshot is MANDATORY — if we can't capture it, we reject the topic and retry.
     attempts = 0
+    script_data = None
+    audio_path  = None
+    word_timestamps = []
+    duration    = 0
     extra_instruction = ""
     min_dur, max_dur = TARGET_AUDIO_DURATION
+    # NOTE: vaibhav duration override removed — YouTube's algorithm strongly
+    # rewards 15-35s Shorts with higher completion rates. All types now use
+    # the config-level TARGET_AUDIO_DURATION (15, 35).
     failed_topics = []  # Track topics whose screenshots failed so Gemini avoids them
 
-    if not resume_from or resume_from == "generate_script":
-        attempts = 0
-        while attempts < MAX_RETRY_ATTEMPTS:
-            log_message(f"STEP 3 (Attempt {attempts+1}/{MAX_RETRY_ATTEMPTS}): Gemini Searching & Generating Script...")
-            
-            # Build avoidance instruction from failed topics (duplicates or screenshot failures)
-            screenshot_avoid = ""
-            if failed_topics:
-                avoid_lines = "\n".join([f"- {t}" for t in failed_topics])
-                screenshot_avoid = (
-                    f"\n\nCRITICAL: The following topics/URLs were REJECTED (either because they are duplicates or their article screenshot could not be captured). "
-                    f"DO NOT pick these again. Choose a DIFFERENT unique story:\n{avoid_lines}\n"
-                )
-            
-            combined_instruction = extra_instruction + screenshot_avoid
-            
-            script_data = pick_and_generate_script(
-                articles=rss_articles, extra_instruction=combined_instruction, forced_article=None, topic_type=topic_type, failed_topics=failed_topics, target_country=target_country, run_index=run_index
+    while attempts < MAX_RETRY_ATTEMPTS:
+        log_message(f"STEP 3 (Attempt {attempts+1}/{MAX_RETRY_ATTEMPTS}): Gemini Searching & Generating Script...")
+        
+        # Build avoidance instruction from failed topics (duplicates or screenshot failures)
+        screenshot_avoid = ""
+        if failed_topics:
+            avoid_lines = "\n".join([f"- {t}" for t in failed_topics])
+            screenshot_avoid = (
+                f"\n\nCRITICAL: The following topics/URLs were REJECTED (either because they are duplicates or their article screenshot could not be captured). "
+                f"DO NOT pick these again. Choose a DIFFERENT unique story:\n{avoid_lines}\n"
             )
+        
+        combined_instruction = extra_instruction + screenshot_avoid
+        
+        script_data = pick_and_generate_script(
+            articles=rss_articles, extra_instruction=combined_instruction, forced_article=None, topic_type=topic_type, failed_topics=failed_topics, target_country=target_country, run_index=run_index
+        )
 
-            if not script_data:
-                log_message("ERROR: Script generation failed.")
-                attempts += 1
-                if attempts % 3 == 0:
-                    log_message("⏳ Gemini API potentially rate-limited. Sleeping 60s before next attempt...")
-                    time.sleep(60)
-                continue
-                
-            # Store slot info for downstream rendering (e.g. aspect ratio)
-            script_data["slot"] = slot
-
-            title  = script_data.get("title", "Tech News!")
-            script = script_data.get("script", "")
-            log_message(f"Selected Headline: {script_data.get('original_news_headline')}")
-            log_message(f"Selected URL: {script_data.get('original_news_url')}")
-            log_message(f"Breaking Level: {script_data.get('breaking_news_level')}")
-
-            # ── STEP 3b: Capture Article Screenshot FIRST (MANDATORY) ────────────
-            # Capture screenshot BEFORE audio to fail fast and avoid wasting API costs.
-            log_message("STEP 3b: Capturing article screenshot (MANDATORY — before audio)...")
-            news_url = script_data.get("original_news_url")
-            screenshot_captured = False
+        if not script_data:
+            log_message("ERROR: Script generation failed.")
+            attempts += 1
+            if attempts % 3 == 0:
+                log_message("⏳ Gemini API potentially rate-limited. Sleeping 60s before next attempt...")
+                time.sleep(60)
+            continue
             
-            if news_url:
-                screenshot_filename = f"screenshot_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-                screenshot_path = capture_article_screenshot(
-                    news_url, 
-                    screenshot_filename, 
-                    headline=script_data.get("original_news_headline")
-                )
-                if screenshot_path:
-                    script_data["screenshot_path"] = screenshot_path
-                    log_message(f"✅ Main screenshot captured: {screenshot_path}")
-                    screenshot_captured = True
+        # Store slot info for downstream rendering (e.g. aspect ratio)
+        script_data["slot"] = slot
+
+        title  = script_data.get("title", "Tech News!")
+        script = script_data.get("script", "")
+        log_message(f"Selected Headline: {script_data.get('original_news_headline')}")
+        log_message(f"Selected URL: {script_data.get('original_news_url')}")
+        log_message(f"Breaking Level: {script_data.get('breaking_news_level')}")
+
+        # ── STEP 3b: Capture Article Screenshot FIRST (MANDATORY) ────────────
+        # Capture screenshot BEFORE audio to fail fast and avoid wasting API costs.
+        log_message("STEP 3b: Capturing article screenshot (MANDATORY — before audio)...")
+        news_url = script_data.get("original_news_url")
+        screenshot_captured = False
+        
+        if news_url:
+            screenshot_filename = f"screenshot_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            screenshot_path = capture_article_screenshot(
+                news_url, 
+                screenshot_filename, 
+                headline=script_data.get("original_news_headline")
+            )
+            if screenshot_path:
+                script_data["screenshot_path"] = screenshot_path
+                log_message(f"✅ Main screenshot captured: {screenshot_path}")
+                screenshot_captured = True
+        
+        if not screenshot_captured:
+            # Screenshot is MANDATORY — reject this topic and try another
+            failed_headline = script_data.get("original_news_headline", title)
+            failed_url = news_url or "unknown"
+            failed_topics.append(failed_headline)
+            if failed_url != "unknown":
+                failed_topics.append(failed_url)
+            log_message(f"❌ Article screenshot FAILED for: {failed_headline}")
+            log_message(f"   URL was: {failed_url}")
+            log_message(f"   Rejecting this topic and picking a different one... ({len(failed_topics)} items rejected so far)")
             
-            if not screenshot_captured:
-                # Screenshot is MANDATORY — reject this topic and try another
+            # Reset — skip audio generation entirely for this topic
+            script_data = None
+            attempts += 1
+            continue
+
+        # ── STEP 3c: Capture Evidence Screenshot (optional) ──────────────────
+        evidence_url = script_data.get("use_case_evidence_url")
+        if evidence_url and "http" in evidence_url:
+            evidence_filename = f"evidence_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            evidence_path = capture_article_screenshot(
+                evidence_url, 
+                evidence_filename, 
+                headline=script_data.get("title")
+            )
+            if evidence_path:
+                script_data["evidence_screenshot_path"] = evidence_path
+                log_message(f"Evidence screenshot captured: {evidence_path}")
+        else:
+            log_message("No valid evidence URL found for secondary screenshot.")
+
+        # ── STEP 3d: Fetch and Validate Entity Tags (MANDATORY for Shorts) ──
+        is_longform = "Slot C" in slot
+        if not is_longform:
+            log_message("STEP 3d: Fetching and validating entity tags for Short...")
+            script_data = fetch_all_entities(script_data)
+            
+            # Find entities with name, description, and successfully downloaded logo
+            valid_entities = []
+            for ent_list_key in ["companies", "people", "key_entities"]:
+                for ent in script_data.get(ent_list_key, []):
+                    name = ent.get("name")
+                    desc = ent.get("description")
+                    logo_path = ent.get("local_logo_path") or ent.get("local_hq_path") or ent.get("local_image_path")
+                    if name and desc and logo_path and os.path.exists(logo_path):
+                        if not any(e.get("name") == name for e in valid_entities):
+                            valid_entities.append(ent)
+            
+            if not valid_entities:
+                log_message("❌ Short validation FAILED: No valid entity tags (logo + name + description) found.")
                 failed_headline = script_data.get("original_news_headline", title)
-                failed_url = news_url or "unknown"
                 failed_topics.append(failed_headline)
-                if failed_url != "unknown":
-                    failed_topics.append(failed_url)
-                log_message(f"❌ Article screenshot FAILED for: {failed_headline}")
-                log_message(f"   URL was: {failed_url}")
-                log_message(f"   Rejecting this topic and picking a different one... ({len(failed_topics)} items rejected so far)")
-                
-                # Reset — skip audio generation entirely for this topic
                 script_data = None
                 attempts += 1
                 continue
-
-            # ── STEP 3c: Capture Evidence Screenshot (optional) ──────────────────
-            evidence_url = script_data.get("use_case_evidence_url")
-            if evidence_url and "http" in evidence_url:
-                evidence_filename = f"evidence_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-                evidence_path = capture_article_screenshot(
-                    evidence_url, 
-                    evidence_filename, 
-                    headline=script_data.get("title")
-                )
-                if evidence_path:
-                    script_data["evidence_screenshot_path"] = evidence_path
-                    log_message(f"Evidence screenshot captured: {evidence_path}")
             else:
-                log_message("No valid evidence URL found for secondary screenshot.")
+                log_message(f"✅ Found {len(valid_entities)} valid entity tags for the Short.")
 
-            # ── STEP 3d: Fetch and Validate Entity Tags (MANDATORY for Shorts) ──
-            is_longform = "Slot C" in slot
-            if not is_longform:
-                log_message("STEP 3d: Fetching and validating entity tags for Short...")
-                script_data = fetch_all_entities(script_data)
-                
-                # Find entities with name, description, and successfully downloaded logo
-                valid_entities = []
-                for ent_list_key in ["companies", "people", "key_entities"]:
-                    for ent in script_data.get(ent_list_key, []):
-                        name = ent.get("name")
-                        desc = ent.get("description")
-                        logo_path = ent.get("local_logo_path") or ent.get("local_hq_path") or ent.get("local_image_path")
-                        if name and desc and logo_path and os.path.exists(logo_path):
-                            if not any(e.get("name") == name for e in valid_entities):
-                                valid_entities.append(ent)
-                
-                if not valid_entities:
-                    log_message("❌ Short validation FAILED: No valid entity tags (logo + name + description) found.")
-                    failed_headline = script_data.get("original_news_headline", title)
-                    failed_topics.append(failed_headline)
-                    script_data = None
-                    attempts += 1
-                    continue
-                else:
-                    log_message(f"✅ Found {len(valid_entities)} valid entity tags for the Short.")
-
-            save_checkpoint("generate_script", {"script_data": script_data}, "shorts")
-            save_checkpoint("capture_screenshots", {"script_data": script_data}, "shorts")
-            save_checkpoint("fetch_entities", {"script_data": script_data}, "shorts")
-            resume_from = None
-
-    # ── STEP 4: Generate Audio + Word Timestamps ──────────────────────────
-    if not resume_from or resume_from == "generate_audio":
+        # ── STEP 4: Generate Audio + Word Timestamps ──────────────────────────
         log_message("STEP 4: Generating voiceover + word timestamps...")
         custom_map = script_data.get("custom_map", {})
         
@@ -691,9 +615,7 @@ def run_pipeline(topic_type="auto", dry_run=False, resume=False, start_stage=Non
                 extra_instruction = f"The previous script was too short at {word_count} words (expected ~{expected_dur:.0f}s). Make the script longer, aim for at least {int(min_dur * 2.4)} words (approx 25-35 seconds)."
             attempts += 1
             script_data = None
-            # Need to go back to script generation
-            resume_from = "generate_script"
-            return False  # Will be resumed from generate_script on next run
+            continue
 
         if has_kaggle and not use_local_only:
             results = trigger_kaggle_gpu_job(script_data, custom_map)
@@ -753,14 +675,14 @@ def run_pipeline(topic_type="auto", dry_run=False, resume=False, start_stage=Non
         else:
             audio_path, duration, word_timestamps = generate_voiceover(script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY)
         
+
         if not audio_path:
             log_message("ERROR: Audio generation failed.")
             failed_headline = script_data.get("original_news_headline", title)
             failed_topics.append(failed_headline)
             attempts += 1
-            resume_from = "generate_script"
-            return False
-        
+            continue
+
         if duration < min_dur:
             log_message(f"Audio too short ({duration:.1f}s < {min_dur}s). Retrying...")
             # If we've tried multiple times and it's still too short, maybe just skip this topic
@@ -772,17 +694,11 @@ def run_pipeline(topic_type="auto", dry_run=False, resume=False, start_stage=Non
             else:
                 extra_instruction = f"The previous script was too short at {duration:.0f}s. Make the script slightly longer, aim for 25-35 seconds of speaking."
             attempts += 1
-            resume_from = "generate_script"
-            return False
+            continue
 
         log_message(f"Audio OK: {duration:.1f}s | {len(word_timestamps)} word timestamps")
-        save_checkpoint("generate_audio", {
-            "audio_path": audio_path,
-            "word_timestamps": word_timestamps,
-            "duration": duration,
-            "script_data": script_data
-        }, "shorts")
-        resume_from = None
+        
+        break   # ← full success (script + screenshot + audio all OK)
 
     if not audio_path or not script_data or duration < min_dur:
         log_message("ERROR: Could not generate valid assets. Aborting.")
@@ -791,7 +707,6 @@ def run_pipeline(topic_type="auto", dry_run=False, resume=False, start_stage=Non
     if not script_data.get("screenshot_path"):
         log_message("ERROR: Could not capture article screenshot after all retries. Aborting.")
         return False
-
 
     # ── STEP 4.5: Reserve Topic Early ─────────────────────────────────────────
     log_message("STEP 4.5: Reserving topic in tracker to prevent reuse on failure...")
@@ -1215,9 +1130,9 @@ def run_pipeline(topic_type="auto", dry_run=False, resume=False, start_stage=Non
     return True
 
 
-def run_local(topic_type="auto", dry_run=False, resume=False, start_stage=None):
+def run_local(topic_type="auto", dry_run=False):
     # XTTS server launch removed. Calling pipeline directly.
-    success = run_pipeline(topic_type=topic_type, dry_run=dry_run, resume=resume, start_stage=start_stage)
+    success = run_pipeline(topic_type=topic_type, dry_run=dry_run)
     if not success:
         print("❌ Pipeline failed. Exiting with error code.")
         sys.exit(1)
@@ -1228,35 +1143,11 @@ if __name__ == "__main__":
     parser.add_argument("--now", action="store_true", help="Run pipeline immediately.")
     parser.add_argument("--type", type=str, choices=["auto", "research", "tools", "news", "tech_trends", "vaibhav", "interview_questions"], default="auto", help="Content type mapped to the schedule")
     parser.add_argument("--dry-run", action="store_true", help="Run without uploading to YouTube/X.com/Telegram.")
-    parser.add_argument("--resume", action="store_true", help="Resume from latest checkpoint.")
-    parser.add_argument("--stage", type=str, choices=SHORTS_STAGES, help="Start from specific stage (implies --resume).")
-    parser.add_argument("--clear-checkpoints", action="store_true", help="Clear all checkpoints and start fresh.")
-    parser.add_argument("--list-checkpoints", action="store_true", help="List existing checkpoints and exit.")
     args = parser.parse_args()
 
-    if args.list_checkpoints:
-        checkpoints = list_checkpoints("shorts")
-        if checkpoints:
-            print("📋 Existing checkpoints:")
-            for stage, meta in checkpoints.items():
-                print(f"  ✅ {stage}: {meta.get('timestamp', 'unknown')}")
-        else:
-            print("📋 No checkpoints found.")
-        sys.exit(0)
-
-    if args.clear_checkpoints:
-        clear_checkpoints(pipeline_type="shorts")
-        print("🗑️ All checkpoints cleared.")
-        sys.exit(0)
-
-    if args.stage:
-        args.resume = True
-        clear_checkpoints(args.stage, "shorts")
-
-    if args.now or args.dry_run or args.resume:
-        run_local(topic_type=args.type, dry_run=args.dry_run, resume=args.resume, start_stage=args.stage)
+    if args.now or args.dry_run:
+        run_local(topic_type=args.type, dry_run=args.dry_run)
     else:
         print("Usage: python main.py --now")
         print("For dry runs: python main.py --dry-run")
-        print("For resume: python main.py --resume")
         print("For scheduled runs: python scheduler.py")
