@@ -74,7 +74,12 @@ jobs:
           # Write client_secret.json for YouTube auth (use same secret as shorts pipeline)
           echo '${{ secrets.CLIENT_SECRET_JSON }}' > client_secret.json
           
-          # Create .env file
+          # Export YouTube OAuth env vars for Python process
+          export YOUTUBE_REFRESH_TOKEN="${YOUTUBE_REFRESH_TOKEN}"
+          export YOUTUBE_CLIENT_ID="${YOUTUBE_CLIENT_ID}"
+          export YOUTUBE_CLIENT_SECRET="${YOUTUBE_CLIENT_SECRET}"
+          
+          # Create .env file for other scripts
           cat > .env << EOF
           GEMINI_API_KEY=${GEMINI_API_KEY}
           GEMINI_API_KEYS=${GEMINI_API_KEYS}
