@@ -227,23 +227,59 @@ def generate_pinned_comment(script_data, next_series_slot):
     )
 
 
-def format_instagram_caption(description, hashtags, youtube_url):
+def format_instagram_caption(description, hashtags, youtube_url, script_data=None):
     """
-    Instagram Reels caption: line breaks, 3-5 hashtags, community-focused.
-    Max 2200 chars.
+    Instagram Reels caption: line breaks, 3-5 niche hashtags + 2 broad, community-focused.
+    Max 2200 chars. First 125 chars optimized for "before more" visibility.
     """
     # Extract the hook/first line
     lines = description.split('\n')
     hook_line = lines[0] if lines else ""
     
-    # Pick 3-5 most relevant hashtags
-    ig_hashtags = hashtags[:5] if hashtags else ["#AI", "#TechNews", "#Developer"]
-    hashtag_str = " ".join(ig_hashtags)
+    # Truncate hook for first 125 chars (visible before "more")
+    # Format: Hook + CTA in first ~125 chars
+    short_hook = hook_line[:100] + "..." if len(hook_line) > 100 else hook_line
+    first_cta = "👇 Full breakdown on YouTube"
     
-    # Build Instagram-native caption with line breaks
-    ig_caption = f"""🔥 {hook_line}
+    # Niche hashtags (3-5 from script_data or description) + 2 broad
+    niche_tags = []
+    if script_data:
+        # Get companies mentioned for @mentions
+        companies = script_data.get("companies_mentioned", [])
+        if companies:
+            for c in companies[:3]:
+                name = c.get("name", "").replace(" ", "")
+                if name:
+                    niche_tags.append(f"@{name.lower()}")
+        
+        # Get niche hashtags from script_data
+        if script_data.get("hashtags"):
+            niche_tags.extend(script_data["hashtags"][:3])
+    
+    # Fallback to passed hashtags
+    if not niche_tags and hashtags:
+        niche_tags = hashtags[:3]
+    
+    # Ensure we have 3-5 niche tags
+    niche_tags = niche_tags[:5]
+    
+    # 2 broad hashtags
+    broad_tags = ["#AI", "#TechNews"]
+    
+    # Combine all hashtags
+    all_hashtags = niche_tags + broad_tags
+    hashtag_str = " ".join(all_hashtags[:7])  # Max 7 total
+    
+    # Location tag (if relevant - can be added from script_data)
+    location_tag = ""
+    if script_data and script_data.get("location"):
+        location_tag = f"\n📍 {script_data['location']}"
+    
+    # Build Instagram-native caption with optimized first 125 chars
+    # First line: Hook (truncated) + immediate CTA
+    ig_caption = f"""🔥 {short_hook} {first_cta}
 
-{description[:1500]}
+{description[:1200]}{location_tag}
 
 👇 Full breakdown on YouTube: {youtube_url}
 
@@ -253,7 +289,7 @@ def format_instagram_caption(description, hashtags, youtube_url):
 
 {hashtag_str}
 
-#AI #TechNews #Developer #Coding #ArtificialIntelligence"""
+🔁 Remix this Reel with your take!"""
     
     return ig_caption[:2200]
 
@@ -1078,8 +1114,8 @@ def run_pipeline(topic_type="auto", dry_run=False):
     # ── STEP 10d: Instagram Reels Auto-Post ───────────────────────────────────
     log_message("STEP 10d: Auto-posting Reel to Instagram...")
     try:
-        # Use platform-native Instagram caption (line breaks, 3-5 hashtags)
-        ig_caption = format_instagram_caption(description, hashtags, youtube_url)
+        # Use platform-native Instagram caption (line breaks, niche + broad hashtags, @mentions)
+        ig_caption = format_instagram_caption(description, hashtags, youtube_url, script_data)
         if dry_run:
             print("🧪 [DRY RUN] Simulating Instagram Reel upload...")
             ig_uploaded, ig_result = True, "MOCK_IG_REEL_ID"
