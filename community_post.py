@@ -12,42 +12,24 @@ def get_authenticated_service():
         print("YouTube client secret file not found.")
         return None
         
-    from google.auth.transport.requests import Request
-    from google.oauth2.credentials import Credentials
-    import google_auth_oauthlib.flow
-    
     creds = None
     token_path = "token.json"
     
-    # Check for refresh token in environment (for CI/CD headless auth)
-    refresh_token = os.getenv("YOUTUBE_REFRESH_TOKEN")
-    client_id = os.getenv("YOUTUBE_CLIENT_ID")
-    client_secret = os.getenv("YOUTUBE_CLIENT_SECRET")
-    
-    if refresh_token and client_id and client_secret:
-        creds = Credentials(
-            token=None,
-            refresh_token=refresh_token,
-            token_uri="https://oauth2.googleapis.com/token",
-            client_id=client_id,
-            client_secret=client_secret,
-            scopes=SCOPES
-        )
-        creds.refresh(Request())
-    elif os.path.exists(token_path):
-        # Use pre-stored token.json (restored from GitHub Secrets in CI)
+    if os.path.exists(token_path):
         creds = Credentials.from_authorized_user_file(token_path, SCOPES)
         
-        if not creds or not creds.valid:
-            if creds and creds.expired and creds.refresh_token:
-                creds.refresh(Request())
-            else:
-                print("token.json invalid or expired, and no refresh token available.")
-                return None
-    else:
-        print("No token.json found and no refresh token available.")
-        return None
-    
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(
+                YOUTUBE_CLIENT_SECRET_FILE, SCOPES
+            )
+            creds = flow.run_local_server(port=8080, prompt='consent')
+            
+        with open(token_path, "w") as token:
+            token.write(creds.to_json())
+            
     try:
         from googleapiclient.discovery import build
         youtube = build("youtube", "v3", credentials=creds)
