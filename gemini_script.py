@@ -1881,12 +1881,6 @@ class MultiAgentGenerationEngine:
             self.persona = SYSTEM_PERSONA
 
     def _call_gemini(self, prompt, model=GEMINI_FLASH_MODEL):
-        # Allow complete bypass of Gemini via environment variable
-        if os.environ.get("GEMINI_BYPASS", "0") == "1":
-            print("⚡ GEMINI_BYPASS=1: Skipping Gemini, using fallbacks directly")
-            from llm_fallback import call_fallback_chain
-            return call_fallback_chain(prompt, normalize=True)
-        
         import os
         from google import genai
         
