@@ -3,9 +3,15 @@ venv*/
 __pycache__/
 *.pyc
 token.json
+token_youtube_analytics.json
 client_secret.json
 .ig_token.json
 .ig_rate_limit.json
+.pipeline_checkpoints/
+.topic_index.json
+.threads_rate_limit.json
+.DS_Store
+decorator_flow_template/.DS_Store
 output/
 logs/*
 !logs/api_exhaustion_cache.json
