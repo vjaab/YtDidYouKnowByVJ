@@ -1013,6 +1013,50 @@ def run_pipeline(topic_type="auto", dry_run=False):
 
     youtube_url = f"https://youtu.be/{result}"
     log_message(f"SUCCESS: {youtube_url}")
+    
+    # Record hook pattern info for analytics tracking
+    try:
+        from hook_analytics import record_hook_performance
+        hook_pattern = script_data.get("hook_pattern")
+        hook_variant = script_data.get("hook_variant")
+        category = script_data.get("sub_category", "AI & Tech Tools")
+        if hook_pattern and hook_variant:
+            # Record initial upload (0 views initially, will be updated by analytics sync)
+            record_hook_performance(
+                category=category,
+                pattern_id=hook_pattern,
+                variant_id=hook_variant,
+                views=0,  # Will be updated by analytics sync job
+                retention_rate=0.0,
+                engagement_rate=0.0
+            )
+            log_message(f"📊 Hook analytics initialized: {hook_pattern}/{hook_variant}")
+            
+            # Store video_id -> hook mapping for analytics sync
+            hook_video_map_file = os.path.join(LOGS_DIR, "hook_video_map.json")
+            hook_video_map = {}
+            if os.path.exists(hook_video_map_file):
+                try:
+                    with open(hook_video_map_file, "r") as f:
+                        hook_video_map = json.load(f)
+                except Exception:
+                    pass
+            
+            hook_video_map[result] = {
+                "video_id": result,
+                "hook_pattern": hook_pattern,
+                "hook_variant": hook_variant,
+                "category": category,
+                "title": title,
+                "uploaded_at": datetime.now().isoformat()
+            }
+            
+            with open(hook_video_map_file, "w") as f:
+                json.dump(hook_video_map, f, indent=2)
+            
+            log_message(f"📊 Hook-video mapping saved: {result} -> {hook_pattern}/{hook_variant}")
+    except Exception as e:
+        log_message(f"⚠️ Hook analytics init failed: {e}")
 
     # ── STEP 10c: X.com Auto-Post ─────────────────────────────────────────────
     log_message("STEP 10c: Auto-posting Short to X.com...")

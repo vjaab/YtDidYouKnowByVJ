@@ -13,6 +13,13 @@ from config import (
 )
 from topic_tracker import load_tracker, check_story_uniqueness, check_cooldowns
 from ecosystem_logic import get_slot_info, get_category_prompt_enhancement, get_series_for_category, get_series_info
+from hook_analytics import (
+    get_hook_analytics,
+    record_hook_performance,
+    select_hook_patterns_for_category,
+    update_hook_variant_views,
+    HOOK_PATTERNS
+)
 
 # ── YPP COMPLIANCE: Editorial Perspective Rotation ──
 # Each video gets a unique editorial "lens" to break mass-produced template patterns
@@ -2097,13 +2104,20 @@ class MultiAgentGenerationEngine:
         if not research: return None
 
         print("🪝 [AGENT 2] Hook Agent: Generating A/B test hook variants...")
-        hook_prompt = HOOK_AGENT_TEMPLATE.format(
-            persona=self.persona,
-            research_json=json.dumps(research)
-        )
+        
+        # Use analytics to select optimized patterns for this category
+        from hook_analytics import select_hook_patterns_for_category, get_optimized_hook_prompt
+        optimized_patterns = select_hook_patterns_for_category(category, num_patterns=3)
+        
+        # Generate analytics-optimized hook prompt
+        hook_prompt = get_optimized_hook_prompt(category, research)
+        
         hooks_data = self._call_gemini(hook_prompt)
         if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         if not hooks_data: return None
+        
+        # Store selected patterns for tracking
+        script_data_hook_patterns = optimized_patterns
         
         # Handle both old format ("hooks") and new A/B format ("ab_test_variants")
         if "ab_test_variants" in hooks_data:
@@ -2215,6 +2229,17 @@ class MultiAgentGenerationEngine:
             if 'script_data_ab_variants' in locals() and script_data_ab_variants:
                 final_script["ab_test_hook_variants"] = script_data_ab_variants
                 print(f"📊 A/B Test Variants attached: {len(script_data_ab_variants)} variants")
+            
+            # Attach selected hook pattern info for analytics tracking
+            if 'script_data_hook_patterns' in locals() and script_data_hook_patterns:
+                final_script["hook_patterns_used"] = script_data_hook_patterns
+            
+            # Attach selected hook info (from best_hook selection)
+            if 'hook_pattern' in locals() and 'hook_variant' in locals():
+                final_script["hook_pattern"] = hook_pattern
+                final_script["hook_variant"] = hook_variant
+                final_script["hook_text"] = hook_text
+                print(f"📊 Hook tracking: pattern={hook_pattern}, variant={hook_variant}")
             
             # ── PHASE 2: Attach retention_map to the final script for downstream use ──
             if retention_map:
