@@ -16,6 +16,11 @@ on:
         description: 'Specific topic to generate'
         required: false
         type: string
+      category:
+        description: 'Category for trending topic (when no topic specified)'
+        required: false
+        type: string
+        default: 'AI & Tech Tools'
       auto_post:
         description: 'Auto-post after Telegram approval'
         required: false
@@ -80,10 +85,54 @@ jobs:
           echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env
           echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .env
 
+      - name: Determine Trending Category
+        id: category
+        run: |
+          # For scheduled runs, pick category based on UTC time (approximating IST windows)
+          # GitHub Actions cron runs in UTC
+          # 02:00 UTC = 07:30 IST (morning)
+          # 10:00 UTC = 15:30 IST (afternoon) 
+          # 14:00 UTC = 19:30 IST (evening)
+          # 04:00 UTC = 09:30 IST (weekend morning)
+          # 12:00 UTC = 17:30 IST (weekend evening)
+          
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            HOUR=$(date -u +%H)
+            DAY=$(date -u +%u)  # 1=Mon, 7=Sun
+            
+            if [[ $DAY -ge 1 && $DAY -le 5 ]]; then
+              # Weekday
+              if [[ $HOUR -eq 02 ]]; then
+                CATEGORY="AI & Tech Tools"
+              elif [[ $HOUR -eq 10 ]]; then
+                CATEGORY="Tech Gadgets & Inventions"
+              elif [[ $HOUR -eq 14 ]]; then
+                CATEGORY="Coding & Development Hacks"
+              else
+                CATEGORY="AI & Tech Tools"
+              fi
+            else
+              # Weekend
+              if [[ $HOUR -eq 04 ]]; then
+                CATEGORY="Facts & Trivia"
+              elif [[ $HOUR -eq 12 ]]; then
+                CATEGORY="Finance & Tech Economy"
+              else
+                CATEGORY="AI & Tech Tools"
+              fi
+            fi
+          else
+            # Manual dispatch - use input or default
+            CATEGORY="${{ github.event.inputs.category || 'AI & Tech Tools' }}"
+          fi
+          
+          echo "category=$CATEGORY" >> $GITHUB_OUTPUT
+          echo "Selected category: $CATEGORY"
+
       - name: Fetch Trending Hashtags
         id: hashtags
         run: |
-          python -u fetch_trending_hashtags.py --category "tech" > hashtags.txt
+          python -u fetch_trending_hashtags.py --category "${{ steps.category.outputs.category }}" > hashtags.txt
           echo "hashtags=$(cat hashtags.txt)" >> $GITHUB_OUTPUT
 
       - name: Generate Images
@@ -92,6 +141,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TOPIC: ${{ github.event.inputs.topic || '' }}
+          TRENDING_CATEGORY: ${{ steps.category.outputs.category }}
         run: |
           python -u generate_decorator_images.py --now \
             --topic "${{ github.event.inputs.topic || '' }}" \

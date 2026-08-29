@@ -16,6 +16,17 @@ from jinja2 import Environment, FileSystemLoader
 from playwright.sync_api import sync_playwright
 import requests
 import datetime
+import hashlib
+
+# Add parent directory to path for trending_engine import
+sys.path.insert(0, str(Path(__file__).parent))
+
+try:
+    from trending_engine import fetch_all_trending_signals, compute_engagement_score
+    TRENDING_ENGINE_AVAILABLE = True
+except ImportError:
+    TRENDING_ENGINE_AVAILABLE = False
+    print("⚠️ trending_engine not available, using fallback topics")
 
 # ── GitHub Actions Output Helper ───────────────────────────────────────────────
 def set_gha_output(key: str, value: str):
@@ -51,7 +62,7 @@ VARIANT = {
     "watermark_opacity": 0.025,
 }
 
-# Topics to rotate through
+# Topics to rotate through (fallback when trending engine unavailable)
 DEFAULT_TOPICS = [
     {
         "topic": "Python Decorators",
@@ -381,11 +392,155 @@ def save_topic_index(index: int):
         print(f"⚠️ Failed to save topic index: {e}")
 
 
-def get_next_topic() -> dict:
-    index = load_topic_index()
-    topic = DEFAULT_TOPICS[index % len(DEFAULT_TOPICS)]
-    save_topic_index((index + 1) % len(DEFAULT_TOPICS))
-    return topic
+def get_trending_topics(category="AI & Tech Tools", max_topics=10):
+    """Fetch trending topics from trending engine and convert to image generator format."""
+    if not TRENDING_ENGINE_AVAILABLE:
+        return None
+    
+    try:
+        print(f"🔍 Fetching trending topics for category: {category}...")
+        signals = fetch_all_trending_signals(target_country="US", category=category)
+        
+        if not signals:
+            print("⚠️ No trending signals found")
+            return None
+        
+        # Convert trending signals to topic format
+        topics = []
+        for signal in signals[:max_topics]:
+            title = signal.get("title", "Untitled")
+            # Clean title for use as topic
+            clean_title = title[:60].strip()
+            
+            # Map signal types to categories
+            signal_type = signal.get("type", "")
+            category_map = {
+                "github_trending": "github",
+                "reddit_trending": "reddit",
+                "hacker_news": "hackernews",
+                "huggingface_trending": "huggingface",
+                "arxiv_papers": "research",
+                "newsletter_ai": "newsletter",
+                "google_trends": "trends",
+                "youtube_most_popular": "youtube",
+                "youtube_outliers": "youtube",
+                "youtube_trending": "youtube",
+            }
+            mapped_category = category_map.get(signal_type, "tech")
+            
+            # Generate steps based on signal content
+            description = signal.get("description", "")
+            steps = generate_steps_from_signal(signal)
+            
+            topic_data = {
+                "topic": clean_title,
+                "category": mapped_category,
+                "filename": f"{clean_title.lower().replace(' ', '_').replace('/', '_')[:40]}.txt",
+                "eyebrow": f"TRENDING: {signal_type.upper().replace('_', ' ')}",
+                "title": clean_title,
+                "subtitle_pre": "",
+                "subtitle_bold": "📈 Trending Now",
+                "subtitle_post": "",
+                "steps": steps,
+                "closing_line": f"trending signal from {signal.get('source', {}).get('name', 'unknown')} — explore more",
+                "_engagement": signal.get("_engagement", {}),
+                "_source_url": signal.get("url", ""),
+            }
+            topics.append(topic_data)
+        
+        print(f"✅ Generated {len(topics)} dynamic topics from trending signals")
+        return topics
+        
+    except Exception as e:
+        print(f"⚠️ Failed to fetch trending topics: {e}")
+        return None
+
+
+def generate_steps_from_signal(signal: dict) -> list:
+    """Generate step data from a trending signal for the image template."""
+    # Default step templates based on signal type
+    signal_type = signal.get("type", "")
+    description = signal.get("description", "")
+    title = signal.get("title", "")
+    tags = signal.get("_engagement", {}).get("tags", []) if "_engagement" in signal else []
+    views = signal.get("_engagement", {}).get("views", 0) if "_engagement" in signal else 0
+    
+    # Color palette for steps
+    colors = ["#C879E6", "#5FB3F0", "#86D9A0", "#E8B85C", "#58C7D6", "#F07178"]
+    icons = ["search", "zap", "layers", "code", "database", "shield-check", "bot", "cloud", "cpu", "git-branch"]
+    
+    steps = []
+    
+    # Step 1: What is it
+    steps.append({
+        "accent": colors[0],
+        "icon": icons[0],
+        "title": "What's Trending",
+        "desc": title[:80],
+    })
+    
+    # Step 2: Source
+    source_name = signal.get("source", {}).get("name", "Unknown")
+    steps.append({
+        "accent": colors[1 % len(colors)],
+        "icon": icons[1 % len(icons)],
+        "title": "Signal Source",
+        "desc": source_name[:80],
+    })
+    
+    # Step 3: Engagement metrics
+    if views > 0:
+        steps.append({
+            "accent": colors[2 % len(colors)],
+            "icon": icons[2 % len(icons)],
+            "title": "Engagement",
+            "desc": f"{views:,} views + trending signals",
+        })
+    
+    # Step 4: Key topics/tags
+    if tags:
+        top_tags = ", ".join(tags[:3])
+        steps.append({
+            "accent": colors[3 % len(colors)],
+            "icon": icons[3 % len(icons)],
+            "title": "Key Topics",
+            "desc": top_tags[:80],
+        })
+    
+    # Step 5: Description snippet
+    if description:
+        steps.append({
+            "accent": colors[4 % len(colors)],
+            "icon": icons[4 % len(icons)],
+            "title": "Why It Matters",
+            "desc": description[:100],
+        })
+    
+    # Step 6: Action
+    steps.append({
+        "accent": colors[5 % len(colors)],
+        "icon": icons[5 % len(icons)],
+        "title": "Explore Further",
+        "desc": "Click source link for full context",
+    })
+    
+    return steps
+
+
+def get_dynamic_topic(category="AI & Tech Tools") -> dict:
+    """Get next dynamic topic from trending signals, fallback to rotation."""
+    # Try to fetch trending topics
+    trending_topics = get_trending_topics(category)
+    
+    if trending_topics:
+        # Use a hash of current date + category to pick consistently within a run
+        today = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
+        seed = hashlib.md5(f"{today}-{category}".encode()).hexdigest()
+        index = int(seed, 16) % len(trending_topics)
+        return trending_topics[index]
+    
+    # Fallback to rotating default topics
+    return get_next_topic()
 
 
 def load_hashtags(hashtags_file: str) -> str:
@@ -417,7 +572,9 @@ def main():
             print(f"❌ Topic not found: {args.topic}")
             sys.exit(1)
     else:
-        topic_data = get_next_topic()
+        # Use dynamic trending topic based on category
+        category = os.getenv("TRENDING_CATEGORY", "AI & Tech Tools")
+        topic_data = get_dynamic_topic(category)
 
     # Load hashtags
     hashtags = ""
