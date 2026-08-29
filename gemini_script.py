@@ -6,8 +6,6 @@ import hashlib
 from datetime import datetime
 import time
 import random
-
-CI_LITE = os.environ.get("CI_LITE", "0") == "1"
 from config import (
     GEMINI_API_KEY, LOGS_DIR,
     GEMINI_PRO_MODEL, GEMINI_FLASH_MODEL, GEMINI_FLASH_LITE_MODEL,
@@ -549,98 +547,6 @@ Return ONLY a JSON object:
   "core_narrative": "A one paragraph summary focusing ONLY on this story."
 }}"""
 
-# ── COMBINED TEMPLATES (Reduce API calls) ──────────────────────────────
-RESEARCH_HOOK_COMBINED_TEMPLATE = """{persona}
-
-TASK: Perform BOTH deep research AND generate A/B hook variants for the target story in ONE response.
-
-NEWS CONTEXT:
-{news_context}
-
-Return ONLY a JSON object:
-{{
-  "research": {{
-    "key_facts": ["Fact 1", "Fact 2"],
-    "entities": ["Entity 1", "Entity 2"],
-    "controversies": ["Controversy 1"],
-    "implications": ["Implication 1"],
-    "narrative_arc": "Beginning -> Middle -> End summary",
-    "technical_details": {{"detail": "value"}},
-    "visual_pivots": ["Visual description 1", "Visual description 2"]
-  }},
-  "hooks_data": {{
-    "ab_test_variants": [
-      {{"variant_id": "A", "pattern": "Negative/Warning", "hooks": [
-        {{"text": "Hook variant A1", "curiosity_score": 8, "emotional_trigger_score": 7, "swipe_stop_score": 8}},
-        {{"text": "Hook variant A2", "curiosity_score": 7, "emotional_trigger_score": 8, "swipe_stop_score": 7}},
-        {{"text": "Hook variant A3", "curiosity_score": 8, "emotional_trigger_score": 7, "swipe_stop_score": 8}}
-      ]}},
-      {{"variant_id": "B", "pattern": "Result-First Reveal", "hooks": [
-        {{"text": "Hook variant B1", "curiosity_score": 9, "emotional_trigger_score": 8, "swipe_stop_score": 9}},
-        {{"text": "Hook variant B2", "curiosity_score": 8, "emotional_trigger_score": 9, "swipe_stop_score": 8}},
-        {{"text": "Hook variant B3", "curiosity_score": 9, "emotional_trigger_score": 8, "swipe_stop_score": 9}}
-      ]}},
-      {{"variant_id": "C", "pattern": "Curiosity Gap", "hooks": [
-        {{"text": "Hook variant C1", "curiosity_score": 8, "emotional_trigger_score": 7, "swipe_stop_score": 8}},
-        {{"text": "Hook variant C2", "curiosity_score": 7, "emotional_trigger_score": 8, "swipe_stop_score": 7}},
-        {{"text": "Hook variant C3", "curiosity_score": 8, "emotional_trigger_score": 7, "swipe_stop_score": 8}}
-      ]}}
-    ]
-  }}
-}}"""
-
-# Combined Retention + Humanizer (1 call instead of 3)
-RETENTION_HUMANIZER_COMBINED_TEMPLATE = """{persona}
-
-TASK: Take the raw narrative and apply BOTH retention optimization AND humanizer pass in ONE response.
-
-NARRATIVE DRAFT:
-{narrative_json}
-
-ORIGINAL STORY CONTEXT:
-{news_context}
-
-SCHEMA REQUIREMENTS:
-{schema_requirements}
-
-CRITICAL RETENTION RULES:
-1. HOOK DENSITY: First 1.5s (6 words) MUST contain surprising claim/stat/contradiction
-2. OPEN LOOPS: Plant 3+ unanswered questions in first 20 seconds
-3. PATTERN INTERRUPTS: Every 8-12s inject cognitive shift (rhetorical question, contradiction, stat bomb, direct address, emotional pivot)
-4. CURIOSITY GAPS: End major points with incomplete thoughts requiring next sentence to resolve
-5. PAYOFF STACKING: Most valuable info in LAST 15 seconds
-6. VOCAL VARIETY: ALL CAPS for emphasis (max 2/sentence), "..." for pauses, short sentences after complex explanations, "!" for energy spikes
-7. RHETORICAL QUESTIONS: 2-3 mandatory, placed at pattern interrupt points
-8. DIRECT ADDRESS: "you/your" in EVERY major section
-9. CONVERSATIONAL TRANSITIONS: "However"→"But here's the thing...", "Therefore"→"And that's exactly why...", "In conclusion"→"So what's the takeaway?"
-
-HUMANIZER RULES (remove all AI patterns):
-- NO grandiose trend statements ("evolving landscape", "pivotal moment", "testament to")
-- NO promotional buzzwords ("groundbreaking", "vibrant", "showcasing", "boasts", "stunning")
-- NO vague attributions ("Industry reports", "Experts argue")  
-- NO AI vocabulary ("delve", "fostering", "garner", "interplay", "intricate", "landscape", "pivotal", "showcase", "tapestry", "testament", "underscore", "vibrant")
-- NO passive voice - use active ("is a tool" not "stands as a tool")
-- NO em dashes, en dashes, or double hyphens - use commas/colons/parentheses/new sentences
-- Use contractions ("it's", "you're", "don't", "can't")
-- Vary sentence lengths, write conversational prose with human pulse
-
-Return ONLY a JSON object matching the final schema exactly:
-{{
-  "script": "Final humanized, retention-optimized script",
-  "original_news_headline": "Headline",
-  "original_news_url": "URL",
-  "retention_map": {{
-    "open_loops": [{{"text": "phrase", "planted_at_word": 15, "resolved_at_word": 45}}],
-    "pattern_interrupts": [{{"type": "contradiction", "text": "phrase", "at_word": 30}}],
-    "rhetorical_questions": [{{"text": "question", "at_word": 40}}],
-    "direct_address_count": 5,
-    "curiosity_gap_ratio": 0.65,
-    "hook_word_count": 6,
-    "payoff_zone_start_word": 120,
-    "retention_risk_zones": [{{"at_word": 50, "risk": "explanation_fatigue", "mitigation": "Added rhetorical question"}}]
-  }}
-}}"""
-
 def check_shorts_viability_via_gemini(client, title, description):
     """
     Evaluates if a tech topic is viable for YouTube Shorts based on three criteria:
@@ -648,10 +554,6 @@ def check_shorts_viability_via_gemini(client, title, description):
     2. The Visual Pivot: Can it be explained visually using split-screen/immediate demo?
     3. The Enemy/Hero Angle: Frame around an entity (e.g., 'Google just killed...').
     """
-    if CI_LITE:
-        print("⚡ CI_LITE: Skipping viability check (assuming viable)")
-        return {"overall_viable": True, "enemy_hero_hook_framing": None, "reason": "CI_LITE mode - skipped"}
-    
     print(f"🧐 Evaluating viability for: '{title[:50]}...'")
     prompt = f"""Evaluate if the following tech trending topic is suitable for a 50-second YouTube Short:
 Topic Title: {title}
@@ -703,10 +605,6 @@ COUNTRY_NAMES = {
 
 def get_hottest_tech_topic(client, target_country="US", avoid_list=""):
     """Uses Gemini Search grounding to find today's most VIRAL tech tip, hidden feature, or tech fact for the target country."""
-    if CI_LITE:
-        print("⚡ CI_LITE: Skipping Google Trends (using RSS only)")
-        return None
-    
     country_name = COUNTRY_NAMES.get(target_country, "USA")
     print(f"🔥 Fetching hottest tech topic for today in {country_name} (Google Trends Analysis)...")
     
@@ -1817,7 +1715,7 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
     recent_history = tracker.get("history", [])[-30:]
     recent_titles = tracker.get("used_titles", [])[-60:]
     
-    max_gen_attempts = 1 if CI_LITE else 2
+    max_gen_attempts = 2
     gen_attempts = 0
     
     while gen_attempts < max_gen_attempts:
@@ -2051,7 +1949,7 @@ class MultiAgentGenerationEngine:
     def execute(self, selection_instruction, prompt_requirements):
         # Use self.run_index for A/B testing format selection
         run_index = self.run_index
-        max_selection_attempts = 1 if CI_LITE else 3
+        max_selection_attempts = 3
         selection_attempts = 0
         local_failed_topics = []
         
@@ -2131,7 +2029,7 @@ class MultiAgentGenerationEngine:
             print(f"🚨 [SELECTOR] Failed to select a unique story after {max_selection_attempts} attempts.")
             return None
             
-        # ── CONTEXT ISOLATION & SHARPENING (COMBINED) ────────────────────────
+        # ── CONTEXT ISOLATION (Fixes topic-screenshot mismatch) ───────────
         isolated_context = ""
         if self.raw_articles:
             # Find matching article in the original list to provide rich but isolated context
@@ -2151,13 +2049,15 @@ class MultiAgentGenerationEngine:
             if "GEMINI SEARCH RESULTS" in self.context:
                 # If in search mode, we must include the grounded text but we'll instruct the agent to focus.
                 isolated_context += f"\n\nSEARCH CONTEXT:\n{self.context}"
-
-        # Combined Selector+Sharpener: Extract core facts in one call
+        
+        # ── CONTEXT SHARPENING (NEW) ──────────────────────────────────────
+        # If we don't have rich RSS metadata, we MUST sharpen the search context
+        # to prevent 'Hallucination Leakage' from other stories in the search result.
         print("🔬 [AGENT 0.5] Context Sharpener: Isolating target story facts...")
         sharpener_prompt = FACT_EXTRACTOR_TEMPLATE.format(
             persona=self.persona,
             target_headline=selected_headline,
-            context=isolated_context
+            context=isolated_context # Pass the messy context to be sharpened
         )
         sharpened_data = self._call_gemini(sharpener_prompt)
         if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
@@ -2187,29 +2087,23 @@ class MultiAgentGenerationEngine:
         print(f"🔒 Isolated Context for downstream agents: {len(isolated_context)} chars")
         print(f"✅ Selected Story: {selected_headline}")
 
-        # ── COMBINED: Research + Hook (1 call instead of 2) ──────────────────
-        print("🕵️🪝 [AGENT 1+2] Research + Hook Agent: Extracting narrative & hooks...")
-        combined_research_hook_prompt = RESEARCH_HOOK_COMBINED_TEMPLATE.format(
+        print("🕵️ [AGENT 1] Research Agent: Extracting narrative elements...")
+        research_prompt = RESEARCH_AGENT_TEMPLATE.format(
             persona=self.persona,
             news_context=selected_context
         )
-        research_hook = self._call_gemini(combined_research_hook_prompt)
+        research = self._call_gemini(research_prompt)
         if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
-        if not research_hook: return None
-        
-        research = research_hook.get("research", {})
-        hooks_data = research_hook.get("hooks_data", {})
-        if not research or not hooks_data:
-            print("⚠️ Combined Research+Hook failed. Trying separate calls...")
-            # Fallback to separate calls
-            research = self._call_gemini(RESEARCH_AGENT_TEMPLATE.format(
-                persona=self.persona, news_context=selected_context
-            ))
-            if not research: return None
-            hooks_data = self._call_gemini(HOOK_AGENT_TEMPLATE.format(
-                persona=self.persona, research_json=json.dumps(research)
-            ))
-            if not hooks_data: return None
+        if not research: return None
+
+        print("🪝 [AGENT 2] Hook Agent: Generating A/B test hook variants...")
+        hook_prompt = HOOK_AGENT_TEMPLATE.format(
+            persona=self.persona,
+            research_json=json.dumps(research)
+        )
+        hooks_data = self._call_gemini(hook_prompt)
+        if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
+        if not hooks_data: return None
         
         # Handle both old format ("hooks") and new A/B format ("ab_test_variants")
         if "ab_test_variants" in hooks_data:
@@ -2251,7 +2145,7 @@ class MultiAgentGenerationEngine:
             hook_words = len(hook_text.split())
             print(f"🎯 Selected Hook ({hook_words} words): {hook_text}")
 
-# Alternate between formats for A/B testing (even=Result-First, odd=Problem-First)
+        # Alternate between formats for A/B testing (even=Result-First, odd=Problem-First)
         script_format = "Result-First" if (run_index % 2 == 0) else "Problem-First"
         narrative_template = NARRATIVE_AGENT_TEMPLATE_RESULT_FIRST if (run_index % 2 == 0) else NARRATIVE_AGENT_TEMPLATE_PROBLEM_FIRST
         print(f"📝 [AGENT 3] Fact Script Generator: Writing {script_format} script (run_index={run_index})...")
@@ -2265,37 +2159,53 @@ class MultiAgentGenerationEngine:
         if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         if not narrative: return None
 
-        # ── COMBINED: Retention Optimizer + Retention Scientist + Humanizer (1 call instead of 3) ──
-        print("⚡🧬🗣️ [AGENT 4+5] Retention + Humanizer: Optimizing & humanizing script...")
-        # Inject the selected headline and URL back into the requirements
+        print("⚡ [AGENT 4] Retention Optimizer: Maximizing pacing and curiosity density...")
+        retention_prompt = RETENTION_OPTIMIZER_TEMPLATE.format(
+            persona=self.persona,
+            narrative_json=json.dumps(narrative)
+        )
+        optimized = self._call_gemini(retention_prompt, model=GEMINI_PRO_MODEL)
+        if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
+        if not optimized: return None
+
+        # ── PHASE 2: RETENTION SCIENTIST (Agent 4.5) ──────────────────────────
+        print("🧬 [AGENT 4.5] Retention Scientist: Injecting proven retention patterns...")
+        retention_sci_prompt = RETENTION_SCIENTIST_TEMPLATE.format(
+            persona=self.persona,
+            optimized_script=optimized.get("optimized_script", "")
+        )
+        retention_result = self._call_gemini(retention_sci_prompt, model=GEMINI_PRO_MODEL)
+        if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
+        
+        retention_map = {}
+        if retention_result and "retention_enhanced_script" in retention_result:
+            optimized["optimized_script"] = retention_result["retention_enhanced_script"]
+            retention_map = retention_result.get("retention_map", {})
+            cgr = retention_map.get("curiosity_gap_ratio", 0)
+            loops = len(retention_map.get("open_loops", []))
+            interrupts = len(retention_map.get("pattern_interrupts", []))
+            print(f"   ✅ Retention: {loops} open loops, {interrupts} pattern interrupts, {cgr:.0%} curiosity gap ratio")
+        else:
+            print("   ⚠️ Retention Scientist failed (non-fatal). Using optimizer output directly.")
+
+        print("🗣️ [AGENT 5] Humanizer Agent: Fixing AI cadence and returning final schema...")
+        # Inject the selected headline and URL back into the requirements if they are missing
         refined_requirements = prompt_requirements
         if "original_news_headline" in refined_requirements:
             refined_requirements = refined_requirements.replace('"original_news_headline": "Exact headline"', f'"original_news_headline": "{selected_headline}"')
         if "original_news_url" in refined_requirements:
             refined_requirements = refined_requirements.replace('"original_news_url": "Direct article URL"', f'"original_news_url": "{selected_url}"')
 
-        combined_retention_humanizer_prompt = RETENTION_HUMANIZER_COMBINED_TEMPLATE.format(
+        humanizer_prompt = HUMANIZER_AGENT_TEMPLATE.format(
             persona=self.persona,
-            narrative_json=json.dumps(narrative),
+            optimized_script=optimized.get("optimized_script", ""),
             news_context=selected_context,
             schema_requirements=refined_requirements
         )
-        final_script = self._call_gemini(combined_retention_humanizer_prompt, model=GEMINI_PRO_MODEL)
-        if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
-        
-        # Extract retention_map if present
-        retention_map = {}
-        if final_script and "retention_map" in final_script:
-            retention_map = final_script["retention_map"]
-            cgr = retention_map.get("curiosity_gap_ratio", 0)
-            loops = len(retention_map.get("open_loops", []))
-            interrupts = len(retention_map.get("pattern_interrupts", []))
-            print(f"   ✅ Retention: {loops} open loops, {interrupts} pattern interrupts, {cgr:.0%} curiosity gap ratio")
-        else:
-            print("   ⚠️ Retention map not returned. Using basic script.")
+        final_script = self._call_gemini(humanizer_prompt, model=GEMINI_PRO_MODEL)
         
         if final_script:
-            # Final safety check: ensure the headline/url are set correctly
+            # Final safety check: ensure the headline/url are set correctly in the final object
             if not final_script.get("original_news_headline") or final_script.get("original_news_headline") == "Exact headline":
                 final_script["original_news_headline"] = selected_headline
             if not final_script.get("original_news_url") or final_script.get("original_news_url") == "Direct article URL":
@@ -2306,7 +2216,7 @@ class MultiAgentGenerationEngine:
                 final_script["ab_test_hook_variants"] = script_data_ab_variants
                 print(f"📊 A/B Test Variants attached: {len(script_data_ab_variants)} variants")
             
-            # Attach retention_map to the final script for downstream use
+            # ── PHASE 2: Attach retention_map to the final script for downstream use ──
             if retention_map:
                 final_script["retention_map"] = retention_map
             

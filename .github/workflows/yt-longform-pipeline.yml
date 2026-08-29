@@ -5,26 +5,7 @@ on:
   #   # ── 1 LONG-FORM EVERY DAY ──
   #   # Triggers daily at 04:30 UTC (10:00 AM IST)
   #   - cron: '30 4 * * *'
-  workflow_dispatch:
-    inputs:
-      resume_stage:
-        description: 'Resume from specific pipeline stage (downloads checkpoints artifact)'
-        required: false
-        type: choice
-        options:
-          - "auto"      # Resume from last checkpoint automatically
-          - "fetch_articles"
-          - "generate_script"
-          - "generate_audio"
-          - "capture_screenshots"
-          - "build_chunks"
-          - "fetch_entities"
-          - "generate_visuals"
-          - "render_video"
-          - "generate_thumbnail"
-          - "upload_youtube"
-          - "generate_shorts_teaser"
-        default: "auto"
+  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
 
 jobs:
   run-pipeline:
@@ -182,12 +163,7 @@ jobs:
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
           CI_LITE: "1"
         run: |
-          STAGE="${{ github.event.inputs.resume_stage }}"
-          if [ "$STAGE" = "auto" ]; then
-            python -u main_longform.py --now --resume
-          else
-            python -u main_longform.py --now --stage "$STAGE"
-          fi
+          python -u main_longform.py --now --resume
 
       - name: Upload Checkpoints Artifact
         if: always()
@@ -204,13 +180,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
           # 1. Pull latest changes first using rebase and autostash
-          # Capture output to detect stash application conflicts
-          PULL_OUTPUT=$(git pull origin main --rebase --autostash 2>&1)
-          PULL_EXIT_CODE=$?
-          echo "$PULL_OUTPUT"
-          
-          # Check if pull failed
-          if [ $PULL_EXIT_CODE -ne 0 ]; then
+          if ! git pull origin main --rebase --autostash; then
             echo "⚠️ Rebase pull failed. Checking for merge conflicts..."
             if [ -n "$(git diff --name-only --diff-filter=U)" ]; then
               echo "❌ Merge conflicts detected! Aborting rebase to prevent committing conflicts."
@@ -219,13 +189,6 @@ jobs:
             else
               echo "Pull failed for other reasons, proceeding..."
             fi
-          fi
-          
-          # Check if stash application resulted in conflicts (git outputs warning but exits 0)
-          if echo "$PULL_OUTPUT" | grep -q "applying them resulted in conflicts"; then
-            echo "⚠️ Stash application had conflicts. Resetting to pulled state and discarding local changes..."
-            git reset --hard HEAD
-            git stash drop || echo "No stash to drop"
           fi
           
           # Add tracking files and technical logs (force add since logs/ is gitignored)

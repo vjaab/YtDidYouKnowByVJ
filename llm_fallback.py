@@ -321,35 +321,11 @@ def call_opencode(user_prompt: str) -> Optional[Dict[str, Any]]:
             "response_format": {"type": "json_object"},
             "temperature": 0.3,
         }
-        r = requests.post("https://opencode.ai/zen/v1/chat/completions", json=payload, headers=headers, timeout=60)
+        r = requests.post("https://opencode.ai/zen/v1/chat/completions", json=payload, headers=headers, timeout=90)
         if r.status_code == 200:
-            data = r.json()
-            # Check for error response
-            if "error" in data:
-                print(f"⚠️ [OpenCode Zen] API error: {data['error']}")
-                return None
-            # Try multiple response formats for compatibility
-            content = None
-            # Format 1: OpenAI standard
-            choices = data.get("choices")
-            if choices and len(choices) > 0:
-                msg = choices[0].get("message")
-                if msg and "content" in msg and msg["content"]:
-                    content = msg["content"].strip()
-            # Format 2: Direct content field
-            if not content and "content" in data and data["content"]:
-                content = data["content"].strip()
-            # Format 3: Response object with text
-            if not content and "response" in data and isinstance(data["response"], dict):
-                content = data["response"].get("text", "").strip()
-            # Format 4: Raw text in data
-            if not content and "text" in data and data["text"]:
-                content = data["text"].strip()
-            
+            content = safe_extract_choices(r.json(), "OpenCode Zen")
             if content:
                 return clean_and_parse_json(content)
-            else:
-                print(f"⚠️ [OpenCode Zen] Response structure unexpected: {list(data.keys())}")
     except Exception as e:
         print(f"⚠️ OpenCode Zen exception: {e}")
     return None
