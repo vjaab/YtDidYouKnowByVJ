@@ -172,6 +172,19 @@ def upload_video_to_github_releases(video_path):
             "X-GitHub-Api-Version": "2022-11-28",
         }
 
+        # Check if repo is public (Threads needs public access to fetch video)
+        repo_resp = requests.get(
+            f"https://api.github.com/repos/{owner}/{repo_name}",
+            headers=headers, timeout=15
+        )
+        if repo_resp.status_code == 200:
+            repo_data = repo_resp.json()
+            if repo_data.get("private", True):
+                print(f"⚠️ WARNING: Repository {owner}/{repo_name} is PRIVATE. Threads cannot fetch video from private repos!")
+                print(f"   Make the repo public or use THREADS_VIDEO_PUBLIC_URL with a public CDN URL.")
+        else:
+            print(f"⚠️ Could not verify repo visibility: {repo_resp.status_code}")
+
         tag = f"media-threads-{int(time.time())}"
         filename = os.path.basename(video_path)
 
@@ -284,15 +297,17 @@ def wait_for_container(container_id: str, timeout_s: int = 300, poll_every_s: in
     while time.time() < deadline:
         resp = requests.get(
             f"{GRAPH_API_BASE}/{container_id}",
-            params={"fields": "status", "access_token": access_token},
+            params={"fields": "status,error_message", "access_token": access_token},
             timeout=30,
         )
         resp.raise_for_status()
-        status = resp.json().get("status", "UNKNOWN")
+        data = resp.json()
+        status = data.get("status", "UNKNOWN")
         if status == "FINISHED":
             return
         if status == "ERROR":
-            raise RuntimeError(f"Container {container_id} failed processing")
+            error_msg = data.get("error_message", "No error message provided")
+            raise RuntimeError(f"Container {container_id} failed processing: {error_msg}")
         time.sleep(poll_every_s)
     raise TimeoutError(f"Container {container_id} still processing after {timeout_s}s")
 
@@ -318,7 +333,7 @@ def upload_video_to_threads(video_path: str, caption: str):
     Workflow:
       1. Get public video URL (from GitHub Releases, or THREADS_VIDEO_PUBLIC_URL env var)
       2. POST /{threads-user-id}/threads → create container (media_type=VIDEO)
-      3. GET /{container-id}?fields=status → poll until FINISHED
+      3. GET /{container-id}?fields=status,error_message → poll until FINISHED
       4. POST /{threads-user-id}/threads_publish → publish the post
 
     Args:
@@ -333,6 +348,32 @@ def upload_video_to_threads(video_path: str, caption: str):
 
     if not os.path.exists(video_path):
         return False, f"Error: Video file not found at {video_path}"
+
+    # Log video specs for debugging
+    try:
+        import subprocess
+        result = subprocess.run([
+            "ffprobe", "-v", "error", "-select_streams", "v:0",
+            "-show_entries", "stream=codec_name,width,height,duration,pix_fmt",
+            "-of", "csv=p=0", video_path
+        ], capture_output=True, text=True, timeout=10)
+        if result.returncode == 0:
+            v_info = result.stdout.strip().split(",")
+            print(f"📹 Video specs: codec={v_info[0]}, {v_info[1]}x{v_info[2]}, duration={v_info[3]}s, pix_fmt={v_info[4]}")
+        
+        result = subprocess.run([
+            "ffprobe", "-v", "error", "-select_streams", "a:0",
+            "-show_entries", "stream=codec_name,sample_rate",
+            "-of", "csv=p=0", video_path
+        ], capture_output=True, text=True, timeout=10)
+        if result.returncode == 0:
+            a_info = result.stdout.strip().split(",")
+            print(f"🔊 Audio specs: codec={a_info[0]}, sample_rate={a_info[1]}")
+        
+        file_size = os.path.getsize(video_path)
+        print(f"📦 File size: {file_size / (1024*1024):.1f} MB")
+    except Exception as e:
+        print(f"⚠️ Could not probe video: {e}")
 
     allowed, current_count = _check_rate_limit()
     if not allowed:
