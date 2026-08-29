@@ -3,6 +3,10 @@ import random
 from datetime import datetime
 from config import YOUTUBE_CLIENT_SECRET_FILE
 
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+import google_auth_oauthlib.flow
+
 SCOPES = [
     "https://www.googleapis.com/auth/youtube.force-ssl",
 ]
