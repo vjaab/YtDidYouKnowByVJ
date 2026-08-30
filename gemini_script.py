@@ -1990,9 +1990,13 @@ class MultiAgentGenerationEngine:
                 if self.raw_articles and len(self.raw_articles) > 0:
                     top = None
                     for art in self.raw_articles:
-                        art_title = art.get("title", "")
-                        art_url = art.get("url", "")
-                        if art_title in local_failed_topics or art_url in local_failed_topics:
+                        if isinstance(art, dict):
+                            art_title = art.get("title", "")
+                            art_url = art.get("url", "")
+                        else:
+                            art_title = str(art)
+                            art_url = ""
+                        if art_title in local_failed_topics or (art_url and art_url in local_failed_topics):
                             continue
                         # Also check uniqueness against tracker
                         is_uniq, _ = check_story_uniqueness(art_title, new_url=art_url)
@@ -2000,8 +2004,12 @@ class MultiAgentGenerationEngine:
                             top = art
                             break
                     if top:
-                        selected_headline = top.get("title", "AI Tech Breakthrough")
-                        selected_url = top.get("url", "")
+                        if isinstance(top, dict):
+                            selected_headline = top.get("title", "AI Tech Breakthrough")
+                            selected_url = top.get("url", "")
+                        else:
+                            selected_headline = str(top)
+                            selected_url = ""
                         print(f"🔄 Fallback to Top Unique Scored Article: {selected_headline}")
                         break
                 
@@ -2110,7 +2118,7 @@ class MultiAgentGenerationEngine:
         optimized_patterns = select_hook_patterns_for_category(self.category, num_patterns=3)
         
         # Generate analytics-optimized hook prompt
-        hook_prompt = get_optimized_hook_prompt(self.category, research)
+        hook_prompt = get_optimized_hook_prompt(self.category, research, persona=self.persona)
         
         hooks_data = self._call_gemini(hook_prompt)
         if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
@@ -2119,45 +2127,148 @@ class MultiAgentGenerationEngine:
         # Store selected patterns for tracking
         script_data_hook_patterns = optimized_patterns
         
-        # Handle both old format ("hooks") and new A/B format ("ab_test_variants")
-        if "ab_test_variants" in hooks_data:
-            # New A/B test format - pick best hook across all variants
-            all_hooks = []
-            for variant in hooks_data["ab_test_variants"]:
-                for hook in variant.get("hooks", []):
-                    hook["variant_id"] = variant.get("variant_id", "")
-                    hook["pattern"] = variant.get("pattern", "")
-                    all_hooks.append(hook)
-            
-            # Store A/B variants for YouTube testing
-            script_data_ab_variants = hooks_data["ab_test_variants"]
-            
-            best_hook = max(all_hooks, key=lambda h: (
-                h.get("curiosity_score", 0) + 
-                h.get("emotional_trigger_score", 0) + 
-                h.get("swipe_stop_score", h.get("curiosity_score", 0))
-            ))
-            hook_text = best_hook.get('text', '')
-            hook_variant = best_hook.get('variant_id', '')
-            hook_pattern = best_hook.get('pattern', '')
-            hook_words = len(hook_text.split())
-            print(f"🎯 Selected Hook ({hook_words} words) [Variant {hook_variant} - {hook_pattern}]: {hook_text}")
-            
-            # Print all variants for reference
-            for v in hooks_data["ab_test_variants"]:
-                print(f"   📊 Variant {v['variant_id']} ({v['pattern']}): {len(v['hooks'])} hooks")
-        else:
-            # Legacy format fallback
-            script_data_ab_variants = None
-            if "hooks" not in hooks_data: return None
-            best_hook = max(hooks_data["hooks"], key=lambda h: (
-                h.get("curiosity_score", 0) + 
-                h.get("emotional_trigger_score", 0) + 
-                h.get("swipe_stop_score", h.get("curiosity_score", 0))
-            ))
-            hook_text = best_hook.get('text', '')
-            hook_words = len(hook_text.split())
-            print(f"🎯 Selected Hook ({hook_words} words): {hook_text}")
+        # Robust hook extraction across all potential LLM output structures
+        all_hooks = []
+        ab_variants_structured = []
+
+        if isinstance(hooks_data, dict) and "ab_test_variants" in hooks_data:
+            raw_variants = hooks_data["ab_test_variants"]
+            if isinstance(raw_variants, list):
+                for idx, v in enumerate(raw_variants):
+                    if isinstance(v, dict):
+                        var_id = v.get("variant_id", chr(65 + idx))
+                        var_pat = v.get("pattern", "unknown")
+                        v_hooks = v.get("hooks", [])
+                        if isinstance(v_hooks, list):
+                            for h in v_hooks:
+                                if isinstance(h, dict):
+                                    text = h.get("text") or h.get("hook") or ""
+                                    if text:
+                                        all_hooks.append({
+                                            "text": str(text).strip(),
+                                            "variant_id": var_id,
+                                            "pattern": var_pat,
+                                            "curiosity_score": h.get("curiosity_score", 5),
+                                            "emotional_trigger_score": h.get("emotional_trigger_score", 5),
+                                            "swipe_stop_score": h.get("swipe_stop_score", h.get("curiosity_score", 5))
+                                        })
+                                elif isinstance(h, str) and h.strip():
+                                    all_hooks.append({
+                                        "text": h.strip(),
+                                        "variant_id": var_id,
+                                        "pattern": var_pat,
+                                        "curiosity_score": 5,
+                                        "emotional_trigger_score": 5,
+                                        "swipe_stop_score": 5
+                                    })
+                        elif isinstance(v.get("text") or v.get("hook"), str):
+                            text = v.get("text") or v.get("hook")
+                            all_hooks.append({
+                                "text": str(text).strip(),
+                                "variant_id": var_id,
+                                "pattern": var_pat,
+                                "curiosity_score": v.get("curiosity_score", 5),
+                                "emotional_trigger_score": v.get("emotional_trigger_score", 5),
+                                "swipe_stop_score": v.get("swipe_stop_score", 5)
+                            })
+                        ab_variants_structured.append(v)
+                    elif isinstance(v, str) and v.strip():
+                        var_id = chr(65 + idx)
+                        all_hooks.append({
+                            "text": v.strip(),
+                            "variant_id": var_id,
+                            "pattern": "general",
+                            "curiosity_score": 5,
+                            "emotional_trigger_score": 5,
+                            "swipe_stop_score": 5
+                        })
+                        ab_variants_structured.append({
+                            "variant_id": var_id,
+                            "pattern": "general",
+                            "hooks": [{"text": v.strip(), "curiosity_score": 5, "emotional_trigger_score": 5}]
+                        })
+
+        if not all_hooks and isinstance(hooks_data, dict):
+            # Check for legacy "hooks" array or direct keys
+            hooks_list = hooks_data.get("hooks", [])
+            if isinstance(hooks_list, list):
+                for h in hooks_list:
+                    if isinstance(h, dict):
+                        text = h.get("text") or h.get("hook") or ""
+                        if text:
+                            all_hooks.append({
+                                "text": str(text).strip(),
+                                "variant_id": "A",
+                                "pattern": "general",
+                                "curiosity_score": h.get("curiosity_score", 5),
+                                "emotional_trigger_score": h.get("emotional_trigger_score", 5),
+                                "swipe_stop_score": h.get("swipe_stop_score", 5)
+                            })
+                    elif isinstance(h, str) and h.strip():
+                        all_hooks.append({
+                            "text": h.strip(),
+                            "variant_id": "A",
+                            "pattern": "general",
+                            "curiosity_score": 5,
+                            "emotional_trigger_score": 5,
+                            "swipe_stop_score": 5
+                        })
+            elif isinstance(hooks_data.get("hook") or hooks_data.get("text"), str):
+                text = hooks_data.get("hook") or hooks_data.get("text")
+                all_hooks.append({
+                    "text": str(text).strip(),
+                    "variant_id": "A",
+                    "pattern": "general",
+                    "curiosity_score": 5,
+                    "emotional_trigger_score": 5,
+                    "swipe_stop_score": 5
+                })
+
+        if not all_hooks and isinstance(hooks_data, list):
+            for idx, item in enumerate(hooks_data):
+                if isinstance(item, dict):
+                    text = item.get("text") or item.get("hook") or ""
+                    if text:
+                        all_hooks.append({
+                            "text": str(text).strip(),
+                            "variant_id": item.get("variant_id", chr(65 + idx)),
+                            "pattern": item.get("pattern", "general"),
+                            "curiosity_score": item.get("curiosity_score", 5),
+                            "emotional_trigger_score": item.get("emotional_trigger_score", 5),
+                            "swipe_stop_score": item.get("swipe_stop_score", 5)
+                        })
+                elif isinstance(item, str) and item.strip():
+                    all_hooks.append({
+                        "text": item.strip(),
+                        "variant_id": chr(65 + idx),
+                        "pattern": "general",
+                        "curiosity_score": 5,
+                        "emotional_trigger_score": 5,
+                        "swipe_stop_score": 5
+                    })
+
+        if not all_hooks:
+            print("⚠️ Could not extract valid hooks from Hook Agent response.")
+            return None
+
+        script_data_ab_variants = ab_variants_structured if ab_variants_structured else None
+
+        best_hook = max(all_hooks, key=lambda h: (
+            (h.get("curiosity_score") if isinstance(h.get("curiosity_score"), (int, float)) else 0) + 
+            (h.get("emotional_trigger_score") if isinstance(h.get("emotional_trigger_score"), (int, float)) else 0) + 
+            (h.get("swipe_stop_score") if isinstance(h.get("swipe_stop_score"), (int, float)) else 0)
+        ))
+        hook_text = best_hook.get('text', '')
+        hook_variant = best_hook.get('variant_id', 'A')
+        hook_pattern = best_hook.get('pattern', 'general')
+        hook_words = len(hook_text.split())
+        print(f"🎯 Selected Hook ({hook_words} words) [Variant {hook_variant} - {hook_pattern}]: {hook_text}")
+        if script_data_ab_variants:
+            for v in script_data_ab_variants:
+                v_id = v.get('variant_id', '')
+                v_pat = v.get('pattern', '')
+                v_count = len(v.get('hooks', [])) if isinstance(v.get('hooks'), list) else 1
+                print(f"   📊 Variant {v_id} ({v_pat}): {v_count} hooks")
 
         # Alternate between formats for A/B testing (even=Result-First, odd=Problem-First)
         script_format = "Result-First" if (run_index % 2 == 0) else "Problem-First"

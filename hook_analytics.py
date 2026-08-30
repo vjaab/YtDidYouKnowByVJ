@@ -332,37 +332,70 @@ def print_analytics_summary():
 
 
 # Convenience function for pipeline integration
-def get_optimized_hook_prompt(category: str, research: Dict) -> str:
+def get_optimized_hook_prompt(category: str, research: Dict, persona: str = "") -> str:
     """
     Generate an optimized hook prompt that includes the best patterns for the category.
     """
     selected_patterns = select_hook_patterns_for_category(category, num_patterns=3)
     
+    variant_labels = ["A", "B", "C"]
     pattern_descriptions = []
-    for pid in selected_patterns:
+    for i, pid in enumerate(selected_patterns):
+        label = variant_labels[i] if i < len(variant_labels) else f"V{i+1}"
         info = get_hook_pattern_info(pid)
         examples = get_hook_pattern_examples(pid)
-        pattern_descriptions.append(f"""
-  {info['name']} ({pid}):
-    Description: {info['description']}
-    Examples: {examples[:2]}
-""")
+        pattern_descriptions.append(f"""  VARIANT {label} ({info.get('name', pid)}):
+    Pattern ID: {pid}
+    Description: {info.get('description', '')}
+    Examples: {examples[:2]}""")
     
-    return f"""HOOK AGENT TASK:
+    persona_header = f"{persona}\n\n" if persona else ""
+    patterns_text = "\n\n".join(pattern_descriptions)
+
+    return f"""{persona_header}HOOK AGENT TASK:
 Generate 3 distinct A/B TEST HOOK VARIANTS for YouTube Shorts A/B testing.
 Based on analytics for category '{category}', use these OPTIMIZED patterns:
 
-{''.join(pattern_descriptions)}
+{patterns_text}
 
 RULES:
 - First 3 words MUST stop the scroll
 - Max 8 words. One clause only.
 - Each variant = same pattern, different angles on the topic
-- Return ONLY JSON with ab_test_variants array
+- NO greetings. NO "Today we..." NO "In this video..." NO "Hey guys..."
 
 RESEARCH:
 {json.dumps(research, indent=2)}
-"""
 
-
-import json  # for get_optimized_hook_prompt
+Return ONLY JSON:
+{{
+  "ab_test_variants": [
+    {{
+      "variant_id": "A",
+      "pattern": "{selected_patterns[0] if len(selected_patterns) > 0 else 'negative_warning'}",
+      "hooks": [
+        {{"text": "Hook 1 text", "curiosity_score": 9, "emotional_trigger_score": 8, "swipe_stop_score": 9, "reason": "Why it works"}},
+        {{"text": "Hook 2 text", "curiosity_score": 8, "emotional_trigger_score": 7, "swipe_stop_score": 8, "reason": "Why it works"}},
+        {{"text": "Hook 3 text", "curiosity_score": 7, "emotional_trigger_score": 8, "swipe_stop_score": 7, "reason": "Why it works"}}
+      ]
+    }},
+    {{
+      "variant_id": "B",
+      "pattern": "{selected_patterns[1] if len(selected_patterns) > 1 else 'result_first'}",
+      "hooks": [
+        {{"text": "Hook 1 text", "curiosity_score": 9, "emotional_trigger_score": 8, "swipe_stop_score": 9, "reason": "Why it works"}},
+        {{"text": "Hook 2 text", "curiosity_score": 8, "emotional_trigger_score": 7, "swipe_stop_score": 8, "reason": "Why it works"}},
+        {{"text": "Hook 3 text", "curiosity_score": 7, "emotional_trigger_score": 8, "swipe_stop_score": 7, "reason": "Why it works"}}
+      ]
+    }},
+    {{
+      "variant_id": "C",
+      "pattern": "{selected_patterns[2] if len(selected_patterns) > 2 else 'stat_contradiction'}",
+      "hooks": [
+        {{"text": "Hook 1 text", "curiosity_score": 9, "emotional_trigger_score": 8, "swipe_stop_score": 9, "reason": "Why it works"}},
+        {{"text": "Hook 2 text", "curiosity_score": 8, "emotional_trigger_score": 7, "swipe_stop_score": 8, "reason": "Why it works"}},
+        {{"text": "Hook 3 text", "curiosity_score": 7, "emotional_trigger_score": 8, "swipe_stop_score": 7, "reason": "Why it works"}}
+      ]
+    }}
+  ]
+}}"""
