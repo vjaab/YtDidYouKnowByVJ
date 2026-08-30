@@ -195,7 +195,34 @@ jobs:
           CI_LITE: "1"
         run: |
           python -u main.py --now --type auto
-        
+         
+      - name: Platform-Native Optimization & A/B Test Setup
+      - name: Platform-Native Optimization & A/B Test Setup
+        if: always()
+        run: |
+          echo "🔧 Running platform-native optimization..."
+          # 1. A/B test metadata
+          if [ -d "output" ]; then
+            find output -name "*_abtest.json" -type f | head -20 | while read f; do
+              echo "📊 Found A/B test metadata: $f"
+              cat "$f" | jq . 2>/dev/null || cat "$f"
+            done
+          fi
+          # 2. Platform optimization (using repo script)
+          python3 scripts/platform_optimization.py
+          # 3. Quality validation (using repo script)
+          python3 scripts/validate_thumbnails.py
+
+      - name: Upload Optimization Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: platform-optimization-report
+          path: |
+            output/*_abtest.json
+            output/platform_optimization_report.json
+          retention-days: 30
+          
       - name: Commit Updated Tracking File & Logs
         # Always run this step to save the log, preventing duplicate topics tomorrow
         if: always()

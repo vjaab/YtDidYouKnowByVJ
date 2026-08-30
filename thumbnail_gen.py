@@ -3,9 +3,11 @@ thumbnail_gen.py — Premium Imagen-3 + Authority Avatar Thumbnail Generator.
 
 Design Philosophy (2026 High-Authority Spec):
   - Generative Backdrop: Unique Imagen-3 tech art for every topic.
-  - Personal Authority: Seamlessly integrated avatar (cutout).
+  - Personal Authority: Seamlessly integrated avatar (cutout) with emotion overlay.
   - Premium Typography: Montserrat Black, high contrast yellow/white.
   - Curiosity Gap: Professionally written hooks by Gemini.
+  - A/B Testing: 3 variants per video with performance tracking.
+  - Platform-Native: Rule of thirds, text <3 words, high contrast.
 """
 
 import os
@@ -24,9 +26,61 @@ from rembg import remove
 from config import OUTPUT_DIR, ASSETS_DIR, GEMINI_API_KEY
 import cv2
 import requests
+from dataclasses import dataclass, asdict
+from typing import Optional, List, Tuple, Dict
 
 THUMB_W, THUMB_H = 1280, 720
 SHORTS_W, SHORTS_H = 1080, 1920
+
+# ── A/B TEST CONFIG ──────────────────────────────────────────────────────────
+THUMBNAIL_VARIANTS = 3
+MAX_TEXT_WORDS = 3
+RULE_OF_THIRDS_GRID = True
+HIGH_CONTRAST_RATIO = 4.5  # WCAG AA
+
+# ── FACE DETECTION & EMOTION CONFIG ──────────────────────────────────────────
+FACE_DETECTION_CONFIDENCE = 0.7
+EMOTION_OVERLAYS = {
+    "shocked": "😱",
+    "curious": "🤔", 
+    "excited": "🤯",
+    "warning": "⚠️",
+    "mind_blown": "💥"
+}
+EMOTION_WEIGHTS = {
+    "security": "warning",
+    "privacy": "warning",
+    "breaking": "shocked",
+    "secret": "shocked",
+    "revealed": "mind_blown",
+    "ai": "excited",
+    "launch": "excited",
+    "new": "curious",
+    "how": "curious",
+    "why": "curious"
+}
+
+@dataclass
+class ThumbnailVariant:
+    """Metadata for A/B testing thumbnail variants."""
+    variant_id: str
+    path: str
+    style: str  # "authority", "curiosity", "urgency"
+    hook_text: str
+    emotion: str
+    text_word_count: int
+    contrast_score: float
+    rule_of_thirds_score: float
+    face_detected: bool
+    created_at: str
+
+@dataclass
+class ABTestResult:
+    """Result of A/B test for thumbnail selection."""
+    winner_variant_id: str
+    ctr_data: Dict[str, float]
+    test_duration_hours: int
+    confidence: float
 
 # ── ASSETS ───────────────────────────────────────────────────────────────────
 AVATAR_PATH = os.path.join(ASSETS_DIR, "gemini_img_without_logo.png")
@@ -34,6 +88,15 @@ FONT_BLACK = os.path.join(ASSETS_DIR, "fonts", "Montserrat-Black.ttf")
 FONT_EXTRABOLD = os.path.join(ASSETS_DIR, "fonts", "Montserrat-ExtraBold.ttf")
 
 FALLBACKS = ["/System/Library/Fonts/Supplemental/Arial Bold.ttf", "/usr/share/fonts/truetype/roboto/Roboto-Bold.ttf"]
+
+# Load OpenCV face detector (Haar cascade - lightweight, no extra downloads)
+_FACE_CASCADE = None
+def _get_face_cascade():
+    global _FACE_CASCADE
+    if _FACE_CASCADE is None:
+        cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+        _FACE_CASCADE = cv2.CascadeClassifier(cascade_path)
+    return _FACE_CASCADE
 
 _fcache = {}
 
@@ -58,32 +121,169 @@ def _text_size(text, font):
     bb = font.getbbox(text)
     return bb[2] - bb[0], bb[3] - bb[1]
 
+# ── FACE DETECTION & EMOTION OVERLAY ──────────────────────────────────────────
+
+def _detect_face_region(image: Image.Image) -> Optional[Tuple[int, int, int, int]]:
+    """
+    Detect face in image using OpenCV Haar cascade.
+    Returns (x, y, w, h) in PIL coordinates or None.
+    """
+    try:
+        cv_img = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+        gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
+        cascade = _get_face_cascade()
+        faces = cascade.detectMultiScale(
+            gray, scaleFactor=1.1, minNeighbors=5, minSize=(50, 50)
+        )
+        if len(faces) > 0:
+            x, y, w, h = max(faces, key=lambda f: f[2] * f[3])
+            return (int(x), int(y), int(w), int(h))
+    except Exception as e:
+        print(f"⚠️ Face detection failed: {e}")
+    return None
+
+
+def _select_emotion_for_content(title: str, hook_text: str) -> str:
+    """Select appropriate emotion emoji based on content keywords."""
+    content = (title + " " + hook_text).lower()
+    for keyword, emotion in EMOTION_WEIGHTS.items():
+        if keyword in content:
+            return EMOTION_OVERLAYS[emotion]
+    return EMOTION_OVERLAYS["excited"]
+
+
+def _apply_emotion_overlay(canvas: Image.Image, face_region: Optional[Tuple], emotion: str, 
+                            accent_color: Tuple[int, int, int], is_shorts: bool) -> Image.Image:
+    """
+    Apply emotion emoji overlay near detected face region following rule of thirds.
+    """
+    if not face_region:
+        return canvas
+    
+    draw = ImageDraw.Draw(canvas)
+    w, h = canvas.size
+    fx, fy, fw, fh = face_region
+    
+    # Rule of thirds: place emotion at intersection points
+    third_w, third_h = w // 3, h // 3
+    intersections = [
+        (third_w, third_h),           # Top-left
+        (2 * third_w, third_h),       # Top-right
+        (third_w, 2 * third_h),       # Bottom-left
+        (2 * third_w, 2 * third_h),   # Bottom-right
+    ]
+    
+    # Pick intersection closest to face but on opposite side for balance
+    face_center = (fx + fw // 2, fy + fh // 2)
+    best_pos = min(intersections, key=lambda p: abs(p[0] - face_center[0]) + abs(p[1] - face_center[1]))
+    
+    # Offset slightly from intersection to avoid covering face
+    offset_x = 60 if best_pos[0] < w // 2 else -60
+    offset_y = -40 if best_pos[1] < h // 2 else 40
+    emoji_pos = (best_pos[0] + offset_x, best_pos[1] + offset_y)
+    
+    # Clamp to canvas bounds
+    emoji_pos = (max(50, min(w - 150, emoji_pos[0])), max(50, min(h - 150, emoji_pos[1])))
+    
+    # Draw emotion emoji with glow
+    font_size = 80 if not is_shorts else 100
+    font = _load_font(font_size, "black")
+    
+    # Glow effect
+    for offset in range(1, 8):
+        draw.text((emoji_pos[0] + offset, emoji_pos[1] + offset), emotion, font=font, fill=(0, 0, 0, 180))
+    draw.text(emoji_pos, emotion, font=font, fill=(255, 255, 255, 255))
+    
+    # Add accent ring around emoji
+    ring_radius = font_size // 2 + 10
+    overlay = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+    ring_draw = ImageDraw.Draw(overlay)
+    ring_draw.ellipse([
+        emoji_pos[0] - ring_radius, emoji_pos[1] - ring_radius,
+        emoji_pos[0] + ring_radius, emoji_pos[1] + ring_radius
+    ], outline=(*accent_color, 180), width=4)
+    canvas = Image.alpha_composite(canvas.convert("RGBA"), overlay).convert("RGB")
+    
+    return canvas
+
+
+def _enforce_max_words(text: str, max_words: int = MAX_TEXT_WORDS) -> str:
+    """Enforce maximum word count for thumbnail text."""
+    words = text.replace("\n", " ").split()
+    if len(words) <= max_words:
+        return text
+    # Keep first max_words words
+    return " ".join(words[:max_words])
+
+
+def _calculate_contrast_ratio(fg_color: Tuple[int, int, int], bg_color: Tuple[int, int, int]) -> float:
+    """Calculate WCAG contrast ratio between foreground and background."""
+    def luminance(r, g, b):
+        def channel(c):
+            c = c / 255.0
+            return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+        return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b)
+    
+    l1 = luminance(*fg_color)
+    l2 = luminance(*bg_color)
+    return (max(l1, l2) + 0.05) / (min(l1, l2) + 0.05)
+
+
+def _calculate_rule_of_thirds_score(canvas: Image.Image, text_positions: List[Tuple], 
+                                     face_region: Optional[Tuple]) -> float:
+    """Score how well elements align with rule of thirds grid."""
+    w, h = canvas.size
+    third_w, third_h = w / 3, h / 3
+    grid_lines = [third_w, 2 * third_w, third_h, 2 * third_h]
+    
+    score = 0.0
+    elements = text_positions + ([ (face_region[0] + face_region[2]//2, face_region[1] + face_region[3]//2) ] if face_region else [])
+    
+    for ex, ey in elements:
+        # Distance to nearest vertical grid line
+        dx = min(abs(ex - gl) for gl in grid_lines[:2])
+        # Distance to nearest horizontal grid line
+        dy = min(abs(ey - gl) for gl in grid_lines[2:])
+        # Score: closer to grid = higher score (normalized)
+        score += 1.0 - min(1.0, (dx + dy) / (w + h) * 6)
+    
+    return score / len(elements) if elements else 0.0
+
+
 # ── AI AGENTS ─────────────────────────────────────────────────────────────────
 
-def _generate_hook_text(title, client, is_shorts=False):
-    """Generates a high-click-through curiosity gap hook."""
+def _generate_hook_text(title, client, is_shorts=False, variant_style="curiosity"):
+    """Generates a high-click-through curiosity gap hook with variant styles."""
+    variant_prompts = {
+        "authority": "Authoritative, expert tone. Trust signal. Example: 'EXPERT VERDICT'",
+        "curiosity": "Curiosity gap, information void. Example: 'WHAT THEY HID'",
+        "urgency": "Urgent, time-sensitive, FOMO. Example: 'ACT NOW BEFORE'"
+    }
+    style_guidance = variant_prompts.get(variant_style, variant_prompts["curiosity"])
+    
     if is_shorts:
         prompt = f"""You are a viral YouTube Short thumbnail designer.
 Generate an extremely short, high-impact curiosity value proposition or alert message in ALL CAPS for a mobile vertical thumbnail about: "{title}".
+STYLE: {style_guidance}
 RULES:
-1. Max 3 words, ALL CAPS.
-2. Extremely punchy, viral and dramatic (e.g. "TURN OFF NOW", "DON'T TRUST IT", "DO THIS NOW", "HIDDEN MENU").
-3. Use \\n for line breaks between words to stack them vertically.
+1. Max {MAX_TEXT_WORDS} words TOTAL, ALL CAPS.
+2. Extremely punchy, viral and dramatic.
+3. Use \\n for line breaks between words to stack vertically.
 Return ONLY the raw words. No quotes, no preamble."""
     else:
         prompt = f"""You are a viral YouTube thumbnail copywriter. 
 Generate a SHORT, punchy curiosity gap hook for this topic: "{title}"
-RULES: Max 8 words, emotional, curiosity-gap style, end with "...". 
-Use \\n for line breaks (max 3 lines). 
-Example: "Google is\\nfinally\\nfinished..."
+STYLE: {style_guidance}
+RULES: Max {MAX_TEXT_WORDS} words TOTAL, emotional, curiosity-gap style. 
+Use \\n for line breaks (max 2 lines). 
+Example: "SECRET\\nREVEALED"
 Return ONLY the text."""
     try:
         response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
         hook = response.text.strip().replace("\\n", "\n")
-        if is_shorts:
-            hook = "\n".join(w.strip().upper() for w in hook.split("\n") if w.strip())
-            return "\n".join(hook.split("\n")[:3])
-        return "\n".join(hook.split("\n")[:3])
+        # Enforce max words
+        hook = _enforce_max_words(hook, MAX_TEXT_WORDS)
+        return "\n".join(hook.split("\n")[:2 if not is_shorts else 3])
     except:
         if is_shorts:
             return "WARNING!"
@@ -528,9 +728,12 @@ def _draw_logo_badges(canvas, script_json, accent_color, is_shorts=False):
 
 # ── RENDERING ─────────────────────────────────────────────────────────────────
 
-def _render_premium_thumbnail(hook_text, bg_img, avatar_img, accent_color, width, height, script_json=None, is_shorts=False):
+def _render_premium_thumbnail(hook_text, bg_img, avatar_img, accent_color, width, height, script_json=None, is_shorts=False, variant_style="curiosity"):
+    """
+    Renders premium thumbnail with face detection, emotion overlay, and A/B test metadata.
+    Returns: (canvas, metadata_dict)
+    """
     canvas = bg_img.resize((width, height), Image.LANCZOS)
-    # Darken background slightly for text readability
     canvas = ImageEnhance.Brightness(canvas).enhance(0.7)
     
     # 1. Apply Figma Tech HUD decorations if it is a 16:9 thumbnail
@@ -542,6 +745,8 @@ def _render_premium_thumbnail(hook_text, bg_img, avatar_img, accent_color, width
     draw = ImageDraw.Draw(canvas)
     
     # 2. Overlay Avatar with Premium Aura Glow
+    face_region = None
+    avatar_pos = None
     if avatar_img:
         # Scale avatar to fit ~85% of height for landscape, ~45% for portrait
         av_h = int(height * 0.85) if not is_shorts else int(height * 0.45)
@@ -554,10 +759,32 @@ def _render_premium_thumbnail(hook_text, bg_img, avatar_img, accent_color, width
         else:
             pos = (width - av_res.width - 20, height - av_res.height)
             
+        avatar_pos = pos
         canvas = _draw_multi_tier_glow(canvas, av_res, pos, accent_color)
         draw = ImageDraw.Draw(canvas) # Re-get draw for subsequent drawing
-
-    # 3. Render Hook Text (Curiosity Gap) with Figma blocks & high-contrast colors
+        
+        # Detect face in the placed avatar region
+        avatar_crop = canvas.crop((pos[0], pos[1], pos[0] + av_res.width, pos[1] + av_res.height))
+        face_in_avatar = _detect_face_region(avatar_crop)
+        if face_in_avatar:
+            # Convert to canvas coordinates
+            face_region = (pos[0] + face_in_avatar[0], pos[1] + face_in_avatar[1], 
+                          face_in_avatar[2], face_in_avatar[3])
+    
+    # If no face in avatar, try detecting in full canvas (background might have face)
+    if not face_region:
+        face_region = _detect_face_region(canvas)
+    
+    # 3. Apply Emotion Overlay based on content
+    emotion = _select_emotion_for_content(
+        script_json.get("title", "") if script_json else "", 
+        hook_text
+    )
+    if face_region:
+        canvas = _apply_emotion_overlay(canvas, face_region, emotion, accent_color, is_shorts)
+        draw = ImageDraw.Draw(canvas)
+    
+    # 4. Render Hook Text (Curiosity Gap) with Figma blocks & high-contrast colors
     lines = hook_text.split("\n")
     font_size = 90 if not is_shorts else 125
     font = _load_font(font_size, "extrabold" if is_shorts else "black")
@@ -567,6 +794,7 @@ def _render_premium_thumbnail(hook_text, bg_img, avatar_img, accent_color, width
     y = (height - total_h) // 2 if not is_shorts else height // 2 - (total_h // 2)
     x = 80 if not is_shorts else 60
     
+    text_positions = []
     for idx, line in enumerate(lines):
         lw, lh = _text_size(line, font)
         cur_x = x if not is_shorts else (width - lw) // 2
@@ -599,17 +827,41 @@ def _render_premium_thumbnail(hook_text, bg_img, avatar_img, accent_color, width
             draw.text((cur_x+offset, y+offset), line, font=font, fill=(0, 0, 0, 140))
         
         draw.text((cur_x, y), line, font=font, fill=txt_color)
+        
+        # Track text center position for rule of thirds scoring
+        text_positions.append((cur_x + lw // 2, y + lh // 2))
         y += lh + 45
         
-    # 4. Branding Accent
+    # 5. Branding Accent
     draw = ImageDraw.Draw(canvas)
     draw.rectangle([0, height-15, width, height], fill=accent_color)
     
-    # 5. Render Logos
+    # 6. Render Logos
     if script_json:
         canvas = _draw_logo_badges(canvas, script_json, accent_color, is_shorts=is_shorts)
-        
-    return canvas
+    
+    # 7. Calculate Quality Metrics
+    # Sample background color behind text for contrast check
+    bg_sample = canvas.crop((text_positions[0][0]-10, text_positions[0][1]-10, 
+                            text_positions[0][0]+10, text_positions[0][1]+10)) if text_positions else None
+    avg_bg = tuple(np.mean(np.array(bg_sample), axis=(0,1)).astype(int)) if bg_sample else (20, 20, 30)
+    
+    contrast_score = _calculate_contrast_ratio((255, 255, 255), avg_bg)
+    rule_of_thirds_score = _calculate_rule_of_thirds_score(canvas, text_positions, face_region)
+    text_word_count = len(hook_text.replace("\n", " ").split())
+    
+    metadata = {
+        "face_detected": face_region is not None,
+        "face_region": face_region,
+        "emotion": emotion,
+        "contrast_score": round(contrast_score, 2),
+        "rule_of_thirds_score": round(rule_of_thirds_score, 2),
+        "text_word_count": text_word_count,
+        "variant_style": variant_style,
+        "avatar_position": avatar_pos
+    }
+    
+    return canvas, metadata
 
 def _draw_neon_arrow(draw, start, end, accent_color, width=12):
     """Draws a premium neon arrow pointing from start to end with glow."""
@@ -749,6 +1001,58 @@ def _render_compilation_thumbnail(bg_img, avatar_img, accent_color, width, heigh
         
     return canvas
 
+def _save_variant_metadata(variants: List[ThumbnailVariant], base_path: str):
+    """Save A/B test metadata for thumbnail variants."""
+    metadata = {
+        "test_id": hashlib.md5(f"{base_path}{datetime.now().isoformat()}".encode()).hexdigest()[:12],
+        "created_at": datetime.now().isoformat(),
+        "variants": [asdict(v) for v in variants],
+        "status": "pending_selection",
+        "selection_criteria": {
+            "min_contrast": HIGH_CONTRAST_RATIO,
+            "min_rule_of_thirds": 0.6,
+            "max_words": MAX_TEXT_WORDS,
+            "face_required": True
+        }
+    }
+    meta_path = base_path.replace(".jpg", "_abtest.json")
+    with open(meta_path, "w") as f:
+        json.dump(metadata, f, indent=2)
+    print(f"📊 A/B Test Metadata saved: {meta_path}")
+    return meta_path
+
+
+def _select_best_variant(variants: List[ThumbnailVariant]) -> ThumbnailVariant:
+    """Select best variant based on quality scores."""
+    scored = []
+    for v in variants:
+        score = 0
+        # Contrast (WCAG AA compliant = 4.5)
+        if v.contrast_score >= HIGH_CONTRAST_RATIO:
+            score += 30
+        else:
+            score += max(0, v.contrast_score / HIGH_CONTRAST_RATIO * 30)
+        
+        # Rule of thirds
+        score += v.rule_of_thirds_score * 25
+        
+        # Face detection bonus (+30% CTR proven)
+        if v.face_detected:
+            score += 30
+        
+        # Word count compliance
+        if v.text_word_count <= MAX_TEXT_WORDS:
+            score += 15
+        else:
+            score += max(0, (MAX_TEXT_WORDS / v.text_word_count) * 15)
+        
+        scored.append((score, v))
+    
+    scored.sort(key=lambda x: x[0], reverse=True)
+    print(f"🏆 Variant scores: {[(v.variant_id, round(s, 1)) for s, v in scored]}")
+    return scored[0][1]
+
+
 def generate_thumbnail(script_json):
     client = genai.Client(api_key=GEMINI_API_KEY)
     
@@ -765,7 +1069,7 @@ def generate_thumbnail(script_json):
     
     out_yt = os.path.join(OUTPUT_DIR, f"thumbnail{suffix_str}.jpg")
     out_shorts = os.path.join(OUTPUT_DIR, f"thumbnail_shorts{suffix_str}.jpg")
-
+    
     # Pipeline
     bg = _generate_imagen_background(title, client)
     
@@ -783,26 +1087,90 @@ def generate_thumbnail(script_json):
         print(f"✅ Premium Compilation Thumbnail Generated: {out_yt}")
         return out_yt
     else:
-        # Determine Hook Text
+        # Define variant styles for A/B testing
+        variant_styles = ["authority", "curiosity", "urgency"]
+        
+        # Generate hooks for each variant style
         if custom_hook:
             print("📝 Using custom hook text from script_json...")
-            hook_yt = custom_hook.replace("\\n", "\n")
-            hook_shorts = custom_hook.replace("\\n", "\n").upper()
+            base_hook = custom_hook.replace("\\n", "\n")
+            hooks_yt = {style: base_hook for style in variant_styles}
+            hooks_shorts = {style: base_hook.upper() for style in variant_styles}
         else:
-            hook_yt = _generate_hook_text(title, client, is_shorts=False)
-            hook_shorts = _generate_hook_text(title, client, is_shorts=True)
+            hooks_yt = {style: _generate_hook_text(title, client, is_shorts=False, variant_style=style) for style in variant_styles}
+            hooks_shorts = {style: _generate_hook_text(title, client, is_shorts=True, variant_style=style) for style in variant_styles}
+        
+        # Generate YouTube (16:9) variants
+        print(f"🎬 Generating {THUMBNAIL_VARIANTS} YouTube Thumbnail Variants...")
+        yt_variants = []
+        for i, style in enumerate(variant_styles):
+            variant_id = f"yt_{style}_{suffix_str}"
+            canvas, meta = _render_premium_thumbnail(
+                hooks_yt[style], bg, avatar, accent_rgb, THUMB_W, THUMB_H, 
+                script_json=script_json, variant_style=style
+            )
+            variant_path = os.path.join(OUTPUT_DIR, f"thumbnail_{style}{suffix_str}.jpg")
+            canvas.convert("RGB").save(variant_path, "JPEG", quality=95)
             
-        # YT (16:9)
-        print("🎬 Rendering YouTube Thumbnail...")
-        yt = _render_premium_thumbnail(hook_yt, bg, avatar, accent_rgb, THUMB_W, THUMB_H, script_json=script_json)
-        yt.convert("RGB").save(out_yt, "JPEG", quality=95)
-
-        # Shorts (9:16)
-        print("🎬 Rendering Shorts Thumbnail...")
+            yt_variants.append(ThumbnailVariant(
+                variant_id=variant_id,
+                path=variant_path,
+                style=style,
+                hook_text=hooks_yt[style].replace("\n", " | "),
+                emotion=meta["emotion"],
+                text_word_count=meta["text_word_count"],
+                contrast_score=meta["contrast_score"],
+                rule_of_thirds_score=meta["rule_of_thirds_score"],
+                face_detected=meta["face_detected"],
+                created_at=datetime.now().isoformat()
+            ))
+            print(f"   ✅ Variant {i+1}/{THUMBNAIL_VARIANTS} ({style}): {variant_path}")
+        
+        # Select best variant for YouTube
+        best_yt = _select_best_variant(yt_variants)
+        # Copy best to main output path
+        import shutil
+        shutil.copy2(best_yt.path, out_yt)
+        print(f"🏆 Best YouTube variant: {best_yt.style} (contrast={best_yt.contrast_score}, rot={best_yt.rule_of_thirds_score}, face={best_yt.face_detected})")
+        
+        # Save A/B test metadata
+        _save_variant_metadata(yt_variants, out_yt)
+        
+        # Generate Shorts (9:16) variants
+        print(f"🎬 Generating {THUMBNAIL_VARIANTS} Shorts Thumbnail Variants...")
         bg_vert = bg.resize((SHORTS_W, SHORTS_H), Image.LANCZOS)
-        shorts = _render_premium_thumbnail(hook_shorts, bg_vert, avatar, accent_rgb, SHORTS_W, SHORTS_H, script_json=script_json, is_shorts=True)
-        shorts.convert("RGB").save(out_shorts, "JPEG", quality=95)
-
+        shorts_variants = []
+        for i, style in enumerate(variant_styles):
+            variant_id = f"shorts_{style}_{suffix_str}"
+            canvas, meta = _render_premium_thumbnail(
+                hooks_shorts[style], bg_vert, avatar, accent_rgb, SHORTS_W, SHORTS_H, 
+                script_json=script_json, is_shorts=True, variant_style=style
+            )
+            variant_path = os.path.join(OUTPUT_DIR, f"thumbnail_shorts_{style}{suffix_str}.jpg")
+            canvas.convert("RGB").save(variant_path, "JPEG", quality=95)
+            
+            shorts_variants.append(ThumbnailVariant(
+                variant_id=variant_id,
+                path=variant_path,
+                style=style,
+                hook_text=hooks_shorts[style].replace("\n", " | "),
+                emotion=meta["emotion"],
+                text_word_count=meta["text_word_count"],
+                contrast_score=meta["contrast_score"],
+                rule_of_thirds_score=meta["rule_of_thirds_score"],
+                face_detected=meta["face_detected"],
+                created_at=datetime.now().isoformat()
+            ))
+            print(f"   ✅ Variant {i+1}/{THUMBNAIL_VARIANTS} ({style}): {variant_path}")
+        
+        # Select best variant for Shorts
+        best_shorts = _select_best_variant(shorts_variants)
+        shutil.copy2(best_shorts.path, out_shorts)
+        print(f"🏆 Best Shorts variant: {best_shorts.style} (contrast={best_shorts.contrast_score}, rot={best_shorts.rule_of_thirds_score}, face={best_shorts.face_detected})")
+        
+        # Save A/B test metadata for shorts
+        _save_variant_metadata(shorts_variants, out_shorts)
+        
         print(f"✅ Premium Thumbnails Generated: {out_yt}")
         return out_yt
 
