@@ -236,18 +236,25 @@ def post_video_to_facebook_page(video_url: str, caption: str, first_comment: str
         print(f"✔ Upload session started. Video ID: {video_id}")
         print(f"📤 Upload URL: {upload_url}")
         
-        # Step 2: Download video for binary upload
-        # The rupload endpoint requires binary upload with Offset/Content-Length headers
-        print("📤 [Facebook] Downloading video for binary upload...")
-        try:
-            video_resp = requests.get(video_url, timeout=120, stream=True)
-            video_resp.raise_for_status()
-            video_data = video_resp.content
+        # Step 2: Prepare video binary for upload (supports local file path or remote URL)
+        print("📤 [Facebook] Preparing video binary for upload...")
+        if os.path.isfile(video_url):
+            print(f"✔ Using native local video file: {video_url}")
+            with open(video_url, "rb") as vf:
+                video_data = vf.read()
             video_size = len(video_data)
-            print(f"✔ Downloaded video: {video_size:,} bytes ({video_size/1024/1024:.1f} MB)")
-        except Exception as e:
-            print(f"⚠️ [Facebook] Download failed: {e}")
-            raise
+            print(f"✔ Read local video: {video_size:,} bytes ({video_size/1024/1024:.1f} MB)")
+        else:
+            print(f"📤 [Facebook] Downloading video from {video_url} for binary upload...")
+            try:
+                video_resp = requests.get(video_url, timeout=120, stream=True)
+                video_resp.raise_for_status()
+                video_data = video_resp.content
+                video_size = len(video_data)
+                print(f"✔ Downloaded video: {video_size:,} bytes ({video_size/1024/1024:.1f} MB)")
+            except Exception as e:
+                print(f"⚠️ [Facebook] Download failed: {e}")
+                raise
         
         # Step 3: Upload video binary to rupload.facebook.com
         print("📤 [Facebook] Uploading video binary to rupload.facebook.com...")
@@ -332,10 +339,10 @@ def post_video_to_facebook_page(video_url: str, caption: str, first_comment: str
         
         print(f"🎉 Facebook Reel published! ID: {video_id}")
         
-        # Step 6: Post first comment (YouTube link)
+        # Step 6: Post first comment (YouTube link + engagement question)
         if first_comment:
             try:
-                print("💬 [Facebook] Posting first comment with YouTube link...")
+                print("💬 [Facebook] Posting first comment with YouTube link and engagement question...")
                 comment_payload = {
                     "message": first_comment,
                     "access_token": fb_page_access_token,
@@ -352,6 +359,9 @@ def post_video_to_facebook_page(video_url: str, caption: str, first_comment: str
             except Exception as e:
                 print(f"⚠️ First comment exception: {e}")
         
+        # Step 7: Cross-share to configured Groups/Pages
+        share_post_to_facebook_groups(video_id, message=caption.split("\n")[0] if caption else "")
+        
         return video_id, None
         
     except requests.HTTPError as e:
@@ -364,9 +374,42 @@ def post_video_to_facebook_page(video_url: str, caption: str, first_comment: str
         return None, f"Facebook upload exception: {e}"
 
 
+# ── Share to Groups / Pages ───────────────────────────────────────────────────
+
+def share_post_to_facebook_groups(post_id: str, message: str = ""):
+    """
+    Share the published Reel/Video to configured Facebook Groups or connected Pages.
+    Configured via FB_GROUP_IDS (comma-separated list of Group/Page IDs in .env/Secrets).
+    """
+    group_ids_str = os.getenv("FB_GROUP_IDS", "").strip()
+    if not group_ids_str:
+        return
+        
+    fb_page_access_token = os.getenv("FB_PAGE_ACCESS_TOKEN")
+    if not fb_page_access_token:
+        return
+        
+    group_ids = [gid.strip() for gid in group_ids_str.split(",") if gid.strip()]
+    for gid in group_ids:
+        try:
+            print(f"📡 [Facebook Share] Sharing to Group/Page {gid}...")
+            payload = {
+                "link": f"https://www.facebook.com/{post_id}",
+                "message": message[:500] if message else "Check out our latest tech update!",
+                "access_token": fb_page_access_token,
+            }
+            resp = requests.post(f"{GRAPH_API_BASE}/{gid}/feed", data=payload, timeout=30)
+            if resp.status_code == 200:
+                print(f"✔ Shared to Facebook Group/Page {gid}: {resp.json().get('id')}")
+            else:
+                print(f"⚠️ Sharing to {gid} returned {resp.status_code}: {resp.text}")
+        except Exception as e:
+            print(f"⚠️ Error sharing to Facebook Group/Page {gid}: {e}")
+
+
 # ── Fallback: Regular Video Post ──────────────────────────────────────────────
 
-def post_video_to_facebook_page_fallback(video_url: str, caption: str) -> tuple:
+def post_video_to_facebook_page_fallback(video_source: str, caption: str) -> tuple:
     """Fallback: Post as regular video via /videos endpoint (not Reel)."""
     fb_page_id = os.getenv("FB_PAGE_ID")
     fb_page_access_token = os.getenv("FB_PAGE_ACCESS_TOKEN")
@@ -376,30 +419,36 @@ def post_video_to_facebook_page_fallback(video_url: str, caption: str) -> tuple:
     
     try:
         print("📡 [Facebook Fallback] Posting via /videos endpoint...")
-        fallback_payload = {
-            "file_url": video_url,
-            "description": caption[:2200],
-            "published": "true",
-            "access_token": fb_page_access_token,
-        }
-        print(f"📡 [Facebook Fallback] Payload: {fallback_payload}")
-        
-        def _fallback_post():
+        if os.path.isfile(video_source):
+            with open(video_source, "rb") as vf:
+                files = {"source": vf}
+                data = {
+                    "description": caption[:2200],
+                    "published": "true",
+                    "access_token": fb_page_access_token,
+                }
+                resp = requests.post(
+                    f"{GRAPH_API_BASE}/{fb_page_id}/videos",
+                    data=data,
+                    files=files,
+                    timeout=120
+                )
+        else:
+            fallback_payload = {
+                "file_url": video_source,
+                "description": caption[:2200],
+                "published": "true",
+                "access_token": fb_page_access_token,
+            }
             resp = requests.post(
                 f"{GRAPH_API_BASE}/{fb_page_id}/videos",
                 data=fallback_payload,
                 timeout=60
             )
-            response_text = resp.text
-            print(f"📡 [Facebook Fallback] Response: {resp.status_code} - {response_text}")
-            try:
-                resp.raise_for_status()
-            except requests.HTTPError as e:
-                e.response_text = response_text
-                raise
-            return resp.json()
-        
-        result = _retry_with_backoff(_fallback_post)
+        response_text = resp.text
+        print(f"📡 [Facebook Fallback] Response: {resp.status_code} - {response_text}")
+        resp.raise_for_status()
+        result = resp.json()
         video_id = result.get("id")
         print(f"🎉 Facebook Video published (fallback)! ID: {video_id}")
         return video_id, None

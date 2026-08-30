@@ -163,12 +163,15 @@ jobs:
           if [ ! -z "${{ secrets.INSTAGRAM_BUSINESS_ACCOUNT_ID }}" ]; then
             echo "INSTAGRAM_BUSINESS_ACCOUNT_ID=${{ secrets.INSTAGRAM_BUSINESS_ACCOUNT_ID }}" >> .env
           fi
-          # Facebook Page cross-posting
+          # Facebook Page & Groups cross-posting
           if [ ! -z "${{ secrets.FB_PAGE_ID }}" ]; then
             echo "FB_PAGE_ID=${{ secrets.FB_PAGE_ID }}" >> .env
           fi
           if [ ! -z "${{ secrets.FB_PAGE_ACCESS_TOKEN }}" ]; then
             echo "FB_PAGE_ACCESS_TOKEN=${{ secrets.FB_PAGE_ACCESS_TOKEN }}" >> .env
+          fi
+          if [ ! -z "${{ secrets.FB_GROUP_IDS }}" ]; then
+            echo "FB_GROUP_IDS=${{ secrets.FB_GROUP_IDS }}" >> .env
           fi
           
       - name: Setup YouTube Auth Files

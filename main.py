@@ -28,7 +28,7 @@ from thumbnail_gen import generate_thumbnail
 from youtube_upload import upload_video
 from x_upload import upload_video_to_x
 from instagram_upload import upload_reel_to_instagram
-from facebook_upload import post_video_to_facebook_page
+from facebook_upload import post_video_to_facebook_page, post_video_to_facebook_page_fallback
 from telegram_selector import notify_telegram as real_notify_telegram, send_video_to_telegram
 from threads_upload import upload_video_to_threads
 from entity_fetcher import fetch_all_entities, get_retention_layers_config
@@ -294,39 +294,77 @@ def format_instagram_caption(description, hashtags, youtube_url, script_data=Non
     return ig_caption[:2200]
 
 
-def format_facebook_caption(description, hashtags, youtube_url):
+def format_facebook_caption(description, hashtags, youtube_url="", script_data=None):
     """
-    Facebook Reels caption: longer text, link in first comment.
-    Max 2200 chars for caption, link goes in comment.
+    Facebook Reels caption: Native focus, no external link in caption body (prevents algorithmic reach suppression).
+    5-8 hashtags max (algorithm penalty for >8).
+    Includes strong hook, narrative summary, and call to check first comment.
     """
-    lines = description.split('\n')
+    import re
+    lines = [l for l in description.split('\n') if l.strip()]
     hook_line = lines[0] if lines else ""
+    if script_data and script_data.get("hook_text"):
+        hook_line = script_data.get("hook_text")
     
-    # Use more hashtags on FB (algorithm likes them)
-    fb_hashtags = hashtags[:10] if hashtags else ["#AI", "#TechNews", "#Developer", "#Coding", "#ArtificialIntelligence", "#MachineLearning", "#TechTrends", "#OpenSource", "#Innovation", "#FutureTech"]
-    hashtag_str = " ".join(fb_hashtags)
+    # 5-8 hashtags max (algorithm penalty for more)
+    default_tags = ["#AI", "#TechNews", "#Developer", "#OpenSource", "#ArtificialIntelligence", "#MachineLearning", "#TechTrends"]
+    if hashtags:
+        selected_tags = [tag for tag in hashtags if tag.startswith("#")]
+        if not selected_tags:
+            selected_tags = [f"#{tag.replace(' ', '')}" for tag in hashtags]
+        selected_tags = selected_tags[:6]
+        for dt in default_tags:
+            if dt not in selected_tags and len(selected_tags) < 6:
+                selected_tags.append(dt)
+        fb_hashtags = selected_tags
+    else:
+        fb_hashtags = default_tags[:6]
+        
+    hashtag_str = " ".join(fb_hashtags[:7])
     
+    # Clean description body: remove URLs to avoid FB algorithmic reach penalty
+    clean_desc = re.sub(r'https?://\S+|www\.\S+|t\.me/\S+|whatsapp\.com/\S+', '', description).strip()
+    clean_lines = [l.strip() for l in clean_desc.split('\n') if l.strip()]
+    if len(clean_lines) > 1:
+        body_text = "\n".join(clean_lines[1:])
+    elif len(clean_lines) == 1:
+        body_text = clean_lines[0]
+    else:
+        body_text = "Check out the latest breakthrough in tech and open-source AI."
+        
     fb_caption = f"""🔥 {hook_line}
 
-{description[:1800]}
+{body_text[:1200]}
 
-🎥 Full video on YouTube → Link in comments!
+👇 What are your thoughts on this? Drop your take below!
+🔗 Full breakdown and resources in the FIRST comment 👇
 
-📲 Follow for daily AI insights:
-• Telegram → https://t.me/technewsbyvj
-• WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
-• LinkedIn → https://www.linkedin.com/in/vijayakumar-j/
-
-{hashtag_str}
-
-#AI #TechNews #Developer #Coding #ArtificialIntelligence #MachineLearning #TechTrends #OpenSource #Innovation #FutureTech"""
+{hashtag_str}"""
     
-    return fb_caption[:2200]
+    return fb_caption[:2200].strip()
 
 
-def get_facebook_first_comment(youtube_url, hashtags):
-    """First comment on Facebook post with the YouTube link."""
-    return f"🔗 Full video: {youtube_url}\n\n#VJTechNews #AIResearch #DailyTechUpdates"
+def get_facebook_first_comment(youtube_url, hashtags=None, script_data=None):
+    """
+    First comment on Facebook Reel with YouTube link and an engagement question.
+    Placing the link in the first comment avoids the Facebook algorithmic link suppression penalty.
+    """
+    hook = ""
+    if script_data and script_data.get("hook_text"):
+        hook = script_data.get("hook_text")
+    
+    question = "💬 Have you tested this yet or seen similar tools in your workflow?"
+    if hook:
+        clean_hook = hook.rstrip(".!?")
+        question = f"💬 What do you think about {clean_hook}? Would you use this?"
+        
+    comment = f"""{question}
+
+🔗 Watch the full video breakdown on YouTube:
+{youtube_url}
+
+#TechCommunity #AIDevelopment #TechNews"""
+    return comment.strip()
 
 
 def format_telegram_caption(title, description, hashtags, youtube_url, script_data=None):
@@ -1132,15 +1170,18 @@ def run_pipeline(topic_type="auto", dry_run=False):
     # ── STEP 10e: Facebook Reels Auto-Post ───────────────────────────────────
     log_message("STEP 10e: Auto-posting Reel to Facebook...")
     try:
-        # Use platform-native Facebook caption (longer text, link in comment)
-        fb_caption = format_facebook_caption(description, hashtags, youtube_url)
-        fb_first_comment = get_facebook_first_comment(youtube_url, hashtags)
+        # Platform-native Facebook caption (5-8 hashtags max, clean body, link in first comment)
+        fb_caption = format_facebook_caption(description, hashtags, youtube_url, script_data)
+        fb_first_comment = get_facebook_first_comment(youtube_url, hashtags, script_data)
         if dry_run:
             print("🧪 [DRY RUN] Simulating Facebook Reel upload...")
             fb_uploaded, fb_result = True, "MOCK_FB_REEL_ID"
         else:
-            # Facebook requires a public video URL - use YouTube URL after upload
-            fb_uploaded, fb_result = post_video_to_facebook_page(youtube_url, fb_caption, fb_first_comment)
+            # Direct native video binary upload (not YouTube link) to avoid algorithmic reach penalties
+            fb_uploaded, fb_result = post_video_to_facebook_page(video_path, fb_caption, fb_first_comment)
+            if not fb_uploaded:
+                print("⚠️ [Facebook] Trying fallback regular video upload...")
+                fb_uploaded, fb_result = post_video_to_facebook_page_fallback(video_path, fb_caption)
 
         if fb_uploaded:
             log_message(f"SUCCESS: Posted Reel to Facebook! ID: {fb_result}")
