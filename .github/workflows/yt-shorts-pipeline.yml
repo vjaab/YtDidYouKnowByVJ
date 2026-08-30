@@ -197,7 +197,6 @@ jobs:
           python -u main.py --now --type auto
          
       - name: Platform-Native Optimization & A/B Test Setup
-      - name: Platform-Native Optimization & A/B Test Setup
         if: always()
         run: |
           echo "🔧 Running platform-native optimization..."
