@@ -585,6 +585,9 @@ def run_pipeline(topic_type="auto", dry_run=False):
                 time.sleep(60)
             continue
             
+        # Store target_country for hashtag generation
+        script_data["target_country"] = target_country
+        
         # Store slot info for downstream rendering (e.g. aspect ratio)
         script_data["slot"] = slot
 
@@ -1018,6 +1021,7 @@ def run_pipeline(topic_type="auto", dry_run=False):
     
     # Generate dynamic, optimized hashtags and tags
     initial_people = [p.get("name") for p in script_data.get("people", [])] if script_data.get("people") else []
+    target_country = script_data.get("target_country", "US")
     optimized_metadata = get_optimized_metadata(
         title=title,
         script=script,
@@ -1027,6 +1031,7 @@ def run_pipeline(topic_type="auto", dry_run=False):
         initial_people=initial_people,
         initial_hashtags=script_data.get("hashtags", []),
         is_shorts=True,
+        target_country=target_country,
         editorial_perspective=script_data.get("editorial_perspective"),
         content_fingerprint=script_data.get("content_fingerprint")
     )

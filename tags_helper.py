@@ -2,7 +2,13 @@
 tags_helper.py — Dynamic metadata tags and hashtags optimizer for YouTube upload.
 Matches title, script, and metadata against curated AI & tech tag categories and key figures.
 """
+import os
 import re
+import json
+import time
+import urllib.request
+import xml.etree.ElementTree as ET
+from datetime import datetime, timezone
 
 # ── CATEGORIES OF TAGS ──
 
@@ -168,9 +174,17 @@ PEOPLE_METADATA = {
     }
 }
 
+# ── HASHTAG LIMITS BY FORMAT ──
+SHORTS_MAX_HASHTAGS = 10
+LONGFORM_MAX_HASHTAGS = 15
+
 # ── TOP 5 HASHTAGS FOR ENGLISH FACTS CHANNEL ──
 DEFAULT_BROAD_HASHTAGS = ["#ArtificialIntelligence", "#Technology", "#MachineLearning"]
 DEFAULT_NICHE_HASHTAGS = ["#AITools", "#TechFacts"]
+
+# ── TRENDING HASHTAG CACHE ──
+TRENDING_HASHTAGS_CACHE_FILE = os.path.join("logs", "trending_hashtags_cache.json")
+TRENDING_HASHTAGS_CACHE_TTL_HOURS = 6
 
 GENERIC_HASHTAGS = {
     "aihacks", "techtips", "productivity", "vaibhavsisinty",
@@ -187,6 +201,133 @@ GENERIC_HASHTAGS = {
     # NOTE: Removed #shorts, #ai, #viral, #trending, #fyp, #foryou, #shortsfeed
     # from blocklist — these are discovery-critical for Shorts feed algorithm
 }
+
+
+def fetch_trending_hashtags_from_google(target_country="US") -> list:
+    """
+    Fetches trending hashtags from Google Trends RSS feed.
+    Filters for tech/AI related trends and converts to hashtag format.
+    Uses caching to avoid repeated API calls.
+    """
+    # Check cache first
+    if os.path.exists(TRENDING_HASHTAGS_CACHE_FILE):
+        try:
+            mtime = os.path.getmtime(TRENDING_HASHTAGS_CACHE_FILE)
+            age_hours = (time.time() - mtime) / 3600.0
+            if age_hours < TRENDING_HASHTAGS_CACHE_TTL_HOURS:
+                with open(TRENDING_HASHTAGS_CACHE_FILE, "r", encoding="utf-8") as f:
+                    cached = json.load(f)
+                print(f"📋 Loaded trending hashtags cache (Age: {age_hours:.1f} hours)")
+                return cached
+        except Exception as e:
+            print(f"⚠️ Failed to load trending hashtags cache: {e}")
+
+    # Tech/AI whitelist for filtering Google Trends
+    tech_whitelist = {
+        'ai', 'artificial intelligence', 'chatgpt', 'gpt', 'llm', 'llama', 'claude', 'gemini',
+        'openai', 'anthropic', 'deepseek', 'mistral', 'ollama', 'agent', 'autogen', 'crewai',
+        'langgraph', 'langchain', 'rag', 'vector', 'embedding', 'fine-tune', 'quantization',
+        'nvidia', 'gpu', 'cuda', 'h100', 'h200', 'blackwell', 'chip', 'semiconductor',
+        'python', 'javascript', 'typescript', 'rust', 'go', 'coding', 'programming',
+        'vscode', 'github', 'copilot', 'cursor', 'ide', 'developer', 'devops', 'kubernetes',
+        'docker', 'aws', 'cloud', 'serverless', 'lambda', 'api', 'microservice',
+        'robot', 'robotics', 'automation', 'workflow', 'productivity', 'tool',
+        'startup', 'funding', 'venture', 'ycombinator', 'unicorn', 'ipo',
+        'crypto', 'blockchain', 'web3', 'defi', 'bitcoin', 'ethereum', 'solana',
+        'ar', 'vr', 'xr', 'metaverse', 'spatial', 'vision pro', 'quest',
+        'quantum', 'quantum computing', 'qubit', 'ibm', 'google quantum',
+        'security', 'hack', 'exploit', 'vulnerability', 'zero-day', 'malware',
+        'data', 'analytics', 'bi', 'tableau', 'powerbi', 'sql', 'nosql', 'database',
+        'ml', 'machine learning', 'deep learning', 'neural', 'transformer', 'attention',
+        'diffusion', 'stable diffusion', 'midjourney', 'dall-e', 'sora', 'veo', 'runway',
+        'flux', 'image generation', 'video generation', 'text-to-video', 'text-to-image'
+    }
+
+    url = f"https://trends.google.com/trending/rss?geo={target_country}"
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0'}
+    trending_hashtags = []
+
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=15) as response:
+            xml_data = response.read()
+
+        root = ET.fromstring(xml_data)
+        items = root.findall('.//item')
+
+        for item in items:
+            title = item.find('title').text or ""
+            desc = ""
+            desc_elem = item.find('description')
+            if desc_elem is not None:
+                desc = desc_elem.text or ""
+
+            title_lower = title.lower()
+            desc_lower = desc.lower()
+            combined = f"{title_lower} {desc_lower}"
+
+            # Check if any tech keyword matches
+            is_tech = False
+            matched_keyword = None
+            for keyword in tech_whitelist:
+                if keyword in combined:
+                    is_tech = True
+                    matched_keyword = keyword
+                    break
+
+            if is_tech:
+                # Convert to hashtag format
+                hashtag = to_clean_hashtag(matched_keyword or title)
+                if hashtag and len(hashtag) > 2:
+                    trending_hashtags.append(hashtag)
+
+        # Deduplicate while preserving order
+        seen = set()
+        unique_hashtags = []
+        for ht in trending_hashtags:
+            ht_lower = ht.lower()
+            if ht_lower not in seen:
+                seen.add(ht_lower)
+                unique_hashtags.append(ht)
+
+        # Cache the results
+        try:
+            os.makedirs(os.path.dirname(TRENDING_HASHTAGS_CACHE_FILE), exist_ok=True)
+            with open(TRENDING_HASHTAGS_CACHE_FILE, "w", encoding="utf-8") as f:
+                json.dump(unique_hashtags, f, indent=2)
+        except Exception as e:
+            print(f"⚠️ Failed to save trending hashtags cache: {e}")
+
+        print(f"✅ Google Trends: Found {len(unique_hashtags)} tech-related trending hashtags for {target_country}")
+        return unique_hashtags
+
+    except Exception as e:
+        print(f"⚠️ Google Trends hashtag fetch failed: {e}")
+        return []
+
+
+def get_trending_hashtags_for_content(title, script, target_country="US", max_count=5) -> list:
+    """
+    Returns trending hashtags relevant to the content.
+    Filters Google Trends results against the video's title/script.
+    """
+    trending = fetch_trending_hashtags_from_google(target_country)
+    
+    if not trending:
+        return []
+    
+    full_text = f"{title} {script}".lower()
+    relevant = []
+    
+    for ht in trending:
+        # Extract the keyword from hashtag (remove # and convert from PascalCase)
+        keyword = ht[1:].lower()
+        # Check if keyword appears in content (flexible matching)
+        if keyword in full_text or any(word in full_text for word in keyword.split()):
+            relevant.append(ht)
+    
+    return relevant[:max_count]
+
 
 STOPWORDS = {
     "a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are", "arent", "as", "at",
@@ -273,16 +414,22 @@ def generate_specific_hashtags(
     initial_keywords=None,
     initial_companies=None,
     initial_people=None,
-    initial_hashtags=None
+    initial_hashtags=None,
+    is_shorts=True,
+    target_country="US"
 ):
     """
     Generates specific keyword-based hashtags based on proper nouns, entities,
     and non-generic phrases found in the content.
+    Includes trending hashtags from Google Trends for discovery.
     """
     initial_keywords = initial_keywords or []
     initial_companies = initial_companies or []
     initial_people = initial_people or []
     initial_hashtags = initial_hashtags or []
+    
+    # Determine max hashtags based on format
+    max_hashtags = SHORTS_MAX_HASHTAGS if is_shorts else LONGFORM_MAX_HASHTAGS
     
     # Normalize initial lists
     norm_companies = []
@@ -338,6 +485,10 @@ def generate_specific_hashtags(
     key_phrases = extract_key_phrases(f"{title} {script}")
     raw_candidates.extend(key_phrases)
 
+    # 7. Add trending hashtags from Google Trends (for discovery)
+    trending_for_content = get_trending_hashtags_for_content(title, script, target_country, max_count=5)
+    raw_candidates.extend(trending_for_content)
+
     # Clean, normalize, deduplicate, and filter generic hashtags
     seen_ht_lower = set()
     final_hashtags = []
@@ -352,14 +503,14 @@ def generate_specific_hashtags(
             seen_ht_lower.add(ht_lower)
             final_hashtags.append(ht)
 
-    return final_hashtags[:4]
+    return final_hashtags[:max_hashtags]
 
-def get_hyper_targeted_hashtags(title, script, is_shorts=True):
+def get_hyper_targeted_hashtags(title, script, is_shorts=True, target_country="US"):
     """
     Generates keyword-based hashtags by extracting proper nouns and key phrases
     from the title and script.
     """
-    return generate_specific_hashtags(title, script)
+    return generate_specific_hashtags(title, script, is_shorts=is_shorts, target_country=target_country)
 
 def get_optimized_metadata(
     title, 
@@ -370,12 +521,15 @@ def get_optimized_metadata(
     initial_people=None, 
     initial_hashtags=None,
     is_shorts=True,
+    target_country="US",
     editorial_perspective=None,
     content_fingerprint=None
 ):
     """
-    Computes an optimized list of 8-15 unique tags and exactly 4 unique hashtags
+    Computes an optimized list of 8-15 unique tags and 8-15 unique hashtags
     based on the content of the video.
+    Shorts: 8-10 hashtags, Longform: 12-15 hashtags
+    Includes trending hashtags from Google Trends for discovery.
     """
     initial_keywords = initial_keywords or []
     initial_companies = initial_companies or []
@@ -472,7 +626,7 @@ def get_optimized_metadata(
             seen_tags_lower.add(tag_lower)
             cleaned_tags.append(tag_clean)
             
-    # YouTube Studio tags field constraint: Limit to 8-15 tags
+# YouTube Studio tags field constraint: Limit to 8-15 tags
     final_tags = cleaned_tags[:15]
     if len(final_tags) < 8:
         # Force fill up to 8 minimum
@@ -483,8 +637,8 @@ def get_optimized_metadata(
                 seen_tags_lower.add(d.lower())
                 if len(final_tags) >= 8:
                     break
- 
-    # 7. Generate exactly 4 specific keyword-based hashtags
+  
+    # 7. Generate keyword-based hashtags (8-10 for Shorts, 12-15 for Longform)
     final_hashtags = generate_specific_hashtags(
         title=title,
         script=script,
@@ -492,7 +646,9 @@ def get_optimized_metadata(
         initial_keywords=initial_keywords,
         initial_companies=initial_companies,
         initial_people=initial_people,
-        initial_hashtags=initial_hashtags
+        initial_hashtags=initial_hashtags,
+        is_shorts=is_shorts,
+        target_country=target_country
     )
     
     return {

@@ -37,7 +37,7 @@ from config_longform import (
 )
 from fetch_research_papers import fetch_tech_news, fetch_ai_tools, fetch_trending_from_newsapi, fetch_reddit_news
 from kaggle_handover import trigger_kaggle_gpu_job
-from topic_tracker import record_story, update_youtube_url
+from topic_tracker import record_story, update_youtube_url, get_next_target_country
 from gemini_script_longform import generate_longform_script
 from audio_gen import generate_voiceover, clean_tts_text
 from chunk_builder import build_chunks, build_chapter_aware_chunks, redistribute_to_audio_duration
@@ -170,7 +170,8 @@ def format_longform_description(script_data, hashtags):
 def run_longform_pipeline(dry_run=False):
     """Main chaptered deep-dive pipeline: research → script → render → upload."""
     depth_mode = get_topic_depth_mode()
-    log_message(f"=== STARTING CHAPTERED DEEP-DIVE PIPELINE (mode={depth_mode}) ===")
+    target_country = get_next_target_country()
+    log_message(f"=== STARTING CHAPTERED DEEP-DIVE PIPELINE (mode={depth_mode}) | COUNTRY: {target_country} ===")
 
     # Initialize Kaggle configuration flags
     has_kaggle = os.getenv("KAGGLE_USERNAME") is not None or os.path.exists(os.path.expanduser("~/.kaggle/kaggle.json"))
@@ -266,6 +267,9 @@ def run_longform_pipeline(dry_run=False):
                 log_message("⏳ Potential rate limit. Sleeping 60s...")
                 time.sleep(60)
             continue
+
+        # Store target_country for hashtag generation
+        script_data["target_country"] = target_country
 
         # Track best candidate
         script = script_data.get("script", "")
@@ -591,6 +595,7 @@ def run_longform_pipeline(dry_run=False):
         title = random.choice(script_data["title_options"])
 
     initial_people = [p.get("name") for p in script_data.get("people", [])] if script_data.get("people") else []
+    target_country = script_data.get("target_country", "US")
     optimized_metadata = get_optimized_metadata(
         title=title,
         script=script,
@@ -600,6 +605,7 @@ def run_longform_pipeline(dry_run=False):
         initial_people=initial_people,
         initial_hashtags=hashtags,
         is_shorts=False,
+        target_country=target_country,
         editorial_perspective=script_data.get("editorial_perspective"),
         content_fingerprint=script_data.get("content_fingerprint")
     )
