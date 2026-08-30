@@ -259,12 +259,16 @@ def get_hook_pattern_examples(pattern_id: str, topic: str = "") -> List[str]:
     return []
 
 
-def get_selected_hook_info(pattern_id: str) -> Dict:
+def get_hook_pattern_info(pattern_id: str) -> Dict:
     """Get full pattern info for a pattern ID."""
     for pattern in HOOK_PATTERNS:
         if pattern["id"] == pattern_id:
             return pattern
-    return {}
+    return {"id": pattern_id, "name": pattern_id, "description": "", "examples": []}
+
+
+# Alias for backward compatibility
+get_selected_hook_info = get_hook_pattern_info
 
 
 def update_hook_variant_views(
