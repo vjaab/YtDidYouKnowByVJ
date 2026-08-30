@@ -271,17 +271,53 @@ def delete_github_release(release_id):
 
 # ── Threads Graph API: 2-Step Container Workflow ────────────────────────────
 
-def create_threads_container(video_url: str, caption: str) -> str:
-    """Step 1: create a media container. Returns the container/creation ID."""
+def create_threads_container(video_url: str, caption: str, reply_to_id: str = None) -> str:
+    """Step 1: create a media container. Returns the container/creation ID.
+    
+    Args:
+        video_url: Public URL of the video
+        caption: Text caption for the post
+        reply_to_id: Optional ID of the post to reply to (for threading)
+    """
+    threads_user_id = os.getenv("THREADS_USER_ID")
+    access_token = os.getenv("THREADS_ACCESS_TOKEN")
+
+    data = {
+        "media_type": "VIDEO",
+        "video_url": video_url,
+        "text": caption[:2200],  # Threads text limit
+        "access_token": access_token,
+    }
+    if reply_to_id:
+        data["reply_to_id"] = reply_to_id
+
+    resp = requests.post(
+        f"{GRAPH_API_BASE}/{threads_user_id}/threads",
+        data=data,
+        timeout=30,
+    )
+    resp.raise_for_status()
+    return resp.json()["id"]
+
+
+def create_threads_reply(post_id: str, reply_text: str) -> str:
+    """Create a text-only reply to an existing Threads post.
+    
+    Args:
+        post_id: The ID of the post to reply to
+        reply_text: Text content of the reply
+        
+    Returns:
+        The reply post ID
+    """
     threads_user_id = os.getenv("THREADS_USER_ID")
     access_token = os.getenv("THREADS_ACCESS_TOKEN")
 
     resp = requests.post(
         f"{GRAPH_API_BASE}/{threads_user_id}/threads",
         data={
-            "media_type": "VIDEO",
-            "video_url": video_url,
-            "text": caption[:2200],  # Threads text limit
+            "text": reply_text[:2200],
+            "reply_to_id": post_id,
             "access_token": access_token,
         },
         timeout=30,
@@ -326,7 +362,7 @@ def publish_container(container_id: str) -> str:
     return resp.json()["id"]
 
 
-def upload_video_to_threads(video_path: str, caption: str):
+def upload_video_to_threads(video_path: str, caption: str, source_url: str = None):
     """
     Uploads a video as a Threads post using the official Graph API.
 
@@ -335,10 +371,12 @@ def upload_video_to_threads(video_path: str, caption: str):
       2. POST /{threads-user-id}/threads → create container (media_type=VIDEO)
       3. GET /{container-id}?fields=status,error_message → poll until FINISHED
       4. POST /{threads-user-id}/threads_publish → publish the post
+      5. (Optional) Post a reply with source link
 
     Args:
         video_path (str): Absolute path to the .mp4 video file.
         caption (str): Caption text for the Threads post.
+        source_url (str): Optional source article URL to reply with.
 
     Returns:
         tuple: (bool success, str result_message_or_post_id)
@@ -418,6 +456,16 @@ def upload_video_to_threads(video_path: str, caption: str):
         print(f"📡 [Threads] Step 4/4: Publishing Thread...")
         post_id = publish_container(container_id)
         print(f"🎉 Threads post published! ID: {post_id}")
+
+        # Post reply with source link if provided
+        if source_url:
+            print(f"📡 [Threads] Posting source link reply...")
+            reply_text = f"📰 Source: {source_url}"
+            try:
+                reply_id = create_threads_reply(post_id, reply_text)
+                print(f"✅ Source reply posted! ID: {reply_id}")
+            except Exception as e:
+                print(f"⚠️ Failed to post source reply: {e}")
 
         _increment_rate_limit()
 

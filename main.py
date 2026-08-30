@@ -405,6 +405,7 @@ def format_telegram_caption(title, description, hashtags, youtube_url, script_da
 def format_threads_caption(title, description, hashtags, youtube_url, script_data=None):
     """
     Threads caption for Shorts: native text format, line breaks, no HTML.
+    Format: Thread 🧵 → Hook → Value → Question → Link
     Max 500 chars recommended for engagement.
     """
     # Extract hook
@@ -412,27 +413,28 @@ def format_threads_caption(title, description, hashtags, youtube_url, script_dat
     if len(hook) > 80:
         hook = hook[:77] + "..."
     
-    # 3-5 relevant hashtags
-    th_hashtags = hashtags[:5] if hashtags else ["#AI", "#TechNews", "#Shorts"]
-    hashtag_str = " ".join(th_hashtags)
+    # 3-5 relevant hashtags + tag relevant accounts
+    th_hashtags = hashtags[:3] if hashtags else ["#AI", "#TechNews", "#Shorts"]
+    tag_accounts = " @techcrunch @verge @TheVerge @WIRED @engadget"
+    hashtag_str = " ".join(th_hashtags) + tag_accounts
     
-    # Short description snippet
-    desc_snippet = description[:300] if description else ""
+    # Value: key insight from description
+    value = description[:200] if description else ""
+    
+    # Question to drive engagement
+    question = "\n\nWhat's your take on this?"
     
     # Source article URL (from script_data)
     source_url = script_data.get("original_news_url", "") if script_data else ""
-    source_line = f"\n📰 Source: {source_url}" if source_url else ""
+    source_line = f"\n\n📰 Source: {source_url}" if source_url else ""
     
-    threads_caption = f"""🔥 {hook}
+    threads_caption = f"""Thread 🧵
 
-{desc_snippet}
-{source_line}
+🔥 {hook}
 
-🎥 Full breakdown: {youtube_url}
+💡 {value}{question}
 
-📲 Follow for daily AI insights:
-• Telegram → https://t.me/technewsbyvj
-• WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
+🎥 Full breakdown: {youtube_url}{source_line}
 
 {hashtag_str}"""
     
@@ -1213,11 +1215,12 @@ def run_pipeline(topic_type="auto", dry_run=False):
     try:
         # Use dedicated Threads caption for Shorts
         threads_caption = format_threads_caption(title, description, hashtags, youtube_url, script_data)
+        source_url = script_data.get("original_news_url", "") if script_data else ""
         if dry_run:
             print("🧪 [DRY RUN] Simulating Threads upload...")
             threads_uploaded, threads_result = True, "MOCK_THREADS_POST_ID"
         else:
-            threads_uploaded, threads_result = upload_video_to_threads(video_path, threads_caption)
+            threads_uploaded, threads_result = upload_video_to_threads(video_path, threads_caption, source_url)
 
         if threads_uploaded:
             log_message(f"SUCCESS: Posted to Threads! ID: {threads_result}")
