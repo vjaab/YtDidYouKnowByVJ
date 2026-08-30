@@ -8,8 +8,6 @@ from config import YOUTUBE_CLIENT_SECRET_FILE
 SCOPES = [
     "https://www.googleapis.com/auth/youtube.upload",
     "https://www.googleapis.com/auth/youtube.force-ssl",  # required for comments
-    "https://www.googleapis.com/auth/yt-analytics.readonly",  # for hook analytics
-    "https://www.googleapis.com/auth/youtube.readonly",  # for video metadata
 ]
 
 # ── YPP COMPLIANCE: Rotating pinned comment templates ──
