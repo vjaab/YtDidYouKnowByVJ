@@ -2107,10 +2107,10 @@ class MultiAgentGenerationEngine:
         
         # Use analytics to select optimized patterns for this category
         from hook_analytics import select_hook_patterns_for_category, get_optimized_hook_prompt
-        optimized_patterns = select_hook_patterns_for_category(category, num_patterns=3)
+        optimized_patterns = select_hook_patterns_for_category(self.category, num_patterns=3)
         
         # Generate analytics-optimized hook prompt
-        hook_prompt = get_optimized_hook_prompt(category, research)
+        hook_prompt = get_optimized_hook_prompt(self.category, research)
         
         hooks_data = self._call_gemini(hook_prompt)
         if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
