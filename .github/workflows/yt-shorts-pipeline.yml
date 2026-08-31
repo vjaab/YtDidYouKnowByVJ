@@ -2,7 +2,7 @@ name: Daily Tech News Shorts Pipeline
 
 on:
   schedule:
-    # ── AUDIENCE-OPTIMIZED SCHEDULE (EST → UTC conversion, UTC-5) ──
+    # AUDIENCE-OPTIMIZED SCHEDULE (EST → UTC conversion, UTC-5)
     # Weekdays (Mon-Fri): 11 AM & 7 PM EST → 16:00 & 00:00 UTC
     - cron: '0 16 * * 1-5'  # Mon-Fri 11:00 AM EST
     - cron: '0 0 * * 2-6'   # Tue-Sat 12:00 AM UTC (Mon-Fri 7:00 PM EST)
@@ -35,61 +35,50 @@ concurrency:
 jobs:
   run-pipeline:
     runs-on: ubuntu-latest
-    timeout-minutes: 180 # 3h max
+    timeout-minutes: 180
     permissions:
-      contents: write  # Required for GITHUB_TOKEN to create releases (Instagram video hosting)
+      contents: write
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-     
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-         
+
       - name: Free Disk Space
         run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "/usr/local/share/boost"
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc "/usr/local/share/boost" "$AGENT_TOOLSDIRECTORY"
           df -h
-         
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11' 
+          python-version: '3.11'
           cache: 'pip'
-           
+
       - name: Install System Dependencies
-        # ffmpeg is needed by moviepy for video rendering
-        # MuseTalk requires libglib2.0-0 libsm6 libxext6 libxrender1 for OpenCV
-        # jq is used for parsing A/B test metadata JSON
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg fonts-roboto libglib2.0-0 libsm6 libxext6 libxrender1 espeak-ng wget jq
-           
+
       - name: Verify FFmpeg Installation
         run: ffmpeg -version
-           
+
       - name: Install Project Python Dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install "numpy<2.0"
-          pip install "grpcio==1.62.2"
+          pip install "numpy<2.0" "grpcio==1.62.2"
           pip install -r requirements.txt
-          # Ensure python-dotenv is available for config.py
           pip install python-dotenv
-          # Skip local MMLab stack to save disk space (offloaded to Kaggle)
-          # Explicitly fix potential imageio recursion by forcing latest imageio-ffmpeg last
           pip install --upgrade imageio imageio-ffmpeg moviepy
-           
+
       - name: Cache Playwright
         id: playwright-cache
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
-           
+
       - name: Install Playwright Browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: python -m playwright install --with-deps chromium
@@ -106,12 +95,8 @@ jobs:
           echo "TELEGRAM_CHANNEL_USERNAME=${{ secrets.TELEGRAM_CHANNEL_USERNAME }}" >> .env
           echo "THREADS_USER_ID=${{ secrets.THREADS_USER_ID }}" >> .env
           echo "THREADS_ACCESS_TOKEN=${{ secrets.THREADS_ACCESS_TOKEN }}" >> .env
-          if [ ! -z "${{ secrets.THREADS_APP_ID }}" ]; then
-            echo "THREADS_APP_ID=${{ secrets.THREADS_APP_ID }}" >> .env
-          fi
-          if [ ! -z "${{ secrets.THREADS_APP_SECRET }}" ]; then
-            echo "THREADS_APP_SECRET=${{ secrets.THREADS_APP_SECRET }}" >> .env
-          fi
+          if [ ! -z "${{ secrets.THREADS_APP_ID }}" ]; then echo "THREADS_APP_ID=${{ secrets.THREADS_APP_ID }}" >> .env; fi
+          if [ ! -z "${{ secrets.THREADS_APP_SECRET }}" ]; then echo "THREADS_APP_SECRET=${{ secrets.THREADS_APP_SECRET }}" >> .env; fi
           echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> .env
           echo "CF_ACCOUNT_ID=${{ secrets.CF_ACCOUNT_ID }}" >> .env
           echo "CF_API_TOKEN=${{ secrets.CF_API_TOKEN }}" >> .env
@@ -128,87 +113,45 @@ jobs:
           echo "REDDIT_CLIENT_ID=${{ secrets.REDDIT_CLIENT_ID }}" >> .env
           echo "REDDIT_CLIENT_SECRET=${{ secrets.REDDIT_CLIENT_SECRET }}" >> .env
           echo "YOUTUBE_DATA_API_KEY=${{ secrets.YOUTUBE_DATA_API_KEY }}" >> .env
-           
-          if [ ! -z "${{ secrets.IG_VIDEO_PUBLIC_URL }}" ]; then
-            echo "IG_VIDEO_PUBLIC_URL=${{ secrets.IG_VIDEO_PUBLIC_URL }}" >> .env
-          fi
-          # GitHub Releases for Instagram video hosting (free, 2GB limit, works in CI)
+          if [ ! -z "${{ secrets.IG_VIDEO_PUBLIC_URL }}" ]; then echo "IG_VIDEO_PUBLIC_URL=${{ secrets.IG_VIDEO_PUBLIC_URL }}" >> .env; fi
           echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env
           echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .env
-          if [ ! -z "${{ secrets.OPENAI_API_KEY }}" ]; then
-            echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
-          fi
-          if [ ! -z "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
-            echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> .env
-          fi
-          if [ ! -z "${{ secrets.GROQ_API_KEY }}" ]; then
-            echo "GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}" >> .env
-          fi
-          if [ ! -z "${{ secrets.CEREBRAS_API_KEY }}" ]; then
-            echo "CEREBRAS_API_KEY=${{ secrets.CEREBRAS_API_KEY }}" >> .env
-          fi
-          if [ ! -z "${{ secrets.DEEPSEEK_API_KEY }}" ]; then
-            echo "DEEPSEEK_API_KEY=${{ secrets.DEEPSEEK_API_KEY }}" >> .env
-          fi
-          if [ ! -z "${{ secrets.OPENROUTER_API_KEY }}" ]; then
-            echo "OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}" >> .env
-          fi
-          if [ ! -z "${{ secrets.VIDIQ_API_KEY }}" ]; then
-            echo "VIDIQ_API_KEY=${{ secrets.VIDIQ_API_KEY }}" >> .env
-          fi
-          if [ ! -z "${{ secrets.OPENCODE_API_KEY }}" ]; then
-            echo "OPENCODE_API_KEY=${{ secrets.OPENCODE_API_KEY }}" >> .env
-          fi
-          if [ ! -z "${{ secrets.IG_USER_ID }}" ]; then
-            echo "IG_USER_ID=${{ secrets.IG_USER_ID }}" >> .env
-          fi
-          if [ ! -z "${{ secrets.IG_ACCESS_TOKEN }}" ]; then
-            echo "IG_ACCESS_TOKEN=${{ secrets.IG_ACCESS_TOKEN }}" >> .env
-          fi
-          # Instagram Graph API credentials (for token refresh)
-          if [ ! -z "${{ secrets.INSTAGRAM_APP_ID }}" ]; then
-            echo "INSTAGRAM_APP_ID=${{ secrets.INSTAGRAM_APP_ID }}" >> .env
-          fi
-          if [ ! -z "${{ secrets.INSTAGRAM_APP_SECRET }}" ]; then
-            echo "INSTAGRAM_APP_SECRET=${{ secrets.INSTAGRAM_APP_SECRET }}" >> .env
-          fi
-          if [ ! -z "${{ secrets.INSTAGRAM_ACCESS_TOKEN }}" ]; then
-            echo "INSTAGRAM_ACCESS_TOKEN=${{ secrets.INSTAGRAM_ACCESS_TOKEN }}" >> .env
-          fi
-          if [ ! -z "${{ secrets.INSTAGRAM_BUSINESS_ACCOUNT_ID }}" ]; then
-            echo "INSTAGRAM_BUSINESS_ACCOUNT_ID=${{ secrets.INSTAGRAM_BUSINESS_ACCOUNT_ID }}" >> .env
-          fi
-          # Facebook Page & Groups cross-posting
-          if [ ! -z "${{ secrets.FB_PAGE_ID }}" ]; then
-            echo "FB_PAGE_ID=${{ secrets.FB_PAGE_ID }}" >> .env
-          fi
-          if [ ! -z "${{ secrets.FB_PAGE_ACCESS_TOKEN }}" ]; then
-            echo "FB_PAGE_ACCESS_TOKEN=${{ secrets.FB_PAGE_ACCESS_TOKEN }}" >> .env
-          fi
-          if [ ! -z "${{ secrets.FB_GROUP_IDS }}" ]; then
-            echo "FB_GROUP_IDS=${{ secrets.FB_GROUP_IDS }}" >> .env
-          fi
+          if [ ! -z "${{ secrets.OPENAI_API_KEY }}" ]; then echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env; fi
+          if [ ! -z "${{ secrets.ANTHROPIC_API_KEY }}" ]; then echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> .env; fi
+          if [ ! -z "${{ secrets.GROQ_API_KEY }}" ]; then echo "GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}" >> .env; fi
+          if [ ! -z "${{ secrets.CEREBRAS_API_KEY }}" ]; then echo "CEREBRAS_API_KEY=${{ secrets.CEREBRAS_API_KEY }}" >> .env; fi
+          if [ ! -z "${{ secrets.DEEPSEEK_API_KEY }}" ]; then echo "DEEPSEEK_API_KEY=${{ secrets.DEEPSEEK_API_KEY }}" >> .env; fi
+          if [ ! -z "${{ secrets.OPENROUTER_API_KEY }}" ]; then echo "OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}" >> .env; fi
+          if [ ! -z "${{ secrets.VIDIQ_API_KEY }}" ]; then echo "VIDIQ_API_KEY=${{ secrets.VIDIQ_API_KEY }}" >> .env; fi
+          if [ ! -z "${{ secrets.OPENCODE_API_KEY }}" ]; then echo "OPENCODE_API_KEY=${{ secrets.OPENCODE_API_KEY }}" >> .env; fi
+          if [ ! -z "${{ secrets.IG_USER_ID }}" ]; then echo "IG_USER_ID=${{ secrets.IG_USER_ID }}" >> .env; fi
+          if [ ! -z "${{ secrets.IG_ACCESS_TOKEN }}" ]; then echo "IG_ACCESS_TOKEN=${{ secrets.IG_ACCESS_TOKEN }}" >> .env; fi
+          if [ ! -z "${{ secrets.INSTAGRAM_APP_ID }}" ]; then echo "INSTAGRAM_APP_ID=${{ secrets.INSTAGRAM_APP_ID }}" >> .env; fi
+          if [ ! -z "${{ secrets.INSTAGRAM_APP_SECRET }}" ]; then echo "INSTAGRAM_APP_SECRET=${{ secrets.INSTAGRAM_APP_SECRET }}" >> .env; fi
+          if [ ! -z "${{ secrets.INSTAGRAM_ACCESS_TOKEN }}" ]; then echo "INSTAGRAM_ACCESS_TOKEN=${{ secrets.INSTAGRAM_ACCESS_TOKEN }}" >> .env; fi
+          if [ ! -z "${{ secrets.INSTAGRAM_BUSINESS_ACCOUNT_ID }}" ]; then echo "INSTAGRAM_BUSINESS_ACCOUNT_ID=${{ secrets.INSTAGRAM_BUSINESS_ACCOUNT_ID }}" >> .env; fi
+          if [ ! -z "${{ secrets.FB_PAGE_ID }}" ]; then echo "FB_PAGE_ID=${{ secrets.FB_PAGE_ID }}" >> .env; fi
+          if [ ! -z "${{ secrets.FB_PAGE_ACCESS_TOKEN }}" ]; then echo "FB_PAGE_ACCESS_TOKEN=${{ secrets.FB_PAGE_ACCESS_TOKEN }}" >> .env; fi
+          if [ ! -z "${{ secrets.FB_GROUP_IDS }}" ]; then echo "FB_GROUP_IDS=${{ secrets.FB_GROUP_IDS }}" >> .env; fi
 
       - name: Setup YouTube Auth Files
-        # We restore the JSON files from GitHub Secrets
         env:
           CLIENT_SECRET_JSON: ${{ secrets.CLIENT_SECRET_JSON }}
           TOKEN_JSON: ${{ secrets.TOKEN_JSON }}
         run: python3 scripts/ci_setup_youtube_auth.py
 
       - name: Setup YouTube Analytics Token
-        # Restore separate token for YouTube Analytics API (yt-analytics.readonly scope)
         if: ${{ secrets.YOUTUBE_ANALYTICS_TOKEN_JSON != '' }}
         env:
           YOUTUBE_ANALYTICS_TOKEN_JSON: ${{ secrets.YOUTUBE_ANALYTICS_TOKEN_JSON }}
         run: python3 scripts/ci_setup_analytics_token.py
-           
+
       - name: Setup Kaggle Credentials
         env:
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
         run: python3 scripts/ci_setup_kaggle.py
-           
+
       - name: Run Pipeline (Kaggle GPU Priority)
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -217,33 +160,26 @@ jobs:
           FAL_KEY: ${{ secrets.FAL_KEY }}
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
-          ORT_LOG_LEVEL: ERROR  # Suppress harmless ONNX Runtime PCI bus warnings
+          ORT_LOG_LEVEL: ERROR
           CI_LITE: "1"
         run: |
           DRY_RUN_FLAG=""
-          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
-            DRY_RUN_FLAG="--dry-run"
-          fi
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then DRY_RUN_FLAG="--dry-run"; fi
           TOPIC_TYPE="${{ github.event.inputs.topic_type }}"
-          if [ -z "$TOPIC_TYPE" ]; then
-            TOPIC_TYPE="auto"
-          fi
+          if [ -z "$TOPIC_TYPE" ]; then TOPIC_TYPE="auto"; fi
           python -u main.py --now --type "$TOPIC_TYPE" $DRY_RUN_FLAG
-           
+
       - name: Platform-Native Optimization & A/B Test Setup
         if: always()
         run: |
           echo "🔧 Running platform-native optimization..."
-          # 1. A/B test metadata
           if [ -d "output" ]; then
             find output -name "*_abtest.json" -type f | head -20 | while read f; do
               echo "📊 Found A/B test metadata: $f"
               cat "$f" | jq . 2>/dev/null || cat "$f"
             done
           fi
-          # 2. Platform optimization (using repo script)
           python3 scripts/platform_optimization.py
-          # 3. Quality validation (using repo script)
           python3 scripts/validate_thumbnails.py
 
       - name: Upload Optimization Artifacts
@@ -255,7 +191,7 @@ jobs:
             output/*_abtest.json
             output/platform_optimization_report.json
           retention-days: 30
-           
+
       - name: Analytics Sync & Health Check
         if: always()
         env:
@@ -264,15 +200,12 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python3 scripts/ci_analytics_check.py
-           
+
       - name: Commit Updated Tracking File & Logs
-        # Always run this step to save the log, preventing duplicate topics tomorrow
         if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-           
-          # 1. Pull latest changes first using rebase and autostash
           if ! git pull origin main --rebase --autostash; then
             echo "⚠️ Rebase pull failed. Checking for merge conflicts..."
             if [ -n "$(git diff --name-only --diff-filter=U)" ]; then
@@ -283,45 +216,27 @@ jobs:
               echo "Pull failed for other reasons, proceeding..."
             fi
           fi
-           
-          # 2. Add tracking files and technical logs (force add since logs/ is gitignored)
           for f in news_log.json facts_log.json layout_tracker.json series_tracker.json .topic_index.json; do
-            if [ -f "$f" ]; then
-              git add "$f"
-            fi
+            if [ -f "$f" ]; then git add "$f"; fi
           done
           if [ -d "logs" ]; then
             git add -f logs/*.txt 2>/dev/null || true
             git add -f logs/*.json 2>/dev/null || true
           fi
-           
-          # Safety check: Ensure no conflict markers exist in news_log.json or facts_log.json
           if grep -q "^<<<<<<<" news_log.json facts_log.json 2>/dev/null; then
             echo "❌ Conflict markers found in news_log.json or facts_log.json. Aborting commit."
             exit 1
           fi
-           
-          # Only commit if there are actual changes
           if ! git diff --cached --quiet; then
             git commit -m "[Bot] Auto-update news tracker logs"
-             
-            # Retry push up to 5 times for robustness against concurrent runs
             for i in {1..5}; do
               echo "Attempt $i to push changes..."
-              if git push origin main; then
-                echo "✅ Successfully pushed logs."
-                exit 0
-              fi
+              if git push origin main; then echo "✅ Successfully pushed logs."; exit 0; fi
               echo "⚠️ Push failed, syncing and retrying..."
               sleep 10
-              if ! git pull origin main --rebase; then
-                echo "⚠️ Sync failed, aborting rebase if active..."
-                git rebase --abort || echo "Rebase abort failed"
-                exit 1
-              fi
+              if ! git pull origin main --rebase; then echo "⚠️ Sync failed, aborting rebase..."; git rebase --abort || true; exit 1; fi
             done
             echo "❌ Failed to push logs after 5 attempts."
-            # We don't exit 1 here to keep the overall job status "Success" if generation worked
           else
             echo "✅ No changes to logs detected."
           fi
@@ -336,10 +251,7 @@ jobs:
             RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             MSG="❌ *Daily Shorts Pipeline Failed*\nRun: ${RUN_URL}\nCommit: ${{ github.sha }}\nCheck the workflow logs for details."
             curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-              -d chat_id="${TELEGRAM_CHAT_ID}" \
-              -d text="${MSG}" \
-              -d parse_mode="Markdown" \
-              -d disable_web_page_preview=true
+              -d chat_id="${TELEGRAM_CHAT_ID}" -d text="${MSG}" -d parse_mode="Markdown" -d disable_web_page_preview=true
             echo "📱 Failure notification sent to Telegram"
           else
             echo "⚠️ Telegram credentials not configured, skipping failure notification"
