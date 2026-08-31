@@ -7,8 +7,7 @@ from config import YOUTUBE_CLIENT_SECRET_FILE
 
 SCOPES = [
     "https://www.googleapis.com/auth/youtube.upload",
-    "https://www.googleapis.com/auth/youtube.force-ssl",  # required for comments
-    "https://www.googleapis.com/auth/youtubepartner",  # required for playlists/end screens
+    "https://www.googleapis.com/auth/youtube.force-ssl",  # required for comments, playlists, end screens
 ]
 
 # ── PLAYLIST MAPPING: Category/Series → Playlist ID ──
