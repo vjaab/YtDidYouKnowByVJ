@@ -212,6 +212,7 @@ class ScriptData(BaseModel):
     # Screenshot paths
     screenshot_path: Optional[str] = None
     evidence_screenshot_path: Optional[str] = None
+    is_github_readme: Optional[bool] = None
     
     # Output
     output_suffix: Optional[str] = None

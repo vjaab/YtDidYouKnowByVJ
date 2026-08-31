@@ -383,3 +383,61 @@ def capture_article_screenshot(url, output_filename, desktop=False, headline=Non
         
     return None
 
+
+def is_github_repo_url(url):
+    """Check if URL is a GitHub repository URL."""
+    if not url:
+        return False
+    import re
+    # Match github.com/owner/repo pattern (anywhere in URL)
+    pattern = r'github\.com/([^/]+)/([^/?#]+)'
+    return bool(re.search(pattern, url))
+
+
+def get_github_readme_url(repo_url, branch="main"):
+    """Convert GitHub repo URL to README URL for a specific branch."""
+    import re
+    match = re.match(r'(https?://github\.com/([^/]+)/([^/?#]+))', repo_url)
+    if not match:
+        return None
+    base_url = match.group(1)
+    return f"{base_url}/blob/{branch}/README.md"
+
+
+def capture_github_readme(repo_url, output_filename, desktop=False, headline=None, branch="main"):
+    """
+    Captures a screenshot of the GitHub README page.
+    
+    Args:
+        repo_url: GitHub repository URL (e.g., https://github.com/owner/repo)
+        output_filename: Filename to save the screenshot as.
+        desktop: If True, use desktop viewport (1920x1080) for 16:9 longform videos.
+                 If False (default), use mobile viewport (1080x1920) for 9:16 Shorts.
+        headline: Optional text headline to draw on fallback card.
+        branch: Branch to read README from (default: main, fallback: master)
+    
+    Returns:
+        Screenshot path or None if failed.
+    """
+    readme_url = get_github_readme_url(repo_url, branch)
+    if not readme_url:
+        print(f"⚠️ Invalid GitHub repo URL for README capture: {repo_url}")
+        return None
+    
+    print(f"📸 Capturing GitHub README screenshot: {readme_url} -> {output_filename}")
+    return capture_article_screenshot(readme_url, output_filename, desktop=desktop, headline=headline)
+
+
+def capture_github_readme_with_fallback(repo_url, output_filename, desktop=False, headline=None):
+    """
+    Captures GitHub README with branch fallback (main -> master).
+    """
+    # Try main branch first
+    result = capture_github_readme(repo_url, output_filename, desktop=desktop, headline=headline, branch="main")
+    if result:
+        return result
+    
+    # Fallback to master branch
+    print(f"🔄 README not found on 'main' branch, trying 'master'...")
+    result = capture_github_readme(repo_url, output_filename, desktop=desktop, headline=headline, branch="master")
+    return result

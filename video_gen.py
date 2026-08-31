@@ -5166,9 +5166,14 @@ def _longform_topic_transition_clips(script_json, audio_duration):
             
     return clips
 
-def _evidence_screenshot_clip(evidence_path, duration):
+def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False):
     """
     Shows a secondary 'Evidence' or 'Use Case' screenshot during the analytical section.
+    
+    Args:
+        evidence_path: Path to the evidence screenshot
+        duration: Total audio/video duration
+        is_github_readme: If True, extends duration to 12s for GitHub README readability
     """
     if not evidence_path or not os.path.exists(evidence_path):
         return []
@@ -5183,7 +5188,9 @@ def _evidence_screenshot_clip(evidence_path, duration):
         arr_mask = (arr_rgba[:, :, 3] / 255.0).astype(float)
         
         start = 28.0 
-        dur = min(6.0, duration - start - 5.0)
+        # Extend duration for GitHub README (12s max) vs regular evidence (6s max)
+        max_dur = 12.0 if is_github_readme else 6.0
+        dur = min(max_dur, duration - start - 5.0)
         
         if dur > 1.0:
             clip = ImageClip(arr_rgb, duration=dur)
@@ -8420,6 +8427,16 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         topic_transition_clips = _longform_topic_transition_clips(script_json, audio_duration)
         
     base_layers = bg_layer_clips + burst_clips + ([particle_layer] if particle_layer else []) + screenshot_clips + topic_transition_clips + infographic_clips + settings_mockup_clips
+    
+    # Add evidence screenshot clip (GitHub README or secondary evidence)
+    evidence_screenshot_path = script_json.get("evidence_screenshot_path")
+    is_github_readme = script_json.get("is_github_readme", False)
+    if evidence_screenshot_path and os.path.exists(evidence_screenshot_path):
+        evidence_clips = _evidence_screenshot_clip(evidence_screenshot_path, audio_duration, is_github_readme=is_github_readme)
+        base_layers.extend(evidence_clips)
+        if evidence_clips:
+            log_type = "GitHub README" if is_github_readme else "Evidence"
+            print(f"   📸 {log_type} screenshot clip added ({evidence_clips[0].duration:.1f}s)")
     
     # Add overlays
     base_layers.append(gradient)

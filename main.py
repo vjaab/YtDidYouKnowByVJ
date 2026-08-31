@@ -24,7 +24,7 @@ from chunk_builder import build_chunks, redistribute_to_audio_duration
 from pexels_fetcher import fetch_all_chunk_visuals, generate_visual_style_guide
 from nano_scene_gen import generate_nano_scene_visuals
 from video_gen import create_video
-from screenshot_gen import capture_article_screenshot
+from screenshot_gen import capture_article_screenshot, is_github_repo_url, capture_github_readme_with_fallback
 from thumbnail_gen import generate_thumbnail
 from youtube_upload import upload_video
 from x_upload import upload_video_to_x
@@ -615,6 +615,24 @@ def run_pipeline(topic_type="auto", dry_run=False):
                 script_data["screenshot_path"] = screenshot_path
                 log_message(f"✅ Main screenshot captured: {screenshot_path}")
                 screenshot_captured = True
+                
+                # ── Auto-capture GitHub README for GitHub repo topics ──
+                news_url = script_data.get("original_news_url", "")
+                if is_github_repo_url(news_url):
+                    log_message("🐙 GitHub repo detected — capturing README as evidence screenshot...")
+                    evidence_filename = f"evidence_readme_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+                    evidence_path = capture_github_readme_with_fallback(
+                        news_url,
+                        evidence_filename,
+                        headline=script_data.get("title")
+                    )
+                    if evidence_path:
+                        script_data["evidence_screenshot_path"] = evidence_path
+                        script_data["use_case_evidence_url"] = f"{news_url}/blob/main/README.md"
+                        script_data["is_github_readme"] = True
+                        log_message(f"✅ GitHub README captured: {evidence_path}")
+                    else:
+                        log_message("⚠️ GitHub README capture failed (no README on main/master branch)")
         
         if not screenshot_captured:
             # Screenshot is MANDATORY — reject this topic and try another
@@ -633,19 +651,23 @@ def run_pipeline(topic_type="auto", dry_run=False):
             continue
 
         # ── STEP 3c: Capture Evidence Screenshot (optional) ──────────────────
-        evidence_url = script_data.get("use_case_evidence_url")
-        if evidence_url and "http" in evidence_url:
-            evidence_filename = f"evidence_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-            evidence_path = capture_article_screenshot(
-                evidence_url, 
-                evidence_filename, 
-                headline=script_data.get("title")
-            )
-            if evidence_path:
-                script_data["evidence_screenshot_path"] = evidence_path
-                log_message(f"Evidence screenshot captured: {evidence_path}")
+        # Skip if we already captured a GitHub README
+        if script_data.get("is_github_readme"):
+            log_message("ℹ️ GitHub README already captured as evidence — skipping secondary screenshot")
         else:
-            log_message("No valid evidence URL found for secondary screenshot.")
+            evidence_url = script_data.get("use_case_evidence_url")
+            if evidence_url and "http" in evidence_url:
+                evidence_filename = f"evidence_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+                evidence_path = capture_article_screenshot(
+                    evidence_url, 
+                    evidence_filename, 
+                    headline=script_data.get("title")
+                )
+                if evidence_path:
+                    script_data["evidence_screenshot_path"] = evidence_path
+                    log_message(f"Evidence screenshot captured: {evidence_path}")
+            else:
+                log_message("No valid evidence URL found for secondary screenshot.")
 
         # ── STEP 3d: Fetch and Validate Entity Tags (MANDATORY for Shorts) ──
         is_longform = "Slot C" in slot
