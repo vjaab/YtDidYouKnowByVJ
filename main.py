@@ -11,6 +11,7 @@ import glob
 import hashlib
 import random
 import traceback
+import json
 from datetime import datetime
 
 from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY, ENABLE_TRENDING_ENGINE

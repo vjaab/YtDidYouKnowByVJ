@@ -213,7 +213,10 @@ def upload_video_to_github_releases(video_path):
                 timeout=120,
             )
         asset_resp.raise_for_status()
-        public_url = asset_resp.json()["browser_download_url"]
+        asset_data = asset_resp.json()
+        if not isinstance(asset_data, dict) or "browser_download_url" not in asset_data:
+            raise RuntimeError(f"Unexpected GitHub asset response: {asset_data}")
+        public_url = asset_data["browser_download_url"]
 
         print(f"⏳ Waiting for GitHub CDN propagation...")
         time.sleep(10)
@@ -297,7 +300,10 @@ def create_threads_container(video_url: str, caption: str, reply_to_id: str = No
         timeout=30,
     )
     resp.raise_for_status()
-    return resp.json()["id"]
+    result = resp.json()
+    if not isinstance(result, dict) or "id" not in result:
+        raise RuntimeError(f"Unexpected response from create_threads_container: {result}")
+    return result["id"]
 
 
 def create_threads_reply(post_id: str, reply_text: str) -> str:
@@ -323,7 +329,10 @@ def create_threads_reply(post_id: str, reply_text: str) -> str:
         timeout=30,
     )
     resp.raise_for_status()
-    return resp.json()["id"]
+    result = resp.json()
+    if not isinstance(result, dict) or "id" not in result:
+        raise RuntimeError(f"Unexpected response from create_threads_reply: {result}")
+    return result["id"]
 
 
 def wait_for_container(container_id: str, timeout_s: int = 300, poll_every_s: int = 5) -> None:
@@ -359,7 +368,10 @@ def publish_container(container_id: str) -> str:
         timeout=30,
     )
     resp.raise_for_status()
-    return resp.json()["id"]
+    result = resp.json()
+    if not isinstance(result, dict) or "id" not in result:
+        raise RuntimeError(f"Unexpected response from publish_container: {result}")
+    return result["id"]
 
 
 def upload_video_to_threads(video_path: str, caption: str, source_url: str = None):

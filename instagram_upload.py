@@ -283,7 +283,10 @@ def upload_video_to_github_releases(video_path):
                 timeout=120,
             )
         asset_resp.raise_for_status()
-        public_url = asset_resp.json()["browser_download_url"]
+        asset_data = asset_resp.json()
+        if not isinstance(asset_data, dict) or "browser_download_url" not in asset_data:
+            raise RuntimeError(f"Unexpected GitHub asset response: {asset_data}")
+        public_url = asset_data["browser_download_url"]
 
         # Let CDN edge catch up before Graph API tries to fetch (increased for video)
         print(f"⏳ Waiting for GitHub CDN propagation...")
@@ -365,7 +368,10 @@ def create_reels_container(video_url: str, caption: str, share_to_feed: bool = T
         timeout=30,
     )
     resp.raise_for_status()
-    return resp.json()["id"]
+    data = resp.json()
+    if not isinstance(data, dict) or "id" not in data:
+        raise RuntimeError(f"Unexpected response from create_reels_container: {data}")
+    return data["id"]
 
 
 def wait_for_container(container_id: str, timeout_s: int = 300, poll_every_s: int = 5) -> None:
@@ -379,7 +385,10 @@ def wait_for_container(container_id: str, timeout_s: int = 300, poll_every_s: in
             timeout=30,
         )
         resp.raise_for_status()
-        status = resp.json()["status_code"]
+        data = resp.json()
+        if not isinstance(data, dict) or "status_code" not in data:
+            raise RuntimeError(f"Unexpected response from wait_for_container: {data}")
+        status = data["status_code"]
         if status == "FINISHED":
             return
         if status == "ERROR":
@@ -399,7 +408,10 @@ def publish_container(container_id: str) -> str:
         timeout=30,
     )
     resp.raise_for_status()
-    return resp.json()["id"]
+    data = resp.json()
+    if not isinstance(data, dict) or "id" not in data:
+        raise RuntimeError(f"Unexpected response from publish_container: {data}")
+    return data["id"]
 
 
 def upload_reel_to_instagram(video_path: str, caption: str):
