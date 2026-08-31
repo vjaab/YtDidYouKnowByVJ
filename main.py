@@ -276,13 +276,16 @@ def format_instagram_caption(description, hashtags, youtube_url, script_data=Non
     if script_data and script_data.get("location"):
         location_tag = f"\n📍 {script_data['location']}"
     
+    # Handle None youtube_url
+    yt_link = youtube_url if youtube_url else "YouTube upload pending — check channel"
+    
     # Build Instagram-native caption with optimized first 125 chars
     # First line: Hook (truncated) + immediate CTA
     ig_caption = f"""🔥 {short_hook} {first_cta}
 
 {description[:1200]}{location_tag}
 
-👇 Full breakdown on YouTube: {youtube_url}
+👇 Full breakdown on YouTube: {yt_link}
 
 📲 Join the community:
 • Telegram → https://t.me/technewsbyvj
@@ -359,10 +362,13 @@ def get_facebook_first_comment(youtube_url, hashtags=None, script_data=None):
         clean_hook = hook.rstrip(".!?")
         question = f"💬 What do you think about {clean_hook}? Would you use this?"
         
+    # Handle None youtube_url
+    yt_link = youtube_url if youtube_url else "YouTube upload pending — check channel"
+    
     comment = f"""{question}
 
 🔗 Watch the full video breakdown on YouTube:
-{youtube_url}
+{yt_link}
 
 #TechCommunity #AIDevelopment #TechNews"""
     return comment.strip()
@@ -389,12 +395,15 @@ def format_telegram_caption(title, description, hashtags, youtube_url, script_da
     source_url = script_data.get("original_news_url", "") if script_data else ""
     source_line = f'\n📰 <a href="{source_url}">Source Article</a>' if source_url else ""
     
+    # Handle None youtube_url
+    yt_link = youtube_url if youtube_url else "YouTube upload pending — check channel"
+    
     tg_caption = f"""🔥 <b>{hook}</b>
 
 {desc_snippet}
 {source_line}
 
-🎥 <a href="{youtube_url}">Watch on YouTube</a>
+🎥 <a href="{yt_link}">Watch on YouTube</a>
 
 📲 <a href="https://t.me/technewsbyvj">Telegram</a> | <a href="https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z">WhatsApp</a>
 
@@ -429,13 +438,16 @@ def format_threads_caption(title, description, hashtags, youtube_url, script_dat
     source_url = script_data.get("original_news_url", "") if script_data else ""
     source_line = f"\n\n📰 Source: {source_url}" if source_url else ""
     
+    # Handle None youtube_url
+    yt_link = youtube_url if youtube_url else "YouTube upload pending — check channel"
+    
     threads_caption = f"""Thread 🧵
 
 🔥 {hook}
 
 💡 {value}{question}
 
-🎥 Full breakdown: {youtube_url}{source_line}
+🎥 Full breakdown: {yt_link}{source_line}
 
 {hashtag_str}"""
     
@@ -1112,11 +1124,11 @@ def run_pipeline(topic_type="auto", dry_run=False):
         )
 
     if not uploaded:
-        log_message(f"ERROR: YouTube upload failed: {result}")
-        return False
-
-    youtube_url = f"https://youtu.be/{result}"
-    log_message(f"SUCCESS: {youtube_url}")
+        log_message(f"WARNING: YouTube upload failed: {result} — continuing with other platforms")
+        youtube_url = None
+    else:
+        youtube_url = f"https://youtu.be/{result}"
+        log_message(f"SUCCESS: {youtube_url}")
     
     # Record hook pattern info for analytics tracking
     try:
@@ -1165,7 +1177,8 @@ def run_pipeline(topic_type="auto", dry_run=False):
     # ── STEP 10c: X.com Auto-Post ─────────────────────────────────────────────
     log_message("STEP 10c: Auto-posting Short to X.com...")
     try:
-        x_post_text = f"🔥 {title}\n\nFull breakdown: {youtube_url}\n\n" + " ".join(hashtags)
+        yt_link = youtube_url if youtube_url else "YouTube upload pending — check channel"
+        x_post_text = f"🔥 {title}\n\nFull breakdown: {yt_link}\n\n" + " ".join(hashtags)
         if dry_run:
             print("🧪 [DRY RUN] Simulating X.com auto-post...")
             x_uploaded, x_result = True, "MOCK_TWEET_ID"
