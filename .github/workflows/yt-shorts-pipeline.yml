@@ -2,28 +2,13 @@ name: Daily Tech News Shorts Pipeline
 
 on:
   schedule:
-    # ── DAY-SPECIFIC SCHEDULE (IST → UTC conversion) ──
-    # Monday: 9:00 AM, 7:30 PM IST → 03:30, 14:00 UTC
-    - cron: '30 3 * * 1'   # Mon 9:00 AM IST
-    - cron: '0 14 * * 1'   # Mon 7:30 PM IST
-    # Tuesday: 8:00 AM, 8:00 PM IST → 02:30, 14:30 UTC
-    - cron: '30 2 * * 2'   # Tue 8:00 AM IST
-    - cron: '30 14 * * 2'  # Tue 8:00 PM IST
-    # Wednesday: 8:00 AM, 8:00 PM IST → 02:30, 14:30 UTC
-    - cron: '30 2 * * 3'   # Wed 8:00 AM IST
-    - cron: '30 14 * * 3'  # Wed 8:00 PM IST
-    # Thursday: 10:00 AM, 8:00 PM IST → 04:30, 14:30 UTC
-    - cron: '30 4 * * 4'   # Thu 10:00 AM IST
-    - cron: '30 14 * * 4'  # Thu 8:00 PM IST
-    # Friday: 9:00 AM, 8:00 PM IST → 03:30, 14:30 UTC
-    - cron: '30 3 * * 5'   # Fri 9:00 AM IST
-    - cron: '30 14 * * 5'  # Fri 8:00 PM IST
-    # Saturday: 11:00 AM, 8:00 PM IST → 05:30, 14:30 UTC
-    - cron: '30 5 * * 6'   # Sat 11:00 AM IST
-    - cron: '30 14 * * 6'  # Sat 8:00 PM IST
-    # Sunday: 11:00 AM, 7:30 PM IST → 05:30, 14:00 UTC
-    - cron: '30 5 * * 0'   # Sun 11:00 AM IST
-    - cron: '0 14 * * 0'   # Sun 7:30 PM IST
+    # ── AUDIENCE-OPTIMIZED SCHEDULE (EST → UTC conversion, UTC-5) ──
+    # Weekdays (Mon-Fri): 11 AM & 7 PM EST → 16:00 & 00:00 UTC
+    - cron: '0 16 * * 1-5'  # Mon-Fri 11:00 AM EST
+    - cron: '0 0 * * 2-6'   # Tue-Sat 12:00 AM UTC (Mon-Fri 7:00 PM EST)
+    # Weekends (Sat-Sun): 10 AM & 3 PM EST → 15:00 & 20:00 UTC
+    - cron: '0 15 * * 6,0'  # Sat-Sun 10:00 AM EST
+    - cron: '0 20 * * 6,0'  # Sat-Sun 3:00 PM EST
   workflow_dispatch: # Allows manual trigger from GitHub Actions UI
 
 jobs:
