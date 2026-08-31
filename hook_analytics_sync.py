@@ -55,12 +55,16 @@ def get_youtube_analytics_service():
                 print(f"❌ Credentials file not found: {CREDENTIALS_FILE}")
                 print("   Download from Google Cloud Console > APIs & Services > Credentials")
                 return None
+            if os.getenv("CI") or os.getenv("GITHUB_ACTIONS"):
+                print("❌ YouTube Analytics token missing or invalid in CI environment. Run locally to authenticate.")
+                return None
             flow = InstalledAppFlow.from_client_secrets_file(str(CREDENTIALS_FILE), SCOPES)
             # Use fixed port matching authorized redirect URI in Google Cloud Console
             creds = flow.run_local_server(port=54630)
         
-        with open(TOKEN_FILE, "w") as token:
-            token.write(creds.to_json())
+        if creds:
+            with open(TOKEN_FILE, "w") as token:
+                token.write(creds.to_json())
     
     return creds
 

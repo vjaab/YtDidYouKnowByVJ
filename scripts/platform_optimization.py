@@ -39,6 +39,7 @@ report = {
     },
     'ab_test_status': 'pending_ctr_collection'
 }
+os.makedirs('output', exist_ok=True)
 with open('output/platform_optimization_report.json', 'w') as f:
     json.dump(report, f, indent=2)
 print('✅ Platform optimization report saved')

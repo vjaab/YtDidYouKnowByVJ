@@ -63,9 +63,10 @@ jobs:
       - name: Install System Dependencies
         # ffmpeg is needed by moviepy for video rendering
         # MuseTalk requires libglib2.0-0 libsm6 libxext6 libxrender1 for OpenCV
+        # jq is used for parsing A/B test metadata JSON
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg fonts-roboto libglib2.0-0 libsm6 libxext6 libxrender1 espeak-ng wget
+          sudo apt-get install -y ffmpeg fonts-roboto libglib2.0-0 libsm6 libxext6 libxrender1 espeak-ng wget jq
            
       - name: Verify FFmpeg Installation
         run: ffmpeg -version
@@ -188,23 +189,61 @@ jobs:
           if [ ! -z "${{ secrets.FB_GROUP_IDS }}" ]; then
             echo "FB_GROUP_IDS=${{ secrets.FB_GROUP_IDS }}" >> .env
           fi
-           
+
       - name: Setup YouTube Auth Files
         # We restore the JSON files from GitHub Secrets
+        env:
+          CLIENT_SECRET_JSON: ${{ secrets.CLIENT_SECRET_JSON }}
+          TOKEN_JSON: ${{ secrets.TOKEN_JSON }}
         run: |
-          echo '${{ secrets.CLIENT_SECRET_JSON }}' > client_secret.json
-          echo '${{ secrets.TOKEN_JSON }}' > token.json
+          python3 -c "
+          import json, os
+          for filename, env_var in [('client_secret.json', 'CLIENT_SECRET_JSON'), ('token.json', 'TOKEN_JSON')]:
+              val = os.environ.get(env_var, '').strip()
+              if val:
+                  try:
+                      data = json.loads(val)
+                      if isinstance(data, str):
+                          data = json.loads(data)
+                      with open(filename, 'w') as f:
+                          json.dump(data, f, indent=2)
+                  except Exception:
+                      with open(filename, 'w') as f:
+                          f.write(val)
+          "
           
       - name: Setup YouTube Analytics Token
         # Restore separate token for YouTube Analytics API (yt-analytics.readonly scope)
         if: ${{ secrets.YOUTUBE_ANALYTICS_TOKEN_JSON != '' }}
+        env:
+          YOUTUBE_ANALYTICS_TOKEN_JSON: ${{ secrets.YOUTUBE_ANALYTICS_TOKEN_JSON }}
         run: |
-          echo '${{ secrets.YOUTUBE_ANALYTICS_TOKEN_JSON }}' > token_youtube_analytics.json
+          python3 -c "
+          import json, os
+          val = os.environ.get('YOUTUBE_ANALYTICS_TOKEN_JSON', '').strip()
+          if val:
+              try:
+                  data = json.loads(val)
+                  if isinstance(data, str):
+                      data = json.loads(data)
+                  with open('token_youtube_analytics.json', 'w') as f:
+                      json.dump(data, f, indent=2)
+              except Exception:
+                  with open('token_youtube_analytics.json', 'w') as f:
+                      f.write(val)
+          "
            
       - name: Setup Kaggle Credentials
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
         run: |
           mkdir -p ~/.kaggle
-          echo '{"username":"${{ secrets.KAGGLE_USERNAME }}","key":"${{ secrets.KAGGLE_KEY }}"}' > ~/.kaggle/kaggle.json
+          python3 -c "
+          import json, os
+          with open(os.path.expanduser('~/.kaggle/kaggle.json'), 'w') as f:
+              json.dump({'username': os.environ.get('KAGGLE_USERNAME', ''), 'key': os.environ.get('KAGGLE_KEY', '')}, f, indent=2)
+          "
           chmod 600 ~/.kaggle/kaggle.json
            
       - name: Run Pipeline (Kaggle GPU Priority)
@@ -222,7 +261,10 @@ jobs:
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
             DRY_RUN_FLAG="--dry-run"
           fi
-          TOPIC_TYPE="${{ github.event.inputs.topic_type || 'auto' }}"
+          TOPIC_TYPE="${{ github.event.inputs.topic_type }}"
+          if [ -z "$TOPIC_TYPE" ]; then
+            TOPIC_TYPE="auto"
+          fi
           python -u main.py --now --type "$TOPIC_TYPE" $DRY_RUN_FLAG
           
       - name: Platform-Native Optimization & A/B Test Setup
@@ -260,71 +302,73 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           echo "📊 Running Analytics Sync & Health Check..."
-          cat > /tmp/analytics_check.py << 'PYEOF'
+          python3 - << 'PYEOF'
           import sys
           sys.path.insert(0, '.')
-          from hook_analytics_sync import sync_hook_analytics_with_youtube
-          from hook_analytics import get_hook_analytics, print_analytics_summary
           import json
 
           # Sync with YouTube Analytics (last 7 days)
           print('🔄 Syncing hook analytics with YouTube...')
           try:
+              from hook_analytics_sync import sync_hook_analytics_with_youtube
               sync_hook_analytics_with_youtube(days_back=7)
           except Exception as e:
               print(f'⚠️ Analytics sync failed: {e}')
 
           # Check metrics against targets
           print('\n📈 Checking metrics against targets...')
-          analytics = get_hook_analytics()
+          try:
+              from hook_analytics import get_hook_analytics, print_analytics_summary
+              analytics = get_hook_analytics()
 
-          # Targets from strategy
-          TARGETS = {
-              'ctr': 0.05,           # >5% CTR
-              'retention': 0.50,     # >50% AVD
-              'engagement': 0.03,    # >3% engagement rate
-          }
+              # Targets from strategy
+              TARGETS = {
+                  'ctr': 0.05,           # >5% CTR
+                  'retention': 0.50,     # >50% AVD
+                  'engagement': 0.03,    # >3% engagement rate
+              }
 
-          alerts = []
-          for category, cat_data in analytics.get('categories', {}).items():
-              for pattern_id, pattern_data in cat_data.items():
-                  if pattern_id.startswith('_'):  # Skip metadata keys
-                      continue
-                  avg_retention = pattern_data.get('avg_retention', 0)
-                  avg_engagement = pattern_data.get('avg_engagement', 0)
-                  total_views = pattern_data.get('total_views', 0)
+              alerts = []
+              for category, cat_data in analytics.get('categories', {}).items():
+                  for pattern_id, pattern_data in cat_data.items():
+                      if pattern_id.startswith('_'):  # Skip metadata keys
+                          continue
+                      avg_retention = pattern_data.get('avg_retention', 0)
+                      avg_engagement = pattern_data.get('avg_engagement', 0)
+                      total_views = pattern_data.get('total_views', 0)
+                      
+                      if total_views > 10:  # Only alert if enough data
+                          if avg_retention < TARGETS['retention']:
+                              alerts.append(f'🔴 LOW RETENTION: {category}/{pattern_id} = {avg_retention:.1%} (target >{TARGETS["retention"]:.0%})')
+                          if avg_engagement < TARGETS['engagement']:
+                              alerts.append(f'🔴 LOW ENGAGEMENT: {category}/{pattern_id} = {avg_engagement:.1%} (target >{TARGETS["engagement"]:.0%})')
+
+              if alerts:
+                  print('\n⚠️ METRICS BELOW TARGET:')
+                  for alert in alerts:
+                      print(f'  {alert}')
                   
-                  if total_views > 10:  # Only alert if enough data
-                      if avg_retention < TARGETS['retention']:
-                          alerts.append(f'🔴 LOW RETENTION: {category}/{pattern_id} = {avg_retention:.1%} (target >{TARGETS["retention"]:.0%})')
-                      if avg_engagement < TARGETS['engagement']:
-                          alerts.append(f'🔴 LOW ENGAGEMENT: {category}/{pattern_id} = {avg_engagement:.1%} (target >{TARGETS["engagement"]:.0%})')
+                  # Send Telegram alert if configured
+                  import os
+                  bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
+                  chat_id = os.getenv('TELEGRAM_CHAT_ID')
+                  if bot_token and chat_id:
+                      import requests
+                      msg = '📊 *Analytics Alert - Metrics Below Target*\n\n' + '\n'.join(alerts[:10])
+                      try:
+                          requests.post(f'https://api.telegram.org/bot{bot_token}/sendMessage', 
+                                       json={'chat_id': chat_id, 'text': msg, 'parse_mode': 'Markdown'})
+                          print('📱 Telegram alert sent')
+                      except Exception as e:
+                          print(f'⚠️ Failed to send Telegram alert: {e}')
+              else:
+                  print('✅ All tracked metrics above target thresholds')
 
-          if alerts:
-              print('\n⚠️ METRICS BELOW TARGET:')
-              for alert in alerts:
-                  print(f'  {alert}')
-              
-              # Send Telegram alert if configured
-              import os
-              bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
-              chat_id = os.getenv('TELEGRAM_CHAT_ID')
-              if bot_token and chat_id:
-                  import requests
-                  msg = '📊 *Analytics Alert - Metrics Below Target*\n\n' + '\n'.join(alerts[:10])
-                  try:
-                      requests.post(f'https://api.telegram.org/bot{bot_token}/sendMessage', 
-                                   json={'chat_id': chat_id, 'text': msg, 'parse_mode': 'Markdown'})
-                      print('📱 Telegram alert sent')
-                  except Exception as e:
-                      print(f'⚠️ Failed to send Telegram alert: {e}')
-          else:
-              print('✅ All tracked metrics above target thresholds')
-
-          print('\n📋 Full analytics summary:')
-          print_analytics_summary()
+              print('\n📋 Full analytics summary:')
+              print_analytics_summary()
+          except Exception as e:
+              print(f'⚠️ Analytics summary check failed: {e}')
           PYEOF
-          python3 /tmp/analytics_check.py
 
       - name: Commit Updated Tracking File & Logs
         # Always run this step to save the log, preventing duplicate topics tomorrow
@@ -346,10 +390,14 @@ jobs:
           fi
            
           # 2. Add tracking files and technical logs (force add since logs/ is gitignored)
-          git add news_log.json facts_log.json layout_tracker.json series_tracker.json || echo "Root logs missing"
+          for f in news_log.json facts_log.json layout_tracker.json series_tracker.json .topic_index.json; do
+            if [ -f "$f" ]; then
+              git add "$f"
+            fi
+          done
           if [ -d "logs" ]; then
-            git add -f logs/*.txt 2>/dev/null || echo "No txt logs"
-            git add -f logs/*.json 2>/dev/null || echo "No json logs"
+            git add -f logs/*.txt 2>/dev/null || true
+            git add -f logs/*.json 2>/dev/null || true
           fi
            
           # Safety check: Ensure no conflict markers exist in news_log.json or facts_log.json

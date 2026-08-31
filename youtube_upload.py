@@ -226,13 +226,17 @@ def get_authenticated_service():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
+            if os.getenv("CI") or os.getenv("GITHUB_ACTIONS"):
+                print("❌ YouTube token missing, expired, or invalid in CI. Re-authenticate locally and update GitHub Secrets.")
+                return None
             flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(
                 YOUTUBE_CLIENT_SECRET_FILE, SCOPES
             )
             creds = flow.run_local_server(port=8080, prompt='consent')
             
-        with open(token_path, "w") as token:
-            token.write(creds.to_json())
+        if creds:
+            with open(token_path, "w") as token:
+                token.write(creds.to_json())
             
     try:
         youtube = googleapiclient.discovery.build("youtube", "v3", credentials=creds)
