@@ -139,9 +139,6 @@ jobs:
           echo '${{ secrets.CLIENT_SECRET_JSON }}' > client_secret.json
           echo '${{ secrets.TOKEN_JSON }}' > token.json
           
-      - name: Clear stale YouTube token (forces re-auth with new scopes)
-        run: rm -f token.json
-          
       - name: Setup Kaggle Credentials
         run: |
           mkdir -p ~/.kaggle
