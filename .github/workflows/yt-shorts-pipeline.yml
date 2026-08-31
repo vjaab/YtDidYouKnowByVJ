@@ -194,6 +194,12 @@ jobs:
         run: |
           echo '${{ secrets.CLIENT_SECRET_JSON }}' > client_secret.json
           echo '${{ secrets.TOKEN_JSON }}' > token.json
+          
+      - name: Setup YouTube Analytics Token
+        # Restore separate token for YouTube Analytics API (yt-analytics.readonly scope)
+        if: ${{ secrets.YOUTUBE_ANALYTICS_TOKEN_JSON != '' }}
+        run: |
+          echo '${{ secrets.YOUTUBE_ANALYTICS_TOKEN_JSON }}' > token_youtube_analytics.json
            
       - name: Setup Kaggle Credentials
         run: |
