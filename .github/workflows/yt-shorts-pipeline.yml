@@ -57,6 +57,8 @@ jobs:
           pip install "numpy<2.0"
           pip install "grpcio==1.62.2"
           pip install -r requirements.txt
+          # Ensure python-dotenv is available for config.py
+          pip install python-dotenv
           # Skip local MMLab stack to save disk space (offloaded to Kaggle)
           # Explicitly fix potential imageio recursion by forcing latest imageio-ffmpeg last
           pip install --upgrade imageio imageio-ffmpeg moviepy
