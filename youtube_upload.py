@@ -8,7 +8,140 @@ from config import YOUTUBE_CLIENT_SECRET_FILE
 SCOPES = [
     "https://www.googleapis.com/auth/youtube.upload",
     "https://www.googleapis.com/auth/youtube.force-ssl",  # required for comments
+    "https://www.googleapis.com/auth/youtubepartner",  # required for playlists/end screens
 ]
+
+# ── PLAYLIST MAPPING: Category/Series → Playlist ID ──
+# Create these playlists in YouTube Studio first, then add their IDs here
+# Format: "playlist_name": "PLAYLIST_ID"
+PLAYLIST_MAP = {
+    "AI & Tech Tools": os.getenv("PLAYLIST_AI_TOOLS", ""),
+    "Tech Gadgets & Inventions": os.getenv("PLAYLIST_GADGETS", ""),
+    "Finance & Tech Economy": os.getenv("PLAYLIST_FINANCE", ""),
+    "Facts & Trivia": os.getenv("PLAYLIST_FACTS", ""),
+    "Coding & Development Hacks": os.getenv("PLAYLIST_CODING", ""),
+    "Quiz & Trivia": os.getenv("PLAYLIST_QUIZ", ""),
+    "Interview Questions": os.getenv("PLAYLIST_INTERVIEW", ""),
+    "Programming Language Origins": os.getenv("PLAYLIST_LANG_ORIGINS", ""),
+    "Tech Company Founding Stories": os.getenv("PLAYLIST_FOUNDING", ""),
+    "Famous Bugs & Glitches": os.getenv("PLAYLIST_BUGS", ""),
+    "Agentic AI Facts": os.getenv("PLAYLIST_AGENTIC", ""),
+    # Series-specific playlists
+    "GitHub Gems": os.getenv("PLAYLIST_GITHUB_GEMS", ""),
+    "Free AI Alternatives": os.getenv("PLAYLIST_AI_ALTS", ""),
+    "Dev Productivity Hacks": os.getenv("PLAYLIST_DEV_HACKS", ""),
+    "GitHub Repo You Should Know": os.getenv("PLAYLIST_GITHUB_REPO", ""),
+    "AI Fact of the Day": os.getenv("PLAYLIST_AI_FACTS", ""),
+    "Interview Question of the Day": os.getenv("PLAYLIST_INTERVIEW_Q", ""),
+    "Famous Bugs & Glitches Series": os.getenv("PLAYLIST_BUG_HUNTER", ""),
+    "Tech Founding Stories": os.getenv("PLAYLIST_FOUNDING_STORIES", ""),
+}
+
+def get_playlist_id_for_content(category, series_name=""):
+    """Returns the appropriate playlist ID for the given category/series."""
+    # Priority: series-specific playlist > category playlist
+    if series_name and series_name in PLAYLIST_MAP and PLAYLIST_MAP[series_name]:
+        return PLAYLIST_MAP[series_name]
+    if category in PLAYLIST_MAP and PLAYLIST_MAP[category]:
+        return PLAYLIST_MAP[category]
+    return None
+
+def add_video_to_playlist(youtube, video_id, playlist_id):
+    """Adds a video to a playlist. Creates the playlist item."""
+    if not playlist_id:
+        return None
+    try:
+        request = youtube.playlistItems().insert(
+            part="snippet",
+            body={
+                "snippet": {
+                    "playlistId": playlist_id,
+                    "resourceId": {
+                        "kind": "youtube#video",
+                        "videoId": video_id
+                    }
+                }
+            }
+        )
+        response = request.execute()
+        print(f"✅ Added video to playlist: {playlist_id}")
+        return response
+    except googleapiclient.errors.HttpError as e:
+        if e.resp.status == 404:
+            print(f"⚠️ Playlist not found: {playlist_id} (create it in YouTube Studio)")
+        else:
+            print(f"⚠️ Failed to add to playlist: {e}")
+        return None
+
+def add_end_screen(youtube, video_id, next_video_id=None, playlist_id=None, subscribe=True):
+    """Adds end screen elements to the video."""
+    if not next_video_id and not playlist_id and not subscribe:
+        return None
+    
+    end_screen_elements = []
+    
+    # Subscribe button (always recommended)
+    if subscribe:
+        end_screen_elements.append({
+            "type": "subscribe",
+            "videoId": video_id,  # Not used for subscribe, but required
+        })
+    
+    # Next video in series
+    if next_video_id:
+        end_screen_elements.append({
+            "type": "video",
+            "videoId": next_video_id,
+            "recentUpload": False,
+        })
+    
+    # Playlist link
+    if playlist_id:
+        end_screen_elements.append({
+            "type": "playlist",
+            "playlistId": playlist_id,
+        })
+    
+    if not end_screen_elements:
+        return None
+    
+    try:
+        request = youtube.videos().update(
+            part="endScreen",
+            body={
+                "id": video_id,
+                "endScreen": {
+                    "elements": end_screen_elements
+                }
+            }
+        )
+        response = request.execute()
+        print(f"✅ End screen added to video: {video_id}")
+        return response
+    except googleapiclient.errors.HttpError as e:
+        print(f"⚠️ End screen failed: {e}")
+        return None
+
+def get_latest_video_in_series(youtube, channel_id, series_keywords):
+    """Finds the most recent video in the same series for end screen linking."""
+    try:
+        request = youtube.search().list(
+            part="snippet",
+            channelId=channel_id,
+            maxResults=5,
+            order="date",
+            type="video",
+            q=" ".join(series_keywords)
+        )
+        response = request.execute()
+        for item in response.get("items", []):
+            video_id = item["id"]["videoId"]
+            title = item["snippet"]["title"]
+            if any(kw.lower() in title.lower() for kw in series_keywords):
+                return video_id
+    except Exception as e:
+        print(f"⚠️ Could not find previous video in series: {e}")
+    return None
 
 # ── YPP COMPLIANCE: Rotating pinned comment templates ──
 # Prevents identical metadata fingerprint across uploads
@@ -169,10 +302,36 @@ def upload_video(video_path, title, description, tags, thumbnail_path=None, cate
             except Exception as e:
                 print(f"Thumbnail upload failed (non-fatal): {e}")
 
-        # Step 3: Post + pin comment immediately (rotated template for YPP compliance)
+        # Step 3: Add to Playlist
+        playlist_id = None
+        series_name = ""
+        if script_data:
+            category = script_data.get("sub_category", "")
+            series_name = script_data.get("series_name", "")
+            playlist_id = get_playlist_id_for_content(category, series_name)
+            if playlist_id:
+                try:
+                    add_video_to_playlist(youtube, video_id, playlist_id)
+                except Exception as e:
+                    print(f"Playlist add failed (non-fatal): {e}")
+
+        # Step 4: Add End Screen (link to next video in series + playlist)
+        try:
+            channel_id = get_channel_id(youtube)
+            next_video_id = None
+            if series_name:
+                series_keywords = [series_name.lower().replace(" ", ""), "vj", "tech"]
+                next_video_id = get_latest_video_in_series(youtube, channel_id, series_keywords)
+            if next_video_id or playlist_id:
+                add_end_screen(youtube, video_id, next_video_id=next_video_id, playlist_id=playlist_id)
+        except Exception as e:
+            print(f"End screen failed (non-fatal): {e}")
+
+        # Step 5: Post + pin comment with playlist link (rotated template for YPP compliance)
         try:
             pinned_text = _get_pinned_comment(title)
-            full_comment = f"{title}\n\n{comment_hook}\n\n{pinned_text}" if comment_hook else pinned_text
+            playlist_link = f"\n\n📺 Full playlist: https://youtube.com/playlist?list={playlist_id}" if playlist_id else ""
+            full_comment = f"{title}\n\n{comment_hook}\n\n{pinned_text}{playlist_link}" if comment_hook else f"{pinned_text}{playlist_link}"
             post_and_pin_comment(youtube, video_id, full_comment)
         except Exception as e:
             print(f"Pinned comment failed (non-fatal): {e}")
@@ -181,6 +340,18 @@ def upload_video(video_path, title, description, tags, thumbnail_path=None, cate
     except googleapiclient.errors.HttpError as e:
         print(f"YouTube upload error {e.resp.status}: {e.content}")
         return False, str(e)
+
+
+def get_channel_id(youtube):
+    """Gets the authenticated user's channel ID."""
+    try:
+        request = youtube.channels().list(part="id", mine=True)
+        response = request.execute()
+        if response.get("items"):
+            return response["items"][0]["id"]
+    except Exception as e:
+        print(f"⚠️ Could not get channel ID: {e}")
+    return None
 
 
 def post_and_pin_comment(youtube, video_id, comment_text):

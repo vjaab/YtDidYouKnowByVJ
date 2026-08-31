@@ -1667,6 +1667,8 @@ This perspective MUST shape your hook, analysis, and solution framing. Do NOT ju
     script_data = engine.execute(selection_instruction, prompt_requirements)
     
     if script_data:
+        script_data["series_name"] = series_name
+        script_data["series_episode"] = series_episode
         # ── Post-generation sanitization: strip LLM artifacts from script text ──
         if script_data.get("script"):
             from audio_gen import sanitize_script_for_tts
