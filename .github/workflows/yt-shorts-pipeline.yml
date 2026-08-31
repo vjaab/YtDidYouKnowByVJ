@@ -9,7 +9,28 @@ on:
     # Weekends (Sat-Sun): 10 AM & 3 PM EST → 15:00 & 20:00 UTC
     - cron: '0 15 * * 6,0'  # Sat-Sun 10:00 AM EST
     - cron: '0 20 * * 6,0'  # Sat-Sun 3:00 PM EST
-  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Run in dry-run mode (no uploads)'
+        type: boolean
+        default: false
+      topic_type:
+        description: 'Topic type to generate'
+        type: choice
+        options:
+          - auto
+          - research
+          - tools
+          - news
+          - tech_trends
+          - vaibhav
+          - interview_questions
+        default: auto
+
+concurrency:
+  group: yt-shorts-pipeline
+  cancel-in-progress: false
 
 jobs:
   run-pipeline:
@@ -19,11 +40,11 @@ jobs:
       contents: write  # Required for GITHUB_TOKEN to create releases (Instagram video hosting)
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-    
+     
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        
+         
       - name: Free Disk Space
         run: |
           sudo rm -rf /usr/share/dotnet
@@ -32,25 +53,24 @@ jobs:
           sudo rm -rf "/usr/local/share/boost"
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
           df -h
-        
+         
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11' 
           cache: 'pip'
-          
+           
       - name: Install System Dependencies
         # ffmpeg is needed by moviepy for video rendering
         # MuseTalk requires libglib2.0-0 libsm6 libxext6 libxrender1 for OpenCV
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg fonts-roboto libglib2.0-0 libsm6 libxext6 libxrender1 espeak-ng wget
-          
+           
       - name: Verify FFmpeg Installation
         run: ffmpeg -version
-          
+           
 
-          
       - name: Install Project Python Dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
@@ -62,8 +82,16 @@ jobs:
           # Skip local MMLab stack to save disk space (offloaded to Kaggle)
           # Explicitly fix potential imageio recursion by forcing latest imageio-ffmpeg last
           pip install --upgrade imageio imageio-ffmpeg moviepy
-          
+           
+      - name: Cache Playwright
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
+           
       - name: Install Playwright Browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: python -m playwright install --with-deps chromium
 
       - name: Setup Environment Secrets (.env)
@@ -100,7 +128,7 @@ jobs:
           echo "REDDIT_CLIENT_ID=${{ secrets.REDDIT_CLIENT_ID }}" >> .env
           echo "REDDIT_CLIENT_SECRET=${{ secrets.REDDIT_CLIENT_SECRET }}" >> .env
           echo "YOUTUBE_DATA_API_KEY=${{ secrets.YOUTUBE_DATA_API_KEY }}" >> .env
-          
+           
           if [ ! -z "${{ secrets.IG_VIDEO_PUBLIC_URL }}" ]; then
             echo "IG_VIDEO_PUBLIC_URL=${{ secrets.IG_VIDEO_PUBLIC_URL }}" >> .env
           fi
@@ -160,19 +188,19 @@ jobs:
           if [ ! -z "${{ secrets.FB_GROUP_IDS }}" ]; then
             echo "FB_GROUP_IDS=${{ secrets.FB_GROUP_IDS }}" >> .env
           fi
-          
+           
       - name: Setup YouTube Auth Files
         # We restore the JSON files from GitHub Secrets
         run: |
           echo '${{ secrets.CLIENT_SECRET_JSON }}' > client_secret.json
           echo '${{ secrets.TOKEN_JSON }}' > token.json
-          
+           
       - name: Setup Kaggle Credentials
         run: |
           mkdir -p ~/.kaggle
           echo '{"username":"${{ secrets.KAGGLE_USERNAME }}","key":"${{ secrets.KAGGLE_KEY }}"}' > ~/.kaggle/kaggle.json
           chmod 600 ~/.kaggle/kaggle.json
-          
+           
       - name: Run Pipeline (Kaggle GPU Priority)
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -184,8 +212,13 @@ jobs:
           ORT_LOG_LEVEL: ERROR  # Suppress harmless ONNX Runtime PCI bus warnings
           CI_LITE: "1"
         run: |
-          python -u main.py --now --type auto
-         
+          DRY_RUN_FLAG=""
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            DRY_RUN_FLAG="--dry-run"
+          fi
+          TOPIC_TYPE="${{ github.event.inputs.topic_type || 'auto' }}"
+          python -u main.py --now --type "$TOPIC_TYPE" $DRY_RUN_FLAG
+          
       - name: Platform-Native Optimization & A/B Test Setup
         if: always()
         run: |
@@ -212,13 +245,88 @@ jobs:
             output/platform_optimization_report.json
           retention-days: 30
           
+      - name: Analytics Sync & Health Check
+        if: always()
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          YOUTUBE_DATA_API_KEY: ${{ secrets.YOUTUBE_DATA_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          echo "📊 Running Analytics Sync & Health Check..."
+          cat > /tmp/analytics_check.py << 'PYEOF'
+          import sys
+          sys.path.insert(0, '.')
+          from hook_analytics_sync import sync_hook_analytics_with_youtube
+          from hook_analytics import get_hook_analytics, print_analytics_summary
+          import json
+
+          # Sync with YouTube Analytics (last 7 days)
+          print('🔄 Syncing hook analytics with YouTube...')
+          try:
+              sync_hook_analytics_with_youtube(days_back=7)
+          except Exception as e:
+              print(f'⚠️ Analytics sync failed: {e}')
+
+          # Check metrics against targets
+          print('\n📈 Checking metrics against targets...')
+          analytics = get_hook_analytics()
+
+          # Targets from strategy
+          TARGETS = {
+              'ctr': 0.05,           # >5% CTR
+              'retention': 0.50,     # >50% AVD
+              'engagement': 0.03,    # >3% engagement rate
+          }
+
+          alerts = []
+          for category, cat_data in analytics.get('categories', {}).items():
+              for pattern_id, pattern_data in cat_data.items():
+                  if pattern_id.startswith('_'):  # Skip metadata keys
+                      continue
+                  avg_retention = pattern_data.get('avg_retention', 0)
+                  avg_engagement = pattern_data.get('avg_engagement', 0)
+                  total_views = pattern_data.get('total_views', 0)
+                  
+                  if total_views > 10:  # Only alert if enough data
+                      if avg_retention < TARGETS['retention']:
+                          alerts.append(f'🔴 LOW RETENTION: {category}/{pattern_id} = {avg_retention:.1%} (target >{TARGETS["retention"]:.0%})')
+                      if avg_engagement < TARGETS['engagement']:
+                          alerts.append(f'🔴 LOW ENGAGEMENT: {category}/{pattern_id} = {avg_engagement:.1%} (target >{TARGETS["engagement"]:.0%})')
+
+          if alerts:
+              print('\n⚠️ METRICS BELOW TARGET:')
+              for alert in alerts:
+                  print(f'  {alert}')
+              
+              # Send Telegram alert if configured
+              import os
+              bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
+              chat_id = os.getenv('TELEGRAM_CHAT_ID')
+              if bot_token and chat_id:
+                  import requests
+                  msg = '📊 *Analytics Alert - Metrics Below Target*\n\n' + '\n'.join(alerts[:10])
+                  try:
+                      requests.post(f'https://api.telegram.org/bot{bot_token}/sendMessage', 
+                                   json={'chat_id': chat_id, 'text': msg, 'parse_mode': 'Markdown'})
+                      print('📱 Telegram alert sent')
+                  except Exception as e:
+                      print(f'⚠️ Failed to send Telegram alert: {e}')
+          else:
+              print('✅ All tracked metrics above target thresholds')
+
+          print('\n📋 Full analytics summary:')
+          print_analytics_summary()
+          PYEOF
+          python3 /tmp/analytics_check.py
+
       - name: Commit Updated Tracking File & Logs
         # Always run this step to save the log, preventing duplicate topics tomorrow
         if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
+           
           # 1. Pull latest changes first using rebase and autostash
           if ! git pull origin main --rebase --autostash; then
             echo "⚠️ Rebase pull failed. Checking for merge conflicts..."
@@ -230,24 +338,24 @@ jobs:
               echo "Pull failed for other reasons, proceeding..."
             fi
           fi
-          
+           
           # 2. Add tracking files and technical logs (force add since logs/ is gitignored)
           git add news_log.json facts_log.json layout_tracker.json series_tracker.json || echo "Root logs missing"
           if [ -d "logs" ]; then
             git add -f logs/*.txt 2>/dev/null || echo "No txt logs"
             git add -f logs/*.json 2>/dev/null || echo "No json logs"
           fi
-          
+           
           # Safety check: Ensure no conflict markers exist in news_log.json or facts_log.json
           if grep -q "^<<<<<<<" news_log.json facts_log.json 2>/dev/null; then
             echo "❌ Conflict markers found in news_log.json or facts_log.json. Aborting commit."
             exit 1
           fi
-          
+           
           # Only commit if there are actual changes
           if ! git diff --cached --quiet; then
             git commit -m "[Bot] Auto-update news tracker logs"
-            
+             
             # Retry push up to 5 times for robustness against concurrent runs
             for i in {1..5}; do
               echo "Attempt $i to push changes..."
@@ -268,3 +376,32 @@ jobs:
           else
             echo "✅ No changes to logs detected."
           fi
+
+      - name: Failure Notification
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -n "${{ secrets.TELEGRAM_BOT_TOKEN }}" ] && [ -n "${{ secrets.TELEGRAM_CHAT_ID }}" ]; then
+            RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            MSG="❌ *Daily Shorts Pipeline Failed*\nRun: ${RUN_URL}\nCommit: ${{ github.sha }}\nCheck the workflow logs for details."
+            curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+              -d chat_id="${TELEGRAM_CHAT_ID}" \
+              -d text="${MSG}" \
+              -d parse_mode="Markdown" \
+              -d disable_web_page_preview=true
+            echo "📱 Failure notification sent to Telegram"
+          else
+            echo "⚠️ Telegram credentials not configured, skipping failure notification"
+          fi
+
+      - name: Upload Failure Logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-logs
+          path: |
+            logs/
+            output/
+          retention-days: 7
