@@ -51,10 +51,11 @@ VIRAL_HOOK_TAGS = [
 ]
 
 LONG_TAIL_TAGS = [
-    "how does AI work", "what is artificial intelligence", "AI explained simply",
-    "best AI tools 2026", "free AI tools", "AI tools for beginners",
-    "AI for YouTube creators", "how to use AI", "AI automation tutorial",
-    "machine learning explained", "deep learning for beginners"
+    "how to use AI", "AI tutorial 2026", "artificial intelligence explained",
+    "free AI tools 2026", "how does AI work", "what is AI explained",
+    "best free AI tools", "AI for beginners tutorial", "machine learning tutorial",
+    "deep learning explained 2026", "AI automation how to", "generative AI tutorial",
+    "how to automate with AI", "AI tools explained free", "learn AI 2026 free"
 ]
 
 # ── PROMINENT PEOPLE METADATA ──
@@ -600,18 +601,21 @@ def get_optimized_metadata(
     has_facts = any(term in full_text for term in ["fact", "know", "amazing", "discover", "breakthrough", "scary", "secret"])
  
     if has_ai:
-        matched_tags.extend(BROAD_AI_TAGS[:4])
-        matched_tags.extend(LONG_TAIL_TAGS[:2])
+        matched_tags.extend(BROAD_AI_TAGS[:3])
+        matched_tags.extend(LONG_TAIL_TAGS[:6])
     if has_tech:
-        matched_tags.extend(TECHNOLOGY_TAGS[:4])
+        matched_tags.extend(TECHNOLOGY_TAGS[:3])
+        matched_tags.extend(LONG_TAIL_TAGS[6:10])
     if has_facts:
         matched_tags.extend(FACTS_STYLE_TAGS[:3])
         matched_tags.extend(VIRAL_HOOK_TAGS[:2])
+        matched_tags.extend(LONG_TAIL_TAGS[10:15])
         
     # Fallback to general high-value tags to ensure variety and count
     matched_tags.extend(FACTS_STYLE_TAGS[:2])
     matched_tags.extend(BROAD_AI_TAGS[:2])
     matched_tags.extend(TECHNOLOGY_TAGS[:2])
+    matched_tags.extend(LONG_TAIL_TAGS)
  
     # 6. Deduplicate and Clean Tags
     seen_tags_lower = set()
