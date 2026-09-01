@@ -18,9 +18,9 @@
     }
   },
   "gemini_models": {
-    "gemini-2.5-flash": 1786986988.307407,
-    "gemini-2.5-pro": 1786987017.3729436,
-    "gemini-2.5-flash-lite": 1786987145.921721
+    "gemini-2.5-flash": 1788319194.0213876,
+    "gemini-2.5-pro": 1788319213.5774496,
+    "gemini-2.5-flash-lite": 1788319624.3376813
   },
   "groq_models": {
     "llama-3.3-70b-versatile": 1786987162.8149407,
