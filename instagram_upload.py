@@ -90,10 +90,11 @@ def _load_token():
         try:
             with open(TOKEN_FILE, "r") as f:
                 data = json.load(f)
-                token = data.get("access_token", "")
-                expiry = data.get("expires_at", "")
-                if token:
-                    return token, expiry
+                if isinstance(data, dict):
+                    token = data.get("access_token", "")
+                    expiry = data.get("expires_at", "")
+                    if token:
+                        return token, expiry
         except Exception:
             pass
     return os.getenv("IG_ACCESS_TOKEN", ""), ""
@@ -149,13 +150,17 @@ def _refresh_token_if_needed(current_token, expiry_str):
         }
         resp = requests.get(url, params=params, timeout=15)
         if resp.status_code == 200:
-            data = resp.json()
-            new_token = data.get("access_token")
-            expires_in = data.get("expires_in", 5184000)  # Default 60 days
-            if new_token:
-                _save_token(new_token, expires_in)
-                print("✅ Instagram token refreshed successfully.")
-                return new_token
+            try:
+                data = resp.json()
+            except Exception:
+                data = {}
+            if isinstance(data, dict):
+                new_token = data.get("access_token")
+                expires_in = data.get("expires_in", 5184000)  # Default 60 days
+                if new_token:
+                    _save_token(new_token, expires_in)
+                    print("✅ Instagram token refreshed successfully.")
+                    return new_token
 
         print(f"⚠️ Token refresh failed (HTTP {resp.status_code}): {resp.text}")
     except Exception as e:
@@ -269,7 +274,12 @@ def upload_video_to_github_releases(video_path):
             timeout=30,
         )
         release_resp.raise_for_status()
-        release_data = release_resp.json()
+        try:
+            release_data = release_resp.json()
+        except Exception:
+            release_data = {}
+        if not isinstance(release_data, dict) or "id" not in release_data or "upload_url" not in release_data:
+            raise RuntimeError(f"Unexpected GitHub release response: {release_data}")
         release_id = release_data["id"]
         upload_url = release_data["upload_url"].split("{")[0]
 
@@ -283,7 +293,10 @@ def upload_video_to_github_releases(video_path):
                 timeout=120,
             )
         asset_resp.raise_for_status()
-        asset_data = asset_resp.json()
+        try:
+            asset_data = asset_resp.json()
+        except Exception:
+            asset_data = {}
         if not isinstance(asset_data, dict) or "browser_download_url" not in asset_data:
             raise RuntimeError(f"Unexpected GitHub asset response: {asset_data}")
         public_url = asset_data["browser_download_url"]
@@ -330,7 +343,12 @@ def delete_github_release(release_id):
         )
         tag_name = ""
         if rel_resp.status_code == 200:
-            tag_name = rel_resp.json().get("tag_name", "")
+            try:
+                rel_data = rel_resp.json()
+            except Exception:
+                rel_data = {}
+            if isinstance(rel_data, dict):
+                tag_name = rel_data.get("tag_name", "")
         
         # Delete release
         requests.delete(
@@ -368,7 +386,10 @@ def create_reels_container(video_url: str, caption: str, share_to_feed: bool = T
         timeout=30,
     )
     resp.raise_for_status()
-    data = resp.json()
+    try:
+        data = resp.json()
+    except Exception:
+        data = {}
     if not isinstance(data, dict) or "id" not in data:
         raise RuntimeError(f"Unexpected response from create_reels_container: {data}")
     return data["id"]
@@ -385,7 +406,10 @@ def wait_for_container(container_id: str, timeout_s: int = 300, poll_every_s: in
             timeout=30,
         )
         resp.raise_for_status()
-        data = resp.json()
+        try:
+            data = resp.json()
+        except Exception:
+            data = {}
         if not isinstance(data, dict) or "status_code" not in data:
             raise RuntimeError(f"Unexpected response from wait_for_container: {data}")
         status = data["status_code"]
@@ -408,7 +432,10 @@ def publish_container(container_id: str) -> str:
         timeout=30,
     )
     resp.raise_for_status()
-    data = resp.json()
+    try:
+        data = resp.json()
+    except Exception:
+        data = {}
     if not isinstance(data, dict) or "id" not in data:
         raise RuntimeError(f"Unexpected response from publish_container: {data}")
     return data["id"]
