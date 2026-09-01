@@ -141,7 +141,7 @@ jobs:
         run: python3 scripts/ci_setup_youtube_auth.py
 
       - name: Setup YouTube Analytics Token
-        if: secrets.YOUTUBE_ANALYTICS_TOKEN_JSON != ''
+        if: ${{ secrets.YOUTUBE_ANALYTICS_TOKEN_JSON != '' }}
         env:
           YOUTUBE_ANALYTICS_TOKEN_JSON: ${{ secrets.YOUTUBE_ANALYTICS_TOKEN_JSON }}
         run: python3 scripts/ci_setup_analytics_token.py
