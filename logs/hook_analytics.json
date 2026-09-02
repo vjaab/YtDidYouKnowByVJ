@@ -77,6 +77,22 @@
         "avg_retention": 0.0,
         "avg_engagement": 0.0
       }
+    },
+    "AI Tools & Privacy": {
+      "negative_warning": {
+        "variants": {
+          "A": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "count": 1
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0
+      }
     }
   },
   "global": {
@@ -84,7 +100,7 @@
       "views": 0,
       "retention": 0.0,
       "engagement": 0.0,
-      "count": 1
+      "count": 2
     },
     "result_first": {
       "views": 0,
@@ -111,5 +127,5 @@
       "count": 1
     }
   },
-  "last_updated": "2026-09-02T04:30:32.167657"
+  "last_updated": "2026-09-02T19:49:14.913300"
 }
