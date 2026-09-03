@@ -249,7 +249,13 @@ def format_instagram_caption(description, hashtags, youtube_url, script_data=Non
         companies = script_data.get("companies_mentioned", [])
         if companies:
             for c in companies[:3]:
-                name = c.get("name", "").replace(" ", "")
+                if isinstance(c, dict):
+                    name = c.get("name", "")
+                elif isinstance(c, str):
+                    name = c
+                else:
+                    name = ""
+                name = name.replace(" ", "")
                 if name:
                     niche_tags.append(f"@{name.lower()}")
         
