@@ -549,7 +549,17 @@ def setup_project():
         
     print("📥 Cloning Project Repository...")
     if not os.path.exists("YtDidYouKnowByVJ"):
-        run_cmd(["git", "clone", "-q", "https://github.com/vjaab/YtDidYouKnowByVJ.git"])
+        github_token = ""
+        if "JOB_PAYLOAD" in globals():
+            github_token = globals()["JOB_PAYLOAD"].get("github_token", "")
+        public_url = "https://github.com/vjaab/YtDidYouKnowByVJ.git"
+        if github_token:
+            clone_url = f"https://x-access-token:{github_token}@github.com/vjaab/YtDidYouKnowByVJ.git"
+            print(f"Executing: git clone -q {public_url} (authenticated)")
+        else:
+            clone_url = public_url
+            print(f"Executing: git clone -q {clone_url}")
+        run_cmd(["git", "clone", "-q", clone_url])
     
     if os.path.isdir("YtDidYouKnowByVJ"):
         os.chdir("YtDidYouKnowByVJ")
