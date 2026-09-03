@@ -125,6 +125,22 @@
         "avg_retention": 0.0,
         "avg_engagement": 0.0
       }
+    },
+    "Tech News": {
+      "personal_stake": {
+        "variants": {
+          "B": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "count": 1
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0
+      }
     }
   },
   "global": {
@@ -156,8 +172,8 @@
       "views": 0,
       "retention": 0.0,
       "engagement": 0.0,
-      "count": 1
+      "count": 2
     }
   },
-  "last_updated": "2026-09-03T12:47:53.660293"
+  "last_updated": "2026-09-03T20:41:42.388365"
 }
