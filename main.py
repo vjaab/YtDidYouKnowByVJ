@@ -1138,9 +1138,10 @@ def run_pipeline(topic_type="auto", dry_run=False):
     
     # Record hook pattern info for analytics tracking
     try:
-        from hook_analytics import record_hook_performance
+        from hook_analytics import record_hook_performance, record_hook_text
         hook_pattern = script_data.get("hook_pattern")
         hook_variant = script_data.get("hook_variant")
+        hook_text = script_data.get("hook_text")
         category = script_data.get("sub_category", "AI & Tech Tools")
         if hook_pattern and hook_variant:
             # Record initial upload (0 views initially, will be updated by analytics sync)
@@ -1153,6 +1154,16 @@ def run_pipeline(topic_type="auto", dry_run=False):
                 engagement_rate=0.0
             )
             log_message(f"📊 Hook analytics initialized: {hook_pattern}/{hook_variant}")
+            
+            # Record the actual hook text for few-shot example retrieval
+            if hook_text:
+                record_hook_text(
+                    category=category,
+                    pattern_id=hook_pattern,
+                    variant_id=hook_variant,
+                    hook_text=hook_text,
+                    video_id=result
+                )
             
             # Store video_id -> hook mapping for analytics sync
             hook_video_map_file = os.path.join(LOGS_DIR, "hook_video_map.json")
@@ -1168,6 +1179,7 @@ def run_pipeline(topic_type="auto", dry_run=False):
                 "video_id": result,
                 "hook_pattern": hook_pattern,
                 "hook_variant": hook_variant,
+                "hook_text": hook_text,
                 "category": category,
                 "title": title,
                 "uploaded_at": datetime.now().isoformat()

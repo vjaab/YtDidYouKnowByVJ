@@ -106,6 +106,89 @@ def _save_analytics(data: Dict):
         json.dump(data, f, indent=2)
 
 
+def record_hook_text(
+    category: str,
+    pattern_id: str,
+    variant_id: str,
+    hook_text: str,
+    video_id: str = None
+):
+    """
+    Record the actual hook text used for a video.
+    This enables few-shot example injection for future script generation.
+    """
+    data = _load_analytics()
+    
+    # Update category-level analytics
+    if category not in data["categories"]:
+        data["categories"][category] = {}
+    
+    cat = data["categories"][category]
+    if pattern_id not in cat:
+        cat[pattern_id] = {"variants": {}, "total_views": 0, "total_videos": 0, "avg_retention": 0.0, "avg_engagement": 0.0}
+    
+    pattern = cat[pattern_id]
+    
+    # Update variant with hook text
+    if variant_id not in pattern["variants"]:
+        pattern["variants"][variant_id] = {"views": 0, "retention": 0.0, "engagement": 0.0, "count": 0, "hook_texts": []}
+    
+    variant = pattern["variants"][variant_id]
+    
+    # Store hook text with video_id for traceability
+    hook_entry = {
+        "text": hook_text,
+        "video_id": video_id,
+        "recorded_at": datetime.now().isoformat()
+    }
+    
+    # Avoid duplicates
+    existing_texts = [h.get("text", "") for h in variant.get("hook_texts", [])]
+    if hook_text not in existing_texts:
+        variant.setdefault("hook_texts", []).append(hook_entry)
+    
+    _save_analytics(data)
+
+
+def get_top_hooks_for_category(category: str, top_n: int = 5, min_views: int = 100) -> List[Dict]:
+    """
+    Get top N historically best-performing hooks for a category with their actual text.
+    Returns list of dicts with: text, pattern, variant, views, retention, engagement, score
+    """
+    data = _load_analytics()
+    cat_data = data.get("categories", {}).get(category, {})
+    
+    results = []
+    for pattern_id, pattern_data in cat_data.items():
+        for variant_id, variant_data in pattern_data.get("variants", {}).items():
+            views = variant_data.get("views", 0)
+            retention = variant_data.get("retention", 0.0)
+            engagement = variant_data.get("engagement", 0.0)
+            
+            # Only include hooks with minimum views for statistical significance
+            if views >= min_views:
+                hook_texts = variant_data.get("hook_texts", [])
+                for hook_entry in hook_texts:
+                    text = hook_entry.get("text", "")
+                    if text:
+                        score = (retention + engagement) / 2
+                        results.append({
+                            "text": text,
+                            "pattern": pattern_id,
+                            "variant": variant_id,
+                            "views": views,
+                            "retention": retention,
+                            "engagement": engagement,
+                            "score": score,
+                            "video_id": hook_entry.get("video_id"),
+                            "recorded_at": hook_entry.get("recorded_at")
+                        })
+    
+    # Sort by score descending
+    results.sort(key=lambda x: x["score"], reverse=True)
+    return results[:top_n]
+
+
 def get_hook_analytics(category: Optional[str] = None) -> Dict:
     """Get current hook analytics, optionally filtered by category."""
     data = _load_analytics()

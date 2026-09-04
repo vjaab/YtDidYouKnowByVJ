@@ -18,6 +18,7 @@ from hook_analytics import (
     record_hook_performance,
     select_hook_patterns_for_category,
     update_hook_variant_views,
+    get_top_hooks_for_category,
     HOOK_PATTERNS
 )
 
@@ -2276,12 +2277,28 @@ class MultiAgentGenerationEngine:
         script_format = "Result-First" if (run_index % 2 == 0) else "Problem-First"
         narrative_template = NARRATIVE_AGENT_TEMPLATE_RESULT_FIRST if (run_index % 2 == 0) else NARRATIVE_AGENT_TEMPLATE_PROBLEM_FIRST
         print(f"📝 [AGENT 3] Fact Script Generator: Writing {script_format} script (run_index={run_index})...")
+
+        # Fetch top-performing hooks for few-shot examples (feedback loop closure)
+        top_hooks_examples = ""
+        try:
+            top_hooks = get_top_hooks_for_category(self.category, top_n=3, min_views=50)
+            if top_hooks:
+                examples_list = []
+                for i, hook in enumerate(top_hooks, 1):
+                    examples_list.append(f"  Example {i} ({hook['pattern']}/{hook['variant']}, {hook['views']} views, {hook['retention']:.0%} ret): \"{hook['text']}\"")
+                top_hooks_examples = "\n\nTOP-PERFORMING HOOKS FROM HISTORICAL DATA (use as few-shot inspiration for tone/structure):\n" + "\n".join(examples_list)
+                print(f"🔁 Injected {len(top_hooks)} top-performing hooks as few-shot examples")
+            else:
+                print("🔁 No historical hook data yet (first runs)")
+        except Exception as e:
+            print(f"⚠️ Could not fetch top hooks: {e}")
+
         narrative_prompt = narrative_template.format(
             persona=self.persona,
             research_json=json.dumps(research),
             selected_hook=hook_text,
             selection_instruction=selection_instruction
-        )
+        ) + top_hooks_examples
         narrative = self._call_gemini(narrative_prompt, model=GEMINI_PRO_MODEL)
         if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         if not narrative: return None
