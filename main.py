@@ -233,12 +233,10 @@ def format_instagram_caption(description, hashtags, youtube_url, script_data=Non
     Instagram Reels caption: line breaks, 3-5 niche hashtags + 2 broad, community-focused.
     Max 2200 chars. First 125 chars optimized for "before more" visibility.
     """
-    # Extract the hook/first line
-    lines = description.split('\n')
-    hook_line = lines[0] if lines else ""
+    base_hook = script_data.get("hook_text", "") if script_data else ""
+    hook_line = generate_platform_hook(script_data, "instagram", base_hook) if script_data else base_hook
     
     # Truncate hook for first 125 chars (visible before "more")
-    # Format: Hook + CTA in first ~125 chars
     short_hook = hook_line[:100] + "..." if len(hook_line) > 100 else hook_line
     first_cta = "👇 Full breakdown on YouTube"
     
@@ -311,10 +309,8 @@ def format_facebook_caption(description, hashtags, youtube_url="", script_data=N
     Includes strong hook, narrative summary, and call to check first comment.
     """
     import re
-    lines = [l for l in description.split('\n') if l.strip()]
-    hook_line = lines[0] if lines else ""
-    if script_data and script_data.get("hook_text"):
-        hook_line = script_data.get("hook_text")
+    base_hook = script_data.get("hook_text", "") if script_data else ""
+    hook_line = generate_platform_hook(script_data, "facebook", base_hook) if script_data else base_hook
     
     # 5-8 hashtags max (algorithm penalty for more)
     default_tags = ["#AI", "#TechNews", "#Developer", "#OpenSource", "#ArtificialIntelligence", "#MachineLearning", "#TechTrends"]
@@ -359,9 +355,8 @@ def get_facebook_first_comment(youtube_url, hashtags=None, script_data=None):
     First comment on Facebook Reel with YouTube link and an engagement question.
     Placing the link in the first comment avoids the Facebook algorithmic link suppression penalty.
     """
-    hook = ""
-    if script_data and script_data.get("hook_text"):
-        hook = script_data.get("hook_text")
+    base_hook = script_data.get("hook_text", "") if script_data else ""
+    hook = generate_platform_hook(script_data, "facebook", base_hook) if script_data else base_hook
     
     question = "💬 Have you tested this yet or seen similar tools in your workflow?"
     if hook:
@@ -385,8 +380,8 @@ def format_telegram_caption(title, description, hashtags, youtube_url, script_da
     Telegram caption for Shorts: concise, HTML formatting, clickable link.
     Max 1024 chars for caption.
     """
-    # Extract hook from description or script_data
-    hook = script_data.get("hook_text", title) if script_data else title
+    base_hook = script_data.get("hook_text", title) if script_data else title
+    hook = generate_platform_hook(script_data, "telegram", base_hook) if script_data else base_hook
     if len(hook) > 100:
         hook = hook[:97] + "..."
     
@@ -424,8 +419,8 @@ def format_threads_caption(title, description, hashtags, youtube_url, script_dat
     Format: Thread 🧵 → Hook → Value → Question → Link
     Max 500 chars recommended for engagement.
     """
-    # Extract hook
-    hook = script_data.get("hook_text", title) if script_data else title
+    base_hook = script_data.get("hook_text", title) if script_data else title
+    hook = generate_platform_hook(script_data, "threads", base_hook) if script_data else base_hook
     if len(hook) > 80:
         hook = hook[:77] + "..."
     
@@ -458,6 +453,85 @@ def format_threads_caption(title, description, hashtags, youtube_url, script_dat
 {hashtag_str}"""
     
     return threads_caption[:500]
+
+
+def generate_platform_hook(script_data: dict, platform: str, base_hook: str) -> str:
+    """
+    Generate a platform-native hook from the same topic data.
+    Each platform has different optimal hook styles and character limits.
+    """
+    import random
+    
+    companies = script_data.get("companies_mentioned", [])
+    company_names = []
+    for c in companies[:2]:
+        if isinstance(c, dict):
+            name = c.get("name", "")
+        elif isinstance(c, str):
+            name = c
+        else:
+            name = ""
+        if name:
+            company_names.append(name)
+    
+    companies_str = " ".join(company_names) if company_names else "this tool"
+    subcat = script_data.get("sub_category", "AI & Tech Tools")
+    keywords = script_data.get("keywords", [])
+    
+    # Platform-specific hook patterns
+    hooks_by_platform = {
+        "instagram": [
+            # Visual-first, emoji-rich, community-oriented
+            f"POV: You're using {companies_str} wrong 😱",
+            f"This {companies_str} feature changes EVERYTHING ✨",
+            f"Stop scrolling — this {companies_str} hack saves hours ⏰",
+            f"The {companies_str} setting nobody told you about 🤫",
+            f"Your {companies_str} workflow is about to get 10x better 🚀",
+        ],
+        "facebook": [
+            # Discussion-driven, question-oriented, share-worthy
+            f"Has anyone else noticed this {companies_str} issue? 🤔",
+            f"I can't believe {companies_str} has been doing this...",
+            f"Real talk: this {companies_str} feature is a game-changer for developers",
+            f"Anyone using {companies_str}? You need to see this update.",
+            f"The {companies_str} feature you've been missing 👀",
+        ],
+        "tiktok": [
+            # Trend-aware, sound-first, ultra-short, hook-heavy
+            f"POV: {companies_str} just dropped this 🔥",
+            f"Stop using {companies_str} like this! 🛑",
+            f"This {companies_str} trick is VIRAL for a reason 📈",
+            f"Nobody talks about this {companies_str} feature... 🤫",
+            f"Wait for it... {companies_str} just changed the game ⚡",
+        ],
+        "threads": [
+            # Conversational, thread-native, opinion-driven
+            f"Unpopular opinion: {companies_str} is actually better when you... 🧵",
+            f"Hot take on the {companies_str} update: 👇",
+            f"Been using {companies_str} for months and just discovered this 🤯",
+            f"{companies_str} shipped something wild. Here's why it matters: 🧵",
+            f"Everyone's sleeping on this {companies_str} feature. Don't. 💤",
+        ],
+        "telegram": [
+            # Direct, value-first, concise, link-ready
+            f"🔥 {companies_str} update you missed: {base_hook[:80]}",
+            f"⚡ Breaking: {companies_str} just released this game-changer",
+            f"💡 Pro tip: This {companies_str} setting saves hours",
+            f"🚨 {companies_str} users: Check this immediately",
+            f"🎯 The {companies_str} feature everyone's asking about",
+        ],
+        "x": [
+            # Character-limited, hashtag-ready, viral-optimized
+            f"{companies_str} just dropped a feature that changes everything 🧵👇",
+            f"Stop using {companies_str} wrong. Here's the fix: 👇",
+            f"This {companies_str} update is flying under the radar 👀",
+            f"Free {companies_str} alternative that's actually better: 👇",
+            f"90% of devs don't know this {companies_str} trick 🤯",
+        ],
+    }
+    
+    platform_hooks = hooks_by_platform.get(platform, hooks_by_platform["instagram"])
+    return random.choice(platform_hooks)
 
 
 def run_pipeline(topic_type="auto", dry_run=False):
