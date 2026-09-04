@@ -62,5 +62,14 @@
     "category": "Tech News",
     "title": "NVIDIA's New Scanner: Is Your AI Agent Leaking Data?",
     "uploaded_at": "2026-09-04T04:14:22.591245"
+  },
+  "NZEAtf0Ivw4": {
+    "video_id": "NZEAtf0Ivw4",
+    "hook_pattern": "negative_warning",
+    "hook_variant": "A",
+    "hook_text": "Stop paying for AI coding!",
+    "category": "Open Source AI Tools",
+    "title": "Meta's Llama 3 400B: The End of Paid AI Coding?",
+    "uploaded_at": "2026-09-04T19:58:18.551671"
   }
 }
