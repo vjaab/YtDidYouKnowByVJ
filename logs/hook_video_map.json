@@ -54,5 +54,13 @@
     "category": "Tech News",
     "title": "True or False: Hidden Windows 11 File Ate Your Drive? \ud83e\udd14",
     "uploaded_at": "2026-09-03T20:41:42.389164"
+  },
+  "TE2PCqAmXXY": {
+    "video_id": "TE2PCqAmXXY",
+    "hook_pattern": "curiosity_gap",
+    "hook_variant": "A",
+    "category": "Tech News",
+    "title": "NVIDIA's New Scanner: Is Your AI Agent Leaking Data?",
+    "uploaded_at": "2026-09-04T04:14:22.591245"
   }
 }
