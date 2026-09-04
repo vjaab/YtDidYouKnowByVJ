@@ -160,6 +160,7 @@ def record_story(title, news_headline, subcategory, companies, keywords, breakin
         "breaking_news_level": breaking_news_level,
         "voice_used": voice_used,
         "youtube_url": youtube_url,
+        "facebook_post_id": None,
         "news_source_url": news_source_url,
         "target_country": target_country,
         "avatar_used": avatar_used
@@ -175,6 +176,14 @@ def update_youtube_url(news_headline, youtube_url, tracker_file=TRACKER_FILE):
     for entry in tracker.get("history", []):
         if entry.get("news_headline") == news_headline:
             entry["youtube_url"] = youtube_url
+            break
+    save_tracker(tracker, tracker_file)
+
+def update_facebook_post_id(news_headline, facebook_post_id, tracker_file=TRACKER_FILE):
+    tracker = load_tracker(tracker_file)
+    for entry in tracker.get("history", []):
+        if entry.get("news_headline") == news_headline:
+            entry["facebook_post_id"] = facebook_post_id
             break
     save_tracker(tracker, tracker_file)
 

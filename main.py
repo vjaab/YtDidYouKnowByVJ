@@ -16,7 +16,7 @@ from datetime import datetime
 
 from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY, ENABLE_TRENDING_ENGINE
 from fetch_research_papers import fetch_tech_news, fetch_ai_tools
-from topic_tracker import record_story, update_youtube_url, get_next_topic_type_by_ratio, get_next_target_country, get_next_avatar
+from topic_tracker import record_story, update_youtube_url, update_facebook_post_id, get_next_topic_type_by_ratio, get_next_target_country, get_next_avatar
 from gemini_script import pick_and_generate_script
 from ecosystem_logic import get_slot_info, get_series_identity, get_next_slot
 from audio_gen import generate_voiceover, clean_tts_text
@@ -1219,23 +1219,42 @@ def run_pipeline(topic_type="auto", dry_run=False):
     # ── STEP 10e: Facebook Reels Auto-Post ───────────────────────────────────
     log_message("STEP 10e: Auto-posting Reel to Facebook...")
     try:
-        # Platform-native Facebook caption (5-8 hashtags max, clean body, link in first comment)
-        fb_caption = format_facebook_caption(description, hashtags, youtube_url, script_data)
-        fb_first_comment = get_facebook_first_comment(youtube_url, hashtags, script_data)
-        if dry_run:
-            print("🧪 [DRY RUN] Simulating Facebook Reel upload...")
-            fb_uploaded, fb_result = True, "MOCK_FB_REEL_ID"
-        else:
-            # Direct native video binary upload (not YouTube link) to avoid algorithmic reach penalties
-            fb_uploaded, fb_result = post_video_to_facebook_page(video_path, fb_caption, fb_first_comment)
-            if not fb_uploaded:
-                print("⚠️ [Facebook] Trying fallback regular video upload...")
-                fb_uploaded, fb_result = post_video_to_facebook_page_fallback(video_path, fb_caption)
+        # Check if already uploaded to Facebook (prevent duplicate uploads)
+        news_headline = script_data.get("original_news_headline", "")
+        if news_headline:
+            from topic_tracker import load_tracker
+            tracker = load_tracker()
+            existing_fb_id = None
+            for entry in tracker.get("history", []):
+                if entry.get("news_headline") == news_headline:
+                    existing_fb_id = entry.get("facebook_post_id")
+                    break
+            if existing_fb_id:
+                log_message(f"⏭️ Skipping Facebook upload — already posted (ID: {existing_fb_id})")
+                fb_uploaded, fb_result = True, existing_fb_id
+            else:
+                # Platform-native Facebook caption (5-8 hashtags max, clean body, link in first comment)
+                fb_caption = format_facebook_caption(description, hashtags, youtube_url, script_data)
+                fb_first_comment = get_facebook_first_comment(youtube_url, hashtags, script_data)
+                if dry_run:
+                    print("🧪 [DRY RUN] Simulating Facebook Reel upload...")
+                    fb_uploaded, fb_result = True, "MOCK_FB_REEL_ID"
+                else:
+                    # Direct native video binary upload (not YouTube link) to avoid algorithmic reach penalties
+                    fb_uploaded, fb_result = post_video_to_facebook_page(video_path, fb_caption, fb_first_comment)
+                    if not fb_uploaded:
+                        print("⚠️ [Facebook] Trying fallback regular video upload...")
+                        fb_uploaded, fb_result = post_video_to_facebook_page_fallback(video_path, fb_caption)
 
-        if fb_uploaded:
-            log_message(f"SUCCESS: Posted Reel to Facebook! ID: {fb_result}")
+                if fb_uploaded:
+                    log_message(f"SUCCESS: Posted Reel to Facebook! ID: {fb_result}")
+                    # Track Facebook post ID to prevent duplicate uploads
+                    if news_headline and fb_result and fb_result != "MOCK_FB_REEL_ID":
+                        update_facebook_post_id(news_headline, fb_result)
+                else:
+                    log_message(f"WARNING: Facebook posting skipped/failed: {fb_result}")
         else:
-            log_message(f"WARNING: Facebook posting skipped/failed: {fb_result}")
+            log_message("WARNING: No news_headline in script_data, skipping Facebook upload")
     except Exception as ex:
         log_message(f"WARNING: Facebook auto-post failed: {ex}")
 
