@@ -201,6 +201,29 @@
         "avg_retention": 0.0,
         "avg_engagement": 0.0
       }
+    },
+    "Famous Bugs & Glitches": {
+      "curiosity_gap": {
+        "variants": {
+          "B": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "Is AI secretly dulling your tech skills?",
+                "video_id": "yDJgytp-sQM",
+                "recorded_at": "2026-09-05T18:08:03.530635"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0
+      }
     }
   },
   "global": {
@@ -226,7 +249,7 @@
       "views": 0,
       "retention": 0.0,
       "engagement": 0.0,
-      "count": 2
+      "count": 3
     },
     "personal_stake": {
       "views": 0,
@@ -235,5 +258,5 @@
       "count": 2
     }
   },
-  "last_updated": "2026-09-05T04:11:39.966356"
+  "last_updated": "2026-09-05T18:08:03.530671"
 }
