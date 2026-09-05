@@ -71,5 +71,14 @@
     "category": "Open Source AI Tools",
     "title": "Meta's Llama 3 400B: The End of Paid AI Coding?",
     "uploaded_at": "2026-09-04T19:58:18.551671"
+  },
+  "Jglld5c6YM8": {
+    "video_id": "Jglld5c6YM8",
+    "hook_pattern": "stat_contradiction",
+    "hook_variant": "B",
+    "hook_text": "Meta\u2019s glasses are locked down. This isn't.",
+    "category": "Tech Innovations",
+    "title": "Your Smart Glasses Are Spying... Unless They're THIS! \ud83e\udd2f",
+    "uploaded_at": "2026-09-05T04:11:39.967114"
   }
 }

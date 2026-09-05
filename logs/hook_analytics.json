@@ -178,6 +178,29 @@
         "avg_retention": 0.0,
         "avg_engagement": 0.0
       }
+    },
+    "Tech Innovations": {
+      "stat_contradiction": {
+        "variants": {
+          "B": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "Meta\u2019s glasses are locked down. This isn't.",
+                "video_id": "Jglld5c6YM8",
+                "recorded_at": "2026-09-05T04:11:39.966320"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0
+      }
     }
   },
   "global": {
@@ -197,7 +220,7 @@
       "views": 0,
       "retention": 0.0,
       "engagement": 0.0,
-      "count": 2
+      "count": 3
     },
     "curiosity_gap": {
       "views": 0,
@@ -212,5 +235,5 @@
       "count": 2
     }
   },
-  "last_updated": "2026-09-04T19:58:18.550807"
+  "last_updated": "2026-09-05T04:11:39.966356"
 }
