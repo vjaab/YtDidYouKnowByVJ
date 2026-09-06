@@ -21,13 +21,24 @@
             "views": 0,
             "retention": 0.0,
             "engagement": 0.0,
-            "count": 1
+            "count": 2,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "hook_texts": [
+              {
+                "text": "AI job hunter saves you hours",
+                "video_id": "YaJiYjHgwec",
+                "recorded_at": "2026-09-06T18:52:34.516452"
+              }
+            ]
           }
         },
         "total_views": 0,
-        "total_videos": 1,
+        "total_videos": 2,
         "avg_retention": 0.0,
-        "avg_engagement": 0.0
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
       },
       "personal_stake": {
         "variants": {
@@ -258,7 +269,9 @@
       "views": 0,
       "retention": 0.0,
       "engagement": 0.0,
-      "count": 2
+      "count": 3,
+      "swipe_away_rate": 0.0,
+      "avg_view_percentage": 0.0
     },
     "stat_contradiction": {
       "views": 0,
@@ -279,5 +292,5 @@
       "count": 3
     }
   },
-  "last_updated": "2026-09-05T23:04:33.414388"
+  "last_updated": "2026-09-06T18:52:34.516472"
 }
