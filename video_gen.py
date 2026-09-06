@@ -6799,7 +6799,13 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         else:
             print(f"🎨 No vibrant dominant color found in {first_visual_path}, using default accents.")
 
-    layout = generate_layout_profile(layout_seed, dominant_color=dominant_color)
+    # Get category-based layout for avatar positioning variety
+    from ecosystem_logic import get_dynamic_layout
+    category = script_json.get("sub_category", "AI & Tech Tools")
+    visual_type = chunks[0].get("visual_type", "") if chunks else ""
+    category_layout = get_dynamic_layout(category, visual_type, 0, max(1, len(chunks)))
+
+    layout = generate_layout_profile(layout_seed, dominant_color=dominant_color, daily_layout=category_layout)
     # Merge layout jitter into subtitle shift
     subtitle_y_shift += layout["subtitle_y_jitter"]
 
