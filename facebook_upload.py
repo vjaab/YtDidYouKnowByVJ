@@ -359,11 +359,8 @@ def post_video_to_facebook_page(video_url: str, caption: str, first_comment: str
             except Exception as e:
                 print(f"⚠️ First comment exception: {e}")
         
-        # Step 7: Cross-share to configured Groups/Pages
-        share_post_to_facebook_groups(video_id, message=caption.split("\n")[0] if caption else "")
-        
-        return video_id, None
-        
+return video_id, None
+         
     except requests.HTTPError as e:
         response_text = getattr(e, 'response_text', None) or (e.response.text if e.response else "")
         error_data = _parse_meta_error(response_text)
@@ -372,39 +369,6 @@ def post_video_to_facebook_page(video_url: str, caption: str, first_comment: str
     except Exception as e:
         print(f"⚠️ Facebook upload exception: {e}")
         return None, f"Facebook upload exception: {e}"
-
-
-# ── Share to Groups / Pages ───────────────────────────────────────────────────
-
-def share_post_to_facebook_groups(post_id: str, message: str = ""):
-    """
-    Share the published Reel/Video to configured Facebook Groups or connected Pages.
-    Configured via FB_GROUP_IDS (comma-separated list of Group/Page IDs in .env/Secrets).
-    """
-    group_ids_str = os.getenv("FB_GROUP_IDS", "").strip()
-    if not group_ids_str:
-        return
-        
-    fb_page_access_token = os.getenv("FB_PAGE_ACCESS_TOKEN")
-    if not fb_page_access_token:
-        return
-        
-    group_ids = [gid.strip() for gid in group_ids_str.split(",") if gid.strip()]
-    for gid in group_ids:
-        try:
-            print(f"📡 [Facebook Share] Sharing to Group/Page {gid}...")
-            payload = {
-                "link": f"https://www.facebook.com/{post_id}",
-                "message": message[:500] if message else "Check out our latest tech update!",
-                "access_token": fb_page_access_token,
-            }
-            resp = requests.post(f"{GRAPH_API_BASE}/{gid}/feed", data=payload, timeout=30)
-            if resp.status_code == 200:
-                print(f"✔ Shared to Facebook Group/Page {gid}: {resp.json().get('id')}")
-            else:
-                print(f"⚠️ Sharing to {gid} returned {resp.status_code}: {resp.text}")
-        except Exception as e:
-            print(f"⚠️ Error sharing to Facebook Group/Page {gid}: {e}")
 
 
 # ── Fallback: Regular Video Post ──────────────────────────────────────────────
