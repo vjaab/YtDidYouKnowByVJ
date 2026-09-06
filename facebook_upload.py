@@ -359,7 +359,7 @@ def post_video_to_facebook_page(video_url: str, caption: str, first_comment: str
             except Exception as e:
                 print(f"⚠️ First comment exception: {e}")
         
-return video_id, None
+        return video_id, None
          
     except requests.HTTPError as e:
         response_text = getattr(e, 'response_text', None) or (e.response.text if e.response else "")
