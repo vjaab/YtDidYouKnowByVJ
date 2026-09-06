@@ -1256,7 +1256,8 @@ def run_pipeline(topic_type="auto", dry_run=False):
                 "hook_text": hook_text,
                 "category": category,
                 "title": title,
-                "uploaded_at": datetime.now().isoformat()
+                "uploaded_at": datetime.now().isoformat(),
+                "synced": False
             }
             
             with open(hook_video_map_file, "w") as f:
