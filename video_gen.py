@@ -7893,36 +7893,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                             # Move avatar left to avoid collision (with 10px padding)
                             home_x = ez_x - scaled_w - 10
                     
-                    # Screenshot-aware positioning: glide to top-right corner before screenshot, fade during, return after
-                    # Screenshot typically shows 4.0-12.0s
-                    ss_start = 4.0
-                    ss_end = min(12.0, audio_duration - 2.0)
-                    transition_dur = 1.5  # Time to glide to/from corner
-                    
-                    # Check if we're in screenshot transition period
-                    if ss_start - transition_dur <= t < ss_start:
-                        # Glide from home to top-right corner before screenshot
-                        corner_x = FRAME_W - scaled_w - 40.0
-                        corner_y = 120.0
-                        p = (t - (ss_start - transition_dur)) / transition_dur
-                        p = 1.0 - (1.0 - p)**3  # ease-out
-                        x_pos = home_x + (corner_x - home_x) * p
-                        y_pos = home_y + (corner_y - home_y) * p
-                        return (int(x_pos), int(y_pos))
-                    elif ss_start <= t < ss_end:
-                        # During screenshot: stay at corner (will be faded out by mask)
-                        return (int(FRAME_W - scaled_w - 40.0), int(120.0))
-                    elif ss_end <= t < ss_end + transition_dur:
-                        # Glide back from corner to home after screenshot
-                        corner_x = FRAME_W - scaled_w - 40.0
-                        corner_y = 120.0
-                        p = (t - ss_end) / transition_dur
-                        p = p * p * (3 - 2 * p)  # ease-in-out (smoothstep)
-                        x_pos = corner_x + (home_x - corner_x) * p
-                        y_pos = corner_y + (home_y - corner_y) * p
-                        return (int(x_pos), int(y_pos))
-                    
-                    # Normal positioning (outside screenshot transitions)
+                    # Normal positioning (avatar stays in its home position during screenshots;
+                    # mask fading at lines 7959-7976 handles visibility)
                     if layout_variation_enabled:
                         if layout_type == "asymmetric":
                             return (int(home_x), int(home_y))
