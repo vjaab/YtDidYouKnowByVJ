@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
-hook_analytics_sync.py — Sync YouTube Analytics with Hook Performance
+hook_analytics_sync.py -- Sync YouTube Analytics with Hook Performance
 
 Run periodically (daily via the hook-analytics-sync.yml workflow, and once per
 upload via scripts/ci_analytics_check.py) to pull real view/retention data for
@@ -18,7 +19,7 @@ How the loop closes:
      calls record_hook_performance() so the real numbers land in
      hook_analytics.json.
   4. The entry is marked "synced" (with the raw metrics snapshot attached)
-     so it's only ever recorded once — re-running this script is always
+     so it's only ever recorded once -- re-running this script is always
      safe and won't double-count views.
 """
 
@@ -48,7 +49,7 @@ try:
     YOUTUBE_API_AVAILABLE = True
 except ImportError:
     YOUTUBE_API_AVAILABLE = False
-    print("⚠️ googleapiclient not installed. Run: pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib")
+    print("[WARNING] googleapiclient not installed. Run: pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib")
 
 # YouTube Analytics API scopes
 SCOPES = ['https://www.googleapis.com/auth/yt-analytics.readonly', 'https://www.googleapis.com/auth/youtube.readonly']
@@ -78,11 +79,11 @@ def get_youtube_analytics_service():
             creds.refresh(Request())
         else:
             if not CREDENTIALS_FILE.exists():
-                print(f"❌ Credentials file not found: {CREDENTIALS_FILE}")
+                print(f"[ERROR] Credentials file not found: {CREDENTIALS_FILE}")
                 print("   Download from Google Cloud Console > APIs & Services > Credentials")
                 return None
             if os.getenv("CI") or os.getenv("GITHUB_ACTIONS"):
-                print("❌ YouTube Analytics token missing or invalid in CI environment. Run locally to authenticate.")
+                print("[ERROR] YouTube Analytics token missing or invalid in CI environment. Run locally to authenticate.")
                 print("   (This means YOUTUBE_ANALYTICS_TOKEN_JSON is not set as a repo secret yet,")
                 print("    or the token has expired and needs to be regenerated locally.)")
                 return None
@@ -147,7 +148,7 @@ def fetch_video_analytics(service, video_id, start_date: str, end_date: str) -> 
                 "shares": row[7] if len(row) > 7 else 0
             }
     except Exception as e:
-        print(f"⚠️ Failed to fetch analytics for {video_id}: {e}")
+        print(f"[WARNING] Failed to fetch analytics for {video_id}: {e}")
     
     return {}
 
@@ -160,7 +161,7 @@ def fetch_video_duration(yt_service, video_id: str) -> float:
         if items:
             return _parse_iso8601_duration(items[0].get("contentDetails", {}).get("duration", ""))
     except Exception as e:
-        print(f"⚠️ Failed to fetch duration for {video_id}: {e}")
+        print(f"[WARNING] Failed to fetch duration for {video_id}: {e}")
     return 0.0
 
 
@@ -171,7 +172,7 @@ def _load_hook_video_map() -> dict:
             with open(HOOK_VIDEO_MAP_FILE, "r") as f:
                 return json.load(f)
         except Exception as e:
-            print(f"⚠️ Failed to read {HOOK_VIDEO_MAP_FILE}: {e}")
+            print(f"[WARNING] Failed to read {HOOK_VIDEO_MAP_FILE}: {e}")
     return {}
 
 
@@ -214,18 +215,18 @@ def sync_hook_analytics_with_youtube(days_back: int = 7, min_age_hours: int = DE
     many days" so existing callers (ci_analytics_check.py, main()) keep
     working unchanged.
     """
-    print(f"🔄 Syncing hook analytics with YouTube (videos {min_age_hours}h–{days_back}d old)...")
+    print(f"[SYNC] Syncing hook analytics with YouTube (videos {min_age_hours}h-{days_back}d old)...")
 
     hook_video_map = _load_hook_video_map()
     if not hook_video_map:
-        print(f"⚠️ No {HOOK_VIDEO_MAP_FILE} found yet — nothing to sync. "
+        print(f"[WARNING] No {HOOK_VIDEO_MAP_FILE} found yet -- nothing to sync. "
               "It's written automatically the next time a Short uploads.")
         print_analytics_summary()
         return
 
     pending = _get_pending_videos(hook_video_map, min_age_hours, days_back)
     already_synced = sum(1 for e in hook_video_map.values() if e.get("synced"))
-    print(f"📹 {len(pending)} video(s) pending sync · {already_synced} already synced · "
+    print(f"[VIDEO] {len(pending)} video(s) pending sync · {already_synced} already synced · "
           f"{len(hook_video_map)} tracked total")
 
     if not pending:
@@ -233,12 +234,12 @@ def sync_hook_analytics_with_youtube(days_back: int = 7, min_age_hours: int = DE
         return
 
     if not YOUTUBE_API_AVAILABLE:
-        print("⚠️ YouTube Analytics API not available - skipping live sync")
+        print("[WARNING] YouTube Analytics API not available - skipping live sync")
         return
 
     creds = get_youtube_analytics_service()
     if not creds:
-        print("⚠️ Could not get valid YouTube Analytics credentials - skipping live sync this run")
+        print("[WARNING] Could not get valid YouTube Analytics credentials - skipping live sync this run")
         return
 
     analytics_service = build('youtubeAnalytics', 'v2', credentials=creds)
@@ -250,7 +251,7 @@ def sync_hook_analytics_with_youtube(days_back: int = 7, min_age_hours: int = DE
         pattern_id = entry.get("hook_pattern")
         variant_id = entry.get("hook_variant")
         if not (category and pattern_id and variant_id):
-            print(f"⚠️ Skipping {video_id} — hook mapping entry is incomplete")
+            print(f"[WARNING] Skipping {video_id} -- hook mapping entry is incomplete")
             continue
 
         start_date = entry["uploaded_at"][:10]
@@ -258,7 +259,7 @@ def sync_hook_analytics_with_youtube(days_back: int = 7, min_age_hours: int = DE
 
         analytics = fetch_video_analytics(analytics_service, video_id, start_date, end_date)
         if not analytics or not analytics.get("views"):
-            print(f"⚠️ No analytics yet for {video_id} ({entry.get('title', '')[:40]!r}) — will retry next run")
+            print(f"[WARNING] No analytics yet for {video_id} ({entry.get('title', '')[:40]!r}) -- will retry next run")
             continue
 
         duration_sec = fetch_video_duration(yt_service, video_id)
@@ -302,23 +303,23 @@ def sync_hook_analytics_with_youtube(days_back: int = 7, min_age_hours: int = DE
         hook_video_map[video_id] = entry
         synced_count += 1
 
-        print(f"✅ Synced {video_id} [{category}/{pattern_id}/{variant_id}]: "
+        print(f"[OK] Synced {video_id} [{category}/{pattern_id}/{variant_id}]: "
               f"{views} views, {retention_rate:.1%} retention, {engagement_rate:.1%} engagement, "
               f"swipe_away: {swipe_away_rate:.1%}")
 
     if synced_count:
         _save_hook_video_map(hook_video_map)
-        print(f"💾 Recorded {synced_count} new video(s) into hook_analytics.json "
+        print(f"[SAVE] Recorded {synced_count} new video(s) into hook_analytics.json "
               f"and marked them synced in {HOOK_VIDEO_MAP_FILE.name}")
     else:
-        print("ℹ️ Nothing had analytics data available to sync this run.")
+        print("[INFO] Nothing had analytics data available to sync this run.")
 
     # Print current analytics summary + leaderboards
     print_analytics_summary()
     analytics_data = _load_analytics()
     categories = analytics_data.get("categories", {})
     for category in categories:
-        print(f"\n🏆 Top hooks for {category}:")
+        print(f"\n[TROPHY] Top hooks for {category}:")
         leaderboard = get_category_leaderboard(category, top_n=3)
         for i, item in enumerate(leaderboard, 1):
             swipe = item.get('swipe_away_rate', 0)
@@ -376,16 +377,16 @@ def main():
     if args.print_only:
         print_analytics_summary()
     elif args.find_underperforming:
-        print("🔍 Finding underperforming hooks (swipe-away > 70%)...")
+        print("[SEARCH] Finding underperforming hooks (swipe-away > 70%)...")
         under = get_underperforming_hooks()
         if under:
             for u in under:
-                print(f"\n⚠️ {u['category']} / {u['pattern']} / {u['variant']}")
+                print(f"\n[WARNING] {u['category']} / {u['pattern']} / {u['variant']}")
                 print(f"   Swipe-away: {u['swipe_away_rate']:.1%} | Retention: {u['retention']:.1%} | Views: {u['views']}")
                 print(f"   Latest hook: \"{u['hook_text']}\"")
                 print(f"   All variants: {u['hook_texts']}")
         else:
-            print("✅ No underperforming hooks found.")
+            print("[OK] No underperforming hooks found.")
     else:
         sync_hook_analytics_with_youtube(args.days, args.min_age_hours)
 
