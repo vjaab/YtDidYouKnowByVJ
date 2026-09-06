@@ -92,7 +92,7 @@ def _load_analytics() -> Dict:
             pass
     return {
         "categories": {},
-        "global": {pattern["id"]: {"views": 0, "retention": 0.0, "engagement": 0.0, "count": 0} 
+        "global": {pattern["id"]: {"views": 0, "retention": 0.0, "engagement": 0.0, "swipe_away_rate": 0.0, "avg_view_percentage": 0.0, "count": 0} 
                   for pattern in HOOK_PATTERNS},
         "last_updated": None
     }
@@ -204,7 +204,9 @@ def record_hook_performance(
     views: int,
     retention_rate: float,
     engagement_rate: float,
-    watch_time_seconds: float = 0
+    watch_time_seconds: float = 0,
+    swipe_away_rate: float = 0.0,
+    avg_view_percentage: float = 0.0
 ):
     """
     Record performance metrics for a hook pattern/variant.
@@ -218,13 +220,13 @@ def record_hook_performance(
     
     cat = data["categories"][category]
     if pattern_id not in cat:
-        cat[pattern_id] = {"variants": {}, "total_views": 0, "total_videos": 0, "avg_retention": 0.0, "avg_engagement": 0.0}
+        cat[pattern_id] = {"variants": {}, "total_views": 0, "total_videos": 0, "avg_retention": 0.0, "avg_engagement": 0.0, "avg_swipe_away": 0.0, "avg_view_percentage": 0.0}
     
     pattern = cat[pattern_id]
     
     # Update variant
     if variant_id not in pattern["variants"]:
-        pattern["variants"][variant_id] = {"views": 0, "retention": 0.0, "engagement": 0.0, "count": 0}
+        pattern["variants"][variant_id] = {"views": 0, "retention": 0.0, "engagement": 0.0, "swipe_away_rate": 0.0, "avg_view_percentage": 0.0, "count": 0}
     
     variant = pattern["variants"][variant_id]
     variant["views"] = variant.get("views", 0) + views
@@ -237,6 +239,14 @@ def record_hook_performance(
     old_eng = variant.get("engagement", 0.0)
     variant["engagement"] = (old_eng * (variant["count"] - 1) + engagement_rate) / variant["count"]
     
+    # Running average for swipe_away_rate
+    old_swipe = variant.get("swipe_away_rate", 0.0)
+    variant["swipe_away_rate"] = (old_swipe * (variant["count"] - 1) + swipe_away_rate) / variant["count"]
+    
+    # Running average for avg_view_percentage
+    old_avg_pct = variant.get("avg_view_percentage", 0.0)
+    variant["avg_view_percentage"] = (old_avg_pct * (variant["count"] - 1) + avg_view_percentage) / variant["count"]
+    
     # Update pattern totals
     pattern["total_views"] = pattern.get("total_views", 0) + views
     pattern["total_videos"] = pattern.get("total_videos", 0) + 1
@@ -244,26 +254,33 @@ def record_hook_performance(
     # Recalculate pattern averages
     total_ret = sum(v.get("retention", 0.0) * v.get("count", 1) for v in pattern["variants"].values())
     total_eng = sum(v.get("engagement", 0.0) * v.get("count", 1) for v in pattern["variants"].values())
+    total_swipe = sum(v.get("swipe_away_rate", 0.0) * v.get("count", 1) for v in pattern["variants"].values())
+    total_avg_pct = sum(v.get("avg_view_percentage", 0.0) * v.get("count", 1) for v in pattern["variants"].values())
     total_cnt = sum(v.get("count", 1) for v in pattern["variants"].values())
     
     pattern["avg_retention"] = total_ret / max(total_cnt, 1)
     pattern["avg_engagement"] = total_eng / max(total_cnt, 1)
+    pattern["avg_swipe_away"] = total_swipe / max(total_cnt, 1)
+    pattern["avg_view_percentage"] = total_avg_pct / max(total_cnt, 1)
     
     # Update global
-    glob = data["global"].setdefault(pattern_id, {"views": 0, "retention": 0.0, "engagement": 0.0, "count": 0})
+    glob = data["global"].setdefault(pattern_id, {"views": 0, "retention": 0.0, "engagement": 0.0, "swipe_away_rate": 0.0, "avg_view_percentage": 0.0, "count": 0})
     glob["views"] = glob.get("views", 0) + views
     glob["count"] = glob.get("count", 0) + 1
     glob["retention"] = (glob.get("retention", 0.0) * (glob["count"] - 1) + retention_rate) / glob["count"]
     glob["engagement"] = (glob.get("engagement", 0.0) * (glob["count"] - 1) + engagement_rate) / glob["count"]
+    glob["swipe_away_rate"] = (glob.get("swipe_away_rate", 0.0) * (glob["count"] - 1) + swipe_away_rate) / glob["count"]
+    glob["avg_view_percentage"] = (glob.get("avg_view_percentage", 0.0) * (glob["count"] - 1) + avg_view_percentage) / glob["count"]
     
     _save_analytics(data)
-    print(f"📊 Hook analytics updated: {category}/{pattern_id}/{variant_id} - {views} views, {retention_rate:.1%} retention")
+    print(f"📊 Hook analytics updated: {category}/{pattern_id}/{variant_id} - {views} views, {retention_rate:.1%} retention, swipe_away: {swipe_away_rate:.1%}")
 
 
 def select_hook_patterns_for_category(category: str, num_patterns: int = 3) -> List[str]:
     """
     Select the best hook patterns for a category based on historical performance.
     Uses Thompson Sampling for exploration/exploitation balance.
+    Penalizes patterns with high swipe-away rates (>70% = hook failure).
     """
     import random
     import math
@@ -281,12 +298,14 @@ def select_hook_patterns_for_category(category: str, num_patterns: int = 3) -> L
         cat_stats = cat_data.get(pid, {})
         cat_ret = cat_stats.get("avg_retention", 0.0)
         cat_eng = cat_stats.get("avg_engagement", 0.0)
+        cat_swipe = cat_stats.get("avg_swipe_away", 0.0)
         cat_cnt = cat_stats.get("total_videos", 0)
         
         # Get global stats as prior
         glob_stats = global_data.get(pid, {})
         glob_ret = glob_stats.get("retention", 0.0)
         glob_eng = glob_stats.get("engagement", 0.0)
+        glob_swipe = glob_stats.get("swipe_away_rate", 0.0)
         glob_cnt = glob_stats.get("count", 0)
         
         # Weighted score: 70% category, 30% global (with smoothing)
@@ -295,9 +314,14 @@ def select_hook_patterns_for_category(category: str, num_patterns: int = 3) -> L
         else:
             weight = 0.0
         
-        # Combined score (retention + engagement)
-        cat_score = (cat_ret + cat_eng) / 2 if cat_cnt > 0 else 0.5
-        glob_score = (glob_ret + glob_eng) / 2 if glob_cnt > 0 else 0.5
+        # Combined score: retention + engagement, MINUS swipe-away penalty
+        # High swipe-away (>70%) means the hook fails to stop the scroll
+        cat_score = (cat_ret + cat_eng) / 2 - cat_swipe if cat_cnt > 0 else 0.5
+        glob_score = (glob_ret + glob_eng) / 2 - glob_swipe if glob_cnt > 0 else 0.5
+        
+        # Ensure score doesn't go negative
+        cat_score = max(cat_score, 0.0)
+        glob_score = max(glob_score, 0.0)
         
         score = weight * cat_score + (1 - weight) * glob_score
         
@@ -384,12 +408,47 @@ def get_category_leaderboard(category: str, top_n: int = 5) -> List[Dict]:
                 "views": variant_data.get("views", 0),
                 "retention": variant_data.get("retention", 0.0),
                 "engagement": variant_data.get("engagement", 0.0),
+                "swipe_away_rate": variant_data.get("swipe_away_rate", 0.0),
+                "avg_view_percentage": variant_data.get("avg_view_percentage", 0.0),
                 "count": variant_data.get("count", 0),
                 "score": (variant_data.get("retention", 0.0) + variant_data.get("engagement", 0.0)) / 2
             })
     
     results.sort(key=lambda x: x["score"], reverse=True)
     return results[:top_n]
+
+
+def get_underperforming_hooks(min_views: int = 50, max_swipe_away: float = 0.7) -> List[Dict]:
+    """
+    Identify hooks with high swipe-away rates (>70%) that need rewriting.
+    Returns list of dicts with category, pattern, variant, hook_text, swipe_away_rate, views.
+    """
+    data = _load_analytics()
+    
+    underperforming = []
+    for category, cat_data in data.get("categories", {}).items():
+        for pattern_id, pattern_data in cat_data.items():
+            for variant_id, variant_data in pattern_data.get("variants", {}).items():
+                views = variant_data.get("views", 0)
+                swipe_away = variant_data.get("swipe_away_rate", 0)
+                retention = variant_data.get("retention", 0)
+                
+                if views >= min_views and (swipe_away > max_swipe_away or retention < 0.3):
+                    hook_texts = variant_data.get("hook_texts", [])
+                    latest_hook = hook_texts[-1].get("text", "") if hook_texts else ""
+                    underperforming.append({
+                        "category": category,
+                        "pattern": pattern_id,
+                        "variant": variant_id,
+                        "hook_text": latest_hook,
+                        "swipe_away_rate": swipe_away,
+                        "retention": retention,
+                        "views": views,
+                        "hook_texts": [h.get("text", "") for h in hook_texts]
+                    })
+    
+    underperforming.sort(key=lambda x: x["swipe_away_rate"], reverse=True)
+    return underperforming
 
 
 def print_analytics_summary():
@@ -404,14 +463,20 @@ def print_analytics_summary():
             total_v = pattern_data.get("total_videos", 0)
             avg_ret = pattern_data.get("avg_retention", 0.0)
             avg_eng = pattern_data.get("avg_engagement", 0.0)
-            print(f"  {pattern_id}: {total_v} videos, {avg_ret:.1%} retention, {avg_eng:.1%} engagement")
+            avg_swipe = pattern_data.get("avg_swipe_away", 0.0)
+            avg_pct = pattern_data.get("avg_view_percentage", 0.0)
+            print(f"  {pattern_id}: {total_v} videos, {avg_ret:.1%} retention, {avg_eng:.1%} engagement, {avg_swipe:.1%} swipe_away, {avg_pct:.1f}% avg_view")
             for var_id, var_data in pattern_data.get("variants", {}).items():
-                print(f"    {var_id}: {var_data.get('views', 0)} views, {var_data.get('retention', 0.0):.1%} ret")
+                swipe = var_data.get("swipe_away_rate", 0.0)
+                pct = var_data.get("avg_view_percentage", 0.0)
+                print(f"    {var_id}: {var_data.get('views', 0)} views, {var_data.get('retention', 0.0):.1%} ret, {swipe:.1%} swipe, {pct:.1f}% view")
     
     print("\n🌍 Global:")
     for pid, glob in data.get("global", {}).items():
         if glob.get("count", 0) > 0:
-            print(f"  {pid}: {glob['count']} videos, {glob['retention']:.1%} ret, {glob['engagement']:.1%} eng")
+            swipe = glob.get("swipe_away_rate", 0.0)
+            pct = glob.get("avg_view_percentage", 0.0)
+            print(f"  {pid}: {glob['count']} videos, {glob['retention']:.1%} ret, {glob['engagement']:.1%} eng, {swipe:.1%} swipe, {pct:.1f}% view")
 
 
 # Convenience function for pipeline integration
