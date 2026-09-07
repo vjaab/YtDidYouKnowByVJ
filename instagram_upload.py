@@ -43,11 +43,6 @@ from config import (
     BASE_DIR,
 )
 
-from facebook_upload import (
-    post_video_to_facebook_page,
-    post_video_to_facebook_page_fallback,
-)
-
 # ── Constants ────────────────────────────────────────────────────────────────
 GRAPH_API_VERSION = "v25.0"
 GRAPH_API_BASE = f"https://graph.facebook.com/{GRAPH_API_VERSION}"
@@ -70,13 +65,6 @@ def _check_credentials():
     ig_user_id = os.getenv("IG_USER_ID")
     ig_access_token = os.getenv("IG_ACCESS_TOKEN")
     return all(k and k.strip() for k in [ig_user_id, ig_access_token])
-
-
-def _check_facebook_credentials():
-    """Verifies that Facebook Page credentials are configured for cross-posting."""
-    fb_page_id = os.getenv("FB_PAGE_ID")
-    fb_page_access_token = os.getenv("FB_PAGE_ACCESS_TOKEN")
-    return all(k and k.strip() for k in [fb_page_id, fb_page_access_token])
 
 
 # ── Token Management ────────────────────────────────────────────────────────
@@ -518,23 +506,6 @@ def upload_reel_to_instagram(video_path: str, caption: str):
         print(f"📡 [Instagram] Step 4/4: Publishing Reel...")
         reel_id = publish_container(container_id)
         print(f"🎉 Instagram Reel published! ID: {reel_id}")
-
-        # ── STEP 5: Cross-post to Facebook Page (if configured) ──────────────
-        if _check_facebook_credentials():
-            print(f"📡 [Facebook] Cross-posting to Facebook Page...")
-            try:
-                fb_reel_id, fb_error = post_video_to_facebook_page(public_url, caption)
-                if not fb_reel_id:
-                    print(f"🔄 [Facebook] video_reels failed ({fb_error}), trying fallback /videos endpoint...")
-                    fb_reel_id, fb_error = post_video_to_facebook_page_fallback(public_url, caption)
-                if fb_reel_id:
-                    print(f"🎉 Facebook Reel published! ID: {fb_reel_id}")
-                else:
-                    print(f"⚠️ Facebook cross-post skipped: {fb_error}")
-            except Exception as e:
-                print(f"⚠️ Facebook cross-post failed (non-fatal): {e}")
-        else:
-            print("⚠️ Facebook Page credentials not configured — skipping cross-post")
 
         # Track rate limit
         _increment_rate_limit()
