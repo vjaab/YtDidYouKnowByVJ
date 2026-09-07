@@ -134,10 +134,17 @@ def fetch_video_analytics(service, video_id, start_date: str, end_date: str) -> 
         rows = response.get("rows", [])
         if rows:
             row = rows[0]
+            # Validate that row[0] is numeric (views)
+            try:
+                views_val = int(row[0])
+            except (ValueError, TypeError, IndexError):
+                print(f"[WARNING] Invalid views data for {video_id}: {row[0]!r}")
+                return {}
+            
             avg_view_pct = row[3] if len(row) > 3 else 0
             swipe_away_rate = max(0.0, 1.0 - (avg_view_pct / 100.0)) if avg_view_pct else 1.0
             return {
-                "views": row[0],
+                "views": views_val,
                 "estimated_minutes_watched": row[1],
                 "avg_view_duration_sec": row[2],
                 "avg_view_percentage": avg_view_pct,
@@ -147,6 +154,8 @@ def fetch_video_analytics(service, video_id, start_date: str, end_date: str) -> 
                 "comments": row[6] if len(row) > 6 else 0,
                 "shares": row[7] if len(row) > 7 else 0
             }
+        else:
+            print(f"[INFO] No analytics rows returned for {video_id}")
     except Exception as e:
         print(f"[WARNING] Failed to fetch analytics for {video_id}: {e}")
     
@@ -260,6 +269,13 @@ def sync_hook_analytics_with_youtube(days_back: int = 7, min_age_hours: int = DE
         analytics = fetch_video_analytics(analytics_service, video_id, start_date, end_date)
         if not analytics or not analytics.get("views"):
             print(f"[WARNING] No analytics yet for {video_id} ({entry.get('title', '')[:40]!r}) -- will retry next run")
+            continue
+        
+        # Validate views is numeric
+        try:
+            views_val = int(analytics.get("views", 0))
+        except (ValueError, TypeError):
+            print(f"[WARNING] Invalid views value for {video_id}: {analytics.get('views')!r} -- skipping")
             continue
 
         duration_sec = fetch_video_duration(yt_service, video_id)
