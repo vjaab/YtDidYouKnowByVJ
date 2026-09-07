@@ -263,13 +263,13 @@ def sync_hook_analytics_with_youtube(days_back: int = 7, min_age_hours: int = DE
             continue
 
         duration_sec = fetch_video_duration(yt_service, video_id)
-        views = analytics.get("views", 0) or 0
-        avg_view_duration = analytics.get("avg_view_duration_sec", 0) or 0
-        avg_view_percentage = analytics.get("avg_view_percentage", 0) or 0
-        swipe_away_rate = analytics.get("swipe_away_rate", 1.0)
-        likes = analytics.get("likes", 0) or 0
-        comments = analytics.get("comments", 0) or 0
-        shares = analytics.get("shares", 0) or 0
+        views = int(analytics.get("views", 0) or 0)
+        avg_view_duration = float(analytics.get("avg_view_duration_sec", 0) or 0)
+        avg_view_percentage = float(analytics.get("avg_view_percentage", 0) or 0)
+        swipe_away_rate = float(analytics.get("swipe_away_rate", 1.0) or 1.0)
+        likes = int(analytics.get("likes", 0) or 0)
+        comments = int(analytics.get("comments", 0) or 0)
+        shares = int(analytics.get("shares", 0) or 0)
 
         retention_rate = min(avg_view_duration / duration_sec, 1.0) if duration_sec > 0 else 0.0
         engagement_rate = (likes + comments + shares) / views if views > 0 else 0.0
