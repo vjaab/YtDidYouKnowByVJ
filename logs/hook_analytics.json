@@ -76,6 +76,31 @@
         "total_videos": 1,
         "avg_retention": 0.0,
         "avg_engagement": 0.0
+      },
+      "negative_warning": {
+        "variants": {
+          "C": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "Don't sideload apps! Your iPhone's at risk.",
+                "video_id": "vEx8H2lHitY",
+                "recorded_at": "2026-09-07T20:25:53.123961"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
       }
     },
     "Tech Tips": {
@@ -290,7 +315,7 @@
       "views": 0,
       "retention": 0.0,
       "engagement": 0.0,
-      "count": 4,
+      "count": 5,
       "swipe_away_rate": 0.0,
       "avg_view_percentage": 0.0
     },
@@ -321,5 +346,5 @@
       "count": 3
     }
   },
-  "last_updated": "2026-09-06T23:53:10.301703"
+  "last_updated": "2026-09-07T20:25:53.124000"
 }
