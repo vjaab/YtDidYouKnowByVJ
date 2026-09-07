@@ -23,7 +23,7 @@ WEEKLY_SCHEDULE = {
     "Thu": ["Tech Company Founding Stories", "Programming Language Origins"],
     "Fri": ["Quiz & Trivia", "Interview Questions"],
     "Sat": ["Famous Bugs & Glitches", "Interview Questions"],
-    "Sun": ["Coding & Development Hacks", "Interview Questions"],
+    "Sun": ["Coding & Development Hacks", "Python Libraries & Frameworks"],
 }
 
 SCHEDULE_TRACKER_FILE = os.path.join(os.path.dirname(__file__), "schedule_tracker.json")
@@ -165,6 +165,8 @@ CONTENT_LAYOUT_MAP = {
     "Tech Company Founding Stories": "asymmetric", # Storytelling
     "Famous Bugs & Glitches": "side_strip",      # Bug details + avatar
     "Agentic AI Facts": "hero_center",           # Concept visualization
+    "Python Libraries & Frameworks": "split_screen",  # Code + terminal demo
+    "AWS Cloud Services": "side_strip",          # Architecture diagram + presenter
 }
 
 # Visual type to layout mapping (overrides category default)
@@ -638,6 +640,40 @@ _AI_HACKS_DATA = {
             "You are a staff engineer conducting a technical interview. Provide the complete answer to this {topic} interview question: {question}. Include: 1) Direct answer, 2) Code/config/diagram example, 3) Why interviewers ask this, 4) Common wrong answers, 5) Follow-up questions. Keep it concise for a 30-second Short.",
             "Generate a senior-level technical interview question for {topic} with a complete answer. The question should test deep understanding, not just syntax. Include a code snippet or architecture diagram description.",
             "What are the top 5 most commonly asked {topic} interview questions that separate junior from senior candidates? Format as a Short script with hook, context, answer, and key takeaway."
+        ]
+    },
+    "Python Libraries & Frameworks": {
+        "strategy": "Focus on one specific Python library or framework per video. Show real code, not just descriptions. Cover: FastAPI/Django/Flask (web), Pandas/Polars (data), NumPy/SciPy (scientific), Requests/httpx (HTTP), SQLAlchemy/Tortoise (ORM), Pydantic (validation), Celery/RQ (async), pytest/Hypothesis (testing), Poetry/UV (packaging), Typer/Click (CLI), Rich/Textual (TUI), LangChain/LlamaIndex (AI), BeautifulSoup/Playwright (scraping). Include: install command, 3-line quickstart, one killer feature demo, when NOT to use it.",
+        "hooks": [
+            "Stop writing SQL by hand. SQLAlchemy 2.0 does it for you — here's how.",
+            "This Python library replaces 500 lines of Flask code with 50. FastAPI demo.",
+            "Pandas is slow. Polars is 10x faster. I'll prove it in 30 seconds.",
+            "The ONLY way to build CLIs in 2024: Typer + Rich. Zero boilerplate.",
+            "Pydantic V2 just changed everything. Your validation code is now 5x faster."
+        ],
+        "demo_format": "Hook (problem solved) → `pip install` command (1s) → 3-line quickstart (2-5s) → Live feature demo solving real problem (5-20s) → When to avoid it (20-25s) → CTA (25-30s)",
+        "tools": ["Python.org", "PyPI", "GitHub Trending", "Real Python", "Awesome Python", "PyCoder's Weekly", "Python Weekly", "TestDriven.io", "FastAPI Docs", "Django Docs", "Polars Docs", "Pydantic Docs"],
+        "prompts": [
+            "You are a senior Python developer. Write a 30-second Short script explaining ONE specific Python library/framework. Structure: Hook → Install → Quickstart (3 lines) → Killer Feature Demo → Caveats → CTA. Target: engineers who want to level up their tooling.",
+            "Generate a 'Python tip of the day' Short about a lesser-known standard library module (itertools, functools, collections, pathlib, dataclasses, contextlib). Show practical use case.",
+            "Compare two similar Python libraries (e.g., Requests vs httpx, Pandas vs Polars, Flask vs FastAPI). Give a clear recommendation with code examples."
+        ]
+    },
+    "AWS Cloud Services": {
+        "strategy": "Focus on ONE specific AWS service per video. Target developers who use AWS but don't know all services. Cover: Lambda, ECS/Fargate, EKS, API Gateway, EventBridge, Step Functions, S3, DynamoDB, RDS Aurora, CloudFront, SNS/SQS, Secrets Manager, Parameter Store, CloudWatch, X-Ray, IAM, CDK, SAM, Amplify, App Runner. Include: console screenshot or CDK/Terraform snippet, pricing reality check, when to use vs alternatives, common gotcha.",
+        "hooks": [
+            "You're overpaying for EC2. Lambda + API Gateway costs $0.20/month for 1M requests.",
+            "Stop managing Kubernetes. ECS Fargate runs containers WITHOUT cluster ops.",
+            "DynamoDB single-table design: The pattern that scales to millions for pennies.",
+            "EventBridge = the nervous system of your AWS architecture. Here's why.",
+            "CDK > CloudFormation. Write infrastructure in Python/TypeScript. No YAML pain."
+        ],
+        "demo_format": "Hook (cost/savings/architecture win) → Console/CDK snippet (2-5s) → Architecture diagram → Live deploy or config walkthrough (5-20s) → Pricing breakdown (20-25s) → CTA (25-30s)",
+        "tools": ["AWS Console", "AWS CDK", "AWS SAM", "Terraform", "LocalStack", "AWS Pricing Calculator", "AWS Well-Architected Tool", "CloudWatch", "X-Ray", "AWS Docs", "AWS Blogs", "AWS Compute Blog"],
+        "prompts": [
+            "You are an AWS Solutions Architect. Write a 30-second Short about ONE AWS service. Structure: Hook (cost/ops win) → CDK/Terraform/Console snippet → Architecture context → Pricing reality → When NOT to use it → CTA.",
+            "Generate a 'AWS tip of the day' Short about a hidden feature or cost optimization (e.g., S3 Intelligent Tiering, Lambda Power Tuning, Compute Savings Plans, Graviton).",
+            "Compare two AWS services for the same use case (e.g., Lambda vs Fargate, DynamoDB vs Aurora, SQS vs EventBridge). Give a clear decision framework with pricing."
         ]
     }
 }

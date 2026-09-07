@@ -216,6 +216,42 @@ CATEGORY_SIGNALS = {
         "google_trends_whitelist": {'agent', 'autogen', 'crewai', 'langgraph', 'autonomous', 'multi-agent', 'reflexion'},
         "youtube_outlier_keywords": ["AI agent", "AutoGen", "CrewAI", "LangGraph", "autonomous agent", "multi-agent"],
     },
+    "Python Libraries & Frameworks": {
+        "youtube_queries": [
+            "Python libraries you need to know 2026",
+            "FastAPI tutorial Python",
+            "Pandas vs Polars performance",
+            "Python CLI tools Typer Rich",
+            "Pydantic validation Python",
+            "best Python packages 2026",
+        ],
+        "reddit_subs": ["Python", "learnpython", "PythonPackages", "django", "fastapi", "DataEngineering"],
+        "github_topics": ["python", "fastapi", "django", "pandas", "polars", "pydantic", "typer", "rich", "sqlalchemy", "pytest"],
+        "github_languages": ["python"],
+        "hn_keywords": ['python', 'fastapi', 'django', 'pandas', 'polars', 'pydantic', 'typer', 'rich', 'sqlalchemy', 'pytest', 'pip', 'uv', 'poetry'],
+        "hf_tasks": [],
+        "arxiv_cats": ["cs.SE", "cs.PL"],
+        "google_trends_whitelist": {'python', 'fastapi', 'django', 'pandas', 'polars', 'pydantic', 'typer', 'library', 'package', 'pip'},
+        "youtube_outlier_keywords": ["Python library", "Python package", "FastAPI", "Polars", "Pydantic", "Typer"],
+    },
+    "AWS Cloud Services": {
+        "youtube_queries": [
+            "AWS Lambda tutorial 2026",
+            "ECS Fargate vs Lambda",
+            "DynamoDB single table design",
+            "AWS CDK infrastructure as code",
+            "EventBridge event driven architecture",
+            "AWS cost optimization tips",
+        ],
+        "reddit_subs": ["aws", "devops", "cloudcomputing", "sysadmin", "serverless", "aws_certification"],
+        "github_topics": ["aws", "lambda", "cdk", "terraform", "serverless", "dynamodb", "ecs", "cloudformation"],
+        "github_languages": ["python", "typescript", "go", "yaml"],
+        "hn_keywords": ['aws', 'lambda', 'dynamodb', 'ecs', 'fargate', 'cdk', 'terraform', 'serverless', 'cloudformation', 'eventbridge', 'step-functions'],
+        "hf_tasks": [],
+        "arxiv_cats": ["cs.DC", "cs.SE"],
+        "google_trends_whitelist": {'aws', 'lambda', 'dynamodb', 'ecs', 'fargate', 'cdk', 'serverless', 'cloud', 'infrastructure'},
+        "youtube_outlier_keywords": ["AWS Lambda", "DynamoDB", "CDK", "Fargate", "EventBridge", "AWS cost"],
+    },
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -914,6 +950,8 @@ YOUTUBE_CATEGORY_MAP = {
     "Agentic AI Facts": 28,         # Science & Technology
     "Facts & Trivia": 28,           # Science & Technology
     "Quiz & Trivia": 28,            # Science & Technology
+    "Python Libraries & Frameworks": 28,  # Science & Technology
+    "AWS Cloud Services": 28,       # Science & Technology
 }
 
 

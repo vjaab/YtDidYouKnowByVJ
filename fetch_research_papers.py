@@ -390,6 +390,8 @@ X_CATEGORY_QUERIES = {
     "Tech Company Founding Stories": "(#startup OR #founder OR #YCombinator OR #techhistory) -is:retweet lang:en",
     "Famous Bugs & Glitches": "(#softwarebugs OR #programminghorror OR #postmortem OR #outage) -is:retweet lang:en",
     "Agentic AI Facts": "(#AIagents OR #AutoGen OR #CrewAI OR #LangGraph OR #multiagent) -is:retweet lang:en",
+    "Python Libraries & Frameworks": "(#python OR #fastapi OR #django OR #pandas OR #polars OR #pydantic OR #typer OR #rich) -is:retweet lang:en",
+    "AWS Cloud Services": "(#aws OR #lambda OR #dynamodb OR #ecs OR #cdk OR #terraform OR #serverless) -is:retweet lang:en",
 }
 
 

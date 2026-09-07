@@ -87,6 +87,22 @@ CATEGORY_YOUTUBE_QUERIES = {
         "AI agent workflow",
         "multi-agent systems",
     ],
+    "Python Libraries & Frameworks": [
+        "Python libraries 2026",
+        "FastAPI tutorial Python",
+        "Pandas vs Polars",
+        "Python CLI Typer Rich",
+        "Pydantic validation",
+        "best Python packages",
+    ],
+    "AWS Cloud Services": [
+        "AWS Lambda tutorial",
+        "ECS Fargate vs Lambda",
+        "DynamoDB design patterns",
+        "AWS CDK Python",
+        "EventBridge tutorial",
+        "AWS cost optimization",
+    ],
 }
 
 
