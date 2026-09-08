@@ -36,7 +36,7 @@ jobs:
           python music_fetcher.py --source curated
       
       - name: Sync audio from Pixabay videos
-        if: ${{ secrets.PIXABAY_API_KEY != '' }}
+        if: secrets.PIXABAY_API_KEY != ''
         env:
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
         run: |
@@ -47,7 +47,7 @@ jobs:
           python music_fetcher.py --source fma --max-per-category 2
       
       - name: Sync from Jamendo
-        if: ${{ secrets.JAMENDO_CLIENT_ID != '' }}
+        if: secrets.JAMENDO_CLIENT_ID != ''
         env:
           JAMENDO_CLIENT_ID: ${{ secrets.JAMENDO_CLIENT_ID }}
         run: |
