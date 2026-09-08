@@ -40,6 +40,10 @@ YOUTUBE_DATA_API_KEY = os.getenv("YOUTUBE_DATA_API_KEY", "")
 REDDIT_CLIENT_ID = os.getenv("REDDIT_CLIENT_ID", "")
 REDDIT_CLIENT_SECRET = os.getenv("REDDIT_CLIENT_SECRET", "")
 
+# Free Music APIs
+PIXABAY_API_KEY = os.getenv("PIXABAY_API_KEY", "")  # For video API (audio extraction)
+JAMENDO_CLIENT_ID = os.getenv("JAMENDO_CLIENT_ID", "a2e02f14")  # Free at https://developer.jamendo.com
+
 
 # Directory Paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

@@ -14,6 +14,7 @@ from config import GEMINI_API_KEY, OUTPUT_DIR, VEO_MODEL_ID, HF_TOKEN, CF_ACCOUN
 import random
 
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")
+PIXABAY_API_KEY = os.getenv("PIXABAY_API_KEY", "")
 TODAY = datetime.now().strftime("%Y-%m-%d")
 
 _download_lock = threading.Lock()
@@ -403,7 +404,117 @@ def _search_pexels_photos(query, orientation="portrait"):
         return results
     except Exception as e:
         print(f"Pexels photo search error: {e}")
+        return []
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PIXABAY API (Free fallback - 100 req/min)
+# ─────────────────────────────────────────────────────────────────────────────
+def _search_pixabay_videos(query, chunk_duration, orientation="portrait"):
+    """Search Pixabay Videos API for free b-roll footage."""
+    if not PIXABAY_API_KEY:
+        return []
+    try:
+        r = requests.get(
+            "https://pixabay.com/api/videos/",
+            params={
+                "key": PIXABAY_API_KEY,
+                "q": query,
+                "per_page": 5,
+                "order": "popular",
+                "category": "music"  # or "backgrounds", "technology", "computer"
+            },
+            timeout=15
+        )
+        if r.status_code != 200:
+            return []
+        
+        results = []
+        for v in r.json().get("hits", []):
+            vid_id = f"pixabay_{v.get('id')}"
+            if vid_id in _used_media:
+                continue
+                
+            dur = v.get("duration", 0)
+            if dur < max(1.0, chunk_duration - 1.0):
+                continue
+            
+            # Get best quality video URL
+            video_files = v.get("videos", {})
+            target_files = []
+            if orientation == "portrait":
+                # Prefer vertical or square videos
+                for quality in ["large", "medium", "small", "tiny"]:
+                    if quality in video_files:
+                        f = video_files[quality]
+                        if f.get("height", 0) >= f.get("width", 1):  # vertical/square
+                            target_files.append(f)
+            else:
+                # Landscape
+                for quality in ["large", "medium", "small", "tiny"]:
+                    if quality in video_files:
+                        f = video_files[quality]
+                        if f.get("width", 0) > f.get("height", 1):
+                            target_files.append(f)
+            
+            if not target_files and video_files:
+                target_files = list(video_files.values())
+                
+            if target_files:
+                best = max(target_files, key=lambda f: f.get("size", 0))
+                results.append({
+                    "id": vid_id,
+                    "link": best["url"],
+                    "desc": v.get("tags", query),
+                    "type": "video",
+                    "duration": dur
+                })
+        return results
+    except Exception as e:
+        print(f"Pixabay video search error: {e}")
     return []
+
+
+def _search_pixabay_photos(query, orientation="portrait"):
+    """Search Pixabay Images API for free photos."""
+    if not PIXABAY_API_KEY:
+        return []
+    try:
+        r = requests.get(
+            "https://pixabay.com/api/",
+            params={
+                "key": PIXABAY_API_KEY,
+                "q": query,
+                "per_page": 5,
+                "orientation": orientation,
+                "image_type": "photo",
+                "order": "popular",
+                "category": "computer"  # tech-focused
+            },
+            timeout=15
+        )
+        if r.status_code != 200:
+            return []
+            
+        results = []
+        for p in r.json().get("hits", []):
+            pid = f"pixabay_{p.get('id')}"
+            if pid in _used_media:
+                continue
+            
+            url = p.get("largeImageURL") or p.get("webformatURL")
+            if url:
+                results.append({
+                    "id": pid,
+                    "link": url,
+                    "desc": p.get("tags", query),
+                    "type": "photo"
+                })
+        return results
+    except Exception as e:
+        print(f"Pixabay photo search error: {e}")
+    return []
+
 
 def _download_video(url, output_path):
     try:
@@ -593,15 +704,12 @@ def _fetch_pexels_fallback(chunk, duration, is_video=False, is_longform=False, t
     
     orientation = "landscape" if is_longform else "portrait"
     
-    if is_video:
-        # 1. Search videos for all queries
+    def _try_pexels_videos():
         all_videos = []
         for query in queries:
             print(f"   Searching Pexels video for '{query}'...")
             videos = _search_pexels_videos(query, duration, {"orientation": orientation})
             all_videos.extend(videos)
-            
-        # Score and rank videos
         if all_videos:
             scored_videos = _filter_and_sort_candidates_by_relevance(chunk.get("text", ""), all_videos)
             for score, v in scored_videos:
@@ -610,33 +718,15 @@ def _fetch_pexels_fallback(chunk, duration, is_video=False, is_longform=False, t
                 if path:
                     with _download_lock:
                         _used_media.add(v["id"])
-                    return path, f"Video ({v['desc']}) [Score: {score}]", "video"
-        
-        # 2. Fallback to photos if no videos found
-        all_photos = []
-        for query in queries:
-            print(f"   No video found. Searching Pexels photo for '{query}'...")
-            photos = _search_pexels_photos(query, orientation=orientation)
-            all_photos.extend(photos)
-            
-        if all_photos:
-            scored_photos = _filter_and_sort_candidates_by_relevance(chunk.get("text", ""), all_photos)
-            for score, p in scored_photos:
-                print(f"      -> Best photo candidate (video fallback): {p['desc']} (Score: {score}/10)")
-                path = _download_photo(p["link"], photo_out, is_longform=is_longform)
-                if path:
-                    with _download_lock:
-                        _used_media.add(p["id"])
-                    return path, f"Photo ({p['desc']}) [Score: {score}]", "photo"
-    else:
-        # 1. Search photos for all queries
+                    return path, f"Pexels Video ({v['desc']}) [Score: {score}]", "video"
+        return None
+    
+    def _try_pexels_photos():
         all_photos = []
         for query in queries:
             print(f"   Searching Pexels photo for '{query}'...")
             photos = _search_pexels_photos(query, orientation=orientation)
             all_photos.extend(photos)
-            
-        # Score and rank photos
         if all_photos:
             scored_photos = _filter_and_sort_candidates_by_relevance(chunk.get("text", ""), all_photos)
             for score, p in scored_photos:
@@ -645,25 +735,81 @@ def _fetch_pexels_fallback(chunk, duration, is_video=False, is_longform=False, t
                 if path:
                     with _download_lock:
                         _used_media.add(p["id"])
-                    return path, f"Photo ({p['desc']}) [Score: {score}]", "photo"
-                    
-        # 2. Fallback to videos if no photos found
+                    return path, f"Pexels Photo ({p['desc']}) [Score: {score}]", "photo"
+        return None
+    
+    def _try_pixabay_videos():
+        if not PIXABAY_API_KEY:
+            return None
         all_videos = []
         for query in queries:
-            print(f"   No photo found. Searching Pexels video for '{query}'...")
-            videos = _search_pexels_videos(query, duration, {"orientation": orientation})
+            print(f"   Searching Pixabay video for '{query}'...")
+            videos = _search_pixabay_videos(query, duration, orientation)
             all_videos.extend(videos)
-            
         if all_videos:
             scored_videos = _filter_and_sort_candidates_by_relevance(chunk.get("text", ""), all_videos)
             for score, v in scored_videos:
-                print(f"      -> Best video candidate (photo fallback): {v['desc']} (Score: {score}/10)")
+                print(f"      -> Best Pixabay video candidate: {v['desc']} (Score: {score}/10)")
                 path = _download_video(v["link"], video_out)
                 if path:
                     with _download_lock:
                         _used_media.add(v["id"])
-                    return path, f"Video ({v['desc']}) [Score: {score}]", "video"
-                    
+                    return path, f"Pixabay Video ({v['desc']}) [Score: {score}]", "video"
+        return None
+    
+    def _try_pixabay_photos():
+        if not PIXABAY_API_KEY:
+            return None
+        all_photos = []
+        for query in queries:
+            print(f"   Searching Pixabay photo for '{query}'...")
+            photos = _search_pixabay_photos(query, orientation=orientation)
+            all_photos.extend(photos)
+        if all_photos:
+            scored_photos = _filter_and_sort_candidates_by_relevance(chunk.get("text", ""), all_photos)
+            for score, p in scored_photos:
+                print(f"      -> Best Pixabay photo candidate: {p['desc']} (Score: {score}/10)")
+                path = _download_photo(p["link"], photo_out, is_longform=is_longform)
+                if path:
+                    with _download_lock:
+                        _used_media.add(p["id"])
+                    return path, f"Pixabay Photo ({p['desc']}) [Score: {score}]", "photo"
+        return None
+    
+    # Fallback chain: Pixabay -> Pexels (Pixabay first - free, 100 req/min)
+    if is_video:
+        # 1. Pixabay Videos (free, higher rate limit)
+        result = _try_pixabay_videos()
+        if result: return result
+        
+        # 2. Pixabay Photos
+        result = _try_pixabay_photos()
+        if result: return result
+        
+        # 3. Pexels Videos
+        result = _try_pexels_videos()
+        if result: return result
+        
+        # 4. Pexels Photos
+        result = _try_pexels_photos()
+        if result: return result
+    else:
+        # 1. Pixabay Photos (free, higher rate limit)
+        result = _try_pixabay_photos()
+        if result: return result
+        
+        # 2. Pixabay Videos
+        result = _try_pixabay_videos()
+        if result: return result
+        
+        # 3. Pexels Photos
+        result = _try_pexels_photos()
+        if result: return result
+        
+        # 4. Pexels Videos
+        result = _try_pexels_videos()
+        if result: return result
+        
     return None, None, None
 
 # ─────────────────────────────────────────────────────────────────────────────

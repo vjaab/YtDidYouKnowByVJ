@@ -116,6 +116,8 @@ jobs:
           echo "REDDIT_CLIENT_ID=${{ secrets.REDDIT_CLIENT_ID }}" >> .env
           echo "REDDIT_CLIENT_SECRET=${{ secrets.REDDIT_CLIENT_SECRET }}" >> .env
           echo "YOUTUBE_DATA_API_KEY=${{ secrets.YOUTUBE_DATA_API_KEY }}" >> .env
+          if [ ! -z "${{ secrets.PIXABAY_API_KEY }}" ]; then echo "PIXABAY_API_KEY=${{ secrets.PIXABAY_API_KEY }}" >> .env; fi
+          if [ ! -z "${{ secrets.JAMENDO_CLIENT_ID }}" ]; then echo "JAMENDO_CLIENT_ID=${{ secrets.JAMENDO_CLIENT_ID }}" >> .env; fi
           if [ ! -z "${{ secrets.IG_VIDEO_PUBLIC_URL }}" ]; then echo "IG_VIDEO_PUBLIC_URL=${{ secrets.IG_VIDEO_PUBLIC_URL }}" >> .env; fi
           echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env
           echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .env
@@ -171,6 +173,7 @@ jobs:
           CI_LITE: "1"
           DRY_RUN: ${{ github.event.inputs.dry_run }}
           TOPIC_TYPE: ${{ github.event.inputs.topic_type }}
+          ENABLE_KINETIC_CAPTIONS: "0"
         run: |
           DRY_RUN_FLAG=""
           if [ "$DRY_RUN" = "true" ]; then DRY_RUN_FLAG="--dry-run"; fi

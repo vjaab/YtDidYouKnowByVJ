@@ -1,0 +1,69 @@
+name: Sync Trending Free Music
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Every Monday 6 AM UTC
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  sync-music:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Needed to commit new music files
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install requests python-dotenv
+      
+      - name: Install ffmpeg (for Pixabay video audio extraction)
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+      
+      - name: Show curated free music sources
+        run: |
+          python music_fetcher.py --source curated
+      
+      - name: Sync audio from Pixabay videos
+        if: ${{ secrets.PIXABAY_API_KEY != '' }}
+        env:
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+        run: |
+          python music_fetcher.py --source pixabay-video --max-per-category 3
+      
+      - name: Sync from Free Music Archive
+        run: |
+          python music_fetcher.py --source fma --max-per-category 2
+      
+      - name: Sync from Jamendo
+        if: ${{ secrets.JAMENDO_CLIENT_ID != '' }}
+        env:
+          JAMENDO_CLIENT_ID: ${{ secrets.JAMENDO_CLIENT_ID }}
+        run: |
+          python music_fetcher.py --source jamendo --max-per-category 2
+      
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      
+      - name: Commit new music files
+        run: |
+          git add assets/music/*.mp3 .music_cache.json
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: sync trending free music $(date +%Y-%m-%d)"
+            git push
+          else
+            echo "No new music files to commit"
+          fi
