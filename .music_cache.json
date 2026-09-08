@@ -1,5 +1,420 @@
 {
-  "tracks": {},
+  "tracks": {
+    "pixvid_8577": {
+      "title": "tape",
+      "artist": "Pixabay",
+      "genre": "technology",
+      "license": "Pixabay Content License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/pixabay_aud_8577_tape.mp3",
+      "source": "pixabay_video",
+      "duration": 68
+    },
+    "pixvid_145555": {
+      "title": "green screen",
+      "artist": "Pixabay",
+      "genre": "upbeat",
+      "license": "Pixabay Content License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/pixabay_aud_145555_green screen.mp3",
+      "source": "pixabay_video",
+      "duration": 20
+    },
+    "pixvid_146282": {
+      "title": "wave effect",
+      "artist": "Pixabay",
+      "genre": "upbeat",
+      "license": "Pixabay Content License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/pixabay_aud_146282_wave effect.mp3",
+      "source": "pixabay_video",
+      "duration": 13
+    },
+    "jam_1214935": {
+      "title": "Wish You Were Here",
+      "artist": "The.madpix.project",
+      "genre": "electronic",
+      "mood": "energetic",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Wish_You_Were_Here.mp3",
+      "source": "jamendo"
+    },
+    "jam_1157358": {
+      "title": "You and Me",
+      "artist": "JekK",
+      "genre": "electronic",
+      "mood": "energetic",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_You_and_Me.mp3",
+      "source": "jamendo"
+    },
+    "jam_1528482": {
+      "title": "Haunted Room",
+      "artist": "Guillermo Flores",
+      "genre": "electronic",
+      "mood": "cool",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Haunted_Room.mp3",
+      "source": "jamendo"
+    },
+    "jam_1540322": {
+      "title": "Tears of Dragon",
+      "artist": "Efr - Enhanced Full Rate",
+      "genre": "electronic",
+      "mood": "cool",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Tears_of_Dragon.mp3",
+      "source": "jamendo"
+    },
+    "jam_1342479": {
+      "title": "Breathe",
+      "artist": "Axl &amp; Arth",
+      "genre": "hiphop",
+      "mood": "energetic",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Breathe.mp3",
+      "source": "jamendo"
+    },
+    "jam_1169943": {
+      "title": "Earworm",
+      "artist": "Jaief &amp; Asong",
+      "genre": "hiphop",
+      "mood": "energetic",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Earworm.mp3",
+      "source": "jamendo"
+    },
+    "jam_1445423": {
+      "title": "The Promise",
+      "artist": "Wordsmith",
+      "genre": "hiphop",
+      "mood": "inspiring",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_The_Promise.mp3",
+      "source": "jamendo"
+    },
+    "jam_1564155": {
+      "title": "On the Come Up",
+      "artist": "Wordsmith",
+      "genre": "hiphop",
+      "mood": "inspiring",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_On_the_Come_Up.mp3",
+      "source": "jamendo"
+    },
+    "jam_1107251": {
+      "title": "On The Beach",
+      "artist": "Jonay",
+      "genre": "hiphop",
+      "mood": "happy",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_On_The_Beach.mp3",
+      "source": "jamendo"
+    },
+    "jam_1169942": {
+      "title": "Glow",
+      "artist": "Jaief &amp; Asong",
+      "genre": "hiphop",
+      "mood": "happy",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Glow.mp3",
+      "source": "jamendo"
+    },
+    "jam_1308766": {
+      "title": "Inspiring",
+      "artist": "Andrey Khatsko",
+      "genre": "ambient",
+      "mood": "energetic",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Inspiring.mp3",
+      "source": "jamendo"
+    },
+    "jam_1470125": {
+      "title": "Spanish Horizon",
+      "artist": "Mark Bodino",
+      "genre": "ambient",
+      "mood": "energetic",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Spanish_Horizon.mp3",
+      "source": "jamendo"
+    },
+    "jam_480707": {
+      "title": "Once",
+      "artist": "Justin Sound",
+      "genre": "ambient",
+      "mood": "upbeat",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Once.mp3",
+      "source": "jamendo"
+    },
+    "jam_480718": {
+      "title": "Meaning",
+      "artist": "Justin Sound",
+      "genre": "ambient",
+      "mood": "upbeat",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Meaning.mp3",
+      "source": "jamendo"
+    },
+    "jam_1073214": {
+      "title": "Dj Rostej - Forgotten Melody",
+      "artist": "Dj Rostej",
+      "genre": "ambient",
+      "mood": "relaxed",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Dj_Rostej_-_Forgotten_Melody.mp3",
+      "source": "jamendo"
+    },
+    "jam_357512": {
+      "title": "Singular",
+      "artist": "Project Divinity",
+      "genre": "ambient",
+      "mood": "happy",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Singular.mp3",
+      "source": "jamendo"
+    },
+    "jam_1258578": {
+      "title": "Escape From The Machine Planet",
+      "artist": "Kai Klaas",
+      "genre": "ambient",
+      "mood": "happy",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Escape_From_The_Machine_Planet.mp3",
+      "source": "jamendo"
+    },
+    "jam_1413591": {
+      "title": "The Epic",
+      "artist": "Carlos Estella",
+      "genre": "cinematic",
+      "mood": "energetic",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_The_Epic.mp3",
+      "source": "jamendo"
+    },
+    "jam_1317628": {
+      "title": "Action Inspiration Trailer",
+      "artist": "Blue Giraffe",
+      "genre": "cinematic",
+      "mood": "energetic",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Action_Inspiration_Trailer.mp3",
+      "source": "jamendo"
+    },
+    "jam_168948": {
+      "title": "Thryst",
+      "artist": "Roger Subirana Mata",
+      "genre": "cinematic",
+      "mood": "upbeat",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Thryst.mp3",
+      "source": "jamendo"
+    },
+    "jam_1203144": {
+      "title": "Solstice",
+      "artist": "Gabriele Bochicchio",
+      "genre": "cinematic",
+      "mood": "upbeat",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Solstice.mp3",
+      "source": "jamendo"
+    },
+    "jam_1876634": {
+      "title": "Clair De Lune",
+      "artist": "AurbanniAudio",
+      "genre": "cinematic",
+      "mood": "inspiring",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Clair_De_Lune.mp3",
+      "source": "jamendo"
+    },
+    "jam_1288234": {
+      "title": "Inspiring Epic Glory",
+      "artist": "Carlos Estella",
+      "genre": "cinematic",
+      "mood": "inspiring",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Inspiring_Epic_Glory.mp3",
+      "source": "jamendo"
+    },
+    "jam_1371888": {
+      "title": "White Knight",
+      "artist": "ebunny",
+      "genre": "cinematic",
+      "mood": "happy",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_White_Knight.mp3",
+      "source": "jamendo"
+    },
+    "jam_1544220": {
+      "title": "MC",
+      "artist": "Adam Gill",
+      "genre": "cinematic",
+      "mood": "happy",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_MC.mp3",
+      "source": "jamendo"
+    },
+    "jam_1349931": {
+      "title": "Liquid Blue (Instrumental)",
+      "artist": "The.madpix.project",
+      "genre": "corporate",
+      "mood": "energetic",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Liquid_Blue_Instrumental.mp3",
+      "source": "jamendo"
+    },
+    "jam_1496667": {
+      "title": "Energetic Rock",
+      "artist": "Joystock",
+      "genre": "corporate",
+      "mood": "energetic",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Energetic_Rock.mp3",
+      "source": "jamendo"
+    },
+    "jam_1267263": {
+      "title": "Positive",
+      "artist": "Akashic Records",
+      "genre": "corporate",
+      "mood": "upbeat",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Positive.mp3",
+      "source": "jamendo"
+    },
+    "jam_1284462": {
+      "title": "Spirit of Success",
+      "artist": "Alumo",
+      "genre": "corporate",
+      "mood": "upbeat",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Spirit_of_Success.mp3",
+      "source": "jamendo"
+    },
+    "jam_1105461": {
+      "title": "Motivational",
+      "artist": "Akashic Records",
+      "genre": "corporate",
+      "mood": "inspiring",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Motivational.mp3",
+      "source": "jamendo"
+    },
+    "jam_1532773": {
+      "title": "Serenity",
+      "artist": "Paul Werner",
+      "genre": "corporate",
+      "mood": "inspiring",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Serenity.mp3",
+      "source": "jamendo"
+    },
+    "jam_1537586": {
+      "title": "Energetic Pop",
+      "artist": "Trending Music",
+      "genre": "corporate",
+      "mood": "cool",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Energetic_Pop.mp3",
+      "source": "jamendo"
+    },
+    "jam_1551393": {
+      "title": "Groovy SIX",
+      "artist": "MZR",
+      "genre": "corporate",
+      "mood": "cool",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Groovy_SIX.mp3",
+      "source": "jamendo"
+    },
+    "jam_1319973": {
+      "title": "Beyond Borders of Inspiration",
+      "artist": "Veaceslav  Draganov       | Royalty Free Music Licensing",
+      "genre": "corporate",
+      "mood": "relaxed",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Beyond_Borders_of_Inspiration.mp3",
+      "source": "jamendo"
+    },
+    "jam_1167458": {
+      "title": "Confidence",
+      "artist": "Akashic Records",
+      "genre": "corporate",
+      "mood": "relaxed",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Confidence.mp3",
+      "source": "jamendo"
+    },
+    "jam_1281388": {
+      "title": "Upbeat",
+      "artist": "Akashic Records",
+      "genre": "corporate",
+      "mood": "happy",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Upbeat.mp3",
+      "source": "jamendo"
+    },
+    "jam_1195872": {
+      "title": "Electronica",
+      "artist": "Matti Paalanen",
+      "genre": "corporate",
+      "mood": "happy",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Electronica.mp3",
+      "source": "jamendo"
+    },
+    "jam_1308586": {
+      "title": "11 Ray Poima - Revenge",
+      "artist": "Ray Poima",
+      "genre": "lofi",
+      "mood": "energetic",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_11_Ray_Poima_-_Revenge.mp3",
+      "source": "jamendo"
+    },
+    "jam_1876882": {
+      "title": "Zewor Beats - Keep going 88bpm",
+      "artist": "Beat scientists",
+      "genre": "lofi",
+      "mood": "energetic",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Zewor_Beats_-_Keep_going_88bpm.mp3",
+      "source": "jamendo"
+    },
+    "jam_620613": {
+      "title": "The Lounge",
+      "artist": "JCRZ",
+      "genre": "lofi",
+      "mood": "upbeat",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_The_Lounge.mp3",
+      "source": "jamendo"
+    },
+    "jam_1886305": {
+      "title": "Sunny Day",
+      "artist": "Kangaroosound",
+      "genre": "lofi",
+      "mood": "upbeat",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Sunny_Day.mp3",
+      "source": "jamendo"
+    },
+    "jam_1858465": {
+      "title": "Beach Sunset",
+      "artist": "Loufo",
+      "genre": "lofi",
+      "mood": "relaxed",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Beach_Sunset.mp3",
+      "source": "jamendo"
+    },
+    "jam_2201203": {
+      "title": "Chill Lounge Lofi Beat",
+      "artist": "Crystal Wave",
+      "genre": "lofi",
+      "mood": "relaxed",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Chill_Lounge_Lofi_Beat.mp3",
+      "source": "jamendo"
+    }
+  },
   "last_fetch": 0,
   "sources_checked": []
 }
