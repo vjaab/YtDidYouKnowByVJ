@@ -101,6 +101,31 @@
         "avg_engagement": 0.0,
         "avg_swipe_away": 0.0,
         "avg_view_percentage": 0.0
+      },
+      "result_first": {
+        "variants": {
+          "A": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "Free AI video tool, no filters!",
+                "video_id": "H_udDOdVhaQ",
+                "recorded_at": "2026-09-08T04:21:11.613325"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
       }
     },
     "Tech Tips": {
@@ -323,7 +348,7 @@
       "views": 0,
       "retention": 0.0,
       "engagement": 0.0,
-      "count": 3,
+      "count": 4,
       "swipe_away_rate": 0.0,
       "avg_view_percentage": 0.0
     },
@@ -346,5 +371,5 @@
       "count": 3
     }
   },
-  "last_updated": "2026-09-07T20:25:53.124000"
+  "last_updated": "2026-09-08T04:21:11.613361"
 }
