@@ -5722,6 +5722,19 @@ def wrap_text_to_lines(words, word_widths, max_width, font):
 # KINETIC CAPTIONS (Hormozi Style) — Word-by-word active highlighting
 # ══════════════════════════════════════════════════════════════════════════════
 
+STUDENT_TRIGGER_WORDS = {
+    "FREE", "4X FASTER", "NOTEBOOKLM", "COPILOT", "GITHUB", "STUDENT", "PACK",
+    "SHORTCUT", "CAPSTONE", "RAG", "RESUME", "PROJECT", "VS CODE", "TERMINAL"
+}
+
+STUDENT_VISUAL_OVERRIDES = {
+    "code_font_size": 22,              # Minimum 22pt for code display
+    "code_max_lines": 10,              # Crop to 5-10 active lines
+    "code_theme": "dracula",           # High-contrast dark theme
+    "enable_cursor_highlights": True,  # Arrow overlays on key UI elements
+    "caption_position": "center",      # Center-screen open captions
+}
+
 def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, y_shift=0):
     """
     Renders Hormozi-style kinetic captions:
@@ -5870,9 +5883,13 @@ def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, 
             target_y = int(start_y - (rotated.height - base_size) // 2 + 3)
             img.alpha_composite(rotated, (target_x, target_y))
         else:
-            # Inactive words: dimmed if spoken, bright white if future
+            # Inactive words: dimmed if spoken, bright white if future (or neon cyan if student trigger word)
             opacity = 140 if is_spoken else 255
-            c_fill = (255, 255, 255, opacity)
+            clean_word = "".join(c for c in word_text.upper() if c.isalnum())
+            if clean_word in STUDENT_TRIGGER_WORDS:
+                c_fill = (0, 255, 204, opacity)  # High-energy neon cyan
+            else:
+                c_fill = (255, 255, 255, opacity)
             f_word = f_main
             w_w = word_widths_main[global_idx]
             w_h = fake_draw.textbbox((0, 0), word_text, font=f_word)[3] - fake_draw.textbbox((0, 0), word_text, font=f_word)[1]

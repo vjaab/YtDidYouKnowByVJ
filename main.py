@@ -216,6 +216,8 @@ Join engineers getting daily AI research drops:
 
 
 def generate_pinned_comment(script_data, next_series_slot):
+    if script_data.get("pinned_comment"):
+        return script_data["pinned_comment"]
     series = get_series_identity(next_series_slot)
     tease  = script_data.get("next_video_tease", "something big tomorrow")
     hook   = script_data.get("comment_hook", "What do you think?")
@@ -685,6 +687,19 @@ def run_pipeline(topic_type="auto", dry_run=False):
         script_data["slot"] = slot
 
         title  = script_data.get("title", "Tech News!")
+        category_or_type = script_data.get("topic_category", "") or topic_type
+        if category_or_type.startswith("student") or topic_type == "student":
+            sub_vec = script_data.get("topic_category", "")
+            prefix_map = {
+                "student_academic_ai": "[STUDY HACK]",
+                "student_dev": "[FREE]",
+                "student_capstone": "[FINAL YEAR PROJECT]",
+                "student_contrarian": "[VS CODE TRICK]",
+            }
+            prefix = prefix_map.get(sub_vec, "[FREE]")
+            if not title.startswith("["):
+                title = f"{prefix} {title}"
+                script_data["title"] = title
         script = script_data.get("script", "")
         log_message(f"Selected Headline: {script_data.get('original_news_headline')}")
         log_message(f"Selected URL: {script_data.get('original_news_url')}")
@@ -930,12 +945,14 @@ def run_pipeline(topic_type="auto", dry_run=False):
     breaking_level = script_data.get("breaking_news_level", 0)
     voice_used  = script_data.get("edge_tts_voice")
     
+    student_vector = script_data.get("topic_category") if (topic_type == "student" or (isinstance(script_data.get("topic_category"), str) and script_data.get("topic_category", "").startswith("student"))) else None
     record_story(
         title, script_data.get("original_news_headline"),
         subcat, companies, keywords, breaking_level,
         voice_used, "pending_upload", script_data.get("original_news_url"),
         topic_type=topic_type, target_country=target_country,
-        avatar_used=script_data.get("lipsync_face_path")
+        avatar_used=script_data.get("lipsync_face_path"),
+        student_vector=student_vector
     )
 
     # ── STEP 5: Build Visual Chunks ───────────────────────────────────────────
@@ -1148,7 +1165,8 @@ def run_pipeline(topic_type="auto", dry_run=False):
         is_shorts=True,
         target_country=target_country,
         editorial_perspective=script_data.get("editorial_perspective"),
-        content_fingerprint=script_data.get("content_fingerprint")
+        content_fingerprint=script_data.get("content_fingerprint"),
+        topic_category=script_data.get("topic_category")
     )
     hashtags = optimized_metadata["hashtags"]
     tags = optimized_metadata["tags"]
@@ -1428,7 +1446,7 @@ def run_local(topic_type="auto", dry_run=False):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--now", action="store_true", help="Run pipeline immediately.")
-    parser.add_argument("--type", type=str, choices=["auto", "research", "tools", "news", "tech_trends", "vaibhav", "interview_questions"], default="auto", help="Content type mapped to the schedule")
+    parser.add_argument("--type", type=str, choices=["auto", "research", "tools", "news", "tech_trends", "vaibhav", "interview_questions", "student"], default="auto", help="Content type mapped to the schedule")
     parser.add_argument("--dry-run", action="store_true", help="Run without uploading to YouTube/X.com/Telegram.")
     args = parser.parse_args()
 

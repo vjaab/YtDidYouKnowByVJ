@@ -26,6 +26,8 @@ PLAYLIST_MAP = {
     "Tech Company Founding Stories": os.getenv("PLAYLIST_FOUNDING", ""),
     "Famous Bugs & Glitches": os.getenv("PLAYLIST_BUGS", ""),
     "Agentic AI Facts": os.getenv("PLAYLIST_AGENTIC", ""),
+    "Student Dev & AI Tools": os.getenv("PLAYLIST_STUDENT_DEV", ""),
+    "Student Capstone Projects": os.getenv("PLAYLIST_STUDENT_CAPSTONE", ""),
     # Series-specific playlists
     "GitHub Gems": os.getenv("PLAYLIST_GITHUB_GEMS", ""),
     "Free AI Alternatives": os.getenv("PLAYLIST_AI_ALTS", ""),
@@ -198,10 +200,51 @@ The best part? It's all free.
 🔗 Everything → link in bio""",
 ]
 
-def _get_pinned_comment(title=""):
-    """Select a pinned comment template based on the video title hash."""
+STUDENT_PINNED_COMMENT_TEMPLATES = [
+    """🎓 Free Student Dev Tools & Setup Guides:
+
+1. GitHub Student Pack: https://education.github.com/pack
+2. Google NotebookLM: https://notebooklm.google.com
+3. Complete Setup & Config Guide: https://t.me/technewsbyvj
+
+👇 Comment {keyword} below and I'll send the direct links + verification walkthrough!
+💬 Student Dev Community: https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z""",
+
+    """🚀 Free AI & Coding Resources For Students:
+
+Grab the full student setup bundle (free Copilot, cloud credits, and dotfiles):
+📲 https://t.me/technewsbyvj
+
+👇 Drop a comment with '{keyword}' to get the direct verification link & guide!
+🔗 All tools & links in bio.""",
+
+    """⚡ The Ultimate Student Developer Stack:
+
+Get $2,500+ in free student developer tools and AI research guides:
+📲 https://t.me/technewsbyvj
+💬 https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
+
+👇 Comment '{keyword}' for the instant setup cheatsheet!""",
+
+    """📚 Capstone & Resume AI Starter Kit:
+
+Architecture diagrams, RAG templates, and step-by-step setup guides:
+📲 https://t.me/technewsbyvj
+
+👇 Comment '{keyword}' and I'll send you the GitHub repo & template!
+🔗 Link in bio.""",
+]
+
+def _get_pinned_comment(title="", topic_type="", keyword="PACK"):
+    """Select a pinned comment template based on video title hash and topic type."""
     import hashlib
     seed = int(hashlib.md5(title.encode()).hexdigest(), 16)
+    
+    if topic_type == "student" or (isinstance(topic_type, str) and topic_type.startswith("student")):
+        idx = seed % len(STUDENT_PINNED_COMMENT_TEMPLATES)
+        template = STUDENT_PINNED_COMMENT_TEMPLATES[idx]
+        return template.format(keyword=keyword or "PACK")
+        
     idx = seed % len(PINNED_COMMENT_TEMPLATES)
     return PINNED_COMMENT_TEMPLATES[idx]
 
@@ -333,9 +376,20 @@ def upload_video(video_path, title, description, tags, thumbnail_path=None, cate
 
         # Step 5: Post + pin comment with playlist link (rotated template for YPP compliance)
         try:
-            pinned_text = _get_pinned_comment(title)
+            topic_type = ""
+            keyword = "PACK"
+            if script_data:
+                topic_type = script_data.get("topic_category", "") or script_data.get("topic_type", "")
+                keyword = script_data.get("comment_keyword", "") or script_data.get("comment_trigger_keyword", "PACK")
+            
+            # Use LLM-generated pinned comment if present, else template
+            if script_data and script_data.get("pinned_comment"):
+                pinned_text = script_data["pinned_comment"]
+            else:
+                pinned_text = _get_pinned_comment(title, topic_type=topic_type, keyword=keyword)
+                
             playlist_link = f"\n\n📺 Full playlist: https://youtube.com/playlist?list={playlist_id}" if playlist_id else ""
-            full_comment = f"{title}\n\n{comment_hook}\n\n{pinned_text}{playlist_link}" if comment_hook else f"{pinned_text}{playlist_link}"
+            full_comment = f"{title}\n\n{comment_hook}\n\n{pinned_text}{playlist_link}" if comment_hook and comment_hook not in pinned_text else f"{pinned_text}{playlist_link}"
             post_and_pin_comment(youtube, video_id, full_comment)
         except Exception as e:
             print(f"Pinned comment failed (non-fatal): {e}")

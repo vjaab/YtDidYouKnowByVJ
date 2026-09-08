@@ -58,6 +58,18 @@ LONG_TAIL_TAGS = [
     "how to automate with AI", "AI tools explained free", "learn AI 2026 free"
 ]
 
+STUDENT_SEO_TAGS = [
+    "computer science", "student developer", "study hacks", "AI projects",
+    "GitHub Student Pack", "Copilot Pro", "free dev tools", "CS student",
+    "final year project", "college coding", "student coding", "VS Code tricks",
+    "NotebookLM", "study tips", "capstone project"
+]
+
+STUDENT_HASHTAGS = [
+    "#ComputerScience", "#StudentDeveloper", "#StudyHacks", "#AIProjects",
+    "#Shorts", "#CodingStudent", "#FreeDevTools", "#CSStudent"
+]
+
 # ── PROMINENT PEOPLE METADATA ──
 
 PEOPLE_METADATA = {
@@ -524,7 +536,8 @@ def get_optimized_metadata(
     is_shorts=True,
     target_country="US",
     editorial_perspective=None,
-    content_fingerprint=None
+    content_fingerprint=None,
+    topic_category=None
 ):
     """
     Computes an optimized list of 8-15 unique tags and 8-15 unique hashtags
@@ -532,6 +545,11 @@ def get_optimized_metadata(
     Shorts: 8-10 hashtags, Longform: 12-15 hashtags
     Includes trending hashtags from Google Trends for discovery.
     """
+    is_student = (
+        (topic_category and str(topic_category).lower().startswith("student")) or
+        ("student" in (sub_category or "").lower()) or
+        ("student" in title.lower())
+    )
     initial_keywords = initial_keywords or []
     initial_companies = initial_companies or []
     initial_people = initial_people or []
@@ -610,6 +628,10 @@ def get_optimized_metadata(
         matched_tags.extend(FACTS_STYLE_TAGS[:3])
         matched_tags.extend(VIRAL_HOOK_TAGS[:2])
         matched_tags.extend(LONG_TAIL_TAGS[10:15])
+
+    # If student content, inject specialized student tags at high priority
+    if is_student:
+        matched_tags = STUDENT_SEO_TAGS[:8] + matched_tags
         
     # Fallback to general high-value tags to ensure variety and count
     matched_tags.extend(FACTS_STYLE_TAGS[:2])
@@ -655,6 +677,13 @@ def get_optimized_metadata(
         target_country=target_country
     )
     
+    if is_student:
+        # Prepend student hashtags while preserving unique order
+        for sht in reversed(STUDENT_HASHTAGS):
+            if sht not in final_hashtags:
+                final_hashtags.insert(0, sht)
+        final_hashtags = final_hashtags[:12 if is_shorts else 15]
+
     return {
         "tags": final_tags,
         "hashtags": final_hashtags

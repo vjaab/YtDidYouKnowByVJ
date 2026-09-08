@@ -252,6 +252,41 @@ You must strictly follow the Humanizer guidelines to remove any robotic AI writi
 - Hard constraint: The text must contain NO em dashes (—), en dashes (–), spaced em dashes ( — ), or double hyphens (--).
 - Personality & Soul: React to facts, vary sentence rhythms (mix short punchy and longer flowing sentences), and write with a human pulse. Use contractions (it's, you're, don't, can't) naturally."""
 
+STUDENT_SYSTEM_PERSONA = """Role: You are an elite tech educator writing high-retention 45-60 second YouTube Shorts scripts for students and developers.
+You specialize in turning complex dev tools, academic workflows, free student software, and AI engineering concepts into punchy, high-yield, actionable Shorts.
+Target Audience: College students, CS undergrads, junior coders, self-taught developers, and career switchers looking for an unfair competitive advantage.
+Tone: Direct, empathetic, authoritative yet relatable ("peer who figured it out first"). Zero fluff, zero patronizing advice.
+
+"STICKY 5" STRUCTURE CONSTRAINTS (MANDATORY):
+1. HARD HOOK (0:00 - 0:03): Financial/grade pain points or contrarian claims. 8-12 words. First 3 words stop the scroll. Never introduce yourself.
+2. RAPID PACING (0:03 - 0:30): Extreme value density with concrete benchmarks. Deliver exact tool, command, shortcut, or architecture. No jargon without immediate context.
+3. PAYOFF (0:30 - 0:45): Demonstrate the working output or confirmed free activation on screen. Show the speedup or finished app.
+4. FRICTION-FREE CTA (0:45 - 0:50): Single friction-free command + comment trigger keyword (e.g. PACK, PROJECT, NOTEBOOK, SHORTCUT).
+5. LOOPING ENDING (0:50 - 1:00): Abrupt end on payoff line for seamless loop back to opening hook.
+
+STRICT RULES:
+- Script length: 110-140 words spoken at an energetic, confident pace (approx 45-55 seconds).
+- Speak directly using "you" and "your".
+- No generic advice ("work hard", "learn to code"). Name exact tools, repos, config files, and commands.
+- Do NOT use emojis in the script text.
+- Do NOT say "In this video" or "Today we are going to".
+- Output must be plain spoken text only: no stage directions, no scene labels.
+- Hard constraint: The text must contain NO em dashes, en dashes, spaced em dashes, or double hyphens.
+- Visuals must describe real UI: VS Code, terminal, GitHub, NotebookLM, architecture flowcharts.
+
+TTS-READY OUTPUT RULES (CRITICAL):
+- The "script" field must contain ONLY speakable text. NO alternate word options (word1/word2), NO pronunciation guides, NO formatting notes.
+- If a tool or brand name is hard to pronounce, pick ONE spelling and use it consistently throughout.
+
+HUMANIZER PRINCIPLES & WRITING CONSTRAINTS (MANDATORY):
+- Avoid words/phrases emphasizing significance, legacy, or broader trends.
+- Avoid vague attributions and weasel words.
+- Avoid superficial analyses with "-ing" endings.
+- Avoid promotional language.
+- Do NOT use high-frequency AI vocabulary words: "delve", "fostering", "tapestry", "intricate", "pivotal", "vibrant", "enhance".
+- Use contractions (it's, you're, don't, can't) naturally.
+"""
+
 RESEARCH_AGENT_TEMPLATE = """{persona}
 
 RESEARCH AGENT TASK:
@@ -907,6 +942,11 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                     type_score += sum(15 for kw in interview_keywords if kw in title_lower)
                     if art.get("type") in ["github_trending", "reddit_trending", "youtube_trending"]:
                         type_score += 25
+                elif topic_type == "student":
+                    student_keywords = ["student", "free", "github", "copilot", "pack", "notebooklm", "gemini", "hack", "study", "notes", "rag", "project", "capstone", "resume", "vs code", "terminal"]
+                    type_score += sum(15 for kw in student_keywords if kw in title_lower)
+                    if art.get("type") in ["tools", "github_trending", "youtube_trending"]:
+                        type_score += 25
                 
                 # ── COMPOSITE VIRAL SCORE (weighted blend) ──
                 hot_score = (
@@ -976,13 +1016,33 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
 
         # ── STEP 1: GEMINI SEARCH FALLBACK (biased toward hot topic) ────────────
         if not articles:
-            search_subject = hot_topic_str if hot_topic_str else f"{category}"
-            print(f"🔍 STEP 1: Using Gemini Search for '{search_subject}'...")
-            search_query = (
-                f"Find the most viral, trending open-source projects or active GitHub repositories related to: {search_subject}. "
-                "PRIORITIZE finding stories about breakout GitHub repositories, innovative developer tools, local models, "
-                "AI agents, developer hacks, or open-source software packages. Provide the full repository name (owner/repo) and description."
-            )
+            if topic_type == "student":
+                try:
+                    from topic_tracker import get_student_sub_vector
+                    current_vector = get_student_sub_vector()
+                except Exception:
+                    current_vector = "student_academic_ai"
+                vector_queries = {
+                    "student_academic_ai": "viral student AI study workflows, Google NotebookLM hacks, Gemini for academic research, flashcard automation, lecture note summarization",
+                    "student_dev": "free developer tools for students, GitHub Student Developer Pack, GitHub Copilot Pro free student access, VS Code shortcuts, terminal setups zsh",
+                    "student_capstone": "standout final year CS capstone project ideas, production RAG project architecture, multi-agent AI resume projects, local voice assistants",
+                    "student_contrarian": "coding and study habits that hold CS students back, common mistakes learning to code, why tutorials don't work, AI coding myths debunked",
+                }
+                search_subject = vector_queries.get(current_vector, "free AI tools and productivity workflows for computer science students")
+                print(f"🎓 STEP 1: Using Gemini Search for Student Vector '{current_vector}': '{search_subject}'...")
+                search_query = (
+                    f"Find the most viral, trending tools, guides, or tutorials related to: {search_subject}. "
+                    "PRIORITIZE finding actionable tools, free student perks, exact commands/extensions, or production project architectures. "
+                    "Provide specific tool names, URLs, and real student use cases."
+                )
+            else:
+                search_subject = hot_topic_str if hot_topic_str else f"{category}"
+                print(f"🔍 STEP 1: Using Gemini Search for '{search_subject}'...")
+                search_query = (
+                    f"Find the most viral, trending open-source projects or active GitHub repositories related to: {search_subject}. "
+                    "PRIORITIZE finding stories about breakout GitHub repositories, innovative developer tools, local models, "
+                    "AI agents, developer hacks, or open-source software packages. Provide the full repository name (owner/repo) and description."
+                )
             
             try:
                 search_response = client.models.generate_content(
@@ -1030,6 +1090,8 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
         content_desc = "high-velocity Google tech search trends and viral YouTube breakout videos"
     elif topic_type == "interview_questions":
         content_desc = "technical interview questions and answers for Java, JavaScript, Spring Boot, AWS, Python, Kubernetes, Docker"
+    elif topic_type == "student":
+        content_desc = "free developer tools for students, study hacks, GitHub Student Pack perks, AI capstone projects, and coding myth-busting"
     else:
         content_desc = "surprising tech facts, agentic AI facts, AI coding shortcuts, and AI transformation experiments"
 
@@ -1553,6 +1615,90 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "incentive_cta_type": "One of: 'digital_vault', 'comment_trigger', 'benchmark_challenge', 'community_audit'",
   "digital_asset_offer": "Description of the asset being offered (e.g., '50 interview Q&A with code examples', 'Interview prep checklist & cheat sheet', 'Mock interview score tracker', 'API credit giveaway entry')"
 }}"""
+        elif topic_type == "student":
+            try:
+                from topic_tracker import get_student_sub_vector
+                current_vector = get_student_sub_vector()
+            except Exception:
+                current_vector = "student_academic_ai"
+            
+            vector_descriptions = {
+                "student_academic_ai": "Google NotebookLM hacks, Gemini 1.5 Pro academic workflows, turning syllabus and PDFs into audio guides or flashcards automatically",
+                "student_dev": "GitHub Student Developer Pack (free Copilot Pro, cloud credits, domains), essential VS Code shortcuts, terminal configs (Oh My Zsh, Starship), free dev perks",
+                "student_capstone": "standout final-year CS capstone project blueprints, local RAG architectures with LlamaIndex/ChromaDB, multi-agent AI systems, voice assistants for resumes",
+                "student_contrarian": "myth-busting bad CS student habits ('You are taking notes wrong', 'Why watching tutorial hell ruins your coding', 'Stop using ChatGPT like this for homework')",
+            }
+            sub_vector_focus = vector_descriptions.get(current_vector, "free AI tools and high-yield productivity hacks for computer science students")
+            
+            selection_instruction = (
+                f"Analyze the following {content_desc} and pick the SINGLE highest-impact, most actionable student/developer topic.\n"
+                f"ACTIVE STUDENT VECTOR: {current_vector} ({sub_vector_focus})\n"
+                f"PRIMARY CATEGORY: {category}\n"
+                f"{series_instruction}"
+                "SELECTION FILTERS:\n"
+                "1. 'STICKY 5' SHORTS ARCHITECTURE (45-60s, approx 110-140 words):\n"
+                "   - Hook (0-3s): Open on financial pain, grade anxiety, or contrarian myth-busting. 8-12 words.\n"
+                "   - Rapid Pacing (3-30s): Deliver high density of value with concrete benchmarks, tools, commands, or architecture.\n"
+                "   - Payoff (30-45s): Demonstrate working output or confirmed free activation on screen.\n"
+                "   - Friction-Free CTA (45-50s): Single command with comment keyword trigger (e.g. PACK, PROJECT, NOTEBOOK, SHORTCUT).\n"
+                "   - Looping Ending (50-60s): Crisp concluding sentence that seamlessly flows into the opening hook.\n"
+                "2. NO GENERIC ADVICE: Name exact software, URLs, keyboard shortcuts, or architecture layers.\n"
+                "3. VISUAL CLARITY: Visual prompts must show code editors, terminals, GitHub, or clean system flowcharts.\n"
+            )
+            prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
+{{
+  "title_options": ["[FREE] Title Idea 1", "[STUDY HACK] Title Idea 2", "[PROJECT] Title Idea 3"],
+  "description": "Full 100+ word rich SEO description for YouTube describing the student tool/project, setup steps, and relevant hashtags.",
+  "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence (official site, GitHub repo, tool docs).",
+  "title": "Punchy YouTube title max 60 chars. Formatted with outcome/curiosity formula: e.g. '[FREE] How to Get GitHub Copilot Pro for $0' or '[STUDY HACK] Turn 50-Page PDFs into Audio Guides' or '[PROJECT] Build a Local RAG Assistant in 48 Hours'.",
+  "hook_script": "The Hook (0-3s): Punchy opening hook tapping into student pain or contrarian truth. 8-12 words.",
+  "problem_context": "The Setup (3-10s): Why students waste hours or hundreds of dollars doing this wrong. 15-20 words.",
+  "solution_tech": "The Demo / Architecture (10-30s): Step-by-step workflow, command, or architecture diagram. 40-60 words.",
+  "payoff_output": "The Payoff (30-45s): The exact working output or confirmed free activation. 20-30 words.",
+  "incentive_cta": "The Incentive CTA (45-50s): Single keyword trigger CTA: 'Comment \\'PACK\\' below and I\\'ll send the direct link + setup guide.'",
+  "retention_loop": "The Loop Bridge (50-60s): Concluding sentence flowing seamlessly back to the opening hook.",
+  "outro_cta": "CTA: Save this for later. Subscribe for more student dev hacks.",
+  "script": "The FULL unified voiceover script combining hook_script, problem_context, solution_tech, payoff_output, incentive_cta, retention_loop, and outro_cta. Target 110-140 words total (45-55 seconds). Must flow naturally for TTS.",
+  "hook_text": "The exact first 5-8 words of the script.",
+  "relevant_links": ["https://education.github.com/pack", "https://notebooklm.google.com"],
+  "phonetic_pronunciation_map": {{}},
+  "hook": "Matches the first sentence of the script",
+  "summary": "One line summary",
+  "sub_category": "{category}",
+  "topic_category": "{current_vector}",
+  "comment_keyword": "PACK",
+  "pinned_comment": "Get the direct student verification link + setup guide here: https://t.me/technewsbyvj 👇 Comment PACK if you need help with verification!",
+  "breaking_news_level": 9,
+  "retention_cues": [{{"timestamp": 2.0, "effect": "zoom_in", "reason": "hook_impact"}}],
+  "subtitle_chunks": [{{
+      "chunk_id": 1,
+      "text": "Sentence 1",
+      "start": 0.00,
+      "end": 2.50,
+      "scene_objective": "Hook the student audience with immediate pain point or free perk",
+      "visual_type": "Code Snippet|Terminal Output|GitHub UI|Animated UI Mockup|Screen Recording|Diagram|Side-by-side Comparison|AI Image",
+      "nano_visual_prompt": "A clean, high-contrast visual for THIS sentence. Vertical 9:16. Photorealistic, 8K. Showing clear developer UI, terminal, or student portal.",
+      "is_setting_chunk": false,
+      "has_infographic": false,
+      "infographic_type": null,
+      "infographic_data": null,
+      "on_screen_elements": ["labels/arrows/highlights/code/terminal"],
+      "camera_motion": "Slow zoom|Dolly-in|Orbit|Pan|Tracking shot|None",
+      "transition": "Match cut|Zoom transition|Morph|Swipe|Data stream transition"
+  }}],
+  "original_news_headline": "Exact tool or topic headline",
+  "original_news_url": "Direct article or tool URL",
+  "keywords": ["student developer", "free dev tools", "GitHub Student Pack", "CS student", "study hacks", "NotebookLM"],
+  "hashtags": ["#StudentDeveloper", "#ComputerScience", "#StudyHacks", "#GitHubPack", "#Shorts", "#CodingStudent"],
+  "companies_mentioned": ["GitHub", "Google", "Microsoft"],
+  "companies": [{{"name": "GitHub", "domain": "github.com", "description": "Developer platform"}}],
+  "people": [],
+  "key_entities": [{{"name": "GitHub Student Developer Pack", "type": "TOOL", "description": "Free developer tool bundle for students"}}],
+  "comment_hook": "Are you taking advantage of your student perks? Drop a comment below!",
+  "comment_trigger_keyword": "PACK",
+  "incentive_cta_type": "comment_trigger",
+  "digital_asset_offer": "Direct student verification link and setup guide"
+}}"""
         else: # research / educational / general
             selection_instruction = (
                 f"Analyze the following {content_desc} and pick the SINGLE most surprising, useful, or mind-blowing tech fact or comparison.\n"
@@ -1887,6 +2033,8 @@ class MultiAgentGenerationEngine:
         self.run_index = run_index
         if topic_type == "vaibhav":
             self.persona = VAIBHAV_SYSTEM_PERSONA
+        elif topic_type == "student":
+            self.persona = STUDENT_SYSTEM_PERSONA
         else:
             self.persona = SYSTEM_PERSONA
 

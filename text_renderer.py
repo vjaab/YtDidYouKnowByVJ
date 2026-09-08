@@ -69,7 +69,16 @@ def draw_style_a(draw, text, x, y, font, text_color, base_stroke, bg_region, bg_
     draw.text((x, y), text, font=font, fill=text_color)
     return draw
 
-def render_frosted_glass_subtitle(bg_frame_array, text_lines, x, y, font, text_color, base_stroke, active_word_idx=None):
+STUDENT_TRIGGER_WORDS = {
+    "FREE", "4X FASTER", "NOTEBOOKLM", "COPILOT", "GITHUB", "STUDENT", "PACK",
+    "SHORTCUT", "CAPSTONE", "RAG", "RESUME", "PROJECT", "VS CODE", "TERMINAL"
+}
+
+def is_trigger_word(word, topic_type=""):
+    cleaned = "".join(c for c in word.upper() if c.isalnum() or c in ["-", "_"])
+    return cleaned in STUDENT_TRIGGER_WORDS
+
+def render_frosted_glass_subtitle(bg_frame_array, text_lines, x, y, font, text_color, base_stroke, active_word_idx=None, topic_type=""):
     """Style B implementation. bg_frame_array is the full RGB video frame numpy array."""
     # Subtitle width max 860.
     
@@ -104,7 +113,13 @@ def render_frosted_glass_subtitle(bg_frame_array, text_lines, x, y, font, text_c
         for i, wd in enumerate(line):
             word = wd["word"]
             is_active = (wd.get("is_active", False))
-            color = (255, 214, 0, 255) if is_active else text_color # Rule 5: Yellow or White
+            clean_w = "".join(c for c in word.upper() if c.isalnum())
+            if is_active:
+                color = (255, 214, 0, 255) # Rule 5: Active spoken word is yellow
+            elif clean_w in STUDENT_TRIGGER_WORDS:
+                color = (0, 255, 204, 255) # High-energy neon cyan for student trigger words
+            else:
+                color = text_color
             
             # Stroke
             for dx in range(-stroke, stroke+1):

@@ -110,7 +110,7 @@ def check_cooldowns(companies, subcategory, tracker_file=TRACKER_FILE):
         
     return True, "Cooldowns OK"
 
-def record_story(title, news_headline, subcategory, companies, keywords, breaking_news_level, voice_used, youtube_url, news_source_url, topic_type=None, target_country=None, avatar_used=None, tracker_file=TRACKER_FILE):
+def record_story(title, news_headline, subcategory, companies, keywords, breaking_news_level, voice_used, youtube_url, news_source_url, topic_type=None, target_country=None, avatar_used=None, student_vector=None, tracker_file=TRACKER_FILE):
     tracker = load_tracker(tracker_file)
     today = datetime.now().strftime("%Y-%m-%d")
     
@@ -167,6 +167,8 @@ def record_story(title, news_headline, subcategory, companies, keywords, breakin
     }
     if topic_type:
         history_entry["topic_type"] = topic_type
+    if student_vector:
+        history_entry["student_vector"] = student_vector
         
     tracker.setdefault("history", []).append(history_entry)
     save_tracker(tracker, tracker_file)
@@ -187,16 +189,54 @@ def update_facebook_post_id(news_headline, facebook_post_id, tracker_file=TRACKE
             break
     save_tracker(tracker, tracker_file)
 
-def get_next_topic_type_by_ratio(tracker_file=TRACKER_FILE):
+# ── STUDENT CONTENT VECTORS ────────────────────────────────────────────────
+# 4 student sub-vectors that rotate cyclically within the 40% student allocation
+STUDENT_VECTORS = [
+    "student_academic_ai",    # NotebookLM, Gemini for research, flashcard automation
+    "student_dev",            # GitHub Student Pack, Copilot Pro, cloud credits, IDE shortcuts, zsh setup
+    "student_capstone",       # Production RAG architectures, multi-agent AI, voice assistants for resume projects
+    "student_contrarian",     # "You're studying/coding wrong" myth-busting formats
+]
+
+def get_student_sub_vector(tracker_file=TRACKER_FILE):
     """
-    Computes the proportion of each topic_type ('tools', 'news', 'research', 'quiz', 'interview_questions') 
-    in recent history (last 30 entries) and returns the type that is most
-    in deficit compared to the target ratio:
-      - tools: 35% (0.35) — Hidden features, AI tools, free apps, tips & tricks
-      - news: 20% (0.20) — Tech myths, privacy scares, common mistakes  
-      - research: 10% (0.10) — Comparisons, AI experiments, educational tech facts
-      - quiz: 15% (0.15) — Interactive tech trivia, history quizzes, multiple choice
-      - interview_questions: 20% (0.20) — Technical interview Q&A for Java, JS, Spring Boot, AWS, Python, K8s, Docker
+    Returns the next student sub-vector by cycling through the 4 vectors.
+    Checks recent history for the last used student_vector and returns the next one.
+    """
+    tracker = load_tracker(tracker_file)
+    history = tracker.get("history", [])
+    
+    # Find the last student_vector used
+    last_vector = None
+    for entry in reversed(history):
+        if not isinstance(entry, dict):
+            continue
+        sv = entry.get("student_vector")
+        if sv and sv in STUDENT_VECTORS:
+            last_vector = sv
+            break
+    
+    if not last_vector:
+        return STUDENT_VECTORS[0]
+    
+    try:
+        idx = STUDENT_VECTORS.index(last_vector)
+        next_idx = (idx + 1) % len(STUDENT_VECTORS)
+        return STUDENT_VECTORS[next_idx]
+    except ValueError:
+        return STUDENT_VECTORS[0]
+
+
+def _get_core_topic_type(tracker_file=TRACKER_FILE):
+    """
+    Internal: Computes the next core topic type using deficit-based ratio balancing.
+    Only considers core types (excludes 'student').
+    Target ratios (within the 60% core allocation):
+      - tools: 35% — Hidden features, AI tools, free apps, tips & tricks
+      - news: 20% — Tech myths, privacy scares, common mistakes  
+      - research: 10% — Comparisons, AI experiments, educational tech facts
+      - quiz: 15% — Interactive tech trivia, history quizzes, multiple choice
+      - interview_questions: 20% — Technical interview Q&A
     """
     tracker = load_tracker(tracker_file)
     history = tracker.get("history", [])
@@ -209,7 +249,7 @@ def get_next_topic_type_by_ratio(tracker_file=TRACKER_FILE):
         "interview_questions": 0.20
     }
     
-    # Analyze the last 30 entries in history (or as many as exist)
+    # Only analyze core entries (non-student) from last 30
     recent_entries = history[-30:] if history else []
     
     counts = {"tools": 0, "news": 0, "research": 0, "quiz": 0, "interview_questions": 0}
@@ -219,6 +259,9 @@ def get_next_topic_type_by_ratio(tracker_file=TRACKER_FILE):
         if not isinstance(entry, dict):
             continue
         ttype = entry.get("topic_type")
+        # Skip student entries for core ratio calculation
+        if ttype == "student":
+            continue
         if ttype in counts:
             counts[ttype] += 1
             total_counted += 1
@@ -253,8 +296,61 @@ def get_next_topic_type_by_ratio(tracker_file=TRACKER_FILE):
         deficits[t] = target - current_ratio
         
     selected = max(deficits, key=deficits.get)
-    print(f"📊 Ratio calculation: counts={counts}, deficits={deficits} -> Selected: {selected}")
+    print(f"📊 Core ratio calculation: counts={counts}, deficits={deficits} -> Selected: {selected}")
     return selected
+
+
+def get_next_topic_type_by_ratio(tracker_file=TRACKER_FILE):
+    """
+    2-Tier Weighted Allocation System:
+    
+    TIER 1: Decides between 'student' (40%) and 'core' (60%) content.
+    Uses a sliding window of the last 10 entries to enforce the 40/60 split.
+    Every 5 generated Shorts should contain exactly 2 student-targeted scripts.
+    
+    TIER 2: 
+      - If student: returns 'student' (sub-vector selected separately via get_student_sub_vector())
+      - If core: delegates to _get_core_topic_type() for deficit-based ratio balancing
+        among tools/news/research/quiz/interview_questions.
+    """
+    tracker = load_tracker(tracker_file)
+    history = tracker.get("history", [])
+    
+    # Tier 1: Student vs Core allocation (sliding window of last 10)
+    recent_10 = history[-10:] if history else []
+    
+    student_count = 0
+    core_count = 0
+    for entry in recent_10:
+        if not isinstance(entry, dict):
+            continue
+        ttype = entry.get("topic_type", "")
+        if ttype == "student":
+            student_count += 1
+        else:
+            core_count += 1
+    
+    total = student_count + core_count
+    
+    if total == 0:
+        # Cold start: begin with student content to seed the ratio
+        print("📊 Tier 1: Cold start -> Selecting 'student'")
+        return "student"
+    
+    # Target: 40% student, 60% core
+    student_ratio = student_count / total
+    student_deficit = 0.40 - student_ratio
+    core_deficit = 0.60 - (core_count / total)
+    
+    if student_deficit > core_deficit:
+        # Student content is underrepresented
+        print(f"📊 Tier 1: student={student_count}/{total} ({student_ratio:.0%}), deficit={student_deficit:+.2f} -> Selecting 'student'")
+        return "student"
+    else:
+        # Core content is underrepresented or balanced
+        core_type = _get_core_topic_type(tracker_file)
+        print(f"📊 Tier 1: student={student_count}/{total} ({student_ratio:.0%}), deficit={student_deficit:+.2f} -> Selecting core: '{core_type}'")
+        return core_type
 
 
 def get_next_target_country(tracker_file=TRACKER_FILE):

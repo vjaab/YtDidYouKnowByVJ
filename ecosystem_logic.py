@@ -14,6 +14,8 @@ ALL_CATEGORIES = [
     "Programming Language Origins",
     "Tech Company Founding Stories",
     "Famous Bugs & Glitches",
+    "Student Dev & AI Tools",
+    "Student Capstone Projects",
 ]
 
 WEEKLY_SCHEDULE = {
@@ -167,6 +169,8 @@ CONTENT_LAYOUT_MAP = {
     "Agentic AI Facts": "hero_center",           # Concept visualization
     "Python Libraries & Frameworks": "split_screen",  # Code + terminal demo
     "AWS Cloud Services": "side_strip",          # Architecture diagram + presenter
+    "Student Dev & AI Tools": "split_screen",    # Code + terminal demos
+    "Student Capstone Projects": "hero_center",  # Project showcases
 }
 
 # Visual type to layout mapping (overrides category default)
@@ -494,6 +498,72 @@ def get_category_prompt_enhancement(category, slot):
                 • LeetCode / NeetCode / Blind 75 discussion threads
                 • Staff engineer blog posts (Netflix, Uber, Airbnb, Google tech blogs)
                 • System design interview repositories (Grokking, Design Gurus)
+""",
+        "Student Dev & AI Tools": f"""
+            CATEGORY: Student Dev & AI Tools (High utility, viral student audience).
+            STRATEGY: {base_discovery}
+            AUDIENCE: College students, CS undergrads, junior coders, self-taught developers.
+            GOAL: Deliver immediate actionable value via free software, study automation, or terminal/dev environment hacks.
+            HOOK STYLE: 'Stop paying for ChatGPT Plus as a student.' or 'If you have a .edu email, you have $2,000 in free software waiting.' or 'You're taking notes completely wrong.'
+            EMOTIONAL TRIGGER: "I'm missing out on free stuff" + "This saves me 10 hours a week" + FOMO.
+            CONTENT FORMAT: 
+                - 0-3s: Pain point hook (grades, time, money)
+                - 3-30s: Exact setup, command, or workflow with side-by-side terminal/tool view
+                - 30-45s: Output payoff showing speedup/savings
+                - 45-50s: Single keyword CTA (e.g., "Comment PACK for direct link")
+                - 50-60s: Seamless looping ending
+            
+            AI_HACK_STRATEGY:
+                • Academic AI: Google NotebookLM (source-grounded study guides, audio podcast summaries), Gemini 1.5 Pro for research paper synthesis, Anki flashcard generation from lecture PDFs.
+                • Student Dev Pack: GitHub Student Developer Pack (GitHub Copilot Pro free, JetBrains Ultimate, $100 Azure/AWS credits, domain names), terminal setups (Oh My Zsh, Starship, zsh-autosuggestions), VS Code essential extensions and keybindings.
+                • Contrarian Student: Myth-busting inefficient study habits, "Why you shouldn't use ChatGPT for coding assignments (use this instead)", "Stop watching 4-hour tutorials, build this in 20 minutes".
+            
+            AI_HACK_HOOKS:
+                1. "If you have a student email, you're leaving $2,500 on the table right now."
+                2. "Stop making flashcards manually. NotebookLM turns your syllabus into an audio study guide in 60 seconds."
+                3. "You're coding with VS Code wrong. Here are 3 shortcuts that double your typing speed."
+                4. "How to get GitHub Copilot Pro completely FREE as a student."
+                5. "Don't pay for research papers: Use this AI workflow to synthesize 10 PDFs in 3 minutes."
+            
+            AI_TOOL_DEMO_FORMAT (45-60s Short):
+                1. Hook (0-3s): Punchy callout on free student benefits or study efficiency.
+                2. Rapid Walkthrough (3-30s): Split-screen terminal/browser walkthrough showing zero-friction setup.
+                3. Payoff (30-45s): Working output or confirmed free activation on screen.
+                4. CTA (45-50s): "Comment 'PACK' below and I'll send the direct student verification link."
+                5. Seamless Loop (50-60s): End on the payoff insight to loop back into hook.
+""",
+        "Student Capstone Projects": f"""
+            CATEGORY: Student Capstone Projects (Resume-worthy builds, final year projects).
+            STRATEGY: {base_discovery}
+            AUDIENCE: CS students, graduating seniors, career switchers needing portfolio projects that actually get interviews.
+            GOAL: Showcase production-grade, resume-ready project architectures (Local RAG, Multi-Agent AI, Voice Assistants) instead of generic todo apps.
+            HOOK STYLE: 'Delete that Todo list app from your resume. Build this instead.' or 'This capstone project got me 3 FAANG interviews.'
+            EMOTIONAL TRIGGER: Job market anxiety + high ambition + practical blueprint.
+            CONTENT FORMAT:
+                - 0-3s: Shock hook on why standard college projects get ignored
+                - 3-30s: System architecture breakdown (LlamaIndex, Chroma, FastAPI, Next.js)
+                - 30-45s: Demo of live deployed app handling real multimodal inputs
+                - 45-50s: Frictionless CTA ("Comment PROJECT for the GitHub repo & architecture diagram")
+                - 50-60s: Seamless loop
+            
+            AI_HACK_STRATEGY:
+                • Production RAG: LlamaIndex + FAISS/ChromaDB + Ollama/Groq + Streamlit/FastAPI for domain-specific document chat.
+                • Multi-Agent Systems: CrewAI / LangGraph team for automated market research or automated bug bounty triage.
+                • Voice AI Assistant: Local Whisper.cpp + Ollama + Piper TTS for hands-free coding companion.
+                • Edge AI / Computer Vision: YOLOv8 on Raspberry Pi for automated attendance or lab safety monitoring.
+            
+            AI_HACK_HOOKS:
+                1. "Recruiters are rejecting your portfolio because every student builds a weather app. Build THIS."
+                2. "How to build a Production RAG system for your final year capstone in 48 hours."
+                3. "This multi-agent AI resume project will make you stand out from 500 applicants."
+                4. "Turn any open-source model into a voice assistant you can demo live to interviewers."
+            
+            AI_TOOL_DEMO_FORMAT (45-60s Short):
+                1. Hook (0-3s): Show deployed project UI with recruiter-impressing metrics.
+                2. Architecture (3-30s): Visual diagram showing frontend -> FastAPI -> Vector DB -> LLM.
+                3. Live Execution (30-45s): Real-time response with sub-second latency.
+                4. CTA (45-50s): "Comment 'PROJECT' for the full source code and setup guide."
+                5. Seamless Loop (50-60s): Crisp concluding sentence that flows into the hook.
 """,
     }
     
