@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write  # Needed to commit new music files
+    env:
+      PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+      JAMENDO_CLIENT_ID: ${{ secrets.JAMENDO_CLIENT_ID }}
     
     steps:
       - name: Checkout repository
@@ -36,9 +39,7 @@ jobs:
           python music_fetcher.py --source curated
       
       - name: Sync audio from Pixabay videos
-        if: secrets.PIXABAY_API_KEY != ''
-        env:
-          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+        if: env.PIXABAY_API_KEY != ''
         run: |
           python music_fetcher.py --source pixabay-video --max-per-category 3
       
@@ -47,9 +48,7 @@ jobs:
           python music_fetcher.py --source fma --max-per-category 2
       
       - name: Sync from Jamendo
-        if: secrets.JAMENDO_CLIENT_ID != ''
-        env:
-          JAMENDO_CLIENT_ID: ${{ secrets.JAMENDO_CLIENT_ID }}
+        if: env.JAMENDO_CLIENT_ID != ''
         run: |
           python music_fetcher.py --source jamendo --max-per-category 2
       
