@@ -4468,7 +4468,7 @@ def _create_asymmetric_corner(accent_color, duration):
 
 
 # ─── ENTITY LOGO PAIRING NEAR AVATAR ─────────────────────────────────────────
-def _create_entity_logo_pip_clips(script_json, avatar_pip_func, audio_duration, cur_w, cur_h, accent_color):
+def _create_entity_logo_pip_clips(script_json, avatar_pip_func, audio_duration, cur_w, cur_h, accent_color, screenshot_intervals=None):
     """
     Creates logo clips that appear near the avatar when entities are mentioned.
     Returns list of (clip, start_time, end_time) for compositing.
@@ -4494,6 +4494,20 @@ def _create_entity_logo_pip_clips(script_json, avatar_pip_func, audio_duration, 
     
     logo_clips = []
     logo_size = int(min(cur_w, cur_h) * 0.6)  # 60% of avatar size
+    
+    # Helper: check if time is during screenshot with fade
+    def screenshot_hide_factor(t):
+        if not screenshot_intervals:
+            return 1.0
+        for s_start, s_end in screenshot_intervals:
+            if s_start <= t <= s_end:
+                fade_win = 0.3
+                if t < s_start + fade_win:
+                    return max(0.0, (s_start + fade_win - t) / fade_win)
+                elif t > s_end - fade_win:
+                    return max(0.0, (t - (s_end - fade_win)) / fade_win)
+                return 0.0
+        return 1.0
     
     for ent in entities:
         name = ent["name"].lower()
@@ -4540,6 +4554,8 @@ def _create_entity_logo_pip_clips(script_json, avatar_pip_func, audio_duration, 
                                 fade = progress / 0.2
                             elif progress > 0.8:
                                 fade = (1.0 - progress) / 0.2
+                            # Also apply screenshot hiding
+                            fade *= screenshot_hide_factor(t)
                             mask = np.ones((logo_size, logo_size), dtype=np.float32) * fade
                             # Circular mask
                             y, x = np.ogrid[:logo_size, :logo_size]
@@ -8565,7 +8581,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     if not is_longform and avatar_pip:
         try:
             entity_logo_clips = _create_entity_logo_pip_clips(
-                script_json, pip_position, audio_duration, cur_w, cur_h, accent_color
+                script_json, pip_position, audio_duration, cur_w, cur_h, accent_color, screenshot_intervals
             )
             for logo_clip, start_t, end_t in entity_logo_clips:
                 # Trim clip to active interval
