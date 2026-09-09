@@ -158,5 +158,15 @@
     "title": "[STUDENT HACK] Deploy AI Trading Bots for FREE",
     "uploaded_at": "2026-09-09T04:21:53.631763",
     "synced": false
+  },
+  "EVEJR_ioLNQ": {
+    "video_id": "EVEJR_ioLNQ",
+    "hook_pattern": "personal_stake",
+    "hook_variant": "A",
+    "hook_text": "You're cutting off correct AI answers.",
+    "category": "LLM Optimization",
+    "title": "[AI HACK] Don't Delete Your Local LLM's 'Errors'!",
+    "uploaded_at": "2026-09-09T19:57:47.646770",
+    "synced": false
   }
 }

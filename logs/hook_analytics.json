@@ -383,6 +383,33 @@
         "avg_swipe_away": 0.0,
         "avg_view_percentage": 0.0
       }
+    },
+    "LLM Optimization": {
+      "personal_stake": {
+        "variants": {
+          "A": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "You're cutting off correct AI answers.",
+                "video_id": "EVEJR_ioLNQ",
+                "recorded_at": "2026-09-09T19:57:47.645765"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
+      }
     }
   },
   "global": {
@@ -422,8 +449,10 @@
       "views": 0,
       "retention": 0.0,
       "engagement": 0.0,
-      "count": 3
+      "count": 4,
+      "swipe_away_rate": 0.0,
+      "avg_view_percentage": 0.0
     }
   },
-  "last_updated": "2026-09-09T04:21:53.630904"
+  "last_updated": "2026-09-09T19:57:47.645803"
 }
