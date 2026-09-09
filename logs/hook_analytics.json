@@ -183,6 +183,31 @@
         "avg_engagement": 0.0,
         "avg_swipe_away": 0.0,
         "avg_view_percentage": 0.0
+      },
+      "curiosity_gap": {
+        "variants": {
+          "A": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "This AI framework builds trading bots.",
+                "video_id": "QgRb_B51MjI",
+                "recorded_at": "2026-09-09T04:21:53.630873"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
       }
     },
     "AI Tools & Privacy": {
@@ -389,7 +414,9 @@
       "views": 0,
       "retention": 0.0,
       "engagement": 0.0,
-      "count": 3
+      "count": 4,
+      "swipe_away_rate": 0.0,
+      "avg_view_percentage": 0.0
     },
     "personal_stake": {
       "views": 0,
@@ -398,5 +425,5 @@
       "count": 3
     }
   },
-  "last_updated": "2026-09-08T20:13:18.093481"
+  "last_updated": "2026-09-09T04:21:53.630904"
 }
