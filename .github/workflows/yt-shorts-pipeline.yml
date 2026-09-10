@@ -174,6 +174,7 @@ jobs:
           DRY_RUN: ${{ github.event.inputs.dry_run }}
           TOPIC_TYPE: ${{ github.event.inputs.topic_type }}
           ENABLE_KINETIC_CAPTIONS: "0"
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
         run: |
           DRY_RUN_FLAG=""
           if [ "$DRY_RUN" = "true" ]; then DRY_RUN_FLAG="--dry-run"; fi
