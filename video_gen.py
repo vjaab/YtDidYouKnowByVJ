@@ -7529,6 +7529,18 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         end_s = min(12.0, audio_duration - 2.0)
         if end_s - start_s >= 1.0:
             screenshot_intervals.append((start_s, end_s))
+    
+    # Also add evidence screenshot intervals (GitHub README, secondary evidence)
+    # These hide entity tags when evidence/web pages are shown in background
+    evidence_screenshot_path = script_json.get("evidence_screenshot_path")
+    is_github_readme = script_json.get("is_github_readme", False)
+    if evidence_screenshot_path and os.path.exists(evidence_screenshot_path):
+        # Evidence screenshots start at 28.0s (from _evidence_screenshot_clip)
+        evidence_start = 28.0
+        max_dur = 12.0 if is_github_readme else 6.0
+        evidence_end = min(evidence_start + max_dur, audio_duration)
+        if evidence_end - evidence_start >= 1.0:
+            screenshot_intervals.append((evidence_start, evidence_end))
 
     if not chunks:
         print("ERROR: no chunks")
