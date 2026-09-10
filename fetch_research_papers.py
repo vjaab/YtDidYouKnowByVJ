@@ -39,6 +39,15 @@ RSS_FEEDS = [
     "https://rss.arxiv.org/rss/cs.AI",
     "https://rss.arxiv.org/rss/cs.CL",
     "https://tldr.tech/ai/rss",
+    
+    # Medium Technology Articles
+    "https://medium.com/feed/tag/technology",
+    "https://medium.com/feed/tag/artificial-intelligence",
+    "https://medium.com/feed/tag/machine-learning",
+    "https://medium.com/feed/tag/programming",
+    "https://medium.com/feed/tag/software-engineering",
+    "https://medium.com/feed/tag/data-science",
+    "https://medium.com/feed/tag/web-development",
 ]
 
 TOOL_RSS_FEEDS = [
