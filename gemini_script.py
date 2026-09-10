@@ -98,15 +98,9 @@ Constraint Checklist:
   2. THE PROBLEM (3-10s): State the specific pain point. "Developers lose 5+ hrs/week debugging memory leaks." Make it personal: "your" language.
   3. THE SOLUTION (10-20s): Present the exact fix. Name the tool, command, or config. "This open-source tool auto-patches leaks in seconds."
   4. REAL EXAMPLES (20-35s): Give 1-2 concrete examples with real companies, exact commands, measurable results. "Shopify cut debug time 6hrs→12min." "Run: npx leak-finder --fix."
-  5. WHY IT MATTERS + CTA (35-45s): "Saves you hours every sprint." + Save/share CTA.
-- SUBSCRIBER INCENTIVE LOOP (SHORTS ONLY): Every Short MUST include ONE incentive CTA at 00:25-00:35. Choose exactly one mode:
-  1. DIGITAL VAULT / CODE BLUEPRINT: "I put the entire Python script & architecture diagram in our Telegram. Link in description."
-  2. SECRET MENU / COMMENT KEYWORD TRIGGER: "Comment 'CONFIG' below and I'll send you my exact evaluation template."
-  3. BEAT THE BENCHMARK CHALLENGE: "I got 45 tokens/sec on an M2 Mac. Comment your hardware specs to beat it."
-  4. COMMUNITY AUDIT & MONTHLY $100 API CREDIT GIVEAWAY: "Sub and comment your setup for our monthly $100 API credit giveaway."
-  5. SAVE-TRIGGER: "Save this before it disappears. You'll need it later."
-  6. SHARE-TRIGGER: "Send this to a developer who needs this."
-- SCHEMA EXTENSION: Output must include `comment_trigger_keyword` (e.g. "OLLAMA", "CONFIG", "EVALS"), `incentive_cta_type` (one of: "digital_vault", "comment_trigger", "benchmark_challenge", "community_audit", "save_trigger", "share_trigger"), and `digital_asset_offer` (description of the asset being offered).
+  5. WHY IT MATTERS (35-45s): "Saves you hours every sprint." Personal stake, no CTA.
+- NO SUBSCRIBER INCENTIVE LOOP: Do NOT include any follow/subscribe/save/share/comment CTAs. Just explain the topic and finish cleanly.
+- SCHEMA EXTENSION: Output must include `comment_trigger_keyword` (set to ""), `incentive_cta_type` (set to "none"), and `digital_asset_offer` (set to "").
 - RHETORICAL QUESTIONS: Include 2-3 rhetorical questions per script to create open loops and drive engagement. Examples: "What does this mean for your production apps?", "Why should you care?", "But here's the real question: can you trust it?"
 - DIRECT VIEWER ADDRESS: Use "you" and "your" language throughout. Frame every point from the viewer's perspective: "Your data...", "Your production apps...", "What you need to know..."
 - CONVERSATIONAL TRANSITIONS: Replace essay-style transitions with conversational ones: "But here's the thing...", "Now here's where it gets interesting...", "And that's exactly why...", "So what's the takeaway?"
@@ -117,7 +111,7 @@ SUCCESS PATTERNS (2026):
 - THE PROBLEM (3-10s): State the pain point clearly and personally. "Your API keys leak in CI logs."
 - THE SOLUTION (10-20s): Name the exact tool/command/fix. "Add this one line to encrypt keys at rest."
 - REAL EXAMPLES (20-35s): Specific companies, commands, numbers. "Stripe uses this. Run: npx secret-scan --fix."
-- WHY IT MATTERS + CTA (35-45s): Personal stake + Save/Share/Follow.
+- WHY IT MATTERS (35-45s): Personal stake. No CTA.
 - SEAMLESS LOOP (45-50s): Final sentence flows back to opening hook.
 
 Visual Director Persona & Visual Selection Logic:
@@ -195,15 +189,9 @@ STRICT RULES:
   2. THE PROBLEM (0:03 - 0:10): State the pain point personally. "Your API keys leak in CI logs."
   3. THE SOLUTION (0:10 - 0:20): Name the exact tool/command/fix. "Add this one line to encrypt keys at rest."
   4. REAL EXAMPLES (0:20 - 0:30): Specific companies, commands, numbers. "Stripe uses this. Run: npx secret-scan --fix."
-  5. WHY IT MATTERS + CTA (0:30 - 0:35): "Saves you 5 hours a week." + "Save this. Follow for more."
-- SUBSCRIBER INCENTIVE CTA MODES (pick exactly ONE):
-  1. DIGITAL VAULT / CODE BLUEPRINT: "I put the entire Python script & architecture diagram in our Telegram. Link in description."
-  2. SECRET MENU / COMMENT KEYWORD TRIGGER: "Comment 'CONFIG' below and I'll send you my exact evaluation template."
-  3. BEAT THE BENCHMARK CHALLENGE: "I got 45 tokens/sec on an M2 Mac. Comment your hardware specs to beat it."
-  4. COMMUNITY AUDIT & MONTHLY $100 API CREDIT GIVEAWAY: "Sub and comment your setup for our monthly $100 API credit giveaway."
-  5. SAVE-TRIGGER: "Save this before it disappears. You'll need it later."
-  6. SHARE-TRIGGER: "Send this to a developer who needs this."
-- SCHEMA EXTENSION: Output must include `comment_trigger_keyword`, `incentive_cta_type`, and `digital_asset_offer`.
+  5. WHY IT MATTERS (0:30 - 0:35): "Saves you 5 hours a week." Personal stake, no CTA.
+- NO SUBSCRIBER INCENTIVE CTA: Do NOT include any follow/subscribe/save/share/comment CTAs. Just explain the topic and finish cleanly.
+- SCHEMA EXTENSION: Output must include `comment_trigger_keyword` (set to ""), `incentive_cta_type` (set to "none"), and `digital_asset_offer` (set to "").
 - RHETORICAL QUESTIONS: Include 2-3 rhetorical questions per script to create open loops. Examples: "What does this mean for your workflow?", "Why should you care?", "But can you actually trust it?"
 - DIRECT VIEWER ADDRESS: Frame every point from the viewer's perspective: "Your data...", "Your production apps...", "What you need to know..."
 - CONVERSATIONAL TRANSITIONS: "But here's the thing...", "Now here's where it gets interesting...", "And that's exactly why...", "So what's the takeaway?"
