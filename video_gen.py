@@ -5751,24 +5751,235 @@ STUDENT_VISUAL_OVERRIDES = {
     "caption_position": "center",      # Center-screen open captions
 }
 
+# ══════════════════════════════════════════════════════════════════════════════
+# 7-DAY SUBTITLE VARIETY SYSTEM (Deterministic by Day of Week)
+# ══════════════════════════════════════════════════════════════════════════════
+# Each day has a distinct visual personality for episodic branding.
+# Universal base: dark gray/black badge for readability across all topics.
+
+DAY_STYLES = {
+    # Monday: Montserrat ExtraBold, Neon Cyan, Pill, Kinetic Pop
+    0: {
+        "font_family": "Montserrat",
+        "font_weight": "ExtraBold",
+        "accent_color": (0, 229, 255),      # #00E5FF - Cyber Cyan
+        "bg_style": "pill",
+        "glow_outline": True,
+        "animation": "kinetic_pop",
+        "active_scale": 1.18,
+        "stroke_width": 6,
+    },
+    # Tuesday: Montserrat Black, Hot Pink, Pill, Kinetic Pop
+    1: {
+        "font_family": "Montserrat",
+        "font_weight": "Black",
+        "accent_color": (255, 20, 147),     # #FF1493 - Hot Pink
+        "bg_style": "pill",
+        "glow_outline": False,
+        "animation": "kinetic_pop",
+        "active_scale": 1.22,
+        "stroke_width": 7,
+    },
+    # Wednesday: Roboto Bold, Electric Green, Minimal Line, Static Bold
+    2: {
+        "font_family": "Roboto",
+        "font_weight": "Bold",
+        "accent_color": (0, 255, 127),      # #00FF7F - Hacker Green
+        "bg_style": "minimal_line",
+        "glow_outline": False,
+        "animation": "static_bold",
+        "active_scale": 1.15,
+        "stroke_width": 4,
+    },
+    # Thursday: Montserrat Bold+Italic, Orange, Gradient Badge, Kinetic Pop
+    3: {
+        "font_family": "Montserrat",
+        "font_weight": "Bold",
+        "italic": True,
+        "accent_color": (255, 165, 0),      # #FFA500 - Orange
+        "bg_style": "gradient_badge",
+        "glow_outline": True,
+        "animation": "kinetic_pop",
+        "active_scale": 1.18,
+        "stroke_width": 5,
+    },
+    # Friday: Montserrat Variable, Purple, Neon Glow, Kinetic Pop
+    4: {
+        "font_family": "Montserrat",
+        "font_weight": "Variable",
+        "accent_color": (224, 170, 255),    # #E0AAFF - Neon Purple
+        "bg_style": "neon_glow",
+        "glow_outline": True,
+        "animation": "kinetic_pop",
+        "active_scale": 1.18,
+        "stroke_width": 5,
+    },
+    # Saturday: NanumBarunGothic Regular, Gold, Card Border, Static Bold
+    5: {
+        "font_family": "NanumBarunGothic",
+        "font_weight": "Regular",
+        "accent_color": (255, 215, 0),      # #FFD700 - Dark Gold
+        "bg_style": "card_border",
+        "glow_outline": False,
+        "animation": "static_bold",
+        "active_scale": 1.12,
+        "stroke_width": 4,
+    },
+    # Sunday: Roboto Variable, Teal, Floating Island, Kinetic Pop
+    6: {
+        "font_family": "Roboto",
+        "font_weight": "Variable",
+        "accent_color": (0, 128, 128),      # #008080 - Teal
+        "bg_style": "floating_island",
+        "glow_outline": True,
+        "animation": "kinetic_pop",
+        "active_scale": 1.18,
+        "stroke_width": 5,
+    },
+}
+
+def get_day_style():
+    """Returns the subtitle style config for the current day of week (0=Mon, 6=Sun)."""
+    day = datetime.now().weekday()
+    return DAY_STYLES[day]
+
+def get_font_for_style(style_config, size, bold=False):
+    """Load font based on day style config."""
+    family = style_config["font_family"]
+    weight = style_config["font_weight"]
+    italic = style_config.get("italic", False)
+    
+    # Build search paths based on family and weight
+    search_paths = []
+    
+    if family == "Montserrat":
+        if weight == "Black":
+            search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Montserrat-Black.ttf"))
+        elif weight == "ExtraBold":
+            search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Montserrat-ExtraBold.ttf"))
+        elif weight == "Bold":
+            search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Montserrat-Bold.ttf"))
+        elif weight == "Variable":
+            search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Montserrat-Variable.ttf"))
+        if italic:
+            search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Montserrat-Italic.ttf"))
+    elif family == "Roboto":
+        if weight == "Bold":
+            search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Roboto-Bold.ttf"))
+        elif weight == "Variable":
+            search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Roboto-Variable.ttf"))
+        else:
+            search_paths.append(os.path.join(ASSETS_DIR, "fonts", "Roboto-Regular.ttf"))
+    elif family == "NanumBarunGothic":
+        search_paths.append(os.path.join(ASSETS_DIR, "fonts", "NanumBarunGothic.ttf"))
+    
+    # Add system fallbacks
+    search_paths.extend(FONT_PATHS)
+    
+    for p in search_paths:
+        if os.path.exists(p):
+            try:
+                return ImageFont.truetype(p, size)
+            except Exception:
+                pass
+    return ImageFont.load_default()
+
+def _render_day_background(draw, block_x1, block_y1, block_x2, block_y2, style_config, accent_color, frame_width, frame_height):
+    """Render the day-specific background badge style."""
+    bg_style = style_config["bg_style"]
+    glow = style_config["glow_outline"]
+    
+    if bg_style == "pill":
+        # Full rounded pill capsule
+        radius = (block_y2 - block_y1) // 2
+        draw.rounded_rectangle([block_x1, block_y1, block_x2, block_y2], radius=radius, fill=(0, 0, 0, 215))
+        if glow:
+            # Outer glow effect
+            for i in range(3):
+                gx1, gy1 = block_x1 - i * 2, block_y1 - i * 2
+                gx2, gy2 = block_x2 + i * 2, block_y2 + i * 2
+                draw.rounded_rectangle([gx1, gy1, gx2, gy2], radius=radius + i * 2, outline=(*accent_color, 60 - i * 15), width=2)
+    
+    elif bg_style == "minimal_line":
+        # Thin line under text, no full background
+        line_y = block_y2 + 4
+        draw.line([(block_x1, line_y), (block_x2, line_y)], fill=(*accent_color, 255), width=3)
+        # Small accent dots at ends
+        draw.ellipse([block_x1 - 6, line_y - 6, block_x1 + 6, line_y + 6], fill=(*accent_color, 255))
+        draw.ellipse([block_x2 - 6, line_y - 6, block_x2 + 6, line_y + 6], fill=(*accent_color, 255))
+    
+    elif bg_style == "gradient_badge":
+        # Gradient background with accent top edge
+        draw.rounded_rectangle([block_x1, block_y1, block_x2, block_y2], radius=16, fill=(0, 0, 0, 220))
+        # Gradient top edge
+        for i in range(4):
+            alpha = 255 - i * 60
+            draw.rectangle([block_x1, block_y1 + i, block_x2, block_y1 + i + 1], fill=(*accent_color, alpha))
+        if glow:
+            for i in range(3):
+                gx1, gy1 = block_x1 - i * 2, block_y1 - i * 2
+                gx2, gy2 = block_x2 + i * 2, block_y2 + i * 2
+                draw.rounded_rectangle([gx1, gy1, gx2, gy2], radius=16 + i * 2, outline=(*accent_color, 50 - i * 12), width=2)
+    
+    elif bg_style == "neon_glow":
+        # Dark card with neon outline glow
+        draw.rounded_rectangle([block_x1, block_y1, block_x2, block_y2], radius=16, fill=(10, 10, 15, 230))
+        # Multi-layer neon outline
+        for i in range(5):
+            gx1, gy1 = block_x1 - i * 2, block_y1 - i * 2
+            gx2, gy2 = block_x2 + i * 2, block_y2 + i * 2
+            alpha = 180 - i * 35
+            draw.rounded_rectangle([gx1, gy1, gx2, gy2], radius=16 + i * 2, outline=(*accent_color, alpha), width=2)
+    
+    elif bg_style == "card_border":
+        # Card with accent border
+        draw.rounded_rectangle([block_x1, block_y1, block_x2, block_y2], radius=16, fill=(0, 0, 0, 215), outline=(*accent_color, 200), width=3)
+        # Inner accent line
+        draw.rounded_rectangle([block_x1 + 3, block_y1 + 3, block_x2 - 3, block_y2 - 3], radius=13, outline=(*accent_color, 80), width=1)
+    
+    elif bg_style == "floating_island":
+        # Floating island with shadow
+        # Shadow
+        shadow_offset = 8
+        draw.rounded_rectangle(
+            [block_x1 + shadow_offset, block_y1 + shadow_offset, block_x2 + shadow_offset, block_y2 + shadow_offset],
+            radius=16, fill=(0, 0, 0, 120)
+        )
+        # Main island
+        draw.rounded_rectangle([block_x1, block_y1, block_x2, block_y2], radius=16, fill=(0, 0, 0, 220))
+        if glow:
+            # Top accent line
+            draw.rectangle([block_x1, block_y1, block_x2, block_y1 + 3], fill=(*accent_color, 255))
+
 def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, y_shift=0):
     """
-    Renders Hormozi-style kinetic captions:
-    - Single line locked in safe zone (lower third for landscape, upper-middle for portrait)
-    - Active word: enlarged, bold, accent color, pop animation
-    - Spoken words: dimmed white
-    - Future words: normal white
-    - Black stroke for contrast on any background
+    Renders Hormozi-style kinetic captions with 7-day variety:
+    - Day-specific font, accent color, background style, animation
+    - Universal dark badge base for readability
+    - Topic accent color used for glow/outline, day accent for text highlight
     """
     img = Image.new('RGBA', (frame_width, frame_height), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
+
+    # Get day-of-week style config
+    day_style = get_day_style()
+    day_accent = day_style["accent_color"]
+    day_font_family = day_style["font_family"]
+    day_font_weight = day_style["font_weight"]
+    day_italic = day_style.get("italic", False)
+    active_scale = day_style.get("active_scale", 1.18)
+    stroke_width = day_style.get("stroke_width", 6)
+    animation = day_style.get("animation", "kinetic_pop")
+    bg_style = day_style.get("bg_style", "pill")
+    glow_outline = day_style.get("glow_outline", True)
 
     scale_ratio = frame_width / 1080.0 if frame_width < frame_height else frame_width / 1920.0
     is_landscape = frame_width > frame_height
     base_size = int(72 * scale_ratio) if is_landscape else int(58 * scale_ratio)
 
-    f_main = gf(base_size, bold=True)
-    f_active = gf(int(base_size * 1.18), bold=True)  # 18% larger for active word
+    # Load day-specific fonts
+    f_main = get_font_for_style(day_style, base_size, bold=True)
+    f_active = get_font_for_style(day_style, int(base_size * active_scale), bold=True)
 
     words = [wd["word"] for wd in word_data]
     if not words:
@@ -5842,21 +6053,15 @@ def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, 
     max_y = int(frame_height * 0.85) - (line_h // 2)
     start_y = max(min_y, min(start_y, max_y))
 
-    # Background block (obsidian with rounded corners)
+    # Background block - use day-specific style
     bg_pad_x, bg_pad_y = 35, 20
     block_x1 = (frame_width - line_w) // 2 - bg_pad_x
     block_x2 = (frame_width + line_w) // 2 + bg_pad_x
     block_y1 = start_y - bg_pad_y
     block_y2 = start_y + line_h - (line_h - base_size) + bg_pad_y
 
-    draw.rounded_rectangle(
-        [block_x1, block_y1, block_x2, block_y2],
-        radius=16,
-        fill=(0, 0, 0, 220)
-    )
-
-    # Accent top edge line
-    draw.rectangle([block_x1, block_y1, block_x2, block_y1 + 3], fill=(*accent_color, 255))
+    # Render day-specific background badge
+    _render_day_background(draw, block_x1, block_y1, block_x2, block_y2, day_style, day_accent, frame_width, frame_height)
 
     # Render words
     cur_x = (frame_width - line_w) // 2
@@ -5867,35 +6072,46 @@ def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, 
         is_spoken = wd.get("is_spoken", False)
 
         if is_active:
-            # Active word: accent color, enlarged, pop effect
-            c_fill = (*accent_color, 255)
+            # Active word: day accent color, enlarged, animation based on day style
+            c_fill = (*day_accent, 255)
             f_word = f_active
             w_w = word_widths_active[global_idx]
             
-            # Create word image for pop animation
-            w_h = fake_draw.textbbox((0, 0), word_text, font=f_word)[3] - fake_draw.textbbox((0, 0), word_text, font=f_word)[1]
-            word_img = Image.new("RGBA", (w_w + 80, w_h + 80), (0, 0, 0, 0))
-            word_draw = ImageDraw.Draw(word_img)
-            
-            # Thick black stroke (6px) for maximum contrast
-            stroke = 6
-            for dx in range(-stroke, stroke + 1):
-                for dy in range(-stroke, stroke + 1):
-                    if dx * dx + dy * dy <= stroke * stroke:
-                        word_draw.text((40 + dx, 40 + dy), word_text, font=f_word, fill=(0, 0, 0, 255))
-            
-            # Accent glow behind
-            word_draw.text((42, 42), word_text, font=f_word, fill=(*accent_color, 100))
-            # Main text
-            word_draw.text((40, 40), word_text, font=f_word, fill=c_fill)
-            
-            # Subtle rotation for energy (±2 degrees based on word index)
-            angle = 2.0 * math.sin(active_idx * 0.5) if active_idx >= 0 else 0
-            rotated = word_img.rotate(angle, resample=Image.BICUBIC, expand=True)
-            
-            target_x = int(cur_x - (rotated.width - w_w) // 2)
-            target_y = int(start_y - (rotated.height - base_size) // 2 + 3)
-            img.alpha_composite(rotated, (target_x, target_y))
+            if animation == "kinetic_pop":
+                # Create word image for pop animation
+                w_h = fake_draw.textbbox((0, 0), word_text, font=f_word)[3] - fake_draw.textbbox((0, 0), word_text, font=f_word)[1]
+                word_img = Image.new("RGBA", (w_w + 80, w_h + 80), (0, 0, 0, 0))
+                word_draw = ImageDraw.Draw(word_img)
+                
+                # Thick black stroke (day-specific width) for maximum contrast
+                for dx in range(-stroke_width, stroke_width + 1):
+                    for dy in range(-stroke_width, stroke_width + 1):
+                        if dx * dx + dy * dy <= stroke_width * stroke_width:
+                            word_draw.text((40 + dx, 40 + dy), word_text, font=f_word, fill=(0, 0, 0, 255))
+                
+                # Day accent glow behind
+                word_draw.text((42, 42), word_text, font=f_word, fill=(*day_accent, 100))
+                # Main text
+                word_draw.text((40, 40), word_text, font=f_word, fill=c_fill)
+                
+                # Subtle rotation for energy (±2 degrees based on word index)
+                angle = 2.0 * math.sin(active_idx * 0.5) if active_idx >= 0 else 0
+                rotated = word_img.rotate(angle, resample=Image.BICUBIC, expand=True)
+                
+                target_x = int(cur_x - (rotated.width - w_w) // 2)
+                target_y = int(start_y - (rotated.height - base_size) // 2 + 3)
+                img.alpha_composite(rotated, (target_x, target_y))
+            else:
+                # Static bold: render directly with stroke
+                # Black stroke
+                for dx in range(-stroke_width, stroke_width + 1):
+                    for dy in range(-stroke_width, stroke_width + 1):
+                        if dx * dx + dy * dy <= stroke_width * stroke_width:
+                            draw.text((cur_x + dx, start_y + 3 + dy), word_text, font=f_word, fill=(0, 0, 0, 255))
+                # Day accent glow
+                draw.text((cur_x + 2, start_y + 5), word_text, font=f_word, fill=(*day_accent, 120))
+                # Main text
+                draw.text((cur_x, start_y + 3), word_text, font=f_word, fill=c_fill)
         else:
             # Inactive words: dimmed if spoken, bright white if future (or neon cyan if student trigger word)
             opacity = 140 if is_spoken else 255
@@ -5908,7 +6124,7 @@ def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, 
             w_w = word_widths_main[global_idx]
             w_h = fake_draw.textbbox((0, 0), word_text, font=f_word)[3] - fake_draw.textbbox((0, 0), word_text, font=f_word)[1]
             
-            # Black stroke
+            # Black stroke (smaller for inactive)
             for dx in range(-4, 5):
                 for dy in range(-4, 5):
                     if dx * dx + dy * dy <= 16:
@@ -6358,11 +6574,17 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     
     Revised: Locked static line rendering (kinetic text), safe-zone positioning,
     dimmed past words, and precomputed wrap caching for high rendering performance.
+    Now with 7-day variety system.
     """
     # Use kinetic captions if enabled
     enable_kinetic = os.environ.get("ENABLE_KINETIC_CAPTIONS", "1") == "1"
     if enable_kinetic:
         return _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, y_shift)
+
+    # Get day-of-week style config
+    day_style = get_day_style()
+    day_accent = day_style["accent_color"]
+    stroke_width = day_style.get("stroke_width", 5)
 
     img = Image.new('RGBA', (frame_width, frame_height), (0,0,0,0))
     draw = ImageDraw.Draw(img)
@@ -6374,7 +6596,8 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     else:
         base_size = int(58 * scale_ratio)
 
-    f_main = gf(base_size, bold=True)
+    # Load day-specific font
+    f_main = get_font_for_style(day_style, base_size, bold=True)
 
     active_word_data = [wd for wd in word_data if not wd.get("is_spoken", False)]
     if not active_word_data:
@@ -6420,11 +6643,8 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     block_y1 = start_y - bg_pad_y
     block_y2 = start_y + len(lines) * line_h - (line_h - base_size) + bg_pad_y
 
-    draw.rounded_rectangle(
-        [block_x1, block_y1, block_x2, block_y2],
-        radius=12,
-        fill=(0, 0, 0, 215)
-    )
+    # Render day-specific background badge
+    _render_day_background(draw, block_x1, block_y1, block_x2, block_y2, day_style, day_accent, frame_width, frame_height)
 
     word_idx = 0
     for i, line in enumerate(lines):
@@ -6437,15 +6657,14 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
             is_active = wd["is_active"]
 
             if is_active:
-                c_fill = (204, 255, 0, 255) # Electric Yellow
-                f_word = gf(int(base_size * 1.12), bold=True)
+                c_fill = (*day_accent, 255)
+                f_word = get_font_for_style(day_style, int(base_size * 1.12), bold=True)
                 w_w, w_h = ts(word_text, f_word)
                 word_img = Image.new("RGBA", (w_w + 60, w_h + 60), (0,0,0,0))
                 word_draw = ImageDraw.Draw(word_img)
 
-                stroke = 5
-                for dx in range(-stroke, stroke+1):
-                    for dy in range(-stroke, stroke+1):
+                for dx in range(-stroke_width, stroke_width+1):
+                    for dy in range(-stroke_width, stroke_width+1):
                         if dx*dx + dy*dy <= stroke*stroke:
                             word_draw.text((30+dx, 30+dy), word_text, font=f_word, fill=(0,0,0,255))
 
@@ -6459,6 +6678,7 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
                 img.alpha_composite(rotated, (target_x, target_y))
             else:
                 c_fill = (255, 255, 255, 255)
+                # Black stroke for inactive words
                 for dx in range(-3, 4):
                     for dy in range(-3, 4):
                         draw.text((cur_x+dx, line_y+2+dy), word_text, font=f_main, fill=(0,0,0,255))
