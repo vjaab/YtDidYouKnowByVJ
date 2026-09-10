@@ -168,5 +168,15 @@
     "title": "[AI HACK] Don't Delete Your Local LLM's 'Errors'!",
     "uploaded_at": "2026-09-09T19:57:47.646770",
     "synced": false
+  },
+  "Hs8tN9nyALM": {
+    "video_id": "Hs8tN9nyALM",
+    "hook_pattern": "result_first",
+    "hook_variant": "A",
+    "hook_text": "Free Claude Code alternative runs locally.",
+    "category": "Tech Company Founding Stories",
+    "title": "[STUDY HACK] Free Claude Code Alternative",
+    "uploaded_at": "2026-09-10T04:26:20.997244",
+    "synced": false
   }
 }
