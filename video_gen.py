@@ -1644,80 +1644,216 @@ def _pattern_interrupt_flash(accent_color, total_dur):
 
 
 # ── LAYER E2: Giant Hook Text (First 1.5s) ────────────────────────────────────
-def _hook_text_overlay(hook_text, accent_color, total_dur):
-    """Displays giant hook text. Redesigned to use centered bold uppercase sans-serif text,
-    obsidian card backing, and neon accent border.
+def _render_title_with_style(text, style_config, frame_width, frame_height, accent_color=None):
     """
-    enable_hook = os.environ.get("ENABLE_HOOK_OVERLAY", "1") == "1"
-    if not enable_hook or not hook_text:
-        return None
-        
-    dur = min(3.0, total_dur)
-    f = gf(68, bold=True)
-    max_w = FRAME_W - 120
-
-    # Word-wrap the hook text in ALL CAPS
-    words = hook_text.upper().split()
+    Renders a title text using the specified day style config.
+    Returns PIL Image with the rendered title.
+    """
+    font_family = style_config["font_family"]
+    font_weight = style_config["font_weight"]
+    text_case = style_config.get("text_case", "uppercase")
+    letter_spacing = style_config.get("letter_spacing", 0)
+    bg_style = style_config.get("bg_style", "rounded_badge")
+    border_radius = style_config.get("border_radius", 16)
+    max_lines = style_config.get("max_lines", 3)
+    position = style_config.get("position", "upper_middle")
+    primary_color = style_config.get("primary_color", (255, 255, 255))
+    secondary_color = style_config.get("secondary_color", (255, 255, 255))
+    bg_color = style_config.get("bg_color", (0, 0, 0, 200))
+    shadow_type = style_config.get("shadow", "drop")
+    alternate_colors = style_config.get("alternate_line_colors", False)
+    emojis = style_config.get("emojis", False)
+    rotation = style_config.get("rotation", 0)
+    prefix = style_config.get("prefix", "")
+    gradient_colors = style_config.get("gradient_colors", None)
+    alert_color = style_config.get("alert_color", None)
+    stroke_width = style_config.get("stroke_width", 0)
+    badge_tags = style_config.get("badge_tags", False)
+    alt_bg_color = style_config.get("alt_bg_color", None)
+    shadow_offset = style_config.get("shadow_offset", (3, 3))
+    shadow_color = style_config.get("shadow_color", (0, 0, 0, 255))
+    
+    # Apply text case
+    if text_case == "uppercase":
+        text = text.upper()
+    elif text_case == "title":
+        text = text.title()
+    elif text_case == "sentence":
+        text = text.capitalize()
+    
+    # Add prefix for terminal style
+    if prefix:
+        text = prefix + text
+    
+    # Load font
+    font_size = 68  # Base size for hook text
+    font = get_font_for_style(style_config, font_size, bold=True)
+    
+    max_w = frame_width - 120
+    words = text.split()
     lines, cur = [], []
     for w in words:
         test = " ".join(cur + [w])
-        if ts(test, f)[0] > max_w and cur:
+        if ts(test, font)[0] > max_w and cur:
             lines.append(" ".join(cur))
             cur = [w]
         else:
             cur.append(w)
     if cur:
         lines.append(" ".join(cur))
-    lines = lines[:3]
-
-    lh = ts("Ag", f)[1]
-    lsp = int(lh * 1.3)
+    lines = lines[:max_lines]
+    
+    lh = ts("Ag", font)[1]
+    lsp = int(lh * 1.4)
     total_h = lh + (len(lines) - 1) * lsp
     
-    # Calculate dimensions for the backdrop block
-    max_line_w = max(ts(line, f)[0] for line in lines)
+    max_line_w = max(ts(line, font)[0] for line in lines) if lines else 0
     
     bg_pad_x, bg_pad_y = 40, 25
     block_w = max_line_w + bg_pad_x * 2
     block_h = total_h + bg_pad_y * 2
     
     canvas_h = block_h + 60
-    canvas = Image.new("RGBA", (FRAME_W, canvas_h), (0, 0, 0, 0))
+    canvas = Image.new("RGBA", (frame_width, canvas_h), (0, 0, 0, 0))
     draw = ImageDraw.Draw(canvas)
     
-    # Position of block in canvas
-    bx1 = (FRAME_W - block_w) // 2
+    bx1 = (frame_width - block_w) // 2
     by1 = 30
     bx2 = bx1 + block_w
     by2 = by1 + block_h
     
-    # Draw glassmorphic background box with neon border outline
-    draw.rounded_rectangle(
-        [bx1, by1, bx2, by2],
-        radius=20,
-        fill=(10, 10, 15, 230),
-        outline=accent_color,
-        width=3
-    )
-
+    # Render background based on style
+    if bg_style == "rounded_badge":
+        # Tech Dark Mode - rounded badge with subtle border
+        draw.rounded_rectangle([bx1, by1, bx2, by2], radius=border_radius, fill=bg_color)
+        # Neon accent top line
+        draw.rectangle([bx1, by1, bx2, by1 + 3], fill=(*primary_color, 255))
+        
+    elif bg_style == "solid_badge":
+        # Warning Alert - solid color badge
+        draw.rounded_rectangle([bx1, by1, bx2, by2], radius=border_radius, fill=bg_color)
+        if alert_color:
+            # Red accent line at top
+            draw.rectangle([bx1, by1, bx2, by1 + 4], fill=(*alert_color, 255))
+            
+    elif bg_style == "terminal_rect":
+        # Minimalist Terminal - dark rect with green accent line
+        draw.rounded_rectangle([bx1, by1, bx2, by2], radius=border_radius, fill=bg_color)
+        # Green accent line on left
+        draw.rectangle([bx1, by1, bx1 + 4, by2], fill=(*primary_color, 255))
+        
+    elif bg_style == "text_only":
+        # Viral Pop - no background, just text with heavy shadow
+        pass
+        
+    elif bg_style == "frost_glass":
+        # Gradient Tech - frosted glass with blur effect
+        draw.rounded_rectangle([bx1, by1, bx2, by2], radius=border_radius, fill=bg_color)
+        # Subtle border
+        draw.rounded_rectangle([bx1, by1, bx2, by2], radius=border_radius, outline=(255, 255, 255, 40), width=1)
+        
+    elif bg_style == "banner_strip":
+        # Breaking News - full width banner strip
+        bx1, bx2 = 0, frame_width
+        draw.rectangle([bx1, by1, bx2, by2], fill=bg_color)
+        
+    elif bg_style == "pill_badge":
+        # Clean Educational - pill shape with rounded corners
+        draw.rounded_rectangle([bx1, by1, bx2, by2], radius=border_radius, fill=bg_color)
+        # Inner highlight
+        draw.rounded_rectangle([bx1 + 2, by1 + 2, bx2 - 2, by2 - 2], radius=border_radius - 2, outline=(255, 255, 255, 30), width=1)
+    
+    # Render text lines
     for i, line in enumerate(lines):
-        lw, _ = ts(line, f)
-        tx = (FRAME_W - lw) // 2
+        lw, _ = ts(line, font)
+        tx = (frame_width - lw) // 2
         ty = by1 + bg_pad_y + i * lsp
         
-        # High contrast drop shadow
-        for dx, dy in [(-3, -3), (3, -3), (-3, 3), (3, 3), (-2, 0), (2, 0), (0, -2), (0, 2)]:
-            draw.text((tx + dx, ty + dy), line, font=f, fill=(0, 0, 0, 220))
+        # Determine text color
+        if alternate_colors and len(lines) > 1:
+            txt_fill = primary_color if i % 2 == 0 else secondary_color
+        elif i == 0:
+            txt_fill = primary_color
+        else:
+            txt_fill = secondary_color
+        
+        # Render based on shadow type
+        if shadow_type == "drop":
+            # Standard drop shadow
+            for dx, dy in [(-2, -2), (2, -2), (-2, 2), (2, 2), (-1, 0), (1, 0), (0, -1), (0, 1)]:
+                draw.text((tx + dx, ty + dy), line, font=font, fill=(0, 0, 0, 220))
+            draw.text((tx, ty), line, font=font, fill=(*txt_fill, 255))
             
-        # Alternate line colors: Line 1 is the accent color, others are white
-        txt_fill = (255, 255, 255, 255)
-        if len(lines) > 1 and i == 1:
-            txt_fill = (*accent_color, 255) if len(accent_color) == 3 else (204, 255, 0, 255)
-        elif len(lines) == 1:
-            txt_fill = (*accent_color, 255) if len(accent_color) == 3 else (204, 255, 0, 255)
+        elif shadow_type == "thick_outline":
+            # Heavy black outline for warning style
+            for dx in range(-stroke_width, stroke_width + 1):
+                for dy in range(-stroke_width, stroke_width + 1):
+                    if dx * dx + dy * dy <= stroke_width * stroke_width:
+                        draw.text((tx + dx, ty + dy), line, font=font, fill=(0, 0, 0, 255))
+            draw.text((tx, ty), line, font=font, fill=(*txt_fill, 255))
             
-        draw.text((tx, ty), line, font=f, fill=txt_fill)
+        elif shadow_type == "drop_shadow":
+            # Viral Pop - offset drop shadow
+            sx, sy = shadow_offset
+            draw.text((tx + sx, ty + sy), line, font=font, fill=shadow_color)
+            draw.text((tx, ty), line, font=font, fill=(*txt_fill, 255))
+            
+        elif shadow_type == "glow":
+            # Gradient Tech - glow effect
+            for dx, dy in [(-2, -2), (2, -2), (-2, 2), (2, 2)]:
+                draw.text((tx + dx, ty + dy), line, font=font, fill=(*primary_color, 80))
+            draw.text((tx, ty), line, font=font, fill=(*txt_fill, 255))
+            
+        elif shadow_type == "hard":
+            # Breaking News - hard shadow
+            draw.text((tx + 2, ty + 2), line, font=font, fill=(0, 0, 0, 200))
+            draw.text((tx, ty), line, font=font, fill=(*txt_fill, 255))
+            
+        elif shadow_type == "gaussian_blur":
+            # Clean Educational - would need actual blur, simulate with layered shadows
+            for radius, alpha in [(4, 60), (2, 120), (1, 180)]:
+                for dx in range(-radius, radius + 1):
+                    for dy in range(-radius, radius + 1):
+                        if dx * dx + dy * dy <= radius * radius:
+                            draw.text((tx + dx, ty + dy), line, font=font, fill=(0, 0, 0, alpha))
+            draw.text((tx, ty), line, font=font, fill=(*txt_fill, 255))
+            
+        elif shadow_type == "subtle":
+            # Terminal - subtle shadow
+            draw.text((tx + 1, ty + 1), line, font=font, fill=(0, 0, 0, 150))
+            draw.text((tx, ty), line, font=font, fill=(*txt_fill, 255))
+        
+        # Add emojis for viral pop
+        if emojis and i == len(lines) - 1:
+            emoji_options = [" 🚀", " 🔥", " 💡", " ⚡", " 🎯"]
+            import random
+            emoji = random.choice(emoji_options)
+            ew, _ = ts(emoji, font)
+            draw.text((tx + lw + 10, ty), emoji, font=font, fill=(*primary_color, 255))
+    
+    # Apply rotation if needed (for breaking news)
+    if rotation != 0:
+        canvas = canvas.rotate(rotation, resample=Image.BICUBIC, expand=True)
+    
+    return canvas, (bx1, by1, bx2, by2), canvas_h
 
+
+def _hook_text_overlay(hook_text, accent_color, total_dur):
+    """Displays giant hook text using 7-day title variety system."""
+    enable_hook = os.environ.get("ENABLE_HOOK_OVERLAY", "1") == "1"
+    if not enable_hook or not hook_text:
+        return None
+        
+    dur = min(3.0, total_dur)
+    
+    # Get day-specific title style
+    title_style = get_title_day_style()
+    
+    # Render title with day style
+    canvas, _, canvas_h = _render_title_with_style(
+        hook_text, title_style, FRAME_W, FRAME_H, accent_color
+    )
+    
     arr = np.array(canvas.convert("RGB"))
     mask = np.array(canvas.split()[3]).astype(float) / 255.0
 
@@ -1731,8 +1867,15 @@ def _hook_text_overlay(hook_text, accent_color, total_dur):
     clip = VideoClip(lambda t: arr, duration=dur)
     mclip = VideoClip(lambda t: mask * opacity_fn(t), is_mask=True, duration=dur)
     
-    # Center-middle position (moved down to clear entity logo/name/description)
-    y_pos = int(FRAME_H * 0.48) - (canvas_h // 2)
+    # Position based on style
+    style_pos = title_style.get("position", "upper_middle")
+    if style_pos == "center":
+        y_pos = int(FRAME_H * 0.5) - (canvas_h // 2)
+    elif style_pos == "upper_third":
+        y_pos = int(FRAME_H * 0.25) - (canvas_h // 2)
+    else:  # upper_middle - safe zone 20-30% from top
+        y_pos = int(FRAME_H * 0.28) - (canvas_h // 2)
+    
     return clip.with_mask(mclip).with_position(("center", y_pos)).with_start(0)
 
 
@@ -3952,12 +4095,50 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
     return img
 
 def render_shorts_header_bar(title, accent_color=(255, 255, 255), frame_width=1080):
-    """Renders a solid black top bar with white and accent colored title text for Shorts."""
-    font = gf(54, bold=True)
-    draw_temp = ImageDraw.Draw(Image.new('RGBA', (frame_width, 200)))
+    """Renders a title bar using 7-day title variety system for Shorts."""
+    # Get day-specific title style
+    title_style = get_title_day_style()
     
-    # Wrap text to fit inside the bar (with 60px padding on each side)
+    font_family = title_style["font_family"]
+    font_weight = title_style["font_weight"]
+    text_case = title_style.get("text_case", "uppercase")
+    letter_spacing = title_style.get("letter_spacing", 0)
+    bg_style = title_style.get("bg_style", "rounded_badge")
+    border_radius = title_style.get("border_radius", 16)
+    max_lines = title_style.get("max_lines", 3)
+    primary_color = title_style.get("primary_color", (255, 255, 255))
+    secondary_color = title_style.get("secondary_color", (255, 255, 255))
+    bg_color = title_style.get("bg_color", (0, 0, 0, 200))
+    shadow_type = title_style.get("shadow", "drop")
+    alternate_colors = title_style.get("alternate_line_colors", False)
+    prefix = title_style.get("prefix", "")
+    gradient_colors = title_style.get("gradient_colors", None)
+    alert_color = title_style.get("alert_color", None)
+    stroke_width = title_style.get("stroke_width", 0)
+    badge_tags = title_style.get("badge_tags", False)
+    alt_bg_color = title_style.get("alt_bg_color", None)
+    shadow_offset = title_style.get("shadow_offset", (3, 3))
+    shadow_color = title_style.get("shadow_color", (0, 0, 0, 255))
+    
+    # Apply text case
+    if text_case == "uppercase":
+        title = title.upper()
+    elif text_case == "title":
+        title = title.title()
+    elif text_case == "sentence":
+        title = title.capitalize()
+    
+    # Add prefix for terminal style
+    if prefix:
+        title = prefix + title
+    
+    # Load day-specific font
+    font_size = 54
+    font = get_font_for_style(title_style, font_size, bold=True)
+    
+    # Wrap text to fit inside the bar
     max_w = frame_width - 120
+    draw_temp = ImageDraw.Draw(Image.new('RGBA', (frame_width, 200)))
     words = title.split()
     lines = []
     current_line = []
@@ -3972,7 +4153,7 @@ def render_shorts_header_bar(title, accent_color=(255, 255, 255), frame_width=10
     if current_line:
         lines.append(" ".join(current_line))
         
-    lines = lines[:2] # Max 2 lines to keep header compact
+    lines = lines[:max_lines]
     
     bbox = font.getbbox("Ag")
     line_height = bbox[3] - bbox[1]
@@ -3985,45 +4166,140 @@ def render_shorts_header_bar(title, accent_color=(255, 255, 255), frame_width=10
     draw = ImageDraw.Draw(img)
     
     # Shift down by 3 cm (113 pixels at 96 DPI) to avoid system HUD/notch overlap
-    offset_y = 113
+    # But for some styles, position differently
+    style_pos = title_style.get("position", "upper_middle")
+    if style_pos == "upper_third":
+        offset_y = int(FRAME_H * 0.15)  # Higher up for breaking news
+    elif style_pos == "center":
+        offset_y = int(FRAME_H * 0.35)  # Lower for viral pop
+    else:
+        offset_y = 113  # Standard offset
     
-    # Draw solid black background bar shifted down
-    draw.rectangle([0, offset_y, frame_width, offset_y + bar_height], fill=(0, 0, 0, 255))
-    
-    # Draw centered text with color variant
-    for i, line in enumerate(lines):
-        words_in_line = line.split()
-        if not words_in_line:
-            continue
-            
-        highlight_mask = [False] * len(words_in_line)
-        if len(lines) == 1:
-            # Highlight the last 1 or 2 words (approx last 30%)
-            num_highlight = max(1, len(words_in_line) // 3)
-            for idx in range(len(words_in_line) - num_highlight, len(words_in_line)):
-                highlight_mask[idx] = True
-        else:
-            # Highlight the entire second line
-            if i == 1:
-                highlight_mask = [True] * len(words_in_line)
-                
-        space_w = draw.textlength(" ", font=font)
-        word_widths = [draw.textlength(w, font=font) for w in words_in_line]
-        total_line_w = sum(word_widths) + space_w * (len(words_in_line) - 1)
+    # Draw background based on style
+    if bg_style == "rounded_badge":
+        # Tech Dark Mode - centered rounded badge
+        max_line_w = max(draw.textlength(line, font=font) for line in lines) if lines else 0
+        bw = max_line_w + 80
+        bx1 = (frame_width - bw) // 2
+        bx2 = bx1 + bw
+        draw.rounded_rectangle([bx1, offset_y, bx2, offset_y + bar_height], radius=border_radius, fill=bg_color)
+        draw.rectangle([bx1, offset_y, bx2, offset_y + 3], fill=(*primary_color, 255))
+        text_offset_x = bx1 + 40
         
-        cur_x = (frame_width - total_line_w) // 2
+    elif bg_style == "solid_badge":
+        # Warning Alert - centered solid badge
+        max_line_w = max(draw.textlength(line, font=font) for line in lines) if lines else 0
+        bw = max_line_w + 80
+        bx1 = (frame_width - bw) // 2
+        bx2 = bx1 + bw
+        draw.rounded_rectangle([bx1, offset_y, bx2, offset_y + bar_height], radius=border_radius, fill=bg_color)
+        if alert_color:
+            draw.rectangle([bx1, offset_y, bx2, offset_y + 4], fill=(*alert_color, 255))
+        text_offset_x = bx1 + 40
+        
+    elif bg_style == "terminal_rect":
+        # Terminal - left-aligned rect
+        max_line_w = max(draw.textlength(line, font=font) for line in lines) if lines else 0
+        bw = max_line_w + 80
+        bx1 = 40
+        bx2 = bx1 + bw
+        draw.rounded_rectangle([bx1, offset_y, bx2, offset_y + bar_height], radius=border_radius, fill=bg_color)
+        draw.rectangle([bx1, offset_y, bx1 + 4, offset_y + bar_height], fill=(*primary_color, 255))
+        text_offset_x = bx1 + 20
+        
+    elif bg_style == "text_only":
+        # Viral Pop - no background
+        text_offset_x = 0  # Will center each line
+        
+    elif bg_style == "frost_glass":
+        # Gradient Tech - centered frosted glass
+        max_line_w = max(draw.textlength(line, font=font) for line in lines) if lines else 0
+        bw = max_line_w + 80
+        bx1 = (frame_width - bw) // 2
+        bx2 = bx1 + bw
+        draw.rounded_rectangle([bx1, offset_y, bx2, offset_y + bar_height], radius=border_radius, fill=bg_color)
+        draw.rounded_rectangle([bx1, offset_y, bx2, offset_y + bar_height], radius=border_radius, outline=(255, 255, 255, 40), width=1)
+        text_offset_x = bx1 + 40
+        
+    elif bg_style == "banner_strip":
+        # Breaking News - full width banner
+        draw.rectangle([0, offset_y, frame_width, offset_y + bar_height], fill=bg_color)
+        text_offset_x = 0  # Will center each line
+        
+    elif bg_style == "pill_badge":
+        # Clean Educational - centered pill
+        max_line_w = max(draw.textlength(line, font=font) for line in lines) if lines else 0
+        bw = max_line_w + 80
+        bx1 = (frame_width - bw) // 2
+        bx2 = bx1 + bw
+        draw.rounded_rectangle([bx1, offset_y, bx2, offset_y + bar_height], radius=border_radius, fill=bg_color)
+        draw.rounded_rectangle([bx1 + 2, offset_y + 2, bx2 - 2, offset_y + bar_height - 2], radius=border_radius - 2, outline=(255, 255, 255, 30), width=1)
+        text_offset_x = bx1 + 40
+        
+    else:
+        # Default: full width bar
+        draw.rectangle([0, offset_y, frame_width, offset_y + bar_height], fill=(0, 0, 0, 255))
+        text_offset_x = 0
+    
+    # Draw text
+    for i, line in enumerate(lines):
+        if text_offset_x == 0:
+            # Center the line
+            lw = draw.textlength(line, font=font)
+            cur_x = (frame_width - lw) // 2
+        else:
+            cur_x = text_offset_x
+            
         ty = offset_y + padding_y + i * (line_height + line_spacing)
         
-        for idx, word in enumerate(words_in_line):
-            w_w = word_widths[idx]
-            color = accent_color if highlight_mask[idx] else (255, 255, 255, 255)
+        # Determine line color
+        if alternate_colors and len(lines) > 1:
+            line_color = primary_color if i % 2 == 0 else secondary_color
+        elif i == 0:
+            line_color = primary_color
+        else:
+            line_color = secondary_color
+        
+        # Render with appropriate shadow
+        if shadow_type == "drop":
+            for dx, dy in [(-2, -2), (2, -2), (-2, 2), (2, 2), (-1, 0), (1, 0), (0, -1), (0, 1)]:
+                draw.text((cur_x + dx, ty + dy), line, font=font, fill=(0, 0, 0, 220))
+            draw.text((cur_x, ty), line, font=font, fill=(*line_color, 255))
             
-            # Draw shadow for maximum contrast
-            for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                draw.text((cur_x + dx, ty + dy), word, font=font, fill=(0, 0, 0, 150))
-                
-            draw.text((cur_x, ty), word, font=font, fill=color)
-            cur_x += w_w + space_w
+        elif shadow_type == "thick_outline":
+            for dx in range(-stroke_width, stroke_width + 1):
+                for dy in range(-stroke_width, stroke_width + 1):
+                    if dx * dx + dy * dy <= stroke_width * stroke_width:
+                        draw.text((cur_x + dx, ty + dy), line, font=font, fill=(0, 0, 0, 255))
+            draw.text((cur_x, ty), line, font=font, fill=(*line_color, 255))
+            
+        elif shadow_type == "drop_shadow":
+            sx, sy = shadow_offset
+            draw.text((cur_x + sx, ty + sy), line, font=font, fill=shadow_color)
+            draw.text((cur_x, ty), line, font=font, fill=(*line_color, 255))
+            
+        elif shadow_type == "glow":
+            for dx, dy in [(-2, -2), (2, -2), (-2, 2), (2, 2)]:
+                draw.text((cur_x + dx, ty + dy), line, font=font, fill=(*primary_color, 80))
+            draw.text((cur_x, ty), line, font=font, fill=(*line_color, 255))
+            
+        elif shadow_type == "hard":
+            draw.text((cur_x + 2, ty + 2), line, font=font, fill=(0, 0, 0, 200))
+            draw.text((cur_x, ty), line, font=font, fill=(*line_color, 255))
+            
+        elif shadow_type == "gaussian_blur":
+            for radius, alpha in [(4, 60), (2, 120), (1, 180)]:
+                for dx in range(-radius, radius + 1):
+                    for dy in range(-radius, radius + 1):
+                        if dx * dx + dy * dy <= radius * radius:
+                            draw.text((cur_x + dx, ty + dy), line, font=font, fill=(0, 0, 0, alpha))
+            draw.text((cur_x, ty), line, font=font, fill=(*line_color, 255))
+            
+        elif shadow_type == "subtle":
+            draw.text((cur_x + 1, ty + 1), line, font=font, fill=(0, 0, 0, 150))
+            draw.text((cur_x, ty), line, font=font, fill=(*line_color, 255))
+        else:
+            draw.text((cur_x, ty), line, font=font, fill=(*line_color, 255))
             
     return img
 
@@ -5837,6 +6113,147 @@ DAY_STYLES = {
         "stroke_width": 5,
     },
 }
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 7-DAY TITLE STYLE SYSTEM (Deterministic by Day of Week)
+# ══════════════════════════════════════════════════════════════════════════════
+# Mobile Safe Zone: 20% from top, 30% from bottom of 9:16 frame. Max 3 lines.
+# Each style maps to a specific title aesthetic for episodic branding.
+
+TITLE_DAY_STYLES = {
+    # Monday: "Tech Dark Mode" - Clean, modern, developer-focused
+    # Font: Roboto Bold | Neon Cyan + White on Soft Black badge
+    0: {
+        "name": "tech_dark",
+        "font_family": "Roboto",
+        "font_weight": "Bold",
+        "primary_color": (0, 240, 255),      # #00F0FF - Neon Cyan
+        "secondary_color": (255, 255, 255),  # #FFFFFF - Pure White
+        "bg_color": (18, 18, 18, 204),       # #121212 @ 80% opacity
+        "text_case": "uppercase",
+        "letter_spacing": 2,
+        "bg_style": "rounded_badge",
+        "border_radius": 16,
+        "shadow": "drop",
+        "max_lines": 3,
+        "position": "upper_middle",  # 20-30% from top
+    },
+    # Tuesday: "Warning / Alert" - High urgency for security/critical
+    # Font: Montserrat Black (condensed) | Bright Yellow + Caution Red with Black outline
+    1: {
+        "name": "warning_alert",
+        "font_family": "Montserrat",
+        "font_weight": "Black",
+        "primary_color": (255, 215, 0),      # #FFD700 - Bright Yellow
+        "secondary_color": (255, 255, 255),  # #FFFFFF - White
+        "alert_color": (255, 46, 0),         # #FF2E00 - Caution Red
+        "bg_color": (255, 0, 0, 230),        # Solid Red badge
+        "text_case": "uppercase",
+        "letter_spacing": 1,
+        "bg_style": "solid_badge",
+        "border_radius": 8,
+        "stroke_width": 4,  # Heavy black outline
+        "shadow": "thick_outline",
+        "max_lines": 3,
+        "position": "upper_middle",
+    },
+    # Wednesday: "Minimalist Terminal" - Dev/hacker aesthetic
+    # Font: NanumBarunGothic (monospace-like) | Hacker Green on dark rect
+    2: {
+        "name": "terminal",
+        "font_family": "NanumBarunGothic",
+        "font_weight": "Regular",
+        "primary_color": (0, 255, 102),      # #00FF66 - Hacker Green
+        "secondary_color": (166, 255, 0),    # #A6FF00 - Bright Lime
+        "bg_color": (10, 15, 10, 220),       # Dark semi-transparent
+        "text_case": "sentence",
+        "letter_spacing": 0,
+        "prefix": "> ",
+        "bg_style": "terminal_rect",
+        "border_radius": 4,
+        "shadow": "subtle",
+        "max_lines": 3,
+        "position": "upper_middle",
+    },
+    # Thursday: "Viral Pop" - Bold & punchy (Hormozi/MrBeast style)
+    # Font: Montserrat ExtraBold | Vibrant Yellow + White with black drop shadow
+    3: {
+        "name": "viral_pop",
+        "font_family": "Montserrat",
+        "font_weight": "ExtraBold",
+        "primary_color": (255, 245, 0),      # #FFF500 - Vibrant Yellow
+        "secondary_color": (255, 255, 255),  # #FFFFFF - Pure White
+        "bg_color": (0, 0, 0, 0),            # No bg - text with shadow only
+        "text_case": "uppercase",
+        "letter_spacing": -1,
+        "bg_style": "text_only",
+        "shadow": "drop_shadow",
+        "shadow_offset": (3, 3),
+        "shadow_color": (0, 0, 0, 255),
+        "max_lines": 3,
+        "alternate_line_colors": True,
+        "emojis": True,
+        "position": "center",  # Center screen for viral pop
+    },
+    # Friday: "Gradient Tech" - Premium & sleek for AI/architecture
+    # Font: Montserrat Variable | Electric Purple-to-Blue gradient + White
+    4: {
+        "name": "gradient_tech",
+        "font_family": "Montserrat",
+        "font_weight": "Variable",
+        "gradient_colors": [(138, 43, 226), (0, 210, 255)],  # #8A2BE2 to #00D2FF
+        "secondary_color": (255, 255, 255),  # #FFFFFF - Crisp White
+        "bg_color": (10, 10, 20, 180),       # Frost glass background
+        "text_case": "title",
+        "letter_spacing": 0,
+        "bg_style": "frost_glass",
+        "border_radius": 20,
+        "shadow": "glow",
+        "max_lines": 3,
+        "position": "upper_middle",
+    },
+    # Saturday: "Breaking News Sticker" - Hook heavy for news drops
+    # Font: Montserrat Black | White on Solid Red/Orange banner, rotated
+    5: {
+        "name": "breaking_news",
+        "font_family": "Montserrat",
+        "font_weight": "Black",
+        "primary_color": (255, 255, 255),    # #FFFFFF - Pure White
+        "bg_color": (229, 9, 20, 255),       # #E50914 - Netflix Red
+        "alt_bg_color": (255, 87, 34, 255),  # #FF5722 - Bright Orange
+        "text_case": "uppercase",
+        "letter_spacing": 0,
+        "bg_style": "banner_strip",
+        "border_radius": 0,
+        "rotation": -4,  # degrees
+        "shadow": "hard",
+        "max_lines": 2,
+        "position": "upper_third",  # Upper third of frame
+    },
+    # Sunday: "Clean Educational" - Professional for tutorials/comparisons
+    # Font: Roboto Variable | Soft Cream + White with gaussian blur shadow
+    6: {
+        "name": "clean_educational",
+        "font_family": "Roboto",
+        "font_weight": "Variable",
+        "primary_color": (255, 243, 191),    # #FFF3BF - Soft Cream
+        "secondary_color": (255, 255, 255),  # #FFFFFF - Pure White
+        "bg_color": (25, 25, 35, 220),       # Dark blue-gray
+        "text_case": "title",
+        "letter_spacing": 1,
+        "bg_style": "pill_badge",
+        "border_radius": 24,
+        "shadow": "gaussian_blur",
+        "badge_tags": True,  # [TAG] style badges
+        "max_lines": 3,
+        "position": "upper_middle",
+    },
+}
+
+def get_title_day_style():
+    """Returns the title style config for the current day of week (0=Mon, 6=Sun)."""
+    day = datetime.now().weekday()
+    return TITLE_DAY_STYLES[day]
 
 def get_day_style():
     """Returns the subtitle style config for the current day of week (0=Mon, 6=Sun)."""
