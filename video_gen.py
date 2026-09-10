@@ -5826,22 +5826,20 @@ def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, 
         if i < line_word_count - 1:
             line_w += 22  # space
 
-    # Safe Zone: center 60% vertical viewport (20%-80%)
-    # For Shorts (portrait): use upper-middle zone (30%-55%) - avoids top UI and presenter area
-    # For Longform (landscape): use lower-middle zone (55%-75%) - avoids bottom UI
+    # Safe Zone: Position subtitles at bottom, just above avatar head
+    # For Shorts (portrait): bottom zone (70%-85%) - above avatar which is at ~78-95%
+    # For Longform (landscape): lower third area (65%-80%)
     if is_landscape:
-        # Landscape: lower third area
         y_pos_pct = 0.70
     else:
-        # Portrait: upper-middle zone (center of safe 60%)
-        y_pos_pct = 0.425  # Middle of 30%-55% range
+        y_pos_pct = 0.75  # Bottom zone, just above avatar head
     line_h = int(90 * scale_ratio)
     start_y = int(frame_height * y_pos_pct) - (line_h // 2) + y_shift
 
-    # CLAMP: Ensure captions stay in upper-middle safe zone (30%-55%) to avoid YouTube auto-caption overlap
-    # YouTube auto-captions appear in bottom 20% of screen, so keep our captions above 55%
-    min_y = int(frame_height * 0.30) - (line_h // 2)  # Top of safe zone
-    max_y = int(frame_height * 0.55) - (line_h // 2)  # Bottom of safe zone (above YouTube captions)
+    # CLAMP: Allow bottom positioning (up to 85%) for avatar clearance
+    # YouTube auto-captions appear in bottom 20%, so stay above 80% to be safe
+    min_y = int(frame_height * 0.30) - (line_h // 2)
+    max_y = int(frame_height * 0.85) - (line_h // 2)
     start_y = max(min_y, min(start_y, max_y))
 
     # Background block (obsidian with rounded corners)
@@ -6396,16 +6394,16 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     lines = lines[:1]
     line_h = int(90 * scale_ratio)
     
-    # Safe Zone: center 60% vertical viewport
+    # Safe Zone: Position subtitles at bottom, just above avatar head
     if is_landscape:
         y_pos_pct = 0.70
     else:
-        y_pos_pct = 0.425  # Upper-middle zone
+        y_pos_pct = 0.75  # Bottom zone, just above avatar head
     start_y = int(frame_height * y_pos_pct) - (len(lines) * line_h // 2) + y_shift
 
-    # CLAMP: Ensure captions stay in upper-middle safe zone (30%-55%) to avoid YouTube auto-caption overlap
+    # CLAMP: Allow bottom positioning (up to 85%) for avatar clearance
     min_y = int(frame_height * 0.30) - (len(lines) * line_h // 2)
-    max_y = int(frame_height * 0.55) - (len(lines) * line_h // 2)
+    max_y = int(frame_height * 0.85) - (len(lines) * line_h // 2)
     start_y = max(min_y, min(start_y, max_y))
     
     max_line_w = 0
