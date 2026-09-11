@@ -14,7 +14,7 @@ import traceback
 import json
 from datetime import datetime
 
-from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY, ENABLE_TRENDING_ENGINE
+from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY, ENABLE_TRENDING_ENGINE, TRENDING_SOURCES
 from fetch_research_papers import fetch_tech_news, fetch_ai_tools
 from topic_tracker import record_story, update_youtube_url, update_facebook_post_id, get_next_topic_type_by_ratio, get_next_target_country, get_next_avatar
 from gemini_script import pick_and_generate_script
@@ -627,9 +627,9 @@ def run_pipeline(topic_type="auto", dry_run=False):
         if ENABLE_TRENDING_ENGINE:
             try:
                 from trending_engine import fetch_all_trending_signals
-                trending_articles = fetch_all_trending_signals(target_country=target_country, category=category)
+                trending_articles = fetch_all_trending_signals(target_country=target_country, category=category, sources=TRENDING_SOURCES)
                 rss_articles = trending_articles + rss_articles  # Trending FIRST for priority
-                log_message(f"🔥 Trending Engine injected {len(trending_articles)} high-signal articles for geo={target_country}, category={category}.")
+                log_message(f"🔥 Trending Engine injected {len(trending_articles)} high-signal articles for geo={target_country}, category={category}, sources={TRENDING_SOURCES}.")
             except Exception as ex:
                 log_message(f"⚠️ Trending Engine failed (non-fatal): {ex}")
             

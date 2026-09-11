@@ -1584,78 +1584,97 @@ def compute_engagement_score(article):
     return min(100, score)
 
 
-def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools"):
+def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools", sources=None):
     """
     Master aggregator: fetches from all trending sources and returns
     a unified, scored article list ready for the pipeline.
     Filters all sources by the given category.
+    
+    Args:
+        target_country: Target country for geo-specific trends
+        category: Category to filter by
+        sources: List of sources to fetch from. Options: "youtube", "reddit", "github", "hackernews", "huggingface", "arxiv", "tldr", "google_trends", "youtube_popular"
+                Defaults to config.TRENDING_SOURCES or all sources if not specified.
     """
-    print(f"\n🔥 === TRENDING ENGINE: Fetching Multi-Platform Signals for region={target_country}, category='{category}' === 🔥")
+    from config import TRENDING_SOURCES as DEFAULT_SOURCES
+    if sources is None:
+        sources = DEFAULT_SOURCES
+    
+    print(f"\n🔥 === TRENDING ENGINE: Fetching Multi-Platform Signals for region={target_country}, category='{category}', sources={sources} === 🔥")
     
     all_articles = []
     
     # 1. YouTube Trending Shorts
-    try:
-        yt_articles = fetch_youtube_trending_shorts(target_country, category)
-        all_articles.extend(yt_articles)
-    except Exception as e:
-        print(f"⚠️ YouTube trending failed: {e}")
+    if "youtube" in sources:
+        try:
+            yt_articles = fetch_youtube_trending_shorts(target_country, category)
+            all_articles.extend(yt_articles)
+        except Exception as e:
+            print(f"⚠️ YouTube trending failed: {e}")
     
     # 2. Reddit Hot Posts
-    try:
-        reddit_articles = fetch_reddit_hot_ai(category)
-        all_articles.extend(reddit_articles)
-    except Exception as e:
-        print(f"⚠️ Reddit trending failed: {e}")
+    if "reddit" in sources:
+        try:
+            reddit_articles = fetch_reddit_hot_ai(category)
+            all_articles.extend(reddit_articles)
+        except Exception as e:
+            print(f"⚠️ Reddit trending failed: {e}")
     
     # 3. GitHub Trending Repos & Topics
-    try:
-        github_articles = fetch_github_trending_ai(category)
-        all_articles.extend(github_articles)
-    except Exception as e:
-        print(f"⚠️ GitHub trending failed: {e}")
+    if "github" in sources:
+        try:
+            github_articles = fetch_github_trending_ai(category)
+            all_articles.extend(github_articles)
+        except Exception as e:
+            print(f"⚠️ GitHub trending failed: {e}")
     
     # 4. Hacker News Top Discussions
-    try:
-        hn_articles = fetch_hacker_news_trending(category)
-        all_articles.extend(hn_articles)
-    except Exception as e:
-        print(f"⚠️ Hacker News fetch failed: {e}")
+    if "hackernews" in sources:
+        try:
+            hn_articles = fetch_hacker_news_trending(category)
+            all_articles.extend(hn_articles)
+        except Exception as e:
+            print(f"⚠️ Hacker News fetch failed: {e}")
     
     # 5. Hugging Face Trending Papers & Models
-    try:
-        hf_articles = fetch_huggingface_trending(category)
-        all_articles.extend(hf_articles)
-    except Exception as e:
-        print(f"⚠️ Hugging Face fetch failed: {e}")
+    if "huggingface" in sources:
+        try:
+            hf_articles = fetch_huggingface_trending(category)
+            all_articles.extend(hf_articles)
+        except Exception as e:
+            print(f"⚠️ Hugging Face fetch failed: {e}")
     
     # 6. ArXiv AI Research Papers
-    try:
-        arxiv_articles = fetch_arxiv_ai_papers(category)
-        all_articles.extend(arxiv_articles)
-    except Exception as e:
-        print(f"⚠️ ArXiv AI fetch failed: {e}")
+    if "arxiv" in sources:
+        try:
+            arxiv_articles = fetch_arxiv_ai_papers(category)
+            all_articles.extend(arxiv_articles)
+        except Exception as e:
+            print(f"⚠️ ArXiv AI fetch failed: {e}")
     
     # 7. TLDR AI & Newsletters
-    try:
-        tldr_articles = fetch_tldr_ai_newsletters(category)
-        all_articles.extend(tldr_articles)
-    except Exception as e:
-        print(f"⚠️ TLDR AI fetch failed: {e}")
+    if "tldr" in sources:
+        try:
+            tldr_articles = fetch_tldr_ai_newsletters(category)
+            all_articles.extend(tldr_articles)
+        except Exception as e:
+            print(f"⚠️ TLDR AI fetch failed: {e}")
     
     # 8. Google Trends (Stream A)
-    try:
-        gt_articles = fetch_google_trending_tech(target_country, category)
-        all_articles.extend(gt_articles)
-    except Exception as e:
-        print(f"⚠️ Google Trends fetch failed: {e}")
+    if "google_trends" in sources:
+        try:
+            gt_articles = fetch_google_trending_tech(target_country, category)
+            all_articles.extend(gt_articles)
+        except Exception as e:
+            print(f"⚠️ Google Trends fetch failed: {e}")
     
     # 9. YouTube Most Popular (Cheap - 1 unit/call via chart=mostPopular)
-    try:
-        ymp_articles = fetch_youtube_most_popular(target_country, category)
-        all_articles.extend(ymp_articles)
-    except Exception as e:
-        print(f"⚠️ YouTube Most Popular fetch failed: {e}")
+    if "youtube_popular" in sources:
+        try:
+            ymp_articles = fetch_youtube_most_popular(target_country, category)
+            all_articles.extend(ymp_articles)
+        except Exception as e:
+            print(f"⚠️ YouTube Most Popular fetch failed: {e}")
 
     # 10. YouTube Outlier Hunter (Stream B - 100 units/call via search.list)
     try:
