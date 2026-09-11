@@ -1,0 +1,131 @@
+{
+  "source_history": [
+    {
+      "source": "medium",
+      "articles_count": 1,
+      "timestamp": "2026-09-12T00:45:46.498436",
+      "video_number": 1
+    },
+    {
+      "source": "github",
+      "articles_count": 174,
+      "timestamp": "2026-09-12T00:45:46.499249",
+      "video_number": 2
+    },
+    {
+      "source": "medium",
+      "articles_count": 1,
+      "timestamp": "2026-09-12T00:48:01.282333",
+      "video_number": 3
+    },
+    {
+      "source": "github",
+      "articles_count": 174,
+      "timestamp": "2026-09-12T00:48:01.282928",
+      "video_number": 4
+    },
+    {
+      "source": "arxiv",
+      "articles_count": 12,
+      "timestamp": "2026-09-12T00:48:01.283138",
+      "video_number": 5
+    },
+    {
+      "source": "hackernews",
+      "articles_count": 4,
+      "timestamp": "2026-09-12T00:48:01.283345",
+      "video_number": 6
+    },
+    {
+      "source": "huggingface",
+      "articles_count": 15,
+      "timestamp": "2026-09-12T00:48:01.283532",
+      "video_number": 7
+    },
+    {
+      "source": "reddit",
+      "articles_count": 2,
+      "timestamp": "2026-09-12T00:48:01.283737",
+      "video_number": 8
+    },
+    {
+      "source": "medium",
+      "articles_count": 1,
+      "timestamp": "2026-09-12T00:50:17.500818",
+      "video_number": 9
+    },
+    {
+      "source": "github",
+      "articles_count": 174,
+      "timestamp": "2026-09-12T00:50:17.501364",
+      "video_number": 10
+    },
+    {
+      "source": "arxiv",
+      "articles_count": 12,
+      "timestamp": "2026-09-12T00:50:17.501691",
+      "video_number": 11
+    },
+    {
+      "source": "hackernews",
+      "articles_count": 4,
+      "timestamp": "2026-09-12T00:50:17.501989",
+      "video_number": 12
+    },
+    {
+      "source": "huggingface",
+      "articles_count": 15,
+      "timestamp": "2026-09-12T00:50:17.502283",
+      "video_number": 13
+    },
+    {
+      "source": "medium",
+      "articles_count": 1,
+      "timestamp": "2026-09-12T04:01:26.061380",
+      "video_number": 14
+    },
+    {
+      "source": "arxiv",
+      "articles_count": 12,
+      "timestamp": "2026-09-12T04:01:26.062000",
+      "video_number": 15
+    },
+    {
+      "source": "huggingface",
+      "articles_count": 15,
+      "timestamp": "2026-09-12T04:01:26.062214",
+      "video_number": 16
+    },
+    {
+      "source": "reddit",
+      "articles_count": 1,
+      "timestamp": "2026-09-12T04:01:26.062408",
+      "video_number": 17
+    },
+    {
+      "source": "medium",
+      "articles_count": 1,
+      "timestamp": "2026-09-12T04:05:34.655429",
+      "video_number": 18
+    },
+    {
+      "source": "arxiv",
+      "articles_count": 12,
+      "timestamp": "2026-09-12T04:05:34.656273",
+      "video_number": 19
+    },
+    {
+      "source": "huggingface",
+      "articles_count": 15,
+      "timestamp": "2026-09-12T04:05:34.656697",
+      "video_number": 20
+    },
+    {
+      "source": "reddit",
+      "articles_count": 1,
+      "timestamp": "2026-09-12T04:05:34.657237",
+      "video_number": 21
+    }
+  ],
+  "video_count": 21
+}

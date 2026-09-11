@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 YT Did You Know - Main Pipeline Orchestrator
 
@@ -665,6 +666,9 @@ def run_pipeline(topic_type="auto", dry_run=False):
         else:
             log_message(f"✅ Fetched {len(rss_articles)} total articles ({len(github_news)} GitHub, {len(vidiq_news)} vidIQ, {len(research_news)} research, {len(ai_tool_news)} tools, {len(x_news)} X.com, {len(trending_articles)} trending).")
     
+    except Exception as e:
+        log_message(f"⚠️ RSS/Trending Fetch failed: {e}")
+
     # ── STEP 2.5: Embedding-based deduplication & Zero-shot classification ──
     try:
         from topic_classifier import filter_and_classify_candidates, get_recent_topic_embeddings
@@ -691,9 +695,6 @@ def run_pipeline(topic_type="auto", dry_run=False):
                 
     except Exception as e:
         log_message(f"⚠️ Topic classification failed (non-fatal): {e}")
-        
-    except Exception as e:
-        log_message(f"⚠️ RSS/Trending Fetch failed: {e}")
 
     # ── STEP 3: Script Generation (with retry) ────────────────────────────────
     # Screenshot is MANDATORY — if we can't capture it, we reject the topic and retry.
