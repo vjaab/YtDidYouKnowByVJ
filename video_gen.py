@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 video_gen.py — Full 15-layer engagement video.
 
@@ -447,7 +448,7 @@ def get_vibrant_dominant_color(img_path):
                 return vibrant_colors[0][1]
             return None
     except Exception as e:
-        print(f"⚠️ Error extracting dominant color: {e}")
+        print(f"[WARN] Error extracting dominant color: {e}")
         return None
 
 # Layout profile generation now handled by layout_engine.py
@@ -1152,6 +1153,80 @@ def _gradient_clip(duration, height_pct=0.45, position="bottom", is_longform=Fal
     clip = ImageClip(arr, duration=duration)
     mask = VideoClip(lambda t: mask_arr, is_mask=True, duration=duration)
     return clip.with_mask(mask).with_position(("center", position))
+
+
+def _create_clean_background_clip(duration, accent_color, audio_duration, start_time, is_longform=False):
+    """
+    Creates a clean, minimal background clip for flowcharts/diagrams.
+    Based on the decorator_flow_template style: clean solid color with subtle accents.
+    """
+    # Clean background color (dark for shorts, light for longform)
+    if is_longform:
+        bg_color = (250, 250, 250)  # Light gray/white for longform
+        accent_rgb = tuple(int(accent_color.lstrip("#")[i:i+2], 16) for i in (0, 2, 4)) if isinstance(accent_color, str) else accent_color
+    else:
+        bg_color = (15, 15, 22)  # Dark for shorts
+        accent_rgb = accent_color if isinstance(accent_color, tuple) else tuple(int(accent_color.lstrip("#")[i:i+2], 16) for i in (0, 2, 4))
+    
+    # Create base frame
+    arr = np.full((FRAME_H, FRAME_W, 3), bg_color, dtype=np.uint8)
+    
+    # Add subtle accent line at top
+    if is_longform:
+        line_color = accent_rgb
+    else:
+        line_color = accent_rgb
+    
+    line_h = 4
+    arr[:line_h, :] = line_color
+    
+    # Add subtle grid pattern (very low opacity) for longform
+    if is_longform:
+        grid_spacing = 80
+        grid_color = tuple(min(255, c + 20) for c in bg_color)
+        for x in range(0, FRAME_W, grid_spacing):
+            arr[:, x:x+1] = grid_color
+        for y in range(0, FRAME_H, grid_spacing):
+            arr[y:y+1, :] = grid_color
+    
+    # Add subtle glow in corner (like decorator template)
+    glow_w, glow_h = 400, 400
+    if is_longform:
+        glow_x, glow_y = FRAME_W - glow_w - 50, 50
+    else:
+        glow_x, glow_y = FRAME_W - glow_w - 30, 30
+    
+    # Create a radial gradient glow
+    y_grid, x_grid = np.ogrid[:FRAME_H, :FRAME_W]
+    center_y, center_x = glow_y + glow_h // 2, glow_x + glow_w // 2
+    dist = np.sqrt((x_grid - center_x)**2 + (y_grid - center_y)**2)
+    max_dist = np.sqrt(glow_w**2 + glow_h**2) / 2
+    glow_mask = np.clip(1 - dist / max_dist, 0, 1)
+    glow_mask = glow_mask ** 2  # Sharper falloff
+    
+    # Apply glow with very low opacity
+    glow_alpha = 0.03 if is_longform else 0.05
+    for c in range(3):
+        arr[:, :, c] = np.clip(arr[:, :, c] + (glow_mask * accent_rgb[c] * glow_alpha * 255).astype(np.uint8), 0, 255)
+    
+    clip = ImageClip(arr, duration=duration)
+    clip = clip.with_start(start_time)
+    
+    # Fade in/out
+    fade_in = 0.3
+    fade_out = 0.3
+    def opacity_fn(t):
+        if t < fade_in:
+            return t / fade_in
+        if t > duration - fade_out:
+            return max(0, (duration - t) / fade_out)
+        return 1.0
+    
+    mask_arr = np.ones((FRAME_H, FRAME_W), dtype=float)
+    mask_clip = VideoClip(lambda t: mask_arr * opacity_fn(t), is_mask=True, duration=duration)
+    clip = clip.with_mask(mask_clip)
+    
+    return clip
 
 
 # ─── Themed Background Images per Category ──────────────────────────────────
@@ -3026,9 +3101,12 @@ def _render_stat_card(stat_value, stat_label, accent_color, width=600):
     # Value — centered
     draw.text(((card_w - vw) // 2, 20), stat_value,
               font=f_val, fill=(*accent_color, 255))
-    # Label — centered, dimmer
+# Label — centered, dimmer
     draw.text(((card_w - lw) // 2, 28 + vh), stat_label,
               font=f_label, fill=(200, 200, 210, 200))
+
+    return img
+
 
 def _render_flowchart_card(steps, accent_color, width=980, active_step=None):
     """Vertical architectural flowchart styled like a cloud diagram."""
@@ -3435,10 +3513,20 @@ def _infographic_card_clip(infographic_type, infographic_data,
         clip = VideoClip(make_frame, duration=dur)
         mclip = VideoClip(make_mask, is_mask=True, duration=dur)
 
+    # Return both the infographic clip and a clean background clip for diagram types
+    diagram_types = {"flowchart", "architecture", "pipeline", "data_flow", 
+                     "cluster_diagram", "container_diagram", "branch_diagram",
+                     "ci_cd_pipeline", "attack_defense_flow", "service_architecture",
+                     "process", "slide", "comparison"}
+    
+    clean_bg_clip = None
+    if itype in diagram_types:
+        clean_bg_clip = _create_clean_background_clip(dur, accent_color, audio_duration, start_time, is_longform=FRAME_W > FRAME_H)
+    
     return (clip.with_mask(mclip)
                 .with_position(lambda t: (x_pos, y_pos_fn(t)))
                 .with_start(start_time)
-                .with_effects([vfx.CrossFadeOut(0.3)]))
+                .with_effects([vfx.CrossFadeOut(0.3)]), clean_bg_clip)
 
 
 # ── SERIES IDENTITY: Persistent Badge ──────────────────────────────────────────
@@ -9034,11 +9122,12 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     # ── COMPOSITING ──
     # Collect infographics logic — ENABLED if feature flag is active
     infographic_clips = []
+    clean_bg_clips = []  # Clean backgrounds for diagrams/flowcharts
     enable_infographics = os.environ.get("ENABLE_INFOGRAPHICS", "1") == "1"
     if enable_infographics and not CI_LITE:
         for chunk in chunks:
             if chunk.get("has_infographic") and chunk.get("infographic_type"):
-                iclip = _infographic_card_clip(
+                result = _infographic_card_clip(
                     chunk.get("infographic_type"),
                     chunk.get("infographic_data"),
                     accent_color,
@@ -9046,8 +9135,12 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                     chunk["duration"],
                     audio_duration
                 )
-                if iclip:
-                    infographic_clips.append(iclip)
+                if result:
+                    iclip, clean_bg = result
+                    if iclip:
+                        infographic_clips.append(iclip)
+                    if clean_bg:
+                        clean_bg_clips.append(clean_bg)
     elif enable_infographics and CI_LITE:
         print("   🔧 CI-LITE: Skipping infographics")
 
@@ -9164,7 +9257,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     if is_longform:
         topic_transition_clips = _longform_topic_transition_clips(script_json, audio_duration)
         
-    base_layers = bg_layer_clips + burst_clips + ([particle_layer] if particle_layer else []) + screenshot_clips + topic_transition_clips + infographic_clips + settings_mockup_clips
+    base_layers = bg_layer_clips + burst_clips + ([particle_layer] if particle_layer else []) + screenshot_clips + topic_transition_clips + clean_bg_clips + infographic_clips + settings_mockup_clips
     
     # Add evidence screenshot clip (GitHub README or secondary evidence)
     evidence_screenshot_path = script_json.get("evidence_screenshot_path")

@@ -686,6 +686,96 @@ def _filter_and_sort_candidates_by_relevance(chunk_text, candidates):
     return scored_candidates
 
 
+def _fetch_pixabay_primary(chunk, duration, is_video=False, is_longform=False, topic_context=""):
+    """
+    Fetch from Pixabay as a PRIMARY source (not just fallback).
+    Uses the same query logic as the fallback but prioritized.
+    """
+    cid = chunk.get("chunk_id")
+    
+    # Formulate search queries
+    smart_query = _extract_clean_search_query(chunk, topic_context)
+    primary_q = smart_query
+    fallback_q = chunk.get("pexels_fallback", "technology")
+    
+    if primary_q == fallback_q:
+        queries = [primary_q]
+    else:
+        queries = [primary_q, fallback_q]
+        
+    video_out = os.path.join(OUTPUT_DIR, f"chunk_{cid}_{TODAY}.mp4")
+    photo_out = os.path.join(OUTPUT_DIR, f"chunk_{cid}_{TODAY}.jpg")
+    
+    orientation = "landscape" if is_longform else "portrait"
+    
+    if is_video:
+        # For video mode: Pixabay Videos first
+        all_videos = []
+        for query in queries:
+            print(f"   Searching Pixabay video (primary) for '{query}'...")
+            videos = _search_pixabay_videos(query, duration, orientation)
+            all_videos.extend(videos)
+        if all_videos:
+            scored_videos = _filter_and_sort_candidates_by_relevance(chunk.get("text", ""), all_videos)
+            for score, v in scored_videos:
+                print(f"      -> Best Pixabay video candidate: {v['desc']} (Score: {score}/10)")
+                path = _download_video(v["link"], video_out)
+                if path:
+                    with _download_lock:
+                        _used_media.add(v["id"])
+                    return path, f"Pixabay Video ({v['desc']}) [Score: {score}]", "video"
+        
+        # Try Pixabay photos as backup for video mode
+        all_photos = []
+        for query in queries:
+            print(f"   Searching Pixabay photo (primary) for '{query}'...")
+            photos = _search_pixabay_photos(query, orientation=orientation)
+            all_photos.extend(photos)
+        if all_photos:
+            scored_photos = _filter_and_sort_candidates_by_relevance(chunk.get("text", ""), all_photos)
+            for score, p in scored_photos:
+                print(f"      -> Best Pixabay photo candidate: {p['desc']} (Score: {score}/10)")
+                path = _download_photo(p["link"], photo_out, is_longform=is_longform)
+                if path:
+                    with _download_lock:
+                        _used_media.add(p["id"])
+                    return path, f"Pixabay Photo ({p['desc']}) [Score: {score}]", "photo"
+    else:
+        # For photo mode: Pixabay Photos first
+        all_photos = []
+        for query in queries:
+            print(f"   Searching Pixabay photo (primary) for '{query}'...")
+            photos = _search_pixabay_photos(query, orientation=orientation)
+            all_photos.extend(photos)
+        if all_photos:
+            scored_photos = _filter_and_sort_candidates_by_relevance(chunk.get("text", ""), all_photos)
+            for score, p in scored_photos:
+                print(f"      -> Best Pixabay photo candidate: {p['desc']} (Score: {score}/10)")
+                path = _download_photo(p["link"], photo_out, is_longform=is_longform)
+                if path:
+                    with _download_lock:
+                        _used_media.add(p["id"])
+                    return path, f"Pixabay Photo ({p['desc']}) [Score: {score}]", "photo"
+        
+        # Try Pixabay videos as backup for photo mode
+        all_videos = []
+        for query in queries:
+            print(f"   Searching Pixabay video (primary) for '{query}'...")
+            videos = _search_pixabay_videos(query, duration, orientation)
+            all_videos.extend(videos)
+        if all_videos:
+            scored_videos = _filter_and_sort_candidates_by_relevance(chunk.get("text", ""), all_videos)
+            for score, v in scored_videos:
+                print(f"      -> Best Pixabay video candidate: {v['desc']} (Score: {score}/10)")
+                path = _download_video(v["link"], video_out)
+                if path:
+                    with _download_lock:
+                        _used_media.add(v["id"])
+                    return path, f"Pixabay Video ({v['desc']}) [Score: {score}]", "video"
+    
+    return None, None, None
+
+
 def _fetch_pexels_fallback(chunk, duration, is_video=False, is_longform=False, topic_context=""):
     cid = chunk.get("chunk_id")
     
@@ -1155,6 +1245,20 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
 
     if visual_mode == "nano_hook" or visual_mode == "nano_concept":
         print(f"Chunk {cid} -> MODE: {visual_mode}")
+        
+        # Try Pixabay as primary source FIRST (fast, free, high rate limit)
+        if PIXABAY_API_KEY:
+            print(f"Chunk {cid} -> Trying Pixabay as primary source...")
+            pixabay_path, pixabay_source, pixabay_type = _fetch_pixabay_primary(chunk, dur, is_video=False, is_longform=is_longform, topic_context=topic_context)
+            if pixabay_path:
+                chunk["visual_path"] = pixabay_path
+                chunk["visual_type"] = pixabay_type
+                chunk["relevance_score"] = 8
+                chunk["source"] = f"Pixabay primary ({pixabay_source})"
+                return chunk
+            else:
+                print(f"Chunk {cid} -> Pixabay primary failed, trying AI generation...")
+        
         # Generate custom prompt via Gemini
         custom_prompt = generate_premium_prompt_via_gemini(
             chunk_text=text,
@@ -1239,6 +1343,19 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
             chunk["source"] = screenshot_source
             return chunk
 
+        # Try Pixabay as primary source for evidence (before AI generation)
+        if PIXABAY_API_KEY:
+            print(f"Chunk {cid} -> Trying Pixabay as primary source for evidence...")
+            pixabay_path, pixabay_source, pixabay_type = _fetch_pixabay_primary(chunk, dur, is_video=False, is_longform=is_longform, topic_context=topic_context)
+            if pixabay_path:
+                chunk["visual_path"] = pixabay_path
+                chunk["visual_type"] = pixabay_type
+                chunk["relevance_score"] = 8
+                chunk["source"] = f"Pixabay primary evidence ({pixabay_source})"
+                return chunk
+            else:
+                print(f"Chunk {cid} -> Pixabay primary evidence failed, trying AI generation...")
+
         print(f"Chunk {cid} -> MODE: nano_evidence (Using AI Macro Fallback)")
         evidence_concept = f"A professional macro photograph of scientific research paper, technical charts, code editor or document titled '{headline}'."
         custom_prompt = generate_premium_prompt_via_gemini(
@@ -1279,6 +1396,20 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
 
     elif visual_mode == "veo_concept" or visual_mode == "veo_cta":
         print(f"Chunk {cid} -> MODE: {visual_mode}")
+        
+        # Try Pixabay as primary source for video (before Veo)
+        if PIXABAY_API_KEY:
+            print(f"Chunk {cid} -> Trying Pixabay as primary source for video...")
+            pixabay_path, pixabay_source, pixabay_type = _fetch_pixabay_primary(chunk, dur, is_video=True, is_longform=is_longform, topic_context=topic_context)
+            if pixabay_path:
+                chunk["visual_path"] = pixabay_path
+                chunk["visual_type"] = pixabay_type
+                chunk["relevance_score"] = 8
+                chunk["source"] = f"Pixabay primary video ({pixabay_source})"
+                return chunk
+            else:
+                print(f"Chunk {cid} -> Pixabay primary video failed, trying Veo...")
+        
         custom_video_prompt = generate_premium_prompt_via_gemini(
             chunk_text=text,
             topic_context=topic_context,
