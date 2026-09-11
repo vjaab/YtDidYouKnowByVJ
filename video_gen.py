@@ -7322,7 +7322,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     # Dynamic refinement parameters
     dynamic_params = {
         "avatar_scale_mult": 1.0,
-        "subtitle_y_shift": 0
+        "subtitle_y_shift": -80
     }
     
     while iterations <= max_iters:
