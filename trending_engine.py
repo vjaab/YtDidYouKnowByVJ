@@ -1773,167 +1773,168 @@ def compute_engagement_score(article):
     return min(100, score)
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# SOURCE ROTATION TRACKER
+# ─────────────────────────────────────────────────────────────────────────────
+import json
+import os
+from datetime import datetime
+
+ROTATION_STATE_FILE = "data/source_rotation_state.json"
+
+def load_rotation_state():
+    """Load source rotation state from file."""
+    if not os.path.exists(ROTATION_STATE_FILE):
+        return {"source_history": [], "video_count": 0}
+    try:
+        with open(ROTATION_STATE_FILE, 'r') as f:
+            return json.load(f)
+    except Exception:
+        return {"source_history": [], "video_count": 0}
+
+
+def save_rotation_state(state):
+    """Save source rotation state to file."""
+    os.makedirs(os.path.dirname(ROTATION_STATE_FILE), exist_ok=True)
+    try:
+        with open(ROTATION_STATE_FILE, 'w') as f:
+            json.dump(state, f, indent=2)
+    except Exception as e:
+        print(f"⚠️ Failed to save rotation state: {e}")
+
+
+def get_source_priority_boost(source_name, rotation_state, window=10):
+    """
+    Calculate priority boost for a source based on how recently it was used.
+    Sources not used recently get higher boost to ensure rotation.
+    """
+    history = rotation_state.get("source_history", [])
+    recent_sources = set()
+    
+    # Look at last N videos worth of sources
+    for entry in history[-(window * 3):]:  # 3 sources per video on average
+        if isinstance(entry, dict):
+            recent_sources.add(entry.get("source"))
+        elif isinstance(entry, str):
+            recent_sources.add(entry)
+    
+    # If source not used recently, give it a boost
+    if source_name not in recent_sources:
+        return 1.5  # 50% boost for unused sources
+    return 1.0
+
+
+def record_source_usage(source_name, articles_count):
+    """Record that a source contributed articles for this video."""
+    state = load_rotation_state()
+    state["video_count"] = state.get("video_count", 0) + 1
+    state["source_history"].append({
+        "source": source_name,
+        "articles_count": articles_count,
+        "timestamp": datetime.now().isoformat(),
+        "video_number": state["video_count"]
+    })
+    # Keep last 100 entries
+    if len(state["source_history"]) > 100:
+        state["source_history"] = state["source_history"][-100:]
+    save_rotation_state(state)
+
+
 def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools", sources=None):
     """
     Master aggregator: fetches from all trending sources and returns
     a unified, scored article list ready for the pipeline.
     Filters all sources by the given category.
     
+    Implements source rotation to ensure viewer freshness - each source
+    gets periodic representation based on priority order.
+    
     Args:
         target_country: Target country for geo-specific trends
         category: Category to filter by
-        sources: List of sources to fetch from. Options: "youtube", "reddit", "github", "hackernews", "huggingface", "huggingface_hub", "arxiv", "google_trends", "youtube_popular", "medium"
+        sources: List of sources to fetch from. Options: "youtube", "reddit", "github", "hackernews", "huggingface", "huggingface_hub", "arxiv", "google_trends", "youtube_popular", "medium", "youtube_outliers"
                 Defaults to config.TRENDING_SOURCES or all sources if not specified.
     """
-    from config import TRENDING_SOURCES as DEFAULT_SOURCES
+    from config import TRENDING_SOURCES as DEFAULT_SOURCES, SOURCE_ROTATION_ENABLED, MIN_ARTICLES_PER_SOURCE, SOURCE_ROTATION_WINDOW
     if sources is None:
         sources = DEFAULT_SOURCES
     
+    # Load rotation state for priority boosting
+    rotation_state = load_rotation_state() if SOURCE_ROTATION_ENABLED else {"source_history": [], "video_count": 0}
+    
     print(f"\n🔥 === TRENDING ENGINE: Fetching Multi-Platform Signals for region={target_country}, category='{category}', sources={sources} === 🔥")
+    if SOURCE_ROTATION_ENABLED:
+        print(f"🔄 Source Rotation: ENABLED (window={SOURCE_ROTATION_WINDOW}, min_per_source={MIN_ARTICLES_PER_SOURCE})")
+    
+    # Define source fetchers in priority order (matching TRENDING_SOURCES config)
+    source_fetchers = [
+        ("medium", lambda: fetch_medium_rss(category)),
+        ("github", lambda: fetch_github_trending_ai(category)),
+        ("huggingface_hub", lambda: fetch_huggingface_hub_trending(category)),
+        ("arxiv", lambda: fetch_arxiv_ai_papers(category)),
+        ("youtube", lambda: fetch_youtube_trending_shorts(target_country, category)),
+        ("hackernews", lambda: fetch_hacker_news_trending(category)),
+        ("huggingface", lambda: fetch_huggingface_trending(category)),
+        ("google_trends", lambda: fetch_google_trending_tech(target_country, category)),
+        ("youtube_outliers", lambda: fetch_youtube_outlier_trends(target_country, category)),
+        ("youtube_popular", lambda: fetch_youtube_most_popular(target_country, category)),
+        ("reddit", lambda: fetch_reddit_hot_ai(category)),
+    ]
     
     all_articles = []
+    source_stats = {}
     
-    # 1. YouTube Trending Shorts
-    if "youtube" in sources:
+    # Fetch from each enabled source in priority order
+    for source_name, fetcher in source_fetchers:
+        if source_name not in sources:
+            continue
+            
+        priority_boost = get_source_priority_boost(source_name, rotation_state, SOURCE_ROTATION_WINDOW)
+        print(f"  📡 Fetching from {source_name} (priority_boost={priority_boost:.1f}x)...")
+        
         try:
-            yt_articles = fetch_youtube_trending_shorts(target_country, category)
-            all_articles.extend(yt_articles)
+            articles = fetcher()
+            source_stats[source_name] = len(articles)
+            
+            # Apply priority boost to engagement scores
+            for art in articles:
+                art["_source_priority_boost"] = priority_boost
+                art["_source_name"] = source_name
+            
+            all_articles.extend(articles)
+            print(f"    ✅ {source_name}: {len(articles)} articles")
         except Exception as e:
-            print(f"⚠️ YouTube trending failed: {e}")
+            print(f"    ⚠️ {source_name} fetch failed: {e}")
+            source_stats[source_name] = 0
     
-    # 2. Reddit Hot Posts
-    if "reddit" in sources:
-        try:
-            reddit_articles = fetch_reddit_hot_ai(category)
-            all_articles.extend(reddit_articles)
-        except Exception as e:
-            print(f"⚠️ Reddit trending failed: {e}")
-    
-    # 3. GitHub Trending Repos & Topics
-    if "github" in sources:
-        try:
-            github_articles = fetch_github_trending_ai(category)
-            all_articles.extend(github_articles)
-        except Exception as e:
-            print(f"⚠️ GitHub trending failed: {e}")
-    
-    # 4. Hacker News Top Discussions
-    if "hackernews" in sources:
-        try:
-            hn_articles = fetch_hacker_news_trending(category)
-            all_articles.extend(hn_articles)
-        except Exception as e:
-            print(f"⚠️ Hacker News fetch failed: {e}")
-    
-    # 5. Hugging Face Trending Papers & Models
-    if "huggingface" in sources:
-        try:
-            hf_articles = fetch_huggingface_trending(category)
-            all_articles.extend(hf_articles)
-        except Exception as e:
-            print(f"⚠️ Hugging Face fetch failed: {e}")
-    
-    # 5b. Hugging Face Hub Trending Models & Datasets
-    if "huggingface_hub" in sources:
-        try:
-            hf_hub_articles = fetch_huggingface_hub_trending(category)
-            all_articles.extend(hf_hub_articles)
-        except Exception as e:
-            print(f"⚠️ Hugging Face Hub fetch failed: {e}")
-
-# 6. ArXiv AI Research Papers
-    if "arxiv" in sources:
-        try:
-            arxiv_articles = fetch_arxiv_ai_papers(category)
-            all_articles.extend(arxiv_articles)
-        except Exception as e:
-            print(f"⚠️ ArXiv AI fetch failed: {e}")
-    
-    # 6b. Medium RSS Feeds
-    if "medium" in sources:
-        try:
-            medium_articles = fetch_medium_rss(category)
-            all_articles.extend(medium_articles)
-        except Exception as e:
-            print(f"⚠️ Medium RSS fetch failed: {e}")
-
-    # 7. Google Trends (Stream A)
-    if "google_trends" in sources:
-        try:
-            gt_articles = fetch_google_trending_tech(target_country, category)
-            all_articles.extend(gt_articles)
-        except Exception as e:
-            print(f"⚠️ Google Trends fetch failed: {e}")
-    
-    # 9. YouTube Most Popular (Cheap - 1 unit/call via chart=mostPopular)
-    if "youtube_popular" in sources:
-        try:
-            ymp_articles = fetch_youtube_most_popular(target_country, category)
-            all_articles.extend(ymp_articles)
-        except Exception as e:
-            print(f"⚠️ YouTube Most Popular fetch failed: {e}")
-
-    # 10. YouTube Outlier Hunter (Stream B - 100 units/call via search.list)
-    try:
-        yo_articles = fetch_youtube_outlier_trends(target_country, category)
-        all_articles.extend(yo_articles)
-    except Exception as e:
-        print(f"⚠️ YouTube Outlier Hunter fetch failed: {e}")
-    
-    # Compute unified engagement scores
+    # Apply priority boost to engagement scores
     for art in all_articles:
-        art["_engagement_score"] = compute_engagement_score(art)
+        boost = art.pop("_source_priority_boost", 1.0)
+        if "_engagement_score" in art:
+            art["_engagement_score"] = min(100, int(art["_engagement_score"] * boost))
+        else:
+            art["_engagement_score"] = min(100, int(compute_engagement_score(art) * boost))
     
-    # Sort by engagement score
+    # Sort by boosted engagement score
     all_articles.sort(key=lambda x: x.get("_engagement_score", 0), reverse=True)
     
-    # Summary
-    yt_count = sum(1 for a in all_articles if a.get("type") == "youtube_trending")
-    ymp_count = sum(1 for a in all_articles if a.get("type") == "youtube_most_popular")
-    reddit_count = sum(1 for a in all_articles if a.get("type") == "reddit_trending")
-    reddit_estimated = sum(1 for a in all_articles if a.get("type") == "reddit_trending" and a.get("_engagement", {}).get("engagement_estimated"))
-    github_count = sum(1 for a in all_articles if a.get("type") == "github_trending")
-    hn_count = sum(1 for a in all_articles if a.get("type") == "hacker_news")
-    hf_count = sum(1 for a in all_articles if a.get("type") == "huggingface_trending")
-    hf_hub_count = sum(1 for a in all_articles if a.get("type") in ("huggingface_hub_model", "huggingface_hub_dataset"))
-    arxiv_count = sum(1 for a in all_articles if a.get("type") == "arxiv_papers")
-    medium_count = sum(1 for a in all_articles if a.get("type") == "medium_rss")
-    gt_count = sum(1 for a in all_articles if a.get("type") == "google_trends")
-    yo_count = sum(1 for a in all_articles if a.get("type") == "youtube_outliers")
+    # Record source usage for rotation tracking
+    if SOURCE_ROTATION_ENABLED:
+        for source_name, count in source_stats.items():
+            if count > 0:
+                record_source_usage(source_name, count)
     
+    # Print summary
     print(f"\n📊 Trending Engine Summary: {len(all_articles)} total signals")
-    print(f"   YouTube: {yt_count} | Most Popular: {ymp_count} | Reddit: {reddit_count} | GitHub: {github_count} | Hacker News: {hn_count}")
-    print(f"   HuggingFace: {hf_count} | HF Hub: {hf_hub_count} | ArXiv: {arxiv_count} | Medium: {medium_count} | Google Trends: {gt_count} | YouTube Outliers: {yo_count}")
+    for source_name, fetcher in source_fetchers:
+        if source_name in source_stats:
+            count = source_stats[source_name]
+            boost = get_source_priority_boost(source_name, rotation_state, SOURCE_ROTATION_WINDOW)
+            status = "✅" if count > 0 else "⚠️"
+            print(f"   {status} {source_name}: {count} articles (boost: {boost:.1f}x)")
+    
     if all_articles:
         top = all_articles[0]
-        print(f"   🏆 Top Signal: '{top['title'][:60]}...' (Score: {top.get('_engagement_score', 0)})")
-    
-    # ── Data Source Health Dashboard ──────────────────────────────────────
-    yt_status = "✅ Active" if yt_count > 0 else "❌ Offline (YOUTUBE_DATA_API_KEY missing?)"
-    ymp_status = "✅ Active" if ymp_count > 0 else "❌ Offline (YOUTUBE_DATA_API_KEY missing?)"
-    reddit_native = reddit_count - reddit_estimated
-    reddit_status = "✅ Active" if reddit_native > 0 else ("⚠️ Degraded" if reddit_estimated > 0 else "❌ Offline")
-    github_status = "✅ Active" if github_count > 0 else "⚠️ No results"
-    hn_status = "✅ Active" if hn_count > 0 else "⚠️ No results"
-    hf_status = "✅ Active" if hf_count > 0 else "⚠️ No results"
-    hf_hub_status = "✅ Active" if hf_hub_count > 0 else "⚠️ No results"
-    arxiv_status = "✅ Active" if arxiv_count > 0 else "⚠️ No results"
-    medium_status = "✅ Active" if medium_count > 0 else "⚠️ No results"
-    gt_status = "✅ Active" if gt_count > 0 else "⚠️ No results"
-    yo_status = "✅ Active" if yo_count > 0 else "⚠️ No results"
-    
-    active_count = sum(1 for s in [yt_status, ymp_status, reddit_status, github_status, hn_status, hf_status, hf_hub_status, arxiv_status, medium_status, gt_status, yo_status] if s.startswith("✅"))
-    print(f"\n🏥 Data Source Health: {active_count}/11 sources fully active")
-    print(f"   YouTube Trending    : {yt_status}")
-    print(f"   YouTube Most Popular: {ymp_status}")
-    print(f"   Reddit              : {reddit_status}")
-    print(f"   GitHub              : {github_status}")
-    print(f"   Hacker News         : {hn_status}")
-    print(f"   Hugging Face Papers : {hf_status}")
-    print(f"   HF Hub Models/Datasets: {hf_hub_status}")
-    print(f"   ArXiv AI            : {arxiv_status}")
-    print(f"   Medium RSS          : {medium_status}")
-    print(f"   Google Trends       : {gt_status}")
-    print(f"   YouTube Outliers    : {yo_status}")
+        print(f"   🏆 Top Signal: '{top['title'][:60]}...' (Score: {top.get('_engagement_score', 0)}, Source: {top.get('_source_name', 'unknown')})")
     
     return all_articles
