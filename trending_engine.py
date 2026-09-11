@@ -1549,6 +1549,85 @@ def fetch_tldr_ai_newsletters(category="AI & Tech Tools"):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# 9b. MEDIUM RSS FEEDS ENGINE
+# ─────────────────────────────────────────────────────────────────────────────
+def fetch_medium_rss(category="AI & Tech Tools"):
+    """
+    Fetches tech/AI articles from Medium tag RSS feeds.
+    Uses Medium's built-in RSS feeds for tags (no API key needed).
+    Feeds: technology, artificial-intelligence, programming, software-engineering, web-development
+    """
+    signals = CATEGORY_SIGNALS.get(category, CATEGORY_SIGNALS["AI & Tech Tools"])
+    filter_keywords = signals.get("hn_keywords", [])
+    
+    # Medium tag feeds - these are stable and aggregate across all publishers
+    tag_feeds = {
+        "technology": "https://medium.com/feed/tag/technology",
+        "artificial-intelligence": "https://medium.com/feed/tag/artificial-intelligence",
+        "programming": "https://medium.com/feed/tag/programming",
+        "software-engineering": "https://medium.com/feed/tag/software-engineering",
+        "web-development": "https://medium.com/feed/tag/web-development",
+    }
+    
+    # Select relevant feeds based on category
+    if category == "AI & Tech Tools":
+        selected_feeds = ["artificial-intelligence", "technology", "programming"]
+    elif category == "Tech Gadgets & Inventions":
+        selected_feeds = ["technology", "web-development"]
+    elif category == "Finance & Tech Economy":
+        selected_feeds = ["technology"]
+    elif category == "Coding & Development Hacks":
+        selected_feeds = ["programming", "software-engineering", "web-development"]
+    elif category == "Facts & Trivia":
+        selected_feeds = ["technology", "programming"]
+    else:
+        selected_feeds = ["technology", "artificial-intelligence", "programming"]
+    
+    print(f"📰 Fetching Medium RSS feeds for category='{category}' (tags: {', '.join(selected_feeds)})")
+    articles = []
+    headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
+    
+    for tag in selected_feeds:
+        feed_url = tag_feeds[tag]
+        try:
+            req = urllib.request.Request(feed_url, headers=headers)
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                xml_data = resp.read()
+            root = ET.fromstring(xml_data)
+            items = root.findall('.//item')
+            
+            for item in items[:5]:  # Top 5 per tag
+                title = item.find('title').text or ""
+                link = item.find('link').text or ""
+                desc_elem = item.find('description')
+                desc = desc_elem.text if desc_elem is not None else ""
+                clean_desc = re.sub('<[^<]+?>', '', desc)[:300].strip()
+                
+                # Filter by category keywords
+                title_lower = title.lower()
+                desc_lower = clean_desc.lower()
+                if filter_keywords:
+                    if not any(kw in title_lower or kw in desc_lower for kw in filter_keywords):
+                        continue
+                
+                articles.append({
+                    "title": f"Medium ({tag}): {title}",
+                    "description": clean_desc if clean_desc else title,
+                    "source": {"name": f"Medium - {tag}"},
+                    "url": link,
+                    "urlToImage": "",
+                    "publishedAt": datetime.now(timezone.utc).isoformat(),
+                    "type": "medium_rss",
+                    "_engagement": {"curated_score": 25, "tag": tag}
+                })
+        except Exception as e:
+            print(f"  ⚠️ Medium RSS fetch error ({tag}): {e}")
+            
+    print(f"✅ Medium RSS: Found {len(articles)} articles for category='{category}'.")
+    return articles
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # 10. UNIFIED TRENDING AGGREGATOR
 # ─────────────────────────────────────────────────────────────────────────────
 def compute_engagement_score(article):
@@ -1645,6 +1724,13 @@ def compute_engagement_score(article):
     elif art_type == "newsletter_ai":
         score += 25
 
+    elif art_type == "medium_rss":
+        score += 25
+        # Boost for AI/tech tags
+        tag = eng.get("tag", "")
+        if tag in ["artificial-intelligence", "programming", "software-engineering"]:
+            score += 10
+
     elif art_type == "google_trends":
         score += 35
         traffic = eng.get("traffic", "N/A").lower()
@@ -1677,7 +1763,7 @@ def compute_engagement_score(article):
     else:
         score += 5
     
-    niche_sources = ["reddit_trending", "github_trending", "youtube_outliers", "hacker_news", "huggingface_trending", "arxiv_papers"]
+    niche_sources = ["reddit_trending", "github_trending", "youtube_outliers", "hacker_news", "huggingface_trending", "arxiv_papers", "medium_rss"]
     if art_type in niche_sources:
         score += TRENDING_NICHE_BIAS * 15
     
@@ -1696,7 +1782,7 @@ def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools", 
     Args:
         target_country: Target country for geo-specific trends
         category: Category to filter by
-        sources: List of sources to fetch from. Options: "youtube", "reddit", "github", "hackernews", "huggingface", "arxiv", "tldr", "google_trends", "youtube_popular"
+        sources: List of sources to fetch from. Options: "youtube", "reddit", "github", "hackernews", "huggingface", "huggingface_hub", "arxiv", "google_trends", "youtube_popular", "medium"
                 Defaults to config.TRENDING_SOURCES or all sources if not specified.
     """
     from config import TRENDING_SOURCES as DEFAULT_SOURCES
@@ -1755,13 +1841,21 @@ def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools", 
         except Exception as e:
             print(f"⚠️ Hugging Face Hub fetch failed: {e}")
 
-    # 6. ArXiv AI Research Papers
+# 6. ArXiv AI Research Papers
     if "arxiv" in sources:
         try:
             arxiv_articles = fetch_arxiv_ai_papers(category)
             all_articles.extend(arxiv_articles)
         except Exception as e:
             print(f"⚠️ ArXiv AI fetch failed: {e}")
+    
+    # 6b. Medium RSS Feeds
+    if "medium" in sources:
+        try:
+            medium_articles = fetch_medium_rss(category)
+            all_articles.extend(medium_articles)
+        except Exception as e:
+            print(f"⚠️ Medium RSS fetch failed: {e}")
 
     # 7. Google Trends (Stream A)
     if "google_trends" in sources:
@@ -1803,12 +1897,13 @@ def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools", 
     hf_count = sum(1 for a in all_articles if a.get("type") == "huggingface_trending")
     hf_hub_count = sum(1 for a in all_articles if a.get("type") in ("huggingface_hub_model", "huggingface_hub_dataset"))
     arxiv_count = sum(1 for a in all_articles if a.get("type") == "arxiv_papers")
+    medium_count = sum(1 for a in all_articles if a.get("type") == "medium_rss")
     gt_count = sum(1 for a in all_articles if a.get("type") == "google_trends")
     yo_count = sum(1 for a in all_articles if a.get("type") == "youtube_outliers")
     
     print(f"\n📊 Trending Engine Summary: {len(all_articles)} total signals")
     print(f"   YouTube: {yt_count} | Most Popular: {ymp_count} | Reddit: {reddit_count} | GitHub: {github_count} | Hacker News: {hn_count}")
-    print(f"   HuggingFace: {hf_count} | HF Hub: {hf_hub_count} | ArXiv: {arxiv_count} | Google Trends: {gt_count} | YouTube Outliers: {yo_count}")
+    print(f"   HuggingFace: {hf_count} | HF Hub: {hf_hub_count} | ArXiv: {arxiv_count} | Medium: {medium_count} | Google Trends: {gt_count} | YouTube Outliers: {yo_count}")
     if all_articles:
         top = all_articles[0]
         print(f"   🏆 Top Signal: '{top['title'][:60]}...' (Score: {top.get('_engagement_score', 0)})")
@@ -1823,11 +1918,12 @@ def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools", 
     hf_status = "✅ Active" if hf_count > 0 else "⚠️ No results"
     hf_hub_status = "✅ Active" if hf_hub_count > 0 else "⚠️ No results"
     arxiv_status = "✅ Active" if arxiv_count > 0 else "⚠️ No results"
+    medium_status = "✅ Active" if medium_count > 0 else "⚠️ No results"
     gt_status = "✅ Active" if gt_count > 0 else "⚠️ No results"
     yo_status = "✅ Active" if yo_count > 0 else "⚠️ No results"
     
-    active_count = sum(1 for s in [yt_status, ymp_status, reddit_status, github_status, hn_status, hf_status, hf_hub_status, arxiv_status, gt_status, yo_status] if s.startswith("✅"))
-    print(f"\n🏥 Data Source Health: {active_count}/10 sources fully active")
+    active_count = sum(1 for s in [yt_status, ymp_status, reddit_status, github_status, hn_status, hf_status, hf_hub_status, arxiv_status, medium_status, gt_status, yo_status] if s.startswith("✅"))
+    print(f"\n🏥 Data Source Health: {active_count}/11 sources fully active")
     print(f"   YouTube Trending    : {yt_status}")
     print(f"   YouTube Most Popular: {ymp_status}")
     print(f"   Reddit              : {reddit_status}")
@@ -1836,6 +1932,7 @@ def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools", 
     print(f"   Hugging Face Papers : {hf_status}")
     print(f"   HF Hub Models/Datasets: {hf_hub_status}")
     print(f"   ArXiv AI            : {arxiv_status}")
+    print(f"   Medium RSS          : {medium_status}")
     print(f"   Google Trends       : {gt_status}")
     print(f"   YouTube Outliers    : {yo_status}")
     

@@ -84,7 +84,7 @@ TARGET_AUDIO_DURATION = (15, 35) # Shorter Shorts = higher completion rates = mo
 # Global Feature Flags
 ENABLE_LONGFORM = False
 ENABLE_TRENDING_ENGINE = True    # Phase 1: YouTube/Reddit/GitHub trending aggregation
-TRENDING_SOURCES = ["youtube", "reddit", "github", "hackernews", "huggingface", "huggingface_hub", "arxiv", "google_trends", "youtube_popular"]
+TRENDING_SOURCES = ["youtube", "reddit", "github", "hackernews", "huggingface", "huggingface_hub", "arxiv", "google_trends", "youtube_popular", "medium"]
 
 # Engagement & Retention Pillars (Production Spec 2026)
 ENABLE_KINETIC_CAPTIONS = True
