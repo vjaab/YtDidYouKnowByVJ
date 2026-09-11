@@ -84,7 +84,7 @@ TARGET_AUDIO_DURATION = (15, 35) # Shorter Shorts = higher completion rates = mo
 # Global Feature Flags
 ENABLE_LONGFORM = False
 ENABLE_TRENDING_ENGINE = True    # Phase 1: YouTube/Reddit/GitHub trending aggregation
-TRENDING_SOURCES = ["youtube", "reddit", "github", "hackernews", "huggingface", "arxiv", "tldr", "google_trends", "youtube_popular"]
+TRENDING_SOURCES = ["youtube", "reddit", "github", "hackernews", "huggingface", "huggingface_hub", "arxiv", "google_trends", "youtube_popular"]
 
 # Engagement & Retention Pillars (Production Spec 2026)
 ENABLE_KINETIC_CAPTIONS = True
@@ -112,10 +112,29 @@ CF_API_TOKEN = CLOUDFLARE_API_TOKEN
 # HuggingFace
 HF_TOKEN = os.getenv("HF_TOKEN", "")
 
+# Local AI Models (for embedding dedup & zero-shot classification)
+EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"  # ~80MB, CPU-only
+ZERO_SHOT_MODEL = "facebook/bart-large-mnli"  # For category classification
+EMBEDDING_SIMILARITY_THRESHOLD = 0.75  # Cosine similarity threshold for deduplication
+ZERO_SHOT_THRESHOLD = 0.5  # Confidence threshold for zero-shot classification
+
 # Fallback availability flags
 HAS_HF_FALLBACK = bool(HF_TOKEN)
 HAS_CF_FALLBACK = bool(CF_ACCOUNT_ID and CF_API_TOKEN)
 HAS_PEXELS = bool(os.getenv("PEXELS_API_KEY", ""))
+
+# Check if local transformers models are available
+try:
+    import sentence_transformers
+    HAS_EMBEDDING_MODEL = True
+except ImportError:
+    HAS_EMBEDDING_MODEL = False
+
+try:
+    from transformers import pipeline
+    HAS_ZERO_SHOT_MODEL = True
+except ImportError:
+    HAS_ZERO_SHOT_MODEL = False
 
 def log_fallback_status():
     """Log which fallback generators are available."""

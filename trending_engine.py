@@ -1327,6 +1327,109 @@ def fetch_huggingface_trending(category="AI & Tech Tools"):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# 7b. HUGGING FACE HUB TRENDING MODELS & DATASETS ENGINE
+# ─────────────────────────────────────────────────────────────────────────────
+def fetch_huggingface_hub_trending(category="AI & Tech Tools"):
+    """
+    Fetches trending models & datasets from Hugging Face Hub API.
+    Uses huggingface.co/api/models?sort=trending and huggingface.co/api/datasets?sort=trending
+    No auth required for public data.
+    """
+    signals = CATEGORY_SIGNALS.get(category, CATEGORY_SIGNALS["AI & Tech Tools"])
+    hf_tasks = signals.get("hf_tasks", ["text-generation", "conversational", "text2text-generation", "summarization"])
+    
+    print(f"🤗 Fetching trending models & datasets from Hugging Face Hub for category='{category}'...")
+    articles = []
+    headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
+    
+    # Trending models
+    try:
+        url = "https://huggingface.co/api/models?sort=trending&limit=20"
+        r = requests.get(url, headers=headers, timeout=10)
+        if r.status_code == 200:
+            data = r.json()
+            for model in data[:10]:
+                model_id = model.get("modelId", "")
+                tags = model.get("tags", [])
+                likes = model.get("likes", 0) or 0
+                downloads = model.get("downloads", 0) or 0
+                
+                # Filter by task relevance
+                if hf_tasks and tags:
+                    if not any(task in tags for task in hf_tasks):
+                        continue
+                
+                # Extract description from model card if available
+                description = ""
+                if "cardData" in model and model["cardData"]:
+                    description = model["cardData"].get("description", "") or ""
+                
+                model_url = f"https://huggingface.co/{model_id}"
+                
+                articles.append({
+                    "title": f"HF Trending Model: {model_id.split('/')[-1]}",
+                    "description": f"🤗 HF Trending Model ({likes} likes, {downloads} downloads) | {description[:280]}",
+                    "source": {"name": "Hugging Face Hub Models"},
+                    "url": model_url,
+                    "urlToImage": f"https://huggingface.co/front/assets/huggingface_logo-noborder.svg",
+                    "publishedAt": datetime.now(timezone.utc).isoformat(),
+                    "type": "huggingface_hub_model",
+                    "_engagement": {
+                        "likes": likes,
+                        "downloads": downloads,
+                        "model_id": model_id,
+                        "tags": tags
+                    }
+                })
+    except Exception as e:
+        print(f"  ⚠️ Hugging Face Hub Models API error: {e}")
+    
+    # Trending datasets
+    try:
+        url = "https://huggingface.co/api/datasets?sort=trending&limit=10"
+        r = requests.get(url, headers=headers, timeout=10)
+        if r.status_code == 200:
+            data = r.json()
+            for dataset in data[:5]:
+                dataset_id = dataset.get("id", "")
+                tags = dataset.get("tags", [])
+                likes = dataset.get("likes", 0) or 0
+                downloads = dataset.get("downloads", 0) or 0
+                
+                # Filter by task relevance (datasets often have task tags)
+                if hf_tasks and tags:
+                    if not any(task in tags for task in hf_tasks):
+                        continue
+                
+                description = ""
+                if "cardData" in dataset and dataset["cardData"]:
+                    description = dataset["cardData"].get("description", "") or ""
+                
+                dataset_url = f"https://huggingface.co/datasets/{dataset_id}"
+                
+                articles.append({
+                    "title": f"HF Trending Dataset: {dataset_id.split('/')[-1]}",
+                    "description": f"🤗 HF Trending Dataset ({likes} likes, {downloads} downloads) | {description[:280]}",
+                    "source": {"name": "Hugging Face Hub Datasets"},
+                    "url": dataset_url,
+                    "urlToImage": f"https://huggingface.co/front/assets/huggingface_logo-noborder.svg",
+                    "publishedAt": datetime.now(timezone.utc).isoformat(),
+                    "type": "huggingface_hub_dataset",
+                    "_engagement": {
+                        "likes": likes,
+                        "downloads": downloads,
+                        "dataset_id": dataset_id,
+                        "tags": tags
+                    }
+                })
+    except Exception as e:
+        print(f"  ⚠️ Hugging Face Hub Datasets API error: {e}")
+    
+    print(f"✅ Hugging Face Hub: Found {len(articles)} trending models/datasets for category='{category}'.")
+    return articles
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # 8. ARXIV AI RESEARCH PAPERS ENGINE
 # ─────────────────────────────────────────────────────────────────────────────
 def fetch_arxiv_ai_papers(category="AI & Tech Tools"):
@@ -1644,6 +1747,14 @@ def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools", 
         except Exception as e:
             print(f"⚠️ Hugging Face fetch failed: {e}")
     
+    # 5b. Hugging Face Hub Trending Models & Datasets
+    if "huggingface_hub" in sources:
+        try:
+            hf_hub_articles = fetch_huggingface_hub_trending(category)
+            all_articles.extend(hf_hub_articles)
+        except Exception as e:
+            print(f"⚠️ Hugging Face Hub fetch failed: {e}")
+
     # 6. ArXiv AI Research Papers
     if "arxiv" in sources:
         try:
@@ -1651,16 +1762,8 @@ def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools", 
             all_articles.extend(arxiv_articles)
         except Exception as e:
             print(f"⚠️ ArXiv AI fetch failed: {e}")
-    
-    # 7. TLDR AI & Newsletters
-    if "tldr" in sources:
-        try:
-            tldr_articles = fetch_tldr_ai_newsletters(category)
-            all_articles.extend(tldr_articles)
-        except Exception as e:
-            print(f"⚠️ TLDR AI fetch failed: {e}")
-    
-    # 8. Google Trends (Stream A)
+
+    # 7. Google Trends (Stream A)
     if "google_trends" in sources:
         try:
             gt_articles = fetch_google_trending_tech(target_country, category)
@@ -1698,14 +1801,14 @@ def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools", 
     github_count = sum(1 for a in all_articles if a.get("type") == "github_trending")
     hn_count = sum(1 for a in all_articles if a.get("type") == "hacker_news")
     hf_count = sum(1 for a in all_articles if a.get("type") == "huggingface_trending")
+    hf_hub_count = sum(1 for a in all_articles if a.get("type") in ("huggingface_hub_model", "huggingface_hub_dataset"))
     arxiv_count = sum(1 for a in all_articles if a.get("type") == "arxiv_papers")
-    tldr_count = sum(1 for a in all_articles if a.get("type") == "newsletter_ai")
     gt_count = sum(1 for a in all_articles if a.get("type") == "google_trends")
     yo_count = sum(1 for a in all_articles if a.get("type") == "youtube_outliers")
     
     print(f"\n📊 Trending Engine Summary: {len(all_articles)} total signals")
     print(f"   YouTube: {yt_count} | Most Popular: {ymp_count} | Reddit: {reddit_count} | GitHub: {github_count} | Hacker News: {hn_count}")
-    print(f"   HuggingFace: {hf_count} | ArXiv: {arxiv_count} | TLDR AI: {tldr_count} | Google Trends: {gt_count} | YouTube Outliers: {yo_count}")
+    print(f"   HuggingFace: {hf_count} | HF Hub: {hf_hub_count} | ArXiv: {arxiv_count} | Google Trends: {gt_count} | YouTube Outliers: {yo_count}")
     if all_articles:
         top = all_articles[0]
         print(f"   🏆 Top Signal: '{top['title'][:60]}...' (Score: {top.get('_engagement_score', 0)})")
@@ -1718,21 +1821,21 @@ def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools", 
     github_status = "✅ Active" if github_count > 0 else "⚠️ No results"
     hn_status = "✅ Active" if hn_count > 0 else "⚠️ No results"
     hf_status = "✅ Active" if hf_count > 0 else "⚠️ No results"
+    hf_hub_status = "✅ Active" if hf_hub_count > 0 else "⚠️ No results"
     arxiv_status = "✅ Active" if arxiv_count > 0 else "⚠️ No results"
-    tldr_status = "✅ Active" if tldr_count > 0 else "⚠️ No results"
     gt_status = "✅ Active" if gt_count > 0 else "⚠️ No results"
     yo_status = "✅ Active" if yo_count > 0 else "⚠️ No results"
     
-    active_count = sum(1 for s in [yt_status, ymp_status, reddit_status, github_status, hn_status, hf_status, arxiv_status, tldr_status, gt_status, yo_status] if s.startswith("✅"))
+    active_count = sum(1 for s in [yt_status, ymp_status, reddit_status, github_status, hn_status, hf_status, hf_hub_status, arxiv_status, gt_status, yo_status] if s.startswith("✅"))
     print(f"\n🏥 Data Source Health: {active_count}/10 sources fully active")
     print(f"   YouTube Trending    : {yt_status}")
     print(f"   YouTube Most Popular: {ymp_status}")
     print(f"   Reddit              : {reddit_status}")
     print(f"   GitHub              : {github_status}")
     print(f"   Hacker News         : {hn_status}")
-    print(f"   Hugging Face        : {hf_status}")
+    print(f"   Hugging Face Papers : {hf_status}")
+    print(f"   HF Hub Models/Datasets: {hf_hub_status}")
     print(f"   ArXiv AI            : {arxiv_status}")
-    print(f"   TLDR AI             : {tldr_status}")
     print(f"   Google Trends       : {gt_status}")
     print(f"   YouTube Outliers    : {yo_status}")
     

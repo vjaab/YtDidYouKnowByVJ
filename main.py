@@ -14,7 +14,7 @@ import traceback
 import json
 from datetime import datetime
 
-from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY, ENABLE_TRENDING_ENGINE, TRENDING_SOURCES
+from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY, ENABLE_TRENDING_ENGINE, TRENDING_SOURCES, TRACKER_FILE
 from fetch_research_papers import fetch_tech_news, fetch_ai_tools
 from topic_tracker import record_story, update_youtube_url, update_facebook_post_id, get_next_topic_type_by_ratio, get_next_target_country, get_next_avatar
 from gemini_script import pick_and_generate_script
@@ -637,6 +637,34 @@ def run_pipeline(topic_type="auto", dry_run=False):
             log_message("⚠️ All feeds returned 0 articles.")
         else:
             log_message(f"✅ Fetched {len(rss_articles)} total articles ({len(github_news)} GitHub, {len(vidiq_news)} vidIQ, {len(research_news)} research, {len(ai_tool_news)} tools, {len(x_news)} X.com, {len(trending_articles)} trending).")
+    
+    # ── STEP 2.5: Embedding-based deduplication & Zero-shot classification ──
+    try:
+        from topic_classifier import filter_and_classify_candidates, get_recent_topic_embeddings
+        from config import TRACKER_FILE
+        
+        # Load recent topics for deduplication
+        recent_topics = get_recent_topic_embeddings(TRACKER_FILE, limit=30)
+        log_message(f"📚 Loaded {len(recent_topics)} recent topics for deduplication")
+        
+        # Filter and classify candidates
+        original_count = len(rss_articles)
+        rss_articles = filter_and_classify_candidates(rss_articles, recent_topics, max_candidates=20)
+        log_message(f"🔍 Deduplication & classification: {original_count} → {len(rss_articles)} candidates")
+        
+        # Re-sort by engagement score after filtering
+        rss_articles.sort(key=lambda x: x.get("_engagement_score", 0), reverse=True)
+        
+        # Update category based on zero-shot classification if available
+        if rss_articles and rss_articles[0].get("_predicted_category"):
+            predicted_cat = rss_articles[0]["_predicted_category"]
+            if predicted_cat != category:
+                log_message(f"🏷️ Zero-shot re-categorized top candidate: {category} → {predicted_cat}")
+                category = predicted_cat
+                
+    except Exception as e:
+        log_message(f"⚠️ Topic classification failed (non-fatal): {e}")
+        
     except Exception as e:
         log_message(f"⚠️ RSS/Trending Fetch failed: {e}")
 
