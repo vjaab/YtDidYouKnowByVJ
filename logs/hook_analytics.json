@@ -435,6 +435,33 @@
         "avg_swipe_away": 0.0,
         "avg_view_percentage": 0.0
       }
+    },
+    "Quiz & Trivia": {
+      "stat_contradiction": {
+        "variants": {
+          "A": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "RayNeo GT Max: AR finally comfortable?",
+                "video_id": "qKbjQuvkogM",
+                "recorded_at": "2026-09-11T15:41:14.513666"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
+      }
     }
   },
   "global": {
@@ -458,7 +485,7 @@
       "views": 0,
       "retention": 0.0,
       "engagement": 0.0,
-      "count": 4,
+      "count": 5,
       "swipe_away_rate": 0.0,
       "avg_view_percentage": 0.0
     },
@@ -479,5 +506,5 @@
       "avg_view_percentage": 0.0
     }
   },
-  "last_updated": "2026-09-10T04:26:20.996138"
+  "last_updated": "2026-09-11T15:41:14.513703"
 }
