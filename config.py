@@ -1,3 +1,87 @@
+"""
+config.py — Central Configuration & Feature Flags
+
+Configuration Architecture:
+```mermaid
+graph TB
+    subgraph "API Keys"
+        K1[GEMINI_API_KEY]
+        K2[ELEVENLABS_API_KEY]
+        K3[HF_TOKEN]
+        K4[YOUTUBE_DATA_API_KEY]
+        K5[REDDIT_CLIENT_ID/SECRET]
+        K6[INSTAGRAM/THREADS API]
+    end
+    
+    subgraph "Feature Flags"
+        F1[ENABLE_TRENDING_ENGINE]
+        F2[ENABLE_LONGFORM]
+        F3[ENABLE_KINETIC_CAPTIONS]
+        F4[ENABLE_AUDIO_DUCKING]
+        F5[ENABLE_PERIODIC_CUTS]
+        F6[ENABLE_EVIDENCE_SCREENSHOTS]
+        F7[ENABLE_SCREENSHOT_VALIDATION]
+        F8[ENABLE_HORMOZI_STYLING]
+    end
+    
+    subgraph "Retention Engine"
+        R1[VISUAL_CUT_TARGET_SECONDS=2.0]
+        R2[ENABLE_CINEMATIC_TRANSITIONS]
+        R3[ENABLE_STRATEGIC_SFX]
+        R4[ENABLE_DYNAMIC_BGM_CURVE]
+        R5[ENABLE_LAYOUT_VARIATION]
+        R6[FORCE_LAYOUT_TYPE]
+        R7[TRENDING_NICHE_BIAS=0.15]
+    end
+    
+    subgraph "Source Rotation"
+        S1[TRENDING_SOURCES\nPriority Ordered List]
+        S2[SOURCE_ROTATION_ENABLED]
+        S3[SOURCE_ROTATION_WINDOW=10]
+        S4[MIN_ARTICLES_PER_SOURCE=1]
+    end
+    
+    subgraph "Local AI Models"
+        L1[EMBEDDING_MODEL\nall-MiniLM-L6-v2]
+        L2[ZERO_SHOT_MODEL\nbart-large-mnli]
+        L3[EMBEDDING_SIMILARITY_THRESHOLD=0.75]
+        L4[ZERO_SHOT_THRESHOLD=0.5]
+    end
+    
+    subgraph "Schedule & Paths"
+        P1[UPLOAD_SCHEDULE\nPer-Day IST Times]
+        P2[MAX_RETRY_ATTEMPTS=10]
+        P3[SIMILARITY_THRESHOLD=75]
+        P4[CATEGORY_COOLDOWN_DAYS=3]
+        P5[TARGET_AUDIO_DURATION=15-35s]
+        P6[TRACKER_FILE=news_log.json]
+    end
+    
+    K1 --> F1
+    K2 --> F1
+    K3 --> F1
+    K4 --> F1
+    K5 --> F1
+    K6 --> F1
+    
+    F1 --> S1
+    S1 --> S2
+    S2 --> S3
+    S3 --> S4
+    
+    F3 --> R1
+    R1 --> R2
+    R2 --> R3
+    R3 --> R4
+    R4 --> R5
+    R5 --> R6
+    R6 --> R7
+    
+    L1 --> L2
+    L2 --> L3
+    L3 --> L4
+```
+"""
 import os
 from dotenv import load_dotenv
 

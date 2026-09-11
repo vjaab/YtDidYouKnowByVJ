@@ -16,6 +16,86 @@ LAYER 12: Telegram CTA card (last 6 seconds, slides up)
 LAYER 13: Subscribe animation (last 3 seconds, pulse)
 LAYER 14: Progress bar (6px at very bottom)
 LAYER 15: Background music (vol 0.045)
+
+Rendering Pipeline:
+```mermaid
+flowchart TD
+    subgraph "Input"
+        SC[Script Data\nsubtitle_chunks, visual_prompts]
+        AD[Audio + Word\nTimestamps]
+        VC[Visual Chunks\nfrom Chunk Builder]
+    end
+    
+    subgraph "Asset Fetching"
+        AF1[Pexels Video Clips]
+        AF2[HF/Imagen Images]
+        AF3[Avatar Videos\nTalking Head]
+        AF4[Screenshots\nEvidence/GitHub]
+    end
+    
+    subgraph "Frame Composition (per frame)"
+        FC1[Base Background\nKen Burns / Video]
+        FC2[Color Grade +\nGradient Overlay]
+        FC3[Particles\nCategory-Specific]
+        FC4[Hook Banner\nFirst 3s]
+        FC5[Entity Tags\nDynamic Overlay]
+        FC6[Screenshot\nEvidence Windows]
+        FC7[Avatar Talking\nHead Composite]
+        FC8[Kinetic Captions\nDay-Style Variety]
+        FC9[Progress Bar\n6px Bottom]
+        FC10[CTA Elements\nLast 6s]
+        FC11[Retention Hooks\nSnap-Zoom/Glitch/SFX]
+    end
+    
+    subgraph "Output"
+        OUT[MP4 Video\nH.264/HEVC]
+    end
+    
+    SC --> VC
+    VC --> AF1
+    VC --> AF2
+    SC --> AF3
+    SC --> AF4
+    
+    AF1 --> FC1
+    AF2 --> FC1
+    AF3 --> FC7
+    AF4 --> FC6
+    
+    FC1 --> FC2 --> FC3 --> FC4 --> FC5 --> FC6 --> FC7 --> FC8 --> FC9 --> FC10 --> FC11 --> OUT
+    
+    AD -.-> FC8
+    AD -.-> FC11
+```
+
+Retention Pattern (Every 2-5s):
+```mermaid
+timeline
+    title Visual Pattern Interrupts
+    0s   : Hook Banner\n(Slide from Top)
+    2s   : Snap-Zoom 1.08x
+    5s   : Glitch + Flash + Woosh SFX
+    7s   : Entity Tag Popup
+    10s  : Whip Pan Transition
+    12s  : Screenshot Evidence
+    15s  : Bass Hit + Glitch
+    17s  : Entity Tag Popup
+    20s  : Zoom Punch 1.1x
+    25s  : CTA Pill Slide Up
+    30s  : Subscribe Pulse\nEnd Screen
+```
+
+Day-Style Caption Variety (7-Day Cycle):
+```mermaid
+pie title Caption Style by Day
+    "Monday: Neon Glow" : 1
+    "Tuesday: Typewriter" : 1
+    "Wednesday: Bounce" : 1
+    "Thursday: Gradient" : 1
+    "Friday: Glitch" : 1
+    "Saturday: Minimal" : 1
+    "Sunday: Comic" : 1
+```
 """
 
 import os

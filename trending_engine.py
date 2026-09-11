@@ -5,9 +5,50 @@ Fetches real-time engagement signals from platforms where AI content goes viral:
 1. YouTube Trending Analysis (YouTube Data API v3)
 2. Reddit Hot Posts (r/MachineLearning, r/LocalLLaMA, etc.)
 3. GitHub Trending Repos (No API key needed)
-4. Gemini Deep Trend Cross-Analysis
+4. Hugging Face Daily Papers & Hub Models/Datasets
+5. ArXiv Research Papers
+6. Google Trends RSS
+7. Medium RSS Tag Feeds
+8. Hacker News Discussions
 
 Returns a unified list of trending topics with virality scores.
+
+Source Priority & Rotation:
+```mermaid
+flowchart LR
+    subgraph "Priority Order (TRENDING_SOURCES)"
+        P1[1. Medium RSS<br/>Tag Feeds]
+        P2[2. GitHub Trending<br/>Repos & Topics]
+        P3[3. HF Hub<br/>Models/Datasets]
+        P4[4. ArXiv<br/>Research Papers]
+        P5[5. YouTube<br/>Trending Shorts]
+        P6[6. Hacker News<br/>Discussions]
+        P7[7. HF Daily<br/>Papers]
+        P8[8. Google Trends<br/>RSS]
+        P9[9. YouTube<br/>Outliers]
+        P10[10. YouTube<br/>Most Popular]
+        P11[11. Reddit<br/>Hot Posts]
+    end
+    
+    P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7 --> P8 --> P9 --> P10 --> P11
+```
+
+Rotation Logic:
+```mermaid
+stateDiagram-v2
+    [*] --> FetchAll: fetch_all_trending_signals()
+    FetchAll --> LoadState[Load Rotation State\nfrom JSON]
+    LoadState --> ForEach[For Each Source\nin Priority Order]
+    ForEach --> CalcBoost{In Recent\nWindow?}
+    CalcBoost -->|No| Boost15[Apply 1.5x\nPriority Boost]
+    CalcBoost -->|Yes| Boost10[Apply 1.0x\nBase Score]
+    Boost15 --> Score[Score Articles\n* Boost]
+    Boost10 --> Score
+    Score --> SortAll[Sort All by\nBoosted Score]
+    SortAll --> Record[Record Usage\nin State File]
+    Record --> Return[Return Ranked\nArticles]
+    Return --> [*]
+```
 """
 
 import os

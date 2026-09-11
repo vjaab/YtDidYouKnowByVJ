@@ -1,3 +1,30 @@
+"""
+YT Did You Know - Main Pipeline Orchestrator
+
+High-Level Flow:
+```mermaid
+flowchart TD
+    Start([Scheduler Trigger]) --> Config[Load Config & Secrets]
+    Config --> Slot{Get Current Slot<br/>A/B/C/D}
+    Slot --> Fetch[Fetch Trending Signals<br/>Priority: Medium→GitHub→HF Hub→ArXiv...]
+    Fetch --> Rotate[Apply Source Rotation Boost]
+    Rotate --> Score[Score & Rank Articles]
+    Score --> Classify[Embedding Dedup + Zero-Shot]
+    Classify --> Select[Select Top Topic]
+    Select --> Script[Gemini Script Generation]
+    Script --> Audio[Generate Voiceover + Timestamps]
+    Audio --> Chunks[Build Visual Chunks]
+    Chunks --> Visuals[Fetch B-Roll Assets]
+    Visuals --> Render[Compose Video Frames]
+    Render --> Upload[Upload to Platforms]
+    Upload --> Notify[Telegram Notification]
+    Notify --> Done([Video Live])
+    
+    Style1[Retention Hooks<br/>Every 2-5s] -.-> Render
+    Style2[Day-Style Captions<br/>7-Day Variety] -.-> Render
+    Style3[Layout Variation<br/>Per Video] -.-> Render
+```
+"""
 import os
 os.environ["PYTHONHASHSEED"] = "0"
 import argparse

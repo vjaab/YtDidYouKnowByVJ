@@ -1,6 +1,59 @@
 """
 topic_classifier.py — Embedding-based deduplication & Zero-shot classification
 Uses local sentence-transformers & transformers models (no API keys, no rate limits)
+
+Architecture:
+```mermaid
+flowchart TD
+    subgraph "Input"
+        C[Candidate Articles\nfrom Trending Engine]
+        R[Recent Topics\nfrom Tracker JSON]
+    end
+    
+    subgraph "Embedding Pipeline"
+        E1[Load all-MiniLM-L6-v2\n~80MB, CPU-only]
+        E2[Encode Candidate\nTitle + Description]
+        E3[Encode Recent\nTopics Batch]
+        E4[Cosine Similarity\nMatrix]
+        E5{Max Sim > 0.75?}
+    end
+    
+    subgraph "Zero-Shot Classification"
+        Z1[Load facebook/bart-large-mnli]
+        Z2[Classify Candidate\nvs CATEGORY_LABELS]
+        Z3{Confidence > 0.5?}
+        Z4[Assign Predicted\nCategory]
+        Z5[Default: AI & Tech Tools]
+    end
+    
+    subgraph "Output"
+        O[Filtered & Classified\nCandidates Ranked]
+    end
+    
+    C --> E2
+    R --> E3
+    E1 --> E2
+    E1 --> E3
+    E2 --> E4
+    E3 --> E4
+    E4 --> E5
+    E5 -->|Yes| Reject[Reject Duplicate]
+    E5 -->|No| Z2
+    Z2 --> Z3
+    Z3 -->|Yes| Z4
+    Z3 -->|No| Z5
+    Z4 --> O
+    Z5 --> O
+    Reject --> Next[Next Candidate]
+    Next --> E2
+```
+
+Model Details:
+- **Embedding**: `sentence-transformers/all-MiniLM-L6-v2` (384-dim, normalized)
+- **Classification**: `facebook/bart-large-mnli` (10 labels, single-label)
+- **Thresholds**: similarity=0.75, confidence=0.5
+- **Performance**: ~50ms/candidate on CPU, no GPU needed
+```
 """
 
 import os
