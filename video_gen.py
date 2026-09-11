@@ -7082,7 +7082,7 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
 
                 for dx in range(-stroke_width, stroke_width+1):
                     for dy in range(-stroke_width, stroke_width+1):
-                        if dx*dx + dy*dy <= stroke*stroke:
+                        if dx*dx + dy*dy <= stroke_width*stroke_width:
                             word_draw.text((30+dx, 30+dy), word_text, font=f_word, fill=(0,0,0,255))
 
                 word_draw.text((34, 34), word_text, font=f_word, fill=(0,0,0,180))
