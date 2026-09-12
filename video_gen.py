@@ -8987,30 +8987,33 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                     print(f"   📊 Stat callout added: {mp.get('value')} {mp.get('label')} at {ts_val:.1f}s")
         
         # ── CODE SNIPPET / DIAGRAM DISPLAY ────────────────────────────────────────
-        # Add code snippets and architecture diagrams for technical content
-        code_snippets = script_json.get("code_snippets", [])
-        for cs in code_snippets:
-            ts_val = cs.get("timestamp", 0)
-            if ts_val > 5 and ts_val < audio_duration - 5:
-                code_clip = _code_snippet_clip(
-                    cs.get("code", ""), cs.get("language", "python"),
-                    ts_val, accent_color, audio_duration, hold=cs.get("duration", 4.0)
-                )
-                if code_clip:
-                    engagement_clips.append(code_clip)
-                    print(f"   💻 Code snippet added at {ts_val:.1f}s")
-        
-        arch_diagrams = script_json.get("architecture_diagrams", [])
-        for ad in arch_diagrams:
-            ts_val = ad.get("timestamp", 0)
-            if ts_val > 5 and ts_val < audio_duration - 5:
-                arch_clip = _architecture_diagram_clip(
-                    ad.get("components", []), ad.get("connections", []),
-                    ts_val, accent_color, audio_duration, hold=ad.get("duration", 5.0)
-                )
-                if arch_clip:
-                    engagement_clips.append(arch_clip)
-                    print(f"   🏗️ Architecture diagram added at {ts_val:.1f}s")
+        # Add code snippets and architecture diagrams for technical content (LONGFORM ONLY)
+        if is_longform:
+            code_snippets = script_json.get("code_snippets", [])
+            for cs in code_snippets:
+                ts_val = cs.get("timestamp", 0)
+                if ts_val > 5 and ts_val < audio_duration - 5:
+                    code_clip = _code_snippet_clip(
+                        cs.get("code", ""), cs.get("language", "python"),
+                        ts_val, accent_color, audio_duration, hold=cs.get("duration", 4.0)
+                    )
+                    if code_clip:
+                        engagement_clips.append(code_clip)
+                        print(f"   💻 Code snippet added at {ts_val:.1f}s")
+            
+            arch_diagrams = script_json.get("architecture_diagrams", [])
+            for ad in arch_diagrams:
+                ts_val = ad.get("timestamp", 0)
+                if ts_val > 5 and ts_val < audio_duration - 5:
+                    arch_clip = _architecture_diagram_clip(
+                        ad.get("components", []), ad.get("connections", []),
+                        ts_val, accent_color, audio_duration, hold=ad.get("duration", 5.0)
+                    )
+                    if arch_clip:
+                        engagement_clips.append(arch_clip)
+                        print(f"   🏗️ Architecture diagram added at {ts_val:.1f}s")
+        else:
+            print("   🎬 Shorts mode: Skipping code snippets and architecture diagrams")
         
         # ── AUDIO-DRIVEN PATTERN INTERRUPTS (Every 4-6 seconds) ──────────────────
         # Generate visual cuts synchronized to audio beats/pace

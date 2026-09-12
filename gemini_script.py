@@ -1002,12 +1002,15 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                     print(f"🔥 Selected article type is '{top.get('type')}'. Switching topic_type to 'tech_trends' to apply 3-part Shorts Formula.")
                     topic_type = "tech_trends"
                 
-                # Visual Strategy: Only allow flowcharts/diagrams for Hugging Face Hub topics
+                # Visual Strategy: All shorts topics - no diagrams, no code snippets, no terminal outputs
                 top_source = top.get("_source_name", "") if top else ""
                 if top_source == "huggingface_hub":
                     extra_instruction += "\n\nVISUAL STRATEGY: This topic is from Hugging Face Hub. You MAY include flowcharts, architecture diagrams, or pipeline diagrams in subtitle_chunks where appropriate to explain model architectures, training pipelines, or data flows. Set 'has_infographic': true and 'infographic_type': 'flowchart' for relevant chunks."
                 else:
-                    extra_instruction += "\n\nVISUAL STRATEGY: This topic is from Medium or GitHub. Do NOT include flowcharts, architecture diagrams, pipeline diagrams, or any diagram-type infographics in subtitle_chunks. Set 'has_infographic': false for all chunks. Use code snippets, terminal outputs, GitHub UI screenshots. Do NOT use whiteboard-style explanations."
+                    extra_instruction += "\n\nVISUAL STRATEGY: This topic is from Medium or GitHub. Do NOT include flowcharts, architecture diagrams, pipeline diagrams, or any diagram-type infographics in subtitle_chunks. Set 'has_infographic': false for all chunks. Use GitHub UI screenshots only. Do NOT use code snippets, terminal outputs, screen recordings, or whiteboard-style explanations."
+                
+                # For ALL shorts topics: No code snippets, no terminal outputs, no screen recordings
+                extra_instruction += "\n\nUNIVERSAL SHORTS VISUAL CONSTRAINT: This is a SHORTS video. Do NOT include code_snippets, terminal outputs, screen recordings, or architecture_diagrams in the script JSON. Visual types allowed: Video, AI Image, GitHub UI, Side-by-side Comparison, Infographic (stat/definition/comparison only). NO 'Code Snippet', NO 'Terminal Output', NO 'Screen Recording', NO 'Flowchart', NO 'Architecture Diagram'."
 
         # ── STEP 1: GEMINI SEARCH FALLBACK (biased toward hot topic) ────────────
         if not articles:
