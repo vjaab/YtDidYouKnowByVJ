@@ -5633,7 +5633,7 @@ def _longform_topic_transition_clips(script_json, audio_duration):
             
     return clips
 
-def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False):
+def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, is_short=False):
     """
     Shows a secondary 'Evidence' or 'Use Case' screenshot during the analytical section.
     
@@ -5641,6 +5641,7 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False):
         evidence_path: Path to the evidence screenshot
         duration: Total audio/video duration
         is_github_readme: If True, extends duration to 12s for GitHub README readability
+        is_short: If True, show throughout the entire short with scrolling animation
     """
     if not evidence_path or not os.path.exists(evidence_path):
         return []
@@ -5654,23 +5655,67 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False):
         arr_rgb = arr_rgba[:, :, :3]
         arr_mask = (arr_rgba[:, :, 3] / 255.0).astype(float)
         
-        start = 28.0 
-        # Extend duration for GitHub README (12s max) vs regular evidence (6s max)
-        max_dur = 12.0 if is_github_readme else 6.0
-        dur = min(max_dur, duration - start - 5.0)
-        
-        if dur > 1.0:
-            clip = ImageClip(arr_rgb, duration=dur)
-            mclip = VideoClip(lambda t: arr_mask, is_mask=True, duration=dur)
-            clip = clip.with_mask(mclip)
+        if is_short:
+            # For shorts: show throughout entire duration with scrolling animation
+            start = 0.0
+            dur = duration
             
-            # Subtle zoom only for evidence
-            clip = clip.resized(lambda t, d=dur: 1.0 + 0.12 * easeInOutQuad(t / d))
-            clip = clip.with_position("center").with_start(start)
-            clip = clip.with_effects([vfx.CrossFadeIn(0.6), vfx.CrossFadeOut(0.6)])
-            return [clip]
+            # Check if image is taller than frame (needs scrolling)
+            img_h, img_w = arr_rgb.shape[:2]
+            needs_scroll = img_h > target_h
             
-        return []
+            if needs_scroll:
+                # Create a scrolling clip using VideoClip for smooth scroll
+                from moviepy import VideoClip
+                
+                def make_frame(t):
+                    # Calculate scroll progress (0 to 1 over the duration)
+                    progress = t / duration
+                    # Scroll from top (0) to bottom (img_h - target_h)
+                    max_scroll = img_h - target_h
+                    scroll_y = int(progress * max_scroll)
+                    # Return the visible portion
+                    return arr_rgb[scroll_y:scroll_y + target_h, :, :]
+                
+                def make_mask(t):
+                    progress = t / duration
+                    max_scroll = img_h - target_h
+                    scroll_y = int(progress * max_scroll)
+                    return arr_mask[scroll_y:scroll_y + target_h, :]
+                
+                clip = VideoClip(make_frame, duration=dur)
+                mclip = VideoClip(make_mask, is_mask=True, duration=dur)
+                clip = clip.with_mask(mclip)
+                clip = clip.with_position("center").with_start(start)
+                clip = clip.with_effects([vfx.CrossFadeIn(0.3)])
+                return [clip]
+            else:
+                # Image fits in frame, no scrolling needed
+                clip = ImageClip(arr_rgb, duration=dur)
+                mclip = VideoClip(lambda t: arr_mask, is_mask=True, duration=dur)
+                clip = clip.with_mask(mclip)
+                clip = clip.with_position("center").with_start(start)
+                clip = clip.with_effects([vfx.CrossFadeIn(0.3)])
+                return [clip]
+        else:
+            # Longform: original behavior - starts at 28s
+            start = 28.0 
+            # Extend duration for GitHub README (12s max) vs regular evidence (6s max)
+            max_dur = 12.0 if is_github_readme else 6.0
+            dur = min(max_dur, duration - start - 5.0)
+            
+            if dur > 1.0:
+                clip = ImageClip(arr_rgb, duration=dur)
+                mclip = VideoClip(lambda t: arr_mask, is_mask=True, duration=dur)
+                clip = clip.with_mask(mclip)
+                
+                # Subtle zoom only for evidence
+                clip = clip.resized(lambda t, d=dur: 1.0 + 0.12 * easeInOutQuad(t / d))
+                clip = clip.with_position("center").with_start(start)
+                clip = clip.with_effects([vfx.CrossFadeIn(0.6), vfx.CrossFadeOut(0.6)])
+                return [clip]
+                
+            return []
     except Exception as e:
         print(f"Evidence screenshot clip error: {e}")
         return []
@@ -9283,11 +9328,21 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     evidence_screenshot_path = script_json.get("evidence_screenshot_path")
     is_github_readme = script_json.get("is_github_readme", False)
     if evidence_screenshot_path and os.path.exists(evidence_screenshot_path):
-        evidence_clips = _evidence_screenshot_clip(evidence_screenshot_path, audio_duration, is_github_readme=is_github_readme)
+        evidence_clips = _evidence_screenshot_clip(evidence_screenshot_path, audio_duration, is_github_readme=is_github_readme, is_short=not is_longform)
         base_layers.extend(evidence_clips)
         if evidence_clips:
             log_type = "GitHub README" if is_github_readme else "Evidence"
             print(f"   📸 {log_type} screenshot clip added ({evidence_clips[0].duration:.1f}s)")
+            
+            # For shorts: add avatar overlay on top of evidence screenshot after 20 seconds
+            if not is_longform and avatar_pip:
+                avatar_overlay_start = 20.0
+                if avatar_overlay_start < audio_duration:
+                    # Create a copy of avatar_pip that starts at 20s
+                    avatar_overlay = avatar_pip.with_start(avatar_overlay_start)
+                    # Position it on top of evidence screenshot (centered, smaller)
+                    base_layers.append(avatar_overlay)
+                    print(f"   👤 Avatar overlay on evidence screenshot from {avatar_overlay_start}s")
     
     # Add overlays
     base_layers.append(gradient)
