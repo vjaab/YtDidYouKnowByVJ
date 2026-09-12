@@ -4262,10 +4262,15 @@ def render_header_bar(title, category, accent_color, frame_width=1080):
     
     return img
 
-def render_shorts_header_bar(title, accent_color=(255, 255, 255), frame_width=1080):
+def render_shorts_header_bar(title, accent_color=(255, 255, 255), frame_width=1080, force_position=None):
     """Renders a title bar using 7-day title variety system for Shorts."""
     # Get day-specific title style
     title_style = get_title_day_style()
+    
+    # Allow forcing position for production (e.g., "top" for AI Human Loop tag)
+    if force_position:
+        title_style = title_style.copy()
+        title_style["position"] = force_position
     
     font_family = title_style["font_family"]
     font_weight = title_style["font_weight"]
@@ -4340,6 +4345,8 @@ def render_shorts_header_bar(title, accent_color=(255, 255, 255), frame_width=10
         offset_y = int(FRAME_H * 0.15)  # Higher up for breaking news
     elif style_pos == "center":
         offset_y = int(FRAME_H * 0.35)  # Lower for viral pop
+    elif style_pos == "top":
+        offset_y = 40  # Top-most position: right after AI Human Loop tag (30px tag + 10px gap)
     else:
         offset_y = 113  # Standard offset
     
@@ -9667,7 +9674,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     
     # Header bar: solid black top bar with white text for Shorts, disabled for Longform
     if not is_longform:
-        header_img = render_shorts_header_bar(title, accent_color, FRAME_W)
+        header_img = render_shorts_header_bar(title, accent_color, FRAME_W, force_position="top")
     else:
         header_img = Image.new('RGBA', (FRAME_W, FRAME_H), (0, 0, 0, 0))
     
