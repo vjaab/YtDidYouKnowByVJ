@@ -1246,19 +1246,6 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
     if visual_mode == "nano_hook" or visual_mode == "nano_concept":
         print(f"Chunk {cid} -> MODE: {visual_mode}")
         
-        # Try Pixabay as primary source FIRST (fast, free, high rate limit)
-        if PIXABAY_API_KEY:
-            print(f"Chunk {cid} -> Trying Pixabay as primary source...")
-            pixabay_path, pixabay_source, pixabay_type = _fetch_pixabay_primary(chunk, dur, is_video=False, is_longform=is_longform, topic_context=topic_context)
-            if pixabay_path:
-                chunk["visual_path"] = pixabay_path
-                chunk["visual_type"] = pixabay_type
-                chunk["relevance_score"] = 8
-                chunk["source"] = f"Pixabay primary ({pixabay_source})"
-                return chunk
-            else:
-                print(f"Chunk {cid} -> Pixabay primary failed, trying AI generation...")
-        
         # Generate custom prompt via Gemini
         custom_prompt = generate_premium_prompt_via_gemini(
             chunk_text=text,
@@ -1296,6 +1283,17 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
             chunk["relevance_score"] = 7
             chunk["source"] = f"Pexels fallback ({source_desc})"
             return chunk
+
+        # Pixabay as LAST fallback (after Pollinations)
+        if PIXABAY_API_KEY:
+            print(f"Chunk {cid} -> Trying Pixabay as last fallback...")
+            pixabay_path, pixabay_source, pixabay_type = _fetch_pixabay_primary(chunk, dur, is_video=False, is_longform=is_longform, topic_context=topic_context)
+            if pixabay_path:
+                chunk["visual_path"] = pixabay_path
+                chunk["visual_type"] = pixabay_type
+                chunk["relevance_score"] = 6
+                chunk["source"] = f"Pixabay fallback ({pixabay_source})"
+                return chunk
 
     elif visual_mode == "nano_evidence":
         selected_screenshot = None
@@ -1343,19 +1341,6 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
             chunk["source"] = screenshot_source
             return chunk
 
-        # Try Pixabay as primary source for evidence (before AI generation)
-        if PIXABAY_API_KEY:
-            print(f"Chunk {cid} -> Trying Pixabay as primary source for evidence...")
-            pixabay_path, pixabay_source, pixabay_type = _fetch_pixabay_primary(chunk, dur, is_video=False, is_longform=is_longform, topic_context=topic_context)
-            if pixabay_path:
-                chunk["visual_path"] = pixabay_path
-                chunk["visual_type"] = pixabay_type
-                chunk["relevance_score"] = 8
-                chunk["source"] = f"Pixabay primary evidence ({pixabay_source})"
-                return chunk
-            else:
-                print(f"Chunk {cid} -> Pixabay primary evidence failed, trying AI generation...")
-
         print(f"Chunk {cid} -> MODE: nano_evidence (Using AI Macro Fallback)")
         evidence_concept = f"A professional macro photograph of scientific research paper, technical charts, code editor or document titled '{headline}'."
         custom_prompt = generate_premium_prompt_via_gemini(
@@ -1394,21 +1379,19 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
             chunk["source"] = f"Pexels evidence fallback ({source_desc})"
             return chunk
 
-    elif visual_mode == "veo_concept" or visual_mode == "veo_cta":
-        print(f"Chunk {cid} -> MODE: {visual_mode}")
-        
-        # Try Pixabay as primary source for video (before Veo)
+        # Pixabay as LAST fallback (after Pollinations)
         if PIXABAY_API_KEY:
-            print(f"Chunk {cid} -> Trying Pixabay as primary source for video...")
-            pixabay_path, pixabay_source, pixabay_type = _fetch_pixabay_primary(chunk, dur, is_video=True, is_longform=is_longform, topic_context=topic_context)
+            print(f"Chunk {cid} -> Trying Pixabay as last fallback for evidence...")
+            pixabay_path, pixabay_source, pixabay_type = _fetch_pixabay_primary(chunk, dur, is_video=False, is_longform=is_longform, topic_context=topic_context)
             if pixabay_path:
                 chunk["visual_path"] = pixabay_path
                 chunk["visual_type"] = pixabay_type
-                chunk["relevance_score"] = 8
-                chunk["source"] = f"Pixabay primary video ({pixabay_source})"
+                chunk["relevance_score"] = 6
+                chunk["source"] = f"Pixabay fallback evidence ({pixabay_source})"
                 return chunk
-            else:
-                print(f"Chunk {cid} -> Pixabay primary video failed, trying Veo...")
+
+    elif visual_mode == "veo_concept" or visual_mode == "veo_cta":
+        print(f"Chunk {cid} -> MODE: {visual_mode}")
         
         custom_video_prompt = generate_premium_prompt_via_gemini(
             chunk_text=text,
@@ -1463,6 +1446,17 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
             chunk["relevance_score"] = 7
             chunk["source"] = f"Pexels video fallback ({source_desc})"
             return chunk
+
+        # Pixabay as LAST fallback (after Pollinations)
+        if PIXABAY_API_KEY:
+            print(f"Chunk {cid} -> Trying Pixabay as last fallback for video...")
+            pixabay_path, pixabay_source, pixabay_type = _fetch_pixabay_primary(chunk, dur, is_video=True, is_longform=is_longform, topic_context=topic_context)
+            if pixabay_path:
+                chunk["visual_path"] = pixabay_path
+                chunk["visual_type"] = pixabay_type
+                chunk["relevance_score"] = 6
+                chunk["source"] = f"Pixabay fallback video ({pixabay_source})"
+                return chunk
 
     chunk["visual_path"] = None
     chunk["visual_type"] = None
