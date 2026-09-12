@@ -5633,7 +5633,7 @@ def _longform_topic_transition_clips(script_json, audio_duration):
             
     return clips
 
-def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, is_short=False):
+def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, is_short=False, topic_context=""):
     """
     Shows a secondary 'Evidence' or 'Use Case' screenshot during the analytical section.
     
@@ -5641,7 +5641,8 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
         evidence_path: Path to the evidence screenshot
         duration: Total audio/video duration
         is_github_readme: If True, extends duration to 12s for GitHub README readability
-        is_short: If True, show throughout the entire short with scrolling animation
+        is_short: If True, cycle between evidence (10s) and topic video/image (2s) throughout
+        topic_context: Topic context for generating day-specific topic visuals
     """
     if not evidence_path or not os.path.exists(evidence_path):
         return []
@@ -5656,47 +5657,186 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
         arr_mask = (arr_rgba[:, :, 3] / 255.0).astype(float)
         
         if is_short:
-            # For shorts: show throughout entire duration with scrolling animation
-            start = 0.0
-            dur = duration
+            # For shorts: cycle evidence screenshot (10s) + topic visual (2s) throughout
+            from moviepy import VideoClip
             
-            # Check if image is taller than frame (needs scrolling)
-            img_h, img_w = arr_rgb.shape[:2]
-            needs_scroll = img_h > target_h
-            
-            if needs_scroll:
-                # Create a scrolling clip using VideoClip for smooth scroll
-                from moviepy import VideoClip
+            # 7 day-specific topic visual generators (9:16 vertical shorts size)
+            def _generate_topic_visual(day, target_w, target_h, topic_context):
+                """Generate day-specific topic visual for the 2s gap."""
+                day_styles = {
+                    0: {  # Monday - Tech Dark Mode
+                        "bg": (18, 18, 28),
+                        "accent": (0, 240, 255),
+                        "style": "tech_grid"
+                    },
+                    1: {  # Tuesday - Warning Alert
+                        "bg": (40, 10, 10),
+                        "accent": (255, 215, 0),
+                        "style": "alert_pulse"
+                    },
+                    2: {  # Wednesday - Terminal
+                        "bg": (10, 20, 10),
+                        "accent": (0, 255, 102),
+                        "style": "terminal_lines"
+                    },
+                    3: {  # Thursday - Viral Pop
+                        "bg": (20, 10, 30),
+                        "accent": (255, 245, 0),
+                        "style": "viral_burst"
+                    },
+                    4: {  # Friday - Gradient Tech
+                        "bg": (15, 10, 35),
+                        "accent": (138, 43, 226),
+                        "style": "gradient_wave"
+                    },
+                    5: {  # Saturday - Breaking News
+                        "bg": (30, 5, 10),
+                        "accent": (255, 87, 34),
+                        "style": "news_ticker"
+                    },
+                    6: {  # Sunday - Clean Educational
+                        "bg": (25, 25, 40),
+                        "accent": (255, 243, 191),
+                        "style": "edu_diagram"
+                    }
+                }
+                style = day_styles.get(day, day_styles[0])
+                canvas = Image.new("RGB", (target_w, target_h), style["bg"])
+                draw = ImageDraw.Draw(canvas)
                 
-                def make_frame(t):
-                    # Calculate scroll progress (0 to 1 over the duration)
-                    progress = t / duration
-                    # Scroll from top (0) to bottom (img_h - target_h)
-                    max_scroll = img_h - target_h
+                # Extract key terms from topic_context for visualization
+                keywords = [w for w in topic_context.split() if len(w) > 3][:5]
+                if not keywords:
+                    keywords = ["AI", "Tech", "Innovation", "Code", "Future"]
+                
+                if style["style"] == "tech_grid":
+                    # Monday: Tech grid pattern
+                    for i in range(0, target_w, 60):
+                        draw.line([(i, 0), (i, target_h)], fill=(*style["accent"], 30), width=1)
+                    for i in range(0, target_h, 60):
+                        draw.line([(0, i), (target_w, i)], fill=(*style["accent"], 30), width=1)
+                    # Center keyword
+                    font = gf(72, bold=True)
+                    kw = keywords[0].upper()
+                    tw, th = draw.textbbox((0, 0), kw, font=font)[2:]
+                    draw.text(((target_w - tw)//2, (target_h - th)//2), kw, font=font, fill=style["accent"])
+                    
+                elif style["style"] == "alert_pulse":
+                    # Tuesday: Pulsing alert rings
+                    cx, cy = target_w // 2, target_h // 2
+                    for r in range(50, min(target_w, target_h)//2, 80):
+                        draw.ellipse([cx-r, cy-r, cx+r, cy+r], outline=(*style["accent"], 60), width=3)
+                    font = gf(64, bold=True)
+                    kw = "⚠ " + keywords[0].upper()
+                    tw, th = draw.textbbox((0, 0), kw, font=font)[2:]
+                    draw.text(((target_w - tw)//2, (target_h - th)//2), kw, font=font, fill=style["accent"])
+                    
+                elif style["style"] == "terminal_lines":
+                    # Wednesday: Terminal-style scrolling lines
+                    font = gf(36)
+                    for i, kw in enumerate(keywords * 3):
+                        y = 80 + i * 60
+                        if y > target_h - 80: break
+                        draw.text((60, y), f"> {kw.lower()}", font=font, fill=style["accent"])
+                    
+                elif style["style"] == "viral_burst":
+                    # Thursday: Radial burst lines
+                    cx, cy = target_w // 2, target_h // 2
+                    for angle in range(0, 360, 30):
+                        import math
+                        x = cx + math.cos(math.radians(angle)) * max(target_w, target_h)
+                        y = cy + math.sin(math.radians(angle)) * max(target_w, target_h)
+                        draw.line([(cx, cy), (x, y)], fill=(*style["accent"], 80), width=2)
+                    font = gf(72, bold=True)
+                    kw = "🚀 " + keywords[0].upper()
+                    tw, th = draw.textbbox((0, 0), kw, font=font)[2:]
+                    draw.text(((target_w - tw)//2, (target_h - th)//2), kw, font=font, fill=style["accent"])
+                    
+                elif style["style"] == "gradient_wave":
+                    # Friday: Gradient wave bars
+                    for i in range(12):
+                        y = i * (target_h // 12)
+                        h = target_h // 12 - 4
+                        alpha = int(255 * (1 - i/12))
+                        r, g, b = style["accent"]
+                        draw.rectangle([40, y, target_w - 40, y + h], fill=(r, g, b, alpha))
+                    font = gf(60, bold=True)
+                    kw = "✨ " + keywords[0].title()
+                    tw, th = draw.textbbox((0, 0), kw, font=font)[2:]
+                    draw.text(((target_w - tw)//2, (target_h - th)//2), kw, font=font, fill=(255,255,255))
+                    
+                elif style["style"] == "news_ticker":
+                    # Saturday: News ticker style
+                    draw.rectangle([0, target_h//2 - 80, target_w, target_h//2 + 80], fill=(*style["accent"], 40))
+                    font = gf(56, bold=True)
+                    kw = "📰 BREAKING: " + " | ".join(kw.upper() for kw in keywords[:3])
+                    tw, th = draw.textbbox((0, 0), kw, font=font)[2:]
+                    draw.text(((target_w - tw)//2, (target_h - th)//2), kw, font=font, fill=style["accent"])
+                    
+                else:  # edu_diagram
+                    # Sunday: Clean educational diagram
+                    cx, cy = target_w // 2, target_h // 2
+                    # Central concept circle
+                    draw.ellipse([cx-100, cy-100, cx+100, cy+100], outline=style["accent"], width=4)
+                    # Connected nodes
+                    positions = [
+                        (cx, cy-180), (cx+160, cy-60), (cx+160, cy+60),
+                        (cx, cy+180), (cx-160, cy+60), (cx-160, cy-60)
+                    ]
+                    for i, (x, y) in enumerate(positions):
+                        draw.ellipse([x-50, y-50, x+50, y+50], outline=style["accent"], width=3)
+                        draw.line([(cx, cy), (x, y)], fill=(*style["accent"], 100), width=2)
+                        if i < len(keywords):
+                            font = gf(28)
+                            kw = keywords[i].title()
+                            tw, th = draw.textbbox((0, 0), kw, font=font)[2:]
+                            draw.text((x - tw//2, y - th//2), kw, font=font, fill=style["accent"])
+                
+                return np.array(canvas)
+            
+            # Get current day for 7-variety rotation
+            day = datetime.now().weekday()
+            
+            # Generate the day-specific topic visual (2s content)
+            topic_visual_arr = _generate_topic_visual(day, target_w, target_h, topic_context)
+            topic_visual_mask = np.ones((target_h, target_w), dtype=float)
+            
+            # Create cycling pattern: 10s evidence + 2s topic visual = 12s cycle
+            cycle_duration = 12.0
+            evidence_duration = 10.0
+            topic_duration = 2.0
+            
+            def make_cycle_frame(t):
+                # Determine where we are in the cycle
+                cycle_pos = t % cycle_duration
+                if cycle_pos < evidence_duration:
+                    # Show evidence screenshot with scrolling
+                    progress = cycle_pos / evidence_duration
+                    img_h, img_w = arr_rgb.shape[:2]
+                    max_scroll = max(0, img_h - target_h)
                     scroll_y = int(progress * max_scroll)
-                    # Return the visible portion
                     return arr_rgb[scroll_y:scroll_y + target_h, :, :]
-                
-                def make_mask(t):
-                    progress = t / duration
-                    max_scroll = img_h - target_h
+                else:
+                    # Show topic visual (2s)
+                    return topic_visual_arr
+            
+            def make_cycle_mask(t):
+                cycle_pos = t % cycle_duration
+                if cycle_pos < evidence_duration:
+                    progress = cycle_pos / evidence_duration
+                    img_h, img_w = arr_mask.shape[:2]
+                    max_scroll = max(0, img_h - target_h)
                     scroll_y = int(progress * max_scroll)
                     return arr_mask[scroll_y:scroll_y + target_h, :]
-                
-                clip = VideoClip(make_frame, duration=dur)
-                mclip = VideoClip(make_mask, is_mask=True, duration=dur)
-                clip = clip.with_mask(mclip)
-                clip = clip.with_position("center").with_start(start)
-                clip = clip.with_effects([vfx.CrossFadeIn(0.3)])
-                return [clip]
-            else:
-                # Image fits in frame, no scrolling needed
-                clip = ImageClip(arr_rgb, duration=dur)
-                mclip = VideoClip(lambda t: arr_mask, is_mask=True, duration=dur)
-                clip = clip.with_mask(mclip)
-                clip = clip.with_position("center").with_start(start)
-                clip = clip.with_effects([vfx.CrossFadeIn(0.3)])
-                return [clip]
+                else:
+                    return topic_visual_mask
+            
+            clip = VideoClip(make_cycle_frame, duration=duration)
+            mclip = VideoClip(make_cycle_mask, is_mask=True, duration=duration)
+            clip = clip.with_mask(mclip)
+            clip = clip.with_position("center").with_start(0)
+            return [clip]
+            
         else:
             # Longform: original behavior - starts at 28s
             start = 28.0 
@@ -9327,8 +9467,9 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     # Add evidence screenshot clip (GitHub README or secondary evidence)
     evidence_screenshot_path = script_json.get("evidence_screenshot_path")
     is_github_readme = script_json.get("is_github_readme", False)
+    topic_context = script_json.get("topic", "") or script_json.get("title", "") or ""
     if evidence_screenshot_path and os.path.exists(evidence_screenshot_path):
-        evidence_clips = _evidence_screenshot_clip(evidence_screenshot_path, audio_duration, is_github_readme=is_github_readme, is_short=not is_longform)
+        evidence_clips = _evidence_screenshot_clip(evidence_screenshot_path, audio_duration, is_github_readme=is_github_readme, is_short=not is_longform, topic_context=topic_context)
         base_layers.extend(evidence_clips)
         if evidence_clips:
             log_type = "GitHub README" if is_github_readme else "Evidence"
