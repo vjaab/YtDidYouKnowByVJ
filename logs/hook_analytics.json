@@ -538,6 +538,31 @@
         "avg_engagement": 0.0,
         "avg_swipe_away": 0.0,
         "avg_view_percentage": 0.0
+      },
+      "result_first": {
+        "variants": {
+          "A": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "Free fix stops the endless reboot",
+                "video_id": "RJ2XEX_R7fk",
+                "recorded_at": "2026-09-12T19:36:40.708379"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
       }
     }
   },
@@ -554,7 +579,7 @@
       "views": 0,
       "retention": 0.0,
       "engagement": 0.0,
-      "count": 5,
+      "count": 6,
       "swipe_away_rate": 0.0,
       "avg_view_percentage": 0.0
     },
@@ -583,5 +608,5 @@
       "avg_view_percentage": 0.0
     }
   },
-  "last_updated": "2026-09-12T13:40:47.521199"
+  "last_updated": "2026-09-12T19:36:40.708416"
 }
