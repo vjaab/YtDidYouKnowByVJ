@@ -2,14 +2,9 @@
 trending_engine.py — Unified Trending Signal Aggregator (Phase 1)
 
 Fetches real-time engagement signals from platforms where AI content goes viral:
-1. YouTube Trending Analysis (YouTube Data API v3)
-2. Reddit Hot Posts (r/MachineLearning, r/LocalLLaMA, etc.)
-3. GitHub Trending Repos (No API key needed)
-4. Hugging Face Daily Papers & Hub Models/Datasets
-5. ArXiv Research Papers
-6. Google Trends RSS
-7. Medium RSS Tag Feeds
-8. Hacker News Discussions
+1. Medium RSS Tag Feeds
+2. GitHub Trending Repos (No API key needed)
+3. Hugging Face Hub Models/Datasets
 
 Returns a unified list of trending topics with virality scores.
 
@@ -20,17 +15,9 @@ flowchart LR
         P1[1. Medium RSS<br/>Tag Feeds]
         P2[2. GitHub Trending<br/>Repos & Topics]
         P3[3. HF Hub<br/>Models/Datasets]
-        P4[4. ArXiv<br/>Research Papers]
-        P5[5. YouTube<br/>Trending Shorts]
-        P6[6. Hacker News<br/>Discussions]
-        P7[7. HF Daily<br/>Papers]
-        P8[8. Google Trends<br/>RSS]
-        P9[9. YouTube<br/>Outliers]
-        P10[10. YouTube<br/>Most Popular]
-        P11[11. Reddit<br/>Hot Posts]
     end
     
-    P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7 --> P8 --> P9 --> P10 --> P11
+    P1 --> P2 --> P3
 ```
 
 Rotation Logic:
@@ -1893,7 +1880,7 @@ def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools", 
     Args:
         target_country: Target country for geo-specific trends
         category: Category to filter by
-        sources: List of sources to fetch from. Options: "youtube", "reddit", "github", "hackernews", "huggingface", "huggingface_hub", "arxiv", "google_trends", "youtube_popular", "medium", "youtube_outliers"
+        sources: List of sources to fetch from. Options: "medium", "github", "huggingface_hub"
                 Defaults to config.TRENDING_SOURCES or all sources if not specified.
     """
     from config import TRENDING_SOURCES as DEFAULT_SOURCES, SOURCE_ROTATION_ENABLED, MIN_ARTICLES_PER_SOURCE, SOURCE_ROTATION_WINDOW

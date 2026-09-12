@@ -168,7 +168,7 @@ TARGET_AUDIO_DURATION = (15, 35) # Shorter Shorts = higher completion rates = mo
 # Global Feature Flags
 ENABLE_LONGFORM = False
 ENABLE_TRENDING_ENGINE = True    # Phase 1: YouTube/Reddit/GitHub trending aggregation
-TRENDING_SOURCES = ["medium", "github", "huggingface_hub", "arxiv", "youtube", "hackernews", "huggingface", "google_trends", "youtube_outliers", "youtube_popular", "reddit"]
+TRENDING_SOURCES = ["medium", "github", "huggingface_hub"]
 
 # Source rotation config - ensures each source gets periodic representation
 SOURCE_ROTATION_ENABLED = True
