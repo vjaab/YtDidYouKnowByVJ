@@ -9124,9 +9124,18 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     infographic_clips = []
     clean_bg_clips = []  # Clean backgrounds for diagrams/flowcharts
     enable_infographics = os.environ.get("ENABLE_INFOGRAPHICS", "1") == "1"
+    # Diagram types that should be excluded from shorts
+    diagram_types = {"flowchart", "architecture", "pipeline", "data_flow", 
+                     "cluster_diagram", "container_diagram", "branch_diagram",
+                     "ci_cd_pipeline", "attack_defense_flow", "service_architecture",
+                     "process", "slide", "comparison"}
     if enable_infographics and not CI_LITE:
         for chunk in chunks:
             if chunk.get("has_infographic") and chunk.get("infographic_type"):
+                itype = chunk.get("infographic_type", "").lower()
+                # Skip diagram types for shorts (non-longform)
+                if not is_longform and itype in diagram_types:
+                    continue
                 result = _infographic_card_clip(
                     chunk.get("infographic_type"),
                     chunk.get("infographic_data"),
@@ -9139,7 +9148,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                     iclip, clean_bg = result
                     if iclip:
                         infographic_clips.append(iclip)
-                    if clean_bg:
+                    # Skip clean background for shorts
+                    if clean_bg and is_longform:
                         clean_bg_clips.append(clean_bg)
     elif enable_infographics and CI_LITE:
         print("   🔧 CI-LITE: Skipping infographics")
