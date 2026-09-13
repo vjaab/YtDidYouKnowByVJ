@@ -9843,65 +9843,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     # Filter out any None values that may have been added
     base_layers = [clip for clip in base_layers if clip is not None]
     # ── LOGO BRANDING OVERLAY STACK ────────────────────────────────────
-    # Render entity tags on the left side below the title for Shorts, or use the right-side logo stack for longform
-    entities_list = []
-    for ent_list_key in ["companies", "people", "key_entities"]:
-        for ent in script_json.get(ent_list_key, []):
-            if not any(e.get("name") == ent.get("name") for e in entities_list):
-                # Ensure local_logo_path is set
-                logo_path = ent.get("local_logo_path") or ent.get("local_hq_path") or ent.get("local_image_path")
-                if logo_path:
-                    ent["local_logo_path"] = logo_path
-                entities_list.append(ent)
-                
-    if not is_longform:
-        # Filter entities to only those that have a name, a description, and a logo
-        entities_list = [
-            e for e in entities_list
-            if e.get("name") and e.get("description") and e.get("local_logo_path") and os.path.exists(e.get("local_logo_path"))
-        ]
-                
-    if not is_longform and entities_list:
-        # Pre-calculate active time intervals for each entity based on chunk mentions
-        for ent in entities_list:
-            name = ent.get("name", "").lower()
-            intervals = []
-            for chunk in chunks:
-                chunk_text = chunk.get("text", "").lower()
-                if name in chunk_text:
-                    intervals.append((chunk["start"], chunk["end"] + 3.0))
-            
-            # Merge overlapping/adjacent intervals
-            merged = []
-            if intervals:
-                intervals.sort(key=lambda x: x[0])
-                curr_start, curr_end = intervals[0]
-                for s, e in intervals[1:]:
-                    if s <= curr_end:
-                        curr_end = max(curr_end, e)
-                    else:
-                        merged.append((curr_start, curr_end))
-                        curr_start, curr_end = s, e
-                merged.append((curr_start, curr_end))
-            
-            # If the entity is never mentioned in the script text, default to showing it throughout
-            if not merged:
-                merged.append((0.0, audio_duration))
-                
-            ent["active_intervals"] = merged
-
-        # Pre-load PIL images for entity logos to avoid disk I/O in the frame loop
-        for ent in entities_list:
-            logo_path = ent.get("local_logo_path")
-            if logo_path and os.path.exists(logo_path):
-                try:
-                    ent["pil_logo"] = Image.open(logo_path).convert("RGBA")
-                except Exception as e:
-                    print(f"Failed to pre-load logo {logo_path}: {e}")
-                    ent["pil_logo"] = None
-            else:
-                ent["pil_logo"] = None
-        
+    # Longform: right-side logo stack (companies/people)
     if is_longform:
         branding_entities = []
         # Collect up to 4 entities to avoid overcrowding
@@ -9956,24 +9898,9 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     base_layers.append(disclosure)
     base_layers.extend(engagement_clips)
 
-    # ── ENTITY LOGO PIP (near avatar) ──────────────────────────────────────
-    if not is_longform and avatar_pip:
-        try:
-            entity_logo_clips = _create_entity_logo_pip_clips(
-                script_json, pip_position, audio_duration, cur_w, cur_h, accent_color, screenshot_intervals
-            )
-            for logo_clip, start_t, end_t in entity_logo_clips:
-                # Trim clip to active interval
-                logo_clip = logo_clip.subclipped(start_t, end_t).with_start(start_t)
-                base_layers.append(logo_clip)
-            if entity_logo_clips:
-                print(f"   🏷️ Entity logo PIP clips added: {len(entity_logo_clips)}")
-        except Exception as e:
-            print(f"   ⚠️ Entity logo PIP failed (non-fatal): {e}")
-
+# ══════════════════════════════════════════════════════════════════════
+# LONGFORM RETENTION UPGRADE: Wire in new premium visual layers
 # ═════════════════════════════════════════════════════════════════════
-    # LONGFORM RETENTION UPGRADE: Wire in new premium visual layers
-    # ════════════════════════════════════════════════════════════════════
     if not CI_LITE:
         snap_zoom_timestamps = []  # Used per-frame in make_final_frame
         
