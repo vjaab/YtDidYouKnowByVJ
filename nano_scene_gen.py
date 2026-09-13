@@ -246,6 +246,11 @@ Consider:
         return is_relevant, confidence, reason
         
     except Exception as e:
+        err_str = str(e)
+        # If quota exceeded, skip review and accept the image (assume it's relevant)
+        if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str or "quota" in err_str.lower():
+            print(f"  ⚠️ Gemini Vision quota exceeded, skipping review and accepting image")
+            return True, 0.8, "Quota exceeded - auto-accepted"
         print(f"  ⚠️ Gemini Vision review failed: {e}")
         return True, 0.5, f"Review failed: {e}"
 

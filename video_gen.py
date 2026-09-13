@@ -10529,8 +10529,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         pass
 
         entity_tags_img = None
-        if not is_longform and entities_list:
-            entity_tags_img = render_dynamic_entity_tags(entities_list, accent_color, t, audio_duration, FRAME_W, FRAME_H, screenshot_intervals=screenshot_intervals)
+        if not is_longform and key_entities:
+            entity_tags_img = render_dynamic_entity_tags(key_entities, accent_color, t, audio_duration, FRAME_W, FRAME_H, screenshot_intervals=screenshot_intervals)
 
         # Minimize Static Branding: Only pass transparency_img in the first 5 seconds for longform
         this_transparency_img = transparency_img if (not is_longform or t < 5.0) else None
