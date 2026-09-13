@@ -92,6 +92,7 @@ urllib3==2.6.3
 websockets==15.0.1
 yarl==1.22.0
 pydub
+pytesseract
 kaggle==1.6.17
 stable-ts
 torch==2.5.1

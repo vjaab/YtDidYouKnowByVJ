@@ -127,6 +127,172 @@ AudioSegment.converter = imageio_ffmpeg.get_ffmpeg_exe()
 
 CI_LITE = os.environ.get("CI_LITE", "0") == "1"
 
+# OCR Cache for evidence screenshots
+_EVIDENCE_OCR_CACHE = {}
+
+def _extract_text_with_pytesseract(image_path):
+    """Fallback OCR using pytesseract."""
+    try:
+        import pytesseract
+        img = Image.open(image_path)
+        img_w, img_h = img.size
+        
+        # Get detailed OCR data with bounding boxes
+        data = pytesseract.image_to_data(img, output_type=pytesseract.Output.DICT)
+        
+        valid_results = []
+        n_boxes = len(data['text'])
+        for i in range(n_boxes):
+            text = data['text'][i].strip()
+            conf = int(data['conf'][i]) if data['conf'][i] != '-1' else 0
+            if text and conf > 30:  # Filter low confidence
+                x1, y1 = data['left'][i], data['top'][i]
+                x2 = x1 + data['width'][i]
+                y2 = y1 + data['height'][i]
+                valid_results.append({
+                    "text": text,
+                    "bbox": [x1, y1, x2, y2],
+                    "confidence": conf / 100.0
+                })
+        return valid_results
+    except ImportError:
+        return []
+    except Exception as e:
+        print(f"⚠️ pytesseract OCR failed: {e}")
+        return []
+
+
+def extract_text_from_evidence_screenshot(image_path, gemini_api_key=None):
+    """
+    Extract text with bounding boxes from an evidence screenshot using Gemini Vision.
+    Falls back to pytesseract if Gemini is unavailable.
+    Returns a list of dicts: [{'text': str, 'bbox': [x1, y1, x2, y2], 'confidence': float}]
+    Coordinates are normalized 0-1 relative to image dimensions.
+    """
+    if image_path in _EVIDENCE_OCR_CACHE:
+        return _EVIDENCE_OCR_CACHE[image_path]
+    
+    # Try Gemini Vision first
+    if not gemini_api_key:
+        gemini_api_key = GEMINI_API_KEY
+    
+    if gemini_api_key:
+        try:
+            from google import genai
+            client = genai.Client(api_key=gemini_api_key)
+            
+            # Load and prepare image
+            img = Image.open(image_path)
+            img_w, img_h = img.size
+            
+            # Resize if too large (Gemini has limits)
+            max_dim = 2048
+            if max(img_w, img_h) > max_dim:
+                scale = max_dim / max(img_w, img_h)
+                new_w, new_h = int(img_w * scale), int(img_h * scale)
+                img = img.resize((new_w, new_h), Image.LANCZOS)
+                img_w, img_h = new_w, new_h
+            
+            # Convert to bytes
+            buf = io.BytesIO()
+            img.save(buf, format='PNG')
+            img_bytes = buf.getvalue()
+            
+            prompt = """Extract all readable text from this screenshot. Return ONLY a JSON array of objects with:
+- "text": the exact text string
+- "bbox": [x1, y1, x2, y2] normalized coordinates (0-1) where x1,y1 is top-left, x2,y2 is bottom-right
+- "confidence": 0-1 confidence score
+
+Include all text: headings, body text, code, buttons, navigation, etc. Group nearby words on the same line into single text entries. Ignore decorative text under 8px height."""
+            
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=[
+                    types.Part.from_bytes(data=img_bytes, mime_type="image/png"),
+                    prompt
+                ],
+                config=types.GenerateContentConfig(
+                    temperature=0.1,
+                    response_mime_type="application/json"
+                )
+            )
+            
+            raw = response.text.strip()
+            if "[" in raw and "]" in raw:
+                raw = raw[raw.find("["):raw.rfind("]") + 1]
+            ocr_results = json.loads(raw)
+            
+            # Validate and filter results
+            valid_results = []
+            for item in ocr_results:
+                if isinstance(item, dict) and "text" in item and "bbox" in item:
+                    text = item["text"].strip()
+                    bbox = item["bbox"]
+                    if text and len(bbox) == 4:
+                        # Denormalize bbox to original image coordinates
+                        x1 = max(0, min(1, bbox[0])) * img_w
+                        y1 = max(0, min(1, bbox[1])) * img_h
+                        x2 = max(0, min(1, bbox[2])) * img_w
+                        y2 = max(0, min(1, bbox[3])) * img_h
+                        valid_results.append({
+                            "text": text,
+                            "bbox": [x1, y1, x2, y2],
+                            "confidence": item.get("confidence", 0.8)
+                        })
+            
+            if valid_results:
+                _EVIDENCE_OCR_CACHE[image_path] = valid_results
+                print(f"📝 OCR extracted {len(valid_results)} text regions from evidence screenshot (Gemini)")
+                return valid_results
+                
+        except Exception as e:
+            print(f"⚠️ Gemini Vision OCR failed, trying pytesseract: {e}")
+    
+    # Fallback to pytesseract
+    print("🔄 Falling back to pytesseract for OCR...")
+    valid_results = _extract_text_with_pytesseract(image_path)
+    
+    if valid_results:
+        _EVIDENCE_OCR_CACHE[image_path] = valid_results
+        print(f"📝 OCR extracted {len(valid_results)} text regions from evidence screenshot (pytesseract)")
+        return valid_results
+    
+    print("⚠️ All OCR methods failed")
+    return []
+
+
+def match_spoken_words_to_ocr(ocr_results, word_timestamps, current_time, time_window=0.5):
+    """
+    Match currently spoken words (from word_timestamps) to OCR text regions.
+    Returns list of OCR items that match the spoken words at current_time.
+    """
+    if not ocr_results or not word_timestamps:
+        return []
+    
+    # Find words being spoken at current_time
+    spoken_words = []
+    for w in word_timestamps:
+        if w["start"] <= current_time <= w["end"]:
+            spoken_words.append(w["word"].lower().strip())
+        elif w["start"] > current_time:
+            break
+    
+    if not spoken_words:
+        return []
+    
+    # Match spoken words to OCR text (fuzzy matching)
+    matched = []
+    for ocr_item in ocr_results:
+        ocr_text = ocr_item["text"].lower()
+        # Check if any spoken word appears in the OCR text
+        for word in spoken_words:
+            clean_word = re.sub(r'[^\w]', '', word)
+            if len(clean_word) > 2 and clean_word in ocr_text:
+                matched.append(ocr_item)
+                break
+    
+    return matched
+
 FRAME_W, FRAME_H = 1080, 1920 # Default for Shorts
 IS_LONGFORM_ACTIVE = False
 def set_resolutions(is_longform=False):
@@ -5633,9 +5799,10 @@ def _longform_topic_transition_clips(script_json, audio_duration):
             
     return clips
 
-def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, is_short=False, topic_context=""):
+def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, is_short=False, topic_context="", word_timestamps=None, gemini_api_key=None):
     """
     Shows a secondary 'Evidence' or 'Use Case' screenshot during the analytical section.
+    Highlights words in the screenshot that match the currently spoken audio.
     
     Args:
         evidence_path: Path to the evidence screenshot
@@ -5643,6 +5810,8 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
         is_github_readme: If True, extends duration to 12s for GitHub README readability
         is_short: If True, cycle between evidence (10s) and topic video/image (2s) throughout
         topic_context: Topic context for generating day-specific topic visuals
+        word_timestamps: List of word timestamp dicts for real-time word highlighting
+        gemini_api_key: Gemini API key for OCR text extraction
     """
     if not evidence_path or not os.path.exists(evidence_path):
         return []
@@ -5655,6 +5824,67 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
         arr_rgba = np.array(canvas.convert("RGBA"))
         arr_rgb = arr_rgba[:, :, :3]
         arr_mask = (arr_rgba[:, :, 3] / 255.0).astype(float)
+        
+        # Extract OCR text from evidence screenshot for word highlighting
+        ocr_results = []
+        if word_timestamps:
+            ocr_results = extract_text_from_evidence_screenshot(evidence_path, gemini_api_key)
+            if ocr_results:
+                print(f"🔍 Evidence OCR: {len(ocr_results)} text regions extracted for highlighting")
+        
+        def _draw_highlights(frame_rgb, current_time):
+            """Draw highlight overlays on frame for currently spoken words."""
+            if not ocr_results or not word_timestamps:
+                return frame_rgb
+            
+            matched_items = match_spoken_words_to_ocr(ocr_results, word_timestamps, current_time)
+            if not matched_items:
+                return frame_rgb
+            
+            # Convert to PIL for drawing
+            pil_frame = Image.fromarray(frame_rgb).convert("RGBA")
+            draw = ImageDraw.Draw(pil_frame)
+            
+            # Get original image dimensions for coordinate mapping
+            orig_img = Image.open(evidence_path)
+            orig_w, orig_h = orig_img.size
+            
+            # Calculate the transform from original image to displayed frame
+            # The screenshot canvas applies scaling and positioning
+            canvas_w, canvas_h = canvas.size
+            
+            # Scale factors from original to canvas
+            scale_x = canvas_w / orig_w
+            scale_y = canvas_h / orig_h
+            
+            # Canvas position in frame (centered)
+            canvas_x = (target_w - canvas_w) // 2
+            canvas_y = (target_h - canvas_h) // 2
+            
+            highlight_color = (255, 214, 0, 180)  # Yellow highlight with transparency
+            border_color = (255, 214, 0, 255)     # Yellow border
+            
+            for item in matched_items:
+                bbox = item["bbox"]  # [x1, y1, x2, y2] in original image coordinates
+                x1, y1, x2, y2 = bbox
+                
+                # Map to canvas coordinates
+                cx1 = int(x1 * scale_x) + canvas_x
+                cy1 = int(y1 * scale_y) + canvas_y
+                cx2 = int(x2 * scale_x) + canvas_x
+                cy2 = int(y2 * scale_y) + canvas_y
+                
+                # Draw highlight rectangle with rounded corners
+                padding = 4
+                draw.rounded_rectangle(
+                    [cx1 - padding, cy1 - padding, cx2 + padding, cy2 + padding],
+                    radius=6,
+                    fill=highlight_color,
+                    outline=border_color,
+                    width=2
+                )
+            
+            return np.array(pil_frame.convert("RGB"))
         
         if is_short:
             # For shorts: cycle evidence screenshot (10s) + topic visual (2s) throughout
@@ -5769,6 +5999,8 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
                         x1, x2 = max(0, cx - new_w // 2), min(w, cx + new_w // 2)
                         cropped = evidence_frame[y1:y2, x1:x2]
                         evidence_frame = cv2.resize(cropped, (target_w, target_h))
+                    # Apply word highlighting
+                    evidence_frame = _draw_highlights(evidence_frame, t)
                     return evidence_frame
                 elif in_evidence_to_topic:
                     # Crossfade from evidence to topic visual (0.5s)
@@ -5787,6 +6019,8 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
                         x1, x2 = max(0, cx - new_w // 2), min(w, cx + new_w // 2)
                         cropped = evidence_frame[y1:y2, x1:x2]
                         evidence_frame = cv2.resize(cropped, (target_w, target_h))
+                    # Apply word highlighting to evidence portion
+                    evidence_frame = _draw_highlights(evidence_frame, t)
                     # Blend evidence frame with topic visual
                     return cv2.addWeighted(evidence_frame, 1.0 - progress, topic_visual_arr, progress, 0)
                 elif cycle_pos < cycle_duration - transition_duration:
@@ -5815,6 +6049,8 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
                         x1, x2 = max(0, cx - new_w // 2), min(w, cx + new_w // 2)
                         cropped = evidence_frame[y1:y2, x1:x2]
                         evidence_frame = cv2.resize(cropped, (target_w, target_h))
+                    # Apply word highlighting to evidence portion
+                    evidence_frame = _draw_highlights(evidence_frame, t)
                     # Blend topic visual with evidence frame
                     return cv2.addWeighted(topic_visual_arr, 1.0 - progress, evidence_frame, progress, 0)
             
@@ -5863,16 +6099,37 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
             dur = min(max_dur, duration - start - 5.0)
             
             if dur > 1.0:
-                clip = ImageClip(arr_rgb, duration=dur)
-                mclip = VideoClip(lambda t: arr_mask, is_mask=True, duration=dur)
-                clip = clip.with_mask(mclip)
+                # Use VideoClip for frame-by-frame highlighting
+                def make_longform_frame(t):
+                    # Calculate progress within the evidence clip duration
+                    progress = t / max(dur, 0.01)
+                    
+                    # Subtle ken burns zoom: 1.0 -> 1.12 over the evidence duration
+                    zoom = 1.0 + 0.12 * progress
+                    evidence_frame = arr_rgb
+                    if zoom > 1.0:
+                        h, w = evidence_frame.shape[:2]
+                        new_h, new_w = int(h / zoom), int(w / zoom)
+                        cy, cx = h // 2, w // 2
+                        y1, y2 = max(0, cy - new_h // 2), min(h, cy + new_h // 2)
+                        x1, x2 = max(0, cx - new_w // 2), min(w, cx + new_w // 2)
+                        cropped = evidence_frame[y1:y2, x1:x2]
+                        evidence_frame = cv2.resize(cropped, (target_w, target_h))
+                    
+                    # Apply word highlighting (t is relative to clip start, add start offset for global time)
+                    evidence_frame = _draw_highlights(evidence_frame, t + start)
+                    return evidence_frame
                 
-                # Subtle zoom only for evidence
-                clip = clip.resized(lambda t, d=dur: 1.0 + 0.12 * easeInOutQuad(t / d))
+                def make_longform_mask(t):
+                    return arr_mask
+                
+                clip = VideoClip(make_longform_frame, duration=dur)
+                mclip = VideoClip(make_longform_mask, is_mask=True, duration=dur)
+                clip = clip.with_mask(mclip)
                 clip = clip.with_position("center").with_start(start)
                 clip = clip.with_effects([vfx.CrossFadeIn(0.6), vfx.CrossFadeOut(0.6)])
                 return [clip]
-                
+            
             return []
     except Exception as e:
         print(f"Evidence screenshot clip error: {e}")
@@ -9544,8 +9801,18 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     evidence_screenshot_path = script_json.get("evidence_screenshot_path")
     is_github_readme = script_json.get("is_github_readme", False)
     topic_context = script_json.get("topic", "") or script_json.get("title", "") or ""
+    # Get word timestamps for real-time highlighting
+    word_timestamps = script_json.get("word_timestamps", [])
     if evidence_screenshot_path and os.path.exists(evidence_screenshot_path):
-        evidence_clips = _evidence_screenshot_clip(evidence_screenshot_path, audio_duration, is_github_readme=is_github_readme, is_short=not is_longform, topic_context=topic_context)
+        evidence_clips = _evidence_screenshot_clip(
+            evidence_screenshot_path, 
+            audio_duration, 
+            is_github_readme=is_github_readme, 
+            is_short=not is_longform, 
+            topic_context=topic_context,
+            word_timestamps=word_timestamps,
+            gemini_api_key=GEMINI_API_KEY
+        )
         base_layers.extend(evidence_clips)
         if evidence_clips:
             log_type = "GitHub README" if is_github_readme else "Evidence"
