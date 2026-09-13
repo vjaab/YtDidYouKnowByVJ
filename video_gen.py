@@ -293,6 +293,311 @@ def match_spoken_words_to_ocr(ocr_results, word_timestamps, current_time, time_w
     
     return matched
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# TOPIC VISUAL FETCHER & REVIEWER FOR SHORTS EVIDENCE SCREENSHOTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_TOPIC_VISUAL_CACHE = {}
+
+def _fetch_topic_visuals_from_pexels(topic_context, max_results=5):
+    """
+    Fetch relevant photos from Pexels/Pixabay based on topic context.
+    Returns list of image URLs with descriptions.
+    """
+    try:
+        from pexels_fetcher import _search_pexels_photos, _search_pixabay_photos, PEXELS_API_KEY, PIXABAY_API_KEY
+        
+        # Extract keywords from topic context for search
+        keywords = _extract_search_keywords(topic_context)
+        if not keywords:
+            keywords = ["technology", "AI", "coding", "software development"]
+        
+        all_results = []
+        for keyword in keywords[:3]:  # Try up to 3 keywords
+            # Try Pexels first
+            if PEXELS_API_KEY:
+                results = _search_pexels_photos(keyword, orientation="portrait")
+                all_results.extend(results)
+            
+            # Try Pixabay as fallback
+            if PIXABAY_API_KEY and len(all_results) < max_results:
+                results = _search_pixabay_photos(keyword, orientation="portrait")
+                all_results.extend(results)
+            
+            if len(all_results) >= max_results:
+                break
+        
+        # Deduplicate by ID
+        seen = set()
+        unique_results = []
+        for r in all_results:
+            if r["id"] not in seen:
+                seen.add(r["id"])
+                unique_results.append(r)
+        
+        return unique_results[:max_results]
+        
+    except Exception as e:
+        print(f"⚠️ Failed to fetch topic visuals from Pexels/Pixabay: {e}")
+        return []
+
+
+def _extract_search_keywords(topic_context):
+    """Extract relevant search keywords from topic context."""
+    if not topic_context:
+        return []
+    
+    # Common tech keywords to prioritize
+    tech_keywords = [
+        "artificial intelligence", "machine learning", "deep learning", "neural network",
+        "LLM", "GPT", "Claude", "Gemini", "transformer", "generative AI",
+        "python", "javascript", "typescript", "rust", "go", "programming",
+        "github", "open source", "repository", "code", "software development",
+        "API", "microservices", "cloud", "AWS", "GCP", "azure", "kubernetes",
+        "docker", "container", "devops", "CI/CD", "deployment",
+        "database", "SQL", "postgresql", "mongodb", "redis",
+        "frontend", "react", "vue", "nextjs", "tailwind",
+        "backend", "nodejs", "fastapi", "django", "flask",
+        "mobile", "iOS", "android", "flutter", "react native",
+        "cybersecurity", "encryption", "authentication", "OAuth",
+        "blockchain", "crypto", "web3", "smart contract",
+        "data science", "pandas", "numpy", "visualization",
+        "computer vision", "NLP", "natural language processing"
+    ]
+    
+    topic_lower = topic_context.lower()
+    found_keywords = []
+    
+    for kw in tech_keywords:
+        if kw.lower() in topic_lower:
+            found_keywords.append(kw)
+    
+    # If no tech keywords found, extract capitalized words and nouns
+    if not found_keywords:
+        import re
+        # Extract words that look like proper nouns or tech terms
+        words = re.findall(r'\b[A-Z][a-z]+\b|\b[A-Z]{2,}\b', topic_context)
+        found_keywords = list(set(words))[:5]
+    
+    return found_keywords[:5]
+
+
+def _download_image(url, output_path):
+    """Download image from URL to local path."""
+    try:
+        import requests
+        r = requests.get(url, timeout=30, stream=True)
+        if r.status_code == 200:
+            with open(output_path, "wb") as f:
+                for chunk in r.iter_content(8192):
+                    f.write(chunk)
+            return True
+    except Exception as e:
+        print(f"⚠️ Failed to download image: {e}")
+    return False
+
+
+def _review_image_relevance_gemini(image_path, topic_context, gemini_api_key=None):
+    """
+    Use Gemini Vision to review if the downloaded image is relevant to the topic.
+    Returns (is_relevant: bool, confidence: float, reason: str)
+    """
+    if not gemini_api_key:
+        gemini_api_key = GEMINI_API_KEY
+    if not gemini_api_key:
+        return True, 0.5, "No API key for review"
+    
+    try:
+        from google import genai
+        from google.genai import types
+        
+        client = genai.Client(api_key=gemini_api_key)
+        
+        # Load and prepare image
+        img = Image.open(image_path)
+        img_w, img_h = img.size
+        
+        # Resize if too large
+        max_dim = 2048
+        if max(img_w, img_h) > max_dim:
+            scale = max_dim / max(img_w, img_h)
+            new_w, new_h = int(img_w * scale), int(img_h * scale)
+            img = img.resize((new_w, new_h), Image.LANCZOS)
+        
+        buf = io.BytesIO()
+        img.save(buf, format='PNG')
+        img_bytes = buf.getvalue()
+        
+        prompt = f"""Analyze this image and determine if it's visually relevant to the topic: "{topic_context}"
+
+Topic context: {topic_context}
+
+Return ONLY a JSON object:
+{{
+  "is_relevant": true/false,
+  "confidence": 0.0-1.0,
+  "reason": "Brief explanation of why the image is or isn't relevant to the topic"
+}}
+
+Consider:
+- Does the image show concepts, tools, logos, or visuals related to the topic?
+- Is it generic stock photo filler, or does it have specific relevance?
+- Would a viewer understand the connection between this image and the topic?"""
+        
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=[
+                types.Part.from_bytes(data=img_bytes, mime_type="image/png"),
+                prompt
+            ],
+            config=types.GenerateContentConfig(
+                temperature=0.1,
+                response_mime_type="application/json"
+            )
+        )
+        
+        raw = response.text.strip()
+        if "{" in raw and "}" in raw:
+            raw = raw[raw.find("{"):raw.rfind("}") + 1]
+        result = json.loads(raw)
+        
+        is_relevant = result.get("is_relevant", False)
+        confidence = result.get("confidence", 0.5)
+        reason = result.get("reason", "No reason provided")
+        
+        return is_relevant, confidence, reason
+        
+    except Exception as e:
+        print(f"⚠️ Gemini Vision review failed: {e}")
+        return True, 0.5, f"Review failed: {e}"
+
+
+def _get_or_generate_topic_visual(topic_context, target_w, target_h, gemini_api_key=None, max_attempts=3):
+    """
+    Fetch a relevant topic visual from Pexels/Pixabay, review with Gemini Vision,
+    and regenerate if not relevant. Returns numpy array of the visual.
+    """
+    cache_key = f"{topic_context}_{target_w}x{target_h}"
+    if cache_key in _TOPIC_VISUAL_CACHE:
+        return _TOPIC_VISUAL_CACHE[cache_key]
+    
+    # Fetch candidate images
+    candidates = _fetch_topic_visuals_from_pexels(topic_context, max_results=max_attempts * 2)
+    
+    if not candidates:
+        print(f"⚠️ No candidate images found for topic: {topic_context}")
+        return _generate_fallback_topic_visual(topic_context, target_w, target_h)
+    
+    import tempfile
+    import os
+    
+    for attempt, candidate in enumerate(candidates):
+        try:
+            # Download image to temp file
+            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
+                temp_path = tmp.name
+            
+            if not _download_image(candidate["link"], temp_path):
+                continue
+            
+            # Review with Gemini Vision
+            is_relevant, confidence, reason = _review_image_relevance_gemini(
+                temp_path, topic_context, gemini_api_key
+            )
+            
+            print(f"🔍 Topic visual review (attempt {attempt+1}): {'RELEVANT' if is_relevant else 'NOT RELEVANT'} (confidence: {confidence:.2f}) - {reason}")
+            
+            if is_relevant and confidence >= 0.6:
+                # Load and resize the approved image
+                img = Image.open(temp_path).convert("RGB")
+                img = ImageOps.fit(img, (target_w, target_h), Image.LANCZOS)
+                arr = np.array(img)
+                
+                # Add subtle label
+                pil_img = Image.fromarray(arr)
+                draw = ImageDraw.Draw(pil_img)
+                font = gf(40, bold=True)
+                label = "TOPIC VISUAL"
+                tw, th = draw.textbbox((0, 0), label, font=font)[2:]
+                draw.text(((target_w - tw)//2, 15), label, font=font, fill=(255, 255, 255, 230))
+                draw.line([(40, target_h - 10), (target_w - 40, target_h - 10)], fill=(0, 240, 255, 200), width=3)
+                
+                arr = np.array(pil_img)
+                
+                # Clean up
+                try:
+                    os.unlink(temp_path)
+                except:
+                    pass
+                
+                _TOPIC_VISUAL_CACHE[cache_key] = arr
+                return arr
+            
+            # Clean up failed attempt
+            try:
+                os.unlink(temp_path)
+            except:
+                pass
+                
+        except Exception as e:
+            print(f"⚠️ Error processing candidate image: {e}")
+            continue
+    
+    # All attempts failed or not relevant enough - use fallback
+    print(f"⚠️ All topic visual candidates rejected, using fallback for: {topic_context}")
+    return _generate_fallback_topic_visual(topic_context, target_w, target_h)
+
+
+def _generate_fallback_topic_visual(topic_context, target_w, target_h):
+    """Generate a clean fallback visual when no relevant images found."""
+    # Create a gradient background with topic text
+    img = Image.new("RGB", (target_w, target_h), (15, 15, 25))
+    draw = ImageDraw.Draw(img)
+    
+    # Gradient background
+    for y in range(target_h):
+        ratio = y / target_h
+        r = int(15 + ratio * 20)
+        g = int(15 + ratio * 15)
+        b = int(25 + ratio * 30)
+        draw.line([(0, y), (target_w, y)], fill=(r, g, b))
+    
+    # Topic text
+    font = gf(56, bold=True)
+    # Wrap topic context
+    words = topic_context.split()
+    lines = []
+    current = []
+    for w in words:
+        test = " ".join(current + [w])
+        tw, _ = draw.textbbox((0, 0), test, font=font)[2:]
+        if tw <= target_w * 0.85:
+            current.append(w)
+        else:
+            if current:
+                lines.append(" ".join(current))
+            current = [w]
+    if current:
+        lines.append(" ".join(current))
+    lines = lines[:4]  # Max 4 lines
+    
+    line_h = 70
+    total_h = len(lines) * line_h
+    start_y = (target_h - total_h) // 2
+    
+    for i, line in enumerate(lines):
+        tw, th = draw.textbbox((0, 0), line, font=font)[2:]
+        y = start_y + i * line_h
+        # Shadow
+        draw.text((target_w//2 + 3, y + 3), line, font=font, fill=(0, 0, 0, 180), anchor="mm")
+        # Text
+        draw.text((target_w//2, y), line, font=font, fill=(255, 255, 255, 255), anchor="mm")
+    
+    # Accent line
+    draw.line([(target_w//4, target_h - 60), (3*target_w//4, target_h - 60)], fill=(0, 240, 255, 200), width=4)
+    
+    return np.array(img)
+
 FRAME_W, FRAME_H = 1080, 1920 # Default for Shorts
 IS_LONGFORM_ACTIVE = False
 def set_resolutions(is_longform=False):
@@ -5890,81 +6195,11 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
             # For shorts: cycle evidence screenshot (10s) + topic visual (2s) throughout
             from moviepy import VideoClip
             
-            # Generate topic-specific visual from the evidence screenshot itself
-            # Different days show different crops/zooms of the evidence to highlight details
-            day = datetime.now().weekday()
-            
-            # Define 7 different detail views of the evidence screenshot
-            def _generate_topic_visual_from_evidence(day, arr_rgb, target_w, target_h):
-                """Generate a detail view from the evidence screenshot based on day."""
-                img_h, img_w = arr_rgb.shape[:2]
-                
-                # 7 different zoom/crop strategies to show relevant details
-                detail_strategies = [
-                    # Monday: Center focus - zoom into middle region
-                    {"zoom": 1.8, "offset_x": 0.5, "offset_y": 0.5, "label": "DETAIL VIEW"},
-                    # Tuesday: Top portion - headers, titles, navigation
-                    {"zoom": 1.6, "offset_x": 0.5, "offset_y": 0.25, "label": "TOP SECTION"},
-                    # Wednesday: Bottom portion - code, results, footer
-                    {"zoom": 1.6, "offset_x": 0.5, "offset_y": 0.75, "label": "BOTTOM SECTION"},
-                    # Thursday: Left side - navigation, sidebar, file tree
-                    {"zoom": 1.6, "offset_x": 0.3, "offset_y": 0.5, "label": "LEFT PANEL"},
-                    # Friday: Right side - main content, editor, output
-                    {"zoom": 1.6, "offset_x": 0.7, "offset_y": 0.5, "label": "RIGHT PANEL"},
-                    # Saturday: Upper-left - menu, toolbar, header
-                    {"zoom": 2.0, "offset_x": 0.25, "offset_y": 0.25, "label": "HEADER AREA"},
-                    # Sunday: Center detail - specific element, button, metric
-                    {"zoom": 2.5, "offset_x": 0.5, "offset_y": 0.5, "label": "CLOSE-UP"},
-                ]
-                
-                strategy = detail_strategies[day % 7]
-                zoom = strategy["zoom"]
-                offset_x = strategy["offset_x"]
-                offset_y = strategy["offset_y"]
-                label = strategy["label"]
-                
-                # Calculate crop region
-                crop_h = int(target_h / zoom)
-                crop_w = int(target_w / zoom)
-                
-                center_y = int(img_h * offset_y)
-                center_x = int(img_w * offset_x)
-                
-                y1 = max(0, center_y - crop_h // 2)
-                y2 = min(img_h, y1 + crop_h)
-                x1 = max(0, center_x - crop_w // 2)
-                x2 = min(img_w, x1 + crop_w)
-                
-                # Adjust if crop goes out of bounds
-                if y2 - y1 < crop_h:
-                    y1 = max(0, y2 - crop_h)
-                if x2 - x1 < crop_w:
-                    x1 = max(0, x2 - crop_w)
-                
-                cropped = arr_rgb[y1:y2, x1:x2]
-                detail_frame = cv2.resize(cropped, (target_w, target_h))
-                
-                # Add subtle label overlay
-                overlay = detail_frame.copy()
-                font = gf(48, bold=True)
-                label_text = label
-                # Draw label at top
-                cv2.rectangle(overlay, (0, 0), (target_w, 70), (0, 0, 0), -1)
-                cv2.addWeighted(overlay, 0.7, detail_frame, 0.3, 0, detail_frame)
-                
-                # Add label text using PIL for better quality
-                detail_pil = Image.fromarray(detail_frame)
-                draw = ImageDraw.Draw(detail_pil)
-                tw, th = draw.textbbox((0, 0), label_text, font=font)[2:]
-                draw.text(((target_w - tw)//2, 15), label_text, font=font, fill=(255, 255, 255, 230))
-                
-                # Add accent line at bottom
-                draw.line([(40, target_h - 10), (target_w - 40, target_h - 10)], fill=(0, 240, 255, 200), width=3)
-                
-                return np.array(detail_pil)
-            
-            # Generate the topic visual from evidence
-            topic_visual_arr = _generate_topic_visual_from_evidence(day, arr_rgb, target_w, target_h)
+            # Generate topic-specific visual from Pexels/Pixabay with Gemini Vision review
+            print(f"🎨 Generating topic visual for: {topic_context[:60]}...")
+            topic_visual_arr = _get_or_generate_topic_visual(
+                topic_context, target_w, target_h, gemini_api_key=gemini_api_key
+            )
             topic_visual_mask = np.ones((target_h, target_w), dtype=float)
             
             # Create cycling pattern: 10s evidence + 2s topic visual = 12s cycle

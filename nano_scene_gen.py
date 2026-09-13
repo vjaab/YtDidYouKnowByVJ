@@ -6,21 +6,326 @@ creating the @vaibhavsisinty-style visual sync where backgrounds change
 every 2-3 seconds to match exactly what's being spoken.
 
 Pipeline:
-  1. For each chunk that has a `nano_visual_prompt`, generate an Imagen image
-  2. If a chunk lacks a prompt, use Gemini Flash to generate one on-the-fly
-  3. If Imagen quota exhausts, reuse the last successful image (graceful degradation)
+  1. For each chunk that has a `nano_visual_prompt`, first try Pexels/Pixabay with relevance review
+  2. If no relevant stock image found, generate via Imagen 4.0
+  3. If Imagen quota exhausts, fallback chain: HuggingFace → Cloudflare → Pollinations
+  4. If all AI generation fails, reuse last successful image (graceful degradation)
 """
 
 import os
+import io
+import json
 import time
 import random
+import requests
+import shutil
+import tempfile
 from datetime import datetime
+from PIL import Image, ImageOps
 from google import genai
-from config import GEMINI_API_KEY, OUTPUT_DIR
+from google.genai import types
+from config import GEMINI_API_KEY, OUTPUT_DIR, HF_TOKEN, CF_ACCOUNT_ID, CF_API_TOKEN, HAS_CF_FALLBACK
 
 TODAY = datetime.now().strftime("%Y-%m-%d")
 
 client = genai.Client(api_key=GEMINI_API_KEY)
+
+PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")
+PIXABAY_API_KEY = os.getenv("PIXABAY_API_KEY", "")
+
+_NANO_VISUAL_CACHE = {}
+
+
+def _extract_chunk_keywords(chunk_text, topic_context=""):
+    """Extract relevant search keywords from chunk text for Pexels search."""
+    import re
+    
+    tech_keywords = [
+        "artificial intelligence", "machine learning", "deep learning", "neural network",
+        "llm", "gpt", "claude", "gemini", "transformer", "generative ai",
+        "python", "javascript", "typescript", "rust", "go", "programming",
+        "github", "open source", "repository", "code", "software development",
+        "api", "microservices", "cloud", "aws", "gcp", "azure", "kubernetes",
+        "docker", "container", "devops", "ci/cd", "deployment",
+        "database", "sql", "postgresql", "mongodb", "redis",
+        "frontend", "react", "vue", "nextjs", "tailwind",
+        "backend", "nodejs", "fastapi", "django", "flask",
+        "mobile", "ios", "android", "flutter", "react native",
+        "cybersecurity", "encryption", "authentication", "oauth",
+        "blockchain", "crypto", "web3", "smart contract",
+        "data science", "pandas", "numpy", "visualization",
+        "computer vision", "nlp", "natural language processing",
+        "gpu", "tpu", "semiconductor", "chip", "nvidia", "intel", "amd",
+        "robot", "humanoid", "automation", "autonomous",
+        "server", "data center", "infrastructure", "cooling",
+        "quantum", "algorithm", "terminal", "coding", "programmer",
+        "fiber optic", "satellite", "dna", "microscope", "supercomputer"
+    ]
+    
+    text_lower = (chunk_text + " " + topic_context).lower()
+    found_keywords = []
+    
+    for kw in tech_keywords:
+        if kw in text_lower:
+            found_keywords.append(kw)
+    
+    if not found_keywords:
+        words = re.findall(r'\b[A-Z][a-z]+\b|\b[A-Z]{2,}\b', chunk_text)
+        found_keywords = list(set(words))[:3]
+    
+    return found_keywords[:3]
+
+
+def _search_pexels_photos(query, orientation="portrait", per_page=5):
+    """Search Pexels for photos matching the query."""
+    if not PEXELS_API_KEY:
+        return []
+    try:
+        r = requests.get(
+            "https://api.pexels.com/v1/search",
+            headers={"Authorization": PEXELS_API_KEY},
+            params={"query": query, "per_page": per_page, "orientation": orientation},
+            timeout=15
+        )
+        if r.status_code != 200:
+            return []
+            
+        results = []
+        for p in r.json().get("photos", []):
+            url = p.get("src", {}).get("large2x") or p.get("src", {}).get("large")
+            if url:
+                results.append({
+                    "id": f"pexels_{p.get('id')}",
+                    "link": url,
+                    "desc": p.get("alt", query),
+                    "type": "photo"
+                })
+        return results
+    except Exception as e:
+        print(f"  ⚠️ Pexels search failed for '{query}': {e}")
+        return []
+
+
+def _search_pixabay_photos(query, orientation="portrait", per_page=5):
+    """Search Pixabay for photos matching the query."""
+    if not PIXABAY_API_KEY:
+        return []
+    try:
+        r = requests.get(
+            "https://pixabay.com/api/",
+            params={
+                "key": PIXABAY_API_KEY,
+                "q": query,
+                "per_page": per_page,
+                "orientation": orientation,
+                "image_type": "photo",
+                "order": "popular",
+                "category": "computer"
+            },
+            timeout=15
+        )
+        if r.status_code != 200:
+            return []
+            
+        results = []
+        for p in r.json().get("hits", []):
+            url = p.get("largeImageURL") or p.get("webformatURL")
+            if url:
+                results.append({
+                    "id": f"pixabay_{p.get('id')}",
+                    "link": url,
+                    "desc": p.get("tags", query),
+                    "type": "photo"
+                })
+        return results
+    except Exception as e:
+        print(f"  ⚠️ Pixabay search failed for '{query}': {e}")
+        return []
+
+
+def _download_image(url, output_path):
+    """Download image from URL to local path."""
+    try:
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        r = requests.get(url, headers=headers, timeout=30, stream=True)
+        if r.status_code == 200:
+            with open(output_path, "wb") as f:
+                for chunk in r.iter_content(8192):
+                    f.write(chunk)
+            return True
+    except Exception as e:
+        print(f"  ⚠️ Failed to download image: {e}")
+    return False
+
+
+def _crop_to_9_16(image_path, output_path):
+    """Crop image to 9:16 aspect ratio (1080x1920)."""
+    try:
+        img = Image.open(image_path).convert("RGB")
+        w, h = img.size
+        target_h = int(w * 16 / 9)
+        if target_h <= h:
+            top = (h - target_h) // 2
+            img = img.crop((0, top, w, top + target_h))
+        else:
+            target_w = int(h * 9 / 16)
+            left = (w - target_w) // 2
+            img = img.crop((left, 0, left + target_w, h))
+        img = img.resize((1080, 1920), Image.LANCZOS)
+        img.save(output_path, "JPEG", quality=90)
+        return True
+    except Exception as e:
+        print(f"  ⚠️ Failed to crop image: {e}")
+        return False
+
+
+def _review_image_relevance_gemini(image_path, chunk_text, topic_context, gemini_api_key=None):
+    """
+    Use Gemini Vision to review if the downloaded image is relevant to the chunk topic.
+    Returns (is_relevant: bool, confidence: float, reason: str)
+    """
+    if not gemini_api_key:
+        gemini_api_key = GEMINI_API_KEY
+    if not gemini_api_key:
+        return True, 0.5, "No API key for review"
+    
+    try:
+        review_client = genai.Client(api_key=gemini_api_key)
+        
+        img = Image.open(image_path)
+        img_w, img_h = img.size
+        
+        max_dim = 2048
+        if max(img_w, img_h) > max_dim:
+            scale = max_dim / max(img_w, img_h)
+            new_w, new_h = int(img_w * scale), int(img_h * scale)
+            img = img.resize((new_w, new_h), Image.LANCZOS)
+        
+        buf = io.BytesIO()
+        img.save(buf, format='PNG')
+        img_bytes = buf.getvalue()
+        
+        prompt = f"""Analyze this image and determine if it's visually relevant to the spoken content.
+
+Spoken text: "{chunk_text}"
+Topic context: "{topic_context}"
+
+Return ONLY a JSON object:
+{{
+  "is_relevant": true/false,
+  "confidence": 0.0-1.0,
+  "reason": "Brief explanation of why the image is or isn't relevant"
+}}
+
+Consider:
+- Does the image show concepts, tools, logos, or visuals related to the spoken text?
+- Is it generic stock photo filler, or does it have specific relevance to the technical topic?
+- Would a viewer understand the connection between this image and what's being said?"""
+        
+        response = review_client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=[
+                types.Part.from_bytes(data=img_bytes, mime_type="image/png"),
+                prompt
+            ],
+            config=types.GenerateContentConfig(
+                temperature=0.1,
+                response_mime_type="application/json"
+            )
+        )
+        
+        raw = response.text.strip()
+        if "{" in raw and "}" in raw:
+            raw = raw[raw.find("{"):raw.rfind("}") + 1]
+        result = json.loads(raw)
+        
+        is_relevant = result.get("is_relevant", False)
+        confidence = result.get("confidence", 0.5)
+        reason = result.get("reason", "No reason provided")
+        
+        return is_relevant, confidence, reason
+        
+    except Exception as e:
+        print(f"  ⚠️ Gemini Vision review failed: {e}")
+        return True, 0.5, f"Review failed: {e}"
+
+
+def _fetch_and_review_pexels_candidates(chunk, topic_context, max_attempts=3):
+    """
+    Fetch candidate images from Pexels/Pixabay, review with Gemini Vision,
+    and return the first relevant image path. Returns None if all fail.
+    """
+    import json
+    
+    cache_key = f"{chunk.get('chunk_id')}_{topic_context[:50]}"
+    if cache_key in _NANO_VISUAL_CACHE:
+        return _NANO_VISUAL_CACHE[cache_key]
+    
+    keywords = _extract_chunk_keywords(chunk.get("text", ""), topic_context)
+    if not keywords:
+        keywords = ["technology", "AI", "software development"]
+    
+    all_candidates = []
+    for keyword in keywords:
+        pexels_results = _search_pexels_photos(keyword, orientation="portrait", per_page=3)
+        all_candidates.extend(pexels_results)
+        
+        if len(all_candidates) < max_attempts:
+            pixabay_results = _search_pixabay_photos(keyword, orientation="portrait", per_page=3)
+            all_candidates.extend(pixabay_results)
+        
+        if len(all_candidates) >= max_attempts * 2:
+            break
+    
+    seen = set()
+    unique_candidates = []
+    for c in all_candidates:
+        if c["id"] not in seen:
+            seen.add(c["id"])
+            unique_candidates.append(c)
+    
+    if not unique_candidates:
+        return None
+    
+    for attempt, candidate in enumerate(unique_candidates[:max_attempts * 2]):
+        try:
+            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
+                temp_path = tmp.name
+            
+            if not _download_image(candidate["link"], temp_path):
+                continue
+            
+            if not _crop_to_9_16(temp_path, temp_path):
+                try:
+                    os.unlink(temp_path)
+                except:
+                    pass
+                continue
+            
+            is_relevant, confidence, reason = _review_image_relevance_gemini(
+                temp_path, chunk.get("text", ""), topic_context
+            )
+            
+            print(f"  🔍 Pexels review (attempt {attempt+1}): {'RELEVANT' if is_relevant else 'NOT RELEVANT'} (confidence: {confidence:.2f}) - {reason[:80]}")
+            
+            if is_relevant and confidence >= 0.6:
+                output_path = os.path.join(OUTPUT_DIR, f"nano_pexels_{chunk.get('chunk_id')}_{TODAY}.jpg")
+                import shutil
+                shutil.move(temp_path, output_path)
+                
+                _NANO_VISUAL_CACHE[cache_key] = output_path
+                return output_path
+            
+            try:
+                os.unlink(temp_path)
+            except:
+                pass
+                
+        except Exception as e:
+            print(f"  ⚠️ Error processing candidate image: {e}")
+            continue
+    
+    return None
 
 
 def _generate_missing_prompts(chunks, headline, style_guide, aspect_ratio="9:16"):
@@ -307,7 +612,15 @@ def _generate_imagen_image(prompt, output_path, aspect_ratio="9:16"):
 
 def generate_nano_scene_visuals(chunks, headline, style_guide="", aspect_ratio="9:16"):
     """
-    Main entry point: generates one Imagen 4.0 background image per chunk.
+    Main entry point: generates one background image per chunk (2-3 second visual sync).
+    
+    Priority order:
+    1. Pexels/Pixabay stock photos with Gemini Vision relevance review
+    2. Imagen 4.0 AI generation
+    3. HuggingFace FLUX.1 Schnell
+    4. Cloudflare Workers AI FLUX.1 Schnell
+    5. Pollinations AI (free, no-key)
+    6. Reuse last successful image (graceful degradation)
 
     Args:
         chunks: List of chunk dicts with 'chunk_id', 'text', and optionally 'nano_visual_prompt'
@@ -321,19 +634,21 @@ def generate_nano_scene_visuals(chunks, headline, style_guide="", aspect_ratio="
         return chunks
 
     total = len(chunks)
-    print(f"\n🎬 NANO-SCENE ENGINE: Generating {total} per-sentence backgrounds...")
+    print(f"\n🎬 NANO-SCENE ENGINE: Generating {total} per-sentence backgrounds (Pexels + AI fallback)...")
 
     # Step 1: Ensure all chunks have nano_visual_prompts
     chunks = _generate_missing_prompts(chunks, headline, style_guide, aspect_ratio=aspect_ratio)
 
-    # Step 2: Generate images
+    # Step 2: Generate images with Pexels-first strategy
     last_successful_path = None
     generated_count = 0
     reused_count = 0
+    pexels_success_count = 0
 
     for i, chunk in enumerate(chunks):
         cid = chunk.get("chunk_id", i + 1)
         prompt = chunk.get("nano_visual_prompt", "")
+        chunk_text = chunk.get("text", "")
 
         if not prompt:
             # No prompt available — reuse last image
@@ -346,58 +661,77 @@ def generate_nano_scene_visuals(chunks, headline, style_guide="", aspect_ratio="
 
         output_path = os.path.join(OUTPUT_DIR, f"nano_scene_{cid}_{TODAY}.jpg")
 
-        print(f"  [{i + 1}/{total}] Generating: {prompt[:70]}...")
+        print(f"  [{i + 1}/{total}] Processing: {chunk_text[:60]}...")
 
-        path = _generate_imagen_image(prompt, output_path, aspect_ratio=aspect_ratio)
+        # ── Strategy 1: Pexels/Pixabay with Gemini Vision Review ────────────────
+        print(f"     → Trying Pexels/Pixabay stock photos with relevance review...")
+        pexels_path = _fetch_and_review_pexels_candidates(chunk, headline, max_attempts=3)
+        
+        if pexels_path:
+            chunk["visual_path"] = pexels_path
+            chunk["visual_type"] = chunk.get("visual_type", "photo")
+            chunk["source"] = "Nano-Scene (Pexels/Pixabay + Reviewed)"
+            chunk["relevance_score"] = 10
+            last_successful_path = pexels_path
+            generated_count += 1
+            pexels_success_count += 1
+            print(f"     ✅ Pexels image approved and saved!")
+        else:
+            # ── Strategy 2: AI Generation Fallback Chain ─────────────────────────
+            print(f"     → Pexels unavailable/rejected, trying AI generation...")
+            
+            path = _generate_imagen_image(prompt, output_path, aspect_ratio=aspect_ratio)
 
-        if not path:
-            # Fallback chain: HuggingFace FLUX → Cloudflare FLUX → Pollinations AI
-            print(f"  [{i + 1}/{total}] Imagen failed, trying HuggingFace/Cloudflare/Pollinations fallback...")
-            path = _generate_huggingface_image(prompt, output_path, aspect_ratio=aspect_ratio)
-            if path:
-                source_name = "Nano-Scene (HuggingFace FLUX.1)"
-                relevance = 9
-            else:
-                path = _generate_cloudflare_image(prompt, output_path, aspect_ratio=aspect_ratio)
+            if not path:
+                # Fallback chain: HuggingFace FLUX → Cloudflare FLUX → Pollinations AI
+                print(f"     → Imagen failed, trying HuggingFace/Cloudflare/Pollinations fallback...")
+                path = _generate_huggingface_image(prompt, output_path, aspect_ratio=aspect_ratio)
                 if path:
-                    source_name = "Nano-Scene (Cloudflare FLUX.1)"
+                    source_name = "Nano-Scene (HuggingFace FLUX.1)"
                     relevance = 9
                 else:
-                    path = _generate_pollinations_image(prompt, output_path, aspect_ratio=aspect_ratio)
-                    source_name = "Nano-Scene (Pollinations AI)"
-                    relevance = 9
-        else:
-            source_name = "Nano-Scene (Imagen 4.0)"
-            relevance = 10
+                    path = _generate_cloudflare_image(prompt, output_path, aspect_ratio=aspect_ratio)
+                    if path:
+                        source_name = "Nano-Scene (Cloudflare FLUX.1)"
+                        relevance = 9
+                    else:
+                        path = _generate_pollinations_image(prompt, output_path, aspect_ratio=aspect_ratio)
+                        source_name = "Nano-Scene (Pollinations AI)"
+                        relevance = 9
+            else:
+                source_name = "Nano-Scene (Imagen 4.0)"
+                relevance = 10
 
-        if path:
-            chunk["visual_path"] = path
-            # Use the visual_type from the AI prompt, fallback to "photo"
-            chunk["visual_type"] = chunk.get("visual_type", "photo")
-            chunk["source"] = source_name
-            chunk["relevance_score"] = relevance
-            last_successful_path = path
-            generated_count += 1
-        elif last_successful_path:
-            # Imagen failed — gracefully reuse last successful image
-            chunk["visual_path"] = last_successful_path
-            chunk["visual_type"] = "photo"
-            chunk["source"] = "Nano-Scene (reused)"
-            chunk["relevance_score"] = 7
-            reused_count += 1
-        else:
-            # No images generated at all yet — mark as failed
-            chunk["visual_path"] = None
-            chunk["visual_type"] = None
-            chunk["source"] = "Failed"
-            chunk["relevance_score"] = 0
+            if path:
+                chunk["visual_path"] = path
+                chunk["visual_type"] = chunk.get("visual_type", "photo")
+                chunk["source"] = source_name
+                chunk["relevance_score"] = relevance
+                last_successful_path = path
+                generated_count += 1
+            elif last_successful_path:
+                # All generation failed — gracefully reuse last successful image
+                chunk["visual_path"] = last_successful_path
+                chunk["visual_type"] = "photo"
+                chunk["source"] = "Nano-Scene (reused)"
+                chunk["relevance_score"] = 7
+                reused_count += 1
+            else:
+                # No images generated at all yet — mark as failed
+                chunk["visual_path"] = None
+                chunk["visual_type"] = None
+                chunk["source"] = "Failed"
+                chunk["relevance_score"] = 0
 
-        # Smart throttling: 5s between Imagen calls to avoid rate limits
-        if i < total - 1 and path:
+        # Smart throttling: 5s between generation calls to avoid rate limits
+        if i < total - 1 and chunk.get("visual_path"):
             time.sleep(5)
 
-    print(f"\n  ✅ Nano-Scene Generation Complete: {generated_count} generated, {reused_count} reused, "
-          f"{total - generated_count - reused_count} failed")
+    print(f"\n  ✅ Nano-Scene Generation Complete:")
+    print(f"     - Pexels/Pixabay (reviewed): {pexels_success_count}")
+    print(f"     - AI Generated: {generated_count - pexels_success_count}")
+    print(f"     - Reused: {reused_count}")
+    print(f"     - Failed: {total - generated_count - reused_count}")
 
     # Fill any remaining gaps (chunks that failed and had no predecessor)
     _fill_visual_gaps(chunks)
@@ -559,14 +893,3 @@ def _apply_visual_type_styling(chunks):
             chunk["render_style"] = type_styles[vtype]["render_style"]
             chunk["overlay_elements"] = type_styles[vtype]["overlay_elements"]
             chunk["camera_motion"] = type_styles[vtype]["camera_motion"]
-
-
-# Call diversity enforcement after generation
-def generate_nano_scene_visuals(chunks, headline, style_guide="", aspect_ratio="9:16"):
-    # ... existing code ...
-    
-    # At the end of the function, before returning:
-    _ensure_visual_type_diversity(chunks)
-    _apply_visual_type_styling(chunks)
-    
-    return chunks
