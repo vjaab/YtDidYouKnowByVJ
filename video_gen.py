@@ -5805,36 +5805,118 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
             cycle_duration = 12.0
             evidence_duration = 10.0
             topic_duration = 2.0
+            transition_duration = 0.5  # 0.5s crossfade at boundaries
             
             def make_cycle_frame(t):
                 # Determine where we are in the cycle
                 cycle_pos = t % cycle_duration
-                if cycle_pos < evidence_duration:
-                    # Show evidence screenshot with scrolling
-                    progress = cycle_pos / evidence_duration
+                
+                # Check if we're in a transition zone
+                in_evidence_to_topic = (evidence_duration - transition_duration) <= cycle_pos < evidence_duration
+                in_topic_to_evidence = (cycle_duration - transition_duration) <= cycle_pos < cycle_duration
+                
+                if cycle_pos < evidence_duration - transition_duration:
+                    # Show evidence screenshot with scrolling + subtle ken burns zoom (main 9.5s)
+                    progress = cycle_pos / (evidence_duration - transition_duration)
                     img_h, img_w = arr_rgb.shape[:2]
                     max_scroll = max(0, img_h - target_h)
                     scroll_y = int(progress * max_scroll)
-                    return arr_rgb[scroll_y:scroll_y + target_h, :, :]
+                    
+                    # Subtle ken burns zoom: 1.0 -> 1.08 over the evidence duration
+                    zoom = 1.0 + 0.08 * progress
+                    evidence_frame = arr_rgb[scroll_y:scroll_y + target_h, :, :]
+                    if zoom > 1.0:
+                        h, w = evidence_frame.shape[:2]
+                        new_h, new_w = int(h / zoom), int(w / zoom)
+                        cy, cx = h // 2, w // 2
+                        y1, y2 = max(0, cy - new_h // 2), min(h, cy + new_h // 2)
+                        x1, x2 = max(0, cx - new_w // 2), min(w, cx + new_w // 2)
+                        cropped = evidence_frame[y1:y2, x1:x2]
+                        evidence_frame = cv2.resize(cropped, (target_w, target_h))
+                    return evidence_frame
+                elif in_evidence_to_topic:
+                    # Crossfade from evidence to topic visual (0.5s)
+                    progress = (cycle_pos - (evidence_duration - transition_duration)) / transition_duration
+                    img_h, img_w = arr_rgb.shape[:2]
+                    max_scroll = max(0, img_h - target_h)
+                    scroll_y = int(progress * max_scroll)
+                    evidence_frame = arr_rgb[scroll_y:scroll_y + target_h, :, :]
+                    # Apply zoom to evidence frame during transition too
+                    zoom = 1.0 + 0.08 * progress
+                    if zoom > 1.0:
+                        h, w = evidence_frame.shape[:2]
+                        new_h, new_w = int(h / zoom), int(w / zoom)
+                        cy, cx = h // 2, w // 2
+                        y1, y2 = max(0, cy - new_h // 2), min(h, cy + new_h // 2)
+                        x1, x2 = max(0, cx - new_w // 2), min(w, cx + new_w // 2)
+                        cropped = evidence_frame[y1:y2, x1:x2]
+                        evidence_frame = cv2.resize(cropped, (target_w, target_h))
+                    # Blend evidence frame with topic visual
+                    return cv2.addWeighted(evidence_frame, 1.0 - progress, topic_visual_arr, progress, 0)
+                elif cycle_pos < cycle_duration - transition_duration:
+                    # Show topic visual with subtle animation (main 1.5s)
+                    topic_progress = (cycle_pos - evidence_duration) / (topic_duration - transition_duration)
+                    # Subtle pulse animation on topic visual
+                    pulse = 1.0 + 0.02 * math.sin(topic_progress * 2 * math.pi * 2)
+                    h, w = topic_visual_arr.shape[:2]
+                    new_h, new_w = int(h / pulse), int(w / pulse)
+                    cy, cx = h // 2, w // 2
+                    y1, y2 = max(0, cy - new_h // 2), min(h, cy + new_h // 2)
+                    x1, x2 = max(0, cx - new_w // 2), min(w, cx + new_w // 2)
+                    cropped = topic_visual_arr[y1:y2, x1:x2]
+                    return cv2.resize(cropped, (target_w, target_h))
                 else:
-                    # Show topic visual (2s)
-                    return topic_visual_arr
+                    # Crossfade from topic visual back to evidence (0.5s)
+                    progress = (cycle_pos - (cycle_duration - transition_duration)) / transition_duration
+                    # Show evidence from top with zoom
+                    evidence_frame = arr_rgb[0:target_h, :, :]
+                    zoom = 1.0 + 0.08 * progress
+                    if zoom > 1.0:
+                        h, w = evidence_frame.shape[:2]
+                        new_h, new_w = int(h / zoom), int(w / zoom)
+                        cy, cx = h // 2, w // 2
+                        y1, y2 = max(0, cy - new_h // 2), min(h, cy + new_h // 2)
+                        x1, x2 = max(0, cx - new_w // 2), min(w, cx + new_w // 2)
+                        cropped = evidence_frame[y1:y2, x1:x2]
+                        evidence_frame = cv2.resize(cropped, (target_w, target_h))
+                    # Blend topic visual with evidence frame
+                    return cv2.addWeighted(topic_visual_arr, 1.0 - progress, evidence_frame, progress, 0)
             
             def make_cycle_mask(t):
                 cycle_pos = t % cycle_duration
-                if cycle_pos < evidence_duration:
-                    progress = cycle_pos / evidence_duration
+                
+                in_evidence_to_topic = (evidence_duration - transition_duration) <= cycle_pos < evidence_duration
+                in_topic_to_evidence = (cycle_duration - transition_duration) <= cycle_pos < cycle_duration
+                
+                if cycle_pos < evidence_duration - transition_duration:
+                    progress = cycle_pos / (evidence_duration - transition_duration)
                     img_h, img_w = arr_mask.shape[:2]
                     max_scroll = max(0, img_h - target_h)
                     scroll_y = int(progress * max_scroll)
                     return arr_mask[scroll_y:scroll_y + target_h, :]
-                else:
+                elif in_evidence_to_topic:
+                    progress = (cycle_pos - (evidence_duration - transition_duration)) / transition_duration
+                    img_h, img_w = arr_mask.shape[:2]
+                    max_scroll = max(0, img_h - target_h)
+                    scroll_y = int(progress * max_scroll)
+                    evidence_mask = arr_mask[scroll_y:scroll_y + target_h, :]
+                    # Blend masks
+                    return cv2.addWeighted(evidence_mask, 1.0 - progress, topic_visual_mask, progress, 0)
+                elif cycle_pos < cycle_duration - transition_duration:
                     return topic_visual_mask
+                else:
+                    progress = (cycle_pos - (cycle_duration - transition_duration)) / transition_duration
+                    img_h, img_w = arr_mask.shape[:2]
+                    max_scroll = max(0, img_h - target_h)
+                    evidence_mask = arr_mask[0:target_h, :]
+                    return cv2.addWeighted(topic_visual_mask, 1.0 - progress, evidence_mask, progress, 0)
             
             clip = VideoClip(make_cycle_frame, duration=duration)
             mclip = VideoClip(make_cycle_mask, is_mask=True, duration=duration)
             clip = clip.with_mask(mclip)
             clip = clip.with_position("center").with_start(0)
+            # Add fade-in at start and fade-out at end for smooth entry/exit
+            clip = clip.with_effects([vfx.CrossFadeIn(0.3), vfx.CrossFadeOut(0.3)])
             return [clip]
             
         else:
