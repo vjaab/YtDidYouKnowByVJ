@@ -238,5 +238,15 @@
     "title": "[PROJECT] Tailored Proxies for Devs",
     "uploaded_at": "2026-09-12T23:09:18.297617",
     "synced": false
+  },
+  "TUSGxPrSTpc": {
+    "video_id": "TUSGxPrSTpc",
+    "hook_pattern": "stat_contradiction",
+    "hook_variant": "A",
+    "hook_text": "AI context windows cost thousands. This cuts it.",
+    "category": "Coding & Development Hacks",
+    "title": "[PROJECT] Faster AI Agents Now",
+    "uploaded_at": "2026-09-13T11:41:16.261163",
+    "synced": false
   }
 }

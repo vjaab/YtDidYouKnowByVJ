@@ -85,6 +85,31 @@
         "avg_engagement": 0.0,
         "avg_swipe_away": 0.0,
         "avg_view_percentage": 0.0
+      },
+      "stat_contradiction": {
+        "variants": {
+          "A": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "AI context windows cost thousands. This cuts it.",
+                "video_id": "TUSGxPrSTpc",
+                "recorded_at": "2026-09-13T11:41:16.259722"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
       }
     },
     "Interview Questions": {
@@ -612,7 +637,7 @@
       "views": 0,
       "retention": 0.0,
       "engagement": 0.0,
-      "count": 6,
+      "count": 7,
       "swipe_away_rate": 0.0,
       "avg_view_percentage": 0.0
     },
@@ -633,5 +658,5 @@
       "avg_view_percentage": 0.0
     }
   },
-  "last_updated": "2026-09-12T23:09:18.296364"
+  "last_updated": "2026-09-13T11:41:16.259759"
 }
