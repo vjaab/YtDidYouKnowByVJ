@@ -5660,145 +5660,81 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
             # For shorts: cycle evidence screenshot (10s) + topic visual (2s) throughout
             from moviepy import VideoClip
             
-            # 7 day-specific topic visual generators (9:16 vertical shorts size)
-            def _generate_topic_visual(day, target_w, target_h, topic_context):
-                """Generate day-specific topic visual for the 2s gap."""
-                day_styles = {
-                    0: {  # Monday - Tech Dark Mode
-                        "bg": (18, 18, 28),
-                        "accent": (0, 240, 255),
-                        "style": "tech_grid"
-                    },
-                    1: {  # Tuesday - Warning Alert
-                        "bg": (40, 10, 10),
-                        "accent": (255, 215, 0),
-                        "style": "alert_pulse"
-                    },
-                    2: {  # Wednesday - Terminal
-                        "bg": (10, 20, 10),
-                        "accent": (0, 255, 102),
-                        "style": "terminal_lines"
-                    },
-                    3: {  # Thursday - Viral Pop
-                        "bg": (20, 10, 30),
-                        "accent": (255, 245, 0),
-                        "style": "viral_burst"
-                    },
-                    4: {  # Friday - Gradient Tech
-                        "bg": (15, 10, 35),
-                        "accent": (138, 43, 226),
-                        "style": "gradient_wave"
-                    },
-                    5: {  # Saturday - Breaking News
-                        "bg": (30, 5, 10),
-                        "accent": (255, 87, 34),
-                        "style": "news_ticker"
-                    },
-                    6: {  # Sunday - Clean Educational
-                        "bg": (25, 25, 40),
-                        "accent": (255, 243, 191),
-                        "style": "edu_diagram"
-                    }
-                }
-                style = day_styles.get(day, day_styles[0])
-                canvas = Image.new("RGB", (target_w, target_h), style["bg"])
-                draw = ImageDraw.Draw(canvas)
-                
-                # Extract key terms from topic_context for visualization
-                keywords = [w for w in topic_context.split() if len(w) > 3][:5]
-                if not keywords:
-                    keywords = ["AI", "Tech", "Innovation", "Code", "Future"]
-                
-                if style["style"] == "tech_grid":
-                    # Monday: Tech grid pattern
-                    for i in range(0, target_w, 60):
-                        draw.line([(i, 0), (i, target_h)], fill=(*style["accent"], 30), width=1)
-                    for i in range(0, target_h, 60):
-                        draw.line([(0, i), (target_w, i)], fill=(*style["accent"], 30), width=1)
-                    # Center keyword
-                    font = gf(72, bold=True)
-                    kw = keywords[0].upper()
-                    tw, th = draw.textbbox((0, 0), kw, font=font)[2:]
-                    draw.text(((target_w - tw)//2, (target_h - th)//2), kw, font=font, fill=style["accent"])
-                    
-                elif style["style"] == "alert_pulse":
-                    # Tuesday: Pulsing alert rings
-                    cx, cy = target_w // 2, target_h // 2
-                    for r in range(50, min(target_w, target_h)//2, 80):
-                        draw.ellipse([cx-r, cy-r, cx+r, cy+r], outline=(*style["accent"], 60), width=3)
-                    font = gf(64, bold=True)
-                    kw = "⚠ " + keywords[0].upper()
-                    tw, th = draw.textbbox((0, 0), kw, font=font)[2:]
-                    draw.text(((target_w - tw)//2, (target_h - th)//2), kw, font=font, fill=style["accent"])
-                    
-                elif style["style"] == "terminal_lines":
-                    # Wednesday: Terminal-style scrolling lines
-                    font = gf(36)
-                    for i, kw in enumerate(keywords * 3):
-                        y = 80 + i * 60
-                        if y > target_h - 80: break
-                        draw.text((60, y), f"> {kw.lower()}", font=font, fill=style["accent"])
-                    
-                elif style["style"] == "viral_burst":
-                    # Thursday: Radial burst lines
-                    cx, cy = target_w // 2, target_h // 2
-                    for angle in range(0, 360, 30):
-                        import math
-                        x = cx + math.cos(math.radians(angle)) * max(target_w, target_h)
-                        y = cy + math.sin(math.radians(angle)) * max(target_w, target_h)
-                        draw.line([(cx, cy), (x, y)], fill=(*style["accent"], 80), width=2)
-                    font = gf(72, bold=True)
-                    kw = "🚀 " + keywords[0].upper()
-                    tw, th = draw.textbbox((0, 0), kw, font=font)[2:]
-                    draw.text(((target_w - tw)//2, (target_h - th)//2), kw, font=font, fill=style["accent"])
-                    
-                elif style["style"] == "gradient_wave":
-                    # Friday: Gradient wave bars
-                    for i in range(12):
-                        y = i * (target_h // 12)
-                        h = target_h // 12 - 4
-                        alpha = int(255 * (1 - i/12))
-                        r, g, b = style["accent"]
-                        draw.rectangle([40, y, target_w - 40, y + h], fill=(r, g, b, alpha))
-                    font = gf(60, bold=True)
-                    kw = "✨ " + keywords[0].title()
-                    tw, th = draw.textbbox((0, 0), kw, font=font)[2:]
-                    draw.text(((target_w - tw)//2, (target_h - th)//2), kw, font=font, fill=(255,255,255))
-                    
-                elif style["style"] == "news_ticker":
-                    # Saturday: News ticker style
-                    draw.rectangle([0, target_h//2 - 80, target_w, target_h//2 + 80], fill=(*style["accent"], 40))
-                    font = gf(56, bold=True)
-                    kw = "📰 BREAKING: " + " | ".join(kw.upper() for kw in keywords[:3])
-                    tw, th = draw.textbbox((0, 0), kw, font=font)[2:]
-                    draw.text(((target_w - tw)//2, (target_h - th)//2), kw, font=font, fill=style["accent"])
-                    
-                else:  # edu_diagram
-                    # Sunday: Clean educational diagram
-                    cx, cy = target_w // 2, target_h // 2
-                    # Central concept circle
-                    draw.ellipse([cx-100, cy-100, cx+100, cy+100], outline=style["accent"], width=4)
-                    # Connected nodes
-                    positions = [
-                        (cx, cy-180), (cx+160, cy-60), (cx+160, cy+60),
-                        (cx, cy+180), (cx-160, cy+60), (cx-160, cy-60)
-                    ]
-                    for i, (x, y) in enumerate(positions):
-                        draw.ellipse([x-50, y-50, x+50, y+50], outline=style["accent"], width=3)
-                        draw.line([(cx, cy), (x, y)], fill=(*style["accent"], 100), width=2)
-                        if i < len(keywords):
-                            font = gf(28)
-                            kw = keywords[i].title()
-                            tw, th = draw.textbbox((0, 0), kw, font=font)[2:]
-                            draw.text((x - tw//2, y - th//2), kw, font=font, fill=style["accent"])
-                
-                return np.array(canvas)
-            
-            # Get current day for 7-variety rotation
+            # Generate topic-specific visual from the evidence screenshot itself
+            # Different days show different crops/zooms of the evidence to highlight details
             day = datetime.now().weekday()
             
-            # Generate the day-specific topic visual (2s content)
-            topic_visual_arr = _generate_topic_visual(day, target_w, target_h, topic_context)
+            # Define 7 different detail views of the evidence screenshot
+            def _generate_topic_visual_from_evidence(day, arr_rgb, target_w, target_h):
+                """Generate a detail view from the evidence screenshot based on day."""
+                img_h, img_w = arr_rgb.shape[:2]
+                
+                # 7 different zoom/crop strategies to show relevant details
+                detail_strategies = [
+                    # Monday: Center focus - zoom into middle region
+                    {"zoom": 1.8, "offset_x": 0.5, "offset_y": 0.5, "label": "DETAIL VIEW"},
+                    # Tuesday: Top portion - headers, titles, navigation
+                    {"zoom": 1.6, "offset_x": 0.5, "offset_y": 0.25, "label": "TOP SECTION"},
+                    # Wednesday: Bottom portion - code, results, footer
+                    {"zoom": 1.6, "offset_x": 0.5, "offset_y": 0.75, "label": "BOTTOM SECTION"},
+                    # Thursday: Left side - navigation, sidebar, file tree
+                    {"zoom": 1.6, "offset_x": 0.3, "offset_y": 0.5, "label": "LEFT PANEL"},
+                    # Friday: Right side - main content, editor, output
+                    {"zoom": 1.6, "offset_x": 0.7, "offset_y": 0.5, "label": "RIGHT PANEL"},
+                    # Saturday: Upper-left - menu, toolbar, header
+                    {"zoom": 2.0, "offset_x": 0.25, "offset_y": 0.25, "label": "HEADER AREA"},
+                    # Sunday: Center detail - specific element, button, metric
+                    {"zoom": 2.5, "offset_x": 0.5, "offset_y": 0.5, "label": "CLOSE-UP"},
+                ]
+                
+                strategy = detail_strategies[day % 7]
+                zoom = strategy["zoom"]
+                offset_x = strategy["offset_x"]
+                offset_y = strategy["offset_y"]
+                label = strategy["label"]
+                
+                # Calculate crop region
+                crop_h = int(target_h / zoom)
+                crop_w = int(target_w / zoom)
+                
+                center_y = int(img_h * offset_y)
+                center_x = int(img_w * offset_x)
+                
+                y1 = max(0, center_y - crop_h // 2)
+                y2 = min(img_h, y1 + crop_h)
+                x1 = max(0, center_x - crop_w // 2)
+                x2 = min(img_w, x1 + crop_w)
+                
+                # Adjust if crop goes out of bounds
+                if y2 - y1 < crop_h:
+                    y1 = max(0, y2 - crop_h)
+                if x2 - x1 < crop_w:
+                    x1 = max(0, x2 - crop_w)
+                
+                cropped = arr_rgb[y1:y2, x1:x2]
+                detail_frame = cv2.resize(cropped, (target_w, target_h))
+                
+                # Add subtle label overlay
+                overlay = detail_frame.copy()
+                font = gf(48, bold=True)
+                label_text = label
+                # Draw label at top
+                cv2.rectangle(overlay, (0, 0), (target_w, 70), (0, 0, 0), -1)
+                cv2.addWeighted(overlay, 0.7, detail_frame, 0.3, 0, detail_frame)
+                
+                # Add label text using PIL for better quality
+                detail_pil = Image.fromarray(detail_frame)
+                draw = ImageDraw.Draw(detail_pil)
+                tw, th = draw.textbbox((0, 0), label_text, font=font)[2:]
+                draw.text(((target_w - tw)//2, 15), label_text, font=font, fill=(255, 255, 255, 230))
+                
+                # Add accent line at bottom
+                draw.line([(40, target_h - 10), (target_w - 40, target_h - 10)], fill=(0, 240, 255, 200), width=3)
+                
+                return np.array(detail_pil)
+            
+            # Generate the topic visual from evidence
+            topic_visual_arr = _generate_topic_visual_from_evidence(day, arr_rgb, target_w, target_h)
             topic_visual_mask = np.ones((target_h, target_w), dtype=float)
             
             # Create cycling pattern: 10s evidence + 2s topic visual = 12s cycle
