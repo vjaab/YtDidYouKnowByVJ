@@ -6392,17 +6392,66 @@ def wrap_text_to_lines(words, word_widths, max_width, font):
 # KINETIC CAPTIONS (Hormozi Style) — Word-by-word active highlighting
 # ══════════════════════════════════════════════════════════════════════════════
 
-STUDENT_TRIGGER_WORDS = {
-    "FREE", "4X FASTER", "NOTEBOOKLM", "COPILOT", "GITHUB", "STUDENT", "PACK",
-    "SHORTCUT", "CAPSTONE", "RAG", "RESUME", "PROJECT", "VS CODE", "TERMINAL"
-}
+# ══════════════════════════════════════════════════════════════════════════════
+# KEY ACTION WORD HIGHLIGHTING - Dynamic colors for impact words
+# ══════════════════════════════════════════════════════════════════════════════
 
-STUDENT_VISUAL_OVERRIDES = {
-    "code_font_size": 22,              # Minimum 22pt for code display
-    "code_max_lines": 10,              # Crop to 5-10 active lines
-    "code_theme": "dracula",           # High-contrast dark theme
-    "enable_cursor_highlights": True,  # Arrow overlays on key UI elements
-    "caption_position": "center",      # Center-screen open captions
+ACTION_WORD_COLORS = {
+    # Green - Positive/Value words
+    "FREE": (0, 255, 100),
+    "NEW": (0, 255, 100),
+    "BEST": (0, 255, 100),
+    "TOP": (0, 255, 100),
+    "EASY": (0, 255, 100),
+    "FAST": (0, 255, 100),
+    "INSTANT": (0, 255, 100),
+    "SAVE": (0, 255, 100),
+    "WIN": (0, 255, 100),
+    "SUCCESS": (0, 255, 100),
+    "WORKS": (0, 255, 100),
+    
+    # Red - Urgency/Warning/Action words
+    "BYPASS": (255, 50, 50),
+    "HACK": (255, 50, 50),
+    "SECRET": (255, 50, 50),
+    "HIDDEN": (255, 50, 50),
+    "STOP": (255, 50, 50),
+    "DONT": (255, 50, 50),
+    "DON'T": (255, 50, 50),
+    "NEVER": (255, 50, 50),
+    "AVOID": (255, 50, 50),
+    "DANGER": (255, 50, 50),
+    "BROKEN": (255, 50, 50),
+    "FAIL": (255, 50, 50),
+    
+    # Yellow/Orange - Attention/Important words
+    "WARNING": (255, 200, 0),
+    "ALERT": (255, 200, 0),
+    "IMPORTANT": (255, 200, 0),
+    "NOTE": (255, 200, 0),
+    "REMEMBER": (255, 200, 0),
+    "CRITICAL": (255, 200, 0),
+    
+    # Cyan/Blue - Tech/Tool words
+    "AI": (0, 229, 255),
+    "GPT": (0, 229, 255),
+    "LLM": (0, 229, 255),
+    "MODEL": (0, 229, 255),
+    "API": (0, 229, 255),
+    "CODE": (0, 229, 255),
+    "TOOL": (0, 229, 255),
+    "APP": (0, 229, 255),
+    "GITHUB": (0, 229, 255),
+    "COPILOT": (0, 229, 255),
+    "NOTEBOOKLM": (0, 229, 255),
+    
+    # Magenta/Purple - Creative/Insight words
+    "INSANE": (255, 0, 255),
+    "CRAZY": (255, 0, 255),
+    "MIND": (255, 0, 255),
+    "BLOWN": (255, 0, 255),
+    "SHOCKING": (255, 0, 255),
+    "UNBELIEVABLE": (255, 0, 255),
 }
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -6832,31 +6881,34 @@ def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, 
         if i < line_word_count - 1:
             line_w += 22  # space
 
-    # Safe Zone: Position subtitles at bottom, just above avatar head
-    # For Shorts (portrait): bottom zone (70%-85%) - above avatar which is at ~78-95%
-    # For Longform (landscape): lower third area (65%-80%)
+    # Safe Zone: Position subtitles in middle-lower third, above presenter's head
+    # For Shorts (portrait): middle-lower third (55%-65%) - well above avatar
+    # For Longform (landscape): lower-middle area (55%-65%)
     if is_landscape:
-        y_pos_pct = 0.70
+        y_pos_pct = 0.58
     else:
-        y_pos_pct = 0.75  # Bottom zone, just above avatar head
+        y_pos_pct = 0.58  # Middle-lower third, above presenter's head
     line_h = int(90 * scale_ratio)
     start_y = int(frame_height * y_pos_pct) - (line_h // 2) + y_shift
 
-    # CLAMP: Allow bottom positioning (up to 85%) for avatar clearance
-    # YouTube auto-captions appear in bottom 20%, so stay above 80% to be safe
-    min_y = int(frame_height * 0.30) - (line_h // 2)
-    max_y = int(frame_height * 0.85) - (line_h // 2)
+    # CLAMP: Keep in middle-lower third (40%-70%) for avatar clearance
+    min_y = int(frame_height * 0.40) - (line_h // 2)
+    max_y = int(frame_height * 0.70) - (line_h // 2)
     start_y = max(min_y, min(start_y, max_y))
 
-    # Background block - use day-specific style
-    bg_pad_x, bg_pad_y = 35, 20
+    # Background block - strengthened for readability (larger padding, darker box)
+    bg_pad_x, bg_pad_y = 45, 25
     block_x1 = (frame_width - line_w) // 2 - bg_pad_x
     block_x2 = (frame_width + line_w) // 2 + bg_pad_x
     block_y1 = start_y - bg_pad_y
     block_y2 = start_y + line_h - (line_h - base_size) + bg_pad_y
 
-    # Render day-specific background badge
+    # Render strengthened background badge (darker, more opaque)
     _render_day_background(draw, block_x1, block_y1, block_x2, block_y2, day_style, day_accent, frame_width, frame_height)
+    
+    # Add extra dark overlay for maximum text contrast
+    overlay_alpha = 180
+    draw.rounded_rectangle([block_x1, block_y1, block_x2, block_y2], radius=16, fill=(0, 0, 0, overlay_alpha))
 
     # Render words
     cur_x = (frame_width - line_w) // 2
@@ -6867,8 +6919,13 @@ def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, 
         is_spoken = wd.get("is_spoken", False)
 
         if is_active:
-            # Active word: day accent color, enlarged, animation based on day style
-            c_fill = (*day_accent, 255)
+            # Active word: check for action word color, fallback to day accent
+            clean_word = "".join(c for c in word_text.upper() if c.isalnum())
+            action_color = ACTION_WORD_COLORS.get(clean_word)
+            if action_color:
+                c_fill = (*action_color, 255)
+            else:
+                c_fill = (*day_accent, 255)
             f_word = f_active
             w_w = word_widths_active[global_idx]
             
@@ -6908,11 +6965,12 @@ def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, 
                 # Main text
                 draw.text((cur_x, start_y + 3), word_text, font=f_word, fill=c_fill)
         else:
-            # Inactive words: dimmed if spoken, bright white if future (or neon cyan if student trigger word)
+            # Inactive words: use action word colors for highlighting, otherwise dimmed white
             opacity = 140 if is_spoken else 255
             clean_word = "".join(c for c in word_text.upper() if c.isalnum())
-            if clean_word in STUDENT_TRIGGER_WORDS:
-                c_fill = (0, 255, 204, opacity)  # High-energy neon cyan
+            action_color = ACTION_WORD_COLORS.get(clean_word)
+            if action_color:
+                c_fill = (*action_color, opacity)
             else:
                 c_fill = (255, 255, 255, opacity)
             f_word = f_main
