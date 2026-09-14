@@ -126,6 +126,7 @@ from pydub import AudioSegment
 AudioSegment.converter = imageio_ffmpeg.get_ffmpeg_exe()
 
 CI_LITE = os.environ.get("CI_LITE", "0") == "1"
+DISABLE_ENTITY_TAGS = os.environ.get("DISABLE_ENTITY_TAGS", "0") == "1"
 
 # OCR Cache for evidence screenshots
 _EVIDENCE_OCR_CACHE = {}
@@ -10529,7 +10530,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         pass
 
         entity_tags_img = None
-        if not is_longform and key_entities:
+        if not is_longform and key_entities and not DISABLE_ENTITY_TAGS:
             entity_tags_img = render_dynamic_entity_tags(key_entities, accent_color, t, audio_duration, FRAME_W, FRAME_H, screenshot_intervals=screenshot_intervals)
 
         # Minimize Static Branding: Only pass transparency_img in the first 5 seconds for longform
