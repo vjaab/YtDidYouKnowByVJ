@@ -639,6 +639,33 @@
         "avg_swipe_away": 0.0,
         "avg_view_percentage": 0.0
       }
+    },
+    "Privacy & Security": {
+      "curiosity_gap": {
+        "variants": {
+          "A": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "Meta AI read your private chats?",
+                "video_id": "VXRcBw3xUcg",
+                "recorded_at": "2026-09-14T12:42:48.478812"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
+      }
     }
   },
   "global": {
@@ -670,7 +697,7 @@
       "views": 0,
       "retention": 0.0,
       "engagement": 0.0,
-      "count": 5,
+      "count": 6,
       "swipe_away_rate": 0.0,
       "avg_view_percentage": 0.0
     },
@@ -683,5 +710,5 @@
       "avg_view_percentage": 0.0
     }
   },
-  "last_updated": "2026-09-14T02:31:26.302822"
+  "last_updated": "2026-09-14T12:42:48.478845"
 }
