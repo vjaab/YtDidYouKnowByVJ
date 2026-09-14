@@ -216,7 +216,7 @@ def wait_for_approval(timeout: int = 3600) -> dict:
     print("⏰ Approval timeout")
     return {"action": "timeout"}
 
-def post_to_platforms(state: dict):
+def post_to_platforms(state: dict, platform: str = "both"):
     """Post to approved platforms based on state action."""
     action = state.get("action", "")
     topic = state.get("topic", "")
@@ -233,9 +233,9 @@ def post_to_platforms(state: dict):
     
     results = {}
     
-    # Determine which platforms to post to (only Instagram and Facebook)
-    post_ig = action in ["approve_all", "approve_ig"]
-    post_fb = action in ["approve_all", "approve_fb"]
+    # Determine which platforms to post to based on action and platform arg
+    post_ig = (action in ["approve_all", "approve_ig"]) and platform in ["both", "instagram"]
+    post_fb = (action in ["approve_all", "approve_fb"]) and platform in ["both", "facebook"]
     
     if post_ig and ig_images:
         print(f"📸 Posting to Instagram ({'Carousel' if is_carousel else 'Single Image'})...")
@@ -273,6 +273,7 @@ def main():
     parser.add_argument("--hashtags", help="Hashtags string")
     parser.add_argument("--timeout", type=int, default=3600, help="Approval timeout (seconds)")
     parser.add_argument("--carousel", action="store_true", help="Images form a carousel")
+    parser.add_argument("--platform", choices=["both", "instagram", "facebook"], default="both", help="Platform to post to")
     args = parser.parse_args()
     
     def set_gha_output(key: str, value: str):
@@ -325,7 +326,7 @@ def main():
             sys.exit(2)  # Special exit code for regeneration
         
         print(f"✅ Approved with action: {action}")
-        results = post_to_platforms(state)
+        results = post_to_platforms(state, args.platform)
         
         # Report results
         for platform, result in results.items():
