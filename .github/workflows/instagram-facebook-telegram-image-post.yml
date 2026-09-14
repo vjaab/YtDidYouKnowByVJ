@@ -13,16 +13,11 @@ on:
   workflow_dispatch:
     inputs:
       topic:
-        description: 'Specific topic to generate'
+        description: 'Specific topic to generate (e.g., "OpenAI GPT-5")'
         required: false
         type: string
-      category:
-        description: 'Category for trending topic (when no topic specified)'
-        required: false
-        type: string
-        default: 'AI & Tech Tools'
       ai_image_provider:
-        description: 'Image generation provider'
+        description: 'Image generation provider (kept for compatibility, not used for carousel)'
         required: false
         type: choice
         default: 'template'
@@ -42,7 +37,7 @@ permissions:
   id-token: write
 
 jobs:
-  generate-images:
+  generate-carousel:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     outputs:
@@ -52,6 +47,8 @@ jobs:
       caption_file: ${{ steps.gen.outputs.caption_file }}
       hashtags: ${{ steps.hashtags.outputs.hashtags }}
       poll_file: ${{ steps.gen.outputs.poll_file }}
+      carousel_json: ${{ steps.gen.outputs.carousel_json }}
+      is_carousel: ${{ steps.gen.outputs.is_carousel }}
 
     steps:
       - name: Checkout Code
@@ -73,8 +70,8 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install "numpy<2.0"
           pip install "grpcio==1.62.2"
-          pip install requests pillow python-dotenv pydantic jinja2 playwright python-telegram-bot aiohttp
-
+          pip install requests pillow python-dotenv pydantic jinja2 playwright python-telegram-bot aiohttp google-generativeai
+          
       - name: Install Playwright Browsers
         run: python -m playwright install --with-deps chromium
 
@@ -86,83 +83,26 @@ jobs:
           echo "IG_ACCESS_TOKEN=${{ secrets.IG_ACCESS_TOKEN }}" >> .env
           echo "FB_PAGE_ID=${{ secrets.FB_PAGE_ID }}" >> .env
           echo "FB_PAGE_ACCESS_TOKEN=${{ secrets.FB_PAGE_ACCESS_TOKEN }}" >> .env
-          # X/Twitter and LinkedIn posting disabled
-          # echo "X_API_KEY=${{ secrets.X_API_KEY }}" >> .env
-          # echo "X_API_SECRET=${{ secrets.X_API_SECRET }}" >> .env
-          # echo "X_ACCESS_TOKEN=${{ secrets.X_ACCESS_TOKEN }}" >> .env
-          # echo "X_ACCESS_SECRET=${{ secrets.X_ACCESS_SECRET }}" >> .env
-          # echo "LINKEDIN_ACCESS_TOKEN=${{ secrets.LINKEDIN_ACCESS_TOKEN }}" >> .env
           echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env
           echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .env
-          # AI Image Generation (optional)
-          echo "AI_IMAGE_PROVIDER=${{ secrets.AI_IMAGE_PROVIDER || 'template' }}" >> .env
-          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
-          echo "STABLE_DIFFUSION_API_URL=${{ secrets.STABLE_DIFFUSION_API_URL }}" >> .env
-          echo "RECRAFT_API_KEY=${{ secrets.RECRAFT_API_KEY }}" >> .env
-          # Image Fallback Chain (uses existing providers in codebase)
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
           echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> .env
           echo "CF_API_TOKEN=${{ secrets.CF_API_TOKEN }}" >> .env
           echo "CF_ACCOUNT_ID=${{ secrets.CF_ACCOUNT_ID }}" >> .env
-          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
-
-      - name: Determine Trending Category
-        id: category
-        run: |
-          # For scheduled runs, pick category based on UTC time (approximating IST windows)
-          # GitHub Actions cron runs in UTC
-          # 02:00 UTC = 07:30 IST (morning)
-          # 10:00 UTC = 15:30 IST (afternoon) 
-          # 14:00 UTC = 19:30 IST (evening)
-          # 04:00 UTC = 09:30 IST (weekend morning)
-          # 12:00 UTC = 17:30 IST (weekend evening)
-          
-          if [[ "${{ github.event_name }}" == "schedule" ]]; then
-            HOUR=$(date -u +%H)
-            DAY=$(date -u +%u)  # 1=Mon, 7=Sun
-            
-            if [[ $DAY -ge 1 && $DAY -le 5 ]]; then
-              # Weekday
-              if [[ $HOUR -eq 02 ]]; then
-                CATEGORY="AI & Tech Tools"
-              elif [[ $HOUR -eq 10 ]]; then
-                CATEGORY="Tech Gadgets & Inventions"
-              elif [[ $HOUR -eq 14 ]]; then
-                CATEGORY="Coding & Development Hacks"
-              else
-                CATEGORY="AI & Tech Tools"
-              fi
-            else
-              # Weekend
-              if [[ $HOUR -eq 04 ]]; then
-                CATEGORY="Facts & Trivia"
-              elif [[ $HOUR -eq 12 ]]; then
-                CATEGORY="Finance & Tech Economy"
-              else
-                CATEGORY="AI & Tech Tools"
-              fi
-            fi
-          else
-            # Manual dispatch - use input or default
-            CATEGORY="${{ github.event.inputs.category || 'AI & Tech Tools' }}"
-          fi
-          
-          echo "category=$CATEGORY" >> $GITHUB_OUTPUT
-          echo "Selected category: $CATEGORY"
 
       - name: Fetch Trending Hashtags
         id: hashtags
         run: |
-          python -u fetch_trending_hashtags.py --category "${{ steps.category.outputs.category }}" > hashtags.txt
+          python -u fetch_trending_hashtags.py --category "AI & Tech Tools" > hashtags.txt
           echo "hashtags=$(cat hashtags.txt)" >> $GITHUB_OUTPUT
 
-      - name: Generate Images
+      - name: Generate AI News Carousel
         id: gen
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TOPIC: ${{ github.event.inputs.topic || '' }}
-          TRENDING_CATEGORY: ${{ steps.category.outputs.category }}
-          AI_IMAGE_PROVIDER: ${{ github.event.inputs.ai_image_provider || 'template' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           python -u generate_decorator_images.py --now \
             --topic "${{ github.event.inputs.topic || '' }}" \
@@ -179,7 +119,8 @@ jobs:
             --ig-images "${{ steps.gen.outputs.ig_images }}" \
             --fb-images "${{ steps.gen.outputs.fb_images }}" \
             --caption-file "${{ steps.gen.outputs.caption_file }}" \
-            --poll-file "${{ steps.gen.outputs.poll_file }}"
+            --poll-file "${{ steps.gen.outputs.poll_file }}" \
+            --carousel
 
       - name: Upload Generated Images
         if: always()
@@ -190,11 +131,10 @@ jobs:
           retention-days: 7
 
   auto-post:
-    needs: generate-images
+    needs: generate-carousel
     if: github.event.inputs.auto_post == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    # Wait for Telegram approval (polling)
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -225,20 +165,17 @@ jobs:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
-          # X/Twitter and LinkedIn posting disabled
-          # X_API_KEY: ${{ secrets.X_API_KEY }}
-          # X_API_SECRET: ${{ secrets.X_API_SECRET }}
-          # X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
-          # X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
-          # LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
           python -u telegram_approval_handler.py --wait-and-post \
-            --topic "${{ needs.generate-images.outputs.topic }}" \
-            --ig-images "${{ needs.generate-images.outputs.ig_images }}" \
-            --fb-images "${{ needs.generate-images.outputs.fb_images }}" \
-            --caption-file "${{ needs.generate-images.outputs.caption_file }}" \
-            --hashtags "${{ needs.generate-images.outputs.hashtags }}" \
-            --poll-file "${{ needs.generate-images.outputs.poll_file }}" \
+            --topic "${{ needs.generate-carousel.outputs.topic }}" \
+            --ig-images "${{ needs.generate-carousel.outputs.ig_images }}" \
+            --fb-images "${{ needs.generate-carousel.outputs.fb_images }}" \
+            --caption-file "${{ needs.generate-carousel.outputs.caption_file }}" \
+            --hashtags "${{ needs.generate-carousel.outputs.hashtags }}" \
+            --poll-file "${{ needs.generate-carousel.outputs.poll_file }}" \
+            --carousel \
             --timeout 3600
 
       - name: Check Approval Result
@@ -263,10 +200,10 @@ jobs:
       - name: Track Engagement (after 1 hour)
         if: success()
         run: |
-          python -u track_engagement.py --topic "${{ needs.generate-images.outputs.topic }}" --delay 3600
+          python -u track_engagement.py --topic "${{ needs.generate-carousel.outputs.topic }}" --delay 3600
 
   commit-logs:
-    needs: [generate-images, auto-post]
+    needs: [generate-carousel, auto-post]
     if: always()
     runs-on: ubuntu-latest
     steps:

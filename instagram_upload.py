@@ -429,6 +429,61 @@ def publish_container(container_id: str) -> str:
     return data["id"]
 
 
+def create_image_container(image_url: str, caption: str = "", is_carousel_item: bool = False) -> str:
+    """Create a media container for an image (or carousel item)."""
+    ig_user_id = os.getenv("IG_USER_ID")
+    access_token = os.getenv("IG_ACCESS_TOKEN")
+    
+    data = {
+        "media_type": "IMAGE",
+        "image_url": image_url,
+        "access_token": access_token,
+    }
+    if caption and not is_carousel_item:
+        data["caption"] = caption[:2200]
+    if is_carousel_item:
+        data["is_carousel_item"] = "true"
+    
+    resp = requests.post(
+        f"{GRAPH_API_BASE}/{ig_user_id}/media",
+        data=data,
+        timeout=30,
+    )
+    resp.raise_for_status()
+    try:
+        result = resp.json()
+    except Exception:
+        result = {}
+    if not isinstance(result, dict) or "id" not in result:
+        raise RuntimeError(f"Unexpected response from create_image_container: {result}")
+    return result["id"]
+
+
+def create_carousel_container(child_ids: list, caption: str) -> str:
+    """Create a carousel container from child media container IDs."""
+    ig_user_id = os.getenv("IG_USER_ID")
+    access_token = os.getenv("IG_ACCESS_TOKEN")
+    
+    resp = requests.post(
+        f"{GRAPH_API_BASE}/{ig_user_id}/media",
+        data={
+            "media_type": "CAROUSEL",
+            "children": ",".join(child_ids),
+            "caption": caption[:2200],
+            "access_token": access_token,
+        },
+        timeout=30,
+    )
+    resp.raise_for_status()
+    try:
+        result = resp.json()
+    except Exception:
+        result = {}
+    if not isinstance(result, dict) or "id" not in result:
+        raise RuntimeError(f"Unexpected response from create_carousel_container: {result}")
+    return result["id"]
+
+
 def upload_reel_to_instagram(video_path: str, caption: str):
     """
     Uploads a video as an Instagram Reel using the official Graph API.
@@ -526,6 +581,111 @@ def upload_reel_to_instagram(video_path: str, caption: str):
             print(f"ℹ️ Keeping GitHub Release {upload_key} for async video processing (tagged for later cleanup)")
             # delete_github_release(int(upload_key))  # Disabled for async fetch compatibility
         # For "direct" method, no cleanup needed
+
+
+def upload_carousel_to_instagram(image_paths: list, caption: str):
+    """
+    Uploads multiple images as an Instagram Carousel using the official Graph API.
+
+    Workflow:
+      1. Get public URLs for all images (upload to GitHub Releases or use direct URLs)
+      2. POST /{ig-user-id}/media → create child containers (media_type=IMAGE, is_carousel_item=true)
+      3. POST /{ig-user-id}/media → create carousel container (media_type=CAROUSEL) with children
+      4. GET /{container-id}?fields=status_code → poll until FINISHED
+      5. POST /{ig-user-id}/media_publish → publish the Carousel
+
+    Args:
+        image_paths (list): List of absolute paths to image files (JPG/PNG).
+        caption (str): Caption text for the Instagram Carousel.
+
+    Returns:
+        tuple: (bool success, str result_message_or_carousel_id)
+    """
+    # Pre-flight checks
+    if not _check_credentials():
+        return False, "Skipped: Instagram credentials not configured (IG_USER_ID, IG_ACCESS_TOKEN)"
+
+    if not image_paths:
+        return False, "Error: No images provided for carousel"
+
+    for p in image_paths:
+        if not os.path.exists(p):
+            return False, f"Error: Image file not found at {p}"
+
+    # Rate limit guard
+    allowed, current_count = _check_rate_limit()
+    if not allowed:
+        return False, f"Skipped: Instagram rate limit reached ({current_count}/{MAX_POSTS_PER_DAY} posts today)"
+
+    # Token management
+    token, expiry = _load_token()
+    token = _refresh_token_if_needed(token, expiry)
+    if token != os.getenv("IG_ACCESS_TOKEN"):
+        os.environ["IG_ACCESS_TOKEN"] = token
+
+    upload_method = None
+    upload_keys = []
+    public_urls = []
+
+    try:
+        # STEP 1: Get public URLs for all images
+        print(f"📡 [Instagram Carousel] Step 1/{len(image_paths)+3}: Getting public URLs for {len(image_paths)} images...")
+        
+        direct_url = os.getenv("IG_VIDEO_PUBLIC_URL")  # Reuse for images if provided
+        if direct_url and direct_url.strip():
+            # If direct URL provided, assume it's a base pattern or single URL
+            # For carousel, we'd need multiple URLs - fallback to GitHub upload
+            pass
+        
+        for idx, img_path in enumerate(image_paths):
+            print(f"   Uploading image {idx+1}/{len(image_paths)}: {os.path.basename(img_path)}")
+            public_url, gh_result = upload_video_to_github_releases(img_path)  # Reuses same upload logic
+            if public_url:
+                upload_method = "github"
+                upload_keys.append(gh_result)
+                public_urls.append(public_url)
+                print(f"   ✅ Image {idx+1} uploaded")
+            else:
+                return False, f"Failed to host image {idx+1} publicly: {gh_result}"
+
+        # STEP 2: Create child containers for each image
+        print(f"📡 [Instagram Carousel] Step 2/{len(image_paths)+3}: Creating {len(public_urls)} child containers...")
+        child_ids = []
+        for idx, url in enumerate(public_urls):
+            child_id = create_image_container(url, is_carousel_item=True)
+            child_ids.append(child_id)
+            print(f"   ✔ Child {idx+1}/{len(public_urls)} created: {child_id}")
+
+        # STEP 3: Create carousel container
+        print(f"📡 [Instagram Carousel] Step 3/{len(image_paths)+3}: Creating carousel container...")
+        carousel_id = create_carousel_container(child_ids, caption)
+        print(f"✔ Carousel container created: {carousel_id}")
+
+        # STEP 4: Poll for processing status
+        print(f"📡 [Instagram Carousel] Step 4/{len(image_paths)+3}: Waiting for carousel processing...")
+        wait_for_container(carousel_id)
+        print(f"✔ Carousel processing finished")
+
+        # STEP 5: Publish the Carousel
+        print(f"📡 [Instagram Carousel] Step 5/{len(image_paths)+3}: Publishing Carousel...")
+        carousel_published_id = publish_container(carousel_id)
+        print(f"🎉 Instagram Carousel published! ID: {carousel_published_id}")
+
+        # Track rate limit
+        _increment_rate_limit()
+
+        return True, carousel_published_id
+
+    except requests.HTTPError as e:
+        response_text = getattr(e, 'response_text', None) or (e.response.text if e.response else "")
+        return False, f"Instagram API error (HTTP {e.response.status_code}): {response_text}"
+    except Exception as e:
+        return False, f"Instagram carousel upload exception: {e}"
+
+    finally:
+        # CLEANUP: Keep GitHub Releases for async processing
+        if upload_method == "github" and upload_keys:
+            print(f"ℹ️ Keeping {len(upload_keys)} GitHub Releases for async processing (tagged for later cleanup)")
 
 
 # ── Standalone Test ────────────────────────────────────────────────────────
