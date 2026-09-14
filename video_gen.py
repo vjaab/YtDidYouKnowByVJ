@@ -6594,56 +6594,70 @@ def _pattern_interrupt_marker(accent_color, audio_duration, start_time, marker_t
         return None
 
 
-def _quiz_countdown_overlay(accent_color, start_time, audio_duration, duration=5.0):
+def _quiz_countdown_overlay(accent_color, start_time, audio_duration, duration=3.0):
     """
-    Creates an extended 4-5 second countdown overlay for quiz answer pause.
-    Each number appears for ~1.3-1.5 seconds with visual progress bar and sound cue.
-    Extended from 3s to give viewers time to read options and form an answer.
+    Creates a simple pause overlay for quiz answer pause.
+    Shows a subtle pulsing indicator for the pause duration without countdown numbers.
     """
     clips = []
     try:
-        # Extended countdown: 4-5 seconds total
-        countdown_numbers = [4, 3, 2, 1] if duration >= 4.5 else [3, 2, 1]
-        num_count = len(countdown_numbers)
-        seconds_per_num = duration / num_count
+        # Simple pause: 3 seconds total, no countdown numbers
+        pause_duration = min(duration, 3.0)
+        pause_start = start_time
         
-        for i, num in enumerate(countdown_numbers):
-            num_start = start_time + i * seconds_per_num
-            if num_start >= audio_duration:
-                break
-                
-            pil = _render_quiz_countdown(num, accent_color, with_progress=True, progress_pct=(i / num_count))
-            arr = np.array(pil.convert("RGB"))
-            mask_arr = np.array(pil.split()[3]).astype(float) / 255.0
+        if pause_start >= audio_duration:
+            return clips
             
-            clip_dur = seconds_per_num
-            clip = VideoClip(lambda t, _arr=arr: _arr, duration=clip_dur)
-            mclip = VideoClip(lambda t, _m=mask_arr: _m, is_mask=True, duration=clip_dur)
-            
-            # Pulse animation - slower for extended duration
-            def make_pulse(t, _dur=clip_dur):
-                progress = t / _dur
-                scale = 1.0 + 0.08 * math.sin(progress * 2 * math.pi * 1.5)
-                return scale
-            
-            clip = clip.with_mask(mclip).with_position("center").with_start(num_start)
-            clips.append(clip)
+        # Render a subtle pause indicator (pulsing circle with "THINK" label)
+        pil = _render_quiz_pause_indicator(accent_color)
+        arr = np.array(pil.convert("RGB"))
+        mask_arr = np.array(pil.split()[3]).astype(float) / 255.0
         
-        # Add "REVEAL!" flash at the end
-        reveal_start = start_time + duration
-        if reveal_start < audio_duration:
-            reveal_pil = _render_quiz_countdown("✓", accent_color, with_progress=False)
-            reveal_arr = np.array(reveal_pil.convert("RGB"))
-            reveal_mask = np.array(reveal_pil.split()[3]).astype(float) / 255.0
-            reveal_clip = VideoClip(lambda t, _arr=reveal_arr: _arr, duration=0.5)
-            reveal_mclip = VideoClip(lambda t, _m=reveal_mask: _m, is_mask=True, duration=0.5)
-            reveal_clip = reveal_clip.with_mask(reveal_mclip).with_position("center").with_start(reveal_start).with_effects([vfx.CrossFadeIn(0.1)])
-            clips.append(reveal_clip)
+        clip = VideoClip(lambda t, _arr=arr: _arr, duration=pause_duration)
+        mclip = VideoClip(lambda t, _m=mask_arr: _m, is_mask=True, duration=pause_duration)
+        
+        # Subtle pulse animation
+        def make_pulse(t, _dur=pause_duration):
+            progress = t / _dur
+            scale = 1.0 + 0.05 * math.sin(progress * 2 * math.pi * 1.0)
+            return scale
+        
+        clip = clip.with_mask(mclip).with_position("center").with_start(pause_start)
+        clips.append(clip)
         
         return clips
     except Exception as e:
-        print(f"⚠️ Quiz countdown error: {e}")
+        print(f"⚠️ Quiz pause overlay error: {e}")
         return []
+
+
+def _render_quiz_pause_indicator(accent_color, width=960):
+    """Render a subtle pause indicator (pulsing circle with 'THINK' label) without numbers."""
+    f_label = gf(40, bold=True)
+    
+    img_height = 280
+    img = Image.new("RGBA", (width, img_height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    
+    center_x = width // 2
+    center_y = 120
+    radius = 80
+    
+    # Outer glow rings (subtle)
+    for r in range(radius + 15, radius, -3):
+        alpha = int(20 * (radius + 15 - r) / 15)
+        draw.ellipse([center_x - r, center_y - r, center_x + r, center_y + r],
+                     outline=(*accent_color, alpha), width=2)
+    
+    # Main circle
+    draw.ellipse([center_x - radius, center_y - radius, center_x + radius, center_y + radius],
+                 fill=(15, 15, 25, 220), outline=(*accent_color, 200), width=4)
+    
+    # "THINK" label below circle
+    draw.text((center_x, center_y + radius + 35), "THINK", font=f_label,
+              fill=(*accent_color, 255), anchor="mm")
+    
+    return img
 
 
 def apply_pattern_interrupts(frame_np, t, cues):
@@ -9830,14 +9844,14 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             elif chunk.get("infographic_type") == "quiz_options":
                 options_chunk = chunk
         
-        # Add countdown before reveal (extended to 5s for better retention)
+        # Add pause before reveal (3 seconds, no countdown numbers)
         if reveal_chunk:
             reveal_start = reveal_chunk.get("start", 0)
-            countdown_duration = 5.0  # Extended from 3s to 5s for better engagement
-            countdown_start = max(0, reveal_start - countdown_duration - 0.5)  # 0.5s buffer
-            countdown_clips = _quiz_countdown_overlay(accent_color, countdown_start, audio_duration, duration=countdown_duration)
-            if countdown_clips:
-                engagement_clips.extend(countdown_clips)
+            pause_duration = 3.0  # 3 second pause for viewers to think
+            pause_start = max(0, reveal_start - pause_duration - 0.5)  # 0.5s buffer
+            pause_clips = _quiz_countdown_overlay(accent_color, pause_start, audio_duration, duration=pause_duration)
+            if pause_clips:
+                engagement_clips.extend(pause_clips)
         
         # Add quiz-specific CTA at the end
         comment_hook = script_json.get("comment_hook", "QUIZ")
