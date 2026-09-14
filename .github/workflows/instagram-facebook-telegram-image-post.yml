@@ -16,16 +16,6 @@ on:
         description: 'Specific topic to generate (e.g., "OpenAI GPT-5")'
         required: false
         type: string
-      ai_image_provider:
-        description: 'Image generation provider (kept for compatibility, not used for carousel)'
-        required: false
-        type: choice
-        default: 'template'
-        options:
-          - template
-          - dall-e-3
-          - stable-diffusion
-          - recraft
       auto_post:
         description: 'Auto-post after Telegram approval'
         required: false
