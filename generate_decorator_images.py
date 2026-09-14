@@ -246,6 +246,7 @@ def main():
     parser.add_argument("--dry-run", action="store_true", help="Preview without posting to Telegram")
     parser.add_argument("--topic", type=str, help="Specific topic to generate")
     parser.add_argument("--hashtags-file", type=str, help="Path to hashtags file")
+    parser.add_argument("--platform", choices=["both", "instagram", "facebook"], default="both", help="Target platform(s)")
     args = parser.parse_args()
 
     if not args.now and not args.dry_run:
@@ -298,8 +299,10 @@ def main():
         print(f"\n🎨 Rendering {CAROUSEL_SLIDES} carousel slides...")
         ig_paths = render_carousel(carousel, output_dir)
         
-        # Generate Facebook images
-        fb_paths = generate_facebook_images_from_carousel(carousel, ig_paths, output_dir)
+        # Generate Facebook images only if needed
+        fb_paths = []
+        if args.platform in ["both", "facebook"]:
+            fb_paths = generate_facebook_images_from_carousel(carousel, ig_paths, output_dir)
         
         # Generate caption
         caption = generate_caption(carousel, hashtags)
@@ -322,9 +325,10 @@ def main():
             print(f"   Instagram slides: {len(ig_paths)}")
             for p in ig_paths:
                 print(f"      {p.name}")
-            print(f"   Facebook: {len(fb_paths)}")
-            for p in fb_paths:
-                print(f"      {p.name}")
+            if fb_paths:
+                print(f"   Facebook: {len(fb_paths)}")
+                for p in fb_paths:
+                    print(f"      {p.name}")
             print(f"   Caption: {caption_path}")
             print(f"   Poll: {poll_path}")
             print(f"   Metadata: {meta_path}")
@@ -343,18 +347,19 @@ def main():
         # Send to Telegram for review
         caption_text = f"📰 <b>{carousel.get('headline', 'AI News')}</b>\n\n{carousel.get('summary', '')[:200]}...\n\nCarousel: {len(ig_paths)} slides\n\nReady for review. Approve for posting?"
         
-        # Send as media group
-        send_carousel_to_telegram(ig_paths, caption_text)
+        # Send Instagram carousel
+        if args.platform in ["both", "instagram"]:
+            send_carousel_to_telegram(ig_paths, caption_text)
         
-        # Also send Facebook version
-        if fb_paths:
+        # Send Facebook version
+        if args.platform in ["both", "facebook"] and fb_paths:
             fb_caption = f"📘 <b>Facebook Version</b>\n\n{caption_text}"
             send_image_to_telegram(fb_paths[0], fb_caption)
         
         send_telegram_message(
             f"✅ Carousel generated for: {carousel.get('headline', 'AI News')}\n"
             f"Instagram Carousel (4:5): {len(ig_paths)} slides\n"
-            f"Facebook (1.91:1): {len(fb_paths)} image\n\nReply to approve for posting.",
+            f"{'Facebook (1.91:1): ' + str(len(fb_paths)) + ' image\n' if fb_paths else ''}\nReply to approve for posting.",
             emoji="🤖"
         )
 

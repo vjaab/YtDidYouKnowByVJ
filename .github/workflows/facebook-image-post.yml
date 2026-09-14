@@ -96,7 +96,8 @@ jobs:
         run: |
           python -u generate_decorator_images.py --now \
             --topic "${{ github.event.inputs.topic || '' }}" \
-            --hashtags-file hashtags.txt
+            --hashtags-file hashtags.txt \
+            --platform facebook
 
       - name: Send to Telegram for Approval
         if: github.event.inputs.auto_post == 'true'
