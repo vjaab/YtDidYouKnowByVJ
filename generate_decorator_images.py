@@ -337,6 +337,7 @@ def main():
             set_gha_output("poll_file", str(poll_path))
             set_gha_output("hashtags", hashtags)
             set_gha_output("carousel_json", str(carousel_path))
+            set_gha_output("is_carousel", "true")
             return
 
         # Send to Telegram for review
@@ -365,6 +366,7 @@ def main():
         set_gha_output("poll_file", str(poll_path))
         set_gha_output("hashtags", hashtags)
         set_gha_output("carousel_json", str(carousel_path))
+        set_gha_output("is_carousel", "true")
         
         print("\n✅ Generation complete. Carousel sent to Telegram for review.")
 
