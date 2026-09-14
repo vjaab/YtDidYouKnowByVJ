@@ -359,7 +359,7 @@ def main():
         send_telegram_message(
             f"✅ Carousel generated for: {carousel.get('headline', 'AI News')}\n"
             f"Instagram Carousel (4:5): {len(ig_paths)} slides\n"
-            f"{'Facebook (1.91:1): ' + str(len(fb_paths)) + ' image\n' if fb_paths else ''}\nReply to approve for posting.",
+            f"{'Facebook (1.91:1): ' + str(len(fb_paths)) + ' image' if fb_paths else ''}\nReply to approve for posting.",
             emoji="🤖"
         )
 
