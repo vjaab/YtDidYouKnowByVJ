@@ -21,11 +21,13 @@
     <span class="code-panel__copy">Copy</span>
   </div>
   <div class="code-panel__content">
-    {% for line in code_lines %}
-    <div class="code-panel__line">
-      <span class="code-panel__comment">{{ line }}</span>
-    </div>
-    {% endfor %}
+    <ol class="code-lines">
+      {% for line in code_lines %}
+      <li class="code-panel__line">
+        <span class="code-panel__comment">{{ line }}</span>
+      </li>
+      {% endfor %}
+    </ol>
   </div>
 </div>
 
