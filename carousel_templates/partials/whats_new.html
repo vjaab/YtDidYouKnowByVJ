@@ -1,0 +1,50 @@
+{% extends "layouts/base.html" %}
+
+{% block header %}
+<header class="header-card header-card--accent"
+        style="--accent-color: {{ accent_color }}; --accent-color-light: {{ accent_color_light }};">
+  <div class="header-card__label">{{ slide_data.eyebrow or category }}</div>
+  <h1 class="header-card__title">{{ slide_data.title }}</h1>
+</header>
+{% endblock %}
+
+{% block content %}
+<div class="section-label" style="color: {{ accent_color }};">{{ slide_data.title }}</div>
+
+<p class="body-text" style="max-width: 90%;">
+  {{ slide_data.body }}
+</p>
+
+<div class="comparison">
+  <div class="comparison__card comparison__card--before">
+    <div class="comparison__label">BEFORE</div>
+    <div class="comparison__text">
+      {% if before_text %}
+        {{ before_text }}
+      {% else %}
+        Manual setup<br>
+        Complex configuration<br>
+        Slow iteration cycles
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="comparison__card comparison__card--after">
+    <div class="comparison__label">AFTER</div>
+    <div class="comparison__text">
+      {% if after_text %}
+        {{ after_text }}
+      {% else %}
+        One-click deploy<br>
+        Auto-configuration<br>
+        Instant feedback
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="handle-chip" style="--accent-color: {{ accent_color }};">
+  <div class="handle-chip__avatar">VJ</div>
+  <span>@vijayakumarj_ai</span>
+</div>
+{% endblock %}

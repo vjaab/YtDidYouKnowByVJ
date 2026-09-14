@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1080, height=1350">
+  <title>{{ slide_data.title or 'AI News Carousel' }}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    {{ css_content | safe }}
+  </style>
+</head>
+<body>
+  <div class="carousel-canvas slide--{{ slide_data.type }}">
+    <div class="slide-number">{{ "%02d"|format(slide_current) }}</div>
+
+    {% block header %}
+    <header class="header-card {% if slide_data.type == 'hook' %}header-card--gradient{% else %}header-card--accent{% endif %}"
+            style="--accent-color: {{ accent_color }}; --accent-color-light: {{ accent_color_light }};">
+      <div class="header-card__label">{{ slide_data.eyebrow or category }}</div>
+      <h1 class="header-card__title">{{ slide_data.title }}</h1>
+    </header>
+    {% endblock %}
+
+    <main class="content-card {% if slide_data.type != 'hook' %}content-card--accent{% endif %}"
+          style="--accent-color: {{ accent_color }}; --accent-color-light: {{ accent_color_light }};">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="slide-footer">
+      <div class="footer__brand">
+        <div class="footer__brand-avatar">VJ</div>
+        <span>VJ AI NEWS</span>
+      </div>
+      <div class="footer__counter">{{ "%02d"|format(slide_current) }} / {{ slide_total }}</div>
+    </footer>
+
+    {% if slide_data.type in ['hook', 'what_happened', 'whats_new', 'why_matters', 'real_world_example'] %}
+    <button class="pill-btn" style="--accent-color: {{ accent_color }};">
+      <span>Swipe</span>
+      <span class="pill-btn__arrow">›</span>
+    </button>
+    {% endif %}
+  </div>
+</body>
+</html>

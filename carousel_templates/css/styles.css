@@ -1,0 +1,674 @@
+/* ==========================================================================
+   AI NEWS CAROUSEL — DESIGN TOKENS & BASE STYLES
+   Light, card-based, editorial aesthetic (Figma Template Kit style)
+   ========================================================================== */
+
+:root {
+  /* ── Canvas ── */
+  --canvas-w: 1080px;
+  --canvas-h: 1350px;
+
+  /* ── Colors ── */
+  --color-white: #FFFFFF;
+  --color-off-white: #F9FAFB;
+  --color-gray-50: #F3F4F6;
+  --color-gray-100: #E5E7EB;
+  --color-gray-200: #D1D5DB;
+  --color-gray-300: #9CA3AF;
+  --color-gray-400: #6B7280;
+  --color-gray-500: #4B5563;
+  --color-gray-600: #374151;
+  --color-gray-700: #1F2937;
+  --color-gray-800: #111827;
+  --color-gray-900: #0F172A;
+
+  /* ── Accent Families (one per slide type) ── */
+  /* hook: vibrant pink→purple→violet gradient */
+  --accent-hook-start: #EC4899;      /* pink-500 */
+  --accent-hook-mid: #A855F7;        /* purple-500 */
+  --accent-hook-end: #8B5CF6;        /* violet-500 */
+
+  /* what_happened: Electric Blue */
+  --accent-what: #0066FF;
+  --accent-what-light: #DBEAFE;
+  --accent-what-dark: #1E40AF;
+
+  /* whats_new: Emerald Green */
+  --accent-new: #059669;
+  --accent-new-light: #D1FAE5;
+  --accent-new-dark: #047857;
+
+  /* why_matters: Amber/Gold */
+  --accent-why: #D97706;
+  --accent-why-light: #FEF3C7;
+  --accent-why-dark: #B45309;
+
+  /* real_world_example: Bright Coral/Red */
+  --accent-code: #FF4B4B;
+  --accent-code-light: #FEF2F2;
+  --accent-code-dark: #DC2626;
+
+  /* takeaway_cta: Warm Magenta/Pink with Soft Purple */
+  --accent-takeaway: #FF2E93;
+  --accent-takeaway-purple: #C084FC;
+  --accent-takeaway-light: #FDF4FF;
+
+  /* ── Code Panel (dark) ── */
+  --code-bg: #0D1117;
+  --code-border: #30363D;
+  --code-text: #E6EDF3;
+  --code-comment: #8B949E;
+  --code-keyword: #FF7B72;
+  --code-string: #A5D6FF;
+  --code-function: #D2A8FF;
+  --code-number: #79C0FF;
+
+  /* ── Typography ── */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+
+  /* ── Spacing ── */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* ── Radii ── */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 8px 30px rgba(0, 0, 0, 0.08);
+  --shadow-elevated: 0 12px 40px rgba(0, 0, 0, 0.10);
+
+  /* ── Transitions ── */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+}
+
+/* ==========================================================================
+   RESET & BASE
+   ========================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: var(--canvas-w);
+  height: var(--canvas-h);
+  background: var(--color-white);
+  font-family: var(--font-sans);
+  color: var(--color-gray-800);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ==========================================================================
+   CANVAS CONTAINER
+   ========================================================================== */
+.carousel-canvas {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-xl);
+  gap: var(--space-lg);
+  background: var(--color-white);
+}
+
+/* ==========================================================================
+   SHARED COMPONENTS
+   ========================================================================== */
+
+/* ── Slide Number Badge (Hero) ── */
+.slide-number {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 120px;
+  line-height: 1;
+  color: var(--accent-color, var(--color-gray-200));
+  opacity: 0.15;
+  position: absolute;
+  top: var(--space-lg);
+  left: var(--space-xl);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ── Header Card ── */
+.header-card {
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-lg);
+  position: relative;
+  z-index: 2;
+}
+
+.header-card--gradient {
+  background: linear-gradient(135deg, var(--accent-hook-start), var(--accent-hook-mid), var(--accent-hook-end));
+  color: var(--color-white);
+}
+
+.header-card--accent {
+  background: var(--color-white);
+  border: 1px solid var(--accent-color-light, var(--color-gray-200));
+  box-shadow: var(--shadow-card);
+}
+
+.header-card__label {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: inherit;
+  opacity: 0.8;
+  margin-bottom: var(--space-sm);
+  display: inline-block;
+}
+
+.header-card__title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 48px;
+  line-height: 1.15;
+  color: inherit;
+  max-width: 90%;
+}
+
+.header-card--gradient .header-card__title {
+  color: var(--color-white);
+}
+
+.header-card--accent .header-card__title {
+  color: var(--color-gray-900);
+}
+
+/* ── Content Card ── */
+.content-card {
+  background: var(--color-white);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-gray-100);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.content-card--accent {
+  border-left: 4px solid var(--accent-color);
+}
+
+/* ── Section Label ── */
+.section-label {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-color, var(--color-gray-500));
+  margin-bottom: var(--space-md);
+}
+
+/* ── Body Text ── */
+.body-text {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 1.6;
+  color: var(--color-gray-700);
+}
+
+.body-text--large {
+  font-size: 26px;
+  line-height: 1.5;
+  color: var(--color-gray-800);
+}
+
+/* ── Bullet List ── */
+.bullet-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.bullet-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--accent-color-light, var(--color-off-white));
+  border-radius: var(--radius-md);
+  border: 1px solid var(--accent-color-light, transparent);
+}
+
+.bullet-item::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-color);
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+.bullet-item__text {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--color-gray-800);
+}
+
+/* ── Before/After Comparison ── */
+.comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
+}
+
+.comparison__card {
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  border: 2px solid;
+}
+
+.comparison__card--before {
+  background: var(--accent-code-light);
+  border-color: var(--accent-code);
+}
+
+.comparison__card--after {
+  background: var(--accent-new-light);
+  border-color: var(--accent-new);
+}
+
+.comparison__label {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-color);
+  margin-bottom: var(--space-md);
+}
+
+.comparison__text {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--color-gray-700);
+}
+
+/* ── Impact Metrics ── */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
+}
+
+.metric {
+  text-align: left;
+  padding: var(--space-lg);
+  background: var(--color-off-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-gray-100);
+}
+
+.metric__label {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--color-gray-500);
+  margin-bottom: var(--space-xs);
+}
+
+.metric__value {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+  color: var(--color-gray-900);
+  margin-bottom: var(--space-xs);
+}
+
+.metric__delta {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--accent-new);
+}
+
+/* ── Code Panel (Dark) ── */
+.code-panel {
+  background: var(--code-bg);
+  border: 1px solid var(--accent-code);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-top: var(--space-lg);
+}
+
+.code-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--code-border);
+  border-bottom: 1px solid var(--code-border);
+}
+
+.code-panel__lang {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--code-comment);
+  text-transform: uppercase;
+}
+
+.code-panel__copy {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--code-comment);
+  cursor: pointer;
+}
+
+.code-panel__content {
+  padding: var(--space-lg);
+  overflow-x: auto;
+}
+
+.code-panel__line {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--code-text);
+  white-space: pre;
+}
+
+.code-panel__comment { color: var(--code-comment); }
+.code-panel__keyword { color: var(--code-keyword); }
+.code-panel__string { color: var(--code-string); }
+.code-panel__function { color: var(--code-function); }
+.code-panel__number { color: var(--code-number); }
+
+/* ── Takeaway List ── */
+.takeaway-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
+}
+
+.takeaway-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-lg);
+}
+
+.takeaway-item__number {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(135deg, var(--accent-takeaway), var(--accent-takeaway-purple));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--color-white);
+  flex-shrink: 0;
+}
+
+.takeaway-item__text {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 1.4;
+  color: var(--color-gray-800);
+  padding-top: var(--space-xs);
+}
+
+/* ── Quotation Mark Graphic ── */
+.quote-mark {
+  font-family: 'Georgia', serif;
+  font-weight: 700;
+  font-size: 180px;
+  line-height: 1;
+  color: var(--accent-color);
+  opacity: 0.12;
+  position: absolute;
+  top: var(--space-xl);
+  right: var(--space-xl);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Pill Button ── */
+.pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-xl);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-white);
+  background: var(--accent-color);
+  border: none;
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  align-self: flex-end;
+  margin-top: auto;
+}
+
+.pill-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-elevated);
+}
+
+.pill-btn__arrow {
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* ── Branded Handle Chip ── */
+.handle-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-pill);
+  background: var(--color-gray-50);
+  border: 1px solid var(--color-gray-200);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-gray-700);
+  margin-top: var(--space-xl);
+  align-self: flex-start;
+}
+
+.handle-chip__avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-hook-start), var(--accent-hook-end));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--color-white);
+}
+
+/* ── Footer ── */
+.slide-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-gray-100);
+  margin-top: auto;
+}
+
+.footer__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-gray-600);
+}
+
+.footer__brand-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent-hook-start), var(--accent-hook-end));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--color-white);
+}
+
+.footer__counter {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-gray-400);
+}
+
+/* ==========================================================================
+   SLIDE-SPECIFIC OVERRIDES
+   ========================================================================== */
+
+/* Hook slide (Slide 1) - Full gradient hero */
+.slide--hook .header-card {
+  background: linear-gradient(135deg, var(--accent-hook-start), var(--accent-hook-mid), var(--accent-hook-end));
+}
+.slide--hook .header-card__title {
+  color: var(--color-white);
+}
+.slide--hook .header-card__label {
+  color: rgba(255,255,255,0.9);
+}
+.slide--hook .content-card {
+  background: var(--color-white);
+  border: none;
+  box-shadow: none;
+  padding: var(--space-lg) var(--space-xl);
+}
+.slide--hook .pill-btn {
+  background: linear-gradient(135deg, var(--accent-hook-start), var(--accent-hook-end));
+}
+
+/* What Happened - Electric Blue */
+.slide--what_happened .content-card {
+  border-left-color: var(--accent-what);
+}
+.slide--what_happened .bullet-item {
+  background: var(--accent-what-light);
+  border-color: var(--accent-what-light);
+}
+.slide--what_happened .bullet-item::before {
+  background: var(--accent-what);
+}
+.slide--what_happened .pill-btn {
+  background: var(--accent-what);
+}
+
+/* What's New - Emerald Green */
+.slide--whats_new .content-card {
+  border-left-color: var(--accent-new);
+}
+.slide--whats_new .comparison__card--before {
+  background: var(--accent-code-light);
+  border-color: var(--accent-code);
+}
+.slide--whats_new .comparison__card--after {
+  background: var(--accent-new-light);
+  border-color: var(--accent-new);
+}
+.slide--whats_new .comparison__label {
+  color: var(--accent-new);
+}
+.slide--whats_new .pill-btn {
+  background: var(--accent-new);
+}
+
+/* Why Matters - Amber/Gold */
+.slide--why_matters .content-card {
+  border-left-color: var(--accent-why);
+}
+.slide--why_matters .metrics-grid .metric {
+  border-left: 3px solid var(--accent-why);
+}
+.slide--why_matters .pill-btn {
+  background: var(--accent-why);
+}
+
+/* Real World Example - Coral/Red (Dark Code Panel) */
+.slide--real_world_example .content-card {
+  border-left-color: var(--accent-code);
+}
+.slide--real_world_example .code-panel {
+  border-color: var(--accent-code);
+}
+.slide--real_world_example .pill-btn {
+  background: var(--accent-code);
+}
+
+/* Takeaway CTA - Magenta/Pink */
+.slide--takeaway_cta .content-card {
+  border-left-color: var(--accent-takeaway);
+}
+.slide--takeaway_cta .takeaway-item__number {
+  background: linear-gradient(135deg, var(--accent-takeaway), var(--accent-takeaway-purple));
+}
+.slide--takeaway_cta .pill-btn {
+  background: linear-gradient(135deg, var(--accent-takeaway), var(--accent-takeaway-purple));
+}
+
+/* ==========================================================================
+   RESPONSIVE / PRINT (not needed but kept for completeness)
+   ========================================================================== */
+@media (max-width: 1080px) {
+  :root {
+    --canvas-w: 100vw;
+    --canvas-h: 100vh;
+  }
+}

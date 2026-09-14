@@ -266,7 +266,7 @@ def main():
     try:
         # Import carousel modules
         from ai_news_carousel import fetch_ai_news_stories, select_best_story, generate_carousel_json
-        from carousel_renderer import render_carousel
+        from carousel_renderer_html import render_carousel
         
         # Get story
         if args.topic:

@@ -1,0 +1,19 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; gap: var(--space-lg); height: 100%;">
+  <p class="body-text body-text--large" style="color: var(--color-gray-600);">
+    {{ slide_data.body }}
+  </p>
+
+  <div style="margin-top: auto; display: flex; justify-content: center; align-items: center;">
+    <div style="width: 180px; height: 180px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-hook-start), var(--accent-hook-mid), var(--accent-hook-end)); opacity: 0.15; display: flex; align-items: center; justify-content: center;">
+      <span style="font-size: 64px;">🚀</span>
+    </div>
+  </div>
+
+  <div class="handle-chip" style="--accent-color: {{ accent_color }};">
+    <div class="handle-chip__avatar">VJ</div>
+    <span>@vijayakumarj_ai</span>
+  </div>
+{% endblock %}

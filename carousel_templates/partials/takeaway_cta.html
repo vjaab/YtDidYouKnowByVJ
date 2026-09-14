@@ -1,0 +1,33 @@
+{% extends "layouts/base.html" %}
+
+{% block header %}
+<header class="header-card header-card--accent"
+        style="--accent-color: {{ accent_color }}; --accent-color-light: {{ accent_color_light }};">
+  <div class="header-card__label">{{ slide_data.eyebrow or category }}</div>
+  <h1 class="header-card__title">{{ slide_data.title }}</h1>
+</header>
+{% endblock %}
+
+{% block content %}
+<div class="section-label" style="color: {{ accent_color }};">{{ slide_data.title }}</div>
+
+<ul class="takeaway-list">
+  {% for takeaway in slide_data.body %}
+  <li class="takeaway-item">
+    <div class="takeaway-item__number">{{ loop.index }}</div>
+    <span class="takeaway-item__text">{{ takeaway }}</span>
+  </li>
+  {% endfor %}
+</ul>
+
+<div style="margin-top: var(--space-xl); display: flex; flex-direction: column; gap: var(--space-md); width: 100%;">
+  <button class="pill-btn" style="width: 100%; justify-content: center; background: linear-gradient(135deg, var(--accent-takeaway), var(--accent-takeaway-purple));">
+    <span>💾 Save this post</span>
+  </button>
+
+  <div class="handle-chip" style="--accent-color: {{ accent_color }}; margin-top: var(--space-md);">
+    <div class="handle-chip__avatar">VJ</div>
+    <span>Follow @vijayakumarj_ai for daily AI updates</span>
+  </div>
+</div>
+{% endblock %}

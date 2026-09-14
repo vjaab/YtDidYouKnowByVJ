@@ -1,0 +1,36 @@
+{% extends "layouts/base.html" %}
+
+{% block header %}
+<header class="header-card header-card--accent"
+        style="--accent-color: {{ accent_color }}; --accent-color-light: {{ accent_color_light }};">
+  <div class="header-card__label">{{ slide_data.eyebrow or category }}</div>
+  <h1 class="header-card__title">{{ slide_data.title }}</h1>
+</header>
+{% endblock %}
+
+{% block content %}
+<div class="section-label" style="color: {{ accent_color }};">{{ slide_data.title }}</div>
+
+<p class="body-text" style="max-width: 90%;">
+  Here's how you can use this in your workflow:
+</p>
+
+<div class="code-panel" style="--accent-color: {{ accent_color }};">
+  <div class="code-panel__header">
+    <span class="code-panel__lang">python</span>
+    <span class="code-panel__copy">Copy</span>
+  </div>
+  <div class="code-panel__content">
+    {% for line in code_lines %}
+    <div class="code-panel__line">
+      <span class="code-panel__comment">{{ line }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="handle-chip" style="--accent-color: {{ accent_color }};">
+  <div class="handle-chip__avatar">VJ</div>
+  <span>@vijayakumarj_ai</span>
+</div>
+{% endblock %}
