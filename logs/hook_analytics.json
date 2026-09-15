@@ -201,6 +201,31 @@
         "avg_engagement": 0.0,
         "avg_swipe_away": 0.0,
         "avg_view_percentage": 0.0
+      },
+      "curiosity_gap": {
+        "variants": {
+          "A": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "Is your code generator secretly free?",
+                "video_id": "9xuf_0_4xLE",
+                "recorded_at": "2026-09-15T04:53:30.780956"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
       }
     },
     "Tech Tips": {
@@ -722,7 +747,7 @@
       "views": 0,
       "retention": 0.0,
       "engagement": 0.0,
-      "count": 6,
+      "count": 7,
       "swipe_away_rate": 0.0,
       "avg_view_percentage": 0.0
     },
@@ -735,5 +760,5 @@
       "avg_view_percentage": 0.0
     }
   },
-  "last_updated": "2026-09-14T21:07:28.360012"
+  "last_updated": "2026-09-15T04:53:30.780981"
 }

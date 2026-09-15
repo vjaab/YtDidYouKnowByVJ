@@ -278,5 +278,15 @@
     "title": "AI Agents Can Be Tricked Into Writing Bad Code?",
     "uploaded_at": "2026-09-14T21:07:28.361129",
     "synced": false
+  },
+  "9xuf_0_4xLE": {
+    "video_id": "9xuf_0_4xLE",
+    "hook_pattern": "curiosity_gap",
+    "hook_variant": "A",
+    "hook_text": "Is your code generator secretly free?",
+    "category": "Interview Questions",
+    "title": "\ud83d\udea8 Stop Paying for AI Coding! Unlimited FREE Claude, GPT & Copilot? \ud83e\udd2f",
+    "uploaded_at": "2026-09-15T04:53:30.782032",
+    "synced": false
   }
 }
