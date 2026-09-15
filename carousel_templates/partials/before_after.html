@@ -3,52 +3,50 @@
 {% block content %}
 <div style="display: flex; flex-direction: column; gap: 20px;">
   {% if slide_data.body %}
-  <p style="font-size: 21px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 6px;">
+  <p style="font-size: 21px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 8px;">
     {{ slide_data.body }}
   </p>
   {% endif %}
 
   <div class="comparison-grid">
+    <!-- BEFORE CARD -->
     <div class="comparison-box comparison-box--before">
       <div class="comp-header">
         <span class="comp-badge comp-badge--danger">BEFORE</span>
-        <span class="comp-title">Legacy Setup</span>
+        <span class="comp-title">{{ slide_data.before_title or 'Legacy Approach' }}</span>
       </div>
       <ul class="comp-list">
-        {% set before_items = before_text.split('\n') if before_text is string else (slide_data.before_items if slide_data.before_items else [
-          'Manual setup & fragmented tooling',
-          'Complex boilerplate configuration',
-          'Slow developer iteration cycles'
-        ]) %}
+        {% set before_items = slide_data.before_items if slide_data.before_items else [
+          'Manual configuration and rigid heuristics',
+          'High latency with frequent timeouts',
+          'Fragile glue code across microservices'
+        ] %}
         {% for item in before_items %}
-        {% if item.strip() %}
         <li class="comp-item">
           <span class="comp-icon" style="color: var(--accent-danger);">✕</span>
           <span>{{ item }}</span>
         </li>
-        {% endif %}
         {% endfor %}
       </ul>
     </div>
 
+    <!-- AFTER CARD -->
     <div class="comparison-box comparison-box--after">
       <div class="comp-header">
         <span class="comp-badge comp-badge--success">AFTER</span>
-        <span class="comp-title">Modern Paradigm</span>
+        <span class="comp-title">{{ slide_data.after_title or 'Modern Architecture' }}</span>
       </div>
       <ul class="comp-list">
-        {% set after_items = after_text.split('\n') if after_text is string else (slide_data.after_items if slide_data.after_items else [
-          'One-click unified workflow',
-          'Autonomous tooling & context injection',
-          'Real-time streaming and instant feedback'
-        ]) %}
+        {% set after_items = slide_data.after_items if slide_data.after_items else [
+          'Autonomous agentic tool execution',
+          'Sub-second response with streaming output',
+          'Unified SDK with full observability'
+        ] %}
         {% for item in after_items %}
-        {% if item.strip() %}
         <li class="comp-item">
           <span class="comp-icon" style="color: var(--accent-success);">✓</span>
           <span>{{ item }}</span>
         </li>
-        {% endif %}
         {% endfor %}
       </ul>
     </div>

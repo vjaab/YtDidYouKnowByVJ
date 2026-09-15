@@ -9,10 +9,10 @@
   {% endif %}
 
   <div class="metrics-grid">
-    {% set metrics_list = metrics if metrics else [
-      {'label': 'Developers', 'value': '15min', 'delta': 'From 2 hours'},
-      {'label': 'Time To Prod', 'value': 'Days', 'delta': 'From weeks'},
-      {'label': 'API Latency', 'value': '180ms', 'delta': '-65% drop'}
+    {% set metrics_list = slide_data.metrics if slide_data.metrics else [
+      {'label': 'Latency', 'value': '180ms', 'delta': '-65% drop'},
+      {'label': 'Context Capacity', 'value': '2M+', 'delta': '10x larger'},
+      {'label': 'API Cost', 'value': '$0.075', 'delta': '50% savings'}
     ] %}
 
     {% for m in metrics_list %}

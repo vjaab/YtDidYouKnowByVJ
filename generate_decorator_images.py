@@ -267,6 +267,7 @@ def main():
         # Import carousel modules
         from ai_news_carousel import fetch_ai_news_stories, select_best_story, generate_carousel_json
         from carousel_renderer_html import render_carousel
+        from visual_strategy import create_visual_strategy
         
         # Get story
         if args.topic:
@@ -287,17 +288,26 @@ def main():
 
         # Generate carousel JSON
         carousel = generate_carousel_json(story)
+        safe_title = sanitize_filename(carousel.get("headline", "ai_news"))
+
+        # Create Visual Strategy (Theme, Layout Sequence, Styling)
+        strategy = create_visual_strategy(carousel, story=story)
+        strategy_path = output_dir / f"strategy_{safe_title}.json"
+        with open(strategy_path, "w", encoding="utf-8") as f:
+            json.dump(strategy, f, indent=2)
+        print(f"🎨 Visual Strategy created & saved: {strategy_path}")
+        print(f"   Theme: {strategy.get('visual_theme')} | Domain: {strategy.get('domain')} | Slides: {len(carousel.get('slides', []))}")
         
         # Save carousel JSON
-        safe_title = sanitize_filename(carousel.get("headline", "ai_news"))
         carousel_path = output_dir / f"carousel_{safe_title}.json"
-        with open(carousel_path, "w") as f:
+        with open(carousel_path, "w", encoding="utf-8") as f:
             json.dump(carousel, f, indent=2)
         print(f"✅ Carousel JSON saved: {carousel_path}")
 
         # Render carousel slides
-        print(f"\n🎨 Rendering {CAROUSEL_SLIDES} carousel slides...")
-        ig_paths = render_carousel(carousel, output_dir)
+        slide_count = len(carousel.get("slides", []))
+        print(f"\n🎨 Rendering {slide_count} carousel slides with theme {strategy.get('visual_theme')}...")
+        ig_paths = render_carousel(carousel, output_dir, strategy=strategy)
         
         # Generate Facebook images only if needed
         fb_paths = []

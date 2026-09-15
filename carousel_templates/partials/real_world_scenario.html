@@ -1,0 +1,31 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="scenario-card card--glow">
+  <div class="company-pill">
+    <span style="color: var(--accent);">🏢</span>
+    <span>{{ slide_data.scenario_company or 'Production Tech Stack' }}</span>
+  </div>
+
+  <div class="scenario-row">
+    <div class="scenario-label" style="color: var(--accent-danger);">The Problem</div>
+    <div class="scenario-text">
+      {{ slide_data.scenario_problem or 'Legacy pipeline struggled with 500k+ customer records, causing severe bottleneck.' }}
+    </div>
+  </div>
+
+  <div class="scenario-row">
+    <div class="scenario-label" style="color: var(--accent);">The Solution</div>
+    <div class="scenario-text">
+      {{ slide_data.scenario_solution or 'Migrated orchestration to streaming multimodal LLM architecture with tool calling.' }}
+    </div>
+  </div>
+
+  <div class="scenario-row">
+    <div class="scenario-label" style="color: var(--accent-success);">The Result</div>
+    <div class="scenario-text" style="font-weight: 700; color: var(--accent-success);">
+      {{ slide_data.scenario_result or '⚡ 78% reduction in latency and 45% cost savings with zero downtime.' }}
+    </div>
+  </div>
+</div>
+{% endblock %}

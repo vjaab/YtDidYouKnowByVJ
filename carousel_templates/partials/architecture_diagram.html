@@ -1,0 +1,74 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="card card--glow architecture-canvas">
+  {% if slide_data.body %}
+  <p style="font-size: 21px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 12px;">
+    {{ slide_data.body }}
+  </p>
+  {% endif %}
+
+  {% if slide_data.diagram and slide_data.diagram.nodes %}
+    {% for node in slide_data.diagram.nodes %}
+      <div class="arch-node">
+        <div class="arch-node__content">
+          <span class="arch-node__name">{{ node.label or node.name or node.title }}</span>
+          {% if node.sub or node.type or node.desc %}
+          <span class="arch-node__sub">{{ node.sub or node.type or node.desc }}</span>
+          {% endif %}
+        </div>
+        <div style="font-family: var(--font-mono); font-size: 20px; font-weight: 800; color: var(--accent);">
+          0{{ loop.index }}
+        </div>
+      </div>
+      
+      {% if not loop.last %}
+      <div class="arch-connector">
+        <div class="arch-connector__line"></div>
+        <div class="arch-connector__badge">
+          {% if slide_data.diagram.connections and loop.index0 < slide_data.diagram.connections|length %}
+            {{ slide_data.diagram.connections[loop.index0].label or 'Data Flow' }}
+          {% else %}
+            Context Stream
+          {% endif %}
+        </div>
+        <div class="arch-connector__line"></div>
+      </div>
+      {% endif %}
+    {% endfor %}
+  {% else %}
+    <!-- Default Architecture Fallback -->
+    <div class="arch-node">
+      <div class="arch-node__content">
+        <span class="arch-node__name">User Application / Client</span>
+        <span class="arch-node__sub">Frontend & API Gateway</span>
+      </div>
+      <div style="font-family: var(--font-mono); font-size: 20px; font-weight: 800; color: var(--accent);">01</div>
+    </div>
+    <div class="arch-connector">
+      <div class="arch-connector__line"></div>
+      <div class="arch-connector__badge">HTTP / Streaming Events</div>
+      <div class="arch-connector__line"></div>
+    </div>
+    <div class="arch-node">
+      <div class="arch-node__content">
+        <span class="arch-node__name">Agent Orchestration Engine</span>
+        <span class="arch-node__sub">Tool Dispatch & Semantic Routing</span>
+      </div>
+      <div style="font-family: var(--font-mono); font-size: 20px; font-weight: 800; color: var(--accent);">02</div>
+    </div>
+    <div class="arch-connector">
+      <div class="arch-connector__line"></div>
+      <div class="arch-connector__badge">Grounding & Context Injection</div>
+      <div class="arch-connector__line"></div>
+    </div>
+    <div class="arch-node">
+      <div class="arch-node__content">
+        <span class="arch-node__name">High-Performance Foundation Model</span>
+        <span class="arch-node__sub">Reasoning Core & Structured Output</span>
+      </div>
+      <div style="font-family: var(--font-mono); font-size: 20px; font-weight: 800; color: var(--accent);">03</div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

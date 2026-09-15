@@ -1,0 +1,17 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="card card--glow big-number-display">
+  <div class="big-number-value">
+    {{ slide_data.number or slide_data.stat or '10x' }}
+  </div>
+  <div class="big-number-label">
+    {{ slide_data.label or slide_data.title }}
+  </div>
+  {% if slide_data.body or slide_data.context %}
+  <p class="big-number-desc">
+    {{ slide_data.body or slide_data.context }}
+  </p>
+  {% endif %}
+</div>
+{% endblock %}

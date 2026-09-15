@@ -1,0 +1,30 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; gap: 20px;">
+  {% if slide_data.body %}
+  <p style="font-size: 21px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 6px;">
+    {{ slide_data.body }}
+  </p>
+  {% endif %}
+
+  <div class="code-window">
+    <div class="code-window__bar">
+      <div class="code-dots">
+        <span class="code-dot code-dot--red"></span>
+        <span class="code-dot code-dot--yellow"></span>
+        <span class="code-dot code-dot--green"></span>
+      </div>
+      <span class="code-window__lang">{{ slide_data.language or 'python' }}</span>
+    </div>
+    <pre class="code-content"><code>{{ highlighted_code or slide_data.code or "from google import genai\n\nclient = genai.Client()\nresponse = client.models.generate_content(\n    model='gemini-2.5-flash',\n    contents='Benchmark AI latency & throughput'\n)\nprint(response.text)" }}</code></pre>
+  </div>
+
+  {% if slide_data.code_explanation or slide_data.explanation %}
+  <div class="code-explanation-card">
+    <strong style="color: var(--text-primary); display: block; margin-bottom: 4px;">💡 Engineer Tip:</strong>
+    {{ slide_data.code_explanation or slide_data.explanation }}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

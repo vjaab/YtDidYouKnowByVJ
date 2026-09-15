@@ -1,0 +1,29 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; gap: 20px;">
+  {% if slide_data.body %}
+  <p style="font-size: 21px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 8px;">
+    {{ slide_data.body }}
+  </p>
+  {% endif %}
+
+  <div class="checklist-container">
+    {% set items = slide_data.checklist_items if slide_data.checklist_items else [
+      'Upgrade SDK dependencies to support latest model capabilities',
+      'Define strict Pydantic schemas for structured agent tools',
+      'Implement client-side exponential backoff and jitter',
+      'Set up continuous evaluation metrics on synthetic datasets'
+    ] %}
+
+    {% for item in items %}
+    <div class="checklist-item">
+      <div class="check-icon-box">✓</div>
+      <div class="checklist-text">
+        {{ item.text if item is mapping else item }}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

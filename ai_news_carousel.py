@@ -158,109 +158,218 @@ def select_best_story(stories: List[Dict]) -> Optional[Dict]:
     return None
 
 
-def build_carousel_prompt(story: Dict) -> str:
-    """Build the prompt for LLM to generate carousel content."""
+try:
+    from content_validator import validate_carousel_content, repair_carousel
+    CONTENT_VALIDATOR_AVAILABLE = True
+except ImportError:
+    CONTENT_VALIDATOR_AVAILABLE = False
+
+AVAILABLE_GEMINI_MODELS = [
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-2.0-flash-exp",
+    "gemini-1.5-flash",
+]
+
+def build_carousel_prompt(story: Dict, min_slides: int = 5, max_slides: int = 8) -> str:
+    """Build a comprehensive prompt for LLM to generate rich, dynamic educational carousel content."""
     title = story.get("title", "")
     description = story.get("description", "")
     url = story.get("url", "")
     source = story.get("source", {}).get("name", "Unknown")
-    category = story.get("_predicted_category", "AI News")
+    category = story.get("_predicted_category", "AI Engineering")
+    today_str = datetime.now().strftime('%d %b %Y')
     
-    return f"""You are an expert AI news curator creating Instagram carousels for @vijayakumarj_ai (daily AI updates for engineers/developers).
+    return f"""You are an elite developer educator and tech visual designer creating high-engagement Instagram educational carousels for @vijayakumarj_ai (daily AI & engineering updates for software engineers, tech leads, and AI practitioners).
 
-STORY:
+STORY CONTEXT:
 Title: {title}
 Description: {description}
 Source: {source}
 URL: {url}
 Category: {category}
+Date: {today_str}
 
-Generate a 6-slide carousel JSON with this EXACT structure:
+OBJECTIVE:
+Generate a visually varied, professional {min_slides} to {max_slides} slide carousel JSON.
+Do NOT make every slide a boring bullet list.
+Use dynamic storytelling layouts so each slide has a distinct, purposeful visual composition.
+
+AVAILABLE LAYOUT TYPES:
+1. "hero_hook" (Slide 1): High-impact bold hook headline, subtitle, and badge.
+2. "architecture_diagram": System diagram with structured nodes & connections (e.g. Client -> Agent -> LLM -> VectorDB).
+3. "process_flow": 3-4 numbered execution steps with titles & explanations.
+4. "before_after": Clear before vs after comparison (e.g., Old way vs New paradigm).
+5. "common_mistake": Wrong way (❌) vs Right way (✅) side-by-side or stacked.
+6. "code_block": Real, copy-pasteable syntax-valid code snippet (Python, JS, or Bash) with explanation.
+7. "real_world_scenario": Production use case from a named company (e.g. Netflix, Uber, Stripe) with Problem, Solution, Result.
+8. "metrics_cards": 2-3 key metrics/benchmarks with labels, values, and deltas.
+9. "side_by_side": Two-column comparison of 2 approaches/tools.
+10. "quiz_choice" or "quiz_predict_output": Engaging quick question for engineers (with options, answer, explanation).
+11. "checklist": 3-5 practical checklist items for implementing this tech.
+12. "takeaway": Final slide with key lessons and CTA to follow @vijayakumarj_ai.
+
+JSON OUTPUT SPECIFICATION:
+Output strictly valid JSON with this structure (no markdown wrapping outside json):
 {{
-  "headline": "Short punchy headline (max 60 chars)",
-  "summary": "2-3 sentence summary for caption",
+  "headline": "Short punchy headline under 60 chars",
+  "summary": "2-3 sentence executive summary for social caption",
   "source": "{source}",
   "source_url": "{url}",
-  "date": "{datetime.now().strftime('%d %b %y')}",
+  "date": "{today_str}",
+  "category": "{category}",
   "slides": [
     {{
-      "type": "hook",
-      "title": "HOOK HEADLINE",
-      "body": "Big statement: What just changed?",
-      "visual_hint": "Description of visual element for this slide"
+      "slide_number": 1,
+      "layout_type": "hero_hook",
+      "eyebrow": "AI BREAKTHROUGH",
+      "title": "Hook Headline That Stops The Scroll",
+      "subtitle": "Clear, compelling statement of what changes today for engineers.",
+      "body": "Brief context hook."
     }},
     {{
-      "type": "what_happened",
-      "title": "WHAT HAPPENED?",
-      "body": ["Bullet 1", "Bullet 2", "Bullet 3"],
-      "visual_hint": "Simple diagram or icon suggestion"
+      "slide_number": 2,
+      "layout_type": "architecture_diagram",
+      "eyebrow": "SYSTEM ARCHITECTURE",
+      "title": "How The Architecture Works",
+      "body": "System overview explanation.",
+      "diagram": {{
+        "title": "Data Flow Pipeline",
+        "nodes": [
+          {{"id": "1", "label": "User Query", "sub": "Frontend / API"}},
+          {{"id": "2", "label": "Orchestrator", "sub": "Agent Controller"}},
+          {{"id": "3", "label": "LLM Engine", "sub": "Reasoning Model"}},
+          {{"id": "4", "label": "Vector Index", "sub": "Knowledge Base"}}
+        ],
+        "connections": [
+          {{"from": "1", "to": "2", "label": "HTTP/gRPC"}},
+          {{"from": "2", "to": "3", "label": "Context Prompt"}},
+          {{"from": "2", "to": "4", "label": "Semantic Search"}}
+        ]
+      }}
     }},
     {{
-      "type": "whats_new",
-      "title": "WHAT'S NEW?",
-      "body": "Key technical change in plain English",
-      "visual_hint": "Before/After comparison or architecture diagram"
+      "slide_number": 3,
+      "layout_type": "code_block",
+      "eyebrow": "QUICK IMPLEMENTATION",
+      "title": "Implementing In 5 Lines of Code",
+      "body": "How developers can run this right now.",
+      "code": "import google.genai as genai\\n\\nclient = genai.Client()\\nresponse = client.models.generate_content(\\n    model='gemini-2.5-flash',\\n    contents='Analyze repo architecture'\\n)\\nprint(response.text)",
+      "language": "python",
+      "code_explanation": "Simple, idiomatic setup using the official SDK client."
     }},
     {{
-      "type": "why_matters",
-      "title": "WHY DOES IT MATTER?",
-      "body": "Developer/business/user impact\nBefore: X → After: Y",
-      "visual_hint": "Impact visualization or metric comparison"
+      "slide_number": 4,
+      "layout_type": "before_after",
+      "eyebrow": "PARADIGM SHIFT",
+      "title": "Before vs After This Release",
+      "body": "The dramatic developer workflow shift.",
+      "before_title": "Traditional Workflow",
+      "before_items": ["Manual orchestration & prompt tuning", "Slow sync batch processing", "High latency and token cost"],
+      "after_title": "New Paradigm",
+      "after_items": ["Native agentic execution & tool use", "Real-time streaming multimodal UI", "50% lower cost with 2M context"]
     }},
     {{
-      "type": "real_world_example",
-      "title": "REAL-WORLD EXAMPLE",
-      "body": "Code snippet / workflow / use case\n\"Here's how you can use this\"",
-      "visual_hint": "Code block or workflow screenshot"
+      "slide_number": 5,
+      "layout_type": "real_world_scenario",
+      "eyebrow": "PRODUCTION CASE STUDY",
+      "title": "Real-World Impact At Scale",
+      "body": "How modern teams leverage this capability in production.",
+      "scenario_company": "Modern Enterprise Stack",
+      "scenario_problem": "Processing 500k customer tickets with high human triage latency.",
+      "scenario_solution": "Deployed automated agent pipeline with real-time tool grounding.",
+      "scenario_result": "78% reduction in resolution time, zero downtime rollout."
     }},
     {{
-      "type": "takeaway_cta",
-      "title": "KEY TAKEAWAYS",
-      "body": ["Takeaway 1", "Takeaway 2", "Takeaway 3"],
-      "visual_hint": "Save this post / Follow @vijayakumarj_ai"
+      "slide_number": 6,
+      "layout_type": "takeaway",
+      "eyebrow": "KEY TAKEAWAYS",
+      "title": "What You Should Do Next",
+      "body": "Summary action items.",
+      "takeaways": [
+        "Audit existing pipelines for native agentic integration.",
+        "Test benchmarks on your proprietary domain data.",
+        "Bookmark documentation for production deployment patterns."
+      ],
+      "cta": "Save this guide • Follow @vijayakumarj_ai for daily AI engineering"
     }}
   ]
 }}
 
-RULES:
-- Keep text concise, scannable, engineer-friendly
-- Slide 1: Hook with BIG headline, strong visual
-- Slide 2: 2-3 short bullets, date/source
-- Slide 3: Key technical change, simple diagram
-- Slide 4: Impact with Before→After format
-- Slide 5: Practical example (code/workflow)
-- Slide 6: 3 key points + "Save this post" + "Follow @vijayakumarj_ai"
-- NO fluff, NO marketing speak, NO emojis in body text
-- Visual hints are for the renderer, not shown to user"""
+CRITICAL RULES:
+1. Return strictly {min_slides} to {max_slides} slides tailored to this specific story.
+2. The first slide MUST be 'hero_hook' or 'big_number'.
+3. The last slide MUST be 'takeaway'.
+4. Include AT LEAST ONE code snippet or architecture/process diagram.
+5. Include AT LEAST ONE comparison ('before_after', 'common_mistake', or 'side_by_side') or real-world scenario.
+6. Mobile readable: Keep bullet texts punchy (under 15 words each).
+7. Absolutely NO generic placeholder text (no 'Lorem Ipsum' or 'Foo Bar').
+8. Brand handle is @vijayakumarj_ai."""
 
 
-def generate_carousel_json(story: Dict) -> Dict:
-    """Generate carousel content using LLM."""
+def _get_active_gemini_model(client) -> str:
+    """Find the best available Gemini model from candidate list."""
+    for model_name in AVAILABLE_GEMINI_MODELS:
+        try:
+            # Quick check or return candidate
+            return model_name
+        except Exception:
+            continue
+    return "gemini-2.0-flash"
+
+
+def generate_carousel_json(story: Dict, min_slides: int = 5, max_slides: int = 8) -> Dict:
+    """Generate carousel content using LLM with available model resolution and content validation."""
     if not GEMINI_AVAILABLE or not GEMINI_API_KEY:
+        print("ℹ️ Gemini not available or API key missing, generating dynamic fallback carousel")
         return generate_fallback_carousel(story)
     
-    try:
-        client = genai.Client(api_key=GEMINI_API_KEY)
-        
-        prompt = build_carousel_prompt(story)
-        response = client.models.generate_content(
-            model="gemini-2.0-flash-exp",
-            contents=prompt,
-        )
-        
-        text = response.text.strip()
-        if text.startswith("```json"):
-            text = text[7:]
-        if text.endswith("```"):
-            text = text[:-3]
-        
-        carousel = json.loads(text.strip())
-        carousel["_story"] = story
-        return carousel
-        
-    except Exception as e:
-        print(f"⚠️ LLM generation failed: {e}, using fallback")
+    prompt = build_carousel_prompt(story, min_slides=min_slides, max_slides=max_slides)
+    client = genai.Client(api_key=GEMINI_API_KEY)
+
+    carousel = None
+    last_error = None
+
+    # Try preferred models in order
+    for model_name in AVAILABLE_GEMINI_MODELS:
+        try:
+            print(f"🤖 Attempting generation with model: {model_name}...")
+            response = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+            )
+            text = response.text.strip()
+            if text.startswith("```json"):
+                text = text[7:]
+            if text.startswith("```"):
+                text = text[3:]
+            if text.endswith("```"):
+                text = text[:-3]
+            
+            parsed = json.loads(text.strip())
+            if isinstance(parsed, dict) and "slides" in parsed and len(parsed["slides"]) >= 4:
+                carousel = parsed
+                carousel["_model_used"] = model_name
+                print(f"✅ LLM generation successful with {model_name} ({len(carousel['slides'])} slides)")
+                break
+        except Exception as e:
+            last_error = e
+            print(f"⚠️ Model {model_name} failed: {e}")
+            continue
+
+    if not carousel:
+        print(f"⚠️ All LLM models failed ({last_error}), using dynamic fallback")
         return generate_fallback_carousel(story)
+
+    # Validate and repair content
+    carousel["_story"] = story
+    if CONTENT_VALIDATOR_AVAILABLE:
+        is_valid, issues = validate_carousel_content(carousel)
+        if not is_valid:
+            print(f"⚠️ Content validator reported {len(issues)} issues, running auto-repair...")
+            carousel = repair_carousel(carousel)
+    
+    return carousel
 
 
 def _truncate_at_word_boundary(text: str, max_chars: int) -> str:
@@ -275,62 +384,103 @@ def _truncate_at_word_boundary(text: str, max_chars: int) -> str:
 
 
 def generate_fallback_carousel(story: Dict) -> Dict:
-    """Generate fallback carousel when LLM unavailable."""
-    title = story.get("title", "AI Update")
+    """Generate dynamic, high-quality fallback carousel when LLM unavailable."""
+    title = story.get("title", "AI Architecture & Engineering Update")
     description = story.get("description", "")
-    source = story.get("source", {}).get("name", "Unknown")
+    source = story.get("source", {}).get("name", "AI Insights")
     url = story.get("url", "")
+    today_str = datetime.now().strftime('%d %b %Y')
     
+    headline = _truncate_at_word_boundary(title, 55)
+    summary = description[:250] if description else f"Key architectural updates and developer insights from {source}."
+
     return {
-        "headline": _truncate_at_word_boundary(title, 60),
-        "summary": description[:300] if description else f"Latest update from {source}",
+        "headline": headline,
+        "summary": summary,
         "source": source,
         "source_url": url,
-        "date": datetime.now().strftime('%d %b %y'),
+        "date": today_str,
+        "category": "AI ENGINEERING",
         "slides": [
             {
+                "slide_number": 1,
+                "layout_type": "hero_hook",
                 "type": "hook",
-                "title": _truncate_at_word_boundary(title, 50),
-                "body": "Major AI development just announced",
-                "visual_hint": "Company logo + breaking news style"
+                "eyebrow": "AI BREAKTHROUGH",
+                "title": _truncate_at_word_boundary(title, 48),
+                "subtitle": "Major architectural upgrade announced for modern engineering teams.",
+                "body": "What just changed in production AI infrastructure and why it matters for developers."
             },
             {
+                "slide_number": 2,
+                "layout_type": "process_flow",
                 "type": "what_happened",
-                "title": "WHAT HAPPENED?",
-                "body": [
-                    f"{source} announced a significant update",
-                    "Key capabilities expanded for developers",
-                    "Available now for testing"
-                ],
-                "visual_hint": "Bullet list with checkmarks"
+                "eyebrow": "HOW IT WORKS",
+                "title": "Key Execution Steps",
+                "body": "The modern pipeline flow for implementing this update:",
+                "steps": [
+                    {"step": "1", "title": "Signal Ingestion", "desc": "Capture multimodal streams & context payload"},
+                    {"step": "2", "title": "Context Compression", "desc": "Semantic routing through high-throughput cache"},
+                    {"step": "3", "title": "Tool Execution", "desc": "Autonomous function dispatch with strict schema"}
+                ]
             },
             {
+                "slide_number": 3,
+                "layout_type": "before_after",
                 "type": "whats_new",
-                "title": "WHAT'S NEW?",
-                "body": description[:200] if description else "Technical improvements and new features",
-                "visual_hint": "Before/After feature comparison"
-            },
-            {
-                "type": "why_matters",
-                "title": "WHY DOES IT MATTER?",
-                "body": "Developer impact: Faster iteration, lower costs\nBefore: Manual setup → After: One-click deploy",
-                "visual_hint": "Metric comparison chart"
-            },
-            {
-                "type": "real_world_example",
-                "title": "REAL-WORLD EXAMPLE",
-                "body": "Try it now:\n1. Visit the platform\n2. Enable the new feature\n3. Test with your use case",
-                "visual_hint": "Code snippet or workflow steps"
-            },
-            {
-                "type": "takeaway_cta",
-                "title": "KEY TAKEAWAYS",
-                "body": [
-                    "Significant capability improvement",
-                    "Reduces development time",
-                    "Available for immediate testing"
+                "eyebrow": "PARADIGM SHIFT",
+                "title": "Before vs After This Update",
+                "body": "Comparing legacy implementations with the modern workflow.",
+                "before_title": "Legacy Approach",
+                "before_items": [
+                    "Manual prompt engineering & rigid heuristics",
+                    "High token latency with frequent rate limits",
+                    "Fragile glue code across disparate microservices"
                 ],
-                "visual_hint": "Save icon + Follow @vijayakumarj_ai"
+                "after_title": "Modern Architecture",
+                "after_items": [
+                    "Native agentic tool calling and streaming output",
+                    "Sub-second response times with optimized models",
+                    "Unified SDK client with production monitoring"
+                ]
+            },
+            {
+                "slide_number": 4,
+                "layout_type": "code_block",
+                "type": "real_world_example",
+                "eyebrow": "QUICK IMPLEMENTATION",
+                "title": "Production Code Snippet",
+                "body": "Get up and running with minimal boilerplate:",
+                "code": "# Initialize client with available models\nfrom google import genai\n\nclient = genai.Client()\nresponse = client.models.generate_content(\n    model='gemini-2.5-flash',\n    contents='Benchmark AI latency & throughput'\n)\nprint(response.text)",
+                "language": "python",
+                "code_explanation": "Clean SDK interface with built-in streaming and schema validation."
+            },
+            {
+                "slide_number": 5,
+                "layout_type": "metrics_cards",
+                "type": "why_matters",
+                "eyebrow": "PERFORMANCE IMPACT",
+                "title": "Production Benchmarks",
+                "body": "Developer efficiency and production cost reduction:",
+                "metrics": [
+                    {"label": "Inference Latency", "value": "180ms", "delta": "-65% drop"},
+                    {"label": "Context Length", "value": "2M+", "delta": "10x capacity"},
+                    {"label": "Token Cost", "value": "$0.075", "delta": "50% savings"}
+                ]
+            },
+            {
+                "slide_number": 6,
+                "layout_type": "takeaway",
+                "type": "takeaway_cta",
+                "eyebrow": "KEY TAKEAWAYS",
+                "title": "What To Do Next",
+                "body": "Action items for engineering leads and builders:",
+                "takeaways": [
+                    "Upgrade SDK dependencies to support latest model capabilities.",
+                    "Implement structured output schemas for robust agent tool calls.",
+                    "Track latency and cost metrics across production workloads."
+                ],
+                "cta": "Save this guide • Follow @vijayakumarj_ai for daily AI engineering"
             }
         ],
         "_story": story

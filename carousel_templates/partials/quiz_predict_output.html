@@ -1,0 +1,47 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="quiz-card card--glow">
+  <div class="quiz-question-box">
+    🧠 {{ slide_data.quiz_question or slide_data.question or 'Code Quiz: What will this snippet output?' }}
+  </div>
+
+  {% if slide_data.code %}
+  <div class="code-window" style="box-shadow: none;">
+    <div class="code-window__bar">
+      <div class="code-dots">
+        <span class="code-dot code-dot--red"></span>
+        <span class="code-dot code-dot--yellow"></span>
+        <span class="code-dot code-dot--green"></span>
+      </div>
+      <span class="code-window__lang">{{ slide_data.language or 'python' }}</span>
+    </div>
+    <pre class="code-content" style="font-size: 18px; padding: 20px;"><code>{{ highlighted_code or slide_data.code }}</code></pre>
+  </div>
+  {% endif %}
+
+  <div class="quiz-options">
+    {% set options = slide_data.quiz_options if slide_data.quiz_options else [
+      'A) Raises SyntaxError at runtime',
+      'B) Returns structured generator stream',
+      'C) Silently fails and returns None'
+    ] %}
+
+    {% for opt in options %}
+    <div class="quiz-opt" style="padding: 14px 20px; font-size: 18px;">
+      <span class="quiz-opt-letter">[{{ loop.index }}]</span>
+      <span>{{ opt }}</span>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if slide_data.quiz_answer or slide_data.answer %}
+  <div class="code-explanation-card" style="border-left-color: var(--accent-success); font-size: 17px; padding: 16px 20px;">
+    <strong style="color: var(--accent-success); display: block; margin-bottom: 2px;">
+      Answer: {{ slide_data.quiz_answer or slide_data.answer }}
+    </strong>
+    {{ slide_data.quiz_explanation or slide_data.explanation }}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

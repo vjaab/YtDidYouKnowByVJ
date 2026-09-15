@@ -3,47 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=1080, height=1350">
-  <title>{{ slide_data.title or 'AI News Carousel' }}</title>
+  <title>{{ slide_data.title or 'AI Educational Carousel' }}</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     {{ css_content | safe }}
   </style>
 </head>
-<body>
-  <div class="carousel-canvas slide--{{ slide_data.type }}">
-    <div class="slide-number">{{ "%02d"|format(slide_current) }}</div>
+<body class="{{ theme_css_class or 'theme--tech-dark' }}" style="{% if theme_colors %}
+  --bg: {{ theme_colors.bg }};
+  --card-bg: {{ theme_colors.card_bg }};
+  --card-border: {{ theme_colors.card_border }};
+  --text-primary: {{ theme_colors.text_primary }};
+  --text-secondary: {{ theme_colors.text_secondary }};
+  --text-muted: {{ theme_colors.text_muted }};
+  --accent: {{ theme_colors.accent }};
+  --accent-secondary: {{ theme_colors.accent_secondary }};
+  --accent-success: {{ theme_colors.accent_success }};
+  --accent-danger: {{ theme_colors.accent_danger }};
+  --accent-warning: {{ theme_colors.accent_warning }};
+  --code-bg: {{ theme_colors.code_bg }};
+  --gradient-start: {{ theme_colors.gradient_start }};
+  --gradient-end: {{ theme_colors.gradient_end }};
+{% endif %}">
 
+  <div class="carousel-canvas layout--{{ slide_data.layout_type or slide_data.type or 'default' }} slide--{{ slide_current }}">
+    
     {% block header %}
-    <header class="header-card {% if slide_data.type == 'hook' %}header-card--gradient{% else %}header-card--accent{% endif %}"
-            style="--accent-color: {{ accent_color }}; --accent-color-light: {{ accent_color_light }};">
-      <div class="header-card__label">{{ slide_data.eyebrow or category }}</div>
-      <h1 class="header-card__title">{{ slide_data.title }}</h1>
+    <header class="slide-header {% if (slide_data.layout_type or slide_data.type) in ['hero_hook', 'big_number'] %}slide-header--center{% endif %}">
+      <div class="eyebrow-badge">
+        <span class="eyebrow-badge__dot"></span>
+        <span>{{ slide_data.eyebrow or category or 'AI ENGINEERING' }}</span>
+      </div>
+      
+      <h1 class="slide-title {% if (slide_data.layout_type or slide_data.type) in ['hero_hook', 'big_number'] %}slide-title--huge slide-title--gradient{% endif %}">
+        {{ slide_data.title }}
+      </h1>
+      
+      {% if slide_data.subtitle %}
+      <p class="slide-subtitle">{{ slide_data.subtitle }}</p>
+      {% endif %}
     </header>
     {% endblock %}
 
-    <main class="content-card {% if slide_data.type != 'hook' %}content-card--accent{% endif %}"
-          style="--accent-color: {{ accent_color }}; --accent-color-light: {{ accent_color_light }};">
+    <main class="slide-body">
       {% block content %}{% endblock %}
     </main>
 
+    {% block footer %}
     <footer class="slide-footer">
-      <div class="footer__brand">
-        <div class="footer__brand-avatar">VJ</div>
-        <span>VJ AI NEWS</span>
+      <div class="footer-brand">
+        <div class="footer-avatar">VJ</div>
+        <span class="footer-handle">{{ brand.handle if brand and brand.handle else '@vijayakumarj_ai' }}</span>
       </div>
-      <div class="footer__counter">{{ "%02d"|format(slide_current) }} / {{ slide_total }}</div>
+      
+      <div class="footer-counter">
+        {{ "%02d"|format(slide_current) }} / {{ "%02d"|format(slide_total) }}
+      </div>
     </footer>
+    {% endblock %}
 
-    {% if slide_data.type in ['hook', 'what_happened', 'whats_new', 'why_matters', 'real_world_example'] %}
-    <button class="pill-btn" style="--accent-color: {{ accent_color }};">
-      <span>Swipe</span>
-      <span class="pill-btn__arrow">›</span>
-    </button>
-    {% endif %}
   </div>
 </body>
 </html>

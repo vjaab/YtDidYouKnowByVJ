@@ -1,0 +1,55 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; gap: 20px;">
+  {% if slide_data.body %}
+  <p style="font-size: 21px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 8px;">
+    {{ slide_data.body }}
+  </p>
+  {% endif %}
+
+  <div class="comparison-grid">
+    <!-- WRONG APPROACH -->
+    <div class="comparison-box comparison-box--wrong">
+      <div class="comp-header">
+        <span class="comp-badge comp-badge--danger">DON'T DO THIS</span>
+        <span class="comp-title">{{ slide_data.wrong_title or 'Anti-Pattern' }}</span>
+      </div>
+      <ul class="comp-list">
+        {% set wrong_items = slide_data.wrong_items if slide_data.wrong_items else [
+          'Hardcoding static prompts without validation',
+          'Blocking synchronous API requests in UI thread',
+          'Ignoring token limits and context drift'
+        ] %}
+        {% for item in wrong_items %}
+        <li class="comp-item">
+          <span class="comp-icon" style="color: var(--accent-danger);">❌</span>
+          <span>{{ item }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- RIGHT APPROACH -->
+    <div class="comparison-box comparison-box--right">
+      <div class="comp-header">
+        <span class="comp-badge comp-badge--success">BEST PRACTICE</span>
+        <span class="comp-title">{{ slide_data.right_title or 'Recommended Pattern' }}</span>
+      </div>
+      <ul class="comp-list">
+        {% set right_items = slide_data.right_items if slide_data.right_items else [
+          'Use structured schema contracts & tool definitions',
+          'Stream token responses with resilient retries',
+          'Track latency & throughput with OpenTelemetry'
+        ] %}
+        {% for item in right_items %}
+        <li class="comp-item">
+          <span class="comp-icon" style="color: var(--accent-success);">✅</span>
+          <span>{{ item }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

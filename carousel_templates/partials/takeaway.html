@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="takeaway-box card--glow">
-  {% if slide_data.body is string %}
+  {% if slide_data.body and not slide_data.takeaways %}
   <p style="font-size: 21px; line-height: 1.5; color: var(--text-secondary);">
     {{ slide_data.body }}
   </p>
@@ -25,8 +25,8 @@
 
   <div class="takeaway-cta-card">
     <div style="display: flex; flex-direction: column; gap: 4px;">
-      <div class="cta-text">Follow for daily AI Engineering</div>
-      <div style="font-size: 16px; color: var(--text-secondary);">Tap save to reference later in your projects.</div>
+      <div class="cta-text">Found this valuable?</div>
+      <div style="font-size: 16px; color: var(--text-secondary);">Bookmark for your team's next sprint.</div>
     </div>
     <div class="cta-badge">
       SAVE THIS POST 🔖

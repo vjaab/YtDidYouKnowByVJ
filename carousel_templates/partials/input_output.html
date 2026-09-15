@@ -1,0 +1,39 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="card card--glow" style="display: flex; flex-direction: column; gap: 24px; padding: 36px 32px;">
+  <!-- INPUT -->
+  <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-left: 5px solid var(--accent); border-radius: 14px; padding: 20px 24px;">
+    <div style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--accent); margin-bottom: 6px;">
+      INPUT PAYLOAD
+    </div>
+    <div style="font-size: 20px; color: var(--text-primary); line-height: 1.4;">
+      {{ slide_data.input or 'Raw user prompt / multi-modal audio & vision stream' }}
+    </div>
+  </div>
+
+  <div style="text-align: center; color: var(--accent); font-size: 24px;">↓</div>
+
+  <!-- PROCESSING -->
+  <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-left: 5px solid var(--accent-secondary); border-radius: 14px; padding: 20px 24px;">
+    <div style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--accent-secondary); margin-bottom: 6px;">
+      SYSTEM TRANSFORMATION
+    </div>
+    <div style="font-size: 20px; color: var(--text-primary); line-height: 1.4;">
+      {{ slide_data.processing or 'Autonomous agent grounding, schema verification, and tool dispatch' }}
+    </div>
+  </div>
+
+  <div style="text-align: center; color: var(--accent-success); font-size: 24px;">↓</div>
+
+  <!-- OUTPUT -->
+  <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-left: 5px solid var(--accent-success); border-radius: 14px; padding: 20px 24px;">
+    <div style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--accent-success); margin-bottom: 6px;">
+      STRUCTURED OUTPUT
+    </div>
+    <div style="font-size: 20px; color: var(--text-primary); line-height: 1.4;">
+      {{ slide_data.output or 'Validated JSON response with actionable UI state' }}
+    </div>
+  </div>
+</div>
+{% endblock %}

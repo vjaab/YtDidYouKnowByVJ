@@ -1,0 +1,33 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="quiz-card card--glow">
+  <div class="quiz-question-box">
+    ❓ {{ slide_data.quiz_question or slide_data.question or 'Quick Check: Which architecture choice minimizes API rate limit throttling?' }}
+  </div>
+
+  <div class="quiz-options">
+    {% set options = slide_data.quiz_options if slide_data.quiz_options else [
+      'A) Synchronous blocking calls on the main event loop',
+      'B) Exponential backoff with jitter and token bucket queue',
+      'C) Spawning 100 concurrent threads without pooling'
+    ] %}
+
+    {% for opt in options %}
+    <div class="quiz-opt">
+      <span class="quiz-opt-letter">[{{ loop.index }}]</span>
+      <span>{{ opt }}</span>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if slide_data.quiz_answer or slide_data.answer %}
+  <div class="code-explanation-card" style="border-left-color: var(--accent-success);">
+    <strong style="color: var(--accent-success); display: block; margin-bottom: 4px;">
+      Answer: {{ slide_data.quiz_answer or slide_data.answer }}
+    </strong>
+    {{ slide_data.quiz_explanation or slide_data.explanation or 'Using token bucket queuing with jitter smooths out burst traffic and prevents 429 throttling.' }}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

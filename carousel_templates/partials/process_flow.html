@@ -1,0 +1,29 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="process-steps">
+  {% if slide_data.body and not slide_data.steps %}
+  <div class="card" style="font-size: 21px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 10px;">
+    {{ slide_data.body }}
+  </div>
+  {% endif %}
+
+  {% set steps_list = slide_data.steps if slide_data.steps else [
+    {'step': '1', 'title': 'Ingest & Parse', 'desc': 'Stream incoming requests and extract structured inputs.'},
+    {'step': '2', 'title': 'Route & Process', 'desc': 'Dispatch execution through optimized model pipelines.'},
+    {'step': '3', 'title': 'Verify & Output', 'desc': 'Validate schema compliance and return streaming response.'}
+  ] %}
+
+  {% for step in steps_list %}
+  <div class="step-card">
+    <div class="step-badge">
+      {{ step.step or loop.index }}
+    </div>
+    <div class="step-info">
+      <div class="step-title">{{ step.title or step.name }}</div>
+      <div class="step-desc">{{ step.desc or step.description or step.text }}</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

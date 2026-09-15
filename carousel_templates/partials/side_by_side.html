@@ -1,0 +1,55 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; gap: 20px;">
+  {% if slide_data.body %}
+  <p style="font-size: 21px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 8px;">
+    {{ slide_data.body }}
+  </p>
+  {% endif %}
+
+  <div class="comparison-grid">
+    <!-- OPTION A -->
+    <div class="comparison-box" style="border-top: 5px solid var(--accent);">
+      <div class="comp-header">
+        <span class="comp-badge" style="background: rgba(255,255,255,0.08); color: var(--accent);">OPTION A</span>
+        <span class="comp-title">{{ slide_data.left_title or 'Approach 1' }}</span>
+      </div>
+      <ul class="comp-list">
+        {% set left_items = slide_data.left_items if slide_data.left_items else [
+          'Direct client-side execution',
+          'Fast setup for prototypes',
+          'Limited memory persistence'
+        ] %}
+        {% for item in left_items %}
+        <li class="comp-item">
+          <span class="comp-icon" style="color: var(--accent);">▸</span>
+          <span>{{ item }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- OPTION B -->
+    <div class="comparison-box" style="border-top: 5px solid var(--accent-secondary);">
+      <div class="comp-header">
+        <span class="comp-badge" style="background: rgba(255,255,255,0.08); color: var(--accent-secondary);">OPTION B</span>
+        <span class="comp-title">{{ slide_data.right_title or 'Approach 2' }}</span>
+      </div>
+      <ul class="comp-list">
+        {% set right_items = slide_data.right_items if slide_data.right_items else [
+          'Stateful agent orchestration',
+          'Built-in human-in-the-loop validation',
+          'Persistent workflow graphs'
+        ] %}
+        {% for item in right_items %}
+        <li class="comp-item">
+          <span class="comp-icon" style="color: var(--accent-secondary);">▸</span>
+          <span>{{ item }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -2,17 +2,19 @@
 
 {% block content %}
 <div class="hero-card">
-  {% if slide_data.body %}
-  <p class="hero-main-statement">
-    {{ slide_data.body }}
-  </p>
-  {% endif %}
+  <div>
+    {% if slide_data.body %}
+    <p class="hero-main-statement">
+      {{ slide_data.body }}
+    </p>
+    {% endif %}
+  </div>
 
   <div class="hero-graphic-box">
     <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center;">
-      <div style="font-size: 80px; line-height: 1;">⚡</div>
+      <div style="font-size: 84px; line-height: 1;">⚡</div>
       <div style="font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase;">
-        {{ slide_data.eyebrow or category or 'AI ENGINEERING' }}
+        {{ slide_data.eyebrow or 'Production Engineering' }}
       </div>
     </div>
   </div>
