@@ -1,0 +1,36 @@
+{
+  "carousels": [
+    {
+      "topic": "GPT-4o: Real-time Multimodal AI Unlocked",
+      "theme": "DATA_DASHBOARD",
+      "layout_pattern": [
+        "scenario_question",
+        "analogy",
+        "architecture_diagram",
+        "checklist",
+        "myth_vs_fact",
+        "metrics_cards",
+        "takeaway"
+      ],
+      "domain": "",
+      "slide_count": 8,
+      "generated_at": "2026-09-15T18:46:33.085619+00:00"
+    },
+    {
+      "topic": "GPT-4o: Real-time Multimodal AI Unlocked",
+      "theme": "CLEAN_LIGHT",
+      "layout_pattern": [
+        "scenario_question",
+        "analogy",
+        "architecture_diagram",
+        "checklist",
+        "myth_vs_fact",
+        "takeaway"
+      ],
+      "domain": "",
+      "slide_count": 8,
+      "generated_at": "2026-09-15T18:50:05.919384+00:00"
+    }
+  ],
+  "last_updated": "2026-09-15T18:50:05.919672+00:00"
+}
