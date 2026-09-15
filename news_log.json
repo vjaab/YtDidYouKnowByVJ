@@ -554,7 +554,8 @@
         "Google Asked: Can AI Write BAD Code?",
         "Interview Question #5: Google asks \u2014 Can AI agents be tricked into writing bad code?",
         "I Found Unlimited FREE AI Coding: 9router Explained",
-        "Stop Paying for AI Coding! Unlimited FREE Claude, GPT & Copilot with 9router"
+        "Stop Paying for AI Coding! Unlimited FREE Claude, GPT & Copilot with 9router",
+        "Meta Releases Llama 3.1 405B - Open Source Frontier Model"
     ],
     "used_keywords": [
         "Cursor AI",
@@ -8164,6 +8165,15 @@
             "target_country": "JP",
             "avatar_used": "assets/video/microsoft_white.mp4",
             "topic_type": "news"
+        },
+        {
+            "news_source_url": "https://ai.meta.com/blog/meta-llama-3-1/",
+            "keywords": [
+                "llama",
+                "meta",
+                "open source",
+                "405b"
+            ]
         }
     ]
 }

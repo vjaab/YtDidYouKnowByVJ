@@ -9,6 +9,7 @@ import os
 import sys
 import json
 import time
+import re
 import argparse
 import requests
 from pathlib import Path
@@ -20,6 +21,102 @@ TELEGRAM_BASE_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}" if TELEG
 
 # State file for tracking approval
 STATE_FILE = Path(__file__).parent / ".telegram_approval_state.json"
+TRACKER_FILE = Path(__file__).parent / "news_log.json"
+
+def record_topic_in_tracker(topic: str, source_url: str = "", keywords: list = None, subcategory: str = "AI News", companies: list = None):
+    """Record a successfully posted topic in the news_log.json tracker."""
+    try:
+        if TRACKER_FILE.exists():
+            with open(TRACKER_FILE, 'r', encoding='utf-8') as f:
+                tracker = json.load(f)
+        else:
+            tracker = {
+                "used_titles": [],
+                "used_keywords": [],
+                "used_companies": {},
+                "used_subcategories": {},
+                "last_7_days_stories": [],
+                "last_3_days_subcategories": [],
+                "last_3_days_companies": [],
+                "total_uploaded": 0,
+                "last_upload": None,
+                "history": []
+            }
+        
+        today = datetime.now().strftime("%Y-%m-%d")
+        
+        # Add to used_titles
+        tracker.setdefault("used_titles", []).append(topic)
+        
+        # Add keywords
+        if keywords:
+            tracker.setdefault("used_keywords", []).extend(keywords)
+            tracker["used_keywords"] = list(set(tracker["used_keywords"]))
+        
+        # Add companies
+        if companies:
+            tracker.setdefault("used_companies", {})
+            for comp in companies:
+                if isinstance(comp, dict):
+                    comp_name = comp.get("name")
+                else:
+                    comp_name = comp
+                if comp_name:
+                    tracker["used_companies"][comp_name] = tracker["used_companies"].get(comp_name, 0) + 1
+        
+        # Add subcategory
+        tracker.setdefault("used_subcategories", {})
+        tracker["used_subcategories"][subcategory] = tracker["used_subcategories"].get(subcategory, 0) + 1
+        
+        # Update rolling windows
+        tracker.setdefault("last_7_days_stories", []).append(topic)
+        if len(tracker["last_7_days_stories"]) > 7:
+            tracker["last_7_days_stories"].pop(0)
+        
+        tracker.setdefault("last_3_days_subcategories", []).append(subcategory)
+        if len(tracker["last_3_days_subcategories"]) > 3:
+            tracker["last_3_days_subcategories"].pop(0)
+        
+        if companies:
+            for comp in companies:
+                comp_name = comp.get("name") if isinstance(comp, dict) else comp
+                if comp_name:
+                    tracker.setdefault("last_3_days_companies", []).append(comp_name)
+            if len(tracker["last_3_days_companies"]) > 5:
+                tracker["last_3_days_companies"] = tracker["last_3_days_companies"][-5:]
+        
+        tracker["total_uploaded"] = tracker.get("total_uploaded", 0) + 1
+        tracker["last_upload"] = today
+        
+        # Add to history
+        history_entry = {
+            "date": today,
+            "title": topic,
+            "news_headline": topic,
+            "sub_category": subcategory,
+            "companies": companies or [],
+            "keywords": keywords or [],
+            "breaking_news_level": "normal",
+            "voice_used": "system",
+            "youtube_url": "",
+            "facebook_post_id": None,
+            "news_source_url": source_url,
+            "target_country": "US",
+            "avatar_used": None,
+            "topic_type": "instagram_carousel"
+        }
+        tracker.setdefault("history", []).append(history_entry)
+        
+        # Save
+        with open(TRACKER_FILE, 'w', encoding='utf-8') as f:
+            json.dump(tracker, f, indent=4)
+        
+        print(f"✅ Recorded topic in tracker: {topic}")
+        return True
+        
+    except Exception as e:
+        print(f"⚠️ Failed to record topic in tracker: {e}")
+        return False
 
 def send_approval_request(topic: str, ig_images: list, fb_images: list, caption_file: str, poll_file: str = "", is_carousel: bool = False) -> int:
     """Send images to Telegram with approval buttons."""
@@ -334,6 +431,34 @@ def main():
                 print(f"❌ {platform}: {result}")
             else:
                 print(f"✅ {platform}: {result}")
+        
+        # Record topic in tracker if successfully posted to at least one platform
+        success = any("ERROR" not in str(v) for v in results.values())
+        if success:
+            # Extract keywords from caption file
+            keywords = []
+            if Path(args.caption_file).exists():
+                with open(args.caption_file, 'r') as f:
+                    caption_text = f.read()
+                    keywords = re.findall(r'#(\w+)', caption_text)
+            
+            # Extract source URL from state if available
+            source_url = ""
+            if "carousel_json" in state:
+                try:
+                    with open(state["carousel_json"], 'r') as f:
+                        carousel = json.load(f)
+                        source_url = carousel.get("source_url", "")
+                except:
+                    pass
+            
+            record_topic_in_tracker(
+                topic=args.topic,
+                source_url=source_url,
+                keywords=keywords,
+                subcategory="AI News",
+                companies=[]
+            )
         
         # Send completion message
         result_text = "\n".join([f"{'✅' if 'ERROR' not in str(v) else '❌'} {k}: {v}" for k, v in results.items()])

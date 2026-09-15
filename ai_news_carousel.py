@@ -9,6 +9,7 @@ import os
 import json
 import sys
 import argparse
+import re
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Any, Optional
@@ -27,7 +28,16 @@ try:
 except ImportError:
     GEMINI_AVAILABLE = False
 
+try:
+    from rapidfuzz import fuzz
+    RAPIDFUZZ_AVAILABLE = True
+except ImportError:
+    RAPIDFUZZ_AVAILABLE = False
+
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+
+TRACKER_FILE = os.path.join(str(Path(__file__).parent), "news_log.json")
+SIMILARITY_THRESHOLD = 75
 
 AI_CATEGORIES = [
     "OpenAI",
@@ -41,6 +51,72 @@ AI_CATEGORIES = [
     "AI agents",
     "AI developer tools",
 ]
+
+def load_topic_tracker() -> Dict:
+    """Load the topic tracker from news_log.json."""
+    if not os.path.exists(TRACKER_FILE):
+        return {"used_titles": [], "used_keywords": [], "history": []}
+    try:
+        with open(TRACKER_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        return {"used_titles": [], "used_keywords": [], "history": []}
+
+def is_topic_unique(title: str, url: str = "", keywords: List[str] = None) -> tuple:
+    """Check if a topic is unique compared to previously used topics."""
+    tracker = load_topic_tracker()
+    
+    if not tracker.get("used_titles") and not tracker.get("history"):
+        return True, "Unique (Empty tracker)"
+    
+    if url:
+        for entry in tracker.get("history", []):
+            if isinstance(entry, dict) and entry.get("news_source_url") == url:
+                return False, f"Exact URL already covered: {url}"
+    
+    if RAPIDFUZZ_AVAILABLE:
+        headlines_to_check = set(tracker.get("used_titles", []))
+        for existing_title in headlines_to_check:
+            score = fuzz.token_set_ratio(title.lower(), existing_title.lower())
+            if score > SIMILARITY_THRESHOLD:
+                return False, f"Semantic match found (score {score}): '{existing_title}'"
+    
+    if keywords:
+        recent_keywords = set()
+        for entry in tracker.get("history", [])[-20:]:
+            if url and entry.get("news_source_url") == url:
+                continue
+            recent_keywords.update([k.lower() for k in entry.get("keywords", [])])
+        
+        new_k_set = set([k.lower() for k in keywords])
+        if new_k_set:
+            intersection = new_k_set.intersection(recent_keywords)
+            overlap_pct = (len(intersection) / len(new_k_set)) * 100
+            if overlap_pct > 70:
+                return False, f"High keyword overlap ({overlap_pct:.0f}%) with recent stories"
+    
+    return True, "Unique"
+
+def filter_unique_stories(stories: List[Dict]) -> List[Dict]:
+    """Filter stories to only include unique topics not previously covered."""
+    unique_stories = []
+    for story in stories:
+        title = story.get("title", "")
+        url = story.get("url", "")
+        description = story.get("description", "")
+        
+        keywords = []
+        if description:
+            keywords = re.findall(r'\b[A-Za-z]{4,}\b', description.lower())
+        
+        is_unique, reason = is_topic_unique(title, url, keywords)
+        if is_unique:
+            unique_stories.append(story)
+        else:
+            print(f"  🔄 Skipping duplicate topic: {title[:60]}... ({reason})")
+    
+    print(f"✅ Filtered {len(stories)} stories -> {len(unique_stories)} unique stories")
+    return unique_stories
 
 SCORING_WEIGHTS = {
     "freshness": 0.25,
@@ -264,7 +340,7 @@ def generate_fallback_carousel(story: Dict) -> Dict:
 def fetch_ai_news_stories() -> List[Dict]:
     """Fetch AI news stories from trending engine with fallback to curated samples."""
     if not TRENDING_ENGINE_AVAILABLE:
-        return get_fallback_stories()
+        return filter_unique_stories(get_fallback_stories())
     
     try:
         print("🔍 Fetching AI trending signals...")
@@ -294,14 +370,14 @@ def fetch_ai_news_stories() -> List[Dict]:
         
         if stories:
             print(f"✅ Fetched {len(stories)} AI news stories from trending engine")
-            return stories
+            return filter_unique_stories(stories)
         
         print("⚠️ Trending engine returned no signals, using fallback stories")
-        return get_fallback_stories()
+        return filter_unique_stories(get_fallback_stories())
         
     except Exception as e:
         print(f"⚠️ Failed to fetch trending signals: {e}, using fallback")
-        return get_fallback_stories()
+        return filter_unique_stories(get_fallback_stories())
 
 
 def get_fallback_stories() -> List[Dict]:
