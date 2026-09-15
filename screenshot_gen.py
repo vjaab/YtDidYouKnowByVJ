@@ -373,15 +373,8 @@ def capture_article_screenshot(url, output_filename, desktop=False, headline=Non
                     pass
     except Exception as e:
         print(f"⚠️ Playwright screenshot failed/timed out for {url}: {e}")
-        
-    # Generate premium fallback card if Playwright screenshot fails
-    try:
-        print(f"🎨 Generating beautiful mockup fallback card...")
-        return generate_fallback_screenshot(url, output_path, desktop=desktop, headline=headline)
-    except Exception as ex:
-        print(f"❌ Fallback mockup generation failed: {ex}")
-        
-    return None
+        # DO NOT generate fallback - let caller decide to retry with different topic
+        return None
 
 
 def is_github_repo_url(url):

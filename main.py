@@ -779,10 +779,10 @@ def run_pipeline(topic_type="auto", dry_run=False):
                 log_message(f"✅ Main screenshot captured: {screenshot_path}")
                 screenshot_captured = True
                 
-                # ── Auto-capture GitHub README for GitHub repo topics ──
+                # ── Auto-capture GitHub README for GitHub repo topics (MANDATORY) ──
                 news_url = script_data.get("original_news_url", "")
                 if is_github_repo_url(news_url):
-                    log_message("🐙 GitHub repo detected — capturing README as evidence screenshot...")
+                    log_message("🐙 GitHub repo detected — capturing README as evidence screenshot (MANDATORY)...")
                     evidence_filename = f"evidence_readme_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
                     evidence_path = capture_github_readme_with_fallback(
                         news_url,
@@ -795,7 +795,18 @@ def run_pipeline(topic_type="auto", dry_run=False):
                         script_data["is_github_readme"] = True
                         log_message(f"✅ GitHub README captured: {evidence_path}")
                     else:
-                        log_message("⚠️ GitHub README capture failed (no README on main/master branch)")
+                        # GitHub README is MANDATORY for repo topics - reject and try another topic
+                        failed_headline = script_data.get("original_news_headline", title)
+                        failed_url = news_url or "unknown"
+                        failed_topics.append(failed_headline)
+                        if failed_url != "unknown":
+                            failed_topics.append(failed_url)
+                        log_message(f"❌ GitHub README screenshot FAILED for: {failed_headline}")
+                        log_message(f"   URL was: {failed_url}")
+                        log_message(f"   Rejecting this topic and picking a different one... ({len(failed_topics)} items rejected so far)")
+                        script_data = None
+                        attempts += 1
+                        continue
         
         if not screenshot_captured:
             # Screenshot is MANDATORY — reject this topic and try another
