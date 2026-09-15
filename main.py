@@ -983,6 +983,9 @@ def run_pipeline(topic_type="auto", dry_run=False):
         log_message("ERROR: Could not capture article screenshot after all retries. Aborting.")
         return False
 
+    # Store word_timestamps in script_data for evidence screenshot word highlighting
+    script_data["word_timestamps"] = word_timestamps
+    
     # ── STEP 4.5: Reserve Topic Early ─────────────────────────────────────────
     log_message("STEP 4.5: Reserving topic in tracker to prevent reuse on failure...")
     title  = script_data.get("title", "Tech News!")

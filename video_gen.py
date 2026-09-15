@@ -6335,14 +6335,19 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
             dur = min(max_dur, duration - start - 5.0)
             
             if dur > 1.0:
-                # Use VideoClip for frame-by-frame highlighting
+                # Use VideoClip for frame-by-frame highlighting with slow scroll down
                 def make_longform_frame(t):
                     # Calculate progress within the evidence clip duration
                     progress = t / max(dur, 0.01)
                     
+                    # Slow scroll down effect for evidence screenshot
+                    img_h, img_w = arr_rgb.shape[:2]
+                    max_scroll = max(0, img_h - target_h)
+                    scroll_y = int(progress * max_scroll)
+                    
                     # Subtle ken burns zoom: 1.0 -> 1.12 over the evidence duration
                     zoom = 1.0 + 0.12 * progress
-                    evidence_frame = arr_rgb
+                    evidence_frame = arr_rgb[scroll_y:scroll_y + target_h, :, :]
                     if zoom > 1.0:
                         h, w = evidence_frame.shape[:2]
                         new_h, new_w = int(h / zoom), int(w / zoom)
@@ -6357,7 +6362,11 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
                     return evidence_frame
                 
                 def make_longform_mask(t):
-                    return arr_mask
+                    progress = t / max(dur, 0.01)
+                    img_h, img_w = arr_mask.shape[:2]
+                    max_scroll = max(0, img_h - target_h)
+                    scroll_y = int(progress * max_scroll)
+                    return arr_mask[scroll_y:scroll_y + target_h, :]
                 
                 clip = VideoClip(make_longform_frame, duration=dur)
                 mclip = VideoClip(make_longform_mask, is_mask=True, duration=dur)
