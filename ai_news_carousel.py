@@ -187,6 +187,17 @@ def generate_carousel_json(story: Dict) -> Dict:
         return generate_fallback_carousel(story)
 
 
+def _truncate_at_word_boundary(text: str, max_chars: int) -> str:
+    """Truncate text at word boundary, adding ellipsis if truncated."""
+    if len(text) <= max_chars:
+        return text
+    truncated = text[:max_chars]
+    last_space = truncated.rfind(' ')
+    if last_space > max_chars * 0.7:
+        return truncated[:last_space] + '…'
+    return truncated + '…'
+
+
 def generate_fallback_carousel(story: Dict) -> Dict:
     """Generate fallback carousel when LLM unavailable."""
     title = story.get("title", "AI Update")
@@ -195,7 +206,7 @@ def generate_fallback_carousel(story: Dict) -> Dict:
     url = story.get("url", "")
     
     return {
-        "headline": title[:60],
+        "headline": _truncate_at_word_boundary(title, 60),
         "summary": description[:300] if description else f"Latest update from {source}",
         "source": source,
         "source_url": url,
@@ -203,7 +214,7 @@ def generate_fallback_carousel(story: Dict) -> Dict:
         "slides": [
             {
                 "type": "hook",
-                "title": title[:50],
+                "title": _truncate_at_word_boundary(title, 50),
                 "body": "Major AI development just announced",
                 "visual_hint": "Company logo + breaking news style"
             },

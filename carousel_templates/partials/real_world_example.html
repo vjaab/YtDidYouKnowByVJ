@@ -9,30 +9,42 @@
 {% endblock %}
 
 {% block content %}
-<div class="section-label" style="color: {{ accent_color }};">{{ slide_data.title }}</div>
+<div class="content-card__main">
+  <div class="section-label" style="color: {{ accent_color }};">{{ slide_data.title }}</div>
 
-<p class="body-text" style="max-width: 90%;">
-  Here's how you can use this in your workflow:
-</p>
+  <p class="body-text" style="max-width: 90%;">
+    Here's how you can use this in your workflow:
+  </p>
 
-<div class="code-panel" style="--accent-color: {{ accent_color }};">
-  <div class="code-panel__header">
-    <span class="code-panel__lang">python</span>
-    <span class="code-panel__copy">Copy</span>
-  </div>
-  <div class="code-panel__content">
-    <ol class="code-lines">
-      {% for line in code_lines %}
-      <li class="code-panel__line">
-        <span class="code-panel__comment">{{ line }}</span>
-      </li>
-      {% endfor %}
-    </ol>
+  <div class="code-panel" style="--accent-color: {{ accent_color }};">
+    <div class="code-panel__header">
+      <span class="code-panel__lang">python</span>
+      <span class="code-panel__copy">Copy</span>
+    </div>
+    <div class="code-panel__content">
+      <ol class="code-lines">
+        {% for line in code_lines %}
+        <li class="code-panel__line">
+          <span class="code-panel__comment">{{ line }}</span>
+        </li>
+        {% endfor %}
+      </ol>
+    </div>
   </div>
 </div>
 
-<div class="handle-chip" style="--accent-color: {{ accent_color }};">
-  <div class="handle-chip__avatar">VJ</div>
-  <span>@vijayakumarj_ai</span>
+<div class="content-card__footer">
+  <div style="display: flex; align-items: center; gap: var(--space-md); padding: var(--space-md) var(--space-lg); background: var(--accent-code-light); border-radius: var(--radius-lg); border-left: 4px solid {{ accent_color }};">
+    <span style="font-size: 24px;">💡</span>
+    <div>
+      <p style="font-family: var(--font-sans); font-weight: 600; font-size: 16px; color: {{ accent_color }}; margin: 0;">Try this</p>
+      <p style="font-family: var(--font-sans); font-weight: 400; font-size: 14px; color: var(--color-gray-600); margin: var(--space-xs) 0 0 0;">Run the snippet above in your project to see it in action</p>
+    </div>
+  </div>
+
+  <div class="handle-chip" style="--accent-color: {{ accent_color }};">
+    <div class="handle-chip__avatar">VJ</div>
+    <span>@vijayakumarj_ai</span>
+  </div>
 </div>
 {% endblock %}

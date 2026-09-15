@@ -9,25 +9,29 @@
 {% endblock %}
 
 {% block content %}
-<div class="section-label" style="color: {{ accent_color }};">{{ slide_data.title }}</div>
+<div class="content-card__main">
+  <div class="section-label" style="color: {{ accent_color }};">{{ slide_data.title }}</div>
 
-<ul class="takeaway-list">
-  {% for takeaway in slide_data.body %}
-  <li class="takeaway-item">
-    <div class="takeaway-item__number">{{ loop.index }}</div>
-    <span class="takeaway-item__text">{{ takeaway }}</span>
-  </li>
-  {% endfor %}
-</ul>
+  <ul class="takeaway-list">
+    {% for takeaway in slide_data.body %}
+    <li class="takeaway-item">
+      <div class="takeaway-item__number">{{ loop.index }}</div>
+      <span class="takeaway-item__text">{{ takeaway }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
 
-<div style="margin-top: var(--space-xl); display: flex; flex-direction: column; gap: var(--space-md); width: 100%;">
-  <button class="pill-btn" style="width: 100%; justify-content: center; background: linear-gradient(135deg, var(--accent-takeaway), var(--accent-takeaway-purple));">
-    <span>💾 Save this post</span>
-  </button>
+<div class="content-card__footer">
+  <div style="display: flex; flex-direction: column; gap: var(--space-md); width: 100%;">
+    <button class="pill-btn" style="width: 100%; justify-content: center; background: linear-gradient(135deg, var(--accent-takeaway), var(--accent-takeaway-purple));">
+      <span>💾 Save this post</span>
+    </button>
 
-  <div class="handle-chip" style="--accent-color: {{ accent_color }}; margin-top: var(--space-md);">
-    <div class="handle-chip__avatar">VJ</div>
-    <span>Follow @vijayakumarj_ai for daily AI updates</span>
+    <div class="handle-chip" style="--accent-color: {{ accent_color }}; margin-top: var(--space-md);">
+      <div class="handle-chip__avatar">VJ</div>
+      <span>Follow @vijayakumarj_ai for daily AI updates</span>
+    </div>
   </div>
 </div>
 {% endblock %}

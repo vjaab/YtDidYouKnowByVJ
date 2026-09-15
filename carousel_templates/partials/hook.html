@@ -1,19 +1,22 @@
 {% extends "layouts/base.html" %}
 
 {% block content %}
-<div style="display: flex; flex-direction: column; height: 100%; gap: var(--space-lg);">
+<div class="content-card__main" style="display: flex; flex-direction: column; height: 100%; gap: var(--space-lg);">
   <p class="body-text body-text--large" style="color: var(--color-gray-600);">
     {{ slide_data.body }}
   </p>
 
   <div style="flex: 1; display: flex; justify-content: center; align-items: center; margin: var(--space-xl) 0;">
-    <div style="width: 440px; height: 440px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-hook-start), var(--accent-hook-mid), var(--accent-hook-end)); opacity: 0.15; display: flex; align-items: center; justify-content: center;">
-      <span style="font-size: 160px;">🚀</span>
+    <div style="width: 520px; height: 520px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-hook-start), var(--accent-hook-mid), var(--accent-hook-end)); opacity: 0.15; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 80px rgba(236, 72, 153, 0.3), 0 0 160px rgba(168, 85, 247, 0.2), inset 0 0 60px rgba(255,255,255,0.1);">
+      <span style="font-size: 200px; filter: drop-shadow(0 8px 24px rgba(168, 85, 247, 0.4));">🚀</span>
     </div>
   </div>
+</div>
 
+<div class="content-card__footer">
   <div class="handle-chip" style="--accent-color: {{ accent_color }}; align-self: flex-start;">
     <div class="handle-chip__avatar">VJ</div>
     <span>@vijayakumarj_ai</span>
   </div>
+</div>
 {% endblock %}

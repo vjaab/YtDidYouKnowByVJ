@@ -9,42 +9,46 @@
 {% endblock %}
 
 {% block content %}
-<div class="section-label" style="color: {{ accent_color }};">{{ slide_data.title }}</div>
+<div class="content-card__main">
+  <div class="section-label" style="color: {{ accent_color }};">{{ slide_data.title }}</div>
 
-<p class="body-text" style="max-width: 90%;">
-  {{ slide_data.body }}
-</p>
+  <p class="body-text" style="max-width: 90%;">
+    {{ slide_data.body }}
+  </p>
 
-<div class="comparison">
-  <div class="comparison__card comparison__card--before">
-    <div class="comparison__label">BEFORE</div>
-    <div class="comparison__text">
-      {% if before_text %}
-        {{ before_text }}
-      {% else %}
-        Manual setup<br>
-        Complex configuration<br>
-        Slow iteration cycles
-      {% endif %}
+  <div class="comparison">
+    <div class="comparison__card comparison__card--before">
+      <div class="comparison__label">BEFORE</div>
+      <div class="comparison__text">
+        {% if before_text %}
+          {{ before_text }}
+        {% else %}
+          Manual setup<br>
+          Complex configuration<br>
+          Slow iteration cycles
+        {% endif %}
+      </div>
     </div>
-  </div>
 
-  <div class="comparison__card comparison__card--after">
-    <div class="comparison__label">AFTER</div>
-    <div class="comparison__text">
-      {% if after_text %}
-        {{ after_text }}
-      {% else %}
-        One-click deploy<br>
-        Auto-configuration<br>
-        Instant feedback
-      {% endif %}
+    <div class="comparison__card comparison__card--after">
+      <div class="comparison__label">AFTER</div>
+      <div class="comparison__text">
+        {% if after_text %}
+          {{ after_text }}
+        {% else %}
+          One-click deploy<br>
+          Auto-configuration<br>
+          Instant feedback
+        {% endif %}
+      </div>
     </div>
   </div>
 </div>
 
-<div class="handle-chip" style="--accent-color: {{ accent_color }};">
-  <div class="handle-chip__avatar">VJ</div>
-  <span>@vijayakumarj_ai</span>
+<div class="content-card__footer">
+  <div class="handle-chip" style="--accent-color: {{ accent_color }};">
+    <div class="handle-chip__avatar">VJ</div>
+    <span>@vijayakumarj_ai</span>
+  </div>
 </div>
 {% endblock %}

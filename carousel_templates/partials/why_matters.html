@@ -9,44 +9,48 @@
 {% endblock %}
 
 {% block content %}
-<div class="section-label" style="color: {{ accent_color }};">{{ slide_data.title }}</div>
+<div class="content-card__main">
+  <div class="section-label" style="color: {{ accent_color }};">{{ slide_data.title }}</div>
 
-<div class="quote-mark" style="color: {{ accent_color }};">66</div>
+  <div class="quote-mark" style="color: {{ accent_color }};">66</div>
 
-<p class="body-text" style="max-width: 90%;">
-  {{ slide_data.body.split('\n')[0] if slide_data.body else 'This changes how engineers build, deploy, and scale AI systems.' }}
-</p>
+  <p class="body-text" style="max-width: 90%;">
+    {{ slide_data.body.split('\n')[0] if slide_data.body else 'This changes how engineers build, deploy, and scale AI systems.' }}
+  </p>
 
-<div class="metrics-grid">
-  {% if metrics %}
-    {% for metric in metrics %}
-    <div class="metric">
-      <div class="metric__label">{{ metric.label }}</div>
-      <div class="metric__value">{{ metric.value }}</div>
-      <div class="metric__delta">{{ metric.delta }}</div>
-    </div>
-    {% endfor %}
-  {% else %}
-    <div class="metric">
-      <div class="metric__label">Developers</div>
-      <div class="metric__value">Hours saved</div>
-      <div class="metric__delta">2h → 15min</div>
-    </div>
-    <div class="metric">
-      <div class="metric__label">Business</div>
-      <div class="metric__value">Time to prod</div>
-      <div class="metric__delta">Weeks → Days</div>
-    </div>
-    <div class="metric">
-      <div class="metric__label">Users</div>
-      <div class="metric__value">Experience</div>
-      <div class="metric__delta">Basic → Pro</div>
-    </div>
-  {% endif %}
+  <div class="metrics-grid">
+    {% if metrics %}
+      {% for metric in metrics %}
+      <div class="metric">
+        <div class="metric__label">{{ metric.label }}</div>
+        <div class="metric__value">{{ metric.value }}</div>
+        <div class="metric__delta">{{ metric.delta }}</div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="metric">
+        <div class="metric__label">Developers</div>
+        <div class="metric__value">Hours saved</div>
+        <div class="metric__delta">2h → 15min</div>
+      </div>
+      <div class="metric">
+        <div class="metric__label">Business</div>
+        <div class="metric__value">Time to prod</div>
+        <div class="metric__delta">Weeks → Days</div>
+      </div>
+      <div class="metric">
+        <div class="metric__label">Users</div>
+        <div class="metric__value">Experience</div>
+        <div class="metric__delta">Basic → Pro</div>
+      </div>
+    {% endif %}
+  </div>
 </div>
 
-<div class="handle-chip" style="--accent-color: {{ accent_color }};">
-  <div class="handle-chip__avatar">VJ</div>
-  <span>@vijayakumarj_ai</span>
+<div class="content-card__footer">
+  <div class="handle-chip" style="--accent-color: {{ accent_color }};">
+    <div class="handle-chip__avatar">VJ</div>
+    <span>@vijayakumarj_ai</span>
+  </div>
 </div>
 {% endblock %}

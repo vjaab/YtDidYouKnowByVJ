@@ -9,24 +9,28 @@
 {% endblock %}
 
 {% block content %}
-<div class="section-label" style="color: {{ accent_color }};">{{ slide_data.title }}</div>
+<div class="content-card__main">
+  <div class="section-label" style="color: {{ accent_color }};">{{ slide_data.title }}</div>
 
-<ul class="bullet-list">
-  {% for bullet in slide_data.body %}
-  <li class="bullet-item">
-    <span class="bullet-item__text">{{ bullet }}</span>
-  </li>
-  {% endfor %}
-</ul>
-
-<div style="margin-top: var(--space-xl); padding: var(--space-lg); background: var(--accent-color-light); border-radius: var(--radius-lg); border-left: 4px solid {{ accent_color }};">
-  <p style="font-family: var(--font-sans); font-weight: 500; font-size: 16px; color: {{ accent_color }}; margin: 0;">
-    📅 {{ date }}  |  📰 {{ source }}
-  </p>
+  <ul class="bullet-list">
+    {% for bullet in slide_data.body %}
+    <li class="bullet-item">
+      <span class="bullet-item__text">{{ bullet }}</span>
+    </li>
+    {% endfor %}
+  </ul>
 </div>
 
-<div class="handle-chip" style="--accent-color: {{ accent_color }};">
-  <div class="handle-chip__avatar">VJ</div>
-  <span>@vijayakumarj_ai</span>
+<div class="content-card__footer">
+  <div style="padding: var(--space-lg); background: var(--accent-color-light); border-radius: var(--radius-lg); border-left: 4px solid {{ accent_color }};">
+    <p style="font-family: var(--font-sans); font-weight: 500; font-size: 16px; color: {{ accent_color }}; margin: 0;">
+      📅 {{ date }}  |  📰 {{ source }}
+    </p>
+  </div>
+
+  <div class="handle-chip" style="--accent-color: {{ accent_color }};">
+    <div class="handle-chip__avatar">VJ</div>
+    <span>@vijayakumarj_ai</span>
+  </div>
 </div>
 {% endblock %}
