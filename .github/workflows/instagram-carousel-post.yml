@@ -60,7 +60,7 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install "numpy<2.0"
           pip install "grpcio==1.62.2"
-          pip install requests pillow python-dotenv pydantic jinja2 playwright python-telegram-bot aiohttp google-generativeai
+          pip install requests pillow python-dotenv pydantic jinja2 playwright python-telegram-bot aiohttp google-generativeai rapidfuzz
           
       - name: Install Playwright Browsers
         run: python -m playwright install --with-deps chromium
