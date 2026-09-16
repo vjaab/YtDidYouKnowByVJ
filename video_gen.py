@@ -5443,7 +5443,8 @@ def _create_entity_logo_pip_clips(script_json, avatar_pip_func, audio_duration, 
             
             word_idx = len(script_text[:idx].split())
             if word_idx < len(word_timestamps):
-                mention_time = word_timestamps[word_idx][0] if word_timestamps[word_idx] else 0
+                wt = word_timestamps[word_idx]
+                mention_time = wt.get("start", 0) if isinstance(wt, dict) else (wt[0] if wt else 0)
                 start_time = max(0, mention_time - 0.5)
                 end_time = min(audio_duration, mention_time + 3.0)
                 
@@ -8361,7 +8362,8 @@ def _get_avatar_expression_segments(script_text, audio_duration, word_timestamps
                 # Estimate timestamp from word position
                 word_idx = len(script_lower[:idx].split())
                 if word_idx < len(word_timestamps):
-                    start_time = word_timestamps[word_idx][0] if word_timestamps[word_idx] else 0
+                    wt = word_timestamps[word_idx]
+                    start_time = wt.get("start", 0) if isinstance(wt, dict) else (wt[0] if wt else 0)
                     end_time = min(start_time + 3.0, audio_duration)  # 3 second expression
                     segments.append((start_time, end_time, expr_type))
                 
