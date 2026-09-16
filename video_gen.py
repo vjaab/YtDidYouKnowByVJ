@@ -128,8 +128,101 @@ AudioSegment.converter = imageio_ffmpeg.get_ffmpeg_exe()
 CI_LITE = os.environ.get("CI_LITE", "0") == "1"
 DISABLE_ENTITY_TAGS = os.environ.get("DISABLE_ENTITY_TAGS", "0") == "1"
 
+# Cloudflare config
+CF_ACCOUNT_ID = os.environ.get("CF_ACCOUNT_ID") or os.environ.get("CLOUDFLARE_ACCOUNT_ID")
+CF_API_TOKEN = os.environ.get("CF_API_TOKEN") or os.environ.get("CLOUDFLARE_API_TOKEN")
+HAS_CF_FALLBACK = bool(CF_ACCOUNT_ID and CF_API_TOKEN)
+
 # OCR Cache for evidence screenshots
 _EVIDENCE_OCR_CACHE = {}
+
+# Topic Visual Cache
+_TOPIC_VISUAL_CACHE = {}
+
+def _generate_topic_pollinations_image(prompt, target_w, target_h):
+    """Generate topic visual using Pollinations AI (free, no API key needed)."""
+    import requests
+    import urllib.parse
+    
+    encoded_prompt = urllib.parse.quote(prompt)
+    url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={target_w}&height={target_h}&nologo=true&private=true"
+    
+    max_attempts = 3
+    for attempt in range(1, max_attempts + 1):
+        try:
+            print(f"     → Generating topic visual via Pollinations (attempt {attempt}/{max_attempts})...")
+            resp = requests.get(url, timeout=45)
+            if resp.status_code == 200:
+                img = Image.open(io.BytesIO(resp.content)).convert("RGB")
+                arr = np.array(img)
+                if arr.shape[:2] != (target_h, target_w):
+                    arr = cv2.resize(arr, (target_w, target_h))
+                return arr
+            elif resp.status_code == 429:
+                wait = 10 * attempt
+                print(f"  ⚠️ [pollinations] Rate limited (429). Waiting {wait}s before retry...")
+                import time
+                time.sleep(wait)
+            else:
+                print(f"  ⚠️ [pollinations] Attempt {attempt} returned status: {resp.status_code}")
+        except Exception as e:
+            print(f"  ⚠️ [pollinations] Attempt {attempt} failed: {e}")
+        
+        if attempt < max_attempts:
+            import time
+            time.sleep(5 * attempt)
+            
+    return None
+
+def _generate_topic_cloudflare_image(prompt, target_w, target_h):
+    """Generate topic visual using Cloudflare Workers AI FLUX.1 Schnell."""
+    if not HAS_CF_FALLBACK:
+        return None
+    
+    import requests
+    import base64
+    
+    try:
+        print(f"     → Generating topic visual via Cloudflare FLUX.1 Schnell...")
+        resp = requests.post(
+            f"https://api.cloudflare.com/client/v4/accounts/{CF_ACCOUNT_ID}/ai/run/@cf/black-forest-labs/flux-1-schnell",
+            headers={
+                "Authorization": f"Bearer {CF_API_TOKEN}",
+                "Content-Type": "application/json"
+            },
+            json={"prompt": prompt},
+            timeout=60
+        )
+        if resp.status_code == 200:
+            content_type = resp.headers.get("content-type", "")
+            if content_type.startswith("image"):
+                img = Image.open(io.BytesIO(resp.content)).convert("RGB")
+                arr = np.array(img)
+                if arr.shape[:2] != (target_h, target_w):
+                    arr = cv2.resize(arr, (target_w, target_h))
+                print(f"  ✅ [cloudflare] Topic visual generated successfully!")
+                return arr
+            else:
+                try:
+                    data = resp.json()
+                    if data.get("success") and data.get("result", {}).get("image"):
+                        img_bytes = base64.b64decode(data["result"]["image"])
+                        img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
+                        arr = np.array(img)
+                        if arr.shape[:2] != (target_h, target_w):
+                            arr = cv2.resize(arr, (target_w, target_h))
+                        print(f"  ✅ [cloudflare] Topic visual generated successfully (base64)!")
+                        return arr
+                except Exception:
+                    pass
+                print(f"  ⚠️ [cloudflare] Unexpected response format: {content_type}")
+        elif resp.status_code == 429:
+            print(f"  ⚠️ [cloudflare] Rate limited (429). Skipping.")
+        else:
+            print(f"  ⚠️ [cloudflare] Returned status: {resp.status_code}")
+    except Exception as e:
+        print(f"  ⚠️ [cloudflare] Failed: {e}")
+    return None
 
 def _extract_text_with_pytesseract(image_path):
     """Fallback OCR using pytesseract."""
@@ -295,257 +388,87 @@ def match_spoken_words_to_ocr(ocr_results, word_timestamps, current_time, time_w
     return matched
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# TOPIC VISUAL FETCHER & REVIEWER FOR SHORTS EVIDENCE SCREENSHOTS
-# ═══════════════════════════════════════════════════════════════════════════════
+# TOPIC VISUAL GENERATOR FOR SHORTS EVIDENCE SCREENSHOTS (Pollinations/Cloudflare AI)
+# ════════════════════════════════════════════════════════════════════════════════
 
 _TOPIC_VISUAL_CACHE = {}
 
-def _fetch_topic_visuals_from_pexels(topic_context, max_results=5):
-    """
-    Fetch relevant photos from Pexels/Pixabay based on topic context.
-    Returns list of image URLs with descriptions.
-    """
-    try:
-        from pexels_fetcher import _search_pexels_photos, _search_pixabay_photos, PEXELS_API_KEY, PIXABAY_API_KEY
-        
-        # Extract keywords from topic context for search
-        keywords = _extract_search_keywords(topic_context)
-        if not keywords:
-            keywords = ["technology", "AI", "coding", "software development"]
-        
-        all_results = []
-        for keyword in keywords[:3]:  # Try up to 3 keywords
-            # Try Pexels first
-            if PEXELS_API_KEY:
-                results = _search_pexels_photos(keyword, orientation="portrait")
-                all_results.extend(results)
-            
-            # Try Pixabay as fallback
-            if PIXABAY_API_KEY and len(all_results) < max_results:
-                results = _search_pixabay_photos(keyword, orientation="portrait")
-                all_results.extend(results)
-            
-            if len(all_results) >= max_results:
-                break
-        
-        # Deduplicate by ID
-        seen = set()
-        unique_results = []
-        for r in all_results:
-            if r["id"] not in seen:
-                seen.add(r["id"])
-                unique_results.append(r)
-        
-        return unique_results[:max_results]
-        
-    except Exception as e:
-        print(f"⚠️ Failed to fetch topic visuals from Pexels/Pixabay: {e}")
-        return []
-
-
-def _extract_search_keywords(topic_context):
-    """Extract relevant search keywords from topic context."""
-    if not topic_context:
-        return []
-    
-    # Common tech keywords to prioritize
-    tech_keywords = [
-        "artificial intelligence", "machine learning", "deep learning", "neural network",
-        "LLM", "GPT", "Claude", "Gemini", "transformer", "generative AI",
-        "python", "javascript", "typescript", "rust", "go", "programming",
-        "github", "open source", "repository", "code", "software development",
-        "API", "microservices", "cloud", "AWS", "GCP", "azure", "kubernetes",
-        "docker", "container", "devops", "CI/CD", "deployment",
-        "database", "SQL", "postgresql", "mongodb", "redis",
-        "frontend", "react", "vue", "nextjs", "tailwind",
-        "backend", "nodejs", "fastapi", "django", "flask",
-        "mobile", "iOS", "android", "flutter", "react native",
-        "cybersecurity", "encryption", "authentication", "OAuth",
-        "blockchain", "crypto", "web3", "smart contract",
-        "data science", "pandas", "numpy", "visualization",
-        "computer vision", "NLP", "natural language processing"
-    ]
-    
+def _build_topic_prompt(topic_context):
+    """Build an optimized image generation prompt for the topic context."""
     topic_lower = topic_context.lower()
-    found_keywords = []
     
-    for kw in tech_keywords:
-        if kw.lower() in topic_lower:
-            found_keywords.append(kw)
+    # Base style for tech content
+    base_style = "high quality tech illustration, modern digital art style, clean composition, vibrant colors, 9:16 vertical format"
     
-    # If no tech keywords found, extract capitalized words and nouns
-    if not found_keywords:
-        import re
-        # Extract words that look like proper nouns or tech terms
-        words = re.findall(r'\b[A-Z][a-z]+\b|\b[A-Z]{2,}\b', topic_context)
-        found_keywords = list(set(words))[:5]
-    
-    return found_keywords[:5]
-
-
-def _download_image(url, output_path):
-    """Download image from URL to local path."""
-    try:
-        import requests
-        r = requests.get(url, timeout=30, stream=True)
-        if r.status_code == 200:
-            with open(output_path, "wb") as f:
-                for chunk in r.iter_content(8192):
-                    f.write(chunk)
-            return True
-    except Exception as e:
-        print(f"⚠️ Failed to download image: {e}")
-    return False
-
-
-def _review_image_relevance_gemini(image_path, topic_context, gemini_api_key=None):
-    """
-    Use Gemini Vision to review if the downloaded image is relevant to the topic.
-    Returns (is_relevant: bool, confidence: float, reason: str)
-    """
-    if not gemini_api_key:
-        gemini_api_key = GEMINI_API_KEY
-    if not gemini_api_key:
-        return True, 0.5, "No API key for review"
-    
-    try:
-        from google import genai
-        from google.genai import types
-        
-        client = genai.Client(api_key=gemini_api_key)
-        
-        # Load and prepare image
-        img = Image.open(image_path)
-        img_w, img_h = img.size
-        
-        # Resize if too large
-        max_dim = 2048
-        if max(img_w, img_h) > max_dim:
-            scale = max_dim / max(img_w, img_h)
-            new_w, new_h = int(img_w * scale), int(img_h * scale)
-            img = img.resize((new_w, new_h), Image.LANCZOS)
-        
-        buf = io.BytesIO()
-        img.save(buf, format='PNG')
-        img_bytes = buf.getvalue()
-        
-        prompt = f"""Analyze this image and determine if it's visually relevant to the topic: "{topic_context}"
-
-Topic context: {topic_context}
-
-Return ONLY a JSON object:
-{{
-  "is_relevant": true/false,
-  "confidence": 0.0-1.0,
-  "reason": "Brief explanation of why the image is or isn't relevant to the topic"
-}}
-
-Consider:
-- Does the image show concepts, tools, logos, or visuals related to the topic?
-- Is it generic stock photo filler, or does it have specific relevance?
-- Would a viewer understand the connection between this image and the topic?"""
-        
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=[
-                types.Part.from_bytes(data=img_bytes, mime_type="image/png"),
-                prompt
-            ],
-            config=types.GenerateContentConfig(
-                temperature=0.1,
-                response_mime_type="application/json"
-            )
-        )
-        
-        raw = response.text.strip()
-        if "{" in raw and "}" in raw:
-            raw = raw[raw.find("{"):raw.rfind("}") + 1]
-        result = json.loads(raw)
-        
-        is_relevant = result.get("is_relevant", False)
-        confidence = result.get("confidence", 0.5)
-        reason = result.get("reason", "No reason provided")
-        
-        return is_relevant, confidence, reason
-        
-    except Exception as e:
-        print(f"⚠️ Gemini Vision review failed: {e}")
-        return True, 0.5, f"Review failed: {e}"
-
+    # Topic-specific prompt enhancements
+    if any(kw in topic_lower for kw in ["ai", "artificial intelligence", "machine learning", "llm", "gpt", "gemini", "claude", "neural", "deep learning", "transformer", "generative ai"]):
+        return f"Futuristic AI neural network visualization, glowing synapses and data flows, holographic brain patterns, electric blue and purple gradient, {base_style}"
+    elif any(kw in topic_lower for kw in ["python", "javascript", "typescript", "rust", "go", "coding", "programming", "developer", "github", "code", "software development", "api", "function"]):
+        return f"Code editor screen with syntax highlighting, floating code snippets and git branches, developer terminal aesthetic, green and blue cyberpunk theme, {base_style}"
+    elif any(kw in topic_lower for kw in ["security", "hack", "cyber", "privacy", "encryption", "auth", "vulnerability", "exploit", "firewall"]):
+        return f"Cybersecurity shield with digital lock, binary code matrix background, red alert warnings, hacker hoodie silhouette, dark red and orange tones, {base_style}"
+    elif any(kw in topic_lower for kw in ["cloud", "aws", "gcp", "azure", "kubernetes", "docker", "devops", "container", "microservice", "deployment", "ci/cd"]):
+        return f"Cloud infrastructure diagram, floating server racks and kubernetes pods, network connections, AWS/Azure/GCP logos subtly integrated, blue and orange gradient, {base_style}"
+    elif any(kw in topic_lower for kw in ["data", "analytics", "pandas", "numpy", "visualization", "database", "sql", "mongodb", "redis", "chart", "graph"]):
+        return f"Data visualization dashboard, interactive charts and graphs, 3D data points flowing, analytics metrics, teal and purple scientific aesthetic, {base_style}"
+    elif any(kw in topic_lower for kw in ["mobile", "ios", "android", "flutter", "react native", "app", "smartphone", "tablet"]):
+        return f"Mobile app interface design, smartphone mockup with modern UI, app store elements, iOS/Android design language, green and purple gradient, {base_style}"
+    elif any(kw in topic_lower for kw in ["web3", "blockchain", "crypto", "nft", "smart contract", "ethereum", "bitcoin", "defi"]):
+        return f"Blockchain visualization, interconnected blocks and cryptographic hashes, golden bitcoin symbols, web3 aesthetic, gold and dark blue theme, {base_style}"
+    elif any(kw in topic_lower for kw in ["startup", "business", "finance", "money", "investment", "funding", "venture", "entrepreneur"]):
+        return f"Startup growth chart, rocket trajectory, financial charts, venture capital symbols, modern business aesthetic, dark gold and navy theme, {base_style}"
+    else:
+        # Generic tech prompt
+        return f"Technology concept illustration for '{topic_context}', futuristic digital elements, abstract tech visualization, modern gradient background, {base_style}"
 
 def _get_or_generate_topic_visual(topic_context, target_w, target_h, gemini_api_key=None, max_attempts=3):
     """
-    Fetch a relevant topic visual from Pexels/Pixabay, review with Gemini Vision,
-    and regenerate if not relevant. Returns numpy array of the visual.
+    Generate a relevant topic visual using Pollinations AI or Cloudflare FLUX.1,
+    with abstract fallback as last resort. Returns numpy array of the visual.
     """
     cache_key = f"{topic_context}_{target_w}x{target_h}"
     if cache_key in _TOPIC_VISUAL_CACHE:
         return _TOPIC_VISUAL_CACHE[cache_key]
     
-    # Fetch candidate images
-    candidates = _fetch_topic_visuals_from_pexels(topic_context, max_results=max_attempts * 2)
+    # Build optimized prompt for the topic
+    prompt = _build_topic_prompt(topic_context)
+    print(f"🎨 Generating topic visual via AI for: {topic_context[:60]}...")
     
-    if not candidates:
-        print(f"⚠️ No candidate images found for topic: {topic_context}. Check PEXELS_API_KEY/PIXABAY_API_KEY.")
-        return _generate_fallback_topic_visual(topic_context, target_w, target_h)
+    # Try Cloudflare FLUX.1 first (higher quality)
+    if HAS_CF_FALLBACK:
+        arr = _generate_topic_cloudflare_image(prompt, target_w, target_h)
+        if arr is not None:
+            # Add subtle label
+            pil_img = Image.fromarray(arr)
+            draw = ImageDraw.Draw(pil_img)
+            font = gf(32, bold=True)
+            label = "TOPIC VISUAL"
+            tw, th = draw.textbbox((0, 0), label, font=font)[2:]
+            draw.text(((target_w - tw)//2, 15), label, font=font, fill=(255, 255, 255, 200))
+            draw.line([(40, target_h - 10), (target_w - 40, target_h - 10)], fill=(0, 240, 255, 180), width=2)
+            arr = np.array(pil_img)
+            
+            _TOPIC_VISUAL_CACHE[cache_key] = arr
+            return arr
     
-    import tempfile
-    import os
+    # Try Pollinations as fallback
+    arr = _generate_topic_pollinations_image(prompt, target_w, target_h)
+    if arr is not None:
+        # Add subtle label
+        pil_img = Image.fromarray(arr)
+        draw = ImageDraw.Draw(pil_img)
+        font = gf(32, bold=True)
+        label = "TOPIC VISUAL"
+        tw, th = draw.textbbox((0, 0), label, font=font)[2:]
+        draw.text(((target_w - tw)//2, 15), label, font=font, fill=(255, 255, 255, 200))
+        draw.line([(40, target_h - 10), (target_w - 40, target_h - 10)], fill=(0, 240, 255, 180), width=2)
+        arr = np.array(pil_img)
+        
+        _TOPIC_VISUAL_CACHE[cache_key] = arr
+        return arr
     
-    for attempt, candidate in enumerate(candidates):
-        try:
-            # Download image to temp file
-            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
-                temp_path = tmp.name
-            
-            if not _download_image(candidate["link"], temp_path):
-                continue
-            
-            # Review with Gemini Vision
-            is_relevant, confidence, reason = _review_image_relevance_gemini(
-                temp_path, topic_context, gemini_api_key
-            )
-            
-            print(f"🔍 Topic visual review (attempt {attempt+1}): {'RELEVANT' if is_relevant else 'NOT RELEVANT'} (confidence: {confidence:.2f}) - {reason}")
-            
-            if is_relevant and confidence >= 0.6:
-                # Load and resize the approved image
-                img = Image.open(temp_path).convert("RGB")
-                img = ImageOps.fit(img, (target_w, target_h), Image.LANCZOS)
-                arr = np.array(img)
-                
-                # Add subtle label
-                pil_img = Image.fromarray(arr)
-                draw = ImageDraw.Draw(pil_img)
-                font = gf(40, bold=True)
-                label = "TOPIC VISUAL"
-                tw, th = draw.textbbox((0, 0), label, font=font)[2:]
-                draw.text(((target_w - tw)//2, 15), label, font=font, fill=(255, 255, 255, 230))
-                draw.line([(40, target_h - 10), (target_w - 40, target_h - 10)], fill=(0, 240, 255, 200), width=3)
-                
-                arr = np.array(pil_img)
-                
-                # Clean up
-                try:
-                    os.unlink(temp_path)
-                except:
-                    pass
-                
-                _TOPIC_VISUAL_CACHE[cache_key] = arr
-                return arr
-            
-            # Clean up failed attempt
-            try:
-                os.unlink(temp_path)
-            except:
-                pass
-                
-        except Exception as e:
-            print(f"⚠️ Error processing candidate image: {e}")
-            continue
-    
-    # All attempts failed or not relevant enough - use fallback
-    print(f"⚠️ All topic visual candidates rejected, using fallback for: {topic_context}")
+    # All AI generation failed - use abstract fallback
+    print(f"⚠️ AI image generation failed, using abstract fallback for: {topic_context}")
     return _generate_fallback_topic_visual(topic_context, target_w, target_h)
 
 
