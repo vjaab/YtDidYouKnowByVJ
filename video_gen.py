@@ -486,7 +486,7 @@ def _get_or_generate_topic_visual(topic_context, target_w, target_h, gemini_api_
     candidates = _fetch_topic_visuals_from_pexels(topic_context, max_results=max_attempts * 2)
     
     if not candidates:
-        print(f"⚠️ No candidate images found for topic: {topic_context}")
+        print(f"⚠️ No candidate images found for topic: {topic_context}. Check PEXELS_API_KEY/PIXABAY_API_KEY.")
         return _generate_fallback_topic_visual(topic_context, target_w, target_h)
     
     import tempfile
@@ -550,52 +550,102 @@ def _get_or_generate_topic_visual(topic_context, target_w, target_h, gemini_api_
 
 
 def _generate_fallback_topic_visual(topic_context, target_w, target_h):
-    """Generate a clean fallback visual when no relevant images found."""
-    # Create a gradient background with topic text
-    img = Image.new("RGB", (target_w, target_h), (15, 15, 25))
+    """Generate a clean fallback visual when no relevant images found.
+    Creates an abstract tech-themed visual based on topic keywords instead of displaying text."""
+    import random
+    import math
+    
+    # Determine color theme from topic context
+    topic_lower = topic_context.lower()
+    
+    # Color themes for different topics
+    if any(kw in topic_lower for kw in ["ai", "artificial", "machine learning", "llm", "gpt", "gemini", "claude", "neural", "deep learning"]):
+        # AI theme - purple/cyan
+        base_color = (20, 10, 40)
+        accent_color = (180, 120, 255)
+        secondary_color = (0, 220, 255)
+    elif any(kw in topic_lower for kw in ["python", "javascript", "typescript", "rust", "go", "coding", "programming", "developer", "github", "code", "software"]):
+        # Coding theme - green/blue
+        base_color = (10, 30, 20)
+        accent_color = (0, 255, 150)
+        secondary_color = (0, 200, 255)
+    elif any(kw in topic_lower for kw in ["security", "hack", "cyber", "privacy", "encryption", "auth"]):
+        # Security theme - red/orange
+        base_color = (30, 10, 10)
+        accent_color = (255, 80, 80)
+        secondary_color = (255, 160, 60)
+    elif any(kw in topic_lower for kw in ["cloud", "aws", "gcp", "azure", "kubernetes", "docker", "devops", "container", "microservice"]):
+        # Cloud/DevOps theme - blue/orange
+        base_color = (10, 20, 40)
+        accent_color = (0, 180, 255)
+        secondary_color = (255, 140, 40)
+    elif any(kw in topic_lower for kw in ["data", "analytics", "pandas", "numpy", "visualization", "database", "sql"]):
+        # Data theme - teal/purple
+        base_color = (10, 25, 30)
+        accent_color = (0, 220, 200)
+        secondary_color = (160, 100, 255)
+    elif any(kw in topic_lower for kw in ["mobile", "ios", "android", "flutter", "react native", "app"]):
+        # Mobile theme - green/purple
+        base_color = (10, 30, 25)
+        accent_color = (80, 255, 180)
+        secondary_color = (180, 100, 255)
+    else:
+        # Default tech theme - cyan/blue
+        base_color = (10, 15, 30)
+        accent_color = (0, 240, 255)
+        secondary_color = (100, 200, 255)
+    
+    # Create base image
+    img = Image.new("RGB", (target_w, target_h), base_color)
     draw = ImageDraw.Draw(img)
     
-    # Gradient background
-    for y in range(target_h):
-        ratio = y / target_h
-        r = int(15 + ratio * 20)
-        g = int(15 + ratio * 15)
-        b = int(25 + ratio * 30)
-        draw.line([(0, y), (target_w, y)], fill=(r, g, b))
+    # Generate abstract geometric pattern
+    # Draw grid lines
+    for i in range(0, target_w, 80):
+        alpha = int(30 * (1 - abs(i - target_w/2) / (target_w/2)))
+        draw.line([(i, 0), (i, target_h)], fill=(*accent_color[:3], alpha), width=1)
     
-    # Topic text
-    font = gf(56, bold=True)
-    # Wrap topic context
-    words = topic_context.split()
-    lines = []
-    current = []
-    for w in words:
-        test = " ".join(current + [w])
-        tw, _ = draw.textbbox((0, 0), test, font=font)[2:]
-        if tw <= target_w * 0.85:
-            current.append(w)
-        else:
-            if current:
-                lines.append(" ".join(current))
-            current = [w]
-    if current:
-        lines.append(" ".join(current))
-    lines = lines[:4]  # Max 4 lines
+    for i in range(0, target_h, 80):
+        alpha = int(30 * (1 - abs(i - target_h/2) / (target_h/2)))
+        draw.line([(0, i), (target_w, i)], fill=(*accent_color[:3], alpha), width=1)
     
-    line_h = 70
-    total_h = len(lines) * line_h
-    start_y = (target_h - total_h) // 2
+    # Draw concentric circles in center
+    cx, cy = target_w // 2, target_h // 2
+    for radius in range(60, min(target_w, target_h) // 2, 80):
+        alpha = int(40 * (1 - radius / (min(target_w, target_h) // 2)))
+        draw.ellipse([cx-radius, cy-radius, cx+radius, cy+radius], 
+                     outline=(*accent_color[:3], alpha), width=2)
     
-    for i, line in enumerate(lines):
-        tw, th = draw.textbbox((0, 0), line, font=font)[2:]
-        y = start_y + i * line_h
-        # Shadow
-        draw.text((target_w//2 + 3, y + 3), line, font=font, fill=(0, 0, 0, 180), anchor="mm")
-        # Text
-        draw.text((target_w//2, y), line, font=font, fill=(255, 255, 255, 255), anchor="mm")
+    # Draw circuit-like pattern
+    for _ in range(15):
+        x1 = random.randint(0, target_w)
+        y1 = random.randint(0, target_h)
+        x2 = x1 + random.randint(-100, 100)
+        y2 = y1 + random.randint(-100, 100)
+        x2 = max(0, min(target_w, x2))
+        y2 = max(0, min(target_h, y2))
+        draw.line([(x1, y1), (x2, y2)], fill=(*secondary_color[:3], 50), width=random.randint(1, 3))
+        # Add nodes
+        draw.ellipse([x1-4, y1-4, x1+4, y1+4], fill=secondary_color)
+        draw.ellipse([x2-4, y2-4, x2+4, y2+4], fill=secondary_color)
     
-    # Accent line
-    draw.line([(target_w//4, target_h - 60), (3*target_w//4, target_h - 60)], fill=(0, 240, 255, 200), width=4)
+    # Add subtle topic indicator (small text at bottom)
+    font = gf(28, bold=True)
+    # Extract key term from topic (first capitalized word or tech term)
+    import re
+    key_terms = re.findall(r'\b[A-Z][a-z]{2,}\b|\b[A-Z]{2,}\b', topic_context)
+    if not key_terms:
+        # Try to extract a meaningful word
+        words = [w for w in topic_context.split() if len(w) > 3 and w.lower() not in ['the', 'and', 'for', 'with', 'this', 'that', 'from']]
+        key_terms = words[:2] if words else ["Tech"]
+    
+    indicator = " ".join(key_terms[:2])
+    tw, th = draw.textbbox((0, 0), indicator, font=font)[2:]
+    draw.text((target_w//2 + 2, target_h - 50 + 2), indicator, font=font, fill=(0, 0, 0, 150), anchor="mm")
+    draw.text((target_w//2, target_h - 50), indicator, font=font, fill=(*accent_color[:3], 255), anchor="mm")
+    
+    # Accent bar at bottom
+    draw.rectangle([target_w//6, target_h - 20, 5*target_w//6, target_h - 10], fill=secondary_color)
     
     return np.array(img)
 
