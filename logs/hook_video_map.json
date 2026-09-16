@@ -298,5 +298,15 @@
     "title": "Stop Paying For Note Apps! This AI Wiki is FREE and PRIVATE",
     "uploaded_at": "2026-09-15T20:31:38.018716",
     "synced": false
+  },
+  "ZKo5bdUaBGs": {
+    "video_id": "ZKo5bdUaBGs",
+    "hook_pattern": "negative_warning",
+    "hook_variant": "B",
+    "hook_text": "Stop using bloated database clients now.",
+    "category": "Finance & Tech Economy",
+    "title": "[PROJECT] The 20MB Database Super-Client",
+    "uploaded_at": "2026-09-16T17:09:44.561183",
+    "synced": false
   }
 }

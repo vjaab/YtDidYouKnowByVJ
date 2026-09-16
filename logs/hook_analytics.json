@@ -325,10 +325,25 @@
                 "recorded_at": "2026-09-15T20:31:38.017207"
               }
             ]
+          },
+          "B": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "Stop using bloated database clients now.",
+                "video_id": "ZKo5bdUaBGs",
+                "recorded_at": "2026-09-16T17:09:44.558258"
+              }
+            ]
           }
         },
         "total_views": 0,
-        "total_videos": 1,
+        "total_videos": 2,
         "avg_retention": 0.0,
         "avg_engagement": 0.0,
         "avg_swipe_away": 0.0,
@@ -748,7 +763,7 @@
       "views": 0,
       "retention": 0.0,
       "engagement": 0.0,
-      "count": 7,
+      "count": 8,
       "swipe_away_rate": 0.0,
       "avg_view_percentage": 0.0
     },
@@ -785,5 +800,5 @@
       "avg_view_percentage": 0.0
     }
   },
-  "last_updated": "2026-09-15T20:31:38.017246"
+  "last_updated": "2026-09-16T17:09:44.558300"
 }
