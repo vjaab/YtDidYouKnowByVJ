@@ -6096,10 +6096,20 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
     if not evidence_path or not os.path.exists(evidence_path):
         return []
     try:
-        img = Image.open(evidence_path).convert("RGB")
+        # Load original image for scrolling (full resolution)
+        orig_img = Image.open(evidence_path).convert("RGB")
         target_h, target_w = FRAME_H, FRAME_W
-        # Apply vignette to evidence screenshots too
-        canvas = _prepare_screenshot_canvas(img, target_w, target_h, evidence_path, apply_vignette=True)
+        
+        # Prepare full-resolution image for scrolling (not scaled down by canvas)
+        # Scale original to target width but keep full height for scrolling
+        orig_w, orig_h = orig_img.size
+        scale = target_w / orig_w
+        scroll_h = int(orig_h * scale)
+        scroll_w = target_w
+        # Resize original for scrolling
+        scroll_img = orig_img.resize((scroll_w, scroll_h), Image.LANCZOS)
+        scroll_arr_rgb = np.array(scroll_img)
+        scroll_arr_mask = np.ones((scroll_h, scroll_w), dtype=float)
         
         arr_rgba = np.array(canvas.convert("RGBA"))
         arr_rgb = arr_rgba[:, :, :3]
@@ -6194,13 +6204,13 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
                 if cycle_pos < evidence_duration - transition_duration:
                     # Show evidence screenshot with scrolling + subtle ken burns zoom (main 9.5s)
                     progress = cycle_pos / (evidence_duration - transition_duration)
-                    img_h, img_w = arr_rgb.shape[:2]
+                    img_h, img_w = scroll_arr_rgb.shape[:2]
                     max_scroll = max(0, img_h - target_h)
                     scroll_y = int(progress * max_scroll)
                     
                     # Subtle ken burns zoom: 1.0 -> 1.08 over the evidence duration
                     zoom = 1.0 + 0.08 * progress
-                    evidence_frame = arr_rgb[scroll_y:scroll_y + target_h, :, :]
+                    evidence_frame = scroll_arr_rgb[scroll_y:scroll_y + target_h, :, :]
                     if zoom > 1.0:
                         h, w = evidence_frame.shape[:2]
                         new_h, new_w = int(h / zoom), int(w / zoom)
@@ -6215,10 +6225,10 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
                 elif in_evidence_to_topic:
                     # Crossfade from evidence to topic visual (0.5s)
                     progress = (cycle_pos - (evidence_duration - transition_duration)) / transition_duration
-                    img_h, img_w = arr_rgb.shape[:2]
+                    img_h, img_w = scroll_arr_rgb.shape[:2]
                     max_scroll = max(0, img_h - target_h)
                     scroll_y = int(progress * max_scroll)
-                    evidence_frame = arr_rgb[scroll_y:scroll_y + target_h, :, :]
+                    evidence_frame = scroll_arr_rgb[scroll_y:scroll_y + target_h, :, :]
                     # Apply zoom to evidence frame during transition too
                     zoom = 1.0 + 0.08 * progress
                     if zoom > 1.0:
@@ -6249,7 +6259,7 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
                     # Crossfade from topic visual back to evidence (0.5s)
                     progress = (cycle_pos - (cycle_duration - transition_duration)) / transition_duration
                     # Show evidence from top with zoom
-                    evidence_frame = arr_rgb[0:target_h, :, :]
+                    evidence_frame = scroll_arr_rgb[0:target_h, :, :]
                     zoom = 1.0 + 0.08 * progress
                     if zoom > 1.0:
                         h, w = evidence_frame.shape[:2]
@@ -6272,25 +6282,23 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
                 
                 if cycle_pos < evidence_duration - transition_duration:
                     progress = cycle_pos / (evidence_duration - transition_duration)
-                    img_h, img_w = arr_mask.shape[:2]
+                    img_h, img_w = scroll_arr_mask.shape[:2]
                     max_scroll = max(0, img_h - target_h)
                     scroll_y = int(progress * max_scroll)
-                    return arr_mask[scroll_y:scroll_y + target_h, :]
+                    return scroll_arr_mask[scroll_y:scroll_y + target_h, :]
                 elif in_evidence_to_topic:
                     progress = (cycle_pos - (evidence_duration - transition_duration)) / transition_duration
-                    img_h, img_w = arr_mask.shape[:2]
+                    img_h, img_w = scroll_arr_mask.shape[:2]
                     max_scroll = max(0, img_h - target_h)
                     scroll_y = int(progress * max_scroll)
-                    evidence_mask = arr_mask[scroll_y:scroll_y + target_h, :]
+                    evidence_mask = scroll_arr_mask[scroll_y:scroll_y + target_h, :]
                     # Blend masks
                     return cv2.addWeighted(evidence_mask, 1.0 - progress, topic_visual_mask, progress, 0)
                 elif cycle_pos < cycle_duration - transition_duration:
                     return topic_visual_mask
                 else:
                     progress = (cycle_pos - (cycle_duration - transition_duration)) / transition_duration
-                    img_h, img_w = arr_mask.shape[:2]
-                    max_scroll = max(0, img_h - target_h)
-                    evidence_mask = arr_mask[0:target_h, :]
+                    evidence_mask = scroll_arr_mask[0:target_h, :]
                     return cv2.addWeighted(topic_visual_mask, 1.0 - progress, evidence_mask, progress, 0)
             
             clip = VideoClip(make_cycle_frame, duration=duration)
@@ -6315,13 +6323,13 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
                     progress = t / max(dur, 0.01)
                     
                     # Slow scroll down effect for evidence screenshot
-                    img_h, img_w = arr_rgb.shape[:2]
+                    img_h, img_w = scroll_arr_rgb.shape[:2]
                     max_scroll = max(0, img_h - target_h)
                     scroll_y = int(progress * max_scroll)
                     
                     # Subtle ken burns zoom: 1.0 -> 1.12 over the evidence duration
                     zoom = 1.0 + 0.12 * progress
-                    evidence_frame = arr_rgb[scroll_y:scroll_y + target_h, :, :]
+                    evidence_frame = scroll_arr_rgb[scroll_y:scroll_y + target_h, :, :]
                     if zoom > 1.0:
                         h, w = evidence_frame.shape[:2]
                         new_h, new_w = int(h / zoom), int(w / zoom)
@@ -6337,10 +6345,10 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
                 
                 def make_longform_mask(t):
                     progress = t / max(dur, 0.01)
-                    img_h, img_w = arr_mask.shape[:2]
+                    img_h, img_w = scroll_arr_mask.shape[:2]
                     max_scroll = max(0, img_h - target_h)
                     scroll_y = int(progress * max_scroll)
-                    return arr_mask[scroll_y:scroll_y + target_h, :]
+                    return scroll_arr_mask[scroll_y:scroll_y + target_h, :]
                 
                 clip = VideoClip(make_longform_frame, duration=dur)
                 mclip = VideoClip(make_longform_mask, is_mask=True, duration=dur)
