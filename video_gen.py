@@ -6122,7 +6122,7 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
             if ocr_results:
                 print(f"🔍 Evidence OCR: {len(ocr_results)} text regions extracted for highlighting")
         
-        def _draw_highlights(frame_rgb, current_time):
+        def _draw_highlights(frame_rgb, current_time, scroll_y=0):
             """Draw highlight overlays on frame for currently spoken words."""
             if not ocr_results or not word_timestamps:
                 return frame_rgb
@@ -6139,17 +6139,11 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
             orig_img = Image.open(evidence_path)
             orig_w, orig_h = orig_img.size
             
-            # Calculate the transform from original image to displayed frame
-            # The screenshot canvas applies scaling and positioning
-            canvas_w, canvas_h = canvas.size
+            # The frame_rgb comes from scroll_arr_rgb which is original image scaled to target_w
+            # Scale factor from original to scroll_arr
+            scroll_scale = target_w / orig_w
             
-            # Scale factors from original to canvas
-            scale_x = canvas_w / orig_w
-            scale_y = canvas_h / orig_h
-            
-            # Canvas position in frame (centered)
-            canvas_x = (target_w - canvas_w) // 2
-            canvas_y = (target_h - canvas_h) // 2
+            frame_h, frame_w = frame_rgb.shape[:2]
             
             highlight_color = (255, 214, 0, 180)  # Yellow highlight with transparency
             border_color = (255, 214, 0, 255)     # Yellow border
@@ -6158,21 +6152,29 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
                 bbox = item["bbox"]  # [x1, y1, x2, y2] in original image coordinates
                 x1, y1, x2, y2 = bbox
                 
-                # Map to canvas coordinates
-                cx1 = int(x1 * scale_x) + canvas_x
-                cy1 = int(y1 * scale_y) + canvas_y
-                cx2 = int(x2 * scale_x) + canvas_x
-                cy2 = int(y2 * scale_y) + canvas_y
+                # Map to scroll_arr coordinates (scaled original)
+                sx1 = int(x1 * scroll_scale)
+                sy1 = int(y1 * scroll_scale)
+                sx2 = int(x2 * scroll_scale)
+                sy2 = int(y2 * scroll_scale)
                 
-                # Draw highlight rectangle with rounded corners
-                padding = 4
-                draw.rounded_rectangle(
-                    [cx1 - padding, cy1 - padding, cx2 + padding, cy2 + padding],
-                    radius=6,
-                    fill=highlight_color,
-                    outline=border_color,
-                    width=2
-                )
+                # Adjust for scroll offset - frame is cropped from scroll_arr at scroll_y
+                fx1 = sx1
+                fy1 = sy1 - scroll_y
+                fx2 = sx2
+                fy2 = sy2 - scroll_y
+                
+                # Only draw if the highlight is within the frame bounds (with some margin)
+                if fy2 > -20 and fy1 < frame_h + 20 and fx2 > 0 and fx1 < frame_w:
+                    # Draw highlight rectangle with rounded corners
+                    padding = 4
+                    draw.rounded_rectangle(
+                        [fx1 - padding, fy1 - padding, fx2 + padding, fy2 + padding],
+                        radius=6,
+                        fill=highlight_color,
+                        outline=border_color,
+                        width=2
+                    )
             
             return np.array(pil_frame.convert("RGB"))
         
@@ -6220,7 +6222,7 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
                         cropped = evidence_frame[y1:y2, x1:x2]
                         evidence_frame = cv2.resize(cropped, (target_w, target_h))
                     # Apply word highlighting
-                    evidence_frame = _draw_highlights(evidence_frame, t)
+                    evidence_frame = _draw_highlights(evidence_frame, t, scroll_y)
                     return evidence_frame
                 elif in_evidence_to_topic:
                     # Crossfade from evidence to topic visual (0.5s)
@@ -6240,7 +6242,7 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
                         cropped = evidence_frame[y1:y2, x1:x2]
                         evidence_frame = cv2.resize(cropped, (target_w, target_h))
                     # Apply word highlighting to evidence portion
-                    evidence_frame = _draw_highlights(evidence_frame, t)
+                    evidence_frame = _draw_highlights(evidence_frame, t, scroll_y)
                     # Blend evidence frame with topic visual
                     return cv2.addWeighted(evidence_frame, 1.0 - progress, topic_visual_arr, progress, 0)
                 elif cycle_pos < cycle_duration - transition_duration:
@@ -6270,7 +6272,7 @@ def _evidence_screenshot_clip(evidence_path, duration, is_github_readme=False, i
                         cropped = evidence_frame[y1:y2, x1:x2]
                         evidence_frame = cv2.resize(cropped, (target_w, target_h))
                     # Apply word highlighting to evidence portion
-                    evidence_frame = _draw_highlights(evidence_frame, t)
+                    evidence_frame = _draw_highlights(evidence_frame, t, 0)
                     # Blend topic visual with evidence frame
                     return cv2.addWeighted(topic_visual_arr, 1.0 - progress, evidence_frame, progress, 0)
             
