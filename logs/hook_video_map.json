@@ -308,5 +308,15 @@
     "title": "[PROJECT] The 20MB Database Super-Client",
     "uploaded_at": "2026-09-16T17:09:44.561183",
     "synced": false
+  },
+  "v_ES-_NkLCc": {
+    "video_id": "v_ES-_NkLCc",
+    "hook_pattern": "negative_warning",
+    "hook_variant": "C",
+    "hook_text": "Stop working. Python AI can do your job.",
+    "category": "Tech Company Founding Stories",
+    "title": "[PROJECT] Build a Full Stack App with AI in Minutes",
+    "uploaded_at": "2026-09-16T20:19:13.094005",
+    "synced": false
   }
 }

@@ -405,6 +405,31 @@
         "avg_engagement": 0.0,
         "avg_swipe_away": 0.0,
         "avg_view_percentage": 0.0
+      },
+      "negative_warning": {
+        "variants": {
+          "C": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "Stop working. Python AI can do your job.",
+                "video_id": "v_ES-_NkLCc",
+                "recorded_at": "2026-09-16T20:19:13.092537"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
       }
     },
     "Tech Company Safety Decisions": {
@@ -763,7 +788,7 @@
       "views": 0,
       "retention": 0.0,
       "engagement": 0.0,
-      "count": 8,
+      "count": 9,
       "swipe_away_rate": 0.0,
       "avg_view_percentage": 0.0
     },
@@ -800,5 +825,5 @@
       "avg_view_percentage": 0.0
     }
   },
-  "last_updated": "2026-09-16T17:09:44.558300"
+  "last_updated": "2026-09-16T20:19:13.092566"
 }
