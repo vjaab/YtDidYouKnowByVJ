@@ -328,5 +328,15 @@
     "title": "[PROJECT] Local AI Agent Power",
     "uploaded_at": "2026-09-17T04:50:34.459396",
     "synced": false
+  },
+  "o6SuoYuH4_o": {
+    "video_id": "o6SuoYuH4_o",
+    "hook_pattern": "result_first",
+    "hook_variant": "A",
+    "hook_text": "Your calculator might be spying.",
+    "category": "Privacy & Security",
+    "title": "Your Calculator Is Spying On You: The Truth About Local-First Software \ud83e\udd2b",
+    "uploaded_at": "2026-09-17T20:37:26.224200",
+    "synced": false
   }
 }
