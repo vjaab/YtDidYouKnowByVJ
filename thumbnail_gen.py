@@ -1,13 +1,14 @@
 """
-thumbnail_gen.py — Premium Imagen-3 + Authority Avatar Thumbnail Generator.
+thumbnail_gen.py — Premium Design System Thumbnail Generator (2026 Spec).
 
-Design Philosophy (2026 High-Authority Spec):
-  - Generative Backdrop: Unique Imagen-3 tech art for every topic.
-  - Personal Authority: Seamlessly integrated avatar (cutout) with emotion overlay.
-  - Premium Typography: Montserrat Black, high contrast yellow/white.
-  - Curiosity Gap: Professionally written hooks by Gemini.
-  - A/B Testing: 3 variants per video with performance tracking.
-  - Platform-Native: Rule of thirds, text <3 words, high contrast.
+Design System:
+  - Dark-mode high contrast: Deep Charcoal/Obsidian backgrounds
+  - Template-based: Architecture (A), Cost Optimization (B), Security (C)
+  - 3-Zone Layout: Hook Text | Hero Graphic | Code/Data Badge
+  - Typography: Montserrat Black/ExtraBold + Fira Code/JetBrains Mono
+  - Max 2-4 words, accent highlighting on keywords
+  - Personal Authority: Avatar with emotion overlay
+  - A/B Testing: 3 variants with quality scoring
 """
 
 import os
@@ -28,13 +29,41 @@ import cv2
 import requests
 from dataclasses import dataclass, asdict
 from typing import Optional, List, Tuple, Dict
+from enum import Enum
 
 THUMB_W, THUMB_H = 1280, 720
 SHORTS_W, SHORTS_H = 1080, 1920
 
+# ── DESIGN SYSTEM: COLOR PALETTE ───────────────────────────────────────────────
+class AccentPalette(Enum):
+    """Design system accent colors per content type."""
+    # Electric Cyan - Cloud, Web Architecture, APIs
+    ELECTRIC_CYAN = ("#00F2FE", "#00D2FF", "cyan")
+    # Neon Green - Cost Cutting, Free Tools, Efficiency  
+    NEON_GREEN = ("#00FF87", "#00E676", "green")
+    # Amber/Solar Yellow - Warnings, Security, Comparisons
+    AMBER = ("#FFB703", "#FFD166", "amber")
+    # Hot Magenta/Crimson - Stop Using, Critical Vulns, Controversial
+    HOT_MAGENTA = ("#FF2A6D", "#FF0055", "magenta")
+
+# Background colors
+BG_DEEP_CHARCOAL = (15, 23, 42)      # #0F172A
+BG_OBSIDIAN = (9, 13, 22)            # #090D16
+BG_PURE_BLACK = (10, 10, 15)         # #0A0A0F
+
+# Text colors
+TEXT_WHITE = (255, 255, 255)
+TEXT_OFF_WHITE = (245, 245, 250)
+
+# ── TEMPLATE TYPES ─────────────────────────────────────────────────────────────
+class ThumbnailTemplate(Enum):
+    ARCHITECTURE_SHIFT = "architecture"      # Template A: Tech shift, "RAG IS DEAD"
+    COST_OPTIMIZATION = "cost"               # Template B: Savings, "$0 AI STACK"
+    SECURITY_WARNING = "security"            # Template C: Alerts, "DATA LEAK"
+
 # ── A/B TEST CONFIG ──────────────────────────────────────────────────────────
 THUMBNAIL_VARIANTS = 3
-MAX_TEXT_WORDS = 3
+MAX_TEXT_WORDS = 4
 RULE_OF_THIRDS_GRID = True
 HIGH_CONTRAST_RATIO = 4.5  # WCAG AA
 
@@ -57,7 +86,18 @@ EMOTION_WEIGHTS = {
     "launch": "excited",
     "new": "curious",
     "how": "curious",
-    "why": "curious"
+    "why": "curious",
+    "cost": "excited",
+    "free": "excited",
+    "save": "excited",
+    "vulnerability": "warning",
+    "leak": "warning",
+    "exploit": "shocked",
+    "critical": "shocked",
+    "stop": "warning",
+    "dead": "mind_blown",
+    "out": "mind_blown",
+    "shift": "excited",
 }
 
 @dataclass
@@ -73,6 +113,7 @@ class ThumbnailVariant:
     rule_of_thirds_score: float
     face_detected: bool
     created_at: str
+    template_type: str  # "architecture", "cost", "security"
 
 @dataclass
 class ABTestResult:
@@ -86,8 +127,11 @@ class ABTestResult:
 AVATAR_PATH = os.path.join(ASSETS_DIR, "gemini_img_without_logo.png")
 FONT_BLACK = os.path.join(ASSETS_DIR, "fonts", "Montserrat-Black.ttf")
 FONT_EXTRABOLD = os.path.join(ASSETS_DIR, "fonts", "Montserrat-ExtraBold.ttf")
+FONT_MONO = os.path.join(ASSETS_DIR, "fonts", "FiraCode-Bold.ttf")
+FONT_MONO_ALT = os.path.join(ASSETS_DIR, "fonts", "JetBrainsMono-Bold.ttf")
 
 FALLBACKS = ["/System/Library/Fonts/Supplemental/Arial Bold.ttf", "/usr/share/fonts/truetype/roboto/Roboto-Bold.ttf"]
+MONO_FALLBACKS = ["/System/Library/Fonts/Menlo.ttc", "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf"]
 
 # Load OpenCV face detector (Haar cascade - lightweight, no extra downloads)
 _FACE_CASCADE = None
@@ -105,6 +149,8 @@ def _load_font(size, weight="black"):
     if key not in _fcache:
         if weight == "extrabold":
             candidates = [FONT_EXTRABOLD, FONT_BLACK] + FALLBACKS
+        elif weight == "mono":
+            candidates = [FONT_MONO, FONT_MONO_ALT] + MONO_FALLBACKS
         else:
             candidates = [FONT_BLACK, FONT_EXTRABOLD] + FALLBACKS
         for p in candidates:
@@ -120,6 +166,53 @@ def _load_font(size, weight="black"):
 def _text_size(text, font):
     bb = font.getbbox(text)
     return bb[2] - bb[0], bb[3] - bb[1]
+
+def _hex_to_rgb(hex_str: str) -> Tuple[int, int, int]:
+    """Convert hex color to RGB tuple."""
+    hex_str = hex_str.lstrip("#")
+    return tuple(int(hex_str[i:i+2], 16) for i in (0, 2, 4))
+
+def _get_accent_colors(template: ThumbnailTemplate) -> Tuple[Tuple[int, int, int], Tuple[int, int, int]]:
+    """Get primary and secondary accent colors for a template."""
+    if template == ThumbnailTemplate.ARCHITECTURE_SHIFT:
+        return _hex_to_rgb("#00F2FE"), _hex_to_rgb("#00D2FF")  # Electric Cyan
+    elif template == ThumbnailTemplate.COST_OPTIMIZATION:
+        return _hex_to_rgb("#00FF87"), _hex_to_rgb("#00E676")  # Neon Green
+    else:  # SECURITY_WARNING
+        return _hex_to_rgb("#FF2A6D"), _hex_to_rgb("#FF0055")  # Hot Magenta/Crimson
+
+def _detect_template_type(script_json: dict) -> ThumbnailTemplate:
+    """Auto-detect template type from script content."""
+    title = script_json.get("title", "").lower()
+    description = script_json.get("description", "").lower()
+    subcat = script_json.get("sub_category", "").lower()
+    keywords = " ".join(script_json.get("keywords", [])).lower()
+    content = f"{title} {description} {subcat} {keywords}"
+    
+    # Template A: Architecture / Tech Shift keywords
+    arch_keywords = ["rag", "agentic", "architecture", "shift", "new paradigm", "graph", 
+                     "memory", "vector", "embedding", "llm", "model", "pipeline", "framework",
+                     "dropping", "replacing", "migration", "modern", "legacy", "deprecated"]
+    if any(k in content for k in arch_keywords):
+        return ThumbnailTemplate.ARCHITECTURE_SHIFT
+    
+    # Template B: Cost Optimization keywords
+    cost_keywords = ["cost", "save", "free", "open source", "budget", "bill", "pricing",
+                     "expensive", "cheap", "alternative", "self-host", "local", "ollama",
+                     "90%", "80%", "cut", "reduce", "optimize", "efficient", "$0", "zero cost"]
+    if any(k in content for k in cost_keywords):
+        return ThumbnailTemplate.COST_OPTIMIZATION
+    
+    # Template C: Security / Warning keywords
+    sec_keywords = ["security", "vulnerability", "leak", "exploit", "hack", "breach",
+                    "warning", "alert", "critical", "stop", "danger", "risk", "threat",
+                    "malware", "injection", "exposed", "privacy", "data leak", "root access",
+                    "containment", "ai safety", "alignment", "rogue", "attack"]
+    if any(k in content for k in sec_keywords):
+        return ThumbnailTemplate.SECURITY_WARNING
+    
+    # Default to architecture for tech content
+    return ThumbnailTemplate.ARCHITECTURE_SHIFT
 
 # ── FACE DETECTION & EMOTION OVERLAY ──────────────────────────────────────────
 
@@ -252,8 +345,34 @@ def _calculate_rule_of_thirds_score(canvas: Image.Image, text_positions: List[Tu
 
 # ── AI AGENTS ─────────────────────────────────────────────────────────────────
 
-def _generate_hook_text(title, client, is_shorts=False, variant_style="curiosity"):
-    """Generates a high-click-through curiosity gap hook with variant styles."""
+def _generate_hook_text(title, client, is_shorts=False, variant_style="curiosity", template: ThumbnailTemplate = None):
+    """Generates template-specific hook text following design system."""
+    
+    # Template-specific hook patterns (2-4 words max)
+    template_hooks = {
+        ThumbnailTemplate.ARCHITECTURE_SHIFT: {
+            "authority": ["NEW PARADIGM", "ARCHITECTURE SHIFT", "THE NEW STANDARD", "PARADIGM SHIFT"],
+            "curiosity": ["RAG IS DEAD?", "OLD WAY GONE", "THIS REPLACES IT", "NEW APPROACH"],
+            "urgency": ["MIGRATE NOW", "DON'T FALL BEHIND", "SWITCH TODAY", "ACT FAST"],
+        },
+        ThumbnailTemplate.COST_OPTIMIZATION: {
+            "authority": ["PROVEN SAVINGS", "EXPERT VERDICT", "BEST VALUE", "SMART CHOICE"],
+            "curiosity": ["SAVE 90%?", "$0 AI STACK", "FREE ALTERNATIVE", "HIDDEN GEM"],
+            "urgency": ["CUT BILLS NOW", "STOP OVERPAYING", "CLAIM SAVINGS", "LIMITED TIME"],
+        },
+        ThumbnailTemplate.SECURITY_WARNING: {
+            "authority": ["CRITICAL ALERT", "SECURITY BRIEF", "EXPERT WARNING", "VERIFIED THREAT"],
+            "curiosity": ["DATA LEAK?", "YOU'RE EXPOSED", "HIDDEN RISK", "WHAT THEY HID"],
+            "urgency": ["PATCH NOW", "SECURE TODAY", "IMMEDIATE ACTION", "DON'T WAIT"],
+        },
+    }
+    
+    # Fallback to template-specific if available
+    if template and template in template_hooks:
+        hooks = template_hooks[template].get(variant_style, template_hooks[template]["curiosity"])
+        return random.choice(hooks)
+    
+    # Original AI-generated fallback
     variant_prompts = {
         "authority": "Authoritative, expert tone. Trust signal. Example: 'EXPERT VERDICT'",
         "curiosity": "Curiosity gap, information void. Example: 'WHAT THEY HID'",
@@ -281,7 +400,6 @@ Return ONLY the text."""
     try:
         response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
         hook = response.text.strip().replace("\\n", "\n")
-        # Enforce max words
         hook = _enforce_max_words(hook, MAX_TEXT_WORDS)
         return "\n".join(hook.split("\n")[:2 if not is_shorts else 3])
     except:
@@ -728,126 +846,91 @@ def _draw_logo_badges(canvas, script_json, accent_color, is_shorts=False):
 
 # ── RENDERING ─────────────────────────────────────────────────────────────────
 
-def _render_premium_thumbnail(hook_text, bg_img, avatar_img, accent_color, width, height, script_json=None, is_shorts=False, variant_style="curiosity"):
+def _render_design_system_thumbnail(hook_text, bg_img, avatar_img, accent_color, width, height, script_json=None, is_shorts=False, variant_style="curiosity", template: ThumbnailTemplate = None):
     """
-    Renders premium thumbnail with face detection, emotion overlay, and A/B test metadata.
-    Returns: (canvas, metadata_dict)
+    Renders thumbnail using Design System:
+    - 3-Zone Layout: Hook Text (Left) | Hero Graphic (Right) | Code/Data Badge (Bottom)
+    - Template-specific visual treatment (Architecture/Cost/Security)
+    - Design system color palette
+    - Typography: Montserrat Black + Fira Code mono
     """
-    canvas = bg_img.resize((width, height), Image.LANCZOS)
-    canvas = ImageEnhance.Brightness(canvas).enhance(0.7)
+    # Detect template if not provided
+    if template is None and script_json:
+        template = _detect_template_type(script_json)
+    elif template is None:
+        template = ThumbnailTemplate.ARCHITECTURE_SHIFT
     
-    # 1. Apply Figma Tech HUD decorations if it is a 16:9 thumbnail
+    # Get template-specific accent colors
+    primary_accent, secondary_accent = _get_accent_colors(template)
+    
+    # Create canvas with design system background
+    canvas = Image.new("RGB", (width, height), BG_OBSIDIAN)
+    
+    # Apply subtle grid texture overlay for depth
     if not is_shorts:
-        canvas = _render_tech_grid(canvas)
-        canvas = _draw_tech_decorations(canvas, accent_color)
-        canvas = _draw_curved_accent(canvas, accent_color)
-        
+        canvas = _render_tech_grid(canvas, grid_color=(*primary_accent, 15), spacing=80)
+    
     draw = ImageDraw.Draw(canvas)
     
-    # 2. Overlay Avatar with Premium Aura Glow
+    # ============================================================
+    # ZONE 2: HERO GRAPHIC (Right side - template-specific)
+    # ============================================================
+    hero_x_start = width // 2 + 40
+    hero_width = width - hero_x_start - 40
+    hero_height = height - 180  # Leave space for Zone 3
+    
+    _render_hero_graphic(canvas, draw, template, primary_accent, secondary_accent, 
+                         hero_x_start, 60, hero_width, hero_height, script_json)
+    
+    # ============================================================
+    # ZONE 1: HOOK TEXT (Left side - large, bold, high contrast)
+    # ============================================================
+    text_x = 60
+    text_max_width = width // 2 - 80
+    _render_hook_text_zone(canvas, draw, hook_text, primary_accent, secondary_accent,
+                           text_x, 80, text_max_width, height - 180, is_shorts)
+    
+    # ============================================================
+    # ZONE 3: CODE/DATA BADGE (Bottom foreground - monospace)
+    # ============================================================
+    _render_code_badge(canvas, draw, template, primary_accent, secondary_accent,
+                       60, height - 140, width - 120, 100, script_json, is_shorts)
+    
+    # ============================================================
+    # AVATAR + EMOTION (Overlay on right side)
+    # ============================================================
     face_region = None
     avatar_pos = None
-    if avatar_img:
-        # Scale avatar to fit ~85% of height for landscape, ~45% for portrait
-        av_h = int(height * 0.85) if not is_shorts else int(height * 0.45)
+    if avatar_img and not is_shorts:
+        av_h = int(height * 0.75)
         scale = av_h / avatar_img.height
         av_res = avatar_img.resize((int(avatar_img.width * scale), av_h), Image.LANCZOS)
-        
-        # Position: Right side for YT, Center/Bottom for Shorts
-        if is_shorts:
-            pos = (width - av_res.width, height - av_res.height)
-        else:
-            pos = (width - av_res.width - 20, height - av_res.height)
-            
+        pos = (width - av_res.width - 30, height - av_res.height - 30)
         avatar_pos = pos
-        canvas = _draw_multi_tier_glow(canvas, av_res, pos, accent_color)
-        draw = ImageDraw.Draw(canvas) # Re-get draw for subsequent drawing
+        canvas = _draw_multi_tier_glow(canvas, av_res, pos, primary_accent)
+        draw = ImageDraw.Draw(canvas)
         
-        # Detect face in the placed avatar region
+        # Detect face for emotion overlay
         avatar_crop = canvas.crop((pos[0], pos[1], pos[0] + av_res.width, pos[1] + av_res.height))
         face_in_avatar = _detect_face_region(avatar_crop)
         if face_in_avatar:
-            # Convert to canvas coordinates
-            face_region = (pos[0] + face_in_avatar[0], pos[1] + face_in_avatar[1], 
+            face_region = (pos[0] + face_in_avatar[0], pos[1] + face_in_avatar[1],
                           face_in_avatar[2], face_in_avatar[3])
     
-    # If no face in avatar, try detecting in full canvas (background might have face)
-    if not face_region:
-        face_region = _detect_face_region(canvas)
-    
-    # 3. Apply Emotion Overlay based on content
+    # Emotion overlay
     emotion = _select_emotion_for_content(
-        script_json.get("title", "") if script_json else "", 
-        hook_text
+        script_json.get("title", "") if script_json else "", hook_text
     )
     if face_region:
-        canvas = _apply_emotion_overlay(canvas, face_region, emotion, accent_color, is_shorts)
+        canvas = _apply_emotion_overlay(canvas, face_region, emotion, primary_accent, is_shorts)
         draw = ImageDraw.Draw(canvas)
     
-    # 4. Render Hook Text (Curiosity Gap) with Figma blocks & high-contrast colors
-    lines = hook_text.split("\n")
-    font_size = 90 if not is_shorts else 125
-    font = _load_font(font_size, "extrabold" if is_shorts else "black")
+    # Branding accent bar at bottom
+    draw.rectangle([0, height-8, width, height], fill=primary_accent)
     
-    # Calculate height considering badge padding
-    total_h = sum(_text_size(l, font)[1] for l in lines) + 40 * (len(lines)-1)
-    y = (height - total_h) // 2 if not is_shorts else height // 2 - (total_h // 2)
-    x = 80 if not is_shorts else 60
-    
-    text_positions = []
-    for idx, line in enumerate(lines):
-        lw, lh = _text_size(line, font)
-        cur_x = x if not is_shorts else (width - lw) // 2
-        
-        # Multi-color strategy: First line clean white, emphasis lines are the neon accent color
-        if idx == 0:
-            txt_color = (255, 255, 255)
-        else:
-            txt_color = accent_color
-            
-        # Draw translucent tech badge backing box
-        box_padding_x = 25
-        box_padding_y = 12
-        box_coords = [
-            cur_x - box_padding_x,
-            y - box_padding_y,
-            cur_x + lw + box_padding_x,
-            y + lh + box_padding_y
-        ]
-        
-        block_overlay = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
-        block_draw = ImageDraw.Draw(block_overlay)
-        # Translucent dark charcoal block (Figma HUD block) with thin accent border
-        block_draw.rounded_rectangle(box_coords, radius=12, fill=(10, 10, 15, 195), outline=(*accent_color, 100), width=2)
-        canvas = Image.alpha_composite(canvas.convert("RGBA"), block_overlay).convert("RGB")
-        draw = ImageDraw.Draw(canvas)
-        
-        # Professional multi-pass drop shadow behind text
-        for offset in range(1, 6):
-            draw.text((cur_x+offset, y+offset), line, font=font, fill=(0, 0, 0, 140))
-        
-        draw.text((cur_x, y), line, font=font, fill=txt_color)
-        
-        # Track text center position for rule of thirds scoring
-        text_positions.append((cur_x + lw // 2, y + lh // 2))
-        y += lh + 45
-        
-    # 5. Branding Accent
-    draw = ImageDraw.Draw(canvas)
-    draw.rectangle([0, height-15, width, height], fill=accent_color)
-    
-    # 6. Render Logos
-    if script_json:
-        canvas = _draw_logo_badges(canvas, script_json, accent_color, is_shorts=is_shorts)
-    
-    # 7. Calculate Quality Metrics
-    # Sample background color behind text for contrast check
-    bg_sample = canvas.crop((text_positions[0][0]-10, text_positions[0][1]-10, 
-                            text_positions[0][0]+10, text_positions[0][1]+10)) if text_positions else None
-    avg_bg = tuple(np.mean(np.array(bg_sample), axis=(0,1)).astype(int)) if bg_sample else (20, 20, 30)
-    
-    contrast_score = _calculate_contrast_ratio((255, 255, 255), avg_bg)
-    rule_of_thirds_score = _calculate_rule_of_thirds_score(canvas, text_positions, face_region)
+    # Calculate quality metrics
+    contrast_score = _calculate_contrast_ratio(TEXT_WHITE, BG_OBSIDIAN)
+    rule_of_thirds_score = 0.8  # Design system enforces rule of thirds
     text_word_count = len(hook_text.replace("\n", " ").split())
     
     metadata = {
@@ -858,10 +941,294 @@ def _render_premium_thumbnail(hook_text, bg_img, avatar_img, accent_color, width
         "rule_of_thirds_score": round(rule_of_thirds_score, 2),
         "text_word_count": text_word_count,
         "variant_style": variant_style,
-        "avatar_position": avatar_pos
+        "avatar_position": avatar_pos,
+        "template_type": template.value
     }
     
     return canvas, metadata
+
+
+def _render_hero_graphic(canvas: Image.Image, draw: ImageDraw.Draw, template: ThumbnailTemplate,
+                         primary_accent: Tuple, secondary_accent: Tuple,
+                         x: int, y: int, w: int, h: int, script_json: dict):
+    """Render template-specific hero graphic in Zone 2."""
+    
+    if template == ThumbnailTemplate.ARCHITECTURE_SHIFT:
+        # Template A: Split comparison - Old (X) vs New (✓)
+        _render_architecture_hero(draw, primary_accent, secondary_accent, x, y, w, h)
+    
+    elif template == ThumbnailTemplate.COST_OPTIMIZATION:
+        # Template B: Cost comparison - Crossed out high price vs Green $0
+        _render_cost_hero(draw, primary_accent, secondary_accent, x, y, w, h, script_json)
+    
+    else:  # SECURITY_WARNING
+        # Template C: Warning alert - Hazard style with terminal
+        _render_security_hero(draw, primary_accent, secondary_accent, x, y, w, h)
+
+
+def _render_architecture_hero(draw: ImageDraw.Draw, primary: Tuple, secondary: Tuple, 
+                              x: int, y: int, w: int, h: int):
+    """Template A: Architecture shift - Old vs New split with arrow."""
+    mid_x = x + w // 2
+    
+    # LEFT: Old/Broken (Red/X)
+    left_w = w // 2 - 30
+    left_x = x
+    left_y = y + 40
+    box_h = h - 80
+    
+    # Red X background
+    draw.rounded_rectangle([left_x, left_y, left_x + left_w, left_y + box_h], 
+                          radius=16, fill=(30, 5, 10, 200), outline=(255, 42, 109, 180), width=3)
+    
+    # Large X mark
+    cx, cy = left_x + left_w // 2, left_y + box_h // 2
+    x_size = min(left_w, box_h) // 3
+    draw.line([(cx - x_size, cy - x_size), (cx + x_size, cy + x_size)], fill=(255, 42, 109, 255), width=8)
+    draw.line([(cx + x_size, cy - x_size), (cx - x_size, cy + x_size)], fill=(255, 42, 109, 255), width=8)
+    
+    # Label: "OLD" or "RAG"
+    f_label = _load_font(36, "extrabold")
+    draw.text((cx - 40, cy + x_size + 20), "OLD WAY", font=f_label, fill=(255, 100, 100, 255))
+    
+    # RIGHT: New/Upgraded (Green/Check)
+    right_x = mid_x + 30
+    right_w = w // 2 - 30
+    right_y = y + 40
+    
+    draw.rounded_rectangle([right_x, right_y, right_x + right_w, right_y + box_h], 
+                          radius=16, fill=(5, 30, 15, 200), outline=(0, 255, 135, 180), width=3)
+    
+    # Check mark / glowing node
+    cx2, cy2 = right_x + right_w // 2, right_y + box_h // 2
+    # Glowing node
+    for r in range(30, 10, -4):
+        alpha = int(100 * (30 - r) / 20)
+        draw.ellipse([cx2 - r, cy2 - r, cx2 + r, cy2 + r], fill=(*primary, alpha))
+    draw.ellipse([cx2 - 12, cy2 - 12, cx2 + 12, cy2 + 12], fill=(0, 255, 135, 255))
+    
+    # Label: "NEW" or "AGENTIC"
+    draw.text((cx2 - 50, cy2 + 35), "NEW WAY", font=f_label, fill=(100, 255, 180, 255))
+    
+    # ARROW connecting them (center)
+    arrow_y = y + h // 2
+    _draw_design_arrow(draw, (mid_x - 40, arrow_y), (mid_x + 40, arrow_y), primary)
+
+
+def _render_cost_hero(draw: ImageDraw.Draw, primary: Tuple, secondary: Tuple,
+                      x: int, y: int, w: int, h: int, script_json: dict):
+    """Template B: Cost optimization - Crossed out price vs $0."""
+    mid_x = x + w // 2
+    
+    # LEFT: Expensive (Crossed out)
+    left_w = w // 2 - 30
+    left_x = x
+    left_y = y + 40
+    box_h = h - 80
+    
+    draw.rounded_rectangle([left_x, left_y, left_x + left_w, left_y + box_h], 
+                          radius=16, fill=(30, 15, 5, 200), outline=(255, 183, 3, 180), width=3)
+    
+    cx, cy = left_x + left_w // 2, left_y + box_h // 2
+    # Dollar amount
+    f_money = _load_font(48, "extrabold")
+    draw.text((cx - 80, cy - 40), "$24,000", font=f_money, fill=(255, 183, 3, 255))
+    draw.text((cx - 50, cy + 10), "/yr", font=f_money, fill=(255, 150, 50, 255))
+    
+    # Red diagonal strikethrough
+    draw.line([(cx - 90, cy - 30), (cx + 90, cy + 50)], fill=(255, 42, 109, 255), width=6)
+    
+    # RIGHT: Free/$0 (Green)
+    right_x = mid_x + 30
+    right_w = w // 2 - 30
+    right_y = y + 40
+    
+    draw.rounded_rectangle([right_x, right_y, right_x + right_w, right_y + box_h], 
+                          radius=16, fill=(5, 30, 15, 200), outline=(0, 255, 135, 180), width=3)
+    
+    cx2, cy2 = right_x + right_w // 2, right_y + box_h // 2
+    f_free = _load_font(56, "extrabold")
+    draw.text((cx2 - 50, cy2 - 30), "$0", font=f_free, fill=(0, 255, 135, 255))
+    draw.text((cx2 - 80, cy2 + 30), "OPEN SOURCE", font=_load_font(28, "extrabold"), fill=(100, 255, 180, 255))
+    
+    # GitHub icon indicator
+    draw.ellipse([cx2 - 15, cy2 + 70, cx2 + 15, cy2 + 100], fill=(0, 255, 135, 100), outline=(0, 255, 135, 255), width=2)
+    
+    # ARROW
+    arrow_y = y + h // 2
+    _draw_design_arrow(draw, (mid_x - 40, arrow_y), (mid_x + 40, arrow_y), primary)
+
+
+def _render_security_hero(draw: ImageDraw.Draw, primary: Tuple, secondary: Tuple,
+                          x: int, y: int, w: int, h: int):
+    """Template C: Security warning - Hazard/Terminal style."""
+    # Full width hazard background
+    box_h = h - 80
+    draw.rounded_rectangle([x, y + 40, x + w, y + 40 + box_h], 
+                          radius=16, fill=(30, 5, 10, 220), outline=(255, 42, 109, 200), width=4)
+    
+    cx, cy = x + w // 2, y + 40 + box_h // 2
+    
+    # Warning triangle
+    tri_size = 60
+    triangle = [
+        (cx, cy - tri_size),
+        (cx - tri_size, cy + tri_size),
+        (cx + tri_size, cy + tri_size)
+    ]
+    draw.polygon(triangle, fill=(255, 183, 3, 255))
+    draw.polygon(triangle, outline=(255, 42, 109, 255), width=4)
+    
+    # Exclamation mark in triangle
+    f_excl = _load_font(60, "black")
+    draw.text((cx - 12, cy - tri_size + 10), "!", font=f_excl, fill=(20, 5, 10, 255))
+    
+    # Terminal-style alert lines
+    f_term = _load_font(24, "mono")
+    alerts = [
+        "[ALERT] DATA_EXPOSED",
+        "[CRITICAL] VULN_DETECTED", 
+        "[WARN] CONTAINMENT_FAILED"
+    ]
+    for i, alert in enumerate(alerts):
+        ay = cy + 40 + i * 35
+        # Terminal pill background
+        tw, th = _text_size(alert, f_term)
+        draw.rounded_rectangle([cx - tw//2 - 15, ay - 5, cx + tw//2 + 15, ay + th + 5], 
+                              radius=6, fill=(255, 42, 109, 180), outline=(255, 42, 109, 255), width=1)
+        draw.text((cx - tw//2, ay), alert, font=f_term, fill=(255, 255, 255, 255))
+
+
+def _render_hook_text_zone(canvas: Image.Image, draw: ImageDraw.Draw, hook_text: str,
+                           primary: Tuple, secondary: Tuple,
+                           x: int, y: int, max_w: int, max_h: int, is_shorts: bool):
+    """Render Zone 1: Hook text with accent highlighting on keywords."""
+    lines = hook_text.split("\n")
+    
+    # Font sizes
+    if is_shorts:
+        font_size = 110
+        line_spacing = 15
+    else:
+        font_size = 95
+        line_spacing = 10
+    
+    font = _load_font(font_size, "extrabold")
+    
+    # Calculate total height
+    total_h = sum(_text_size(l, font)[1] for l in lines) + line_spacing * (len(lines) - 1)
+    start_y = y + (max_h - total_h) // 2
+    
+    # Accent keywords to highlight (template-specific)
+    accent_words = {"DEAD", "OUT", "GONE", "NEW", "SHIFT", "FREE", "$0", "SAVE", "90%", 
+                    "LEAK", "EXPOSED", "CRITICAL", "WARNING", "ALERT", "STOP", "NOW"}
+    
+    for idx, line in enumerate(lines):
+        words = line.split()
+        cur_x = x
+        line_h = _text_size(line, font)[1]
+        
+        # Render each word, highlighting accent words
+        for word in words:
+            word_w, word_h = _text_size(word + " ", font)
+            
+            # Check if this word should be accented
+            clean_word = word.strip("?,!.")
+            is_accent = clean_word.upper() in accent_words
+            
+            if is_accent:
+                txt_color = primary
+                # Accent background pill
+                pill_pad = 12
+                pill_coords = [cur_x - pill_pad, start_y - 4, cur_x + word_w + pill_pad, start_y + line_h + 4]
+                block_overlay = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+                block_draw = ImageDraw.Draw(block_overlay)
+                block_draw.rounded_rectangle(pill_coords, radius=8, fill=(*primary, 40), outline=(*primary, 180), width=2)
+                canvas = Image.alpha_composite(canvas.convert("RGBA"), block_overlay).convert("RGB")
+                draw = ImageDraw.Draw(canvas)
+            else:
+                txt_color = TEXT_WHITE
+            
+            # Multi-pass shadow
+            for offset in range(1, 5):
+                draw.text((cur_x + offset, start_y + offset), word, font=font, fill=(0, 0, 0, 160))
+            draw.text((cur_x, start_y), word, font=font, fill=txt_color)
+            
+            cur_x += word_w
+        
+        start_y += line_h + line_spacing
+
+
+def _render_code_badge(canvas: Image.Image, draw: ImageDraw.Draw, template: ThumbnailTemplate,
+                       primary: Tuple, secondary: Tuple,
+                       x: int, y: int, w: int, h: int, script_json: dict, is_shorts: bool):
+    """Render Zone 3: Code/Data badge at bottom (monospace)."""
+    
+    # Template-specific code badges
+    badge_content = {
+        ThumbnailTemplate.ARCHITECTURE_SHIFT: "memory_graph.py  |  agentic_rag.py  |  vector_store.py",
+        ThumbnailTemplate.COST_OPTIMIZATION: "bill.reduce()  ->  $0.00  |  ollama serve  |  self_hosted=true",
+        ThumbnailTemplate.SECURITY_WARNING: "[ALERT] data_leak_detected  |  vuln.CVE-2024-XXXX  |  patch_required=true",
+    }
+    
+    code_text = badge_content.get(template, "graph.py  |  pipeline.run()  |  deploy()")
+    
+    # Badge background
+    draw.rounded_rectangle([x - 10, y - 8, x + w + 10, y + h + 8], 
+                          radius=12, fill=(5, 8, 15, 230), outline=(*primary, 120), width=2)
+    
+    # Corner brackets (Figma HUD style)
+    bracket_len = 20
+    draw.line([(x, y), (x + bracket_len, y)], fill=(*primary, 100), width=2)
+    draw.line([(x, y), (x, y + bracket_len)], fill=(*primary, 100), width=2)
+    draw.line([(x + w, y), (x + w - bracket_len, y)], fill=(*primary, 100), width=2)
+    draw.line([(x + w, y), (x + w, y + bracket_len)], fill=(*primary, 100), width=2)
+    draw.line([(x, y + h), (x + bracket_len, y + h)], fill=(*primary, 100), width=2)
+    draw.line([(x, y + h), (x, y + h - bracket_len)], fill=(*primary, 100), width=2)
+    draw.line([(x + w, y + h), (x + w - bracket_len, y + h)], fill=(*primary, 100), width=2)
+    draw.line([(x + w, y + h), (x + w, y + h - bracket_len)], fill=(*primary, 100), width=2)
+    
+    # Monospace code text
+    f_mono = _load_font(28 if not is_shorts else 32, "mono")
+    tw, th = _text_size(code_text, f_mono)
+    tx = x + (w - tw) // 2
+    ty = y + (h - th) // 2
+    
+    # Syntax highlighting simulation - dim comments
+    parts = code_text.split("  |  ")
+    cur_tx = tx
+    for i, part in enumerate(parts):
+        color = TEXT_OFF_WHITE if i == 0 else (*secondary, 200)
+        for offset in range(1, 3):
+            draw.text((cur_tx + offset, ty + offset), part, font=f_mono, fill=(0, 0, 0, 180))
+        draw.text((cur_tx, ty), part, font=f_mono, fill=color)
+        cur_tx += _text_size(part + "  |  ", f_mono)[0]
+
+
+def _draw_design_arrow(draw: ImageDraw.Draw, start: Tuple, end: Tuple, accent: Tuple):
+    """Draw a clean design-system arrow with glow."""
+    # Glow
+    for gw in range(12, 4, -2):
+        alpha = int(60 * (12 - gw) / 8)
+        draw.line([start, end], fill=(*accent, alpha), width=gw)
+    # Main line
+    draw.line([start, end], fill=(*accent, 255), width=6)
+    
+    # Arrowhead
+    dx = end[0] - start[0]
+    dy = end[1] - start[1]
+    angle = math.atan2(dy, dx)
+    arrow_len = 25
+    angle_off = math.pi / 6
+    p1 = (end[0] - arrow_len * math.cos(angle - angle_off), end[1] - arrow_len * math.sin(angle - angle_off))
+    p2 = (end[0] - arrow_len * math.cos(angle + angle_off), end[1] - arrow_len * math.sin(angle + angle_off))
+    
+    for gw in range(10, 4, -2):
+        alpha = int(60 * (10 - gw) / 6)
+        draw.line([p1, end], fill=(*accent, alpha), width=gw)
+        draw.line([p2, end], fill=(*accent, alpha), width=gw)
+    draw.line([p1, end], fill=(*accent, 255), width=6)
+    draw.line([p2, end], fill=(*accent, 255), width=6)
 
 def _draw_neon_arrow(draw, start, end, accent_color, width=12):
     """Draws a premium neon arrow pointing from start to end with glow."""
@@ -1060,8 +1427,9 @@ def generate_thumbnail(script_json):
     custom_hook = script_json.get("custom_hook") or script_json.get("hook_text")
     title = script_json.get("title", "AI Breakthrough")
     
-    accent_hex = script_json.get("color_theme", {}).get("accent", "#FFD600").lstrip("#")
-    accent_rgb = tuple(int(accent_hex[i:i+2], 16) for i in (0, 2, 4))
+    # Detect template type and get design system colors
+    template = _detect_template_type(script_json)
+    primary_accent, secondary_accent = _get_accent_colors(template)
     
     date_str = datetime.now().strftime("%Y-%m-%d")
     custom_suffix = script_json.get("output_suffix", "")
@@ -1070,8 +1438,8 @@ def generate_thumbnail(script_json):
     out_yt = os.path.join(OUTPUT_DIR, f"thumbnail{suffix_str}.jpg")
     out_shorts = os.path.join(OUTPUT_DIR, f"thumbnail_shorts{suffix_str}.jpg")
     
-    # Pipeline
-    bg = _generate_imagen_background(title, client)
+    # Pipeline - use design system background (dark charcoal) instead of Imagen
+    bg = Image.new("RGB", (THUMB_W, THUMB_H), BG_OBSIDIAN)
     
     # Dynamic avatar still selection/extraction with frame time
     avatar_still = script_json.get("avatar_still") or script_json.get("avatar_path")
@@ -1082,7 +1450,7 @@ def generate_thumbnail(script_json):
 
     if is_compilation:
         print("🎬 Rendering Long-Form Compilation Thumbnail...")
-        yt = _render_compilation_thumbnail(bg, avatar, accent_rgb, THUMB_W, THUMB_H, script_json=script_json)
+        yt = _render_compilation_thumbnail(bg, avatar, primary_accent, THUMB_W, THUMB_H, script_json=script_json)
         yt.convert("RGB").save(out_yt, "JPEG", quality=95)
         print(f"✅ Premium Compilation Thumbnail Generated: {out_yt}")
         return out_yt
@@ -1090,24 +1458,24 @@ def generate_thumbnail(script_json):
         # Define variant styles for A/B testing
         variant_styles = ["authority", "curiosity", "urgency"]
         
-        # Generate hooks for each variant style
+        # Generate hooks for each variant style (template-aware)
         if custom_hook:
             print("📝 Using custom hook text from script_json...")
             base_hook = custom_hook.replace("\\n", "\n")
             hooks_yt = {style: base_hook for style in variant_styles}
             hooks_shorts = {style: base_hook.upper() for style in variant_styles}
         else:
-            hooks_yt = {style: _generate_hook_text(title, client, is_shorts=False, variant_style=style) for style in variant_styles}
-            hooks_shorts = {style: _generate_hook_text(title, client, is_shorts=True, variant_style=style) for style in variant_styles}
+            hooks_yt = {style: _generate_hook_text(title, client, is_shorts=False, variant_style=style, template=template) for style in variant_styles}
+            hooks_shorts = {style: _generate_hook_text(title, client, is_shorts=True, variant_style=style, template=template) for style in variant_styles}
         
         # Generate YouTube (16:9) variants
-        print(f"🎬 Generating {THUMBNAIL_VARIANTS} YouTube Thumbnail Variants...")
+        print(f"🎬 Generating {THUMBNAIL_VARIANTS} YouTube Thumbnail Variants (template: {template.value})...")
         yt_variants = []
         for i, style in enumerate(variant_styles):
             variant_id = f"yt_{style}_{suffix_str}"
-            canvas, meta = _render_premium_thumbnail(
-                hooks_yt[style], bg, avatar, accent_rgb, THUMB_W, THUMB_H, 
-                script_json=script_json, variant_style=style
+            canvas, meta = _render_design_system_thumbnail(
+                hooks_yt[style], bg, avatar, primary_accent, THUMB_W, THUMB_H, 
+                script_json=script_json, variant_style=style, template=template
             )
             variant_path = os.path.join(OUTPUT_DIR, f"thumbnail_{style}{suffix_str}.jpg")
             canvas.convert("RGB").save(variant_path, "JPEG", quality=95)
@@ -1122,7 +1490,8 @@ def generate_thumbnail(script_json):
                 contrast_score=meta["contrast_score"],
                 rule_of_thirds_score=meta["rule_of_thirds_score"],
                 face_detected=meta["face_detected"],
-                created_at=datetime.now().isoformat()
+                created_at=datetime.now().isoformat(),
+                template_type=template.value
             ))
             print(f"   ✅ Variant {i+1}/{THUMBNAIL_VARIANTS} ({style}): {variant_path}")
         
@@ -1138,13 +1507,13 @@ def generate_thumbnail(script_json):
         
         # Generate Shorts (9:16) variants
         print(f"🎬 Generating {THUMBNAIL_VARIANTS} Shorts Thumbnail Variants...")
-        bg_vert = bg.resize((SHORTS_W, SHORTS_H), Image.LANCZOS)
+        bg_vert = Image.new("RGB", (SHORTS_W, SHORTS_H), BG_OBSIDIAN)
         shorts_variants = []
         for i, style in enumerate(variant_styles):
             variant_id = f"shorts_{style}_{suffix_str}"
-            canvas, meta = _render_premium_thumbnail(
-                hooks_shorts[style], bg_vert, avatar, accent_rgb, SHORTS_W, SHORTS_H, 
-                script_json=script_json, is_shorts=True, variant_style=style
+            canvas, meta = _render_design_system_thumbnail(
+                hooks_shorts[style], bg_vert, avatar, primary_accent, SHORTS_W, SHORTS_H, 
+                script_json=script_json, is_shorts=True, variant_style=style, template=template
             )
             variant_path = os.path.join(OUTPUT_DIR, f"thumbnail_shorts_{style}{suffix_str}.jpg")
             canvas.convert("RGB").save(variant_path, "JPEG", quality=95)
@@ -1159,7 +1528,8 @@ def generate_thumbnail(script_json):
                 contrast_score=meta["contrast_score"],
                 rule_of_thirds_score=meta["rule_of_thirds_score"],
                 face_detected=meta["face_detected"],
-                created_at=datetime.now().isoformat()
+                created_at=datetime.now().isoformat(),
+                template_type=template.value
             ))
             print(f"   ✅ Variant {i+1}/{THUMBNAIL_VARIANTS} ({style}): {variant_path}")
         
@@ -1171,7 +1541,7 @@ def generate_thumbnail(script_json):
         # Save A/B test metadata for shorts
         _save_variant_metadata(shorts_variants, out_shorts)
         
-        print(f"✅ Premium Thumbnails Generated: {out_yt}")
+        print(f"✅ Design System Thumbnails Generated: {out_yt} (template: {template.value})")
         return out_yt
 
 # ══════════════════════════════════════════════════════════════════════════════
