@@ -38,9 +38,8 @@ LONGFORM_DEPTH_SCHEDULE = {
 }
 
 def get_topic_depth_mode():
-    """Returns 'single' or 'multi' based on today's day of the week."""
-    day = datetime.now().weekday()
-    return LONGFORM_DEPTH_SCHEDULE.get(day, "single")
+    """Returns 'multi' to always pick 2-3 thematically linked topics."""
+    return "multi"
 
 LONGFORM_MAX_CHAPTERS = 5                     # Max chapters per deep-dive
 LONGFORM_VISUAL_BEATS_PER_CHAPTER = 6         # Max visual beats per chapter (caps clip count)
