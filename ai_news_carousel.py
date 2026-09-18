@@ -11,7 +11,7 @@ import sys
 import argparse
 import re
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, Any, Optional
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -37,6 +37,7 @@ except ImportError:
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 TRACKER_FILE = os.path.join(str(Path(__file__).parent), "news_log.json")
+CAROUSEL_TRACKER_FILE = os.path.join(str(Path(__file__).parent), "instagram_carousel_log.json")
 SIMILARITY_THRESHOLD = 75
 
 AI_CATEGORIES = [
@@ -62,43 +63,124 @@ def load_topic_tracker() -> Dict:
     except json.JSONDecodeError:
         return {"used_titles": [], "used_keywords": [], "history": []}
 
-def is_topic_unique(title: str, url: str = "", keywords: List[str] = None) -> tuple:
-    """Check if a topic is unique compared to previously used topics."""
-    tracker = load_topic_tracker()
+
+def load_carousel_tracker() -> Dict:
+    """Load the Instagram carousel topic tracker."""
+    if not os.path.exists(CAROUSEL_TRACKER_FILE):
+        return {"used_titles": [], "used_keywords": [], "history": []}
+    try:
+        with open(CAROUSEL_TRACKER_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        return {"used_titles": [], "used_keywords": [], "history": []}
+
+
+def save_carousel_tracker(tracker: Dict) -> None:
+    """Save the Instagram carousel topic tracker."""
+    try:
+        with open(CAROUSEL_TRACKER_FILE, 'w', encoding='utf-8') as f:
+            json.dump(tracker, f, indent=2)
+    except Exception as e:
+        print(f"⚠️ Failed to save carousel tracker: {e}")
+
+
+def record_carousel_topic(title: str, url: str, keywords: List[str], source: str) -> None:
+    """Record a topic as used in the carousel tracker."""
+    tracker = load_carousel_tracker()
     
-    if not tracker.get("used_titles") and not tracker.get("history"):
-        return True, "Unique (Empty tracker)"
+    entry = {
+        "title": title,
+        "news_source_url": url,
+        "keywords": keywords,
+        "source": source,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
     
-    if url:
-        for entry in tracker.get("history", []):
-            if isinstance(entry, dict) and entry.get("news_source_url") == url:
-                return False, f"Exact URL already covered: {url}"
+    tracker.setdefault("history", []).append(entry)
+    tracker.setdefault("used_titles", []).append(title)
+    tracker.setdefault("used_keywords", []).extend(keywords)
     
-    if RAPIDFUZZ_AVAILABLE:
-        headlines_to_check = set(tracker.get("used_titles", []))
-        for existing_title in headlines_to_check:
-            score = fuzz.token_set_ratio(title.lower(), existing_title.lower())
-            if score > SIMILARITY_THRESHOLD:
-                return False, f"Semantic match found (score {score}): '{existing_title}'"
+    # Keep only last 100 entries to prevent unbounded growth
+    if len(tracker["history"]) > 100:
+        tracker["history"] = tracker["history"][-100:]
+    if len(tracker["used_titles"]) > 100:
+        tracker["used_titles"] = tracker["used_titles"][-100:]
+    if len(tracker["used_keywords"]) > 200:
+        tracker["used_keywords"] = tracker["used_keywords"][-200:]
     
-    if keywords:
-        recent_keywords = set()
-        for entry in tracker.get("history", [])[-20:]:
-            if url and entry.get("news_source_url") == url:
-                continue
-            recent_keywords.update([k.lower() for k in entry.get("keywords", [])])
+    save_carousel_tracker(tracker)
+    print(f"📝 Recorded carousel topic: {title[:60]}...")
+
+def is_topic_unique(title: str, url: str = "", keywords: List[str] = None, check_youtube: bool = True, check_carousel: bool = True) -> tuple:
+    """Check if a topic is unique compared to previously used topics (YouTube + Carousel)."""
+    if check_youtube:
+        tracker = load_topic_tracker()
         
-        new_k_set = set([k.lower() for k in keywords])
-        if new_k_set:
-            intersection = new_k_set.intersection(recent_keywords)
-            overlap_pct = (len(intersection) / len(new_k_set)) * 100
-            if overlap_pct > 70:
-                return False, f"High keyword overlap ({overlap_pct:.0f}%) with recent stories"
+        if not tracker.get("used_titles") and not tracker.get("history"):
+            pass
+        else:
+            if url:
+                for entry in tracker.get("history", []):
+                    if isinstance(entry, dict) and entry.get("news_source_url") == url:
+                        return False, f"Exact URL already covered (YouTube): {url}"
+            
+            if RAPIDFUZZ_AVAILABLE:
+                headlines_to_check = set(tracker.get("used_titles", []))
+                for existing_title in headlines_to_check:
+                    score = fuzz.token_set_ratio(title.lower(), existing_title.lower())
+                    if score > SIMILARITY_THRESHOLD:
+                        return False, f"Semantic match found (YouTube, score {score}): '{existing_title}'"
+            
+            if keywords:
+                recent_keywords = set()
+                for entry in tracker.get("history", [])[-20:]:
+                    if url and entry.get("news_source_url") == url:
+                        continue
+                    recent_keywords.update([k.lower() for k in entry.get("keywords", [])])
+                
+                new_k_set = set([k.lower() for k in keywords])
+                if new_k_set:
+                    intersection = new_k_set.intersection(recent_keywords)
+                    overlap_pct = (len(intersection) / len(new_k_set)) * 100
+                    if overlap_pct > 70:
+                        return False, f"High keyword overlap ({overlap_pct:.0f}%) with recent YouTube stories"
+    
+    if check_carousel:
+        carousel_tracker = load_carousel_tracker()
+        
+        if not carousel_tracker.get("used_titles") and not carousel_tracker.get("history"):
+            pass
+        else:
+            if url:
+                for entry in carousel_tracker.get("history", []):
+                    if isinstance(entry, dict) and entry.get("news_source_url") == url:
+                        return False, f"Exact URL already covered (Carousel): {url}"
+            
+            if RAPIDFUZZ_AVAILABLE:
+                headlines_to_check = set(carousel_tracker.get("used_titles", []))
+                for existing_title in headlines_to_check:
+                    score = fuzz.token_set_ratio(title.lower(), existing_title.lower())
+                    if score > SIMILARITY_THRESHOLD:
+                        return False, f"Semantic match found (Carousel, score {score}): '{existing_title}'"
+            
+            if keywords:
+                recent_keywords = set()
+                for entry in carousel_tracker.get("history", [])[-20:]:
+                    if url and entry.get("news_source_url") == url:
+                        continue
+                    recent_keywords.update([k.lower() for k in entry.get("keywords", [])])
+                
+                new_k_set = set([k.lower() for k in keywords])
+                if new_k_set:
+                    intersection = new_k_set.intersection(recent_keywords)
+                    overlap_pct = (len(intersection) / len(new_k_set)) * 100
+                    if overlap_pct > 70:
+                        return False, f"High keyword overlap ({overlap_pct:.0f}%) with recent Carousel stories"
     
     return True, "Unique"
 
 def filter_unique_stories(stories: List[Dict]) -> List[Dict]:
-    """Filter stories to only include unique topics not previously covered."""
+    """Filter stories to only include unique topics not previously covered (YouTube + Carousel)."""
     unique_stories = []
     for story in stories:
         title = story.get("title", "")
@@ -109,7 +191,7 @@ def filter_unique_stories(stories: List[Dict]) -> List[Dict]:
         if description:
             keywords = re.findall(r'\b[A-Za-z]{4,}\b', description.lower())
         
-        is_unique, reason = is_topic_unique(title, url, keywords)
+        is_unique, reason = is_topic_unique(title, url, keywords, check_youtube=True, check_carousel=True)
         if is_unique:
             unique_stories.append(story)
         else:
@@ -144,7 +226,7 @@ def score_story(story: Dict) -> float:
 
 
 def select_best_story(stories: List[Dict]) -> Optional[Dict]:
-    """Select the best story based on scoring."""
+    """Select the best story based on scoring and record it in carousel tracker."""
     if not stories:
         return None
     
@@ -154,6 +236,19 @@ def select_best_story(stories: List[Dict]) -> Optional[Dict]:
     best_score, best_story = scored[0]
     if best_score >= MIN_SCORE_THRESHOLD:
         best_story["_score"] = best_score
+        
+        # Record the selected topic in carousel tracker to prevent reuse
+        title = best_story.get("title", "")
+        url = best_story.get("url", "")
+        description = best_story.get("description", "")
+        source = best_story.get("source", {}).get("name", "Unknown")
+        
+        keywords = []
+        if description:
+            keywords = re.findall(r'\b[A-Za-z]{4,}\b', description.lower())
+        
+        record_carousel_topic(title, url, keywords, source)
+        
         return best_story
     return None
 
