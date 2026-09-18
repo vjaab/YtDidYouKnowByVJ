@@ -8410,7 +8410,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     visual_type = chunks[0].get("visual_type", "") if chunks else ""
     category_layout = get_dynamic_layout(category, visual_type, 0, max(1, len(chunks)))
 
-    layout = generate_layout_profile(layout_seed, dominant_color=dominant_color, daily_layout=category_layout)
+    layout = generate_layout_profile(layout_seed, dominant_color=dominant_color, daily_layout=category_layout, category=category)
     # Merge layout jitter into subtitle shift
     subtitle_y_shift += layout["subtitle_y_jitter"]
 

@@ -190,6 +190,26 @@ VISUAL_TYPE_LAYOUT_MAP = {
     "AI Image": "asymmetric",                    # Concept art + presenter
 }
 
+# Category to avatar X offset mapping (deterministic positioning per category)
+# Values range from -60 (left) to 60 (right), 0 = center
+CATEGORY_AVATAR_X_OFFSET = {
+    "AI & Tech Tools": -40,               # Left side - tool demo focus
+    "Tech Gadgets & Inventions": 40,      # Right side - product showcase
+    "Finance & Tech Economy": -20,        # Slightly left - data + presenter
+    "Facts & Trivia": 0,                  # Center - fact card style
+    "Coding & Development Hacks": -50,    # Far left - code + terminal
+    "Quiz & Trivia": 50,                  # Right - options + avatar
+    "Interview Questions": 30,            # Right of center - question card + presenter
+    "Programming Language Origins": -30,  # Left - storytelling
+    "Tech Company Founding Stories": -30, # Left - storytelling
+    "Famous Bugs & Glitches": 20,         # Slight right - bug details + avatar
+    "Agentic AI Facts": 10,               # Slight right - concept + presenter
+    "Python Libraries & Frameworks": -40, # Left - code demo
+    "AWS Cloud Services": 20,             # Right - architecture + presenter
+    "Student Dev & AI Tools": -40,        # Left - code + terminal
+    "Student Capstone Projects": 30,      # Right - project showcase
+}
+
 def get_dynamic_layout(category, visual_type=None, chunk_index=0, total_chunks=1):
     """
     Returns optimal layout_type based on category, visual_type, and position in video.
@@ -230,8 +250,20 @@ def get_layout_for_chunk(chunk, category, chunk_index=0, total_chunks=1):
     """
     visual_type = chunk.get("visual_type", "")
     return get_dynamic_layout(category, visual_type, chunk_index, total_chunks)
+
+
+def get_category_avatar_x_offset(category: str) -> int:
+    """
+    Returns deterministic avatar X offset for a given category.
+    Used for consistent avatar positioning based on content type.
     
-    return tracker["corner_index"]
+    Args:
+        category: Content category (e.g., "AI & Tech Tools")
+        
+    Returns:
+        X offset value from -60 (left) to 60 (right), 0 = center
+    """
+    return CATEGORY_AVATAR_X_OFFSET.get(category, 0)
 
 
 def get_category_prompt_enhancement(category, slot):

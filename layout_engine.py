@@ -133,7 +133,8 @@ class LayoutEngine:
         seed_string: str,
         dominant_color: Optional[Tuple[int, int, int]] = None,
         layout_type: Optional[str] = None,
-        daily_layout: Optional[str] = None
+        daily_layout: Optional[str] = None,
+        category: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Generate a complete layout profile for a video.
@@ -143,6 +144,7 @@ class LayoutEngine:
             dominant_color: Optional RGB tuple from screenshot to tint theme
             layout_type: Override layout type (overrides daily/random)
             daily_layout: Layout from daily schedule (ecosystem_logic)
+            category: Content category for deterministic avatar positioning
             
         Returns:
             Complete profile dict with layout, theme, and visual parameters
@@ -184,7 +186,12 @@ class LayoutEngine:
         progress_bar_height = rng.randint(4, 8)
         progress_bar_position = rng.choice(PROGRESS_BAR_POSITIONS)
         hook_transition_time = rng.uniform(3.5, 5.0)
-        avatar_x_offset = rng.randint(-60, 60)
+        
+        # Use category-based avatar positioning if available, otherwise random
+        if category:
+            avatar_x_offset = get_category_avatar_x_offset(category)
+        else:
+            avatar_x_offset = rng.randint(-60, 60)
         subtitle_y_jitter = rng.randint(-30, 30)
         
         profile = {
@@ -251,6 +258,8 @@ class LayoutEngine:
         return all(key in profile for key in required)
 
 
+from ecosystem_logic import get_dynamic_layout, get_category_avatar_x_offset
+
 # Convenience function for backward compatibility
 def generate_layout_profile(
     seed_string: str,
@@ -258,7 +267,8 @@ def generate_layout_profile(
     enable_variation: bool = None,
     force_layout: str = None,
     daily_layout: Optional[str] = None,
-    seed_salt: str = ""
+    seed_salt: str = "",
+    category: Optional[str] = None
 ) -> Dict[str, Any]:
     """Backward-compatible function matching original video_gen.py signature."""
     engine = LayoutEngine(
@@ -269,7 +279,8 @@ def generate_layout_profile(
     return engine.generate_profile(
         seed_string=seed_string,
         dominant_color=dominant_color,
-        daily_layout=daily_layout
+        daily_layout=daily_layout,
+        category=category
     )
 
 
