@@ -358,5 +358,15 @@
     "title": "[PROJECT] Is Your Data Flagged by Robots?",
     "uploaded_at": "2026-09-18T19:50:58.215266",
     "synced": false
+  },
+  "8_evwtk8maA": {
+    "video_id": "8_evwtk8maA",
+    "hook_pattern": "result_first",
+    "hook_variant": "A",
+    "hook_text": "This GPU halves AI costs",
+    "category": "AI Hardware Interviews",
+    "title": "B200 vs H100: What Interviewers Expect \ud83d\udca1",
+    "uploaded_at": "2026-09-19T05:17:59.223407",
+    "synced": false
   }
 }
