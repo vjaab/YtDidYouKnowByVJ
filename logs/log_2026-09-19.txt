@@ -140,3 +140,16 @@ Tomorrow on 🔬 HYBRID AI: something big tomorrow
 [20:11:04] STEP 12: Cleaning up output folder...
 [20:11:04] === PIPELINE COMPLETED SUCCESSFULLY ===
 [20:11:04] STEP 13: Terminating leftover ffmpeg processes to prevent pipeline hang...
+[22:20:53] === STARTING DAILY AI PIPELINE (TOOLS) | COUNTRY: JP ===
+[22:20:53] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[22:20:53] STEP 1: Content Ecosystem Check -> Day: Sun, Slot: Slot A (Discovery), Category: Coding & Development Hacks (Run 1/3)
+[22:20:53] STEP 2: Fetching articles (RSS + Trending Engine)...
+[22:20:54] 📈 vidIQ: Injected 8 high-signal topics.
+[22:22:58] 🔥 Trending Engine injected 223 high-signal articles for geo=JP, category=Coding & Development Hacks, sources=['medium', 'github', 'huggingface_hub'].
+[22:22:58] ✅ Fetched 660 total articles (218 GitHub, 8 vidIQ, 142 research, 60 tools, 9 X.com, 223 trending).
+[22:22:58] 📚 Loaded 30 recent topics for deduplication
+[22:25:23] 🔍 Deduplication & classification: 660 → 20 candidates
+[22:25:23] 🏷️ Zero-shot re-categorized top candidate: Coding & Development Hacks → Open Source Projects
+[22:25:23] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[23:03:04] ERROR: Script generation failed.
+[23:03:04] STEP 3 (Attempt 2/10): Gemini Searching & Generating Script...
