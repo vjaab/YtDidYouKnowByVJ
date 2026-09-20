@@ -5,3 +5,29 @@
 [00:39:31] STEP 3 (Attempt 4/10): Gemini Searching & Generating Script...
 [00:54:05] ERROR: Script generation failed.
 [00:54:05] STEP 3 (Attempt 5/10): Gemini Searching & Generating Script...
+[17:54:08] === STARTING DAILY AI PIPELINE (TOOLS) | COUNTRY: JP ===
+[17:54:08] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[17:54:08] STEP 1: Content Ecosystem Check -> Day: Sun, Slot: Slot A (Discovery), Category: Coding & Development Hacks (Run 1/3)
+[17:54:08] STEP 2: Fetching articles (RSS + Trending Engine)...
+[17:54:08] 📈 vidIQ: Injected 8 high-signal topics.
+[17:55:56] 🔥 Trending Engine injected 222 high-signal articles for geo=JP, category=Coding & Development Hacks, sources=['medium', 'github', 'huggingface_hub'].
+[17:55:56] ✅ Fetched 634 total articles (219 GitHub, 8 vidIQ, 131 research, 45 tools, 9 X.com, 222 trending).
+[17:55:56] 📚 Loaded 30 recent topics for deduplication
+[17:58:18] 🔍 Deduplication & classification: 634 → 20 candidates
+[17:58:18] 🏷️ Zero-shot re-categorized top candidate: Coding & Development Hacks → AI & Tech Tools
+[17:58:18] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[18:00:31] Selected Headline: GitHub Trending: tonhowtf/omniget — Udemy & Hotmart course downloader, YouTube downloader (yt-dlp GUI, 1,800+ sites) + desktop app for AI agents: Claude Code, Codex, Gemini CLI, Ollama.
+[18:00:31] Selected URL: https://github.com/tonhowtf/omniget
+[18:00:31] Breaking Level: 9
+[18:00:31] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[18:00:37] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20260920_180031.png
+[18:00:37] 🐙 GitHub repo detected — capturing README as evidence screenshot (MANDATORY)...
+[18:00:44] ✅ GitHub README captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_readme_20260920_180037.png
+[18:00:44] ℹ️ GitHub README already captured as evidence — skipping secondary screenshot
+[18:00:44] STEP 3d: Fetching and validating entity tags for Short...
+[18:00:50] ✅ Found 6 valid entity tags for the Short.
+[18:00:50] STEP 4: Generating voiceover + word timestamps...
+[18:00:50] Selected Lip-Sync Template: assets/video/white_hoodie.mp4 (from 41 options)
+[18:14:30] ❌ Kaggle Handover failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 14 min.
+[18:14:30] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
+[18:14:30] ⚠️ Lip-sync will be SKIPPED for this video (requires GPU).
