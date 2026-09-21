@@ -503,6 +503,96 @@
       "license": "Jamendo Standard License",
       "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Meditation_and_Relaxation_15_minute.mp3",
       "source": "jamendo"
+    },
+    "jam_1632469": {
+      "title": "Silence",
+      "artist": "Nordgroove",
+      "genre": "electronic",
+      "mood": "upbeat",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Silence.mp3",
+      "source": "jamendo"
+    },
+    "jam_4631": {
+      "title": "Moderato",
+      "artist": "Alexander Blu",
+      "genre": "electronic",
+      "mood": "upbeat",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Moderato.mp3",
+      "source": "jamendo"
+    },
+    "jam_26742": {
+      "title": "Beauty",
+      "artist": "Tryad",
+      "genre": "electronic",
+      "mood": "relaxed",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Beauty.mp3",
+      "source": "jamendo"
+    },
+    "jam_296235": {
+      "title": "Flight",
+      "artist": "Pianochocolate",
+      "genre": "electronic",
+      "mood": "relaxed",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Flight.mp3",
+      "source": "jamendo"
+    },
+    "jam_1941088": {
+      "title": "Equal Ruts",
+      "artist": "The ARTISANS Beats",
+      "genre": "hiphop",
+      "mood": "upbeat",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Equal_Ruts.mp3",
+      "source": "jamendo"
+    },
+    "jam_1447654": {
+      "title": "Hip Hop Instrumental",
+      "artist": "Bulbasound",
+      "genre": "hiphop",
+      "mood": "upbeat",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Hip_Hop_Instrumental.mp3",
+      "source": "jamendo"
+    },
+    "jam_1393688": {
+      "title": "Dark Room Full of Lonely People",
+      "artist": "Dutilleul",
+      "genre": "hiphop",
+      "mood": "relaxed",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Dark_Room_Full_of_Lonely_People.mp3",
+      "source": "jamendo"
+    },
+    "jam_311275": {
+      "title": "Lounge Room Beat",
+      "artist": "Dj Esof",
+      "genre": "hiphop",
+      "mood": "relaxed",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Lounge_Room_Beat.mp3",
+      "source": "jamendo"
+    },
+    "jam_1195939": {
+      "title": "Cinematic",
+      "artist": "Matti Paalanen",
+      "genre": "cinematic",
+      "mood": "relaxed",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Cinematic.mp3",
+      "source": "jamendo"
+    },
+    "jam_2037597": {
+      "title": "Little Things (Mallet Orchestra Intro)",
+      "artist": "Moonwalk",
+      "genre": "cinematic",
+      "mood": "relaxed",
+      "license": "Jamendo Standard License",
+      "local_path": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/music/jam_Little_Things_Mallet_Orchestra_Intro.mp3",
+      "source": "jamendo"
     }
   },
   "last_fetch": 0,
