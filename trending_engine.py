@@ -1360,46 +1360,54 @@ def fetch_huggingface_trending(category="AI & Tech Tools"):
 def fetch_huggingface_hub_trending(category="AI & Tech Tools"):
     """
     Fetches trending models & datasets from Hugging Face Hub API.
-    Uses huggingface.co/api/models?sort=trending and huggingface.co/api/datasets?sort=trending
+    Uses huggingface.co/api/models?sort=trendingScore&direction=-1 and huggingface.co/api/datasets?sort=trendingScore&direction=-1
     No auth required for public data.
     """
-    signals = CATEGORY_SIGNALS.get(category, CATEGORY_SIGNALS["AI & Tech Tools"])
-    hf_tasks = signals.get("hf_tasks", ["text-generation", "conversational", "text2text-generation", "summarization"])
+    signals = CATEGORY_SIGNALS.get(category, CATEGORY_SIGNALS.get("AI & Tech Tools", {}))
+    hf_tasks = signals.get("hf_tasks", [])
     
     print(f"🤗 Fetching trending models & datasets from Hugging Face Hub for category='{category}'...")
     articles = []
     headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
     
-    # Trending models
+    # Trending models (sort=trendingScore&direction=-1)
     try:
-        url = "https://huggingface.co/api/models?sort=trending&limit=20"
-        r = requests.get(url, headers=headers, timeout=10)
+        url = "https://huggingface.co/api/models?sort=trendingScore&direction=-1&limit=25"
+        r = requests.get(url, headers=headers, timeout=12)
         if r.status_code == 200:
             data = r.json()
-            for model in data[:10]:
-                model_id = model.get("modelId", "")
+            for model in data[:15]:
+                model_id = model.get("modelId", "") or model.get("id", "")
+                if not model_id:
+                    continue
                 tags = model.get("tags", [])
                 likes = model.get("likes", 0) or 0
                 downloads = model.get("downloads", 0) or 0
                 
-                # Filter by task relevance
+                # Filter by task relevance if strict tasks provided, but allow popular trending models
                 if hf_tasks and tags:
-                    if not any(task in tags for task in hf_tasks):
+                    has_matching_task = any(task in tags for task in hf_tasks)
+                    # Allow high-engagement models even if task tags vary slightly
+                    if not has_matching_task and likes < 20 and downloads < 500:
                         continue
                 
                 # Extract description from model card if available
                 description = ""
-                if "cardData" in model and model["cardData"]:
+                if "cardData" in model and isinstance(model["cardData"], dict):
                     description = model["cardData"].get("description", "") or ""
+                if not description:
+                    pipeline_tag = model.get("pipeline_tag", "ai-model")
+                    description = f"Trending open-weight AI model on Hugging Face Hub ({pipeline_tag})."
                 
+                model_name = model_id.split('/')[-1]
                 model_url = f"https://huggingface.co/{model_id}"
                 
                 articles.append({
-                    "title": f"HF Trending Model: {model_id.split('/')[-1]}",
-                    "description": f"🤗 HF Trending Model ({likes} likes, {downloads} downloads) | {description[:280]}",
+                    "title": f"HF Trending Model: {model_name}",
+                    "description": f"🤗 Trending Model: {model_id} ({likes} likes, {downloads} downloads) | {description[:280]}",
                     "source": {"name": "Hugging Face Hub Models"},
                     "url": model_url,
-                    "urlToImage": f"https://huggingface.co/front/assets/huggingface_logo-noborder.svg",
+                    "urlToImage": "https://huggingface.co/front/assets/huggingface_logo-noborder.svg",
                     "publishedAt": datetime.now(timezone.utc).isoformat(),
                     "type": "huggingface_hub_model",
                     "_engagement": {
@@ -1412,35 +1420,35 @@ def fetch_huggingface_hub_trending(category="AI & Tech Tools"):
     except Exception as e:
         print(f"  ⚠️ Hugging Face Hub Models API error: {e}")
     
-    # Trending datasets
+    # Trending datasets (sort=trendingScore&direction=-1)
     try:
-        url = "https://huggingface.co/api/datasets?sort=trending&limit=10"
-        r = requests.get(url, headers=headers, timeout=10)
+        url = "https://huggingface.co/api/datasets?sort=trendingScore&direction=-1&limit=15"
+        r = requests.get(url, headers=headers, timeout=12)
         if r.status_code == 200:
             data = r.json()
-            for dataset in data[:5]:
+            for dataset in data[:8]:
                 dataset_id = dataset.get("id", "")
+                if not dataset_id:
+                    continue
                 tags = dataset.get("tags", [])
                 likes = dataset.get("likes", 0) or 0
                 downloads = dataset.get("downloads", 0) or 0
                 
-                # Filter by task relevance (datasets often have task tags)
-                if hf_tasks and tags:
-                    if not any(task in tags for task in hf_tasks):
-                        continue
-                
                 description = ""
-                if "cardData" in dataset and dataset["cardData"]:
+                if "cardData" in dataset and isinstance(dataset["cardData"], dict):
                     description = dataset["cardData"].get("description", "") or ""
+                if not description:
+                    description = f"Trending AI dataset on Hugging Face Hub with {downloads} downloads."
                 
+                dataset_name = dataset_id.split('/')[-1]
                 dataset_url = f"https://huggingface.co/datasets/{dataset_id}"
                 
                 articles.append({
-                    "title": f"HF Trending Dataset: {dataset_id.split('/')[-1]}",
-                    "description": f"🤗 HF Trending Dataset ({likes} likes, {downloads} downloads) | {description[:280]}",
+                    "title": f"HF Trending Dataset: {dataset_name}",
+                    "description": f"🤗 Trending Dataset: {dataset_id} ({likes} likes, {downloads} downloads) | {description[:280]}",
                     "source": {"name": "Hugging Face Hub Datasets"},
                     "url": dataset_url,
-                    "urlToImage": f"https://huggingface.co/front/assets/huggingface_logo-noborder.svg",
+                    "urlToImage": "https://huggingface.co/front/assets/huggingface_logo-noborder.svg",
                     "publishedAt": datetime.now(timezone.utc).isoformat(),
                     "type": "huggingface_hub_dataset",
                     "_engagement": {
@@ -1785,13 +1793,22 @@ def compute_engagement_score(article):
         elif views >= 50000: score += 15
         elif views >= 10000: score += 10
     
+    elif art_type in ["huggingface_hub_model", "huggingface_hub_dataset"]:
+        likes = eng.get("likes", 0)
+        downloads = eng.get("downloads", 0)
+        score += 35
+        if likes >= 100 or downloads >= 5000: score += 25
+        elif likes >= 30 or downloads >= 1000: score += 18
+        elif likes >= 10 or downloads >= 200: score += 12
+        else: score += 8
+
     elif art_type == "trending":
         score += 15
     
     else:
         score += 5
     
-    niche_sources = ["reddit_trending", "github_trending", "youtube_outliers", "hacker_news", "huggingface_trending", "arxiv_papers", "medium_rss"]
+    niche_sources = ["reddit_trending", "github_trending", "youtube_outliers", "hacker_news", "huggingface_trending", "huggingface_hub_model", "huggingface_hub_dataset", "arxiv_papers", "medium_rss"]
     if art_type in niche_sources:
         score += TRENDING_NICHE_BIAS * 15
     

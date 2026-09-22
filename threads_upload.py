@@ -374,7 +374,7 @@ def publish_container(container_id: str) -> str:
     return result["id"]
 
 
-def upload_video_to_threads(video_path: str, caption: str, source_url: str = None):
+def upload_video_to_threads(video_path: str, caption: str, source_url: str = None, youtube_url: str = None):
     """
     Uploads a video as a Threads post using the official Graph API.
 
@@ -383,12 +383,13 @@ def upload_video_to_threads(video_path: str, caption: str, source_url: str = Non
       2. POST /{threads-user-id}/threads → create container (media_type=VIDEO)
       3. GET /{container-id}?fields=status,error_message → poll until FINISHED
       4. POST /{threads-user-id}/threads_publish → publish the post
-      5. (Optional) Post a reply with source link
+      5. Post a reply with YouTube link and source URL (keeps main post clean from link penalties)
 
     Args:
         video_path (str): Absolute path to the .mp4 video file.
         caption (str): Caption text for the Threads post.
         source_url (str): Optional source article URL to reply with.
+        youtube_url (str): Optional YouTube URL to reply with.
 
     Returns:
         tuple: (bool success, str result_message_or_post_id)
@@ -447,15 +448,13 @@ def upload_video_to_threads(video_path: str, caption: str, source_url: str = Non
             public_url = direct_url.strip()
             upload_method = "direct"
             print(f"✅ Using provided public URL: {public_url}")
-
-        if not public_url:
-            public_url, gh_result = upload_video_to_github_releases(video_path)
-            if public_url:
-                upload_method = "github"
-                upload_key = gh_result
-                print(f"✅ Uploaded to GitHub Releases")
-            else:
-                return False, f"Failed to host video publicly: {gh_result}"
+        else:
+            # Fallback to GitHub Releases for hosting
+            upload_method = "github"
+            public_url, upload_key = upload_video_to_github_releases(video_path)
+            if not public_url:
+                return False, f"GitHub Releases video upload failed: {upload_key}"
+            print(f"✅ Video hosted on GitHub Releases: {public_url}")
 
         print(f"📡 [Threads] Step 2/4: Creating Threads container...")
         container_id = create_threads_container(public_url, caption)
@@ -469,10 +468,15 @@ def upload_video_to_threads(video_path: str, caption: str, source_url: str = Non
         post_id = publish_container(container_id)
         print(f"🎉 Threads post published! ID: {post_id}")
 
-        # Post reply with source link if provided
-        if source_url:
-            print(f"📡 [Threads] Posting source link reply...")
-            reply_text = f"📰 Source: {source_url}"
+        # Post reply with YouTube and source links (keeps main post clean from reach suppression)
+        if youtube_url or source_url:
+            print(f"📡 [Threads] Posting follow-up reply with resources...")
+            reply_parts = []
+            if youtube_url:
+                reply_parts.append(f"🎥 Watch the full video breakdown on YouTube:\n{youtube_url}")
+            if source_url:
+                reply_parts.append(f"📰 Source article:\n{source_url}")
+            reply_text = "\n\n".join(reply_parts)
             try:
                 reply_id = create_threads_reply(post_id, reply_text)
                 print(f"✅ Source reply posted! ID: {reply_id}")

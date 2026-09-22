@@ -289,7 +289,7 @@ def get_authenticated_service():
         return None
 
 
-def upload_video(video_path, title, description, tags, thumbnail_path=None, category_id="22", comment_hook=None, is_longform=False, script_data=None):
+def upload_video(video_path, title, description, tags, thumbnail_path=None, category_id="28", comment_hook=None, is_longform=False, script_data=None):
     youtube = get_authenticated_service()
     if not youtube:
         return False, "Failed to authenticate with YouTube API"
@@ -302,23 +302,27 @@ def upload_video(video_path, title, description, tags, thumbnail_path=None, cate
         if cleaned_t and cleaned_t not in unique_tags:
             unique_tags.append(cleaned_t)
 
-    # ── YPP COMPLIANCE: Determine if mandatory AI disclosure is needed ──
-    # YouTube requires disclosure for "realistic synthetic content" that could mislead viewers:
-    # - Deepfakes of real people (face/body alteration)
-    # - Synthetic voices of real people (celebrities, politicians, public figures)
-    # - Fabricated events depicted as real
-    # AI-assisted production (TTS narration, AI-generated visuals for concepts) does NOT require disclosure
-    # unless it depicts a real person doing/saying something they didn't actually do/say.
-    #
-    # However, per YouTube's updated policy, we declare ALL videos from this pipeline as containing
-    # synthetic media since they use AI-generated voice (ElevenLabs cloned voice), AI-generated visuals
-    # (Pexels/whiteboard/infographics), and AI-written scripts.
+    # Category: 28 = Science & Technology (CRITICAL: 22 is People & Blogs which kills tech retention)
+    if not category_id or category_id == "22":
+        category_id = "28"
 
-    requires_ai_disclosure = True  # All videos from this pipeline use AI-generated content
+    # YouTube Policy: Informational commentary with AI voiceover and stock/conceptual visuals
+    # is production assistance, NOT deceptive synthetic media of real people.
+    # Setting containsSyntheticMedia=True causes YouTube to place a prominent warning badge
+    # on mobile screens that triggers immediate swipe-aways.
+    requires_ai_disclosure = False
+
+    # Optimize title: Ensure #Shorts tag is present for Shorts shelf indexing
+    formatted_title = title.strip()
+    if not is_longform:
+        if "#shorts" not in formatted_title.lower():
+            if len(formatted_title) > 91:
+                formatted_title = formatted_title[:90].rstrip()
+            formatted_title = f"{formatted_title} #Shorts"
 
     body = {
         "snippet": {
-            "title":                title[:100],
+            "title":                formatted_title[:100],
             "description":          description[:5000],
             "tags":                 unique_tags[:30],
             "categoryId":           category_id,
@@ -328,8 +332,6 @@ def upload_video(video_path, title, description, tags, thumbnail_path=None, cate
         "status": {
             "privacyStatus":          "public",
             "selfDeclaredMadeForKids": False,
-            # AI Disclosure: Set to True only for realistic synthetic media of real people/events
-            # Our pipeline uses AI narration + conceptual visuals = production assistance (no disclosure required)
             "containsSyntheticMedia": requires_ai_disclosure,
         },
     }

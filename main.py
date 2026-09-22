@@ -75,7 +75,18 @@ def log_message(msg):
 
 
 def format_description(ai_description, script, hashtags, slot="Slot A", chunks=None, relevant_links=[], source_url="", script_data=None):
-    hashtag_str = " ".join(hashtags) if hashtags else ""
+    # Ensure #Shorts is present in YouTube hashtags for Shorts shelf indexing
+    cleaned_tags = []
+    if hashtags:
+        for t in hashtags:
+            clean = t.strip()
+            if not clean.startswith("#"):
+                clean = f"#{clean.replace(' ', '')}"
+            if clean and clean not in cleaned_tags:
+                cleaned_tags.append(clean)
+    if "Slot C" not in slot and "#Shorts" not in cleaned_tags and "#shorts" not in cleaned_tags:
+        cleaned_tags.insert(0, "#Shorts")
+    hashtag_str = " ".join(cleaned_tags[:8])
     
     # ── Action-Oriented Summary ──
     clean_summary = ai_description.split(". ")[0] + "."
@@ -260,119 +271,94 @@ def generate_pinned_comment(script_data, next_series_slot):
 
 def format_instagram_caption(description, hashtags, youtube_url, script_data=None):
     """
-    Instagram Reels caption: line breaks, 3-5 niche hashtags + 2 broad, community-focused.
-    Max 2200 chars. First 125 chars optimized for "before more" visibility.
+    Instagram Reels caption:
+    - First 125 chars optimized for "before more" hook visibility.
+    - Clean description with no unclickable raw URLs (avoids Meta algorithm penalty).
+    - Engagement CTA to encourage comments/saves.
+    - Hashtags placed STRICTLY AT THE VERY LAST.
     """
+    import re
     base_hook = script_data.get("hook_text", "") if script_data else ""
     hook_line = generate_platform_hook(script_data, "instagram", base_hook) if script_data else base_hook
     
-    # Truncate hook for first 125 chars (visible before "more")
-    short_hook = hook_line[:100] + "..." if len(hook_line) > 100 else hook_line
-    first_cta = "👇 Full breakdown on YouTube"
+    # First line: Punchy hook (truncated for preview before "more")
+    short_hook = hook_line[:120].strip() if hook_line else "Check out this AI breakthrough"
     
-    # Niche hashtags (3-5 from script_data or description) + 2 broad
-    niche_tags = []
-    if script_data:
-        # Get companies mentioned for @mentions
-        companies = script_data.get("companies_mentioned", [])
-        if companies:
-            for c in companies[:3]:
-                if isinstance(c, dict):
-                    name = c.get("name", "")
-                elif isinstance(c, str):
-                    name = c
-                else:
-                    name = ""
-                name = name.replace(" ", "")
-                if name:
-                    niche_tags.append(f"@{name.lower()}")
-        
-        # Get niche hashtags from script_data
-        if script_data.get("hashtags"):
-            niche_tags.extend(script_data["hashtags"][:3])
+    # Clean description body: strip raw unclickable URLs that hurt Instagram reach
+    clean_desc = re.sub(r'https?://\S+|www\.\S+|t\.me/\S+|whatsapp\.com/\S+', '', description).strip()
+    clean_lines = [l.strip() for l in clean_desc.split('\n') if l.strip() and not l.startswith("⚠️ AI DISCLOSURE") and not l.startswith("#")]
+    body_text = "\n\n".join(clean_lines[:4]) if clean_lines else "The latest breakthrough in AI and tech tools."
     
-    # Fallback to passed hashtags
-    if not niche_tags and hashtags:
-        niche_tags = hashtags[:3]
+    # 5-7 focused high-engagement hashtags (strictly at the last)
+    ig_tags = []
+    if hashtags:
+        for tag in hashtags:
+            cleaned = tag.strip()
+            if not cleaned.startswith("#"):
+                cleaned = f"#{cleaned.replace(' ', '')}"
+            # Exclude @mention tags from hashtags
+            if not cleaned.startswith("@") and cleaned not in ig_tags:
+                ig_tags.append(cleaned)
     
-    # Ensure we have 3-5 niche tags
-    niche_tags = niche_tags[:5]
+    default_tags = ["#AI", "#TechNews", "#ArtificialIntelligence", "#MachineLearning", "#Coding", "#TechTools", "#OpenSource"]
+    for dt in default_tags:
+        if dt not in ig_tags and len(ig_tags) < 7:
+            ig_tags.append(dt)
     
-    # 2 broad hashtags
-    broad_tags = ["#AI", "#TechNews"]
+    hashtag_str = " ".join(ig_tags[:7])
     
-    # Combine all hashtags
-    all_hashtags = niche_tags + broad_tags
-    hashtag_str = " ".join(all_hashtags[:7])  # Max 7 total
-    
-    # Location tag (if relevant - can be added from script_data)
-    location_tag = ""
-    if script_data and script_data.get("location"):
-        location_tag = f"\n📍 {script_data['location']}"
-    
-    # Handle None youtube_url
-    yt_link = youtube_url if youtube_url else "YouTube upload pending — check channel"
-    
-    # Build Instagram-native caption with optimized first 125 chars
-    # First line: Hook (truncated) + immediate CTA
-    ig_caption = f"""🔥 {short_hook} {first_cta}
+    ig_caption = f"""🔥 {short_hook}
 
-{description[:1200]}{location_tag}
+{body_text[:1100]}
 
-👇 Full breakdown on YouTube: {yt_link}
+💬 What do you think about this? Drop your thoughts below!
+🔗 Link in bio for full breakdown and resources!
 
-📲 Join the community:
-• Telegram → https://t.me/technewsbyvj
-• WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
-
-{hashtag_str}
-
-🔁 Remix this Reel with your take!"""
+{hashtag_str}"""
     
-    return ig_caption[:2200]
+    return ig_caption[:2200].strip()
 
 
 def format_facebook_caption(description, hashtags, youtube_url="", script_data=None):
     """
     Facebook Reels caption: Native focus, no external link in caption body (prevents algorithmic reach suppression).
-    5-8 hashtags max (algorithm penalty for >8).
-    Includes strong hook, narrative summary, and call to check first comment.
+    5-7 hashtags max. Includes strong hook, narrative summary, question for comments, and hashtags STRICTLY AT LAST.
     """
     import re
     base_hook = script_data.get("hook_text", "") if script_data else ""
     hook_line = generate_platform_hook(script_data, "facebook", base_hook) if script_data else base_hook
     
-    # 5-8 hashtags max (algorithm penalty for more)
-    default_tags = ["#AI", "#TechNews", "#Developer", "#OpenSource", "#ArtificialIntelligence", "#MachineLearning", "#TechTrends"]
-    if hashtags:
-        selected_tags = [tag for tag in hashtags if tag.startswith("#")]
-        if not selected_tags:
-            selected_tags = [f"#{tag.replace(' ', '')}" for tag in hashtags]
-        selected_tags = selected_tags[:6]
-        for dt in default_tags:
-            if dt not in selected_tags and len(selected_tags) < 6:
-                selected_tags.append(dt)
-        fb_hashtags = selected_tags
-    else:
-        fb_hashtags = default_tags[:6]
-        
-    hashtag_str = " ".join(fb_hashtags[:7])
-    
     # Clean description body: remove URLs to avoid FB algorithmic reach penalty
     clean_desc = re.sub(r'https?://\S+|www\.\S+|t\.me/\S+|whatsapp\.com/\S+', '', description).strip()
-    clean_lines = [l.strip() for l in clean_desc.split('\n') if l.strip()]
+    clean_lines = [l.strip() for l in clean_desc.split('\n') if l.strip() and not l.startswith("⚠️ AI DISCLOSURE") and not l.startswith("#")]
     if len(clean_lines) > 1:
-        body_text = "\n".join(clean_lines[1:])
+        body_text = "\n\n".join(clean_lines[:3])
     elif len(clean_lines) == 1:
         body_text = clean_lines[0]
     else:
         body_text = "Check out the latest breakthrough in tech and open-source AI."
+    
+    # 5-7 hashtags max (strictly at the last)
+    default_tags = ["#AI", "#TechNews", "#Developer", "#OpenSource", "#ArtificialIntelligence", "#MachineLearning", "#TechTrends"]
+    fb_tags = []
+    if hashtags:
+        for tag in hashtags:
+            cleaned = tag.strip()
+            if not cleaned.startswith("#"):
+                cleaned = f"#{cleaned.replace(' ', '')}"
+            if not cleaned.startswith("@") and cleaned not in fb_tags:
+                fb_tags.append(cleaned)
+    for dt in default_tags:
+        if dt not in fb_tags and len(fb_tags) < 7:
+            fb_tags.append(dt)
+            
+    hashtag_str = " ".join(fb_tags[:7])
         
     fb_caption = f"""🔥 {hook_line}
 
 {body_text[:1200]}
 
-👇 What are your thoughts on this? Drop your take below!
+💬 Have you tried this or seen similar tools in your workflow? Share your take below!
 🔗 Full breakdown and resources in the FIRST comment 👇
 
 {hashtag_str}"""
@@ -415,9 +401,9 @@ def format_telegram_caption(title, description, hashtags, youtube_url, script_da
     if len(hook) > 100:
         hook = hook[:97] + "..."
     
-    # 3-5 relevant hashtags
-    tg_hashtags = hashtags[:5] if hashtags else ["#AI", "#TechNews", "#Shorts"]
-    hashtag_str = " ".join(tg_hashtags)
+    # 3-5 clean hashtags
+    clean_tags = [f"#{t.lstrip('#').replace(' ', '')}" for t in hashtags if t and not t.startswith("@")] if hashtags else ["#AI", "#TechNews", "#Shorts"]
+    hashtag_str = " ".join(clean_tags[:5])
     
     # Short description snippet
     desc_snippet = description[:200] if description else ""
@@ -445,44 +431,51 @@ def format_telegram_caption(title, description, hashtags, youtube_url, script_da
 
 def format_threads_caption(title, description, hashtags, youtube_url, script_data=None):
     """
-    Threads caption for Shorts: native text format, line breaks, no HTML.
-    Format: Thread 🧵 → Hook → Value → Question → Link
-    Max 500 chars recommended for engagement.
+    Threads caption for Shorts:
+    - High-engagement native conversation hook (NO fake 'Thread 🧵' prefix for video).
+    - NO mass media spam tags (@techcrunch @verge etc.) that trigger Meta spam shadowbans.
+    - Question to trigger replies (Threads algorithm rewards comment depth).
+    - Hashtags placed STRICTLY AT THE VERY LAST.
+    Max 500 chars recommended.
     """
+    import re
     base_hook = script_data.get("hook_text", title) if script_data else title
     hook = generate_platform_hook(script_data, "threads", base_hook) if script_data else base_hook
-    if len(hook) > 80:
-        hook = hook[:77] + "..."
+    if len(hook) > 120:
+        hook = hook[:117] + "..."
     
-    # 3-5 relevant hashtags + tag relevant accounts
-    th_hashtags = hashtags[:3] if hashtags else ["#AI", "#TechNews", "#Shorts"]
-    tag_accounts = " @techcrunch @verge @TheVerge @WIRED @engadget"
-    hashtag_str = " ".join(th_hashtags) + tag_accounts
+    # 2-3 focused hashtags (Threads uses the first hashtag as an official Topic Tag)
+    th_hashtags = []
+    if hashtags:
+        for tag in hashtags:
+            cleaned = tag.strip()
+            if not cleaned.startswith("#"):
+                cleaned = f"#{cleaned.replace(' ', '')}"
+            if not cleaned.startswith("@") and cleaned not in th_hashtags:
+                th_hashtags.append(cleaned)
+    if not th_hashtags:
+        th_hashtags = ["#AI", "#TechNews", "#Shorts"]
+    hashtag_str = " ".join(th_hashtags[:3])
     
-    # Value: key insight from description
-    value = description[:200] if description else ""
+    # Clean value text (no raw links)
+    clean_desc = re.sub(r'https?://\S+|www\.\S+|t\.me/\S+|whatsapp\.com/\S+', '', description).strip()
+    clean_lines = [l.strip() for l in clean_desc.split('\n') if l.strip() and not l.startswith("⚠️") and not l.startswith("#")]
+    value = clean_lines[0] if clean_lines else "Here is what happened and why it matters for engineers."
+    if len(value) > 180:
+        value = value[:177] + "..."
     
-    # Question to drive engagement
-    question = "\n\nWhat's your take on this?"
+    question = "What's your take on this? Drop your thoughts below!"
     
-    # Source article URL (from script_data)
-    source_url = script_data.get("original_news_url", "") if script_data else ""
-    source_line = f"\n\n📰 Source: {source_url}" if source_url else ""
-    
-    # Handle None youtube_url
-    yt_link = youtube_url if youtube_url else "YouTube upload pending — check channel"
-    
-    threads_caption = f"""Thread 🧵
+    threads_caption = f"""🔥 {hook}
 
-🔥 {hook}
+💡 {value}
 
-💡 {value}{question}
-
-🎥 Full breakdown: {yt_link}{source_line}
+💬 {question}
+🔗 Full breakdown & links in bio!
 
 {hashtag_str}"""
     
-    return threads_caption[:500]
+    return threads_caption[:500].strip()
 
 
 def generate_platform_hook(script_data: dict, platform: str, base_hook: str) -> str:
@@ -1248,7 +1241,7 @@ def run_pipeline(topic_type="auto", dry_run=False):
     relevant_links = script_data.get("relevant_links", [])
     source_url = script_data.get("original_news_url", "")
     
-    # Shorts-optimized description: put hook + hashtags in first 2-3 visible lines
+    # Shorts-optimized description: hook first, hashtags STRICTLY AT THE LAST
     is_shorts_upload = "Slot C" not in slot  # Slot C = longform
     if is_shorts_upload:
         hashtag_str = " ".join(hashtags) if hashtags else ""
@@ -1259,14 +1252,14 @@ def run_pipeline(topic_type="auto", dry_run=False):
         if script_data.get("editorial_perspective"):
             editorial_line = f"\n🎯 Lens: {script_data['editorial_perspective']} | ID: {script_data.get('content_fingerprint', '')[:8]}\n"
         description = (
-            f"{hook_line}\n"
-            f"{hashtag_str}\n\n"
+            f"{hook_line}\n\n"
             f"{ai_desc[:200]}\n\n"
             f"{source_line}"
             f"{editorial_line}"
             f"\n🚀 Daily AI News → https://t.me/technewsbyvj\n"
             f"💬 WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z\n\n"
-            f"⚠️ AI DISCLOSURE: AI-assisted production (voiceover narration, AI-generated conceptual visuals). All editorial decisions — topic selection, research, scriptwriting, analysis — by VJ. No deepfakes or synthetic depictions of real individuals."
+            f"⚠️ AI DISCLOSURE: AI-assisted production (voiceover narration, AI-generated conceptual visuals). All editorial decisions — topic selection, research, scriptwriting, analysis — by VJ. No deepfakes or synthetic depictions of real individuals.\n\n"
+            f"{hashtag_str}"
         )
     else:
         description = format_description(ai_desc, script, hashtags, slot=slot, chunks=chunks, relevant_links=relevant_links, source_url=source_url, script_data=script_data)
@@ -1359,7 +1352,10 @@ def run_pipeline(topic_type="auto", dry_run=False):
     log_message("STEP 10c: Auto-posting Short to X.com...")
     try:
         yt_link = youtube_url if youtube_url else "YouTube upload pending — check channel"
-        x_post_text = f"🔥 {title}\n\nFull breakdown: {yt_link}\n\n" + " ".join(hashtags)
+        x_tags = [f"#{t.lstrip('#').replace(' ', '')}" for t in hashtags if t and not t.startswith("@")]
+        x_tags_str = " ".join(x_tags[:4])
+        x_hook = title[:160].strip()
+        x_post_text = f"🔥 {x_hook}\n\n🎥 Full breakdown: {yt_link}\n\n{x_tags_str}".strip()
         if dry_run:
             print("🧪 [DRY RUN] Simulating X.com auto-post...")
             x_uploaded, x_result = True, "MOCK_TWEET_ID"
@@ -1461,7 +1457,7 @@ def run_pipeline(topic_type="auto", dry_run=False):
             print("🧪 [DRY RUN] Simulating Threads upload...")
             threads_uploaded, threads_result = True, "MOCK_THREADS_POST_ID"
         else:
-            threads_uploaded, threads_result = upload_video_to_threads(video_path, threads_caption, source_url)
+            threads_uploaded, threads_result = upload_video_to_threads(video_path, threads_caption, source_url=source_url, youtube_url=youtube_url)
 
         if threads_uploaded:
             log_message(f"SUCCESS: Posted to Threads! ID: {threads_result}")

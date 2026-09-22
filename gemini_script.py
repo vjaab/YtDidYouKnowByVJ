@@ -785,14 +785,22 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
             # Copy to avoid mutating the caller's list
             articles = list(articles)
             
-            # Enforce selecting GitHub trending repositories always
-            github_articles = [art for art in articles if art.get("type") == "github_trending"]
-            if github_articles:
-                articles = github_articles
-                print(f"📡 Filtered candidates to {len(articles)} GitHub trending repos.")
+            # Prioritize open-source GitHub repositories and Hugging Face Hub models/datasets
+            tech_candidates = [
+                art for art in articles 
+                if art.get("type") in [
+                    "github_trending", "huggingface_hub_model", 
+                    "huggingface_hub_dataset", "huggingface_trending"
+                ]
+            ]
+            if tech_candidates:
+                articles = tech_candidates
+                gh_count = sum(1 for a in articles if a.get("type") == "github_trending")
+                hf_count = sum(1 for a in articles if "huggingface" in (a.get("type") or ""))
+                print(f"📡 Filtered candidates to {gh_count} GitHub trending repos and {hf_count} Hugging Face items.")
             else:
-                print("⚠️ PIPELINE FALLBACK: No unique GitHub candidates found, using general topics.")
-                extra_instruction += "\n⚠️ PIPELINE FALLBACK: No unique GitHub candidates found, using general topics. PRIORITIZE open-source or developer tools if possible.\n"
+                print("⚠️ PIPELINE FALLBACK: No unique GitHub or Hugging Face candidates found, using general topics.")
+                extra_instruction += "\n⚠️ PIPELINE FALLBACK: No unique GitHub or Hugging Face candidates found, using general topics. PRIORITIZE open-source or developer tools if possible.\n"
             
             print(f"📡 STEP 0: Scoring {len(articles)} articles for viral potential (engagement-weighted)...")
             
@@ -833,8 +841,8 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                     is_viral_category = True
                 
                 # Dev-centric or Niche Filtering for General Consumer Appeal (18-70)
-                # Bypassed if the article falls under a viral category or is a GitHub trending project.
-                if not is_viral_category and art.get("type") != "github_trending":
+                # Bypassed if the article falls under a viral category, GitHub trending, or Hugging Face Hub.
+                if not is_viral_category and art.get("type") not in ["github_trending", "huggingface_hub_model", "huggingface_hub_dataset", "huggingface_trending"]:
                     dev_antikeywords = [
                         "repository", "git commit", "api endpoint", "npm package", "pip install", 
                         "cuda", "pytorch", "fine-tune", "fine-tuning", "weights", "parameters", 
@@ -897,10 +905,23 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                     if spd > 100: trending_velocity_score = 35
                     elif spd > 50: trending_velocity_score = 25
                     elif spd > 10: trending_velocity_score = 15
+                elif art.get("type") in ["huggingface_hub_model", "huggingface_hub_dataset"]:
+                    likes = eng.get("likes", 0)
+                    downloads = eng.get("downloads", 0)
+                    if likes > 50 or downloads > 5000: trending_velocity_score = 40
+                    elif likes > 20 or downloads > 1000: trending_velocity_score = 30
+                    elif likes > 5 or downloads > 100: trending_velocity_score = 20
+                    else: trending_velocity_score = 15
+                elif art.get("type") == "huggingface_trending":
+                    upvotes = eng.get("upvotes", 0)
+                    if upvotes > 30: trending_velocity_score = 40
+                    elif upvotes > 15: trending_velocity_score = 30
+                    elif upvotes > 5: trending_velocity_score = 20
+                    else: trending_velocity_score = 15
                 
                 # D. Niche Gap Score (NEW: prefer topics competitors haven't covered)
                 niche_score = 0
-                niche_types = ["github_trending", "reddit_trending"]
+                niche_types = ["github_trending", "reddit_trending", "huggingface_hub_model", "huggingface_hub_dataset", "huggingface_trending"]
                 if art.get("type") in niche_types:
                     niche_score = 15  # Niche sources get a boost
                 
@@ -923,21 +944,21 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                     tool_keywords = ["tool", "app", "free", "alternative", "workflow", "extension", "trick", "hack", "tip",
                                      "save", "productivity", "ai tool", "chatgpt", "plugin", "shortcut"]
                     type_score += sum(15 for kw in tool_keywords if kw in title_lower)
-                    if art.get("type") in ["tools", "github_trending", "youtube_trending"]:
+                    if art.get("type") in ["tools", "github_trending", "youtube_trending", "huggingface_hub_model", "huggingface_hub_dataset"]:
                         type_score += 25
                 elif topic_type == "news":
                     news_keywords = ["hidden", "secret", "feature", "setting", "trick", "hack", "tip", "iphone", "android",
                                      "privacy", "tracking", "battery", "speed", "myth", "wrong", "mistake", "stop",
                                      "breaking", "scandal", "warns", "dangerous", "scary", "free"]
                     type_score += sum(15 for kw in news_keywords if kw in title_lower)
-                    if art.get("type") in ["trending", "youtube_trending", "reddit_trending"]:
+                    if art.get("type") in ["trending", "youtube_trending", "reddit_trending", "huggingface_hub_model"]:
                         type_score += 25
                 elif topic_type == "research":
-                    # Research now means "educational tech facts" not academic papers
+                    # Research now means "educational tech facts" and cutting-edge open weights
                     research_keywords = ["truth", "myth", "actually", "real", "fact", "science", "how", "why", "works",
-                                         "explained", "debunk", "wrong", "correct", "proof"]
+                                         "explained", "debunk", "wrong", "correct", "proof", "model", "weights"]
                     type_score += sum(15 for kw in research_keywords if kw in title_lower)
-                    if art.get("type") in ["reddit_trending", "youtube_trending"]:
+                    if art.get("type") in ["reddit_trending", "youtube_trending", "huggingface_trending", "huggingface_hub_model"]:
                         type_score += 25
                 elif topic_type == "interview_questions":
                     interview_keywords = ["interview", "question", "answer", "java", "javascript", "spring boot", "aws", "python", "kubernetes", "docker", "coding", "system design", "algorithm", "data structure"]
@@ -947,7 +968,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 elif topic_type == "student":
                     student_keywords = ["student", "free", "github", "copilot", "pack", "notebooklm", "gemini", "hack", "study", "notes", "rag", "project", "capstone", "resume", "vs code", "terminal"]
                     type_score += sum(15 for kw in student_keywords if kw in title_lower)
-                    if art.get("type") in ["tools", "github_trending", "youtube_trending"]:
+                    if art.get("type") in ["tools", "github_trending", "youtube_trending", "huggingface_hub_model"]:
                         type_score += 25
                 
                 # ── COMPOSITE VIRAL SCORE (weighted blend) ──
@@ -965,6 +986,30 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 if art.get("type") == "github_trending":
                     hot_score += 100.0  # Boost GitHub trending repos to prioritize them for selection
                     hot_score += art.get("_relevance_score", 0)  # Boost further if technical topic relevance matches
+                elif art.get("type") in ["huggingface_hub_model", "huggingface_hub_dataset", "huggingface_trending"]:
+                    # Parity with GitHub trending repos
+                    hot_score += 100.0
+                    hot_score += art.get("_relevance_score", 0)
+                    
+                    # Periodic HuggingFace boost: if not selected in last 2 runs, prioritize HuggingFace
+                    runs_since_hf = 999
+                    try:
+                        from config import TRACKER_FILE
+                        from topic_tracker import load_tracker
+                        _tracker = load_tracker(TRACKER_FILE)
+                        _history = _tracker.get("history", [])
+                        for idx_h, entry_h in enumerate(reversed(_history)):
+                            _src = (entry_h.get("news_source_url") or "").lower()
+                            _tit = (entry_h.get("title") or "").lower()
+                            if "huggingface.co" in _src or "hf trending" in _tit or "hugging face" in _tit:
+                                runs_since_hf = idx_h
+                                break
+                    except Exception:
+                        runs_since_hf = 5
+                    
+                    if runs_since_hf >= 2:
+                        hf_rotation_boost = min(60.0, 20.0 + (runs_since_hf * 10.0))
+                        hot_score += hf_rotation_boost
 
                 art['_hot_score'] = round(hot_score, 1)
                 art['_score_breakdown'] = {
