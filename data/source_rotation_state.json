@@ -161,7 +161,91 @@
       "articles_count": 162,
       "timestamp": "2026-09-12T16:41:57.920248",
       "video_number": 27
+    },
+    {
+      "source": "medium",
+      "articles_count": 3,
+      "timestamp": "2026-09-22T22:09:30.606949",
+      "video_number": 28
+    },
+    {
+      "source": "github",
+      "articles_count": 163,
+      "timestamp": "2026-09-22T22:09:30.608301",
+      "video_number": 29
+    },
+    {
+      "source": "medium",
+      "articles_count": 3,
+      "timestamp": "2026-09-22T22:12:08.100556",
+      "video_number": 30
+    },
+    {
+      "source": "github",
+      "articles_count": 163,
+      "timestamp": "2026-09-22T22:12:08.101676",
+      "video_number": 31
+    },
+    {
+      "source": "medium",
+      "articles_count": 5,
+      "timestamp": "2026-09-22T22:14:52.570091",
+      "video_number": 32
+    },
+    {
+      "source": "github",
+      "articles_count": 163,
+      "timestamp": "2026-09-22T22:14:52.571767",
+      "video_number": 33
+    },
+    {
+      "source": "medium",
+      "articles_count": 5,
+      "timestamp": "2026-09-22T22:16:07.500316",
+      "video_number": 34
+    },
+    {
+      "source": "github",
+      "articles_count": 163,
+      "timestamp": "2026-09-22T22:16:07.501987",
+      "video_number": 35
+    },
+    {
+      "source": "medium",
+      "articles_count": 5,
+      "timestamp": "2026-09-22T22:16:54.742384",
+      "video_number": 36
+    },
+    {
+      "source": "github",
+      "articles_count": 163,
+      "timestamp": "2026-09-22T22:16:54.744009",
+      "video_number": 37
+    },
+    {
+      "source": "medium",
+      "articles_count": 5,
+      "timestamp": "2026-09-22T22:17:47.324297",
+      "video_number": 38
+    },
+    {
+      "source": "github",
+      "articles_count": 163,
+      "timestamp": "2026-09-22T22:17:47.325193",
+      "video_number": 39
+    },
+    {
+      "source": "medium",
+      "articles_count": 5,
+      "timestamp": "2026-09-22T22:18:35.524380",
+      "video_number": 40
+    },
+    {
+      "source": "github",
+      "articles_count": 163,
+      "timestamp": "2026-09-22T22:18:35.525414",
+      "video_number": 41
     }
   ],
-  "video_count": 27
+  "video_count": 41
 }

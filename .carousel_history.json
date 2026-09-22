@@ -30,7 +30,69 @@
       "domain": "",
       "slide_count": 8,
       "generated_at": "2026-09-15T18:50:05.919384+00:00"
+    },
+    {
+      "topic": "GitHub Trending: tokio-rs/topcoat — A batteries-include…",
+      "theme": "TERMINAL",
+      "layout_pattern": [
+        "scenario_question",
+        "three_column",
+        "real_world_scenario",
+        "code_block",
+        "quiz_predict_output",
+        "takeaway"
+      ],
+      "domain": "",
+      "slide_count": 6,
+      "generated_at": "2026-09-22T16:47:05.963176+00:00"
+    },
+    {
+      "topic": "GitHub Trending: akitaonrails/ai-memory — Solution for…",
+      "theme": "TECH_DARK",
+      "layout_pattern": [
+        "hero_hook",
+        "layered_stack",
+        "process_flow",
+        "input_output",
+        "real_world_scenario",
+        "checklist",
+        "takeaway"
+      ],
+      "domain": "",
+      "slide_count": 6,
+      "generated_at": "2026-09-22T16:47:56.442048+00:00"
+    },
+    {
+      "topic": "GitHub Trending: HakanSeven12/OpenCADStudio — A CAD…",
+      "theme": "MINIMAL",
+      "layout_pattern": [
+        "hero_hook",
+        "analogy",
+        "code_block",
+        "checklist",
+        "common_mistake",
+        "takeaway"
+      ],
+      "domain": "",
+      "slide_count": 6,
+      "generated_at": "2026-09-22T16:48:44.577616+00:00"
+    },
+    {
+      "topic": "Cursor AI Editor Raises $60M at $400M Valuation",
+      "theme": "FUTURISTIC",
+      "layout_pattern": [
+        "hero_hook",
+        "bullet_list",
+        "process_flow",
+        "checklist",
+        "myth_vs_fact",
+        "metrics_cards",
+        "takeaway"
+      ],
+      "domain": "",
+      "slide_count": 6,
+      "generated_at": "2026-09-22T18:23:42.290462+00:00"
     }
   ],
-  "last_updated": "2026-09-15T18:50:05.919672+00:00"
+  "last_updated": "2026-09-22T18:23:42.290487+00:00"
 }

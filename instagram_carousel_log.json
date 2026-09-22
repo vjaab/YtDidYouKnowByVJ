@@ -1,7 +1,10 @@
 {
   "used_titles": [
     "OpenAI Releases GPT-4o with Real-time Voice and Vision",
-    "Cursor AI Editor Raises $60M at $400M Valuation"
+    "Cursor AI Editor Raises $60M at $400M Valuation",
+    "GitHub Trending: tokio-rs/topcoat \u2014 A batteries-included framework for building web apps",
+    "GitHub Trending: akitaonrails/ai-memory \u2014 Solution for long term memory for agent coding CLIs and to facilitate handoff between different agen",
+    "GitHub Trending: HakanSeven12/OpenCADStudio \u2014 A CAD application built with Rust \u2014 2D/3D drawing, DWG/DXF support, and GPU-accelerated rendering"
   ],
   "used_keywords": [
     "openai",
@@ -44,7 +47,39 @@
     "understanding",
     "developers",
     "using",
-    "daily"
+    "daily",
+    "stars",
+    "rust",
+    "batteries",
+    "included",
+    "framework",
+    "building",
+    "apps",
+    "stars",
+    "rust",
+    "solution",
+    "long",
+    "term",
+    "memory",
+    "agent",
+    "coding",
+    "clis",
+    "facilitate",
+    "handoff",
+    "between",
+    "different",
+    "agent",
+    "vendors",
+    "stars",
+    "rust",
+    "application",
+    "built",
+    "with",
+    "rust",
+    "drawing",
+    "support",
+    "accelerated",
+    "rendering"
   ],
   "history": [
     {
@@ -103,6 +138,62 @@
       ],
       "source": "Cursor",
       "timestamp": "2026-09-18T19:53:32.347865+00:00"
+    },
+    {
+      "title": "GitHub Trending: tokio-rs/topcoat \u2014 A batteries-included framework for building web apps",
+      "news_source_url": "https://github.com/tokio-rs/topcoat",
+      "keywords": [
+        "stars",
+        "rust",
+        "batteries",
+        "included",
+        "framework",
+        "building",
+        "apps"
+      ],
+      "source": "GitHub (tokio-rs/topcoat)",
+      "timestamp": "2026-09-22T16:46:55.333675+00:00"
+    },
+    {
+      "title": "GitHub Trending: akitaonrails/ai-memory \u2014 Solution for long term memory for agent coding CLIs and to facilitate handoff between different agen",
+      "news_source_url": "https://github.com/akitaonrails/ai-memory",
+      "keywords": [
+        "stars",
+        "rust",
+        "solution",
+        "long",
+        "term",
+        "memory",
+        "agent",
+        "coding",
+        "clis",
+        "facilitate",
+        "handoff",
+        "between",
+        "different",
+        "agent",
+        "vendors"
+      ],
+      "source": "GitHub (akitaonrails/ai-memory)",
+      "timestamp": "2026-09-22T16:47:47.892656+00:00"
+    },
+    {
+      "title": "GitHub Trending: HakanSeven12/OpenCADStudio \u2014 A CAD application built with Rust \u2014 2D/3D drawing, DWG/DXF support, and GPU-accelerated rendering",
+      "news_source_url": "https://github.com/HakanSeven12/OpenCADStudio",
+      "keywords": [
+        "stars",
+        "rust",
+        "application",
+        "built",
+        "with",
+        "rust",
+        "drawing",
+        "support",
+        "accelerated",
+        "rendering"
+      ],
+      "source": "GitHub (HakanSeven12/OpenCADStudio)",
+      "timestamp": "2026-09-22T16:48:36.134008+00:00"
     }
   ]
 }

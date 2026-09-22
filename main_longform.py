@@ -335,11 +335,12 @@ def run_longform_pipeline(dry_run=False):
                         script_data["screenshot_path"] = ss_path
         log_message(f"✅ Captured {screenshots_captured}/{len(topics)} screenshots.")
         
-        if screenshots_captured == 0:
-            # Screenshot is MANDATORY — reject this topic and try another
-            failed_headline = script_data.get("longform_topics", [{}])[0].get("headline", "Unknown")
-            failed_topics.append(failed_headline)
-            log_message(f"❌ Article screenshot FAILED for all topics. Rejecting...")
+        # MANDATORY: Each topic must have a screenshot
+        missing_screenshots = [t.get("headline", "Unknown") for t in topics if not t.get("screenshot_path")]
+        if missing_screenshots:
+            for headline in missing_screenshots:
+                failed_topics.append(headline)
+            log_message(f"❌ Screenshot FAILED for: {missing_screenshots}. Rejecting topic set...")
             script_data = None
             attempts += 1
             continue
