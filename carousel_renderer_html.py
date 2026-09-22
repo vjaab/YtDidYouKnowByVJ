@@ -21,7 +21,7 @@ LAYOUTS_DIR = TEMPLATE_DIR / "layouts"
 PARTIALS_DIR = TEMPLATE_DIR / "partials"
 CSS_FILE = TEMPLATE_DIR / "css" / "styles.css"
 
-CANVAS_W, CANVAS_H = 1080, 1350
+DEFAULT_CANVAS_W, DEFAULT_CANVAS_H = 1080, 1350
 
 # Layout to Partial template mapping
 LAYOUT_TEMPLATE_MAP = {
@@ -64,10 +64,17 @@ LAYOUT_TEMPLATE_MAP = {
 }
 
 
-def load_css() -> str:
-    """Load the master CSS styles."""
+def load_css(canvas_width: int = DEFAULT_CANVAS_W, canvas_height: int = DEFAULT_CANVAS_H) -> str:
+    """Load the master CSS styles with dynamic canvas dimensions."""
     if CSS_FILE.exists():
-        return CSS_FILE.read_text(encoding="utf-8")
+        css = CSS_FILE.read_text(encoding="utf-8")
+        # Replace hardcoded canvas dimensions with dynamic values
+        css = css.replace("--canvas-w: 1080px;", f"--canvas-w: {canvas_width}px;")
+        css = css.replace("--canvas-h: 1350px;", f"--canvas-h: {canvas_height}px;")
+        css = css.replace("width: 1080px;\n  height: 1350px;", f"width: {canvas_width}px;\n  height: {canvas_height}px;")
+        css = css.replace("width: 1080px;\n  height: 1350px;", f"width: {canvas_width}px;\n  height: {canvas_height}px;")
+        css = css.replace(".carousel-canvas {\n  position: relative;\n  width: 1080px;\n  height: 1350px;", f".carousel-canvas {{\n  position: relative;\n  width: {canvas_width}px;\n  height: {canvas_height}px;")
+        return css
     return ""
 
 
@@ -128,6 +135,8 @@ def build_slide_context(
     total_slides: int,
     strategy: Optional[Dict] = None,
     css_content: str = "",
+    canvas_width: int = DEFAULT_CANVAS_W,
+    canvas_height: int = DEFAULT_CANVAS_H,
 ) -> Dict[str, Any]:
     """Build the Jinja2 template context for a single slide."""
     layout_type = slide.get("layout_type") or slide.get("type") or "hero_hook"
@@ -159,6 +168,8 @@ def build_slide_context(
         "brand": brand,
         "css_content": css_content,
         "highlighted_code": highlighted_code,
+        "canvas_width": canvas_width,
+        "canvas_height": canvas_height,
     }
     
     # Compatibility mapping for legacy templates
@@ -189,7 +200,9 @@ def get_template_for_layout(layout_type: str, env: Environment):
 def render_carousel(
     carousel: Dict,
     output_dir: Path,
-    strategy: Optional[Dict] = None
+    strategy: Optional[Dict] = None,
+    canvas_width: int = DEFAULT_CANVAS_W,
+    canvas_height: int = DEFAULT_CANVAS_H,
 ) -> List[Path]:
     """
     Render all slides of the carousel using HTML/CSS and a persistent Playwright browser.
@@ -222,10 +235,13 @@ def render_carousel(
         autoescape=True,
     )
 
-    css_content = load_css()
+    css_content = load_css(canvas_width, canvas_height)
     output_paths = []
     safe_headline = "".join(c for c in carousel.get("headline", "carousel") if c.isalnum() or c in " -_").strip()[:30]
     safe_headline = safe_headline.replace(" ", "_")
+
+    # Include canvas dimensions in filename to support multiple formats
+    size_suffix = f"_{canvas_width}x{canvas_height}"
 
     # Prepare rendered HTML files for each slide
     slide_html_items = []
@@ -234,21 +250,21 @@ def render_carousel(
         layout_type = slide.get("layout_type") or slide.get("type", "hero_hook")
         
         template = get_template_for_layout(layout_type, env)
-        context = build_slide_context(carousel, slide, slide_num, total_slides, strategy, css_content)
+        context = build_slide_context(carousel, slide, slide_num, total_slides, strategy, css_content, canvas_width, canvas_height)
         
         html_rendered = template.render(**context)
-        html_path = output_dir / f"carousel_{safe_headline}_{slide_num:02d}.html"
+        html_path = output_dir / f"carousel_{safe_headline}_{slide_num:02d}{size_suffix}.html"
         html_path.write_text(html_rendered, encoding="utf-8")
         
-        img_path = output_dir / f"carousel_{safe_headline}_{slide_num:02d}.jpg"
+        img_path = output_dir / f"carousel_{safe_headline}_{slide_num:02d}{size_suffix}.jpg"
         slide_html_items.append((slide_num, layout_type, html_path, img_path))
 
     # High-performance batch screenshot via single Playwright browser instance
-    print(f"🚀 Launching Playwright browser to render {total_slides} slides...")
+    print(f"🚀 Launching Playwright browser to render {total_slides} slides at {canvas_width}x{canvas_height}...")
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page(
-            viewport={"width": CANVAS_W, "height": CANVAS_H},
+            viewport={"width": canvas_width, "height": canvas_height},
             device_scale_factor=2,
         )
 
@@ -257,7 +273,7 @@ def render_carousel(
             page.wait_for_load_state("networkidle")
             page.wait_for_timeout(250)  # Font & rendering stabilization
             
-            # Save as high-quality JPEG for Instagram
+            # Save as high-quality JPEG
             page.screenshot(path=str(img_path), type="jpeg", quality=95)
             output_paths.append(img_path)
             print(f"  ✅ Slide {slide_num}/{total_slides} [{layout_type}]: {img_path.name}")
@@ -285,6 +301,8 @@ def main():
     parser = argparse.ArgumentParser(description="Render AI News Carousel with Dynamic Themes & Layouts")
     parser.add_argument("--carousel-json", required=True, help="Path to carousel JSON")
     parser.add_argument("--output-dir", default="output/social_images", help="Output directory")
+    parser.add_argument("--canvas-width", type=int, default=DEFAULT_CANVAS_W, help="Canvas width")
+    parser.add_argument("--canvas-height", type=int, default=DEFAULT_CANVAS_H, help="Canvas height")
     args = parser.parse_args()
 
     carousel_path = Path(args.carousel_json)
@@ -299,8 +317,8 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     try:
-        paths = render_carousel(carousel, output_dir)
-        print(f"\n🎉 Successfully rendered {len(paths)} slides in {output_dir}")
+        paths = render_carousel(carousel, output_dir, canvas_width=args.canvas_width, canvas_height=args.canvas_height)
+        print(f"\n🎉 Successfully rendered {len(paths)} slides in {output_dir} at {args.canvas_width}x{args.canvas_height}")
         for p in paths:
             print(f"   {p}")
     except Exception as e:

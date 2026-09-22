@@ -245,7 +245,97 @@
       "articles_count": 163,
       "timestamp": "2026-09-22T22:18:35.525414",
       "video_number": 41
+    },
+    {
+      "source": "medium",
+      "articles_count": 2,
+      "timestamp": "2026-09-23T01:16:02.558573",
+      "video_number": 42
+    },
+    {
+      "source": "github",
+      "articles_count": 163,
+      "timestamp": "2026-09-23T01:16:02.560384",
+      "video_number": 43
+    },
+    {
+      "source": "huggingface_hub",
+      "articles_count": 23,
+      "timestamp": "2026-09-23T01:16:02.561694",
+      "video_number": 44
+    },
+    {
+      "source": "medium",
+      "articles_count": 3,
+      "timestamp": "2026-09-23T01:19:06.039669",
+      "video_number": 45
+    },
+    {
+      "source": "github",
+      "articles_count": 163,
+      "timestamp": "2026-09-23T01:19:06.040531",
+      "video_number": 46
+    },
+    {
+      "source": "huggingface_hub",
+      "articles_count": 23,
+      "timestamp": "2026-09-23T01:19:06.041199",
+      "video_number": 47
+    },
+    {
+      "source": "medium",
+      "articles_count": 4,
+      "timestamp": "2026-09-23T01:22:46.399857",
+      "video_number": 48
+    },
+    {
+      "source": "github",
+      "articles_count": 163,
+      "timestamp": "2026-09-23T01:22:46.401126",
+      "video_number": 49
+    },
+    {
+      "source": "huggingface_hub",
+      "articles_count": 23,
+      "timestamp": "2026-09-23T01:22:46.401994",
+      "video_number": 50
+    },
+    {
+      "source": "medium",
+      "articles_count": 4,
+      "timestamp": "2026-09-23T01:25:16.742901",
+      "video_number": 51
+    },
+    {
+      "source": "github",
+      "articles_count": 163,
+      "timestamp": "2026-09-23T01:25:16.744581",
+      "video_number": 52
+    },
+    {
+      "source": "huggingface_hub",
+      "articles_count": 23,
+      "timestamp": "2026-09-23T01:25:16.745805",
+      "video_number": 53
+    },
+    {
+      "source": "medium",
+      "articles_count": 4,
+      "timestamp": "2026-09-23T01:27:25.437076",
+      "video_number": 54
+    },
+    {
+      "source": "github",
+      "articles_count": 163,
+      "timestamp": "2026-09-23T01:27:25.438300",
+      "video_number": 55
+    },
+    {
+      "source": "huggingface_hub",
+      "articles_count": 23,
+      "timestamp": "2026-09-23T01:27:25.439171",
+      "video_number": 56
     }
   ],
-  "video_count": 41
+  "video_count": 56
 }

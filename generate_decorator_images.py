@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 generate_decorator_images.py — Generate AI News Carousel images for Instagram (4:5),
-Facebook (1.91:1), and send to Telegram for review.
+Facebook (9:16 Stories/Reels), and send to Telegram for review.
 Now uses LLM-generated carousel content + Pillow renderer for consistent branding.
 """
 
@@ -43,6 +43,7 @@ TELEGRAM_BASE_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}" if TELEG
 # Canvas sizes
 INSTAGRAM_W, INSTAGRAM_H = 1080, 1350  # 4:5
 FACEBOOK_W, FACEBOOK_H = 1200, 628     # 1.91:1 (FB link post)
+FACEBOOK_STORY_W, FACEBOOK_STORY_H = 1080, 1920  # 9:16 (FB Stories/Reels)
 
 # Carousel settings
 CAROUSEL_SLIDES = 6
@@ -220,23 +221,31 @@ def save_metadata(output_dir: Path, carousel: dict, ig_paths: list, fb_paths: li
     print(f"✅ Metadata saved: {meta_path}")
     return meta_path
 
-def generate_facebook_images_from_carousel(carousel: dict, ig_paths: list, output_dir: Path) -> list:
-    """Generate Facebook-format images from carousel (first slide as link post, or all as album)."""
-    # For Facebook, we'll use the first slide as the main link post image
-    # and create a Facebook-optimized version (1.91:1)
-    from PIL import Image
-    
+def generate_facebook_images_from_carousel(carousel: dict, ig_paths: list, output_dir: Path, strategy: dict = None) -> list:
+    """Generate Facebook 9:16 format images from carousel (for Stories/Reels)."""
+    # Render carousel slides directly in 9:16 format using HTML renderer
     fb_paths = []
     if ig_paths:
-        # Resize first slide to Facebook 1.91:1
-        ig_first = Image.open(ig_paths[0])
-        fb_img = ig_first.resize((FACEBOOK_W, FACEBOOK_H), Image.LANCZOS)
+        from carousel_renderer_html import render_carousel, DEFAULT_CANVAS_W, DEFAULT_CANVAS_H
         
         safe_topic = sanitize_filename(carousel.get("headline", "carousel"))
-        fb_path = output_dir / f"facebook_{safe_topic}.jpg"
-        fb_img.convert("RGB").save(fb_path, "JPEG", quality=95)
-        fb_paths.append(fb_path)
-        print(f"✅ Facebook image generated: {fb_path.name}")
+        
+        # Render all slides in 9:16 format (1080x1920)
+        fb_slide_paths = render_carousel(
+            carousel,
+            output_dir,
+            strategy=strategy,
+            canvas_width=FACEBOOK_STORY_W,
+            canvas_height=FACEBOOK_STORY_H,
+        )
+        
+        # Rename to facebook_ prefix for clarity
+        for i, slide_path in enumerate(fb_slide_paths):
+            fb_path = output_dir / f"facebook_{safe_topic}_{i+1:02d}.jpg"
+            if slide_path != fb_path:
+                slide_path.rename(fb_path)
+            fb_paths.append(fb_path)
+            print(f"✅ Facebook 9:16 image generated: {fb_path.name}")
     
     return fb_paths
 
@@ -278,7 +287,6 @@ def main():
                 sys.exit(1)
         else:
             # Create run context for deterministic selection (date + workflow run info)
-            import datetime
             run_context = f"{datetime.datetime.now().strftime('%Y%m%d')}-{os.getenv('GITHUB_RUN_NUMBER', '0')}-{os.getenv('GITHUB_RUN_ATTEMPT', '1')}"
             stories = fetch_ai_news_stories(run_context=run_context)
             story = select_best_story(stories, run_context=run_context)
@@ -310,15 +318,15 @@ def main():
             json.dump(carousel, f, indent=2)
         print(f"✅ Carousel JSON saved: {carousel_path}")
 
-        # Render carousel slides
+        # Render carousel slides for Instagram (4:5)
         slide_count = len(carousel.get("slides", []))
-        print(f"\n🎨 Rendering {slide_count} carousel slides with theme {strategy.get('visual_theme')}...")
-        ig_paths = render_carousel(carousel, output_dir, strategy=strategy)
+        print(f"\n🎨 Rendering {slide_count} carousel slides for Instagram (4:5) with theme {strategy.get('visual_theme')}...")
+        ig_paths = render_carousel(carousel, output_dir, strategy=strategy, canvas_width=INSTAGRAM_W, canvas_height=INSTAGRAM_H)
         
         # Generate Facebook images only if needed
         fb_paths = []
         if args.platform in ["both", "facebook"]:
-            fb_paths = generate_facebook_images_from_carousel(carousel, ig_paths, output_dir)
+            fb_paths = generate_facebook_images_from_carousel(carousel, ig_paths, output_dir, strategy=strategy)
         
         # Generate caption
         caption = generate_caption(carousel, hashtags)

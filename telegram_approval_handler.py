@@ -175,7 +175,7 @@ def send_approval_request(topic: str, ig_images: list, fb_images: list, caption_
             files = {"photo": f}
             data = {
                 "chat_id": TELEGRAM_CHAT_ID,
-                "caption": f"📘 <b>Facebook (1.91:1)</b>\n\n{caption}",
+                "caption": f"📘 <b>Facebook (9:16)</b>\n\n{caption}",
                 "parse_mode": "HTML",
             }
             resp = requests.post(f"{TELEGRAM_BASE_URL}/sendPhoto", data=data, files=files, timeout=30)

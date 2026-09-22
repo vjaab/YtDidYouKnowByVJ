@@ -1,6 +1,6 @@
 /* ==========================================================================
    CAROUSEL DESIGN SYSTEM — DYNAMIC VISUAL STORYTELLING
-   Supports 7 Themes, 18+ Layout Types, 1080x1350 Canvas
+   Supports 7 Themes, 18+ Layout Types, Dynamic Canvas Sizes (default 1080x1350)
    ========================================================================== */
 
 :root {
@@ -163,8 +163,8 @@
 }
 
 html, body {
-  width: 1080px;
-  height: 1350px;
+  width: var(--canvas-w);
+  height: var(--canvas-h);
   margin: 0;
   padding: 0;
   overflow: hidden;
@@ -176,8 +176,8 @@ html, body {
 
 .carousel-canvas {
   position: relative;
-  width: 1080px;
-  height: 1350px;
+  width: var(--canvas-w);
+  height: var(--canvas-h);
   background: var(--bg);
   padding: 60px 65px;
   display: flex;
