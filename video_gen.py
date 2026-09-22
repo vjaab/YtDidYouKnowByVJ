@@ -5690,8 +5690,8 @@ def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hook
                 duck_factor = duck_envelope[i]
                 sil_factor = smooth_silence[i]
                 
-                # Interpolate volume multiplier: 1.2x (unducked) to 0.25x (ducked)
-                vol_multiplier = (1.5 * (1.0 - duck_factor) + 0.20 * duck_factor) * sil_factor
+                # Interpolate volume multiplier: 1.5x (unducked) to 0.30x (ducked rhythmic bed)
+                vol_multiplier = (1.5 * (1.0 - duck_factor) + 0.30 * duck_factor) * sil_factor
                 
                 # ── PHASE 4: DYNAMIC BGM ENERGY CURVE ────────────────────────
                 # BGM follows Hook→Body→Payoff→CTA arc instead of flat volume
@@ -5699,16 +5699,16 @@ def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hook
                 progress_ratio = i / max(1, n_steps)
                 
                 if ENABLE_DYNAMIC_BGM_CURVE:
-                    if progress_ratio < 0.05:
-                        # Hook zone (0-5%): Higher energy to match opening
-                        energy_mult = 1.4
+                    if progress_ratio < 0.06:
+                        # Hook zone (0-6%): Higher energy to match opening visual hook
+                        energy_mult = 1.5
                     elif progress_ratio < 0.80:
-                        # Body zone (5-80%): Lower, voice-focused
-                        energy_mult = 0.85
+                        # Body zone (6-80%): Steady rhythmic driving bed
+                        energy_mult = 0.90
                     elif progress_ratio < 0.92:
                         # Payoff zone (80-92%): Build back up for climax
                         ramp_prog = (progress_ratio - 0.80) / 0.12
-                        energy_mult = 0.85 + (0.40 * ramp_prog)  # 0.85 → 1.25
+                        energy_mult = 0.90 + (0.45 * ramp_prog)  # 0.90 → 1.35
                     else:
                         # CTA zone (92-100%): Drop for authority
                         energy_mult = 0.6
@@ -5747,10 +5747,10 @@ def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hook
                                 break
                 
                 # ── PHASE 6: HOOK ZONE ENHANCEMENT ──────────────────────────────
-                # First 3 seconds: Keep BGM higher energy, less ducked for impact
-                if chunk_start < 3000:
-                    # Reduce ducking in hook zone for more energy
-                    vol_multiplier = max(vol_multiplier, 0.6)
+                # First 3.5 seconds: Keep BGM punchy and energetic to stop scrolling
+                if chunk_start < 3500:
+                    # Guarantee high energy presence in the critical 3-second hook window
+                    vol_multiplier = max(vol_multiplier * 1.35, 0.75)
                 
                 # ── PHASE 7: CTA ZONE ───────────────────────────────────────────
                 # Last 5 seconds: Drop BGM significantly for CTA authority
@@ -10325,11 +10325,13 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     # Background Music Selection (Topic-Aware: unique music per headline)
     from music_fetcher import select_music_for_topic
     
-    headline = script_json.get("original_news_headline", "")
-    bgm_path = select_music_for_topic(headline)
+    headline = script_json.get("original_news_headline", script_json.get("title", ""))
+    category = script_json.get("category", "")
+    topic_type = script_json.get("topic_type", "")
+    bgm_path = select_music_for_topic(headline, category=category, topic_type=topic_type)
     
     if bgm_path and os.path.exists(bgm_path):
-        print(f"🎵 Topic-Aware BGM Selection: {os.path.basename(bgm_path)}")
+        print(f"🎵 High-Retention BGM Selected: {os.path.basename(bgm_path)}")
     else:
         bgm_path = os.path.join(MUSIC_DIR, "modern_tech.mp3")
         print(f"⚠️ Using fallback BGM: modern_tech.mp3")

@@ -162,7 +162,10 @@ UPLOAD_TIMES = UPLOAD_SCHEDULE["Mon"]
 MAX_RETRY_ATTEMPTS = 10
 SIMILARITY_THRESHOLD = 75
 CATEGORY_COOLDOWN_DAYS = 3
-BGM_VOLUME = 0.07
+BGM_VOLUME = 0.10  # Optimal phone speaker mix: punchy beat without overpowering voice
+ENABLE_HIGH_RETENTION_BGM = True  # Enforce Tier-1 high attention-catching BGMs for Shorts
+BGM_ROTATION_COOLDOWN = 6         # Prevent repeating the same BGM across consecutive pipeline runs
+BGM_MIN_ATTENTION_SCORE = 85      # Minimum retention score (0-100) required for shorts BGM
 TARGET_AUDIO_DURATION = (15, 35) # Shorter Shorts = higher completion rates = more algorithmic push
 
 # Global Feature Flags
