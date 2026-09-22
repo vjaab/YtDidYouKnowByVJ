@@ -333,6 +333,7 @@ def post_to_platforms(state: dict, platform: str = "both"):
     # Determine which platforms to post to based on action and platform arg
     post_ig = (action in ["approve_all", "approve_ig"]) and platform in ["both", "instagram"]
     post_fb = (action in ["approve_all", "approve_fb"]) and platform in ["both", "facebook"]
+    post_threads = (action in ["approve_all", "approve_threads"]) and platform in ["both", "threads"]
     
     if post_ig and ig_images:
         print(f"📸 Posting to Instagram ({'Carousel' if is_carousel else 'Single Image'})...")
@@ -356,6 +357,18 @@ def post_to_platforms(state: dict, platform: str = "both"):
         except Exception as e:
             results["facebook"] = f"ERROR: {e}"
     
+    if post_threads and ig_images:
+        print(f"🧵 Posting to Threads ({'Carousel' if is_carousel else 'Single Image'})...")
+        sys.path.insert(0, str(Path(__file__).parent))
+        from post_to_threads import post_to_threads
+        
+        try:
+            threads_image_arg = ",".join(ig_images) if is_carousel else ig_images[0]
+            post_id = post_to_threads(threads_image_arg, caption)
+            results["threads"] = post_id
+        except Exception as e:
+            results["threads"] = f"ERROR: {e}"
+    
     return results
 
 def main():
@@ -370,7 +383,7 @@ def main():
     parser.add_argument("--hashtags", help="Hashtags string")
     parser.add_argument("--timeout", type=int, default=3600, help="Approval timeout (seconds)")
     parser.add_argument("--carousel", action="store_true", help="Images form a carousel")
-    parser.add_argument("--platform", choices=["both", "instagram", "facebook"], default="both", help="Platform to post to")
+    parser.add_argument("--platform", choices=["both", "instagram", "facebook", "threads"], default="both", help="Platform to post to")
     args = parser.parse_args()
     
     def set_gha_output(key: str, value: str):

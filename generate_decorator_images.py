@@ -255,7 +255,7 @@ def main():
     parser.add_argument("--dry-run", action="store_true", help="Preview without posting to Telegram")
     parser.add_argument("--topic", type=str, help="Specific topic to generate")
     parser.add_argument("--hashtags-file", type=str, help="Path to hashtags file")
-    parser.add_argument("--platform", choices=["both", "instagram", "facebook"], default="both", help="Target platform(s)")
+    parser.add_argument("--platform", choices=["both", "instagram", "facebook", "threads"], default="both", help="Target platform(s)")
     args = parser.parse_args()
 
     if not args.now and not args.dry_run:

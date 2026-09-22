@@ -149,6 +149,9 @@ def track_post_engagement(platform: str, post_id: str, topic: str) -> dict:
         metrics = get_x_metrics(post_id)
     elif platform == "linkedin":
         metrics = get_linkedin_metrics(post_id)
+    elif platform == "threads":
+        # Threads uses the same Graph API structure as Instagram for metrics
+        metrics = get_instagram_metrics(post_id)
     
     # Calculate engagement rate
     impressions = metrics.get("impressions", metrics.get("post_impressions", 1))
@@ -175,7 +178,7 @@ def track_post_engagement(platform: str, post_id: str, topic: str) -> dict:
 def main():
     parser = argparse.ArgumentParser(description="Track engagement metrics")
     parser.add_argument("--topic", required=True, help="Topic name")
-    parser.add_argument("--platform", choices=["instagram", "facebook", "x", "twitter", "linkedin", "all"], default="all")
+    parser.add_argument("--platform", choices=["instagram", "facebook", "x", "twitter", "linkedin", "threads", "all"], default="all")
     parser.add_argument("--post-id", help="Specific post ID to track")
     parser.add_argument("--delay", type=int, default=0, help="Delay before tracking (seconds)")
     args = parser.parse_args()
@@ -188,7 +191,7 @@ def main():
     
     # If post-id provided, track that specific post
     if args.post_id:
-        platforms = [args.platform] if args.platform != "all" else ["instagram", "facebook", "x", "linkedin"]
+        platforms = [args.platform] if args.platform != "all" else ["instagram", "facebook", "x", "linkedin", "threads"]
         for platform in platforms:
             result = track_post_engagement(platform, args.post_id, args.topic)
             metrics_data["posts"].append(result)

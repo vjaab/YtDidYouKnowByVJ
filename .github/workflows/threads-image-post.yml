@@ -1,0 +1,232 @@
+name: Threads Image Post
+
+on:
+  schedule:
+    # Threads peak engagement windows (IST) — offset from IG/FB by 1 hour
+    # to avoid cannibalization and maximize unique reach.
+    # Weekday: lunch + late afternoon + evening
+    - cron: '30 6 * * 1-5'   # 12:00 PM IST Mon-Fri
+    - cron: '30 11 * * 1-5'  # 5:00 PM IST Mon-Fri
+    - cron: '30 15 * * 1-5'  # 9:00 PM IST Mon-Fri
+    # Weekend: late morning + afternoon
+    - cron: '30 5 * * 6,0'   # 11:00 AM IST Sat-Sun
+    - cron: '30 13 * * 6,0'  # 7:00 PM IST Sat-Sun
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'Specific topic to generate (e.g., "OpenAI GPT-5")'
+        required: false
+        type: string
+      auto_post:
+        description: 'Auto-post after Telegram approval'
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  generate-carousel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      topic: ${{ steps.gen.outputs.topic }}
+      ig_images: ${{ steps.gen.outputs.ig_images }}
+      fb_images: ${{ steps.gen.outputs.fb_images }}
+      caption_file: ${{ steps.gen.outputs.caption_file }}
+      hashtags: ${{ steps.hashtags.outputs.hashtags }}
+      poll_file: ${{ steps.gen.outputs.poll_file }}
+      carousel_json: ${{ steps.gen.outputs.carousel_json }}
+      is_carousel: ${{ steps.gen.outputs.is_carousel }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget ffmpeg
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install "numpy<2.0"
+          pip install "grpcio==1.62.2"
+          pip install requests pillow python-dotenv pydantic jinja2 playwright python-telegram-bot aiohttp google-generativeai rapidfuzz
+          
+      - name: Cache Playwright
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('requirements.txt') }}-${{ hashFiles('.github/workflows/threads-image-post.yml') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
+      - name: Install Playwright Browsers
+        run: python -m playwright install --with-deps chromium
+
+      - name: Setup Environment Secrets
+        run: |
+          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env
+          echo "TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}" >> .env
+          echo "THREADS_USER_ID=${{ secrets.THREADS_USER_ID }}" >> .env
+          echo "THREADS_ACCESS_TOKEN=${{ secrets.THREADS_ACCESS_TOKEN }}" >> .env
+          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env
+          echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .env
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
+          if [ ! -z "${{ secrets.OPENROUTER_API_KEY }}" ]; then echo "OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}" >> .env; fi
+          echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> .env
+          echo "CF_API_TOKEN=${{ secrets.CF_API_TOKEN }}" >> .env
+          echo "CF_ACCOUNT_ID=${{ secrets.CF_ACCOUNT_ID }}" >> .env
+
+      - name: Fetch Trending Hashtags
+        id: hashtags
+        run: |
+          python -u fetch_trending_hashtags.py --category "AI & Tech Tools" > hashtags.txt
+          echo "hashtags=$(cat hashtags.txt)" >> $GITHUB_OUTPUT
+
+      - name: Generate AI News Carousel
+        id: gen
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TOPIC: ${{ github.event.inputs.topic || '' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          python -u generate_decorator_images.py --now \
+            --topic "${{ github.event.inputs.topic || '' }}" \
+            --hashtags-file hashtags.txt \
+            --platform threads
+
+      - name: Send to Telegram for Approval
+        if: github.event.inputs.auto_post == 'true'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python -u telegram_approval_handler.py --send-for-approval \
+            --topic "${{ steps.gen.outputs.topic }}" \
+            --ig-images "${{ steps.gen.outputs.ig_images }}" \
+            --fb-images "${{ steps.gen.outputs.fb_images }}" \
+            --caption-file "${{ steps.gen.outputs.caption_file }}" \
+            --poll-file "${{ steps.gen.outputs.poll_file }}" \
+            --carousel
+
+      - name: Upload Generated Images
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-images
+          path: output/social_images/
+          retention-days: 7
+
+  threads-post:
+    needs: generate-carousel
+    if: github.event.inputs.auto_post == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Download Generated Images
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-images
+          path: output/social_images/
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests python-dotenv aiohttp
+
+      - name: Wait for Telegram Approval & Post to Threads
+        id: approval
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          python -u telegram_approval_handler.py --wait-and-post \
+            --topic "${{ needs.generate-carousel.outputs.topic }}" \
+            --ig-images "${{ needs.generate-carousel.outputs.ig_images }}" \
+            --fb-images "${{ needs.generate-carousel.outputs.fb_images }}" \
+            --caption-file "${{ needs.generate-carousel.outputs.caption_file }}" \
+            --hashtags "${{ needs.generate-carousel.outputs.hashtags }}" \
+            --poll-file "${{ needs.generate-carousel.outputs.poll_file }}" \
+            --carousel \
+            --timeout 3600 \
+            --platform threads
+
+      - name: Check Approval Result
+        if: always()
+        run: |
+          ACTION="${{ steps.approval.outputs.approval_action }}"
+          echo "Approval action: $ACTION"
+          if [ "$ACTION" = "reject" ]; then
+            echo "❌ Posting rejected by user"
+            exit 1
+          elif [ "$ACTION" = "timeout" ]; then
+            echo "⏰ Approval timed out"
+            exit 1
+          elif [ "$ACTION" = "regenerate" ]; then
+            echo "🔄 Regeneration requested"
+            exit 2
+          elif [ -z "$ACTION" ]; then
+            echo "⚠️ No approval action recorded"
+            exit 1
+          fi
+
+      - name: Track Engagement (after 1 hour)
+        if: success()
+        run: |
+          python -u track_engagement.py --topic "${{ needs.generate-carousel.outputs.topic }}" --delay 3600 --platform threads
+
+  commit-logs:
+    needs: [generate-carousel, threads-post]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Commit Updated Logs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull origin main --rebase --autostash || true
+          if [ -d "logs" ]; then git add -f logs/*.txt logs/*.json 2>/dev/null || true; fi
+          if [ -d "output/social_images" ]; then git add -f output/social_images/*.json 2>/dev/null || true; fi
+          if [ -f ".threads_rate_limit.json" ]; then git add .threads_rate_limit.json; fi
+          if ! git diff --cached --quiet; then
+            git commit -m "[Bot] Auto-update Threads image post logs & metadata"
+            for i in {1..3}; do git push origin main && exit 0; sleep 10; git pull origin main --rebase || true; done
+          fi
+
+      - name: Upload Logs on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: threads-image-logs
+          path: logs/
+          retention-days: 7
