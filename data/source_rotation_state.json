@@ -389,7 +389,61 @@
       "articles_count": 23,
       "timestamp": "2026-09-23T03:02:26.106280",
       "video_number": 65
+    },
+    {
+      "source": "medium",
+      "articles_count": 5,
+      "timestamp": "2026-09-23T03:28:56.516448",
+      "video_number": 66
+    },
+    {
+      "source": "github",
+      "articles_count": 163,
+      "timestamp": "2026-09-23T03:28:56.518060",
+      "video_number": 67
+    },
+    {
+      "source": "huggingface_hub",
+      "articles_count": 23,
+      "timestamp": "2026-09-23T03:28:56.519309",
+      "video_number": 68
+    },
+    {
+      "source": "medium",
+      "articles_count": 5,
+      "timestamp": "2026-09-23T03:29:46.323649",
+      "video_number": 69
+    },
+    {
+      "source": "github",
+      "articles_count": 163,
+      "timestamp": "2026-09-23T03:29:46.324999",
+      "video_number": 70
+    },
+    {
+      "source": "huggingface_hub",
+      "articles_count": 23,
+      "timestamp": "2026-09-23T03:29:46.326099",
+      "video_number": 71
+    },
+    {
+      "source": "medium",
+      "articles_count": 6,
+      "timestamp": "2026-09-23T03:31:14.892663",
+      "video_number": 72
+    },
+    {
+      "source": "github",
+      "articles_count": 163,
+      "timestamp": "2026-09-23T03:31:14.894161",
+      "video_number": 73
+    },
+    {
+      "source": "huggingface_hub",
+      "articles_count": 23,
+      "timestamp": "2026-09-23T03:31:14.895473",
+      "video_number": 74
     }
   ],
-  "video_count": 65
+  "video_count": 74
 }

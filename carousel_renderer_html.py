@@ -43,9 +43,9 @@ LAYOUT_TEMPLATE_MAP = {
     "side_by_side": "side_by_side.html",
     "whats_new": "whats_new.html",
     
-    # Code & Practical Examples
-    "code_block": "code_block.html",
-    "code_breakdown": "code_block.html",
+    # Conceptual System & Practical Examples (No Code Blocks)
+    "code_block": "input_output.html",
+    "code_breakdown": "process_flow.html",
     "real_world_scenario": "real_world_scenario.html",
     "real_world_example": "real_world_example.html",
     

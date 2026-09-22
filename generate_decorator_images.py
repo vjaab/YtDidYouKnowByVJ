@@ -361,6 +361,7 @@ def main():
             set_gha_output("topic", carousel.get("headline", "AI News"))
             set_gha_output("ig_images", ','.join(str(p) for p in ig_paths))
             set_gha_output("fb_images", ','.join(str(p) for p in fb_paths))
+            set_gha_output("threads_images", ','.join(str(p) for p in ig_paths))
             set_gha_output("caption_file", str(caption_path))
             set_gha_output("poll_file", str(poll_path))
             set_gha_output("hashtags", hashtags)
@@ -375,15 +376,27 @@ def main():
         if args.platform in ["both", "instagram"]:
             send_carousel_to_telegram(ig_paths, caption_text)
         
+        # Send Threads carousel
+        if args.platform in ["both", "threads"]:
+            send_carousel_to_telegram(ig_paths, f"🧵 <b>Threads Version</b>\n\n{caption_text}")
+
         # Send Facebook version
         if args.platform in ["both", "facebook"] and fb_paths:
             fb_caption = f"📘 <b>Facebook Version</b>\n\n{caption_text}"
             send_image_to_telegram(fb_paths[0], fb_caption)
         
+        platform_summary = []
+        if args.platform in ["both", "instagram"]:
+            platform_summary.append(f"Instagram Carousel (4:5): {len(ig_paths)} slides")
+        if args.platform in ["both", "threads"]:
+            platform_summary.append(f"Threads Carousel: {len(ig_paths)} slides")
+        if args.platform in ["both", "facebook"] and fb_paths:
+            platform_summary.append(f"Facebook (1.91:1): {len(fb_paths)} image")
+            
         send_telegram_message(
-            f"✅ Carousel generated for: {carousel.get('headline', 'AI News')}\n"
-            f"Instagram Carousel (4:5): {len(ig_paths)} slides\n"
-            f"{'Facebook (1.91:1): ' + str(len(fb_paths)) + ' image' if fb_paths else ''}\nReply to approve for posting.",
+            f"✅ Content generated for: {carousel.get('headline', 'AI News')}\n"
+            + "\n".join(platform_summary)
+            + "\nReply to approve for posting.",
             emoji="🤖"
         )
 
@@ -391,6 +404,7 @@ def main():
         set_gha_output("topic", carousel.get("headline", "AI News"))
         set_gha_output("ig_images", ','.join(str(p) for p in ig_paths))
         set_gha_output("fb_images", ','.join(str(p) for p in fb_paths))
+        set_gha_output("threads_images", ','.join(str(p) for p in ig_paths))
         set_gha_output("caption_file", str(caption_path))
         set_gha_output("poll_file", str(poll_path))
         set_gha_output("hashtags", hashtags)

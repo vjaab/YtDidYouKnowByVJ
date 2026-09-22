@@ -118,91 +118,176 @@ def record_topic_in_tracker(topic: str, source_url: str = "", keywords: list = N
         print(f"⚠️ Failed to record topic in tracker: {e}")
         return False
 
-def send_approval_request(topic: str, ig_images: list, fb_images: list, caption_file: str, poll_file: str = "", is_carousel: bool = False) -> int:
+def send_approval_request(topic: str, ig_images: list = None, fb_images: list = None, threads_images: list = None, caption_file: str = "", poll_file: str = "", is_carousel: bool = False, platform: str = "both") -> int:
     """Send images to Telegram with approval buttons."""
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         raise ValueError("Telegram not configured")
     
+    ig_images = ig_images or []
+    fb_images = fb_images or []
+    threads_images = threads_images or []
+
     # Read caption
     caption = ""
     if Path(caption_file).exists():
         with open(caption_file) as f:
             caption = f.read()
     
-    # Send Instagram images
     ig_msg_ids = []
-    if is_carousel and len(ig_images) > 1:
-        # Send as media group (album) for carousel
-        media = []
-        files = {}
-        for i, ig_img in enumerate(ig_images):
-            files[f"photo{i}"] = open(ig_img, "rb")
-            media.append({
-                "type": "photo",
-                "media": f"attach://photo{i}",
-                "caption": f"📸 <b>Instagram Carousel (4:5)</b> — Slide {i+1}/{len(ig_images)}\n\n{caption}" if i == 0 else "",
-                "parse_mode": "HTML",
-            })
-        
-        data = {
-            "chat_id": TELEGRAM_CHAT_ID,
-            "media": json.dumps(media),
-        }
-        
-        resp = requests.post(f"{TELEGRAM_BASE_URL}/sendMediaGroup", data=data, files=files, timeout=60)
-        for f in files.values():
-            f.close()
-        resp.raise_for_status()
-        ig_msg_ids = [msg["message_id"] for msg in resp.json()["result"]]
-    else:
-        # Send individual images
-        for ig_img in ig_images:
-            with open(ig_img, "rb") as f:
+    fb_msg_ids = []
+    threads_msg_ids = []
+
+    # Send Instagram images if platform is instagram or both
+    if platform in ["both", "instagram"] and ig_images:
+        if is_carousel and len(ig_images) > 1:
+            media = []
+            files = {}
+            for i, ig_img in enumerate(ig_images):
+                files[f"photo{i}"] = open(ig_img, "rb")
+                media.append({
+                    "type": "photo",
+                    "media": f"attach://photo{i}",
+                    "caption": f"📸 <b>Instagram Carousel (4:5)</b> — Slide {i+1}/{len(ig_images)}\n\n{caption}" if i == 0 else "",
+                    "parse_mode": "HTML",
+                })
+            
+            data = {
+                "chat_id": TELEGRAM_CHAT_ID,
+                "media": json.dumps(media),
+            }
+            
+            resp = requests.post(f"{TELEGRAM_BASE_URL}/sendMediaGroup", data=data, files=files, timeout=60)
+            for f in files.values():
+                f.close()
+            resp.raise_for_status()
+            ig_msg_ids = [msg["message_id"] for msg in resp.json()["result"]]
+        else:
+            for ig_img in ig_images:
+                with open(ig_img, "rb") as f:
+                    files = {"photo": f}
+                    data = {
+                        "chat_id": TELEGRAM_CHAT_ID,
+                        "caption": f"📸 <b>Instagram (4:5)</b>\n\n{caption}",
+                        "parse_mode": "HTML",
+                    }
+                    resp = requests.post(f"{TELEGRAM_BASE_URL}/sendPhoto", data=data, files=files, timeout=30)
+                    resp.raise_for_status()
+                    ig_msg_ids.append(resp.json()["result"]["message_id"])
+
+    # Send Facebook image if platform is facebook or both
+    if platform in ["both", "facebook"] and fb_images:
+        for fb_img in fb_images:
+            with open(fb_img, "rb") as f:
                 files = {"photo": f}
                 data = {
                     "chat_id": TELEGRAM_CHAT_ID,
-                    "caption": f"📸 <b>Instagram (4:5)</b>\n\n{caption}",
+                    "caption": f"📘 <b>Facebook (9:16)</b>\n\n{caption}",
                     "parse_mode": "HTML",
                 }
                 resp = requests.post(f"{TELEGRAM_BASE_URL}/sendPhoto", data=data, files=files, timeout=30)
                 resp.raise_for_status()
-                ig_msg_ids.append(resp.json()["result"]["message_id"])
-    
-    # Send Facebook image
-    fb_msg_ids = []
-    for fb_img in fb_images:
-        with open(fb_img, "rb") as f:
-            files = {"photo": f}
+                fb_msg_ids.append(resp.json()["result"]["message_id"])
+
+    # Send Threads images if platform is threads or both
+    if platform in ["both", "threads"] and threads_images:
+        if is_carousel and len(threads_images) > 1:
+            media = []
+            files = {}
+            for i, th_img in enumerate(threads_images):
+                files[f"photo{i}"] = open(th_img, "rb")
+                media.append({
+                    "type": "photo",
+                    "media": f"attach://photo{i}",
+                    "caption": f"🧵 <b>Threads Carousel</b> — Slide {i+1}/{len(threads_images)}\n\n{caption}" if i == 0 else "",
+                    "parse_mode": "HTML",
+                })
+            
             data = {
                 "chat_id": TELEGRAM_CHAT_ID,
-                "caption": f"📘 <b>Facebook (9:16)</b>\n\n{caption}",
-                "parse_mode": "HTML",
+                "media": json.dumps(media),
             }
-            resp = requests.post(f"{TELEGRAM_BASE_URL}/sendPhoto", data=data, files=files, timeout=30)
+            
+            resp = requests.post(f"{TELEGRAM_BASE_URL}/sendMediaGroup", data=data, files=files, timeout=60)
+            for f in files.values():
+                f.close()
             resp.raise_for_status()
-            fb_msg_ids.append(resp.json()["result"]["message_id"])
-    
-    # Send approval message with inline keyboard
+            threads_msg_ids = [msg["message_id"] for msg in resp.json()["result"]]
+        else:
+            for th_img in threads_images:
+                with open(th_img, "rb") as f:
+                    files = {"photo": f}
+                    data = {
+                        "chat_id": TELEGRAM_CHAT_ID,
+                        "caption": f"🧵 <b>Threads</b>\n\n{caption}",
+                        "parse_mode": "HTML",
+                    }
+                    resp = requests.post(f"{TELEGRAM_BASE_URL}/sendPhoto", data=data, files=files, timeout=30)
+                    resp.raise_for_status()
+                    threads_msg_ids.append(resp.json()["result"]["message_id"])
+
+    # Send approval message with platform-exclusive inline keyboard
     carousel_text = "Carousel" if is_carousel else "Image"
-    keyboard = {
-        "inline_keyboard": [
-            [
-                {"text": f"✅ Approve & Post {carousel_text} (IG+FB)", "callback_data": f"approve_all:{topic}"},
-                {"text": f"✅ Approve Instagram Only", "callback_data": f"approve_ig:{topic}"},
-            ],
-            [
-                {"text": f"✅ Approve Facebook Only", "callback_data": f"approve_fb:{topic}"},
-            ],
-            [
-                {"text": "❌ Reject", "callback_data": f"reject:{topic}"},
-                {"text": "🔄 Regenerate", "callback_data": f"regenerate:{topic}"},
-            ],
-        ]
-    }
-    
+    if platform == "threads":
+        keyboard = {
+            "inline_keyboard": [
+                [
+                    {"text": f"✅ Approve & Post {carousel_text} to Threads", "callback_data": f"approve_threads:{topic}"},
+                ],
+                [
+                    {"text": "❌ Reject", "callback_data": f"reject:{topic}"},
+                    {"text": "🔄 Regenerate", "callback_data": f"regenerate:{topic}"},
+                ],
+            ]
+        }
+        text = f"🤖 <b>Approval Required (Threads)</b>\n\nTopic: <b>{topic}</b>\nType: {carousel_text} ({len(threads_images)} slides)\n\nReview the images above and choose an action:"
+    elif platform == "facebook":
+        keyboard = {
+            "inline_keyboard": [
+                [
+                    {"text": f"✅ Approve & Post to Facebook", "callback_data": f"approve_fb:{topic}"},
+                ],
+                [
+                    {"text": "❌ Reject", "callback_data": f"reject:{topic}"},
+                    {"text": "🔄 Regenerate", "callback_data": f"regenerate:{topic}"},
+                ],
+            ]
+        }
+        text = f"🤖 <b>Approval Required (Facebook)</b>\n\nTopic: <b>{topic}</b>\nType: {carousel_text} ({len(fb_images)} images)\n\nReview the image above and choose an action:"
+    elif platform == "instagram":
+        keyboard = {
+            "inline_keyboard": [
+                [
+                    {"text": f"✅ Approve & Post {carousel_text} to Instagram", "callback_data": f"approve_ig:{topic}"},
+                ],
+                [
+                    {"text": "❌ Reject", "callback_data": f"reject:{topic}"},
+                    {"text": "🔄 Regenerate", "callback_data": f"regenerate:{topic}"},
+                ],
+            ]
+        }
+        text = f"🤖 <b>Approval Required (Instagram)</b>\n\nTopic: <b>{topic}</b>\nType: {carousel_text} ({len(ig_images)} IG slides)\n\nReview the images above and choose an action:"
+    else:
+        keyboard = {
+            "inline_keyboard": [
+                [
+                    {"text": f"✅ Approve & Post {carousel_text} (All)", "callback_data": f"approve_all:{topic}"},
+                    {"text": f"✅ Approve Instagram Only", "callback_data": f"approve_ig:{topic}"},
+                ],
+                [
+                    {"text": f"✅ Approve Facebook Only", "callback_data": f"approve_fb:{topic}"},
+                    {"text": f"✅ Approve Threads Only", "callback_data": f"approve_threads:{topic}"},
+                ],
+                [
+                    {"text": "❌ Reject", "callback_data": f"reject:{topic}"},
+                    {"text": "🔄 Regenerate", "callback_data": f"regenerate:{topic}"},
+                ],
+            ]
+        }
+        text = f"🤖 <b>Approval Required</b>\n\nTopic: <b>{topic}</b>\nType: {carousel_text}\n\nReview the images above and choose an action:"
+
     data = {
         "chat_id": TELEGRAM_CHAT_ID,
-        "text": f"🤖 <b>Approval Required</b>\n\nTopic: <b>{topic}</b>\nType: {carousel_text} ({len(ig_images)} IG slides)\n\nReview the images above and choose an action:",
+        "text": text,
         "parse_mode": "HTML",
         "reply_markup": json.dumps(keyboard),
     }
@@ -214,13 +299,16 @@ def send_approval_request(topic: str, ig_images: list, fb_images: list, caption_
     # Save state
     state = {
         "topic": topic,
+        "platform": platform,
         "ig_images": ig_images,
         "fb_images": fb_images,
+        "threads_images": threads_images,
         "caption_file": caption_file,
         "poll_file": poll_file,
         "approval_msg_id": approval_msg_id,
         "ig_msg_ids": ig_msg_ids,
         "fb_msg_ids": fb_msg_ids,
+        "threads_msg_ids": threads_msg_ids,
         "is_carousel": is_carousel,
         "status": "pending",
         "created_at": datetime.utcnow().isoformat(),
@@ -284,9 +372,10 @@ def wait_for_approval(timeout: int = 3600) -> dict:
                     
                     # Edit approval message
                     action_text = {
-                        "approve_all": "✅ Approved - Posting to Instagram & Facebook",
+                        "approve_all": "✅ Approved - Posting to all approved platforms",
                         "approve_ig": "✅ Approved - Posting to Instagram only",
                         "approve_fb": "✅ Approved - Posting to Facebook only",
+                        "approve_threads": "✅ Approved - Posting to Threads only",
                         "reject": "❌ Rejected - Not posting",
                         "regenerate": "🔄 Regenerating...",
                     }.get(action, f"Action: {action}")
@@ -319,6 +408,7 @@ def post_to_platforms(state: dict, platform: str = "both"):
     topic = state.get("topic", "")
     ig_images = state.get("ig_images", [])
     fb_images = state.get("fb_images", [])
+    threads_images = state.get("threads_images", []) or state.get("ig_images", [])
     caption_file = state.get("caption_file", "")
     is_carousel = state.get("is_carousel", False)
     
@@ -357,13 +447,13 @@ def post_to_platforms(state: dict, platform: str = "both"):
         except Exception as e:
             results["facebook"] = f"ERROR: {e}"
     
-    if post_threads and ig_images:
+    if post_threads and threads_images:
         print(f"🧵 Posting to Threads ({'Carousel' if is_carousel else 'Single Image'})...")
         sys.path.insert(0, str(Path(__file__).parent))
         from post_to_threads import post_to_threads
         
         try:
-            threads_image_arg = ",".join(ig_images) if is_carousel else ig_images[0]
+            threads_image_arg = ",".join(threads_images) if is_carousel else threads_images[0]
             post_id = post_to_threads(threads_image_arg, caption)
             results["threads"] = post_id
         except Exception as e:
@@ -378,6 +468,7 @@ def main():
     parser.add_argument("--topic", required=True, help="Topic name")
     parser.add_argument("--ig-images", nargs="+", help="Instagram image paths")
     parser.add_argument("--fb-images", nargs="+", help="Facebook image paths")
+    parser.add_argument("--threads-images", nargs="+", help="Threads image paths")
     parser.add_argument("--caption-file", help="Caption file path")
     parser.add_argument("--poll-file", help="Poll file path")
     parser.add_argument("--hashtags", help="Hashtags string")
@@ -396,17 +487,25 @@ def main():
         # Parse image lists
         ig_images = args.ig_images or []
         fb_images = args.fb_images or []
+        threads_images = args.threads_images or []
         
         # If comma-separated strings
         if len(ig_images) == 1 and "," in ig_images[0]:
             ig_images = ig_images[0].split(",")
         if len(fb_images) == 1 and "," in fb_images[0]:
             fb_images = fb_images[0].split(",")
+        if len(threads_images) == 1 and "," in threads_images[0]:
+            threads_images = threads_images[0].split(",")
         
         send_approval_request(
-            args.topic, ig_images, fb_images, 
-            args.caption_file, args.poll_file or "",
-            is_carousel=args.carousel
+            topic=args.topic,
+            ig_images=ig_images,
+            fb_images=fb_images,
+            threads_images=threads_images,
+            caption_file=args.caption_file,
+            poll_file=args.poll_file or "",
+            is_carousel=args.carousel,
+            platform=args.platform
         )
         print("✅ Approval request sent to Telegram")
         
@@ -436,6 +535,14 @@ def main():
             sys.exit(2)  # Special exit code for regeneration
         
         print(f"✅ Approved with action: {action}")
+        if args.threads_images and not state.get("threads_images"):
+            state["threads_images"] = args.threads_images[0].split(",") if len(args.threads_images) == 1 and "," in args.threads_images[0] else args.threads_images
+        if args.fb_images and not state.get("fb_images"):
+            state["fb_images"] = args.fb_images[0].split(",") if len(args.fb_images) == 1 and "," in args.fb_images[0] else args.fb_images
+        if args.ig_images and not state.get("ig_images"):
+            state["ig_images"] = args.ig_images[0].split(",") if len(args.ig_images) == 1 and "," in args.ig_images[0] else args.ig_images
+        if args.caption_file and not state.get("caption_file"):
+            state["caption_file"] = args.caption_file
         results = post_to_platforms(state, args.platform)
         
         # Report results

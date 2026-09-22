@@ -346,7 +346,7 @@ CONTENT_ARCHETYPES = {
             {"role": "practical_action", "layout": "checklist", "eyebrow": "INTEGRATION CHECKLIST", "focus": "Evaluation, prompt adaptation, fine-tuning, latency optimization"},
             {"role": "takeaway", "layout": "takeaway", "eyebrow": "KEY TAKEAWAY", "focus": "API availability, rollout status, core conclusion"}
         ],
-        "conditional_rules": "REQUIRE benchmark metrics or before_after comparison. Do NOT include arbitrary code unless official SDK syntax is known."
+        "conditional_rules": "REQUIRE benchmark metrics or before_after comparison. Focus on deep technical evaluation, architecture upgrades, and real-world system impact. Do NOT include code snippets."
     },
     "developer_tool": {
         "name": "Developer Tool & IDE Innovation",
@@ -358,11 +358,11 @@ CONTENT_ARCHETYPES = {
             {"role": "tool_overview", "layout": "whats_new", "eyebrow": "WHAT IT DOES", "focus": "Tool capabilities, platform integration, developer setup"},
             {"role": "core_mechanism", "layout": "process_flow", "eyebrow": "EXECUTION FLOW", "focus": "How the tool processes codebase/AST, runs agents, or manages state"},
             {"role": "architecture", "layout": "architecture_diagram", "eyebrow": "ARCHITECTURE", "focus": "Editor -> Local Agent -> Code Index -> Compiler/LLM"},
-            {"role": "code_or_workflow", "layout": "code_block", "eyebrow": "CODE EXAMPLE", "focus": "Runnable snippet, CLI command, or configuration file"},
+            {"role": "system_workflow", "layout": "input_output", "eyebrow": "EXECUTION MECHANICS", "focus": "Developer Input/Query -> AST Index & State Machine -> Structured Diff/Artifact"},
             {"role": "limitations_and_gotchas", "layout": "common_mistake", "eyebrow": "PRO TIPS & MISTAKES", "focus": "Common developer antipatterns vs recommended usage"},
             {"role": "takeaway", "layout": "takeaway", "eyebrow": "GET STARTED", "focus": "Installation command, configuration, productivity summary"}
         ],
-        "conditional_rules": "REQUIRE code snippet or CLI configuration. Focus on developer ergonomics and practical workflows."
+        "conditional_rules": "REQUIRE system workflow or input-output mechanics. Focus on developer ergonomics, practical workflows, and real-world engineering architecture. Do NOT include code snippets."
     },
     "research_paper": {
         "name": "Research Breakthrough & Methodology",
@@ -379,7 +379,7 @@ CONTENT_ARCHETYPES = {
             {"role": "why_it_matters", "layout": "real_world_scenario", "eyebrow": "INDUSTRY IMPACT", "focus": "Longer term impact on AI systems and future models"},
             {"role": "takeaway", "layout": "takeaway", "eyebrow": "PAPER SUMMARY", "focus": "Paper reference, key takeaway, open questions"}
         ],
-        "conditional_rules": "REQUIRE research methodology and evaluation data. Focus on conceptual rigor and architectural innovation."
+        "conditional_rules": "REQUIRE research methodology and evaluation data. Focus on conceptual rigor, mathematical intuition, and architectural innovation. Do NOT include code snippets."
     },
     "security_incident": {
         "name": "Security Vulnerability & Threat Analysis",
@@ -392,11 +392,11 @@ CONTENT_ARCHETYPES = {
             {"role": "attack_chain", "layout": "process_flow", "eyebrow": "ATTACK CHAIN", "focus": "Step 1 to Step 3 of exploit propagation"},
             {"role": "vulnerable_architecture", "layout": "architecture_diagram", "eyebrow": "VULNERABLE TOPOLOGY", "focus": "Where the exploit enters the system boundaries"},
             {"role": "root_cause_analysis", "layout": "common_mistake", "eyebrow": "VULNERABLE VS SECURE", "focus": "Flawed implementation vs secure implementation"},
-            {"role": "patch_or_exploit", "layout": "code_block", "eyebrow": "PATCH CODE", "focus": "Remediation code snippet or security rule"},
+            {"role": "defense_architecture", "layout": "side_by_side", "eyebrow": "SECURITY HARDENING", "focus": "Vulnerable perimeter vs zero-trust defense-in-depth architecture"},
             {"role": "security_checklist", "layout": "checklist", "eyebrow": "DEFENSE CHECKLIST", "focus": "Audit commands, dependency locks, secret rotation steps"},
             {"role": "takeaway", "layout": "takeaway", "eyebrow": "REMEDIATION ACTION", "focus": "Patch version to upgrade to immediately, final guidance"}
         ],
-        "conditional_rules": "REQUIRE attack flow or vulnerable topology, plus security checklist. Focus on defense-in-depth."
+        "conditional_rules": "REQUIRE attack flow or vulnerable topology, plus security hardening checklist. Focus on defense-in-depth. Do NOT include code snippets."
     },
     "programming_concept": {
         "name": "Programming Concept & Architecture Pattern",
@@ -407,12 +407,12 @@ CONTENT_ARCHETYPES = {
             {"role": "problem_hook", "layout": "hero_hook", "eyebrow": "ARCHITECTURE PATTERN", "focus": "Real engineering challenge, performance bottleneck, or race condition"},
             {"role": "concept_mental_model", "layout": "process_flow", "eyebrow": "MENTAL MODEL", "focus": "Intuitive explanation of how this mechanism operates"},
             {"role": "execution_mechanics", "layout": "input_output", "eyebrow": "HOW IT WORKS", "focus": "Input -> State Transformation -> Output execution path"},
-            {"role": "code_implementation", "layout": "code_block", "eyebrow": "IMPLEMENTATION", "focus": "Clean, syntactically correct code snippet illustrating the pattern"},
+            {"role": "architectural_deep_dive", "layout": "side_by_side", "eyebrow": "PATTERN TRADE-OFFS", "focus": "Latency, throughput, concurrency limits, and architectural trade-offs"},
             {"role": "common_antipattern", "layout": "common_mistake", "eyebrow": "AVOID THIS MISTAKE", "focus": "Naive antipattern (❌) vs robust production solution (✅)"},
             {"role": "production_case_study", "layout": "real_world_scenario", "eyebrow": "SCALE IN PRODUCTION", "focus": "How high-throughput systems utilize this pattern"},
             {"role": "takeaway", "layout": "takeaway", "eyebrow": "ENGINEERING CHEAT SHEET", "focus": "When to apply, trade-offs, follow CTA"}
         ],
-        "conditional_rules": "REQUIRE syntactically valid code and common mistake comparison."
+        "conditional_rules": "REQUIRE architectural trade-offs, mental model, and common antipattern comparison. Focus on system design and software engineering principles. Do NOT include code snippets."
     },
     "framework_update": {
         "name": "Framework & Agent SDK Release",
@@ -423,12 +423,12 @@ CONTENT_ARCHETYPES = {
             {"role": "hook", "layout": "hero_hook", "eyebrow": "{ENTITY} UPDATE", "focus": "Framework version announcement and headline capabilities"},
             {"role": "whats_new", "layout": "whats_new", "eyebrow": "WHAT'S NEW", "focus": "New API methods, state management primitives, breaking changes"},
             {"role": "execution_graph", "layout": "architecture_diagram", "eyebrow": "GRAPH ARCHITECTURE", "focus": "State machine or agent loop execution structure"},
-            {"role": "code_snippet", "layout": "code_block", "eyebrow": "NEW SYNTAX", "focus": "Working code snippet showcasing the new API in action"},
+            {"role": "capability_breakdown", "layout": "side_by_side", "eyebrow": "CAPABILITY UPGRADE", "focus": "Prior framework bottlenecks vs new high-throughput primitives"},
             {"role": "migration_comparison", "layout": "before_after", "eyebrow": "MIGRATION GUIDE", "focus": "Old verbose syntax vs new streamlined API"},
             {"role": "upgrade_checklist", "layout": "checklist", "eyebrow": "UPGRADE STEPS", "focus": "Installation, config updates, deployment checklist"},
             {"role": "takeaway", "layout": "takeaway", "eyebrow": "KEY TAKEAWAY", "focus": "Upgrade commands, documentation links, ecosystem value"}
         ],
-        "conditional_rules": "REQUIRE runnable SDK code snippet and API migration comparison."
+        "conditional_rules": "REQUIRE API capability breakdown and migration trade-offs. Focus on developer ecosystem and production reliability. Do NOT include code snippets."
     },
     "cloud_service": {
         "name": "Cloud Infrastructure & Distributed Systems",
@@ -444,7 +444,7 @@ CONTENT_ARCHETYPES = {
             {"role": "deployment_checklist", "layout": "checklist", "eyebrow": "DEPLOYMENT CHECKLIST", "focus": "IAM permissions, Terraform configuration, network peering"},
             {"role": "takeaway", "layout": "takeaway", "eyebrow": "ACTION ITEM", "focus": "Availability, pricing tier, architecture recommendations"}
         ],
-        "conditional_rules": "REQUIRE architecture topology and deployment checklist."
+        "conditional_rules": "REQUIRE architecture topology and deployment checklist. Focus on cloud scale, reliability, and cost-efficiency. Do NOT include code snippets."
     },
     "industry_trend": {
         "name": "AI Industry Strategy & Market Shift",
@@ -459,7 +459,7 @@ CONTENT_ARCHETYPES = {
             {"role": "developer_implications", "layout": "real_world_scenario", "eyebrow": "WHAT IT MEANS FOR DEVS", "focus": "Implications for engineering teams and tech startup strategy"},
             {"role": "takeaway", "layout": "takeaway", "eyebrow": "THE BIG PICTURE", "focus": "Where the market is heading and key strategic takeaway"}
         ],
-        "conditional_rules": "REQUIRE market context and ecosystem comparison. Do NOT force code."
+        "conditional_rules": "REQUIRE market context and ecosystem comparison. Focus on technical innovation driving the shift. Do NOT include code snippets."
     }
 }
 
@@ -808,7 +808,7 @@ ARCHETYPE-SPECIFIC RULES:
 ANTI-HALLUCINATION & RIGOR MANDATE:
 1. NEVER invent technical specifications, benchmarks, API behavior, pricing, architecture details, performance numbers, release dates, or company claims.
 2. If the source does not provide a specific benchmark or metric, explain the technical concept conceptually or mark it as "Not specified in source" rather than presenting a fabricated number.
-3. Code snippets MUST be syntactically valid and use real, canonical APIs from the relevant ecosystem. If syntax is uncertain, provide a clean architecture diagram or process flow instead.
+3. NO CODE SNIPPETS MANDATE: Do NOT include code snippets, raw code blocks, or syntax lines in ANY slide. Software professionals and students consume high-signal conceptual architecture, system mechanics, mental models, trade-offs, performance metrics, and production anti-patterns on mobile carousels. Code snippets are hard to read and low-engagement on social media. Focus on diagrams, workflows, and conceptual engineering depth.
 
 NO-REPETITION MANDATE:
 Every single slide must advance the story and add genuinely new knowledge.
@@ -854,7 +854,7 @@ CRITICAL SCHEMA RULES:
 3. For 'architecture_diagram' layouts, include a 'diagram' object with 'nodes' (array of {{'name', 'sub'}}) and 'connections' (array of {{'label'}}).
 4. For 'process_flow' layouts, include a 'steps' array of {{'step': '1', 'title': '...', 'desc': '...'}}.
 5. For 'before_after' or 'whats_new' layouts, include 'before_title', 'before_items', 'after_title', 'after_items'.
-6. For 'code_block' layouts, include 'code' (raw code string), 'language' ('python', 'typescript', 'bash'), and 'code_explanation'.
+6. For 'side_by_side' layouts, include 'left_title', 'left_items', 'right_title', 'right_items'. For 'input_output' layouts, include 'input', 'processing', 'output'.
 7. For 'metrics_cards' layouts, include 'metrics' array of {{'label': '...', 'value': '...', 'delta': '...'}}.
 8. For 'checklist' layouts, include 'items' array of strings.
 9. For 'takeaway' layouts, include 'takeaways' array of 3 actionable items and 'cta' mentioning @vijayakumarj_ai."""
@@ -882,10 +882,16 @@ def validate_slide_narrative(carousel: Dict, archetype: Dict = None) -> Tuple[bo
         if l in text_heavy:
             consecutive_text += 1
             if consecutive_text >= 3:
-                issues.append("Found 3 consecutive text-heavy slides without diagrams, code, or metrics.")
+                issues.append("Found 3 consecutive text-heavy slides without diagrams or metrics.")
                 break
         else:
             consecutive_text = 0
+
+    # 3. Disallow code_block layouts
+    for s in slides:
+        l = s.get("layout_type") or s.get("type", "")
+        if l in ["code_block", "code_breakdown"]:
+            issues.append(f"Slide {s.get('slide_number', '?')} uses forbidden '{l}' layout. Carousels must use conceptual diagrams.")
 
     # 3. Duplicate titles or identical text
     titles = [s.get("title", "").strip().lower() for s in slides if s.get("title")]
@@ -1461,14 +1467,14 @@ def generate_fallback_carousel(story: Dict, topic_intel: Dict = None) -> Dict:
             },
             {
                 "slide_number": 5,
-                "role": "code_or_workflow",
-                "layout_type": "code_block",
-                "eyebrow": "CONFIGURATION & CODE",
-                "title": "Project Setup Snippet",
-                "body": f"Clean configuration or API snippet for {entity}:",
-                "code": code_text,
-                "language": code_lang,
-                "code_explanation": code_expl
+                "role": "system_workflow",
+                "layout_type": "input_output",
+                "eyebrow": "EXECUTION MECHANICS",
+                "title": "Query to Verified Patch",
+                "body": f"How {entity} transforms developer natural language prompts into production diffs:",
+                "input": "Developer Prompt: 'Refactor auth middleware to async JWT token verification'",
+                "processing": "AST parser resolves dependency tree, identifies impacted routes, and injects validated types",
+                "output": "Syntactically verified, multi-file diff ready for automated test execution"
             },
             {
                 "slide_number": 6,
@@ -1589,24 +1595,23 @@ def generate_fallback_carousel(story: Dict, topic_intel: Dict = None) -> Dict:
             },
             {
                 "slide_number": 6,
-                "role": "patch_or_exploit",
-                "layout_type": "code_block",
-                "eyebrow": "REMEDIATION SNIPPET",
-                "title": "Secure Hardening Pattern",
-                "body": "Enforce strict validation and defensive boundaries in code:",
-                "code": (
-                    "# Secure parameter validation & boundary guard\n"
-                    "from pydantic import BaseModel, Field\n\n"
-                    "class SecurePayload(BaseModel):\n"
-                    "    session_id: str = Field(..., regex=r'^[a-zA-Z0-9_-]{16,64}$')\n"
-                    "    action: str = Field(..., regex=r'^[a-z_]{3,32}$')\n"
-                    "    auth_token: str\n\n"
-                    "def execute_sanitized(payload: SecurePayload):\n"
-                    "    verify_hmac_signature(payload.auth_token)\n"
-                    "    return dispatch_sandboxed_action(payload.action)"
-                ),
-                "language": "python",
-                "code_explanation": "Enforces strict regex filtering and HMAC token verification prior to execution."
+                "role": "defense_architecture",
+                "layout_type": "side_by_side",
+                "eyebrow": "DEFENSE STRATEGY",
+                "title": "Immediate Hardening Protocol",
+                "body": "Production defense-in-depth measures to eliminate the exploit vector across the stack:",
+                "left_title": "Perimeter Defenses 🛡️",
+                "left_items": [
+                    "Deploy edge WAF rules blocking malformed payload injections",
+                    "Enforce zero-trust mTLS with short-lived certificate rotation",
+                    "Strict rate limiting on authentication & token exchange routes"
+                ],
+                "right_title": "Application Hardening 🔒",
+                "right_items": [
+                    "Replace dynamic query strings with parameterized execution",
+                    "Enforce strict schema validation and bounded field constraints",
+                    "Automate SBOM dependency auditing in the CI/CD pipeline"
+                ]
             },
             {
                 "slide_number": 7,
@@ -1796,14 +1801,23 @@ def generate_fallback_carousel(story: Dict, topic_intel: Dict = None) -> Dict:
             },
             {
                 "slide_number": 4,
-                "role": "code_implementation",
-                "layout_type": "code_block",
-                "eyebrow": "IDIOMATIC CODE",
-                "title": "Production Implementation",
-                "body": "Clean, syntactically verified code demonstrating the pattern:",
-                "code": code_text,
-                "language": code_lang,
-                "code_explanation": code_expl
+                "role": "architectural_deep_dive",
+                "layout_type": "side_by_side",
+                "eyebrow": "PATTERN TRADE-OFFS",
+                "title": "When to Apply This Pattern",
+                "body": "Key architectural trade-offs every senior engineer must evaluate:",
+                "left_title": "Primary Advantages ⚡",
+                "left_items": [
+                    "Near-zero lock contention under high concurrent write loads",
+                    "Linear horizontal scalability across distributed node clusters",
+                    "Predictable sub-millisecond p99 latency during traffic bursts"
+                ],
+                "right_title": "Architectural Cost ⚠️",
+                "right_items": [
+                    "Eventual consistency model requires careful idempotency handling",
+                    "Increased memory consumption for event buffering & write-ahead logs",
+                    "Higher system observability and tracing setup complexity"
+                ]
             },
             {
                 "slide_number": 5,
