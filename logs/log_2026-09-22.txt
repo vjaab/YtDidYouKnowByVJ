@@ -1,0 +1,30 @@
+[03:50:08] === STARTING DAILY AI PIPELINE (TOOLS) | COUNTRY: JP ===
+[03:50:08] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[03:50:08] STEP 1: Content Ecosystem Check -> Day: Tue, Slot: Slot A (Discovery), Category: Interview Questions (Run 1/3)
+[03:50:08] STEP 2: Fetching articles (RSS + Trending Engine)...
+[03:50:09] 📈 vidIQ: Injected 8 high-signal topics.
+[03:52:29] 🔥 Trending Engine injected 199 high-signal articles for geo=JP, category=Interview Questions, sources=['medium', 'github', 'huggingface_hub'].
+[03:52:29] ✅ Fetched 726 total articles (199 GitHub, 8 vidIQ, 228 research, 83 tools, 9 X.com, 199 trending).
+[03:52:29] 📚 Loaded 30 recent topics for deduplication
+[03:54:50] 🔍 Deduplication & classification: 726 → 20 candidates
+[03:54:50] 🏷️ Zero-shot re-categorized top candidate: Interview Questions → AI & Tech Tools
+[03:54:50] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[04:15:27] ERROR: Script generation failed.
+[04:15:27] STEP 3 (Attempt 2/10): Gemini Searching & Generating Script...
+[04:37:38] ERROR: Script generation failed.
+[04:37:38] STEP 3 (Attempt 3/10): Gemini Searching & Generating Script...
+[04:59:45] Selected Headline: GitHub Trending: anthropics/knowledge-work-plugins — Open source repository of plugins primarily intended for knowledge workers to use in Claude Cowork
+[04:59:45] Selected URL: https://github.com/anthropics/knowledge-work-plugins
+[04:59:45] Breaking Level: 9
+[04:59:45] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[04:59:51] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20260922_045945.png
+[04:59:51] 🐙 GitHub repo detected — capturing README as evidence screenshot (MANDATORY)...
+[04:59:57] ✅ GitHub README captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_readme_20260922_045951.png
+[04:59:57] ℹ️ GitHub README already captured as evidence — skipping secondary screenshot
+[04:59:57] STEP 3d: Fetching and validating entity tags for Short...
+[04:59:59] ✅ Found 2 valid entity tags for the Short.
+[04:59:59] STEP 4: Generating voiceover + word timestamps...
+[04:59:59] Selected Lip-Sync Template: assets/video/white_hoodie.mp4 (from 41 options)
+[05:12:41] ❌ Kaggle Handover failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 13 min.
+[05:12:41] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
+[05:12:41] ⚠️ Lip-sync will be SKIPPED for this video (requires GPU).
