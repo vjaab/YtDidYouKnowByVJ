@@ -233,7 +233,7 @@ jobs:
               echo "Pull failed for other reasons, proceeding..."
             fi
           fi
-          for f in news_log.json facts_log.json layout_tracker.json series_tracker.json .topic_index.json; do
+          for f in news_log.json facts_log.json layout_tracker.json series_tracker.json bgm_tracker.json .topic_index.json; do
             if [ -f "$f" ]; then git add "$f"; fi
           done
           if [ -d "logs" ]; then
