@@ -120,7 +120,7 @@ from moviepy import (
 )
 import moviepy.video.fx as vfx
 import moviepy.audio.fx as afx
-from config import OUTPUT_DIR, ASSETS_DIR, MUSIC_DIR, BGM_VOLUME, LOGS_DIR, BASE_DIR, GEMINI_API_KEY
+from config import OUTPUT_DIR, ASSETS_DIR, MUSIC_DIR, BGM_VOLUME, LOGS_DIR, BASE_DIR, GEMINI_API_KEY, GEMINI_FLASH_MODEL
 import imageio_ffmpeg
 from pydub import AudioSegment
 AudioSegment.converter = imageio_ffmpeg.get_ffmpeg_exe()
@@ -300,7 +300,7 @@ def extract_text_from_evidence_screenshot(image_path, gemini_api_key=None):
 Include all text: headings, body text, code, buttons, navigation, etc. Group nearby words on the same line into single text entries. Ignore decorative text under 8px height."""
             
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
+                model=GEMINI_FLASH_MODEL,
                 contents=[
                     types.Part.from_bytes(data=img_bytes, mime_type="image/png"),
                     prompt
@@ -3784,7 +3784,7 @@ class InfographicAuditEngine:
                 "}"
             )
             response = client.models.generate_content(
-                model='gemini-2.5-flash',
+                model=GEMINI_FLASH_MODEL,
                 contents=[
                     types.Part.from_bytes(data=img_bytes, mime_type='image/png'),
                     prompt
@@ -8214,7 +8214,7 @@ class VisualAuditEngine:
             contents = image_parts + [text_part]
 
             response = client.models.generate_content(
-                model='gemini-2.5-flash',
+                model=GEMINI_FLASH_MODEL,
                 contents=contents
             )
 

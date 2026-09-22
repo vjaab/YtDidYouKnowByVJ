@@ -24,7 +24,7 @@ from datetime import datetime
 from PIL import Image, ImageOps
 from google import genai
 from google.genai import types
-from config import GEMINI_API_KEY, OUTPUT_DIR, HF_TOKEN, CF_ACCOUNT_ID, CF_API_TOKEN, HAS_CF_FALLBACK
+from config import GEMINI_API_KEY, GEMINI_FLASH_MODEL, OUTPUT_DIR, HF_TOKEN, CF_ACCOUNT_ID, CF_API_TOKEN, HAS_CF_FALLBACK
 
 TODAY = datetime.now().strftime("%Y-%m-%d")
 
@@ -223,7 +223,7 @@ Consider:
 - Would a viewer understand the connection between this image and what's being said?"""
         
         response = review_client.models.generate_content(
-            model="gemini-2.5-flash",
+            model=GEMINI_FLASH_MODEL,
             contents=[
                 types.Part.from_bytes(data=img_bytes, mime_type="image/png"),
                 prompt
@@ -401,7 +401,7 @@ Return ONLY a JSON array of objects, one per sentence, in order:
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model=GEMINI_FLASH_MODEL,
             contents=prompt,
             config=genai.types.GenerateContentConfig(temperature=0.7)
         )

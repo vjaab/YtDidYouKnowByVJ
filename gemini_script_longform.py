@@ -421,11 +421,11 @@ class ChapteredScriptEngine:
 
         model_sequence = []
         if model == GEMINI_PRO_MODEL:
-            model_sequence = [GEMINI_PRO_MODEL, GEMINI_FLASH_MODEL, GEMINI_FLASH_LITE_MODEL]
+            model_sequence = [GEMINI_PRO_MODEL, GEMINI_FLASH_MODEL, GEMINI_FLASH_LITE_MODEL, "gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.5-flash-lite"]
         elif model == GEMINI_FLASH_MODEL:
-            model_sequence = [GEMINI_FLASH_MODEL, GEMINI_FLASH_LITE_MODEL]
+            model_sequence = [GEMINI_FLASH_MODEL, GEMINI_FLASH_LITE_MODEL, "gemini-2.5-flash", "gemini-2.5-flash-lite"]
         else:
-            model_sequence = [GEMINI_FLASH_LITE_MODEL]
+            model_sequence = [GEMINI_FLASH_LITE_MODEL, "gemini-2.5-flash-lite"]
 
         active_sequence = [m for m in model_sequence if not is_model_exhausted("gemini_models", m)]
 
@@ -471,7 +471,7 @@ class ChapteredScriptEngine:
     def _call_gemini_search(self, query):
         """Call Gemini with Google Search grounding."""
         from gemini_script import is_model_exhausted
-        models = [GEMINI_FLASH_MODEL, GEMINI_FLASH_LITE_MODEL]
+        models = [GEMINI_FLASH_MODEL, GEMINI_FLASH_LITE_MODEL, "gemini-2.5-flash", "gemini-2.5-flash-lite"]
         for m in models:
             if is_model_exhausted("gemini_models", m):
                 continue

@@ -218,11 +218,14 @@ def safe_extract_anthropic(response) -> Optional[str]:
 
 
 class ContentGenerator:
-    def __init__(self, api_key: str, model: str = "gemini-2.5-flash"):
+    def __init__(self, api_key: str, model: str = "gemini-3.8-flash"):
         self.api_key = api_key
         self.model = model
         self.gemini_client = genai.Client(api_key=api_key)
         self.gemini_models_to_try = [
+            "gemini-3.8-flash",
+            "gemini-3.5-flash-lite",
+            "gemini-3.1-pro-preview",
             "gemini-2.5-flash",
             "gemini-2.5-pro",
             "gemini-2.5-flash-lite",

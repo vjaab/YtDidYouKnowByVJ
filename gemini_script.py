@@ -2129,12 +2129,15 @@ class MultiAgentGenerationEngine:
         if not api_keys:
             api_keys = [GEMINI_API_KEY]
             
-        # Initialize models to try
+        # Initialize models to try (Gemini 3 family with maintained legacy fallbacks)
         models_to_try = [model]
         if model == GEMINI_PRO_MODEL:
-            models_to_try.extend([GEMINI_FLASH_MODEL, GEMINI_FLASH_LITE_MODEL])
+            models_to_try.extend([GEMINI_FLASH_MODEL, GEMINI_FLASH_LITE_MODEL, "gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.5-flash-lite"])
         elif model == GEMINI_FLASH_MODEL:
-            models_to_try.extend([GEMINI_FLASH_LITE_MODEL])
+            models_to_try.extend([GEMINI_FLASH_LITE_MODEL, "gemini-2.5-flash", "gemini-2.5-flash-lite"])
+        else:
+            models_to_try.extend(["gemini-2.5-flash-lite"])
+        models_to_try = list(dict.fromkeys(models_to_try))
             
         model_idx = 0
         key_idx = 0

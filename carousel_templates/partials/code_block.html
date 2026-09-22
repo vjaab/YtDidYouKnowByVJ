@@ -17,7 +17,7 @@
       </div>
       <span class="code-window__lang">{{ slide_data.language or 'python' }}</span>
     </div>
-    <pre class="code-content"><code>{{ highlighted_code or slide_data.code or "from google import genai\n\nclient = genai.Client()\nresponse = client.models.generate_content(\n    model='gemini-2.5-flash',\n    contents='Benchmark AI latency & throughput'\n)\nprint(response.text)" }}</code></pre>
+    <pre class="code-content"><code>{{ highlighted_code or slide_data.code or "from google import genai\n\nclient = genai.Client()\nresponse = client.models.generate_content(\n    model='gemini-3.8-flash',\n    contents='Benchmark AI latency & throughput'\n)\nprint(response.text)" }}</code></pre>
   </div>
 
   {% if slide_data.code_explanation or slide_data.explanation %}

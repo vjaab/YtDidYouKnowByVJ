@@ -16,7 +16,7 @@ class EducationPipeline:
         self,
         gemini_api_key: str,
         output_dir: str = "output",
-        model: str = "gemini-2.5-flash"
+        model: str = "gemini-3.8-flash"
     ):
         self.generator = ContentGenerator(gemini_api_key, model)
         self.output_dir = Path(output_dir)
@@ -152,7 +152,7 @@ async def main():
     parser.add_argument("--audience", nargs="+", default=["students", "developers"])
     parser.add_argument("--difficulty", choices=["beginner", "intermediate", "advanced"], default="intermediate")
     parser.add_argument("--output-dir", type=str, default="output")
-    parser.add_argument("--model", type=str, default="gemini-2.5-flash")
+    parser.add_argument("--model", type=str, default="gemini-3.8-flash")
     parser.add_argument("--api-key", type=str, help="Gemini API key (or use GEMINI_API_KEY env)")
     parser.add_argument("--dry-run", action="store_true", help="Generate content only, don't render")
     

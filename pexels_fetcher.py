@@ -86,8 +86,8 @@ def score_relevance(chunk_text, visual_desc):
     attempts = 0
     while attempts < 3:
         try:
-            # Use 2.0-flash for high speed and stability
-            target_model = "gemini-2.5-flash" 
+            # Use 3.8-flash for high speed and stability
+            target_model = "gemini-3.8-flash" 
             prompt = f"""Rate relevance 0-10 between technical text and visual description.
 Chunk text: '{chunk_text}'
 Visual description: '{visual_desc}'
@@ -132,7 +132,7 @@ def generate_visual_style_guide(headline, is_longform=False):
     """
     print("🎨 Designing Global Visual Style Guide...")
     try:
-        target_model = "gemini-2.5-flash"
+        target_model = "gemini-3.8-flash"
         orientation = "16:9 landscape cinematic video" if is_longform else "9:16 vertical cinematic video"
         
         prompt = f"""Based on this news headline: '{headline}', define a cohesive visual style for a {orientation}.
@@ -916,7 +916,7 @@ def _extract_visual_subject(headline):
     attempts = 0
     while attempts < 3:
         try:
-            target_model = "gemini-2.5-flash"
+            target_model = "gemini-3.8-flash"
             prompt = f"""From this news headline, extract the PRIMARY visual subject that should appear in a background image.
 Return ONLY the short subject name (1-5 words). Examples:
 - "Elon Musk sues OpenAI" → "OpenAI vs Elon Musk"
@@ -959,7 +959,7 @@ def generate_premium_prompt_via_gemini(chunk_text, topic_context, global_style_g
     Calls Gemini to generate a highly specific, cinematic, visual prompt for Imagen or Veo.
     """
     import re
-    target_model = "gemini-2.5-flash"
+    target_model = "gemini-3.8-flash"
     orientation = "16:9 landscape format" if aspect_ratio == "16:9" else "9:16 vertical format for mobile"
     media_type = "video clip with slow, fluid cinematic motion" if is_video else "photorealistic high-end image"
     
@@ -1000,8 +1000,8 @@ RULES for the generated prompt:
 
 Output the visual prompt:"""
 
-    # Try primary model, then fallback model on 429/rate-limit
-    models_to_try = [target_model, "gemini-2.0-flash-lite"]
+    # Try primary model, then fallback models on 429/rate-limit
+    models_to_try = [target_model, "gemini-3.5-flash-lite", "gemini-2.5-flash", "gemini-2.5-flash-lite"]
     for model_name in models_to_try:
         try:
             response = client.models.generate_content(

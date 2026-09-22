@@ -9,7 +9,7 @@ import re
 import random
 import numpy as np
 from datetime import datetime
-from config import OUTPUT_DIR, BASE_DIR
+from config import OUTPUT_DIR, BASE_DIR, GEMINI_FLASH_MODEL
 import imageio_ffmpeg
 from pydub import AudioSegment
 AudioSegment.converter = imageio_ffmpeg.get_ffmpeg_exe()
@@ -1720,7 +1720,7 @@ class AudioAuditEngine:
             }}"""
 
             response = self.client.models.generate_content(
-                model='gemini-2.5-flash',
+                model=GEMINI_FLASH_MODEL,
                 contents=[
                     types.Part.from_bytes(data=audio_data, mime_type='audio/wav'),
                     prompt

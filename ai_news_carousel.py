@@ -321,11 +321,12 @@ except ImportError:
     CONTENT_VALIDATOR_AVAILABLE = False
 
 AVAILABLE_GEMINI_MODELS = [
+    "gemini-3.8-flash",
+    "gemini-3.5-flash-lite",
+    "gemini-3.1-pro-preview",
     "gemini-2.5-flash",
-    "gemini-3.6-flash",
     "gemini-2.5-pro",
-    "gemini-2.0-flash",
-    "gemini-1.5-flash",
+    "gemini-2.5-flash-lite",
 ]
 
 # ─── Content Archetypes Registry ───────────────────────────────────────────────
@@ -933,7 +934,7 @@ def _get_active_gemini_model(client) -> str:
             return model_name
         except Exception:
             continue
-    return "gemini-2.0-flash"
+    return "gemini-3.8-flash"
 
 
 def generate_carousel_json(story: Dict, min_slides: int = 5, max_slides: int = 8) -> Dict:
@@ -1241,7 +1242,7 @@ def _get_ecosystem_code_snippet(info: Dict[str, Any]) -> Tuple[str, str, str]:
             "from google import genai\n\n"
             "client = genai.Client()\n"
             "response = client.models.generate_content(\n"
-            "    model='gemini-2.0-flash',\n"
+            "    model='gemini-3.8-flash',\n"
             "    contents='Analyze 2M token context repository architecture'\n"
             ")\n"
             "print(response.text)"

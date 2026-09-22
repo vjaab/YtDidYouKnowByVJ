@@ -24,7 +24,7 @@ from datetime import datetime
 from google import genai
 from google.genai import types
 from rembg import remove
-from config import OUTPUT_DIR, ASSETS_DIR, GEMINI_API_KEY
+from config import OUTPUT_DIR, ASSETS_DIR, GEMINI_API_KEY, GEMINI_FLASH_MODEL
 import cv2
 import requests
 from dataclasses import dataclass, asdict
@@ -398,7 +398,7 @@ Use \\n for line breaks (max 2 lines).
 Example: "SECRET\\nREVEALED"
 Return ONLY the text."""
     try:
-        response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+        response = client.models.generate_content(model=GEMINI_FLASH_MODEL, contents=prompt)
         hook = response.text.strip().replace("\\n", "\n")
         hook = _enforce_max_words(hook, MAX_TEXT_WORDS)
         return "\n".join(hook.split("\n")[:2 if not is_shorts else 3])

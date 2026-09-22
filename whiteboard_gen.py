@@ -5,7 +5,7 @@ import requests
 from PIL import Image, ImageDraw, ImageFont, ImageChops
 from datetime import datetime
 from google import genai
-from config import GEMINI_API_KEY
+from config import GEMINI_API_KEY, GEMINI_FLASH_MODEL
 
 TODAY = datetime.now().strftime("%Y-%m-%d")
 
@@ -34,7 +34,7 @@ Guidelines:
 Example: "A hand cursor clicking a large button"
 """
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model=GEMINI_FLASH_MODEL,
             contents=prompt,
         )
         doodle_concept = response.text.strip().strip('"').strip("'")

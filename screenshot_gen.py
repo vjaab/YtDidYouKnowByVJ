@@ -229,8 +229,8 @@ def check_screenshot_validity(image_path):
             print("⚠️ GEMINI_API_KEY not found in config. Skipping screenshot validation.")
             return True
 
-    # Initialize models to try (Priority 5: Remove gemini-1.5-flash as it is decommissioned)
-    models_to_try = [GEMINI_FLASH_MODEL or "gemini-2.5-flash", "gemini-2.5-flash-lite"]
+    # Initialize models to try (Gemini 3 workhorse + active fallbacks)
+    models_to_try = [GEMINI_FLASH_MODEL or "gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-2.5-flash", "gemini-2.5-flash-lite"]
     
     from google import genai
     from PIL import Image

@@ -110,7 +110,7 @@ MODEL_PRIORITIES = {
     "coding_technical": "poolside/laguna-s-2.1:free",
     "fast_fallback": "nvidia/nemotron-3.5-lightning:free",
     "finance_business": "inclusionai/ling-3.0-flash-fin:free",
-    "gemini_search_discovery": "gemini-2.5-flash",
+    "gemini_search_discovery": "gemini-3.8-flash",
 }
 
 # YouTube Analytics API (for performance feedback loop)
@@ -441,9 +441,31 @@ CLOUDFLARE_ALL_MODELS = (
 )
 
 # Model Configurations (to easily switch/override via env variables or custom values)
-GEMINI_PRO_MODEL = os.getenv("GEMINI_PRO_MODEL", "gemini-2.5-pro")
-GEMINI_FLASH_MODEL = os.getenv("GEMINI_FLASH_MODEL", "gemini-2.5-flash")
-GEMINI_FLASH_LITE_MODEL = os.getenv("GEMINI_FLASH_LITE_MODEL", "gemini-2.5-flash-lite")
+# 1. General & High-Performance Workhorses (Gemini 3 Family)
+GEMINI_PRO_MODEL = os.getenv("GEMINI_PRO_MODEL", "gemini-3.1-pro-preview")
+GEMINI_FLASH_MODEL = os.getenv("GEMINI_FLASH_MODEL", "gemini-3.8-flash")
+GEMINI_FLASH_LITE_MODEL = os.getenv("GEMINI_FLASH_LITE_MODEL", "gemini-3.5-flash-lite")
+
+# 2. Audio & Live Real-Time Models
+GEMINI_LIVE_MODEL = os.getenv("GEMINI_LIVE_MODEL", "gemini-3.8-live")
+GEMINI_LIVE_EXTENDED_THINKING_MODEL = os.getenv("GEMINI_LIVE_EXTENDED_THINKING_MODEL", "gemini-3.8-live-extended-thinking")
+GEMINI_TRANSCRIBE_MODEL = os.getenv("GEMINI_TRANSCRIBE_MODEL", "gemini-3.5-transcribe")
+GEMINI_TTS_MODEL = os.getenv("GEMINI_TTS_MODEL", "gemini-3.1-flash-tts-preview")
+
+# 3. Stable Legacy Models (Maintained Support)
+GEMINI_LEGACY_PRO_MODEL = "gemini-2.5-pro"
+GEMINI_LEGACY_FLASH_MODEL = "gemini-2.5-flash"
+GEMINI_LEGACY_FLASH_LITE_MODEL = "gemini-2.5-flash-lite"
+
+# Full Active Gemini Candidates (Priority Order, Deprecated 2.0 and 1.5 excluded)
+GEMINI_ACTIVE_MODELS = [
+    "gemini-3.8-flash",
+    "gemini-3.5-flash-lite",
+    "gemini-3.1-pro-preview",
+    "gemini-2.5-flash",
+    "gemini-2.5-pro",
+    "gemini-2.5-flash-lite",
+]
 
 # API Call Spacing Delay to prevent rate-limiting on Free Tier keys
 GEMINI_RPM_SLEEP = float(os.getenv("GEMINI_RPM_SLEEP", "2.0"))
