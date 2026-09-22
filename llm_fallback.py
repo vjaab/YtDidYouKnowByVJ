@@ -153,12 +153,24 @@ def normalize_llm_response(data: Dict[str, Any], required_fields: Optional[List[
 
 
 def clean_and_parse_json(content: str) -> Dict[str, Any]:
-    """Extract and parse JSON from LLM response (handles markdown code blocks)."""
+    """Extract and parse JSON from LLM response (handles markdown code blocks and conversational wrappers)."""
     raw = content.strip()
     if "```json" in raw:
         raw = raw[raw.find("```json")+7:raw.rfind("```")]
     elif "```" in raw:
         raw = raw[raw.find("```")+3:raw.rfind("```")]
+    raw = raw.strip()
+    if not (raw.startswith("{") or raw.startswith("[")):
+        start_brace = raw.find("{")
+        start_bracket = raw.find("[")
+        if start_brace != -1 and (start_bracket == -1 or start_brace < start_bracket):
+            end_brace = raw.rfind("}")
+            if end_brace != -1:
+                raw = raw[start_brace:end_brace+1]
+        elif start_bracket != -1:
+            end_bracket = raw.rfind("]")
+            if end_bracket != -1:
+                raw = raw[start_bracket:end_bracket+1]
     return json.loads(raw.strip())
 
 
@@ -219,11 +231,9 @@ def call_groq(user_prompt: str) -> Optional[Dict[str, Any]]:
         return None
     
     groq_models = [
-        "llama-3.3-70b-versatile",
-        "llama-3.1-70b-versatile",
-        "llama-3.1-8b-instant",
-        "mixtral-8x7b-32768",
-        "gemma2-9b-it",
+        "openai/gpt-oss-120b",
+        "openai/gpt-oss-20b",
+        "qwen/qwen3.8-27b",
     ]
     
     headers = {
@@ -248,7 +258,7 @@ def call_groq(user_prompt: str) -> Optional[Dict[str, Any]]:
                 if content:
                     return clean_and_parse_json(content)
             elif result:
-                print(f"⚠️ Groq ({model_name}) failed: {result.status_code}")
+                print(f"⚠️ Groq ({model_name}) returned HTTP {result.status_code}: {result.text[:150]}")
         except Exception as e:
             print(f"⚠️ Groq ({model_name}) exception: {e}")
     return None
@@ -261,14 +271,11 @@ def call_cloudflare(user_prompt: str) -> Optional[Dict[str, Any]]:
         return None
     
     cf_models = [
-        "@cf/meta/llama-3.3-70b-instruct",
         "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-        "@cf/zai-org/glm-4.7-flash",
-        "@cf/openai/gpt-oss-120b",
-        "@cf/nvidia/nemotron-3-120b-a12b",
-        "@cf/meta/llama-4-scout-17b-16e-instruct",
-        "@cf/qwen/qwq-32b",
+        "@cf/meta/llama-3.1-8b-instruct",
         "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+        "@cf/qwen/qwen2.5-72b-instruct",
+        "@cf/mistral/mistral-7b-instruct-v0.2",
     ]
     
     headers = {
@@ -281,8 +288,10 @@ def call_cloudflare(user_prompt: str) -> Optional[Dict[str, Any]]:
         print(f"🔮 Falling back to Cloudflare ({model_name})...")
         try:
             payload = {
-                "messages": [{"role": "user", "content": user_prompt}],
-                "response_format": {"type": "json_object"},
+                "messages": [
+                    {"role": "system", "content": "You are a helpful assistant. Always output valid JSON."},
+                    {"role": "user", "content": user_prompt}
+                ],
                 "temperature": 0.3,
                 "max_tokens": 4096
             }
@@ -307,6 +316,8 @@ def call_cloudflare(user_prompt: str) -> Optional[Dict[str, Any]]:
                         content = str(response_val).strip()
                 if content:
                     return clean_and_parse_json(content)
+            else:
+                print(f"⚠️ Cloudflare ({model_name}) returned HTTP {r.status_code}: {r.text[:150]}")
         except Exception as e:
             print(f"⚠️ Cloudflare ({model_name}) exception: {e}")
     return None
@@ -517,6 +528,8 @@ def call_deepseek(user_prompt: str) -> Optional[Dict[str, Any]]:
             content = safe_extract_choices(r.json(), "DeepSeek")
             if content:
                 return clean_and_parse_json(content)
+        else:
+            print(f"⚠️ DeepSeek returned HTTP {r.status_code}: {r.text[:150]}")
     except Exception as e:
         print(f"⚠️ DeepSeek exception: {e}")
     return None
@@ -535,6 +548,14 @@ OPENROUTER_PRIORITY_MODELS = {
     "finance_business": "inclusionai/ling-3.0-flash-fin:free",
 }
 
+OPENROUTER_ADDITIONAL_FREE_MODELS = [
+    "qwen/qwen3.8-27b:free",
+    "nvidia/nemotron-3.5-lightning:free",
+    "poolside/laguna-s-2.1:free",
+    "z-ai/glm-5.2:free",
+    "meta-llama/llama-3.1-8b-instruct:free",
+]
+
 
 def get_openrouter_models_by_priority(topic_category: Optional[str] = None, context_text: str = "") -> List[str]:
     """Return OpenRouter models ordered according to user-specified priority & topic specialization."""
@@ -542,29 +563,34 @@ def get_openrouter_models_by_priority(topic_category: Optional[str] = None, cont
     
     # Coding / Technical topic detection -> prioritize poolside/laguna-s-2.1
     if any(k in text_lower for k in ["code", "coding", "developer", "ide", "programming", "python", "typescript", "rust", "ast", "cli", "git", "api"]):
-        return [
+        prioritized = [
             OPENROUTER_PRIORITY_MODELS["coding_technical"],   # Priority 2 specialized
             OPENROUTER_PRIORITY_MODELS["main_reasoning"],    # Priority 1 main
             OPENROUTER_PRIORITY_MODELS["fast_fallback"],     # Priority 3 fallback
             OPENROUTER_PRIORITY_MODELS["finance_business"],  # Priority 4
         ]
-    
     # Finance / Business topic detection -> prioritize inclusionai/ling-3.0-flash-fin
-    if any(k in text_lower for k in ["finance", "funding", "valuation", "venture", "market", "revenue", "investor", "acquisition", "stock", "business", "industry_trend", "industry", "economy", "startup"]):
-        return [
+    elif any(k in text_lower for k in ["finance", "funding", "valuation", "venture", "market", "revenue", "investor", "acquisition", "stock", "business", "industry_trend", "industry", "economy", "startup"]):
+        prioritized = [
             OPENROUTER_PRIORITY_MODELS["finance_business"],  # Priority 4 specialized
             OPENROUTER_PRIORITY_MODELS["main_reasoning"],    # Priority 1 main
             OPENROUTER_PRIORITY_MODELS["coding_technical"],  # Priority 2
             OPENROUTER_PRIORITY_MODELS["fast_fallback"],     # Priority 3 fallback
         ]
+    else:
+        # Default order: Main reasoning (P1) -> Coding (P2) -> Fast fallback (P3) -> Finance (P4)
+        prioritized = [
+            OPENROUTER_PRIORITY_MODELS["main_reasoning"],        # Priority 1
+            OPENROUTER_PRIORITY_MODELS["coding_technical"],      # Priority 2
+            OPENROUTER_PRIORITY_MODELS["fast_fallback"],         # Priority 3
+            OPENROUTER_PRIORITY_MODELS["finance_business"],      # Priority 4
+        ]
     
-    # Default order: Main reasoning (P1) -> Coding (P2) -> Fast fallback (P3) -> Finance (P4)
-    return [
-        OPENROUTER_PRIORITY_MODELS["main_reasoning"],        # Priority 1
-        OPENROUTER_PRIORITY_MODELS["coding_technical"],      # Priority 2
-        OPENROUTER_PRIORITY_MODELS["fast_fallback"],         # Priority 3
-        OPENROUTER_PRIORITY_MODELS["finance_business"],      # Priority 4
-    ]
+    # Append fallback free models without duplicates to survive rate-limits
+    for m in OPENROUTER_ADDITIONAL_FREE_MODELS:
+        if m not in prioritized:
+            prioritized.append(m)
+    return prioritized
 
 
 def call_openrouter(user_prompt: str, topic_category: Optional[str] = None, context_text: str = "") -> Optional[Dict[str, Any]]:
@@ -599,23 +625,27 @@ def call_openrouter(user_prompt: str, topic_category: Optional[str] = None, cont
                         return parsed
             else:
                 print(f"⚠️ OpenRouter ({model_name}) returned HTTP {r.status_code}: {r.text[:150]}")
+                if r.status_code == 429 and ("free-models-per-day" in r.text or "per-day" in r.text):
+                    print("⏳ OpenRouter account daily limit reached. Fast-falling back to next provider.")
+                    break
         except Exception as e:
             print(f"⚠️ OpenRouter ({model_name}) exception: {e}")
     return None
 
 
 # ─── Main Fallback Chain ───────────────────────────────────────────────────────
-# Priority 1-4: OpenRouter prioritized models
-# Priority 5+: Other providers + Gemini
+# Priority 1: OpenRouter prioritized free models
+# Priority 2: Groq high-speed free tier
+# Priority 3: Cloudflare Workers AI
+# Priority 4+: Specialized/Paid providers
 FALLBACK_CHAIN = [
     ("OpenRouter", call_openrouter),
+    ("Groq", call_groq),
+    ("Cloudflare", call_cloudflare),
     ("OpenCode Zen", call_opencode),
     ("Cerebras", call_cerebras),
     ("NVIDIA NIM", call_nvidia),
     ("Mistral", call_mistral),
-    ("Groq", call_groq),
-    ("Cloudflare", call_cloudflare),
-    ("GitHub Models", call_github_models),
     ("OpenAI", call_openai),
     ("Anthropic", call_anthropic),
     ("DeepSeek", call_deepseek),

@@ -658,59 +658,77 @@ COUNTRY_NAMES = {
 }
 
 def get_hottest_tech_topic(client, target_country="US", avoid_list=""):
-    """Uses Gemini Search grounding to find today's most VIRAL tech tip, hidden feature, or tech fact for the target country."""
+    """Uses Gemini Search grounding (or fast fallback) to find today's most VIRAL tech tip, hidden feature, or tech fact."""
     country_name = COUNTRY_NAMES.get(target_country, "USA")
     print(f"🔥 Fetching hottest tech topic for today in {country_name} (Google Trends Analysis)...")
     
     avoid_prompt = f"\n\nCRITICAL: DO NOT pick any topics related to the following recently covered stories:\n{avoid_list}" if avoid_list else ""
     
-    attempts = 0
-    while attempts < 3:
+    prompt_content = (
+        f"Analyze today's Google Trends and viral tech content in {country_name}. "
+        f"What is the single most trending technology topic right now in {country_name}? "
+        "Look for today's most viral and trending tech topics in one of these high-performing categories: "
+        "1. Open-Source AI Hacks & Development (e.g. viral GitHub repositories, MiniMind, training custom/local LLMs from scratch, democratization/optimization of AI). "
+        "2. Device Security & Shadow AI Privacy Risks (e.g. Apple's Significant Locations, hidden tracking settings, shadow AI tools scraping corporate data, codebase leaks via dev extensions). "
+        "3. Frontier Tech Gadgets & Privacy-First Hardware (e.g. wearable AR concepts, camera-free AR smart glasses, HUD devices eliminating privacy risks). "
+        "4. Fascinating tech facts, AI tools, or digital productivity hacks going viral. "
+        f"CRITICAL: The topic must appeal to high-RPM English-speaking audiences in {country_name} as well as other high-RPM regions (USA, UK, Canada, Australia, New Zealand) and India. "
+        f"Focus on universal and gender-inclusive themes like saving time, making money, interesting facts, "
+        f"lifestyle and smart organization apps, budget-friendly AI tools, and productivity enhancement in {country_name}. "
+        "Do NOT choose programming tutorials, API releases, corporate tech-investor updates, nor heavily male-biased topics like PC hardware overclocking or gaming frame rate hacks. "
+        "(Note: High-impact open-source AI hacks like MiniMind or training custom LLMs from scratch are explicitly ALLOWED and should be prioritized). "
+        f"{avoid_prompt}\n\n"
+        "Return ONLY a JSON object with two fields: "
+        "'topic' (3-6 word phrase, e.g. 'viral AI productivity tool') and "
+        "'keywords' (list of 6-8 specific search keywords). No markdown, no explanation."
+    )
+    
+    # 1. Attempt with Google Search grounding
+    try:
+        response = client.models.generate_content(
+            model=GEMINI_FLASH_MODEL,
+            contents=prompt_content,
+            config=types.GenerateContentConfig(
+                tools=[{'google_search': {}}]
+            )
+        )
+        raw = response.text.strip()
+        if "{" in raw and "}" in raw:
+            raw = raw[raw.find("{"):raw.rfind("}")+1]
+        data = json.loads(raw)
+        print(f"📈 Google Trends Hot Topic via Search Grounding ({country_name}): {data['topic']}")
+        return data
+    except Exception as e:
+        print(f"⚠️ Google Search grounding unavailable ({e}). Falling back to direct trend generation...")
+
+    # 2. Immediate direct generation across active Gemini models without grounding
+    models_to_try = [GEMINI_FLASH_MODEL, GEMINI_FLASH_LITE_MODEL]
+    for model_name in models_to_try:
         try:
             response = client.models.generate_content(
-                model=GEMINI_FLASH_MODEL,
-                contents=(
-                    f"Analyze today's Google Trends and viral tech content in {country_name}. "
-                    f"What is the single most trending technology topic right now in {country_name}? "
-                    "Look for today's most viral and trending tech topics in one of these high-performing categories: "
-                    "1. Open-Source AI Hacks & Development (e.g. viral GitHub repositories, MiniMind, training custom/local LLMs from scratch, democratization/optimization of AI). "
-                    "2. Device Security & Shadow AI Privacy Risks (e.g. Apple's Significant Locations, hidden tracking settings, shadow AI tools scraping corporate data, codebase leaks via dev extensions). "
-                    "3. Frontier Tech Gadgets & Privacy-First Hardware (e.g. wearable AR concepts, camera-free AR smart glasses, HUD devices eliminating privacy risks). "
-                    "4. Fascinating tech facts, AI tools, or digital productivity hacks going viral. "
-                    f"CRITICAL: The topic must appeal to high-RPM English-speaking audiences in {country_name} as well as other high-RPM regions (USA, UK, Canada, Australia, New Zealand) and India. "
-                    f"Focus on universal and gender-inclusive themes like saving time, making money, interesting facts, "
-                    f"lifestyle and smart organization apps, budget-friendly AI tools, and productivity enhancement in {country_name}. "
-                    "Do NOT choose programming tutorials, API releases, corporate tech-investor updates, nor heavily male-biased topics like PC hardware overclocking or gaming frame rate hacks. "
-                    "(Note: High-impact open-source AI hacks like MiniMind or training custom LLMs from scratch are explicitly ALLOWED and should be prioritized). "
-                    f"{avoid_prompt}\n\n"
-                    "Return ONLY a JSON object with two fields: "
-                    "'topic' (3-6 word phrase, e.g. 'viral AI productivity tool') and "
-                    "'keywords' (list of 6-8 specific search keywords). No markdown, no explanation."
-                ),
-                config=types.GenerateContentConfig(
-                    tools=[{'google_search': {}}]
-                )
+                model=model_name,
+                contents=prompt_content,
             )
             raw = response.text.strip()
-            # Robust extraction: find the first { and last }
             if "{" in raw and "}" in raw:
                 raw = raw[raw.find("{"):raw.rfind("}")+1]
-            
             data = json.loads(raw)
-            print(f"📈 Google Trends Hot Topic ({country_name}): {data['topic']}")
+            print(f"📈 Hot Topic via {model_name} ({country_name}): {data['topic']}")
             return data
-        except Exception as e:
-            err_str = str(e).upper()
-            if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
-                wait = 30 + attempts * 15
-                print(f"⚠️ Google Trends rate limited (429). Retrying in {wait}s... (Attempt {attempts+1}/3)")
-                time.sleep(wait)
-                attempts += 1
-                continue
-            print(f"⚠️ Could not fetch Google Trends topic: {e}. Proceeding with RSS only.")
-            return None
-    
-    print("⚠️ Google Trends exhausted after retries. Proceeding with RSS only.")
+        except Exception as err:
+            print(f"⚠️ Direct topic generation failed on {model_name}: {err}")
+
+    # 3. High-speed Groq fallback
+    try:
+        from llm_fallback import call_groq
+        groq_res = call_groq(prompt_content)
+        if groq_res and isinstance(groq_res, dict) and "topic" in groq_res:
+            print(f"📈 Hot Topic via Groq fallback ({country_name}): {groq_res['topic']}")
+            return groq_res
+    except Exception as err:
+        print(f"⚠️ Groq fallback for hot topic failed: {err}")
+
+    print("⚠️ All trend topic generation models exhausted. Proceeding with RSS candidates only.")
     return None
  
 def _get_active_gemini_key():
