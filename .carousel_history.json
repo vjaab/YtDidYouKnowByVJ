@@ -92,7 +92,129 @@
       "domain": "",
       "slide_count": 6,
       "generated_at": "2026-09-22T18:23:42.290462+00:00"
+    },
+    {
+      "topic": "GitHub Trending: dmtrKovalenko/fff — The fastest and…",
+      "theme": "BLUEPRINT",
+      "layout_pattern": [
+        "scenario_question",
+        "analogy",
+        "code_block",
+        "checklist",
+        "common_mistake",
+        "metrics_cards",
+        "takeaway"
+      ],
+      "domain": "",
+      "slide_count": 6,
+      "generated_at": "2026-09-22T19:49:15.886313+00:00"
+    },
+    {
+      "topic": "GitHub Trending: dmtrKovalenko/fff — The fastest and…",
+      "theme": "BLUEPRINT",
+      "layout_pattern": [
+        "scenario_question",
+        "analogy",
+        "code_block",
+        "checklist",
+        "common_mistake",
+        "metrics_cards",
+        "takeaway"
+      ],
+      "domain": "",
+      "slide_count": 6,
+      "generated_at": "2026-09-22T19:49:22.886662+00:00"
+    },
+    {
+      "topic": "GitHub Trending: dmtrKovalenko/fff — The fastest and…",
+      "theme": "DATA_DASHBOARD",
+      "layout_pattern": [
+        "hero_hook",
+        "bullet_list",
+        "architecture_diagram",
+        "before_after",
+        "code_block",
+        "takeaway"
+      ],
+      "domain": "",
+      "slide_count": 6,
+      "generated_at": "2026-09-22T19:52:55.986159+00:00"
+    },
+    {
+      "topic": "GitHub Trending: dmtrKovalenko/fff — The fastest and…",
+      "theme": "DATA_DASHBOARD",
+      "layout_pattern": [
+        "hero_hook",
+        "bullet_list",
+        "architecture_diagram",
+        "before_after",
+        "code_block",
+        "takeaway"
+      ],
+      "domain": "",
+      "slide_count": 6,
+      "generated_at": "2026-09-22T19:53:01.979243+00:00"
+    },
+    {
+      "topic": "GitHub Trending: dmtrKovalenko/fff — The fastest and…",
+      "theme": "CLEAN_LIGHT",
+      "layout_pattern": [
+        "hero_hook",
+        "bullet_list",
+        "architecture_diagram",
+        "metrics_cards",
+        "common_mistake",
+        "takeaway"
+      ],
+      "domain": "",
+      "slide_count": 6,
+      "generated_at": "2026-09-22T19:55:26.419062+00:00"
+    },
+    {
+      "topic": "GitHub Trending: dmtrKovalenko/fff — The fastest and…",
+      "theme": "CLEAN_LIGHT",
+      "layout_pattern": [
+        "hero_hook",
+        "bullet_list",
+        "architecture_diagram",
+        "metrics_cards",
+        "common_mistake",
+        "takeaway"
+      ],
+      "domain": "",
+      "slide_count": 6,
+      "generated_at": "2026-09-22T19:55:33.106155+00:00"
+    },
+    {
+      "topic": "GitHub Trending: dmtrKovalenko/fff — The fastest and…",
+      "theme": "TECH_DARK",
+      "layout_pattern": [
+        "big_number",
+        "layered_stack",
+        "bullet_list",
+        "input_output",
+        "real_world_scenario",
+        "takeaway"
+      ],
+      "domain": "",
+      "slide_count": 6,
+      "generated_at": "2026-09-22T19:57:35.015787+00:00"
+    },
+    {
+      "topic": "GitHub Trending: dmtrKovalenko/fff — The fastest and…",
+      "theme": "TECH_DARK",
+      "layout_pattern": [
+        "big_number",
+        "layered_stack",
+        "bullet_list",
+        "input_output",
+        "real_world_scenario",
+        "takeaway"
+      ],
+      "domain": "",
+      "slide_count": 6,
+      "generated_at": "2026-09-22T19:57:41.310469+00:00"
     }
   ],
-  "last_updated": "2026-09-22T18:23:42.290487+00:00"
+  "last_updated": "2026-09-22T19:57:41.310483+00:00"
 }
