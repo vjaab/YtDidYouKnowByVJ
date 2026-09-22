@@ -231,7 +231,55 @@
       "domain": "",
       "slide_count": 8,
       "generated_at": "2026-09-22T20:48:33.772578+00:00"
+    },
+    {
+      "topic": "PanWatch: Self-Hosted AI Trading Assistant",
+      "theme": "MINIMAL",
+      "layout_pattern": [
+        "scenario_question",
+        "whats_new",
+        "process_flow",
+        "architecture_diagram",
+        "input_output",
+        "common_mistake",
+        "takeaway"
+      ],
+      "domain": "",
+      "slide_count": 7,
+      "generated_at": "2026-09-22T22:00:25.721894+00:00"
+    },
+    {
+      "topic": "Agent Desktop v1.2: Stable UI Control for Agents",
+      "theme": "TERMINAL",
+      "layout_pattern": [
+        "hero_hook",
+        "whats_new",
+        "architecture_diagram",
+        "side_by_side",
+        "before_after",
+        "checklist",
+        "takeaway"
+      ],
+      "domain": "",
+      "slide_count": 7,
+      "generated_at": "2026-09-22T22:01:57.651140+00:00"
+    },
+    {
+      "topic": "Agent Desktop v1.2: Stable UI Control for Agents",
+      "theme": "TERMINAL",
+      "layout_pattern": [
+        "hero_hook",
+        "whats_new",
+        "architecture_diagram",
+        "side_by_side",
+        "before_after",
+        "checklist",
+        "takeaway"
+      ],
+      "domain": "",
+      "slide_count": 7,
+      "generated_at": "2026-09-22T22:02:04.942987+00:00"
     }
   ],
-  "last_updated": "2026-09-22T20:48:33.772606+00:00"
+  "last_updated": "2026-09-22T22:02:04.943000+00:00"
 }

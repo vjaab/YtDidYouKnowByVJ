@@ -33,7 +33,6 @@ jobs:
     outputs:
       topic: ${{ steps.gen.outputs.topic }}
       ig_images: ${{ steps.gen.outputs.ig_images }}
-      fb_images: ${{ steps.gen.outputs.fb_images }}
       caption_file: ${{ steps.gen.outputs.caption_file }}
       hashtags: ${{ steps.hashtags.outputs.hashtags }}
       poll_file: ${{ steps.gen.outputs.poll_file }}
@@ -80,8 +79,6 @@ jobs:
           echo "TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}" >> .env
           echo "IG_USER_ID=${{ secrets.IG_USER_ID }}" >> .env
           echo "IG_ACCESS_TOKEN=${{ secrets.IG_ACCESS_TOKEN }}" >> .env
-          echo "FB_PAGE_ID=${{ secrets.FB_PAGE_ID }}" >> .env
-          echo "FB_PAGE_ACCESS_TOKEN=${{ secrets.FB_PAGE_ACCESS_TOKEN }}" >> .env
           echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env
           echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .env
           echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
@@ -119,9 +116,9 @@ jobs:
           python -u telegram_approval_handler.py --send-for-approval \
             --topic "${{ steps.gen.outputs.topic }}" \
             --ig-images "${{ steps.gen.outputs.ig_images }}" \
-            --fb-images "${{ steps.gen.outputs.fb_images }}" \
             --caption-file "${{ steps.gen.outputs.caption_file }}" \
             --poll-file "${{ steps.gen.outputs.poll_file }}" \
+            --platform instagram \
             --carousel
 
       - name: Upload Generated Images
@@ -171,7 +168,6 @@ jobs:
           python -u telegram_approval_handler.py --wait-and-post \
             --topic "${{ needs.generate-carousel.outputs.topic }}" \
             --ig-images "${{ needs.generate-carousel.outputs.ig_images }}" \
-            --fb-images "${{ needs.generate-carousel.outputs.fb_images }}" \
             --caption-file "${{ needs.generate-carousel.outputs.caption_file }}" \
             --hashtags "${{ needs.generate-carousel.outputs.hashtags }}" \
             --poll-file "${{ needs.generate-carousel.outputs.poll_file }}" \
