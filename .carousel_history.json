@@ -214,7 +214,24 @@
       "domain": "",
       "slide_count": 6,
       "generated_at": "2026-09-22T19:57:41.310469+00:00"
+    },
+    {
+      "topic": "GitHub Trending: lmnr-ai/lmnr — Laminar - open-source…",
+      "theme": "FUTURISTIC",
+      "layout_pattern": [
+        "hero_hook",
+        "whats_new",
+        "architecture_diagram",
+        "metrics_cards",
+        "before_after",
+        "real_world_scenario",
+        "checklist",
+        "takeaway"
+      ],
+      "domain": "",
+      "slide_count": 8,
+      "generated_at": "2026-09-22T20:48:33.772578+00:00"
     }
   ],
-  "last_updated": "2026-09-22T19:57:41.310483+00:00"
+  "last_updated": "2026-09-22T20:48:33.772606+00:00"
 }
