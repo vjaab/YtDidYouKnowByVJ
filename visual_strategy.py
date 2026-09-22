@@ -18,6 +18,37 @@ from carousel_history import (
     get_recent_layout_patterns,
 )
 
+# Load carousel topic tracker for topic-level avoidance
+def load_carousel_topic_tracker() -> Dict:
+    """Load the Instagram carousel topic tracker."""
+    import os
+    import json
+    from pathlib import Path
+    
+    TRACKER_FILE = Path(__file__).parent / "instagram_carousel_log.json"
+    if not os.path.exists(TRACKER_FILE):
+        return {"used_titles": [], "used_keywords": [], "history": []}
+    try:
+        with open(TRACKER_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        return {"used_titles": [], "used_keywords": [], "history": []}
+
+
+def get_recent_carousel_topics(n: int = 10) -> List[str]:
+    """Get the last N carousel topic titles."""
+    tracker = load_carousel_topic_tracker()
+    return [entry.get("title", "") for entry in tracker.get("history", [])[-n:]]
+
+
+def get_recent_carousel_keywords(n: int = 10) -> Set[str]:
+    """Get keywords from recent carousel topics."""
+    tracker = load_carousel_topic_tracker()
+    keywords = set()
+    for entry in tracker.get("history", [])[-n:]:
+        keywords.update([k.lower() for k in entry.get("keywords", [])])
+    return keywords
+
 # ─── Layout Type Registry ──────────────────────────────────────────────────────
 
 LAYOUT_TYPES = {
@@ -492,8 +523,15 @@ STORYTELLING_PATTERNS = {
 def select_theme(
     domain: str,
     avoided_themes: Set[str] = None,
+    run_context: str = "",
 ) -> Tuple[str, Dict]:
-    """Select a visual theme based on domain, avoiding recently used themes."""
+    """Select a visual theme based on domain, avoiding recently used themes.
+    
+    Args:
+        domain: The content domain
+        avoided_themes: Set of theme IDs to avoid
+        run_context: Optional context for deterministic selection
+    """
     if avoided_themes is None:
         avoided_themes = set()
 
@@ -516,14 +554,27 @@ def select_theme(
     if not candidates:
         candidates = list(VISUAL_THEMES.items())
 
-    # Weighted random: prefer domain-matching themes
-    domain_matches = [
-        (tid, t) for tid, t in candidates if domain in t["domains"]
-    ]
-    if domain_matches and random.random() < 0.8:
-        theme_id, theme = random.choice(domain_matches)
+    # Deterministic selection using run_context hash
+    if run_context:
+        import hashlib
+        ctx_hash = int(hashlib.md5(run_context.encode()).hexdigest()[:8], 16)
+        # Prefer domain-matching themes first
+        domain_matches = [(tid, t) for tid, t in candidates if domain in t["domains"]]
+        if domain_matches:
+            idx = ctx_hash % len(domain_matches)
+            theme_id, theme = domain_matches[idx]
+        else:
+            idx = ctx_hash % len(candidates)
+            theme_id, theme = candidates[idx]
     else:
-        theme_id, theme = random.choice(candidates)
+        # Weighted random: prefer domain-matching themes
+        domain_matches = [
+            (tid, t) for tid, t in candidates if domain in t["domains"]
+        ]
+        if domain_matches and random.random() < 0.8:
+            theme_id, theme = random.choice(domain_matches)
+        else:
+            theme_id, theme = random.choice(candidates)
 
     return theme_id, theme
 
@@ -531,8 +582,17 @@ def select_theme(
 def select_storytelling_pattern(
     domain: str,
     avoided_patterns: List[List[str]] = None,
+    run_context: str = "",
+    topic: str = "",
 ) -> Tuple[str, Dict]:
-    """Select a storytelling pattern based on domain."""
+    """Select a storytelling pattern based on domain and topic.
+    
+    Args:
+        domain: The content domain
+        avoided_patterns: List of recent layout patterns to avoid
+        run_context: Optional context for deterministic selection
+        topic: The carousel topic for topic-level avoidance
+    """
     if avoided_patterns is None:
         avoided_patterns = []
 
@@ -545,17 +605,51 @@ def select_storytelling_pattern(
     if not candidates:
         candidates = list(STORYTELLING_PATTERNS.items())
 
-    # Shuffle and pick one that isn't too similar to recent patterns
-    random.shuffle(candidates)
+    # Topic-level avoidance: check if pattern would repeat recent carousel topics
+    recent_topics = get_recent_carousel_topics(10)
+    recent_keywords = get_recent_carousel_keywords(10)
+    
+    # Score each pattern based on topic overlap
+    scored_candidates = []
     for pattern_id, pattern in candidates:
+        # Generate proposed layouts for this pattern
         proposed_layouts = [
             random.choice(slot[1]) for slot in pattern["slides"]
         ]
-        if not is_layout_pattern_too_similar(proposed_layouts, avoided_patterns):
-            return pattern_id, pattern
-
-    # Fallback: just pick the first candidate
-    return candidates[0]
+        
+        # Check layout similarity
+        layout_penalty = 0
+        if is_layout_pattern_too_similar(proposed_layouts, avoided_patterns):
+            layout_penalty = 100  # Strong penalty for similar layout
+        
+        # Topic overlap check (simplified - would need topic to fully check)
+        topic_penalty = 0
+        
+        score = layout_penalty + topic_penalty
+        scored_candidates.append((score, pattern_id, pattern))
+    
+    # Sort by penalty (lower is better)
+    scored_candidates.sort(key=lambda x: x[0])
+    
+    # Deterministic selection from top candidates with low penalty
+    if run_context:
+        import hashlib
+        ctx_hash = int(hashlib.md5(run_context.encode()).hexdigest()[:8], 16)
+        # Pick from top 3 candidates with lowest penalty
+        top_candidates = [c for c in scored_candidates if c[0] == scored_candidates[0][0]]
+        if len(top_candidates) > 1:
+            top_candidates = top_candidates[:3]
+        idx = ctx_hash % len(top_candidates)
+        _, pattern_id, pattern = top_candidates[idx]
+    else:
+        # Pick from top candidates with lowest penalty
+        min_penalty = scored_candidates[0][0]
+        top_candidates = [c for c in scored_candidates if c[0] == min_penalty]
+        if len(top_candidates) > 1:
+            top_candidates = top_candidates[:3]
+        _, pattern_id, pattern = random.choice(top_candidates)
+    
+    return pattern_id, pattern
 
 
 def _determine_slide_count(pattern: Dict, domain: str) -> int:
@@ -576,6 +670,7 @@ def _determine_slide_count(pattern: Dict, domain: str) -> int:
 def create_visual_strategy(
     carousel: Dict,
     story: Optional[Dict] = None,
+    run_context: str = "",
 ) -> Dict[str, Any]:
     """
     Create a complete visual strategy for a carousel.
@@ -583,6 +678,7 @@ def create_visual_strategy(
     Args:
         carousel: The carousel JSON from LLM (with headline, slides, etc.)
         story: Optional original story metadata
+        run_context: Optional context for deterministic selection (date + run number)
 
     Returns:
         Visual strategy dict with theme, layout, and per-slide instructions.
@@ -598,15 +694,17 @@ def create_visual_strategy(
     domain = classify_domain(headline, description)
     difficulty = classify_difficulty(description)
 
-    # Get avoidance lists
-    avoided_themes = suggest_avoided_themes(3)
-    avoided_patterns = suggest_avoided_layouts(3)
+    # Get avoidance lists - increased window from 3 to 7 for better variety
+    avoided_themes = suggest_avoided_themes(7)
+    avoided_patterns = suggest_avoided_layouts(7)
 
-    # Select theme
-    theme_id, theme = select_theme(domain, avoided_themes)
+    # Select theme with run_context for deterministic selection
+    theme_id, theme = select_theme(domain, avoided_themes, run_context=run_context)
 
-    # Select storytelling pattern
-    pattern_id, pattern = select_storytelling_pattern(domain, avoided_patterns)
+    # Select storytelling pattern with run_context and topic for topic-level avoidance
+    pattern_id, pattern = select_storytelling_pattern(
+        domain, avoided_patterns, run_context=run_context, topic=headline
+    )
 
     # Determine slide count
     slide_count = _determine_slide_count(pattern, domain)

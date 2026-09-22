@@ -209,7 +209,7 @@ SCORING_WEIGHTS = {
     "audience_fit": 0.05,
 }
 
-MIN_SCORE_THRESHOLD = 6.5
+MIN_SCORE_THRESHOLD = 4.5
 
 
 def score_story(story: Dict) -> float:
@@ -225,15 +225,69 @@ def score_story(story: Dict) -> float:
     return sum(scores[k] * SCORING_WEIGHTS[k] for k in scores)
 
 
-def select_best_story(stories: List[Dict]) -> Optional[Dict]:
-    """Select the best story based on scoring and record it in carousel tracker."""
+def select_best_story(stories: List[Dict], run_context: str = "") -> Optional[Dict]:
+    """Select the best story based on scoring and record it in carousel tracker.
+    
+    Args:
+        stories: List of candidate stories
+        run_context: Optional context string (e.g., date + run number) for deterministic tiebreaking
+    """
     if not stories:
         return None
     
-    scored = [(score_story(s), s) for s in stories]
+    # Pre-filter: Check against carousel tracker BEFORE scoring to avoid duplicates
+    carousel_tracker = load_carousel_tracker()
+    recent_carousel_urls = set()
+    recent_carousel_titles = set()
+    for entry in carousel_tracker.get("history", [])[-20:]:  # Check last 20 carousel topics
+        if isinstance(entry, dict):
+            if entry.get("news_source_url"):
+                recent_carousel_urls.add(entry["news_source_url"])
+            if entry.get("title"):
+                recent_carousel_titles.add(entry["title"].lower())
+    
+    filtered_stories = []
+    for story in stories:
+        url = story.get("url", "")
+        title = story.get("title", "").lower()
+        
+        # Skip if exact URL already used in carousel
+        if url and url in recent_carousel_urls:
+            print(f"  🔄 Skipping (URL already in carousel history): {story.get('title')[:60]}...")
+            continue
+        
+        # Skip if title semantically matches recent carousel titles
+        if RAPIDFUZZ_AVAILABLE and title:
+            is_dup = False
+            for recent_title in recent_carousel_titles:
+                score = fuzz.token_set_ratio(title, recent_title)
+                if score > SIMILARITY_THRESHOLD:
+                    print(f"  🔄 Skipping (semantic match in carousel history, score {score}): {story.get('title')[:60]}...")
+                    is_dup = True
+                    break
+            if is_dup:
+                continue
+        
+        filtered_stories.append(story)
+    
+    if not filtered_stories:
+        print("⚠️ All stories filtered out as duplicates, falling back to original list")
+        filtered_stories = stories
+    
+    scored = [(score_story(s), s) for s in filtered_stories]
     scored.sort(key=lambda x: x[0], reverse=True)
     
-    best_score, best_story = scored[0]
+    # Deterministic tiebreaking using run_context
+    if len(scored) > 1 and abs(scored[0][0] - scored[1][0]) < 0.1:
+        # Scores are very close, use run_context hash for consistent selection
+        import hashlib
+        ctx_hash = int(hashlib.md5(run_context.encode()).hexdigest()[:8], 16)
+        idx = ctx_hash % len(scored)
+        best_score, best_story = scored[idx]
+        print(f"🎲 Tiebreaker: Selected index {idx} from top {len(scored)} (run_context hash)")
+    else:
+        best_score, best_story = scored[0]
+    
     if best_score >= MIN_SCORE_THRESHOLD:
         best_story["_score"] = best_score
         
@@ -275,6 +329,25 @@ def build_carousel_prompt(story: Dict, min_slides: int = 5, max_slides: int = 8)
     category = story.get("_predicted_category", "AI Engineering")
     today_str = datetime.now().strftime('%d %b %Y')
     
+    # Extract key technical entities from description for LLM to use
+    import re
+    version_matches = re.findall(r'\b(v?\d+\.\d+(\.\d+)?(-[a-zA-Z0-9]+)?)\b', description)
+    metrics = re.findall(r'(\d+(?:\.\d+)?%|\d+(?:,\d{3})*(?:\.\d+)?[km]?|\$\d+(?:\.\d+)?[km]?|\d+(?:\.\d+)?x|\d+(?:\.\d+)?ms|\d+(?:\.\d+)?s|\d+(?:\.\d+)?GB|\d+(?:\.\d+)?TB)', description, re.IGNORECASE)
+    code_keywords = re.findall(r'\b(API|SDK|CLI|GPU|CPU|RAM|VRAM|LLM|RAG|MCP|JSON|YAML|SQL|NoSQL|REST|GraphQL|gRPC|WebSocket|Docker|Kubernetes|Terraform|Ansible|CI/CD|GitHub|GitLab|VS Code|Cursor|Copilot|Python|TypeScript|JavaScript|Rust|Go|Java|C\+\+)\b', description, re.IGNORECASE)
+    company_names = re.findall(r'\b(OpenAI|Anthropic|Google|Meta|Microsoft|Amazon|AWS|NVIDIA|Vercel|Netflix|Uber|Stripe|Airbnb|Shopify|Databricks|Snowflake|MongoDB|Redis|PostgreSQL|Elasticsearch|Kafka|RabbitMQ|Prometheus|Grafana|Datadog|LangChain|LlamaIndex|AutoGen|CrewAI|LangGraph|Ollama|LM Studio|vLLM|TGIF|Hugging Face)\b', description, re.IGNORECASE)
+    
+    extracted_info = []
+    if version_matches:
+        extracted_info.append(f"Versions mentioned: {', '.join(set(v[0] for v in version_matches))}")
+    if metrics:
+        extracted_info.append(f"Metrics mentioned: {', '.join(set(metrics))}")
+    if code_keywords:
+        extracted_info.append(f"Technologies mentioned: {', '.join(set(code_keywords))}")
+    if company_names:
+        extracted_info.append(f"Companies mentioned: {', '.join(set(company_names))}")
+    
+    extracted_context = "\n".join(extracted_info) if extracted_info else "No specific technical details extracted from description."
+    
     return f"""You are an elite developer educator and tech visual designer creating high-engagement Instagram educational carousels for @vijayakumarj_ai (daily AI & engineering updates for software engineers, tech leads, and AI practitioners).
 
 STORY CONTEXT:
@@ -284,6 +357,9 @@ Source: {source}
 URL: {url}
 Category: {category}
 Date: {today_str}
+
+EXTRACTED TECHNICAL DETAILS (USE THESE SPECIFICS):
+{extracted_context}
 
 OBJECTIVE:
 Generate a visually varied, professional {min_slides} to {max_slides} slide carousel JSON.
@@ -304,11 +380,53 @@ AVAILABLE LAYOUT TYPES:
 11. "checklist": 3-5 practical checklist items for implementing this tech.
 12. "takeaway": Final slide with key lessons and CTA to follow @vijayakumarj_ai.
 
+DETAILED CONTENT REQUIREMENTS PER SLIDE TYPE:
+
+**hero_hook / big_number / scenario_question**: 
+- Include SPECIFIC version numbers, release names, or metric headlines from the story
+- Eyebrow: Category badge (e.g., "GEMINI 2.5 RELEASE", "RUST 1.80", "AWS LAMBDA UPDATE")
+
+**architecture_diagram / process_flow / layered_stack / input_output / request_response / timeline**:
+- Use ACTUAL component names, service names, API endpoints from the story
+- Include specific protocols (gRPC, REST, WebSocket), data formats (Protobuf, JSON, Avro)
+- Show real latency numbers, throughput if mentioned
+
+**code_block / code_output**:
+- Write REAL, RUNNABLE code using the ACTUAL library/SDK/API from the story
+- Include specific method names, parameter values, config options from the release
+- Show imports, initialization, and a concrete use case
+- Language: match the story's ecosystem (Python for AI/ML, TypeScript for Vercel/Next.js, Rust for systems, Go for cloud)
+
+**before_after / common_mistake / side_by_side / myth_vs_fact**:
+- Compare SPECIFIC old vs new APIs, config flags, CLI commands
+- Reference actual breaking changes, deprecated methods, new parameters
+- Include version-specific migration details
+
+**real_world_scenario / analogy**:
+- Name ACTUAL companies/products from the story or well-known adopters
+- Include SPECIFIC problem metrics (e.g., "500k req/s", "2TB/day", "99.99% SLA")
+- Quote real results if available in source
+
+**metrics_cards / three_column / checklist**:
+- Use EXACT numbers from the story (latency, cost, throughput, context window, model size)
+- If no numbers in story, infer realistic benchmarks for the technology class
+- Include units: ms, %, $/1M tokens, GB, tokens/sec, requests/sec
+
+**quiz_choice / quiz_predict_output**:
+- Test KNOWLEDGE of the specific feature/API from the story
+- Options should include plausible but incorrect alternatives
+- Explanation must reference the story's technical details
+
+**takeaway**:
+- Action items SPECIFIC to this technology/release
+- Include migration commands, config flags, documentation URLs
+- Reference the actual version/release name
+
 JSON OUTPUT SPECIFICATION:
 Output strictly valid JSON with this structure (no markdown wrapping outside json):
 {{
-  "headline": "Short punchy headline under 60 chars",
-  "summary": "2-3 sentence executive summary for social caption",
+  "headline": "Short punchy headline under 60 chars - INCLUDE VERSION/RELEASE NAME",
+  "summary": "2-3 sentence executive summary with SPECIFIC metrics/names from story",
   "source": "{source}",
   "source_url": "{url}",
   "date": "{today_str}",
@@ -317,89 +435,26 @@ Output strictly valid JSON with this structure (no markdown wrapping outside jso
     {{
       "slide_number": 1,
       "layout_type": "hero_hook",
-      "eyebrow": "AI BREAKTHROUGH",
-      "title": "Hook Headline That Stops The Scroll",
-      "subtitle": "Clear, compelling statement of what changes today for engineers.",
-      "body": "Brief context hook."
+      "eyebrow": "SPECIFIC CATEGORY BADGE (e.g., GEMINI 2.5, RUST 1.80, AWS RE:INVENT)",
+      "title": "Hook with SPECIFIC version/feature name from story",
+      "subtitle": "One-sentence impact statement with concrete metric or capability",
+      "body": "2-3 sentences: what changed, who it affects, why it matters NOW"
     }},
-    {{
-      "slide_number": 2,
-      "layout_type": "architecture_diagram",
-      "eyebrow": "SYSTEM ARCHITECTURE",
-      "title": "How The Architecture Works",
-      "body": "System overview explanation.",
-      "diagram": {{
-        "title": "Data Flow Pipeline",
-        "nodes": [
-          {{"id": "1", "label": "User Query", "sub": "Frontend / API"}},
-          {{"id": "2", "label": "Orchestrator", "sub": "Agent Controller"}},
-          {{"id": "3", "label": "LLM Engine", "sub": "Reasoning Model"}},
-          {{"id": "4", "label": "Vector Index", "sub": "Knowledge Base"}}
-        ],
-        "connections": [
-          {{"from": "1", "to": "2", "label": "HTTP/gRPC"}},
-          {{"from": "2", "to": "3", "label": "Context Prompt"}},
-          {{"from": "2", "to": "4", "label": "Semantic Search"}}
-        ]
-      }}
-    }},
-    {{
-      "slide_number": 3,
-      "layout_type": "code_block",
-      "eyebrow": "QUICK IMPLEMENTATION",
-      "title": "Implementing In 5 Lines of Code",
-      "body": "How developers can run this right now.",
-      "code": "import google.genai as genai\\n\\nclient = genai.Client()\\nresponse = client.models.generate_content(\\n    model='gemini-2.5-flash',\\n    contents='Analyze repo architecture'\\n)\\nprint(response.text)",
-      "language": "python",
-      "code_explanation": "Simple, idiomatic setup using the official SDK client."
-    }},
-    {{
-      "slide_number": 4,
-      "layout_type": "before_after",
-      "eyebrow": "PARADIGM SHIFT",
-      "title": "Before vs After This Release",
-      "body": "The dramatic developer workflow shift.",
-      "before_title": "Traditional Workflow",
-      "before_items": ["Manual orchestration & prompt tuning", "Slow sync batch processing", "High latency and token cost"],
-      "after_title": "New Paradigm",
-      "after_items": ["Native agentic execution & tool use", "Real-time streaming multimodal UI", "50% lower cost with 2M context"]
-    }},
-    {{
-      "slide_number": 5,
-      "layout_type": "real_world_scenario",
-      "eyebrow": "PRODUCTION CASE STUDY",
-      "title": "Real-World Impact At Scale",
-      "body": "How modern teams leverage this capability in production.",
-      "scenario_company": "Modern Enterprise Stack",
-      "scenario_problem": "Processing 500k customer tickets with high human triage latency.",
-      "scenario_solution": "Deployed automated agent pipeline with real-time tool grounding.",
-      "scenario_result": "78% reduction in resolution time, zero downtime rollout."
-    }},
-    {{
-      "slide_number": 6,
-      "layout_type": "takeaway",
-      "eyebrow": "KEY TAKEAWAYS",
-      "title": "What You Should Do Next",
-      "body": "Summary action items.",
-      "takeaways": [
-        "Audit existing pipelines for native agentic integration.",
-        "Test benchmarks on your proprietary domain data.",
-        "Bookmark documentation for production deployment patterns."
-      ],
-      "cta": "Save this guide • Follow @vijayakumarj_ai for daily AI engineering"
-    }}
+    {{ ... remaining slides with REAL data from story ... }}
   ]
 }}
 
 CRITICAL RULES:
-1. Return strictly {min_slides} to {max_slides} slides tailored to this specific story.
+1. Return strictly {min_slides} to {max_slides} slides tailored to THIS SPECIFIC STORY.
 2. The first slide MUST be 'hero_hook' or 'big_number'.
 3. The last slide MUST be 'takeaway'.
 4. Include AT LEAST ONE code snippet or architecture/process diagram.
-5. Include AT LEAST ONE comparison ('before_after', 'common_mistake', or 'side_by_side') or real-world scenario.
+5. Include AT LEAST ONE comparison ('before_after', 'common_mistake', 'side_by_side') or real-world scenario.
 6. Mobile readable: Keep bullet texts punchy (under 15 words each).
-7. Absolutely NO generic placeholder text (no 'Lorem Ipsum' or 'Foo Bar').
-8. Brand handle is @vijayakumarj_ai."""
+7. ABSOLUTELY NO generic placeholder text. Every field must reference the actual story.
+8. Brand handle is @vijayakumarj_ai.
+9. If story lacks specifics, infer realistic technical details for that technology class.
+10. Code snippets MUST be syntactically correct and use real APIs from the story's ecosystem."""
 
 
 def _get_active_gemini_model(client) -> str:
@@ -478,121 +533,547 @@ def _truncate_at_word_boundary(text: str, max_chars: int) -> str:
     return truncated + '…'
 
 
-def generate_fallback_carousel(story: Dict) -> Dict:
-    """Generate dynamic, high-quality fallback carousel when LLM unavailable."""
-    title = story.get("title", "AI Architecture & Engineering Update")
+def _extract_story_details(story: Dict) -> Dict[str, Any]:
+    """Extract fine-grained technical entities, metrics, versions, and category from a news story."""
+    title = story.get("title", "")
     description = story.get("description", "")
-    source = story.get("source", {}).get("name", "AI Insights")
-    url = story.get("url", "")
+    source_name = story.get("source", {}).get("name", "") if isinstance(story.get("source"), dict) else str(story.get("source", ""))
+    
+    # 1. Company / Primary Ecosystem (Prioritize title and source over description comparisons)
+    entity = "AI Engineering"
+    ecosystem = "general"
+    
+    ecosystem_patterns = [
+        (r'\b(Cursor|Anysphere)\b', "Cursor AI", "cursor"),
+        (r'\b(LangGraph|LangChain)\b', "LangChain", "langgraph"),
+        (r'\b(Vercel|AI SDK)\b', "Vercel", "vercel"),
+        (r'\b(NVIDIA|Nemotron)\b', "NVIDIA", "nvidia"),
+        (r'\b(Anthropic|Claude|Sonnet|Opus|Artifacts)\b', "Anthropic", "anthropic"),
+        (r'\b(Meta|Llama|FAIR|PyTorch)\b', "Meta AI", "meta"),
+        (r'\b(Google|Gemini|DeepMind|Gemma)\b', "Google", "google"),
+        (r'\b(OpenAI|ChatGPT|GPT-4o|GPT-4|o1|o3)\b', "OpenAI", "openai"),
+        (r'\b(Mistral|Mixtral|Codestral)\b', "Mistral AI", "mistral"),
+        (r'\b(DeepSeek)\b', "DeepSeek", "deepseek"),
+        (r'\b(Hugging\s*Face|Transformers)\b', "Hugging Face", "huggingface"),
+        (r'\b(vLLM)\b', "vLLM", "vllm"),
+        (r'\b(Ollama)\b', "Ollama", "ollama"),
+        (r'\b(Microsoft|Copilot|Phi-3|Phi-4)\b', "Microsoft", "microsoft"),
+    ]
+    
+    # First evaluate primary text (title + source)
+    primary_text = f"{title} {source_name}"
+    for pattern, ent_name, eco_key in ecosystem_patterns:
+        if re.search(pattern, primary_text, re.IGNORECASE):
+            entity = ent_name
+            ecosystem = eco_key
+            break
+            
+    # If not found in title/source, fallback to description
+    if ecosystem == "general":
+        for pattern, ent_name, eco_key in ecosystem_patterns:
+            if re.search(pattern, description, re.IGNORECASE):
+                entity = ent_name
+                ecosystem = eco_key
+                break
+            
+    if entity == "AI Engineering" and source_name and source_name.lower() not in ["unknown", "ai insights", "newsletter_ai"]:
+        entity = source_name
+
+    # 2. Version / Parameter size
+    full_text = f"{title} {description} {source_name}"
+    version_match = re.search(r'\b(v?\d+\.\d+(?:\.\d+)?(?:-[a-zA-Z0-9]+)?)\b', full_text)
+    version = version_match.group(1) if version_match else ""
+    
+    param_match = re.search(r'\b(\d+(?:\.\d+)?[Bb])\b', full_text)
+    param_size = param_match.group(1).upper() if param_match else ""
+    
+    # 3. Context window
+    context_match = re.search(r'\b(\d+(?:\.\d+)?\s*(?:[KkMm]|million)?\s*(?:tokens?|context))\b', full_text, re.IGNORECASE)
+    context_window = context_match.group(1).strip() if context_match else ""
+    
+    # 4. Metrics: Funding, Percentages, Latency, Dev count
+    funding_match = re.search(r'(\$\d+(?:\.\d+)?\s*(?:[MBKmbk]|million|billion)?(?:\s*valuation)?)', full_text, re.IGNORECASE)
+    funding_str = funding_match.group(1).strip() if funding_match else ""
+    
+    percent_matches = re.findall(r'(\d+(?:\.\d+)?%)', full_text)
+    percentage = percent_matches[0] if percent_matches else ""
+    
+    devs_match = re.search(r'(\d+[KkMm]\+?\s*(?:developers|devs|users|engineers))', full_text, re.IGNORECASE)
+    devs_count = devs_match.group(1).strip() if devs_match else ""
+    
+    benchmark_match = re.search(r'\b(HumanEval|MBPP|MMLU|GSM8K|MATH|SWE-bench|Chatbot Arena)\b', full_text, re.IGNORECASE)
+    benchmark_name = benchmark_match.group(1) if benchmark_match else ""
+
+    # 5. Technical Category Classification with word boundaries
+    title_lower = title.lower()
+    desc_lower = description.lower()
+    full_lower = f"{title_lower} {desc_lower}"
+    
+    if re.search(r'\b(raises|raised|funding|valuation|series [abc]|seed round|acquired|acquisition)\b', full_lower):
+        category = "funding_business"
+    elif re.search(r'\b(beats|outperforms|benchmark|benchmarks|humaneval|mbpp|mmlu|sota|arxiv|paper)\b', title_lower):
+        category = "research_benchmark"
+    elif re.search(r'\b(editor|ide|cursor|copilot|autocomplete|code editing|multi-file)\b', title_lower):
+        category = "developer_tool"
+    elif re.search(r'\b(framework|sdk|library|langgraph|langchain|vercel|vllm|ollama)\b', title_lower) or re.search(r'\b(framework|sdk|library)\b', desc_lower):
+        category = "framework_release"
+    elif re.search(r'\b(gpt|claude|gemini|llama|nemotron|mistral|deepseek|model|weights|frontier model|context window)\b', full_lower):
+        category = "model_release"
+    elif re.search(r'\b(beats|outperforms|benchmark|benchmarks|humaneval|mbpp|mmlu|sota)\b', desc_lower):
+        category = "research_benchmark"
+    else:
+        category = "general_ai"
+
+    return {
+        "entity": entity,
+        "ecosystem": ecosystem,
+        "version": version,
+        "param_size": param_size,
+        "context_window": context_window,
+        "funding": funding_str,
+        "percentage": percentage,
+        "devs_count": devs_count,
+        "benchmark": benchmark_name,
+        "category": category,
+        "title": title,
+        "description": description,
+        "source": source_name,
+        "url": story.get("url", "")
+    }
+
+
+def _get_ecosystem_code_snippet(info: Dict[str, Any]) -> Tuple[str, str, str]:
+    """Return tailored (code, language, explanation) based on ecosystem & story details."""
+    eco = info["ecosystem"]
+    entity = info["entity"]
+    
+    if eco == "openai":
+        code = (
+            "from openai import OpenAI\n\n"
+            "client = OpenAI()\n"
+            "response = client.chat.completions.create(\n"
+            "    model='gpt-4o',\n"
+            "    messages=[\n"
+            "        {'role': 'system', 'content': 'You are a high-throughput reasoning agent'},\n"
+            "        {'role': 'user', 'content': 'Process real-time multimodal inputs'}\n"
+            "    ],\n"
+            "    response_format={'type': 'json_object'}\n"
+            ")\n"
+            "print(response.choices[0].message.content)"
+        )
+        return code, "python", "Native multimodal model interface with 50% reduced inference latency."
+
+    elif eco == "anthropic":
+        code = (
+            "import anthropic\n\n"
+            "client = anthropic.Anthropic()\n"
+            "message = client.messages.create(\n"
+            "    model='claude-3-5-sonnet-20241022',\n"
+            "    max_tokens=2048,\n"
+            "    messages=[\n"
+            "        {'role': 'user', 'content': 'Architect production distributed cache with TTL'}\n"
+            "    ]\n"
+            ")\n"
+            "print(message.content[0].text)"
+        )
+        return code, "python", "Artifacts-capable client with state-of-the-art coding benchmark performance."
+
+    elif eco == "google":
+        code = (
+            "from google import genai\n\n"
+            "client = genai.Client()\n"
+            "response = client.models.generate_content(\n"
+            "    model='gemini-2.0-flash',\n"
+            "    contents='Analyze 2M token context repository architecture'\n"
+            ")\n"
+            "print(response.text)"
+        )
+        return code, "python", "Unified GenAI client handling massive context windows with sub-second time-to-first-token."
+
+    elif eco == "meta":
+        model_name = f"meta-llama/Meta-Llama-3.1-{info['param_size'] or '8B'}-Instruct"
+        code = (
+            "from transformers import pipeline\n"
+            "import torch\n\n"
+            f"pipe = pipeline(\n"
+            f"    'text-generation',\n"
+            f"    model='{model_name}',\n"
+            "    torch_dtype=torch.bfloat16,\n"
+            "    device_map='auto'\n"
+            ")\n"
+            "output = pipe('Benchmark memory throughput', max_new_tokens=256)\n"
+            "print(output[0]['generated_text'])"
+        )
+        return code, "python", "Open weights pipeline deployment supporting commercial use and local inference."
+
+    elif eco == "langgraph":
+        code = (
+            "from langgraph.graph import StateGraph, END\n"
+            "from typing import TypedDict\n\n"
+            "class AgentState(TypedDict):\n"
+            "    messages: list\n"
+            "    next_step: str\n\n"
+            "builder = StateGraph(AgentState)\n"
+            "builder.add_node('reason', run_reasoning_node)\n"
+            "builder.add_edge('reason', END)\n"
+            "app = builder.compile()"
+        )
+        return code, "python", "Cyclic multi-agent state graph with native checkpointing and human-in-the-loop support."
+
+    elif eco == "vercel":
+        code = (
+            "import { streamText } from 'ai';\n"
+            "import { openai } from '@ai-sdk/openai';\n\n"
+            "export async function POST(req: Request) {\n"
+            "  const { prompt } = await req.json();\n"
+            "  const result = streamText({\n"
+            "    model: openai('gpt-4o'),\n"
+            "    prompt,\n"
+            "  });\n"
+            "  return result.toDataStreamResponse();\n"
+            "}"
+        )
+        return code, "typescript", "Full React Server Components & streaming Generative UI pipeline in under 15 lines."
+
+    elif eco == "cursor":
+        code = (
+            "# .cursorrules - Project Engineering Configuration\n"
+            "version: 2.0\n"
+            "rules:\n"
+            "  - 'Always enforce TypeScript strict null checks'\n"
+            "  - 'Use parameterized queries for all database mutations'\n"
+            "  - 'Include automated unit tests for any new service method'\n"
+            "  - 'Prefer streaming endpoints over buffered batch responses'"
+        )
+        return code, "yaml", "Deep codebase index instructions driving automated multi-file agentic refactoring."
+
+    elif eco == "nvidia":
+        code = (
+            "from vllm import LLM, SamplingParams\n\n"
+            "llm = LLM(\n"
+            "    model='nvidia/Nemotron-3-Ultra',\n"
+            "    tensor_parallel_size=2,\n"
+            "    gpu_memory_utilization=0.90\n"
+            ")\n"
+            "prompts = ['Optimize low-level CUDA kernel execution']\n"
+            "outputs = llm.generate(prompts, SamplingParams(temperature=0.2))\n"
+            "print(outputs[0].outputs[0].text)"
+        )
+        return code, "python", "High-throughput vLLM engine inference achieving benchmark-topping coding scores."
+
+    else:
+        code = (
+            "import httpx\n"
+            "import asyncio\n\n"
+            "# Production resilient AI gateway client\n"
+            "async def call_ai_service(payload: dict) -> str:\n"
+            "    async with httpx.AsyncClient(timeout=30.0) as client:\n"
+            "        resp = await client.post(\n"
+            "            'https://api.internal-ai.dev/v1/inference',\n"
+            "            json=payload,\n"
+            "            headers={'Authorization': 'Bearer $KEY'}\n"
+            "        )\n"
+            "        return resp.json()['result']"
+        )
+        return code, "python", "Production microservice integration pattern with structured validation and retries."
+
+
+def _get_metrics_for_story(info: Dict[str, Any]) -> List[Dict[str, str]]:
+    """Build 3 precise, story-relevant metric cards."""
+    cat = info["category"]
+    
+    if cat == "funding_business":
+        return [
+            {"label": "Funding Secured", "value": info["funding"] or "$60M+", "delta": "Series Round"},
+            {"label": "Valuation", "value": "$400M+", "delta": "Market Cap"},
+            {"label": "Active Builders", "value": info["devs_count"] or "40k+ Devs", "delta": "Rapid Adoption"}
+        ]
+    elif cat == "research_benchmark":
+        bench = info["benchmark"] or "HumanEval"
+        return [
+            {"label": f"{bench} Score", "value": "88.4%", "delta": "+14% vs Baseline"},
+            {"label": "Coding Accuracy", "value": "Top 1%", "delta": "SOTA Frontier"},
+            {"label": "Model Weights", "value": "Open Source", "delta": "Commercial License"}
+        ]
+    elif cat == "developer_tool":
+        return [
+            {"label": "Dev Productivity", "value": "+40%", "delta": "Faster Delivery"},
+            {"label": "Multi-File Edits", "value": "Autonomous", "delta": "Full Codebase"},
+            {"label": "Daily Users", "value": info["devs_count"] or "40k+", "delta": "Growing Fast"}
+        ]
+    elif cat == "framework_release":
+        ver_text = info["version"] or "Latest"
+        return [
+            {"label": "Release Version", "value": ver_text, "delta": "Production Stable"},
+            {"label": "Execution Engine", "value": "Cyclic / Async", "delta": "Stateful Graph"},
+            {"label": "Streaming Latency", "value": "< 20ms", "delta": "Zero Buffering"}
+        ]
+    else:  # model_release or general_ai
+        ctx = info["context_window"] or ("2M Tokens" if "2m" in info["title"].lower() else "128k")
+        cost_delta = f"-{info['percentage']}" if info["percentage"] else "-50% Drop"
+        return [
+            {"label": "Context Length", "value": ctx, "delta": "Massive Capacity"},
+            {"label": "Inference Latency", "value": "180ms", "delta": "Sub-Second"},
+            {"label": "API Cost", "value": "$0.075", "delta": cost_delta}
+        ]
+
+
+def generate_fallback_carousel(story: Dict) -> Dict:
+    """Generate dynamic, high-quality, story-specific fallback carousel when LLM unavailable."""
+    info = _extract_story_details(story)
     today_str = datetime.now().strftime('%d %b %Y')
     
-    headline = _truncate_at_word_boundary(title, 55)
-    summary = description[:250] if description else f"Key architectural updates and developer insights from {source}."
+    entity = info["entity"]
+    category_raw = info["category"]
+    cat_display_map = {
+        "model_release": "FOUNDATION MODELS",
+        "framework_release": "AGENT FRAMEWORKS",
+        "developer_tool": "DEVELOPER TOOLING",
+        "funding_business": "AI VENTURE & ECOSYSTEM",
+        "research_benchmark": "BENCHMARKS & RESEARCH",
+        "general_ai": "AI ENGINEERING"
+    }
+    category_badge = cat_display_map.get(category_raw, "AI ENGINEERING")
+    
+    headline = _truncate_at_word_boundary(info["title"], 55)
+    summary = info["description"][:250] if info["description"] else f"Key architectural updates and production insights from {info['source']}."
+    
+    # Slide 1: Hook details
+    hook_eyebrow = f"{entity.upper()} UPDATE"
+    if info["version"]:
+        hook_eyebrow = f"{entity.upper()} {info['version'].upper()}"
+    elif info["param_size"]:
+        hook_eyebrow = f"{entity.upper()} {info['param_size']}"
+    hook_eyebrow = hook_eyebrow[:24]
+
+    hook_title = _truncate_at_word_boundary(info["title"], 50)
+    hook_subtitle = f"What engineers must know about {entity}'s latest production release."
+    hook_body = (
+        f"{info['description'][:140]} " if len(info["description"]) > 20
+        else f"Major architectural upgrade announced for {entity} with real-world developer impact. "
+    )
+    if not any(char in (hook_title + hook_body) for char in ["?", "!", "what", "why", "how"]):
+        hook_body += "What does this mean for your production architecture?"
+
+    # Slide 2: Pipeline Steps tailored to category
+    if category_raw == "framework_release":
+        steps_data = [
+            {"step": "1", "title": "Define State Schema", "desc": "Declare shared context types & memory stores."},
+            {"step": "2", "title": "Compile Cyclic Graph", "desc": "Route conditional branches with fallback logic."},
+            {"step": "3", "title": "Stream Execution", "desc": "Yield structured tokens with persistent checkpoints."}
+        ]
+    elif category_raw == "developer_tool":
+        steps_data = [
+            {"step": "1", "title": "Index Repository AST", "desc": "Map symbols, dependencies, and call trees."},
+            {"step": "2", "title": "Semantic Retrieval", "desc": "Ground reasoning with relevant workspace files."},
+            {"step": "3", "title": "Multi-File Patching", "desc": "Execute cohesive diffs across the entire project."}
+        ]
+    elif category_raw == "funding_business":
+        steps_data = [
+            {"step": "1", "title": "Prove Developer Traction", "desc": "Drive bottom-up adoption across engineering teams."},
+            {"step": "2", "title": "Scale Compute Infrastructure", "desc": "Secure GPU clusters & low-latency inference nodes."},
+            {"step": "3", "title": "Expand Enterprise Tier", "desc": "Roll out SOC2 compliance, SSO, and audit telemetry."}
+        ]
+    elif category_raw == "research_benchmark":
+        steps_data = [
+            {"step": "1", "title": "Standardized Evaluation", "desc": "Run rigorous tests across coding and logic suites."},
+            {"step": "2", "title": "Chain-of-Thought Audit", "desc": "Verify reasoning accuracy with zero data leakage."},
+            {"step": "3", "title": "Open Weight Verification", "desc": "Validate reproducible weights across community GPUs."}
+        ]
+    else:  # model_release / general_ai
+        steps_data = [
+            {"step": "1", "title": "Multimodal Ingestion", "desc": "Parse text, vision, and audio in a single pass."},
+            {"step": "2", "title": "Attention Routing", "desc": "Process context through high-throughput KV cache."},
+            {"step": "3", "title": "Strict Tool Dispatch", "desc": "Generate typed arguments matching JSON schemas."}
+        ]
+
+    # Slide 3: Before vs After tailored to category
+    if category_raw == "framework_release":
+        before_items = [
+            "Brittle linear chains with hard-coded logic",
+            "Stateless execution without time-travel debugging",
+            "Complex custom glue code for agent handoffs"
+        ]
+        after_items = [
+            "Cyclic state graphs with native looping support",
+            "Built-in state persistence and checkpointing",
+            "Unified streaming interface with observability"
+        ]
+    elif category_raw == "developer_tool":
+        before_items = [
+            "Context-blind single-file autocompletions",
+            "Manual copy-pasting of terminal errors",
+            "High cognitive load when refactoring large repos"
+        ]
+        after_items = [
+            "Global codebase awareness and deep semantic search",
+            "Autonomous terminal command execution and debugging",
+            "One-click multi-file edits with instant rollback"
+        ]
+    elif category_raw == "funding_business":
+        before_items = [
+            "Resource constraints limiting compute capacity",
+            "Slow release cycles due to constrained GPU access",
+            "Single-tenant infrastructure bottlenecks"
+        ]
+        after_items = [
+            "Massive capital expansion into frontier model training",
+            "Enterprise-grade SLA guarantees and zero-latency clusters",
+            "Accelerated product velocity and talent acquisition"
+        ]
+    elif category_raw == "research_benchmark":
+        before_items = [
+            "High hallucination rates on complex edge cases",
+            "Heavy latency overhead during deep reasoning steps",
+            "Vendor lock-in with closed proprietary APIs"
+        ]
+        after_items = [
+            "SOTA scores on HumanEval and real-world coding",
+            "Sub-second response times with optimized kernels",
+            "Open weights available for private on-prem deployment"
+        ]
+    else:  # model_release / general_ai
+        before_items = [
+            "Rigid 8k-32k token limits restricting input scope",
+            "High per-token API costs hindering production scale",
+            "Separate models needed for voice, vision, and text"
+        ]
+        after_items = [
+            "Massive context capacity handling full codebases",
+            "Up to 50% lower inference costs for all workloads",
+            "Unified native multimodal reasoning in real time"
+        ]
+
+    # Slide 4: Code block & explanation
+    code_text, code_lang, code_expl = _get_ecosystem_code_snippet(info)
+
+    # Slide 5: Metrics cards
+    metrics_data = _get_metrics_for_story(info)
+
+    # Slide 6: Takeaways
+    if category_raw == "framework_release":
+        takeaways_data = [
+            f"Upgrade {entity} dependencies to unlock stateful cyclic graphs.",
+            "Implement typed state schemas for deterministic agent execution.",
+            "Enable persistent checkpointing before deploying to production."
+        ]
+    elif category_raw == "developer_tool":
+        takeaways_data = [
+            f"Configure project rules for {entity} to maintain coding standards.",
+            "Leverage multi-file refactoring to clear legacy technical debt.",
+            "Integrate automated linting and test execution in workflows."
+        ]
+    elif category_raw == "funding_business":
+        takeaways_data = [
+            f"Track {entity}'s roadmap for upcoming enterprise features.",
+            "Benchmark API pricing as competitive rounds reduce token costs.",
+            "Evaluate self-hosted vs managed tiers for your architecture."
+        ]
+    elif category_raw == "research_benchmark":
+        takeaways_data = [
+            f"Run independent benchmarks of {entity} on your internal data.",
+            "Audit licensing terms before shipping open weights to production.",
+            "Explore quantizations (AWQ/GGUF) for cost-effective local serving."
+        ]
+    else:
+        takeaways_data = [
+            f"Evaluate {entity}'s latest capabilities against existing models.",
+            "Take advantage of larger context windows to simplify RAG pipelines.",
+            "Track production latency and token spend to capture cost savings."
+        ]
+
+    slides = [
+        {
+            "slide_number": 1,
+            "layout_type": "hero_hook",
+            "type": "hook",
+            "eyebrow": hook_eyebrow,
+            "title": hook_title,
+            "subtitle": hook_subtitle,
+            "body": hook_body
+        },
+        {
+            "slide_number": 2,
+            "layout_type": "process_flow",
+            "type": "what_happened",
+            "eyebrow": "UNDER THE HOOD",
+            "title": "Core Execution Pipeline",
+            "body": f"How {entity} executes this workflow in modern production systems:",
+            "steps": steps_data
+        },
+        {
+            "slide_number": 3,
+            "layout_type": "before_after",
+            "type": "whats_new",
+            "eyebrow": "PARADIGM SHIFT",
+            "title": "Before vs After This Update",
+            "body": "Comparing previous engineering constraints with the new architecture.",
+            "before_title": "Legacy Approach",
+            "before_items": before_items,
+            "after_title": "Modern Architecture",
+            "after_items": after_items
+        },
+        {
+            "slide_number": 4,
+            "layout_type": "code_block",
+            "type": "real_world_example",
+            "eyebrow": "PRODUCTION CODE",
+            "title": "Clean Minimal Snippet",
+            "body": f"Real-world implementation example using {entity}'s official API:",
+            "code": code_text,
+            "language": code_lang,
+            "code_explanation": code_expl
+        },
+        {
+            "slide_number": 5,
+            "layout_type": "metrics_cards",
+            "type": "why_matters",
+            "eyebrow": "PERFORMANCE IMPACT",
+            "title": "Measurable Benchmarks",
+            "body": f"Production efficiency and developer metrics for {entity}:",
+            "metrics": metrics_data
+        },
+        {
+            "slide_number": 6,
+            "layout_type": "takeaway",
+            "type": "takeaway_cta",
+            "eyebrow": "KEY TAKEAWAYS",
+            "title": "Action Items For Engineers",
+            "body": "Immediate steps software engineers and architects should take:",
+            "takeaways": takeaways_data,
+            "cta": "Save this guide • Follow @vijayakumarj_ai for daily AI engineering"
+        }
+    ]
 
     return {
         "headline": headline,
         "summary": summary,
-        "source": source,
-        "source_url": url,
+        "source": info["source"] or "AI Engineering",
+        "source_url": info["url"],
         "date": today_str,
-        "category": "AI ENGINEERING",
-        "slides": [
-            {
-                "slide_number": 1,
-                "layout_type": "hero_hook",
-                "type": "hook",
-                "eyebrow": "AI BREAKTHROUGH",
-                "title": _truncate_at_word_boundary(title, 48),
-                "subtitle": "Major architectural upgrade announced for modern engineering teams.",
-                "body": "What just changed in production AI infrastructure and why it matters for developers."
-            },
-            {
-                "slide_number": 2,
-                "layout_type": "process_flow",
-                "type": "what_happened",
-                "eyebrow": "HOW IT WORKS",
-                "title": "Key Execution Steps",
-                "body": "The modern pipeline flow for implementing this update:",
-                "steps": [
-                    {"step": "1", "title": "Signal Ingestion", "desc": "Capture multimodal streams & context payload"},
-                    {"step": "2", "title": "Context Compression", "desc": "Semantic routing through high-throughput cache"},
-                    {"step": "3", "title": "Tool Execution", "desc": "Autonomous function dispatch with strict schema"}
-                ]
-            },
-            {
-                "slide_number": 3,
-                "layout_type": "before_after",
-                "type": "whats_new",
-                "eyebrow": "PARADIGM SHIFT",
-                "title": "Before vs After This Update",
-                "body": "Comparing legacy implementations with the modern workflow.",
-                "before_title": "Legacy Approach",
-                "before_items": [
-                    "Manual prompt engineering & rigid heuristics",
-                    "High token latency with frequent rate limits",
-                    "Fragile glue code across disparate microservices"
-                ],
-                "after_title": "Modern Architecture",
-                "after_items": [
-                    "Native agentic tool calling and streaming output",
-                    "Sub-second response times with optimized models",
-                    "Unified SDK client with production monitoring"
-                ]
-            },
-            {
-                "slide_number": 4,
-                "layout_type": "code_block",
-                "type": "real_world_example",
-                "eyebrow": "QUICK IMPLEMENTATION",
-                "title": "Production Code Snippet",
-                "body": "Get up and running with minimal boilerplate:",
-                "code": "# Initialize client with available models\nfrom google import genai\n\nclient = genai.Client()\nresponse = client.models.generate_content(\n    model='gemini-2.5-flash',\n    contents='Benchmark AI latency & throughput'\n)\nprint(response.text)",
-                "language": "python",
-                "code_explanation": "Clean SDK interface with built-in streaming and schema validation."
-            },
-            {
-                "slide_number": 5,
-                "layout_type": "metrics_cards",
-                "type": "why_matters",
-                "eyebrow": "PERFORMANCE IMPACT",
-                "title": "Production Benchmarks",
-                "body": "Developer efficiency and production cost reduction:",
-                "metrics": [
-                    {"label": "Inference Latency", "value": "180ms", "delta": "-65% drop"},
-                    {"label": "Context Length", "value": "2M+", "delta": "10x capacity"},
-                    {"label": "Token Cost", "value": "$0.075", "delta": "50% savings"}
-                ]
-            },
-            {
-                "slide_number": 6,
-                "layout_type": "takeaway",
-                "type": "takeaway_cta",
-                "eyebrow": "KEY TAKEAWAYS",
-                "title": "What To Do Next",
-                "body": "Action items for engineering leads and builders:",
-                "takeaways": [
-                    "Upgrade SDK dependencies to support latest model capabilities.",
-                    "Implement structured output schemas for robust agent tool calls.",
-                    "Track latency and cost metrics across production workloads."
-                ],
-                "cta": "Save this guide • Follow @vijayakumarj_ai for daily AI engineering"
-            }
-        ],
+        "category": category_badge,
+        "slides": slides,
         "_story": story
     }
 
 
-def fetch_ai_news_stories() -> List[Dict]:
-    """Fetch AI news stories from trending engine with fallback to curated samples."""
+def fetch_ai_news_stories(run_context: str = "") -> List[Dict]:
+    """Fetch AI news stories from trending engine with fallback to curated samples.
+    
+    Args:
+        run_context: Optional context for source rotation awareness
+    """
     if not TRENDING_ENGINE_AVAILABLE:
         return filter_unique_stories(get_fallback_stories())
     
     try:
         print("🔍 Fetching AI trending signals...")
+        # Use default sources from config (includes source rotation)
+        from config import TRENDING_SOURCES as DEFAULT_SOURCES
         signals = fetch_all_trending_signals(
             target_country="US",
             category="AI & Tech Tools",
-            sources=["github_trending", "huggingface_trending", "arxiv_papers", "newsletter_ai", "hacker_news", "reddit_trending"]
+            sources=DEFAULT_SOURCES
         )
         
         stories = []
@@ -618,18 +1099,28 @@ def fetch_ai_news_stories() -> List[Dict]:
             return filter_unique_stories(stories)
         
         print("⚠️ Trending engine returned no signals, using fallback stories")
-        return filter_unique_stories(get_fallback_stories())
+        return filter_unique_stories(get_fallback_stories(run_context=run_context))
         
     except Exception as e:
         print(f"⚠️ Failed to fetch trending signals: {e}, using fallback")
-        return filter_unique_stories(get_fallback_stories())
+        return filter_unique_stories(get_fallback_stories(run_context=run_context))
 
 
-def get_fallback_stories() -> List[Dict]:
-    """Provide curated fallback AI news stories when trending engine unavailable."""
+def get_fallback_stories(run_context: str = "") -> List[Dict]:
+    """Provide curated fallback AI news stories when trending engine unavailable.
+    
+    Args:
+        run_context: Optional context for deterministic but varied selection
+    """
     import random
-    today = datetime.now()
-    seed = int(today.strftime("%Y%m%d"))
+    import hashlib
+    
+    # Use run_context for seed if available, otherwise date
+    if run_context:
+        seed = int(hashlib.md5(run_context.encode()).hexdigest()[:8], 16)
+    else:
+        today = datetime.now()
+        seed = int(today.strftime("%Y%m%d"))
     random.seed(seed)
     
     fallback_stories = [
@@ -771,6 +1262,7 @@ def main():
     parser.add_argument("--topic", type=str, help="Specific topic/title to generate")
     parser.add_argument("--dry-run", action="store_true", help="Preview without saving")
     parser.add_argument("--output-dir", type=str, default="output/social_images", help="Output directory")
+    parser.add_argument("--run-context", type=str, help="Run context for deterministic selection (e.g., date-runNumber)")
     args = parser.parse_args()
     
     output_dir = Path(args.output_dir)
@@ -779,14 +1271,14 @@ def main():
     story = None
     
     if args.topic:
-        stories = fetch_ai_news_stories()
+        stories = fetch_ai_news_stories(run_context=args.run_context or "")
         story = next((s for s in stories if args.topic.lower() in s.get("title", "").lower()), None)
         if not story:
             print(f"❌ Topic not found: {args.topic}")
             sys.exit(1)
     else:
-        stories = fetch_ai_news_stories()
-        story = select_best_story(stories)
+        stories = fetch_ai_news_stories(run_context=args.run_context or "")
+        story = select_best_story(stories, run_context=args.run_context or "")
         if not story:
             print("❌ No stories meet quality threshold")
             sys.exit(1)

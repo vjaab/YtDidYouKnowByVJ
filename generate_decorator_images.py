@@ -277,8 +277,11 @@ def main():
                 print(f"❌ Topic not found: {args.topic}")
                 sys.exit(1)
         else:
-            stories = fetch_ai_news_stories()
-            story = select_best_story(stories)
+            # Create run context for deterministic selection (date + workflow run info)
+            import datetime
+            run_context = f"{datetime.datetime.now().strftime('%Y%m%d')}-{os.getenv('GITHUB_RUN_NUMBER', '0')}-{os.getenv('GITHUB_RUN_ATTEMPT', '1')}"
+            stories = fetch_ai_news_stories(run_context=run_context)
+            story = select_best_story(stories, run_context=run_context)
             if not story:
                 print("❌ No stories meet quality threshold")
                 sys.exit(1)
@@ -290,8 +293,11 @@ def main():
         carousel = generate_carousel_json(story)
         safe_title = sanitize_filename(carousel.get("headline", "ai_news"))
 
+        # Create run context for deterministic visual strategy
+        run_context = f"{datetime.datetime.now().strftime('%Y%m%d')}-{os.getenv('GITHUB_RUN_NUMBER', '0')}-{os.getenv('GITHUB_RUN_ATTEMPT', '1')}"
+
         # Create Visual Strategy (Theme, Layout Sequence, Styling)
-        strategy = create_visual_strategy(carousel, story=story)
+        strategy = create_visual_strategy(carousel, story=story, run_context=run_context)
         strategy_path = output_dir / f"strategy_{safe_title}.json"
         with open(strategy_path, "w", encoding="utf-8") as f:
             json.dump(strategy, f, indent=2)
