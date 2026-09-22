@@ -630,7 +630,7 @@ Write the deepest possible analysis of this one story across 3-5 chapters.
         """Run the full 4-agent pipeline end-to-end."""
 
         # 0. Discover topics (90s timeout)
-        topics_data = execute_with_timeout(self.discover_topics, 90)
+        topics_data = execute_with_timeout(self.discover_topics, 180)
         if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         if not topics_data or "selected_stories" not in topics_data:
             print("❌ [LONGFORM] Could not discover topics. Aborting.")

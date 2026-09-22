@@ -295,7 +295,16 @@ def call_cloudflare(user_prompt: str) -> Optional[Dict[str, Any]]:
                 if model_name in gpt_oss_models:
                     content = safe_extract_choices(result, f"Cloudflare {model_name}")
                 else:
-                    content = result.get("response", "").strip()
+                    response_val = result.get("response", "")
+                    if isinstance(response_val, dict):
+                        # Some CF models return {"response": {"choices": [...]}} or raw JSON object
+                        content = safe_extract_choices(response_val, f"Cloudflare {model_name}")
+                        if not content:
+                            content = json.dumps(response_val)
+                    elif isinstance(response_val, str):
+                        content = response_val.strip()
+                    else:
+                        content = str(response_val).strip()
                 if content:
                     return clean_and_parse_json(content)
         except Exception as e:
@@ -416,7 +425,7 @@ def call_github_models(user_prompt: str) -> Optional[Dict[str, Any]]:
     if not github_token:
         return None
     
-    github_models = ["gpt-4o-mini", "meta-llama-3.1-405b-instruct"]
+    github_models = ["openai/gpt-4o-mini", "meta-llama-3.1-70b-instruct"]
     headers = {"Authorization": f"Bearer {github_token}", "Content-Type": "application/json"}
     
     for model_name in github_models:
@@ -428,7 +437,7 @@ def call_github_models(user_prompt: str) -> Optional[Dict[str, Any]]:
                 "response_format": {"type": "json_object"},
                 "temperature": 0.3,
             }
-            r = requests.post("https://models.inference.ai.azure.com/chat/completions", json=payload, headers=headers, timeout=30)
+            r = requests.post("https://models.github.ai/inference/chat/completions", json=payload, headers=headers, timeout=30)
             if r.status_code == 200:
                 content = safe_extract_choices(r.json(), "GitHub Models")
                 if content:
