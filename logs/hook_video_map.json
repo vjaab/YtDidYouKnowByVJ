@@ -378,5 +378,15 @@
     "title": "The Hidden Cost of 'Free' AI: Why Open Source Backfires \u26a0\ufe0f",
     "uploaded_at": "2026-09-19T20:08:23.760915",
     "synced": false
+  },
+  "DfrTUcpq__M": {
+    "video_id": "DfrTUcpq__M",
+    "hook_pattern": "personal_stake",
+    "hook_variant": "C",
+    "hook_text": "Your AI could leak private data.",
+    "category": "AI & Machine Learning",
+    "title": "NVIDIA's SkillSpector: The Secret Weapon for Safer AI Agents!",
+    "uploaded_at": "2026-09-22T09:10:48.620035",
+    "synced": false
   }
 }
