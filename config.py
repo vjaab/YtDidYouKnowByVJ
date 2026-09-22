@@ -89,6 +89,7 @@ load_dotenv()
 
 # API Keys
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 NEWS_API_KEY = os.getenv("NEWS_API_KEY", "")
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
 ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "")
@@ -97,6 +98,20 @@ CF_ACCOUNT_ID = os.getenv("CF_ACCOUNT_ID", "")
 CF_API_TOKEN = os.getenv("CF_API_TOKEN", "")
 YOUTUBE_CLIENT_SECRET_FILE = os.getenv("YOUTUBE_CLIENT_SECRET_FILE", "client_secret.json")
 VEO_MODEL_ID = "veo-3.1-generate-preview"
+
+# Model Priority Routing for Content Generation
+# Priority 1: nvidia/nemotron-3-ultra-550b-a55b:free (Main content generation / reasoning)
+# Priority 2: poolside/laguna-s-2.1:free (Coding + technical topics)
+# Priority 3: nvidia/nemotron-3.5-lightning:free (Fast high-volume fallback)
+# Priority 4: inclusionai/ling-3.0-flash-fin:free (Finance/business topics)
+# Priority 5: Existing Gemini (Google Search / current-topic discovery + generation fallback)
+MODEL_PRIORITIES = {
+    "main_reasoning": "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "coding_technical": "poolside/laguna-s-2.1:free",
+    "fast_fallback": "nvidia/nemotron-3.5-lightning:free",
+    "finance_business": "inclusionai/ling-3.0-flash-fin:free",
+    "gemini_search_discovery": "gemini-2.5-flash",
+}
 
 # YouTube Analytics API (for performance feedback loop)
 YOUTUBE_ANALYTICS_API_KEY = os.getenv("YOUTUBE_ANALYTICS_API_KEY", "")

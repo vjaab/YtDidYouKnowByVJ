@@ -85,6 +85,7 @@ jobs:
           echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env
           echo "GITHUB_REPOSITORY=${{ github.repository }}" >> .env
           echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
+          if [ ! -z "${{ secrets.OPENROUTER_API_KEY }}" ]; then echo "OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}" >> .env; fi
           echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> .env
           echo "CF_API_TOKEN=${{ secrets.CF_API_TOKEN }}" >> .env
           echo "CF_ACCOUNT_ID=${{ secrets.CF_ACCOUNT_ID }}" >> .env
@@ -102,6 +103,7 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TOPIC: ${{ github.event.inputs.topic || '' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           python -u generate_decorator_images.py --now \
             --topic "${{ github.event.inputs.topic || '' }}" \

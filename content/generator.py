@@ -255,17 +255,24 @@ class ContentGenerator:
         return None
 
     def _generate_with_fallback(self, user_prompt: str) -> Optional[Dict[str, Any]]:
-        """Try all providers in order until one succeeds. Returns normalized dict."""
+        """Try all providers in priority order until one succeeds. Returns normalized dict."""
         
-        # 1. Try Gemini first
+        # 1. Try OpenRouter priority models first (Priority 1-4)
+        from llm_fallback import call_openrouter
+        result = call_openrouter(user_prompt)
+        if result:
+            print("✅ OpenRouter priority model succeeded")
+            return normalize_llm_response(result)
+        
+        # 2. Try Gemini (Priority 5)
         result = self._call_gemini(user_prompt)
         if result:
             print("✅ Gemini succeeded")
             return normalize_llm_response(result)
         
-        print("🚨 Gemini failed all models. Attempting fallback providers...")
+        print("🚨 OpenRouter & Gemini failed. Attempting other fallback providers...")
         
-        # 2. Use shared fallback chain
+        # 3. Use shared fallback chain
         result = call_fallback_chain(user_prompt, normalize=True)
         if result:
             return result

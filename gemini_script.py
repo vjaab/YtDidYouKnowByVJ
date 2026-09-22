@@ -621,6 +621,15 @@ Return ONLY a JSON object:
   "enemy_hero_hook_framing": "Example hook framing (e.g. 'Google just killed...')"
 }}"""
     try:
+        from llm_fallback import call_openrouter
+        openrouter_data = call_openrouter(prompt, context_text=f"{title} {description}")
+        if openrouter_data and isinstance(openrouter_data, dict) and "overall_viable" in openrouter_data:
+            print("✅ Viability evaluated with OpenRouter priority model")
+            return openrouter_data
+    except Exception:
+        pass
+
+    try:
         response = client.models.generate_content(
             model=GEMINI_FLASH_MODEL,
             contents=prompt,
@@ -2098,7 +2107,22 @@ class MultiAgentGenerationEngine:
     def _call_gemini(self, prompt, model=GEMINI_FLASH_MODEL):
         import os
         from google import genai
+
+        # Priority 1-4: OpenRouter prioritized models
+        try:
+            from llm_fallback import call_openrouter
+            openrouter_res = call_openrouter(
+                prompt,
+                topic_category=getattr(self, "category", None),
+                context_text=str(getattr(self, "context", ""))[:1000]
+            )
+            if openrouter_res and isinstance(openrouter_res, dict):
+                print("✅ Generation successful with OpenRouter priority model")
+                return openrouter_res
+        except Exception as e:
+            print(f"⚠️ OpenRouter generation attempt exception: {e}")
         
+        # Priority 5: Gemini rotation
         # Get list of API keys
         api_keys_env = os.getenv("GEMINI_API_KEYS", os.getenv("GEMINI_API_KEY", ""))
         api_keys = [k.strip() for k in api_keys_env.split(",") if k.strip()]

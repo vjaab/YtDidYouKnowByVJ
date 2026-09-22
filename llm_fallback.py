@@ -513,42 +513,99 @@ def call_deepseek(user_prompt: str) -> Optional[Dict[str, Any]]:
     return None
 
 
-def call_openrouter(user_prompt: str) -> Optional[Dict[str, Any]]:
+# ─── OpenRouter Model Priorities ───────────────────────────────────────────────
+# Priority 1: nvidia/nemotron-3-ultra-550b-a55b:free (Main content generation / reasoning)
+# Priority 2: poolside/laguna-s-2.1:free (Coding + technical topics)
+# Priority 3: nvidia/nemotron-3.5-lightning:free (Fast high-volume fallback)
+# Priority 4: inclusionai/ling-3.0-flash-fin:free (Finance/business topics)
+
+OPENROUTER_PRIORITY_MODELS = {
+    "main_reasoning": "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "coding_technical": "poolside/laguna-s-2.1:free",
+    "fast_fallback": "nvidia/nemotron-3.5-lightning:free",
+    "finance_business": "inclusionai/ling-3.0-flash-fin:free",
+}
+
+
+def get_openrouter_models_by_priority(topic_category: Optional[str] = None, context_text: str = "") -> List[str]:
+    """Return OpenRouter models ordered according to user-specified priority & topic specialization."""
+    text_lower = f"{topic_category or ''} {context_text}".lower()
+    
+    # Coding / Technical topic detection -> prioritize poolside/laguna-s-2.1
+    if any(k in text_lower for k in ["code", "coding", "developer", "ide", "programming", "python", "typescript", "rust", "ast", "cli", "git", "api"]):
+        return [
+            OPENROUTER_PRIORITY_MODELS["coding_technical"],   # Priority 2 specialized
+            OPENROUTER_PRIORITY_MODELS["main_reasoning"],    # Priority 1 main
+            OPENROUTER_PRIORITY_MODELS["fast_fallback"],     # Priority 3 fallback
+            OPENROUTER_PRIORITY_MODELS["finance_business"],  # Priority 4
+        ]
+    
+    # Finance / Business topic detection -> prioritize inclusionai/ling-3.0-flash-fin
+    if any(k in text_lower for k in ["finance", "funding", "valuation", "venture", "market", "revenue", "investor", "acquisition", "stock", "business", "industry_trend", "industry", "economy", "startup"]):
+        return [
+            OPENROUTER_PRIORITY_MODELS["finance_business"],  # Priority 4 specialized
+            OPENROUTER_PRIORITY_MODELS["main_reasoning"],    # Priority 1 main
+            OPENROUTER_PRIORITY_MODELS["coding_technical"],  # Priority 2
+            OPENROUTER_PRIORITY_MODELS["fast_fallback"],     # Priority 3 fallback
+        ]
+    
+    # Default order: Main reasoning (P1) -> Coding (P2) -> Fast fallback (P3) -> Finance (P4)
+    return [
+        OPENROUTER_PRIORITY_MODELS["main_reasoning"],        # Priority 1
+        OPENROUTER_PRIORITY_MODELS["coding_technical"],      # Priority 2
+        OPENROUTER_PRIORITY_MODELS["fast_fallback"],         # Priority 3
+        OPENROUTER_PRIORITY_MODELS["finance_business"],      # Priority 4
+    ]
+
+
+def call_openrouter(user_prompt: str, topic_category: Optional[str] = None, context_text: str = "") -> Optional[Dict[str, Any]]:
+    """Call OpenRouter with prioritized models: Nemotron 3 Ultra, Laguna, Nemotron Lightning, Ling Flash."""
     openrouter_key = os.getenv("OPENROUTER_API_KEY")
     if not openrouter_key:
         return None
     
-    openrouter_models = ["openrouter/free", "meta-llama/llama-3.3-70b-instruct"]
-    headers = {"Authorization": f"Bearer {openrouter_key}", "Content-Type": "application/json"}
+    models_to_try = get_openrouter_models_by_priority(topic_category=topic_category, context_text=context_text)
+    headers = {
+        "Authorization": f"Bearer {openrouter_key}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://github.com/vjaab/YtDidYouKnowByVJ",
+        "X-Title": "YtDidYouKnowByVJ Video & Carousel Pipeline",
+    }
     
-    for model_name in openrouter_models:
-        print(f"🔮 Falling back to OpenRouter ({model_name})...")
+    for model_name in models_to_try:
+        print(f"🔮 Calling OpenRouter priority model ({model_name})...")
         try:
             payload = {
                 "model": model_name,
                 "messages": [{"role": "user", "content": user_prompt}],
-                "temperature": 0.3,
+                "temperature": 0.4,
             }
-            r = requests.post("https://openrouter.ai/api/v1/chat/completions", json=payload, headers=headers, timeout=30)
+            r = requests.post("https://openrouter.ai/api/v1/chat/completions", json=payload, headers=headers, timeout=40)
             if r.status_code == 200:
-                content = safe_extract_choices(r.json(), "OpenRouter")
+                content = safe_extract_choices(r.json(), f"OpenRouter:{model_name}")
                 if content:
-                    return clean_and_parse_json(content)
+                    parsed = clean_and_parse_json(content)
+                    if parsed:
+                        print(f"✅ OpenRouter ({model_name}) succeeded")
+                        return parsed
+            else:
+                print(f"⚠️ OpenRouter ({model_name}) returned HTTP {r.status_code}: {r.text[:150]}")
         except Exception as e:
             print(f"⚠️ OpenRouter ({model_name}) exception: {e}")
     return None
 
 
 # ─── Main Fallback Chain ───────────────────────────────────────────────────────
-
+# Priority 1-4: OpenRouter prioritized models
+# Priority 5+: Other providers + Gemini
 FALLBACK_CHAIN = [
+    ("OpenRouter", call_openrouter),
     ("OpenCode Zen", call_opencode),
     ("Cerebras", call_cerebras),
     ("NVIDIA NIM", call_nvidia),
     ("Mistral", call_mistral),
     ("Groq", call_groq),
     ("Cloudflare", call_cloudflare),
-    ("OpenRouter", call_openrouter),
     ("GitHub Models", call_github_models),
     ("OpenAI", call_openai),
     ("Anthropic", call_anthropic),

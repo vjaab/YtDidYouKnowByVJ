@@ -16,6 +16,11 @@ from typing import Dict, List, Any, Optional, Tuple
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+import requests
+from dotenv import load_dotenv
+
+load_dotenv()
+
 try:
     from trending_engine import fetch_all_trending_signals
     TRENDING_ENGINE_AVAILABLE = True
@@ -35,6 +40,8 @@ except ImportError:
     RAPIDFUZZ_AVAILABLE = False
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
+
 
 TRACKER_FILE = os.path.join(str(Path(__file__).parent), "news_log.json")
 CAROUSEL_TRACKER_FILE = os.path.join(str(Path(__file__).parent), "instagram_carousel_log.json")
@@ -560,14 +567,9 @@ def classify_topic_heuristically(story: Dict) -> Dict[str, Any]:
 
 
 def classify_topic(story: Dict, client=None) -> Dict[str, Any]:
-    """Classify a story into a structured Topic Intelligence object using Gemini with fallback to heuristics."""
+    """Classify a story into a structured Topic Intelligence object using OpenRouter/Gemini with fallback to heuristics."""
     title = story.get("title", "")
     description = story.get("description", "")
-    
-    if not GEMINI_AVAILABLE or not GEMINI_API_KEY:
-        return classify_topic_heuristically(story)
-
-    active_client = client or genai.Client(api_key=GEMINI_API_KEY)
     
     classification_prompt = f"""You are a senior tech editor analyzing an AI & engineering news story for an educational developer carousel.
 Analyze this story and output strictly a JSON object:
@@ -605,30 +607,66 @@ JSON OUTPUT FORMAT:
   "recommended_slide_count": 8
 }}"""
 
-    for model_name in AVAILABLE_GEMINI_MODELS:
-        try:
-            response = active_client.models.generate_content(
-                model=model_name,
-                contents=classification_prompt
-            )
-            raw = response.text.strip()
-            if raw.startswith("```json"):
-                raw = raw[7:]
-            if raw.startswith("```"):
-                raw = raw[3:]
-            if raw.endswith("```"):
-                raw = raw[:-3]
-            data = json.loads(raw.strip())
-            if isinstance(data, dict) and data.get("topic_type") in CONTENT_ARCHETYPES:
-                # Clamp slide count to archetype boundaries
-                arch = CONTENT_ARCHETYPES[data["topic_type"]]
-                min_s, max_s = arch["slide_range"]
-                rec = data.get("recommended_slide_count", arch["default_slide_count"])
-                data["recommended_slide_count"] = max(min_s, min(rec, max_s))
-                print(f"🧠 Topic Intelligence: type={data['topic_type']} | entity={data['primary_entity']} | domain={data['domain']}")
-                return data
-        except Exception as e:
-            continue
+    # Priority 1 & 3: Try OpenRouter for reasoning/classification if available
+    openrouter_key = os.getenv("OPENROUTER_API_KEY", "") or OPENROUTER_API_KEY
+    if openrouter_key:
+        or_models = ["nvidia/nemotron-3-ultra-550b-a55b:free", "nvidia/nemotron-3.5-lightning:free"]
+        headers = {
+            "Authorization": f"Bearer {openrouter_key}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://github.com/vjaab/YtDidYouKnowByVJ",
+            "X-Title": "YtDidYouKnowByVJ Carousel Intelligence",
+        }
+        for model_name in or_models:
+            try:
+                payload = {
+                    "model": model_name,
+                    "messages": [{"role": "user", "content": classification_prompt}],
+                    "temperature": 0.2,
+                }
+                r = requests.post("https://openrouter.ai/api/v1/chat/completions", json=payload, headers=headers, timeout=25)
+                if r.status_code == 200:
+                    choices = r.json().get("choices", [])
+                    if choices:
+                        raw = choices[0].get("message", {}).get("content", "").strip()
+                        from llm_fallback import clean_and_parse_json
+                        data = clean_and_parse_json(raw)
+                        if isinstance(data, dict) and data.get("topic_type") in CONTENT_ARCHETYPES:
+                            arch = CONTENT_ARCHETYPES[data["topic_type"]]
+                            min_s, max_s = arch["slide_range"]
+                            rec = data.get("recommended_slide_count", arch["default_slide_count"])
+                            data["recommended_slide_count"] = max(min_s, min(rec, max_s))
+                            print(f"🧠 Topic Intelligence (OpenRouter:{model_name}): type={data['topic_type']} | entity={data['primary_entity']} | domain={data['domain']}")
+                            return data
+            except Exception as e:
+                print(f"⚠️ OpenRouter topic classification ({model_name}) exception: {e}")
+
+    # Priority 5: Gemini LLM classification
+    if GEMINI_AVAILABLE and GEMINI_API_KEY:
+        active_client = client or genai.Client(api_key=GEMINI_API_KEY)
+        for model_name in AVAILABLE_GEMINI_MODELS:
+            try:
+                response = active_client.models.generate_content(
+                    model=model_name,
+                    contents=classification_prompt
+                )
+                raw = response.text.strip()
+                if raw.startswith("```json"):
+                    raw = raw[7:]
+                if raw.startswith("```"):
+                    raw = raw[3:]
+                if raw.endswith("```"):
+                    raw = raw[:-3]
+                data = json.loads(raw.strip())
+                if isinstance(data, dict) and data.get("topic_type") in CONTENT_ARCHETYPES:
+                    arch = CONTENT_ARCHETYPES[data["topic_type"]]
+                    min_s, max_s = arch["slide_range"]
+                    rec = data.get("recommended_slide_count", arch["default_slide_count"])
+                    data["recommended_slide_count"] = max(min_s, min(rec, max_s))
+                    print(f"🧠 Topic Intelligence (Gemini:{model_name}): type={data['topic_type']} | entity={data['primary_entity']} | domain={data['domain']}")
+                    return data
+            except Exception as e:
+                continue
 
     print("ℹ️ LLM topic classification unavailable, using heuristic classifier")
     return classify_topic_heuristically(story)
@@ -918,50 +956,110 @@ def generate_carousel_json(story: Dict, min_slides: int = 5, max_slides: int = 8
         archetype=archetype,
         slide_count=desired_slides
     )
-    client = genai.Client(api_key=GEMINI_API_KEY)
 
     carousel = None
     last_error = None
 
-    # Try preferred models in order
-    for model_name in AVAILABLE_GEMINI_MODELS:
-        try:
-            print(f"🤖 Generating dynamic carousel ({topic_type} | {desired_slides} slides) with model: {model_name}...")
-            response = client.models.generate_content(
-                model=model_name,
-                contents=prompt,
-            )
-            text = response.text.strip()
-            if text.startswith("```json"):
-                text = text[7:]
-            if text.startswith("```"):
-                text = text[3:]
-            if text.endswith("```"):
-                text = text[:-3]
-            
-            parsed = json.loads(text.strip())
-            if isinstance(parsed, dict) and "slides" in parsed and len(parsed["slides"]) >= 4:
-                carousel = parsed
-                carousel["_model_used"] = model_name
-                carousel["_topic_intelligence"] = topic_intel
-                carousel["_archetype"] = archetype["name"]
-                
-                # Semantic Diversity & Narrative Validation
-                is_valid_narrative, narrative_issues = validate_slide_narrative(carousel, archetype=archetype)
-                if not is_valid_narrative:
-                    print(f"⚠️ Slide narrative validator reported issues: {narrative_issues}")
+    # Priority 1-4: OpenRouter prioritized models
+    openrouter_key = os.getenv("OPENROUTER_API_KEY", "") or OPENROUTER_API_KEY
+    if openrouter_key:
+        from llm_fallback import get_openrouter_models_by_priority, clean_and_parse_json
+        story_context = f"{story.get('title', '')} {story.get('description', '')}"
+        priority_models = get_openrouter_models_by_priority(topic_category=topic_type, context_text=story_context)
+        headers = {
+            "Authorization": f"Bearer {openrouter_key}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://github.com/vjaab/YtDidYouKnowByVJ",
+            "X-Title": "YtDidYouKnowByVJ Carousel Generator",
+        }
+        for model_name in priority_models:
+            try:
+                print(f"🤖 Generating dynamic carousel ({topic_type} | {desired_slides} slides) with OpenRouter: {model_name}...")
+                payload = {
+                    "model": model_name,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "temperature": 0.4,
+                }
+                r = requests.post("https://openrouter.ai/api/v1/chat/completions", json=payload, headers=headers, timeout=45)
+                if r.status_code == 200:
+                    choices = r.json().get("choices", [])
+                    if choices:
+                        raw = choices[0].get("message", {}).get("content", "").strip()
+                        parsed = clean_and_parse_json(raw)
+                        if isinstance(parsed, dict) and "slides" in parsed and len(parsed["slides"]) >= 4:
+                            carousel = parsed
+                            carousel["_model_used"] = f"OpenRouter:{model_name}"
+                            carousel["_topic_intelligence"] = topic_intel
+                            carousel["_archetype"] = archetype["name"]
+
+                            is_valid_narrative, narrative_issues = validate_slide_narrative(carousel, archetype=archetype)
+                            if not is_valid_narrative:
+                                print(f"⚠️ Slide narrative validator reported issues: {narrative_issues}")
+                            else:
+                                print(f"✅ Slide narrative validation passed ({len(carousel['slides'])} slides, {len(set(s.get('layout_type') for s in carousel['slides']))} unique layouts)")
+                            
+                            print(f"✅ OpenRouter generation successful with {model_name} ({len(carousel['slides'])} slides)")
+                            break
                 else:
-                    print(f"✅ Slide narrative validation passed ({len(carousel['slides'])} slides, {len(set(s.get('layout_type') for s in carousel['slides']))} unique layouts)")
+                    print(f"⚠️ OpenRouter ({model_name}) returned HTTP {r.status_code}: {r.text[:120]}")
+            except Exception as e:
+                last_error = e
+                print(f"⚠️ OpenRouter ({model_name}) exception: {e}")
+                continue
+
+    # Priority 5: Gemini LLM generation
+    if not carousel and GEMINI_AVAILABLE and GEMINI_API_KEY:
+        client = genai.Client(api_key=GEMINI_API_KEY)
+        for model_name in AVAILABLE_GEMINI_MODELS:
+            try:
+                print(f"🤖 Generating dynamic carousel ({topic_type} | {desired_slides} slides) with Gemini: {model_name}...")
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                )
+                text = response.text.strip()
+                if text.startswith("```json"):
+                    text = text[7:]
+                if text.startswith("```"):
+                    text = text[3:]
+                if text.endswith("```"):
+                    text = text[:-3]
                 
-                print(f"✅ LLM generation successful with {model_name} ({len(carousel['slides'])} slides)")
-                break
-        except Exception as e:
-            last_error = e
-            print(f"⚠️ Model {model_name} failed: {e}")
-            continue
+                parsed = json.loads(text.strip())
+                if isinstance(parsed, dict) and "slides" in parsed and len(parsed["slides"]) >= 4:
+                    carousel = parsed
+                    carousel["_model_used"] = model_name
+                    carousel["_topic_intelligence"] = topic_intel
+                    carousel["_archetype"] = archetype["name"]
+                    
+                    # Semantic Diversity & Narrative Validation
+                    is_valid_narrative, narrative_issues = validate_slide_narrative(carousel, archetype=archetype)
+                    if not is_valid_narrative:
+                        print(f"⚠️ Slide narrative validator reported issues: {narrative_issues}")
+                    else:
+                        print(f"✅ Slide narrative validation passed ({len(carousel['slides'])} slides, {len(set(s.get('layout_type') for s in carousel['slides']))} unique layouts)")
+                    
+                    print(f"✅ Gemini LLM generation successful with {model_name} ({len(carousel['slides'])} slides)")
+                    break
+            except Exception as e:
+                last_error = e
+                print(f"⚠️ Model {model_name} failed: {e}")
+                continue
+
+    # Priority 6: Shared Fallback Chain
+    if not carousel:
+        print("🚨 OpenRouter & Gemini failed. Attempting shared fallback chain...")
+        from llm_fallback import call_fallback_chain
+        fallback_res = call_fallback_chain(prompt, normalize=False)
+        if fallback_res and isinstance(fallback_res, dict) and "slides" in fallback_res and len(fallback_res["slides"]) >= 4:
+            carousel = fallback_res
+            carousel["_model_used"] = "FallbackChain"
+            carousel["_topic_intelligence"] = topic_intel
+            carousel["_archetype"] = archetype["name"]
+            print(f"✅ Fallback chain generation successful ({len(carousel['slides'])} slides)")
 
     if not carousel:
-        print(f"⚠️ All LLM models failed ({last_error}), using dynamic archetype fallback")
+        print(f"⚠️ All LLM providers failed ({last_error}), using dynamic archetype fallback")
         return generate_fallback_carousel(story, topic_intel=topic_intel)
 
     # Validate and repair content

@@ -404,6 +404,21 @@ class ChapteredScriptEngine:
         """Call Gemini with strict retry logic and fast model fallback."""
         from gemini_script import is_model_exhausted, mark_model_exhausted
 
+        # Priority 1-4: OpenRouter prioritized models for content generation/reasoning
+        if not use_search:
+            try:
+                from llm_fallback import call_openrouter
+                openrouter_res = call_openrouter(
+                    prompt,
+                    topic_category="longform",
+                    context_text=str(getattr(self, "topic", ""))[:1000]
+                )
+                if openrouter_res and isinstance(openrouter_res, dict):
+                    print("✅ [LONGFORM] Generation successful with OpenRouter priority model")
+                    return openrouter_res
+            except Exception as e:
+                print(f"⚠️ [LONGFORM] OpenRouter generation attempt exception: {e}")
+
         model_sequence = []
         if model == GEMINI_PRO_MODEL:
             model_sequence = [GEMINI_PRO_MODEL, GEMINI_FLASH_MODEL, GEMINI_FLASH_LITE_MODEL]

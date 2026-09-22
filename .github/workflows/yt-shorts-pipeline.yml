@@ -170,6 +170,7 @@ jobs:
           FAL_KEY: ${{ secrets.FAL_KEY }}
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           ORT_LOG_LEVEL: ERROR
           CI_LITE: "1"
           DRY_RUN: ${{ github.event.inputs.dry_run }}
