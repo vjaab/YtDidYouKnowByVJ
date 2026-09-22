@@ -60,6 +60,76 @@ def log_message(msg):
     print(msg)
 
 
+def select_best_longform_title(title_options, default_title="", keywords=None):
+    """
+    Score and select the title with highest estimated CTR on YouTube.
+    Prioritizes:
+    - Ideal character length (42-68 chars, avoiding mobile truncation)
+    - High-stakes curiosity triggers (Why, How, Nobody, Replaced, Killed, Finally, Truth, Secret)
+    - Primary tech entities and keywords
+    - Penalizes generic, boring academic phrases
+    """
+    if not title_options:
+        return default_title or "AI Deep Dive"
+    
+    candidates = list(title_options)
+    if default_title and default_title not in candidates:
+        candidates.append(default_title)
+        
+    power_words = {
+        "why": 15, "how": 12, "nobody": 18, "secret": 15, "truth": 15,
+        "replaced": 16, "dead": 16, "killed": 16, "warning": 14, "finally": 14,
+        "mistake": 14, "danger": 14, "quit": 14, "real reason": 18,
+        "threat": 12, "changed": 12, "leak": 14, "free": 12, "built": 10
+    }
+    
+    kw_set = {str(k).lower() for k in (keywords or [])}
+    
+    scored = []
+    for cand in candidates:
+        cand_str = str(cand).strip().strip('"').strip("'")
+        cand_lower = cand_str.lower()
+        score = 50.0
+        
+        # 1. Length scoring (Sweet spot: 42 - 68 chars)
+        l = len(cand_str)
+        if 42 <= l <= 68:
+            score += 25
+        elif 30 <= l < 42:
+            score += 15
+        elif 68 < l <= 85:
+            score += 5
+        else:
+            score -= 20
+            
+        # 2. Power words / Stakes
+        for pw, weight in power_words.items():
+            if pw in cand_lower:
+                score += weight
+                
+        # 3. Keyword presence
+        for kw in kw_set:
+            if kw and kw in cand_lower:
+                score += 10
+                
+        # 4. Penalize boring/academic words
+        boring_words = ["overview", "introduction", "deep dive into", "analysis of", "comprehensive", "a look at"]
+        for bw in boring_words:
+            if bw in cand_lower:
+                score -= 25
+                
+        # 5. Clean punctuation
+        if cand_str.endswith("."):
+            cand_str = cand_str[:-1]
+            
+        scored.append((score, cand_str))
+        
+    scored.sort(key=lambda x: x[0], reverse=True)
+    best_score, best_title = scored[0]
+    log_message(f"🎯 Selected Best CTR Title (score={best_score:.1f}): '{best_title}'")
+    return best_title
+
+
 def format_longform_description(script_data, hashtags):
     """Generate a rich YouTube description for the chaptered deep-dive."""
     chapters = script_data.get("chapters", [])
@@ -79,11 +149,16 @@ def format_longform_description(script_data, hashtags):
 
     hashtag_str = " ".join(hashtags) if hashtags else ""
 
-    # Build chapter timestamps
+    # Build chapter timestamps (YouTube strictly requires 00:00 as the first entry for chapter activation)
     timestamps_str = "📌 CHAPTERS:\n"
     if chapters:
-        for ch in chapters:
+        first_start = chapters[0].get("approx_start_seconds", 0)
+        if first_start > 0:
+            timestamps_str += "00:00 — Overview & Cold Open\n"
+        for idx, ch in enumerate(chapters):
             start_s = ch.get("approx_start_seconds", 0)
+            if idx == 0 and first_start == 0:
+                start_s = 0
             h, rem = divmod(int(start_s), 3600)
             m, s = divmod(rem, 60)
             ch_title = ch.get("chapter_title", f"Chapter {ch.get('chapter_number', '?')}")[:60]
@@ -92,8 +167,13 @@ def format_longform_description(script_data, hashtags):
             else:
                 timestamps_str += f"{m:02d}:{s:02d} — {ch_title}\n"
     elif fact_timestamps:
-        for ft in fact_timestamps:
+        first_start = fact_timestamps[0].get("approx_start_seconds", 0)
+        if first_start > 0:
+            timestamps_str += "00:00 — Overview & Cold Open\n"
+        for idx, ft in enumerate(fact_timestamps):
             start_s = ft.get("approx_start_seconds", 0)
+            if idx == 0 and first_start == 0:
+                start_s = 0
             h, rem = divmod(int(start_s), 3600)
             m, s = divmod(rem, 60)
             topic = ft.get("topic", "Section")[:60]
@@ -591,9 +671,12 @@ def run_longform_pipeline(dry_run=False):
     # ── STEP 11: Upload to YouTube ───────────────────────────────────────
     log_message("STEP 11: Uploading to YouTube...")
 
-    # Title selection
-    if script_data.get("title_options"):
-        title = random.choice(script_data["title_options"])
+    # Title selection: Score and select best CTR candidate (front-loaded curiosity, optimal mobile length)
+    title = select_best_longform_title(
+        script_data.get("title_options", []),
+        default_title=title,
+        keywords=keywords
+    )
 
     initial_people = [p.get("name") for p in script_data.get("people", [])] if script_data.get("people") else []
     target_country = script_data.get("target_country", "US")

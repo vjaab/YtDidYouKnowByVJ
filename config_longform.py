@@ -51,7 +51,7 @@ LONGFORM_NUM_TOPICS = 1                       # Default (overridden by depth mod
 LONGFORM_PER_TOPIC_DURATION = (10, 15)        # Unused but kept for imports
 
 # ── Upload Schedule ───────────────────────────────────────────────────────────
-LONGFORM_UPLOAD_TIME = "04:30"                # 10:00 AM IST = 04:30 UTC
+LONGFORM_UPLOAD_TIME = "13:30"                # 07:00 PM IST = 13:30 UTC (Global peak tech window)
 
 # ── Audio ─────────────────────────────────────────────────────────────────────
 LONGFORM_BGM_VOLUME = 0.09                    # Atmospheric BGM

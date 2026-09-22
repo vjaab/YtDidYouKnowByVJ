@@ -76,10 +76,7 @@ def add_video_to_playlist(youtube, video_id, playlist_id):
         return None
 
 def add_end_screen(youtube, video_id, next_video_id=None, playlist_id=None, subscribe=True):
-    """Adds end screen elements to the video."""
-    if not next_video_id and not playlist_id and not subscribe:
-        return None
-    
+    """Adds end screen elements (subscribe button + video/playlist card) to the video."""
     end_screen_elements = []
     
     # Subscribe button (always recommended)
@@ -89,15 +86,20 @@ def add_end_screen(youtube, video_id, next_video_id=None, playlist_id=None, subs
             "videoId": video_id,  # Not used for subscribe, but required
         })
     
-    # Next video in series
+    # Next video in series or default to most recent upload
     if next_video_id:
         end_screen_elements.append({
             "type": "video",
             "videoId": next_video_id,
             "recentUpload": False,
         })
+    else:
+        end_screen_elements.append({
+            "type": "video",
+            "recentUpload": True,
+        })
     
-    # Playlist link
+    # Playlist link if available
     if playlist_id:
         end_screen_elements.append({
             "type": "playlist",
@@ -364,19 +366,18 @@ def upload_video(video_path, title, description, tags, thumbnail_path=None, cate
                 except Exception as e:
                     print(f"Playlist add failed (non-fatal): {e}")
 
-        # Step 4: Add End Screen (link to next video in series + playlist)
+        # Step 4: Add End Screen (guaranteed subscribe + video card to keep viewers on channel)
         try:
             channel_id = get_channel_id(youtube)
             next_video_id = None
-            if series_name:
+            if series_name and channel_id:
                 series_keywords = [series_name.lower().replace(" ", ""), "vj", "tech"]
                 next_video_id = get_latest_video_in_series(youtube, channel_id, series_keywords)
-            if next_video_id or playlist_id:
-                add_end_screen(youtube, video_id, next_video_id=next_video_id, playlist_id=playlist_id)
+            add_end_screen(youtube, video_id, next_video_id=next_video_id, playlist_id=playlist_id, subscribe=True)
         except Exception as e:
             print(f"End screen failed (non-fatal): {e}")
 
-        # Step 5: Post + pin comment with playlist link (rotated template for YPP compliance)
+        # Step 5: Post + pin comment with discussion hook and playlist link
         try:
             topic_type = ""
             keyword = "PACK"
@@ -391,7 +392,10 @@ def upload_video(video_path, title, description, tags, thumbnail_path=None, cate
                 pinned_text = _get_pinned_comment(title, topic_type=topic_type, keyword=keyword)
                 
             playlist_link = f"\n\n📺 Full playlist: https://youtube.com/playlist?list={playlist_id}" if playlist_id else ""
-            full_comment = f"{title}\n\n{comment_hook}\n\n{pinned_text}{playlist_link}" if comment_hook and comment_hook not in pinned_text else f"{pinned_text}{playlist_link}"
+            if comment_hook and comment_hook not in pinned_text:
+                full_comment = f"💬 QUESTION FOR YOU:\n{comment_hook}\n\n━━━━━━━━━━━━━━━━━━━━━━\n{pinned_text}{playlist_link}"
+            else:
+                full_comment = f"{pinned_text}{playlist_link}"
             post_and_pin_comment(youtube, video_id, full_comment)
         except Exception as e:
             print(f"Pinned comment failed (non-fatal): {e}")
