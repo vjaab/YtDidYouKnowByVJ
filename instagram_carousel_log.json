@@ -4,7 +4,8 @@
     "Cursor AI Editor Raises $60M at $400M Valuation",
     "GitHub Trending: tokio-rs/topcoat \u2014 A batteries-included framework for building web apps",
     "GitHub Trending: akitaonrails/ai-memory \u2014 Solution for long term memory for agent coding CLIs and to facilitate handoff between different agen",
-    "GitHub Trending: HakanSeven12/OpenCADStudio \u2014 A CAD application built with Rust \u2014 2D/3D drawing, DWG/DXF support, and GPU-accelerated rendering"
+    "GitHub Trending: HakanSeven12/OpenCADStudio \u2014 A CAD application built with Rust \u2014 2D/3D drawing, DWG/DXF support, and GPU-accelerated rendering",
+    "GitHub Trending: lmnr-ai/lmnr \u2014 Laminar - open-source observability platform purpose-built for AI agents. YC S24."
   ],
   "used_keywords": [
     "openai",
@@ -79,7 +80,17 @@
     "drawing",
     "support",
     "accelerated",
-    "rendering"
+    "rendering",
+    "stars",
+    "typescript",
+    "laminar",
+    "open",
+    "source",
+    "observability",
+    "platform",
+    "purpose",
+    "built",
+    "agents"
   ],
   "history": [
     {
@@ -194,6 +205,24 @@
       ],
       "source": "GitHub (HakanSeven12/OpenCADStudio)",
       "timestamp": "2026-09-22T16:48:36.134008+00:00"
+    },
+    {
+      "title": "GitHub Trending: lmnr-ai/lmnr \u2014 Laminar - open-source observability platform purpose-built for AI agents. YC S24.",
+      "news_source_url": "https://github.com/lmnr-ai/lmnr",
+      "keywords": [
+        "stars",
+        "typescript",
+        "laminar",
+        "open",
+        "source",
+        "observability",
+        "platform",
+        "purpose",
+        "built",
+        "agents"
+      ],
+      "source": "GitHub (lmnr-ai/lmnr)",
+      "timestamp": "2026-09-22T20:48:21.761735+00:00"
     }
   ]
 }

@@ -667,13 +667,78 @@ def _determine_slide_count(pattern: Dict, domain: str) -> int:
     return min(max(base, 5), 8)
 
 
+# ─── Semantic Visual Motifs by Topic Type ─────────────────────────────────────
+
+TOPIC_VISUAL_MOTIFS = {
+    "model_release": {
+        "visual_concept": "neural_intelligence",
+        "visual_motifs": ["attention_heads", "activation_nodes", "latent_vectors", "context_streams"],
+        "hero_visual": "model_architecture",
+        "accent_style": "cyber_matrix",
+    },
+    "developer_tool": {
+        "visual_concept": "developer_workspace",
+        "visual_motifs": ["ast_nodes", "syntax_tokens", "file_tree", "terminal_prompt"],
+        "hero_visual": "ide_window",
+        "accent_style": "modern_ide",
+    },
+    "security_incident": {
+        "visual_concept": "threat_vector",
+        "visual_motifs": ["attack_path", "lock_shield", "warning_badge", "perimeter_mesh"],
+        "hero_visual": "security_perimeter",
+        "accent_style": "threat_alert",
+    },
+    "research_paper": {
+        "visual_concept": "algorithmic_rigor",
+        "visual_motifs": ["benchmark_radar", "matrix_transform", "coordinate_grid", "proof_graph"],
+        "hero_visual": "methodology_flow",
+        "accent_style": "academic_precision",
+    },
+    "programming_concept": {
+        "visual_concept": "system_architecture",
+        "visual_motifs": ["call_stack", "state_machine", "memory_registers", "concurrency_lanes"],
+        "hero_visual": "execution_flow",
+        "accent_style": "clean_systems",
+    },
+    "framework_update": {
+        "visual_concept": "agent_orchestration",
+        "visual_motifs": ["cyclic_graph", "state_node", "tool_dispatch", "checkpoint_queue"],
+        "hero_visual": "state_graph",
+        "accent_style": "agentic_high_tech",
+    },
+    "cloud_service": {
+        "visual_concept": "distributed_cloud",
+        "visual_motifs": ["vpc_edges", "service_clusters", "ingress_gateway", "data_mesh"],
+        "hero_visual": "cloud_topology",
+        "accent_style": "cloud_blueprint",
+    },
+    "industry_trend": {
+        "visual_concept": "market_dynamics",
+        "visual_motifs": ["growth_vectors", "delta_cards", "market_radar", "capital_flow"],
+        "hero_visual": "market_shift",
+        "accent_style": "executive_pulse",
+    },
+}
+
+TOPIC_PREFERRED_PATTERNS = {
+    "model_release": "news_breakdown",
+    "developer_tool": "problem_solution",
+    "security_incident": "security_incident",
+    "programming_concept": "concept_explained",
+    "research_paper": "architecture_walkthrough",
+    "framework_update": "tutorial_flow",
+    "cloud_service": "architecture_walkthrough",
+    "industry_trend": "news_breakdown",
+}
+
+
 def create_visual_strategy(
     carousel: Dict,
     story: Optional[Dict] = None,
     run_context: str = "",
 ) -> Dict[str, Any]:
     """
-    Create a complete visual strategy for a carousel.
+    Create a complete, topic-aware visual strategy for a carousel.
 
     Args:
         carousel: The carousel JSON from LLM (with headline, slides, etc.)
@@ -681,7 +746,7 @@ def create_visual_strategy(
         run_context: Optional context for deterministic selection (date + run number)
 
     Returns:
-        Visual strategy dict with theme, layout, and per-slide instructions.
+        Visual strategy dict with theme, layout, visual motifs, and per-slide instructions.
     """
     headline = carousel.get("headline", "")
     description = ""
@@ -690,73 +755,92 @@ def create_visual_strategy(
     elif carousel.get("summary"):
         description = carousel["summary"]
 
+    # Extract topic intelligence if available
+    topic_intel = carousel.get("_topic_intelligence") or {}
+    topic_type = topic_intel.get("topic_type") or carousel.get("topic_type", "model_release")
+    
     # Classify domain and difficulty
-    domain = classify_domain(headline, description)
+    domain = topic_intel.get("domain") or classify_domain(headline, description)
     difficulty = classify_difficulty(description)
 
-    # Get avoidance lists - increased window from 3 to 7 for better variety
+    # Get avoidance lists
     avoided_themes = suggest_avoided_themes(7)
     avoided_patterns = suggest_avoided_layouts(7)
 
     # Select theme with run_context for deterministic selection
     theme_id, theme = select_theme(domain, avoided_themes, run_context=run_context)
 
-    # Select storytelling pattern with run_context and topic for topic-level avoidance
-    pattern_id, pattern = select_storytelling_pattern(
-        domain, avoided_patterns, run_context=run_context, topic=headline
-    )
+    # Preferred pattern from topic intelligence
+    preferred_pattern = TOPIC_PREFERRED_PATTERNS.get(topic_type)
+    if preferred_pattern and preferred_pattern in STORYTELLING_PATTERNS:
+        pattern_id = preferred_pattern
+        pattern = STORYTELLING_PATTERNS[pattern_id]
+    else:
+        pattern_id, pattern = select_storytelling_pattern(
+            domain, avoided_patterns, run_context=run_context, topic=headline
+        )
 
-    # Determine slide count
-    slide_count = _determine_slide_count(pattern, domain)
+    # Align with actual generated slides if present
+    actual_slides = carousel.get("slides", [])
+    if actual_slides:
+        slide_count = len(actual_slides)
+        slides_strategy = []
+        layout_pattern = []
+        for i, s in enumerate(actual_slides):
+            chosen_layout = s.get("layout_type") or s.get("type", "hero_hook")
+            layout_pattern.append(chosen_layout)
+            title_pos = "center" if chosen_layout in ("hero_hook", "big_number", "scenario_question") else ("top-left" if i % 2 == 0 else "top-center")
+            slides_strategy.append({
+                "slide_number": i + 1,
+                "role": s.get("role", "slide"),
+                "purpose": s.get("role") or LAYOUT_TYPES.get(chosen_layout, {}).get("purpose", "explanation"),
+                "layout_type": chosen_layout,
+                "title_position": title_pos,
+                "supports": LAYOUT_TYPES.get(chosen_layout, {}).get("supports", []),
+            })
+    else:
+        # Determine slide count dynamically
+        slide_count = _determine_slide_count(pattern, domain)
+        slides_strategy = []
+        pattern_slides = pattern["slides"]
 
-    # Build per-slide strategy
-    slides_strategy = []
-    pattern_slides = pattern["slides"]
+        if slide_count > len(pattern_slides):
+            extra_options = [
+                ("data", ["metrics_cards", "checklist"]),
+                ("comparison", ["common_mistake", "myth_vs_fact"]),
+                ("quiz", ["quiz_choice", "quiz_predict_output"]),
+                ("example", ["real_world_scenario", "analogy"]),
+            ]
+            for i in range(slide_count - len(pattern_slides)):
+                pattern_slides = list(pattern_slides)
+                insert_idx = len(pattern_slides) - 1
+                extra = extra_options[i % len(extra_options)]
+                pattern_slides.insert(insert_idx, extra)
+        elif slide_count < len(pattern_slides):
+            pattern_slides = list(pattern_slides)
+            while len(pattern_slides) > slide_count:
+                mid = len(pattern_slides) // 2
+                pattern_slides.pop(mid)
 
-    # Adjust pattern to match desired slide count
-    if slide_count > len(pattern_slides):
-        # Add extra slides from suitable types
-        extra_options = [
-            ("data", ["metrics_cards", "checklist"]),
-            ("comparison", ["common_mistake", "myth_vs_fact"]),
-            ("quiz", ["quiz_choice", "quiz_predict_output"]),
-            ("example", ["real_world_scenario", "analogy"]),
-        ]
-        for i in range(slide_count - len(pattern_slides)):
-            pattern_slides = list(pattern_slides)  # make mutable
-            # Insert before the CTA (last slide)
-            insert_idx = len(pattern_slides) - 1
-            extra = extra_options[i % len(extra_options)]
-            pattern_slides.insert(insert_idx, extra)
-    elif slide_count < len(pattern_slides):
-        # Remove middle slides (keep first and last)
-        pattern_slides = list(pattern_slides)
-        while len(pattern_slides) > slide_count:
-            # Remove from middle, prefer removing data/quiz slides
-            mid = len(pattern_slides) // 2
-            pattern_slides.pop(mid)
+        layout_pattern = []
+        for i, (purpose, layout_candidates) in enumerate(pattern_slides):
+            chosen_layout = random.choice(layout_candidates)
+            layout_pattern.append(chosen_layout)
+            title_pos = "center" if chosen_layout in ("hero_hook", "big_number", "scenario_question") else "top-left"
+            slides_strategy.append({
+                "slide_number": i + 1,
+                "purpose": purpose,
+                "layout_type": chosen_layout,
+                "title_position": title_pos,
+                "supports": LAYOUT_TYPES.get(chosen_layout, {}).get("supports", []),
+            })
 
-    layout_pattern = []
-    for i, (purpose, layout_candidates) in enumerate(pattern_slides):
-        chosen_layout = random.choice(layout_candidates)
-        layout_pattern.append(chosen_layout)
-
-        # Vary title positions across slides
-        title_positions = ["top-left", "top-center", "center"]
-        title_pos = title_positions[i % len(title_positions)]
-        if chosen_layout in ("hero_hook", "big_number", "scenario_question"):
-            title_pos = "center"
-
-        slides_strategy.append({
-            "slide_number": i + 1,
-            "purpose": purpose,
-            "layout_type": chosen_layout,
-            "title_position": title_pos,
-            "supports": LAYOUT_TYPES.get(chosen_layout, {}).get("supports", []),
-        })
+    # Retrieve semantic visual motifs
+    motifs_config = TOPIC_VISUAL_MOTIFS.get(topic_type, TOPIC_VISUAL_MOTIFS["model_release"])
 
     strategy = {
         "topic": headline,
+        "topic_type": topic_type,
         "domain": domain,
         "difficulty": difficulty,
         "audience": "students_and_professionals",
@@ -778,6 +862,10 @@ def create_visual_strategy(
             "gradient_start": theme["gradient_start"],
             "gradient_end": theme["gradient_end"],
         },
+        "visual_concept": motifs_config["visual_concept"],
+        "visual_motifs": motifs_config["visual_motifs"],
+        "hero_visual": motifs_config["hero_visual"],
+        "accent_style": motifs_config["accent_style"],
         "storytelling_pattern": pattern_id,
         "slide_count": slide_count,
         "layout_pattern": layout_pattern,
@@ -789,7 +877,8 @@ def create_visual_strategy(
         },
     }
 
-    print(f"🎨 Visual strategy: theme={theme_id}, pattern={pattern_id}, slides={slide_count}")
+    print(f"🎨 Visual strategy: topic_type={topic_type}, theme={theme_id}, pattern={pattern_id}, slides={slide_count}")
+    print(f"   Motifs: {', '.join(motifs_config['visual_motifs'])} | Concept: {motifs_config['visual_concept']}")
     print(f"   Layouts: {' → '.join(layout_pattern)}")
 
     return strategy

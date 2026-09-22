@@ -170,9 +170,13 @@ def build_slide_context(
         "highlighted_code": highlighted_code,
         "canvas_width": canvas_width,
         "canvas_height": canvas_height,
+        "deep_dive": slide.get("deep_dive"),
+        "key_fact": slide.get("key_fact"),
+        "why_it_matters": slide.get("why_it_matters"),
+        "source_evidence": slide.get("source_evidence"),
     }
     
-    # Compatibility mapping for legacy templates
+    # Compatibility mapping for legacy & dynamic templates
     if layout_type in ["why_matters", "metrics_cards"]:
         context["metrics"] = slide.get("metrics")
     if layout_type in ["whats_new", "before_after"]:
@@ -180,6 +184,16 @@ def build_slide_context(
         context["after_text"] = slide.get("after_text")
     if layout_type in ["real_world_example", "code_block"]:
         context["code_lines"] = slide.get("body", "").split("\n") if isinstance(slide.get("body"), str) else []
+    if layout_type == "checklist":
+        items = slide.get("items") or slide.get("checklist_items")
+        if items:
+            slide["checklist_items"] = items
+            context["checklist_items"] = items
+    if layout_type in ["takeaway", "takeaway_cta"]:
+        takeaways = slide.get("takeaways") or slide.get("items")
+        if takeaways:
+            slide["takeaways"] = takeaways
+            context["takeaways"] = takeaways
         
     return context
 
