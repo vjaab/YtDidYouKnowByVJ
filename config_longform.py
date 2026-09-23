@@ -58,7 +58,7 @@ LONGFORM_BGM_VOLUME = 0.09                    # Atmospheric BGM
 LONGFORM_BGM_INTENSITY_RAMP = True            # BGM volume ramps in final chapter
 
 # ── Retry Logic ───────────────────────────────────────────────────────────────
-LONGFORM_MAX_RETRY_ATTEMPTS = 8               # Fewer retries needed with 1-3 topics
+LONGFORM_MAX_RETRY_ATTEMPTS = 5               # Reduced from 8 — timeout fixes make fewer retries sufficient
 LONGFORM_PER_TOPIC_RETRIES = 3                # Retries per individual topic
 
 # ── Transition Effects ────────────────────────────────────────────────────────

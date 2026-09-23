@@ -593,8 +593,13 @@ def get_openrouter_models_by_priority(topic_category: Optional[str] = None, cont
     return prioritized
 
 
-def call_openrouter(user_prompt: str, topic_category: Optional[str] = None, context_text: str = "") -> Optional[Dict[str, Any]]:
-    """Call OpenRouter with prioritized models: Nemotron 3 Ultra, Laguna, Nemotron Lightning, Ling Flash."""
+def call_openrouter(user_prompt: str, topic_category: Optional[str] = None, context_text: str = "", timeout: int = 40) -> Optional[Dict[str, Any]]:
+    """Call OpenRouter with prioritized models: Nemotron 3 Ultra, Laguna, Nemotron Lightning, Ling Flash.
+    
+    Args:
+        timeout: HTTP timeout in seconds. Default 40s for shorts; pass 90s for longform prompts
+                 where free-tier 550B models need more generation time.
+    """
     openrouter_key = os.getenv("OPENROUTER_API_KEY")
     if not openrouter_key:
         return None
@@ -615,7 +620,7 @@ def call_openrouter(user_prompt: str, topic_category: Optional[str] = None, cont
                 "messages": [{"role": "user", "content": user_prompt}],
                 "temperature": 0.4,
             }
-            r = requests.post("https://openrouter.ai/api/v1/chat/completions", json=payload, headers=headers, timeout=40)
+            r = requests.post("https://openrouter.ai/api/v1/chat/completions", json=payload, headers=headers, timeout=timeout)
             if r.status_code == 200:
                 content = safe_extract_choices(r.json(), f"OpenRouter:{model_name}")
                 if content:

@@ -411,7 +411,8 @@ class ChapteredScriptEngine:
                 openrouter_res = call_openrouter(
                     prompt,
                     topic_category="longform",
-                    context_text=str(getattr(self, "topic", ""))[:1000]
+                    context_text=str(getattr(self, "topic", ""))[:1000],
+                    timeout=90  # Free-tier 550B models need more time for large longform prompts
                 )
                 if openrouter_res and isinstance(openrouter_res, dict):
                     print("✅ [LONGFORM] Generation successful with OpenRouter priority model")
@@ -629,8 +630,8 @@ Write the deepest possible analysis of this one story across 3-5 chapters.
     def execute(self):
         """Run the full 4-agent pipeline end-to-end."""
 
-        # 0. Discover topics (90s timeout)
-        topics_data = execute_with_timeout(self.discover_topics, 180)
+        # 0. Discover topics (240s timeout — includes Gemini search + OpenRouter cascade)
+        topics_data = execute_with_timeout(self.discover_topics, 240)
         if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         if not topics_data or "selected_stories" not in topics_data:
             print("❌ [LONGFORM] Could not discover topics. Aborting.")
@@ -641,8 +642,8 @@ Write the deepest possible analysis of this one story across 3-5 chapters.
         # 1. Research each story (120s timeout per story)
         research_results = []
         for i, story in enumerate(stories):
-            print(f"🚀 Researching story {i+1}/{len(stories)} with 120s timeout...")
-            result = execute_with_timeout(self.research_story, 120, story)
+            print(f"🚀 Researching story {i+1}/{len(stories)} with 150s timeout...")
+            result = execute_with_timeout(self.research_story, 150, story)
             if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
             if result:
                 research_results.append(result)
@@ -652,10 +653,10 @@ Write the deepest possible analysis of this one story across 3-5 chapters.
                     "technical_details": [], "implications": []
                 })
 
-        # 2. Generate chaptered script (180s timeout)
-        script_data = execute_with_timeout(
-            lambda: self.generate_chaptered_script(stories, research_results), 180
-        )
+        # 2. Generate chaptered script (300s timeout — largest prompt, full fallback cascade)
+        def _generate_chaptered_script():
+            return self.generate_chaptered_script(stories, research_results)
+        script_data = execute_with_timeout(_generate_chaptered_script, 300)
         if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
         if not script_data or "script" not in script_data:
             print("❌ [LONGFORM] Chaptered script generation failed. Aborting.")
@@ -664,10 +665,10 @@ Write the deepest possible analysis of this one story across 3-5 chapters.
         word_count = len(script_data.get("script", "").split())
         print(f"   📊 Chaptered script: {word_count} words, {len(script_data.get('chapters', []))} chapters")
 
-        # 3. Optimize + Humanize (120s timeout)
-        final_data = execute_with_timeout(
-            lambda: self.optimize_and_humanize(script_data), 120
-        )
+        # 3. Optimize + Humanize (180s timeout)
+        def _optimize_and_humanize():
+            return self.optimize_and_humanize(script_data)
+        final_data = execute_with_timeout(_optimize_and_humanize, 180)
         if GEMINI_RPM_SLEEP > 0: time.sleep(GEMINI_RPM_SLEEP)
 
         if not final_data or "script" not in final_data:
