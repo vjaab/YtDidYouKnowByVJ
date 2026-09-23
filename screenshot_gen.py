@@ -324,46 +324,134 @@ def capture_article_screenshot(url, output_filename, desktop=False, headline=Non
     output_path = os.path.join(ASSETS_DIR, "screenshots", output_filename)
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     
-    # Desktop viewport for longform 16:9, mobile viewport for Shorts 9:16
-    viewport = "1920,1080" if desktop else "1080,1920"
+    # Desktop 16:9: 1440x810 with 2x Retina scale factor produces ultra-crisp 2880x1620
+    # Mobile 9:16: 540x960 with 2x Retina scale factor produces ultra-crisp 1080x1920
+    if desktop:
+        vp_width, vp_height = 1440, 810
+    else:
+        vp_width, vp_height = 540, 960
+    scale_factor = 2
     user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
     
     try:
-        print(f"📸 Capturing screenshot via Playwright Python API: {url} -> {output_path}")
+        print(f"📸 Capturing high-res screenshot via Playwright ({vp_width}x{vp_height} @ {scale_factor}x): {url} -> {output_path}")
         from playwright.sync_api import sync_playwright
         
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
-            width, height = map(int, viewport.split(','))
             context = browser.new_context(
                 user_agent=user_agent,
-                viewport={"width": width, "height": height}
+                viewport={"width": vp_width, "height": vp_height},
+                device_scale_factor=scale_factor
             )
             page = context.new_page()
-            page.set_default_timeout(20000)
+            page.set_default_timeout(25000)
             
             try:
-                page.goto(url, wait_until="domcontentloaded")
+                page.goto(url, wait_until="domcontentloaded", timeout=25000)
             except Exception as e:
                 print(f"⚠️ Playwright page.goto warning: {e}")
                 
-            # Wait for content to settle
-            page.wait_for_timeout(3000)
+            # Allow initial layout and web fonts to settle
+            page.wait_for_timeout(2500)
             
-            # Zoom in the page to make text highly readable
-            zoom_factor = 1.2 if desktop else 1.5
-            print(f"🔍 Zooming page by {zoom_factor}x for enhanced readability")
+            # Dismiss cookies, hide intrusive modals/banners, center headline, and await fonts
+            clean_and_frame_js = """() => {
+                // 1. Wait for web fonts if possible
+                try {
+                    if (document.fonts && document.fonts.ready) {
+                        document.fonts.ready;
+                    }
+                } catch(e) {}
+
+                // 2. Click common cookie consent buttons
+                const acceptSelectors = [
+                    '#onetrust-accept-btn-handler',
+                    '.cookie-banner button',
+                    'button[id*="accept"]',
+                    'button[class*="accept"]',
+                    'button[id*="consent"]',
+                    'button[class*="consent"]',
+                    'button[aria-label*="Accept"]',
+                    'button[aria-label*="agree"]',
+                    'button[id*="didomi-notice-agree-button"]'
+                ];
+                for (const sel of acceptSelectors) {
+                    try {
+                        const btn = document.querySelector(sel);
+                        if (btn && btn.offsetParent !== null) {
+                            btn.click();
+                            break;
+                        }
+                    } catch(e) {}
+                }
+
+                // 3. Hide GDPR / cookie popups, newsletter modals, and dark backdrops
+                const hideSelectors = [
+                    '#onetrust-consent-sdk',
+                    '#cmpbox',
+                    '#CybotCookiebotDialog',
+                    '.cookie-banner',
+                    '.cookie-notice',
+                    '.qc-cmp2-container',
+                    '.modal-backdrop',
+                    '.fade.show',
+                    '[class*="cookie"]',
+                    '[id*="cookie"]',
+                    '[class*="consent"]',
+                    '[id*="consent"]',
+                    '[class*="newsletter-popup"]',
+                    '[class*="subscribe-modal"]',
+                    '[id*="newsletter-modal"]',
+                    '[class*="paywall"]',
+                    '[id*="sp_message_container"]',
+                    '[class*="ad-wrapper"]',
+                    '[id*="ad-"]',
+                    '.ad-unit',
+                    'nav[aria-label="File tree"]', // GitHub file tree sidebar
+                    'div[data-testid="tree-panel"]' // GitHub tree panel
+                ];
+                for (const sel of hideSelectors) {
+                    document.querySelectorAll(sel).forEach(el => {
+                        try {
+                            el.style.setProperty('display', 'none', 'important');
+                        } catch(e) {}
+                    });
+                }
+
+                // 4. Restore scrolling on body in case modal locked it
+                document.documentElement.style.setProperty('overflow', 'auto', 'important');
+                document.body.style.setProperty('overflow', 'auto', 'important');
+                document.body.style.setProperty('position', 'static', 'important');
+
+                // 5. Intelligent Framing: Scroll to README or article headline
+                const readme = document.querySelector('article.markdown-body') || document.querySelector('#readme');
+                if (readme) {
+                    readme.scrollIntoView({ block: 'start' });
+                    return;
+                }
+
+                const h1 = document.querySelector('h1') || 
+                           document.querySelector('[class*="headline"]') || 
+                           document.querySelector('[class*="article-title"]');
+                if (h1) {
+                    // Center the headline in the frame for maximum readability
+                    h1.scrollIntoView({ block: 'center' });
+                }
+            }"""
+            
             try:
-                page.evaluate(f"document.body.style.zoom = '{zoom_factor}';")
-                page.wait_for_timeout(500)
-            except Exception as zoom_err:
-                print(f"⚠️ Failed to apply page zoom: {zoom_err}")
+                page.evaluate(clean_and_frame_js)
+                page.wait_for_timeout(800)
+            except Exception as clean_err:
+                print(f"⚠️ Failed to execute page cleanup/framing: {clean_err}")
                 
             page.screenshot(path=output_path)
             browser.close()
             
         if os.path.exists(output_path):
             if check_screenshot_validity(output_path):
+                print(f"✅ High-clarity screenshot saved: {output_path}")
                 return output_path
             else:
                 print(f"🗑️ Deleting invalid screenshot (contains human verification/error).")

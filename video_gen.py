@@ -1018,7 +1018,8 @@ def _prepare_screenshot_canvas(img, target_w, target_h, url=None, apply_vignette
     bar_h = 0 if is_longform else 50
     
     # Calculate scale so that the screenshot PLUS the top bar fits nicely in the safe area
-    scale = min(target_w * 0.86 / iw, (target_h * 0.86 - bar_h) / ih)
+    card_scale = 0.92 if is_longform else 0.86
+    scale = min(target_w * card_scale / iw, (target_h * card_scale - bar_h) / ih)
     fw, fh = int(iw * scale), int(ih * scale)
     
     # Resize original screenshot
@@ -5929,8 +5930,8 @@ def _article_screenshot_clip(screenshot_path, duration):
         
     try:
         raw_img = Image.open(screenshot_path)
-        # Apply vignette to reduce visual clutter from dense web page screenshots
-        canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H, apply_vignette=True)
+        # Clean canvas without dimming vignette for maximum evidence readability
+        canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H, apply_vignette=False)
         canvas_arr = np.array(canvas_img.convert("RGB"))
         
         # Show from 4.0 to 12.0 (8s duration)
@@ -5960,12 +5961,103 @@ def _article_screenshot_clip(screenshot_path, duration):
 
 def _longform_article_screenshot_clips(script_json, audio_duration):
     """
-    For long-form videos: Maps the article screenshot of EACH topic to its
-    approximate active time window. Shows it at the start of the topic, and
-    optionally halfway through, with premium Ken Burns zoom and pan transitions.
+    For long-form videos: Maps the article screenshot of EACH topic/chapter to its
+    active time window. Displays a clean, high-resolution evidence card at the start of
+    each segment with subtle Ken Burns zoom and smooth crossfade.
     """
-    print("🎬 Generating topic-aligned screenshots for long-form compilation... (Disabled repeating overlay)")
-    return []
+    topics = script_json.get("longform_topics", [])
+    chapters = script_json.get("chapters", [])
+    fact_timestamps = script_json.get("fact_timestamps", [])
+    
+    segments = []
+    if chapters and len(chapters) > 0:
+        for i, ch in enumerate(chapters):
+            start_s = float(ch.get("approx_start_seconds", 0))
+            if i + 1 < len(chapters):
+                next_s = float(chapters[i + 1].get("approx_start_seconds", audio_duration))
+            else:
+                next_s = audio_duration
+            
+            topic_idx = min(i, len(topics) - 1) if topics else 0
+            ss_path = topics[topic_idx].get("screenshot_path") if topics else script_json.get("screenshot_path")
+            if not ss_path or not os.path.exists(ss_path):
+                ss_path = script_json.get("screenshot_path")
+                
+            if ss_path and os.path.exists(ss_path):
+                segments.append({
+                    "start": start_s,
+                    "end": next_s,
+                    "screenshot_path": ss_path,
+                    "label": ch.get("chapter_title", f"Chapter {i+1}")
+                })
+    elif fact_timestamps and len(fact_timestamps) > 0:
+        for i, ft in enumerate(fact_timestamps):
+            start_s = float(ft.get("approx_start_seconds", 0))
+            if i + 1 < len(fact_timestamps):
+                next_s = float(fact_timestamps[i + 1].get("approx_start_seconds", audio_duration))
+            else:
+                next_s = audio_duration
+            
+            topic_idx = min(i, len(topics) - 1) if topics else 0
+            ss_path = topics[topic_idx].get("screenshot_path") if topics else script_json.get("screenshot_path")
+            if not ss_path or not os.path.exists(ss_path):
+                ss_path = script_json.get("screenshot_path")
+                
+            if ss_path and os.path.exists(ss_path):
+                segments.append({
+                    "start": start_s,
+                    "end": next_s,
+                    "screenshot_path": ss_path,
+                    "label": ft.get("topic", f"Fact {i+1}")
+                })
+    else:
+        ss_path = script_json.get("screenshot_path")
+        if ss_path and os.path.exists(ss_path):
+            segments.append({
+                "start": 3.5,
+                "end": min(16.0, audio_duration - 2.0),
+                "screenshot_path": ss_path,
+                "label": "Evidence"
+            })
+            
+    if not segments:
+        print("⚠️ No valid segments or screenshots found for longform evidence clips.")
+        return []
+        
+    clips = []
+    for seg in segments:
+        ss_path = seg["screenshot_path"]
+        start_s = seg["start"]
+        seg_dur = seg["end"] - start_s
+        
+        # Show evidence card 2s after segment begins (allows chapter transition card to display first)
+        clip_start = start_s + 2.0 if start_s > 0 else 3.5
+        clip_dur = min(6.0, max(2.5, seg_dur - 2.5))
+        
+        if clip_start + clip_dur > audio_duration - 2.0:
+            clip_dur = max(1.5, audio_duration - 2.0 - clip_start)
+            
+        if clip_dur < 1.0 or clip_start >= audio_duration:
+            continue
+            
+        try:
+            raw_img = Image.open(ss_path)
+            canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H, apply_vignette=False)
+            canvas_arr = np.array(canvas_img.convert("RGB"))
+            
+            clip = ImageClip(canvas_arr).with_duration(clip_dur).with_start(clip_start)
+            # Subtle Ken Burns zoom (1.0 to 1.04) — preserves razor-sharp text clarity
+            clip = clip.resized(lambda t, cd=clip_dur: 1.0 + 0.04 * (t / cd))
+            clip = clip.with_effects([
+                vfx.CrossFadeIn(0.35),
+                vfx.CrossFadeOut(0.35)
+            ])
+            clips.append(clip)
+            print(f"   📸 Added clean evidence screenshot card for '{seg['label']}' from {clip_start:.1f}s to {clip_start + clip_dur:.1f}s")
+        except Exception as e:
+            print(f"⚠️ Error creating longform screenshot clip for {seg.get('label')}: {e}")
+            
+    return clips
 
 
 def _longform_topic_transition_clips(script_json, audio_duration):
@@ -8621,7 +8713,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                                 else:
                                     try:
                                         raw_img = Image.open(vp)
-                                        canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H, apply_vignette=True)
+                                        canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H, apply_vignette=False)
                                         canvas_arr = np.array(canvas_img.convert("RGB"))
                                         c_clip = ImageClip(canvas_arr)
                                         clip_cache[vp] = c_clip
@@ -8775,21 +8867,27 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                         return v_clip
                     else:
                         raw_img = Image.open(vp)
-                        w, h = raw_img.size
-                        target_w_crop = int(h * 16 / 9)
-                        if target_w_crop <= w:
-                            x1 = (w - target_w_crop) // 2
-                            canvas_img = raw_img.crop((x1, 0, x1 + target_w_crop, h))
+                        if "screenshot" in os.path.basename(vp).lower():
+                            canvas_img = _prepare_screenshot_canvas(raw_img, CANVAS_W, CANVAS_H, apply_vignette=False)
+                            canvas_arr = np.array(canvas_img.convert("RGB"))
+                            clip_cache[cache_key] = canvas_arr
+                            return canvas_arr
                         else:
-                            target_h_crop = int(w * 9 / 16)
-                            y1 = (h - target_h_crop) // 2
-                            canvas_img = raw_img.crop((0, y1, w, y1 + target_h_crop))
-                        canvas_img = canvas_img.resize((CANVAS_W, CANVAS_H))
-                        
-                        canvas_arr = np.array(canvas_img.convert("RGB"))
-                        tinted_arr = tint_numpy(canvas_arr, is_warm)
-                        clip_cache[cache_key] = tinted_arr
-                        return tinted_arr
+                            w, h = raw_img.size
+                            target_w_crop = int(h * 16 / 9)
+                            if target_w_crop <= w:
+                                x1 = (w - target_w_crop) // 2
+                                canvas_img = raw_img.crop((x1, 0, x1 + target_w_crop, h))
+                            else:
+                                target_h_crop = int(w * 9 / 16)
+                                y1 = (h - target_h_crop) // 2
+                                canvas_img = raw_img.crop((0, y1, w, y1 + target_h_crop))
+                            canvas_img = canvas_img.resize((CANVAS_W, CANVAS_H))
+                            
+                            canvas_arr = np.array(canvas_img.convert("RGB"))
+                            tinted_arr = tint_numpy(canvas_arr, is_warm)
+                            clip_cache[cache_key] = tinted_arr
+                            return tinted_arr
                 
                 # Pre-calculate shake offsets curves (150 frames max)
                 shake_offsets = []
@@ -8993,7 +9091,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                                 else:
                                     try:
                                         raw_img = Image.open(vp)
-                                        canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H, apply_vignette=True)
+                                        canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H, apply_vignette=False)
                                         canvas_arr = np.array(canvas_img.convert("RGB"))
                                         c_clip = ImageClip(canvas_arr)
                                         clip_cache[vp] = c_clip

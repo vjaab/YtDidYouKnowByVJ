@@ -44,7 +44,7 @@ from chunk_builder import build_chunks, build_chapter_aware_chunks, redistribute
 from pexels_fetcher import generate_visual_style_guide
 from nano_scene_gen import generate_nano_scene_visuals
 from video_gen import create_video
-from screenshot_gen import capture_article_screenshot
+from screenshot_gen import capture_article_screenshot, is_github_repo_url, capture_github_readme_with_fallback
 from thumbnail_gen import generate_thumbnail
 from youtube_upload import upload_video
 from telegram_selector import notify_telegram
@@ -404,10 +404,16 @@ def run_longform_pipeline(dry_run=False):
             url = topic.get("source_url", "")
             if url:
                 ss_filename = f"screenshot_longform_{i+1}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-                ss_path = capture_article_screenshot(
-                    url, ss_filename, desktop=True,
-                    headline=topic.get("headline")
-                )
+                if is_github_repo_url(url):
+                    ss_path = capture_github_readme_with_fallback(
+                        url, ss_filename, desktop=True,
+                        headline=topic.get("headline")
+                    )
+                else:
+                    ss_path = capture_article_screenshot(
+                        url, ss_filename, desktop=True,
+                        headline=topic.get("headline")
+                    )
                 if ss_path:
                     topic["screenshot_path"] = ss_path
                     screenshots_captured += 1
