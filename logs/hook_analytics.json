@@ -850,6 +850,31 @@
         "avg_engagement": 0.0,
         "avg_swipe_away": 0.0,
         "avg_view_percentage": 0.0
+      },
+      "negative_warning": {
+        "variants": {
+          "A": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "You are wasting your hardware RAM.",
+                "video_id": "F8M1tLfm9TQ",
+                "recorded_at": "2026-09-24T20:47:03.467350"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
       }
     },
     "Privacy & Security": {
@@ -1018,7 +1043,7 @@
       "views": 0,
       "retention": 0.0,
       "engagement": 0.0,
-      "count": 9,
+      "count": 10,
       "swipe_away_rate": 0.0,
       "avg_view_percentage": 0.0
     },
@@ -1055,5 +1080,5 @@
       "avg_view_percentage": 0.0
     }
   },
-  "last_updated": "2026-09-24T04:39:59.154115"
+  "last_updated": "2026-09-24T20:47:03.467387"
 }

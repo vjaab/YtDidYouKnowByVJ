@@ -418,5 +418,15 @@
     "title": "[STUDY HACK] Free AI Image Generation Locally",
     "uploaded_at": "2026-09-24T04:39:59.155211",
     "synced": false
+  },
+  "F8M1tLfm9TQ": {
+    "video_id": "F8M1tLfm9TQ",
+    "hook_pattern": "negative_warning",
+    "hook_variant": "A",
+    "hook_text": "You are wasting your hardware RAM.",
+    "category": "AI & Machine Learning",
+    "title": "How to Run Huge Models on Your Laptop \ud83d\ude80",
+    "uploaded_at": "2026-09-24T20:47:03.468966",
+    "synced": false
   }
 }
