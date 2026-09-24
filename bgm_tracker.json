@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_The_Epic.mp3",
+      "headline": "HF Trending Model: Qwen-Image-2.1",
+      "topic_type": "auto",
+      "timestamp": "35951957127"
+    },
+    {
       "track": "jam_Action_Inspiration_Trailer.mp3",
       "headline": "HF Trending Model: convaiinnovations/laya",
       "topic_type": "auto",
@@ -15,6 +21,7 @@
   ],
   "usage_counts": {
     "jam_Energy.mp3": 1,
-    "jam_Action_Inspiration_Trailer.mp3": 1
+    "jam_Action_Inspiration_Trailer.mp3": 1,
+    "jam_The_Epic.mp3": 1
   }
 }
