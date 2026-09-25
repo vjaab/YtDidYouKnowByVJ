@@ -438,5 +438,15 @@
     "title": "This 29B Model Runs on a Potato \ud83e\udd54",
     "uploaded_at": "2026-09-25T04:42:17.909909",
     "synced": false
+  },
+  "fFTkiBULRpE": {
+    "video_id": "fFTkiBULRpE",
+    "hook_pattern": "result_first",
+    "hook_variant": "A",
+    "hook_text": "Hemmingway-1 model saves your local text generation workflow.",
+    "category": "AI & Machine Learning",
+    "title": "[PROJECT] Bypass Cloud APIs with Hemmingway-1",
+    "uploaded_at": "2026-09-25T20:37:04.861403",
+    "synced": false
   }
 }
