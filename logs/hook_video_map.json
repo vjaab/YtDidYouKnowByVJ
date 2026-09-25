@@ -428,5 +428,15 @@
     "title": "How to Run Huge Models on Your Laptop \ud83d\ude80",
     "uploaded_at": "2026-09-24T20:47:03.468966",
     "synced": false
+  },
+  "vShUn5neGMI": {
+    "video_id": "vShUn5neGMI",
+    "hook_pattern": "negative_warning",
+    "hook_variant": "B",
+    "hook_text": "Stop paying for cloud GPUs for LLMs",
+    "category": "Quiz & Trivia",
+    "title": "This 29B Model Runs on a Potato \ud83e\udd54",
+    "uploaded_at": "2026-09-25T04:42:17.909909",
+    "synced": false
   }
 }
