@@ -448,5 +448,15 @@
     "title": "[PROJECT] Bypass Cloud APIs with Hemmingway-1",
     "uploaded_at": "2026-09-25T20:37:04.861403",
     "synced": false
+  },
+  "YD9SiioCRoE": {
+    "video_id": "YD9SiioCRoE",
+    "hook_pattern": "stat_contradiction",
+    "hook_variant": "A",
+    "hook_text": "Google killed free transcription APIs",
+    "category": "Famous Bugs & Glitches",
+    "title": "[PROJECT] Run Edge0 Audio8 ASR Infinite on Your GPU",
+    "uploaded_at": "2026-09-26T05:04:07.477152",
+    "synced": false
   }
 }
