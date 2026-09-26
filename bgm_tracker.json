@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_Energy.mp3",
+      "headline": "XiaomiMiMo/MiMo-V2.6-Pro-RL on Hugging Face Hub",
+      "topic_type": "auto",
+      "timestamp": "36261558315"
+    },
+    {
       "track": "Defiance.mp3",
       "headline": "Bug Hunter #9: Audio8-ASR-Infinite \u2014 Free Local Transcription That Kills OpenAI ",
       "topic_type": "auto",
@@ -44,7 +50,7 @@
     }
   ],
   "usage_counts": {
-    "jam_Energy.mp3": 1,
+    "jam_Energy.mp3": 2,
     "jam_Action_Inspiration_Trailer.mp3": 1,
     "jam_The_Epic.mp3": 1,
     "jam_Escape_From_The_Machine_Planet.mp3": 1,
