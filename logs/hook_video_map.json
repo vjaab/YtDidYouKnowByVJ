@@ -468,5 +468,15 @@
     "title": "[TRENDING] Try XiaomiMiMo MiMo V2.6 Pro RL",
     "uploaded_at": "2026-09-26T18:51:09.826649",
     "synced": false
+  },
+  "clRDVRouHKM": {
+    "video_id": "clRDVRouHKM",
+    "hook_pattern": "personal_stake",
+    "hook_variant": "A",
+    "hook_text": "Your projects are missing this AI model.",
+    "category": "Coding & Development Hacks",
+    "title": "Why 23,000 Developers Are Downloading MiMo-V2.6-Flash-RL",
+    "uploaded_at": "2026-09-26T23:26:21.600331",
+    "synced": false
   }
 }
