@@ -488,5 +488,15 @@
     "title": "Most Developers Ignore This Open Model... \ud83e\udde0",
     "uploaded_at": "2026-09-27T19:35:53.765875",
     "synced": false
+  },
+  "Eiz8sjP9BaI": {
+    "video_id": "Eiz8sjP9BaI",
+    "hook_pattern": "result_first",
+    "hook_variant": "A",
+    "hook_text": "CLM-v0.1-8B ranks text locally.",
+    "category": "AI & Machine Learning",
+    "title": "Are Your Searches Safe From CLM-v0.1-8B? \ud83d\udd0d",
+    "uploaded_at": "2026-09-27T23:47:48.892082",
+    "synced": false
   }
 }
