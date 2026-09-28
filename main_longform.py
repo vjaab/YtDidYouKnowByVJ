@@ -77,10 +77,13 @@ def select_best_longform_title(title_options, default_title="", keywords=None):
         candidates.append(default_title)
         
     power_words = {
-        "why": 15, "how": 12, "nobody": 18, "secret": 15, "truth": 15,
-        "replaced": 16, "dead": 16, "killed": 16, "warning": 14, "finally": 14,
-        "mistake": 14, "danger": 14, "quit": 14, "real reason": 18,
-        "threat": 12, "changed": 12, "leak": 14, "free": 12, "built": 10
+        "why": 15, "how": 12, "nobody": 20, "secret": 18, "truth": 18,
+        "replaced": 16, "dead": 18, "killed": 18, "warning": 16, "finally": 14,
+        "mistake": 18, "danger": 16, "quit": 18, "real reason": 20,
+        "threat": 15, "changed": 12, "leak": 16, "free": 12, "built": 10,
+        "behind": 22, "stop": 20, "fatal": 22, "destroy": 20, "don't": 18,
+        "quietly": 18, "unfair": 20, "hidden": 16, "99%": 20, "won't tell you": 22,
+        "breaks": 18, "costing": 18, "lies": 18, "panic": 20
     }
     
     kw_set = {str(k).lower() for k in (keywords or [])}
@@ -107,7 +110,17 @@ def select_best_longform_title(title_options, default_title="", keywords=None):
             if pw in cand_lower:
                 score += weight
                 
-        # 3. Keyword presence
+        # 3. High-FOMO & Provocative Triggers Bonus
+        fomo_triggers = [
+            "already behind", "before it's too late", "quietly quitting", "fatal flaw",
+            "nobody is talking about", "stop using", "breaks everything", "won't tell you",
+            "unfair advantage", "costing you", "huge mistake"
+        ]
+        for ft in fomo_triggers:
+            if ft in cand_lower:
+                score += 25
+                
+        # 4. Keyword presence
         for kw in kw_set:
             if kw and kw in cand_lower:
                 score += 10

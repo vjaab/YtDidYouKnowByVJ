@@ -183,10 +183,24 @@ STRUCTURAL RULES (non-negotiable):
 
 6. ENDING: Close the final chapter with a direct payoff, then a single-sentence takeaway, then a natural CTA: "If you found this useful, subscribe for more deep-dives like this. I'll see you in the next one."
 
+7. PROVOCATIVE HIGH-FOMO TITLES (MANDATORY):
+   - Every title must trigger Fear Of Missing Out (FOMO), extreme urgency, or the fear of professional obsolescence.
+   - It MUST create an open cognitive loop that can ONLY be resolved by watching the complete video to the end.
+   - Core FOMO & Provocative formulas:
+     * The Obsolescence Threat: "If You Aren't Using [Tool], You're Already Behind" or "Why Senior Engineers Are Quietly Quitting [Old Tool]"
+     * The Fatal Danger: "The Fatal Architecture Mistake Breaking 90% of AI Apps" or "Don't Deploy [X] Until You Watch This"
+     * The Hidden Asymmetry: "The Unfair AI Advantage Nobody Is Talking About Yet" or "What Big Tech Won't Tell You About [Tool]"
+     * The Brutal Disruption: "Why [Tool/Framework] Is Actually Dead (The Harsh Truth)"
+   - Length: Strictly 50 to 72 characters (optimal for mobile and desktop YouTube feeds).
+
 Return ONLY valid JSON matching this schema exactly:
 {{
-  "title": "YouTube title (max 80 chars, curiosity-driven)",
-  "title_options": ["Title option 1", "Title option 2", "Title option 3"],
+  "title": "High-FOMO provocative YouTube title (50-72 chars, creates urgency and compels full watch)",
+  "title_options": [
+    "High-FOMO Title 1 (Obsolescence angle e.g. 'If You Aren\'t Using X, You\'re Already Behind')",
+    "High-FOMO Title 2 (Fatal Danger/Mistake angle e.g. 'The Fatal Flaw in X Nobody Is Warning You About')",
+    "High-FOMO Title 3 (Hidden Secret/Advantage angle e.g. 'What Senior Engineers Won\'t Tell You About X')"
+  ],
   "script": "The FULL narration script, all chapters concatenated. No headers or labels inside the script text.",
   "description": "2-3 sentence video description for YouTube",
   "sub_category": "e.g. AI Models, Security, Open Source, Developer Tools",
@@ -267,8 +281,8 @@ COMPILATION DATA:
 
 Return ONLY valid JSON:
 {{
-  "title": "Optimized YouTube title",
-  "title_options": ["Title 1", "Title 2", "Title 3"],
+  "title": "High-FOMO provocative YouTube title (50-72 chars)",
+  "title_options": ["FOMO Title Option 1", "FOMO Title Option 2", "FOMO Title Option 3"],
   "script": "The full optimized and humanized script",
   "description": "2-3 sentence description",
   "sub_category": "category",
