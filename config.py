@@ -186,7 +186,11 @@ TARGET_AUDIO_DURATION = (15, 35) # Shorter Shorts = higher completion rates = mo
 # Global Feature Flags
 ENABLE_LONGFORM = False
 ENABLE_TRENDING_ENGINE = True    # Phase 1: YouTube/Reddit/GitHub trending aggregation
-TRENDING_SOURCES = ["medium", "github", "huggingface_hub"]
+TRENDING_SOURCES = ["github", "medium", "huggingface_hub"]
+
+# Sequential topic source rotation for shorts pipeline: github -> medium -> huggingface_hub
+SOURCE_SEQUENCE = ["github", "medium", "huggingface_hub"]
+SOURCE_TRACKER_FILE = os.path.join(os.path.dirname(__file__), "source_tracker.json")
 
 # Source rotation config - ensures each source gets periodic representation
 SOURCE_ROTATION_ENABLED = True

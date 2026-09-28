@@ -27,6 +27,15 @@ on:
           - vaibhav
           - interview_questions
         default: auto
+      topic_source:
+        description: 'Trending topic source rotation (github, medium, huggingface_hub)'
+        type: choice
+        options:
+          - auto
+          - github
+          - medium
+          - huggingface_hub
+        default: auto
 
 concurrency:
   group: yt-shorts-pipeline
@@ -179,6 +188,7 @@ jobs:
           CI_LITE: "1"
           DRY_RUN: ${{ github.event.inputs.dry_run }}
           TOPIC_TYPE: ${{ github.event.inputs.topic_type }}
+          TOPIC_SOURCE: ${{ github.event.inputs.topic_source }}
           ENABLE_KINETIC_CAPTIONS: "0"
           DISABLE_ENTITY_TAGS: "1"
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
@@ -186,7 +196,9 @@ jobs:
           DRY_RUN_FLAG=""
           if [ "$DRY_RUN" = "true" ]; then DRY_RUN_FLAG="--dry-run"; fi
           TOPIC_TYPE="${TOPIC_TYPE:-auto}"
-          python -u main.py --now --type "$TOPIC_TYPE" $DRY_RUN_FLAG
+          SOURCE_FLAG=""
+          if [ -n "$TOPIC_SOURCE" ] && [ "$TOPIC_SOURCE" != "auto" ]; then SOURCE_FLAG="--source $TOPIC_SOURCE"; fi
+          python -u main.py --now --type "$TOPIC_TYPE" $SOURCE_FLAG $DRY_RUN_FLAG
 
       - name: Platform-Native Optimization & A/B Test Setup
         if: always()
@@ -238,7 +250,7 @@ jobs:
               echo "Pull failed for other reasons, proceeding..."
             fi
           fi
-          for f in news_log.json facts_log.json layout_tracker.json series_tracker.json bgm_tracker.json .topic_index.json; do
+          for f in news_log.json facts_log.json layout_tracker.json series_tracker.json bgm_tracker.json source_tracker.json .topic_index.json; do
             if [ -f "$f" ]; then git add "$f"; fi
           done
           if [ -d "logs" ]; then

@@ -3,6 +3,11 @@ import os
 from datetime import datetime
 from rapidfuzz import fuzz
 from config import TRACKER_FILE
+try:
+    from config import SOURCE_SEQUENCE, SOURCE_TRACKER_FILE
+except ImportError:
+    SOURCE_SEQUENCE = ["github", "medium", "huggingface_hub"]
+    SOURCE_TRACKER_FILE = os.path.join(os.path.dirname(__file__), "source_tracker.json")
 
 def load_tracker(tracker_file=TRACKER_FILE):
     if not os.path.exists(tracker_file):
@@ -110,7 +115,7 @@ def check_cooldowns(companies, subcategory, tracker_file=TRACKER_FILE):
         
     return True, "Cooldowns OK"
 
-def record_story(title, news_headline, subcategory, companies, keywords, breaking_news_level, voice_used, youtube_url, news_source_url, topic_type=None, target_country=None, avatar_used=None, student_vector=None, tracker_file=TRACKER_FILE):
+def record_story(title, news_headline, subcategory, companies, keywords, breaking_news_level, voice_used, youtube_url, news_source_url, topic_type=None, target_country=None, avatar_used=None, student_vector=None, topic_source=None, tracker_file=TRACKER_FILE):
     tracker = load_tracker(tracker_file)
     today = datetime.now().strftime("%Y-%m-%d")
     
@@ -150,6 +155,9 @@ def record_story(title, news_headline, subcategory, companies, keywords, breakin
     tracker["total_uploaded"] = tracker.get("total_uploaded", 0) + 1
     tracker["last_upload"] = today
     
+    if not topic_source and news_source_url:
+        topic_source = detect_source_from_url(news_source_url)
+
     history_entry = {
         "date": today,
         "title": title,
@@ -169,6 +177,10 @@ def record_story(title, news_headline, subcategory, companies, keywords, breakin
         history_entry["topic_type"] = topic_type
     if student_vector:
         history_entry["student_vector"] = student_vector
+    if topic_source:
+        history_entry["topic_source"] = topic_source
+        if topic_source in SOURCE_SEQUENCE:
+            record_topic_source(topic_source)
         
     tracker.setdefault("history", []).append(history_entry)
     save_tracker(tracker, tracker_file)
@@ -418,4 +430,95 @@ def get_next_avatar(intro_videos, tracker_file=TRACKER_FILE):
         return sorted_videos[next_idx]
     except ValueError:
         return sorted_videos[0]
+
+
+# ── SEQUENTIAL TOPIC SOURCE ROTATION (github -> medium -> huggingface_hub) ────
+
+def detect_source_from_url(url):
+    """
+    Infers the topic source platform from a given URL.
+    Returns: 'github', 'medium', 'huggingface_hub', or None.
+    """
+    if not url:
+        return None
+    url_lower = str(url).lower()
+    if "github.com" in url_lower:
+        return "github"
+    if "medium.com" in url_lower or "towardsdatascience.com" in url_lower or "towardsdev.com" in url_lower:
+        return "medium"
+    if "huggingface.co" in url_lower:
+        return "huggingface_hub"
+    return None
+
+
+def get_next_topic_source(tracker_file=TRACKER_FILE, state_file=SOURCE_TRACKER_FILE):
+    """
+    Determines the next topic source in sequential order:
+    github -> medium -> huggingface_hub -> github
+    
+    Checks source_tracker.json first, and cross-references history in news_log.json
+    so rotation is robust across GitHub Actions runs.
+    """
+    last_source = None
+    
+    # 1. Check persistent state file
+    if os.path.exists(state_file):
+        try:
+            with open(state_file, "r", encoding="utf-8") as f:
+                state = json.load(f)
+                last_source = state.get("last_source")
+        except Exception:
+            pass
+
+    # 2. Check news_log.json history as source of truth
+    tracker = load_tracker(tracker_file)
+    history = tracker.get("history", [])
+    
+    history_last_source = None
+    for entry in reversed(history):
+        if not isinstance(entry, dict):
+            continue
+        # Direct field check
+        src = entry.get("topic_source")
+        if src in SOURCE_SEQUENCE:
+            history_last_source = src
+            break
+        # URL inference check
+        detected = detect_source_from_url(entry.get("news_source_url"))
+        if detected in SOURCE_SEQUENCE:
+            history_last_source = detected
+            break
+            
+    effective_last = history_last_source or last_source
+    
+    if not effective_last or effective_last not in SOURCE_SEQUENCE:
+        return SOURCE_SEQUENCE[0]  # Start with "github"
+        
+    try:
+        idx = SOURCE_SEQUENCE.index(effective_last)
+        next_idx = (idx + 1) % len(SOURCE_SEQUENCE)
+        return SOURCE_SEQUENCE[next_idx]
+    except ValueError:
+        return SOURCE_SEQUENCE[0]
+
+
+def record_topic_source(source, state_file=SOURCE_TRACKER_FILE):
+    """
+    Records the used source and writes sequential state to source_tracker.json.
+    """
+    if source not in SOURCE_SEQUENCE:
+        return
+    idx = SOURCE_SEQUENCE.index(source)
+    next_source = SOURCE_SEQUENCE[(idx + 1) % len(SOURCE_SEQUENCE)]
+    state_data = {
+        "last_source": source,
+        "next_source": next_source,
+        "sequence": SOURCE_SEQUENCE,
+        "last_updated": datetime.now().isoformat()
+    }
+    try:
+        with open(state_file, "w", encoding="utf-8") as f:
+            json.dump(state_data, f, indent=2)
+    except Exception as e:
+        print(f"⚠️ Failed to save source tracker: {e}")
 

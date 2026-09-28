@@ -1600,24 +1600,26 @@ def fetch_medium_rss(category="AI & Tech Tools"):
     tag_feeds = {
         "technology": "https://medium.com/feed/tag/technology",
         "artificial-intelligence": "https://medium.com/feed/tag/artificial-intelligence",
+        "machine-learning": "https://medium.com/feed/tag/machine-learning",
         "programming": "https://medium.com/feed/tag/programming",
         "software-engineering": "https://medium.com/feed/tag/software-engineering",
         "web-development": "https://medium.com/feed/tag/web-development",
+        "data-science": "https://medium.com/feed/tag/data-science",
     }
     
     # Select relevant feeds based on category
     if category == "AI & Tech Tools":
-        selected_feeds = ["artificial-intelligence", "technology", "programming"]
+        selected_feeds = ["artificial-intelligence", "technology", "programming", "machine-learning"]
     elif category == "Tech Gadgets & Inventions":
         selected_feeds = ["technology", "web-development"]
     elif category == "Finance & Tech Economy":
-        selected_feeds = ["technology"]
+        selected_feeds = ["technology", "data-science"]
     elif category == "Coding & Development Hacks":
         selected_feeds = ["programming", "software-engineering", "web-development"]
     elif category == "Facts & Trivia":
         selected_feeds = ["technology", "programming"]
     else:
-        selected_feeds = ["technology", "artificial-intelligence", "programming"]
+        selected_feeds = ["technology", "artificial-intelligence", "programming", "machine-learning"]
     
     print(f"📰 Fetching Medium RSS feeds for category='{category}' (tags: {', '.join(selected_feeds)})")
     articles = []
@@ -1632,7 +1634,7 @@ def fetch_medium_rss(category="AI & Tech Tools"):
             root = ET.fromstring(xml_data)
             items = root.findall('.//item')
             
-            for item in items[:5]:  # Top 5 per tag
+            for item in items[:10]:  # Top 10 per tag
                 title = item.find('title').text or ""
                 link = item.find('link').text or ""
                 desc_elem = item.find('description')
@@ -1654,7 +1656,7 @@ def fetch_medium_rss(category="AI & Tech Tools"):
                     "urlToImage": "",
                     "publishedAt": datetime.now(timezone.utc).isoformat(),
                     "type": "medium_rss",
-                    "_engagement": {"curated_score": 25, "tag": tag}
+                    "_engagement": {"curated_score": 35, "tag": tag}
                 })
         except Exception as e:
             print(f"  ⚠️ Medium RSS fetch error ({tag}): {e}")
@@ -1761,10 +1763,12 @@ def compute_engagement_score(article):
         score += 25
 
     elif art_type == "medium_rss":
-        score += 25
+        score += 35
+        curated = eng.get("curated_score", 30)
+        score += min(25, curated)
         # Boost for AI/tech tags
         tag = eng.get("tag", "")
-        if tag in ["artificial-intelligence", "programming", "software-engineering"]:
+        if tag in ["artificial-intelligence", "machine-learning", "programming", "software-engineering", "data-science"]:
             score += 10
 
     elif art_type == "google_trends":
@@ -1885,7 +1889,7 @@ def record_source_usage(source_name, articles_count):
     save_rotation_state(state)
 
 
-def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools", sources=None):
+def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools", sources=None, active_source=None):
     """
     Master aggregator: fetches from all trending sources and returns
     a unified, scored article list ready for the pipeline.
@@ -1897,24 +1901,36 @@ def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools", 
     Args:
         target_country: Target country for geo-specific trends
         category: Category to filter by
-        sources: List of sources to fetch from. Options: "medium", "github", "huggingface_hub"
+        sources: List of sources to fetch from. Options: "github", "medium", "huggingface_hub"
                 Defaults to config.TRENDING_SOURCES or all sources if not specified.
+        active_source: Specific source to prioritize for this run (e.g. in sequential rotation)
     """
     from config import TRENDING_SOURCES as DEFAULT_SOURCES, SOURCE_ROTATION_ENABLED, MIN_ARTICLES_PER_SOURCE, SOURCE_ROTATION_WINDOW
     if sources is None:
-        sources = DEFAULT_SOURCES
+        sources = list(DEFAULT_SOURCES)
+    else:
+        sources = list(sources)
+        
+    # If active_source is provided, reorder so active_source is queried first
+    if active_source:
+        active_norm = active_source.lower()
+        if active_norm in sources:
+            sources.remove(active_norm)
+            sources.insert(0, active_norm)
+        elif active_norm in ["github", "medium", "huggingface_hub"]:
+            sources.insert(0, active_norm)
     
     # Load rotation state for priority boosting
     rotation_state = load_rotation_state() if SOURCE_ROTATION_ENABLED else {"source_history": [], "video_count": 0}
     
-    print(f"\n🔥 === TRENDING ENGINE: Fetching Multi-Platform Signals for region={target_country}, category='{category}', sources={sources} === 🔥")
+    print(f"\n🔥 === TRENDING ENGINE: Fetching Multi-Platform Signals for region={target_country}, category='{category}', sources={sources} (active_source={active_source}) === 🔥")
     if SOURCE_ROTATION_ENABLED:
         print(f"🔄 Source Rotation: ENABLED (window={SOURCE_ROTATION_WINDOW}, min_per_source={MIN_ARTICLES_PER_SOURCE})")
     
     # Define source fetchers in priority order (matching TRENDING_SOURCES config)
     source_fetchers = [
-        ("medium", lambda: fetch_medium_rss(category)),
         ("github", lambda: fetch_github_trending_ai(category)),
+        ("medium", lambda: fetch_medium_rss(category)),
         ("huggingface_hub", lambda: fetch_huggingface_hub_trending(category)),
         ("arxiv", lambda: fetch_arxiv_ai_papers(category)),
         ("youtube", lambda: fetch_youtube_trending_shorts(target_country, category)),
@@ -1935,6 +1951,8 @@ def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools", 
             continue
             
         priority_boost = get_source_priority_boost(source_name, rotation_state, SOURCE_ROTATION_WINDOW)
+        if active_source and source_name == active_source.lower():
+            priority_boost = max(priority_boost, 2.5)  # Enforce decisive boost for sequential active source
         print(f"  📡 Fetching from {source_name} (priority_boost={priority_boost:.1f}x)...")
         
         try:

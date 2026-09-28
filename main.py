@@ -44,7 +44,7 @@ from datetime import datetime
 
 from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY, ENABLE_TRENDING_ENGINE, TRENDING_SOURCES, TRACKER_FILE
 from fetch_research_papers import fetch_tech_news, fetch_ai_tools
-from topic_tracker import record_story, update_youtube_url, update_facebook_post_id, get_next_topic_type_by_ratio, get_next_target_country, get_next_avatar
+from topic_tracker import record_story, update_youtube_url, update_facebook_post_id, get_next_topic_type_by_ratio, get_next_target_country, get_next_avatar, get_next_topic_source
 from gemini_script import pick_and_generate_script
 from ecosystem_logic import get_slot_info, get_series_identity, get_next_slot
 from audio_gen import generate_voiceover, clean_tts_text
@@ -557,7 +557,7 @@ def generate_platform_hook(script_data: dict, platform: str, base_hook: str) -> 
     return random.choice(platform_hooks)
 
 
-def run_pipeline(topic_type="auto", dry_run=False):
+def run_pipeline(topic_type="auto", dry_run=False, topic_source="auto"):
     # Local mock or real Telegram notification based on dry_run
     def notify_telegram(msg, emoji=""):
         if dry_run:
@@ -568,7 +568,15 @@ def run_pipeline(topic_type="auto", dry_run=False):
     if topic_type == "auto":
         topic_type = get_next_topic_type_by_ratio()
     target_country = get_next_target_country()
-    log_message(f"=== STARTING DAILY AI PIPELINE ({topic_type.upper()}) | COUNTRY: {target_country} ===")
+
+    # ── Sequential Topic Source Rotation (github -> medium -> huggingface_hub) ──
+    if not topic_source or topic_source == "auto":
+        target_source = get_next_topic_source()
+    else:
+        target_source = topic_source.lower()
+        
+    log_message(f"=== STARTING DAILY AI PIPELINE ({topic_type.upper()}) | COUNTRY: {target_country} | SOURCE: {target_source.upper()} ===")
+    log_message(f"🔄 Sequential Topic Source: Active='{target_source.upper()}' (Rotation: github → medium → huggingface_hub)")
 
     # ── Clean output folder before starting ───────────────────────────────────
     if os.path.exists(OUTPUT_DIR):
@@ -602,6 +610,24 @@ def run_pipeline(topic_type="auto", dry_run=False):
     log_message(f"STEP 2: Fetching articles (RSS + Trending Engine)...")
     rss_articles = []
     try:
+        # Build ordered sources starting with the target sequential source
+        ordered_sources = [target_source] + [s for s in TRENDING_SOURCES if s != target_source]
+        
+        # ── TRENDING ENGINE: Sequential source priority (github -> medium -> huggingface_hub) ──
+        trending_articles = []
+        if ENABLE_TRENDING_ENGINE:
+            try:
+                from trending_engine import fetch_all_trending_signals
+                trending_articles = fetch_all_trending_signals(
+                    target_country=target_country, 
+                    category=category, 
+                    sources=ordered_sources,
+                    active_source=target_source
+                )
+                log_message(f"🔥 Trending Engine injected {len(trending_articles)} high-signal articles (active_source='{target_source}', sources={ordered_sources}).")
+            except Exception as ex:
+                log_message(f"⚠️ Trending Engine failed (non-fatal): {ex}")
+
         # Fetch vidIQ trending topics
         vidiq_news = []
         try:
@@ -621,7 +647,7 @@ def run_pipeline(topic_type="auto", dry_run=False):
         except Exception as ex:
             log_message(f"⚠️ vidIQ Fetch failed (non-fatal): {ex}")
 
-        # Fetch both to give Gemini more options
+        # Fetch secondary feeds to give Gemini fallback options
         research_news = fetch_tech_news()
         ai_tool_news = fetch_ai_tools()
         
@@ -633,31 +659,12 @@ def run_pipeline(topic_type="auto", dry_run=False):
             log_message(f"⚠️ Failed to import x_trending_fetcher: {ex}")
             x_news = []
             
-        # Fetch GitHub trending AI repos (Conflict Fix: prioritize trending GitHub projects)
-        try:
-            from trending_engine import fetch_github_trending_ai
-            github_news = fetch_github_trending_ai(category)
-        except Exception as ex:
-            log_message(f"⚠️ GitHub Fetch failed: {ex}")
-            github_news = []
-            
-        rss_articles = github_news + vidiq_news + research_news + ai_tool_news + x_news
+        rss_articles = trending_articles + vidiq_news + research_news + ai_tool_news + x_news
         
-        # ── TRENDING ENGINE (Phase 1): YouTube, Reddit, GitHub signals ──
-        trending_articles = []
-        if ENABLE_TRENDING_ENGINE:
-            try:
-                from trending_engine import fetch_all_trending_signals
-                trending_articles = fetch_all_trending_signals(target_country=target_country, category=category, sources=TRENDING_SOURCES)
-                rss_articles = trending_articles + rss_articles  # Trending FIRST for priority
-                log_message(f"🔥 Trending Engine injected {len(trending_articles)} high-signal articles for geo={target_country}, category={category}, sources={TRENDING_SOURCES}.")
-            except Exception as ex:
-                log_message(f"⚠️ Trending Engine failed (non-fatal): {ex}")
-            
         if not rss_articles:
             log_message("⚠️ All feeds returned 0 articles.")
         else:
-            log_message(f"✅ Fetched {len(rss_articles)} total articles ({len(github_news)} GitHub, {len(vidiq_news)} vidIQ, {len(research_news)} research, {len(ai_tool_news)} tools, {len(x_news)} X.com, {len(trending_articles)} trending).")
+            log_message(f"✅ Fetched {len(rss_articles)} total articles ({len(trending_articles)} trending engine [{target_source}], {len(vidiq_news)} vidIQ, {len(research_news)} research, {len(ai_tool_news)} tools, {len(x_news)} X.com).")
     
     except Exception as e:
         log_message(f"⚠️ RSS/Trending Fetch failed: {e}")
@@ -718,7 +725,7 @@ def run_pipeline(topic_type="auto", dry_run=False):
         combined_instruction = extra_instruction + screenshot_avoid
         
         script_data = pick_and_generate_script(
-            articles=rss_articles, extra_instruction=combined_instruction, forced_article=None, topic_type=topic_type, failed_topics=failed_topics, target_country=target_country, run_index=run_index
+            articles=rss_articles, extra_instruction=combined_instruction, forced_article=None, topic_type=topic_type, failed_topics=failed_topics, target_country=target_country, run_index=run_index, target_source=target_source
         )
 
         if not script_data:
@@ -1015,7 +1022,8 @@ def run_pipeline(topic_type="auto", dry_run=False):
         voice_used, "pending_upload", script_data.get("original_news_url"),
         topic_type=topic_type, target_country=target_country,
         avatar_used=script_data.get("lipsync_face_path"),
-        student_vector=student_vector
+        student_vector=student_vector,
+        topic_source=target_source
     )
 
     # ── STEP 5: Build Visual Chunks ───────────────────────────────────────────
@@ -1501,9 +1509,9 @@ def run_pipeline(topic_type="auto", dry_run=False):
     return True
 
 
-def run_local(topic_type="auto", dry_run=False):
+def run_local(topic_type="auto", dry_run=False, topic_source="auto"):
     # XTTS server launch removed. Calling pipeline directly.
-    success = run_pipeline(topic_type=topic_type, dry_run=dry_run)
+    success = run_pipeline(topic_type=topic_type, dry_run=dry_run, topic_source=topic_source)
     if not success:
         print("❌ Pipeline failed. Exiting with error code.")
         sys.exit(1)
@@ -1514,10 +1522,11 @@ if __name__ == "__main__":
     parser.add_argument("--now", action="store_true", help="Run pipeline immediately.")
     parser.add_argument("--type", type=str, choices=["auto", "research", "tools", "news", "tech_trends", "vaibhav", "interview_questions", "student"], default="auto", help="Content type mapped to the schedule")
     parser.add_argument("--dry-run", action="store_true", help="Run without uploading to YouTube/X.com/Telegram.")
+    parser.add_argument("--source", type=str, choices=["auto", "github", "medium", "huggingface_hub"], default="auto", help="Trending source rotation: github, medium, huggingface_hub")
     args = parser.parse_args()
 
     if args.now or args.dry_run:
-        run_local(topic_type=args.type, dry_run=args.dry_run)
+        run_local(topic_type=args.type, dry_run=args.dry_run, topic_source=args.source)
     else:
         print("Usage: python main.py --now")
         print("For dry runs: python main.py --dry-run")

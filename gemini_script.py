@@ -743,7 +743,7 @@ def _get_active_gemini_key():
             return k
     return api_keys[0]
 
-def _pick_and_generate_script_attempt(articles=None, extra_instruction="", forced_article=None, topic_type="research", failed_topics=None, target_country="US", recent_history=None, recent_titles=None, run_index=0):
+def _pick_and_generate_script_attempt(articles=None, extra_instruction="", forced_article=None, topic_type="research", failed_topics=None, target_country="US", recent_history=None, recent_titles=None, run_index=0, target_source=None):
     if failed_topics is None:
         failed_topics = []
     if recent_history is None:
@@ -812,22 +812,41 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
             # Copy to avoid mutating the caller's list
             articles = list(articles)
             
-            # Prioritize open-source GitHub repositories and Hugging Face Hub models/datasets
-            tech_candidates = [
-                art for art in articles 
-                if art.get("type") in [
-                    "github_trending", "huggingface_hub_model", 
-                    "huggingface_hub_dataset", "huggingface_trending"
-                ]
-            ]
-            if tech_candidates:
-                articles = tech_candidates
-                gh_count = sum(1 for a in articles if a.get("type") == "github_trending")
-                hf_count = sum(1 for a in articles if "huggingface" in (a.get("type") or ""))
-                print(f"📡 Filtered candidates to {gh_count} GitHub trending repos and {hf_count} Hugging Face items.")
+            source_type_map = {
+                "github": ["github_trending"],
+                "medium": ["medium_rss"],
+                "huggingface_hub": ["huggingface_hub_model", "huggingface_hub_dataset", "huggingface_trending"]
+            }
+            
+            if target_source and target_source.lower() in source_type_map:
+                tgt = target_source.lower()
+                target_types = source_type_map[tgt]
+                target_candidates = [art for art in articles if art.get("type") in target_types]
+                fallback_candidates = [art for art in articles if art.get("type") not in target_types]
+                if target_candidates:
+                    print(f"🎯 Target Source '{tgt}': Prioritizing {len(target_candidates)} candidates (with {len(fallback_candidates)} fallbacks).")
+                    articles = target_candidates + fallback_candidates
+                else:
+                    print(f"⚠️ Target Source '{tgt}': No candidates found, falling back to all available sources.")
+                    extra_instruction += f"\n⚠️ PIPELINE FALLBACK: No unique '{tgt}' candidates found, using fallback topics.\n"
             else:
-                print("⚠️ PIPELINE FALLBACK: No unique GitHub or Hugging Face candidates found, using general topics.")
-                extra_instruction += "\n⚠️ PIPELINE FALLBACK: No unique GitHub or Hugging Face candidates found, using general topics. PRIORITIZE open-source or developer tools if possible.\n"
+                # Prioritize open-source GitHub repositories, Medium RSS articles, and Hugging Face Hub models/datasets
+                tech_candidates = [
+                    art for art in articles 
+                    if art.get("type") in [
+                        "github_trending", "medium_rss", "huggingface_hub_model", 
+                        "huggingface_hub_dataset", "huggingface_trending"
+                    ]
+                ]
+                if tech_candidates:
+                    articles = tech_candidates
+                    gh_count = sum(1 for a in articles if a.get("type") == "github_trending")
+                    med_count = sum(1 for a in articles if a.get("type") == "medium_rss")
+                    hf_count = sum(1 for a in articles if "huggingface" in (a.get("type") or ""))
+                    print(f"📡 Filtered candidates to {gh_count} GitHub repos, {med_count} Medium articles, and {hf_count} Hugging Face items.")
+                else:
+                    print("⚠️ PIPELINE FALLBACK: No unique GitHub, Medium, or Hugging Face candidates found, using general topics.")
+                    extra_instruction += "\n⚠️ PIPELINE FALLBACK: No unique GitHub, Medium, or Hugging Face candidates found, using general topics. PRIORITIZE open-source or developer tools if possible.\n"
             
             print(f"📡 STEP 0: Scoring {len(articles)} articles for viral potential (engagement-weighted)...")
             
@@ -868,8 +887,8 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                     is_viral_category = True
                 
                 # Dev-centric or Niche Filtering for General Consumer Appeal (18-70)
-                # Bypassed if the article falls under a viral category, GitHub trending, or Hugging Face Hub.
-                if not is_viral_category and art.get("type") not in ["github_trending", "huggingface_hub_model", "huggingface_hub_dataset", "huggingface_trending"]:
+                # Bypassed if the article falls under a viral category, GitHub trending, Medium RSS, or Hugging Face Hub.
+                if not is_viral_category and art.get("type") not in ["github_trending", "medium_rss", "huggingface_hub_model", "huggingface_hub_dataset", "huggingface_trending"]:
                     dev_antikeywords = [
                         "repository", "git commit", "api endpoint", "npm package", "pip install", 
                         "cuda", "pytorch", "fine-tune", "fine-tuning", "weights", "parameters", 
@@ -909,6 +928,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 if not engagement_score:
                     # Legacy sources without engagement data get base scores by type
                     if art.get("type") == "trending": engagement_score = 20
+                    elif art.get("type") == "medium_rss": engagement_score = 25
                     elif art.get("type") == "tools": engagement_score = 10
                     elif art.get("type") == "research": engagement_score = 10
                     else: engagement_score = 5
@@ -945,10 +965,12 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                     elif upvotes > 15: trending_velocity_score = 30
                     elif upvotes > 5: trending_velocity_score = 20
                     else: trending_velocity_score = 15
+                elif art.get("type") == "medium_rss":
+                    trending_velocity_score = 30
                 
                 # D. Niche Gap Score (NEW: prefer topics competitors haven't covered)
                 niche_score = 0
-                niche_types = ["github_trending", "reddit_trending", "huggingface_hub_model", "huggingface_hub_dataset", "huggingface_trending"]
+                niche_types = ["github_trending", "medium_rss", "reddit_trending", "huggingface_hub_model", "huggingface_hub_dataset", "huggingface_trending"]
                 if art.get("type") in niche_types:
                     niche_score = 15  # Niche sources get a boost
                 
@@ -971,31 +993,31 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                     tool_keywords = ["tool", "app", "free", "alternative", "workflow", "extension", "trick", "hack", "tip",
                                      "save", "productivity", "ai tool", "chatgpt", "plugin", "shortcut"]
                     type_score += sum(15 for kw in tool_keywords if kw in title_lower)
-                    if art.get("type") in ["tools", "github_trending", "youtube_trending", "huggingface_hub_model", "huggingface_hub_dataset"]:
+                    if art.get("type") in ["tools", "github_trending", "medium_rss", "youtube_trending", "huggingface_hub_model", "huggingface_hub_dataset"]:
                         type_score += 25
                 elif topic_type == "news":
                     news_keywords = ["hidden", "secret", "feature", "setting", "trick", "hack", "tip", "iphone", "android",
                                      "privacy", "tracking", "battery", "speed", "myth", "wrong", "mistake", "stop",
                                      "breaking", "scandal", "warns", "dangerous", "scary", "free"]
                     type_score += sum(15 for kw in news_keywords if kw in title_lower)
-                    if art.get("type") in ["trending", "youtube_trending", "reddit_trending", "huggingface_hub_model"]:
+                    if art.get("type") in ["trending", "medium_rss", "youtube_trending", "reddit_trending", "huggingface_hub_model"]:
                         type_score += 25
                 elif topic_type == "research":
                     # Research now means "educational tech facts" and cutting-edge open weights
                     research_keywords = ["truth", "myth", "actually", "real", "fact", "science", "how", "why", "works",
                                          "explained", "debunk", "wrong", "correct", "proof", "model", "weights"]
                     type_score += sum(15 for kw in research_keywords if kw in title_lower)
-                    if art.get("type") in ["reddit_trending", "youtube_trending", "huggingface_trending", "huggingface_hub_model"]:
+                    if art.get("type") in ["reddit_trending", "medium_rss", "youtube_trending", "huggingface_trending", "huggingface_hub_model"]:
                         type_score += 25
                 elif topic_type == "interview_questions":
                     interview_keywords = ["interview", "question", "answer", "java", "javascript", "spring boot", "aws", "python", "kubernetes", "docker", "coding", "system design", "algorithm", "data structure"]
                     type_score += sum(15 for kw in interview_keywords if kw in title_lower)
-                    if art.get("type") in ["github_trending", "reddit_trending", "youtube_trending"]:
+                    if art.get("type") in ["github_trending", "medium_rss", "reddit_trending", "youtube_trending"]:
                         type_score += 25
                 elif topic_type == "student":
                     student_keywords = ["student", "free", "github", "copilot", "pack", "notebooklm", "gemini", "hack", "study", "notes", "rag", "project", "capstone", "resume", "vs code", "terminal"]
                     type_score += sum(15 for kw in student_keywords if kw in title_lower)
-                    if art.get("type") in ["tools", "github_trending", "youtube_trending", "huggingface_hub_model"]:
+                    if art.get("type") in ["tools", "github_trending", "medium_rss", "youtube_trending", "huggingface_hub_model"]:
                         type_score += 25
                 
                 # ── COMPOSITE VIRAL SCORE (weighted blend) ──
@@ -1013,12 +1035,18 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 if art.get("type") == "github_trending":
                     hot_score += 100.0  # Boost GitHub trending repos to prioritize them for selection
                     hot_score += art.get("_relevance_score", 0)  # Boost further if technical topic relevance matches
+                elif art.get("type") == "medium_rss":
+                    hot_score += 100.0  # Baseline parity with GitHub & HuggingFace
                 elif art.get("type") in ["huggingface_hub_model", "huggingface_hub_dataset", "huggingface_trending"]:
-                    # Parity with GitHub trending repos
                     hot_score += 100.0
                     hot_score += art.get("_relevance_score", 0)
-                    
-                    # Periodic HuggingFace boost: if not selected in last 2 runs, prioritize HuggingFace
+                
+                # Sequential rotation boost: decisively boost articles matching target_source
+                if target_source and target_source.lower() in source_type_map:
+                    if art.get("type") in source_type_map[target_source.lower()]:
+                        hot_score += 60.0
+                else:
+                    # Periodic HuggingFace boost when running without target_source
                     runs_since_hf = 999
                     try:
                         from config import TRACKER_FILE
@@ -1034,7 +1062,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                     except Exception:
                         runs_since_hf = 5
                     
-                    if runs_since_hf >= 2:
+                    if runs_since_hf >= 2 and art.get("type") in ["huggingface_hub_model", "huggingface_hub_dataset", "huggingface_trending"]:
                         hf_rotation_boost = min(60.0, 20.0 + (runs_since_hf * 10.0))
                         hot_score += hf_rotation_boost
 
@@ -1090,10 +1118,13 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 
                 # Visual Strategy: All shorts topics - no diagrams, no code snippets, no terminal outputs
                 top_source = top.get("_source_name", "") if top else ""
-                if top_source == "huggingface_hub":
+                top_type = top.get("type", "") if top else ""
+                if top_source == "huggingface_hub" or "huggingface" in top_type:
                     extra_instruction += "\n\nVISUAL STRATEGY: This topic is from Hugging Face Hub. You MAY include flowcharts, architecture diagrams, or pipeline diagrams in subtitle_chunks where appropriate to explain model architectures, training pipelines, or data flows. Set 'has_infographic': true and 'infographic_type': 'flowchart' for relevant chunks."
+                elif top_source == "medium" or top_type == "medium_rss":
+                    extra_instruction += "\n\nVISUAL STRATEGY: This topic is from Medium. Use article UI screenshots, key takeaways, and conceptual tech illustrations. Set 'has_infographic': false for all chunks. Do NOT use code snippets, terminal outputs, screen recordings, or whiteboard-style explanations."
                 else:
-                    extra_instruction += "\n\nVISUAL STRATEGY: This topic is from Medium or GitHub. Do NOT include flowcharts, architecture diagrams, pipeline diagrams, or any diagram-type infographics in subtitle_chunks. Set 'has_infographic': false for all chunks. Use GitHub UI screenshots only. Do NOT use code snippets, terminal outputs, screen recordings, or whiteboard-style explanations."
+                    extra_instruction += "\n\nVISUAL STRATEGY: This topic is from GitHub. Do NOT include flowcharts, architecture diagrams, pipeline diagrams, or any diagram-type infographics in subtitle_chunks. Set 'has_infographic': false for all chunks. Use GitHub UI screenshots only. Do NOT use code snippets, terminal outputs, screen recordings, or whiteboard-style explanations."
                 
                 # For ALL shorts topics: No code snippets, no terminal outputs, no screen recordings
                 extra_instruction += "\n\nUNIVERSAL SHORTS VISUAL CONSTRAINT: This is a SHORTS video. Do NOT include code_snippets, terminal outputs, screen recordings, or architecture_diagrams in the script JSON. Visual types allowed: Video, AI Image, GitHub UI, Side-by-side Comparison, Infographic (stat/definition/comparison only). NO 'Code Snippet', NO 'Terminal Output', NO 'Screen Recording', NO 'Flowchart', NO 'Architecture Diagram'."
@@ -1937,7 +1968,7 @@ This perspective MUST shape your hook, analysis, and solution framing. Do NOT ju
             
     return script_data
 
-def pick_and_generate_script(articles=None, extra_instruction="", forced_article=None, topic_type="research", failed_topics=None, target_country="US", run_index=0):
+def pick_and_generate_script(articles=None, extra_instruction="", forced_article=None, topic_type="research", failed_topics=None, target_country="US", run_index=0, target_source=None):
     if failed_topics is None:
         failed_topics = []
         
@@ -1969,7 +2000,8 @@ def pick_and_generate_script(articles=None, extra_instruction="", forced_article
             target_country=target_country,
             recent_history=recent_history,
             recent_titles=recent_titles,
-            run_index=run_index
+            run_index=run_index,
+            target_source=target_source
         )
         if script_data:
             return script_data
