@@ -5882,10 +5882,48 @@ def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hook
                     except Exception as e:
                         print(f"   ⚠️ Failed to auto-inject SFX {sfx_type}: {e}")
     
-    # Auto-inject transition Woosh SFX for subtitle transitions - REMOVED to prevent visual change sound distraction
-    auto_sfx_count = 0
-                    
-    print(f"   🔊 Mixed {sfx_count} explicit SFX cues + {auto_sfx_count} auto-transition wooshes.")
+    # ── ITEM 6: SOUND DESIGN CUES (Synced to visual elements & key highlight words) ──
+    enable_sound_cues = os.environ.get("ENABLE_SOUND_DESIGN_CUES", "1") == "1"
+    sound_cues_added = 0
+    if enable_sound_cues and chunks:
+        last_cue_s = -2.0
+        pop_sfx_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "sfx", "pop.wav")
+        woosh_sfx_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "sfx", "woosh.wav")
+        
+        pop_sound = None
+        woosh_sound = None
+        if os.path.exists(pop_sfx_path):
+            try:
+                pop_sound = AudioSegment.from_file(pop_sfx_path).set_frame_rate(44100).set_channels(2) - 14
+            except Exception:
+                pass
+        if os.path.exists(woosh_sfx_path):
+            try:
+                woosh_sound = AudioSegment.from_file(woosh_sfx_path).set_frame_rate(44100).set_channels(2) - 16
+            except Exception:
+                pass
+                
+        # 1. Overlay subtle pop cue when a new visual element / chunk enters the screen
+        # 2. Or when a key action/emoji word is triggered
+        for chunk in chunks:
+            c_start = float(chunk.get("start", 0))
+            if c_start > 0.8 and (c_start - last_cue_s) >= 1.2 and c_start < output_duration:
+                if pop_sound:
+                    composite = composite.overlay(pop_sound, position=int(c_start * 1000))
+                    last_cue_s = c_start
+                    sound_cues_added += 1
+            
+            # Key highlight word within chunk
+            for w in chunk.get("words", []):
+                w_start = float(w.get("start", 0))
+                w_clean = "".join(c for c in w.get("word", "").upper() if c.isalnum())
+                if (w_clean in KEYWORD_EMOJIS or w_clean in ACTION_WORD_COLORS) and (w_start - last_cue_s) >= 1.5 and w_start < output_duration:
+                    if pop_sound:
+                        composite = composite.overlay(pop_sound, position=int(w_start * 1000))
+                        last_cue_s = w_start
+                        sound_cues_added += 1
+
+    print(f"   🔊 Mixed {sfx_count} explicit SFX cues + {sound_cues_added} synced sound design cues.")
     
     # 5. Master Output (Normalize to -1.0dB headroom to prevent clipping)
     from pydub.effects import normalize
@@ -6909,25 +6947,71 @@ def _render_animated_stat(stat_text, width, height, progress_ratio, accent_color
     return img
 
 def build_transparency_watermark(width, height):
-    """Creates a subtle, high-end transparency watermark for 2026 compliance."""
+    """Creates a subtle, high-end persistent brand watermark (@vijayakumarj-ai) for attribution and compliance."""
     img = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     
-    # Text: "AI HUMAN-IN-THE-LOOP PRODUCTION"
-    text = "AI HUMAN-IN-THE-LOOP PRODUCTION"
-    font = gf(24) # Small, elite typography
-    tw, th = ts(text, font)
+    brand_handle = os.environ.get("BRAND_WATERMARK", "@vijayakumarj-ai").strip()
+    is_landscape = width > height
     
-    # Position: Very Top Right corner (above the shifted title bar for Shorts)
-    y = 40
-    x = width - tw - 40
+    font_size = 22 if is_landscape else 24
+    font = gf(font_size, bold=True)
+    tw, th = ts(brand_handle, font)
     
-    # Glassmorphism backing
-    rect = [x - 15, y - 8, x + tw + 15, y + th + 8]
-    d.rounded_rectangle(rect, radius=8, fill=(0, 0, 0, 80), outline=(255, 255, 255, 40), width=1)
+    # Position: Top Right corner safe zone
+    y = 35 if is_landscape else 45
+    x = width - tw - 40 if is_landscape else width - tw - 30
     
-    # Semi-transparent text
-    d.text((x, y), text, font=font, fill=(255, 255, 255, 140))
+    # Subtle glassmorphism pill badge
+    rect = [x - 14, y - 6, x + tw + 14, y + th + 6]
+    d.rounded_rectangle(rect, radius=10, fill=(10, 12, 18, 150), outline=(255, 255, 255, 45), width=1)
+    
+    # Semi-transparent clean white text
+    d.text((x, y), brand_handle, font=font, fill=(255, 255, 255, 195))
+    
+    return img
+
+def render_persistent_topic_header(topic_title, accent_color, width, height):
+    """
+    Renders a small, clean persistent topic header overlay at the top of the screen
+    (e.g., 'The Agent Stack: OpenClaw'). If someone scrolls onto the video halfway
+    through, they instantly know what the video is about.
+    """
+    img = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    if not topic_title:
+        return img
+    d = ImageDraw.Draw(img)
+    
+    is_landscape = width > height
+    font_size = 26 if is_landscape else 30
+    font = gf(font_size, bold=True)
+    
+    clean_title = topic_title.strip()
+    max_chars = 48 if is_landscape else 36
+    if len(clean_title) > max_chars:
+        clean_title = clean_title[:max_chars - 3].strip() + "..."
+        
+    tw, th = ts(clean_title, font)
+    pad_x, pad_y = (24, 9) if is_landscape else (26, 11)
+    badge_w = tw + pad_x * 2
+    badge_h = th + pad_y * 2
+    
+    top_y = 35 if is_landscape else 45
+    left_x = (width - badge_w) // 2
+    
+    border_radius = badge_h // 2
+    accent_rgb = accent_color[:3] if isinstance(accent_color, (list, tuple)) else (255, 255, 0)
+    d.rounded_rectangle(
+        [left_x, top_y, left_x + badge_w, top_y + badge_h],
+        radius=border_radius,
+        fill=(12, 14, 20, 185),
+        outline=(*accent_rgb, 120),
+        width=1
+    )
+    
+    # Clean text with subtle drop shadow
+    d.text((left_x + pad_x + 1, top_y + pad_y + 1), clean_title, font=font, fill=(0, 0, 0, 160))
+    d.text((left_x + pad_x, top_y + pad_y), clean_title, font=font, fill=(255, 255, 255, 240))
     
     return img
 
@@ -7048,6 +7132,69 @@ ACTION_WORD_COLORS = {
 }
 
 # ══════════════════════════════════════════════════════════════════════════════
+# RETENTION OPTIMIZATION: CONTEXT-AWARE EMOJIS & CHUNKING HELPERS
+# ══════════════════════════════════════════════════════════════════════════════
+
+_EMOJI_FONT_CACHE = {}
+
+def get_emoji_font(size=40):
+    """Loads a color emoji font across Linux and macOS with sbix support and cache."""
+    if size in _EMOJI_FONT_CACHE:
+        return _EMOJI_FONT_CACHE[size]
+    candidates = [
+        "/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf",
+        "/usr/share/fonts/opentype/noto/NotoColorEmoji.ttf",
+        "/System/Library/Fonts/Apple Color Emoji.ttc",
+        "/Library/Fonts/Apple Color Emoji.ttc"
+    ]
+    valid_sbix_sizes = [20, 32, 40, 48, 64, 96]
+    best_size = min(valid_sbix_sizes, key=lambda s: abs(s - size))
+    for p in candidates:
+        if os.path.exists(p):
+            try:
+                actual_sz = best_size if "Apple Color Emoji" in p else size
+                font = ImageFont.truetype(p, actual_sz)
+                _EMOJI_FONT_CACHE[size] = font
+                return font
+            except Exception:
+                pass
+    _EMOJI_FONT_CACHE[size] = None
+    return None
+
+KEYWORD_EMOJIS = {
+    # Tech nouns & verbs (Context-aware visual anchors for viewer retention)
+    "SKILL": "🛠️", "SKILLS": "🛠️", "TOOL": "🛠️", "TOOLS": "🛠️", "FIX": "🛠️", "BUILD": "🛠️", "CREATE": "🛠️",
+    "FILE": "📁", "FILES": "📁", "REPO": "📁", "FOLDER": "📁", "DOC": "📄", "DOCS": "📄",
+    "CODE": "💻", "CODING": "💻", "DEV": "💻", "PYTHON": "🐍", "GITHUB": "🐙", "TERMINAL": "💻", "CLI": "💻",
+    "PROBLEM": "⚠️", "PROBLEMS": "⚠️", "ISSUE": "⚠️", "ISSUES": "⚠️", "WARNING": "⚠️", "DANGER": "⚠️",
+    "BUG": "🐛", "BUGS": "🐛", "ERROR": "❌", "ERRORS": "❌", "FAIL": "💥", "CRASH": "💥", "BROKEN": "💔",
+    "FAST": "⚡", "SPEED": "⚡", "FASTER": "⚡", "PERFORMANCE": "⚡", "INSTANT": "⚡", "QUICK": "⚡",
+    "ROCKET": "🚀", "LAUNCH": "🚀", "DEPLOY": "🚀", "BOOST": "🚀", "SCALE": "📈",
+    "AI": "🤖", "AGENT": "🤖", "AGENTS": "🤖", "BOT": "🤖", "BOTS": "🤖", "ROBOT": "🤖",
+    "MODEL": "🧠", "LLM": "🧠", "BRAIN": "🧠", "SMART": "💡", "IDEA": "💡", "THINK": "🤔",
+    "SECURITY": "🔒", "SECURE": "🔒", "HACK": "🔓", "HACKER": "🕵️", "KEY": "🔑", "SECRET": "🤫",
+    "DATA": "📊", "DATABASE": "🗄️", "METRICS": "📈", "CLOUD": "☁️", "SERVER": "🖥️",
+    "FREE": "🎁", "MONEY": "💰", "COST": "💰", "PRICE": "🏷️", "PROFIT": "📈", "BILLION": "💎",
+    "WIN": "🏆", "FIRE": "🔥", "HOT": "🔥", "CRAZY": "🤯", "INSANE": "🤯", "MAGIC": "✨",
+    "SEARCH": "🔍", "TIME": "⏱️", "CLOCK": "⏰", "WATCH": "👀", "LOOK": "👀",
+    "CONNECT": "🔗", "LINK": "🔗", "WEB": "🌐", "API": "🔌", "NETWORK": "🌐",
+    "TALK": "💬", "CHAT": "💬", "MESSAGE": "📨", "PROMPT": "📝"
+}
+
+def get_chunk_boundaries(total_count, target=4, min_sz=3, max_sz=5):
+    """Calculates even chunk slices of 3 to 5 words for rapid bite-sized kinetic captions."""
+    if total_count <= max_sz:
+        return [(0, total_count)]
+    num_chunks = max(1, round(total_count / target))
+    base_sz = total_count // num_chunks
+    rem = total_count % num_chunks
+    bounds = []
+    curr = 0
+    for i in range(num_chunks):
+        sz = base_sz + (1 if i < rem else 0)
+        bounds.append((curr, curr + sz))
+        curr += sz
+    return bounds
 # 7-DAY SUBTITLE VARIETY SYSTEM (Deterministic by Day of Week)
 # ══════════════════════════════════════════════════════════════════════════════
 # Each day has a distinct visual personality for episodic branding.
@@ -7438,18 +7585,6 @@ def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, 
     word_widths_main = [fake_draw.textbbox((0, 0), w, font=f_main)[2] - fake_draw.textbbox((0, 0), w, font=f_main)[0] for w in words]
     word_widths_active = [fake_draw.textbbox((0, 0), w, font=f_active)[2] - fake_draw.textbbox((0, 0), w, font=f_active)[0] for w in words]
 
-    max_sub_width = int(frame_width * 0.75) if is_landscape else int(frame_width * 0.85)
-    
-    # Wrap to lines using main font widths
-    lines = wrap_text_to_lines(words, word_widths_main, max_sub_width, f_main)
-    lines = lines[:1]  # Kinetic style: single line only
-    
-    if not lines:
-        return img
-    
-    target_line = lines[0]
-    line_word_count = len(target_line)
-    
     # Find active word index
     active_idx = -1
     for idx, wd in enumerate(word_data):
@@ -7464,24 +7599,57 @@ def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, 
     if active_idx == -1:
         active_idx = len(word_data) - 1
 
-    # Find which word in the target line is active
-    word_counter = 0
-    active_in_line = -1
-    for i, wd in enumerate(word_data):
-        if word_counter <= i < word_counter + line_word_count:
-            if i == active_idx:
-                active_in_line = i - word_counter
-                break
-        if i >= word_counter + line_word_count:
+    # ── ITEM 1: OPTIMIZE CAPTION "CHUNKING" (3-5 Words per Frame) ──
+    # Rapid, bite-sized caption changes create momentum and lock viewer attention
+    try:
+        max_chunk_words = int(os.environ.get("CAPTION_MAX_WORDS", "4"))
+    except ValueError:
+        max_chunk_words = 4
+    max_chunk_words = max(3, min(5, max_chunk_words))
+
+    bounds = get_chunk_boundaries(len(word_data), target=max_chunk_words, min_sz=3, max_sz=5)
+    slice_start, slice_end = 0, len(word_data)
+    active_in_line = active_idx
+    for b_start, b_end in bounds:
+        if b_start <= active_idx < b_end:
+            slice_start, slice_end = b_start, b_end
+            active_in_line = active_idx - b_start
             break
 
-    # Calculate total line width with active word enlarged
-    line_w = 0
-    for i, word in enumerate(target_line):
-        if i == active_in_line:
-            line_w += word_widths_active[word_counter + i]
+    chunk_word_data = word_data[slice_start:slice_end]
+    target_line = [wd["word"] for wd in chunk_word_data]
+    line_word_count = len(target_line)
+    if line_word_count == 0:
+        return img
+
+    # ── ITEM 2: CONTEXT-AWARE EMOJIS / ICONS ──
+    enable_emojis = os.environ.get("ENABLE_CONTEXT_EMOJIS", "1") == "1"
+    emoji_font = get_emoji_font(int(40 * scale_ratio)) if enable_emojis else None
+
+    word_emojis = []
+    emoji_widths = []
+    for wd in chunk_word_data:
+        w_text = wd["word"]
+        clean_w = "".join(c for c in w_text.upper() if c.isalnum())
+        matched_emoji = KEYWORD_EMOJIS.get(clean_w) if enable_emojis else None
+        word_emojis.append(matched_emoji)
+        if matched_emoji and emoji_font:
+            try:
+                ew = fake_draw.textbbox((0, 0), matched_emoji, font=emoji_font)[2] - fake_draw.textbbox((0, 0), matched_emoji, font=emoji_font)[0]
+                emoji_widths.append(max(int(36 * scale_ratio), ew + int(8 * scale_ratio)))
+            except Exception:
+                emoji_widths.append(int(36 * scale_ratio))
         else:
-            line_w += word_widths_main[word_counter + i]
+            emoji_widths.append(0)
+
+    # Calculate total line width with active word enlarged and emojis included
+    line_w = 0
+    for i in range(line_word_count):
+        if i == active_in_line:
+            line_w += word_widths_active[slice_start + i]
+        else:
+            line_w += word_widths_main[slice_start + i]
+        line_w += emoji_widths[i]
         if i < line_word_count - 1:
             line_w += 22  # space
 
@@ -7508,7 +7676,6 @@ def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, 
     block_y2 = start_y + line_h - (line_h - base_size) + bg_pad_y
 
     # Render semi-transparent dark background capsule (70-80% opacity / alpha 180-200)
-    # Redundant 100% solid overlay removed to keep background visible
     _render_day_background(draw, block_x1, block_y1, block_x2, block_y2, day_style, day_accent, frame_width, frame_height)
 
     # Active word highlight color: high-contrast bright color (neon yellow #FFFF00 default or env override)
@@ -7532,10 +7699,12 @@ def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, 
     # Render words
     cur_x = (frame_width - line_w) // 2
     for offset, word_text in enumerate(target_line):
-        global_idx = word_counter + offset
-        wd = word_data[global_idx]
+        global_idx = slice_start + offset
+        wd = chunk_word_data[offset]
         is_active = (offset == active_in_line)
         is_spoken = wd.get("is_spoken", False)
+        word_emoji = word_emojis[offset]
+        em_w = emoji_widths[offset]
 
         if is_active:
             # Active word: check for action word color, fallback to high-contrast bright highlight
@@ -7605,11 +7774,23 @@ def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, 
                         draw.text((cur_x + dx, start_y + 3 + dy), word_text, font=f_word, fill=(0, 0, 0, opacity))
             draw.text((cur_x, start_y + 3), word_text, font=f_word, fill=c_fill)
 
+        # Draw context emoji if available for this word
+        if word_emoji and emoji_font:
+            em_x = cur_x + w_w + int(6 * scale_ratio)
+            em_y = start_y + int(4 * scale_ratio)
+            try:
+                draw.text((em_x, em_y), word_emoji, font=emoji_font, embedded_color=True)
+            except Exception:
+                try:
+                    draw.text((em_x, em_y), word_emoji, font=emoji_font)
+                except Exception:
+                    pass
+
         # Advance cursor
         if offset == active_in_line:
-            cur_x += word_widths_active[global_idx] + 22
+            cur_x += word_widths_active[global_idx] + em_w + 22
         else:
-            cur_x += word_widths_main[global_idx] + 22
+            cur_x += word_widths_main[global_idx] + em_w + 22
 
     return img
 
@@ -10513,13 +10694,17 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     
     final_audio = AudioFileClip(mastered_audio_path)
     
-    # Header bar: solid black top bar with white text for Shorts, disabled for Longform
-    if not is_longform:
+    # ── ITEM 5: PERSISTENT TOPIC HEADER & WATERMARK ──
+    # Clean topic header badge at top center so viewers scrolling halfway immediately know the topic
+    enable_persistent_header = os.environ.get("ENABLE_PERSISTENT_HEADER", "1") == "1"
+    if enable_persistent_header:
+        header_img = render_persistent_topic_header(title, accent_color, FRAME_W, FRAME_H)
+    elif not is_longform:
         header_img = render_shorts_header_bar(title, accent_color, FRAME_W, force_position="top")
     else:
         header_img = Image.new('RGBA', (FRAME_W, FRAME_H), (0, 0, 0, 0))
     
-    # Pre-render 2026 Compliance Watermark
+    # Pre-render 2026 Compliance Watermark with Brand Handle (@vijayakumarj-ai)
     transparency_img = build_transparency_watermark(FRAME_W, FRAME_H)
 
     def make_final_frame(t):
@@ -10536,6 +10721,26 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             if chunk_start - 0.1 <= t < next_start:
                 active_chunk = chunk
                 break
+            
+        # ── ITEM 4: INTRODUCE SUBTLE MOTION (Ken Burns Effect: 100% -> 110%) ──
+        # Continuous slow zoom-in prevents static screenshot / documentation stagnation
+        enable_ken_burns = os.environ.get("ENABLE_KEN_BURNS", "1") == "1"
+        if enable_ken_burns and bg_frame is not None:
+            if active_chunk:
+                c_start = float(active_chunk.get("start", 0.0))
+                c_end = float(active_chunk.get("end", c_start + 3.0))
+                c_dur = max(0.8, c_end - c_start)
+                prog = min(1.0, max(0.0, (t - c_start) / c_dur))
+            else:
+                prog = (t % 4.0) / 4.0
+            
+            zoom = 1.0 + 0.10 * prog
+            h_f, w_f = bg_frame.shape[:2]
+            nh, nw = int(h_f / zoom), int(w_f / zoom)
+            dy, dx = (h_f - nh) // 2, (w_f - nw) // 2
+            if nh > 0 and nw > 0 and dy >= 0 and dx >= 0:
+                cropped = bg_frame[dy:dy + nh, dx:dx + nw]
+                bg_frame = cv2.resize(cropped, (w_f, h_f), interpolation=cv2.INTER_LINEAR)
             
         if active_chunk and active_chunk.get("is_setting_chunk"):
             enable_mockup = os.environ.get("ENABLE_SETTINGS_MOCKUP", "1") == "1"
@@ -10672,8 +10877,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         if not is_longform and key_entities and not DISABLE_ENTITY_TAGS:
             entity_tags_img = render_dynamic_entity_tags(key_entities, accent_color, t, audio_duration, FRAME_W, FRAME_H, screenshot_intervals=screenshot_intervals)
 
-        # Minimize Static Branding: Only pass transparency_img in the first 5 seconds for longform
-        this_transparency_img = transparency_img if (not is_longform or t < 5.0) else None
+        # Persistent Brand Watermark (@vijayakumarj-ai) & Attribution
+        this_transparency_img = transparency_img
         
         # ── LONGFORM TALING-HEAD OVERLAY SYSTEM (Transitions & Styled Cards) ──
         if is_longform and 'avatar_fs_clip' in locals():
