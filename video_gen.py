@@ -1008,10 +1008,11 @@ def _prepare_screenshot_canvas(img, target_w, target_h, url=None, apply_vignette
     if is_longform and img.height > 160:
         img = img.crop((0, 80, img.width, img.height))
 
-    # Create heavily blurred background (scaled to fill)
+    # Create blurred background (scaled to fill) - radius reduced by 50-70% so underlying text/structure remain partially visible
     bg = ImageOps.fit(img, (target_w, target_h), Image.LANCZOS)
-    bg = bg.filter(ImageFilter.GaussianBlur(radius=45))
-    bg = bg.point(lambda p: p * 0.45) # Darken backdrop
+    blur_r = int(os.environ.get("BG_BLUR_RADIUS", "18"))
+    bg = bg.filter(ImageFilter.GaussianBlur(radius=blur_r))
+    bg = bg.point(lambda p: p * 0.50) # Darken backdrop while preserving visual context
     
     # 2. Fit screenshot image
     iw, ih = img.size
@@ -1498,8 +1499,8 @@ def _build_layout_bg_clip(vp, clip_dur, layout, chunk_idx):
                 raw_img = Image.open(vp).convert("RGB")
                 bg_img = ImageOps.fit(raw_img, (FRAME_W, FRAME_H), Image.LANCZOS)
                 bg_arr = np.array(bg_img)
-                bg_arr = cv2.GaussianBlur(bg_arr, (51, 51), 0)
-                bg_blur = ImageClip(bg_arr).with_duration(clip_dur).with_opacity(0.35)
+                bg_arr = cv2.GaussianBlur(bg_arr, (21, 21), 0)
+                bg_blur = ImageClip(bg_arr).with_duration(clip_dur).with_opacity(0.45)
         except Exception as e:
             print(f"⚠️ Error constructing backdrop blur: {e}")
             bg_blur = ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=clip_dur)
@@ -1508,7 +1509,7 @@ def _build_layout_bg_clip(vp, clip_dur, layout, chunk_idx):
         comp = CompositeVideoClip([bg_blur, c_clip], size=(FRAME_W, FRAME_H)).with_duration(clip_dur)
         return comp
     else:
-        # Asymmetric layout: heavily blurred full-screen background
+        # Asymmetric layout: blurred full-screen background (structure partially visible, reduced 65%)
         try:
             if is_video:
                 bg_blur = ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=clip_dur)
@@ -1516,7 +1517,7 @@ def _build_layout_bg_clip(vp, clip_dur, layout, chunk_idx):
                 raw_img = Image.open(vp).convert("RGB")
                 bg_img = ImageOps.fit(raw_img, (FRAME_W, FRAME_H), Image.LANCZOS)
                 bg_arr = np.array(bg_img)
-                bg_arr = cv2.GaussianBlur(bg_arr, (71, 71), 0)
+                bg_arr = cv2.GaussianBlur(bg_arr, (25, 25), 0)
                 bg_blur = ImageClip(bg_arr).with_duration(clip_dur)
         except Exception as e:
             bg_blur = ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=clip_dur)
@@ -7120,11 +7121,11 @@ DAY_STYLES = {
         "active_scale": 1.12,
         "stroke_width": 4,
     },
-    # Sunday: Roboto Variable, Teal, Floating Island, Kinetic Pop
+    # Sunday: Roboto Variable, Neon Yellow, Floating Island, Kinetic Pop
     6: {
         "font_family": "Roboto",
         "font_weight": "Variable",
-        "accent_color": (0, 128, 128),      # #008080 - Teal
+        "accent_color": (255, 255, 0),      # #FFFF00 - High-Contrast Neon Yellow (Replaced muted teal)
         "bg_style": "floating_island",
         "glow_outline": True,
         "animation": "kinetic_pop",
@@ -7315,20 +7316,32 @@ def get_font_for_style(style_config, size, bold=False):
     for p in search_paths:
         if os.path.exists(p):
             try:
-                return ImageFont.truetype(p, size)
+                font = ImageFont.truetype(p, size)
+                if hasattr(font, 'set_variation_by_name'):
+                    try:
+                        font.set_variation_by_name(weight)
+                    except Exception:
+                        try:
+                            font.set_variation_by_name("Bold")
+                        except Exception:
+                            pass
+                return font
             except Exception:
                 pass
     return ImageFont.load_default()
 
 def _render_day_background(draw, block_x1, block_y1, block_x2, block_y2, style_config, accent_color, frame_width, frame_height):
-    """Render the day-specific background badge style."""
+    """Render the day-specific background badge style with semi-transparent dark background (70-80% opacity / alpha 180-200)."""
     bg_style = style_config["bg_style"]
     glow = style_config["glow_outline"]
     
+    # Semi-transparent dark background (around 70-80% opacity / alpha 180-200)
+    bg_alpha = int(os.environ.get("CAPTION_BG_ALPHA", "185"))
+    
     if bg_style == "pill":
-        # Full rounded pill capsule
+        # Rounded pill capsule with semi-transparent dark fill
         radius = (block_y2 - block_y1) // 2
-        draw.rounded_rectangle([block_x1, block_y1, block_x2, block_y2], radius=radius, fill=(0, 0, 0, 215))
+        draw.rounded_rectangle([block_x1, block_y1, block_x2, block_y2], radius=radius, fill=(0, 0, 0, bg_alpha))
         if glow:
             # Outer glow effect
             for i in range(3):
@@ -7345,8 +7358,8 @@ def _render_day_background(draw, block_x1, block_y1, block_x2, block_y2, style_c
         draw.ellipse([block_x2 - 6, line_y - 6, block_x2 + 6, line_y + 6], fill=(*accent_color, 255))
     
     elif bg_style == "gradient_badge":
-        # Gradient background with accent top edge
-        draw.rounded_rectangle([block_x1, block_y1, block_x2, block_y2], radius=16, fill=(0, 0, 0, 220))
+        # Semi-transparent gradient background with accent top edge
+        draw.rounded_rectangle([block_x1, block_y1, block_x2, block_y2], radius=16, fill=(0, 0, 0, bg_alpha))
         # Gradient top edge
         for i in range(4):
             alpha = 255 - i * 60
@@ -7358,8 +7371,8 @@ def _render_day_background(draw, block_x1, block_y1, block_x2, block_y2, style_c
                 draw.rounded_rectangle([gx1, gy1, gx2, gy2], radius=16 + i * 2, outline=(*accent_color, 50 - i * 12), width=2)
     
     elif bg_style == "neon_glow":
-        # Dark card with neon outline glow
-        draw.rounded_rectangle([block_x1, block_y1, block_x2, block_y2], radius=16, fill=(10, 10, 15, 230))
+        # Semi-transparent dark card with neon outline glow
+        draw.rounded_rectangle([block_x1, block_y1, block_x2, block_y2], radius=16, fill=(10, 10, 15, bg_alpha))
         # Multi-layer neon outline
         for i in range(5):
             gx1, gy1 = block_x1 - i * 2, block_y1 - i * 2
@@ -7368,21 +7381,20 @@ def _render_day_background(draw, block_x1, block_y1, block_x2, block_y2, style_c
             draw.rounded_rectangle([gx1, gy1, gx2, gy2], radius=16 + i * 2, outline=(*accent_color, alpha), width=2)
     
     elif bg_style == "card_border":
-        # Card with accent border
-        draw.rounded_rectangle([block_x1, block_y1, block_x2, block_y2], radius=16, fill=(0, 0, 0, 215), outline=(*accent_color, 200), width=3)
+        # Semi-transparent card with accent border
+        draw.rounded_rectangle([block_x1, block_y1, block_x2, block_y2], radius=16, fill=(0, 0, 0, bg_alpha), outline=(*accent_color, 180), width=2)
         # Inner accent line
         draw.rounded_rectangle([block_x1 + 3, block_y1 + 3, block_x2 - 3, block_y2 - 3], radius=13, outline=(*accent_color, 80), width=1)
     
     elif bg_style == "floating_island":
-        # Floating island with shadow
-        # Shadow
-        shadow_offset = 8
+        # Semi-transparent floating island with shadow
+        shadow_offset = 6
         draw.rounded_rectangle(
             [block_x1 + shadow_offset, block_y1 + shadow_offset, block_x2 + shadow_offset, block_y2 + shadow_offset],
-            radius=16, fill=(0, 0, 0, 120)
+            radius=16, fill=(0, 0, 0, 90)
         )
-        # Main island
-        draw.rounded_rectangle([block_x1, block_y1, block_x2, block_y2], radius=16, fill=(0, 0, 0, 220))
+        # Main island with semi-transparent fill
+        draw.rounded_rectangle([block_x1, block_y1, block_x2, block_y2], radius=16, fill=(0, 0, 0, bg_alpha))
         if glow:
             # Top accent line
             draw.rectangle([block_x1, block_y1, block_x2, block_y1 + 3], fill=(*accent_color, 255))
@@ -7473,34 +7485,49 @@ def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, 
         if i < line_word_count - 1:
             line_w += 22  # space
 
-    # Safe Zone: Position subtitles in middle-lower third, above presenter's head
-    # For Shorts (portrait): middle-lower third (55%-65%) - well above avatar
-    # For Longform (landscape): lower-middle area (55%-65%)
-    if is_landscape:
-        y_pos_pct = 0.58
-    else:
-        y_pos_pct = 0.58  # Middle-lower third, above presenter's head
+    # Safe Zone: Position subtitles in lower third (y = video_height * 0.75) to clear center frame for visual content
+    caption_y_env = os.environ.get("CAPTION_Y_POS")
+    try:
+        y_pos_pct = float(caption_y_env) if caption_y_env else 0.75
+    except ValueError:
+        y_pos_pct = 0.75
+
     line_h = int(90 * scale_ratio)
     start_y = int(frame_height * y_pos_pct) - (line_h // 2) + y_shift
 
-    # CLAMP: Keep in middle-lower third (40%-70%) for avatar clearance
-    min_y = int(frame_height * 0.40) - (line_h // 2)
-    max_y = int(frame_height * 0.70) - (line_h // 2)
+    # Safe-zone margin: keep in lower third (60%-85%) ensuring bottom margin and center visual clearance
+    min_y = int(frame_height * 0.60) - (line_h // 2)
+    max_y = int(frame_height * 0.85) - (line_h // 2)
     start_y = max(min_y, min(start_y, max_y))
 
-    # Background block - strengthened for readability (larger padding, darker box)
+    # Background capsule padding
     bg_pad_x, bg_pad_y = 45, 25
     block_x1 = (frame_width - line_w) // 2 - bg_pad_x
     block_x2 = (frame_width + line_w) // 2 + bg_pad_x
     block_y1 = start_y - bg_pad_y
     block_y2 = start_y + line_h - (line_h - base_size) + bg_pad_y
 
-    # Render strengthened background badge (darker, more opaque)
+    # Render semi-transparent dark background capsule (70-80% opacity / alpha 180-200)
+    # Redundant 100% solid overlay removed to keep background visible
     _render_day_background(draw, block_x1, block_y1, block_x2, block_y2, day_style, day_accent, frame_width, frame_height)
-    
-    # Add extra dark overlay for maximum text contrast
-    overlay_alpha = 180
-    draw.rounded_rectangle([block_x1, block_y1, block_x2, block_y2], radius=16, fill=(0, 0, 0, overlay_alpha))
+
+    # Active word highlight color: high-contrast bright color (neon yellow #FFFF00 default or env override)
+    env_active_color = os.environ.get("ACTIVE_WORD_COLOR")
+    if env_active_color:
+        try:
+            hex_clean = env_active_color.strip().lstrip("#")
+            if len(hex_clean) == 6:
+                active_highlight_color = tuple(int(hex_clean[i:i+2], 16) for i in (0, 2, 4))
+            else:
+                active_highlight_color = (255, 255, 0)
+        except Exception:
+            active_highlight_color = (255, 255, 0)
+    else:
+        # Fallback to day_accent; replace muted teal (0, 128, 128) with high-contrast neon yellow #FFFF00
+        if day_accent == (0, 128, 128):
+            active_highlight_color = (255, 255, 0)
+        else:
+            active_highlight_color = day_accent
 
     # Render words
     cur_x = (frame_width - line_w) // 2
@@ -7511,13 +7538,13 @@ def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, 
         is_spoken = wd.get("is_spoken", False)
 
         if is_active:
-            # Active word: check for action word color, fallback to day accent
+            # Active word: check for action word color, fallback to high-contrast bright highlight
             clean_word = "".join(c for c in word_text.upper() if c.isalnum())
             action_color = ACTION_WORD_COLORS.get(clean_word)
             if action_color:
                 c_fill = (*action_color, 255)
             else:
-                c_fill = (*day_accent, 255)
+                c_fill = (*active_highlight_color, 255)
             f_word = f_active
             w_w = word_widths_active[global_idx]
             
@@ -7533,8 +7560,8 @@ def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, 
                         if dx * dx + dy * dy <= stroke_width * stroke_width:
                             word_draw.text((40 + dx, 40 + dy), word_text, font=f_word, fill=(0, 0, 0, 255))
                 
-                # Day accent glow behind
-                word_draw.text((42, 42), word_text, font=f_word, fill=(*day_accent, 100))
+                # Highlight glow behind
+                word_draw.text((42, 42), word_text, font=f_word, fill=(*active_highlight_color, 120))
                 # Main text
                 word_draw.text((40, 40), word_text, font=f_word, fill=c_fill)
                 
@@ -7552,12 +7579,12 @@ def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, 
                     for dy in range(-stroke_width, stroke_width + 1):
                         if dx * dx + dy * dy <= stroke_width * stroke_width:
                             draw.text((cur_x + dx, start_y + 3 + dy), word_text, font=f_word, fill=(0, 0, 0, 255))
-                # Day accent glow
-                draw.text((cur_x + 2, start_y + 5), word_text, font=f_word, fill=(*day_accent, 120))
+                # Highlight glow
+                draw.text((cur_x + 2, start_y + 5), word_text, font=f_word, fill=(*active_highlight_color, 140))
                 # Main text
                 draw.text((cur_x, start_y + 3), word_text, font=f_word, fill=c_fill)
         else:
-            # Inactive words: use action word colors for highlighting, otherwise dimmed white
+            # Inactive words: use action word colors for highlighting, otherwise crisp white
             opacity = 140 if is_spoken else 255
             clean_word = "".join(c for c in word_text.upper() if c.isalnum())
             action_color = ACTION_WORD_COLORS.get(clean_word)
@@ -7569,10 +7596,12 @@ def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, 
             w_w = word_widths_main[global_idx]
             w_h = fake_draw.textbbox((0, 0), word_text, font=f_word)[3] - fake_draw.textbbox((0, 0), word_text, font=f_word)[1]
             
-            # Black stroke (smaller for inactive)
-            for dx in range(-4, 5):
-                for dy in range(-4, 5):
-                    if dx * dx + dy * dy <= 16:
+            # Drop shadow for depth and readability on semi-transparent background
+            draw.text((cur_x + 2, start_y + 5), word_text, font=f_word, fill=(0, 0, 0, 180))
+            # Black stroke
+            for dx in range(-3, 4):
+                for dy in range(-3, 4):
+                    if dx * dx + dy * dy <= 9:
                         draw.text((cur_x + dx, start_y + 3 + dy), word_text, font=f_word, fill=(0, 0, 0, opacity))
             draw.text((cur_x, start_y + 3), word_text, font=f_word, fill=c_fill)
 
@@ -8062,15 +8091,16 @@ def render_subtitle_frame(word_data, bg_frame=None, accent_color=(255,214,0), fr
     lines = lines[:1]
     line_h = int(90 * scale_ratio)
     
-    # Safe Zone: Position subtitles at bottom, just above avatar head
-    if is_landscape:
-        y_pos_pct = 0.70
-    else:
-        y_pos_pct = 0.75  # Bottom zone, just above avatar head
+    # Safe Zone: Position subtitles in lower third (y = video_height * 0.75)
+    caption_y_env = os.environ.get("CAPTION_Y_POS")
+    try:
+        y_pos_pct = float(caption_y_env) if caption_y_env else 0.75
+    except ValueError:
+        y_pos_pct = 0.75
     start_y = int(frame_height * y_pos_pct) - (len(lines) * line_h // 2) + y_shift
 
-    # CLAMP: Allow bottom positioning (up to 85%) for avatar clearance
-    min_y = int(frame_height * 0.30) - (len(lines) * line_h // 2)
+    # CLAMP: Keep in lower third (60%-85%) for center visual clearance and bottom safe-zone
+    min_y = int(frame_height * 0.60) - (len(lines) * line_h // 2)
     max_y = int(frame_height * 0.85) - (len(lines) * line_h // 2)
     start_y = max(min_y, min(start_y, max_y))
     
@@ -8350,7 +8380,7 @@ def create_video(audio_path, script_json, chunks, output_path=None):
     # Dynamic refinement parameters
     dynamic_params = {
         "avatar_scale_mult": 1.0,
-        "subtitle_y_shift": -80
+        "subtitle_y_shift": 0
     }
     
     while iterations <= max_iters:
@@ -8659,7 +8689,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                     raw_img = Image.open(vp).convert("RGB")
                     bg_img = ImageOps.fit(raw_img, (FRAME_W, FRAME_H), Image.LANCZOS)
                     bg_arr = np.array(bg_img)
-                    bg_arr = cv2.GaussianBlur(bg_arr, (71, 71), 0)
+                    # Reduced blur (65% reduction from 71x71 to 25x25) so context remains visible
+                    bg_arr = cv2.GaussianBlur(bg_arr, (25, 25), 0)
                     c_clip = ImageClip(bg_arr, duration=audio_duration)
                 bg_layer_clips.append(c_clip)
             except Exception as e:
@@ -10671,8 +10702,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 return cv2.addWeighted(frame, 0.88, tint_arr, 0.12, 0)
 
             if is_fs:
-                # 1. Blur backdrop completely for full-screen presenter
-                bg_frame = cv2.GaussianBlur(bg_frame, (51, 51), 0)
+                # 1. Blur backdrop for full-screen presenter (reduced blur so background structure is partially visible)
+                bg_frame = cv2.GaussianBlur(bg_frame, (21, 21), 0)
                 
                 # 2. Get full-screen frame
                 fs_frame = avatar_fs_clip.get_frame(t)

@@ -172,6 +172,10 @@ jobs:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           CI_LITE: "1"
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          ACTIVE_WORD_COLOR: "#FFFF00"
+          CAPTION_Y_POS: "0.75"
+          CAPTION_BG_ALPHA: "185"
+          BG_BLUR_RADIUS: "18"
         run: |
           python -u main_longform.py --now
         
