@@ -1117,6 +1117,33 @@
         "avg_swipe_away": 0.0,
         "avg_view_percentage": 0.0
       }
+    },
+    "Data Science & AI": {
+      "stat_contradiction": {
+        "variants": {
+          "A": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "2.5 million papers free on Hugging Face",
+                "video_id": "eJHygJ9QHck",
+                "recorded_at": "2026-09-28T18:59:32.434590"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
+      }
     }
   },
   "global": {
@@ -1140,7 +1167,7 @@
       "views": 0,
       "retention": 0.0,
       "engagement": 0.0,
-      "count": 10,
+      "count": 11,
       "swipe_away_rate": 0.0,
       "avg_view_percentage": 0.0
     },
@@ -1161,5 +1188,5 @@
       "avg_view_percentage": 0.0
     }
   },
-  "last_updated": "2026-09-27T23:47:48.890163"
+  "last_updated": "2026-09-28T18:59:32.434627"
 }

@@ -498,5 +498,15 @@
     "title": "Are Your Searches Safe From CLM-v0.1-8B? \ud83d\udd0d",
     "uploaded_at": "2026-09-27T23:47:48.892082",
     "synced": false
+  },
+  "eJHygJ9QHck": {
+    "video_id": "eJHygJ9QHck",
+    "hook_pattern": "stat_contradiction",
+    "hook_variant": "A",
+    "hook_text": "2.5 million papers free on Hugging Face",
+    "category": "Data Science & AI",
+    "title": "Can You Trust Academic AI Datasets? \ud83e\udde0",
+    "uploaded_at": "2026-09-28T18:59:32.436612",
+    "synced": false
   }
 }
