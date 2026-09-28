@@ -1,10 +1,10 @@
 {
-  "last_source": "github",
-  "next_source": "medium",
+  "last_source": "medium",
+  "next_source": "huggingface_hub",
   "sequence": [
     "github",
     "medium",
     "huggingface_hub"
   ],
-  "last_updated": "2026-09-28T18:41:21.254527"
+  "last_updated": "2026-09-28T22:09:07.540417"
 }

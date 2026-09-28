@@ -1144,6 +1144,33 @@
         "avg_swipe_away": 0.0,
         "avg_view_percentage": 0.0
       }
+    },
+    "AI Development": {
+      "personal_stake": {
+        "variants": {
+          "A": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "Your code is running too slow",
+                "video_id": "Q9gDves08eA",
+                "recorded_at": "2026-09-28T22:36:01.957873"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
+      }
     }
   },
   "global": {
@@ -1183,10 +1210,10 @@
       "views": 0,
       "retention": 0.0,
       "engagement": 0.0,
-      "count": 10,
+      "count": 11,
       "swipe_away_rate": 0.0,
       "avg_view_percentage": 0.0
     }
   },
-  "last_updated": "2026-09-28T18:59:32.434627"
+  "last_updated": "2026-09-28T22:36:01.957903"
 }

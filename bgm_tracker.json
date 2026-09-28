@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_Confidence.mp3",
+      "headline": "The Overnight Speed Loop: Asking AI Agents to Make Code 7x Faster",
+      "topic_type": "auto",
+      "timestamp": "36486895404"
+    },
+    {
       "track": "jam_Inspiring_Epic_Glory.mp3",
       "headline": "Hugging Face Trending Dataset: arxiv-complete - 98K Downloads of Full arXiv Corp",
       "topic_type": "auto",
@@ -80,6 +86,7 @@
     "jam_Escape_From_The_Machine_Planet.mp3": 2,
     "jam_Inspiring_Epic_Glory.mp3": 2,
     "Destiny.mp3": 1,
-    "Defiance.mp3": 1
+    "Defiance.mp3": 1,
+    "jam_Confidence.mp3": 1
   }
 }
