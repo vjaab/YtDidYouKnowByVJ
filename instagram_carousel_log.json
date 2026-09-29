@@ -14,7 +14,8 @@
     "Now It\u2019s Replacing Code Reviews",
     "Medium (artificial-intelligence): Isomorphic Structural Theory: Decoup",
     "Naive Vector Search Fails Production RAG",
-    "AI's 5 Secrets: Not All Bots Learn"
+    "AI's 5 Secrets: Not All Bots Learn",
+    "GPT-6 Astra: The Next Generation of AI"
   ],
   "used_keywords": [
     "openai",
@@ -172,7 +173,12 @@
     "machine learning",
     "reactive AI",
     "autonomous systems",
-    "did you know"
+    "did you know",
+    "did you know",
+    "tech trending",
+    "astra",
+    "next",
+    "generation"
   ],
   "history": [
     {
@@ -453,6 +459,19 @@
       ],
       "source": "Medium - artificial-intelligence",
       "timestamp": "2026-09-29T20:41:38.284642+00:00"
+    },
+    {
+      "title": "GPT-6 Astra: The Next Generation of AI",
+      "news_source_url": "https://medium.com/@sindhuriaishwarya/chatgpts-new-version-gpt-6-astra-the-next-generation-of-ai-4e639c77c3a9?source=rss------artificial_intelligence-5",
+      "keywords": [
+        "did you know",
+        "tech trending",
+        "astra",
+        "next",
+        "generation"
+      ],
+      "source": "Medium - artificial-intelligence",
+      "timestamp": "2026-09-29T20:47:15.398966+00:00"
     }
   ]
 }
