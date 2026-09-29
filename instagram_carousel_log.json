@@ -12,7 +12,8 @@
     "How AI Generates Images from Pure Static Noise",
     "Jev: Simpler AI Models Dethrone LLMs",
     "Now It\u2019s Replacing Code Reviews",
-    "Medium (artificial-intelligence): Isomorphic Structural Theory: Decoup"
+    "Medium (artificial-intelligence): Isomorphic Structural Theory: Decoup",
+    "Naive Vector Search Fails Production RAG"
   ],
   "used_keywords": [
     "openai",
@@ -158,7 +159,13 @@
     "artificial",
     "intelligence",
     "isomorphic",
-    "structural"
+    "structural",
+    "Hybrid Search",
+    "RAG",
+    "Vector Search",
+    "BM25",
+    "AI",
+    "did you know"
   ],
   "history": [
     {
@@ -411,6 +418,20 @@
       ],
       "source": "Medium - artificial-intelligence",
       "timestamp": "2026-09-29T20:21:31.533448+00:00"
+    },
+    {
+      "title": "Naive Vector Search Fails Production RAG",
+      "news_source_url": "https://medium.com/@ronomahedi/beyond-naive-vector-search-why-production-rag-fails-without-hybrid-search-bm25-dense-vectors-608d837688b0?source=rss------artificial_intelligence-5",
+      "keywords": [
+        "Hybrid Search",
+        "RAG",
+        "Vector Search",
+        "BM25",
+        "AI",
+        "did you know"
+      ],
+      "source": "Medium - artificial-intelligence",
+      "timestamp": "2026-09-29T20:31:17.517874+00:00"
     }
   ]
 }

@@ -1,0 +1,21 @@
+{
+  "topic": "Naive Vector Search Fails Production RAG",
+  "category": "AI News",
+  "type": "carousel",
+  "slides": 7,
+  "instagram_images": [
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_why_your_cutting__01.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_why_your_cutting__02.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_why_your_cutting__03.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_why_your_cutting__04.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_why_your_cutting__05.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_why_your_cutting__06.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_why_your_cutting__07.jpg"
+  ],
+  "facebook_images": [],
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know why your cutting-edge AI chatbot is fundamentally missing vital information? \ud83e\udd2f\n\nHere is the mind-blowing reality:\n\ud83d\udd39 Traditional AI vector search, relying solely on cosine similarity, fundamentally fails in production by missing exact keywords, critical error codes, and precise technical jargon. This blind spot means even advanced AI systems can't recall vital, specific information crucial for accurate responses. The breakthrough is a hybrid search approach, combining traditional keyword-matching (BM25) with dense vector embeddings, proving absolutely essential for robust, production-grade Retrieval-Augmented Generation (RAG).\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #Science #Engineering #MindBlowing\n\n#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets",
+  "hashtags": "#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets",
+  "poll_file": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/poll_naive_vector_search_fails_production_rag.json",
+  "carousel_json": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_naive_vector_search_fails_production_rag.json",
+  "generated_at": "2026-09-29T20:31:31.252606+00:00"
+}
