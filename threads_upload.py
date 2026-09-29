@@ -379,14 +379,15 @@ def publish_container(container_id: str) -> str:
 
 # ── Image / Carousel Support ─────────────────────────────────────────────────
 
-def create_threads_image_container(image_url: str, caption: str = "", is_carousel_item: bool = False) -> str:
-    """Create a Threads container for a single image.
+def create_threads_image_container(image_url: str, caption: str = "", is_carousel_item: bool = False, max_retries: int = 3) -> str:
+    """Create a Threads container for a single image with retries.
 
     Args:
         image_url: Public URL of the image (JPEG/PNG, max 8 MB).
         caption: Text caption (ignored if is_carousel_item=True; Threads only
                  accepts text on the parent carousel container).
         is_carousel_item: Set True when this image is part of a carousel.
+        max_retries: Maximum attempts on 5xx or transient errors.
 
     Returns:
         The container/creation ID.
@@ -404,24 +405,43 @@ def create_threads_image_container(image_url: str, caption: str = "", is_carouse
     else:
         data["text"] = caption[:2200]
 
-    resp = requests.post(
-        f"{GRAPH_API_BASE}/{threads_user_id}/threads",
-        data=data,
-        timeout=30,
-    )
-    resp.raise_for_status()
-    result = resp.json()
-    if not isinstance(result, dict) or "id" not in result:
-        raise RuntimeError(f"Unexpected response from create_threads_image_container: {result}")
-    return result["id"]
+    last_err = None
+    for attempt in range(1, max_retries + 1):
+        try:
+            resp = requests.post(
+                f"{GRAPH_API_BASE}/{threads_user_id}/threads",
+                data=data,
+                timeout=30,
+            )
+            resp.raise_for_status()
+            result = resp.json()
+            if not isinstance(result, dict) or "id" not in result:
+                raise RuntimeError(f"Unexpected response from create_threads_image_container: {result}")
+            return result["id"]
+        except requests.HTTPError as e:
+            err_body = (e.response.text or "").strip() if e.response is not None else ""
+            err_text = err_body if err_body else f"{e} (empty response body)"
+            print(f"⚠️ Image container creation attempt {attempt}/{max_retries} error: {err_text}")
+            last_err = e
+            e.response_text = err_text
+            if attempt < max_retries:
+                time.sleep(attempt * 4)
+        except Exception as e:
+            print(f"⚠️ Image container creation attempt {attempt}/{max_retries} exception: {e}")
+            last_err = e
+            if attempt < max_retries:
+                time.sleep(attempt * 4)
+
+    raise last_err
 
 
-def create_threads_carousel_container(child_ids: list, caption: str) -> str:
+def create_threads_carousel_container(child_ids: list, caption: str, max_retries: int = 3) -> str:
     """Create a parent CAROUSEL container that groups child containers.
 
     Args:
         child_ids: List of child container IDs (2-20 items).
         caption: Text caption for the carousel post.
+        max_retries: Maximum attempts on 5xx or transient errors.
 
     Returns:
         The parent container/creation ID.
@@ -443,7 +463,7 @@ def create_threads_carousel_container(child_ids: list, caption: str) -> str:
     }
 
     last_err = None
-    for attempt in range(1, 4):
+    for attempt in range(1, max_retries + 1):
         try:
             resp = requests.post(
                 f"{GRAPH_API_BASE}/{threads_user_id}/threads",
@@ -456,21 +476,27 @@ def create_threads_carousel_container(child_ids: list, caption: str) -> str:
                 raise RuntimeError(f"Unexpected response from create_threads_carousel_container: {result}")
             return result["id"]
         except requests.HTTPError as e:
-            err_text = e.response.text if e.response is not None else str(e)
-            print(f"⚠️ Carousel container creation attempt {attempt}/3 error: {err_text}")
+            err_body = (e.response.text or "").strip() if e.response is not None else ""
+            err_text = err_body if err_body else f"{e} (empty response body)"
+            print(f"⚠️ Carousel container creation attempt {attempt}/{max_retries} error: {err_text}")
             last_err = e
             e.response_text = err_text
-            if attempt < 3:
+            if attempt < max_retries:
+                time.sleep(attempt * 4)
+        except Exception as e:
+            print(f"⚠️ Carousel container creation attempt {attempt}/{max_retries} exception: {e}")
+            last_err = e
+            if attempt < max_retries:
                 time.sleep(attempt * 4)
 
     raise last_err
 
 
-def upload_image_to_github_releases(image_path: str) -> tuple:
-    """Upload a single image to GitHub Releases for public hosting.
+def upload_images_to_github_release(image_paths: list) -> tuple:
+    """Upload one or more images to a single GitHub Release for public hosting.
 
     Returns:
-        (public_url, release_id) or (None, error_message)
+        (list_of_public_urls, release_id) or (None, error_message)
     """
     token = os.getenv("GITHUB_TOKEN")
     repo = os.getenv("GITHUB_REPOSITORY")
@@ -481,11 +507,11 @@ def upload_image_to_github_releases(image_path: str) -> tuple:
     if "/" not in repo:
         return None, f"Invalid GITHUB_REPOSITORY format: {repo}"
 
-    file_size = os.path.getsize(image_path)
-    size_mb = file_size / (1024 * 1024)
-
-    if size_mb > 8:
-        return None, f"Image too large ({size_mb:.1f}MB) — Threads limit is 8MB"
+    for img in image_paths:
+        file_size = os.path.getsize(img)
+        size_mb = file_size / (1024 * 1024)
+        if size_mb > 8:
+            return None, f"Image {os.path.basename(img)} too large ({size_mb:.1f}MB) — Threads limit is 8MB"
 
     try:
         owner, repo_name = repo.split("/")
@@ -495,20 +521,14 @@ def upload_image_to_github_releases(image_path: str) -> tuple:
             "X-GitHub-Api-Version": "2022-11-28",
         }
 
-        tag = f"media-threads-img-{int(time.time())}"
-        filename = os.path.basename(image_path)
-
-        # Determine content type
-        ext = os.path.splitext(image_path)[1].lower()
-        content_type = "image/png" if ext == ".png" else "image/jpeg"
-
+        tag = f"media-threads-post-{int(time.time())}"
         release_resp = requests.post(
             f"https://api.github.com/repos/{owner}/{repo_name}/releases",
             headers=headers,
             json={
                 "tag_name": tag,
                 "name": f"Temp media {tag}",
-                "body": "Auto-generated for Threads image publish. Safe to delete after 24h.",
+                "body": "Auto-generated for Threads carousel publish. Safe to delete after 24h.",
                 "prerelease": False,
             },
             timeout=30,
@@ -518,39 +538,56 @@ def upload_image_to_github_releases(image_path: str) -> tuple:
         release_id = release_data["id"]
         upload_url = release_data["upload_url"].split("{")[0]
 
-        with open(image_path, "rb") as f:
-            asset_resp = requests.post(
-                upload_url,
-                headers={**headers, "Content-Type": content_type},
-                params={"name": filename},
-                data=f,
-                timeout=60,
-            )
-        asset_resp.raise_for_status()
-        asset_data = asset_resp.json()
-        if not isinstance(asset_data, dict) or "browser_download_url" not in asset_data:
-            raise RuntimeError(f"Unexpected GitHub asset response: {asset_data}")
-        public_url = asset_data["browser_download_url"]
+        public_urls = []
+        for i, img_path in enumerate(image_paths):
+            filename = os.path.basename(img_path)
+            ext = os.path.splitext(img_path)[1].lower()
+            content_type = "image/png" if ext == ".png" else "image/jpeg"
 
-        # Wait for CDN propagation
-        time.sleep(5)
+            print(f"   📤 Uploading asset {i+1}/{len(image_paths)}: {filename}")
+            with open(img_path, "rb") as f:
+                asset_resp = requests.post(
+                    upload_url,
+                    headers={**headers, "Content-Type": content_type},
+                    params={"name": filename},
+                    data=f,
+                    timeout=60,
+                )
+            asset_resp.raise_for_status()
+            asset_data = asset_resp.json()
+            if not isinstance(asset_data, dict) or "browser_download_url" not in asset_data:
+                raise RuntimeError(f"Unexpected GitHub asset response for {filename}: {asset_data}")
+            public_urls.append(asset_data["browser_download_url"])
 
-        return public_url, str(release_id)
+        # Wait for CDN propagation across all assets
+        print(f"   ⏳ Waiting 6s for GitHub CDN propagation...")
+        time.sleep(6)
+
+        return public_urls, str(release_id)
 
     except Exception as e:
         return None, f"GitHub Releases image upload exception: {e}"
+
+
+def upload_image_to_github_releases(image_path: str) -> tuple:
+    """Upload a single image to GitHub Releases for public hosting."""
+    urls, rel_id = upload_images_to_github_release([image_path])
+    if urls:
+        return urls[0], rel_id
+    return None, rel_id
 
 
 def upload_images_to_threads(image_paths: list, caption: str, source_url: str = None, youtube_url: str = None):
     """Upload image(s) as a Threads post (single image or carousel).
 
     Workflow:
-      1. Upload each image to GitHub Releases for public hosting
-      2. Create child containers for each image (is_carousel_item=True if >1)
-      3. If carousel: create parent CAROUSEL container, else use single container
-      4. Poll until container is FINISHED
-      5. Publish the post
-      6. Post a reply with YouTube link and source URL
+      1. Upload images to GitHub Releases (single release hosting all assets)
+      2. Create child containers for each image with pacing & retries
+      3. Wait for all child containers to reach FINISHED status
+      4. Create parent CAROUSEL container (or single image container)
+      5. Poll until container is FINISHED
+      6. Publish the post
+      7. Post a reply with YouTube link and source URL
 
     Args:
         image_paths: List of local image file paths.
@@ -586,22 +623,20 @@ def upload_images_to_threads(image_paths: list, caption: str, source_url: str = 
     release_ids = []  # Track for cleanup
 
     try:
-        # Step 1: Upload images to GitHub Releases for public URLs
+        # Step 1: Upload images to GitHub Releases (single release for all assets)
         print(f"📡 [Threads] Step 1: Uploading {len(image_paths)} image(s) to GitHub Releases...")
-        public_urls = []
-        for i, img_path in enumerate(image_paths):
-            print(f"   📤 Uploading image {i+1}/{len(image_paths)}: {os.path.basename(img_path)}")
-            url, release_id = upload_image_to_github_releases(img_path)
-            if not url:
-                return False, f"Failed to upload image {i+1}: {release_id}"
-            public_urls.append(url)
-            release_ids.append(release_id)
+        public_urls, release_id = upload_images_to_github_release(image_paths)
+        if not public_urls:
+            return False, f"Failed to upload images: {release_id}"
+        release_ids.append(release_id)
 
         if is_carousel:
-            # Step 2a: Create child containers
+            # Step 2a: Create child containers with pacing
             print(f"📡 [Threads] Step 2: Creating {len(public_urls)} child containers...")
             child_ids = []
             for i, url in enumerate(public_urls):
+                if i > 0:
+                    time.sleep(2.5)  # Pacing between container creation requests
                 container_id = create_threads_image_container(url, is_carousel_item=True)
                 child_ids.append(container_id)
                 print(f"   ✔ Child container {i+1}: {container_id}")
@@ -611,6 +646,9 @@ def upload_images_to_threads(image_paths: list, caption: str, source_url: str = 
             for i, c_id in enumerate(child_ids):
                 wait_for_container(c_id, timeout_s=120, poll_every_s=3)
                 print(f"   ✔ Child container {i+1}/{len(child_ids)} ready (FINISHED)")
+
+            # Brief pause before creating parent container
+            time.sleep(2)
 
             # Step 3: Create carousel parent container
             print(f"📡 [Threads] Step 3: Creating carousel container ({len(child_ids)} children)...")
@@ -632,7 +670,7 @@ def upload_images_to_threads(image_paths: list, caption: str, source_url: str = 
         post_id = publish_container(container_id)
         print(f"🎉 Threads {'carousel' if is_carousel else 'image'} post published! ID: {post_id}")
 
-        # Step 5: Post reply with links
+        # Step 6: Post reply with links
         if youtube_url or source_url:
             print(f"📡 [Threads] Posting follow-up reply with resources...")
             reply_parts = []
@@ -652,8 +690,8 @@ def upload_images_to_threads(image_paths: list, caption: str, source_url: str = 
         return True, post_id
 
     except requests.HTTPError as e:
-        response_text = getattr(e, 'response_text', None) or (e.response.text if e.response else "")
-        return False, f"Threads API error (HTTP {e.response.status_code}): {response_text}"
+        response_text = getattr(e, 'response_text', None) or (e.response.text if e.response is not None and e.response.text else str(e))
+        return False, f"Threads API error (HTTP {e.response.status_code if e.response else '?'}): {response_text}"
     except Exception as e:
         return False, f"Threads image upload exception: {e}"
 
