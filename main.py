@@ -1016,6 +1016,7 @@ def run_pipeline(topic_type="auto", dry_run=False, topic_source="auto"):
     voice_used  = script_data.get("edge_tts_voice")
     
     student_vector = script_data.get("topic_category") if (topic_type == "student" or (isinstance(script_data.get("topic_category"), str) and script_data.get("topic_category", "").startswith("student"))) else None
+    dyk_vector = script_data.get("topic_category") if topic_type == "did_you_know" else None
     record_story(
         title, script_data.get("original_news_headline"),
         subcat, companies, keywords, breaking_level,
@@ -1023,6 +1024,7 @@ def run_pipeline(topic_type="auto", dry_run=False, topic_source="auto"):
         topic_type=topic_type, target_country=target_country,
         avatar_used=script_data.get("lipsync_face_path"),
         student_vector=student_vector,
+        dyk_vector=dyk_vector,
         topic_source=target_source
     )
 
@@ -1520,7 +1522,7 @@ def run_local(topic_type="auto", dry_run=False, topic_source="auto"):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--now", action="store_true", help="Run pipeline immediately.")
-    parser.add_argument("--type", type=str, choices=["auto", "research", "tools", "news", "tech_trends", "vaibhav", "interview_questions", "student"], default="auto", help="Content type mapped to the schedule")
+    parser.add_argument("--type", type=str, choices=["auto", "did_you_know", "research", "tools", "news", "tech_trends", "vaibhav", "interview_questions", "student"], default="auto", help="Content type mapped to the schedule")
     parser.add_argument("--dry-run", action="store_true", help="Run without uploading to YouTube/X.com/Telegram.")
     parser.add_argument("--source", type=str, choices=["auto", "github", "medium", "huggingface_hub"], default="auto", help="Trending source rotation: github, medium, huggingface_hub")
     args = parser.parse_args()

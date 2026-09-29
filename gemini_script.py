@@ -276,9 +276,51 @@ HUMANIZER PRINCIPLES & WRITING CONSTRAINTS (MANDATORY):
 - Avoid words/phrases emphasizing significance, legacy, or broader trends.
 - Avoid vague attributions and weasel words.
 - Avoid superficial analyses with "-ing" endings.
-- Avoid promotional language.
 - Do NOT use high-frequency AI vocabulary words: "delve", "fostering", "tapestry", "intricate", "pivotal", "vibrant", "enhance".
 - Use contractions (it's, you're, don't, can't) naturally.
+"""
+
+DID_YOU_KNOW_SYSTEM_PERSONA = """Role: You are an elite YouTube Shorts scriptwriter and visual director for 'Did You Know By VJ' (@YtDidYouKnowByVJ).
+Your mission is to produce viral, high-retention 45-50 second curiosity Shorts that make viewers stop mid-scroll, question what they thought they knew about technology, and watch on an infinite loop.
+
+CORE IDENTITY & TONE:
+- Channel: 'Did You Know By VJ' (@YtDidYouKnowByVJ)
+- Persona: Fascinated, fast-talking tech insider sharing mind-bending technological realities and hidden engineering secrets.
+- Tone: High-energy, captivating, conversational, peer-to-peer. Zero dry lecture, zero corporate PR speak.
+- Target Audience: Global audience (18-70) across USA, UK, Canada, Australia, Europe. Universally accessible analogies. A 14-year-old student and a 65-year-old grandparent must both be utterly captivated.
+- Language: Plain, visceral, punchy English. Every technical term MUST be followed immediately by a physical or real-world comparison.
+
+THE 5-STAGE CURIOSITY LOOP FORMULA (45-50s, 80-120 words):
+1. THE CURIOSITY HOOK (0:00 - 0:03, ~8-12 words):
+   - Open with "Did you know that...?" or a counter-intuitive paradox.
+   - Immediate scroll-stopper. State a surprising fact that contradicts common intuition.
+   - Example: "Did you know that ninety-nine percent of the internet is not in the cloud... it is sitting on the ocean floor?"
+2. MYSTERY & CONTRAST (0:03 - 0:10, ~15-20 words):
+   - Shatter the common myth. Contrast what 99% of people believe with the shocking reality.
+   - "Most people imagine satellites beaming Netflix from space, but satellites carry less than one percent of global data."
+3. PHYSICAL ANALOGY BREAKDOWN (0:10 - 0:28, ~35-45 words):
+   - Explain HOW it actually works using a vivid, everyday physical analogy.
+   - No developer jargon or abstract equations.
+   - "Instead, hundreds of fiber-optic cables as thin as a garden hose snake across the ocean floor, carrying petabytes of video and banking trades through laser light."
+4. MIND-BLOWING TWIST OR SCALE (0:28 - 0:40, ~20-25 words):
+   - Hit them with an insane number, extreme danger, or crazy engineering feat.
+   - "If an anchor snags one, robotic submarines have to dive two miles deep into freezing black water just to splice glass strands thinner than human hair."
+5. SEAMLESS INFINITE LOOP (0:40 - 0:48, ~10-15 words):
+   - Concluding sentence flows grammatically and contextually straight back into the opening hook word-for-word.
+   - Viewers loop into the second view before realizing it finished!
+
+VISUAL DIRECTION & RAPID PACING:
+- Fast visual pacing: Scene change every 1.8 to 2.5 seconds (8-12 subtitle chunks).
+- Macro 3D B-roll, split-screen comparisons, cinematic hardware close-ups, and animated diagrams.
+- Clean vertical 9:16 aspect ratio prompts for each chunk.
+- NO boring talking-head monologues or generic stock footage.
+- STRICT 80-120 words voiceover limit to ensure 45-50s runtime and 100% completion rate.
+
+TTS & WRITING CONSTRAINTS:
+- Spoken text only: no emojis, no stage directions, no scene labels in the voiceover.
+- No em dashes, en dashes, or double hyphens.
+- Use natural contractions (it's, you're, don't, that's).
+- Avoid AI buzzwords: 'delve', 'tapestry', 'intricate', 'pivotal', 'revolutionize'.
 """
 
 RESEARCH_AGENT_TEMPLATE = """{persona}
@@ -1019,6 +1061,16 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                     type_score += sum(15 for kw in student_keywords if kw in title_lower)
                     if art.get("type") in ["tools", "github_trending", "medium_rss", "youtube_trending", "huggingface_hub_model"]:
                         type_score += 25
+                elif topic_type == "did_you_know":
+                    dyk_keywords = [
+                        "did you know", "secret", "hidden", "actually", "myth", "truth", "bizarre",
+                        "mystery", "how it works", "why", "shocking", "easter egg", "fact", "insane",
+                        "history", "unbelievable", "mind-blowing", "crazy", "underwater", "submarine cable",
+                        "quantum", "datacenter", "exploit", "stuxnet", "gps", "relativity"
+                    ]
+                    type_score += sum(15 for kw in dyk_keywords if kw in title_lower)
+                    if art.get("type") in ["youtube_trending", "medium_rss", "reddit_trending", "trending"]:
+                        type_score += 25
                 
                 # ── COMPOSITE VIRAL SCORE (weighted blend) ──
                 hot_score = (
@@ -1131,7 +1183,27 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
 
         # ── STEP 1: GEMINI SEARCH FALLBACK (biased toward hot topic) ────────────
         if not articles:
-            if topic_type == "student":
+            if topic_type == "did_you_know":
+                try:
+                    from topic_tracker import get_did_you_know_sub_vector
+                    current_vector = get_did_you_know_sub_vector()
+                except Exception:
+                    current_vector = "ai_secrets"
+                vector_queries = {
+                    "ai_secrets": "shocking AI facts, hidden LLM mechanics, how AI models hallucinate or store memory, uncanny AI agent behavior",
+                    "everyday_tech_mysteries": "unbelievable facts about everyday devices, submarine internet cables, how GPS uses Einstein relativity, airplane WiFi physics",
+                    "hardware_megastructures": "insane engineering scale ASML extreme ultraviolet laser chip etching, deep sea underwater datacenters, datacenter cooling",
+                    "bizarre_tech_history": "500 million dollar software bugs, accidental tech inventions that changed humanity, forgotten easter eggs in tech history",
+                    "cybersecurity_secrets": "Stuxnet centrifuges, tempest keystroke eavesdropping, the 7 physical keys controlling the internet, crazy real cybersecurity hacks"
+                }
+                search_subject = vector_queries.get(current_vector, "mind-blowing technology and science facts")
+                print(f"🧠 STEP 1: Using Gemini Search for Did You Know Vector '{current_vector}': '{search_subject}'...")
+                search_query = (
+                    f"Find the single most mind-blowing, counter-intuitive, verified tech or science fact related to: {search_subject}. "
+                    "PRIORITIZE facts that sound like fiction but are 100% true, with physical mechanisms, surprising numbers, or historical drama. "
+                    "Provide specific facts, names, numbers, and legitimate source URLs."
+                )
+            elif topic_type == "student":
                 try:
                     from topic_tracker import get_student_sub_vector
                     current_vector = get_student_sub_vector()
@@ -1201,6 +1273,8 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
         content_desc = "viral AI tools, money-making side hustles, productivity hacks, and free apps that appeal to EVERYONE"
     elif topic_type == "news":
         content_desc = "fascinating tech facts, AI industry shifts, motivation and success stories, and viral tech updates"
+    elif topic_type == "did_you_know":
+        content_desc = "mind-blowing 'Did You Know' tech secrets, bizarre hardware realities, AI mysteries, and everyday device phenomena"
     elif topic_type == "tech_trends":
         content_desc = "high-velocity Google tech search trends and viral YouTube breakout videos"
     elif topic_type == "interview_questions":
@@ -1814,6 +1888,88 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "incentive_cta_type": "comment_trigger",
   "digital_asset_offer": "Direct student verification link and setup guide"
 }}"""
+        elif topic_type == "did_you_know":
+            try:
+                from topic_tracker import get_did_you_know_sub_vector
+                current_vector = get_did_you_know_sub_vector()
+            except Exception:
+                current_vector = "ai_secrets"
+            
+            vector_descriptions = {
+                "ai_secrets": "shocking AI facts, hidden LLM mechanics, bizarre agent behaviors, context window mysteries, and how AI models actually think",
+                "everyday_tech_mysteries": "unbelievable facts about everyday devices, submarine internet cables, GPS Einstein relativity corrections, how touchscreens sense electrons",
+                "hardware_megastructures": "insane engineering scale, ASML extreme ultraviolet laser chip etching, deep-sea server pods, datacenter power grids",
+                "bizarre_tech_history": "$500M software bugs, accidental inventions that changed the world, hidden Easter eggs kept secret for decades",
+                "cybersecurity_secrets": "Stuxnet centrifuges, tempest keystroke eavesdropping, the 7 physical keys that control the internet, unbelievable real hacks"
+            }
+            sub_vector_focus = vector_descriptions.get(current_vector, "mind-blowing technology and science facts")
+
+            selection_instruction = (
+                f"Analyze the following {content_desc} and pick the SINGLE most mind-blowing, counter-intuitive tech fact or mystery.\n"
+                f"ACTIVE DID YOU KNOW VECTOR: {current_vector} ({sub_vector_focus})\n"
+                f"PRIMARY CATEGORY: {category}\n"
+                f"{series_instruction}"
+                "SELECTION FILTERS:\n"
+                "1. THE 5-STAGE CURIOSITY LOOP FORMULA (45-50s, 80-120 words max):\n"
+                "   - Hook (0-3s): Open with 'Did you know that...?' or a paradox. Stop the scroll instantly. 8-12 words.\n"
+                "   - Mystery / Contrast (3-10s): Shatter common belief. What people assume vs the shocking truth. 15-20 words.\n"
+                "   - Physical Analogy Breakdown (10-28s): Explain how it works using a vivid, everyday physical analogy. 35-45 words. NO developer jargon.\n"
+                "   - Mind-Blowing Twist / Scale (28-40s): Reveal an insane number, danger, or extreme engineering feat. 20-25 words.\n"
+                "   - Seamless Infinite Loop (40-48s): Crisp concluding sentence that flows seamlessly back into the opening hook without seam.\n"
+                "2. STRICT DURATION & WORD COUNT: Total script MUST be strictly 80-120 words (approx 45-48 seconds). Every extra word hurts retention.\n"
+                "3. RAPID VISUAL PACING: Provide 8-12 subtitle chunks with visual changes every 1.8s-2.5s. Nano visual prompts must be cinematic, macro 3D B-roll, or high-contrast split-screen comparisons.\n"
+                "4. GENDER & AGE INCLUSIVE (18-70): The curiosity fact must amaze any human, from a teenager to a grandparent.\n"
+            )
+            prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
+{{
+  "title_options": ["Did You Know This About [X]? 🤯", "The Hidden [X] Nobody Talks About 🤫", "Why 99% Of People Get [X] Wrong ⚡"],
+  "description": "Full 100+ word rich SEO description for YouTube Shorts describing this mind-blowing tech fact, how it works, and hashtags.",
+  "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section or official documentary/source link.",
+  "title": "Punchy, curiosity-gap YouTube Shorts title max 55 chars with emoji: e.g. 'Did You Know This About Your Phone? 🤯' or 'The $500M Bug That Shocked NASA 🚀' or 'Why 99% Of The Internet Lies Underwater 🌊'.",
+  "hook_script": "The Curiosity Hook (0-3s): Open with 'Did you know that...?' or a paradox. 8-12 words.",
+  "mystery_contrast": "The Mystery / Contrast (3-10s): What everyone believes vs the shocking truth. 15-20 words.",
+  "core_explanation": "The Analogy Breakdown (10-28s): Explain the physical mechanism using everyday analogies. 35-45 words.",
+  "twist_scale": "The Twist / Scale (28-40s): The insane number, scale, or secret consequence. 20-25 words.",
+  "retention_loop": "The Seamless Loop (40-48s): Concluding sentence flowing directly back into the opening hook sentence.",
+  "script": "The FULL unified voiceover script combining hook_script, mystery_contrast, core_explanation, twist_scale, and retention_loop. STRICTLY 80-120 words total. The final words MUST flow directly into the first sentence for an endless seamless loop.",
+  "hook_text": "The exact first 5-8 words of the script.",
+  "relevant_links": ["https://en.wikipedia.org"],
+  "phonetic_pronunciation_map": {{}},
+  "hook": "Matches the first sentence of the script",
+  "summary": "One line summary of this mind-blowing fact",
+  "sub_category": "{category}",
+  "topic_category": "{current_vector}",
+  "breaking_news_level": 9,
+  "retention_cues": [{{"timestamp": 2.0, "effect": "zoom_in", "reason": "hook_impact"}}, {{"timestamp": 12.0, "effect": "camera_shake", "reason": "twist_impact"}}],
+  "subtitle_chunks": [{{
+      "chunk_id": 1,
+      "text": "Sentence or phrase (1.8-2.5s duration)",
+      "start": 0.00,
+      "end": 2.20,
+      "scene_objective": "Stop the scroll with visual mystery",
+      "visual_type": "Video|AI Image|Side-by-side Comparison|Infographic|Animated UI Mockup",
+      "nano_visual_prompt": "Cinematic 9:16 vertical, photorealistic 8K, macro close-up of [subject], glowing dramatic lighting, no text overlays.",
+      "is_setting_chunk": false,
+      "has_infographic": false,
+      "infographic_type": null,
+      "infographic_data": null,
+      "on_screen_elements": ["labels/arrows/highlights"],
+      "camera_motion": "Slow zoom|Dolly-in|Orbit|Pan|Tracking shot",
+      "transition": "Match cut|Zoom transition|Morph|Swipe"
+  }}],
+  "original_news_headline": "Fact title or headline",
+  "original_news_url": "Direct source or verification URL",
+  "keywords": ["Did You Know", "Tech Facts", "Science Facts", "Mind Blowing", "Technology"],
+  "hashtags": ["#DidYouKnow", "#TechFacts", "#ScienceFacts", "#Shorts", "#MindBlowing", "#Curiosity"],
+  "companies_mentioned": [],
+  "companies": [],
+  "people": [],
+  "key_entities": [],
+  "comment_hook": "Did you already know this, or did it blow your mind? Let me know below!",
+  "comment_trigger_keyword": "",
+  "incentive_cta_type": "none",
+  "digital_asset_offer": ""
+}}"""
         else: # research / educational / general
             selection_instruction = (
                 f"Analyze the following {content_desc} and pick the SINGLE most surprising, useful, or mind-blowing tech fact or comparison.\n"
@@ -2151,6 +2307,8 @@ class MultiAgentGenerationEngine:
             self.persona = VAIBHAV_SYSTEM_PERSONA
         elif topic_type == "student":
             self.persona = STUDENT_SYSTEM_PERSONA
+        elif topic_type == "did_you_know":
+            self.persona = DID_YOU_KNOW_SYSTEM_PERSONA
         else:
             self.persona = SYSTEM_PERSONA
 

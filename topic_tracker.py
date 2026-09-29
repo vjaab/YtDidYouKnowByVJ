@@ -115,7 +115,7 @@ def check_cooldowns(companies, subcategory, tracker_file=TRACKER_FILE):
         
     return True, "Cooldowns OK"
 
-def record_story(title, news_headline, subcategory, companies, keywords, breaking_news_level, voice_used, youtube_url, news_source_url, topic_type=None, target_country=None, avatar_used=None, student_vector=None, topic_source=None, tracker_file=TRACKER_FILE):
+def record_story(title, news_headline, subcategory, companies, keywords, breaking_news_level, voice_used, youtube_url, news_source_url, topic_type=None, target_country=None, avatar_used=None, student_vector=None, dyk_vector=None, topic_source=None, tracker_file=TRACKER_FILE):
     tracker = load_tracker(tracker_file)
     today = datetime.now().strftime("%Y-%m-%d")
     
@@ -177,6 +177,8 @@ def record_story(title, news_headline, subcategory, companies, keywords, breakin
         history_entry["topic_type"] = topic_type
     if student_vector:
         history_entry["student_vector"] = student_vector
+    if dyk_vector:
+        history_entry["dyk_vector"] = dyk_vector
     if topic_source:
         history_entry["topic_source"] = topic_source
         if topic_source in SOURCE_SEQUENCE:
@@ -239,32 +241,70 @@ def get_student_sub_vector(tracker_file=TRACKER_FILE):
         return STUDENT_VECTORS[0]
 
 
+# ── DID YOU KNOW VECTORS ────────────────────────────────────────────────
+# 5 curiosity sub-vectors rotating through mind-blowing technology facts
+DID_YOU_KNOW_VECTORS = [
+    "ai_secrets",                 # Uncanny AI behavior, context windows, model hallucinations, hidden reasoning tricks
+    "everyday_tech_mysteries",    # Smartphone secrets, submarine cables, how GPS uses relativity, airplane WiFi
+    "hardware_megastructures",   # ASML EUV lithography, deep sea datacenters, chip fabrication cleanrooms
+    "bizarre_tech_history",       # $500M software bugs, accidental inventions (Wi-Fi, microwave), forgotten Easter eggs
+    "cybersecurity_secrets",      # Stuxnet centrifuges, tempest keystroke snooping, DNSSEC internet key ceremony
+]
+
+def get_did_you_know_sub_vector(tracker_file=TRACKER_FILE):
+    """
+    Returns the next 'did you know' sub-vector by cycling through the 5 vectors.
+    Checks recent history for the last used dyk_vector and returns the next one.
+    """
+    tracker = load_tracker(tracker_file)
+    history = tracker.get("history", [])
+    
+    last_vector = None
+    for entry in reversed(history):
+        if not isinstance(entry, dict):
+            continue
+        dv = entry.get("dyk_vector")
+        if dv and dv in DID_YOU_KNOW_VECTORS:
+            last_vector = dv
+            break
+            
+    if not last_vector:
+        return DID_YOU_KNOW_VECTORS[0]
+        
+    try:
+        idx = DID_YOU_KNOW_VECTORS.index(last_vector)
+        next_idx = (idx + 1) % len(DID_YOU_KNOW_VECTORS)
+        return DID_YOU_KNOW_VECTORS[next_idx]
+    except ValueError:
+        return DID_YOU_KNOW_VECTORS[0]
+
+
 def _get_core_topic_type(tracker_file=TRACKER_FILE):
     """
     Internal: Computes the next core topic type using deficit-based ratio balancing.
     Only considers core types (excludes 'student').
     Target ratios (within the 60% core allocation):
-      - tools: 35% — Hidden features, AI tools, free apps, tips & tricks
-      - news: 20% — Tech myths, privacy scares, common mistakes  
-      - research: 10% — Comparisons, AI experiments, educational tech facts
-      - quiz: 15% — Interactive tech trivia, history quizzes, multiple choice
-      - interview_questions: 20% — Technical interview Q&A
+      - did_you_know: 35% — Mind-blowing tech facts, curiosity loops, bizarre tech history (Primary channel brand)
+      - tools: 20% — Hidden features, AI tools, free apps, tips & tricks
+      - news: 15% — Tech myths, privacy scares, common mistakes  
+      - research: 15% — Comparisons, AI experiments, educational tech facts
+      - interview_questions: 15% — Technical interview Q&A
     """
     tracker = load_tracker(tracker_file)
     history = tracker.get("history", [])
     
     target_ratios = {
-        "tools": 0.35,
-        "news": 0.20,
-        "research": 0.10,
-        "quiz": 0.15,
-        "interview_questions": 0.20
+        "did_you_know": 0.35,
+        "tools": 0.20,
+        "news": 0.15,
+        "research": 0.15,
+        "interview_questions": 0.15
     }
     
     # Only analyze core entries (non-student) from last 30
     recent_entries = history[-30:] if history else []
     
-    counts = {"tools": 0, "news": 0, "research": 0, "quiz": 0, "interview_questions": 0}
+    counts = {"did_you_know": 0, "tools": 0, "news": 0, "research": 0, "interview_questions": 0}
     total_counted = 0
     
     for entry in recent_entries:
@@ -283,14 +323,14 @@ def _get_core_topic_type(tracker_file=TRACKER_FILE):
             title = str(entry.get("title", "")).lower()
             headline = str(entry.get("news_headline", "")).lower()
             
-            if "tool" in sub_cat or "app" in sub_cat or "feature" in sub_cat or "tip" in title or "trick" in title or "hidden" in title or "hack" in title:
+            if ttype == "did_you_know" or "did you know" in title or "did you know" in headline or "dyk" in sub_cat:
+                counts["did_you_know"] += 1
+                total_counted += 1
+            elif "tool" in sub_cat or "app" in sub_cat or "feature" in sub_cat or "tip" in title or "trick" in title or "hidden" in title or "hack" in title:
                 counts["tools"] += 1
                 total_counted += 1
             elif "myth" in sub_cat or "privacy" in sub_cat or "scary" in sub_cat or "wrong" in title or "mistake" in title or "stop" in title or "myth" in title:
                 counts["news"] += 1
-                total_counted += 1
-            elif "quiz" in sub_cat or "trivia" in sub_cat or "quiz" in title or "trivia" in title:
-                counts["quiz"] += 1
                 total_counted += 1
             elif "interview" in sub_cat or "interview" in title or "interview" in headline:
                 counts["interview_questions"] += 1
@@ -300,7 +340,7 @@ def _get_core_topic_type(tracker_file=TRACKER_FILE):
                 total_counted += 1
                 
     if total_counted == 0:
-        return "tools"
+        return "did_you_know"
         
     deficits = {}
     for t, target in target_ratios.items():

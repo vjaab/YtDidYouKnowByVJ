@@ -49,6 +49,7 @@ class IncentiveCTAType(str, Enum):
 
 
 class TopicType(str, Enum):
+    DID_YOU_KNOW = "did_you_know"
     RESEARCH = "research"
     TOOLS = "tools"
     NEWS = "news"
@@ -56,6 +57,7 @@ class TopicType(str, Enum):
     VAIBHAV = "vaibhav"
     INTERVIEW_QUESTIONS = "interview_questions"
     QUIZ = "quiz"
+    STUDENT = "student"
 
 
 class SlotType(str, Enum):

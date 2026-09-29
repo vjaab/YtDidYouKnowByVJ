@@ -20,6 +20,8 @@ on:
         type: choice
         options:
           - auto
+          - did_you_know
+          - student
           - research
           - tools
           - news
