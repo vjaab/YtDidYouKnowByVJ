@@ -60,3 +60,24 @@ Get the direct run command + GPU memory specs here: https://t.me/technewsbyvj �
 [05:55:14] STEP 12: Cleaning up output folder...
 [05:55:14] === PIPELINE COMPLETED SUCCESSFULLY ===
 [05:55:14] STEP 13: Terminating leftover ffmpeg processes to prevent pipeline hang...
+[19:49:15] === STARTING DAILY AI PIPELINE (DID_YOU_KNOW) | COUNTRY: US | SOURCE: GITHUB ===
+[19:49:15] 🔄 Sequential Topic Source: Active='GITHUB' (Rotation: github → medium → huggingface_hub)
+[19:49:15] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[19:49:15] STEP 1: Content Ecosystem Check -> Day: Wed, Slot: Slot A (Discovery), Category: Finance & Tech Economy (Run 1/3)
+[19:49:15] STEP 2: Fetching articles (RSS + Trending Engine)...
+[19:49:37] 🔥 Trending Engine injected 153 high-signal articles (active_source='github', sources=['github', 'medium', 'huggingface_hub']).
+[19:49:38] 📈 vidIQ: Injected 8 high-signal topics.
+[19:50:48] ✅ Fetched 507 total articles (153 trending engine [github], 8 vidIQ, 240 research, 97 tools, 9 X.com).
+[19:50:48] 📚 Loaded 30 recent topics for deduplication
+[19:52:17] 🔍 Deduplication & classification: 507 → 20 candidates
+[19:52:17] 🏷️ Zero-shot re-categorized top candidate: Finance & Tech Economy → AI & Tech Tools
+[19:52:17] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[19:53:16] Selected Headline: OpenStock: Open-source alternative to expensive market platforms
+[19:53:16] Selected URL: https://github.com/Open-Dev-Society/OpenStock
+[19:53:16] Breaking Level: 9
+[19:53:16] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[19:53:23] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20260929_195316.png
+[19:53:23] 🐙 GitHub repo detected — capturing README as evidence screenshot (MANDATORY)...
+[19:53:29] ✅ GitHub README captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_readme_20260929_195323.png
+[19:53:29] ℹ️ GitHub README already captured as evidence — skipping secondary screenshot
+[19:53:29] STEP 3d: Fetching and validating entity tags for Short...
