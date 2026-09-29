@@ -335,24 +335,27 @@ def create_threads_reply(post_id: str, reply_text: str) -> str:
     return result["id"]
 
 
-def wait_for_container(container_id: str, timeout_s: int = 300, poll_every_s: int = 5) -> None:
-    """Step 2: poll until Threads finishes processing the uploaded video."""
+def wait_for_container(container_id: str, timeout_s: int = 300, poll_every_s: int = 4) -> None:
+    """Poll until Threads finishes processing the media container."""
     access_token = os.getenv("THREADS_ACCESS_TOKEN")
     deadline = time.time() + timeout_s
     while time.time() < deadline:
-        resp = requests.get(
-            f"{GRAPH_API_BASE}/{container_id}",
-            params={"fields": "status,error_message", "access_token": access_token},
-            timeout=30,
-        )
-        resp.raise_for_status()
-        data = resp.json()
-        status = data.get("status", "UNKNOWN")
-        if status == "FINISHED":
-            return
-        if status == "ERROR":
-            error_msg = data.get("error_message", "No error message provided")
-            raise RuntimeError(f"Container {container_id} failed processing: {error_msg}")
+        try:
+            resp = requests.get(
+                f"{GRAPH_API_BASE}/{container_id}",
+                params={"fields": "status,error_message", "access_token": access_token},
+                timeout=30,
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            status = data.get("status", "UNKNOWN")
+            if status in ["FINISHED", "PUBLISHED"]:
+                return
+            if status == "ERROR":
+                error_msg = data.get("error_message", "No error message provided")
+                raise RuntimeError(f"Container {container_id} failed processing: {error_msg}")
+        except requests.HTTPError as e:
+            print(f"⚠️ Polling container {container_id} HTTP error: {e}")
         time.sleep(poll_every_s)
     raise TimeoutError(f"Container {container_id} still processing after {timeout_s}s")
 
@@ -439,16 +442,28 @@ def create_threads_carousel_container(child_ids: list, caption: str) -> str:
         "access_token": access_token,
     }
 
-    resp = requests.post(
-        f"{GRAPH_API_BASE}/{threads_user_id}/threads",
-        data=data,
-        timeout=30,
-    )
-    resp.raise_for_status()
-    result = resp.json()
-    if not isinstance(result, dict) or "id" not in result:
-        raise RuntimeError(f"Unexpected response from create_threads_carousel_container: {result}")
-    return result["id"]
+    last_err = None
+    for attempt in range(1, 4):
+        try:
+            resp = requests.post(
+                f"{GRAPH_API_BASE}/{threads_user_id}/threads",
+                data=data,
+                timeout=30,
+            )
+            resp.raise_for_status()
+            result = resp.json()
+            if not isinstance(result, dict) or "id" not in result:
+                raise RuntimeError(f"Unexpected response from create_threads_carousel_container: {result}")
+            return result["id"]
+        except requests.HTTPError as e:
+            err_text = e.response.text if e.response is not None else str(e)
+            print(f"⚠️ Carousel container creation attempt {attempt}/3 error: {err_text}")
+            last_err = e
+            e.response_text = err_text
+            if attempt < 3:
+                time.sleep(attempt * 4)
+
+    raise last_err
 
 
 def upload_image_to_github_releases(image_path: str) -> tuple:
@@ -591,7 +606,13 @@ def upload_images_to_threads(image_paths: list, caption: str, source_url: str = 
                 child_ids.append(container_id)
                 print(f"   ✔ Child container {i+1}: {container_id}")
 
-            # Step 2b: Create carousel parent container
+            # Step 2b: Wait for all child containers to be processed by Meta
+            print(f"📡 [Threads] Step 2b: Waiting for all {len(child_ids)} child containers to finish processing...")
+            for i, c_id in enumerate(child_ids):
+                wait_for_container(c_id, timeout_s=120, poll_every_s=3)
+                print(f"   ✔ Child container {i+1}/{len(child_ids)} ready (FINISHED)")
+
+            # Step 3: Create carousel parent container
             print(f"📡 [Threads] Step 3: Creating carousel container ({len(child_ids)} children)...")
             container_id = create_threads_carousel_container(child_ids, caption)
             print(f"   ✔ Carousel container: {container_id}")
@@ -601,12 +622,12 @@ def upload_images_to_threads(image_paths: list, caption: str, source_url: str = 
             container_id = create_threads_image_container(public_urls[0], caption=caption)
             print(f"   ✔ Container: {container_id}")
 
-        # Step 3: Wait for processing
-        print(f"📡 [Threads] Waiting for container processing...")
-        wait_for_container(container_id, timeout_s=120)
+        # Step 4: Wait for container processing
+        print(f"📡 [Threads] Step 4: Waiting for parent container processing...")
+        wait_for_container(container_id, timeout_s=120, poll_every_s=3)
         print(f"   ✔ Processing complete")
 
-        # Step 4: Publish
+        # Step 5: Publish
         print(f"📡 [Threads] Publishing {'carousel' if is_carousel else 'image'} post...")
         post_id = publish_container(container_id)
         print(f"🎉 Threads {'carousel' if is_carousel else 'image'} post published! ID: {post_id}")
