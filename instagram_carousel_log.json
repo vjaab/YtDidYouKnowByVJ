@@ -16,7 +16,8 @@
     "Naive Vector Search Fails Production RAG",
     "AI's 5 Secrets: Not All Bots Learn",
     "GPT-6 Astra: The Next Generation of AI",
-    "Self-Attention Costs Double When You Double Text Length"
+    "Self-Attention Costs Double When You Double Text Length",
+    "Training AI on AI-Generated Text Causes Model Collapse"
   ],
   "used_keywords": [
     "openai",
@@ -184,6 +185,11 @@
     "self attention",
     "quadratic cost",
     "context length",
+    "did you know",
+    "model collapse",
+    "synthetic data",
+    "ai training",
+    "machine learning",
     "did you know"
   ],
   "history": [
@@ -491,6 +497,19 @@
       ],
       "source": "Attention Is All You Need (Vaswani et al.)",
       "timestamp": "2026-09-29T21:02:32.035827+00:00"
+    },
+    {
+      "title": "Training AI on AI-Generated Text Causes Model Collapse",
+      "news_source_url": "",
+      "keywords": [
+        "model collapse",
+        "synthetic data",
+        "ai training",
+        "machine learning",
+        "did you know"
+      ],
+      "source": "Nature: The Curse of Recursion in Generative Models",
+      "timestamp": "2026-09-29T21:19:17.681527+00:00"
     }
   ]
 }
