@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_Energy.mp3",
+      "headline": "NVIDIA Launches Open Agent Safety Platform and Developers Flock to Agent Orchest",
+      "topic_type": "auto",
+      "timestamp": "36614629685"
+    },
+    {
       "track": "Destiny.mp3",
       "headline": "NVIDIA Nemotron-3-Diarization: Free Open-Weight Speaker Diarization Model",
       "topic_type": "auto",
@@ -86,7 +92,7 @@
     }
   ],
   "usage_counts": {
-    "jam_Energy.mp3": 2,
+    "jam_Energy.mp3": 3,
     "jam_Action_Inspiration_Trailer.mp3": 2,
     "jam_The_Epic.mp3": 2,
     "jam_Escape_From_The_Machine_Planet.mp3": 2,
