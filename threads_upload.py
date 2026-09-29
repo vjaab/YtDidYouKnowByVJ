@@ -274,6 +274,24 @@ def delete_github_release(release_id):
 
 # ── Threads Graph API: 2-Step Container Workflow ────────────────────────────
 
+THREADS_TEXT_LIMIT = 500
+
+
+def _truncate_threads_text(text: str, max_len: int = THREADS_TEXT_LIMIT) -> str:
+    """Trim text to fit within Threads character limit (500 chars)."""
+    if not text:
+        return ""
+    text = text.strip()
+    if len(text) <= max_len:
+        return text
+    # Smart truncate at whitespace to avoid breaking words
+    truncated = text[:max_len - 3]
+    last_space = truncated.rfind(" ")
+    if last_space > max_len - 60:
+        truncated = truncated[:last_space]
+    return truncated.rstrip() + "..."
+
+
 def create_threads_container(video_url: str, caption: str, reply_to_id: str = None) -> str:
     """Step 1: create a media container. Returns the container/creation ID.
     
@@ -288,7 +306,7 @@ def create_threads_container(video_url: str, caption: str, reply_to_id: str = No
     data = {
         "media_type": "VIDEO",
         "video_url": video_url,
-        "text": caption[:2200],  # Threads text limit
+        "text": _truncate_threads_text(caption),
         "access_token": access_token,
     }
     if reply_to_id:
@@ -322,7 +340,7 @@ def create_threads_reply(post_id: str, reply_text: str) -> str:
     resp = requests.post(
         f"{GRAPH_API_BASE}/{threads_user_id}/threads",
         data={
-            "text": reply_text[:2200],
+            "text": _truncate_threads_text(reply_text),
             "reply_to_id": post_id,
             "access_token": access_token,
         },
@@ -403,7 +421,7 @@ def create_threads_image_container(image_url: str, caption: str = "", is_carouse
     if is_carousel_item:
         data["is_carousel_item"] = "true"
     else:
-        data["text"] = caption[:2200]
+        data["text"] = _truncate_threads_text(caption)
 
     last_err = None
     for attempt in range(1, max_retries + 1):
@@ -458,7 +476,7 @@ def create_threads_carousel_container(child_ids: list, caption: str, max_retries
     data = {
         "media_type": "CAROUSEL",
         "children": ",".join(child_ids),
-        "text": caption[:2200],
+        "text": _truncate_threads_text(caption),
         "access_token": access_token,
     }
 
