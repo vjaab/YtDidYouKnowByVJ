@@ -27,7 +27,7 @@ CHARACTERS_DIR = BASE_DIR / "assets" / "characters"
 TEMPLATE_DIR = BASE_DIR / "carousel_templates"
 
 # Mascot configuration
-VALID_SPEAKERS = ["byte", "asha"]
+VALID_SPEAKERS = ["byte", "vj"]
 VALID_EMOTIONS = ["neutral", "curious", "excited", "shocked", "thinking", "smug"]
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
@@ -45,20 +45,32 @@ def get_character_image_path(speaker: str, emotion: str) -> Optional[Path]:
     speaker = speaker.lower().strip()
     emotion = emotion.lower().strip()
     
+    # Backward compatibility alias
+    if speaker == "asha":
+        speaker = "vj"
+    
     if speaker not in VALID_SPEAKERS:
         speaker = "byte"
     if emotion not in VALID_EMOTIONS:
         emotion = "neutral"
         
-    # Check folder structure: assets/characters/byte/curious.png
+    # Check folder structure: assets/characters/vj/curious.png
     nested_path = CHARACTERS_DIR / speaker / f"{emotion}.png"
     if nested_path.exists():
         return nested_path
         
-    # Check flat structure: assets/characters/byte_curious.png
+    # Check flat structure: assets/characters/vj_curious.png
     flat_path = CHARACTERS_DIR / f"{speaker}_{emotion}.png"
     if flat_path.exists():
         return flat_path
+        
+    # Fallback to neutral
+    fallback_path = CHARACTERS_DIR / speaker / "neutral.png"
+    if fallback_path.exists():
+        return fallback_path
+    flat_fallback = CHARACTERS_DIR / f"{speaker}_neutral.png"
+    if flat_fallback.exists():
+        return flat_fallback
         
     # Fallback to neutral
     fallback_path = CHARACTERS_DIR / speaker / "neutral.png"
@@ -90,7 +102,7 @@ def build_dialogue_prompt(mode: str, topic: Optional[str] = None, story: Optiona
         
         prompt = f"""You are a senior tech writer creating a high-engagement, viral Instagram dialogue carousel (6-7 slides) between two characters:
 1. "byte" (a curious, smart robot mascot)
-2. "asha" (a sharp, enthusiastic human female software developer)
+2. "vj" (the human tech creator and host of 'Did You Know By VJ', wearing a blue hoodie, explaining complex tech simply and clearly)
 
 The carousel is grounded STRICTLY in this verified AI news event:
 - Headline: {title}
@@ -103,7 +115,7 @@ CRITICAL ACCURACY RULES:
 1. GROUNDED IN REALITY: Do NOT invent features, benchmarks, or claims not provided in the verified details above.
 2. MODE: "news"
 3. SLIDE COUNT: Exactly 6 to 7 slides.
-4. SPEAKERS ALTERNATE: Alternate between "byte" and "asha" on every slide (e.g., slide 1 byte, slide 2 asha, slide 3 byte, etc.).
+4. SPEAKERS ALTERNATE: Alternate between "byte" and "vj" on every slide (e.g., slide 1 byte, slide 2 vj, slide 3 byte, etc.).
 5. CONCISE BUBBLES: Each speech bubble MUST BE 18 WORDS OR FEWER. Short, punchy, conversational, engaging!
 6. EMOTIONS: Each slide must have a valid emotion: ["curious", "thinking", "excited", "shocked", "neutral", "smug"].
 7. LAST SLIDE: The final slide is a takeaway plus a follow CTA. Provide a "takeaway" field and note the source: "{source}, {date}".
@@ -117,11 +129,11 @@ Return ONLY valid JSON matching this schema with NO markdown fences, NO preamble
   "date": "{date}",
   "slides": [
     {{"speaker": "byte", "emotion": "shocked", "bubble": "Did OpenAI really just drop GPT-5 preview?"}},
-    {{"speaker": "asha", "emotion": "excited", "bubble": "Yes! It introduces native autonomous tool orchestration."}},
+    {{"speaker": "vj", "emotion": "excited", "bubble": "Yes! It introduces native autonomous tool orchestration."}},
     {{"speaker": "byte", "emotion": "curious", "bubble": "How does that help everyday engineers?"}},
-    {{"speaker": "asha", "emotion": "thinking", "bubble": "No more brittle agent loops. It handles planning internally."}},
+    {{"speaker": "vj", "emotion": "thinking", "bubble": "No more brittle agent loops. It handles planning internally."}},
     {{"speaker": "byte", "emotion": "smug", "bubble": "My debugging sessions just got 10x faster."}},
-    {{"speaker": "asha", "emotion": "excited", "bubble": "Follow @vijayakumarj_ai for daily updates!", "is_takeaway": true}}
+    {{"speaker": "vj", "emotion": "excited", "bubble": "Follow @vijayakumarj_ai for daily updates!", "is_takeaway": true}}
   ],
   "takeaway": "Autonomous tool calling cuts agent boilerplate and boosts pipeline reliability.",
   "caption": "Breaking AI Update: {title}\\n\\nHere is what developers need to know...\\n\\nSource: {source} ({date})\\n\\nFollow @vijayakumarj_ai for daily AI breakdowns!\\n#AI #TechNews #DevCommunity"
@@ -133,14 +145,14 @@ Return ONLY valid JSON matching this schema with NO markdown fences, NO preamble
     concept_topic = topic or "Why does ChatGPT forget you?"
     prompt = f"""You are a world-class tech educator creating an engaging, easy-to-understand Instagram educational carousel (6-7 slides) between two mascot characters:
 1. "byte" (a curious, smart robot mascot who asks great questions)
-2. "asha" (a sharp, friendly female developer who explains complex tech simply)
+2. "vj" (the human tech creator and host of 'Did You Know By VJ', wearing a blue hoodie, who explains complex tech simply)
 
 TOPIC TO EXPLAIN: "{concept_topic}"
 
 CRITICAL RULES:
 1. MODE: "concept"
 2. SLIDE COUNT: Exactly 6 to 7 slides.
-3. SPEAKERS ALTERNATE: Alternate between "byte" and "asha" on every slide.
+3. SPEAKERS ALTERNATE: Alternate between "byte" and "vj" on every slide.
 4. PUNCHY BUBBLES: Every single speech bubble MUST BE 18 WORDS OR FEWER. No exceptions.
 5. EMOTIONS: Valid emotions for each slide: ["curious", "thinking", "excited", "shocked", "neutral", "smug"].
 6. HOOK: Must start with a magnetic hook question that stops the user's scroll.
@@ -153,11 +165,11 @@ Return ONLY valid JSON with NO markdown formatting:
   "headline": "{concept_topic}",
   "slides": [
     {{"speaker": "byte", "emotion": "curious", "bubble": "Why does ChatGPT forget what I said earlier?"}},
-    {{"speaker": "asha", "emotion": "thinking", "bubble": "Think of it as the AI's short-term memory: the context window."}},
+    {{"speaker": "vj", "emotion": "thinking", "bubble": "Think of it as the AI's short-term memory: the context window."}},
     {{"speaker": "byte", "emotion": "curious", "bubble": "What happens when that window fills up?"}},
-    {{"speaker": "asha", "emotion": "shocked", "bubble": "Older messages drop off, so it literally cannot see them anymore!"}},
+    {{"speaker": "vj", "emotion": "shocked", "bubble": "Older messages drop off, so it literally cannot see them anymore!"}},
     {{"speaker": "byte", "emotion": "thinking", "bubble": "So prompt summaries prevent memory loss?"}},
-    {{"speaker": "asha", "emotion": "smug", "bubble": "Exactly! Summarize older context or use vector memory."}},
+    {{"speaker": "vj", "emotion": "smug", "bubble": "Exactly! Summarize older context or use vector memory."}},
     {{"speaker": "byte", "emotion": "excited", "bubble": "Follow @vijayakumarj_ai for daily AI breakdowns!", "is_takeaway": true}}
   ],
   "takeaway": "LLMs have finite context windows. To avoid memory drop, summarize long chats and prune prompts!",
@@ -183,11 +195,11 @@ def get_curated_fallback_dialogue(mode: str, topic: Optional[str] = None, story:
             "date": date,
             "slides": [
                 {"speaker": "byte", "emotion": "shocked", "bubble": f"Did you see the latest update from {source}?"},
-                {"speaker": "asha", "emotion": "excited", "bubble": f"Yes! {title[:60]} just went live."},
+                {"speaker": "vj", "emotion": "excited", "bubble": f"Yes! {title[:60]} just went live."},
                 {"speaker": "byte", "emotion": "curious", "bubble": "What is the biggest capability improvement?"},
-                {"speaker": "asha", "emotion": "thinking", "bubble": "Faster inference speeds and significantly higher reasoning accuracy."},
+                {"speaker": "vj", "emotion": "thinking", "bubble": "Faster inference speeds and significantly higher reasoning accuracy."},
                 {"speaker": "byte", "emotion": "smug", "bubble": "This changes how we build agent workflows."},
-                {"speaker": "asha", "emotion": "excited", "bubble": "Follow @vijayakumarj_ai for daily verified AI news!", "is_takeaway": True}
+                {"speaker": "vj", "emotion": "excited", "bubble": "Follow @vijayakumarj_ai for daily verified AI news!", "is_takeaway": True}
             ],
             "takeaway": f"This release from {source} accelerates practical AI deployment and agent pipelines.",
             "caption": f"📰 {title}\n\nKey takeaways from the latest release.\n\nSource: {source} ({date})\n\nFollow @vijayakumarj_ai for daily AI news!\n#AI #TechNews #ArtificialIntelligence"
@@ -203,11 +215,11 @@ def get_curated_fallback_dialogue(mode: str, topic: Optional[str] = None, story:
         "date": current_date,
         "slides": [
             {"speaker": "byte", "emotion": "curious", "bubble": "Why does ChatGPT forget what I said 10 minutes ago?"},
-            {"speaker": "asha", "emotion": "thinking", "bubble": "Think of it as the AI's short-term memory: context window."},
+            {"speaker": "vj", "emotion": "thinking", "bubble": "Think of it as the AI's short-term memory: context window."},
             {"speaker": "byte", "emotion": "curious", "bubble": "What happens when that window gets full?"},
-            {"speaker": "asha", "emotion": "shocked", "bubble": "Older messages drop off completely so it cannot read them!"},
+            {"speaker": "vj", "emotion": "shocked", "bubble": "Older messages drop off completely so it cannot read them!"},
             {"speaker": "byte", "emotion": "thinking", "bubble": "So smart prompt compression keeps chats alive?"},
-            {"speaker": "asha", "emotion": "smug", "bubble": "Exactly! Keep system prompts clean and summarize history."},
+            {"speaker": "vj", "emotion": "smug", "bubble": "Exactly! Keep system prompts clean and summarize history."},
             {"speaker": "byte", "emotion": "excited", "bubble": "Follow @vijayakumarj_ai for daily AI breakdowns!", "is_takeaway": True}
         ],
         "takeaway": "LLMs rely on finite context windows. Trim excess prompts and summarize earlier dialogue to preserve memory.",
@@ -239,12 +251,14 @@ def parse_and_validate_dialogue(data: Any, mode: str, topic: Optional[str] = Non
             continue
             
         speaker = s.get("speaker", expected_speaker).lower()
+        if speaker == "asha":
+            speaker = "vj"
         if speaker not in VALID_SPEAKERS:
             speaker = expected_speaker
             
         # Ensure alternating speaker
         if i > 0 and speaker == validated_slides[-1]["speaker"]:
-            speaker = "asha" if validated_slides[-1]["speaker"] == "byte" else "byte"
+            speaker = "vj" if validated_slides[-1]["speaker"] == "byte" else "byte"
             
         emotion = s.get("emotion", "neutral").lower()
         if emotion not in VALID_EMOTIONS:
@@ -260,7 +274,7 @@ def parse_and_validate_dialogue(data: Any, mode: str, topic: Optional[str] = Non
             "is_takeaway": s.get("is_takeaway", False)
         }
         validated_slides.append(slide_entry)
-        expected_speaker = "asha" if speaker == "byte" else "byte"
+        expected_speaker = "vj" if speaker == "byte" else "byte"
 
     # Mark the last slide as takeaway
     if validated_slides:
@@ -388,7 +402,8 @@ def render_cartoon_dialogue_carousel(
     
     # Mascot image paths for final celebratory slide
     byte_excited_path = get_character_image_path("byte", "excited") or get_character_image_path("byte", "neutral")
-    asha_excited_path = get_character_image_path("asha", "excited") or get_character_image_path("asha", "neutral")
+    vj_excited_path = get_character_image_path("vj", "excited") or get_character_image_path("vj", "neutral")
+    asha_excited_path = vj_excited_path or get_character_image_path("asha", "excited")
     
     for i, slide in enumerate(slides):
         slide_num = i + 1
@@ -422,6 +437,7 @@ def render_cartoon_dialogue_carousel(
             "brand": {"handle": "@vijayakumarj_ai", "name": "Vijayakumar J"},
             "character_img_path": char_img_uri,
             "character_byte_path": f"file://{byte_excited_path.resolve()}" if byte_excited_path else "",
+            "character_vj_path": f"file://{vj_excited_path.resolve()}" if vj_excited_path else "",
             "character_asha_path": f"file://{asha_excited_path.resolve()}" if asha_excited_path else "",
             "background_image_url": bg_uri,
         }

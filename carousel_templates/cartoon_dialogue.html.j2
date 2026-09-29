@@ -20,8 +20,10 @@
       --canvas-h: {{ canvas_height|default(1350) }}px;
       --color-byte-primary: #00F2FE;
       --color-byte-glow: rgba(0, 242, 254, 0.35);
-      --color-asha-primary: #FF5E8E;
-      --color-asha-glow: rgba(255, 94, 142, 0.35);
+      --color-vj-primary: #38BDF8;
+      --color-vj-glow: rgba(56, 189, 248, 0.38);
+      --color-asha-primary: #38BDF8;
+      --color-asha-glow: rgba(56, 189, 248, 0.38);
       --color-bg-dark: #0B0F19;
       --color-card-bg: rgba(16, 24, 44, 0.88);
       --color-text-main: #FFFFFF;
@@ -200,7 +202,8 @@
       left: 10px;
     }
 
-    .character-wrap.speaker-asha {
+    .character-wrap.speaker-asha,
+    .character-wrap.speaker-vj {
       right: 10px;
     }
 
@@ -216,8 +219,9 @@
       filter: drop-shadow(0 20px 36px rgba(0, 242, 254, 0.28)) drop-shadow(0 10px 20px rgba(0,0,0,0.6));
     }
 
-    .speaker-asha .character-img {
-      filter: drop-shadow(0 20px 36px rgba(255, 94, 142, 0.28)) drop-shadow(0 10px 20px rgba(0,0,0,0.6));
+    .speaker-asha .character-img,
+    .speaker-vj .character-img {
+      filter: drop-shadow(0 20px 36px rgba(56, 189, 248, 0.30)) drop-shadow(0 10px 20px rgba(0,0,0,0.6));
     }
 
     /* Speaker Name Badge */
@@ -239,10 +243,11 @@
       border: 2px solid #BAF4FF;
     }
 
-    .speaker-asha .speaker-tag {
-      background: linear-gradient(135deg, #FF5E8E 0%, #E11D48 100%);
-      color: #FFFFFF;
-      border: 2px solid #FECDD3;
+    .speaker-asha .speaker-tag,
+    .speaker-vj .speaker-tag {
+      background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%);
+      color: #031427;
+      border: 2px solid #E0F2FE;
     }
 
     /* ── Speech Bubble ──────────────────────────────────── */
@@ -619,8 +624,10 @@
         {% if character_byte_path %}
         <img class="mini-mascot-left" src="{{ character_byte_path }}" alt="Byte Robot">
         {% endif %}
-        {% if character_asha_path %}
-        <img class="mini-mascot-right" src="{{ character_asha_path }}" alt="Asha Dev">
+        {% if character_vj_path %}
+        <img class="mini-mascot-right" src="{{ character_vj_path }}" alt="VJ">
+        {% elif character_asha_path %}
+        <img class="mini-mascot-right" src="{{ character_asha_path }}" alt="VJ">
         {% endif %}
       </div>
 
@@ -636,7 +643,7 @@
         <img class="character-img" src="{{ character_img_path }}" alt="{{ speaker }}">
         {% endif %}
         <div class="speaker-tag">
-          {% if speaker == 'byte' %}🤖 BYTE{% else %}👩‍💻 ASHA{% endif %}
+          {% if speaker == 'byte' %}🤖 BYTE{% else %}👨‍💻 VJ{% endif %}
         </div>
       </div>
 
