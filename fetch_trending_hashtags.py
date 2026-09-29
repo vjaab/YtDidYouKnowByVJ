@@ -48,6 +48,12 @@ HASHTAG_CATEGORIES = {
         "#DeveloperLife", "#CodeQuality", "#CleanCode", "#BestPractices",
         "#TechTrends", "#Innovation", "#DigitalTransformation"
     ],
+    "did_you_know": [
+        "#DidYouKnow", "#TechFacts", "#MindBlowingFacts", "#TechTrivia",
+        "#ScienceFacts", "#EngineeringMarvels", "#ComputerScience",
+        "#InterestingFacts", "#DailyFacts", "#TechLore", "#GeekFacts",
+        "#DidYouKnowTech", "#LearnOnInstagram", "#STEMFacts", "#TechSecrets"
+    ],
 }
 
 # Cross-platform trending hashtags (always relevant)
@@ -107,10 +113,16 @@ def fetch_reddit_trending(programming_subs: list = None) -> list:
 
 def get_hashtags_for_category(category: str, count: int = 15) -> list:
     """Get hashtags for a specific category."""
-    category = category.lower()
+    category = category.lower().strip()
     
     # Map category to our defined categories
     cat_map = {
+        "did_you_know": "did_you_know",
+        "did you know": "did_you_know",
+        "dyk": "did_you_know",
+        "tech_facts": "did_you_know",
+        "facts": "did_you_know",
+        "trivia": "did_you_know",
         "python": "python",
         "aws": "aws",
         "cloud": "aws",
@@ -119,6 +131,7 @@ def get_hashtags_for_category(category: str, count: int = 15) -> list:
         "ai": "ai_ml",
         "ml": "ai_ml",
         "llm": "ai_ml",
+        "ai & tech tools": "ai_ml",
         "devops": "devops",
         "javascript": "javascript",
         "typescript": "javascript",

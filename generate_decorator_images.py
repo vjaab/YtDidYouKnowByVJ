@@ -256,7 +256,7 @@ def main():
     parser.add_argument("--topic", type=str, help="Specific topic to generate")
     parser.add_argument("--hashtags-file", type=str, help="Path to hashtags file")
     parser.add_argument("--style", choices=["cartoon_dialogue", "code_editor"], default="cartoon_dialogue", help="Carousel visual style")
-    parser.add_argument("--mode", choices=["auto", "concept", "news"], default="auto", help="Content mode: auto, concept, news")
+    parser.add_argument("--mode", choices=["auto", "concept", "news", "did_you_know"], default="did_you_know", help="Content mode: did_you_know, concept, news, auto")
     parser.add_argument("--ai-backgrounds", action="store_true", help="Optionally generate AI backgrounds per slide")
     parser.add_argument("--platform", choices=["both", "instagram", "facebook", "threads"], default="both", help="Target platform(s)")
     args = parser.parse_args()
@@ -280,10 +280,24 @@ def main():
 
         # ── Style: cartoon_dialogue (Fixed Mascots + HTML Speech Bubbles) ───
         if args.style == "cartoon_dialogue":
-            from cartoon_dialogue_engine import generate_cartoon_dialogue_json, render_cartoon_dialogue_carousel
+            from cartoon_dialogue_engine import (
+                generate_cartoon_dialogue_json,
+                render_cartoon_dialogue_carousel,
+                fetch_or_select_did_you_know_fact
+            )
 
             story = None
-            if args.mode in ["news", "auto"]:
+            mode = args.mode
+            if mode == "auto":
+                mode = "did_you_know"
+
+            topic_to_use = args.topic
+
+            if mode in ["did_you_know", "dyk"]:
+                print("🧠 Mode: 'did_you_know' — Selecting high-attraction tech fact...")
+                story = fetch_or_select_did_you_know_fact(topic=args.topic)
+                topic_to_use = story.get("title", args.topic or "Did You Know Tech Fact")
+            elif mode == "news":
                 try:
                     stories = fetch_ai_news_stories()
                     if args.topic:
@@ -299,10 +313,13 @@ def main():
                         story = select_best_story(stories)
                 except Exception as e:
                     print(f"⚠️ Note on fetching stories: {e}")
+                topic_to_use = args.topic or (story.get("title") if story else "AI News")
+            else:
+                topic_to_use = args.topic or "Tech Concept"
 
-            print(f"🎭 Generating Mascot Cartoon Dialogue ({args.mode} mode)...")
-            dialogue = generate_cartoon_dialogue_json(topic=args.topic, story=story, mode=args.mode)
-            safe_title = sanitize_filename(dialogue.get("headline", dialogue.get("hook", "ai_update")))
+            print(f"🎭 Generating Mascot Cartoon Dialogue ({mode} mode: '{topic_to_use}')...")
+            dialogue = generate_cartoon_dialogue_json(topic=topic_to_use, story=story, mode=mode)
+            safe_title = sanitize_filename(dialogue.get("headline", dialogue.get("hook", "dyk_update")))
 
             # Save dialogue JSON
             carousel_path = output_dir / f"carousel_{safe_title}.json"
@@ -341,7 +358,7 @@ def main():
             # Caption
             caption = dialogue.get("caption", "")
             if not caption:
-                caption = f"🤖 {dialogue.get('hook')}\n\n💡 {dialogue.get('takeaway')}\n\nFollow @vijayakumarj_ai for daily AI breakdowns!"
+                caption = f"🧠 {dialogue.get('hook')}\n\n💡 {dialogue.get('takeaway')}\n\nFollow @vijayakumarj_ai for daily mind-blowing tech facts!"
             if hashtags and hashtags not in caption:
                 caption = f"{caption}\n\n{hashtags}"
 
@@ -350,7 +367,7 @@ def main():
             print(f"✅ Caption saved: {caption_path}")
 
             # Poll data
-            carousel = {"headline": dialogue.get("headline", dialogue.get("hook", "AI Update")), "summary": dialogue.get("takeaway", "")}
+            carousel = {"headline": dialogue.get("headline", dialogue.get("hook", "Did You Know?")), "summary": dialogue.get("takeaway", "")}
             poll_path = generate_poll_data(carousel, output_dir)
 
             # Save metadata

@@ -137,6 +137,18 @@
       box-shadow: 0 0 12px #38BDF8;
     }
 
+    .topic-badge.badge-dyk {
+      background: rgba(0, 242, 254, 0.12);
+      border: 1.5px solid rgba(0, 242, 254, 0.4);
+      color: #00F2FE;
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.22);
+    }
+
+    .topic-badge.badge-dyk .dot {
+      background: #00F2FE;
+      box-shadow: 0 0 14px #00F2FE;
+    }
+
     .slide-counter {
       padding: 10px 20px;
       background: rgba(15, 23, 42, 0.7);
@@ -584,9 +596,9 @@
     <!-- Header -->
     <header class="header-bar">
       <div class="badge-wrap">
-        <div class="topic-badge">
+        <div class="topic-badge {{ 'badge-dyk' if mode in ['did_you_know', 'dyk'] else '' }}">
           <span class="dot"></span>
-          <span>{{ category or ('AI NEWS' if mode == 'news' else 'AI EXPLAINED') }}</span>
+          <span>{{ category or ('🧠 DID YOU KNOW?' if mode in ['did_you_know', 'dyk'] else ('AI NEWS' if mode == 'news' else 'AI EXPLAINED')) }}</span>
         </div>
       </div>
       <div class="slide-counter">
@@ -602,7 +614,7 @@
     <div class="takeaway-stage">
       
       <div class="takeaway-card">
-        <div class="takeaway-badge">💡 Key Takeaway</div>
+        <div class="takeaway-badge">{{ '🤯 Mind-Blowing Fact' if mode in ['did_you_know', 'dyk'] else '💡 Key Takeaway' }}</div>
         <div class="takeaway-text">"{{ takeaway or slide_data.bubble }}"</div>
         
         {% if source %}
@@ -614,7 +626,7 @@
 
       <div class="cta-banner">
         <div class="cta-content">
-          <div class="cta-heading">Follow for Daily AI Breakdowns</div>
+          <div class="cta-heading">{{ 'Follow for Daily Mind-Blowing Tech Facts' if mode in ['did_you_know', 'dyk'] else 'Follow for Daily AI Breakdowns' }}</div>
           <div class="cta-sub">{{ brand.handle|default('@vijayakumarj_ai') }} • Save & Share with a friend 📌</div>
         </div>
         <div class="cta-btn">FOLLOW ➔</div>
