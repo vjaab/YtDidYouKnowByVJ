@@ -255,13 +255,16 @@ def main():
     parser.add_argument("--dry-run", action="store_true", help="Preview without posting to Telegram")
     parser.add_argument("--topic", type=str, help="Specific topic to generate")
     parser.add_argument("--hashtags-file", type=str, help="Path to hashtags file")
+    parser.add_argument("--style", choices=["cartoon_dialogue", "code_editor"], default="cartoon_dialogue", help="Carousel visual style")
+    parser.add_argument("--mode", choices=["auto", "concept", "news"], default="auto", help="Content mode: auto, concept, news")
+    parser.add_argument("--ai-backgrounds", action="store_true", help="Optionally generate AI backgrounds per slide")
     parser.add_argument("--platform", choices=["both", "instagram", "facebook", "threads"], default="both", help="Target platform(s)")
     args = parser.parse_args()
 
     if not args.now and not args.dry_run:
         print("Usage: python generate_decorator_images.py --now       # Generate and send to Telegram")
         print("       python generate_decorator_images.py --dry-run   # Generate only")
-        print("       python generate_decorator_images.py --now --topic 'OpenAI GPT-5'")
+        print("       python generate_decorator_images.py --now --topic 'OpenAI GPT-5' --style cartoon_dialogue")
         sys.exit(1)
 
     # Load hashtags
@@ -273,75 +276,142 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     try:
-        # Import carousel modules
-        from ai_news_carousel import fetch_ai_news_stories, select_best_story, generate_carousel_json
-        from carousel_renderer_html import render_carousel
-        from visual_strategy import create_visual_strategy
-        
-        # Get story
-        if args.topic:
-            stories = fetch_ai_news_stories()
-            story = next((s for s in stories if args.topic.lower() in s.get("title", "").lower()), None)
-            if not story:
-                print(f"❌ Topic not found: {args.topic}")
-                sys.exit(1)
+        from ai_news_carousel import fetch_ai_news_stories, select_best_story
+
+        # ── Style: cartoon_dialogue (Fixed Mascots + HTML Speech Bubbles) ───
+        if args.style == "cartoon_dialogue":
+            from cartoon_dialogue_engine import generate_cartoon_dialogue_json, render_cartoon_dialogue_carousel
+
+            story = None
+            if args.mode in ["news", "auto"]:
+                try:
+                    stories = fetch_ai_news_stories()
+                    if args.topic:
+                        story = next((s for s in stories if args.topic.lower() in s.get("title", "").lower()), None)
+                        if not story and args.mode == "news":
+                            story = {
+                                "title": args.topic,
+                                "source": "Verified Tech News",
+                                "date": datetime.datetime.now().strftime("%d %b %Y"),
+                                "description": args.topic,
+                            }
+                    else:
+                        story = select_best_story(stories)
+                except Exception as e:
+                    print(f"⚠️ Note on fetching stories: {e}")
+
+            print(f"🎭 Generating Mascot Cartoon Dialogue ({args.mode} mode)...")
+            dialogue = generate_cartoon_dialogue_json(topic=args.topic, story=story, mode=args.mode)
+            safe_title = sanitize_filename(dialogue.get("headline", dialogue.get("hook", "ai_update")))
+
+            # Save dialogue JSON
+            carousel_path = output_dir / f"carousel_{safe_title}.json"
+            with open(carousel_path, "w", encoding="utf-8") as f:
+                json.dump(dialogue, f, indent=2)
+            print(f"✅ Cartoon Dialogue JSON saved: {carousel_path}")
+
+            # Optional AI backgrounds
+            bg_images = None
+            if args.ai_backgrounds:
+                print("🌌 Generating optional AI scene backgrounds...")
+                try:
+                    from image_gen import _generate_cloudflare_image, _generate_huggingface_image
+                    bg_images = []
+                    slides = dialogue.get("slides", [])
+                    hook = dialogue.get("hook", "artificial intelligence datacenter")
+                    for s_idx in range(len(slides)):
+                        bg_file = output_dir / f"bg_{safe_title}_{s_idx+1:02d}.jpg"
+                        bg_prompt = f"Abstract subtle minimalist digital technology background, soft atmospheric neon cyan and purple ambient glow, cinematic wide shot, no text, no words, no characters, clean studio background, depth of field"
+                        out_bg = _generate_cloudflare_image(bg_prompt, str(bg_file), aspect_ratio="9:16") or _generate_huggingface_image(bg_prompt, str(bg_file), aspect_ratio="9:16")
+                        bg_images.append(str(out_bg) if out_bg else None)
+                except Exception as bg_err:
+                    print(f"⚠️ AI background generation skipped: {bg_err}")
+                    bg_images = None
+
+            # Render Instagram 4:5 slides
+            print(f"🎨 Rendering {len(dialogue.get('slides', []))} slides for Instagram (4:5)...")
+            ig_paths = render_cartoon_dialogue_carousel(dialogue, output_dir, canvas_width=INSTAGRAM_W, canvas_height=INSTAGRAM_H, prefix="carousel_", bg_images=bg_images)
+
+            # Render Facebook 9:16 format if needed
+            fb_paths = []
+            if args.platform in ["both", "facebook"]:
+                print(f"📘 Rendering Facebook 9:16 stories...")
+                fb_paths = render_cartoon_dialogue_carousel(dialogue, output_dir, canvas_width=FACEBOOK_STORY_W, canvas_height=FACEBOOK_STORY_H, prefix="facebook_", bg_images=bg_images)
+
+            # Caption
+            caption = dialogue.get("caption", "")
+            if not caption:
+                caption = f"🤖 {dialogue.get('hook')}\n\n💡 {dialogue.get('takeaway')}\n\nFollow @vijayakumarj_ai for daily AI breakdowns!"
+            if hashtags and hashtags not in caption:
+                caption = f"{caption}\n\n{hashtags}"
+
+            caption_path = output_dir / f"caption_{safe_title}.txt"
+            caption_path.write_text(caption, encoding="utf-8")
+            print(f"✅ Caption saved: {caption_path}")
+
+            # Poll data
+            carousel = {"headline": dialogue.get("headline", dialogue.get("hook", "AI Update")), "summary": dialogue.get("takeaway", "")}
+            poll_path = generate_poll_data(carousel, output_dir)
+
+            # Save metadata
+            meta_path = save_metadata(
+                output_dir, carousel, ig_paths, fb_paths,
+                caption, hashtags, poll_path
+            )
+
+        # ── Style: code_editor (Existing Tech/Code Cards) ──────────────
         else:
-            # Create run context for deterministic selection (date + workflow run info)
+            from ai_news_carousel import generate_carousel_json
+            from carousel_renderer_html import render_carousel
+            from visual_strategy import create_visual_strategy
+
+            # Get story
+            if args.topic:
+                stories = fetch_ai_news_stories()
+                story = next((s for s in stories if args.topic.lower() in s.get("title", "").lower()), None)
+                if not story:
+                    print(f"❌ Topic not found: {args.topic}")
+                    sys.exit(1)
+            else:
+                run_context = f"{datetime.datetime.now().strftime('%Y%m%d')}-{os.getenv('GITHUB_RUN_NUMBER', '0')}-{os.getenv('GITHUB_RUN_ATTEMPT', '1')}"
+                stories = fetch_ai_news_stories(run_context=run_context)
+                story = select_best_story(stories, run_context=run_context)
+                if not story:
+                    print("❌ No stories meet quality threshold")
+                    sys.exit(1)
+
+            print(f"📰 Selected story: {story.get('title')}")
+            carousel = generate_carousel_json(story)
+            safe_title = sanitize_filename(carousel.get("headline", "ai_news"))
+
             run_context = f"{datetime.datetime.now().strftime('%Y%m%d')}-{os.getenv('GITHUB_RUN_NUMBER', '0')}-{os.getenv('GITHUB_RUN_ATTEMPT', '1')}"
-            stories = fetch_ai_news_stories(run_context=run_context)
-            story = select_best_story(stories, run_context=run_context)
-            if not story:
-                print("❌ No stories meet quality threshold")
-                sys.exit(1)
+            strategy = create_visual_strategy(carousel, story=story, run_context=run_context)
+            strategy_path = output_dir / f"strategy_{safe_title}.json"
+            with open(strategy_path, "w", encoding="utf-8") as f:
+                json.dump(strategy, f, indent=2)
 
-        print(f"📰 Selected story: {story.get('title')}")
-        print(f"   Score: {story.get('_score', 'N/A')}")
+            carousel_path = output_dir / f"carousel_{safe_title}.json"
+            with open(carousel_path, "w", encoding="utf-8") as f:
+                json.dump(carousel, f, indent=2)
 
-        # Generate carousel JSON
-        carousel = generate_carousel_json(story)
-        safe_title = sanitize_filename(carousel.get("headline", "ai_news"))
+            slide_count = len(carousel.get("slides", []))
+            print(f"\n🎨 Rendering {slide_count} carousel slides for Instagram (4:5) with theme {strategy.get('visual_theme')}...")
+            ig_paths = render_carousel(carousel, output_dir, strategy=strategy, canvas_width=INSTAGRAM_W, canvas_height=INSTAGRAM_H)
 
-        # Create run context for deterministic visual strategy
-        run_context = f"{datetime.datetime.now().strftime('%Y%m%d')}-{os.getenv('GITHUB_RUN_NUMBER', '0')}-{os.getenv('GITHUB_RUN_ATTEMPT', '1')}"
+            fb_paths = []
+            if args.platform in ["both", "facebook"]:
+                fb_paths = generate_facebook_images_from_carousel(carousel, ig_paths, output_dir, strategy=strategy)
 
-        # Create Visual Strategy (Theme, Layout Sequence, Styling)
-        strategy = create_visual_strategy(carousel, story=story, run_context=run_context)
-        strategy_path = output_dir / f"strategy_{safe_title}.json"
-        with open(strategy_path, "w", encoding="utf-8") as f:
-            json.dump(strategy, f, indent=2)
-        print(f"🎨 Visual Strategy created & saved: {strategy_path}")
-        print(f"   Theme: {strategy.get('visual_theme')} | Domain: {strategy.get('domain')} | Slides: {len(carousel.get('slides', []))}")
-        
-        # Save carousel JSON
-        carousel_path = output_dir / f"carousel_{safe_title}.json"
-        with open(carousel_path, "w", encoding="utf-8") as f:
-            json.dump(carousel, f, indent=2)
-        print(f"✅ Carousel JSON saved: {carousel_path}")
+            caption = generate_caption(carousel, hashtags)
+            caption_path = output_dir / f"caption_{safe_title}.txt"
+            caption_path.write_text(caption, encoding="utf-8")
 
-        # Render carousel slides for Instagram (4:5)
-        slide_count = len(carousel.get("slides", []))
-        print(f"\n🎨 Rendering {slide_count} carousel slides for Instagram (4:5) with theme {strategy.get('visual_theme')}...")
-        ig_paths = render_carousel(carousel, output_dir, strategy=strategy, canvas_width=INSTAGRAM_W, canvas_height=INSTAGRAM_H)
-        
-        # Generate Facebook images only if needed
-        fb_paths = []
-        if args.platform in ["both", "facebook"]:
-            fb_paths = generate_facebook_images_from_carousel(carousel, ig_paths, output_dir, strategy=strategy)
-        
-        # Generate caption
-        caption = generate_caption(carousel, hashtags)
-        caption_path = output_dir / f"caption_{safe_title}.txt"
-        caption_path.write_text(caption)
-        print(f"✅ Caption saved: {caption_path}")
-        
-        # Generate poll data
-        poll_path = generate_poll_data(carousel, output_dir)
-        
-        # Save metadata
-        meta_path = save_metadata(
-            output_dir, carousel, ig_paths, fb_paths,
-            caption, hashtags, poll_path
-        )
+            poll_path = generate_poll_data(carousel, output_dir)
+            meta_path = save_metadata(
+                output_dir, carousel, ig_paths, fb_paths,
+                caption, hashtags, poll_path
+            )
+            headline_for_output = carousel.get("headline", "AI News")
 
         if args.dry_run:
             print(f"\n✅ DRY RUN COMPLETE")

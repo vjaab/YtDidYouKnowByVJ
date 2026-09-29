@@ -13,9 +13,26 @@ on:
   workflow_dispatch:
     inputs:
       topic:
-        description: 'Specific topic to generate (e.g., "OpenAI GPT-5")'
+        description: 'Specific topic to generate (e.g., "OpenAI GPT-5" or "Why does ChatGPT forget you?")'
         required: false
         type: string
+      style:
+        description: 'Carousel visual style'
+        required: false
+        type: choice
+        options:
+          - cartoon_dialogue
+          - code_editor
+        default: cartoon_dialogue
+      mode:
+        description: 'Content mode'
+        required: false
+        type: choice
+        options:
+          - auto
+          - concept
+          - news
+        default: auto
       auto_post:
         description: 'Auto-post after Telegram approval'
         required: false
@@ -99,11 +116,13 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TOPIC: ${{ github.event.inputs.topic || '' }}
+          STYLE: ${{ github.event.inputs.style || 'cartoon_dialogue' }}
+          MODE:  ${{ github.event.inputs.mode  || 'auto' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           python -u generate_decorator_images.py --now \
-            --topic "${{ github.event.inputs.topic || '' }}" \
+            --topic "$TOPIC" --style "$STYLE" --mode "$MODE" \
             --hashtags-file hashtags.txt \
             --platform instagram
 
