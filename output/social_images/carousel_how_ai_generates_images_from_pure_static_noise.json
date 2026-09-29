@@ -1,0 +1,60 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "hook": "Did You Know AI Paints from Pure TV Static? \ud83c\udfa8",
+  "headline": "How AI Generates Images from Pure Static Noise",
+  "source": "Denoising Diffusion Probabilistic Models",
+  "slides": [
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "AI from Static? \ud83e\udd2f",
+      "bubble": "Wait, did you know AI paints amazing images starting from pure static noise?!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Diffusion Magic \u2728",
+      "bubble": "Absolutely! Diffusion models begin with 100% random static. Like TV fuzz before a channel.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "curious",
+      "title": "How Does It Work? \ud83d\uddbc\ufe0f",
+      "bubble": "100% static? How does it even know what to paint from that chaos?!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Denoising Steps \ud83d\udcc9",
+      "bubble": "It's like reverse-engineering. It gradually subtracts noise, step by step, over 50 iterations.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "50 Steps?! \ud83c\udfa8",
+      "bubble": "So, from pure random fuzz to a crisp image in just 50 steps? That's insane!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Refining the Vision \ud83c\udfaf",
+      "bubble": "Each step refines the image, making it clearer until the final masterpiece crystallizes.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "excited",
+      "title": "Mind-Blown Tech \ud83e\udd2f",
+      "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts and AI insights!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "AI's image generation is reverse entropy: transforming pure random noise into structured images by gradually subtracting noise over many steps, like magic.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nEver wondered how AI can create stunning images from nothing? It literally starts from pure TV static!\n\nHere's the mind-blowing reality of Diffusion Models:\n\ud83d\udd39 They begin with 100% random pixel noise, like an old TV with no signal.\n\ud83d\udd39 An AI model then iteratively 'denoises' this static over 50+ steps.\n\ud83d\udd39 With each step, it subtracts noise, gradually revealing the intended image, pixel by pixel!\n\n\ud83d\udcac Did you already know this, or did this process blow your mind? Drop a \ud83e\udd2f in the comments!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #AIGenArt #DiffusionModels #TechFacts #MindBlowingFacts #Midjourney #StableDiffusion #AIArt"
+}

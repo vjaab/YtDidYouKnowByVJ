@@ -1,0 +1,21 @@
+{
+  "topic": "How AI Generates Images from Pure Static Noise",
+  "category": "AI News",
+  "type": "carousel",
+  "slides": 7,
+  "instagram_images": [
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_ai_paints_from_pu_01.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_ai_paints_from_pu_02.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_ai_paints_from_pu_03.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_ai_paints_from_pu_04.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_ai_paints_from_pu_05.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_ai_paints_from_pu_06.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_ai_paints_from_pu_07.jpg"
+  ],
+  "facebook_images": [],
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nEver wondered how AI can create stunning images from nothing? It literally starts from pure TV static!\n\nHere's the mind-blowing reality of Diffusion Models:\n\ud83d\udd39 They begin with 100% random pixel noise, like an old TV with no signal.\n\ud83d\udd39 An AI model then iteratively 'denoises' this static over 50+ steps.\n\ud83d\udd39 With each step, it subtracts noise, gradually revealing the intended image, pixel by pixel!\n\n\ud83d\udcac Did you already know this, or did this process blow your mind? Drop a \ud83e\udd2f in the comments!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #AIGenArt #DiffusionModels #TechFacts #MindBlowingFacts #Midjourney #StableDiffusion #AIArt\n\n#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets",
+  "hashtags": "#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets",
+  "poll_file": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/poll_how_ai_generates_images_from_pure_static_noise.json",
+  "carousel_json": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_how_ai_generates_images_from_pure_static_noise.json",
+  "generated_at": "2026-09-29T19:57:10.346824+00:00"
+}
