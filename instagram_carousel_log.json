@@ -13,7 +13,8 @@
     "Jev: Simpler AI Models Dethrone LLMs",
     "Now It\u2019s Replacing Code Reviews",
     "Medium (artificial-intelligence): Isomorphic Structural Theory: Decoup",
-    "Naive Vector Search Fails Production RAG"
+    "Naive Vector Search Fails Production RAG",
+    "AI's 5 Secrets: Not All Bots Learn"
   ],
   "used_keywords": [
     "openai",
@@ -165,6 +166,12 @@
     "Vector Search",
     "BM25",
     "AI",
+    "did you know",
+    "AI agents",
+    "AI classification",
+    "machine learning",
+    "reactive AI",
+    "autonomous systems",
     "did you know"
   ],
   "history": [
@@ -432,6 +439,20 @@
       ],
       "source": "Medium - artificial-intelligence",
       "timestamp": "2026-09-29T20:31:17.517874+00:00"
+    },
+    {
+      "title": "AI's 5 Secrets: Not All Bots Learn",
+      "news_source_url": "https://julitreedesign.medium.com/cinco-tipos-de-agentes-de-ia-de-reaccionar-a-aprender-52423a72d8c1?source=rss------artificial_intelligence-5",
+      "keywords": [
+        "AI agents",
+        "AI classification",
+        "machine learning",
+        "reactive AI",
+        "autonomous systems",
+        "did you know"
+      ],
+      "source": "Medium - artificial-intelligence",
+      "timestamp": "2026-09-29T20:41:38.284642+00:00"
     }
   ]
 }
