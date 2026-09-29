@@ -259,6 +259,7 @@ def main():
     parser.add_argument("--mode", choices=["auto", "concept", "news", "did_you_know"], default="did_you_know", help="Content mode: did_you_know, concept, news, auto")
     parser.add_argument("--ai-backgrounds", action="store_true", help="Optionally generate AI backgrounds per slide")
     parser.add_argument("--platform", choices=["both", "instagram", "facebook", "threads"], default="both", help="Target platform(s)")
+    parser.add_argument("--send-telegram-preview", action="store_true", help="Explicitly send preview images to Telegram")
     args = parser.parse_args()
 
     if not args.now and not args.dry_run:
@@ -317,8 +318,25 @@ def main():
             else:
                 topic_to_use = args.topic or "Tech Concept"
 
-            print(f"🎭 Generating Mascot Cartoon Dialogue ({mode} mode: '{topic_to_use}')...")
-            dialogue = generate_cartoon_dialogue_json(topic=topic_to_use, story=story, mode=mode)
+            # Rigorous Accuracy & Layperson Verification Loop
+            try:
+                from content_accuracy_agent import verify_content_accuracy
+                for diag_attempt in range(3):
+                    print(f"🎭 Generating Mascot Cartoon Dialogue ({mode} mode: '{topic_to_use}')...")
+                    dialogue = generate_cartoon_dialogue_json(topic=topic_to_use, story=story, mode=mode)
+                    audit = verify_content_accuracy(topic_to_use, dialogue)
+                    print(f"🔍 [Accuracy Agent] Score: {audit['accuracy_score']}/10 | Verdict: {audit['verdict']}")
+                    if audit["verdict"] == "APPROVED":
+                        print(f"✅ [Accuracy Agent] Dialogue verified: '{topic_to_use}'")
+                        break
+                    else:
+                        print(f"⚠️ [Accuracy Agent] Rejected: {audit['reason']}. Picking fresh topic...")
+                        story = fetch_or_select_did_you_know_fact(topic="")
+                        topic_to_use = story.get("title", "Fresh Tech Fact")
+            except Exception as ver_err:
+                print(f"ℹ️ Verifier integration note: {ver_err}")
+                dialogue = generate_cartoon_dialogue_json(topic=topic_to_use, story=story, mode=mode)
+
             safe_title = sanitize_filename(dialogue.get("headline", dialogue.get("hook", "dyk_update")))
 
             # Save dialogue JSON
@@ -456,35 +474,36 @@ def main():
             set_gha_output("is_carousel", "true")
             return
 
-        # Send to Telegram preview if configured
-        caption_text = f"🧠 <b>{carousel.get('headline', 'Did You Know?')}</b>\n\n{carousel.get('summary', '')[:200]}...\n\nCarousel: {len(ig_paths)} slides"
-        
-        # Send Instagram carousel preview
-        if args.platform in ["both", "instagram"]:
-            send_carousel_to_telegram(ig_paths, caption_text)
-        
-        # Send Threads carousel preview
-        if args.platform in ["both", "threads"]:
-            send_carousel_to_telegram(ig_paths, f"🧵 <b>Threads Version</b>\n\n{caption_text}")
-
-        # Send Facebook version preview
-        if args.platform in ["both", "facebook"] and fb_paths:
-            fb_caption = f"📘 <b>Facebook Version</b>\n\n{caption_text}"
-            send_image_to_telegram(fb_paths[0], fb_caption)
-        
-        platform_summary = []
-        if args.platform in ["both", "instagram"]:
-            platform_summary.append(f"Instagram Carousel (4:5): {len(ig_paths)} slides")
-        if args.platform in ["both", "threads"]:
-            platform_summary.append(f"Threads Carousel: {len(ig_paths)} slides")
-        if args.platform in ["both", "facebook"] and fb_paths:
-            platform_summary.append(f"Facebook (1.91:1): {len(fb_paths)} image")
+        # Send to Telegram preview if configured (local run or explicitly requested)
+        if not os.getenv("GITHUB_ACTIONS") or args.send_telegram_preview:
+            caption_text = f"🧠 <b>{carousel.get('headline', 'Did You Know?')}</b>\n\n{carousel.get('summary', '')[:200]}...\n\nCarousel: {len(ig_paths)} slides"
             
-        send_telegram_message(
-            f"✅ Content generated for: {carousel.get('headline', 'Did You Know?')}\n"
-            + "\n".join(platform_summary),
-            emoji="🤖"
-        )
+            # Send Instagram carousel preview
+            if args.platform in ["both", "instagram"]:
+                send_carousel_to_telegram(ig_paths, caption_text)
+            
+            # Send Threads carousel preview
+            if args.platform in ["both", "threads"]:
+                send_carousel_to_telegram(ig_paths, f"🧵 <b>Threads Version</b>\n\n{caption_text}")
+
+            # Send Facebook version preview
+            if args.platform in ["both", "facebook"] and fb_paths:
+                fb_caption = f"📘 <b>Facebook Version</b>\n\n{caption_text}"
+                send_image_to_telegram(fb_paths[0], fb_caption)
+            
+            platform_summary = []
+            if args.platform in ["both", "instagram"]:
+                platform_summary.append(f"Instagram Carousel (4:5): {len(ig_paths)} slides")
+            if args.platform in ["both", "threads"]:
+                platform_summary.append(f"Threads Carousel: {len(ig_paths)} slides")
+            if args.platform in ["both", "facebook"] and fb_paths:
+                platform_summary.append(f"Facebook (1.91:1): {len(fb_paths)} image")
+                
+            send_telegram_message(
+                f"✅ Content generated for: {carousel.get('headline', 'Did You Know?')}\n"
+                + "\n".join(platform_summary),
+                emoji="🤖"
+            )
 
         # Output for GitHub Actions
         set_gha_output("topic", carousel.get("headline", "AI News"))

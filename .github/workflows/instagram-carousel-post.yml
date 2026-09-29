@@ -119,8 +119,23 @@ jobs:
             --hashtags-file hashtags.txt \
             --platform instagram
 
+      - name: Verify Content Accuracy & Auto-Approve Agent
+        id: verifier
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          python -u content_accuracy_agent.py \
+            --platform instagram \
+            --carousel-json "${{ steps.gen.outputs.carousel_json }}" \
+            --caption-file "${{ steps.gen.outputs.caption_file }}" \
+            --topic "${{ steps.gen.outputs.topic }}" \
+            --hashtags-file hashtags.txt \
+            --style "${{ github.event.inputs.style || 'cartoon_dialogue' }}" \
+            --mode "${{ github.event.inputs.mode || 'did_you_know' }}"
+
       - name: Post Carousel Directly to Instagram
-        if: github.event_name == 'schedule' || github.event.inputs.auto_post != 'false'
+        if: (github.event_name == 'schedule' || github.event.inputs.auto_post != 'false') && steps.verifier.outputs.approved == 'true'
         id: post_ig
         env:
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
@@ -131,8 +146,8 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           python -u post_to_instagram.py \
-            --image "${{ steps.gen.outputs.ig_images }}" \
-            --caption-file "${{ steps.gen.outputs.caption_file }}"
+            --image "${{ steps.verifier.outputs.ig_images || steps.gen.outputs.ig_images }}" \
+            --caption-file "${{ steps.verifier.outputs.caption_file || steps.gen.outputs.caption_file }}"
 
       - name: Upload Generated Images
         if: always()

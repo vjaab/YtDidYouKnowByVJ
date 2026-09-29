@@ -118,8 +118,23 @@ jobs:
             --hashtags-file hashtags.txt \
             --platform threads
 
+      - name: Verify Content Accuracy & Auto-Approve Agent
+        id: verifier
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          python -u content_accuracy_agent.py \
+            --platform threads \
+            --carousel-json "${{ steps.gen.outputs.carousel_json }}" \
+            --caption-file "${{ steps.gen.outputs.caption_file }}" \
+            --topic "${{ steps.gen.outputs.topic }}" \
+            --hashtags-file hashtags.txt \
+            --style "${{ github.event.inputs.style || 'cartoon_dialogue' }}" \
+            --mode "${{ github.event.inputs.mode || 'did_you_know' }}"
+
       - name: Post Directly to Threads
-        if: github.event_name == 'schedule' || github.event.inputs.auto_post != 'false'
+        if: (github.event_name == 'schedule' || github.event.inputs.auto_post != 'false') && steps.verifier.outputs.approved == 'true'
         id: post_threads
         env:
           THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
@@ -130,9 +145,9 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           python -u post_to_threads.py \
-            --image "${{ steps.gen.outputs.threads_images }}" \
-            --caption-file "${{ steps.gen.outputs.caption_file }}" \
-            --topic "${{ steps.gen.outputs.topic }}"
+            --image "${{ steps.verifier.outputs.threads_images || steps.gen.outputs.threads_images }}" \
+            --caption-file "${{ steps.verifier.outputs.caption_file || steps.gen.outputs.caption_file }}" \
+            --topic "${{ steps.verifier.outputs.topic || steps.gen.outputs.topic }}"
 
       - name: Upload Generated Images
         if: always()

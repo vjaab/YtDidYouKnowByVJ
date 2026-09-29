@@ -31,13 +31,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     outputs:
-      topic: ${{ steps.gen.outputs.topic }}
-      fb_images: ${{ steps.gen.outputs.fb_images }}
-      caption_file: ${{ steps.gen.outputs.caption_file }}
+      topic: ${{ steps.verifier.outputs.topic || steps.gen.outputs.topic }}
+      fb_images: ${{ steps.verifier.outputs.fb_images || steps.gen.outputs.fb_images }}
+      caption_file: ${{ steps.verifier.outputs.caption_file || steps.gen.outputs.caption_file }}
       hashtags: ${{ steps.hashtags.outputs.hashtags }}
-      poll_file: ${{ steps.gen.outputs.poll_file }}
-      carousel_json: ${{ steps.gen.outputs.carousel_json }}
+      poll_file: ${{ steps.verifier.outputs.poll_file || steps.gen.outputs.poll_file }}
+      carousel_json: ${{ steps.verifier.outputs.carousel_json || steps.gen.outputs.carousel_json }}
       is_carousel: ${{ steps.gen.outputs.is_carousel }}
+      approved: ${{ steps.verifier.outputs.approved }}
 
     steps:
       - name: Checkout Code
@@ -107,17 +108,32 @@ jobs:
             --hashtags-file hashtags.txt \
             --platform facebook
 
+      - name: Verify Content Accuracy & Auto-Approve Agent
+        id: verifier
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          python -u content_accuracy_agent.py \
+            --platform facebook \
+            --carousel-json "${{ steps.gen.outputs.carousel_json }}" \
+            --caption-file "${{ steps.gen.outputs.caption_file }}" \
+            --topic "${{ steps.gen.outputs.topic }}" \
+            --hashtags-file hashtags.txt \
+            --style cartoon_dialogue \
+            --mode did_you_know
+
       - name: Send to Telegram for Approval
-        if: github.event.inputs.auto_post == 'true'
+        if: (github.event.inputs.auto_post == 'true') && (steps.verifier.outputs.approved == 'true')
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           python -u telegram_approval_handler.py --send-for-approval \
-            --topic "${{ steps.gen.outputs.topic }}" \
-            --fb-images "${{ steps.gen.outputs.fb_images }}" \
-            --caption-file "${{ steps.gen.outputs.caption_file }}" \
-            --poll-file "${{ steps.gen.outputs.poll_file }}" \
+            --topic "${{ steps.verifier.outputs.topic || steps.gen.outputs.topic }}" \
+            --fb-images "${{ steps.verifier.outputs.fb_images || steps.gen.outputs.fb_images }}" \
+            --caption-file "${{ steps.verifier.outputs.caption_file || steps.gen.outputs.caption_file }}" \
+            --poll-file "${{ steps.verifier.outputs.poll_file || steps.gen.outputs.poll_file }}" \
             --platform facebook \
             --carousel
 
@@ -131,7 +147,7 @@ jobs:
 
   facebook-post:
     needs: generate-carousel
-    if: github.event.inputs.auto_post == 'true'
+    if: (github.event.inputs.auto_post == 'true') && (needs.generate-carousel.outputs.approved == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
