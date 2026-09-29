@@ -456,18 +456,18 @@ def main():
             set_gha_output("is_carousel", "true")
             return
 
-        # Send to Telegram for review
-        caption_text = f"📰 <b>{carousel.get('headline', 'AI News')}</b>\n\n{carousel.get('summary', '')[:200]}...\n\nCarousel: {len(ig_paths)} slides\n\nReady for review. Approve for posting?"
+        # Send to Telegram preview if configured
+        caption_text = f"🧠 <b>{carousel.get('headline', 'Did You Know?')}</b>\n\n{carousel.get('summary', '')[:200]}...\n\nCarousel: {len(ig_paths)} slides"
         
-        # Send Instagram carousel
+        # Send Instagram carousel preview
         if args.platform in ["both", "instagram"]:
             send_carousel_to_telegram(ig_paths, caption_text)
         
-        # Send Threads carousel
+        # Send Threads carousel preview
         if args.platform in ["both", "threads"]:
             send_carousel_to_telegram(ig_paths, f"🧵 <b>Threads Version</b>\n\n{caption_text}")
 
-        # Send Facebook version
+        # Send Facebook version preview
         if args.platform in ["both", "facebook"] and fb_paths:
             fb_caption = f"📘 <b>Facebook Version</b>\n\n{caption_text}"
             send_image_to_telegram(fb_paths[0], fb_caption)
@@ -481,9 +481,8 @@ def main():
             platform_summary.append(f"Facebook (1.91:1): {len(fb_paths)} image")
             
         send_telegram_message(
-            f"✅ Content generated for: {carousel.get('headline', 'AI News')}\n"
-            + "\n".join(platform_summary)
-            + "\nReply to approve for posting.",
+            f"✅ Content generated for: {carousel.get('headline', 'Did You Know?')}\n"
+            + "\n".join(platform_summary),
             emoji="🤖"
         )
 

@@ -35,7 +35,7 @@ on:
           - auto
         default: did_you_know
       auto_post:
-        description: 'Auto-post after Telegram approval'
+        description: 'Directly publish to Instagram'
         required: false
         type: boolean
         default: true
@@ -45,17 +45,9 @@ permissions:
   id-token: write
 
 jobs:
-  generate-carousel:
+  generate-and-post-carousel:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    outputs:
-      topic: ${{ steps.gen.outputs.topic }}
-      ig_images: ${{ steps.gen.outputs.ig_images }}
-      caption_file: ${{ steps.gen.outputs.caption_file }}
-      hashtags: ${{ steps.hashtags.outputs.hashtags }}
-      poll_file: ${{ steps.gen.outputs.poll_file }}
-      carousel_json: ${{ steps.gen.outputs.carousel_json }}
-      is_carousel: ${{ steps.gen.outputs.is_carousel }}
+    timeout-minutes: 25
 
     steps:
       - name: Checkout Code
@@ -127,19 +119,20 @@ jobs:
             --hashtags-file hashtags.txt \
             --platform instagram
 
-      - name: Send to Telegram for Approval
-        if: github.event.inputs.auto_post == 'true'
+      - name: Post Carousel Directly to Instagram
+        if: github.event_name == 'schedule' || github.event.inputs.auto_post != 'false'
+        id: post_ig
         env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          python -u telegram_approval_handler.py --send-for-approval \
-            --topic "${{ steps.gen.outputs.topic }}" \
-            --ig-images "${{ steps.gen.outputs.ig_images }}" \
-            --caption-file "${{ steps.gen.outputs.caption_file }}" \
-            --poll-file "${{ steps.gen.outputs.poll_file }}" \
-            --platform instagram \
-            --carousel
+          python -u post_to_instagram.py \
+            --image "${{ steps.gen.outputs.ig_images }}" \
+            --caption-file "${{ steps.gen.outputs.caption_file }}"
 
       - name: Upload Generated Images
         if: always()
@@ -149,85 +142,8 @@ jobs:
           path: output/social_images/
           retention-days: 7
 
-  instagram-post:
-    needs: generate-carousel
-    if: github.event.inputs.auto_post == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Download Generated Images
-        uses: actions/download-artifact@v4
-        with:
-          name: generated-images
-          path: output/social_images/
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests python-dotenv aiohttp
-
-      - name: Wait for Telegram Approval & Post to Instagram
-        id: approval
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          IG_USER_ID: ${{ secrets.IG_USER_ID }}
-          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-        run: |
-          python -u telegram_approval_handler.py --wait-and-post \
-            --topic "${{ needs.generate-carousel.outputs.topic }}" \
-            --ig-images "${{ needs.generate-carousel.outputs.ig_images }}" \
-            --caption-file "${{ needs.generate-carousel.outputs.caption_file }}" \
-            --hashtags "${{ needs.generate-carousel.outputs.hashtags }}" \
-            --poll-file "${{ needs.generate-carousel.outputs.poll_file }}" \
-            --carousel \
-            --timeout 3600 \
-            --platform instagram
-
-      - name: Check Approval Result
-        if: always()
-        run: |
-          ACTION="${{ steps.approval.outputs.approval_action }}"
-          echo "Approval action: $ACTION"
-          if [ "$ACTION" = "reject" ]; then
-            echo "❌ Posting rejected by user"
-            exit 1
-          elif [ "$ACTION" = "timeout" ]; then
-            echo "⏰ Approval timed out"
-            exit 1
-          elif [ "$ACTION" = "regenerate" ]; then
-            echo "🔄 Regeneration requested"
-            exit 2
-          elif [ -z "$ACTION" ]; then
-            echo "⚠️ No approval action recorded"
-            exit 1
-          fi
-
-      - name: Track Engagement (after 1 hour)
-        if: success()
-        run: |
-          python -u track_engagement.py --topic "${{ needs.generate-carousel.outputs.topic }}" --delay 3600 --platform instagram
-
-  commit-logs:
-    needs: [generate-carousel, instagram-post]
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
       - name: Commit Updated Logs
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
