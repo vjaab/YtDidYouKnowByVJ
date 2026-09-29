@@ -442,7 +442,8 @@ def post_to_platforms(state: dict, platform: str = "both"):
         print("📘 Posting to Facebook...")
         from post_to_facebook import post_to_facebook
         try:
-            post_id = post_to_facebook(fb_images[0], caption)
+            fb_image_arg = ",".join(fb_images) if is_carousel else fb_images[0]
+            post_id = post_to_facebook(fb_image_arg, caption)
             results["facebook"] = post_id
         except Exception as e:
             results["facebook"] = f"ERROR: {e}"
