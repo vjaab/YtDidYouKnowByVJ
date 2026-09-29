@@ -15,7 +15,8 @@
     "Medium (artificial-intelligence): Isomorphic Structural Theory: Decoup",
     "Naive Vector Search Fails Production RAG",
     "AI's 5 Secrets: Not All Bots Learn",
-    "GPT-6 Astra: The Next Generation of AI"
+    "GPT-6 Astra: The Next Generation of AI",
+    "Self-Attention Costs Double When You Double Text Length"
   ],
   "used_keywords": [
     "openai",
@@ -178,7 +179,12 @@
     "tech trending",
     "astra",
     "next",
-    "generation"
+    "generation",
+    "transformer",
+    "self attention",
+    "quadratic cost",
+    "context length",
+    "did you know"
   ],
   "history": [
     {
@@ -472,6 +478,19 @@
       ],
       "source": "Medium - artificial-intelligence",
       "timestamp": "2026-09-29T20:47:15.398966+00:00"
+    },
+    {
+      "title": "Self-Attention Costs Double When You Double Text Length",
+      "news_source_url": "",
+      "keywords": [
+        "transformer",
+        "self attention",
+        "quadratic cost",
+        "context length",
+        "did you know"
+      ],
+      "source": "Attention Is All You Need (Vaswani et al.)",
+      "timestamp": "2026-09-29T21:02:32.035827+00:00"
     }
   ]
 }

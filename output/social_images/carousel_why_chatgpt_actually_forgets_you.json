@@ -1,0 +1,55 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "hook": "Why Does ChatGPT Forget What You Said? \ud83e\udd2f",
+  "headline": "Why ChatGPT Actually Forgets You",
+  "source": "Transformer Attention & Context Windows",
+  "date": "29 Sep 2026",
+  "slides": [
+    {
+      "speaker": "byte",
+      "emotion": "curious",
+      "title": "Why Does ChatGPT Forget? \ud83e\udd2f",
+      "bubble": "Why does ChatGPT forget what I said 10 minutes ago in our chat?"
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "The Context Window \ud83e\udde0",
+      "bubble": "LLMs have no ongoing memory. Each reply re-reads earlier text in a context window."
+    },
+    {
+      "speaker": "byte",
+      "emotion": "curious",
+      "title": "What Happens When Full? \ud83d\uded1",
+      "bubble": "What happens when that context window reaches its token limit?"
+    },
+    {
+      "speaker": "vj",
+      "emotion": "shocked",
+      "title": "Silent Eviction \u2702\ufe0f",
+      "bubble": "Older messages are dropped off from the start, so the model literally cannot see them!"
+    },
+    {
+      "speaker": "byte",
+      "emotion": "thinking",
+      "title": "How To Fix It? \ud83d\udca1",
+      "bubble": "So prompt summaries or vector databases keep long chats alive?"
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Keep Prompts Lean \u26a1",
+      "bubble": "Exactly! Prune system prompts and summarize key points before the window overflows."
+    },
+    {
+      "speaker": "byte",
+      "emotion": "excited",
+      "title": "Mind-Blowing Fact \ud83d\udca1",
+      "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "ChatGPT doesn't have human memory. When the context window fills up, older messages silently disappear.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nEver wonder why ChatGPT forgets what you said 20 minutes ago?\n\nHere is how LLM memory actually works:\n\ud83d\udd39 LLMs store zero memory between turns.\n\ud83d\udd39 Every response re-reads your previous messages in a 'context window'.\n\ud83d\udd39 Once that window fills, older tokens are silently discarded!\n\n\ud83d\udcac Did you know this is how AI 'memory' works? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns!\n#DidYouKnow #ChatGPT #AI #TechTips #Developers"
+}
