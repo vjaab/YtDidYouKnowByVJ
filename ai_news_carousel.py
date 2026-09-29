@@ -131,12 +131,24 @@ def is_topic_unique(title: str, url: str = "", keywords: List[str] = None, check
                     if isinstance(entry, dict) and entry.get("news_source_url") == url:
                         return False, f"Exact URL already covered (YouTube): {url}"
             
+            headlines_to_check = set(tracker.get("used_titles", []))
+            for entry in tracker.get("history", []):
+                if isinstance(entry, dict) and entry.get("title"):
+                    headlines_to_check.add(entry["title"])
+
             if RAPIDFUZZ_AVAILABLE:
-                headlines_to_check = set(tracker.get("used_titles", []))
                 for existing_title in headlines_to_check:
                     score = fuzz.token_set_ratio(title.lower(), existing_title.lower())
                     if score > SIMILARITY_THRESHOLD:
                         return False, f"Semantic match found (YouTube, score {score}): '{existing_title}'"
+            else:
+                title_words = set(re.findall(r'\b[a-zA-Z]{3,}\b', title.lower()))
+                for existing_title in headlines_to_check:
+                    exist_words = set(re.findall(r'\b[a-zA-Z]{3,}\b', existing_title.lower()))
+                    if title_words and exist_words:
+                        overlap = len(title_words & exist_words) / len(title_words | exist_words)
+                        if overlap > 0.65:
+                            return False, f"Word overlap match found (YouTube, overlap {overlap:.2f}): '{existing_title}'"
             
             if keywords:
                 recent_keywords = set()
@@ -163,12 +175,24 @@ def is_topic_unique(title: str, url: str = "", keywords: List[str] = None, check
                     if isinstance(entry, dict) and entry.get("news_source_url") == url:
                         return False, f"Exact URL already covered (Carousel): {url}"
             
+            headlines_to_check = set(carousel_tracker.get("used_titles", []))
+            for entry in carousel_tracker.get("history", []):
+                if isinstance(entry, dict) and entry.get("title"):
+                    headlines_to_check.add(entry["title"])
+
             if RAPIDFUZZ_AVAILABLE:
-                headlines_to_check = set(carousel_tracker.get("used_titles", []))
                 for existing_title in headlines_to_check:
                     score = fuzz.token_set_ratio(title.lower(), existing_title.lower())
                     if score > SIMILARITY_THRESHOLD:
                         return False, f"Semantic match found (Carousel, score {score}): '{existing_title}'"
+            else:
+                title_words = set(re.findall(r'\b[a-zA-Z]{3,}\b', title.lower()))
+                for existing_title in headlines_to_check:
+                    exist_words = set(re.findall(r'\b[a-zA-Z]{3,}\b', existing_title.lower()))
+                    if title_words and exist_words:
+                        overlap = len(title_words & exist_words) / len(title_words | exist_words)
+                        if overlap > 0.65:
+                            return False, f"Word overlap match found (Carousel, overlap {overlap:.2f}): '{existing_title}'"
             
             if keywords:
                 recent_keywords = set()

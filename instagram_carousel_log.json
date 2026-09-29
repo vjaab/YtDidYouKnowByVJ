@@ -9,7 +9,9 @@
     "GitHub Trending: TNT-Likely/PanWatch \u2014 \u76ef\u76d8\u4fa0 PanWatch \u00b7 \u81ea\u6258\u7ba1 AI \u76ef\u76d8\u52a9\u624b\uff0c\u96c6\u6210 TradingAgents \u591a Agent \u6295\u8d44\u51b3\u7b56 | A\u80a1/\u6e2f\u80a1/\u7f8e\u80a1\u5b9e\u65f6\u76d1\u63a7\u3001\u6301\u4ed3\u7ba1\u7406\u3001\u667a\u80fd\u5206\u6790\u3001\u5168\u6e20\u9053\u63a8\u9001",
     "GitHub Trending: lahfir/agent-desktop \u2014 Agent Desktop gives any agent reliable computer use on the desktop. Built with Rust, it sees any app",
     "Why AI Can Count to Billions But Fails at Strawberry 'r's",
-    "How AI Generates Images from Pure Static Noise"
+    "How AI Generates Images from Pure Static Noise",
+    "Jev: Simpler AI Models Dethrone LLMs",
+    "Now It\u2019s Replacing Code Reviews"
   ],
   "used_keywords": [
     "openai",
@@ -139,7 +141,16 @@
     "midjourney",
     "image generation",
     "ai art",
-    "did you know"
+    "Jev AI",
+    "LLM",
+    "AI efficiency",
+    "breakthrough",
+    "smaller models",
+    "artificial intelligence",
+    "tech trending",
+    "replacing",
+    "code",
+    "reviews"
   ],
   "history": [
     {
@@ -349,6 +360,34 @@
       ],
       "source": "Denoising Diffusion Probabilistic Models",
       "timestamp": "2026-09-29T19:56:41.908082+00:00"
+    },
+    {
+      "title": "Jev: Simpler AI Models Dethrone LLMs",
+      "news_source_url": "https://medium.com/@martin.jurado.p/jev-when-something-simpler-can-be-better-than-an-llm-562fb12a434d?source=rss------artificial_intelligence-5",
+      "keywords": [
+        "Jev AI",
+        "LLM",
+        "AI efficiency",
+        "breakthrough",
+        "smaller models",
+        "artificial intelligence",
+        "did you know"
+      ],
+      "source": "Medium - artificial-intelligence",
+      "timestamp": "2026-09-29T20:09:46.760687+00:00"
+    },
+    {
+      "title": "Now It\u2019s Replacing Code Reviews",
+      "news_source_url": "https://medium.com/tailed-tech/ai-replaced-coding-by-hand-now-its-replacing-code-reviews-3450fd722f17?source=rss------artificial_intelligence-5",
+      "keywords": [
+        "did you know",
+        "tech trending",
+        "replacing",
+        "code",
+        "reviews"
+      ],
+      "source": "Medium - artificial-intelligence",
+      "timestamp": "2026-09-29T20:11:06.747220+00:00"
     }
   ]
 }

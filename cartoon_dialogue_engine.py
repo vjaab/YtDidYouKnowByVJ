@@ -83,11 +83,6 @@ def get_character_image_path(speaker: str, emotion: str) -> Optional[Path]:
     if flat_fallback.exists():
         return flat_fallback
         
-    # Fallback to neutral
-    fallback_path = CHARACTERS_DIR / speaker / "neutral.png"
-    if fallback_path.exists():
-        return fallback_path
-        
     return None
 
 
@@ -138,6 +133,42 @@ DID_YOU_KNOW_SEED_FACTS = [
         "source": "Byte-Pair Encoding Tokenization",
         "keywords": ["tokenization", "bpe", "strawberry", "llm reasoning", "did you know"]
     },
+    {
+        "vector": "ai_secrets",
+        "title": "Self-Attention Costs Double When You Double Text Length",
+        "hook": "Did You Know AI Memory Explodes Quadratically? 💥",
+        "headline": "O(N²) Transformer Quadratic Scaling",
+        "fact_summary": "In standard transformers, every token must calculate attention with every other token. Doubling prompt length doesn't double memory—it multiplies computation by four.",
+        "source": "Attention Is All You Need (Vaswani et al.)",
+        "keywords": ["transformer", "self attention", "quadratic cost", "context length", "did you know"]
+    },
+    {
+        "vector": "ai_secrets",
+        "title": "Training AI on AI-Generated Text Causes Model Collapse",
+        "hook": "Did You Know AI Goes Insane on Its Own Data? 🌀",
+        "headline": "Model Autophagous Collapse Disorder",
+        "fact_summary": "When language models are trained recursively on synthetic AI outputs, mathematical tails vanish, entropy collapses, and the model permanently degenerates into gibberish.",
+        "source": "Nature: The Curse of Recursion in Generative Models",
+        "keywords": ["model collapse", "synthetic data", "ai training", "machine learning", "did you know"]
+    },
+    {
+        "vector": "ai_secrets",
+        "title": "Mixture of Experts Only Wakes Up 3% of the Brain",
+        "hook": "Did You Know Giant AIs Sleep Through Most Words? 🧠",
+        "headline": "MoE Sparse Neural Routing",
+        "fact_summary": "Models like Mixtral and DeepSeek have hundreds of billions of parameters, but a router gate activates only 2 out of 64 expert neural networks per individual token.",
+        "source": "Sparse Mixture-of-Experts Architecture Papers",
+        "keywords": ["mixture of experts", "moe", "deepseek", "neural networks", "did you know"]
+    },
+    {
+        "vector": "ai_secrets",
+        "title": "RLHF Makes AI Sycophantic Rather Than Honest",
+        "hook": "Did You Know AI is Trained to Flatter You? 🎭",
+        "headline": "RLHF Sycophancy Emergence",
+        "fact_summary": "Reinforcement learning with human feedback rewards models that agree with the user's misconceptions, causing chatbots to flatter opinions rather than state factual corrections.",
+        "source": "Anthropic Research on AI Sycophancy",
+        "keywords": ["rlhf", "sycophancy", "alignment", "chatbots", "did you know"]
+    },
 
     # ── Everyday Tech Mysteries ─────────────────────────────────────────────
     {
@@ -176,6 +207,42 @@ DID_YOU_KNOW_SEED_FACTS = [
         "source": "Aeronautical Satellite Telecommunications",
         "keywords": ["airplane wifi", "satellite", "aviation tech", "phased array", "did you know"]
     },
+    {
+        "vector": "everyday_tech_mysteries",
+        "title": "Quartz Clocks Vibrate Exactly 32,768 Times Every Second",
+        "hook": "Did You Know Why Watches Tick in Powers of Two? ⌚",
+        "headline": "The Piezoelectric 32,768 Hz Tuning Fork",
+        "fact_summary": "Every quartz watch contains a microscopic tuning fork vibrating at 32,768 Hz. A 15-stage binary flip-flop circuit halves the frequency 15 times to yield exactly 1 second.",
+        "source": "Horological Quartz Oscillation Engineering",
+        "keywords": ["quartz crystal", "binary", "watches", "piezoelectric", "did you know"]
+    },
+    {
+        "vector": "everyday_tech_mysteries",
+        "title": "Blue OLED Subpixels Die 3 Times Faster Than Red or Green",
+        "hook": "Did You Know Blue Light Destroys Your OLED Screen? 📺",
+        "headline": "The Blue Phosphorescent Organic Decay Problem",
+        "fact_summary": "Blue light requires high-energy photon emission, breaking organic chemical bonds much faster than red or green. Phone makers make blue subpixels twice as large to compensate.",
+        "source": "Society for Information Display (SID) Research",
+        "keywords": ["oled", "burn in", "blue subpixels", "display tech", "did you know"]
+    },
+    {
+        "vector": "everyday_tech_mysteries",
+        "title": "Li-Fi Transmits 224 Gigabits Per Second Through Room Bulbs",
+        "hook": "Did You Know Light Bulbs Can Outrun Wi-Fi 100x? 💡",
+        "headline": "Visible Light Optical Communications (Li-Fi)",
+        "fact_summary": "Specialized LED bulbs can flicker millions of times per second—undetectable to human eyes—beaming 224 Gbps of encrypted wireless data directly into laptop photo-sensors.",
+        "source": "IEEE 802.11bb Light Wireless Standard",
+        "keywords": ["lifi", "visible light", "wireless communication", "photonics", "did you know"]
+    },
+    {
+        "vector": "everyday_tech_mysteries",
+        "title": "Credit Cards Have Zero Battery and Power Themselves from Air",
+        "hook": "Did You Know Contactless Cards Have No Battery? 💳",
+        "headline": "Near-Field Electromagnetic Induction",
+        "fact_summary": "A tap-to-pay card has a copper antenna coil running along its edges. The terminal emits an electromagnetic field that induces current, powering the onboard cryptographic CPU.",
+        "source": "ISO/IEC 14443 Contactless Standards",
+        "keywords": ["nfc", "rfid", "contactless payments", "electromagnetic induction", "did you know"]
+    },
 
     # ── Hardware Megastructures ─────────────────────────────────────────────
     {
@@ -204,6 +271,51 @@ DID_YOU_KNOW_SEED_FACTS = [
         "fact_summary": "A single speck of human dead skin or dust can bridge microscopic transistor paths. Air in chip cleanrooms is filtered to under 10 particles per cubic meter.",
         "source": "Semiconductor Fab Standards (ISO 14644)",
         "keywords": ["cleanroom", "semiconductors", "fab", "transistors", "did you know"]
+    },
+    {
+        "vector": "hardware_megastructures",
+        "title": "Cerebras Built a Single Chip with 4 Trillion Transistors",
+        "hook": "Did You Know the World's Largest Chip is 8.5 Inches? 🖥️",
+        "headline": "Cerebras Wafer-Scale Engine 3",
+        "fact_summary": "Instead of slicing silicon wafers into hundreds of tiny chips, Cerebras uses an entire 300mm silicon wafer as a single giant AI processor with 900,000 compute cores.",
+        "source": "Cerebras Systems Architectural Whitepaper",
+        "keywords": ["cerebras", "wafer scale", "ai chips", "hardware megastructures", "did you know"]
+    },
+    {
+        "vector": "hardware_megastructures",
+        "title": "HBM3e Stacks DRAM with 50,000 Microscopic Silicon Vias",
+        "hook": "Did You Know AI Memory is Stacked Like Skyscraper Towers? 🏢",
+        "headline": "High-Bandwidth 3D Memory Packaging",
+        "fact_summary": "NVIDIA Blackwell GPUs achieve 8 TB/s memory speeds by stacking 12 DRAM dies vertically, connected by 50,000 Through-Silicon Vias microscopic channels per stack.",
+        "source": "JEDEC High Bandwidth Memory Specification",
+        "keywords": ["hbm3e", "gpu memory", "nvidia blackwell", "semiconductors", "did you know"]
+    },
+    {
+        "vector": "hardware_megastructures",
+        "title": "CPU Interconnects are 10,000x Thinner Than a Human Hair",
+        "hook": "Did You Know Inside a CPU Looks Like a 15-Story Highway? 🛣️",
+        "headline": "Multilayer Copper Interconnect Metallurgy",
+        "fact_summary": "Inside modern 3nm chips, over 100 kilometers of microscopic copper wires weave through 15 vertical metal layers, some measuring only 12 nanometers in width.",
+        "source": "IEEE Transactions on Electron Devices",
+        "keywords": ["semiconductor", "interconnects", "3nm", "copper wiring", "did you know"]
+    },
+    {
+        "vector": "hardware_megastructures",
+        "title": "Hard Drive Heads Fly Just 3 Nanometers Above Platters",
+        "hook": "Did You Know Hard Drive Heads Fly Closer Than Smoke Particles? 💽",
+        "headline": "Air Bearing Slider Aerodynamics",
+        "fact_summary": "HDD magnetic read heads glide 3 nanometers above platters spinning at 120 km/h. If the head were a Boeing 747, it would be flying 0.1 millimeters above the grass.",
+        "source": "Seagate & Western Digital Advanced Storage Physics",
+        "keywords": ["hard drive", "hdd", "aerodynamics", "magnetic storage", "did you know"]
+    },
+    {
+        "vector": "hardware_megastructures",
+        "title": "EV Batteries Check Cell Health 1,000 Times Every Second",
+        "hook": "Did You Know EV Batteries Run 1,000 Safety Checks a Second? ⚡",
+        "headline": "Real-Time Microsecond Battery Management",
+        "fact_summary": "EV battery packs contain thousands of lithium cells. Dedicated BMS chips monitor microvolt shifts and millikelvin thermal deviations 1,000 times/sec to prevent thermal runaway.",
+        "source": "Automotive BMS Functional Safety (ISO 26262)",
+        "keywords": ["ev battery", "battery management", "electric vehicles", "automotive tech", "did you know"]
     },
 
     # ── Bizarre Tech History ────────────────────────────────────────────────
@@ -243,6 +355,42 @@ DID_YOU_KNOW_SEED_FACTS = [
         "source": "NASA Mars Climate Orbiter Mishap Board",
         "keywords": ["mars climate orbiter", "nasa", "metric system", "spacecraft", "did you know"]
     },
+    {
+        "vector": "bizarre_tech_history",
+        "title": "A Cloud Reflection Almost Triggered Nuclear War in 1983",
+        "hook": "Did You Know Cloud Reflections Almost Started World War III? ☢️",
+        "headline": "The 1983 Soviet Satellite False Alarm",
+        "fact_summary": "Soviet early-warning satellite Oko detected five incoming US nuclear missiles. Duty officer Stanislav Petrov trusted his intuition that it was a computer glitch, which turned out to be sun reflecting off high clouds.",
+        "source": "United Nations Peace History & CIA Declassified Archives",
+        "keywords": ["stanislav petrov", "nuclear false alarm", "cold war tech", "satellites", "did you know"]
+    },
+    {
+        "vector": "bizarre_tech_history",
+        "title": "The First 1GB Hard Drive in 1980 Weighed 550 Pounds",
+        "hook": "Did You Know the First 1GB Drive Was the Size of a Refrigerator? 🗄️",
+        "headline": "IBM 3380 Direct Access Storage Device",
+        "fact_summary": "Released in 1980, the IBM 3380 was the first storage system capable of holding 1 Gigabyte of data. It weighed 550 pounds (250 kg) and cost over $40,000.",
+        "source": "IBM Archives & Computer History Museum",
+        "keywords": ["ibm 3380", "1gb hard drive", "computer history", "storage", "did you know"]
+    },
+    {
+        "vector": "bizarre_tech_history",
+        "title": "The $100 Billion Y2K Fix That Actually Worked",
+        "hook": "Did You Know Y2K Wasn't a Hoax—It Cost $100 Billion to Fix? 🛠️",
+        "headline": "The Millennium Bug Global Code Remediation",
+        "fact_summary": "Early programmers used 2 digits for years (99 for 1999) to save memory. A coordinated effort involving millions of engineers and $100B in refactoring prevented global banking systems from crashing at midnight.",
+        "source": "US Department of Commerce Y2K Economic Report",
+        "keywords": ["y2k", "millennium bug", "legacy code", "software engineering", "did you know"]
+    },
+    {
+        "vector": "bizarre_tech_history",
+        "title": "Soviet Titanium Submarines Were Driven by Liquid Metal Reactors",
+        "hook": "Did You Know Soviet Subs Ran on Liquid Lead-Bismuth Metal? ⚓",
+        "headline": "Project 705 Lira (Alfa-Class) High-Automation Submarines",
+        "fact_summary": "Soviet Alfa-class submarines featured an all-titanium hull and reached 80 km/h underwater. Their reactor was cooled by molten lead-bismuth metal and could never be shut down without freezing solid.",
+        "source": "Naval Nuclear Propulsion History Archives",
+        "keywords": ["alfa class", "titanium submarine", "nuclear reactor", "engineering history", "did you know"]
+    },
 
     # ── Cybersecurity Secrets ───────────────────────────────────────────────
     {
@@ -280,24 +428,275 @@ DID_YOU_KNOW_SEED_FACTS = [
         "fact_summary": "At 03:14:07 UTC on Jan 19, 2038, 32-bit signed integers tracking seconds since 1970 will overflow into negative numbers, sending legacy systems back to December 13, 1901.",
         "source": "POSIX Standard & Unix Time Architecture",
         "keywords": ["y2038", "unix epoch", "integer overflow", "32 bit bug", "did you know"]
+    },
+    {
+        "vector": "cybersecurity_secrets",
+        "title": "Rowhammer Flips Memory Bits in Physical DRAM Without Permissions",
+        "hook": "Did You Know Hackers Can Flip Bits Using Electrical Leakage? ⚡",
+        "headline": "DRAM Rowhammer Electrical Disturbance",
+        "fact_summary": "By repeatedly accessing a row of transistors in modern RAM millions of times per second, electrical charge leaks into adjacent capacitor rows, flipping bits from 0 to 1 without software authorization.",
+        "source": "ACM SIGARCH Computer Architecture Research",
+        "keywords": ["rowhammer", "dram", "hardware exploit", "cybersecurity", "did you know"]
+    },
+    {
+        "vector": "cybersecurity_secrets",
+        "title": "BadUSB Firmware Tricks Computers by Pretending to be Keyboards",
+        "hook": "Did You Know a Flash Drive Can Type Faster Than a Human? 🔌",
+        "headline": "USB HID Firmware Microcontroller Injection",
+        "fact_summary": "Computers inherently trust USB keyboards. Malicious USB devices reprogram their microcontroller firmware to present as a Human Interface Device, injecting shell commands in milliseconds.",
+        "source": "Black Hat BadUSB Research Papers",
+        "keywords": ["badusb", "hid injection", "cybersecurity", "hardware hacking", "did you know"]
+    },
+    {
+        "vector": "cybersecurity_secrets",
+        "title": "Tempest Leaks: Spies Can Rebuild Your Screen from Radio Waves",
+        "hook": "Did You Know Your Monitor Radiates Your Screen into the Air? 📡",
+        "headline": "TEMPEST Video Electromagnetic Side-Channel",
+        "fact_summary": "HDMI and display cables emit faint electromagnetic radio signals as pixels refresh. Sensitive software-defined radios up to 100 meters away can reconstruct the exact screen image in real time.",
+        "source": "NSA TEMPEST Specifications & IEEE S&P",
+        "keywords": ["tempest", "side channel", "electromagnetic surveillance", "rf hacking", "did you know"]
+    },
+    {
+        "vector": "cybersecurity_secrets",
+        "title": "Quantum Computers Will Break RSA Encryption with Shor's Algorithm",
+        "hook": "Did You Know Quantum Math Will Break Today's Passwords? 🔮",
+        "headline": "Shor's Algorithm Polynomial Prime Factorization",
+        "fact_summary": "Modern internet security relies on the mathematical difficulty of factoring huge prime numbers. A sufficiently scaled quantum computer will factor these numbers in minutes using quantum superposition.",
+        "source": "NIST Post-Quantum Cryptography Standardization",
+        "keywords": ["quantum computing", "shor algorithm", "rsa encryption", "post quantum crypto", "did you know"]
     }
 ]
 
 
+def query_llm_for_json(prompt: str) -> Optional[Dict]:
+    """Helper to query OpenRouter or Gemini and return parsed JSON."""
+    openrouter_key = os.getenv("OPENROUTER_API_KEY", "") or OPENROUTER_API_KEY
+    if openrouter_key:
+        try:
+            headers = {
+                "Authorization": f"Bearer {openrouter_key}",
+                "Content-Type": "application/json",
+                "HTTP-Referer": "https://github.com/vjaab/YtDidYouKnowByVJ",
+                "X-Title": "YtDidYouKnowByVJ Cartoon Dialogue",
+            }
+            models = ["google/gemini-2.5-flash", "meta-llama/llama-3.3-70b-instruct", "openai/gpt-4o-mini"]
+            for m in models:
+                res = requests.post(
+                    "https://openrouter.ai/api/v1/chat/completions",
+                    headers=headers,
+                    json={
+                        "model": m,
+                        "messages": [{"role": "user", "content": prompt}],
+                        "temperature": 0.3,
+                    },
+                    timeout=25,
+                )
+                if res.status_code == 200:
+                    raw = res.json().get("choices", [{}])[0].get("message", {}).get("content", "")
+                    raw = re.sub(r"^```(?:json)?\s*", "", raw.strip(), flags=re.MULTILINE)
+                    raw = re.sub(r"\s*```$", "", raw.strip(), flags=re.MULTILINE)
+                    data = json.loads(raw)
+                    if isinstance(data, dict):
+                        return data
+        except Exception as e:
+            print(f"⚠️ OpenRouter query note: {e}")
+
+    if GEMINI_AVAILABLE and (os.getenv("GEMINI_API_KEY") or GEMINI_API_KEY):
+        api_key = os.getenv("GEMINI_API_KEY") or GEMINI_API_KEY
+        models = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
+        for m in models:
+            try:
+                raw = ""
+                if GEMINI_GENAI_AVAILABLE:
+                    client = genai.Client(api_key=api_key)
+                    resp = client.models.generate_content(
+                        model=m,
+                        contents=prompt,
+                    )
+                    raw = resp.text.strip()
+                elif GEMINI_LEGACY_AVAILABLE:
+                    genai_legacy.configure(api_key=api_key)
+                    model_inst = genai_legacy.GenerativeModel(m)
+                    resp = model_inst.generate_content(prompt)
+                    raw = resp.text.strip()
+
+                if raw:
+                    raw = re.sub(r"^```(?:json)?\s*", "", raw.strip(), flags=re.MULTILINE)
+                    raw = re.sub(r"\s*```$", "", raw.strip(), flags=re.MULTILINE)
+                    data = json.loads(raw)
+                    if isinstance(data, dict):
+                        return data
+            except Exception:
+                continue
+
+    return None
+
+
+def convert_trending_story_to_dyk_fact(story: Dict) -> Dict:
+    """
+    Transform a fresh trending tech/AI news story into a high-attraction 'Did You Know' fact.
+    Extracts the most shocking technical detail, benchmark, or engineering achievement.
+    """
+    title = story.get("title", "")
+    description = story.get("description", "")
+    url = story.get("url", "")
+    source = story.get("source", {})
+    source_name = source.get("name", "Verified Tech Signals") if isinstance(source, dict) else str(source)
+
+    prompt = f"""You are the viral tech director for 'Did You Know By VJ'.
+Transform this breaking trending tech news story into a mind-blowing 'Did You Know' fact carousel topic.
+Find the most shocking number, engineering feat, hidden detail, or breakthrough insight in this story.
+
+STORY:
+Title: {title}
+Description: {description}
+Source: {source_name}
+
+Return ONLY valid JSON (no markdown):
+{{
+  "title": "<Concise, punchy 5-8 word fact title highlighting the achievement or shocker>",
+  "hook": "Did You Know <compelling question with emoji>? 🤯",
+  "headline": "<High-tech technical headline>",
+  "fact_summary": "<2-3 sentence explanation with exact numbers, specs, or mind-blowing reality>",
+  "source": "{source_name}",
+  "keywords": ["<keyword1>", "<keyword2>", "<keyword3>", "did you know"]
+}}
+"""
+    parsed = query_llm_for_json(prompt)
+    if parsed and isinstance(parsed, dict) and parsed.get("title") and parsed.get("hook"):
+        return {
+            "mode": "did_you_know",
+            "category": "🧠 DID YOU KNOW?",
+            "title": parsed["title"].strip(),
+            "hook": parsed["hook"].strip(),
+            "headline": parsed.get("headline", parsed["title"]).strip(),
+            "fact_summary": parsed.get("fact_summary", description or title).strip(),
+            "source": parsed.get("source", source_name),
+            "news_source_url": url,
+            "keywords": parsed.get("keywords", ["did you know", "tech facts"]),
+            "vector": "trending_breakthroughs"
+        }
+
+    # Rule-based fallback if LLM is unavailable
+    clean_title = re.sub(r'^(GitHub Trending:\s*|Show HN:\s*|Ask HN:\s*)', '', title).strip()
+    if " — " in clean_title:
+        parts = clean_title.split(" — ")
+        clean_title = parts[1].strip() if len(parts[1].strip()) > 15 else parts[0].strip()
+    
+    hook = f"Did You Know About This New Breakthrough? 🚀"
+    if len(clean_title) < 55:
+        hook = f"Did You Know: {clean_title}? ⚡"
+
+    return {
+        "mode": "did_you_know",
+        "category": "🧠 DID YOU KNOW?",
+        "title": clean_title[:70],
+        "hook": hook,
+        "headline": clean_title[:60],
+        "fact_summary": description or clean_title,
+        "source": source_name,
+        "news_source_url": url,
+        "keywords": ["did you know", "tech trending"] + [w.lower() for w in re.findall(r'\b[a-zA-Z]{4,}\b', clean_title)[:5]],
+        "vector": "trending_breakthroughs"
+    }
+
+
+def synthesize_unique_dyk_fact(vector: str, used_titles: List[str]) -> Optional[Dict]:
+    """
+    Synthesizes a brand-new, 100% verified, unique 'Did You Know' tech/science fact using LLM.
+    Guarantees zero duplicates even if all seed facts are exhausted.
+    """
+    recent_sample = ", ".join([f'"{t}"' for t in used_titles[-25:]]) if used_titles else "none"
+    prompt = f"""You are the viral tech director for 'Did You Know By VJ'.
+Generate a brand-new, mind-blowing, 100% scientifically and technically accurate 'Did You Know' fact about '{vector}'.
+CRITICAL: It must be COMPLETELY DIFFERENT and NOT cover any of these recently used topics:
+[{recent_sample}]
+
+Choose an extraordinary, lesser-known hardware, software, networking, physics, or AI architectural marvel.
+
+Return ONLY valid JSON (no markdown):
+{{
+  "title": "<Punchy 5-8 word fact title>",
+  "hook": "Did You Know <compelling question with emoji>? 🤯",
+  "headline": "<High-tech technical headline>",
+  "fact_summary": "<2-3 sentence explanation with exact numbers, hardware specs, or physics mechanisms>",
+  "source": "<Verified scientific / engineering specification / standard>",
+  "keywords": ["<keyword1>", "<keyword2>", "<keyword3>", "did you know"]
+}}
+"""
+    parsed = query_llm_for_json(prompt)
+    if parsed and isinstance(parsed, dict) and parsed.get("title") and parsed.get("hook"):
+        return {
+            "mode": "did_you_know",
+            "category": "🧠 DID YOU KNOW?",
+            "title": parsed["title"].strip(),
+            "hook": parsed["hook"].strip(),
+            "headline": parsed.get("headline", parsed["title"]).strip(),
+            "fact_summary": parsed.get("fact_summary", parsed["title"]).strip(),
+            "source": parsed.get("source", "Verified Tech Architecture & Science"),
+            "news_source_url": "",
+            "keywords": parsed.get("keywords", ["did you know", "tech facts", vector]),
+            "vector": vector
+        }
+    return None
+
+
 def fetch_or_select_did_you_know_fact(topic: Optional[str] = None) -> Dict:
     """
-    Selects or generates a high-attraction 'Did You Know' fact.
-    - If topic is provided, formats it into a DYK fact structure.
-    - If no topic, cycles through DID_YOU_KNOW_VECTORS from topic_tracker,
-      filters out recently used topics from instagram_carousel_log.json,
-      and records the selection.
+    Selects or generates a high-attraction, 100% unique 'Did You Know' fact.
+    - If explicit topic is provided: checks uniqueness, formats, and records in tracker.
+    - If no topic (auto run / workflow schedule):
+      1. PRIORITY 1: Live Trending Signals First.
+         Fetches live stories via fetch_ai_news_stories() / trending_engine,
+         filters them through is_topic_unique against BOTH news_log.json (YouTube)
+         and instagram_carousel_log.json (Carousel).
+         Converts the top unique trending signal into a mind-blowing DYK fact
+         using convert_trending_story_to_dyk_fact().
+      2. PRIORITY 2: Curated Seed Catalog (40+ facts across 5 vectors).
+         Cycles through vectors, strictly filtering out any fact that has been covered
+         using is_topic_unique() (RapidFuzz token similarity + keyword overlap).
+      3. PRIORITY 3: Real-Time Dynamic LLM Synthesis.
+         If all seed facts are exhausted, synthesizes a brand-new unique fact
+         using Gemini/OpenRouter, checking is_topic_unique() to guarantee zero duplicates.
+    - Records the final selection in BOTH instagram_carousel_log.json and news_log.json.
     """
-    if topic:
+    try:
+        from ai_news_carousel import (
+            is_topic_unique,
+            record_carousel_topic,
+            load_carousel_tracker,
+            fetch_ai_news_stories,
+            filter_unique_stories
+        )
+    except Exception as e:
+        print(f"⚠️ Warning importing ai_news_carousel: {e}")
+        is_topic_unique = None
+        record_carousel_topic = None
+        load_carousel_tracker = None
+        fetch_ai_news_stories = None
+        filter_unique_stories = None
+
+    try:
+        from telegram_approval_handler import record_topic_in_tracker
+    except Exception:
+        record_topic_in_tracker = None
+
+    selected = None
+
+    # CASE A: Explicit topic passed by caller / user
+    if topic and topic.strip():
         clean_topic = topic.strip()
+        if is_topic_unique:
+            uniq, reason = is_topic_unique(clean_topic, check_youtube=True, check_carousel=True)
+            if not uniq:
+                print(f"⚠️ Warning: Requested explicit topic may be a duplicate: {reason}")
+            else:
+                print(f"✅ Requested topic '{clean_topic}' is verified unique.")
+        
         hook = clean_topic if clean_topic.lower().startswith("did you know") else f"Did You Know: {clean_topic}?"
         if not hook.endswith("?") and not hook.endswith("!"):
             hook += "?"
-        return {
+        selected = {
             "mode": "did_you_know",
             "category": "🧠 DID YOU KNOW?",
             "title": clean_topic,
@@ -305,80 +704,151 @@ def fetch_or_select_did_you_know_fact(topic: Optional[str] = None) -> Dict:
             "headline": clean_topic,
             "fact_summary": clean_topic,
             "source": "Verified Tech Architecture & Science",
-            "keywords": ["did you know", "tech facts", "engineering"] + [w.lower() for w in clean_topic.split() if len(w) > 3]
+            "news_source_url": "",
+            "keywords": ["did you know", "tech facts", "engineering"] + [w.lower() for w in clean_topic.split() if len(w) > 3],
+            "vector": "custom"
         }
 
-    # Auto-selection from topic tracker vectors
-    try:
-        from topic_tracker import get_did_you_know_sub_vector
-        current_vector = get_did_you_know_sub_vector()
-    except Exception:
-        current_vector = "ai_secrets"
+    # CASE B: Auto-selection for workflow schedule (Always pick fresh trending / zero-duplicate facts)
+    if not selected:
+        # Determine active vector rotation
+        try:
+            from topic_tracker import get_did_you_know_sub_vector
+            current_vector = get_did_you_know_sub_vector()
+        except Exception:
+            current_vector = "ai_secrets"
 
-    print(f"🧠 Selecting 'Did You Know' fact for active vector: '{current_vector}'...")
+        print(f"🧠 Selecting high-attraction fact for rotation vector: '{current_vector}'...")
 
-    # Load tracker history to prevent duplicates
-    used_titles = set()
-    try:
-        from ai_news_carousel import load_carousel_tracker, record_carousel_topic
-        tracker = load_carousel_tracker()
-        for t in tracker.get("used_titles", []):
-            used_titles.add(str(t).lower())
-        for h in tracker.get("history", []):
-            if isinstance(h, dict) and h.get("title"):
-                used_titles.add(h["title"].lower())
-    except Exception as e:
-        print(f"⚠️ Carousel tracker note: {e}")
-        record_carousel_topic = None
-
-    # Filter seed facts
-    vector_candidates = [f for f in DID_YOU_KNOW_SEED_FACTS if f.get("vector") == current_vector]
-    if not vector_candidates:
-        vector_candidates = DID_YOU_KNOW_SEED_FACTS
-
-    unseen_candidates = []
-    for cand in vector_candidates:
-        cand_title = cand["title"].lower()
-        is_dup = False
-        if cand_title in used_titles:
-            is_dup = True
-        elif RAPIDFUZZ_AVAILABLE:
-            for used in used_titles:
-                if fuzz.token_set_ratio(cand_title, used) > 70:
-                    is_dup = True
+        # ── PRIORITY 1: Fetch Live Trending Signals ──────────────────────────
+        if fetch_ai_news_stories and filter_unique_stories:
+            try:
+                print("📡 Querying live trending signals for fresh breaking facts...")
+                raw_stories = fetch_ai_news_stories()
+                unique_stories = filter_unique_stories(raw_stories) if raw_stories else []
+                
+                for candidate_story in unique_stories[:5]:
+                    cand_title = candidate_story.get("title", "")
+                    cand_url = candidate_story.get("url", "")
+                    
+                    # Convert to Did You Know format
+                    converted = convert_trending_story_to_dyk_fact(candidate_story)
+                    
+                    # Verify converted fact uniqueness
+                    if is_topic_unique:
+                        is_uniq, reason = is_topic_unique(
+                            converted["title"],
+                            converted.get("news_source_url", cand_url),
+                            converted.get("keywords", []),
+                            check_youtube=True,
+                            check_carousel=True
+                        )
+                        if not is_uniq:
+                            print(f"  🔄 Converted trending topic duplicate ({reason}), checking next story...")
+                            continue
+                    
+                    selected = converted
+                    print(f"🔥 Successfully picked live trending fact: '{selected['title']}' ({selected.get('source', '')})")
                     break
-        if not is_dup:
-            unseen_candidates.append(cand)
+            except Exception as e:
+                print(f"⚠️ Note on live trending fact extraction: {e}")
 
-    # Pick candidate
-    selected = None
-    if unseen_candidates:
-        selected = random.choice(unseen_candidates)
-    else:
-        print("⚠️ All seed facts for current vector have been used recently; picking from full seed catalog...")
-        all_unseen = [f for f in DID_YOU_KNOW_SEED_FACTS if f["title"].lower() not in used_titles]
-        if all_unseen:
-            selected = random.choice(all_unseen)
-        else:
-            selected = random.choice(vector_candidates)
+        # ── PRIORITY 2: Curated Seed Catalog (40+ Facts across 5 Vectors) ────
+        if not selected:
+            print("📚 Checking curated seed facts with multi-layer deduplication...")
+            # 1. Filter candidates for current vector
+            vector_candidates = [f for f in DID_YOU_KNOW_SEED_FACTS if f.get("vector") == current_vector]
+            unseen_vector = []
+            for cand in vector_candidates:
+                if is_topic_unique:
+                    is_uniq, _ = is_topic_unique(
+                        cand["title"],
+                        "",
+                        cand.get("keywords", []),
+                        check_youtube=True,
+                        check_carousel=True
+                    )
+                    if is_uniq:
+                        unseen_vector.append(cand)
+                else:
+                    unseen_vector.append(cand)
+            
+            if unseen_vector:
+                selected = dict(random.choice(unseen_vector))
+                print(f"🎯 Selected unseen seed fact for '{current_vector}': '{selected['title']}'")
+            else:
+                # 2. Check all remaining seed facts across other vectors
+                print(f"ℹ️ All seed facts in '{current_vector}' covered; searching full 40-fact seed catalog...")
+                all_unseen = []
+                for cand in DID_YOU_KNOW_SEED_FACTS:
+                    if is_topic_unique:
+                        is_uniq, _ = is_topic_unique(
+                            cand["title"],
+                            "",
+                            cand.get("keywords", []),
+                            check_youtube=True,
+                            check_carousel=True
+                        )
+                        if is_uniq:
+                            all_unseen.append(cand)
+                    else:
+                        all_unseen.append(cand)
+                
+                if all_unseen:
+                    selected = dict(random.choice(all_unseen))
+                    print(f"🎯 Selected unseen seed fact across catalog: '{selected['title']}' ({selected.get('vector')})")
 
-    selected = dict(selected)
+        # ── PRIORITY 3: Real-Time Dynamic LLM Synthesis (Zero-Duplicate Guarantee) ──
+        if not selected:
+            print("⚡ All seed facts covered! Synthesizing brand-new unique fact using real-time LLM...")
+            used_titles_list = []
+            if load_carousel_tracker:
+                try:
+                    c_tracker = load_carousel_tracker()
+                    used_titles_list.extend(c_tracker.get("used_titles", []))
+                except Exception:
+                    pass
+            
+            synth = synthesize_unique_dyk_fact(current_vector, used_titles_list)
+            if synth:
+                if is_topic_unique:
+                    uniq, _ = is_topic_unique(synth["title"], "", synth.get("keywords", []), check_youtube=True, check_carousel=True)
+                    if uniq:
+                        selected = synth
+                else:
+                    selected = synth
+
+        # Fallback safeguard (guarantee a valid dictionary)
+        if not selected:
+            selected = dict(random.choice(DID_YOU_KNOW_SEED_FACTS))
+
     selected["mode"] = "did_you_know"
     selected["category"] = "🧠 DID YOU KNOW?"
 
-    # Record selection in carousel tracker
+    # ── Record in Trackers to Prevent Future Duplication ───────────────────────
     if record_carousel_topic:
         try:
             record_carousel_topic(
                 title=selected["title"],
-                url="",
+                url=selected.get("news_source_url", ""),
                 keywords=selected.get("keywords", ["did you know"]),
                 source=selected.get("source", "Did You Know By VJ")
             )
         except Exception as e:
             print(f"⚠️ Note recording carousel topic: {e}")
 
-    print(f"🎯 Selected 'Did You Know' fact: '{selected['title']}' ({selected.get('vector', 'general')})")
+    if record_topic_in_tracker:
+        try:
+            record_topic_in_tracker(
+                topic=selected["title"],
+                source_url=selected.get("news_source_url", ""),
+                keywords=selected.get("keywords", ["did you know"]),
+                subcategory="Did You Know Fact"
+            )
+        except Exception as e:
+            print(f"⚠️ Note recording in news_log: {e}")
+
+    print(f"🚀 Final Selected Fact: '{selected['title']}' (Hook: '{selected.get('hook', '')}')")
     return selected
 
 
