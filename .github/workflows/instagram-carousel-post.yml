@@ -77,7 +77,7 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install "numpy<2.0"
           pip install "grpcio==1.62.2"
-          pip install requests pillow python-dotenv pydantic jinja2 playwright python-telegram-bot aiohttp google-generativeai rapidfuzz
+          pip install requests pillow python-dotenv pydantic jinja2 playwright python-telegram-bot aiohttp google-genai google-generativeai rapidfuzz
           
       - name: Cache Playwright
         id: playwright-cache

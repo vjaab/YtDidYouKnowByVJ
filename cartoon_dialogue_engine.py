@@ -33,11 +33,22 @@ VALID_EMOTIONS = ["neutral", "curious", "excited", "shocked", "thinking", "smug"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 
+GEMINI_GENAI_AVAILABLE = False
+GEMINI_LEGACY_AVAILABLE = False
+
 try:
     from google import genai
-    GEMINI_AVAILABLE = True
+    GEMINI_GENAI_AVAILABLE = True
 except ImportError:
-    GEMINI_AVAILABLE = False
+    pass
+
+try:
+    import google.generativeai as genai_legacy
+    GEMINI_LEGACY_AVAILABLE = True
+except ImportError:
+    pass
+
+GEMINI_AVAILABLE = GEMINI_GENAI_AVAILABLE or GEMINI_LEGACY_AVAILABLE
 
 
 def get_character_image_path(speaker: str, emotion: str) -> Optional[Path]:
@@ -416,7 +427,8 @@ CRITICAL RULES FOR MAXIMUM VIEWER ATTRACTION:
    - Byte: "shocked" on slide 5 asking the crazy consequence or edge case.
    - VJ: "thinking" or "smug" on slide 6 delivering the punchline.
 7. FINAL SLIDE: Mark "is_takeaway": true. Provide a punchy summary in "takeaway" field.
-8. CAPTION: Engaging Instagram caption with Did You Know format, 3 bullet points, an engagement question ("Did you already know this? Drop a 🤯 below!"), and viral hashtags.
+8. SLIDE TITLES: Every single slide MUST include a "title" property (2-5 words, plus an optional emoji) matching what that specific slide discusses! Slide 1 title should be the hook.
+9. CAPTION: Engaging Instagram caption with Did You Know format, 3 bullet points, an engagement question ("Did you already know this? Drop a 🤯 below!"), and viral hashtags.
 
 Return ONLY valid JSON matching this schema with NO markdown fences, NO preamble:
 {{
@@ -426,13 +438,13 @@ Return ONLY valid JSON matching this schema with NO markdown fences, NO preamble
   "headline": "{fact_title}",
   "source": "{fact_source}",
   "slides": [
-    {{"speaker": "byte", "emotion": "shocked", "bubble": "Wait, did you know that 99% of the internet is underwater?!"}},
-    {{"speaker": "vj", "emotion": "excited", "bubble": "Yes! Over 1.4 million kilometers of fiber optic cables sit on the ocean floor."}},
-    {{"speaker": "byte", "emotion": "curious", "bubble": "What stops sharks or anchors from destroying them?"}},
-    {{"speaker": "vj", "emotion": "smug", "bubble": "Near shore they have heavy steel armor, deep down they are barely garden-hose thick!"}},
-    {{"speaker": "byte", "emotion": "shocked", "bubble": "What happens if an anchor snags one?"}},
-    {{"speaker": "vj", "emotion": "thinking", "bubble": "Entire countries can go offline until specialized repair ships arrive."}},
-    {{"speaker": "byte", "emotion": "excited", "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!", "is_takeaway": true}}
+    {{"speaker": "byte", "emotion": "shocked", "title": "Internet Under the Sea? 🌊", "bubble": "Wait, did you know that 99% of the internet is underwater?!"}},
+    {{"speaker": "vj", "emotion": "excited", "title": "1.4M km of Glass Fiber 🌐", "bubble": "Yes! Over 1.4 million kilometers of fiber optic cables sit on the ocean floor."}},
+    {{"speaker": "byte", "emotion": "curious", "title": "Shark & Anchor Defense 🦈", "bubble": "What stops sharks or anchors from destroying them?"}},
+    {{"speaker": "vj", "emotion": "smug", "title": "Garden-Hose Thin ⚙️", "bubble": "Near shore they have heavy steel armor, deep down they are barely garden-hose thick!"}},
+    {{"speaker": "byte", "emotion": "shocked", "title": "When Cables Break 🚢", "bubble": "What happens if an anchor snags one?"}},
+    {{"speaker": "vj", "emotion": "thinking", "title": "Instant Reroute ⚡", "bubble": "Entire countries can go offline until specialized repair ships arrive."}},
+    {{"speaker": "byte", "emotion": "excited", "title": "Mind-Blowing Fact 💡", "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!", "is_takeaway": true}}
   ],
   "takeaway": "99% of international data relies on physical seafloor cables, not satellites. The cloud is literally on the ocean floor!",
   "caption": "🧠 DID YOU KNOW? 🤯\\n\\n99% of the internet is not in the sky... it is sitting on the ocean floor!\\n\\nHere is the mind-blowing reality:\\n🔹 Over 500 undersea fiber optic cables carry global data.\\n🔹 They transmit data at 99.7% the speed of light.\\n🔹 Deep-sea cables are only as thick as a garden hose, but carry trillions of dollars daily!\\n\\n💬 Did you already know this, or did this blow your mind? Drop a 🤯 in the comments!\\n\\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\\n#DidYouKnow #TechFacts #MindBlowingFacts #Engineering #ComputerScience"
@@ -465,7 +477,8 @@ CRITICAL ACCURACY RULES:
 4. SPEAKERS ALTERNATE: Alternate between "byte" and "vj" on every slide (e.g., slide 1 byte, slide 2 vj, slide 3 byte, etc.).
 5. CONCISE BUBBLES: Each speech bubble MUST BE 18 WORDS OR FEWER. Short, punchy, conversational, engaging!
 6. EMOTIONS: Each slide must have a valid emotion: ["curious", "thinking", "excited", "shocked", "neutral", "smug"].
-7. LAST SLIDE: The final slide is a takeaway plus a follow CTA. Provide a "takeaway" field and note the source: "{source}, {date}".
+7. SLIDE TITLES: Every single slide MUST include a "title" property (2-5 words) matching that slide's content.
+8. LAST SLIDE: The final slide is a takeaway plus a follow CTA. Provide a "takeaway" field and note the source: "{source}, {date}".
 
 Return ONLY valid JSON matching this schema with NO markdown fences, NO preamble:
 {{
@@ -475,12 +488,12 @@ Return ONLY valid JSON matching this schema with NO markdown fences, NO preamble
   "source": "{source}",
   "date": "{date}",
   "slides": [
-    {{"speaker": "byte", "emotion": "shocked", "bubble": "Did OpenAI really just drop GPT-5 preview?"}},
-    {{"speaker": "vj", "emotion": "excited", "bubble": "Yes! It introduces native autonomous tool orchestration."}},
-    {{"speaker": "byte", "emotion": "curious", "bubble": "How does that help everyday engineers?"}},
-    {{"speaker": "vj", "emotion": "thinking", "bubble": "No more brittle agent loops. It handles planning internally."}},
-    {{"speaker": "byte", "emotion": "smug", "bubble": "My debugging sessions just got 10x faster."}},
-    {{"speaker": "vj", "emotion": "excited", "bubble": "Follow @vijayakumarj_ai for daily updates!", "is_takeaway": true}}
+    {{"speaker": "byte", "emotion": "shocked", "title": "Breaking Update 🚨", "bubble": "Did OpenAI really just drop GPT-5 preview?"}},
+    {{"speaker": "vj", "emotion": "excited", "title": "Autonomous Tools ⚡", "bubble": "Yes! It introduces native autonomous tool orchestration."}},
+    {{"speaker": "byte", "emotion": "curious", "title": "Developer Impact 🛠️", "bubble": "How does that help everyday engineers?"}},
+    {{"speaker": "vj", "emotion": "thinking", "title": "Internal Planning 🧠", "bubble": "No more brittle agent loops. It handles planning internally."}},
+    {{"speaker": "byte", "emotion": "smug", "title": "10x Faster Debugging 💻", "bubble": "My debugging sessions just got 10x faster."}},
+    {{"speaker": "vj", "emotion": "excited", "title": "Key Takeaway 💡", "bubble": "Follow @vijayakumarj_ai for daily updates!", "is_takeaway": true}}
   ],
   "takeaway": "Autonomous tool calling cuts agent boilerplate and boosts pipeline reliability.",
   "caption": "Breaking AI Update: {title}\\n\\nHere is what developers need to know...\\n\\nSource: {source} ({date})\\n\\nFollow @vijayakumarj_ai for daily AI breakdowns!\\n#AI #TechNews #DevCommunity"
@@ -503,7 +516,8 @@ CRITICAL RULES:
 4. PUNCHY BUBBLES: Every single speech bubble MUST BE 18 WORDS OR FEWER. No exceptions.
 5. EMOTIONS: Valid emotions for each slide: ["curious", "thinking", "excited", "shocked", "neutral", "smug"].
 6. HOOK: Must start with a magnetic hook question that stops the user's scroll.
-7. LAST SLIDE: Must be a clear takeaway summary plus a follow CTA.
+7. SLIDE TITLES: Every single slide MUST include a "title" property (2-5 words) matching that slide's content.
+8. LAST SLIDE: Must be a clear takeaway summary plus a follow CTA.
 
 Return ONLY valid JSON with NO markdown formatting:
 {{
@@ -511,13 +525,13 @@ Return ONLY valid JSON with NO markdown formatting:
   "hook": "Why does ChatGPT forget you?",
   "headline": "{concept_topic}",
   "slides": [
-    {{"speaker": "byte", "emotion": "curious", "bubble": "Why does ChatGPT forget what I said earlier?"}},
-    {{"speaker": "vj", "emotion": "thinking", "bubble": "Think of it as the AI's short-term memory: the context window."}},
-    {{"speaker": "byte", "emotion": "curious", "bubble": "What happens when that window fills up?"}},
-    {{"speaker": "vj", "emotion": "shocked", "bubble": "Older messages drop off, so it literally cannot see them anymore!"}},
-    {{"speaker": "byte", "emotion": "thinking", "bubble": "So prompt summaries prevent memory loss?"}},
-    {{"speaker": "vj", "emotion": "smug", "bubble": "Exactly! Summarize older context or use vector memory."}},
-    {{"speaker": "byte", "emotion": "excited", "bubble": "Follow @vijayakumarj_ai for daily AI breakdowns!", "is_takeaway": true}}
+    {{"speaker": "byte", "emotion": "curious", "title": "Why ChatGPT Forgets? 🤯", "bubble": "Why does ChatGPT forget what I said earlier?"}},
+    {{"speaker": "vj", "emotion": "thinking", "title": "The Context Window 🧠", "bubble": "Think of it as the AI's short-term memory: the context window."}},
+    {{"speaker": "byte", "emotion": "curious", "title": "When Limits Hit 🛑", "bubble": "What happens when that window fills up?"}},
+    {{"speaker": "vj", "emotion": "shocked", "title": "Silent Token Drop ✂️", "bubble": "Older messages drop off, so it literally cannot see them anymore!"}},
+    {{"speaker": "byte", "emotion": "thinking", "title": "Memory Solutions 💡", "bubble": "So prompt summaries prevent memory loss?"}},
+    {{"speaker": "vj", "emotion": "smug", "title": "Vector Memory ⚡", "bubble": "Exactly! Summarize older context or use vector memory."}},
+    {{"speaker": "byte", "emotion": "excited", "title": "Key Takeaway 💡", "bubble": "Follow @vijayakumarj_ai for daily AI breakdowns!", "is_takeaway": true}}
   ],
   "takeaway": "LLMs have finite context windows. To avoid memory drop, summarize long chats and prune prompts!",
   "caption": "Why does ChatGPT forget you?\\n\\nEver noticed your long chat losing its train of thought? Here is how context windows actually work...\\n\\nFollow @vijayakumarj_ai for daily AI engineering breakdowns!\\n#AI #MachineLearning #ChatGPT #TechTips"
@@ -526,33 +540,249 @@ Return ONLY valid JSON with NO markdown formatting:
     return prompt
 
 
+def build_tailored_dyk_dialogue(title: str, hook: str, fact_summary: str, source: str) -> Dict:
+    """Dynamically construct 6-7 slide dialogue tailored strictly to the given topic and summary."""
+    current_date = datetime.now().strftime("%d %b %Y")
+    clean_summary = fact_summary.strip()
+    # Split summary into sentences or chunks
+    sentences = [s.strip() for s in re.split(r'[.!?]+', clean_summary) if len(s.strip()) > 5]
+    part1 = sentences[0] if sentences else clean_summary[:60]
+    part2 = sentences[1] if len(sentences) > 1 else (clean_summary[60:130] if len(clean_summary) > 60 else "It completely defies our daily intuition.")
+    
+    return {
+        "mode": "did_you_know",
+        "category": "🧠 DID YOU KNOW?",
+        "hook": hook,
+        "headline": title,
+        "source": source,
+        "date": current_date,
+        "slides": [
+            {
+                "speaker": "byte",
+                "emotion": "shocked",
+                "title": hook,
+                "bubble": clean_bubble_text(f"Wait, did you know that {part1}?!", 18)
+            },
+            {
+                "speaker": "vj",
+                "emotion": "excited",
+                "title": "The Reality ⚙️",
+                "bubble": clean_bubble_text(f"Yes! {part2}", 18)
+            },
+            {
+                "speaker": "byte",
+                "emotion": "curious",
+                "title": "How Does It Work? 🔍",
+                "bubble": clean_bubble_text(f"What makes this happen in modern engineering?", 18)
+            },
+            {
+                "speaker": "vj",
+                "emotion": "smug",
+                "title": "The Mechanism ⚡",
+                "bubble": clean_bubble_text("Underlying physics and software architectures make this fully operational.", 18)
+            },
+            {
+                "speaker": "byte",
+                "emotion": "shocked",
+                "title": "Why It Matters 🚨",
+                "bubble": clean_bubble_text("What happens if this system glitches or fails?", 18)
+            },
+            {
+                "speaker": "vj",
+                "emotion": "thinking",
+                "title": "Fail-Safe Design 🛡️",
+                "bubble": clean_bubble_text("Automated fail-safes and redundancy keep the entire system from failing.", 18)
+            },
+            {
+                "speaker": "byte",
+                "emotion": "excited",
+                "title": "Mind-Blowing Fact 💡",
+                "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!",
+                "is_takeaway": True
+            }
+        ],
+        "takeaway": clean_summary[:140],
+        "caption": (
+            f"🧠 DID YOU KNOW? 🤯\n\n"
+            f"{hook}\n\n"
+            f"Here is the mind-blowing reality:\n"
+            f"🔹 {clean_summary}\n\n"
+            f"💬 Did you already know this, or did this blow your mind? Drop a 🤯 below!\n\n"
+            f"Follow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n"
+            f"#DidYouKnow #TechFacts #Science #Engineering #MindBlowing"
+        )
+    }
+
+
 def get_curated_fallback_dialogue(mode: str, topic: Optional[str] = None, story: Optional[Dict] = None) -> Dict:
-    """High-quality curated fallback dialogue if all LLM endpoints fail."""
+    """High-quality curated fallback dialogue strictly matching the requested topic."""
     current_date = datetime.now().strftime("%d %b %Y")
     
+    topic_str = (story.get("title") if story else None) or topic or ""
+    hook_str = (story.get("hook") if story else None) or f"Did You Know: {topic_str[:40]}? 🤯"
+    summary_str = (story.get("fact_summary") if story else None) or (story.get("description") if story else None) or topic_str
+    source_str = (story.get("source") if story else None) or "Tech Architecture & Science"
+    t_lower = f"{topic_str} {hook_str} {summary_str}".lower()
+    
     if mode in ["did_you_know", "dyk"]:
-        t = (story.get("title") if story else None) or topic or "99% of the Internet is Underwater"
-        hook = (story.get("hook") if story else None) or f"Did You Know: {t[:40]}? 🌊"
-        source = (story.get("source") if story else None) or "Subsea Cable Registry"
-        return {
-            "mode": "did_you_know",
-            "category": "🧠 DID YOU KNOW?",
-            "hook": hook,
-            "headline": t,
-            "source": source,
-            "date": current_date,
-            "slides": [
-                {"speaker": "byte", "emotion": "shocked", "bubble": "Wait, did you know that 99% of the internet is underwater?!"},
-                {"speaker": "vj", "emotion": "excited", "bubble": "Yes! Satellites carry almost nothing. 1.4M km of glass fiber sit on the seafloor."},
-                {"speaker": "byte", "emotion": "curious", "bubble": "What stops sharks or heavy boat anchors from snapping them?"},
-                {"speaker": "vj", "emotion": "smug", "bubble": "Near shore they have thick steel armor wire. Deep down they are garden-hose thin!"},
-                {"speaker": "byte", "emotion": "shocked", "bubble": "What happens when an underwater cable actually gets cut?"},
-                {"speaker": "vj", "emotion": "thinking", "bubble": "Traffic reroutes in milliseconds, and specialized grappling ships sail out to fish it up!"},
-                {"speaker": "byte", "emotion": "excited", "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!", "is_takeaway": True}
-            ],
-            "takeaway": "99% of global internet data travels through thin glass cables on the ocean floor, not satellites in space!",
-            "caption": "🧠 DID YOU KNOW? 🤯\n\n99% of the internet is not in the sky... it is sitting on the ocean floor!\n\nHere is the mind-blowing reality:\n🔹 Over 500 undersea fiber optic cables carry global data.\n🔹 They transmit data at 99.7% the speed of light.\n🔹 Deep-sea cables are only as thick as a garden hose, but carry trillions of dollars daily!\n\n💬 Did you already know this, or did this blow your mind? Drop a 🤯 below!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #Engineering #ComputerScience"
-        }
+        # 1. AI Hallucination
+        if any(k in t_lower for k in ["hallucinat", "ignorance", "probability engine", "next-token"]):
+            return {
+                "mode": "did_you_know",
+                "category": "🧠 DID YOU KNOW?",
+                "hook": "Why Do AI Models Hallucinate? 🤖",
+                "headline": "Why AI Hallucinates Instead of Admitting Ignorance",
+                "source": "Transformer Probabilistic Modeling",
+                "date": current_date,
+                "slides": [
+                    {"speaker": "byte", "emotion": "shocked", "title": "Why Do AI Models Lie? 🤖", "bubble": "Why do AI models lie with 100% confidence instead of admitting ignorance?"},
+                    {"speaker": "vj", "emotion": "thinking", "title": "Next-Token Prediction ⚙️", "bubble": "Because LLMs have zero concept of truth. They only calculate what word comes next!"},
+                    {"speaker": "byte", "emotion": "curious", "title": "No Concept of Truth? 🔍", "bubble": "Wait, so the AI doesn't actually understand what it is saying?"},
+                    {"speaker": "vj", "emotion": "excited", "title": "Statistical Guessing 📊", "bubble": "Never! It produces plausible-sounding sentences, even if the facts are totally fake."},
+                    {"speaker": "byte", "emotion": "shocked", "title": "The Confidence Trap 🚨", "bubble": "So high confidence just means high statistical probability, not truth?!"},
+                    {"speaker": "vj", "emotion": "smug", "title": "Always Verify Facts 🛡️", "bubble": "Exactly! Treat AI as a reasoning engine, not an infallible database. Always verify!"},
+                    {"speaker": "byte", "emotion": "excited", "title": "Mind-Blowing Fact 💡", "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!", "is_takeaway": True}
+                ],
+                "takeaway": "AI models don't look up facts—they calculate next-token probabilities. Plausibility never equals factual truth!",
+                "caption": "🧠 DID YOU KNOW? 🤯\n\nWhy do AI models invent fake citations and lie with absolute confidence?\n\nHere is the mind-blowing reality:\n🔹 LLMs have zero internal concept of factual truth or falsehood.\n🔹 They generate text using next-token mathematical probability.\n🔹 When an AI sounds confident, it just means the sentence structure is probable!\n\n💬 Have you ever caught an AI completely hallucinating? Drop your story below!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #AIHallucinations #MachineLearning #ArtificialIntelligence #TechFacts"
+            }
+
+        # 2. ChatGPT Memory / Context Window
+        if any(k in t_lower for k in ["forget", "context window", "ai memory", "token limit"]):
+            return {
+                "mode": "did_you_know",
+                "category": "🧠 DID YOU KNOW?",
+                "hook": "Why Does ChatGPT Forget What You Said? 🤯",
+                "headline": "Why ChatGPT Actually Forgets You",
+                "source": "Transformer Attention & Context Windows",
+                "date": current_date,
+                "slides": [
+                    {"speaker": "byte", "emotion": "curious", "title": "Why Does ChatGPT Forget? 🤯", "bubble": "Why does ChatGPT forget what I said 10 minutes ago in our chat?"},
+                    {"speaker": "vj", "emotion": "thinking", "title": "The Context Window 🧠", "bubble": "LLMs have no ongoing memory. Each reply re-reads earlier text in a context window."},
+                    {"speaker": "byte", "emotion": "curious", "title": "What Happens When Full? 🛑", "bubble": "What happens when that context window reaches its token limit?"},
+                    {"speaker": "vj", "emotion": "shocked", "title": "Silent Eviction ✂️", "bubble": "Older messages are dropped off from the start, so the model literally cannot see them!"},
+                    {"speaker": "byte", "emotion": "thinking", "title": "How To Fix It? 💡", "bubble": "So prompt summaries or vector databases keep long chats alive?"},
+                    {"speaker": "vj", "emotion": "smug", "title": "Keep Prompts Lean ⚡", "bubble": "Exactly! Prune system prompts and summarize key points before the window overflows."},
+                    {"speaker": "byte", "emotion": "excited", "title": "Mind-Blowing Fact 💡", "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!", "is_takeaway": True}
+                ],
+                "takeaway": "ChatGPT doesn't have human memory. When the context window fills up, older messages silently disappear.",
+                "caption": "🧠 DID YOU KNOW? 🤯\n\nEver wonder why ChatGPT forgets what you said 20 minutes ago?\n\nHere is how LLM memory actually works:\n🔹 LLMs store zero memory between turns.\n🔹 Every response re-reads your previous messages in a 'context window'.\n🔹 Once that window fills, older tokens are silently discarded!\n\n💬 Did you know this is how AI 'memory' works? Drop a 🤯 below!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns!\n#DidYouKnow #ChatGPT #AI #TechTips #Developers"
+            }
+
+        # 3. Strawberry Tokenization
+        if any(k in t_lower for k in ["strawberry", "tokenization", "bpe", "subword"]):
+            return {
+                "mode": "did_you_know",
+                "category": "🧠 DID YOU KNOW?",
+                "hook": "Why Can't AI Count Letters in 'Strawberry'? 🍓",
+                "headline": "Why AI Can Count to Billions But Fails at Strawberry 'r's",
+                "source": "Byte-Pair Encoding Tokenization",
+                "date": current_date,
+                "slides": [
+                    {"speaker": "byte", "emotion": "shocked", "title": "Why Can't AI Count 'r's? 🍓", "bubble": "Why does ChatGPT struggle to count how many 'r's are in 'strawberry'?"},
+                    {"speaker": "vj", "emotion": "thinking", "title": "Subword Tokenization 🧩", "bubble": "Because LLMs never see letters! Words are chopped into numeric chunks called tokens."},
+                    {"speaker": "byte", "emotion": "curious", "title": "Token Blindspot 🕶️", "bubble": "So the word 'strawberry' isn't stored as ten individual characters?"},
+                    {"speaker": "vj", "emotion": "excited", "title": "Tokens Over Letters 🔢", "bubble": "Right! It sees token IDs like 'straw' and 'berry', completely hiding the raw letters."},
+                    {"speaker": "byte", "emotion": "shocked", "title": "How Do Newer AIs Fix It? ⚡", "bubble": "Can reasoning models fix this by spelling out the word internally?"},
+                    {"speaker": "vj", "emotion": "smug", "title": "Chain-of-Thought Power 🧠", "bubble": "Yes! Reasoning models spell each letter in their scratchpad to count accurately."},
+                    {"speaker": "byte", "emotion": "excited", "title": "Mind-Blowing Fact 💡", "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!", "is_takeaway": True}
+                ],
+                "takeaway": "AI doesn't see letters—it sees token chunks. Asking for letter counts breaks subword tokenization!",
+                "caption": "🧠 DID YOU KNOW? 🤯\n\nWhy can AI solve differential equations but fail to count letters in 'strawberry'?\n\nHere is the answer:\n🔹 Language models do not read individual characters.\n🔹 Words are tokenized into subword IDs (e.g. 'straw' + 'berry').\n🔹 Without seeing individual letters, character counting becomes a statistical guess!\n\nFollow @vijayakumarj_ai for daily tech breakthroughs!\n#DidYouKnow #AI #Tokenization #MachineLearning #TechFacts"
+            }
+
+        # 4. GPS Relativity
+        if any(k in t_lower for k in ["gps", "relativ", "einstein", "time dilation"]):
+            return {
+                "mode": "did_you_know",
+                "category": "🧠 DID YOU KNOW?",
+                "hook": "Did You Know GPS Needs Einstein's Relativity? 🛰️",
+                "headline": "GPS Would Drift 11 Kilometers Daily Without Einstein",
+                "source": "General & Special Relativity in GNSS",
+                "date": current_date,
+                "slides": [
+                    {"speaker": "byte", "emotion": "shocked", "title": "GPS Needs Einstein? 🛰️", "bubble": "Did you know GPS would drift 11 kilometers every day without Einstein's physics?!"},
+                    {"speaker": "vj", "emotion": "excited", "title": "Satellite Time Dilation ⏱️", "bubble": "Satellite atomic clocks tick 38 microseconds faster every day than clocks on Earth."},
+                    {"speaker": "byte", "emotion": "curious", "title": "Why Clocks Tick Faster? 🌌", "bubble": "Why does time run faster for GPS satellites in orbit?"},
+                    {"speaker": "vj", "emotion": "thinking", "title": "Weaker Gravity & Speed 🪐", "bubble": "Weaker gravity speeds time up, while orbital speed slows it down slightly."},
+                    {"speaker": "byte", "emotion": "shocked", "title": "38 Microseconds Drift? 📍", "bubble": "Does 38 tiny microseconds really cause an 11-kilometer navigation error?"},
+                    {"speaker": "vj", "emotion": "smug", "title": "Speed of Light Math ⚡", "bubble": "Radio signals travel at light speed! A microsecond error equals hundreds of meters off."},
+                    {"speaker": "byte", "emotion": "excited", "title": "Mind-Blowing Fact 💡", "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!", "is_takeaway": True}
+                ],
+                "takeaway": "GPS satellites run 38 microseconds fast daily due to relativity. Without Einstein's math, Google Maps fails!",
+                "caption": "🧠 DID YOU KNOW? 🤯\n\nWithout Albert Einstein, Google Maps would be unusable within hours!\n\nHere is why:\n🔹 Satellite atomic clocks tick 38 microseconds faster each day due to relativity.\n🔹 Radio signals travel at the speed of light: 300,000 km/s.\n🔹 38 microseconds translates into an 11 km navigation drift every single day!\n\nFollow @vijayakumarj_ai for daily mind-blowing facts!\n#DidYouKnow #GPS #Physics #Einstein #ScienceFacts"
+            }
+
+        # 5. Ariane 5 Rocket Bug
+        if any(k in t_lower for k in ["ariane", "64-bit", "rocket", "integer overflow"]):
+            return {
+                "mode": "did_you_know",
+                "category": "🧠 DID YOU KNOW?",
+                "hook": "Did You Know a 64-Bit Bug Blew Up a $500M Rocket? 🚀",
+                "headline": "The $500M Rocket Crash Caused by 64-Bit to 16-Bit Conversion",
+                "source": "Ariane 5 Flight 501 Inquiry Board Report",
+                "date": current_date,
+                "slides": [
+                    {"speaker": "byte", "emotion": "shocked", "title": "A $500M Type Bug? 🚀", "bubble": "Did you know a simple number conversion destroyed a $500M rocket in 37 seconds?!"},
+                    {"speaker": "vj", "emotion": "excited", "title": "Ariane 5 Flight 501 💥", "bubble": "In 1996, the Ariane 5 rocket exploded immediately after launch due to software."},
+                    {"speaker": "byte", "emotion": "curious", "title": "What Code Failed? 💻", "bubble": "What single line of code could possibly blow up an entire space rocket?"},
+                    {"speaker": "vj", "emotion": "thinking", "title": "64-Bit to 16-Bit Overflow ⚠️", "bubble": "Guidance software converted a 64-bit float into a 16-bit signed integer. It overflowed!"},
+                    {"speaker": "byte", "emotion": "shocked", "title": "No Exception Handling?! 🚨", "bubble": "Wait, the guidance computer didn't catch the overflow exception?"},
+                    {"speaker": "vj", "emotion": "smug", "title": "Shutdown in Mid-Air 🛑", "bubble": "Both primary and backup computers shut down, causing nozzles to swerve fatally."},
+                    {"speaker": "byte", "emotion": "excited", "title": "Mind-Blowing Fact 💡", "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!", "is_takeaway": True}
+                ],
+                "takeaway": "In 1996, a $500M rocket exploded because a 64-bit number overflowed a 16-bit integer without exception handling.",
+                "caption": "🧠 DID YOU KNOW? 🤯\n\nA single line of unhandled code caused the most expensive software bug in space history!\n\n🔹 Ariane 5 rocket exploded 37 seconds after launch in 1996.\n🔹 Software attempted to fit a 64-bit float into a 16-bit integer.\n🔹 The integer overflowed, shutting down guidance computers mid-flight!\n\nFollow @vijayakumarj_ai for daily tech history & software lessons!\n#DidYouKnow #SoftwareEngineering #Coding #Bugs #SpaceExploration"
+            }
+
+        # 6. Wi-Fi from Black Holes
+        if any(k in t_lower for k in ["wifi", "wi-fi", "black hole", "astronom"]):
+            return {
+                "mode": "did_you_know",
+                "category": "🧠 DID YOU KNOW?",
+                "hook": "Did You Know Wi-Fi Came from Black Holes? 🌌",
+                "headline": "Wi-Fi Was Accidentally Invented by an Astronomer Studying Black Holes",
+                "source": "CSIRO Wireless LAN Patent History",
+                "date": current_date,
+                "slides": [
+                    {"speaker": "byte", "emotion": "shocked", "title": "Wi-Fi from Black Holes? 🌌", "bubble": "Did you know that Wi-Fi was accidentally invented by an astronomer studying black holes?!"},
+                    {"speaker": "vj", "emotion": "excited", "title": "Dr. John O'Sullivan's Search 🔭", "bubble": "In the 1990s, astronomer Dr. John O'Sullivan tried detecting exploding mini black holes."},
+                    {"speaker": "byte", "emotion": "curious", "title": "Echoes in the Sky 📡", "bubble": "How did searching for black holes lead to wireless internet on our laptops?"},
+                    {"speaker": "vj", "emotion": "thinking", "title": "Multipath Distortion 📶", "bubble": "Radio waves bounce off walls, causing distorted ghost echoes that ruined wireless signals."},
+                    {"speaker": "byte", "emotion": "shocked", "title": "The Astronomy Math 💡", "bubble": "So his astronomy signal-cleaning equation worked for indoor radio waves?!"},
+                    {"speaker": "vj", "emotion": "smug", "title": "Modern Wi-Fi Born 🚀", "bubble": "Exactly! That exact Fast Fourier math became the foundational patent for high-speed Wi-Fi."},
+                    {"speaker": "byte", "emotion": "excited", "title": "Mind-Blowing Fact 💡", "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!", "is_takeaway": True}
+                ],
+                "takeaway": "The algorithm powering modern Wi-Fi was originally invented to detect faint radio echoes from evaporating black holes!",
+                "caption": "🧠 DID YOU KNOW? 🤯\n\nYour home Wi-Fi was born from the search for exploding black holes!\n\n🔹 Astronomers in Australia were searching for faint radio signals from dying mini black holes.\n🔹 Indoor wireless signals suffered from the exact same multipath echo interference.\n🔹 The radio astronomy mathematical equations became the basis for IEEE 802.11 Wi-Fi!\n\nFollow @vijayakumarj_ai for daily visual science & tech breakthroughs!\n#DidYouKnow #WiFi #Astronomy #TechHistory #Engineering"
+            }
+
+        # 7. Undersea Cables
+        if any(k in t_lower for k in ["cable", "underwater", "ocean", "seafloor"]):
+            return {
+                "mode": "did_you_know",
+                "category": "🧠 DID YOU KNOW?",
+                "hook": "Did You Know 99% of the Internet is Underwater? 🌊",
+                "headline": "99% of Global Internet is on the Ocean Floor",
+                "source": "TeleGeography Submarine Cable Registry",
+                "date": current_date,
+                "slides": [
+                    {"speaker": "byte", "emotion": "shocked", "title": "Internet Under the Sea? 🌊", "bubble": "Wait, did you know that 99% of all international internet data is underwater?!"},
+                    {"speaker": "vj", "emotion": "excited", "title": "1.4M km of Glass Fiber 🌐", "bubble": "Yes! Satellites carry under 1%. Over 1.4 million km of seafloor fiber carry the web."},
+                    {"speaker": "byte", "emotion": "curious", "title": "Shark & Anchor Defense 🦈", "bubble": "What stops sharks or heavy boat anchors from snapping them in two?"},
+                    {"speaker": "vj", "emotion": "smug", "title": "Garden-Hose Thin ⚙️", "bubble": "Near shore they have heavy steel armor; in deep waters they are garden-hose thin!"},
+                    {"speaker": "byte", "emotion": "shocked", "title": "What If One Snaps? 🚢", "bubble": "What happens when an underwater cable actually gets cut by an anchor?"},
+                    {"speaker": "vj", "emotion": "thinking", "title": "Autonomous Rerouting ⚡", "bubble": "Traffic reroutes in milliseconds, and specialized grappling ships sail out to repair it!"},
+                    {"speaker": "byte", "emotion": "excited", "title": "Mind-Blowing Fact 💡", "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!", "is_takeaway": True}
+                ],
+                "takeaway": "99% of global internet data travels through thin glass cables on the ocean floor, not satellites in space!",
+                "caption": "🧠 DID YOU KNOW? 🤯\n\n99% of the internet is not in the sky... it is sitting on the ocean floor!\n\nHere is the mind-blowing reality:\n🔹 Over 500 undersea fiber optic cables carry global data.\n🔹 They transmit data at 99.7% the speed of light.\n🔹 Deep-sea cables are only as thick as a garden hose, but carry trillions of dollars daily!\n\n💬 Did you already know this, or did this blow your mind? Drop a 🤯 below!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #Engineering #ComputerScience"
+            }
+
+        # 8. Dynamic Tailored Fallback for any other topic
+        t = topic_str or "99% of the Internet is Underwater"
+        hook = hook_str or f"Did You Know: {t[:40]}? 🤯"
+        return build_tailored_dyk_dialogue(title=t, hook=hook, fact_summary=summary_str, source=source_str)
 
     if mode == "news" and story:
         title = story.get("title", topic or "New AI System Released")
@@ -565,12 +795,12 @@ def get_curated_fallback_dialogue(mode: str, topic: Optional[str] = None, story:
             "source": source,
             "date": date,
             "slides": [
-                {"speaker": "byte", "emotion": "shocked", "bubble": f"Did you see the latest update from {source}?"},
-                {"speaker": "vj", "emotion": "excited", "bubble": f"Yes! {title[:60]} just went live."},
-                {"speaker": "byte", "emotion": "curious", "bubble": "What is the biggest capability improvement?"},
-                {"speaker": "vj", "emotion": "thinking", "bubble": "Faster inference speeds and significantly higher reasoning accuracy."},
-                {"speaker": "byte", "emotion": "smug", "bubble": "This changes how we build agent workflows."},
-                {"speaker": "vj", "emotion": "excited", "bubble": "Follow @vijayakumarj_ai for daily verified AI news!", "is_takeaway": True}
+                {"speaker": "byte", "emotion": "shocked", "title": "Breaking News 🚨", "bubble": f"Did you see the latest update from {source}?"},
+                {"speaker": "vj", "emotion": "excited", "title": "Major Release ⚡", "bubble": clean_bubble_text(f"Yes! {title[:50]} just went live.", 18)},
+                {"speaker": "byte", "emotion": "curious", "title": "Capability Jump 🔍", "bubble": "What is the biggest capability improvement?"},
+                {"speaker": "vj", "emotion": "thinking", "title": "Inference Speed ⚙️", "bubble": "Faster inference speeds and significantly higher reasoning accuracy."},
+                {"speaker": "byte", "emotion": "smug", "title": "Agent Workflows 🚀", "bubble": "This changes how we build autonomous agent workflows."},
+                {"speaker": "vj", "emotion": "excited", "title": "Key Takeaway 💡", "bubble": "Follow @vijayakumarj_ai for daily verified AI news!", "is_takeaway": True}
             ],
             "takeaway": f"This release from {source} accelerates practical AI deployment and agent pipelines.",
             "caption": f"📰 {title}\n\nKey takeaways from the latest release.\n\nSource: {source} ({date})\n\nFollow @vijayakumarj_ai for daily AI news!\n#AI #TechNews #ArtificialIntelligence"
@@ -585,13 +815,13 @@ def get_curated_fallback_dialogue(mode: str, topic: Optional[str] = None, story:
         "source": "AI Architecture Guides",
         "date": current_date,
         "slides": [
-            {"speaker": "byte", "emotion": "curious", "bubble": "Why does ChatGPT forget what I said 10 minutes ago?"},
-            {"speaker": "vj", "emotion": "thinking", "bubble": "Think of it as the AI's short-term memory: context window."},
-            {"speaker": "byte", "emotion": "curious", "bubble": "What happens when that window gets full?"},
-            {"speaker": "vj", "emotion": "shocked", "bubble": "Older messages drop off completely so it cannot read them!"},
-            {"speaker": "byte", "emotion": "thinking", "bubble": "So smart prompt compression keeps chats alive?"},
-            {"speaker": "vj", "emotion": "smug", "bubble": "Exactly! Keep system prompts clean and summarize history."},
-            {"speaker": "byte", "emotion": "excited", "bubble": "Follow @vijayakumarj_ai for daily AI breakdowns!", "is_takeaway": True}
+            {"speaker": "byte", "emotion": "curious", "title": "Why ChatGPT Forgets? 🤯", "bubble": "Why does ChatGPT forget what I said 10 minutes ago?"},
+            {"speaker": "vj", "emotion": "thinking", "title": "The Context Window 🧠", "bubble": "Think of it as the AI's short-term memory: context window."},
+            {"speaker": "byte", "emotion": "curious", "title": "When Limits Hit 🛑", "bubble": "What happens when that window gets full?"},
+            {"speaker": "vj", "emotion": "shocked", "title": "Silent Token Drop ✂️", "bubble": "Older messages drop off completely so it cannot read them!"},
+            {"speaker": "byte", "emotion": "thinking", "title": "Memory Solutions 💡", "bubble": "So smart prompt compression keeps chats alive?"},
+            {"speaker": "vj", "emotion": "smug", "title": "Vector Memory ⚡", "bubble": "Exactly! Keep system prompts clean and summarize history."},
+            {"speaker": "byte", "emotion": "excited", "title": "Key Takeaway 💡", "bubble": "Follow @vijayakumarj_ai for daily AI breakdowns!", "is_takeaway": True}
         ],
         "takeaway": "LLMs rely on finite context windows. Trim excess prompts and summarize earlier dialogue to preserve memory.",
         "caption": "Ever wondered why your long AI chats lose track of context?\n\nHere is how context limits work and how you can fix them.\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns!\n#AI #ChatGPT #TechTips #Developers"
@@ -599,7 +829,7 @@ def get_curated_fallback_dialogue(mode: str, topic: Optional[str] = None, story:
 
 
 def parse_and_validate_dialogue(data: Any, mode: str, topic: Optional[str] = None, story: Optional[Dict] = None) -> Dict:
-    """Ensure strict adherence to alternating speakers, word limits, and slide count."""
+    """Ensure strict adherence to alternating speakers, word limits, slide titles, and slide count."""
     if not isinstance(data, dict):
         return get_curated_fallback_dialogue(mode, topic, story)
 
@@ -610,9 +840,9 @@ def parse_and_validate_dialogue(data: Any, mode: str, topic: Optional[str] = Non
     # Ensure 6–7 slides
     if len(slides) > 7:
         slides = slides[:7]
-    elif len(slides) < 6:
-        # If 4 or 5 slides, ensure we add conclusion slide
-        pass
+
+    hook = data.get("hook") or data.get("headline") or "Did You Know?"
+    headline = data.get("headline") or hook
 
     validated_slides = []
     expected_speaker = "byte"
@@ -638,9 +868,20 @@ def parse_and_validate_dialogue(data: Any, mode: str, topic: Optional[str] = Non
         raw_bubble = s.get("bubble", "")
         bubble = clean_bubble_text(raw_bubble, max_words=18)
         
+        # Ensure slide has a matching title
+        slide_title = s.get("title")
+        if not slide_title or len(slide_title.strip()) < 2:
+            if i == 0:
+                slide_title = hook
+            elif i == len(slides) - 1 or s.get("is_takeaway"):
+                slide_title = "Mind-Blowing Fact 💡" if mode in ["did_you_know", "dyk"] else "Key Takeaway 💡"
+            else:
+                slide_title = headline
+        
         slide_entry = {
             "speaker": speaker,
             "emotion": emotion,
+            "title": slide_title,
             "bubble": bubble,
             "is_takeaway": s.get("is_takeaway", False)
         }
@@ -653,8 +894,8 @@ def parse_and_validate_dialogue(data: Any, mode: str, topic: Optional[str] = Non
 
     data["slides"] = validated_slides
     data["mode"] = mode
-    data["hook"] = data.get("hook") or data.get("headline") or "AI Insights"
-    data["headline"] = data.get("headline") or data["hook"]
+    data["hook"] = hook
+    data["headline"] = headline
     data["takeaway"] = data.get("takeaway") or "Understand core tech systems to build better workflows."
     
     if mode in ["did_you_know", "dyk"]:
@@ -728,19 +969,26 @@ def generate_cartoon_dialogue_json(
         except Exception as e:
             print(f"⚠️ OpenRouter generation note: {e}")
 
-    # Priority 2: Google GenAI (Gemini)
+    # Priority 2: Google GenAI (Gemini) — supports both new `google.genai` and legacy `google.generativeai`
     if not dialogue_data and GEMINI_AVAILABLE and GEMINI_API_KEY:
-        try:
-            client = genai.Client(api_key=GEMINI_API_KEY)
-            models = ["gemini-2.5-flash", "gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-2.5-pro"]
-            for m in models:
-                try:
-                    print(f"🤖 Generating cartoon dialogue with Gemini ({m})...")
+        models = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.5-pro"]
+        for m in models:
+            try:
+                raw = ""
+                if GEMINI_GENAI_AVAILABLE:
+                    client = genai.Client(api_key=GEMINI_API_KEY)
                     resp = client.models.generate_content(
                         model=m,
                         contents=prompt,
                     )
                     raw = resp.text.strip()
+                elif GEMINI_LEGACY_AVAILABLE:
+                    genai_legacy.configure(api_key=GEMINI_API_KEY)
+                    model_inst = genai_legacy.GenerativeModel(m)
+                    resp = model_inst.generate_content(prompt)
+                    raw = resp.text.strip()
+
+                if raw:
                     raw = re.sub(r"^```(?:json)?\s*", "", raw, flags=re.MULTILINE)
                     raw = re.sub(r"\s*```$", "", raw, flags=re.MULTILINE)
                     parsed = json.loads(raw)
@@ -748,11 +996,9 @@ def generate_cartoon_dialogue_json(
                         dialogue_data = parsed
                         print(f"✅ Gemini ({m}) generated {len(dialogue_data.get('slides', []))} dialogue slides")
                         break
-                except Exception as model_err:
-                    print(f"⚠️ Gemini model {m} note: {model_err}")
-                    continue
-        except Exception as e:
-            print(f"⚠️ Gemini client setup note: {e}")
+            except Exception as model_err:
+                print(f"⚠️ Gemini model {m} note: {model_err}")
+                continue
 
     # Validate and fallback if needed
     result = parse_and_validate_dialogue(dialogue_data, mode=mode, topic=topic, story=story)
@@ -795,6 +1041,7 @@ def render_cartoon_dialogue_carousel(
         speaker = slide.get("speaker", "byte")
         emotion = slide.get("emotion", "neutral")
         is_takeaway = (slide_num == total_slides) or slide.get("is_takeaway", False)
+        slide_title = slide.get("title") or (dialogue.get("hook") if i == 0 else dialogue.get("headline", ""))
         
         char_img = get_character_image_path(speaker, emotion)
         char_img_uri = f"file://{char_img.resolve()}" if char_img else ""
@@ -820,6 +1067,7 @@ def render_cartoon_dialogue_carousel(
             "slide_total": total_slides,
             "mode": derived_mode,
             "category": category_label,
+            "slide_title": slide_title,
             "hook": dialogue.get("hook", ""),
             "headline": dialogue.get("headline", ""),
             "speaker": speaker,
