@@ -815,7 +815,9 @@ ARCHETYPE-SPECIFIC RULES:
 ANTI-HALLUCINATION & RIGOR MANDATE:
 1. NEVER invent technical specifications, benchmarks, API behavior, pricing, architecture details, performance numbers, release dates, or company claims.
 2. If the source does not provide a specific benchmark or metric, explain the technical concept conceptually or mark it as "Not specified in source" rather than presenting a fabricated number.
-3. NO CODE SNIPPETS MANDATE: Do NOT include code snippets, raw code blocks, or syntax lines in ANY slide. Software professionals and students consume high-signal conceptual architecture, system mechanics, mental models, trade-offs, performance metrics, and production anti-patterns on mobile carousels. Code snippets are hard to read and low-engagement on social media. Focus on diagrams, workflows, and conceptual engineering depth.
+3. NO CODE SNIPPETS MANDATE: Do NOT include code snippets, raw code blocks, or syntax lines in ANY slide. Focus on conceptual architecture, mental models, workflows, and intuitive diagrams.
+4. COMMON LAYMAN UNDERSTANDABLE: The content must be accessible and fascinating to a common layperson (students, non-specialists). Always use intuitive real-world analogies so anyone who reads it can instantly understand and appreciate the concept.
+5. NO SCRIPT ARTIFACTS: Absolutely NO words or directions like '[pause]', '(pause)', 'pause', '[break]', '(break)', 'break', '[continue]', '(continue)', 'continue' anywhere in slide text. Text must be pure, clean, engaging, natural human writing.
 
 NO-REPETITION MANDATE:
 Every single slide must advance the story and add genuinely new knowledge.

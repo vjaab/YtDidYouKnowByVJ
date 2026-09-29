@@ -603,24 +603,28 @@ Return ONLY valid JSON (no markdown):
 
 def synthesize_unique_dyk_fact(vector: str, used_titles: List[str]) -> Optional[Dict]:
     """
-    Synthesizes a brand-new, 100% verified, unique 'Did You Know' tech/science fact using LLM.
-    Guarantees zero duplicates even if all seed facts are exhausted.
+    Synthesizes a brand-new, 100% verified, unique 'Did You Know' tech/AI fact using LLM.
+    Guarantees that topics are fascinating and easily understandable by a common layperson.
+    Guarantees zero duplicates against all previously used topics.
     """
-    recent_sample = ", ".join([f'"{t}"' for t in used_titles[-25:]]) if used_titles else "none"
-    prompt = f"""You are the viral tech director for 'Did You Know By VJ'.
-Generate a brand-new, mind-blowing, 100% scientifically and technically accurate 'Did You Know' fact about '{vector}'.
-CRITICAL: It must be COMPLETELY DIFFERENT and NOT cover any of these recently used topics:
-[{recent_sample}]
+    recent_sample = ", ".join([f'"{t}"' for t in used_titles[-30:]]) if used_titles else "none"
+    prompt = f"""You are the viral tech storyteller for 'Did You Know By VJ' (@vijayakumarj_ai).
+Generate an extraordinary, fascinating 'Did You Know' fact about Technology and AI that is easily understood by a COMMON LAYPERSON (a student or non-technical adult).
 
-Choose an extraordinary, lesser-known hardware, software, networking, physics, or AI architectural marvel.
+CRITICAL AUDIENCE & CONTENT RULES:
+1. LAYMAN UNDERSTANDABLE: Anyone from age 12 to 80 must instantly understand it. Avoid developer-only jargon (no niche database internals, no raw APIs, no obscure benchmark suites).
+2. FASCINATING EVERYDAY WONDER: Focus on mind-blowing technology concepts people interact with or wonder about (e.g. smartphones, touchscreens, internet cables under oceans, how AI recognizes photos, microchip physics, GPS satellites and Einstein's relativity, biometric sensors, battery chemistry, how Wi-Fi travels through walls).
+3. NO SCRIPT ARTIFACTS: Absolutely NO 'pause', 'continue', or 'break' statements.
+4. ZERO DUPLICATES: It must be COMPLETELY DIFFERENT from these recently covered topics:
+[{recent_sample}]
 
 Return ONLY valid JSON (no markdown):
 {{
-  "title": "<Punchy 5-8 word fact title>",
-  "hook": "Did You Know <compelling question with emoji>? 🤯",
-  "headline": "<High-tech technical headline>",
-  "fact_summary": "<2-3 sentence explanation with exact numbers, hardware specs, or physics mechanisms>",
-  "source": "<Verified scientific / engineering specification / standard>",
+  "title": "<Catchy 5-8 word topic title understandable by anyone>",
+  "hook": "Did You Know <compelling, simple layman question with emoji>? 🤯",
+  "headline": "<Clear, intriguing headline>",
+  "fact_summary": "<2-3 sentence simple explanation with a vivid real-world analogy and mind-blowing reality>",
+  "source": "<Verified scientific / tech fact source>",
   "keywords": ["<keyword1>", "<keyword2>", "<keyword3>", "did you know"]
 }}
 """
@@ -643,22 +647,13 @@ Return ONLY valid JSON (no markdown):
 
 def fetch_or_select_did_you_know_fact(topic: Optional[str] = None) -> Dict:
     """
-    Selects or generates a high-attraction, 100% unique 'Did You Know' fact.
-    - If explicit topic is provided: checks uniqueness, formats, and records in tracker.
-    - If no topic (auto run / workflow schedule):
-      1. PRIORITY 1: Live Trending Signals First.
-         Fetches live stories via fetch_ai_news_stories() / trending_engine,
-         filters them through is_topic_unique against BOTH news_log.json (YouTube)
-         and instagram_carousel_log.json (Carousel).
-         Converts the top unique trending signal into a mind-blowing DYK fact
-         using convert_trending_story_to_dyk_fact().
-      2. PRIORITY 2: Curated Seed Catalog (40+ facts across 5 vectors).
-         Cycles through vectors, strictly filtering out any fact that has been covered
-         using is_topic_unique() (RapidFuzz token similarity + keyword overlap).
-      3. PRIORITY 3: Real-Time Dynamic LLM Synthesis.
-         If all seed facts are exhausted, synthesizes a brand-new unique fact
-         using Gemini/OpenRouter, checking is_topic_unique() to guarantee zero duplicates.
-    - Records the final selection in BOTH instagram_carousel_log.json and news_log.json.
+    Selects or generates a high-attraction, 100% unique 'Did You Know' fact that is
+    easily understandable by a common layperson (not overly niche or dry).
+    - Guarantees zero duplicate topics across all platforms (checked via RapidFuzz & keywords).
+    - Avoids niche developer tooling; focuses on fascinating everyday tech & AI concepts.
+    - PRIORITY 1: Curated Layman-Friendly Seed Catalog (verified, high curiosity).
+    - PRIORITY 2: Real-Time Dynamic LLM Synthesis (new layman facts, deduplicated).
+    - PRIORITY 3: Live Trending Signals (filtered for layman interest).
     """
     try:
         from ai_news_carousel import (
@@ -709,57 +704,43 @@ def fetch_or_select_did_you_know_fact(topic: Optional[str] = None) -> Dict:
             "vector": "custom"
         }
 
-    # CASE B: Auto-selection for workflow schedule (Always pick fresh trending / zero-duplicate facts)
+    # CASE B: Auto-selection (Prioritize high-attraction, layman-friendly concepts with zero duplicates)
     if not selected:
-        # Determine active vector rotation
         try:
             from topic_tracker import get_did_you_know_sub_vector
             current_vector = get_did_you_know_sub_vector()
         except Exception:
             current_vector = "ai_secrets"
 
-        print(f"🧠 Selecting high-attraction fact for rotation vector: '{current_vector}'...")
+        print(f"🧠 Selecting layman-friendly 'Did You Know' fact for rotation vector: '{current_vector}'...")
 
-        # ── PRIORITY 1: Fetch Live Trending Signals ──────────────────────────
-        if fetch_ai_news_stories and filter_unique_stories:
-            try:
-                print("📡 Querying live trending signals for fresh breaking facts...")
-                raw_stories = fetch_ai_news_stories()
-                unique_stories = filter_unique_stories(raw_stories) if raw_stories else []
-                
-                for candidate_story in unique_stories[:5]:
-                    cand_title = candidate_story.get("title", "")
-                    cand_url = candidate_story.get("url", "")
-                    
-                    # Convert to Did You Know format
-                    converted = convert_trending_story_to_dyk_fact(candidate_story)
-                    
-                    # Verify converted fact uniqueness
-                    if is_topic_unique:
-                        is_uniq, reason = is_topic_unique(
-                            converted["title"],
-                            converted.get("news_source_url", cand_url),
-                            converted.get("keywords", []),
-                            check_youtube=True,
-                            check_carousel=True
-                        )
-                        if not is_uniq:
-                            print(f"  🔄 Converted trending topic duplicate ({reason}), checking next story...")
-                            continue
-                    
-                    selected = converted
-                    print(f"🔥 Successfully picked live trending fact: '{selected['title']}' ({selected.get('source', '')})")
-                    break
-            except Exception as e:
-                print(f"⚠️ Note on live trending fact extraction: {e}")
-
-        # ── PRIORITY 2: Curated Seed Catalog (40+ Facts across 5 Vectors) ────
-        if not selected:
-            print("📚 Checking curated seed facts with multi-layer deduplication...")
-            # 1. Filter candidates for current vector
-            vector_candidates = [f for f in DID_YOU_KNOW_SEED_FACTS if f.get("vector") == current_vector]
-            unseen_vector = []
-            for cand in vector_candidates:
+        # ── PRIORITY 1: Curated Seed Catalog (40+ Verified Layman-Friendly Facts) ────
+        print("📚 Checking curated seed facts with multi-layer deduplication...")
+        # 1. Filter candidates for current vector
+        vector_candidates = [f for f in DID_YOU_KNOW_SEED_FACTS if f.get("vector") == current_vector]
+        unseen_vector = []
+        for cand in vector_candidates:
+            if is_topic_unique:
+                is_uniq, _ = is_topic_unique(
+                    cand["title"],
+                    "",
+                    cand.get("keywords", []),
+                    check_youtube=True,
+                    check_carousel=True
+                )
+                if is_uniq:
+                    unseen_vector.append(cand)
+            else:
+                unseen_vector.append(cand)
+        
+        if unseen_vector:
+            selected = dict(random.choice(unseen_vector))
+            print(f"🎯 Selected unseen seed fact for '{current_vector}': '{selected['title']}'")
+        else:
+            # 2. Check all remaining seed facts across other vectors
+            print(f"ℹ️ All seed facts in '{current_vector}' covered; searching full 40-fact seed catalog...")
+            all_unseen = []
+            for cand in DID_YOU_KNOW_SEED_FACTS:
                 if is_topic_unique:
                     is_uniq, _ = is_topic_unique(
                         cand["title"],
@@ -769,38 +750,17 @@ def fetch_or_select_did_you_know_fact(topic: Optional[str] = None) -> Dict:
                         check_carousel=True
                     )
                     if is_uniq:
-                        unseen_vector.append(cand)
-                else:
-                    unseen_vector.append(cand)
-            
-            if unseen_vector:
-                selected = dict(random.choice(unseen_vector))
-                print(f"🎯 Selected unseen seed fact for '{current_vector}': '{selected['title']}'")
-            else:
-                # 2. Check all remaining seed facts across other vectors
-                print(f"ℹ️ All seed facts in '{current_vector}' covered; searching full 40-fact seed catalog...")
-                all_unseen = []
-                for cand in DID_YOU_KNOW_SEED_FACTS:
-                    if is_topic_unique:
-                        is_uniq, _ = is_topic_unique(
-                            cand["title"],
-                            "",
-                            cand.get("keywords", []),
-                            check_youtube=True,
-                            check_carousel=True
-                        )
-                        if is_uniq:
-                            all_unseen.append(cand)
-                    else:
                         all_unseen.append(cand)
-                
-                if all_unseen:
-                    selected = dict(random.choice(all_unseen))
-                    print(f"🎯 Selected unseen seed fact across catalog: '{selected['title']}' ({selected.get('vector')})")
+                else:
+                    all_unseen.append(cand)
+            
+            if all_unseen:
+                selected = dict(random.choice(all_unseen))
+                print(f"🎯 Selected unseen seed fact across catalog: '{selected['title']}' ({selected.get('vector')})")
 
-        # ── PRIORITY 3: Real-Time Dynamic LLM Synthesis (Zero-Duplicate Guarantee) ──
+        # ── PRIORITY 2: Real-Time Dynamic LLM Synthesis (Zero-Duplicate Layman Fact) ──
         if not selected:
-            print("⚡ All seed facts covered! Synthesizing brand-new unique fact using real-time LLM...")
+            print("⚡ Seed facts covered! Synthesizing brand-new unique layman-friendly fact via LLM...")
             used_titles_list = []
             if load_carousel_tracker:
                 try:
@@ -817,6 +777,36 @@ def fetch_or_select_did_you_know_fact(topic: Optional[str] = None) -> Dict:
                         selected = synth
                 else:
                     selected = synth
+
+        # ── PRIORITY 3: Live Trending Signals (Filtered for Layman-Friendliness) ────
+        if not selected and fetch_ai_news_stories and filter_unique_stories:
+            try:
+                print("📡 Checking live trending signals for accessible breaking tech concepts...")
+                raw_stories = fetch_ai_news_stories()
+                unique_stories = filter_unique_stories(raw_stories) if raw_stories else []
+                
+                for candidate_story in unique_stories[:5]:
+                    cand_title = candidate_story.get("title", "")
+                    cand_url = candidate_story.get("url", "")
+                    
+                    converted = convert_trending_story_to_dyk_fact(candidate_story)
+                    
+                    if is_topic_unique:
+                        is_uniq, reason = is_topic_unique(
+                            converted["title"],
+                            converted.get("news_source_url", cand_url),
+                            converted.get("keywords", []),
+                            check_youtube=True,
+                            check_carousel=True
+                        )
+                        if not is_uniq:
+                            continue
+                    
+                    selected = converted
+                    print(f"🔥 Picked live fact: '{selected['title']}'")
+                    break
+            except Exception as e:
+                print(f"⚠️ Note on live trending fact extraction: {e}")
 
         # Fallback safeguard (guarantee a valid dictionary)
         if not selected:
@@ -853,8 +843,29 @@ def fetch_or_select_did_you_know_fact(topic: Optional[str] = None) -> Dict:
 
 
 def clean_bubble_text(text: str, max_words: int = 18) -> str:
-    """Ensure bubble text is concise (18 words or fewer) without overflow."""
-    text = text.strip().strip('"').strip("'")
+    """Ensure bubble text is clean, layman-friendly, and concise (18 words or fewer).
+    Removes pause, continue, break statements and any script/stage direction artifacts.
+    """
+    if not text:
+        return ""
+    text = str(text).strip().strip('"').strip("'")
+    
+    # 1. Remove bracketed / parenthetical stage directions: [pause], (pause), [beat], (continue), etc.
+    text = re.sub(r'\[\s*(?:pause|beat|break|continue|breathe|silence|tone|laughter|sigh)\s*\]', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'\(\s*(?:pause|beat|break|continue|breathe|silence|tone|laughter|sigh)\s*\)', '', text, flags=re.IGNORECASE)
+    
+    # 2. Remove standalone pause/continue/break commands at word boundaries if written as artifacts
+    text = re.sub(r'\b(?:pause|break|continue)\s*\.{2,}', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'^\s*(?:pause|break|continue)\s*[:,\-—]\s*', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'\s*[:,\-—]\s*(?:pause|break|continue)\s*$', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'\b(?:take a break|let\'s pause|continue reading|to be continued)\b', '', text, flags=re.IGNORECASE)
+
+    # 3. Clean up leftover double punctuation and excess spaces
+    text = re.sub(r'\s{2,}', ' ', text)
+    text = re.sub(r'[,;]\s*([.?!])', r'\1', text)
+    text = text.strip()
+
+    # 4. Word count limit
     words = text.split()
     if len(words) > max_words:
         text = " ".join(words[:max_words]).rstrip(",;:-") + "..."
@@ -883,22 +894,24 @@ MIND-BLOWING FACT TO COVER:
 - Verified Details: {fact_summary}
 - Source: {fact_source}
 
-CRITICAL RULES FOR MAXIMUM VIEWER ATTRACTION:
-1. MODE: "did_you_know"
-2. CATEGORY: "🧠 DID YOU KNOW?"
-3. SLIDE 1 HOOK: Must start with a scroll-stopping question: "Did you know that...?" or a counter-intuitive paradox. Max 14 words.
-4. SPEAKERS ALTERNATE: Slide 1 byte, Slide 2 vj, Slide 3 byte, Slide 4 vj, Slide 5 byte, Slide 6 vj (Slide 7 takeaway).
-5. SPEECH BUBBLE LENGTH: STRICTLY 18 WORDS OR FEWER PER BUBBLE. Short, punchy, conversational, mind-blowing!
-6. EMOTIONAL ARC:
+CRITICAL RULES FOR MAXIMUM VIEWER ATTRACTION & LAYMAN UNDERSTANDING:
+1. COMMON LAYMAN UNDERSTANDABLE: Must be crystal clear and instantly understandable by a common layman (a 12-year-old student or non-technical adult). Zero complex jargon without an immediate simple analogy.
+2. ABSOLUTELY NO SCRIPT ARTIFACTS: NEVER use words or stage directions like '[pause]', '(pause)', 'pause', '[break]', '(break)', 'break', '[continue]', '(continue)', 'continue' anywhere in speech bubbles. Every bubble must be pure, clean, natural conversational English.
+3. MODE: "did_you_know"
+4. CATEGORY: "🧠 DID YOU KNOW?"
+5. SLIDE 1 HOOK: Must start with a scroll-stopping question: "Did you know that...?" or a counter-intuitive paradox. Max 14 words.
+6. SPEAKERS ALTERNATE: Slide 1 byte, Slide 2 vj, Slide 3 byte, Slide 4 vj, Slide 5 byte, Slide 6 vj (Slide 7 takeaway).
+7. SPEECH BUBBLE LENGTH: STRICTLY 18 WORDS OR FEWER PER BUBBLE. Short, punchy, conversational, mind-blowing!
+8. EMOTIONAL ARC:
    - Byte: "shocked" or "curious" on slide 1 ("Wait, did you know that...?").
    - VJ: "excited" or "thinking" on slide 2 revealing the scale & numbers.
    - Byte: "curious" or "thinking" on slide 3 asking the technical question.
-   - VJ: "smug" or "excited" on slide 4 explaining the engineering mechanism.
+   - VJ: "smug" or "excited" on slide 4 explaining the engineering mechanism with a simple analogy.
    - Byte: "shocked" on slide 5 asking the crazy consequence or edge case.
    - VJ: "thinking" or "smug" on slide 6 delivering the punchline.
-7. FINAL SLIDE: Mark "is_takeaway": true. Provide a punchy summary in "takeaway" field.
-8. SLIDE TITLES: Every single slide MUST include a "title" property (2-5 words, plus an optional emoji) matching what that specific slide discusses! Slide 1 title should be the hook.
-9. CAPTION: Engaging Instagram caption with Did You Know format, 3 bullet points, an engagement question ("Did you already know this? Drop a 🤯 below!"), and viral hashtags.
+9. FINAL SLIDE: Mark "is_takeaway": true. Provide a punchy summary in "takeaway" field.
+10. SLIDE TITLES: Every single slide MUST include a "title" property (2-5 words, plus an optional emoji) matching what that specific slide discusses! Slide 1 title should be the hook.
+11. CAPTION: Engaging Instagram caption with Did You Know format, 3 bullet points, an engagement question ("Did you already know this? Drop a 🤯 below!"), and viral hashtags.
 
 Return ONLY valid JSON matching this schema with NO markdown fences, NO preamble:
 {{
