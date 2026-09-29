@@ -266,51 +266,29 @@ def select_best_story(stories: List[Dict], run_context: str = "") -> Optional[Di
     if not stories:
         return None
     
-    # Pre-filter: Check against carousel tracker BEFORE scoring to avoid duplicates
-    carousel_tracker = load_carousel_tracker()
-    recent_carousel_urls = set()
-    recent_carousel_titles = set()
-    for entry in carousel_tracker.get("history", [])[-20:]:  # Check last 20 carousel topics
-        if isinstance(entry, dict):
-            if entry.get("news_source_url"):
-                recent_carousel_urls.add(entry["news_source_url"])
-            if entry.get("title"):
-                recent_carousel_titles.add(entry["title"].lower())
-    
+    # Pre-filter: Check against both YouTube and Carousel trackers to avoid any duplicates
     filtered_stories = []
     for story in stories:
         url = story.get("url", "")
-        title = story.get("title", "").lower()
+        title = story.get("title", "")
+        description = story.get("description", "")
+        keywords = re.findall(r'\b[A-Za-z]{4,}\b', description.lower()) if description else []
         
-        # Skip if exact URL already used in carousel
-        if url and url in recent_carousel_urls:
-            print(f"  🔄 Skipping (URL already in carousel history): {story.get('title')[:60]}...")
-            continue
-        
-        # Skip if title semantically matches recent carousel titles
-        if RAPIDFUZZ_AVAILABLE and title:
-            is_dup = False
-            for recent_title in recent_carousel_titles:
-                score = fuzz.token_set_ratio(title, recent_title)
-                if score > SIMILARITY_THRESHOLD:
-                    print(f"  🔄 Skipping (semantic match in carousel history, score {score}): {story.get('title')[:60]}...")
-                    is_dup = True
-                    break
-            if is_dup:
-                continue
-        
-        filtered_stories.append(story)
+        is_uniq, reason = is_topic_unique(title, url, keywords, check_youtube=True, check_carousel=True)
+        if is_uniq:
+            filtered_stories.append(story)
+        else:
+            print(f"  🔄 Skipping duplicate in select_best_story: {title[:60]}... ({reason})")
     
     if not filtered_stories:
-        print("⚠️ All stories filtered out as duplicates, falling back to original list")
-        filtered_stories = stories
+        print("⚠️ All stories filtered out as duplicates; zero duplicate policy prevents selecting existing topics.")
+        return None
     
     scored = [(score_story(s), s) for s in filtered_stories]
     scored.sort(key=lambda x: x[0], reverse=True)
     
     # Deterministic tiebreaking using run_context
     if len(scored) > 1 and abs(scored[0][0] - scored[1][0]) < 0.1:
-        # Scores are very close, use run_context hash for consistent selection
         import hashlib
         ctx_hash = int(hashlib.md5(run_context.encode()).hexdigest()[:8], 16)
         idx = ctx_hash % len(scored)
@@ -322,17 +300,21 @@ def select_best_story(stories: List[Dict], run_context: str = "") -> Optional[Di
     if best_score >= MIN_SCORE_THRESHOLD:
         best_story["_score"] = best_score
         
-        # Record the selected topic in carousel tracker to prevent reuse
         title = best_story.get("title", "")
         url = best_story.get("url", "")
         description = best_story.get("description", "")
-        source = best_story.get("source", {}).get("name", "Unknown")
+        source = best_story.get("source", {}).get("name", "Unknown") if isinstance(best_story.get("source"), dict) else str(best_story.get("source", "Unknown"))
         
         keywords = []
         if description:
             keywords = re.findall(r'\b[A-Za-z]{4,}\b', description.lower())
         
         record_carousel_topic(title, url, keywords, source)
+        try:
+            from telegram_approval_handler import record_topic_in_tracker
+            record_topic_in_tracker(title, source_url=url, keywords=keywords, subcategory="Carousel News")
+        except Exception as e:
+            print(f"⚠️ Note recording topic in news_log: {e}")
         
         return best_story
     return None

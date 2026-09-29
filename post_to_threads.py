@@ -56,23 +56,64 @@ def post_to_threads(image_path: str, caption: str) -> str:
 
     if not success:
         raise RuntimeError(result)
+
+    # Optional informational Telegram notification
+    tg_token = os.getenv("TELEGRAM_BOT_TOKEN")
+    tg_chat = os.getenv("TELEGRAM_CHAT_ID")
+    if tg_token and tg_chat:
+        try:
+            import requests
+            post_type = f"Carousel ({len(paths)} slides)" if len(paths) > 1 else "Single Image"
+            msg = f"🧵 <b>Posted to Threads!</b>\n\n📌 <b>Type:</b> {post_type}\n🆔 <b>Post ID:</b> <code>{result}</code>"
+            requests.post(
+                f"https://api.telegram.org/bot{tg_token}/sendMessage",
+                json={"chat_id": tg_chat, "text": msg, "parse_mode": "HTML"},
+                timeout=10
+            )
+        except Exception as e:
+            print(f"ℹ️ Telegram notice note: {e}")
+
     return result
 
 
 def main():
     parser = argparse.ArgumentParser(description="Post to Threads (image or carousel)")
     parser.add_argument("--image", required=True, help="Image file path(s) - comma separated for carousel")
-    parser.add_argument("--caption", required=True, help="Post caption (max 2200 chars)")
+    parser.add_argument("--caption", default="", help="Post caption (max 2200 chars)")
+    parser.add_argument("--caption-file", default="", help="Path to text file containing post caption")
+    parser.add_argument("--topic", default="", help="Topic title for tracking logs")
     args = parser.parse_args()
 
     if not _check_credentials():
         print("❌ Threads credentials not configured (need THREADS_USER_ID, THREADS_ACCESS_TOKEN)")
         sys.exit(1)
 
+    caption = args.caption
+    if args.caption_file and Path(args.caption_file).exists():
+        caption = Path(args.caption_file).read_text(encoding="utf-8")
+
+    if not caption:
+        print("❌ No caption provided (--caption or --caption-file required)")
+        sys.exit(1)
+
     try:
-        post_id = post_to_threads(args.image, args.caption)
+        post_id = post_to_threads(args.image, caption)
         print(f"✅ Threads post published: {post_id}")
         print(f"POST_ID={post_id}")
+
+        # Record in trackers to prevent duplication
+        if args.topic:
+            try:
+                from telegram_approval_handler import record_topic_in_tracker
+                record_topic_in_tracker(args.topic, subcategory="Threads Post")
+            except Exception as e:
+                print(f"⚠️ Note recording topic: {e}")
+            try:
+                from ai_news_carousel import record_carousel_topic
+                record_carousel_topic(args.topic, "", ["threads", "tech"], "Threads Post")
+            except Exception as e:
+                print(f"⚠️ Note recording carousel tracker: {e}")
+
     except Exception as e:
         print(f"❌ Threads post failed: {e}")
         sys.exit(1)
