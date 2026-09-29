@@ -518,5 +518,15 @@
     "title": "Make Your Code 7x Faster Overnight \u26a1",
     "uploaded_at": "2026-09-28T22:36:01.959822",
     "synced": false
+  },
+  "LAyHCSLh9IE": {
+    "video_id": "LAyHCSLh9IE",
+    "hook_pattern": "negative_warning",
+    "hook_variant": "A",
+    "hook_text": "Stop paying AssemblyAI for speaker diarization",
+    "category": "Interview Questions",
+    "title": "[STUDY HACK] Run SOTA Speaker Diarization Locally For Zero Cost",
+    "uploaded_at": "2026-09-29T05:51:55.268297",
+    "synced": false
   }
 }
