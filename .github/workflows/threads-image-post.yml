@@ -150,7 +150,7 @@ jobs:
           git pull origin main --rebase --autostash || true
           if [ -d "logs" ]; then git add -f logs/*.txt logs/*.json 2>/dev/null || true; fi
           if [ -d "output/social_images" ]; then git add -f output/social_images/*.json 2>/dev/null || true; fi
-          if [ -f ".threads_rate_limit.json" ]; then git add .threads_rate_limit.json; fi
+          if [ -f ".threads_rate_limit.json" ]; then git add -f .threads_rate_limit.json; fi
           if [ -f "instagram_carousel_log.json" ]; then git add instagram_carousel_log.json; fi
           if [ -f "news_log.json" ]; then git add news_log.json; fi
           if [ -f "topic_tracker.json" ]; then git add topic_tracker.json; fi
