@@ -378,21 +378,53 @@ def wait_for_container(container_id: str, timeout_s: int = 300, poll_every_s: in
     raise TimeoutError(f"Container {container_id} still processing after {timeout_s}s")
 
 
-def publish_container(container_id: str) -> str:
-    """Step 3: publish the finished container. Returns the published media ID."""
+def publish_container(container_id: str, max_retries: int = 5, retry_delay_s: int = 5) -> str:
+    """Step 3: publish the finished container. Returns the published media ID.
+    Includes retries with backoff for edge replication delays (error code 24 / Media Not Found).
+    """
     threads_user_id = os.getenv("THREADS_USER_ID")
     access_token = os.getenv("THREADS_ACCESS_TOKEN")
 
-    resp = requests.post(
-        f"{GRAPH_API_BASE}/{threads_user_id}/threads_publish",
-        data={"creation_id": container_id, "access_token": access_token},
-        timeout=30,
-    )
-    resp.raise_for_status()
-    result = resp.json()
-    if not isinstance(result, dict) or "id" not in result:
-        raise RuntimeError(f"Unexpected response from publish_container: {result}")
-    return result["id"]
+    for attempt in range(1, max_retries + 1):
+        resp = requests.post(
+            f"{GRAPH_API_BASE}/{threads_user_id}/threads_publish",
+            data={"creation_id": container_id, "access_token": access_token},
+            timeout=30,
+        )
+        if resp.status_code == 200:
+            result = resp.json()
+            if isinstance(result, dict) and "id" in result:
+                return result["id"]
+            raise RuntimeError(f"Unexpected response from publish_container: {result}")
+
+        # Check if error is transient / replication delay
+        try:
+            err_data = resp.json().get("error", {})
+            err_code = err_data.get("code")
+            err_subcode = err_data.get("error_subcode")
+            err_msg = err_data.get("message", "")
+            err_user_title = err_data.get("error_user_title", "")
+        except Exception:
+            err_code, err_subcode, err_msg, err_user_title = None, None, "", ""
+
+        is_replication_error = (
+            err_code == 24 or
+            err_subcode == 4279009 or
+            "cannot be found" in err_msg.lower() or
+            "media not found" in err_user_title.lower() or
+            resp.status_code >= 500
+        )
+
+        if is_replication_error and attempt < max_retries:
+            wait_time = retry_delay_s * attempt
+            print(f"   ⏳ Container {container_id} not yet propagated across Meta edge clusters (attempt {attempt}/{max_retries}: code {err_code}, '{err_user_title or err_msg}'). Retrying in {wait_time}s...")
+            time.sleep(wait_time)
+            continue
+
+        resp.raise_for_status()
+
+    raise RuntimeError(f"Failed to publish container {container_id} after {max_retries} attempts")
+
 
 
 # ── Image / Carousel Support ─────────────────────────────────────────────────
@@ -682,6 +714,10 @@ def upload_images_to_threads(image_paths: list, caption: str, source_url: str = 
         print(f"📡 [Threads] Step 4: Waiting for parent container processing...")
         wait_for_container(container_id, timeout_s=120, poll_every_s=3)
         print(f"   ✔ Processing complete")
+
+        if is_carousel:
+            print(f"   ⏳ Waiting 8s for carousel container aggregation and replication across Meta...")
+            time.sleep(8)
 
         # Step 5: Publish
         print(f"📡 [Threads] Publishing {'carousel' if is_carousel else 'image'} post...")
