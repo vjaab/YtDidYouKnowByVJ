@@ -663,11 +663,23 @@ def _fetch_ddg_image(name, output_path, is_logo=False):
     return None
 
 def fetch_person_photo(person):
-    name = person.get("name")
+    if isinstance(person, str):
+        name = person.strip()
+        twitter_handle = None
+        wiki_slug = None
+        desc = "visionary tech industry leader portrait"
+    elif isinstance(person, dict):
+        name = person.get("name")
+        twitter_handle = person.get("twitter_handle")
+        wiki_slug = person.get("wikipedia_slug")
+        desc = person.get("description") or "visionary tech industry leader portrait"
+    else:
+        return None
+
+    if not name:
+        return None
+
     resolved = resolve_tech_entity(name)
-    twitter_handle = person.get("twitter_handle")
-    
-    wiki_slug = person.get("wikipedia_slug")
     if not wiki_slug:
         if resolved and "wiki_slug" in resolved:
             wiki_slug = resolved["wiki_slug"]
@@ -705,7 +717,6 @@ def fetch_person_photo(person):
 
     # PRIORITY 4: Generative AI fallback (was Pexels)
     print(f"  -> Falling back to Generative AI for {name}...")
-    desc = person.get("description") or "visionary tech industry leader portrait"
     prompt = f"Professional portrait photo headshot of a {desc}, corporate studio lighting, clean office background, highly detailed, photorealistic, premium corporate headshot"
     path = _generate_imagen3(prompt, output_path, topic_context=name, aspect_ratio="9:16")
     if path:
@@ -720,10 +731,21 @@ def fetch_person_photo(person):
     return None
 
 def fetch_company_logo(company):
-    name = company.get("name")
+    if isinstance(company, str):
+        name = company.strip()
+        domain = None
+        wiki_slug = None
+    elif isinstance(company, dict):
+        name = company.get("name")
+        domain = company.get("domain") or company.get("company_domain")
+        wiki_slug = company.get("wikipedia_slug")
+    else:
+        return None
+
+    if not name:
+        return None
+
     resolved = resolve_tech_entity(name)
-    
-    domain = company.get("domain") or company.get("company_domain")
     if not domain and resolved and "domain" in resolved:
         domain = resolved["domain"]
     if not domain:
@@ -746,7 +768,6 @@ def fetch_company_logo(company):
 
     # PRIORITY 2: Wikipedia API
     try:
-        wiki_slug = company.get("wikipedia_slug")
         if not wiki_slug:
             if resolved and "wiki_slug" in resolved:
                 wiki_slug = resolved["wiki_slug"]
@@ -822,13 +843,24 @@ def fetch_all_entities(script_data):
         key_entities = []
         script_data["key_entities"] = key_entities
 
-    existing_names = {ent.get("name", "").lower() for ent in key_entities if isinstance(ent, dict)}
+    existing_names = set()
+    for ent in key_entities:
+        if isinstance(ent, dict) and ent.get("name"):
+            existing_names.add(ent["name"].lower())
+        elif isinstance(ent, str):
+            existing_names.add(ent.lower())
+
     for p in script_data.get("people", []):
-        if isinstance(p, dict):
-            existing_names.add(p.get("name", "").lower())
+        if isinstance(p, dict) and p.get("name"):
+            existing_names.add(p["name"].lower())
+        elif isinstance(p, str):
+            existing_names.add(p.lower())
+
     for c in script_data.get("companies", []):
-        if isinstance(c, dict):
-            existing_names.add(c.get("name", "").lower())
+        if isinstance(c, dict) and c.get("name"):
+            existing_names.add(c["name"].lower())
+        elif isinstance(c, str):
+            existing_names.add(c.lower())
 
     for c in companies_mentioned:
         if isinstance(c, dict):
@@ -852,20 +884,44 @@ def fetch_all_entities(script_data):
             key_entities.append({"name": t_name, "type": "TOOL", "description": "AI Tool"})
             existing_names.add(t_name.lower())
 
-    for person in script_data.get("people", []):
+    # Normalize and fetch people
+    people_list = script_data.get("people", [])
+    normalized_people = []
+    for person in people_list:
+        if isinstance(person, str):
+            person = {"name": person}
+        elif not isinstance(person, dict):
+            continue
         path = fetch_person_photo(person)
         if path:
             person["local_image_path"] = path
+        normalized_people.append(person)
+    script_data["people"] = normalized_people
 
-    for company in script_data.get("companies", []):
+    # Normalize and fetch companies
+    companies_list = script_data.get("companies", [])
+    normalized_companies = []
+    for company in companies_list:
+        if isinstance(company, str):
+            company = {"name": company}
+        elif not isinstance(company, dict):
+            continue
         path = fetch_company_logo(company)
         if path:
             if path.endswith(".png"):
                 company["local_logo_path"] = path
             else:
                 company["local_hq_path"] = path
+        normalized_companies.append(company)
+    script_data["companies"] = normalized_companies
 
-    for entity in script_data.get("key_entities", []):
+    # Normalize and fetch key_entities
+    normalized_key_entities = []
+    for entity in key_entities:
+        if isinstance(entity, str):
+            entity = {"name": entity, "type": "TOOL"}
+        elif not isinstance(entity, dict):
+            continue
         ent_type = str(entity.get("type", "")).upper()
         if ent_type in ["PEOPLE", "PERSON"]:
             path = fetch_person_photo(entity)
@@ -878,6 +934,8 @@ def fetch_all_entities(script_data):
                     entity["local_logo_path"] = path
                 else:
                     entity["local_hq_path"] = path
+        normalized_key_entities.append(entity)
+    script_data["key_entities"] = normalized_key_entities
 
     return script_data
 
