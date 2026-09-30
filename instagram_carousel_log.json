@@ -19,13 +19,14 @@
     "Self-Attention Costs Double When You Double Text Length",
     "Training AI on AI-Generated Text Causes Model Collapse",
     "RLHF Makes AI Sycophantic Rather Than Honest",
-    "RLHF Makes AI Sycophantic Rather Than Honest"
+    "RLHF Makes AI Sycophantic Rather Than Honest",
+    "Why ChatGPT Actually Forgets You",
+    "Why AI Hallucinates Instead of Admitting Ignorance",
+    "Mixture of Experts Only Wakes Up 3% of the Brain",
+    "AI Can Steal Passwords Just by Listening to Keyboard Audio",
+    "EV Batteries Check Cell Health 1,000 Times Every Second"
   ],
   "used_keywords": [
-    "openai",
-    "launched",
-    "multimodal",
-    "model",
     "with",
     "real",
     "time",
@@ -199,7 +200,33 @@
     "chatbots",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "chatgpt",
+    "context window",
+    "ai memory",
+    "tokens",
+    "llm",
+    "did you know",
+    "ai hallucination",
+    "transformers",
+    "machine learning",
+    "probability",
+    "did you know",
+    "mixture of experts",
+    "moe",
+    "deepseek",
+    "neural networks",
+    "did you know",
+    "acoustic attack",
+    "keyboard snooping",
+    "passwords",
+    "ai audio",
+    "did you know",
+    "ev battery",
+    "battery management",
+    "electric vehicles",
+    "automotive tech",
+    "did you know"
   ],
   "history": [
     {
@@ -542,6 +569,72 @@
       ],
       "source": "Threads Post",
       "timestamp": "2026-09-30T06:06:54.932656+00:00"
+    },
+    {
+      "title": "Why ChatGPT Actually Forgets You",
+      "news_source_url": "",
+      "keywords": [
+        "chatgpt",
+        "context window",
+        "ai memory",
+        "tokens",
+        "llm",
+        "did you know"
+      ],
+      "source": "Transformer Attention & Context Windows",
+      "timestamp": "2026-09-30T07:36:03.143092+00:00"
+    },
+    {
+      "title": "Why AI Hallucinates Instead of Admitting Ignorance",
+      "news_source_url": "",
+      "keywords": [
+        "ai hallucination",
+        "transformers",
+        "machine learning",
+        "probability",
+        "did you know"
+      ],
+      "source": "Transformer Probabilistic Modeling",
+      "timestamp": "2026-09-30T07:36:52.109194+00:00"
+    },
+    {
+      "title": "Mixture of Experts Only Wakes Up 3% of the Brain",
+      "news_source_url": "",
+      "keywords": [
+        "mixture of experts",
+        "moe",
+        "deepseek",
+        "neural networks",
+        "did you know"
+      ],
+      "source": "Sparse Mixture-of-Experts Architecture Papers",
+      "timestamp": "2026-09-30T07:36:52.141463+00:00"
+    },
+    {
+      "title": "AI Can Steal Passwords Just by Listening to Keyboard Audio",
+      "news_source_url": "",
+      "keywords": [
+        "acoustic attack",
+        "keyboard snooping",
+        "passwords",
+        "ai audio",
+        "did you know"
+      ],
+      "source": "IEEE European Symposium on Security and Privacy",
+      "timestamp": "2026-09-30T07:36:52.343808+00:00"
+    },
+    {
+      "title": "EV Batteries Check Cell Health 1,000 Times Every Second",
+      "news_source_url": "",
+      "keywords": [
+        "ev battery",
+        "battery management",
+        "electric vehicles",
+        "automotive tech",
+        "did you know"
+      ],
+      "source": "Automotive BMS Functional Safety (ISO 26262)",
+      "timestamp": "2026-09-30T07:36:52.497987+00:00"
     }
   ]
 }
