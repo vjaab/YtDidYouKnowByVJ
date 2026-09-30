@@ -1,0 +1,21 @@
+{
+  "topic": "The Year 2038 Problem: When Unix Time Runs Out",
+  "category": "AI News",
+  "type": "carousel",
+  "slides": 7,
+  "instagram_images": [
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_some_computers_mi_01.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_some_computers_mi_02.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_some_computers_mi_03.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_some_computers_mi_04.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_some_computers_mi_05.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_some_computers_mi_06.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_some_computers_mi_07.jpg"
+  ],
+  "facebook_images": [],
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nImagine your computer suddenly thinking it's 1901. That's the 'Year 2038 Problem' waiting to happen!\n\nHere's the mind-blowing reality:\n\ud83d\udd39 At 03:14:07 UTC on January 19, 2038, 32-bit Unix time will overflow.\n\ud83d\udd39 This makes affected systems believe the date is December 13, 1901, due to a negative number.\n\ud83d\udd39 It primarily affects legacy embedded systems, industrial controls, and older software that haven't been updated to 64-bit time.\n\n\ud83d\udcac Did you already know about this digital time bomb? Drop a \ud83d\udca3 below if this blew your mind!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #Year2038 #UnixTime #ComputerScience #DigitalTimeBomb #FutureTech #TechHistory\n\n#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets",
+  "hashtags": "#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets",
+  "poll_file": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/poll_the_year_2038_problem_when_unix_time_runs_out.json",
+  "carousel_json": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_the_year_2038_problem_when_unix_time_runs_out.json",
+  "generated_at": "2026-09-30T16:26:55.726739+00:00"
+}

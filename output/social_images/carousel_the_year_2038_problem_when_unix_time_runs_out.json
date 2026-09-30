@@ -1,0 +1,60 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "hook": "Did you know some computers might reset to 1901 in 2038? \ud83d\udd70\ufe0f",
+  "headline": "The Year 2038 Problem: When Unix Time Runs Out",
+  "source": "POSIX Standard & Unix Time Architecture",
+  "slides": [
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "2038 Time Glitch? \ud83d\udd70\ufe0f",
+      "bubble": "Wait, did you know some computers might reset to 1901 in the year 2038?!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "The Digital Clock \u23f0",
+      "bubble": "It's real! On Jan 19, 2038, at 03:14:07 UTC, 32-bit systems will hit a limit.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "curious",
+      "title": "What's the Limit? \ud83e\udd14",
+      "bubble": "A limit? Does the digital clock just... stop working then?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Running Out of Time \u23f3",
+      "bubble": "Systems count seconds since 1970 using a 32-bit number. It just runs out of space to count!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "Back to 1901?! \ud83d\ude31",
+      "bubble": "So it goes negative and thinks it's 1901?! Which systems are affected by this?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Real-World Impact \ud83d\udea8",
+      "bubble": "Legacy industrial controls, embedded devices, even some critical software could have major date errors.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "excited",
+      "title": "Mind Blown! \ud83e\udd2f",
+      "bubble": "This is wild! Follow @vijayakumarj_ai for more mind-blowing tech facts! \u2728",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "The 'Year 2038 Problem' is when 32-bit computer systems run out of time, potentially causing major date errors in critical infrastructure worldwide. It's like a digital Y2K!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nImagine your computer suddenly thinking it's 1901. That's the 'Year 2038 Problem' waiting to happen!\n\nHere's the mind-blowing reality:\n\ud83d\udd39 At 03:14:07 UTC on January 19, 2038, 32-bit Unix time will overflow.\n\ud83d\udd39 This makes affected systems believe the date is December 13, 1901, due to a negative number.\n\ud83d\udd39 It primarily affects legacy embedded systems, industrial controls, and older software that haven't been updated to 64-bit time.\n\n\ud83d\udcac Did you already know about this digital time bomb? Drop a \ud83d\udca3 below if this blew your mind!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #Year2038 #UnixTime #ComputerScience #DigitalTimeBomb #FutureTech #TechHistory"
+}

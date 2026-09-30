@@ -27,14 +27,10 @@
     "EV Batteries Check Cell Health 1,000 Times Every Second",
     "Your Smartphone Screen Steals Your Electrons",
     "The 14 People Who Hold 7 Physical Keys to the Global Internet",
-    "The 14 People Who Hold 7 Physical Keys to the Global Internet"
+    "The 14 People Who Hold 7 Physical Keys to the Global Internet",
+    "The Year 2038 Problem: When Unix Time Runs Out"
   ],
   "used_keywords": [
-    "lower",
-    "cost",
-    "than",
-    "turbo",
-    "powered",
     "code",
     "editor",
     "cursor",
@@ -229,7 +225,12 @@
     "cryptography",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "y2038",
+    "unix epoch",
+    "integer overflow",
+    "32 bit bug",
+    "did you know"
   ],
   "history": [
     {
@@ -674,6 +675,19 @@
       ],
       "source": "Threads Post",
       "timestamp": "2026-09-30T12:59:44.720931+00:00"
+    },
+    {
+      "title": "The Year 2038 Problem: When Unix Time Runs Out",
+      "news_source_url": "",
+      "keywords": [
+        "y2038",
+        "unix epoch",
+        "integer overflow",
+        "32 bit bug",
+        "did you know"
+      ],
+      "source": "POSIX Standard & Unix Time Architecture",
+      "timestamp": "2026-09-30T16:25:24.933107+00:00"
     }
   ]
 }
