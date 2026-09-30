@@ -34,35 +34,14 @@
     "Quantum Computers Will Break RSA Encryption with Shor's Algorithm",
     "Tempest Leaks: Spies Can Rebuild Your Screen from Radio Waves",
     "Rowhammer Flips Memory Bits in Physical DRAM Without Permissions",
-    "Cleanrooms are 10,000x Cleaner Than Hospital Surgery Rooms"
+    "Cleanrooms are 10,000x Cleaner Than Hospital Surgery Rooms",
+    "GPS Would Drift 11 Kilometers Daily Without Einstein",
+    "The First Computer Bug Was an Actual Moth",
+    "How Airplanes Get Wi-Fi at 35,000 Feet Over Oceans",
+    "The First 1GB Hard Drive in 1980 Weighed 550 Pounds",
+    "Li-Fi Transmits 224 Gigabits Per Second Through Room Bulbs"
   ],
   "used_keywords": [
-    "long",
-    "term",
-    "memory",
-    "agent",
-    "coding",
-    "clis",
-    "facilitate",
-    "handoff",
-    "between",
-    "different",
-    "agent",
-    "vendors",
-    "stars",
-    "rust",
-    "application",
-    "built",
-    "with",
-    "rust",
-    "drawing",
-    "support",
-    "accelerated",
-    "rendering",
-    "stars",
-    "typescript",
-    "laminar",
-    "open",
     "source",
     "observability",
     "platform",
@@ -236,6 +215,32 @@
     "semiconductors",
     "fab",
     "transistors",
+    "did you know",
+    "gps",
+    "einstein",
+    "relativity",
+    "time dilation",
+    "satellites",
+    "did you know",
+    "computer bug",
+    "grace hopper",
+    "harvard mark ii",
+    "tech history",
+    "did you know",
+    "airplane wifi",
+    "satellite",
+    "aviation tech",
+    "phased array",
+    "did you know",
+    "ibm 3380",
+    "1gb hard drive",
+    "computer history",
+    "storage",
+    "did you know",
+    "lifi",
+    "visible light",
+    "wireless communication",
+    "photonics",
     "did you know"
   ],
   "history": [
@@ -772,6 +777,72 @@
       ],
       "source": "Semiconductor Fab Standards (ISO 14644)",
       "timestamp": "2026-09-30T18:54:46.679503+00:00"
+    },
+    {
+      "title": "GPS Would Drift 11 Kilometers Daily Without Einstein",
+      "news_source_url": "",
+      "keywords": [
+        "gps",
+        "einstein",
+        "relativity",
+        "time dilation",
+        "satellites",
+        "did you know"
+      ],
+      "source": "General & Special Relativity in GNSS",
+      "timestamp": "2026-09-30T20:27:59.653370+00:00"
+    },
+    {
+      "title": "The First Computer Bug Was an Actual Moth",
+      "news_source_url": "",
+      "keywords": [
+        "computer bug",
+        "grace hopper",
+        "harvard mark ii",
+        "tech history",
+        "did you know"
+      ],
+      "source": "Smithsonian National Museum of American History",
+      "timestamp": "2026-09-30T20:28:48.561036+00:00"
+    },
+    {
+      "title": "How Airplanes Get Wi-Fi at 35,000 Feet Over Oceans",
+      "news_source_url": "",
+      "keywords": [
+        "airplane wifi",
+        "satellite",
+        "aviation tech",
+        "phased array",
+        "did you know"
+      ],
+      "source": "Aeronautical Satellite Telecommunications",
+      "timestamp": "2026-09-30T20:28:48.747296+00:00"
+    },
+    {
+      "title": "The First 1GB Hard Drive in 1980 Weighed 550 Pounds",
+      "news_source_url": "",
+      "keywords": [
+        "ibm 3380",
+        "1gb hard drive",
+        "computer history",
+        "storage",
+        "did you know"
+      ],
+      "source": "IBM Archives & Computer History Museum",
+      "timestamp": "2026-09-30T20:28:48.893060+00:00"
+    },
+    {
+      "title": "Li-Fi Transmits 224 Gigabits Per Second Through Room Bulbs",
+      "news_source_url": "",
+      "keywords": [
+        "lifi",
+        "visible light",
+        "wireless communication",
+        "photonics",
+        "did you know"
+      ],
+      "source": "IEEE 802.11bb Light Wireless Standard",
+      "timestamp": "2026-09-30T20:28:49.037410+00:00"
     }
   ]
 }

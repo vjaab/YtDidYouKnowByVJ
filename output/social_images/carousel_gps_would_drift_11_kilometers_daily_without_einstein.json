@@ -1,0 +1,60 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "hook": "Did you know GPS needs Einstein's Relativity to work?",
+  "headline": "GPS Would Drift 11 Kilometers Daily Without Einstein",
+  "source": "General & Special Relativity in GNSS",
+  "slides": [
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "GPS Needs Einstein? \ud83e\udd2f",
+      "bubble": "Did you know GPS needs Einstein's Relativity to work?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Clocks Tick Faster! \u23f1\ufe0f",
+      "bubble": "Yes! Satellite clocks tick 38 microseconds faster daily because they're in space.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "curious",
+      "title": "Maps Affected How? \ud83e\udd14",
+      "bubble": "Wait, faster clocks? How does that affect my Google Maps?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "11 km Drift Daily! \ud83d\udccd",
+      "bubble": "Space-time is warped! Without Einstein's math, your GPS would drift 11 kilometers daily.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "Useless GPS? \ud83e\udd2f",
+      "bubble": "11 kilometers?! So without Einstein, my phone GPS would be useless?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Einstein Keeps Us On Track \u2728",
+      "bubble": "Exactly. GPS works because it constantly corrects for relativity, keeping you on track!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "excited",
+      "title": "Relativity Rules! \u269b\ufe0f",
+      "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your GPS relies on Einstein's theories of relativity to function accurately. Without these corrections, it would drift 11 km daily!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour daily commute, food delivery, and even finding your way home all rely on a mind-bending physics concept from over a century ago: Einstein's Theories of Relativity!\n\nHere's the cosmic reality:\n\ud83d\udd39 GPS satellites orbit Earth at high speeds and experience weaker gravity.\n\ud83d\udd39 These relativistic effects make their clocks tick 38 microseconds faster per day compared to Earth-bound clocks.\n\ud83d\udd39 Without constant, precise corrections based on Einstein's Special and General Relativity, your navigation would drift by a shocking 11 kilometers (6.8 miles) *every single day*!\n\n\ud83d\udcac Did you already know Einstein was essential for your daily navigation? Drop a \ud83e\udd2f below if this blew your mind!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #GPS #Einstein #Relativity #Physics #TechFacts #MindBlowingFacts #Engineering #Science"
+}
