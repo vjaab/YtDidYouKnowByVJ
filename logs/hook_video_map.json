@@ -528,5 +528,15 @@
     "title": "[STUDY HACK] Run SOTA Speaker Diarization Locally For Zero Cost",
     "uploaded_at": "2026-09-29T05:51:55.268297",
     "synced": false
+  },
+  "c1wHDt3-tmA": {
+    "video_id": "c1wHDt3-tmA",
+    "hook_pattern": "curiosity_gap",
+    "hook_variant": "A",
+    "hook_text": "Most developers don't know GLiNER2.5-Decide exists.",
+    "category": "AI Engineering",
+    "title": "Stop wasting hours on custom token classification!",
+    "uploaded_at": "2026-09-30T22:14:36.462191",
+    "synced": false
   }
 }

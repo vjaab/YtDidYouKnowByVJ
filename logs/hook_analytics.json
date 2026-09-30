@@ -1186,6 +1186,33 @@
         "avg_swipe_away": 0.0,
         "avg_view_percentage": 0.0
       }
+    },
+    "AI Engineering": {
+      "curiosity_gap": {
+        "variants": {
+          "A": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "Most developers don't know GLiNER2.5-Decide exists.",
+                "video_id": "c1wHDt3-tmA",
+                "recorded_at": "2026-09-30T22:14:36.460266"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
+      }
     }
   },
   "global": {
@@ -1217,7 +1244,7 @@
       "views": 0,
       "retention": 0.0,
       "engagement": 0.0,
-      "count": 11,
+      "count": 12,
       "swipe_away_rate": 0.0,
       "avg_view_percentage": 0.0
     },
@@ -1230,5 +1257,5 @@
       "avg_view_percentage": 0.0
     }
   },
-  "last_updated": "2026-09-29T05:51:55.266369"
+  "last_updated": "2026-09-30T22:14:36.460296"
 }
