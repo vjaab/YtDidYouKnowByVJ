@@ -33,14 +33,10 @@
     "Hard Drive Heads Fly Just 3 Nanometers Above Platters",
     "Quantum Computers Will Break RSA Encryption with Shor's Algorithm",
     "Tempest Leaks: Spies Can Rebuild Your Screen from Radio Waves",
-    "Rowhammer Flips Memory Bits in Physical DRAM Without Permissions"
+    "Rowhammer Flips Memory Bits in Physical DRAM Without Permissions",
+    "Cleanrooms are 10,000x Cleaner Than Hospital Surgery Rooms"
   ],
   "used_keywords": [
-    "building",
-    "apps",
-    "stars",
-    "rust",
-    "solution",
     "long",
     "term",
     "memory",
@@ -235,6 +231,11 @@
     "dram",
     "hardware exploit",
     "cybersecurity",
+    "did you know",
+    "cleanroom",
+    "semiconductors",
+    "fab",
+    "transistors",
     "did you know"
   ],
   "history": [
@@ -758,6 +759,19 @@
       ],
       "source": "ACM SIGARCH Computer Architecture Research",
       "timestamp": "2026-09-30T17:08:39.679753+00:00"
+    },
+    {
+      "title": "Cleanrooms are 10,000x Cleaner Than Hospital Surgery Rooms",
+      "news_source_url": "",
+      "keywords": [
+        "cleanroom",
+        "semiconductors",
+        "fab",
+        "transistors",
+        "did you know"
+      ],
+      "source": "Semiconductor Fab Standards (ISO 14644)",
+      "timestamp": "2026-09-30T18:54:46.679503+00:00"
     }
   ]
 }
