@@ -151,5 +151,24 @@ class TestGithubTrending(unittest.TestCase):
         self.assertEqual(len(parsed_results), 10)
         self.assertEqual(parsed_results[0]["title"].lower(), "github trending: google/antigravity — ")
 
+    @patch("trending_engine.scrape_github_trending", return_value=[])
+    @patch("requests.get")
+    def test_fetch_github_trending_null_languages_category(self, mock_api_get, mock_scrape):
+        """Verify fetch_github_trending_ai handles categories with github_languages=[None] without crashing."""
+        mock_api_resp = MagicMock()
+        mock_api_resp.status_code = 200
+        mock_api_resp.json.return_value = {
+            "items": [
+                {"full_name": f"founder/startup{i}", "stargazers_count": 500, "description": "Startup repo", "html_url": "url"}
+                for i in range(5)
+            ]
+        }
+        mock_api_get.return_value = mock_api_resp
+
+        # Should not raise TypeError: 'NoneType' object is not iterable
+        results = fetch_github_trending_ai(category="Tech Company Founding Stories")
+        self.assertIsInstance(results, list)
+        self.assertGreaterEqual(len(results), 5)
+
 if __name__ == "__main__":
     unittest.main()

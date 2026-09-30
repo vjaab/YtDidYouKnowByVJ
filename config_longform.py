@@ -3,9 +3,9 @@ config_longform.py — Configuration for the 16:9 long-form pipeline.
 
 CHAPTERED DEEP-DIVE FORMAT (2026-07):
   - Replaced 8-topic compilation with chaptered deep-dive (Fireship/MKBHD/Johnny Harris hybrid)
-  - Duration is depth-driven, not target-driven (5-25 min flexible)
+  - Duration is strictly 2 to 3 mins (120-180 seconds, 280-420 words)
   - Topic depth rotates weekly: 3 days multi-story, 4 days single deep story
-  - Reduces visual clip count from ~200 to ~25 (fixes memory/SIGTERM)
+  - Compact visual clip count (fixes memory/SIGTERM)
 """
 import os
 from datetime import datetime
@@ -15,10 +15,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LONGFORM_TRACKER_FILE = os.path.join(BASE_DIR, "longform_news_log.json")
 
 # ── Duration & Resolution ─────────────────────────────────────────────────────
-# FLEXIBLE: Let the story dictate runtime.
-# A single rich story earns 15-25 min. A thinner but solid story gets 5-8 min.
-# Mid-roll ads kick in at 8+ min, so aim there when depth supports it.
-LONGFORM_TARGET_AUDIO_DURATION = (300, 1500)  # 5-25 min flexible range
+# STRICT: 2 to 3 mins duration only (120 to 180 seconds)
+LONGFORM_TARGET_AUDIO_DURATION = (120, 180)  # 2-3 min (120-180 seconds)
 LONGFORM_RESOLUTION = (1920, 1080)            # 16:9 Landscape
 LONGFORM_FPS = 30
 
@@ -41,9 +39,9 @@ def get_topic_depth_mode():
     """Returns 'multi' to always pick 2-3 thematically linked topics."""
     return "multi"
 
-LONGFORM_MAX_CHAPTERS = 5                     # Max chapters per deep-dive
-LONGFORM_VISUAL_BEATS_PER_CHAPTER = 6         # Max visual beats per chapter (caps clip count)
-LONGFORM_WORD_COUNT_TARGET = (700, 3500)      # ~5-25 min at 140 WPM
+LONGFORM_MAX_CHAPTERS = 3                     # Max chapters per deep-dive (fits 2-3 min runtime)
+LONGFORM_VISUAL_BEATS_PER_CHAPTER = 4         # Max visual beats per chapter (caps clip count)
+LONGFORM_WORD_COUNT_TARGET = (280, 420)       # Strictly 2-3 min at 140 WPM (120-180 seconds)
 LONGFORM_FORMAT = "chaptered"                 # The format flag for downstream branching
 
 # Legacy aliases kept for backward compat in video_gen.py branch checks

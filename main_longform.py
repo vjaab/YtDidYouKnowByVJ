@@ -2,8 +2,8 @@
 main_longform.py — Chaptered Deep-Dive Long-Form AI Video Pipeline.
 
 CHAPTERED FORMAT (2026-07):
-  Produces a 5-25 minute, 16:9 landscape deep-dive video. Depth is driven by
-  the story, not a fixed target. Topic depth rotates weekly:
+  Produces a 2-3 minute, 16:9 landscape deep-dive video (120-180 seconds only).
+  Topic depth rotates weekly:
     Mon/Wed/Fri: 2-3 thematically linked stories
     Tue/Thu/Sat/Sun: 1 single deep story
 
@@ -398,13 +398,13 @@ def run_longform_pipeline(dry_run=False):
         # ── Word Count Pre-Flight ────────────────────────────────────────
         expected_dur = word_count / 2.33  # ~140 WPM
 
-        if expected_dur < min_dur:
+        if expected_dur < min_dur - 10:
             log_message(f"⚠️ Script too short ({word_count} words, ~{expected_dur:.0f}s < {min_dur}s). Retrying...")
             attempts += 1
             script_data = None
             continue
-        elif expected_dur > max_dur + 60:
-            log_message(f"⚠️ Script too long ({word_count} words, ~{expected_dur:.0f}s > {max_dur + 60}s). Retrying...")
+        elif expected_dur > max_dur + 10:
+            log_message(f"⚠️ Script too long ({word_count} words, ~{expected_dur:.0f}s > {max_dur}s). Retrying...")
             attempts += 1
             script_data = None
             continue
@@ -503,8 +503,8 @@ def run_longform_pipeline(dry_run=False):
             attempts += 1
             continue
 
-        if duration > max_dur + 60:
-            log_message(f"Audio too long ({duration:.1f}s > {max_dur + 60}s). Retrying...")
+        if duration > max_dur + 10:
+            log_message(f"Audio too long ({duration:.1f}s > {max_dur + 10}s). Retrying...")
             attempts += 1
             continue
 
@@ -514,7 +514,7 @@ def run_longform_pipeline(dry_run=False):
     # ── FALLBACK ──────────────────────────────────────────────────────────
     if not audio_path and best_script_data:
         expected_best_dur = best_word_count / 2.33
-        if expected_best_dur < 30:
+        if expected_best_dur < min_dur * 0.7:
             log_message(f"❌ Best candidate too short ({best_word_count} words). Aborting.")
         else:
             log_message(f"⚠️ [FALLBACK] Using best candidate ({best_word_count} words)...")

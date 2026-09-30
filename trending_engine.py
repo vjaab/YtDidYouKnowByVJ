@@ -118,7 +118,7 @@ CATEGORY_SIGNALS = {
         ],
         "reddit_subs": ["todayilearned", "technology", "computerscience", "programminghorror", "retrobattlestations"],
         "github_topics": ["awesome", "computer-history", "tech-trivia", "fun-facts"],
-        "github_languages": None,
+        "github_languages": [None],
         "hn_keywords": ['history', 'trivia', 'fact', 'origin', 'first', 'invented', 'moth', 'grace-hopper', 'backrub'],
         "hf_tasks": [],
         "arxiv_cats": ["cs.HC", "physics.hist-ph"],
@@ -152,10 +152,10 @@ CATEGORY_SIGNALS = {
         ],
         "reddit_subs": ["trivia", "quiz", "computerscience", "programminghorror", "todayilearned"],
         "github_topics": ["quiz", "trivia", "interview-prep", "coding-challenges"],
-        "github_languages": None,
+        "github_languages": [None],
         "hn_keywords": ['quiz', 'trivia', 'interview', 'question', 'challenge', 'puzzle'],
         "hf_tasks": [],
-        "arxiv_cats": None,
+        "arxiv_cats": [],
         "google_trends_whitelist": {'quiz', 'trivia', 'question', 'challenge', 'test', 'guess'},
         "youtube_outlier_keywords": ["tech quiz", "trivia", "interview question", "can you guess"],
     },
@@ -172,7 +172,7 @@ CATEGORY_SIGNALS = {
         "github_languages": ["java", "python", "javascript", "go", "cpp"],
         "hn_keywords": ['interview', 'leetcode', 'system-design', 'algorithm', 'data-structure', 'coding-interview', 'spring-boot', 'kubernetes', 'docker'],
         "hf_tasks": [],
-        "arxiv_cats": None,
+        "arxiv_cats": [],
         "google_trends_whitelist": {'interview', 'leetcode', 'system-design', 'algorithm', 'spring', 'kubernetes', 'docker', 'java', 'python'},
         "youtube_outlier_keywords": ["interview question", "system design", "LeetCode", "coding interview", "Spring Boot", "Kubernetes"],
     },
@@ -203,7 +203,7 @@ CATEGORY_SIGNALS = {
         ],
         "reddit_subs": ["technology", "startups", "entrepreneur", "business", "YCombinator"],
         "github_topics": ["startup", "business", "entrepreneurship", "founder"],
-        "github_languages": None,
+        "github_languages": [None],
         "hn_keywords": ['founder', 'startup', 'ycombinator', 'google', 'apple', 'microsoft', 'amazon', 'meta', 'nvidia', 'history'],
         "hf_tasks": [],
         "arxiv_cats": ["cs.CY", "econ.GN"],
@@ -220,7 +220,7 @@ CATEGORY_SIGNALS = {
         ],
         "reddit_subs": ["programminghorror", "computerscience", "softwareengineering", "devops", "sysadmin"],
         "github_topics": ["bug", "postmortem", "incident", "failure", "debugging", "outage"],
-        "github_languages": None,
+        "github_languages": [None],
         "hn_keywords": ['bug', 'glitch', 'failure', 'outage', 'postmortem', 'incident', 'mars', 'ariane', 'therac', 'overflow'],
         "hf_tasks": [],
         "arxiv_cats": ["cs.SE", "cs.CR"],
@@ -789,12 +789,18 @@ def fetch_github_trending_ai(category="AI & Tech Tools"):
     """
     import random
     signals = CATEGORY_SIGNALS.get(category, CATEGORY_SIGNALS["AI & Tech Tools"])
-    github_topics = signals.get("github_topics", ['llm', 'gpt', 'llama', 'agent', 'ai', 'transformer', 'stable-diffusion', 'deepseek', 
-        'compiler', 'terminal', 'database', 'api', 'editor', 'linux', 'rust', 'python', 'go', 
-        'security', 'hack', 'exploit', 'performance', 'git', 'open-source', 'productivity', 
-        'machine-learning', 'dataset', 'nlp', 'vision', 'neural', 'weights', 'inference'])
-    github_languages = signals.get("github_languages", [None, "python", "typescript", "rust", "cpp"])
-    keywords = signals.get("hn_keywords", ['llm', 'gpt', 'llama', 'claude', 'deepseek', 'agent', 'mcp', 'transformer', 'quantization', 'gpu', 'inference', 'vllm', 'compiler', 'rust', 'python', 'c++', 'benchmark', 'model', 'dataset', 'arxiv'])
+    github_topics = signals.get("github_topics")
+    if not github_topics:
+        github_topics = ['llm', 'gpt', 'llama', 'agent', 'ai', 'transformer', 'stable-diffusion', 'deepseek', 
+            'compiler', 'terminal', 'database', 'api', 'editor', 'linux', 'rust', 'python', 'go', 
+            'security', 'hack', 'exploit', 'performance', 'git', 'open-source', 'productivity', 
+            'machine-learning', 'dataset', 'nlp', 'vision', 'neural', 'weights', 'inference']
+    github_languages = signals.get("github_languages")
+    if not github_languages:
+        github_languages = [None]
+    keywords = signals.get("hn_keywords")
+    if not keywords:
+        keywords = ['llm', 'gpt', 'llama', 'claude', 'deepseek', 'agent', 'mcp', 'transformer', 'quantization', 'gpu', 'inference', 'vllm', 'compiler', 'rust', 'python', 'c++', 'benchmark', 'model', 'dataset', 'arxiv']
     
     print(f"🐙 Fetching trending repos from GitHub for category='{category}'...")
     all_repos = []
@@ -1957,6 +1963,8 @@ def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools", 
         
         try:
             articles = fetcher()
+            if not articles:
+                articles = []
             source_stats[source_name] = len(articles)
             
             # Apply priority boost to engagement scores

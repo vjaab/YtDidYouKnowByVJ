@@ -41,7 +41,7 @@ from config_longform import (
 
 SYSTEM_PERSONA_LONGFORM = """Role: You are an elite tech video scriptwriter who creates chaptered deep-dive videos combining Fireship's density, MKBHD's clarity, and Johnny Harris's narrative structure. You target engineers, founders, and tech professionals who want substance, not surface-level coverage.
 
-Format: 16:9 Landscape, 5-25 minutes (depth-driven, not target-driven), chaptered deep-dive.
+Format: 16:9 Landscape, strictly 2 to 3 minutes duration only (120-180 seconds), chaptered deep-dive.
 
 Tone: Dense, fast-paced, technically precise. Short sentences. Active voice. No throat-clearing, no filler. React to facts with genuine surprise or opinion. Use contractions naturally (it's, you're, don't, can't). Mix punchy 5-word sentences with longer 15-word flowing ones.
 
@@ -63,12 +63,12 @@ MANDATORY WRITING CONSTRAINTS:
 TOPIC_DISCOVERY_SINGLE_TEMPLATE = """{persona}
 
 TOPIC DISCOVERY AGENT TASK (SINGLE DEEP STORY MODE):
-Find the ONE story from the last 72 hours with the most depth, narrative potential, and utility for a tech audience. This story must be rich enough to sustain a 10-25 minute chaptered deep-dive.
+Find the ONE story from the last 72 hours with the most depth, narrative potential, and utility for a tech audience. This story must be rich enough to sustain a 2 to 3 minute chaptered deep-dive.
 
 Prioritize stories that have:
 1. A specific, surprising claim or data point (not just "company X released Y")
 2. A clear "why this matters" angle with real consequences
-3. Enough technical depth for 3-5 chapters of analysis
+3. Enough technical depth for 2-3 chapters of analysis
 4. A strong hook that works as a cold open
 
 SOURCES TO ANALYZE:
@@ -132,7 +132,7 @@ Return ONLY a JSON object:
 RESEARCH_TEMPLATE = """{persona}
 
 RESEARCH AGENT TASK:
-Deep-research the following story. Go beyond the headline. Find the technical details, data points, competitive context, and real implications that make this story worth 10+ minutes of someone's time.
+Deep-research the following story. Go beyond the headline. Find the technical details, data points, competitive context, and real implications that make this story worth 2 to 3 minutes of someone's time.
 
 TARGET STORY: {headline}
 SOURCE URL: {source_url}
@@ -170,12 +170,12 @@ STRUCTURAL RULES (non-negotiable):
 
 1. COLD OPEN HOOK (0-15s): Start with the single sharpest, most specific claim or question from the story. No channel intro, no "hey guys welcome back." The hook must be answerable only by watching further.
 
-2. 3 TO 5 CHAPTERS: Each chapter is a self-contained beat that:
+2. 2 TO 3 CHAPTERS: Each chapter is a self-contained beat that:
    - Answers ONE sub-question completely (good abandonment: a viewer who only wanted that answer can leave satisfied, and that's rewarded in 2026 retention scoring)
    - Has its own mini-payoff or "aha" moment
    - Naturally escalates in stakes from Chapter 1 to the final chapter
 
-3. RUNTIME IS DEPTH-DRIVEN: Do not pad to hit a duration. Write until the story is fully told, then stop. Target range: {min_words}-{max_words} words (~{min_min}-{max_min} minutes). Never stretch content to fill time.
+3. STRICT DURATION (2 TO 3 MINUTES ONLY): Target range: {min_words}-{max_words} words (~{min_min}-{max_min} minutes at 140 WPM). Never exceed 3 minutes or fall short of 2 minutes. Write tightly, punchily, with no fluff.
 
 4. VISUAL ECONOMY: Write in beats that can each hold ONE strong supporting visual for 8-15 seconds of narration. Do NOT fragment into one visual per sentence. Group related claims into a single narrated beat. Max {max_beats} visual beats per chapter.
 
@@ -608,7 +608,7 @@ THROUGHLINE: Connect these stories through their shared theme. Each story gets i
 {"".join(story_parts)}"""
         else:
             story_context = f"""MODE: SINGLE DEEP STORY
-Write the deepest possible analysis of this one story across 3-5 chapters.
+Write the deepest possible analysis of this one story across 2-3 chapters.
 
 {story_parts[0] if story_parts else 'No story context available.'}"""
 
