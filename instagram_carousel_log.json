@@ -28,34 +28,14 @@
     "Your Smartphone Screen Steals Your Electrons",
     "The 14 People Who Hold 7 Physical Keys to the Global Internet",
     "The 14 People Who Hold 7 Physical Keys to the Global Internet",
-    "The Year 2038 Problem: When Unix Time Runs Out"
+    "The Year 2038 Problem: When Unix Time Runs Out",
+    "Cerebras Built a Single Chip with 4 Trillion Transistors",
+    "Hard Drive Heads Fly Just 3 Nanometers Above Platters",
+    "Quantum Computers Will Break RSA Encryption with Shor's Algorithm",
+    "Tempest Leaks: Spies Can Rebuild Your Screen from Radio Waves",
+    "Rowhammer Flips Memory Bits in Physical DRAM Without Permissions"
   ],
   "used_keywords": [
-    "code",
-    "editor",
-    "cursor",
-    "secured",
-    "series",
-    "funding",
-    "features",
-    "include",
-    "natural",
-    "language",
-    "editing",
-    "multi",
-    "file",
-    "changes",
-    "deep",
-    "codebase",
-    "understanding",
-    "developers",
-    "using",
-    "daily",
-    "stars",
-    "rust",
-    "batteries",
-    "included",
-    "framework",
     "building",
     "apps",
     "stars",
@@ -230,6 +210,31 @@
     "unix epoch",
     "integer overflow",
     "32 bit bug",
+    "did you know",
+    "cerebras",
+    "wafer scale",
+    "ai chips",
+    "hardware megastructures",
+    "did you know",
+    "hard drive",
+    "hdd",
+    "aerodynamics",
+    "magnetic storage",
+    "did you know",
+    "quantum computing",
+    "shor algorithm",
+    "rsa encryption",
+    "post quantum crypto",
+    "did you know",
+    "tempest",
+    "side channel",
+    "electromagnetic surveillance",
+    "rf hacking",
+    "did you know",
+    "rowhammer",
+    "dram",
+    "hardware exploit",
+    "cybersecurity",
     "did you know"
   ],
   "history": [
@@ -688,6 +693,71 @@
       ],
       "source": "POSIX Standard & Unix Time Architecture",
       "timestamp": "2026-09-30T16:25:24.933107+00:00"
+    },
+    {
+      "title": "Cerebras Built a Single Chip with 4 Trillion Transistors",
+      "news_source_url": "",
+      "keywords": [
+        "cerebras",
+        "wafer scale",
+        "ai chips",
+        "hardware megastructures",
+        "did you know"
+      ],
+      "source": "Cerebras Systems Architectural Whitepaper",
+      "timestamp": "2026-09-30T17:08:05.319116+00:00"
+    },
+    {
+      "title": "Hard Drive Heads Fly Just 3 Nanometers Above Platters",
+      "news_source_url": "",
+      "keywords": [
+        "hard drive",
+        "hdd",
+        "aerodynamics",
+        "magnetic storage",
+        "did you know"
+      ],
+      "source": "Seagate & Western Digital Advanced Storage Physics",
+      "timestamp": "2026-09-30T17:08:39.194718+00:00"
+    },
+    {
+      "title": "Quantum Computers Will Break RSA Encryption with Shor's Algorithm",
+      "news_source_url": "",
+      "keywords": [
+        "quantum computing",
+        "shor algorithm",
+        "rsa encryption",
+        "post quantum crypto",
+        "did you know"
+      ],
+      "source": "NIST Post-Quantum Cryptography Standardization",
+      "timestamp": "2026-09-30T17:08:39.387136+00:00"
+    },
+    {
+      "title": "Tempest Leaks: Spies Can Rebuild Your Screen from Radio Waves",
+      "news_source_url": "",
+      "keywords": [
+        "tempest",
+        "side channel",
+        "electromagnetic surveillance",
+        "rf hacking",
+        "did you know"
+      ],
+      "source": "NSA TEMPEST Specifications & IEEE S&P",
+      "timestamp": "2026-09-30T17:08:39.533850+00:00"
+    },
+    {
+      "title": "Rowhammer Flips Memory Bits in Physical DRAM Without Permissions",
+      "news_source_url": "",
+      "keywords": [
+        "rowhammer",
+        "dram",
+        "hardware exploit",
+        "cybersecurity",
+        "did you know"
+      ],
+      "source": "ACM SIGARCH Computer Architecture Research",
+      "timestamp": "2026-09-30T17:08:39.679753+00:00"
     }
   ]
 }
