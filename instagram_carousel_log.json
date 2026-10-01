@@ -57,14 +57,10 @@
     "Wi-Fi Was Accidentally Invented by an Astronomer Studying Black Holes",
     "Soviet Titanium Submarines Were Driven by Liquid Metal Reactors",
     "A Cloud Reflection Almost Triggered Nuclear War in 1983",
-    "AI Chatbots Just 'Make Stuff Up'"
+    "AI Chatbots Just 'Make Stuff Up'",
+    "AI's 'Eyes' See Billions"
   ],
   "used_keywords": [
-    "ai training",
-    "machine learning",
-    "did you know",
-    "rlhf",
-    "sycophancy",
     "alignment",
     "chatbots",
     "did you know",
@@ -259,6 +255,11 @@
     "artificial intelligence",
     "hallucination",
     "language models",
+    "did you know",
+    "AI learning",
+    "computer vision",
+    "machine learning",
+    "neural networks",
     "did you know"
   ],
   "history": [
@@ -1096,6 +1097,19 @@
       ],
       "source": "Leading AI Research Institutions like OpenAI and Google DeepMind on Large Language Model limitations.",
       "timestamp": "2026-10-01T17:29:29.893749+00:00"
+    },
+    {
+      "title": "AI's 'Eyes' See Billions",
+      "news_source_url": "",
+      "keywords": [
+        "AI learning",
+        "computer vision",
+        "machine learning",
+        "neural networks",
+        "did you know"
+      ],
+      "source": "Leading AI research institutions (e.g., Google, OpenAI, Meta) routinely publish papers detailing training datasets in the billions (e.g., LAION-5B, ImageNet for conceptual understanding).",
+      "timestamp": "2026-10-01T19:21:58.229044+00:00"
     }
   ]
 }
