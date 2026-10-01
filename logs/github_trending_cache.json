@@ -1,5 +1,6 @@
 [
   {
+<<<<<<< Updated upstream
     "repo": "tile-ai/tilelang",
     "full_name": "tile-ai/tilelang",
     "description": "Domain-specific language designed to streamline the development of high-performance GPU/CPU/Accelerators kernels",
@@ -31,12 +32,123 @@
     "stars_in_period": 225,
     "url": "https://github.com/Friedrich-M/UniMate",
     "html_url": "https://github.com/Friedrich-M/UniMate"
+=======
+    "repo": "DietrichGebert/ponytail",
+    "full_name": "DietrichGebert/ponytail",
+    "description": "Makes your AI agent think like the laziest senior dev in the room. The best code is the code you never wrote.",
+    "language": "JavaScript",
+    "stargazers_count": 150334,
+    "forks_count": 8074,
+    "stars_in_period": 1179,
+    "url": "https://github.com/DietrichGebert/ponytail",
+    "html_url": "https://github.com/DietrichGebert/ponytail"
   },
   {
-    "repo": "VectifyAI/PageIndex",
-    "full_name": "VectifyAI/PageIndex",
-    "description": "\ud83d\udcd1 PageIndex: Document Index for Vectorless, Reasoning-based RAG",
+    "repo": "mattpocock/skills",
+    "full_name": "mattpocock/skills",
+    "description": "Skills for Real Engineers. Straight from my .agents directory.",
+    "language": "Shell",
+    "stargazers_count": 273777,
+    "forks_count": 22991,
+    "stars_in_period": 888,
+    "url": "https://github.com/mattpocock/skills",
+    "html_url": "https://github.com/mattpocock/skills"
+  },
+  {
+    "repo": "NVIDIA/OpenShell",
+    "full_name": "NVIDIA/OpenShell",
+    "description": "OpenShell is the safe, private runtime for autonomous AI agents.",
+    "language": "Rust",
+    "stargazers_count": 13941,
+    "forks_count": 1621,
+    "stars_in_period": 2503,
+    "url": "https://github.com/NVIDIA/OpenShell",
+    "html_url": "https://github.com/NVIDIA/OpenShell"
+  },
+  {
+    "repo": "firebase/firebase-ios-sdk",
+    "full_name": "firebase/firebase-ios-sdk",
+    "description": "Firebase SDK for Apple App Development",
+    "language": "C++",
+    "stargazers_count": 6845,
+    "forks_count": 1806,
+    "stars_in_period": 112,
+    "url": "https://github.com/firebase/firebase-ios-sdk",
+    "html_url": "https://github.com/firebase/firebase-ios-sdk"
+  },
+  {
+    "repo": "mvschwarz/openrig",
+    "full_name": "mvschwarz/openrig",
+    "description": "Build your own network of agents from Claude Code, Codex and Pi: persistent teams with roles, shared context and owned work.",
+    "language": "TypeScript",
+    "stargazers_count": 3621,
+    "forks_count": 244,
+    "stars_in_period": 640,
+    "url": "https://github.com/mvschwarz/openrig",
+    "html_url": "https://github.com/mvschwarz/openrig"
+  },
+  {
+    "repo": "cursor/plugins",
+    "full_name": "cursor/plugins",
+    "description": "Cursor plugin specification and official plugins",
+    "language": "TypeScript",
+    "stargazers_count": 9302,
+    "forks_count": 880,
+    "stars_in_period": 157,
+    "url": "https://github.com/cursor/plugins",
+    "html_url": "https://github.com/cursor/plugins"
+  },
+  {
+    "repo": "obra/superpowers",
+    "full_name": "obra/superpowers",
+    "description": "An agentic skills framework & software development methodology that works.",
+    "language": "Shell",
+    "stargazers_count": 293899,
+    "forks_count": 26288,
+    "stars_in_period": 476,
+    "url": "https://github.com/obra/superpowers",
+    "html_url": "https://github.com/obra/superpowers"
+  },
+  {
+    "repo": "mksglu/context-mode",
+    "full_name": "mksglu/context-mode",
+    "description": "Context window optimization for AI coding agents. Sandboxes tool output (98% reduction), persists session memory, and enforces routing across 17 platforms via MCP + hooks.",
+    "language": "TypeScript",
+    "stargazers_count": 24744,
+    "forks_count": 1783,
+    "stars_in_period": 357,
+    "url": "https://github.com/mksglu/context-mode",
+    "html_url": "https://github.com/mksglu/context-mode"
+  },
+  {
+    "repo": "heygen-com/hyperframes",
+    "full_name": "heygen-com/hyperframes",
+    "description": "Write HTML. Render video. Built for agents.",
+    "language": "TypeScript",
+    "stargazers_count": 55262,
+    "forks_count": 5014,
+    "stars_in_period": 624,
+    "url": "https://github.com/heygen-com/hyperframes",
+    "html_url": "https://github.com/heygen-com/hyperframes"
+>>>>>>> Stashed changes
+  },
+  {
+    "repo": "earendil-works/pi",
+    "full_name": "earendil-works/pi",
+    "description": "AI agent toolkit: unified LLM API, agent loop, TUI, coding agent CLI",
+    "language": "TypeScript",
+    "stargazers_count": 111122,
+    "forks_count": 14124,
+    "stars_in_period": 294,
+    "url": "https://github.com/earendil-works/pi",
+    "html_url": "https://github.com/earendil-works/pi"
+  },
+  {
+    "repo": "tile-ai/tilelang",
+    "full_name": "tile-ai/tilelang",
+    "description": "Domain-specific language designed to streamline the development of high-performance GPU/CPU/Accelerators kernels",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 38406,
     "forks_count": 3326,
     "stars_in_period": 543,
@@ -53,23 +165,94 @@
     "stars_in_period": 345,
     "url": "https://github.com/ComposioHQ/awesome-claude-skills",
     "html_url": "https://github.com/ComposioHQ/awesome-claude-skills"
+=======
+    "stargazers_count": 8068,
+    "forks_count": 812,
+    "stars_in_period": 157,
+    "url": "https://github.com/tile-ai/tilelang",
+    "html_url": "https://github.com/tile-ai/tilelang"
+  },
+  {
+    "repo": "pablostanley/yoinks",
+    "full_name": "pablostanley/yoinks",
+    "description": "yoink any video from your terminal. no shady ads.",
+    "language": "TypeScript",
+    "stargazers_count": 2853,
+    "forks_count": 271,
+    "stars_in_period": 356,
+    "url": "https://github.com/pablostanley/yoinks",
+    "html_url": "https://github.com/pablostanley/yoinks"
+  },
+  {
+    "repo": "HunxByts/GhostTrack",
+    "full_name": "HunxByts/GhostTrack",
+    "description": "Useful tool to track location or mobile number",
+    "language": "Python",
+    "stargazers_count": 16338,
+    "forks_count": 2251,
+    "stars_in_period": 369,
+    "url": "https://github.com/HunxByts/GhostTrack",
+    "html_url": "https://github.com/HunxByts/GhostTrack"
+  },
+  {
+    "repo": "pbakaus/impeccable",
+    "full_name": "pbakaus/impeccable",
+    "description": "The design language that makes your AI harness better at design.",
+    "language": "JavaScript",
+    "stargazers_count": 73577,
+    "forks_count": 4436,
+    "stars_in_period": 602,
+    "url": "https://github.com/pbakaus/impeccable",
+    "html_url": "https://github.com/pbakaus/impeccable"
+  },
+  {
+    "repo": "Friedrich-M/UniMate",
+    "full_name": "Friedrich-M/UniMate",
+    "description": "[SIGGRAPH Asia 2026] UniMate: One Unified Model to Animate Diverse Skeletons",
+    "language": "Python",
+    "stargazers_count": 1038,
+    "forks_count": 97,
+    "stars_in_period": 225,
+    "url": "https://github.com/Friedrich-M/UniMate",
+    "html_url": "https://github.com/Friedrich-M/UniMate"
+  },
+  {
+    "repo": "paperclipai/paperclip",
+    "full_name": "paperclipai/paperclip",
+    "description": "The open-source app everyone uses to manage agents at work",
+    "language": "TypeScript",
+    "stargazers_count": 95777,
+    "forks_count": 16243,
+    "stars_in_period": 13855,
+    "url": "https://github.com/paperclipai/paperclip",
+    "html_url": "https://github.com/paperclipai/paperclip"
+>>>>>>> Stashed changes
   },
   {
     "repo": "TencentCloud/Octop",
     "full_name": "TencentCloud/Octop",
     "description": "A smarter, self-hosted AI assistant \u2014 multi-user, multi-agent.",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 6220,
     "forks_count": 785,
     "stars_in_period": 179,
     "url": "https://github.com/TencentCloud/Octop",
     "html_url": "https://github.com/TencentCloud/Octop"
+=======
+    "stargazers_count": 44253,
+    "forks_count": 5855,
+    "stars_in_period": 18389,
+    "url": "https://github.com/vectorize-io/hindsight",
+    "html_url": "https://github.com/vectorize-io/hindsight"
+>>>>>>> Stashed changes
   },
   {
     "repo": "debpalash/VoiceStudio",
     "full_name": "debpalash/VoiceStudio",
     "description": "VoiceStudio is the open-source, fully-local ElevenLabs alternative \u2014 voice cloning, voice design, video dubbing, dictation, transcription & audiobook creation in 646 languages.",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 51256,
     "forks_count": 5698,
     "stars_in_period": 1395,
@@ -600,6 +783,10 @@
     "language": "Python",
     "stargazers_count": 51256,
     "forks_count": 5698,
+=======
+    "stargazers_count": 51294,
+    "forks_count": 5696,
+>>>>>>> Stashed changes
     "stars_in_period": 15186,
     "url": "https://github.com/debpalash/VoiceStudio",
     "html_url": "https://github.com/debpalash/VoiceStudio"
@@ -609,8 +796,13 @@
     "full_name": "rohitg00/ai-engineering-from-scratch",
     "description": "Learn it. Build it. Ship it for others.",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 62365,
     "forks_count": 10670,
+=======
+    "stargazers_count": 62383,
+    "forks_count": 10676,
+>>>>>>> Stashed changes
     "stars_in_period": 6485,
     "url": "https://github.com/rohitg00/ai-engineering-from-scratch",
     "html_url": "https://github.com/rohitg00/ai-engineering-from-scratch"
@@ -620,6 +812,7 @@
     "full_name": "anthropics/financial-services",
     "description": "",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 38459,
     "forks_count": 5533,
     "stars_in_period": 1637,
@@ -627,12 +820,48 @@
     "html_url": "https://github.com/anthropics/financial-services"
   },
   {
+=======
+    "stargazers_count": 38463,
+    "forks_count": 5532,
+    "stars_in_period": 1637,
+    "url": "https://github.com/anthropics/financial-services",
+    "html_url": "https://github.com/anthropics/financial-services"
+  },
+  {
+    "repo": "vercel/next.js",
+    "full_name": "vercel/next.js",
+    "description": "The React Framework",
+    "language": "JavaScript",
+    "stargazers_count": 142983,
+    "forks_count": 33559,
+    "stars_in_period": 595,
+    "url": "https://github.com/vercel/next.js",
+    "html_url": "https://github.com/vercel/next.js"
+  },
+  {
+    "repo": "pbakaus/impeccable",
+    "full_name": "pbakaus/impeccable",
+    "description": "The design language that makes your AI harness better at design.",
+    "language": "JavaScript",
+    "stargazers_count": 73577,
+    "forks_count": 4436,
+    "stars_in_period": 2775,
+    "url": "https://github.com/pbakaus/impeccable",
+    "html_url": "https://github.com/pbakaus/impeccable"
+  },
+  {
+>>>>>>> Stashed changes
     "repo": "HKUDS/CLI-Anything",
     "full_name": "HKUDS/CLI-Anything",
     "description": "\"CLI-Anything: Making ALL Software Agent-Native\" -- CLI-Hub:https://clianything.cc/",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 51204,
     "forks_count": 4667,
+=======
+    "stargazers_count": 51211,
+    "forks_count": 4668,
+>>>>>>> Stashed changes
     "stars_in_period": 1371,
     "url": "https://github.com/HKUDS/CLI-Anything",
     "html_url": "https://github.com/HKUDS/CLI-Anything"
@@ -642,8 +871,13 @@
     "full_name": "alirezarezvani/claude-skills",
     "description": "380 Claude Code skills & agent skills & plugins (30+ Agents, 70+ custom commands, 380+ skills, customizable references, scripts)for Claude Code, Codex, Gemini CLI, Cursor, and 8 more coding agents \u2014 engineering, marketing, product, compliance, C-level advisory, research, business operations, commercial & finance, and your daily productivity skills.",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 27153,
     "forks_count": 3837,
+=======
+    "stargazers_count": 27161,
+    "forks_count": 3838,
+>>>>>>> Stashed changes
     "stars_in_period": 711,
     "url": "https://github.com/alirezarezvani/claude-skills",
     "html_url": "https://github.com/alirezarezvani/claude-skills"
@@ -653,7 +887,11 @@
     "full_name": "davila7/claude-code-templates",
     "description": "CLI tool for configuring and monitoring Claude Code",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 32267,
+=======
+    "stargazers_count": 32268,
+>>>>>>> Stashed changes
     "forks_count": 3665,
     "stars_in_period": 914,
     "url": "https://github.com/davila7/claude-code-templates",
@@ -664,17 +902,36 @@
     "full_name": "TencentCloud/Octop",
     "description": "A smarter, self-hosted AI assistant \u2014 multi-user, multi-agent.",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 6220,
+=======
+    "stargazers_count": 6226,
+>>>>>>> Stashed changes
     "forks_count": 785,
     "stars_in_period": 1301,
     "url": "https://github.com/TencentCloud/Octop",
     "html_url": "https://github.com/TencentCloud/Octop"
   },
   {
+<<<<<<< Updated upstream
+=======
+    "repo": "agent-substrate/substrate",
+    "full_name": "agent-substrate/substrate",
+    "description": "Agent Substrate: the core system",
+    "language": "Go",
+    "stargazers_count": 4090,
+    "forks_count": 490,
+    "stars_in_period": 594,
+    "url": "https://github.com/agent-substrate/substrate",
+    "html_url": "https://github.com/agent-substrate/substrate"
+  },
+  {
+>>>>>>> Stashed changes
     "repo": "tile-ai/tilelang",
     "full_name": "tile-ai/tilelang",
     "description": "Domain-specific language designed to streamline the development of high-performance GPU/CPU/Accelerators kernels",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 8052,
     "forks_count": 811,
     "stars_in_period": 480,
@@ -746,13 +1003,24 @@
     "stars_in_period": 13855,
     "url": "https://github.com/paperclipai/paperclip",
     "html_url": "https://github.com/paperclipai/paperclip"
+=======
+    "stargazers_count": 8068,
+    "forks_count": 812,
+    "stars_in_period": 480,
+    "url": "https://github.com/tile-ai/tilelang",
+    "html_url": "https://github.com/tile-ai/tilelang"
+>>>>>>> Stashed changes
   },
   {
     "repo": "anthropics/claude-code-action",
     "full_name": "anthropics/claude-code-action",
     "description": "",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 9314,
+=======
+    "stargazers_count": 9317,
+>>>>>>> Stashed changes
     "forks_count": 2182,
     "stars_in_period": 329,
     "url": "https://github.com/anthropics/claude-code-action",
@@ -763,8 +1031,13 @@
     "full_name": "dream-num/univer",
     "description": "The Office Harness for AI Agents \u2014 Spreadsheets, Docs, Slides, Canvas, Relational Tables, and PDF in one runtime.",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 22228,
     "forks_count": 1868,
+=======
+    "stargazers_count": 22230,
+    "forks_count": 1869,
+>>>>>>> Stashed changes
     "stars_in_period": 6091,
     "url": "https://github.com/dream-num/univer",
     "html_url": "https://github.com/dream-num/univer"
@@ -781,6 +1054,7 @@
     "html_url": "https://github.com/FxEmbed/FxEmbed"
   },
   {
+<<<<<<< Updated upstream
     "repo": "pablostanley/yoinks",
     "full_name": "pablostanley/yoinks",
     "description": "yoink any video from your terminal. no shady ads.",
@@ -1131,5 +1405,27 @@
     "stars_in_period": 112,
     "url": "https://github.com/l0ng-ai/tty7",
     "html_url": "https://github.com/l0ng-ai/tty7"
+=======
+    "repo": "flutter/flutter",
+    "full_name": "flutter/flutter",
+    "description": "Flutter makes it easy and fast to build beautiful apps for mobile and beyond",
+    "language": "Dart",
+    "stargazers_count": 179195,
+    "forks_count": 32737,
+    "stars_in_period": 150,
+    "url": "https://github.com/flutter/flutter",
+    "html_url": "https://github.com/flutter/flutter"
+  },
+  {
+    "repo": "androoAGI/starnet",
+    "full_name": "androoAGI/starnet",
+    "description": "A living pixel-art station where real AI agents do real work. Local-first desktop agent harness - bring your own key, watch your crew actually run.",
+    "language": "JavaScript",
+    "stargazers_count": 848,
+    "forks_count": 144,
+    "stars_in_period": 659,
+    "url": "https://github.com/androoAGI/starnet",
+    "html_url": "https://github.com/androoAGI/starnet"
+>>>>>>> Stashed changes
   }
 ]

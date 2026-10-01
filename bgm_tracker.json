@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "modern_tech.mp3",
+      "headline": "Amazon\u2019s delivery driver smart glasses will reportedly take photos \u2018almost const",
+      "topic_type": "auto",
+      "timestamp": "36924012539"
+    },
+    {
       "track": "jam_Upbeat.mp3",
       "headline": "NVIDIA OpenShell: The Open-Source Shield Blinding Big Tech's AI Agents",
       "topic_type": "auto",
@@ -112,6 +118,7 @@
     "Destiny.mp3": 2,
     "Defiance.mp3": 1,
     "jam_Confidence.mp3": 1,
-    "jam_Upbeat.mp3": 1
+    "jam_Upbeat.mp3": 1,
+    "modern_tech.mp3": 1
   }
 }
