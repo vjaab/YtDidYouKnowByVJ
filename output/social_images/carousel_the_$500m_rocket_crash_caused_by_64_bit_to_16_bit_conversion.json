@@ -1,0 +1,60 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "hook": "Did You Know a 64-Bit Bug Blew Up a $500M Rocket? \ud83d\ude80",
+  "headline": "The $500M Rocket Crash Caused by 64-Bit to 16-Bit Conversion",
+  "source": "Ariane 5 Flight 501 Inquiry Board Report",
+  "slides": [
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "Rocket Exploded?! \ud83e\udd2f",
+      "bubble": "Wait, did a computer bug really make a $500M rocket explode?!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Ariane 5 Disaster \ud83d\ude80",
+      "bubble": "Yes! In 1996, the Ariane 5 rocket exploded 37 seconds after launch. Cost? Half a billion dollars!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "curious",
+      "title": "What was the Bug? \ud83e\uddd0",
+      "bubble": "A bug? How could a tiny software error cause such a massive disaster?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "64-bit to 16-bit \ud83d\udd22",
+      "bubble": "Software crammed a massive 64-bit number into a tiny 16-bit space. It overflowed, like a gallon into a...",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "Code Error = Boom? \ud83d\udca5",
+      "bubble": "So, just a number being too big made the whole rocket explode? That's insane!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Fatal Overflow \ud83d\udca1",
+      "bubble": "Exactly! The 'overflow' crashed its guidance system, turning the $500M rocket into a fiery spectacle.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "excited",
+      "title": "Mind-Blowing Tech! \ud83e\udd2f",
+      "bubble": "Follow @vijayakumarj_ai for more mind-blowing tech facts and stories!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "A simple data type conversion error on Ariane 5 led to a $500M explosion. Precision in code is paramount!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nA single line of code, a simple conversion error, and $500 million goes up in smoke! The Ariane 5 rocket disaster is a stark reminder.\n\nHere's the mind-blowing reality:\n\ud83d\udd39 The Ariane 5 rocket exploded just 37 seconds after its maiden launch in 1996.\n\ud83d\udd39 The cause: its software tried to cram a 64-bit floating point number into a 16-bit integer, causing a fatal overflow.\n\ud83d\udd39 This seemingly small programming mistake rendered the rocket's guidance system useless, leading to its catastrophic destruction.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f in the comments!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #SoftwareBug #Ariane5 #RocketScience #EngineeringFailure #CodeBug"
+}

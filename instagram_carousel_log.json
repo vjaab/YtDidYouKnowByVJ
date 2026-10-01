@@ -52,36 +52,14 @@
     "Credit Cards Have Zero Battery and Power Themselves from Air",
     "HBM3e Stacks DRAM with 50,000 Microscopic Silicon Vias",
     "ASML Chip Lasers Fire 50,000 Times a Second at Molten Tin",
-    "Quartz Clocks Vibrate Exactly 32,768 Times Every Second"
+    "Quartz Clocks Vibrate Exactly 32,768 Times Every Second",
+    "The $500M Rocket Crash Caused by 64-Bit to 16-Bit Conversion",
+    "Wi-Fi Was Accidentally Invented by an Astronomer Studying Black Holes",
+    "Soviet Titanium Submarines Were Driven by Liquid Metal Reactors",
+    "A Cloud Reflection Almost Triggered Nuclear War in 1983",
+    "AI Chatbots Just 'Make Stuff Up'"
   ],
   "used_keywords": [
-    "intelligence",
-    "isomorphic",
-    "structural",
-    "Hybrid Search",
-    "RAG",
-    "Vector Search",
-    "BM25",
-    "AI",
-    "did you know",
-    "AI agents",
-    "AI classification",
-    "machine learning",
-    "reactive AI",
-    "autonomous systems",
-    "did you know",
-    "did you know",
-    "tech trending",
-    "astra",
-    "next",
-    "generation",
-    "transformer",
-    "self attention",
-    "quadratic cost",
-    "context length",
-    "did you know",
-    "model collapse",
-    "synthetic data",
     "ai training",
     "machine learning",
     "did you know",
@@ -254,6 +232,33 @@
     "binary",
     "watches",
     "piezoelectric",
+    "did you know",
+    "ariane 5",
+    "integer overflow",
+    "software bug",
+    "rocket science",
+    "did you know",
+    "wifi",
+    "invention",
+    "black holes",
+    "radio astronomy",
+    "csiro",
+    "did you know",
+    "alfa class",
+    "titanium submarine",
+    "nuclear reactor",
+    "engineering history",
+    "did you know",
+    "stanislav petrov",
+    "nuclear false alarm",
+    "cold war tech",
+    "satellites",
+    "did you know",
+    "AI",
+    "chatbots",
+    "artificial intelligence",
+    "hallucination",
+    "language models",
     "did you know"
   ],
   "history": [
@@ -1024,6 +1029,73 @@
       ],
       "source": "Horological Quartz Oscillation Engineering",
       "timestamp": "2026-10-01T17:02:48.982718+00:00"
+    },
+    {
+      "title": "The $500M Rocket Crash Caused by 64-Bit to 16-Bit Conversion",
+      "news_source_url": "",
+      "keywords": [
+        "ariane 5",
+        "integer overflow",
+        "software bug",
+        "rocket science",
+        "did you know"
+      ],
+      "source": "Ariane 5 Flight 501 Inquiry Board Report",
+      "timestamp": "2026-10-01T17:28:39.955513+00:00"
+    },
+    {
+      "title": "Wi-Fi Was Accidentally Invented by an Astronomer Studying Black Holes",
+      "news_source_url": "",
+      "keywords": [
+        "wifi",
+        "invention",
+        "black holes",
+        "radio astronomy",
+        "csiro",
+        "did you know"
+      ],
+      "source": "CSIRO Wireless LAN Patent History",
+      "timestamp": "2026-10-01T17:29:16.890210+00:00"
+    },
+    {
+      "title": "Soviet Titanium Submarines Were Driven by Liquid Metal Reactors",
+      "news_source_url": "",
+      "keywords": [
+        "alfa class",
+        "titanium submarine",
+        "nuclear reactor",
+        "engineering history",
+        "did you know"
+      ],
+      "source": "Naval Nuclear Propulsion History Archives",
+      "timestamp": "2026-10-01T17:29:17.073234+00:00"
+    },
+    {
+      "title": "A Cloud Reflection Almost Triggered Nuclear War in 1983",
+      "news_source_url": "",
+      "keywords": [
+        "stanislav petrov",
+        "nuclear false alarm",
+        "cold war tech",
+        "satellites",
+        "did you know"
+      ],
+      "source": "United Nations Peace History & CIA Declassified Archives",
+      "timestamp": "2026-10-01T17:29:17.205446+00:00"
+    },
+    {
+      "title": "AI Chatbots Just 'Make Stuff Up'",
+      "news_source_url": "",
+      "keywords": [
+        "AI",
+        "chatbots",
+        "artificial intelligence",
+        "hallucination",
+        "language models",
+        "did you know"
+      ],
+      "source": "Leading AI Research Institutions like OpenAI and Google DeepMind on Large Language Model limitations.",
+      "timestamp": "2026-10-01T17:29:29.893749+00:00"
     }
   ]
 }

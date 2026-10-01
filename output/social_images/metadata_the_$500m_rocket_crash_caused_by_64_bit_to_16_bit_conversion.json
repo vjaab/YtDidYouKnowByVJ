@@ -1,0 +1,21 @@
+{
+  "topic": "The $500M Rocket Crash Caused by 64-Bit to 16-Bit Conversion",
+  "category": "AI News",
+  "type": "carousel",
+  "slides": 7,
+  "instagram_images": [
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_a_64_bit_bug_blew_01.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_a_64_bit_bug_blew_02.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_a_64_bit_bug_blew_03.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_a_64_bit_bug_blew_04.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_a_64_bit_bug_blew_05.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_a_64_bit_bug_blew_06.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_a_64_bit_bug_blew_07.jpg"
+  ],
+  "facebook_images": [],
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nA single line of code, a simple conversion error, and $500 million goes up in smoke! The Ariane 5 rocket disaster is a stark reminder.\n\nHere's the mind-blowing reality:\n\ud83d\udd39 The Ariane 5 rocket exploded just 37 seconds after its maiden launch in 1996.\n\ud83d\udd39 The cause: its software tried to cram a 64-bit floating point number into a 16-bit integer, causing a fatal overflow.\n\ud83d\udd39 This seemingly small programming mistake rendered the rocket's guidance system useless, leading to its catastrophic destruction.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f in the comments!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #SoftwareBug #Ariane5 #RocketScience #EngineeringFailure #CodeBug\n\n#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets",
+  "hashtags": "#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets",
+  "poll_file": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/poll_the_$500m_rocket_crash_caused_by_64_bit_to_16_bit_conversion.json",
+  "carousel_json": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_the_$500m_rocket_crash_caused_by_64_bit_to_16_bit_conversion.json",
+  "generated_at": "2026-10-01T17:29:15.605237+00:00"
+}
