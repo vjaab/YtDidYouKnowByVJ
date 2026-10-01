@@ -44,16 +44,11 @@
     "BadUSB Firmware Tricks Computers by Pretending to be Keyboards",
     "Microsoft Sunk a Datacenter 117 Feet Under the Sea",
     "Stuxnet Destroyed 1,000 Centrifuges Without Any Explosives",
-    "The $100 Billion Y2K Fix That Actually Worked"
+    "The $100 Billion Y2K Fix That Actually Worked",
+    "Blue OLED Subpixels Die 3 Times Faster Than Red or Green",
+    "Blue OLED Subpixels Die 3 Times Faster Than Red or Green"
   ],
   "used_keywords": [
-    "through",
-    "accessibility",
-    "trees",
-    "operates",
-    "refs",
-    "stay",
-    "stable",
     "actions",
     "stay",
     "safe",
@@ -246,7 +241,14 @@
     "millennium bug",
     "legacy code",
     "software engineering",
-    "did you know"
+    "did you know",
+    "oled",
+    "burn in",
+    "blue subpixels",
+    "display tech",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
     {
@@ -914,6 +916,29 @@
       ],
       "source": "US Department of Commerce Y2K Economic Report",
       "timestamp": "2026-10-01T07:57:38.984962+00:00"
+    },
+    {
+      "title": "Blue OLED Subpixels Die 3 Times Faster Than Red or Green",
+      "news_source_url": "",
+      "keywords": [
+        "oled",
+        "burn in",
+        "blue subpixels",
+        "display tech",
+        "did you know"
+      ],
+      "source": "Society for Information Display (SID) Research",
+      "timestamp": "2026-10-01T13:50:22.359877+00:00"
+    },
+    {
+      "title": "Blue OLED Subpixels Die 3 Times Faster Than Red or Green",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "timestamp": "2026-10-01T13:52:32.327067+00:00"
     }
   ]
 }

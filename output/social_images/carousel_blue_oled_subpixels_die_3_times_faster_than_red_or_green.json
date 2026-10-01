@@ -1,0 +1,60 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "hook": "Did You Know Blue Light Destroys Your OLED Screen? \ud83d\udcfa",
+  "headline": "Blue OLED Subpixels Die 3 Times Faster Than Red or Green",
+  "source": "Society for Information Display (SID) Research",
+  "slides": [
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "Blue Light's OLED Secret \ud83d\udcfa",
+      "bubble": "Did you know blue light actively destroys your expensive OLED screen?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "3x Faster Decay! \ud83e\udd2f",
+      "bubble": "Yep! Blue OLED subpixels die three times faster than red or green ones!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "curious",
+      "title": "Why Blue? \ud83e\udd14",
+      "bubble": "Three times?! Why is blue light so much more destructive?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "High-Energy Photons \u2728",
+      "bubble": "Blue light needs more energy to emit. Imagine tiny, high-speed wrecking balls breaking chemical bonds!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "Uneven Screen Aging? \ud83d\ude31",
+      "bubble": "So, my screen's colors could fade unevenly over time? That's insane!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Engineering's Fix \u2705",
+      "bubble": "Exactly! Phone makers make blue subpixels twice as large to compensate for the faster decay.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "excited",
+      "title": "Tech Mind-Blown! \ud83e\udde0",
+      "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Blue OLED subpixels require more energy and degrade 3x faster. Manufacturers enlarge them to ensure your screen's lifespan and color balance.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour beloved OLED screen is fighting a hidden battle, and blue light is the secret villain!\n\nHere's the mind-blowing reality:\n\ud83d\udd39 Blue OLED subpixels degrade 3X faster than red or green, thanks to their high-energy emissions.\n\ud83d\udd39 To compensate, phone manufacturers make blue subpixels twice as large!\n\ud83d\udd39 This engineering trick ensures your screen ages gracefully and colors stay vibrant longer.\n\n\ud83d\udcac Did you already know this, or did this tech fact blow your mind? Drop a \ud83e\udd2f in the comments!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #OLED #ScreenTech #BlueLight #Engineering #MindBlown #Smartphone"
+}
