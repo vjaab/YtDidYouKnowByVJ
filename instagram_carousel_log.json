@@ -39,35 +39,14 @@
     "The First Computer Bug Was an Actual Moth",
     "How Airplanes Get Wi-Fi at 35,000 Feet Over Oceans",
     "The First 1GB Hard Drive in 1980 Weighed 550 Pounds",
-    "Li-Fi Transmits 224 Gigabits Per Second Through Room Bulbs"
+    "Li-Fi Transmits 224 Gigabits Per Second Through Room Bulbs",
+    "Why NASA Lost a $327M Mars Orbiter Over Metric Units",
+    "BadUSB Firmware Tricks Computers by Pretending to be Keyboards",
+    "Microsoft Sunk a Datacenter 117 Feet Under the Sea",
+    "Stuxnet Destroyed 1,000 Centrifuges Without Any Explosives",
+    "The $100 Billion Y2K Fix That Actually Worked"
   ],
   "used_keywords": [
-    "source",
-    "observability",
-    "platform",
-    "purpose",
-    "built",
-    "agents",
-    "stars",
-    "python",
-    "panwatch",
-    "tradingagents",
-    "agent",
-    "stars",
-    "rust",
-    "agent",
-    "desktop",
-    "gives",
-    "agent",
-    "reliable",
-    "computer",
-    "desktop",
-    "built",
-    "with",
-    "rust",
-    "sees",
-    "real",
-    "structure",
     "through",
     "accessibility",
     "trees",
@@ -241,6 +220,32 @@
     "visible light",
     "wireless communication",
     "photonics",
+    "did you know",
+    "mars climate orbiter",
+    "nasa",
+    "metric system",
+    "spacecraft",
+    "did you know",
+    "badusb",
+    "hid injection",
+    "cybersecurity",
+    "hardware hacking",
+    "did you know",
+    "project natick",
+    "underwater datacenter",
+    "cloud servers",
+    "microsoft",
+    "did you know",
+    "stuxnet",
+    "cybersecurity",
+    "plc",
+    "zero day",
+    "malware",
+    "did you know",
+    "y2k",
+    "millennium bug",
+    "legacy code",
+    "software engineering",
     "did you know"
   ],
   "history": [
@@ -843,6 +848,72 @@
       ],
       "source": "IEEE 802.11bb Light Wireless Standard",
       "timestamp": "2026-09-30T20:28:49.037410+00:00"
+    },
+    {
+      "title": "Why NASA Lost a $327M Mars Orbiter Over Metric Units",
+      "news_source_url": "",
+      "keywords": [
+        "mars climate orbiter",
+        "nasa",
+        "metric system",
+        "spacecraft",
+        "did you know"
+      ],
+      "source": "NASA Mars Climate Orbiter Mishap Board",
+      "timestamp": "2026-10-01T07:56:20.292559+00:00"
+    },
+    {
+      "title": "BadUSB Firmware Tricks Computers by Pretending to be Keyboards",
+      "news_source_url": "",
+      "keywords": [
+        "badusb",
+        "hid injection",
+        "cybersecurity",
+        "hardware hacking",
+        "did you know"
+      ],
+      "source": "Black Hat BadUSB Research Papers",
+      "timestamp": "2026-10-01T07:57:38.618974+00:00"
+    },
+    {
+      "title": "Microsoft Sunk a Datacenter 117 Feet Under the Sea",
+      "news_source_url": "",
+      "keywords": [
+        "project natick",
+        "underwater datacenter",
+        "cloud servers",
+        "microsoft",
+        "did you know"
+      ],
+      "source": "Microsoft Project Natick Research",
+      "timestamp": "2026-10-01T07:57:38.786472+00:00"
+    },
+    {
+      "title": "Stuxnet Destroyed 1,000 Centrifuges Without Any Explosives",
+      "news_source_url": "",
+      "keywords": [
+        "stuxnet",
+        "cybersecurity",
+        "plc",
+        "zero day",
+        "malware",
+        "did you know"
+      ],
+      "source": "Symantec W32.Stuxnet Dossier",
+      "timestamp": "2026-10-01T07:57:38.880630+00:00"
+    },
+    {
+      "title": "The $100 Billion Y2K Fix That Actually Worked",
+      "news_source_url": "",
+      "keywords": [
+        "y2k",
+        "millennium bug",
+        "legacy code",
+        "software engineering",
+        "did you know"
+      ],
+      "source": "US Department of Commerce Y2K Economic Report",
+      "timestamp": "2026-10-01T07:57:38.984962+00:00"
     }
   ]
 }

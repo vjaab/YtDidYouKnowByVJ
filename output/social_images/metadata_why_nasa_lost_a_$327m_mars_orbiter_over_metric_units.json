@@ -1,0 +1,21 @@
+{
+  "topic": "Why NASA Lost a $327M Mars Orbiter Over Metric Units",
+  "category": "AI News",
+  "type": "carousel",
+  "slides": 7,
+  "instagram_images": [
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_a_unit_mix_up_cra_01.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_a_unit_mix_up_cra_02.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_a_unit_mix_up_cra_03.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_a_unit_mix_up_cra_04.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_a_unit_mix_up_cra_05.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_a_unit_mix_up_cra_06.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_a_unit_mix_up_cra_07.jpg"
+  ],
+  "facebook_images": [],
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nNASA lost a $327 million Mars orbiter because two teams used different units of measurement!\n\nHere is the mind-blowing reality:\n\ud83d\udd39 Lockheed Martin's software calculated thruster impulse in 'pound-seconds' (imperial units).\n\ud83d\udd39 NASA's navigation software expected those calculations to be in 'newton-seconds' (metric units).\n\ud83d\udd39 This tiny oversight caused the Mars Climate Orbiter to enter Mars' atmosphere too low, leading to its incineration.\n\n\ud83d\udcac Did you already know this, or did this fact blow your mind? Drop a \ud83e\udd2f in the comments!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #SpaceExploration #NASA #Mars #EngineeringFails #MindBlown #MetricVsImperial #ScienceFacts\n\n#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets",
+  "hashtags": "#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets",
+  "poll_file": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/poll_why_nasa_lost_a_$327m_mars_orbiter_over_metric_units.json",
+  "carousel_json": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_why_nasa_lost_a_$327m_mars_orbiter_over_metric_units.json",
+  "generated_at": "2026-10-01T07:57:37.660626+00:00"
+}

@@ -1,0 +1,60 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "hook": "Did You Know a Unit Mix-Up Crashed a Mars Probe? \ud83e\ude90",
+  "headline": "Why NASA Lost a $327M Mars Orbiter Over Metric Units",
+  "source": "NASA Mars Climate Orbiter Mishap Board",
+  "slides": [
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "$327M Orbiter Lost? \ud83d\udcb8",
+      "bubble": "Did you know NASA lost a $327 million Mars orbiter because of a tiny mistake?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Mars Orbiter Disaster \ud83d\udef0\ufe0f",
+      "bubble": "Yes! A $327 million spacecraft incinerated in Mars' atmosphere over measurement units.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "curious",
+      "title": "Units Mix-Up? \ud83d\udccf",
+      "bubble": "Measurement units? What kind of mistake could lead to such a massive disaster?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Metric vs. Imperial \ud83d\udcca",
+      "bubble": "One team used imperial 'pound-seconds' for thrust. NASA expected metric 'newton-seconds'. Huge difference!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "Vanished Forever? \ud83e\udd2f",
+      "bubble": "So, because of that unit mix-up, the spacecraft flew too low and just burned up?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Incinerated in Orbit \ud83d\udd25",
+      "bubble": "Exactly. It entered Mars' atmosphere too low and fast, then tragically disintegrated. A costly lesson.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "excited",
+      "title": "Precision Matters! \u2705",
+      "bubble": "Wow, precision is EVERYTHING! Follow @vijayakumarj_ai for more mind-blowing tech facts!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "A simple unit conversion error between Lockheed Martin's software (imperial) and NASA's navigation (metric) cost $327M and a Mars orbiter. Precision is critical!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nNASA lost a $327 million Mars orbiter because two teams used different units of measurement!\n\nHere is the mind-blowing reality:\n\ud83d\udd39 Lockheed Martin's software calculated thruster impulse in 'pound-seconds' (imperial units).\n\ud83d\udd39 NASA's navigation software expected those calculations to be in 'newton-seconds' (metric units).\n\ud83d\udd39 This tiny oversight caused the Mars Climate Orbiter to enter Mars' atmosphere too low, leading to its incineration.\n\n\ud83d\udcac Did you already know this, or did this fact blow your mind? Drop a \ud83e\udd2f in the comments!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #SpaceExploration #NASA #Mars #EngineeringFails #MindBlown #MetricVsImperial #ScienceFacts"
+}
