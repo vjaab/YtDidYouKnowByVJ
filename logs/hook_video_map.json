@@ -538,5 +538,15 @@
     "title": "Stop wasting hours on custom token classification!",
     "uploaded_at": "2026-09-30T22:14:36.462191",
     "synced": false
+  },
+  "aDOsgLFdm6Y": {
+    "video_id": "aDOsgLFdm6Y",
+    "hook_pattern": "personal_stake",
+    "hook_variant": "A",
+    "hook_text": "Your AI agents leak data daily",
+    "category": "Tech Company Founding Stories",
+    "title": "[SECRET] OpenShell Blocks Credential Access",
+    "uploaded_at": "2026-10-01T05:46:33.973548",
+    "synced": false
   }
 }

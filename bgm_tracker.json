@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_Upbeat.mp3",
+      "headline": "NVIDIA OpenShell: The Open-Source Shield Blinding Big Tech's AI Agents",
+      "topic_type": "auto",
+      "timestamp": "36815899549"
+    },
+    {
       "track": "jam_Action_Inspiration_Trailer.mp3",
       "headline": "HF Trending Model: GLiNER2.5-Decide",
       "topic_type": "auto",
@@ -105,6 +111,7 @@
     "jam_Inspiring_Epic_Glory.mp3": 2,
     "Destiny.mp3": 2,
     "Defiance.mp3": 1,
-    "jam_Confidence.mp3": 1
+    "jam_Confidence.mp3": 1,
+    "jam_Upbeat.mp3": 1
   }
 }

@@ -501,6 +501,31 @@
         "avg_engagement": 0.0,
         "avg_swipe_away": 0.0,
         "avg_view_percentage": 0.0
+      },
+      "personal_stake": {
+        "variants": {
+          "A": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "Your AI agents leak data daily",
+                "video_id": "aDOsgLFdm6Y",
+                "recorded_at": "2026-10-01T05:46:33.971834"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
       }
     },
     "Tech Company Safety Decisions": {
@@ -1252,10 +1277,10 @@
       "views": 0,
       "retention": 0.0,
       "engagement": 0.0,
-      "count": 11,
+      "count": 12,
       "swipe_away_rate": 0.0,
       "avg_view_percentage": 0.0
     }
   },
-  "last_updated": "2026-09-30T22:14:36.460296"
+  "last_updated": "2026-10-01T05:46:33.971860"
 }
