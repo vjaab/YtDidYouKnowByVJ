@@ -1,0 +1,55 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "hook": "Did You Know 99% of the Internet is Underwater? \ud83c\udf0a",
+  "headline": "99% of Global Internet is on the Ocean Floor",
+  "source": "TeleGeography Submarine Cable Registry",
+  "date": "01 Oct 2026",
+  "slides": [
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "Internet Under the Sea? \ud83c\udf0a",
+      "bubble": "Wait, did you know that 99% of all international internet data is underwater?!"
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "1.4M km of Glass Fiber \ud83c\udf10",
+      "bubble": "Yes! Satellites carry under 1%. Over 1.4 million km of seafloor fiber carry the web."
+    },
+    {
+      "speaker": "byte",
+      "emotion": "curious",
+      "title": "Shark & Anchor Defense \ud83e\udd88",
+      "bubble": "What stops sharks or heavy boat anchors from snapping them in two?"
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Garden-Hose Thin \u2699\ufe0f",
+      "bubble": "Near shore they have heavy steel armor; in deep waters they are garden-hose thin!"
+    },
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "What If One Snaps? \ud83d\udea2",
+      "bubble": "What happens when an underwater cable actually gets cut by an anchor?"
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Autonomous Rerouting \u26a1",
+      "bubble": "Traffic reroutes in milliseconds, and specialized grappling ships sail out to repair it!"
+    },
+    {
+      "speaker": "byte",
+      "emotion": "excited",
+      "title": "Mind-Blowing Fact \ud83d\udca1",
+      "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "99% of global internet data travels through thin glass cables on the ocean floor, not satellites in space!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\n99% of the internet is not in the sky... it is sitting on the ocean floor!\n\nHere is the mind-blowing reality:\n\ud83d\udd39 Over 500 undersea fiber optic cables carry global data.\n\ud83d\udd39 They transmit data at 99.7% the speed of light.\n\ud83d\udd39 Deep-sea cables are only as thick as a garden hose, but carry trillions of dollars daily!\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #Engineering #ComputerScience"
+}

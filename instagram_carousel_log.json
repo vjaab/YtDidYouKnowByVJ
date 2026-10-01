@@ -46,40 +46,15 @@
     "Stuxnet Destroyed 1,000 Centrifuges Without Any Explosives",
     "The $100 Billion Y2K Fix That Actually Worked",
     "Blue OLED Subpixels Die 3 Times Faster Than Red or Green",
-    "Blue OLED Subpixels Die 3 Times Faster Than Red or Green"
+    "Blue OLED Subpixels Die 3 Times Faster Than Red or Green",
+    "CPU Interconnects are 10,000x Thinner Than a Human Hair",
+    "99% of Global Internet is on the Ocean Floor",
+    "Credit Cards Have Zero Battery and Power Themselves from Air",
+    "HBM3e Stacks DRAM with 50,000 Microscopic Silicon Vias",
+    "ASML Chip Lasers Fire 50,000 Times a Second at Molten Tin",
+    "Quartz Clocks Vibrate Exactly 32,768 Times Every Second"
   ],
   "used_keywords": [
-    "actions",
-    "stay",
-    "safe",
-    "retry",
-    "instead",
-    "guessing",
-    "from",
-    "pixels",
-    "tokenization",
-    "bpe",
-    "strawberry",
-    "llm reasoning",
-    "did you know",
-    "diffusion models",
-    "midjourney",
-    "image generation",
-    "ai art",
-    "Jev AI",
-    "LLM",
-    "AI efficiency",
-    "breakthrough",
-    "smaller models",
-    "artificial intelligence",
-    "tech trending",
-    "replacing",
-    "code",
-    "reviews",
-    "did you know",
-    "tech trending",
-    "medium",
-    "artificial",
     "intelligence",
     "isomorphic",
     "structural",
@@ -248,7 +223,38 @@
     "display tech",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "semiconductor",
+    "interconnects",
+    "3nm",
+    "copper wiring",
+    "did you know",
+    "submarine cables",
+    "internet",
+    "fiber optics",
+    "ocean floor",
+    "did you know",
+    "nfc",
+    "rfid",
+    "contactless payments",
+    "electromagnetic induction",
+    "did you know",
+    "hbm3e",
+    "gpu memory",
+    "nvidia blackwell",
+    "semiconductors",
+    "did you know",
+    "asml",
+    "euv",
+    "semiconductors",
+    "chip making",
+    "microprocessors",
+    "did you know",
+    "quartz crystal",
+    "binary",
+    "watches",
+    "piezoelectric",
+    "did you know"
   ],
   "history": [
     {
@@ -939,6 +945,85 @@
       ],
       "source": "Threads Post",
       "timestamp": "2026-10-01T13:52:32.327067+00:00"
+    },
+    {
+      "title": "CPU Interconnects are 10,000x Thinner Than a Human Hair",
+      "news_source_url": "",
+      "keywords": [
+        "semiconductor",
+        "interconnects",
+        "3nm",
+        "copper wiring",
+        "did you know"
+      ],
+      "source": "IEEE Transactions on Electron Devices",
+      "timestamp": "2026-10-01T17:01:26.663025+00:00"
+    },
+    {
+      "title": "99% of Global Internet is on the Ocean Floor",
+      "news_source_url": "",
+      "keywords": [
+        "submarine cables",
+        "internet",
+        "fiber optics",
+        "ocean floor",
+        "did you know"
+      ],
+      "source": "TeleGeography Submarine Cable Registry",
+      "timestamp": "2026-10-01T17:02:06.372214+00:00"
+    },
+    {
+      "title": "Credit Cards Have Zero Battery and Power Themselves from Air",
+      "news_source_url": "",
+      "keywords": [
+        "nfc",
+        "rfid",
+        "contactless payments",
+        "electromagnetic induction",
+        "did you know"
+      ],
+      "source": "ISO/IEC 14443 Contactless Standards",
+      "timestamp": "2026-10-01T17:02:48.676770+00:00"
+    },
+    {
+      "title": "HBM3e Stacks DRAM with 50,000 Microscopic Silicon Vias",
+      "news_source_url": "",
+      "keywords": [
+        "hbm3e",
+        "gpu memory",
+        "nvidia blackwell",
+        "semiconductors",
+        "did you know"
+      ],
+      "source": "JEDEC High Bandwidth Memory Specification",
+      "timestamp": "2026-10-01T17:02:48.797418+00:00"
+    },
+    {
+      "title": "ASML Chip Lasers Fire 50,000 Times a Second at Molten Tin",
+      "news_source_url": "",
+      "keywords": [
+        "asml",
+        "euv",
+        "semiconductors",
+        "chip making",
+        "microprocessors",
+        "did you know"
+      ],
+      "source": "ASML High-NA EUV Engineering",
+      "timestamp": "2026-10-01T17:02:48.891912+00:00"
+    },
+    {
+      "title": "Quartz Clocks Vibrate Exactly 32,768 Times Every Second",
+      "news_source_url": "",
+      "keywords": [
+        "quartz crystal",
+        "binary",
+        "watches",
+        "piezoelectric",
+        "did you know"
+      ],
+      "source": "Horological Quartz Oscillation Engineering",
+      "timestamp": "2026-10-01T17:02:48.982718+00:00"
     }
   ]
 }
