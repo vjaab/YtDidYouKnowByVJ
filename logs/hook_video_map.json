@@ -568,5 +568,15 @@
     "title": "Big Tech Charging You Per Prompt? Build AI for Free Instead \ud83d\udd25",
     "uploaded_at": "2026-10-02T05:35:34.832078",
     "synced": false
+  },
+  "mRZqOH-tv_k": {
+    "video_id": "mRZqOH-tv_k",
+    "hook_pattern": "negative_warning",
+    "hook_variant": "A",
+    "hook_text": "Stop using censored models for local cybersecurity work.",
+    "category": "AI Models & Security",
+    "title": "[SECRET] Bypass Cloud Filters With This Uncensored 27B Model",
+    "uploaded_at": "2026-10-02T21:21:23.153375",
+    "synced": false
   }
 }
