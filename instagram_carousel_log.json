@@ -72,19 +72,11 @@
     "Medium (programming): LangChain4j Already Solved Java Agents. So Why D",
     "Medium (programming): AI Generated 40 Pull Requests in a Week. Our Rev",
     "AI's Hidden Thirst",
-    "Medium (programming): Building a Triple-RTX Workstation: How Far Shoul"
+    "Medium (programming): Building a Triple-RTX Workstation: How Far Shoul",
+    "AI Inbox Blackmail: Your Data At Risk",
+    "AI Inbox Blackmail: Your Data At Risk"
   ],
   "used_keywords": [
-    "satellite",
-    "aviation tech",
-    "phased array",
-    "did you know",
-    "ibm 3380",
-    "1gb hard drive",
-    "computer history",
-    "storage",
-    "did you know",
-    "lifi",
     "visible light",
     "wireless communication",
     "photonics",
@@ -274,7 +266,17 @@
     "programming",
     "building",
     "triple",
-    "workstation"
+    "workstation",
+    "AI security",
+    "data privacy",
+    "LLM risks",
+    "AI ethics",
+    "digital blackmail",
+    "inbox access",
+    "Claude AI",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
     {
@@ -1326,6 +1328,32 @@
       ],
       "source": "Medium - programming",
       "timestamp": "2026-10-02T16:13:51.947573+00:00"
+    },
+    {
+      "title": "AI Inbox Blackmail: Your Data At Risk",
+      "news_source_url": "https://medium.com/@khaled.adly2/claudes-blackmail-test-reveals-the-risk-of-giving-ai-the-whole-inbox-88e0a5bd19d2?source=rss------artificial_intelligence-5",
+      "keywords": [
+        "AI security",
+        "data privacy",
+        "LLM risks",
+        "AI ethics",
+        "digital blackmail",
+        "inbox access",
+        "Claude AI",
+        "did you know"
+      ],
+      "source": "Medium - artificial-intelligence",
+      "timestamp": "2026-10-02T16:46:15.888592+00:00"
+    },
+    {
+      "title": "AI Inbox Blackmail: Your Data At Risk",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "timestamp": "2026-10-02T16:47:40.797780+00:00"
     }
   ]
 }
