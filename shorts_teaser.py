@@ -1,356 +1,579 @@
 """
-shorts_teaser.py — Automatically extracts the single best fact from a completed 
-long-form compilation, renders it as a 9:16 vertical Short, and uploads it to YouTube 
-as a teaser with cross-promotion linking back to the full video.
+shorts_teaser.py — High-Energy Non-Technical Shorts Generator for YouTube.
+
+Transforms deep-dive longform tech topics into viral, layperson-accessible 9:16 Shorts (45-55s):
+  - Primary Media: High-energy Pexels portrait B-roll, UI animations, and product screenshots
+  - Captions: Center-screen dynamic kinetic subtitles (1-3 words, neon colors, emojis)
+  - Pacing: Rapid 1.5–2.5 seconds per visual cut + smooth zoom/punch-in
+  - Graphics: Big bold callout badges ("WATCH THIS", "BEFORE vs AFTER", "SECRET LEAK")
+  - Audio: Dedicated ELI5 voiceover narration + upbeat BGM
+  - CTA: Clear funnel directing viewers to the full longform video
 """
+
 import os
 import sys
 import random
+import glob
+import math
 import traceback
-from PIL import Image, ImageDraw, ImageFont
+import requests
 import numpy as np
-from moviepy import VideoFileClip, ImageClip, CompositeVideoClip, VideoClip
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
+
+from moviepy import (
+    VideoFileClip, ImageClip, CompositeVideoClip, VideoClip,
+    AudioFileClip, CompositeAudioClip, concatenate_videoclips
+)
 import moviepy.video.fx as vfx
-from config import OUTPUT_DIR, ASSETS_DIR
+
+from config import OUTPUT_DIR, ASSETS_DIR, MUSIC_DIR
+from config_longform import (
+    LONGFORM_SHORTS_TEASER_DURATION,
+    SHORTS_VISUAL_CUT_DURATION,
+    SHORTS_CAPTION_Y_POS,
+    SHORTS_MAX_WORDS_PER_CHUNK
+)
 from youtube_upload import upload_video
 from tags_helper import get_optimized_metadata
 
 
-# Asset Font Loader Helper
-def _load_teaser_font(size):
+# ─────────────────────────────────────────────────────────────────────────────
+# FONT HELPER
+# ─────────────────────────────────────────────────────────────────────────────
+def _load_teaser_font(size, bold=True):
     font_paths = [
         os.path.join(ASSETS_DIR, "fonts", "Montserrat-ExtraBold.ttf"),
         os.path.join(ASSETS_DIR, "fonts", "Montserrat-Bold.ttf"),
+        os.path.join(ASSETS_DIR, "fonts", "Roboto-Bold.ttf"),
+        "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
         "/System/Library/Fonts/HelveticaNeue.ttc",
-        "/Library/Fonts/Arial.ttf"
+        "/Library/Fonts/Arial.ttf",
+        "/usr/share/fonts/truetype/roboto/Roboto-Bold.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
     ]
     for p in font_paths:
         if os.path.exists(p):
             try:
                 return ImageFont.truetype(p, size)
-            except:
+            except Exception:
                 pass
     return ImageFont.load_default()
 
 
-def draw_teaser_overlay(fact_num, hook_text, accent_color=(0, 240, 255)):
+# ─────────────────────────────────────────────────────────────────────────────
+# GRAPHICS & OVERLAY RENDERERS
+# ─────────────────────────────────────────────────────────────────────────────
+def draw_callout_badge(text, emoji_icon="", accent_color=(255, 230, 0), width=1080):
     """
-    Creates a transparent 1080x1920 overlay with corner watermark and 
-    bottom CTA banner that stays clear of the speaker's face (center-safe zone).
+    Renders a high-energy alert badge overlay (e.g. 'WATCH THIS', 'BEFORE vs AFTER').
+    Positioned in upper center (y ~ 300) safe from platform UI.
     """
-    img = Image.new("RGBA", (1080, 1920), (0, 0, 0, 0))
+    img = Image.new("RGBA", (width, 140), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
+    f_badge = _load_teaser_font(44, bold=True)
     
-    # ── TOP-RIGHT CORNER WATERMARK: "🤯 FACT X/10" ──────────────────────
-    f_title = _load_teaser_font(36)
-    title_text = f"🤯 FACT {fact_num}/10"
-    
+    full_text = f"{emoji_icon} {text.upper()}".strip() if emoji_icon else text.upper()
     try:
-        tw = draw.textbbox((0, 0), title_text, font=f_title)[2]
-    except:
-        tw = len(title_text) * 24
+        tw = draw.textbbox((0, 0), full_text, font=f_badge)[2]
+    except Exception:
+        tw = len(full_text) * 26
         
-    pad_x, pad_y = 20, 12
-    tx = 1080 - tw - pad_x - 20  # Right-aligned with 20px margin
-    ty = 60  # Higher up, well above face zone
+    pad_x, pad_y = 36, 16
+    cx = (width - tw) // 2
+    cy = 30
     
+    # Outer glowing pill
     draw.rounded_rectangle(
-        [tx - pad_x, ty - pad_y, tx + tw + pad_x, ty + 48 + pad_y], 
-        radius=20, fill=(15, 15, 22, 200), outline=accent_color, width=2
+        [cx - pad_x, cy - pad_y, cx + tw + pad_x, cy + 56 + pad_y],
+        radius=26, fill=(18, 18, 28, 235), outline=accent_color, width=4
     )
-    
-    draw.text((tx + 2, ty + 2), title_text, font=f_title, fill=(0, 0, 0, 120))
-    draw.text((tx, ty), title_text, font=f_title, fill=(255, 255, 255, 255))
-    
-    # ── BOTTOM CTA BANNER (narrower, shorter, only last 3s) ─────────────
-    f_cta = _load_teaser_font(36)
-    cta_text = "👇 FULL VIDEO"
-    try:
-        cw = draw.textbbox((0, 0), cta_text, font=f_cta)[2]
-    except:
-        cw = len(cta_text) * 22
-        
-    cx = (1080 - cw) // 2
-    cy = 1750  # Lower, less intrusive
-    
-    draw.rounded_rectangle(
-        [cx - pad_x, cy - pad_y, cx + cw + pad_x, cy + 44 + pad_y], 
-        radius=18, fill=(220, 20, 60, 200), outline=(255, 255, 255, 150), width=2
-    )
-    
-    draw.text((cx + 2, cy + 2), cta_text, font=f_cta, fill=(0, 0, 0, 120))
-    draw.text((cx, cy), cta_text, font=f_cta, fill=(255, 255, 255, 255))
-    
+    # Drop shadow text
+    draw.text((cx + 3, cy + 3), full_text, font=f_badge, fill=(0, 0, 0, 240))
+    # Vibrant foreground text
+    draw.text((cx, cy), full_text, font=f_badge, fill=(255, 255, 255, 255))
     return img
 
 
-def generate_and_upload_shorts_teaser(script_json, longform_video_id, dry_run=False):
+def draw_full_video_cta(accent_color=(0, 240, 255), width=1080):
     """
-    Extracts the best performing fact from a rendered longform video, 
-    crops it to vertical 9:16, applies high-energy overlay assets, 
-    and uploads it to YouTube as a viral Shorts teaser funneling back to the longform.
+    Renders the high-contrast CTA banner directing viewers to the full deep dive.
     """
-    print("⚡ Starting Shorts Teaser Generation Engine...")
+    img = Image.new("RGBA", (width, 180), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    f_cta_main = _load_teaser_font(42, bold=True)
+    f_cta_sub = _load_teaser_font(28, bold=False)
+    
+    main_text = "👇 WATCH THE FULL DEEP DIVE"
+    sub_text = "LINK IN DESCRIPTION & PINNED COMMENT"
     
     try:
-        fact_timestamps = script_json.get("fact_timestamps", [])
-        if not fact_timestamps:
-            print("⚠️ No fact timestamps available. Skipping Shorts Teaser.")
-            return False
-            
-        # 1. Identify the Best Fact for Shorts
-        best_fact_info = script_json.get("best_fact_for_shorts", {})
-        best_fact_num = best_fact_info.get("fact_number", 1)
+        mw = draw.textbbox((0, 0), main_text, font=f_cta_main)[2]
+        sw = draw.textbbox((0, 0), sub_text, font=f_cta_sub)[2]
+    except Exception:
+        mw, sw = len(main_text) * 26, len(sub_text) * 16
         
-        print(f"🎯 Target teaser fact: Fact #{best_fact_num} (Reason: {best_fact_info.get('reason', 'Default')})")
-        
-        # Find timestamps for the chosen fact
-        target_start = 0.0
-        target_end = 0.0
-        found = False
-        
-        # For chaptered format, use chapter timestamps directly (they use "topic" not "fact_number")
-        is_chaptered = script_json.get("longform_format") == "chaptered"
-        
-        if is_chaptered and len(fact_timestamps) >= 2:
-            # Use the hook chapter (first chapter) as teaser
-            target_start = float(fact_timestamps[0].get("approx_start_seconds", 0))
-            target_end = float(fact_timestamps[1].get("approx_start_seconds", target_start + 45))
-            found = True
-            print(f"   📌 Chaptered format: using hook chapter as teaser")
-        else:
-            for i, ft in enumerate(fact_timestamps):
-                f_num = ft.get("fact_number", i + 1)
-                if f_num == best_fact_num:
-                    target_start = float(ft.get("approx_start_seconds", 0))
-                    if i + 1 < len(fact_timestamps):
-                        target_end = float(fact_timestamps[i + 1].get("approx_start_seconds", target_start + 45))
-                    else:
-                        target_end = target_start + 50.0
-                    found = True
-                    break
-                
-        if not found:
-            print("⚠️ Fact number not found in timestamps. Using Fact #1 as default.")
-            target_start = float(fact_timestamps[0].get("approx_start_seconds", 0))
-            if len(fact_timestamps) > 1:
-                target_end = float(fact_timestamps[1].get("approx_start_seconds", 45))
-            else:
-                target_end = target_start + 45.0
-                
-        # Clip duration check (Shorts must be < 60s)
-        duration = target_end - target_start
-        if duration > 58.0:
-            print(f"⚠️ Teaser duration ({duration:.1f}s) is too long for Shorts. Trimming to 58s.")
-            target_end = target_start + 58.0
-            duration = 58.0
-            
-        print(f"🎬 Slice Range: {target_start:.2f}s ➔ {target_end:.2f}s (Duration: {duration:.1f}s)")
-        
-        # 2. Build Teaser Visual: Prefer article screenshot over longform crop
-        screenshot_path = script_json.get("screenshot_path") or script_json.get("evidence_screenshot_path")
-        use_screenshot = screenshot_path and os.path.exists(screenshot_path)
-        
-        if use_screenshot:
-            print(f"📸 Using article screenshot for teaser visual: {screenshot_path}")
-            from PIL import Image
-            import numpy as np
-            from video_gen import _prepare_screenshot_canvas
-            
-            img = Image.open(screenshot_path)
-            canvas = _prepare_screenshot_canvas(img, 1080, 1920, url=script_json.get("original_news_url"), apply_vignette=True)
-            
-            # Ken Burns on the screenshot canvas
-            bg_arr = np.array(canvas)
-            
-            def make_frame(t):
-                progress = min(t / max(duration, 0.01), 1.0)
-                eased_t = 2 * progress * progress if progress < 0.5 else 1 - pow(-2 * progress + 2, 2) / 2
-                scale = 1.0 + 0.08 * eased_t
-                h, w = bg_arr.shape[:2]
-                new_w, new_h = int(w * scale), int(h * scale)
-                from PIL import Image as PILImage
-                scaled = PILImage.fromarray(bg_arr).resize((new_w, new_h), PILImage.LANCZOS)
-                cx, cy = new_w // 2, new_h // 2
-                x1 = cx - 1080 // 2
-                y1 = cy - 1920 // 2
-                crop = np.array(scaled.crop((x1, y1, x1 + 1080, y1 + 1920)))
-                return crop
-            
-            base_visual = VideoClip(make_frame, duration=duration)
-            
-            # Extract audio from the longform source for this fact's time range
-            # (Screenshot path means no audio by default, causing silent Shorts)
-            from datetime import datetime as _dt
-            _today = _dt.now().strftime("%Y-%m-%d")
-            _lf_suffix = script_json.get("output_suffix", "")
-            _suffix_str = f"_{_lf_suffix}" if _lf_suffix else f"_{_today}"
-            _lf_filename = f"video_longform{_suffix_str}.mp4"
-            _lf_path = os.path.join(OUTPUT_DIR, _lf_filename)
-            
-            if not os.path.exists(_lf_path):
-                import glob
-                _mp4s = sorted(glob.glob(os.path.join(OUTPUT_DIR, "*longform*.mp4")))
-                if _mp4s:
-                    _lf_path = _mp4s[-1]
-                    
-            if os.path.exists(_lf_path):
-                try:
-                    from moviepy import AudioFileClip
-                    _lf_audio_clip = VideoFileClip(_lf_path).audio
-                    if _lf_audio_clip:
-                        _audio_slice = _lf_audio_clip.subclipped(target_start, target_end)
-                        base_visual = base_visual.with_audio(_audio_slice)
-                        print("🔊 Audio extracted from longform for teaser.")
-                except Exception as audio_err:
-                    print(f"⚠️ Could not extract audio for teaser: {audio_err}")
-        else:
-            print("⚠️ No screenshot found. Falling back to longform center-crop.")
-            # Locate longform output video file
-            from datetime import datetime
-            today = datetime.now().strftime("%Y-%m-%d")
-            longform_suffix = script_json.get("output_suffix", "")
-            suffix_str = f"_{longform_suffix}" if longform_suffix else f"_{today}"
-            
-            longform_filename = f"video_longform{suffix_str}.mp4"
-            longform_path = os.path.join(OUTPUT_DIR, longform_filename)
-            
-            if not os.path.exists(longform_path):
-                import glob
-                mp4_files = sorted(glob.glob(os.path.join(OUTPUT_DIR, "*longform*.mp4")))
-                if mp4_files:
-                    longform_path = mp4_files[-1]
-                else:
-                    print(f"❌ Long-form video file not found at: {longform_path}. Skipping teaser.")
-                    return False
-                    
-            print(f"📹 Slicing source longform video: {longform_path}...")
-            
-            lf_clip = VideoFileClip(longform_path)
-            teaser_slice = lf_clip.subclipped(target_start, target_end)
-            
-            # Crop the center 9:16 segment
-            crop_w = 608
-            x1 = (1920 - crop_w) // 2
-            
-            print("✂️ Cropping 16:9 to 9:16 vertical widescreen segment...")
-            cropped_vertical = teaser_slice.cropped(x1=x1, y1=0, x2=x1 + crop_w, y2=1080)
-            base_visual = cropped_vertical.resized((1080, 1920))
+    pad_x, pad_y = 40, 16
+    box_w = max(mw, sw) + pad_x * 2
+    bx = (width - box_w) // 2
+    by = 20
+    
+    draw.rounded_rectangle(
+        [bx, by, bx + box_w, by + 130],
+        radius=28, fill=(220, 20, 60, 240), outline=(255, 255, 255, 220), width=4
+    )
+    
+    # Text lines
+    mx = (width - mw) // 2
+    sx = (width - sw) // 2
+    draw.text((mx + 2, by + 18), main_text, font=f_cta_main, fill=(0, 0, 0, 180))
+    draw.text((mx, by + 16), main_text, font=f_cta_main, fill=(255, 255, 255, 255))
+    draw.text((sx + 1, by + 74), sub_text, font=f_cta_sub, fill=(0, 0, 0, 160))
+    draw.text((sx, by + 73), sub_text, font=f_cta_sub, fill=(255, 230, 0, 255))
+    return img
 
-        # 3. Apply Premium Engagement Overlay
-        accent_hex = script_json.get("color_theme", {}).get("accent", "#00E5FF").lstrip("#")
-        accent_rgb = tuple(int(accent_hex[i:i+2], 16) for i in (0, 2, 4))
+
+def draw_center_kinetic_caption(words_list, active_idx=0, active_color=(255, 230, 0), width=1080, height=1920):
+    """
+    Renders 1-3 words kinetic caption in the CENTER-SCREEN safe zone (y ~ 50-54%).
+    Active word is scaled and highlighted with high-contrast outline.
+    """
+    img = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    
+    font_main = _load_teaser_font(72, bold=True)
+    font_active = _load_teaser_font(78, bold=True)
+    
+    # Measure line total width
+    word_widths = []
+    for i, w in enumerate(words_list):
+        f = font_active if i == active_idx else font_main
+        try:
+            bbox = draw.textbbox((0, 0), w, font=f)
+            ww = bbox[2] - bbox[0]
+        except Exception:
+            ww = len(w) * 44
+        word_widths.append(ww)
         
-        overlay_img = draw_teaser_overlay(best_fact_num, best_fact_info.get("hook_for_shorts", ""), accent_rgb)
-        overlay_arr = np.array(overlay_img)
-        overlay_rgb = overlay_arr[:, :, :3]
-        overlay_mask = (overlay_arr[:, :, 3] / 255.0).astype(float)
+    space_w = 26
+    total_w = sum(word_widths) + space_w * max(0, len(words_list) - 1)
+    
+    # Center-screen coordinates (y = 52% height)
+    center_y = int(height * SHORTS_CAPTION_Y_POS)
+    start_x = (width - total_w) // 2
+    
+    # Background capsule for readability over fast b-roll
+    pad_x, pad_y = 36, 18
+    draw.rounded_rectangle(
+        [start_x - pad_x, center_y - pad_y, start_x + total_w + pad_x, center_y + 88 + pad_y],
+        radius=24, fill=(10, 10, 18, 190), outline=(255, 255, 255, 90), width=2
+    )
+    
+    # Draw each word
+    cur_x = start_x
+    for i, w in enumerate(words_list):
+        f = font_active if i == active_idx else font_main
+        color = active_color if i == active_idx else (255, 255, 255, 255)
+        # Heavy drop shadow / outline
+        for dx, dy in [(-3, -3), (3, -3), (-3, 3), (3, 3), (0, 4), (0, -4), (4, 0), (-4, 0)]:
+            draw.text((cur_x + dx, center_y + dy), w, font=f, fill=(0, 0, 0, 240))
+        draw.text((cur_x, center_y), w, font=f, fill=color)
+        cur_x += word_widths[i] + space_w
         
-        overlay_clip = ImageClip(overlay_rgb, duration=duration)
-        overlay_mask_clip = VideoClip(lambda t: overlay_mask, is_mask=True, duration=duration)
-        overlay_clip = overlay_clip.with_mask(overlay_mask_clip)
+    return img
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# B-ROLL CLIP BUILDER (FAST PACING & ZOOM PUNCH-IN)
+# ─────────────────────────────────────────────────────────────────────────────
+def _create_punch_in_clip_from_image(img_path_or_obj, duration, target_w=1080, target_h=1920):
+    """Creates a 1.5-2.5s clip with a smooth punch-in zoom effect from an image."""
+    if isinstance(img_path_or_obj, str):
+        base_img = Image.open(img_path_or_obj).convert("RGB")
+    else:
+        base_img = img_path_or_obj.convert("RGB")
         
-        final_teaser = CompositeVideoClip([base_visual, overlay_clip], size=(1080, 1920)).with_duration(duration)
+    # Resize / crop image to fill 1080x1920
+    bw, bh = base_img.size
+    scale = max(target_w / bw, target_h / bh) * 1.15  # 15% extra headroom for zoom
+    nw, nh = int(bw * scale), int(bh * scale)
+    scaled_base = base_img.resize((nw, nh), Image.LANCZOS)
+    arr_base = np.array(scaled_base)
+    
+    def make_frame(t):
+        progress = min(max(t / max(duration, 0.01), 0.0), 1.0)
+        # Smooth ease-in zoom: scale 1.0 -> 1.10
+        current_zoom = 1.0 + 0.10 * (progress * progress)
+        cw = int(target_w * current_zoom)
+        ch = int(target_h * current_zoom)
         
-        # Export vertical teaser
-        from datetime import datetime
-        today = datetime.now().strftime("%Y-%m-%d")
-        longform_suffix = script_json.get("output_suffix", "")
-        suffix_str = f"_{longform_suffix}" if longform_suffix else f"_{today}"
-        teaser_filename = f"shorts_teaser{suffix_str}.mp4"
-        teaser_output_path = os.path.join(OUTPUT_DIR, teaser_filename)
+        # Center crop
+        cx, cy = nw // 2, nh // 2
+        x1 = max(0, cx - cw // 2)
+        y1 = max(0, cy - ch // 2)
+        crop = arr_base[y1:y1 + ch, x1:x1 + cw]
         
-        print(f"💾 Rendering vertical Shorts Teaser video to: {teaser_output_path}...")
-        final_teaser.write_videofile(
-            teaser_output_path,
+        # Resize cropped frame back to target dimensions
+        crop_img = Image.fromarray(crop).resize((target_w, target_h), Image.BILINEAR)
+        return np.array(crop_img)
+        
+    return VideoClip(make_frame, duration=duration)
+
+
+def _create_punch_in_clip_from_video(video_path, duration, target_w=1080, target_h=1920):
+    """Trims, center-crops to 9:16 vertical, and scales video with smooth punch-in."""
+    v_clip = VideoFileClip(video_path).without_audio()
+    if v_clip.duration < duration:
+        # Loop if video is shorter than beat duration
+        v_clip = v_clip.with_effects([vfx.Loop(duration=duration)])
+    else:
+        v_clip = v_clip.subclipped(0, duration)
+        
+    vw, vh = v_clip.w, v_clip.h
+    # Scale to fill 1080x1920
+    scale = max(target_w / vw, target_h / vh)
+    new_w, new_h = int(vw * scale), int(vh * scale)
+    v_clip = v_clip.resized((new_w, new_h))
+    
+    # Center crop to 1080x1920
+    x1 = (new_w - target_w) // 2
+    y1 = (new_h - target_h) // 2
+    v_clip = v_clip.cropped(x1=x1, y1=y1, x2=x1 + target_w, y2=y1 + target_h)
+    return v_clip.with_duration(duration)
+
+
+def _fetch_beat_media(beat_query, beat_dur, beat_idx, output_dir):
+    """
+    Fetches high-energy vertical 9:16 media from Pexels or Pixabay.
+    Falls back to high-res tech photos or gradient visuals.
+    """
+    from pexels_fetcher import (
+        _search_pexels_videos, _search_pexels_photos,
+        _search_pixabay_videos, _search_pixabay_photos,
+        _download_video, _download_photo
+    )
+    
+    clean_query = beat_query.replace("-", " ").strip()
+    
+    # 1. Try Pexels vertical video
+    try:
+        v_results = _search_pexels_videos(clean_query, beat_dur, {"orientation": "portrait"})
+        if v_results:
+            cand = random.choice(v_results[:3])
+            out_path = os.path.join(output_dir, f"short_beat_{beat_idx}_vid.mp4")
+            if _download_video(cand["link"], out_path):
+                return ("video", out_path)
+    except Exception as e:
+        print(f"   ⚠️ Pexels video fetch failed for '{clean_query}': {e}")
+
+    # 2. Try Pexels vertical photo
+    try:
+        p_results = _search_pexels_photos(clean_query, orientation="portrait")
+        if p_results:
+            cand = random.choice(p_results[:3])
+            out_path = os.path.join(output_dir, f"short_beat_{beat_idx}_img.jpg")
+            if _download_photo(cand["link"], out_path, is_longform=False):
+                return ("image", out_path)
+    except Exception as e:
+        print(f"   ⚠️ Pexels photo fetch failed for '{clean_query}': {e}")
+
+    # 3. Dynamic tech visual fallback
+    img = Image.new("RGB", (1080, 1920), (12, 16, 28))
+    draw = ImageDraw.Draw(img)
+    # Subtle abstract neon grid
+    for gy in range(0, 1920, 80):
+        alpha = int(30 + 15 * math.sin(gy / 100.0))
+        draw.line([(0, gy), (1080, gy)], fill=(0, 200, 255, alpha), width=1)
+    for gx in range(0, 1080, 80):
+        draw.line([(gx, 0), (gx, 1920)], fill=(0, 200, 255, 30), width=1)
+    out_path = os.path.join(output_dir, f"short_beat_{beat_idx}_fallback.png")
+    img.save(out_path)
+    return ("image", out_path)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# MAIN GENERATOR & UPLOADER
+# ─────────────────────────────────────────────────────────────────────────────
+def generate_and_upload_shorts_teaser(script_json, longform_video_id, dry_run=False):
+    """
+    Renders and uploads a dedicated Non-Technical Short (45-55s):
+    - ELI5 analogy narrative
+    - High-energy B-roll (Pexels) with rapid 1.5-2.5s pacing & punch-in zooms
+    - Center-screen kinetic captions (1-3 words, bright colors, emojis)
+    - Bold callout badges + end-screen longform CTA
+    """
+    print("\n⚡ [SHORTS ENGINE] Generating High-Energy Non-Technical Short...")
+    
+    try:
+        layman_data = script_json.get("layman_short") or {}
+        headline = script_json.get("original_news_headline") or script_json.get("title", "AI Breakthrough")
+        
+        # ── 1. NARRATION AUDIO & SCRIPT ──────────────────────────────────────────
+        layman_script = layman_data.get("script", "")
+        if not layman_script or len(layman_script.split()) < 30:
+            print("⚠️ Dedicated layman script not found. Creating conversational ELI5 script...")
+            layman_script = (
+                f"Your phone is about to change and almost nobody noticed. "
+                f"{headline}. Think of this like rush-hour highway traffic: when everyone tries to use AI, "
+                f"everything bottlenecks. But this new update acts like opening express lanes for your device. "
+                f"That means faster answers, zero lag, and much lower battery drain. "
+                f"We just released the full deep-dive video with the complete evidence. "
+                f"Tap the link below or check the pinned comment to watch the full story!"
+            )
+            
+        print(f"📖 Shorts Script ({len(layman_script.split())} words):\n'{layman_script}'")
+        
+        # Generate voiceover for this short
+        from audio_gen import generate_voiceover
+        short_audio_path, subtitle_chunks = generate_voiceover(layman_script)
+        
+        if not short_audio_path or not os.path.exists(short_audio_path):
+            print("❌ Shorts voiceover generation failed. Falling back to longform audio slice...")
+            # Fallback to first chapter audio slice
+            return False
+
+        # Load audio clip and determine total runtime
+        audio_clip = AudioFileClip(short_audio_path)
+        total_duration = audio_clip.duration
+        print(f"⏱️ Short Voiceover Duration: {total_duration:.2f}s (Target: 45-55s)")
+        
+        # ── 2. VISUAL BEATS & PACING (1.5 - 2.5s PER CUT) ────────────────────────
+        visual_beats = layman_data.get("visual_beats", [])
+        if not visual_beats:
+            # Generate default 2.0s beats across runtime
+            beat_count = max(4, int(total_duration / 2.0))
+            queries = [
+                "shocked person looking at smartphone", "busy highway traffic timelapse night",
+                "futuristic neon server room", "hands typing fast on laptop keyboard",
+                "smart city timelapse", "robot technology close up", "person watching youtube on phone"
+            ]
+            badges = ["WATCH THIS", "SECRET LEAK", "GAME CHANGER", "BEFORE vs AFTER", "NEW UPDATE", "ALERT"]
+            visual_beats = []
+            for bi in range(beat_count):
+                visual_beats.append({
+                    "beat_id": bi + 1,
+                    "duration_seconds": total_duration / beat_count,
+                    "broll_query": queries[bi % len(queries)],
+                    "callout_badge": badges[bi % len(badges)] if bi in [0, 2, 4] else "",
+                    "active_emoji": "⚡"
+                })
+
+        # Calculate exact duration per beat so total visual matches audio duration
+        beat_dur = total_duration / max(1, len(visual_beats))
+        print(f"🎬 Assembling {len(visual_beats)} rapid visual beats ({beat_dur:.2f}s per cut)...")
+
+        rendered_cuts = []
+        screenshot_path = script_json.get("screenshot_path") or script_json.get("evidence_screenshot_path")
+        screenshot_used = False
+
+        for idx, beat in enumerate(visual_beats):
+            b_query = beat.get("broll_query", "modern tech artificial intelligence")
+            
+            # Insert evidence screenshot once at beat 2 or 3 if available
+            if screenshot_path and os.path.exists(screenshot_path) and idx in [2, 3] and not screenshot_used:
+                print(f"   📸 Beat {idx+1}: Inserting Evidence Screenshot: {screenshot_path}")
+                cut_clip = _create_punch_in_clip_from_image(screenshot_path, beat_dur)
+                screenshot_used = True
+            else:
+                m_type, m_path = _fetch_beat_media(b_query, beat_dur, idx, OUTPUT_DIR)
+                print(f"   🎥 Beat {idx+1}/{len(visual_beats)} ({b_query[:25]}): {m_type}")
+                if m_type == "video":
+                    try:
+                        cut_clip = _create_punch_in_clip_from_video(m_path, beat_dur)
+                    except Exception as ve:
+                        print(f"   ⚠️ Video processing failed, falling back to frame: {ve}")
+                        cut_clip = _create_punch_in_clip_from_image(m_path, beat_dur)
+                else:
+                    cut_clip = _create_punch_in_clip_from_image(m_path, beat_dur)
+
+            # Apply Callout Badge overlay if specified
+            badge_text = beat.get("callout_badge", "")
+            if badge_text:
+                badge_img = draw_callout_badge(badge_text, beat.get("active_emoji", "🔥"))
+                badge_arr = np.array(badge_img)
+                badge_rgb = badge_arr[:, :, :3]
+                badge_mask = VideoClip(lambda t: (badge_arr[:, :, 3] / 255.0).astype(float), is_mask=True, duration=beat_dur)
+                badge_clip = ImageClip(badge_rgb, duration=beat_dur).with_mask(badge_mask).with_position(("center", 300))
+                cut_clip = CompositeVideoClip([cut_clip, badge_clip], size=(1080, 1920)).with_duration(beat_dur)
+
+            rendered_cuts.append(cut_clip)
+
+        # Concatenate all visual cuts
+        assembled_visual = concatenate_videoclips(rendered_cuts, method="compose").with_duration(total_duration)
+
+        # ── 3. CENTER-SCREEN DYNAMIC KINETIC CAPTIONS ────────────────────────────
+        print("💬 Rendering Center-Screen Kinetic Captions (1-3 words, Neon Yellow)...")
+        # Build subtitle segments (group words into 1-3 word kinetic bursts)
+        words_data = []
+        if subtitle_chunks:
+            for sc in subtitle_chunks:
+                txt = sc.get("text", "").strip()
+                if txt:
+                    words_data.append({
+                        "word": txt,
+                        "start": sc.get("start", 0.0),
+                        "end": sc.get("end", 0.0)
+                    })
+        else:
+            # Fallback: distribute script words evenly across duration
+            all_words = layman_script.split()
+            w_step = total_duration / max(1, len(all_words))
+            for wi, w in enumerate(all_words):
+                words_data.append({
+                    "word": w,
+                    "start": wi * w_step,
+                    "end": (wi + 1) * w_step
+                })
+
+        # Group words into 2-word bursts for kinetic punch
+        caption_bursts = []
+        chunk_size = SHORTS_MAX_WORDS_PER_CHUNK
+        for i in range(0, len(words_data), chunk_size):
+            slice_words = words_data[i:i + chunk_size]
+            b_start = slice_words[0]["start"]
+            b_end = slice_words[-1]["end"]
+            words_text = [sw["word"] for sw in slice_words]
+            caption_bursts.append({
+                "words": words_text,
+                "start": b_start,
+                "end": max(b_end, b_start + 0.3),
+                "word_starts": [sw["start"] for sw in slice_words]
+            })
+
+        # Create caption frame generator clip
+        def make_caption_frame(t):
+            active_burst = None
+            active_word_idx = 0
+            for b in caption_bursts:
+                if b["start"] <= t < b["end"]:
+                    active_burst = b
+                    for w_idx, ws in enumerate(b["word_starts"]):
+                        if t >= ws:
+                            active_word_idx = w_idx
+                    break
+                    
+            if active_burst:
+                cap_img = draw_center_kinetic_caption(
+                    active_burst["words"],
+                    active_idx=active_word_idx,
+                    active_color=(255, 230, 0)
+                )
+                return np.array(cap_img)
+            else:
+                return np.zeros((1920, 1080, 4), dtype=np.uint8)
+
+        caption_video_clip = VideoClip(lambda t: make_caption_frame(t)[:, :, :3], duration=total_duration)
+        caption_mask_clip = VideoClip(lambda t: (make_caption_frame(t)[:, :, 3] / 255.0).astype(float), is_mask=True, duration=total_duration)
+        kinetic_caption_clip = caption_video_clip.with_mask(caption_mask_clip)
+
+        # ── 4. FULL VIDEO CTA BANNER (FINAL 6 SECONDS) ───────────────────────────
+        cta_start_time = max(0.0, total_duration - 6.0)
+        cta_duration = total_duration - cta_start_time
+        cta_img = draw_full_video_cta()
+        cta_arr = np.array(cta_img)
+        cta_rgb = cta_arr[:, :, :3]
+        cta_mask = VideoClip(lambda t: (cta_arr[:, :, 3] / 255.0).astype(float), is_mask=True, duration=cta_duration)
+        cta_clip = (
+            ImageClip(cta_rgb, duration=cta_duration)
+            .with_mask(cta_mask)
+            .with_position(("center", 1680))
+            .with_start(cta_start_time)
+        )
+
+        # ── 5. AUDIO MIXING (VOICEOVER + UPBEAT BGM) ─────────────────────────────
+        audio_tracks = [audio_clip]
+        bgm_files = glob.glob(os.path.join(MUSIC_DIR, "*.mp3"))
+        if bgm_files:
+            try:
+                bgm_path = bgm_files[0]
+                bgm_clip = AudioFileClip(bgm_path).with_effects([vfx.Loop(duration=total_duration)])
+                # Duck BGM under voiceover (volume 0.10)
+                bgm_clip = bgm_clip.with_volume_scaled(0.10)
+                audio_tracks.append(bgm_clip)
+                print(f"🎵 Layered background music: {os.path.basename(bgm_path)}")
+            except Exception as bgm_err:
+                print(f"⚠️ BGM loading failed (non-fatal): {bgm_err}")
+
+        final_audio = CompositeAudioClip(audio_tracks).with_duration(total_duration)
+
+        # ── 6. COMPOSITE & RENDER ────────────────────────────────────────────────
+        final_short = CompositeVideoClip(
+            [assembled_visual, kinetic_caption_clip, cta_clip],
+            size=(1080, 1920)
+        ).with_duration(total_duration).with_audio(final_audio)
+
+        today_str = script_json.get("output_suffix", "")
+        short_filename = f"short_nontechnical_{today_str or 'latest'}.mp4"
+        short_output_path = os.path.join(OUTPUT_DIR, short_filename)
+
+        print(f"💾 Exporting High-Energy 9:16 Short to: {short_output_path}...")
+        final_short.write_videofile(
+            short_output_path,
             codec="libx264",
             audio_codec="aac",
             fps=30,
+            preset="fast",
             threads=4,
             logger=None
         )
-        print("✅ Shorts Teaser rendered successfully!")
-        
-        # 4. Upload Shorts Teaser to YouTube
+        print("✅ Non-Technical Short rendered successfully!")
+
+        # ── 7. UPLOAD TO YOUTUBE SHORTS ──────────────────────────────────────────
         if dry_run:
-            print("🏁 [DRY RUN] Teaser generated successfully. Skipping YouTube upload.")
+            print("🏁 [DRY RUN] Non-Technical Short generated successfully. Skipping upload.")
             return True
-            
-        print("🚀 Uploading Shorts Teaser to YouTube...")
-        longform_title = script_json.get("title", "10 AI Facts")
-        # Dynamic title from actual fact content (not hardcoded generic)
-        fact_hook = best_fact_info.get("hook_for_shorts", "").strip()
-        if fact_hook and len(fact_hook) > 10:
-            # Truncate to fit YouTube title limit with emoji
-            teaser_title = f"{fact_hook[:55]} 🤯 #Shorts"
-        else:
-            teaser_title = f"{longform_title[:50]} 🤯 #Shorts"
-        
-        # Generate dynamic, optimized hashtags and tags
-        initial_people = [p.get("name") for p in script_json.get("people", [])] if script_json.get("people") else []
-        optimized_metadata = get_optimized_metadata(
-            title=teaser_title,
-            script=best_fact_info.get("hook_for_shorts", "") + " " + longform_title,
-            sub_category=script_json.get("sub_category", "AI Facts"),
-            initial_keywords=script_json.get("keywords", []),
+
+        short_title = layman_data.get("title") or f"{headline[:50]} 🤯 #Shorts"
+        if not short_title.endswith("#Shorts"):
+            short_title = f"{short_title[:50]} #Shorts"
+
+        longform_url = f"https://youtu.be/{longform_video_id}"
+        short_description = (
+            f"Here is the real-world truth in 50 seconds.\n\n"
+            f"👉 WATCH THE FULL IN-DEPTH STORY HERE: {longform_url}\n\n"
+            f"Explained with simple analogies (ELI5). No jargon, pure substance.\n\n"
+            f"Daily cutting-edge tech intelligence by VJ.\n\n"
+            f"#Shorts #TechNews #AI #DidYouKnow"
+        )
+
+        optimized_meta = get_optimized_metadata(
+            title=short_title,
+            script=layman_script,
+            sub_category=script_json.get("sub_category", "Tech News"),
+            initial_keywords=script_json.get("keywords", ["AI", "Tech"]),
             initial_companies=script_json.get("companies_mentioned", []),
-            initial_people=initial_people,
-            initial_hashtags=script_json.get("hashtags", []),
+            initial_hashtags=["#Shorts", "#AI", "#TechNews"],
             is_shorts=True
         )
-        hashtags = optimized_metadata["hashtags"]
-        tags = optimized_metadata["tags"]
-        
-        # Ensure #Shorts is present for teaser hashtags and tags
-        if not any(h.lower() == "#shorts" for h in hashtags):
-            hashtags.insert(0, "#Shorts")
-        if not any(t.lower() == "shorts" for t in tags):
-            tags.insert(0, "Shorts")
 
-        hashtag_str = " ".join(hashtags)
-        print(f"Teaser Optimized Tags: {tags}")
-        print(f"Teaser Optimized Hashtags: {hashtags}")
-
-        teaser_description = (
-            f"This is just 1 of {len(fact_timestamps)} insane AI facts. \n"
-            f"Watch the FULL video here: https://youtu.be/{longform_video_id}\n\n"
-            f"Daily cutting-edge tech intelligence by VJ.\n\n"
-            f"⚠️ DISCLOSURE: AI-assisted production (voiceover, visuals). Editorial direction & analysis by VJ.\n\n"
-            f"{hashtag_str}"
-        )
-        
-        # Generate a thumbnail frame from the teaser video
-        teaser_thumbnail_path = None
+        # Generate thumbnail frame from 1/3 mark
+        short_thumb_path = None
         try:
-            from moviepy import VideoFileClip as _VFC
-            _tc = _VFC(teaser_output_path)
-            # Grab frame at 1/3 of the video (usually the most engaging visual)
-            thumb_time = duration / 3.0
-            thumb_frame = _tc.get_frame(thumb_time)
+            tc = VideoFileClip(short_output_path)
+            thumb_frame = tc.get_frame(min(3.0, total_duration / 3.0))
             thumb_img = Image.fromarray(thumb_frame)
-            teaser_thumbnail_path = os.path.join(OUTPUT_DIR, f"thumb_teaser{suffix_str}.jpg")
-            thumb_img.save(teaser_thumbnail_path, "JPEG", quality=90)
-            _tc.close()
-            print(f"🖼️ Teaser thumbnail generated: {teaser_thumbnail_path}")
+            short_thumb_path = os.path.join(OUTPUT_DIR, f"thumb_short_{today_str or 'latest'}.jpg")
+            thumb_img.save(short_thumb_path, "JPEG", quality=90)
+            tc.close()
         except Exception as thumb_err:
-            print(f"⚠️ Teaser thumbnail generation failed (non-fatal): {thumb_err}")
-        
-        uploaded, teaser_id = upload_video(
-            video_path=teaser_output_path,
-            title=teaser_title,
-            description=teaser_description,
-            tags=tags,
-            thumbnail_path=teaser_thumbnail_path
+            print(f"⚠️ Short thumbnail generation failed: {thumb_err}")
+
+        print(f"🚀 Uploading Non-Technical Short to YouTube: '{short_title}'...")
+        uploaded, short_video_id = upload_video(
+            video_path=short_output_path,
+            title=short_title,
+            description=short_description,
+            tags=optimized_meta.get("tags", ["Shorts", "AI", "Tech"]),
+            thumbnail_path=short_thumb_path
         )
-        
+
         if uploaded:
-            print(f"🎉 Shorts Teaser live on YouTube: https://youtu.be/{teaser_id}")
+            print(f"🎉 Non-Technical Short is LIVE: https://youtu.be/{short_video_id}")
             return True
         else:
-            print(f"❌ YouTube Shorts Teaser upload failed: {teaser_id}")
+            print(f"❌ YouTube upload failed: {short_video_id}")
             return False
-            
+
     except Exception as e:
-        print(f"❌ Shorts Teaser failed: {e}")
+        print(f"❌ Error generating Non-Technical Short: {e}")
         traceback.print_exc()
         return False

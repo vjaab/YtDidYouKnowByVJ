@@ -74,6 +74,10 @@ LONGFORM_MIDPOINT_TWIST_FACT = 3
 LONGFORM_INTRO_DURATION = 5
 LONGFORM_OUTRO_DURATION = 5
 
-# ── Shorts Cross-Promotion ───────────────────────────────────────────────────
-LONGFORM_GENERATE_SHORTS_TEASER = False       # Disabled — do not upload Shorts of longform videos
-LONGFORM_SHORTS_TEASER_DURATION = (50, 58)    # Shorts teaser duration range
+# ── Shorts Cross-Promotion (Non-Technical Audience) ──────────────────────────
+LONGFORM_GENERATE_SHORTS_TEASER = True        # Enabled — produce and upload viral non-technical Shorts teaser
+LONGFORM_SHORTS_TEASER_DURATION = (45, 55)    # Strictly 45-55 second target
+SHORTS_VISUAL_CUT_DURATION = (1.5, 2.5)       # Rapid visual pacing: 1.5-2.5s per cut + zoom punch-in
+SHORTS_CAPTION_Y_POS = 0.52                   # Center-screen dynamic kinetic captions
+SHORTS_MAX_WORDS_PER_CHUNK = 3                # 1-3 words per kinetic caption chunk
+

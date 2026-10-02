@@ -83,7 +83,9 @@ def select_best_longform_title(title_options, default_title="", keywords=None):
         "threat": 15, "changed": 12, "leak": 16, "free": 12, "built": 10,
         "behind": 22, "stop": 20, "fatal": 22, "destroy": 20, "don't": 18,
         "quietly": 18, "unfair": 20, "hidden": 16, "99%": 20, "won't tell you": 22,
-        "breaks": 18, "costing": 18, "lies": 18, "panic": 20
+        "breaks": 18, "costing": 18, "lies": 18, "panic": 20,
+        "iphone": 20, "phone": 16, "safe": 18, "banning": 20, "banned": 20,
+        "noticed": 18, "actually": 15, "silent": 16, "everyday": 14
     }
     
     kw_set = {str(k).lower() for k in (keywords or [])}
@@ -110,11 +112,12 @@ def select_best_longform_title(title_options, default_title="", keywords=None):
             if pw in cand_lower:
                 score += weight
                 
-        # 3. High-FOMO & Provocative Triggers Bonus
+        # 3. High-FOMO & Non-Technical Curiosity Triggers Bonus
         fomo_triggers = [
             "already behind", "before it's too late", "quietly quitting", "fatal flaw",
             "nobody is talking about", "stop using", "breaks everything", "won't tell you",
-            "unfair advantage", "costing you", "huge mistake"
+            "unfair advantage", "costing you", "huge mistake", "about to get this",
+            "quietly banning", "actually safe", "nobody noticed", "30-second truth"
         ]
         for ft in fomo_triggers:
             if ft in cand_lower:

@@ -39,13 +39,23 @@ from config_longform import (
 # PROMPT TEMPLATES (CHAPTERED DEEP-DIVE FORMAT)
 # ═══════════════════════════════════════════════════════════════════════════════
 
-SYSTEM_PERSONA_LONGFORM = """Role: You are an elite tech video scriptwriter who creates chaptered deep-dive videos combining Fireship's density, MKBHD's clarity, and Johnny Harris's narrative structure. You target engineers, founders, and tech professionals who want substance, not surface-level coverage.
+SYSTEM_PERSONA_LONGFORM = """Role: You are an elite tech video scriptwriter who creates chaptered deep-dive videos combining Fireship's density, MKBHD's clarity, and Johnny Harris's narrative structure. You target engineers, founders, and tech professionals who want substance, not surface-level coverage, while remaining effortlessly accessible to curious everyday people.
 
 Format: 16:9 Landscape, strictly 2 to 3 minutes duration only (120-180 seconds), chaptered deep-dive.
 
 Tone: Dense, fast-paced, technically precise. Short sentences. Active voice. No throat-clearing, no filler. React to facts with genuine surprise or opinion. Use contractions naturally (it's, you're, don't, can't). Mix punchy 5-word sentences with longer 15-word flowing ones.
 
-Target Audience: Engineers, founders, creators from high-RPM countries (USA, UK, Canada, Australia, Singapore, India). Standard English, clean numbers, clear analogies.
+Target Audience: Engineers, founders, creators from high-RPM countries (USA, UK, Canada, Australia, Singapore, India), plus tech-curious non-technical viewers. Standard English, clean numbers, clear physical analogies.
+
+MANDATORY "ELI5" (EXPLAIN LIKE I'M 5) ANALOGY RULE:
+- Every abstract, complex, or technical concept MUST use a real-world physical metaphor that anyone can instantly visualize.
+- Examples:
+  * Server load/concurrency -> rush-hour highway traffic or airport security checkpoints
+  * Token context / context window -> physical desk space that gets cluttered or a whiteboard with limited space
+  * Embeddings / vector database -> organizing a supermarket by flavor and texture instead of alphabetical aisles
+  * Quantization / weights compression -> packing a travel suitcase using vacuum compression bags
+  * AI Agents / Mixture-of-Experts -> a high-end restaurant kitchen with specialized line cooks and executive chefs
+- Never present pure abstract jargon without immediately grounding it in a tactile, everyday physical comparison.
 
 MANDATORY WRITING CONSTRAINTS:
 - First sentence must immediately state high stakes. NO "hey guys", NO channel intros, NO welcomes.
@@ -183,23 +193,27 @@ STRUCTURAL RULES (non-negotiable):
 
 6. ENDING: Close the final chapter with a direct payoff, then a single-sentence takeaway, then a natural CTA: "If you found this useful, subscribe for more deep-dives like this. I'll see you in the next one."
 
-7. PROVOCATIVE HIGH-FOMO TITLES (MANDATORY):
-   - Every title must trigger Fear Of Missing Out (FOMO), extreme urgency, or the fear of professional obsolescence.
-   - It MUST create an open cognitive loop that can ONLY be resolved by watching the complete video to the end.
-   - Core FOMO & Provocative formulas:
+7. PROVOCATIVE HIGH-FOMO & CURIOSITY TITLES (MANDATORY):
+   - Every title must trigger Fear Of Missing Out (FOMO), extreme urgency, or everyday human curiosity.
+   - Non-technical and broad audiences respond to everyday curiosity, personal safety, money, jobs, and wonder:
+     * Everyday Device / Feature Hook: "Your iPhone/Phone Is About to Change and Nobody Noticed" or "The Hidden AI Feature Already Running on Your Device"
+     * The Quiet Ban / Corporate Move: "Why Companies Are Quietly Banning This Popular AI Tool" or "Why Top Tech Firms Just Banned [Tool]"
+     * The Real Truth / Safety Reality: "Is This New AI Tech Actually Safe? Here Is The Truth" or "The Dark Side of [Tool] Nobody Mentions"
      * The Obsolescence Threat: "If You Aren't Using [Tool], You're Already Behind" or "Why Senior Engineers Are Quietly Quitting [Old Tool]"
      * The Fatal Danger: "The Fatal Architecture Mistake Breaking 90% of AI Apps" or "Don't Deploy [X] Until You Watch This"
-     * The Hidden Asymmetry: "The Unfair AI Advantage Nobody Is Talking About Yet" or "What Big Tech Won't Tell You About [Tool]"
-     * The Brutal Disruption: "Why [Tool/Framework] Is Actually Dead (The Harsh Truth)"
+   - It MUST create an open cognitive loop that can ONLY be resolved by watching the complete video to the end.
    - Length: Strictly 50 to 72 characters (optimal for mobile and desktop YouTube feeds).
+
+8. ENFORCE THE "ELI5" ANALOGY RULE:
+   - Throughout every chapter, ground every abstract concept into a real physical metaphor (highways, desk space, restaurant kitchens, physical luggage).
 
 Return ONLY valid JSON matching this schema exactly:
 {{
   "title": "High-FOMO provocative YouTube title (50-72 chars, creates urgency and compels full watch)",
   "title_options": [
     "High-FOMO Title 1 (Obsolescence angle e.g. 'If You Aren\'t Using X, You\'re Already Behind')",
-    "High-FOMO Title 2 (Fatal Danger/Mistake angle e.g. 'The Fatal Flaw in X Nobody Is Warning You About')",
-    "High-FOMO Title 3 (Hidden Secret/Advantage angle e.g. 'What Senior Engineers Won\'t Tell You About X')"
+    "High-FOMO Title 2 (Curiosity/Safety angle e.g. 'Why Companies Are Quietly Banning X')",
+    "High-FOMO Title 3 (Everyday Impact angle e.g. 'Your Device Is About to Get This AI Feature')"
   ],
   "script": "The FULL narration script, all chapters concatenated. No headers or labels inside the script text.",
   "description": "2-3 sentence video description for YouTube",
@@ -272,6 +286,7 @@ HUMANIZER AUDIT (fix all of these):
 7. Eliminate ALL em dashes, en dashes, spaced em dashes, double hyphens. Use commas, colons, or periods.
 8. Use contractions naturally (it's, you're, don't, can't)
 9. Vary sentence rhythm: mix 5-word punches with 15-word flows
+10. ELI5 AUDIT: If any technical term or mechanism appears abstract or academic, insert a vivid, one-sentence physical metaphor (e.g. comparing cache memory to a pocket notebook, or token limits to physical luggage limits).
 
 SCRIPT TO OPTIMIZE:
 {script}
@@ -306,6 +321,121 @@ Return ONLY valid JSON:
     "em_dashes_removed": 0
   }}
 }}"""
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# LAYMAN SUMMARY SHORTS SCRIPT TEMPLATE (NON-TECHNICAL AUDIENCE)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+LAYMAN_SHORTS_SCRIPT_TEMPLATE = """Role: You are an elite short-form video creator making ultra-engaging 9:16 YouTube Shorts for a broad, non-technical audience (curious everyday people, professionals, tech enthusiasts).
+
+LONGFORM STORY CONTEXT:
+Headline: {headline}
+Summary: {summary}
+Core Concepts & Numbers: {details}
+
+TASK:
+Generate a dedicated 45 to 55-second layman summary script designed specifically for YouTube Shorts (strictly 110-135 words).
+
+MANDATORY NON-TECHNICAL RULES:
+1. MAX READING GRADE LEVEL: 6th–8th grade (Flesch-Kincaid). Use crisp, conversational everyday English.
+2. ZERO UNDEFINED ACRONYMS: Absolutely NO unexplained technical acronyms like "RAG", "LLM", "GPU", "PR", "SDK", "API". Translate them immediately into plain English:
+   - "RAG" -> "smart data search"
+   - "LLM" -> "AI model"
+   - "GPU" -> "graphics chip"
+   - "PR" -> "code update"
+   - "API" -> "software connector"
+3. THE "ELI5" (EXPLAIN LIKE I'M 5) PHYSICAL ANALOGY:
+   Enforce a tactile, real-world physical metaphor (e.g., comparing server load to rush-hour highway traffic, token limits to desk space, AI routing to a restaurant kitchen).
+4. CLEAR 3-PART NARRATIVE STRUCTURE:
+   - Part 1: High-Stakes Curiosity Hook (0–5 seconds, ~12-15 words):
+     Must trigger everyday curiosity, safety, money, or wonder:
+     Examples:
+     "Your iPhone is about to get this feature and almost nobody noticed..."
+     "Why companies are quietly banning this popular AI tool..."
+     "Is this new tech actually safe? Here's the 30-second truth."
+   - Part 2: The Real-World Impact (5–35 seconds, ~75-90 words):
+     Deliver the ELI5 physical metaphor. Explain what this actually changes for regular people, daily devices, jobs, or money.
+   - Part 3: The "Full Story" CTA (35–45/50 seconds, ~20-25 words):
+     Deliver the payoff and direct viewers to the full longform breakdown:
+     "We just broke down the full deep dive with all the benchmarks and proof. Tap the link right below or check the pinned comment for the full story!"
+
+5. RAPID VISUAL CUTS & PACING (1.5–2.5 SECONDS PER CUT):
+   Break the script down into 18 to 24 rapid visual beats for 9:16 vertical b-roll (Pexels).
+   - "broll_query": 2-3 high-energy stock video search keywords (e.g., "shocked person looking at smartphone", "busy highway traffic", "futuristic neon city", "hands typing fast on laptop", "stacks of cash"). NEVER use code snippets or terminal shells.
+   - "callout_badge": Big bold text callout overlay (e.g., "WATCH THIS", "BEFORE vs AFTER", "SECRET LEAK", "BIG MISTAKE", "GAME CHANGER").
+   - "active_emoji": Single high-impact emoji (🤯, ⚠️, 📱, 💸, 🚦, ⚡, 🔒).
+
+Return ONLY valid JSON matching this schema:
+{{
+  "title": "High-Curiosity Shorts Title (50-60 chars) #Shorts",
+  "hook_type": "curiosity | safety | money | everyday_device",
+  "target_duration_seconds": 48,
+  "reading_grade_level": "7th Grade",
+  "script": "The complete 45-55 second narration script without headers.",
+  "visual_beats": [
+    {{
+      "beat_id": 1,
+      "beat_text": "Spoken sentence fragment",
+      "duration_seconds": 2.0,
+      "broll_query": "shocked person looking at smartphone",
+      "callout_badge": "WATCH THIS",
+      "active_emoji": "📱"
+    }}
+  ],
+  "subtitle_chunks": [
+    {{"text": "Your iPhone", "start": 0.0, "end": 0.8}},
+    {{"text": "is about to", "start": 0.8, "end": 1.4}}
+  ],
+  "cta_text": "👉 Watch the full deep dive linked below!",
+  "hashtags": ["#Shorts", "#TechNews", "#AI", "#DidYouKnow"]
+}}"""
+
+
+def calculate_flesch_kincaid_grade(text):
+    """Calculates Flesch-Kincaid Grade Level to enforce 6th-8th grade readability."""
+    import re
+    words = [w for w in re.findall(r'[a-zA-Z0-9]+', text)]
+    sentences = [s for s in re.split(r'[.!?]+', text) if s.strip()]
+    if not words or not sentences:
+        return 7.0
+    
+    def _count_syllables(word):
+        word = word.lower()
+        if len(word) <= 3:
+            return 1
+        word = re.sub(r'(?:[^laeiouy]|ed|es|e)$', '', word)
+        word = re.sub(r'^y', '', word)
+        syllables = len(re.findall(r'[aeiouy]{1,2}', word))
+        return max(1, syllables)
+        
+    total_syllables = sum(_count_syllables(w) for w in words)
+    words_per_sentence = len(words) / max(1, len(sentences))
+    syllables_per_word = total_syllables / max(1, len(words))
+    
+    fk = 0.39 * words_per_sentence + 11.8 * syllables_per_word - 15.59
+    return round(fk, 1)
+
+
+def sanitize_layman_acronyms(text):
+    """Replaces raw unexplained technical acronyms with layman-friendly terms."""
+    import re
+    acronym_map = {
+        r'\bRAG\b': "smart data retrieval",
+        r'\bLLMs?\b': "AI model",
+        r'\bGPUs?\b': "graphics processing chip",
+        r'\bPRs?\b': "code update",
+        r'\bSDKs?\b': "software toolkit",
+        r'\bAPIs?\b': "software connector",
+        r'\bSOTA\b': "world record",
+        r'\bMoE\b': "team of specialized AI models",
+        r'\bKV-cache\b': "instant AI memory"
+    }
+    sanitized = text
+    for pattern, replacement in acronym_map.items():
+        sanitized = re.sub(pattern, replacement, sanitized)
+    return sanitized
+
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -724,7 +854,20 @@ Write the deepest possible analysis of this one story across 2-3 chapters.
             })
         final_data["fact_scripts"] = combined_fact_scripts
 
-        if not final_data.get("best_fact_for_shorts"):
+        # Generate dedicated Layman Summary Shorts Script (non-technical audience)
+        print("🎬 Generating Dedicated Layman Summary Script for Shorts (45-55s, ELI5)...")
+        layman_data = self.generate_layman_shorts_script(stories[0] if stories else {}, final_data)
+        if layman_data:
+            final_data["layman_short"] = layman_data
+            final_data["best_fact_for_shorts"] = {
+                "fact_number": 1,
+                "reason": "Dedicated Layman ELI5 Summary Script",
+                "hook_for_shorts": layman_data.get("title", stories[0].get("headline", "")),
+                "script": layman_data.get("script", ""),
+                "reading_grade_level": layman_data.get("reading_grade_level", "7th Grade"),
+                "visual_beats": layman_data.get("visual_beats", [])
+            }
+        elif not final_data.get("best_fact_for_shorts"):
             final_data["best_fact_for_shorts"] = {
                 "fact_number": 1,
                 "reason": "Hook from the main deep-dive chapter",
@@ -736,6 +879,65 @@ Write the deepest possible analysis of this one story across 2-3 chapters.
               f"{len(final_data.get('chapters', []))} chapters, "
               f"{len(stories)} story/stories (mode={self.depth_mode})")
         return final_data
+
+    def generate_layman_shorts_script(self, primary_story, longform_data):
+        """Generates a dedicated 45-55s layman short script with ELI5 metaphors and 6-8th grade reading level."""
+        headline = primary_story.get("headline", longform_data.get("title", ""))
+        summary = primary_story.get("why_this_story", longform_data.get("description", ""))
+        details = (
+            f"Headline: {headline}\n"
+            f"Chapters: {[c.get('chapter_title') for c in longform_data.get('chapters', [])]}\n"
+            f"Script sample: {longform_data.get('script', '')[:600]}"
+        )
+
+        prompt = LAYMAN_SHORTS_SCRIPT_TEMPLATE.format(
+            headline=headline,
+            summary=summary,
+            details=details
+        )
+
+        result = self._call_gemini(prompt, model=GEMINI_FLASH_MODEL)
+        if not result or "script" not in result:
+            print("⚠️ Layman shorts generation via Gemini failed. Using heuristic builder.")
+            # Deterministic fallback builder
+            fallback_script = (
+                f"Your phone is about to get an upgrade that almost nobody noticed. "
+                f"{headline}. Think of this like rush-hour highway traffic: when everyone tries to use AI at once, "
+                f"everything bottlenecks. But this new update acts like opening express lanes for every single device. "
+                f"That means faster answers, lower battery drain, and zero waiting. "
+                f"We just released the full deep-dive video with the complete evidence. "
+                f"Tap the link below to watch the full story!"
+            )
+            clean_script = sanitize_layman_acronyms(fallback_script)
+            fk_grade = calculate_flesch_kincaid_grade(clean_script)
+            return {
+                "title": f"Why Everyone Is Talking About {headline[:30]} #Shorts",
+                "hook_type": "everyday_device",
+                "target_duration_seconds": 48,
+                "reading_grade_level": f"{fk_grade} Grade",
+                "script": clean_script,
+                "visual_beats": [
+                    {"beat_id": 1, "beat_text": "Your phone is about to get an upgrade", "duration_seconds": 2.0, "broll_query": "shocked person looking at smartphone", "callout_badge": "WATCH THIS", "active_emoji": "📱"},
+                    {"beat_id": 2, "beat_text": "nobody noticed", "duration_seconds": 2.0, "broll_query": "smartphone scrolling fast close up", "callout_badge": "SECRET LEAK", "active_emoji": "⚡"},
+                    {"beat_id": 3, "beat_text": "Think of this like rush-hour highway traffic", "duration_seconds": 2.5, "broll_query": "highway traffic timelapse night", "callout_badge": "TRAFFIC JAM", "active_emoji": "🚦"},
+                    {"beat_id": 4, "beat_text": "opening express lanes for every device", "duration_seconds": 2.5, "broll_query": "futuristic data stream light speed", "callout_badge": "GAME CHANGER", "active_emoji": "🚀"},
+                    {"beat_id": 5, "beat_text": "faster answers lower battery drain", "duration_seconds": 2.0, "broll_query": "battery charging animation phone", "callout_badge": "SUPER SPEED", "active_emoji": "🔋"},
+                    {"beat_id": 6, "beat_text": "Tap the link below for the full story", "duration_seconds": 2.5, "broll_query": "person clicking play on youtube screen", "callout_badge": "FULL VIDEO", "active_emoji": "👇"}
+                ],
+                "subtitle_chunks": [],
+                "cta_text": "👉 Watch the full deep dive linked below!",
+                "hashtags": ["#Shorts", "#AI", "#TechNews"]
+            }
+
+        # Sanitize acronyms and calculate reading level
+        raw_script = result.get("script", "")
+        clean_script = sanitize_layman_acronyms(raw_script)
+        result["script"] = clean_script
+        fk_grade = calculate_flesch_kincaid_grade(clean_script)
+        result["reading_grade_level"] = f"{fk_grade} Grade"
+        print(f"   ✅ Layman Short generated: {len(clean_script.split())} words, Readability: {fk_grade} Grade")
+        return result
+
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
