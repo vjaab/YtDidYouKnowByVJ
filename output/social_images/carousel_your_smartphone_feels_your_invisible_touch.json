@@ -1,0 +1,53 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "hook": "Did You Know your smartphone screen can 'feel' your finger without *actually* touching it? \ud83e\udd2f",
+  "headline": "Your Smartphone Feels Your Invisible Touch",
+  "source": "IEEE Spectrum, How Capacitive Touchscreens Work; MIT Technology Review, The Science Behind Touchscreens",
+  "slides": [
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "Invisible Touch? \ud83d\udd90\ufe0f",
+      "bubble": "Did you know your phone feels your finger without *actually* touching it? That's wild!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "It's True! \u2728",
+      "bubble": "Yes! Your screen has an invisible electric field. Your body disrupts it when you get close.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "curious",
+      "title": "Electric Field? \u26a1",
+      "bubble": "Wait, so it's not sensing physical pressure, like old tech? How does that even work?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Electric Pond \ud83c\udf0a",
+      "bubble": "Imagine the screen's surface is a still electric pond. Your finger is a pebble creating ripples.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "Before I Touch? \ud83d\ude32",
+      "bubble": "So, it 'sees' the ripple and knows I'm there, even before my skin hits the glass?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Invisible Sensation \ud83e\ude84",
+      "bubble": "Exactly! It's sensing your electrical presence, not just physical contact. Pure invisible magic!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your smartphone doesn't just react to pressure. It senses your body's electrical field, detecting your touch before physical contact. It's invisible tech at work!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour smartphone's screen can 'feel' your finger *before* you even touch it! Here's the mind-blowing reality:\n\n*   \ud83d\udcf1 **Invisible Electric Field:** Your screen is covered by an invisible electrical force field.\n*   \u270b **You Create Ripples:** Your finger, being electrically conductive, subtly disrupts this field when it gets close.\n*   \u2728 **Instant Detection:** The screen detects these tiny electrical changes, pinpointing your 'touch' instantly.\n\n\ud83d\udcac Did you already know this, or did this fact blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingTech #Smartphone #CapacitiveTouch #InvisibleTech #VJTech"
+}
