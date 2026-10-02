@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_Elite.mp3",
+      "headline": "Stop Paying Big Tech AI APIs: This Free Open-Source Repo Lets You Build and Ship",
+      "topic_type": "auto",
+      "timestamp": "36964707875"
+    },
+    {
       "track": "modern_tech.mp3",
       "headline": "Amazon\u2019s delivery driver smart glasses will reportedly take photos \u2018almost const",
       "topic_type": "auto",
@@ -119,6 +125,7 @@
     "Defiance.mp3": 1,
     "jam_Confidence.mp3": 1,
     "jam_Upbeat.mp3": 1,
-    "modern_tech.mp3": 1
+    "modern_tech.mp3": 1,
+    "jam_Elite.mp3": 1
   }
 }
