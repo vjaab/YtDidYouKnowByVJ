@@ -156,38 +156,39 @@ def get_corner_rotation_index(tracker_file=None):
 
 CONTENT_LAYOUT_MAP = {
     # Category-based default layouts
-    "AI & Tech Tools": "split_screen",           # Tool demo + presenter
-    "Tech Gadgets & Inventions": "hero_center",  # Product showcase
-    "Finance & Tech Economy": "side_strip",      # Data + presenter
-    "Facts & Trivia": "top_center",              # Fact card style
-    "Coding & Development Hacks": "split_screen", # Code + terminal
-    "Quiz & Trivia": "split_screen",             # Options + avatar
-    "Interview Questions": "hero_center",        # Question card + presenter
-    "Programming Language Origins": "asymmetric", # Storytelling
-    "Tech Company Founding Stories": "asymmetric", # Storytelling
-    "Famous Bugs & Glitches": "side_strip",      # Bug details + avatar
-    "Agentic AI Facts": "hero_center",           # Concept visualization
-    "Python Libraries & Frameworks": "split_screen",  # Code + terminal demo
-    "AWS Cloud Services": "side_strip",          # Architecture diagram + presenter
-    "Student Dev & AI Tools": "split_screen",    # Code + terminal demos
-    "Student Capstone Projects": "hero_center",  # Project showcases
+    "AI & Tech Tools": "split_screen_faceoff",     # Tool demo + comparison faceoff
+    "Tech Gadgets & Inventions": "hero_center",    # Product showcase
+    "Finance & Tech Economy": "side_strip",        # Data + presenter
+    "Facts & Trivia": "top_center",                # Fact card style
+    "Coding & Development Hacks": "terminal_ide",  # Code + terminal IDE
+    "Quiz & Trivia": "split_screen_faceoff",       # Options A/B faceoff
+    "Interview Questions": "terminal_ide",         # Tech interview live code/terminal
+    "Programming Language Origins": "terminal_ide", # Language code & terminal origin
+    "Tech Company Founding Stories": "asymmetric",  # Storytelling
+    "Famous Bugs & Glitches": "terminal_ide",       # Bug showcase in terminal/IDE
+    "Agentic AI Facts": "terminal_ide",            # Autonomous agent CLI/code
+    "Python Libraries & Frameworks": "terminal_ide", # Python terminal / code IDE
+    "AWS Cloud Services": "terminal_ide",          # Cloud CLI & architecture
+    "Student Dev & AI Tools": "terminal_ide",      # Student dev tools & terminal
+    "Student Capstone Projects": "split_screen_faceoff", # Project comparison faceoff
 }
 
 # Visual type to layout mapping (overrides category default)
 VISUAL_TYPE_LAYOUT_MAP = {
-    "Code Snippet": "split_screen",              # Code needs side-by-side
-    "Terminal Output": "split_screen",           # Terminal + explanation
-    "Screen Recording": "hero_center",           # Full-screen demo
-    "Animated UI Mockup": "hero_center",         # Full-screen UI
-    "Side-by-side Comparison": "split_screen",   # Natural fit
-    "Architecture Diagram": "side_strip",        # Diagram + labels
-    "Flowchart": "side_strip",                   # Flow + explanation
-    "Diagram": "side_strip",                     # Diagram + labels
-    "Whiteboard": "asymmetric",                  # Full-screen teaching
-    "Infographic": "top_center",                 # Data visualization
-    "GitHub UI": "split_screen",                 # Repo + explanation
-    "Video": "hero_center",                      # Full-screen video
-    "AI Image": "asymmetric",                    # Concept art + presenter
+    "Code Snippet": "terminal_ide",                # Developer code editor
+    "Terminal Output": "terminal_ide",             # CLI command & terminal logs
+    "GitHub UI": "terminal_ide",                   # Code repo / developer workspace
+    "Side-by-side Comparison": "split_screen_faceoff", # X vs Y comparison
+    "Split Screen Faceoff": "split_screen_faceoff",# Two-tier battle layout
+    "Screen Recording": "hero_center",             # Full-screen demo
+    "Animated UI Mockup": "hero_center",           # Full-screen UI
+    "Architecture Diagram": "side_strip",          # Diagram + labels
+    "Flowchart": "side_strip",                     # Flow + explanation
+    "Diagram": "side_strip",                       # Diagram + labels
+    "Whiteboard": "asymmetric",                    # Full-screen teaching
+    "Infographic": "top_center",                   # Data visualization
+    "Video": "hero_center",                        # Full-screen video
+    "AI Image": "asymmetric",                      # Concept art + presenter
 }
 
 # Category to avatar X offset mapping (deterministic positioning per category)
@@ -210,20 +211,33 @@ CATEGORY_AVATAR_X_OFFSET = {
     "Student Capstone Projects": 30,      # Right - project showcase
 }
 
-def get_dynamic_layout(category, visual_type=None, chunk_index=0, total_chunks=1):
+def get_dynamic_layout(category, visual_type=None, chunk_index=0, total_chunks=1, headline="", chunk_text=""):
     """
-    Returns optimal layout_type based on category, visual_type, and position in video.
+    Returns optimal layout_type based on category, visual_type, headline/text, and position in video.
     
     Args:
         category: Content category (e.g., "AI & Tech Tools")
         visual_type: Visual type from nano_scene_gen (e.g., "Code Snippet", "Screen Recording")
         chunk_index: Current chunk index (0-based)
         total_chunks: Total number of chunks in video
+        headline: Optional news/story headline
+        chunk_text: Text of the current chunk
     
     Returns:
         layout_type string
     """
-    # Hook zone (first 15%): Use hero_center for impact
+    combined_text = f"{headline} {chunk_text}".lower()
+    
+    # 1. Content-aware heuristics for tech & coding comparisons
+    comparison_indicators = [" vs ", " versus ", "compare", "alternative to", "faster than", "better than", "benchmark", "old way"]
+    if any(k in combined_text for k in comparison_indicators):
+        return "split_screen_faceoff"
+        
+    code_indicators = ["code", "coding", "terminal", "pip install", "npm ", "github", "git ", "python", "script", "developer", "ide", "bash", "cli"]
+    if any(k in combined_text for k in code_indicators) and visual_type in ["Code Snippet", "Terminal Output", "GitHub UI", None, ""]:
+        return "terminal_ide"
+
+    # Hook zone (first 15%): Use hero_center for impact unless comparison/coding specifically
     if total_chunks > 0 and chunk_index / max(1, total_chunks) < 0.15:
         return "hero_center"
     
@@ -244,12 +258,13 @@ def get_dynamic_layout(category, visual_type=None, chunk_index=0, total_chunks=1
     return get_daily_layout(day_name)
 
 
-def get_layout_for_chunk(chunk, category, chunk_index=0, total_chunks=1):
+def get_layout_for_chunk(chunk, category, chunk_index=0, total_chunks=1, headline=""):
     """
-    Determines layout for a specific chunk based on its visual_type and position.
+    Determines layout for a specific chunk based on its visual_type, category, position, and text.
     """
     visual_type = chunk.get("visual_type", "")
-    return get_dynamic_layout(category, visual_type, chunk_index, total_chunks)
+    chunk_text = chunk.get("text", "")
+    return get_dynamic_layout(category, visual_type, chunk_index, total_chunks, headline=headline, chunk_text=chunk_text)
 
 
 def get_category_avatar_x_offset(category: str) -> int:

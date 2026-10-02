@@ -5148,7 +5148,7 @@ def render_emoji_popup(emoji, frame_width=1080):
 
 
 # ─── DYNAMIC LAYOUT VISUAL ELEMENTS ───────────────────────────────────────────
-def _create_layout_visual_clip(layout_type, visual_type, chunk, accent_color, audio_duration):
+def _create_layout_visual_clip(layout_type, visual_type, chunk, accent_color, audio_duration, script_json=None):
     """
     Creates layout-aware visual elements for a chunk based on its dynamic layout.
     Returns a VideoClip that adds layout-specific visual treatment.
@@ -5167,10 +5167,14 @@ def _create_layout_visual_clip(layout_type, visual_type, chunk, accent_color, au
         return None
     
     # Layout-specific visual treatments
-    if layout_type == "split_screen":
-        # Split screen: Add vertical divider accent
-        return _create_split_screen_accent(accent_color, clip_duration).with_start(start_time)
+    if layout_type in ["split_screen_faceoff", "split_screen", "comparison"]:
+        # Split screen faceoff: Top vs Bottom Option A / Option B battle layout
+        return _create_split_screen_faceoff_clip(accent_color, clip_duration, chunk=chunk, script_json=script_json).with_start(start_time)
     
+    elif layout_type in ["terminal_ide", "terminal", "code_editor", "hacker"]:
+        # Terminal / IDE: floating developer code editor window
+        return _create_terminal_ide_clip(accent_color, clip_duration, chunk=chunk, script_json=script_json).with_start(start_time)
+
     elif layout_type == "hero_center":
         # Hero center: Add center glow/pulse
         return _create_hero_center_glow(accent_color, clip_duration).with_start(start_time)
@@ -5190,32 +5194,224 @@ def _create_layout_visual_clip(layout_type, visual_type, chunk, accent_color, au
     return None
 
 
-def _create_split_screen_accent(accent_color, duration):
-    """Vertical divider line for split_screen layout."""
+def _create_split_screen_faceoff_clip(accent_color, duration, chunk=None, script_json=None):
+    """
+    Split-Screen Faceoff (X vs Y / Before vs After / Tool A vs Tool B) layout for Shorts (1080x1920).
+    Renders:
+    - Top Pane (Option A / Tool 1 / Before) with red/coral border and glowing badge
+    - Bottom Pane (Option B / Tool 2 / After) with cyan/green border and glowing badge
+    - Vibrant horizontal glowing divider bar across Y = FRAME_H // 2 (960)
+    - Central animated pulsing 'VS' badge emblem with high-contrast metallic styling
+    """
     from moviepy import VideoClip
     import numpy as np
+    from PIL import Image, ImageDraw
+
+    # Determine labels for Option A and Option B
+    option_a = "OPTION A"
+    option_b = "OPTION B"
     
-    line_w = 4
-    line_h = FRAME_H
-    line_x = FRAME_W // 2
+    if script_json:
+        companies = script_json.get("companies_mentioned", [])
+        if len(companies) >= 2:
+            c1 = companies[0].get("name", "") if isinstance(companies[0], dict) else str(companies[0])
+            c2 = companies[1].get("name", "") if isinstance(companies[1], dict) else str(companies[1])
+            if c1 and c2:
+                option_a = c1[:18].upper()
+                option_b = c2[:18].upper()
+        else:
+            title = script_json.get("title", "")
+            if " vs " in title.lower():
+                parts = title.lower().split(" vs ")
+                if len(parts) >= 2:
+                    option_a = parts[0].strip().split()[-1].upper()[:16]
+                    option_b = parts[1].strip().split()[0].upper()[:16]
+
+    center_y = FRAME_H // 2
+
+    # Pre-render base static frame to minimize per-frame computation
+    base_img = Image.new("RGBA", (FRAME_W, FRAME_H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(base_img)
+
+    # 1. Top Card Frame (Y: 180 to 920) - Option A
+    top_box = [45, 180, FRAME_W - 45, center_y - 35]
+    draw.rounded_rectangle(top_box, radius=20, fill=(15, 23, 42, 120), outline=(255, 75, 75, 180), width=3)
     
-    fps = 15
-    total_frames = int(duration * fps)
+    # Top Badge Pill
+    badge_f = gf(26, bold=True)
+    badge_a_text = f"⚡ {option_a}"
+    bw_a, bh_a = ts(badge_a_text, badge_f)
+    pill_a_box = [70, 205, 70 + bw_a + 28, 205 + bh_a + 14]
+    draw.rounded_rectangle(pill_a_box, radius=12, fill=(220, 38, 38, 230))
+    draw.text((84, 212), badge_a_text, font=badge_f, fill=(255, 255, 255, 255))
+
+    # 2. Bottom Card Frame (Y: 995 to 1730) - Option B
+    bottom_box = [45, center_y + 35, FRAME_W - 45, 1730]
+    draw.rounded_rectangle(bottom_box, radius=20, fill=(15, 23, 42, 120), outline=(0, 229, 255, 180), width=3)
     
+    # Bottom Badge Pill
+    badge_b_text = f"🚀 {option_b}"
+    bw_b, bh_b = ts(badge_b_text, badge_f)
+    pill_b_box = [70, center_y + 60, 70 + bw_b + 28, center_y + 60 + bh_b + 14]
+    draw.rounded_rectangle(pill_b_box, radius=12, fill=(16, 185, 129, 230))
+    draw.text((84, center_y + 67), badge_b_text, font=badge_f, fill=(255, 255, 255, 255))
+
+    # 3. Horizontal Glowing Divider Bar (Y: 956 to 964)
+    draw.rounded_rectangle([40, center_y - 4, FRAME_W - 40, center_y + 4], radius=4, fill=(*accent_color, 240))
+
+    base_arr = np.array(base_img)
+
+    # 4. Pre-render the central "VS" Emblem badge
+    vs_size = 120
+    vs_img = Image.new("RGBA", (vs_size, vs_size), (0, 0, 0, 0))
+    vs_draw = ImageDraw.Draw(vs_img)
+    vs_draw.ellipse([5, 5, vs_size - 5, vs_size - 5], fill=(11, 15, 25, 255), outline=(255, 215, 0, 255), width=4)
+    vs_font = gf(42, bold=True)
+    vw, vh = ts("VS", vs_font)
+    vs_draw.text(((vs_size - vw) // 2, (vs_size - vh) // 2 - 2), "VS", font=vs_font, fill=(255, 235, 59, 255))
+
     def make_frame(t):
-        img = np.zeros((FRAME_H, FRAME_W, 4), dtype=np.uint8)
-        # Animated vertical line
-        pulse = 1.0 + 0.3 * np.sin(t * 4)
-        alpha = int(180 * pulse)
-        color = (*accent_color, alpha)
-        img[:, line_x - line_w//2:line_x + line_w//2] = color
-        return img
-    
+        frame = base_arr.copy()
+        # Animated pulse for the VS badge
+        pulse = 1.0 + 0.08 * math.sin(t * 6.0)
+        cur_size = int(vs_size * pulse)
+        cur_vs = vs_img.resize((cur_size, cur_size), Image.Resampling.BILINEAR)
+        cur_vs_arr = np.array(cur_vs)
+        
+        # Paste centered at (FRAME_W // 2, center_y)
+        x1 = max(0, FRAME_W // 2 - cur_size // 2)
+        y1 = max(0, center_y - cur_size // 2)
+        x2 = min(FRAME_W, x1 + cur_size)
+        y2 = min(FRAME_H, y1 + cur_size)
+        
+        cw = x2 - x1
+        ch = y2 - y1
+        if cw > 0 and ch > 0:
+            sub_vs = cur_vs_arr[:ch, :cw]
+            alpha = sub_vs[:, :, 3] / 255.0
+            for c in range(3):
+                frame[y1:y2, x1:x2, c] = (sub_vs[:, :, c] * alpha + frame[y1:y2, x1:x2, c] * (1.0 - alpha)).astype(np.uint8)
+            frame[y1:y2, x1:x2, 3] = np.maximum(frame[y1:y2, x1:x2, 3], sub_vs[:, :, 3])
+        return frame
+
     def make_mask(t):
-        img = np.zeros((FRAME_H, FRAME_W), dtype=np.float32)
-        img[:, line_x - line_w//2:line_x + line_w//2] = 1.0
-        return img
-    
+        frame = make_frame(t)
+        return frame[:, :, 3].astype(np.float32) / 255.0
+
+    clip = VideoClip(make_frame, duration=duration)
+    mclip = VideoClip(make_mask, is_mask=True, duration=duration)
+    return clip.with_mask(mclip)
+
+
+def _create_terminal_ide_clip(accent_color, duration, chunk=None, script_json=None):
+    """
+    Terminal / IDE Code Editor layout mode for developer & tech videos (1080x1920).
+    Renders:
+    - Floating modern developer window positioned at eye-level
+    - macOS style 3-dot window buttons (Red, Yellow, Green)
+    - Window title bar: 'terminal — bash (python3.11)' or '<keyword>.py — VS Code'
+    - Left gutter with numbered lines (01, 02, 03, 04, 05...)
+    - Realistic syntax-highlighted code / CLI commands extracted from topic/chunk
+    - Animated blinking terminal cursor ▋
+    - Glowing neon border in accent color
+    """
+    from moviepy import VideoClip
+    import numpy as np
+    from PIL import Image, ImageDraw
+
+    win_w = 980
+    win_h = 740
+    win_x = (FRAME_W - win_w) // 2
+    win_y = 500  # Centered eye-level zone above captions
+    header_h = 48
+
+    # Extract keywords/topic for realistic code snippet
+    title = script_json.get("title", "") if script_json else ""
+    topic_kw = "ai_tool"
+    if script_json and script_json.get("keywords"):
+        kw_list = script_json.get("keywords")
+        if kw_list and len(kw_list) > 0:
+            topic_kw = str(kw_list[0]).lower().replace(" ", "_")
+    elif title:
+        topic_kw = title.split()[0].lower()
+
+    code_lines = [
+        ("# 1. Install & import package", (106, 153, 85)), # green comment
+        (f"$ pip install -q {topic_kw}", (0, 229, 255)),   # cyan command
+        ("from transformers import pipeline", (197, 134, 192)), # purple import
+        (f"model = pipeline('text-generation', '{topic_kw}')", (220, 220, 170)), # yellow func
+        ("output = model.run(optimize=True)", (156, 220, 254)), # blue var
+        ("> [BENCHMARK] Speed: 10x faster execution [OK]", (78, 201, 176)) # success teal
+    ]
+
+    base_img = Image.new("RGBA", (FRAME_W, FRAME_H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(base_img)
+
+    # 1. Outer Neon Glow Border & Window Background
+    win_box = [win_x, win_y, win_x + win_w, win_y + win_h]
+    draw.rounded_rectangle(win_box, radius=18, fill=(13, 17, 23, 230), outline=(*accent_color, 210), width=3)
+
+    # 2. Header Bar
+    header_box = [win_x, win_y, win_x + win_w, win_y + header_h]
+    draw.rounded_rectangle(header_box, radius=18, fill=(22, 27, 34, 255))
+    # Square bottom of header
+    draw.rectangle([win_x, win_y + header_h - 10, win_x + win_w, win_y + header_h], fill=(22, 27, 34, 255))
+    draw.line([win_x, win_y + header_h, win_x + win_w, win_y + header_h], fill=(48, 54, 61, 255), width=1)
+
+    # 3. macOS Window Control Dots
+    dot_r = 6
+    dot_y = win_y + header_h // 2
+    draw.ellipse([win_x + 22 - dot_r, dot_y - dot_r, win_x + 22 + dot_r, dot_y + dot_r], fill=(255, 95, 86, 255))
+    draw.ellipse([win_x + 44 - dot_r, dot_y - dot_r, win_x + 44 + dot_r, dot_y + dot_r], fill=(255, 189, 46, 255))
+    draw.ellipse([win_x + 66 - dot_r, dot_y - dot_r, win_x + 66 + dot_r, dot_y + dot_r], fill=(39, 201, 63, 255))
+
+    # Header title
+    title_f = gf(20, bold=True)
+    title_text = f"zsh — python3 • {topic_kw}.py"
+    tw, th = ts(title_text, title_f)
+    draw.text((win_x + (win_w - tw) // 2, dot_y - th // 2), title_text, font=title_f, fill=(139, 148, 158, 255))
+
+    # Right badge
+    badge_f = gf(16, bold=True)
+    draw.text((win_x + win_w - 90, dot_y - 8), "UTF-8", font=badge_f, fill=(88, 166, 255, 220))
+
+    # 4. Code lines & line numbers
+    code_f = gf(24, bold=True)
+    gutter_x = win_x + 24
+    code_start_x = win_x + 95
+    line_start_y = win_y + header_h + 30
+    line_height = 56
+
+    cursor_target_pos = (code_start_x, line_start_y)
+
+    for i, (text, color) in enumerate(code_lines):
+        cur_y = line_start_y + i * line_height
+        if cur_y + line_height > win_y + win_h - 20:
+            break
+        # Line number
+        draw.text((gutter_x, cur_y), f"{i+1:02d}", font=code_f, fill=(72, 79, 88, 255))
+        # Code text
+        draw.text((code_start_x, cur_y), text, font=code_f, fill=(*color, 255))
+        if i == len(code_lines) - 1:
+            cw, ch = ts(text, code_f)
+            cursor_target_pos = (code_start_x + cw + 8, cur_y)
+
+    base_arr = np.array(base_img)
+
+    def make_frame(t):
+        frame = base_arr.copy()
+        # Animated blinking cursor: on for 0.5s, off for 0.5s
+        if int(t * 2.0) % 2 == 0:
+            cx, cy = cursor_target_pos
+            if 0 <= cy < FRAME_H and 0 <= cx + 12 < FRAME_W:
+                frame[cy:cy + 28, cx:cx + 12, :3] = (0, 229, 255)
+                frame[cy:cy + 28, cx:cx + 12, 3] = 255
+        return frame
+
+    def make_mask(t):
+        frame = make_frame(t)
+        return frame[:, :, 3].astype(np.float32) / 255.0
+
     clip = VideoClip(make_frame, duration=duration)
     mclip = VideoClip(make_mask, is_mask=True, duration=duration)
     return clip.with_mask(mclip)
@@ -5817,68 +6013,99 @@ def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hook
     composite = room_tone.overlay(ducked_bgm)
     composite = composite.overlay(voice, position=0)
     
-    # 4. Mix SFX cues
+    # 4. Mix SFX cues (Memory-Safe Cached Engine)
     sfx_count = 0
+    sfx_cache = {}
+
+    def get_sfx(ctype):
+        """Loads and caches SFX audio segments once to eliminate repeated disk I/O and memory overhead."""
+        clean_type = str(ctype).lower().strip()
+        if clean_type not in sfx_cache:
+            sfx_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "sfx", f"{clean_type}.wav")
+            if os.path.exists(sfx_path) and os.path.getsize(sfx_path) > 0:
+                try:
+                    sfx_cache[clean_type] = AudioSegment.from_file(sfx_path).set_frame_rate(44100).set_channels(2)
+                except Exception as e:
+                    print(f"   ⚠️ Failed to load SFX {clean_type}: {e}")
+                    sfx_cache[clean_type] = None
+            else:
+                sfx_cache[clean_type] = None
+        return sfx_cache.get(clean_type)
+
+    last_sfx_ms = -2000
     for cue in sfx_cues:
+        if sfx_count >= 12:
+            break
         ctype = cue.get("type", "woosh").lower()
         cue_ts = float(cue.get("timestamp", 0))
-        sfx_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "sfx", f"{ctype}.wav")
-        if os.path.exists(sfx_path) and os.path.getsize(sfx_path) > 0 and cue_ts < output_duration:
+        pos_ms = int(cue_ts * 1000)
+        
+        # Enforce minimum 800ms spacing between SFX to prevent audio clutter and memory churn
+        if (pos_ms - last_sfx_ms) < 800:
+            continue
+
+        raw_sfx = get_sfx(ctype)
+        if raw_sfx and cue_ts < output_duration:
             try:
-                sfx = AudioSegment.from_file(sfx_path).set_frame_rate(44100).set_channels(2)
                 # SFX volume mapping: Woosh is subtle, pops are crispy, glitches are sharp
                 if ctype == "woosh":
-                    sfx = sfx - 10  # Moderate woosh volume
+                    sfx = raw_sfx - 10
                 elif ctype == "pop":
-                    sfx = sfx - 6   # Crispy pop volume
+                    sfx = raw_sfx - 6
                 elif ctype == "glitch":
-                    sfx = sfx - 4   # Glitch needs to cut through
+                    sfx = raw_sfx - 4
                 elif ctype == "bass":
-                    sfx = sfx - 2   # Bass hit for impact moments
+                    sfx = raw_sfx - 2
                 else:
-                    sfx = sfx - 8   # Default volume
+                    sfx = raw_sfx - 8
                 
-                pos_ms = int(cue_ts * 1000)
                 composite = composite.overlay(sfx, position=pos_ms)
                 sfx_count += 1
+                last_sfx_ms = pos_ms
             except Exception as e:
-                print(f"   ⚠️ Failed to load SFX {ctype}: {e}")
+                print(f"   ⚠️ Failed to mix SFX {ctype}: {e}")
                 
     # ── ENHANCED: Auto-inject SFX at pattern interrupts (retention_map driven) ──
+    # Active in all environments (including CI) with zero memory blowup thanks to sfx_cache
     from config import ENABLE_STRATEGIC_SFX
-    if ENABLE_STRATEGIC_SFX and retention_map and not CI_LITE:
+    if ENABLE_STRATEGIC_SFX and retention_map:
         pi_timestamps = retention_map.get("pattern_interrupts", [])
         for pi in pi_timestamps:
+            if sfx_count >= 12:
+                break
             pi_word = pi.get("at_word", 0)
             pi_type = pi.get("type", "contradiction")
             pi_time_s = pi_word / 3.0
+            pos_ms = int(pi_time_s * 1000)
             
+            if (pos_ms - last_sfx_ms) < 900:
+                continue
+
             if pi_time_s < output_duration:
                 # Map pattern interrupt type to SFX
                 if pi_type in ["contradiction", "stat_bomb"]:
-                    sfx_type = "glitch"  # Sharp impact
+                    sfx_type = "glitch"
                 elif pi_type in ["rhetorical_question", "direct_address"]:
-                    sfx_type = "pop"     # Crisp attention grabber
+                    sfx_type = "pop"
                 elif pi_type in ["emotional_pivot", "curiosity_gap"]:
-                    sfx_type = "woosh"   # Smooth transition
+                    sfx_type = "woosh"
                 else:
                     sfx_type = "woosh"
                 
-                sfx_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "sfx", f"{sfx_type}.wav")
-                if os.path.exists(sfx_path) and os.path.getsize(sfx_path) > 0:
+                raw_sfx = get_sfx(sfx_type)
+                if raw_sfx:
                     try:
-                        sfx = AudioSegment.from_file(sfx_path).set_frame_rate(44100).set_channels(2)
                         if sfx_type == "woosh":
-                            sfx = sfx - 12
+                            sfx = raw_sfx - 12
                         elif sfx_type == "pop":
-                            sfx = sfx - 6
+                            sfx = raw_sfx - 6
                         elif sfx_type == "glitch":
-                            sfx = sfx - 4
+                            sfx = raw_sfx - 4
                         else:
-                            sfx = sfx - 8
-                        pos_ms = int(pi_time_s * 1000)
+                            sfx = raw_sfx - 8
                         composite = composite.overlay(sfx, position=pos_ms)
                         sfx_count += 1
+                        last_sfx_ms = pos_ms
                     except Exception as e:
                         print(f"   ⚠️ Failed to auto-inject SFX {sfx_type}: {e}")
     
@@ -5887,44 +6114,26 @@ def _mix_and_master_audio(voice_path, bgm_path, sfx_cues, chunks, retention_hook
     sound_cues_added = 0
     if enable_sound_cues and chunks:
         last_cue_s = -2.0
-        pop_sfx_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "sfx", "pop.wav")
-        woosh_sfx_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "sfx", "woosh.wav")
-        
-        pop_sound = None
-        woosh_sound = None
-        if os.path.exists(pop_sfx_path):
-            try:
-                pop_sound = AudioSegment.from_file(pop_sfx_path).set_frame_rate(44100).set_channels(2) - 14
-            except Exception:
-                pass
-        if os.path.exists(woosh_sfx_path):
-            try:
-                woosh_sound = AudioSegment.from_file(woosh_sfx_path).set_frame_rate(44100).set_channels(2) - 16
-            except Exception:
-                pass
+        pop_sound_raw = get_sfx("pop")
+        pop_sound = (pop_sound_raw - 14) if pop_sound_raw else None
                 
-        # 1. Overlay subtle pop cue when a new visual element / chunk enters the screen
-        # 2. Or when a key action/emoji word is triggered
+        # Overlay subtle pop cue when a new visual element / chunk enters the screen
         for chunk in chunks:
+            if sound_cues_added >= 8:
+                break
             c_start = float(chunk.get("start", 0))
-            if c_start > 0.8 and (c_start - last_cue_s) >= 1.2 and c_start < output_duration:
+            if c_start > 0.8 and (c_start - last_cue_s) >= 1.5 and c_start < output_duration:
                 if pop_sound:
                     composite = composite.overlay(pop_sound, position=int(c_start * 1000))
                     last_cue_s = c_start
                     sound_cues_added += 1
-            
-            # Key highlight word within chunk
-            for w in chunk.get("words", []):
-                w_start = float(w.get("start", 0))
-                w_clean = "".join(c for c in w.get("word", "").upper() if c.isalnum())
-                if (w_clean in KEYWORD_EMOJIS or w_clean in ACTION_WORD_COLORS) and (w_start - last_cue_s) >= 1.5 and w_start < output_duration:
-                    if pop_sound:
-                        composite = composite.overlay(pop_sound, position=int(w_start * 1000))
-                        last_cue_s = w_start
-                        sound_cues_added += 1
 
-    print(f"   🔊 Mixed {sfx_count} explicit SFX cues + {sound_cues_added} synced sound design cues.")
+    print(f"   🔊 Mixed {sfx_count} explicit retention SFX cues + {sound_cues_added} synced sound design cues.")
     
+    # Clear cache to free audio buffers immediately
+    sfx_cache.clear()
+    gc.collect()
+
     # 5. Master Output (Normalize to -1.0dB headroom to prevent clipping)
     from pydub.effects import normalize
     mastered = normalize(composite, headroom=1.0)
@@ -10256,24 +10465,25 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     # Add layout-aware visual treatments per chunk based on dynamic layout
     layout_visual_clips = []
     enable_dynamic_layout = os.environ.get("ENABLE_DYNAMIC_LAYOUT", "1") == "1"
-    if enable_dynamic_layout and not CI_LITE:
+    if enable_dynamic_layout:
         try:
             from ecosystem_logic import get_layout_for_chunk
             category = script_json.get("sub_category", "AI & Tech Tools")
+            headline = script_json.get("original_news_headline", script_json.get("title", ""))
             total_chunks = len(chunks)
             
             for i, chunk in enumerate(chunks):
-                layout_type = get_layout_for_chunk(chunk, category, i, total_chunks)
+                layout_type = get_layout_for_chunk(chunk, category, i, total_chunks, headline=headline)
                 visual_type = chunk.get("visual_type", "")
                 
-                # Add layout-specific visual element
+                # Add layout-specific visual element (Split-Screen Faceoff, Terminal/IDE, etc.)
                 layout_clip = _create_layout_visual_clip(
-                    layout_type, visual_type, chunk, accent_color, audio_duration
+                    layout_type, visual_type, chunk, accent_color, audio_duration, script_json=script_json
                 )
                 if layout_clip:
                     layout_visual_clips.append(layout_clip)
                     
-            print(f"   🎨 Dynamic Layout Visuals: {len(layout_visual_clips)} clips added")
+            print(f"   🎨 Dynamic Layout Visuals: {len(layout_visual_clips)} clips added (including faceoff/terminal modes)")
         except Exception as e:
             print(f"   ⚠️ Dynamic layout visuals failed: {e}")
     elif enable_mockup and CI_LITE:
@@ -10349,7 +10559,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     if is_longform:
         topic_transition_clips = _longform_topic_transition_clips(script_json, audio_duration)
         
-    base_layers = bg_layer_clips + burst_clips + ([particle_layer] if particle_layer else []) + screenshot_clips + topic_transition_clips + clean_bg_clips + infographic_clips + settings_mockup_clips
+    base_layers = bg_layer_clips + burst_clips + ([particle_layer] if particle_layer else []) + screenshot_clips + topic_transition_clips + clean_bg_clips + infographic_clips + settings_mockup_clips + layout_visual_clips
     
     # Add evidence screenshot clip (GitHub README or secondary evidence)
     evidence_screenshot_path = script_json.get("evidence_screenshot_path")
