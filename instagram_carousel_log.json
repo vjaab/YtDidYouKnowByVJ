@@ -74,43 +74,14 @@
     "AI's Hidden Thirst",
     "Medium (programming): Building a Triple-RTX Workstation: How Far Shoul",
     "AI Inbox Blackmail: Your Data At Risk",
-    "AI Inbox Blackmail: Your Data At Risk"
+    "AI Inbox Blackmail: Your Data At Risk",
+    "Medium (programming): AI Lets Everyone Build Software. But Can They Tr",
+    "Medium (programming): SQL Percentile Queries",
+    "Medium (machine-learning): RLHF Series: 16/17 [Evaluating LLMs and RLH",
+    "Medium (technology): Shrinking Big Models for Local AI: A Practical Ro",
+    "Medium (technology): Chapter 5: Democracy Is Just Paint and Wax\u2013It\u2019s A"
   ],
   "used_keywords": [
-    "visible light",
-    "wireless communication",
-    "photonics",
-    "did you know",
-    "mars climate orbiter",
-    "nasa",
-    "metric system",
-    "spacecraft",
-    "did you know",
-    "badusb",
-    "hid injection",
-    "cybersecurity",
-    "hardware hacking",
-    "did you know",
-    "project natick",
-    "underwater datacenter",
-    "cloud servers",
-    "microsoft",
-    "did you know",
-    "stuxnet",
-    "cybersecurity",
-    "plc",
-    "zero day",
-    "malware",
-    "did you know",
-    "y2k",
-    "millennium bug",
-    "legacy code",
-    "software engineering",
-    "did you know",
-    "oled",
-    "burn in",
-    "blue subpixels",
-    "display tech",
     "did you know",
     "threads",
     "tech",
@@ -276,7 +247,41 @@
     "Claude AI",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know",
+    "tech trending",
+    "medium",
+    "programming",
+    "lets",
+    "everyone",
+    "build",
+    "did you know",
+    "tech trending",
+    "medium",
+    "programming",
+    "percentile",
+    "queries",
+    "did you know",
+    "tech trending",
+    "medium",
+    "machine",
+    "learning",
+    "rlhf",
+    "series",
+    "did you know",
+    "tech trending",
+    "medium",
+    "technology",
+    "shrinking",
+    "models",
+    "local",
+    "did you know",
+    "tech trending",
+    "medium",
+    "technology",
+    "chapter",
+    "democracy",
+    "just"
   ],
   "history": [
     {
@@ -1354,6 +1359,80 @@
       ],
       "source": "Threads Post",
       "timestamp": "2026-10-02T16:47:40.797780+00:00"
+    },
+    {
+      "title": "Medium (programming): AI Lets Everyone Build Software. But Can They Tr",
+      "news_source_url": "https://medium.com/@mahishdino/ai-lets-everyone-build-software-but-can-they-truly-engineer-it-9045896fe903?source=rss------programming-5",
+      "keywords": [
+        "did you know",
+        "tech trending",
+        "medium",
+        "programming",
+        "lets",
+        "everyone",
+        "build"
+      ],
+      "source": "Medium - programming",
+      "timestamp": "2026-10-02T19:04:55.733456+00:00"
+    },
+    {
+      "title": "Medium (programming): SQL Percentile Queries",
+      "news_source_url": "https://medium.com/@AlexanderObregon/sql-percentile-queries-1303a1ba4878?source=rss------programming-5",
+      "keywords": [
+        "did you know",
+        "tech trending",
+        "medium",
+        "programming",
+        "percentile",
+        "queries"
+      ],
+      "source": "Medium - programming",
+      "timestamp": "2026-10-02T19:05:41.874527+00:00"
+    },
+    {
+      "title": "Medium (machine-learning): RLHF Series: 16/17 [Evaluating LLMs and RLH",
+      "news_source_url": "https://medium.com/@deepakcse2k5/rlhf-series-16-17-evaluating-llms-and-rlhf-systems-33e49b48f49b?source=rss------machine_learning-5",
+      "keywords": [
+        "did you know",
+        "tech trending",
+        "medium",
+        "machine",
+        "learning",
+        "rlhf",
+        "series"
+      ],
+      "source": "Medium - machine-learning",
+      "timestamp": "2026-10-02T19:05:59.611994+00:00"
+    },
+    {
+      "title": "Medium (technology): Shrinking Big Models for Local AI: A Practical Ro",
+      "news_source_url": "https://mehmetozgenozdogan.medium.com/shrinking-big-models-for-local-ai-a-practical-roadmap-to-teacher-student-distillation-967fbc910447?source=rss------technology-5",
+      "keywords": [
+        "did you know",
+        "tech trending",
+        "medium",
+        "technology",
+        "shrinking",
+        "models",
+        "local"
+      ],
+      "source": "Medium - technology",
+      "timestamp": "2026-10-02T19:06:17.675297+00:00"
+    },
+    {
+      "title": "Medium (technology): Chapter 5: Democracy Is Just Paint and Wax\u2013It\u2019s A",
+      "news_source_url": "https://medium.com/agent-x-and-the-edge-of-reality/chapter-5-democracy-is-just-paint-and-wax-its-all-police-state-under-the-hood-38cc41cbb1cd?source=rss------technology-5",
+      "keywords": [
+        "did you know",
+        "tech trending",
+        "medium",
+        "technology",
+        "chapter",
+        "democracy",
+        "just"
+      ],
+      "source": "Medium - technology",
+      "timestamp": "2026-10-02T19:06:35.695085+00:00"
     }
   ]
 }
