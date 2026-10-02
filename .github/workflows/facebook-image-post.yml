@@ -2,20 +2,38 @@ name: Facebook Image Post
 
 on:
   schedule:
-    # Peak engagement windows (IST)
+    # Peak engagement windows (IST) — offset 15 min from Instagram to avoid duplicate topic races
     # Weekday mornings (commute) + afternoons + evenings
-    - cron: '0 2 * * 1-5'   # 7:30 AM IST Mon-Fri
-    - cron: '0 10 * * 1-5'  # 3:30 PM IST Mon-Fri
-    - cron: '0 14 * * 1-5'  # 7:30 PM IST Mon-Fri
+    - cron: '15 2 * * 1-5'   # 7:45 AM IST Mon-Fri
+    - cron: '15 10 * * 1-5'  # 3:45 PM IST Mon-Fri
+    - cron: '15 14 * * 1-5'  # 7:45 PM IST Mon-Fri
     # Weekend: later mornings, earlier evenings
-    - cron: '0 4 * * 6,0'   # 9:30 AM IST Sat-Sun
-    - cron: '0 12 * * 6,0'  # 5:30 PM IST Sat-Sun
+    - cron: '15 4 * * 6,0'   # 9:45 AM IST Sat-Sun
+    - cron: '15 12 * * 6,0'  # 5:45 PM IST Sat-Sun
   workflow_dispatch:
     inputs:
       topic:
         description: 'Specific topic to generate (e.g., "OpenAI GPT-5")'
         required: false
         type: string
+      style:
+        description: 'Carousel visual style'
+        required: false
+        type: choice
+        options:
+          - cartoon_dialogue
+          - code_editor
+        default: cartoon_dialogue
+      mode:
+        description: 'Content mode'
+        required: false
+        type: choice
+        options:
+          - did_you_know
+          - concept
+          - news
+          - auto
+        default: did_you_know
       auto_post:
         description: 'Auto-post after Telegram approval'
         required: false
@@ -105,6 +123,8 @@ jobs:
         run: |
           python -u generate_decorator_images.py --now \
             --topic "${{ github.event.inputs.topic || '' }}" \
+            --style "${{ github.event.inputs.style || 'cartoon_dialogue' }}" \
+            --mode "${{ github.event.inputs.mode || 'did_you_know' }}" \
             --hashtags-file hashtags.txt \
             --platform facebook
 
@@ -120,8 +140,8 @@ jobs:
             --caption-file "${{ steps.gen.outputs.caption_file }}" \
             --topic "${{ steps.gen.outputs.topic }}" \
             --hashtags-file hashtags.txt \
-            --style cartoon_dialogue \
-            --mode did_you_know
+            --style "${{ github.event.inputs.style || 'cartoon_dialogue' }}" \
+            --mode "${{ github.event.inputs.mode || 'did_you_know' }}"
 
       - name: Send to Telegram for Approval
         if: (github.event.inputs.auto_post == 'true') && (steps.verifier.outputs.approved == 'true')

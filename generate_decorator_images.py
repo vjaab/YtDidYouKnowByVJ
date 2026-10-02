@@ -296,7 +296,7 @@ def main():
 
             if mode in ["did_you_know", "dyk"]:
                 print("🧠 Mode: 'did_you_know' — Selecting high-attraction tech fact...")
-                story = fetch_or_select_did_you_know_fact(topic=args.topic)
+                story = fetch_or_select_did_you_know_fact(topic=args.topic, platform=args.platform)
                 topic_to_use = story.get("title", args.topic or "Did You Know Tech Fact")
             elif mode == "news":
                 try:
@@ -331,7 +331,7 @@ def main():
                         break
                     else:
                         print(f"⚠️ [Accuracy Agent] Rejected: {audit['reason']}. Picking fresh topic...")
-                        story = fetch_or_select_did_you_know_fact(topic="")
+                        story = fetch_or_select_did_you_know_fact(topic="", platform=args.platform)
                         topic_to_use = story.get("title", "Fresh Tech Fact")
             except Exception as ver_err:
                 print(f"ℹ️ Verifier integration note: {ver_err}")
@@ -373,10 +373,22 @@ def main():
                 print(f"📘 Rendering Facebook 9:16 stories...")
                 fb_paths = render_cartoon_dialogue_carousel(dialogue, output_dir, canvas_width=FACEBOOK_STORY_W, canvas_height=FACEBOOK_STORY_H, prefix="facebook_", bg_images=bg_images)
 
-            # Caption
+            # Caption with platform-specific engagement CTAs
             caption = dialogue.get("caption", "")
             if not caption:
                 caption = f"🧠 {dialogue.get('hook')}\n\n💡 {dialogue.get('takeaway')}\n\nFollow @vijayakumarj_ai for daily mind-blowing tech facts!"
+            
+            # Platform-specific engagement CTAs that boost likes/saves/shares
+            platform_cta = {
+                "instagram": "\n\n📌 Save this for later! | 💬 Drop a 🤯 if this blew your mind!",
+                "threads": "\n\n🔁 Repost this to blow your friends' minds! | 💬 Tag someone who needs to see this!",
+                "facebook": "\n\n👉 Share this with a friend who needs to know! | 💬 Comment your reaction below!",
+                "both": "\n\n📌 Save & Share! | 💬 Drop a 🤯 if this blew your mind!",
+            }
+            cta = platform_cta.get(args.platform, platform_cta["both"])
+            if cta.strip() not in caption:
+                caption = f"{caption}{cta}"
+            
             if hashtags and hashtags not in caption:
                 caption = f"{caption}\n\n{hashtags}"
 

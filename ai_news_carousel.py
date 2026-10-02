@@ -91,7 +91,7 @@ def save_carousel_tracker(tracker: Dict) -> None:
         print(f"⚠️ Failed to save carousel tracker: {e}")
 
 
-def record_carousel_topic(title: str, url: str, keywords: List[str], source: str) -> None:
+def record_carousel_topic(title: str, url: str, keywords: List[str], source: str, platform: str = "unknown") -> None:
     """Record a topic as used in the carousel tracker."""
     tracker = load_carousel_tracker()
     
@@ -100,6 +100,7 @@ def record_carousel_topic(title: str, url: str, keywords: List[str], source: str
         "news_source_url": url,
         "keywords": keywords,
         "source": source,
+        "platform": platform,
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
     
@@ -116,7 +117,7 @@ def record_carousel_topic(title: str, url: str, keywords: List[str], source: str
         tracker["used_keywords"] = tracker["used_keywords"][-200:]
     
     save_carousel_tracker(tracker)
-    print(f"📝 Recorded carousel topic: {title[:60]}...")
+    print(f"📝 Recorded carousel topic [{platform}]: {title[:60]}...")
 
 def is_topic_unique(title: str, url: str = "", keywords: List[str] = None, check_youtube: bool = True, check_carousel: bool = True) -> tuple:
     """Check if a topic is unique compared to previously used topics (YouTube + Carousel)."""

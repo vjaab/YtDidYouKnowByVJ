@@ -95,6 +95,8 @@ except ImportError:
 
 # ── DID YOU KNOW CURATED SEED FACT POOL ───────────────────────────────────────
 # High-attraction, verified mind-blowing facts rotating across 5 curiosity vectors
+# engagement_score (1-10): predicted relative engagement based on topic universality,
+# shareability, and emotional surprise factor. Higher = more likes/saves/shares.
 DID_YOU_KNOW_SEED_FACTS = [
     # ── AI Secrets ──────────────────────────────────────────────────────────
     {
@@ -104,7 +106,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "The Context Window Reality",
         "fact_summary": "LLMs do not store memories between turns. Every reply re-reads earlier text until the context window overflows, silently dropping older tokens from the start.",
         "source": "Transformer Attention & Context Windows",
-        "keywords": ["chatgpt", "context window", "ai memory", "tokens", "llm", "did you know"]
+        "keywords": ["chatgpt", "context window", "ai memory", "tokens", "llm", "did you know"],
+        "engagement_score": 9
     },
     {
         "vector": "ai_secrets",
@@ -113,7 +116,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "Next-Token Probability Engine",
         "fact_summary": "AI has zero concept of factual truth. It calculates mathematical probabilities of what word should come next, generating convincing falsehoods when confidence is low.",
         "source": "Transformer Probabilistic Modeling",
-        "keywords": ["ai hallucination", "transformers", "machine learning", "probability", "did you know"]
+        "keywords": ["ai hallucination", "transformers", "machine learning", "probability", "did you know"],
+        "engagement_score": 9
     },
     {
         "vector": "ai_secrets",
@@ -122,7 +126,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "Diffusion Reverse Denoising",
         "fact_summary": "Diffusion models like Midjourney start with 100% random static fuzz and gradually subtract noise over 50 steps until a crisp image crystallizes.",
         "source": "Denoising Diffusion Probabilistic Models",
-        "keywords": ["diffusion models", "midjourney", "image generation", "ai art", "did you know"]
+        "keywords": ["diffusion models", "midjourney", "image generation", "ai art", "did you know"],
+        "engagement_score": 8
     },
     {
         "vector": "ai_secrets",
@@ -131,7 +136,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "The Subword Tokenization Blindspot",
         "fact_summary": "LLMs never see raw characters. Words are sliced into multi-letter token IDs, making it impossible for the model to see individual letters without spelling them out.",
         "source": "Byte-Pair Encoding Tokenization",
-        "keywords": ["tokenization", "bpe", "strawberry", "llm reasoning", "did you know"]
+        "keywords": ["tokenization", "bpe", "strawberry", "llm reasoning", "did you know"],
+        "engagement_score": 10
     },
     {
         "vector": "ai_secrets",
@@ -140,7 +146,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "O(N²) Transformer Quadratic Scaling",
         "fact_summary": "In standard transformers, every token must calculate attention with every other token. Doubling prompt length doesn't double memory—it multiplies computation by four.",
         "source": "Attention Is All You Need (Vaswani et al.)",
-        "keywords": ["transformer", "self attention", "quadratic cost", "context length", "did you know"]
+        "keywords": ["transformer", "self attention", "quadratic cost", "context length", "did you know"],
+        "engagement_score": 6
     },
     {
         "vector": "ai_secrets",
@@ -149,7 +156,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "Model Autophagous Collapse Disorder",
         "fact_summary": "When language models are trained recursively on synthetic AI outputs, mathematical tails vanish, entropy collapses, and the model permanently degenerates into gibberish.",
         "source": "Nature: The Curse of Recursion in Generative Models",
-        "keywords": ["model collapse", "synthetic data", "ai training", "machine learning", "did you know"]
+        "keywords": ["model collapse", "synthetic data", "ai training", "machine learning", "did you know"],
+        "engagement_score": 8
     },
     {
         "vector": "ai_secrets",
@@ -158,7 +166,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "MoE Sparse Neural Routing",
         "fact_summary": "Models like Mixtral and DeepSeek have hundreds of billions of parameters, but a router gate activates only 2 out of 64 expert neural networks per individual token.",
         "source": "Sparse Mixture-of-Experts Architecture Papers",
-        "keywords": ["mixture of experts", "moe", "deepseek", "neural networks", "did you know"]
+        "keywords": ["mixture of experts", "moe", "deepseek", "neural networks", "did you know"],
+        "engagement_score": 7
     },
     {
         "vector": "ai_secrets",
@@ -167,7 +176,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "RLHF Sycophancy Emergence",
         "fact_summary": "Reinforcement learning with human feedback rewards models that agree with the user's misconceptions, causing chatbots to flatter opinions rather than state factual corrections.",
         "source": "Anthropic Research on AI Sycophancy",
-        "keywords": ["rlhf", "sycophancy", "alignment", "chatbots", "did you know"]
+        "keywords": ["rlhf", "sycophancy", "alignment", "chatbots", "did you know"],
+        "engagement_score": 8
     },
 
     # ── Everyday Tech Mysteries ─────────────────────────────────────────────
@@ -178,7 +188,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "Subsea Fiber Optic Megastructure",
         "fact_summary": "Satellites carry under 1% of data. Over 1.4 million kilometers of submarine fiber optic cables, armored against sharks and anchors, carry all global internet.",
         "source": "TeleGeography Submarine Cable Registry",
-        "keywords": ["submarine cables", "internet", "fiber optics", "ocean floor", "did you know"]
+        "keywords": ["submarine cables", "internet", "fiber optics", "ocean floor", "did you know"],
+        "engagement_score": 10
     },
     {
         "vector": "everyday_tech_mysteries",
@@ -187,7 +198,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "Relativistic Satellite Time Dilation",
         "fact_summary": "Satellite clocks tick 38 microseconds faster per day due to weaker gravity and high speed. Without relativistic math correction, Google Maps would drift 11 km every day.",
         "source": "General & Special Relativity in GNSS",
-        "keywords": ["gps", "einstein", "relativity", "time dilation", "satellites", "did you know"]
+        "keywords": ["gps", "einstein", "relativity", "time dilation", "satellites", "did you know"],
+        "engagement_score": 10
     },
     {
         "vector": "everyday_tech_mysteries",
@@ -196,7 +208,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "Capacitive Touchscreen Physics",
         "fact_summary": "Phone glass does not detect pressure. A grid of transparent indium tin oxide electrodes detects tiny electrical charges transferring from your skin when you touch it.",
         "source": "Capacitive Sensing Physics & IEEE",
-        "keywords": ["touchscreen", "capacitance", "smartphone", "physics", "did you know"]
+        "keywords": ["touchscreen", "capacitance", "smartphone", "physics", "did you know"],
+        "engagement_score": 9
     },
     {
         "vector": "everyday_tech_mysteries",
@@ -205,7 +218,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "Gimbaled Satellite Phased Arrays",
         "fact_summary": "Planes use motorized parabolic antennas inside a teardrop roof dome that track geostationary satellites 36,000 km away while flying at 900 km/h.",
         "source": "Aeronautical Satellite Telecommunications",
-        "keywords": ["airplane wifi", "satellite", "aviation tech", "phased array", "did you know"]
+        "keywords": ["airplane wifi", "satellite", "aviation tech", "phased array", "did you know"],
+        "engagement_score": 8
     },
     {
         "vector": "everyday_tech_mysteries",
@@ -214,7 +228,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "The Piezoelectric 32,768 Hz Tuning Fork",
         "fact_summary": "Every quartz watch contains a microscopic tuning fork vibrating at 32,768 Hz. A 15-stage binary flip-flop circuit halves the frequency 15 times to yield exactly 1 second.",
         "source": "Horological Quartz Oscillation Engineering",
-        "keywords": ["quartz crystal", "binary", "watches", "piezoelectric", "did you know"]
+        "keywords": ["quartz crystal", "binary", "watches", "piezoelectric", "did you know"],
+        "engagement_score": 7
     },
     {
         "vector": "everyday_tech_mysteries",
@@ -223,7 +238,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "The Blue Phosphorescent Organic Decay Problem",
         "fact_summary": "Blue light requires high-energy photon emission, breaking organic chemical bonds much faster than red or green. Phone makers make blue subpixels twice as large to compensate.",
         "source": "Society for Information Display (SID) Research",
-        "keywords": ["oled", "burn in", "blue subpixels", "display tech", "did you know"]
+        "keywords": ["oled", "burn in", "blue subpixels", "display tech", "did you know"],
+        "engagement_score": 8
     },
     {
         "vector": "everyday_tech_mysteries",
@@ -232,7 +248,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "Visible Light Optical Communications (Li-Fi)",
         "fact_summary": "Specialized LED bulbs can flicker millions of times per second—undetectable to human eyes—beaming 224 Gbps of encrypted wireless data directly into laptop photo-sensors.",
         "source": "IEEE 802.11bb Light Wireless Standard",
-        "keywords": ["lifi", "visible light", "wireless communication", "photonics", "did you know"]
+        "keywords": ["lifi", "visible light", "wireless communication", "photonics", "did you know"],
+        "engagement_score": 8
     },
     {
         "vector": "everyday_tech_mysteries",
@@ -241,7 +258,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "Near-Field Electromagnetic Induction",
         "fact_summary": "A tap-to-pay card has a copper antenna coil running along its edges. The terminal emits an electromagnetic field that induces current, powering the onboard cryptographic CPU.",
         "source": "ISO/IEC 14443 Contactless Standards",
-        "keywords": ["nfc", "rfid", "contactless payments", "electromagnetic induction", "did you know"]
+        "keywords": ["nfc", "rfid", "contactless payments", "electromagnetic induction", "did you know"],
+        "engagement_score": 9
     },
 
     # ── Hardware Megastructures ─────────────────────────────────────────────
@@ -252,7 +270,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "ASML Extreme Ultraviolet Lithography",
         "fact_summary": "A high-powered CO2 laser vaporizes 50,000 drops of molten tin per second into plasma hotter than the sun's surface to produce 13.5nm light waves.",
         "source": "ASML High-NA EUV Engineering",
-        "keywords": ["asml", "euv", "semiconductors", "chip making", "microprocessors", "did you know"]
+        "keywords": ["asml", "euv", "semiconductors", "chip making", "microprocessors", "did you know"],
+        "engagement_score": 8
     },
     {
         "vector": "hardware_megastructures",
@@ -261,7 +280,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "Project Natick Underwater Server Pods",
         "fact_summary": "Microsoft submerged 864 servers in a sealed nitrogen capsule off Scotland. With no humans and constant natural seawater cooling, server failure dropped by 800%.",
         "source": "Microsoft Project Natick Research",
-        "keywords": ["project natick", "underwater datacenter", "cloud servers", "microsoft", "did you know"]
+        "keywords": ["project natick", "underwater datacenter", "cloud servers", "microsoft", "did you know"],
+        "engagement_score": 9
     },
     {
         "vector": "hardware_megastructures",
@@ -270,7 +290,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "ISO Class 1 Semiconductor Cleanrooms",
         "fact_summary": "A single speck of human dead skin or dust can bridge microscopic transistor paths. Air in chip cleanrooms is filtered to under 10 particles per cubic meter.",
         "source": "Semiconductor Fab Standards (ISO 14644)",
-        "keywords": ["cleanroom", "semiconductors", "fab", "transistors", "did you know"]
+        "keywords": ["cleanroom", "semiconductors", "fab", "transistors", "did you know"],
+        "engagement_score": 7
     },
     {
         "vector": "hardware_megastructures",
@@ -279,7 +300,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "Cerebras Wafer-Scale Engine 3",
         "fact_summary": "Instead of slicing silicon wafers into hundreds of tiny chips, Cerebras uses an entire 300mm silicon wafer as a single giant AI processor with 900,000 compute cores.",
         "source": "Cerebras Systems Architectural Whitepaper",
-        "keywords": ["cerebras", "wafer scale", "ai chips", "hardware megastructures", "did you know"]
+        "keywords": ["cerebras", "wafer scale", "ai chips", "hardware megastructures", "did you know"],
+        "engagement_score": 7
     },
     {
         "vector": "hardware_megastructures",
@@ -288,7 +310,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "High-Bandwidth 3D Memory Packaging",
         "fact_summary": "NVIDIA Blackwell GPUs achieve 8 TB/s memory speeds by stacking 12 DRAM dies vertically, connected by 50,000 Through-Silicon Vias microscopic channels per stack.",
         "source": "JEDEC High Bandwidth Memory Specification",
-        "keywords": ["hbm3e", "gpu memory", "nvidia blackwell", "semiconductors", "did you know"]
+        "keywords": ["hbm3e", "gpu memory", "nvidia blackwell", "semiconductors", "did you know"],
+        "engagement_score": 7
     },
     {
         "vector": "hardware_megastructures",
@@ -297,7 +320,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "Multilayer Copper Interconnect Metallurgy",
         "fact_summary": "Inside modern 3nm chips, over 100 kilometers of microscopic copper wires weave through 15 vertical metal layers, some measuring only 12 nanometers in width.",
         "source": "IEEE Transactions on Electron Devices",
-        "keywords": ["semiconductor", "interconnects", "3nm", "copper wiring", "did you know"]
+        "keywords": ["semiconductor", "interconnects", "3nm", "copper wiring", "did you know"],
+        "engagement_score": 7
     },
     {
         "vector": "hardware_megastructures",
@@ -306,7 +330,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "Air Bearing Slider Aerodynamics",
         "fact_summary": "HDD magnetic read heads glide 3 nanometers above platters spinning at 120 km/h. If the head were a Boeing 747, it would be flying 0.1 millimeters above the grass.",
         "source": "Seagate & Western Digital Advanced Storage Physics",
-        "keywords": ["hard drive", "hdd", "aerodynamics", "magnetic storage", "did you know"]
+        "keywords": ["hard drive", "hdd", "aerodynamics", "magnetic storage", "did you know"],
+        "engagement_score": 8
     },
     {
         "vector": "hardware_megastructures",
@@ -315,7 +340,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "Real-Time Microsecond Battery Management",
         "fact_summary": "EV battery packs contain thousands of lithium cells. Dedicated BMS chips monitor microvolt shifts and millikelvin thermal deviations 1,000 times/sec to prevent thermal runaway.",
         "source": "Automotive BMS Functional Safety (ISO 26262)",
-        "keywords": ["ev battery", "battery management", "electric vehicles", "automotive tech", "did you know"]
+        "keywords": ["ev battery", "battery management", "electric vehicles", "automotive tech", "did you know"],
+        "engagement_score": 8
     },
 
     # ── Bizarre Tech History ────────────────────────────────────────────────
@@ -326,7 +352,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "Ariane 5 Flight 501 Integer Overflow",
         "fact_summary": "In 1996, the Ariane 5 rocket exploded 37 seconds after launch because software tried to stuff a 64-bit floating point number into a 16-bit integer, causing fatal overflow.",
         "source": "Ariane 5 Flight 501 Inquiry Board Report",
-        "keywords": ["ariane 5", "integer overflow", "software bug", "rocket science", "did you know"]
+        "keywords": ["ariane 5", "integer overflow", "software bug", "rocket science", "did you know"],
+        "engagement_score": 10
     },
     {
         "vector": "bizarre_tech_history",
@@ -335,7 +362,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "CSIRO Radio Astronomy Invention",
         "fact_summary": "In the 1990s, Australian astronomer Dr. John O'Sullivan was trying to detect exploding mini black holes using radio waves. The signal-cleaning algorithm became modern Wi-Fi.",
         "source": "CSIRO Wireless LAN Patent History",
-        "keywords": ["wifi", "invention", "black holes", "radio astronomy", "csiro", "did you know"]
+        "keywords": ["wifi", "invention", "black holes", "radio astronomy", "csiro", "did you know"],
+        "engagement_score": 10
     },
     {
         "vector": "bizarre_tech_history",
@@ -344,7 +372,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "Grace Hopper's 1947 Harvard Relay Bug",
         "fact_summary": "In 1947, computer pioneer Grace Hopper's team investigated a malfunction in the Harvard Mark II relay computer and found a live moth trapped between Relay #70.",
         "source": "Smithsonian National Museum of American History",
-        "keywords": ["computer bug", "grace hopper", "harvard mark ii", "tech history", "did you know"]
+        "keywords": ["computer bug", "grace hopper", "harvard mark ii", "tech history", "did you know"],
+        "engagement_score": 9
     },
     {
         "vector": "bizarre_tech_history",
@@ -353,7 +382,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "Mars Climate Orbiter Navigation Loss",
         "fact_summary": "Lockheed Martin software calculated thruster impulse in pound-seconds, but NASA navigation software expected metric newton-seconds. The orbiter incinerated in Mars' atmosphere.",
         "source": "NASA Mars Climate Orbiter Mishap Board",
-        "keywords": ["mars climate orbiter", "nasa", "metric system", "spacecraft", "did you know"]
+        "keywords": ["mars climate orbiter", "nasa", "metric system", "spacecraft", "did you know"],
+        "engagement_score": 9
     },
     {
         "vector": "bizarre_tech_history",
@@ -362,7 +392,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "The 1983 Soviet Satellite False Alarm",
         "fact_summary": "Soviet early-warning satellite Oko detected five incoming US nuclear missiles. Duty officer Stanislav Petrov trusted his intuition that it was a computer glitch, which turned out to be sun reflecting off high clouds.",
         "source": "United Nations Peace History & CIA Declassified Archives",
-        "keywords": ["stanislav petrov", "nuclear false alarm", "cold war tech", "satellites", "did you know"]
+        "keywords": ["stanislav petrov", "nuclear false alarm", "cold war tech", "satellites", "did you know"],
+        "engagement_score": 9
     },
     {
         "vector": "bizarre_tech_history",
@@ -371,7 +402,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "IBM 3380 Direct Access Storage Device",
         "fact_summary": "Released in 1980, the IBM 3380 was the first storage system capable of holding 1 Gigabyte of data. It weighed 550 pounds (250 kg) and cost over $40,000.",
         "source": "IBM Archives & Computer History Museum",
-        "keywords": ["ibm 3380", "1gb hard drive", "computer history", "storage", "did you know"]
+        "keywords": ["ibm 3380", "1gb hard drive", "computer history", "storage", "did you know"],
+        "engagement_score": 8
     },
     {
         "vector": "bizarre_tech_history",
@@ -380,7 +412,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "The Millennium Bug Global Code Remediation",
         "fact_summary": "Early programmers used 2 digits for years (99 for 1999) to save memory. A coordinated effort involving millions of engineers and $100B in refactoring prevented global banking systems from crashing at midnight.",
         "source": "US Department of Commerce Y2K Economic Report",
-        "keywords": ["y2k", "millennium bug", "legacy code", "software engineering", "did you know"]
+        "keywords": ["y2k", "millennium bug", "legacy code", "software engineering", "did you know"],
+        "engagement_score": 8
     },
     {
         "vector": "bizarre_tech_history",
@@ -389,7 +422,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "Project 705 Lira (Alfa-Class) High-Automation Submarines",
         "fact_summary": "Soviet Alfa-class submarines featured an all-titanium hull and reached 80 km/h underwater. Their reactor was cooled by molten lead-bismuth metal and could never be shut down without freezing solid.",
         "source": "Naval Nuclear Propulsion History Archives",
-        "keywords": ["alfa class", "titanium submarine", "nuclear reactor", "engineering history", "did you know"]
+        "keywords": ["alfa class", "titanium submarine", "nuclear reactor", "engineering history", "did you know"],
+        "engagement_score": 7
     },
 
     # ── Cybersecurity Secrets ───────────────────────────────────────────────
@@ -400,7 +434,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "Stuxnet Frequency Inverter Weapon",
         "fact_summary": "The Stuxnet cyberweapon targeted Siemens PLCs, secretly spinning uranium enrichment centrifuges at dangerously fast and slow speeds while playing fake normal recordings to operators.",
         "source": "Symantec W32.Stuxnet Dossier",
-        "keywords": ["stuxnet", "cybersecurity", "plc", "zero day", "malware", "did you know"]
+        "keywords": ["stuxnet", "cybersecurity", "plc", "zero day", "malware", "did you know"],
+        "engagement_score": 9
     },
     {
         "vector": "cybersecurity_secrets",
@@ -409,7 +444,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "The DNSSEC Root Key Signing Ceremony",
         "fact_summary": "Every 3 months, 14 trusted cryptographers meet under armed guard in California and Virginia to execute the DNSSEC Key Ceremony, ensuring internet domain names cannot be hijacked.",
         "source": "ICANN Root Key Signing Formal Ceremonies",
-        "keywords": ["dnssec", "icann", "internet keys", "cryptography", "did you know"]
+        "keywords": ["dnssec", "icann", "internet keys", "cryptography", "did you know"],
+        "engagement_score": 10
     },
     {
         "vector": "cybersecurity_secrets",
@@ -418,7 +454,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "Acoustic Keyboard Side-Channel Attack",
         "fact_summary": "Researchers trained an audio deep learning model that decodes keystrokes from laptop microphone recordings with 95% accuracy by analyzing acoustic resonance waveforms.",
         "source": "IEEE European Symposium on Security and Privacy",
-        "keywords": ["acoustic attack", "keyboard snooping", "passwords", "ai audio", "did you know"]
+        "keywords": ["acoustic attack", "keyboard snooping", "passwords", "ai audio", "did you know"],
+        "engagement_score": 10
     },
     {
         "vector": "cybersecurity_secrets",
@@ -427,7 +464,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "The 32-Bit Unix Epoch Rollover Bug",
         "fact_summary": "At 03:14:07 UTC on Jan 19, 2038, 32-bit signed integers tracking seconds since 1970 will overflow into negative numbers, sending legacy systems back to December 13, 1901.",
         "source": "POSIX Standard & Unix Time Architecture",
-        "keywords": ["y2038", "unix epoch", "integer overflow", "32 bit bug", "did you know"]
+        "keywords": ["y2038", "unix epoch", "integer overflow", "32 bit bug", "did you know"],
+        "engagement_score": 8
     },
     {
         "vector": "cybersecurity_secrets",
@@ -436,7 +474,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "DRAM Rowhammer Electrical Disturbance",
         "fact_summary": "By repeatedly accessing a row of transistors in modern RAM millions of times per second, electrical charge leaks into adjacent capacitor rows, flipping bits from 0 to 1 without software authorization.",
         "source": "ACM SIGARCH Computer Architecture Research",
-        "keywords": ["rowhammer", "dram", "hardware exploit", "cybersecurity", "did you know"]
+        "keywords": ["rowhammer", "dram", "hardware exploit", "cybersecurity", "did you know"],
+        "engagement_score": 7
     },
     {
         "vector": "cybersecurity_secrets",
@@ -445,7 +484,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "USB HID Firmware Microcontroller Injection",
         "fact_summary": "Computers inherently trust USB keyboards. Malicious USB devices reprogram their microcontroller firmware to present as a Human Interface Device, injecting shell commands in milliseconds.",
         "source": "Black Hat BadUSB Research Papers",
-        "keywords": ["badusb", "hid injection", "cybersecurity", "hardware hacking", "did you know"]
+        "keywords": ["badusb", "hid injection", "cybersecurity", "hardware hacking", "did you know"],
+        "engagement_score": 8
     },
     {
         "vector": "cybersecurity_secrets",
@@ -454,7 +494,8 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "TEMPEST Video Electromagnetic Side-Channel",
         "fact_summary": "HDMI and display cables emit faint electromagnetic radio signals as pixels refresh. Sensitive software-defined radios up to 100 meters away can reconstruct the exact screen image in real time.",
         "source": "NSA TEMPEST Specifications & IEEE S&P",
-        "keywords": ["tempest", "side channel", "electromagnetic surveillance", "rf hacking", "did you know"]
+        "keywords": ["tempest", "side channel", "electromagnetic surveillance", "rf hacking", "did you know"],
+        "engagement_score": 8
     },
     {
         "vector": "cybersecurity_secrets",
@@ -463,8 +504,162 @@ DID_YOU_KNOW_SEED_FACTS = [
         "headline": "Shor's Algorithm Polynomial Prime Factorization",
         "fact_summary": "Modern internet security relies on the mathematical difficulty of factoring huge prime numbers. A sufficiently scaled quantum computer will factor these numbers in minutes using quantum superposition.",
         "source": "NIST Post-Quantum Cryptography Standardization",
-        "keywords": ["quantum computing", "shor algorithm", "rsa encryption", "post quantum crypto", "did you know"]
-    }
+        "keywords": ["quantum computing", "shor algorithm", "rsa encryption", "post quantum crypto", "did you know"],
+        "engagement_score": 8
+    },
+
+    # ── NEW HIGH-ENGAGEMENT EXPANSION POOL ──────────────────────────────────
+    # Fresh facts to replenish the seed pool after near-exhaustion
+    {
+        "vector": "ai_secrets",
+        "title": "GPT-4 Was Trained on More Text Than You Could Read in 20,000 Years",
+        "hook": "Did You Know GPT-4 Read More Than 20,000 Lifetimes of Text? 📚",
+        "headline": "The Scale of LLM Training Data",
+        "fact_summary": "GPT-4's training corpus contains roughly 13 trillion tokens. If a human read 250 words per minute nonstop, it would take over 20,000 years to read the same amount.",
+        "source": "OpenAI Technical Reports & Estimates",
+        "keywords": ["gpt4", "training data", "llm", "tokens", "ai scale", "did you know"],
+        "engagement_score": 10
+    },
+    {
+        "vector": "ai_secrets",
+        "title": "AI Image Generators Have Invisible Watermarks You Cannot See",
+        "hook": "Did You Know AI Images Have Hidden Invisible Watermarks? 🔍",
+        "headline": "Steganographic AI Provenance Watermarking",
+        "fact_summary": "Google DeepMind's SynthID embeds imperceptible patterns into AI-generated images at the pixel level. These watermarks survive cropping, filtering, and screenshotting.",
+        "source": "Google DeepMind SynthID Paper",
+        "keywords": ["synthid", "ai watermark", "image generation", "deepmind", "did you know"],
+        "engagement_score": 9
+    },
+    {
+        "vector": "everyday_tech_mysteries",
+        "title": "Bluetooth is Named After a 10th-Century Viking King",
+        "hook": "Did You Know Bluetooth is Named After a Viking? 🦷",
+        "headline": "Harald Bluetooth's Wireless Legacy",
+        "fact_summary": "Bluetooth is named after Harald 'Bluetooth' Gormsson, a Viking king who united warring Scandinavian tribes. The Bluetooth logo is his runic initials H and B merged together.",
+        "source": "Bluetooth SIG Official History",
+        "keywords": ["bluetooth", "viking", "wireless", "tech naming", "did you know"],
+        "engagement_score": 10
+    },
+    {
+        "vector": "everyday_tech_mysteries",
+        "title": "Wi-Fi Signals Pass Through Walls Using Quantum-Like Wave Diffraction",
+        "hook": "Did You Know How Wi-Fi Passes Through Walls? 📶",
+        "headline": "Radio Wave Diffraction & Building Penetration",
+        "fact_summary": "Wi-Fi operates at 2.4 GHz and 5 GHz radio frequencies whose wavelengths (12 cm and 6 cm) are large enough to diffract around doorframes and penetrate drywall, but are absorbed by water and metal.",
+        "source": "IEEE 802.11 Radio Physics Standards",
+        "keywords": ["wifi", "radio waves", "diffraction", "physics", "did you know"],
+        "engagement_score": 9
+    },
+    {
+        "vector": "everyday_tech_mysteries",
+        "title": "QR Codes Still Work Even When 30% Is Destroyed",
+        "hook": "Did You Know QR Codes Work Even When Damaged? 📱",
+        "headline": "Reed-Solomon Error Correction Magic",
+        "fact_summary": "QR codes use Reed-Solomon error correction that stores redundant data. At the highest error correction level (H), up to 30% of the code can be destroyed and it still scans perfectly.",
+        "source": "ISO/IEC 18004 QR Code Standard",
+        "keywords": ["qr code", "error correction", "reed solomon", "barcode", "did you know"],
+        "engagement_score": 10
+    },
+    {
+        "vector": "everyday_tech_mysteries",
+        "title": "Your Phone Knows You're in Your Pocket Using a Proximity Infrared Beam",
+        "hook": "Did You Know Your Phone Shoots Invisible Light at Your Face? 👁️",
+        "headline": "Infrared Proximity Sensor Detection",
+        "fact_summary": "A tiny IR LED next to your phone's front camera emits invisible infrared light. When it bounces back from your ear or pocket, the phone turns off the display to save battery and prevent accidental touches.",
+        "source": "Smartphone Sensor Design Engineering",
+        "keywords": ["proximity sensor", "infrared", "smartphone", "sensors", "did you know"],
+        "engagement_score": 8
+    },
+    {
+        "vector": "hardware_megastructures",
+        "title": "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
+        "hook": "Did You Know GPUs Have More Transistors Than Stars in Our Galaxy? ⭐",
+        "headline": "NVIDIA B200 Transistor Density Milestone",
+        "fact_summary": "NVIDIA's B200 GPU contains 208 billion transistors on a single chip package. The Milky Way galaxy contains an estimated 100-400 billion stars.",
+        "source": "NVIDIA Blackwell Architecture Whitepaper",
+        "keywords": ["nvidia", "gpu", "transistors", "semiconductor", "did you know"],
+        "engagement_score": 9
+    },
+    {
+        "vector": "hardware_megastructures",
+        "title": "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection",
+        "hook": "Did You Know Internet Data Travels as Light Bouncing Inside Glass? 💡",
+        "headline": "Total Internal Reflection Photonic Waveguides",
+        "fact_summary": "Inside each hair-thin glass fiber, laser light bounces off the walls thousands of times per meter through total internal reflection, travelling at 200,000 km/s with near-zero loss.",
+        "source": "Corning Optical Fiber Engineering",
+        "keywords": ["fiber optics", "total internal reflection", "photonics", "internet", "did you know"],
+        "engagement_score": 8
+    },
+    {
+        "vector": "bizarre_tech_history",
+        "title": "The Microwave Oven Was Invented When a Candy Bar Melted in an Engineer's Pocket",
+        "hook": "Did You Know a Melting Candy Bar Invented the Microwave? 🍫",
+        "headline": "Percy Spencer's Accidental Magnetron Discovery",
+        "fact_summary": "In 1945, Raytheon engineer Percy Spencer was testing military radar magnetrons when he noticed the chocolate bar in his pocket had melted. He then pointed the magnetron at popcorn kernels — and they popped.",
+        "source": "Raytheon Company Historical Archives",
+        "keywords": ["microwave oven", "invention", "percy spencer", "accidental discovery", "did you know"],
+        "engagement_score": 10
+    },
+    {
+        "vector": "bizarre_tech_history",
+        "title": "The Original iPhone Had No Copy-Paste for Two Full Years",
+        "hook": "Did You Know the Original iPhone Couldn't Copy-Paste? 📋",
+        "headline": "iPhone OS 1.0-2.0 Missing Clipboard Feature",
+        "fact_summary": "When Apple launched the iPhone in 2007, it shipped without copy-paste functionality. The feature didn't arrive until iPhone OS 3.0 in June 2009 — two years after launch.",
+        "source": "Apple iOS Version History",
+        "keywords": ["iphone", "apple", "copy paste", "smartphone history", "did you know"],
+        "engagement_score": 9
+    },
+    {
+        "vector": "bizarre_tech_history",
+        "title": "Nintendo Started as a Playing Card Company in 1889",
+        "hook": "Did You Know Nintendo is 135 Years Old? 🎮",
+        "headline": "From Hanafuda Cards to Global Gaming Empire",
+        "fact_summary": "Nintendo was founded in 1889 in Kyoto, Japan, as a handmade hanafuda (flower card) company. Before video games, they tried taxi services, love hotels, and instant rice.",
+        "source": "Nintendo Corporate History Archives",
+        "keywords": ["nintendo", "gaming history", "hanafuda", "tech companies", "did you know"],
+        "engagement_score": 10
+    },
+    {
+        "vector": "cybersecurity_secrets",
+        "title": "Your Deleted Files Are Never Actually Erased From Your Hard Drive",
+        "hook": "Did You Know 'Deleted' Files Are Still on Your Disk? 🗑️",
+        "headline": "File System Pointer Deletion vs Physical Erasure",
+        "fact_summary": "When you delete a file, the OS only removes the pointer in the file table. The actual data remains on disk until new data physically overwrites those exact sectors, which may never happen.",
+        "source": "NIST SP 800-88 Media Sanitization Guidelines",
+        "keywords": ["file deletion", "data recovery", "hard drive", "digital forensics", "did you know"],
+        "engagement_score": 10
+    },
+    {
+        "vector": "cybersecurity_secrets",
+        "title": "Airplane Mode Doesn't Actually Stop Your Phone From Being Tracked",
+        "hook": "Did You Know Airplane Mode Doesn't Fully Disable Tracking? ✈️",
+        "headline": "Baseband Processor Independent Operation",
+        "fact_summary": "The baseband modem chip in smartphones can operate independently from the main processor. Some phones can still be pinged by cell towers even in airplane mode if the baseband firmware allows it.",
+        "source": "Mobile Security Research & Baseband Analysis",
+        "keywords": ["airplane mode", "tracking", "baseband", "phone security", "did you know"],
+        "engagement_score": 9
+    },
+    {
+        "vector": "cybersecurity_secrets",
+        "title": "Emojis Are Approved by a 12-Person Committee That Controls All Text on Earth",
+        "hook": "Did You Know 12 People Decide Every Emoji You Use? 😱",
+        "headline": "The Unicode Consortium Emoji Subcommittee",
+        "fact_summary": "Every emoji on every phone, computer, and platform is approved by the Unicode Consortium's 12-member Emoji Subcommittee. They review thousands of proposals annually and control the text encoding standard used by all digital devices.",
+        "source": "Unicode Consortium Emoji Technical Reports",
+        "keywords": ["emoji", "unicode", "text encoding", "tech governance", "did you know"],
+        "engagement_score": 10
+    },
+    {
+        "vector": "ai_secrets",
+        "title": "ChatGPT Uses More Electricity Per Query Than a Google Search Uses in a Day",
+        "hook": "Did You Know One ChatGPT Query Uses 10x More Power Than Google? ⚡",
+        "headline": "LLM Inference Energy Consumption",
+        "fact_summary": "A single ChatGPT query consumes roughly 10 watt-hours of electricity — about 10 times more than a standard Google search. Running GPT-4 at scale requires thousands of NVIDIA GPUs drawing megawatts.",
+        "source": "IEA & Goldman Sachs AI Energy Reports",
+        "keywords": ["ai energy", "chatgpt power", "gpu electricity", "sustainability", "did you know"],
+        "engagement_score": 9
+    },
 ]
 
 
@@ -645,16 +840,22 @@ Return ONLY valid JSON (no markdown):
     return None
 
 
-def fetch_or_select_did_you_know_fact(topic: Optional[str] = None) -> Dict:
+def fetch_or_select_did_you_know_fact(topic: Optional[str] = None, platform: str = "instagram") -> Dict:
     """
     Selects or generates a high-attraction, 100% unique 'Did You Know' fact that is
     easily understandable by a common layperson (not overly niche or dry).
     - Guarantees zero duplicate topics across all platforms (checked via RapidFuzz & keywords).
-    - Avoids niche developer tooling; focuses on fascinating everyday tech & AI concepts.
+    - Uses engagement-weighted selection to prioritize high-like topics.
+    - Platform-aware offsets prevent Instagram/Threads/Facebook from selecting the same topic
+      during simultaneous cron runs.
     - PRIORITY 1: Curated Layman-Friendly Seed Catalog (verified, high curiosity).
     - PRIORITY 2: Real-Time Dynamic LLM Synthesis (new layman facts, deduplicated).
     - PRIORITY 3: Live Trending Signals (filtered for layman interest).
     """
+    # Platform-specific offset to break ties during concurrent runs
+    PLATFORM_OFFSETS = {"instagram": 0, "threads": 1, "facebook": 2, "both": 0}
+    platform_offset = PLATFORM_OFFSETS.get(platform.lower(), 0)
+
     try:
         from ai_news_carousel import (
             is_topic_unique,
@@ -708,11 +909,40 @@ def fetch_or_select_did_you_know_fact(topic: Optional[str] = None) -> Dict:
     if not selected:
         try:
             from topic_tracker import get_did_you_know_sub_vector
-            current_vector = get_did_you_know_sub_vector()
+            # Apply platform offset to vector rotation so each platform starts on a different vector
+            base_vector = get_did_you_know_sub_vector()
+            vector_idx = DID_YOU_KNOW_VECTORS.index(base_vector) if base_vector in DID_YOU_KNOW_VECTORS else 0
+            offset_idx = (vector_idx + platform_offset) % len(DID_YOU_KNOW_VECTORS)
+            current_vector = DID_YOU_KNOW_VECTORS[offset_idx]
         except Exception:
-            current_vector = "ai_secrets"
+            # Fallback: use platform offset directly
+            current_vector = DID_YOU_KNOW_VECTORS[platform_offset % len(DID_YOU_KNOW_VECTORS)]
 
-        print(f"🧠 Selecting layman-friendly 'Did You Know' fact for rotation vector: '{current_vector}'...")
+        print(f"🧠 [{platform.upper()}] Selecting layman-friendly fact for vector: '{current_vector}'...")
+
+        def _engagement_weighted_select(candidates: list) -> dict:
+            """Select a topic weighted by engagement_score. Higher scores get proportionally more chance."""
+            if not candidates:
+                return None
+            # Sort by engagement_score descending so highest-engagement topics are tried first
+            scored = sorted(candidates, key=lambda f: f.get("engagement_score", 5), reverse=True)
+            # Use weighted random: engagement_score as weight
+            weights = [f.get("engagement_score", 5) for f in scored]
+            total = sum(weights)
+            # Deterministic seed based on date + platform to ensure different selection per platform per day
+            import hashlib
+            from datetime import datetime
+            day_key = datetime.now().strftime("%Y-%m-%d")
+            seed_str = f"{day_key}-{platform}-{current_vector}"
+            seed_val = int(hashlib.sha256(seed_str.encode()).hexdigest()[:8], 16)
+            rng = random.Random(seed_val)
+            r = rng.uniform(0, total)
+            cumulative = 0
+            for i, w in enumerate(weights):
+                cumulative += w
+                if r <= cumulative:
+                    return dict(scored[i])
+            return dict(scored[0])
 
         # ── PRIORITY 1: Curated Seed Catalog (40+ Verified Layman-Friendly Facts) ────
         print("📚 Checking curated seed facts with multi-layer deduplication...")
@@ -734,11 +964,11 @@ def fetch_or_select_did_you_know_fact(topic: Optional[str] = None) -> Dict:
                 unseen_vector.append(cand)
         
         if unseen_vector:
-            selected = dict(random.choice(unseen_vector))
-            print(f"🎯 Selected unseen seed fact for '{current_vector}': '{selected['title']}'")
+            selected = _engagement_weighted_select(unseen_vector)
+            print(f"🎯 [{platform.upper()}] Selected unseen seed fact for '{current_vector}': '{selected['title']}' (engagement: {selected.get('engagement_score', '?')})")
         else:
-            # 2. Check all remaining seed facts across other vectors
-            print(f"ℹ️ All seed facts in '{current_vector}' covered; searching full 40-fact seed catalog...")
+            # 2. Check all remaining seed facts across other vectors (also engagement-weighted)
+            print(f"ℹ️ All seed facts in '{current_vector}' covered; searching full seed catalog...")
             all_unseen = []
             for cand in DID_YOU_KNOW_SEED_FACTS:
                 if is_topic_unique:
@@ -755,8 +985,8 @@ def fetch_or_select_did_you_know_fact(topic: Optional[str] = None) -> Dict:
                     all_unseen.append(cand)
             
             if all_unseen:
-                selected = dict(random.choice(all_unseen))
-                print(f"🎯 Selected unseen seed fact across catalog: '{selected['title']}' ({selected.get('vector')})")
+                selected = _engagement_weighted_select(all_unseen)
+                print(f"🎯 [{platform.upper()}] Selected unseen seed fact across catalog: '{selected['title']}' (engagement: {selected.get('engagement_score', '?')})")
 
         # ── PRIORITY 2: Real-Time Dynamic LLM Synthesis (Zero-Duplicate Layman Fact) ──
         if not selected:
@@ -803,14 +1033,15 @@ def fetch_or_select_did_you_know_fact(topic: Optional[str] = None) -> Dict:
                             continue
                     
                     selected = converted
-                    print(f"🔥 Picked live fact: '{selected['title']}'")
+                    print(f"🔥 [{platform.upper()}] Picked live fact: '{selected['title']}'")
                     break
             except Exception as e:
                 print(f"⚠️ Note on live trending fact extraction: {e}")
 
-        # Fallback safeguard (guarantee a valid dictionary)
+        # Fallback safeguard (guarantee a valid dictionary — use platform offset for variety)
         if not selected:
-            selected = dict(random.choice(DID_YOU_KNOW_SEED_FACTS))
+            fallback_idx = platform_offset % len(DID_YOU_KNOW_SEED_FACTS)
+            selected = dict(DID_YOU_KNOW_SEED_FACTS[fallback_idx])
 
     selected["mode"] = "did_you_know"
     selected["category"] = "🧠 DID YOU KNOW?"
@@ -838,7 +1069,7 @@ def fetch_or_select_did_you_know_fact(topic: Optional[str] = None) -> Dict:
         except Exception as e:
             print(f"⚠️ Note recording in news_log: {e}")
 
-    print(f"🚀 Final Selected Fact: '{selected['title']}' (Hook: '{selected.get('hook', '')}')")
+    print(f"🚀 [{platform.upper()}] Final Selected Fact: '{selected['title']}' (Hook: '{selected.get('hook', '')}')")
     return selected
 
 
