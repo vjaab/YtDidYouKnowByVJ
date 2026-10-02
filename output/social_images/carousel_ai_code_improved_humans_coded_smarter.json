@@ -1,0 +1,60 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "hook": "Did you know engineers get MORE value from AI by *not* letting it code first? \ud83e\udd2f",
+  "headline": "AI Code Improved: Humans Coded Smarter",
+  "source": "Medium - artificial-intelligence",
+  "slides": [
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "AI Code First? \ud83e\udd2f",
+      "bubble": "Wait, did you know engineers get MORE from AI by NOT letting it code first?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "AI Got Smarter \ud83e\udde0",
+      "bubble": "Yes! Claude Code AI significantly improved its coding ability over six months of use.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "curious",
+      "title": "Why Not Code First? \ud83e\udd14",
+      "bubble": "But if AI got better, shouldn't we just let it write all the code for us?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Human Guide, AI Refine \u2728",
+      "bubble": "Think of AI as a super-fast assistant. Humans give it the map, then let AI find the best...",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "Humans Still Key? \ud83d\udd11",
+      "bubble": "So, humans are still essential, even with advanced AI doing the heavy lifting?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Redefining Collaboration \ud83e\udd1d",
+      "bubble": "Exactly. It's about smart collaboration. Humans *guide* AI, leading to true peak innovation.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "excited",
+      "title": "Smarter AI Use \u2705",
+      "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts and insights!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Optimal AI use isn't about replacement, but strategic human guidance. We're teaching AI to learn better *through* us, not *for* us. That's the real smart move!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nEngineers found a surprising way to get MORE out of AI coding tools, and it's not what you think!\n\nHere's the mind-blowing reality:\n\ud83d\udd39 Advanced AI like Claude Code improved drastically over 6 months.\n\ud83d\udd39 BUT, the best teams got peak results by having humans *guide* the AI, not letting it code first.\n\ud83d\udd39 This redefines human-machine collaboration, making us smarter together!\n\n\ud83d\udcac Did you already know this approach, or does this change your view on AI's role? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #AI #TechFacts #Coding #HumanMachineCollaboration #Innovation"
+}
