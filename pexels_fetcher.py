@@ -1300,14 +1300,22 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
         screenshot_source = None
         
         if is_longform:
-            fact_num = chunk.get("fact_number")
+            fact_num = chunk.get("chapter_number") or chunk.get("fact_number")
             topics = script_data.get("longform_topics", [])
-            if isinstance(fact_num, int) and 1 <= fact_num <= len(topics):
-                topic = topics[fact_num - 1]
-                screenshot_path = topic.get("screenshot_path")
-                if screenshot_path and os.path.exists(screenshot_path):
-                    selected_screenshot = screenshot_path
-                    screenshot_source = f"Fact {fact_num} Article Screenshot"
+            if topics:
+                if len(topics) == 1:
+                    topic = topics[0]
+                    screenshot_path = topic.get("screenshot_path") or script_data.get("screenshot_path")
+                    if screenshot_path and os.path.exists(screenshot_path):
+                        selected_screenshot = screenshot_path
+                        screenshot_source = "Deep Dive Article Screenshot"
+                elif isinstance(fact_num, int):
+                    topic_idx = min(max(0, fact_num - 1), len(topics) - 1)
+                    topic = topics[topic_idx]
+                    screenshot_path = topic.get("screenshot_path")
+                    if screenshot_path and os.path.exists(screenshot_path):
+                        selected_screenshot = screenshot_path
+                        screenshot_source = f"Topic {topic_idx + 1} Article Screenshot"
             
             if not selected_screenshot:
                 main_screenshot = script_data.get("screenshot_path")
@@ -1489,7 +1497,7 @@ def fetch_all_chunk_visuals(chunks, topic_context="", script_data=None, is_longf
         total_chunks = len(chunks)
         
         if is_longform:
-            fact_num = chunk.get("fact_number")
+            fact_num = chunk.get("chapter_number") or chunk.get("fact_number") or 1
             
             # If the fact number changes, reset the offset
             if fact_num != current_fact:
@@ -1498,26 +1506,22 @@ def fetch_all_chunk_visuals(chunks, topic_context="", script_data=None, is_longf
             else:
                 fact_offset += 1
                 
-            # Determine mode within the current fact
+            # Determine mode within the current chapter/fact
             if fact_num == 0:  # Cold Open
-                if fact_offset == 0:
-                    v_mode = "nano_hook"
-                else:
-                    v_mode = "veo_concept" if fact_offset % 2 == 0 else "nano_concept"
+                v_mode = "nano_hook" if fact_offset == 0 else "nano_evidence"
             elif fact_num == "outro":
                 v_mode = "veo_cta"
             elif isinstance(fact_num, str) and "recap" in fact_num:
                 v_mode = "nano_concept"
             else:
-                # Standard fact structure
+                # Chapter structure: start with clear article screenshot for viewer to read
                 if fact_offset == 0:
-                    v_mode = "nano_hook"
+                    v_mode = "nano_evidence"  # Topic-aligned screenshot for reading
                 elif fact_offset == 1:
-                    v_mode = "nano_evidence"  # Show topic-aligned screenshot right after hook
+                    v_mode = "nano_concept"
                 elif i == total_chunks - 1:
                     v_mode = "veo_cta"
                 else:
-                    # Alternate between Veo video and Imagen image
                     v_mode = "veo_concept" if fact_offset % 2 == 0 else "nano_concept"
         else:
             # Shorts logic

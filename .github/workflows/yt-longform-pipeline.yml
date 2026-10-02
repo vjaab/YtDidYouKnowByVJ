@@ -175,7 +175,7 @@ jobs:
           ACTIVE_WORD_COLOR: "#FFFF00"
           CAPTION_Y_POS: "0.75"
           CAPTION_BG_ALPHA: "185"
-          BG_BLUR_RADIUS: "18"
+          BG_BLUR_RADIUS: "0"
           CAPTION_MAX_WORDS: "4"
           ENABLE_CONTEXT_EMOJIS: "1"
           ENABLE_KEN_BURNS: "1"

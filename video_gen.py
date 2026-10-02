@@ -1586,8 +1586,10 @@ def _gradient_clip(duration, height_pct=0.45, position="bottom", is_longform=Fal
         # Dual-directional gradient for vertical Shorts framing
         return _dual_directional_gradient_clip(duration)
     
-    # Fallback to original single-sided gradient for landscape long-form
-    h = int(FRAME_H * height_pct)
+    # In longform, keep gradient height compact (max 22%) so the scrolling text
+    # remains crisp, bright, and legible across the upper and middle 80% of the screen.
+    eff_height_pct = min(height_pct, 0.22)
+    h = int(FRAME_H * eff_height_pct)
     arr = np.zeros((h, FRAME_W, 3), dtype=np.uint8)
     if position == "top":
         mask_arr = np.array(
@@ -6209,103 +6211,11 @@ def _article_screenshot_clip(screenshot_path, duration):
 
 def _longform_article_screenshot_clips(script_json, audio_duration):
     """
-    For long-form videos: Maps the article screenshot of EACH topic/chapter to its
-    active time window. Displays a clean, high-resolution evidence card at the start of
-    each segment with subtle Ken Burns zoom and smooth crossfade.
+    In longform videos, full-screen scrolling screenshots and visual assets
+    are rendered directly in the synchronized background layer across the entire chapter
+    so the viewer can read the article/page throughout without static pop-ups or cuts.
     """
-    topics = script_json.get("longform_topics", [])
-    chapters = script_json.get("chapters", [])
-    fact_timestamps = script_json.get("fact_timestamps", [])
-    
-    segments = []
-    if chapters and len(chapters) > 0:
-        for i, ch in enumerate(chapters):
-            start_s = float(ch.get("approx_start_seconds", 0))
-            if i + 1 < len(chapters):
-                next_s = float(chapters[i + 1].get("approx_start_seconds", audio_duration))
-            else:
-                next_s = audio_duration
-            
-            topic_idx = min(i, len(topics) - 1) if topics else 0
-            ss_path = topics[topic_idx].get("screenshot_path") if topics else script_json.get("screenshot_path")
-            if not ss_path or not os.path.exists(ss_path):
-                ss_path = script_json.get("screenshot_path")
-                
-            if ss_path and os.path.exists(ss_path):
-                segments.append({
-                    "start": start_s,
-                    "end": next_s,
-                    "screenshot_path": ss_path,
-                    "label": ch.get("chapter_title", f"Chapter {i+1}")
-                })
-    elif fact_timestamps and len(fact_timestamps) > 0:
-        for i, ft in enumerate(fact_timestamps):
-            start_s = float(ft.get("approx_start_seconds", 0))
-            if i + 1 < len(fact_timestamps):
-                next_s = float(fact_timestamps[i + 1].get("approx_start_seconds", audio_duration))
-            else:
-                next_s = audio_duration
-            
-            topic_idx = min(i, len(topics) - 1) if topics else 0
-            ss_path = topics[topic_idx].get("screenshot_path") if topics else script_json.get("screenshot_path")
-            if not ss_path or not os.path.exists(ss_path):
-                ss_path = script_json.get("screenshot_path")
-                
-            if ss_path and os.path.exists(ss_path):
-                segments.append({
-                    "start": start_s,
-                    "end": next_s,
-                    "screenshot_path": ss_path,
-                    "label": ft.get("topic", f"Fact {i+1}")
-                })
-    else:
-        ss_path = script_json.get("screenshot_path")
-        if ss_path and os.path.exists(ss_path):
-            segments.append({
-                "start": 3.5,
-                "end": min(16.0, audio_duration - 2.0),
-                "screenshot_path": ss_path,
-                "label": "Evidence"
-            })
-            
-    if not segments:
-        print("⚠️ No valid segments or screenshots found for longform evidence clips.")
-        return []
-        
-    clips = []
-    for seg in segments:
-        ss_path = seg["screenshot_path"]
-        start_s = seg["start"]
-        seg_dur = seg["end"] - start_s
-        
-        # Show evidence card 2s after segment begins (allows chapter transition card to display first)
-        clip_start = start_s + 2.0 if start_s > 0 else 3.5
-        clip_dur = min(6.0, max(2.5, seg_dur - 2.5))
-        
-        if clip_start + clip_dur > audio_duration - 2.0:
-            clip_dur = max(1.5, audio_duration - 2.0 - clip_start)
-            
-        if clip_dur < 1.0 or clip_start >= audio_duration:
-            continue
-            
-        try:
-            raw_img = Image.open(ss_path)
-            canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H, apply_vignette=False)
-            canvas_arr = np.array(canvas_img.convert("RGB"))
-            
-            clip = ImageClip(canvas_arr).with_duration(clip_dur).with_start(clip_start)
-            # Subtle Ken Burns zoom (1.0 to 1.04) — preserves razor-sharp text clarity
-            clip = clip.resized(lambda t, cd=clip_dur: 1.0 + 0.04 * (t / cd))
-            clip = clip.with_effects([
-                vfx.CrossFadeIn(0.35),
-                vfx.CrossFadeOut(0.35)
-            ])
-            clips.append(clip)
-            print(f"   📸 Added clean evidence screenshot card for '{seg['label']}' from {clip_start:.1f}s to {clip_start + clip_dur:.1f}s")
-        except Exception as e:
-            print(f"⚠️ Error creating longform screenshot clip for {seg.get('label')}: {e}")
-            
-    return clips
+    return []
 
 
 def _longform_topic_transition_clips(script_json, audio_duration):
@@ -9051,410 +8961,156 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         print(f"DEBUG: is_longform={is_longform}, about to check if is_longform")
         crossfade = 0.4 if not is_longform else 0.6 # Longer crossfade for longform smoothness
         
-        # --- CI-LITE: Skip complex background rendering ---
-        if CI_LITE and is_longform:
-            print("🔧 CI-LITE: Using simplified static background for longform")
-            # Just use a single static background
-            vp = visual_paths[0]
-            # Define expanded_visual_paths for B-roll bursts later
-            expanded_visual_paths = visual_paths[:]
-            try:
-                if vp.endswith(".mp4"):
-                    c_clip = VideoFileClip(vp).without_audio()
-                    if c_clip.duration < audio_duration:
-                        c_clip = c_clip.with_effects([vfx.Loop(duration=audio_duration)])
-                    else:
-                        c_clip = c_clip.subclipped(0, audio_duration)
-                    w, h = c_clip.size
-                    target_w_crop = int(h * 16 / 9)
-                    if target_w_crop <= w:
-                        x1 = (w - target_w_crop) // 2
-                        c_clip = c_clip.cropped(x1=x1, y1=0, x2=x1 + target_w_crop, y2=h)
-                    else:
-                        target_h_crop = int(w * 9 / 16)
-                        y1 = (h - target_h_crop) // 2
-                        c_clip = c_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h_crop)
-                    c_clip = c_clip.resized((FRAME_W, FRAME_H))
+        # Define expanded_visual_paths for burst clips and B-roll later
+        expanded_visual_paths = visual_paths[:]
+
+        if is_longform:
+            print("🎬 LONGFORM: Building chunk-synchronized, full-clarity scrolling background clips...")
+            topics = script_json.get("longform_topics", [])
+            
+            # 1. Ensure every chunk has a valid visual path matching its chapter/topic
+            for idx, chunk in enumerate(chunks):
+                vp = chunk.get("visual_path")
+                if not vp or not os.path.exists(vp):
+                    ch_num = chunk.get("chapter_number") or chunk.get("fact_number") or 1
+                    fallback_vp = None
+                    if topics:
+                        t_idx = min(max(0, ch_num - 1), len(topics) - 1)
+                        t_ss = topics[t_idx].get("screenshot_path")
+                        if t_ss and os.path.exists(t_ss):
+                            fallback_vp = t_ss
+                    if not fallback_vp:
+                        main_ss = script_json.get("screenshot_path")
+                        if main_ss and os.path.exists(main_ss):
+                            fallback_vp = main_ss
+                    if not fallback_vp and visual_paths:
+                        fallback_vp = visual_paths[idx % len(visual_paths)]
+                    chunk["visual_path"] = fallback_vp
+
+            # 2. Group contiguous chunks sharing the same visual into continuous scrolling segments
+            visual_segments = []
+            current_seg = None
+            for chunk in chunks:
+                vp = chunk.get("visual_path")
+                s_t = float(chunk.get("start", 0))
+                e_t = float(chunk.get("end", 0))
+                if e_t <= s_t:
+                    continue
+                if current_seg and current_seg["visual_path"] == vp and abs(current_seg["end"] - s_t) < 0.6:
+                    current_seg["end"] = e_t
+                    current_seg["duration"] = current_seg["end"] - current_seg["start"]
                 else:
-                    raw_img = Image.open(vp).convert("RGB")
-                    bg_img = ImageOps.fit(raw_img, (FRAME_W, FRAME_H), Image.LANCZOS)
-                    bg_arr = np.array(bg_img)
-                    # Reduced blur (65% reduction from 71x71 to 25x25) so context remains visible
-                    bg_arr = cv2.GaussianBlur(bg_arr, (25, 25), 0)
-                    c_clip = ImageClip(bg_arr, duration=audio_duration)
-                bg_layer_clips.append(c_clip)
-            except Exception as e:
-                print(f"⚠️ CI-LITE background failed: {e}")
-                bg_layer_clips.append(ColorClip(size=(FRAME_W, FRAME_H), color=(10, 10, 15), duration=audio_duration))
-        
-        # --- LONGFORM 2.5s PACING PATTERN INTERRUPTS ---
-        elif is_longform:
-            print("DEBUG: Entering is_longform=True branch")
-            if os.environ.get("USE_LEGACY_LONGFORM_BG", "0") == "1":
-                clip_dur = 2.5 + crossfade
-                num_clips_needed = int(audio_duration // 2.5) + 1
-                expanded_visual_paths = []
-                while len(expanded_visual_paths) < num_clips_needed:
-                    expanded_visual_paths.extend(visual_paths)
-                expanded_visual_paths = expanded_visual_paths[:num_clips_needed]
-                
-                current_start = 0.0
-                clip_cache = {}
-                
-                for i, vp in enumerate(expanded_visual_paths):
+                    if current_seg:
+                        visual_segments.append(current_seg)
+                    current_seg = {
+                        "visual_path": vp,
+                        "start": s_t,
+                        "end": e_t,
+                        "duration": e_t - s_t,
+                        "chapter_title": chunk.get("chapter_title", "")
+                    }
+            if current_seg:
+                visual_segments.append(current_seg)
+
+            if visual_segments:
+                visual_segments[-1]["end"] = max(visual_segments[-1]["end"], audio_duration)
+                visual_segments[-1]["duration"] = visual_segments[-1]["end"] - visual_segments[-1]["start"]
+
+            # 3. Create high-resolution scrolling / panning clips
+            crossfade = 0.5
+            for s_idx, seg in enumerate(visual_segments):
+                vp = seg["visual_path"]
+                start_t = seg["start"]
+                base_dur = seg["duration"]
+                is_first = (s_idx == 0)
+                is_last = (s_idx == len(visual_segments) - 1)
+                clip_dur = base_dur + (crossfade if not is_last else 0.0)
+
+                if not vp or not os.path.exists(vp):
+                    c_clip = ColorClip(size=(FRAME_W, FRAME_H), color=(15, 15, 20), duration=clip_dur)
+                elif vp.endswith(".mp4"):
                     try:
-                        if vp.endswith(".mp4"):
-                            if vp in clip_cache:
-                                c_clip = clip_cache[vp].copy()
-                            else:
-                                c_clip = VideoFileClip(vp).without_audio()
-                                clip_cache[vp] = c_clip
-                            
-                            if c_clip.duration < clip_dur:
-                                c_clip = c_clip.with_effects([vfx.Loop(duration=clip_dur)])
-                            else:
-                                c_clip = c_clip.subclipped(0, clip_dur)
-                            
-                            # Standard Resize & Crop (adapts to 16:9 based on longform)
-                            w, h = c_clip.size
-                            # 16:9 landscape crop
-                            target_w_crop = int(h * 16 / 9)
-                            if target_w_crop <= w:
-                                x1 = (w - target_w_crop) // 2
-                                c_clip = c_clip.cropped(x1=x1, y1=0, x2=x1 + target_w_crop, y2=h)
-                            else:
-                                target_h_crop = int(w * 9 / 16)
-                                y1 = (h - target_h_crop) // 2
-                                c_clip = c_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h_crop)
-                            c_clip = c_clip.resized((FRAME_W, FRAME_H))
+                        c_clip = VideoFileClip(vp).without_audio()
+                        if c_clip.duration < clip_dur:
+                            c_clip = c_clip.with_effects([vfx.Loop(duration=clip_dur)])
                         else:
-                            if vp.endswith(".png"):
-                                if vp in clip_cache:
-                                    c_clip = clip_cache[vp].copy()
-                                else:
-                                    try:
-                                        raw_img = Image.open(vp)
-                                        canvas_img = _prepare_screenshot_canvas(raw_img, FRAME_W, FRAME_H, apply_vignette=False)
-                                        canvas_arr = np.array(canvas_img.convert("RGB"))
-                                        c_clip = ImageClip(canvas_arr)
-                                        clip_cache[vp] = c_clip
-                                    except Exception as e:
-                                        print(f"⚠️ Error preparing screenshot canvas in longform for {vp}: {e}")
-                                        c_clip = ImageClip(vp)
-                                        clip_cache[vp] = c_clip
-                                c_clip = c_clip.with_duration(clip_dur)
-                            else:
-                                if vp in clip_cache:
-                                    c_clip = clip_cache[vp].copy()
-                                else:
-                                    c_clip = ImageClip(vp)
-                                    clip_cache[vp] = c_clip
-                                c_clip = c_clip.with_duration(clip_dur)
-                                
-                                # Standard Resize & Crop (adapts to 16:9 based on longform)
-                                w, h = c_clip.size
-                                # 16:9 landscape crop
-                                target_w_crop = int(h * 16 / 9)
-                                if target_w_crop <= w:
-                                    x1 = (w - target_w_crop) // 2
-                                    c_clip = c_clip.cropped(x1=x1, y1=0, x2=x1 + target_w_crop, y2=h)
-                                else:
-                                    target_h_crop = int(w * 9 / 16)
-                                    y1 = (h - target_h_crop) // 2
-                                    c_clip = c_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h_crop)
-                                c_clip = c_clip.resized((FRAME_W, FRAME_H))
-                        
-                        if i > 0:
-                            retention_map = script_json.get("retention_map", {})
-                            if retention_map:
-                                trans_type = get_transition_type_for_chunk(i, retention_map, len(expanded_visual_paths))
-                                if trans_type == "flash_cut": trans_type = "glitch"
-                                elif trans_type == "zoom_punch": trans_type = "zoom"
-                                elif trans_type == "whip_pan": trans_type = random.choice(["slide_r", "slide_l"])
-                                else: trans_type = random.choice(["zoom", "slide_r", "slide_l", "slide_t", "glitch"])
-                            else:
-                                trans_type = random.choice(["zoom", "slide_r", "slide_l", "slide_t", "glitch"])
-                            
-                            if trans_type == "zoom":
-                                c_clip = c_clip.with_effects([vfx.CrossFadeIn(crossfade)])
-                                c_clip = c_clip.resized(lambda t: 1.3 - (0.3 * min(1, t / crossfade)) if t < crossfade else 1.0)
-                            elif "slide" in trans_type:
-                                c_clip = c_clip.with_effects([vfx.CrossFadeIn(crossfade * 0.5)])
-                                def slide_pos(t):
-                                    if t > crossfade: return ("center", "center")
-                                    prog = t / crossfade
-                                    prog = 1 - (1 - prog)**3 
-                                    if trans_type == "slide_r": return (int(FRAME_W * (1 - prog)), "center")
-                                    if trans_type == "slide_l": return (int(-FRAME_W * (1 - prog)), "center")
-                                    if trans_type == "slide_t": return ("center", int(-FRAME_H * (1 - prog)))
-                                    return ("center", "center")
-                                c_clip = c_clip.with_position(slide_pos)
-                            elif trans_type == "glitch":
-                                c_clip = c_clip.with_effects([vfx.CrossFadeIn(0.1)])
-                                trans_clip = _create_transition_clip("glitch", duration=0.15)
-                                if trans_clip:
-                                    trans_clip = trans_clip.with_start(current_start)
-                                    logo_clips.append(trans_clip)
-
-                            flash = ColorClip(size=(FRAME_W, FRAME_H), color=(255, 255, 255), duration=0.2).with_opacity(0.6)
-                            flash = flash.with_start(current_start).with_effects([vfx.CrossFadeOut(0.15)])
-                            logo_clips.append(flash)
-
-                        scale_factor = 1.0 + random.uniform(0.18, 0.25)
-                        c_clip = c_clip.resized(lambda t, sf=scale_factor, cd=clip_dur: 1.0 + (sf - 1.0) * (t / cd))
-                        c_clip = _apply_handheld_shake(c_clip)
-                        
-                        is_warm = (i % 2 == 0)
-                        def tint_frame(frame, is_w=is_warm):
-                            frame_f = frame.astype(np.float32)
-                            if is_w:
-                                frame_f[:, :, 0] = np.clip(frame_f[:, :, 0] * 1.04 + 3, 0, 255)
-                                frame_f[:, :, 1] = np.clip(frame_f[:, :, 1] * 1.01, 0, 255)
-                                frame_f[:, :, 2] = np.clip(frame_f[:, :, 2] * 0.96 - 3, 0, 255)
-                            else:
-                                frame_f[:, :, 0] = np.clip(frame_f[:, :, 0] * 0.96 - 3, 0, 255)
-                                frame_f[:, :, 1] = np.clip(frame_f[:, :, 1] * 1.01, 0, 255)
-                                frame_f[:, :, 2] = np.clip(frame_f[:, :, 2] * 1.04 + 3, 0, 255)
-                            return frame_f.astype(np.uint8)
-                        c_clip = c_clip.image_transform(tint_frame)
-                        
-                        c_clip = c_clip.with_start(current_start)
-                        bg_layer_clips.append(c_clip)
-                        current_start += (clip_dur - crossfade)
-                    except Exception as e:
-                        print(f"Failed to load background img {vp}: {e}")
-            else:
-                from collections import OrderedDict
-                import psutil
-                
-                clip_dur = 2.5 + crossfade
-                num_clips_needed = int(audio_duration // 2.5) + 1
-                expanded_visual_paths = []
-                while len(expanded_visual_paths) < num_clips_needed:
-                    expanded_visual_paths.extend(visual_paths)
-                expanded_visual_paths = expanded_visual_paths[:num_clips_needed]
-                
-                # Headroom canvas dimensions (1.05x zoom padding)
-                CANVAS_W = int(FRAME_W * 1.05)
-                CANVAS_H = int(FRAME_H * 1.05)
-                
-                def tint_numpy(arr, is_w):
-                    frame_f = arr.astype(np.float32)
-                    if is_w:
-                        frame_f[:, :, 0] = np.clip(frame_f[:, :, 0] * 1.04 + 3, 0, 255)
-                        frame_f[:, :, 1] = np.clip(frame_f[:, :, 1] * 1.01, 0, 255)
-                        frame_f[:, :, 2] = np.clip(frame_f[:, :, 2] * 0.96 - 3, 0, 255)
-                    else:
-                        frame_f[:, :, 0] = np.clip(frame_f[:, :, 0] * 0.96 - 3, 0, 255)
-                        frame_f[:, :, 1] = np.clip(frame_f[:, :, 1] * 1.01, 0, 255)
-                        frame_f[:, :, 2] = np.clip(frame_f[:, :, 2] * 1.04 + 3, 0, 255)
-                    return frame_f.astype(np.uint8)
-
-                # OrderedDict LRU cache (capacity 4)
-                # Cache holds post-crop, post-resized assets at CANVAS size:
-                # - np.ndarray (for images)
-                # - VideoFileClip (for videos)
-                clip_cache = OrderedDict()
-                CACHE_CAPACITY = 4
-                
-                def get_processed_asset(vp, is_warm):
-                    cache_key = (vp, is_warm)
-                    if cache_key in clip_cache:
-                        clip_cache.move_to_end(cache_key)
-                        return clip_cache[cache_key]
-                        
-                    if len(clip_cache) >= CACHE_CAPACITY:
-                        evict_key, evict_val = clip_cache.popitem(last=False)
-                        if isinstance(evict_val, VideoFileClip):
-                            try:
-                                evict_val.close()
-                            except Exception as ex:
-                                print(f"⚠️ Error closing evicted VideoFileClip: {ex}")
-                        del evict_val
-                        
-                    if vp.endswith(".mp4"):
-                        v_clip = VideoFileClip(vp).without_audio()
-                        w, h = v_clip.size
+                            c_clip = c_clip.subclipped(0, clip_dur)
+                        w, h = c_clip.size
                         target_w_crop = int(h * 16 / 9)
                         if target_w_crop <= w:
                             x1 = (w - target_w_crop) // 2
-                            v_clip = v_clip.cropped(x1=x1, y1=0, x2=x1 + target_w_crop, y2=h)
+                            c_clip = c_clip.cropped(x1=x1, y1=0, x2=x1 + target_w_crop, y2=h)
                         else:
                             target_h_crop = int(w * 9 / 16)
                             y1 = (h - target_h_crop) // 2
-                            v_clip = v_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h_crop)
-                        v_clip = v_clip.resized((CANVAS_W, CANVAS_H))
-                        clip_cache[cache_key] = v_clip
-                        return v_clip
-                    else:
-                        raw_img = Image.open(vp)
-                        if "screenshot" in os.path.basename(vp).lower():
-                            canvas_img = _prepare_screenshot_canvas(raw_img, CANVAS_W, CANVAS_H, apply_vignette=False)
-                            canvas_arr = np.array(canvas_img.convert("RGB"))
-                            clip_cache[cache_key] = canvas_arr
-                            return canvas_arr
-                        else:
-                            w, h = raw_img.size
-                            target_w_crop = int(h * 16 / 9)
-                            if target_w_crop <= w:
-                                x1 = (w - target_w_crop) // 2
-                                canvas_img = raw_img.crop((x1, 0, x1 + target_w_crop, h))
-                            else:
-                                target_h_crop = int(w * 9 / 16)
-                                y1 = (h - target_h_crop) // 2
-                                canvas_img = raw_img.crop((0, y1, w, y1 + target_h_crop))
-                            canvas_img = canvas_img.resize((CANVAS_W, CANVAS_H))
-                            
-                            canvas_arr = np.array(canvas_img.convert("RGB"))
-                            tinted_arr = tint_numpy(canvas_arr, is_warm)
-                            clip_cache[cache_key] = tinted_arr
-                            return tinted_arr
-                
-                # Pre-calculate shake offsets curves (150 frames max)
-                shake_offsets = []
-                for f in range(150):
-                    t = f / 30.0
-                    off_x = math.sin(t * 1.5) * 2 + math.cos(t * 0.8) * 1.5
-                    off_y = math.cos(t * 1.2) * 2 + math.sin(t * 0.9) * 1.5
-                    shake_offsets.append((int(off_x), int(off_y)))
+                            c_clip = c_clip.cropped(x1=0, y1=y1, x2=w, y2=y1 + target_h_crop)
+                        c_clip = c_clip.resized((FRAME_W, FRAME_H))
+                    except Exception as ex:
+                        print(f"⚠️ Error loading longform video clip {vp}: {ex}")
+                        c_clip = ColorClip(size=(FRAME_W, FRAME_H), color=(15, 15, 20), duration=clip_dur)
+                else:
+                    try:
+                        raw_img = Image.open(vp).convert("RGB")
+                        iw, ih = raw_img.size
+                        target_w, target_h = FRAME_W, FRAME_H
+                        target_aspect = target_w / target_h
 
-                # Pre-calculate starts, scale factors, and transition types
-                seg_starts = []
-                seg_scale_factors = []
-                seg_trans_types = []
-                
-                current_start = 0.0
-                for i, vp in enumerate(expanded_visual_paths):
-                    seg_starts.append(current_start)
-                    seg_scale_factors.append(1.0 + random.uniform(0.18, 0.25))
-                    
-                    if i > 0:
-                        retention_map = script_json.get("retention_map", {})
-                        if retention_map:
-                            trans_type = get_transition_type_for_chunk(i, retention_map, len(expanded_visual_paths))
-                            if trans_type == "flash_cut": trans_type = "glitch"
-                            elif trans_type == "zoom_punch": trans_type = "zoom"
-                            elif trans_type == "whip_pan": trans_type = random.choice(["slide_r", "slide_l"])
-                            else: trans_type = random.choice(["zoom", "slide_r", "slide_l", "slide_t", "glitch"])
-                        else:
-                            trans_type = random.choice(["zoom", "slide_r", "slide_l", "slide_t", "glitch"])
-                        seg_trans_types.append(trans_type)
-                        
-                        if trans_type == "glitch":
-                            trans_clip = _create_transition_clip("glitch", duration=0.15)
-                            if trans_clip:
-                                trans_clip = trans_clip.with_start(current_start)
-                                logo_clips.append(trans_clip)
+                        # Check if tall image (e.g. article screenshot, README, document)
+                        if ih > int(iw / target_aspect * 1.02):
+                            # Scale to full 1080p width (1920)
+                            scaled_w = target_w
+                            scaled_h = int(ih * (target_w / iw))
+                            scaled_img = raw_img.resize((scaled_w, scaled_h), Image.LANCZOS)
+                            scaled_arr = np.array(scaled_img)
+                            max_scroll_y = max(0, scaled_h - target_h)
 
-                        flash = ColorClip(size=(FRAME_W, FRAME_H), color=(255, 255, 255), duration=0.2).with_opacity(0.6)
-                        flash = flash.with_start(current_start).with_effects([vfx.CrossFadeOut(0.15)])
-                        logo_clips.append(flash)
-                    else:
-                        seg_trans_types.append(None)
-                        
-                    current_start += (clip_dur - crossfade)
+                            def make_scroll_frame(t, arr=scaled_arr, max_y=max_scroll_y, cd=clip_dur):
+                                prog = min(1.0, max(0.0, t / max(cd, 0.01)))
+                                # Smooth reading scroll from top to bottom
+                                y_off = int(prog * max_y)
+                                return arr[y_off : y_off + target_h, 0 : target_w]
 
-                process = psutil.Process(os.getpid())
-                frame_counter = [0]
-                
-                def make_bg_frame(t):
-                    frame_counter[0] += 1
-                    if frame_counter[0] % 300 == 0:
-                        rss = process.memory_info().rss / (1024 * 1024)
-                        print(f"🎬 [BG RENDER] Frame {frame_counter[0]} | Video time: {t:.2f}s | Memory RSS: {rss:.2f} MB")
-                        
-                    seg_idx = int(t // 2.5)
-                    t_rel = t % 2.5
-                    
-                    if seg_idx >= len(expanded_visual_paths):
-                        seg_idx = len(expanded_visual_paths) - 1
-                        
-                    vp = expanded_visual_paths[seg_idx]
-                    is_warm = (seg_idx % 2 == 0)
-                    
-                    # 1. Fetch current frame
-                    asset = get_processed_asset(vp, is_warm)
-                    if isinstance(asset, np.ndarray):
-                        curr_canvas = asset
-                    else:
-                        t_v = min(t_rel, asset.duration - 0.01)
-                        raw_frame = asset.get_frame(t_v)
-                        curr_canvas = tint_numpy(raw_frame, is_warm)
-                        
-                    # 2. Zoom & Shake with Headroom
-                    sf = seg_scale_factors[seg_idx]
-                    scale = 1.0 + (sf - 1.0) * (t_rel / clip_dur)
-                    
-                    trans_type = seg_trans_types[seg_idx]
-                    if trans_type == "zoom" and t_rel < crossfade:
-                        scale *= (1.3 - (0.3 * (t_rel / crossfade)))
-                        
-                    crop_w, crop_h = int(CANVAS_W / scale), int(CANVAS_H / scale)
-                    dx, dy = (CANVAS_W - crop_w) // 2, (CANVAS_H - crop_h) // 2
-                    frame = cv2.resize(curr_canvas[dy:dy+crop_h, dx:dx+crop_w], (CANVAS_W, CANVAS_H))
-                    
-                    # Translation via warpAffine
-                    frame_idx = min(149, int(t_rel * 30.0))
-                    off_x, off_y = shake_offsets[frame_idx]
-                    if off_x != 0 or off_y != 0:
-                        T = np.float32([[1, 0, off_x], [0, 1, off_y]])
-                        frame = cv2.warpAffine(frame, T, (CANVAS_W, CANVAS_H), borderMode=cv2.BORDER_REPLICATE)
-                        
-                    # 3. Handle transition boundaries
-                    if seg_idx > 0 and t_rel < crossfade:
-                        prev_vp = expanded_visual_paths[seg_idx - 1]
-                        prev_is_warm = ((seg_idx - 1) % 2 == 0)
-                        prev_asset = get_processed_asset(prev_vp, prev_is_warm)
-                        
-                        if isinstance(prev_asset, np.ndarray):
-                            prev_canvas = prev_asset
+                            c_clip = VideoClip(make_scroll_frame, duration=clip_dur)
+                        elif iw > int(ih * target_aspect * 1.02):
+                            # Wide image: pan horizontally
+                            scaled_h = target_h
+                            scaled_w = int(iw * (target_h / ih))
+                            scaled_img = raw_img.resize((scaled_w, scaled_h), Image.LANCZOS)
+                            scaled_arr = np.array(scaled_img)
+                            max_scroll_x = max(0, scaled_w - target_w)
+
+                            def make_pan_frame(t, arr=scaled_arr, max_x=max_scroll_x, cd=clip_dur):
+                                prog = min(1.0, max(0.0, t / max(cd, 0.01)))
+                                x_off = int(prog * max_x)
+                                return arr[0 : target_h, x_off : x_off + target_w]
+
+                            c_clip = VideoClip(make_pan_frame, duration=clip_dur)
                         else:
-                            t_prev_rel = 2.5 + t_rel
-                            t_v = min(t_prev_rel, prev_asset.duration - 0.01)
-                            raw_frame = prev_asset.get_frame(t_v)
-                            prev_canvas = tint_numpy(raw_frame, prev_is_warm)
-                            
-                        prev_sf = seg_scale_factors[seg_idx - 1]
-                        prev_scale = 1.0 + (prev_sf - 1.0) * ((2.5 + t_rel) / clip_dur)
-                        
-                        pcw, pch = int(CANVAS_W / prev_scale), int(CANVAS_H / prev_scale)
-                        pdx, pdy = (CANVAS_W - pcw) // 2, (CANVAS_H - pch) // 2
-                        prev_frame = cv2.resize(prev_canvas[pdy:pdy+pch, pdx:pdx+pcw], (CANVAS_W, CANVAS_H))
-                        
-                        po_x, po_y = shake_offsets[min(149, int((2.5 + t_rel) * 30.0))]
-                        if po_x != 0 or po_y != 0:
-                            T_p = np.float32([[1, 0, po_x], [0, 1, po_y]])
-                            prev_frame = cv2.warpAffine(prev_frame, T_p, (CANVAS_W, CANVAS_H), borderMode=cv2.BORDER_REPLICATE)
-                            
-                        if trans_type and "slide" in trans_type:
-                            prog = t_rel / crossfade
-                            prog = 1 - (1 - prog)**3
-                            combined = prev_frame.copy()
-                            if trans_type == "slide_r":
-                                x = int(CANVAS_W * (1 - prog))
-                                combined[:, x:] = frame[:, :CANVAS_W-x]
-                            elif trans_type == "slide_l":
-                                x = int(CANVAS_W * (1 - prog))
-                                combined[:, :CANVAS_W-x] = frame[:, x:]
-                            elif trans_type == "slide_t":
-                                y = int(CANVAS_H * (1 - prog))
-                                combined[:CANVAS_H-y, :] = frame[y:, :]
-                            frame = combined
-                        else:
-                            cf_dur = 0.1 if trans_type == "glitch" else crossfade
-                            if t_rel < cf_dur:
-                                alpha = t_rel / cf_dur
-                                frame = cv2.addWeighted(frame, alpha, prev_frame, 1.0 - alpha, 0)
-                                
-                    # 4. Final crop to production dimensions
-                    margin_x = (CANVAS_W - FRAME_W) // 2
-                    margin_y = (CANVAS_H - FRAME_H) // 2
-                    return frame[margin_y:margin_y+FRAME_H, margin_x:margin_x+FRAME_W]
-                    
-                bg_clip = VideoClip(make_bg_frame, duration=audio_duration)
-                bg_layer_clips.append(bg_clip)
-                # Reclaim any garbage from the asset processing phase
-                gc.collect()
+                            # Approximately 16:9: subtle downward drift to avoid static appearance
+                            scaled_w = int(target_w * 1.08)
+                            scaled_h = int(target_h * 1.08)
+                            scaled_img = raw_img.resize((scaled_w, scaled_h), Image.LANCZOS)
+                            scaled_arr = np.array(scaled_img)
+                            max_scroll_y = scaled_h - target_h
+                            max_scroll_x = scaled_w - target_w
+
+                            def make_drift_frame(t, arr=scaled_arr, max_y=max_scroll_y, max_x=max_scroll_x, cd=clip_dur):
+                                prog = min(1.0, max(0.0, t / max(cd, 0.01)))
+                                y_off = int(prog * max_y)
+                                x_off = int((1.0 - prog) * (max_x // 2))
+                                return arr[y_off : y_off + target_h, x_off : x_off + target_w]
+
+                            c_clip = VideoClip(make_drift_frame, duration=clip_dur)
+                    except Exception as ex:
+                        print(f"⚠️ Error creating longform scrolling image clip {vp}: {ex}")
+                        c_clip = ColorClip(size=(FRAME_W, FRAME_H), color=(15, 15, 20), duration=clip_dur)
+
+                if not is_first:
+                    c_clip = c_clip.with_effects([vfx.CrossFadeIn(crossfade)])
+                c_clip = c_clip.with_start(start_t)
+                bg_layer_clips.append(c_clip)
+            
+            print(f"✅ Created {len(bg_layer_clips)} synchronized longform scrolling background clips.")
         else:
             print("DEBUG: Entering is_longform=False (SHORTS) branch")
             # --- SHORTS PACING SYNCHRONIZED TO CHUNKS ---

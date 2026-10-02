@@ -446,10 +446,30 @@ def capture_article_screenshot(url, output_filename, desktop=False, headline=Non
             except Exception as clean_err:
                 print(f"⚠️ Failed to execute page cleanup/framing: {clean_err}")
                 
-            page.screenshot(path=output_path)
+            if desktop:
+                try:
+                    page.screenshot(path=output_path, full_page=True)
+                except Exception as ss_err:
+                    print(f"⚠️ full_page screenshot failed, trying viewport: {ss_err}")
+                    page.screenshot(path=output_path)
+            else:
+                page.screenshot(path=output_path)
             browser.close()
             
         if os.path.exists(output_path):
+            if desktop:
+                try:
+                    from PIL import Image
+                    im = Image.open(output_path)
+                    # Limit maximum height to 4500px so it contains the core article/README
+                    # without endless comment sections or footer bloat
+                    if im.height > 4500:
+                        im = im.crop((0, 0, im.width, 4500))
+                        im.save(output_path, "PNG")
+                        print(f"✂️ Clamped tall screenshot to 4500px height (original {im.height}px)")
+                except Exception as crop_err:
+                    print(f"⚠️ Screenshot clamp warning: {crop_err}")
+
             if check_screenshot_validity(output_path):
                 print(f"✅ High-clarity screenshot saved: {output_path}")
                 return output_path
@@ -512,13 +532,20 @@ def capture_github_readme(repo_url, output_filename, desktop=False, headline=Non
 def capture_github_readme_with_fallback(repo_url, output_filename, desktop=False, headline=None):
     """
     Captures GitHub README with branch fallback (main -> master).
+    Tries the direct repo URL first (which renders README automatically on GitHub).
     """
-    # Try main branch first
+    # 1. Try direct repo URL first (renders full repo landing page with README)
+    print(f"📸 Capturing GitHub repo directly: {repo_url} -> {output_filename}")
+    result = capture_article_screenshot(repo_url, output_filename, desktop=desktop, headline=headline)
+    if result:
+        return result
+
+    # 2. Try main branch first
     result = capture_github_readme(repo_url, output_filename, desktop=desktop, headline=headline, branch="main")
     if result:
         return result
     
-    # Fallback to master branch
+    # 3. Fallback to master branch
     print(f"🔄 README not found on 'main' branch, trying 'master'...")
     result = capture_github_readme(repo_url, output_filename, desktop=desktop, headline=headline, branch="master")
     return result
