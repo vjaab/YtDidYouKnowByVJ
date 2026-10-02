@@ -70,21 +70,11 @@
     "GPS Needs Einstein's Time Secrets",
     "Medium (programming): I Used Claude Code Every Day for 6 Months. I Fin",
     "Medium (programming): LangChain4j Already Solved Java Agents. So Why D",
-    "Medium (programming): AI Generated 40 Pull Requests in a Week. Our Rev"
+    "Medium (programming): AI Generated 40 Pull Requests in a Week. Our Rev",
+    "AI's Hidden Thirst",
+    "Medium (programming): Building a Triple-RTX Workstation: How Far Shoul"
   ],
   "used_keywords": [
-    "gps",
-    "einstein",
-    "relativity",
-    "time dilation",
-    "satellites",
-    "did you know",
-    "computer bug",
-    "grace hopper",
-    "harvard mark ii",
-    "tech history",
-    "did you know",
-    "airplane wifi",
     "satellite",
     "aviation tech",
     "phased array",
@@ -272,7 +262,19 @@
     "programming",
     "generated",
     "pull",
-    "requests"
+    "requests",
+    "AI",
+    "water consumption",
+    "data centers",
+    "energy use",
+    "did you know",
+    "did you know",
+    "tech trending",
+    "medium",
+    "programming",
+    "building",
+    "triple",
+    "workstation"
   ],
   "history": [
     {
@@ -1296,6 +1298,34 @@
       ],
       "source": "Medium - programming",
       "timestamp": "2026-10-02T13:06:31.254456+00:00"
+    },
+    {
+      "title": "AI's Hidden Thirst",
+      "news_source_url": "",
+      "keywords": [
+        "AI",
+        "water consumption",
+        "data centers",
+        "energy use",
+        "did you know"
+      ],
+      "source": "University of California, Riverside and Google's 2023 Environmental Report have highlighted these significant water demands.",
+      "timestamp": "2026-10-02T16:13:22.397237+00:00"
+    },
+    {
+      "title": "Medium (programming): Building a Triple-RTX Workstation: How Far Shoul",
+      "news_source_url": "https://tinkerd.medium.com/building-a-triple-rtx-workstation-how-far-should-local-ai-go-a67fa1aceaa5?source=rss------programming-5",
+      "keywords": [
+        "did you know",
+        "tech trending",
+        "medium",
+        "programming",
+        "building",
+        "triple",
+        "workstation"
+      ],
+      "source": "Medium - programming",
+      "timestamp": "2026-10-02T16:13:51.947573+00:00"
     }
   ]
 }
