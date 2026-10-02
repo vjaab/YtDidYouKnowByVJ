@@ -24,6 +24,19 @@ on:
           - cartoon_dialogue
           - code_editor
         default: cartoon_dialogue
+      theme:
+        description: 'Carousel visual theme'
+        required: false
+        type: choice
+        options:
+          - auto
+          - neon_cyber
+          - cyber_matrix
+          - tech_blueprint
+          - amber_solaris
+          - synthwave_plum
+          - swiss_minimal
+        default: auto
       mode:
         description: 'Content mode'
         required: false
@@ -124,6 +137,7 @@ jobs:
           python -u generate_decorator_images.py --now \
             --topic "${{ github.event.inputs.topic || '' }}" \
             --style "${{ github.event.inputs.style || 'cartoon_dialogue' }}" \
+            --theme "${{ github.event.inputs.theme || 'auto' }}" \
             --mode "${{ github.event.inputs.mode || 'did_you_know' }}" \
             --hashtags-file hashtags.txt \
             --platform facebook
@@ -141,6 +155,7 @@ jobs:
             --topic "${{ steps.gen.outputs.topic }}" \
             --hashtags-file hashtags.txt \
             --style "${{ github.event.inputs.style || 'cartoon_dialogue' }}" \
+            --theme "${{ github.event.inputs.theme || 'auto' }}" \
             --mode "${{ github.event.inputs.mode || 'did_you_know' }}"
 
       - name: Send to Telegram for Approval

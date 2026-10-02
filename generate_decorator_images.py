@@ -256,6 +256,7 @@ def main():
     parser.add_argument("--topic", type=str, help="Specific topic to generate")
     parser.add_argument("--hashtags-file", type=str, help="Path to hashtags file")
     parser.add_argument("--style", choices=["cartoon_dialogue", "code_editor"], default="cartoon_dialogue", help="Carousel visual style")
+    parser.add_argument("--theme", choices=["auto", "neon_cyber", "cyber_matrix", "tech_blueprint", "amber_solaris", "synthwave_plum", "swiss_minimal"], default="auto", help="Carousel visual color theme")
     parser.add_argument("--mode", choices=["auto", "concept", "news", "did_you_know"], default="did_you_know", help="Content mode: did_you_know, concept, news, auto")
     parser.add_argument("--ai-backgrounds", action="store_true", help="Optionally generate AI backgrounds per slide")
     parser.add_argument("--platform", choices=["both", "instagram", "facebook", "threads"], default="both", help="Target platform(s)")
@@ -364,14 +365,32 @@ def main():
                     bg_images = None
 
             # Render Instagram 4:5 slides
-            print(f"🎨 Rendering {len(dialogue.get('slides', []))} slides for Instagram (4:5)...")
-            ig_paths = render_cartoon_dialogue_carousel(dialogue, output_dir, canvas_width=INSTAGRAM_W, canvas_height=INSTAGRAM_H, prefix="carousel_", bg_images=bg_images)
+            print(f"🎨 Rendering {len(dialogue.get('slides', []))} slides for {args.platform.capitalize()} (4:5)...")
+            ig_paths = render_cartoon_dialogue_carousel(
+                dialogue,
+                output_dir,
+                canvas_width=INSTAGRAM_W,
+                canvas_height=INSTAGRAM_H,
+                prefix="carousel_",
+                bg_images=bg_images,
+                theme=args.theme,
+                platform=args.platform,
+            )
 
             # Render Facebook 9:16 format if needed
             fb_paths = []
             if args.platform in ["both", "facebook"]:
                 print(f"📘 Rendering Facebook 9:16 stories...")
-                fb_paths = render_cartoon_dialogue_carousel(dialogue, output_dir, canvas_width=FACEBOOK_STORY_W, canvas_height=FACEBOOK_STORY_H, prefix="facebook_", bg_images=bg_images)
+                fb_paths = render_cartoon_dialogue_carousel(
+                    dialogue,
+                    output_dir,
+                    canvas_width=FACEBOOK_STORY_W,
+                    canvas_height=FACEBOOK_STORY_H,
+                    prefix="facebook_",
+                    bg_images=bg_images,
+                    theme=args.theme,
+                    platform=args.platform,
+                )
 
             # Caption with platform-specific engagement CTAs
             caption = dialogue.get("caption", "")

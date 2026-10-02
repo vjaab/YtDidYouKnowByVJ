@@ -292,6 +292,7 @@ def regenerate_and_verify_carousel(
     platform: str,
     style: str = "cartoon_dialogue",
     mode: str = "did_you_know",
+    theme: str = "auto",
     hashtags_file: str = "",
     max_attempts: int = 4
 ) -> Tuple[bool, dict, List[Path], List[Path], Path, Path]:
@@ -317,8 +318,8 @@ def regenerate_and_verify_carousel(
     for attempt in range(1, max_attempts + 1):
         print(f"\n🔄 [Content Accuracy Agent] Generation & Verification Loop: Attempt {attempt}/{max_attempts}...")
 
-        # 1. Pick a brand-new, unique DYK fact
-        story = fetch_or_select_did_you_know_fact(topic="")
+        # 1. Pick a brand-new, unique DYK fact with platform awareness
+        story = fetch_or_select_did_you_know_fact(topic="", platform=platform)
         topic = story.get("title", "Fascinating Tech Fact")
 
         # Double check uniqueness against history
@@ -365,16 +366,28 @@ def regenerate_and_verify_carousel(
         with open(carousel_path, "w", encoding="utf-8") as f:
             json.dump(dialogue, f, indent=2)
 
-        print(f"🎨 Rendering verified carousel slides for Instagram / Threads (4:5)...")
+        print(f"🎨 Rendering verified carousel slides for {platform.capitalize()} (4:5)...")
         ig_paths = render_cartoon_dialogue_carousel(
-            dialogue, output_dir, canvas_width=INSTAGRAM_W, canvas_height=INSTAGRAM_H, prefix="carousel_"
+            dialogue,
+            output_dir,
+            canvas_width=INSTAGRAM_W,
+            canvas_height=INSTAGRAM_H,
+            prefix="carousel_",
+            theme=theme,
+            platform=platform,
         )
 
         fb_paths = []
         if platform in ["both", "facebook"]:
             print(f"📘 Rendering verified Facebook 9:16 carousel stories...")
             fb_paths = render_cartoon_dialogue_carousel(
-                dialogue, output_dir, canvas_width=FACEBOOK_STORY_W, canvas_height=FACEBOOK_STORY_H, prefix="facebook_"
+                dialogue,
+                output_dir,
+                canvas_width=FACEBOOK_STORY_W,
+                canvas_height=FACEBOOK_STORY_H,
+                prefix="facebook_",
+                theme=theme,
+                platform=platform,
             )
 
         caption_path = output_dir / f"caption_{safe_title}.txt"
@@ -398,6 +411,7 @@ def main():
     parser.add_argument("--topic", type=str, default="", help="Topic of the carousel")
     parser.add_argument("--hashtags-file", type=str, default="", help="Path to hashtags file")
     parser.add_argument("--style", default="cartoon_dialogue")
+    parser.add_argument("--theme", default="auto")
     parser.add_argument("--mode", default="did_you_know")
     args = parser.parse_args()
 
@@ -448,6 +462,7 @@ def main():
             platform=args.platform,
             style=args.style,
             mode=args.mode,
+            theme=args.theme,
             hashtags_file=args.hashtags_file,
             max_attempts=4
         )

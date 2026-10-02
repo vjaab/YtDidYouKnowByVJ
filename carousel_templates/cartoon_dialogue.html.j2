@@ -18,16 +18,20 @@
     :root {
       --canvas-w: {{ canvas_width|default(1080) }}px;
       --canvas-h: {{ canvas_height|default(1350) }}px;
-      --color-byte-primary: #00F2FE;
-      --color-byte-glow: rgba(0, 242, 254, 0.35);
-      --color-vj-primary: #38BDF8;
-      --color-vj-glow: rgba(56, 189, 248, 0.38);
-      --color-asha-primary: #38BDF8;
-      --color-asha-glow: rgba(56, 189, 248, 0.38);
-      --color-bg-dark: #0B0F19;
-      --color-card-bg: rgba(16, 24, 44, 0.88);
+      --color-byte-primary: {{ theme.accent_primary|default('#00F2FE') }};
+      --color-byte-glow: {{ theme.accent_glow|default('rgba(0, 242, 254, 0.35)') }};
+      --color-vj-primary: {{ theme.accent_secondary|default('#38BDF8') }};
+      --color-vj-glow: {{ theme.accent_glow|default('rgba(56, 189, 248, 0.38)') }};
+      --color-asha-primary: {{ theme.accent_secondary|default('#38BDF8') }};
+      --color-asha-glow: {{ theme.accent_glow|default('rgba(56, 189, 248, 0.38)') }};
+      --color-bg-dark: {{ theme.bg_dark|default('#0B0F19') }};
+      --color-card-bg: {{ theme.card_bg|default('rgba(16, 24, 44, 0.90)') }};
       --color-text-main: #FFFFFF;
       --color-text-sub: #94A3B8;
+      --color-accent-tag-bg: {{ theme.accent_tag_bg|default('linear-gradient(135deg, #00F2FE 0%, #0077FE 100%)') }};
+      --color-accent-tag-color: {{ theme.accent_tag_color|default('#031427') }};
+      --color-secondary-tag-bg: {{ theme.secondary_tag_bg|default('linear-gradient(135deg, #38BDF8 0%, #0284C7 100%)') }};
+      --color-secondary-tag-color: {{ theme.secondary_tag_color|default('#031427') }};
     }
 
     body {
@@ -49,7 +53,7 @@
       flex-direction: column;
       justify-content: space-between;
       padding: 56px 60px 48px 60px;
-      background: radial-gradient(circle at 50% 0%, #172554 0%, #0B0F19 60%, #030712 100%);
+      background: {{ theme.bg_gradient|default('radial-gradient(circle at 50% 0%, #172554 0%, #0B0F19 60%, #030712 100%)') }};
       overflow: hidden;
     }
 
@@ -78,7 +82,7 @@
       transform: translateX(-50%);
       width: 900px;
       height: 500px;
-      background: radial-gradient(circle, rgba(56, 189, 248, 0.18) 0%, rgba(168, 85, 247, 0.12) 50%, transparent 75%);
+      background: {{ theme.mesh_glow|default('radial-gradient(circle, rgba(56, 189, 248, 0.18) 0%, rgba(168, 85, 247, 0.12) 50%, transparent 75%)') }};
       filter: blur(80px);
       pointer-events: none;
       z-index: 2;
@@ -125,7 +129,7 @@
       font-weight: 700;
       letter-spacing: 1px;
       text-transform: uppercase;
-      color: #38BDF8;
+      color: var(--color-vj-primary);
       backdrop-filter: blur(12px);
     }
 
@@ -133,20 +137,20 @@
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      background: #38BDF8;
-      box-shadow: 0 0 12px #38BDF8;
+      background: var(--color-vj-primary);
+      box-shadow: 0 0 12px var(--color-vj-glow);
     }
 
     .topic-badge.badge-dyk {
-      background: rgba(0, 242, 254, 0.12);
-      border: 1.5px solid rgba(0, 242, 254, 0.4);
-      color: #00F2FE;
-      box-shadow: 0 0 25px rgba(0, 242, 254, 0.22);
+      background: {{ theme.badge_bg|default('rgba(0, 242, 254, 0.12)') }};
+      border: 1.5px solid {{ theme.badge_border|default('rgba(0, 242, 254, 0.4)') }};
+      color: var(--color-byte-primary);
+      box-shadow: 0 0 25px var(--color-byte-glow);
     }
 
     .topic-badge.badge-dyk .dot {
-      background: #00F2FE;
-      box-shadow: 0 0 14px #00F2FE;
+      background: var(--color-byte-primary);
+      box-shadow: 0 0 14px var(--color-byte-glow);
     }
 
     .slide-counter {
@@ -228,12 +232,12 @@
     }
 
     .speaker-byte .character-img {
-      filter: drop-shadow(0 20px 36px rgba(0, 242, 254, 0.28)) drop-shadow(0 10px 20px rgba(0,0,0,0.6));
+      filter: drop-shadow(0 20px 36px var(--color-byte-glow)) drop-shadow(0 10px 20px rgba(0,0,0,0.6));
     }
 
     .speaker-asha .character-img,
     .speaker-vj .character-img {
-      filter: drop-shadow(0 20px 36px rgba(56, 189, 248, 0.30)) drop-shadow(0 10px 20px rgba(0,0,0,0.6));
+      filter: drop-shadow(0 20px 36px var(--color-vj-glow)) drop-shadow(0 10px 20px rgba(0,0,0,0.6));
     }
 
     /* Speaker Name Badge */
@@ -250,16 +254,16 @@
     }
 
     .speaker-byte .speaker-tag {
-      background: linear-gradient(135deg, #00F2FE 0%, #0077FE 100%);
-      color: #031427;
-      border: 2px solid #BAF4FF;
+      background: var(--color-accent-tag-bg);
+      color: var(--color-accent-tag-color);
+      border: 2px solid rgba(255, 255, 255, 0.4);
     }
 
     .speaker-asha .speaker-tag,
     .speaker-vj .speaker-tag {
-      background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%);
-      color: #031427;
-      border: 2px solid #E0F2FE;
+      background: var(--color-secondary-tag-bg);
+      color: var(--color-secondary-tag-color);
+      border: 2px solid rgba(255, 255, 255, 0.4);
     }
 
     /* ── Speech Bubble ──────────────────────────────────── */
@@ -289,13 +293,13 @@
     }
 
     .stage-speaker-left .speech-bubble {
-      border: 2.5px solid rgba(0, 242, 254, 0.4);
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 242, 254, 0.15);
+      border: 2.5px solid {{ theme.bubble_border_left|default('rgba(0, 242, 254, 0.45)') }};
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 40px var(--color-byte-glow);
     }
 
     .stage-speaker-right .speech-bubble {
-      border: 2.5px solid rgba(255, 94, 142, 0.4);
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(255, 94, 142, 0.15);
+      border: 2.5px solid {{ theme.bubble_border_right|default('rgba(56, 189, 248, 0.45)') }};
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 40px var(--color-vj-glow);
     }
 
     /* Bubble Emotion Badge */
@@ -313,15 +317,45 @@
     }
 
     .stage-speaker-left .emotion-pill {
-      background: rgba(0, 242, 254, 0.12);
-      color: #00F2FE;
-      border: 1px solid rgba(0, 242, 254, 0.3);
+      background: {{ theme.badge_bg|default('rgba(0, 242, 254, 0.12)') }};
+      color: var(--color-byte-primary);
+      border: 1px solid {{ theme.badge_border|default('rgba(0, 242, 254, 0.3)') }};
     }
 
     .stage-speaker-right .emotion-pill {
-      background: rgba(255, 94, 142, 0.12);
-      color: #FF75A0;
-      border: 1px solid rgba(255, 94, 142, 0.3);
+      background: {{ theme.badge_bg|default('rgba(56, 189, 248, 0.12)') }};
+      color: var(--color-vj-primary);
+      border: 1px solid {{ theme.badge_border|default('rgba(56, 189, 248, 0.3)') }};
+    }
+
+    /* Stat Highlight Callout (Dynamic Layout Variety) */
+    .stat-highlight-box {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding: 10px 24px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid var(--color-byte-primary);
+      border-radius: 20px;
+      box-shadow: 0 0 30px var(--color-byte-glow);
+    }
+
+    .stat-highlight-box .stat-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 52px;
+      font-weight: 900;
+      color: var(--color-byte-primary);
+      letter-spacing: -1px;
+      text-shadow: 0 0 20px var(--color-byte-glow);
+    }
+
+    .stat-highlight-box .stat-label {
+      font-size: 20px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #E2E8F0;
     }
 
     /* Speech Bubble Text */
@@ -347,7 +381,7 @@
       height: 0;
       border-top: 18px solid transparent;
       border-bottom: 18px solid transparent;
-      border-right: 28px solid rgba(0, 242, 254, 0.5);
+      border-right: 28px solid {{ theme.bubble_border_left|default('rgba(0, 242, 254, 0.5)') }};
     }
 
     .stage-speaker-left .speech-bubble::after {
@@ -360,7 +394,7 @@
       height: 0;
       border-top: 16px solid transparent;
       border-bottom: 16px solid transparent;
-      border-right: 24px solid #101B2E;
+      border-right: 24px solid var(--color-card-bg);
     }
 
     /* Pointing RIGHT towards Asha */
@@ -374,7 +408,7 @@
       height: 0;
       border-top: 18px solid transparent;
       border-bottom: 18px solid transparent;
-      border-left: 28px solid rgba(255, 94, 142, 0.5);
+      border-left: 28px solid {{ theme.bubble_border_right|default('rgba(56, 189, 248, 0.5)') }};
     }
 
     .stage-speaker-right .speech-bubble::after {
@@ -387,7 +421,7 @@
       height: 0;
       border-top: 16px solid transparent;
       border-bottom: 16px solid transparent;
-      border-left: 24px solid #1E1627;
+      border-left: 24px solid var(--color-card-bg);
     }
 
     /* ── Special Takeaway Slide Layout (Last Slide) ────────── */
@@ -407,10 +441,10 @@
     .takeaway-card {
       width: 100%;
       background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
-      border: 2px solid rgba(56, 189, 248, 0.4);
+      border: 2px solid {{ theme.takeaway_border|default('rgba(56, 189, 248, 0.4)') }};
       border-radius: 36px;
       padding: 48px 48px;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 50px rgba(56, 189, 248, 0.15);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 50px {{ theme.accent_glow|default('rgba(56, 189, 248, 0.15)') }};
       position: relative;
       overflow: hidden;
     }
@@ -422,7 +456,7 @@
       left: 0;
       right: 0;
       height: 6px;
-      background: linear-gradient(90deg, #00F2FE 0%, #A855F7 50%, #FF5E8E 100%);
+      background: {{ theme.accent_gradient|default('linear-gradient(90deg, #00F2FE 0%, #A855F7 50%, #FF5E8E 100%)') }};
     }
 
     .takeaway-badge {
@@ -430,13 +464,13 @@
       align-items: center;
       gap: 8px;
       padding: 8px 24px;
-      background: rgba(56, 189, 248, 0.15);
-      border: 1px solid rgba(56, 189, 248, 0.4);
+      background: {{ theme.badge_bg|default('rgba(56, 189, 248, 0.15)') }};
+      border: 1px solid {{ theme.badge_border|default('rgba(56, 189, 248, 0.4)') }};
       border-radius: 999px;
       font-size: 20px;
       font-weight: 800;
       letter-spacing: 1.5px;
-      color: #38BDF8;
+      color: var(--color-vj-primary);
       text-transform: uppercase;
       margin-bottom: 24px;
     }
@@ -468,13 +502,13 @@
     /* CTA Card */
     .cta-banner {
       width: 100%;
-      background: linear-gradient(135deg, #0284C7 0%, #2563EB 50%, #7C3AED 100%);
+      background: {{ theme.cta_bg|default('linear-gradient(135deg, #0284C7 0%, #2563EB 50%, #7C3AED 100%)') }};
       border-radius: 28px;
       padding: 32px 36px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 16px 40px rgba(37, 99, 235, 0.35);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
       border: 1px solid rgba(255, 255, 255, 0.25);
     }
 
@@ -544,14 +578,14 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #00F2FE 0%, #7C3AED 100%);
+      background: {{ theme.accent_gradient|default('linear-gradient(135deg, #00F2FE 0%, #7C3AED 100%)') }};
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
       font-size: 18px;
       color: #FFFFFF;
-      box-shadow: 0 4px 12px rgba(0, 242, 254, 0.3);
+      box-shadow: 0 4px 12px var(--color-byte-glow);
     }
 
     .brand-handle {
@@ -576,7 +610,7 @@
     }
 
     .swipe-pill .arrow {
-      color: #00F2FE;
+      color: var(--color-byte-primary);
       font-weight: 900;
     }
   </style>
@@ -627,7 +661,7 @@
       <div class="cta-banner">
         <div class="cta-content">
           <div class="cta-heading">{{ 'Follow for Daily Mind-Blowing Tech Facts' if mode in ['did_you_know', 'dyk'] else 'Follow for Daily AI Breakdowns' }}</div>
-          <div class="cta-sub">{{ brand.handle|default('@vijayakumarj_ai') }} • Save & Share with a friend 📌</div>
+          <div class="cta-sub">{{ brand.handle|default('@vijayakumarj_ai') }} • {{ 'Save this for later 📌' if platform == 'instagram' else ('Repost with thoughts 🔁' if platform == 'threads' else 'Share with friends 👉') }}</div>
         </div>
         <div class="cta-btn">FOLLOW ➔</div>
       </div>
@@ -673,6 +707,16 @@
             {% endif %}
           </div>
           {% endif %}
+
+          {% if slide_data.highlight_stat %}
+          <div class="stat-highlight-box">
+            <span class="stat-value">{{ slide_data.highlight_stat }}</span>
+            {% if slide_data.stat_label %}
+            <span class="stat-label">{{ slide_data.stat_label }}</span>
+            {% endif %}
+          </div>
+          {% endif %}
+
           <div class="bubble-text">{{ slide_data.bubble }}</div>
         </div>
       </div>

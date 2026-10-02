@@ -24,6 +24,19 @@ on:
           - cartoon_dialogue
           - code_editor
         default: cartoon_dialogue
+      theme:
+        description: 'Carousel visual theme'
+        required: false
+        type: choice
+        options:
+          - auto
+          - neon_cyber
+          - cyber_matrix
+          - tech_blueprint
+          - amber_solaris
+          - synthwave_plum
+          - swiss_minimal
+        default: auto
       mode:
         description: 'Content mode'
         required: false
@@ -110,12 +123,13 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TOPIC: ${{ github.event.inputs.topic || '' }}
           STYLE: ${{ github.event.inputs.style || 'cartoon_dialogue' }}
+          THEME: ${{ github.event.inputs.theme || 'auto' }}
           MODE:  ${{ github.event.inputs.mode  || 'did_you_know' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           python -u generate_decorator_images.py --now \
-            --topic "$TOPIC" --style "$STYLE" --mode "$MODE" \
+            --topic "$TOPIC" --style "$STYLE" --theme "$THEME" --mode "$MODE" \
             --hashtags-file hashtags.txt \
             --platform instagram
 
@@ -132,6 +146,7 @@ jobs:
             --topic "${{ steps.gen.outputs.topic }}" \
             --hashtags-file hashtags.txt \
             --style "${{ github.event.inputs.style || 'cartoon_dialogue' }}" \
+            --theme "${{ github.event.inputs.theme || 'auto' }}" \
             --mode "${{ github.event.inputs.mode || 'did_you_know' }}"
 
       - name: Post Carousel Directly to Instagram

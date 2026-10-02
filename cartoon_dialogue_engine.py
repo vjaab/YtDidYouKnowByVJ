@@ -93,6 +93,193 @@ except ImportError:
     RAPIDFUZZ_AVAILABLE = False
 
 
+# ── CAROUSEL THEME SYSTEM ──────────────────────────────────────────────────
+# 6 distinct, high-engagement visual themes that dynamically match the topic vector
+# or platform, eliminating visual monotony across social media channels.
+CAROUSEL_THEMES = {
+    "neon_cyber": {
+        "id": "neon_cyber",
+        "name": "Neon Cyber",
+        "bg_gradient": "radial-gradient(circle at 50% 0%, #172554 0%, #0B0F19 60%, #030712 100%)",
+        "mesh_glow": "radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, rgba(168, 85, 247, 0.15) 50%, transparent 75%)",
+        "bg_dark": "#0B0F19",
+        "card_bg": "rgba(16, 24, 44, 0.90)",
+        "accent_primary": "#00F2FE",
+        "accent_secondary": "#38BDF8",
+        "accent_glow": "rgba(0, 242, 254, 0.35)",
+        "accent_tag_bg": "linear-gradient(135deg, #00F2FE 0%, #0077FE 100%)",
+        "accent_tag_color": "#031427",
+        "secondary_tag_bg": "linear-gradient(135deg, #38BDF8 0%, #0284C7 100%)",
+        "secondary_tag_color": "#031427",
+        "badge_border": "rgba(0, 242, 254, 0.4)",
+        "badge_bg": "rgba(0, 242, 254, 0.12)",
+        "bubble_border_left": "rgba(0, 242, 254, 0.45)",
+        "bubble_border_right": "rgba(56, 189, 248, 0.45)",
+        "cta_bg": "linear-gradient(135deg, #0284C7 0%, #2563EB 50%, #7C3AED 100%)",
+        "takeaway_border": "rgba(56, 189, 248, 0.45)",
+        "accent_gradient": "linear-gradient(90deg, #00F2FE 0%, #A855F7 50%, #FF5E8E 100%)",
+    },
+    "cyber_matrix": {
+        "id": "cyber_matrix",
+        "name": "Cyber Matrix",
+        "bg_gradient": "radial-gradient(circle at 50% 0%, #064E3B 0%, #0A140F 60%, #020704 100%)",
+        "mesh_glow": "radial-gradient(circle, rgba(16, 185, 129, 0.28) 0%, rgba(5, 150, 105, 0.18) 50%, transparent 75%)",
+        "bg_dark": "#0A140F",
+        "card_bg": "rgba(10, 28, 20, 0.92)",
+        "accent_primary": "#10B981",
+        "accent_secondary": "#34D399",
+        "accent_glow": "rgba(16, 185, 129, 0.35)",
+        "accent_tag_bg": "linear-gradient(135deg, #10B981 0%, #047857 100%)",
+        "accent_tag_color": "#022013",
+        "secondary_tag_bg": "linear-gradient(135deg, #34D399 0%, #059669 100%)",
+        "secondary_tag_color": "#022013",
+        "badge_border": "rgba(16, 185, 129, 0.4)",
+        "badge_bg": "rgba(16, 185, 129, 0.12)",
+        "bubble_border_left": "rgba(16, 185, 129, 0.45)",
+        "bubble_border_right": "rgba(52, 211, 153, 0.45)",
+        "cta_bg": "linear-gradient(135deg, #059669 0%, #047857 50%, #065F46 100%)",
+        "takeaway_border": "rgba(16, 185, 129, 0.45)",
+        "accent_gradient": "linear-gradient(90deg, #10B981 0%, #34D399 50%, #6EE7B7 100%)",
+    },
+    "tech_blueprint": {
+        "id": "tech_blueprint",
+        "name": "Tech Blueprint",
+        "bg_gradient": "radial-gradient(circle at 50% 0%, #1E3A8A 0%, #0B192C 60%, #050C17 100%)",
+        "mesh_glow": "radial-gradient(circle, rgba(96, 165, 250, 0.25) 0%, rgba(37, 99, 235, 0.18) 50%, transparent 75%)",
+        "bg_dark": "#0B192C",
+        "card_bg": "rgba(15, 30, 54, 0.92)",
+        "accent_primary": "#60A5FA",
+        "accent_secondary": "#93C5FD",
+        "accent_glow": "rgba(96, 165, 250, 0.35)",
+        "accent_tag_bg": "linear-gradient(135deg, #60A5FA 0%, #2563EB 100%)",
+        "accent_tag_color": "#051329",
+        "secondary_tag_bg": "linear-gradient(135deg, #93C5FD 0%, #3B82F6 100%)",
+        "secondary_tag_color": "#051329",
+        "badge_border": "rgba(96, 165, 250, 0.4)",
+        "badge_bg": "rgba(96, 165, 250, 0.12)",
+        "bubble_border_left": "rgba(96, 165, 250, 0.45)",
+        "bubble_border_right": "rgba(147, 197, 253, 0.45)",
+        "cta_bg": "linear-gradient(135deg, #2563EB 0%, #1D4ED8 50%, #1E40AF 100%)",
+        "takeaway_border": "rgba(96, 165, 250, 0.45)",
+        "accent_gradient": "linear-gradient(90deg, #60A5FA 0%, #38BDF8 50%, #818CF8 100%)",
+    },
+    "amber_solaris": {
+        "id": "amber_solaris",
+        "name": "Amber Solaris",
+        "bg_gradient": "radial-gradient(circle at 50% 0%, #451A03 0%, #16110D 60%, #080605 100%)",
+        "mesh_glow": "radial-gradient(circle, rgba(245, 158, 11, 0.28) 0%, rgba(217, 119, 6, 0.18) 50%, transparent 75%)",
+        "bg_dark": "#16110D",
+        "card_bg": "rgba(32, 22, 14, 0.92)",
+        "accent_primary": "#F59E0B",
+        "accent_secondary": "#FBBF24",
+        "accent_glow": "rgba(245, 158, 11, 0.35)",
+        "accent_tag_bg": "linear-gradient(135deg, #F59E0B 0%, #D97706 100%)",
+        "accent_tag_color": "#200D00",
+        "secondary_tag_bg": "linear-gradient(135deg, #FBBF24 0%, #B45309 100%)",
+        "secondary_tag_color": "#200D00",
+        "badge_border": "rgba(245, 158, 11, 0.4)",
+        "badge_bg": "rgba(245, 158, 11, 0.12)",
+        "bubble_border_left": "rgba(245, 158, 11, 0.45)",
+        "bubble_border_right": "rgba(251, 191, 36, 0.45)",
+        "cta_bg": "linear-gradient(135deg, #D97706 0%, #B45309 50%, #92400E 100%)",
+        "takeaway_border": "rgba(245, 158, 11, 0.45)",
+        "accent_gradient": "linear-gradient(90deg, #F59E0B 0%, #F97316 50%, #EF4444 100%)",
+    },
+    "synthwave_plum": {
+        "id": "synthwave_plum",
+        "name": "Synthwave Plum",
+        "bg_gradient": "radial-gradient(circle at 50% 0%, #4A0E4E 0%, #180B26 60%, #0A0412 100%)",
+        "mesh_glow": "radial-gradient(circle, rgba(255, 51, 102, 0.25) 0%, rgba(168, 85, 247, 0.20) 50%, transparent 75%)",
+        "bg_dark": "#180B26",
+        "card_bg": "rgba(34, 16, 50, 0.92)",
+        "accent_primary": "#FF3366",
+        "accent_secondary": "#C084FC",
+        "accent_glow": "rgba(255, 51, 102, 0.35)",
+        "accent_tag_bg": "linear-gradient(135deg, #FF3366 0%, #BE185D 100%)",
+        "accent_tag_color": "#1F030B",
+        "secondary_tag_bg": "linear-gradient(135deg, #C084FC 0%, #9333EA 100%)",
+        "secondary_tag_color": "#1F030B",
+        "badge_border": "rgba(255, 51, 102, 0.4)",
+        "badge_bg": "rgba(255, 51, 102, 0.12)",
+        "bubble_border_left": "rgba(255, 51, 102, 0.45)",
+        "bubble_border_right": "rgba(192, 132, 252, 0.45)",
+        "cta_bg": "linear-gradient(135deg, #BE185D 0%, #9333EA 50%, #7E22CE 100%)",
+        "takeaway_border": "rgba(255, 51, 102, 0.45)",
+        "accent_gradient": "linear-gradient(90deg, #FF3366 0%, #C084FC 50%, #38BDF8 100%)",
+    },
+    "swiss_minimal": {
+        "id": "swiss_minimal",
+        "name": "Swiss Minimal",
+        "bg_gradient": "radial-gradient(circle at 50% 0%, #1E293B 0%, #0F172A 60%, #020617 100%)",
+        "mesh_glow": "radial-gradient(circle, rgba(167, 139, 250, 0.20) 0%, rgba(99, 102, 241, 0.15) 50%, transparent 75%)",
+        "bg_dark": "#0F172A",
+        "card_bg": "rgba(24, 33, 52, 0.92)",
+        "accent_primary": "#A78BFA",
+        "accent_secondary": "#E2E8F0",
+        "accent_glow": "rgba(167, 139, 250, 0.35)",
+        "accent_tag_bg": "linear-gradient(135deg, #A78BFA 0%, #6D28D9 100%)",
+        "accent_tag_color": "#0F0B1E",
+        "secondary_tag_bg": "linear-gradient(135deg, #E2E8F0 0%, #94A3B8 100%)",
+        "secondary_tag_color": "#0F0B1E",
+        "badge_border": "rgba(167, 139, 250, 0.4)",
+        "badge_bg": "rgba(167, 139, 250, 0.12)",
+        "bubble_border_left": "rgba(167, 139, 250, 0.45)",
+        "bubble_border_right": "rgba(226, 232, 240, 0.45)",
+        "cta_bg": "linear-gradient(135deg, #6D28D9 0%, #4F46E5 50%, #3730A3 100%)",
+        "takeaway_border": "rgba(167, 139, 250, 0.45)",
+        "accent_gradient": "linear-gradient(90deg, #A78BFA 0%, #818CF8 50%, #38BDF8 100%)",
+    },
+}
+
+def resolve_carousel_theme(
+    theme: Optional[str] = "auto",
+    vector: Optional[str] = None,
+    platform: Optional[str] = None,
+) -> Dict:
+    """Resolve theme configuration based on explicit choice, topic vector, or platform."""
+    if theme and theme != "auto" and theme in CAROUSEL_THEMES:
+        return CAROUSEL_THEMES[theme]
+
+    # Vector-to-theme mapping
+    vector_map = {
+        "ai_secrets": "cyber_matrix",
+        "everyday_tech_mysteries": "tech_blueprint",
+        "hardware_megastructures": "amber_solaris",
+        "internet_infrastructure": "neon_cyber",
+        "forgotten_tech_history": "swiss_minimal",
+    }
+    if vector and vector in vector_map:
+        return CAROUSEL_THEMES[vector_map[vector]]
+
+    # Platform default / fallback mapping
+    platform_map = {
+        "threads": "swiss_minimal",
+        "facebook": "tech_blueprint",
+        "instagram": "synthwave_plum",
+    }
+    pref = platform_map.get((platform or "").lower(), "neon_cyber")
+    return CAROUSEL_THEMES[pref]
+
+def extract_stat_from_bubble(text: str) -> Optional[Dict[str, str]]:
+    """Detect prominent numerical stats in dialogue bubble to create visual stat callouts."""
+    if not text:
+        return None
+    patterns = [
+        r'(\b\d{1,3}(?:,\d{3})*(?:\.\d+)?\s*(?:%|percent))',
+        r'(\b\d{1,3}(?:,\d{3})*(?:\.\d+)?\s*(?:Gbps|Tbps|Mbps|km|meters|miles|Hz|kHz|MHz|GHz|ms|microseconds|seconds|hours|days|years)\b)',
+        r'(\b(?:over|under|nearly|exactly|approx\.?|around)?\s*\d{1,3}(?:,\d{3})*(?:\.\d+)?\s*(?:billion|million|trillion|thousand)\b)',
+        r'(\b\d{1,3}(?:,\d{3})*(?:\.\d+)?x\b)',
+        r'(\b(?:18\d{2}|19\d{2}|20\d{2})\b)',
+    ]
+    for p in patterns:
+        m = re.search(p, text, re.IGNORECASE)
+        if m:
+            stat_val = m.group(1).strip()
+            if len(stat_val) >= 2:
+                return {"highlight_stat": stat_val}
+    return None
+
+
 # ── DID YOU KNOW CURATED SEED FACT POOL ───────────────────────────────────────
 # High-attraction, verified mind-blowing facts rotating across 5 curiosity vectors
 # engagement_score (1-10): predicted relative engagement based on topic universality,
@@ -1611,6 +1798,8 @@ def parse_and_validate_dialogue(data: Any, mode: str, topic: Optional[str] = Non
     data["hook"] = hook
     data["headline"] = headline
     data["takeaway"] = data.get("takeaway") or "Understand core tech systems to build better workflows."
+    if story and story.get("vector"):
+        data["vector"] = story.get("vector")
     
     if mode in ["did_you_know", "dyk"]:
         data["category"] = data.get("category") or "🧠 DID YOU KNOW?"
@@ -1726,6 +1915,8 @@ def render_cartoon_dialogue_carousel(
     canvas_height: int = 1350,
     prefix: str = "carousel_",
     bg_images: Optional[List[str]] = None,
+    theme: Optional[str] = "auto",
+    platform: Optional[str] = "instagram",
 ) -> List[Path]:
     """Render the cartoon dialogue slides using cartoon_dialogue.html.j2 & Playwright."""
     slides = dialogue.get("slides", [])
@@ -1734,6 +1925,14 @@ def render_cartoon_dialogue_carousel(
 
     output_dir.mkdir(parents=True, exist_ok=True)
     total_slides = len(slides)
+
+    # Resolve theme dynamically based on topic vector, platform, or explicit choice
+    theme_cfg = resolve_carousel_theme(
+        theme=theme or dialogue.get("theme", "auto"),
+        vector=dialogue.get("vector"),
+        platform=platform,
+    )
+    print(f"🎨 Theme Selected: '{theme_cfg['name']}' ({theme_cfg['id']}) for platform '{platform}'")
     
     # Jinja2 setup
     env = Environment(
@@ -1774,6 +1973,12 @@ def render_cartoon_dialogue_carousel(
             else:
                 category_label = "AI EXPLAINED"
 
+        # Extract numerical stat callout if present
+        slide_copy = dict(slide)
+        stat_info = extract_stat_from_bubble(slide.get("bubble", ""))
+        if stat_info and not slide_copy.get("highlight_stat"):
+            slide_copy.update(stat_info)
+
         context = {
             "canvas_width": canvas_width,
             "canvas_height": canvas_height,
@@ -1786,7 +1991,7 @@ def render_cartoon_dialogue_carousel(
             "headline": dialogue.get("headline", ""),
             "speaker": speaker,
             "emotion": emotion,
-            "slide_data": slide,
+            "slide_data": slide_copy,
             "is_takeaway": is_takeaway,
             "takeaway": dialogue.get("takeaway", ""),
             "source": dialogue.get("source", ""),
@@ -1797,6 +2002,8 @@ def render_cartoon_dialogue_carousel(
             "character_vj_path": f"file://{vj_excited_path.resolve()}" if vj_excited_path else "",
             "character_asha_path": f"file://{asha_excited_path.resolve()}" if asha_excited_path else "",
             "background_image_url": bg_uri,
+            "theme": theme_cfg,
+            "platform": platform,
         }
         
         html_path = output_dir / f"cartoon_{prefix}{safe_title}_{slide_num:02d}.html"
