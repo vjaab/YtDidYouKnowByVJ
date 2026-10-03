@@ -293,6 +293,7 @@ def regenerate_and_verify_carousel(
     style: str = "cartoon_dialogue",
     mode: str = "did_you_know",
     theme: str = "auto",
+    characters: str = "auto",
     hashtags_file: str = "",
     max_attempts: int = 4
 ) -> Tuple[bool, dict, List[Path], List[Path], Path, Path]:
@@ -331,7 +332,7 @@ def regenerate_and_verify_carousel(
         print(f"🎯 Selected Topic: '{topic}'")
 
         # 2. Generate dialogue JSON
-        dialogue = generate_cartoon_dialogue_json(topic=topic, story=story, mode=mode)
+        dialogue = generate_cartoon_dialogue_json(topic=topic, story=story, mode=mode, characters=characters)
         caption = dialogue.get("caption", "")
         if not caption:
             caption = f"🧠 {dialogue.get('hook')}\n\n💡 {dialogue.get('takeaway')}\n\nFollow @vijayakumarj_ai for daily mind-blowing tech facts!"
@@ -374,6 +375,7 @@ def regenerate_and_verify_carousel(
             canvas_height=INSTAGRAM_H,
             prefix="carousel_",
             theme=theme,
+            characters=characters,
             platform=platform,
         )
 
@@ -387,6 +389,7 @@ def regenerate_and_verify_carousel(
                 canvas_height=FACEBOOK_STORY_H,
                 prefix="facebook_",
                 theme=theme,
+                characters=characters,
                 platform=platform,
             )
 
@@ -412,6 +415,7 @@ def main():
     parser.add_argument("--hashtags-file", type=str, default="", help="Path to hashtags file")
     parser.add_argument("--style", default="cartoon_dialogue")
     parser.add_argument("--theme", default="auto")
+    parser.add_argument("--characters", default="auto")
     parser.add_argument("--mode", default="did_you_know")
     args = parser.parse_args()
 
@@ -463,6 +467,7 @@ def main():
             style=args.style,
             mode=args.mode,
             theme=args.theme,
+            characters=args.characters,
             hashtags_file=args.hashtags_file,
             max_attempts=4
         )

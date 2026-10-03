@@ -256,7 +256,47 @@ def main():
     parser.add_argument("--topic", type=str, help="Specific topic to generate")
     parser.add_argument("--hashtags-file", type=str, help="Path to hashtags file")
     parser.add_argument("--style", choices=["cartoon_dialogue", "code_editor"], default="cartoon_dialogue", help="Carousel visual style")
-    parser.add_argument("--theme", choices=["auto", "neon_cyber", "cyber_matrix", "tech_blueprint", "amber_solaris", "synthwave_plum", "swiss_minimal"], default="auto", help="Carousel visual color theme")
+    parser.add_argument(
+        "--theme",
+        choices=[
+            "auto",
+            "monochrome_noir",
+            "paper_editorial",
+            "crimson_ember",
+            "emerald_terminal",
+            "luxury_gold",
+            "arctic_frost",
+            "tokyo_midnight",
+            "neon_cyber",
+            "cyber_matrix",
+            "tech_blueprint",
+            "amber_solaris",
+            "synthwave_plum",
+            "swiss_minimal",
+        ],
+        default="auto",
+        help="Carousel visual color theme"
+    )
+    parser.add_argument(
+        "--characters",
+        choices=[
+            "auto",
+            "vj_byte",
+            "vj_phone",
+            "vj_computer",
+            "vj_watch",
+            "vj_chip",
+            "vj_camera",
+            "vj_earbuds",
+            "vj_battery",
+            "vj_vr",
+            "vj_server",
+            "vj_controller",
+            "vj_drone",
+        ],
+        default="auto",
+        help="Mascot character duo for dialogue",
+    )
     parser.add_argument("--mode", choices=["auto", "concept", "news", "did_you_know"], default="did_you_know", help="Content mode: did_you_know, concept, news, auto")
     parser.add_argument("--ai-backgrounds", action="store_true", help="Optionally generate AI backgrounds per slide")
     parser.add_argument("--platform", choices=["both", "instagram", "facebook", "threads"], default="both", help="Target platform(s)")
@@ -324,7 +364,7 @@ def main():
                 from content_accuracy_agent import verify_content_accuracy
                 for diag_attempt in range(3):
                     print(f"🎭 Generating Mascot Cartoon Dialogue ({mode} mode: '{topic_to_use}')...")
-                    dialogue = generate_cartoon_dialogue_json(topic=topic_to_use, story=story, mode=mode)
+                    dialogue = generate_cartoon_dialogue_json(topic=topic_to_use, story=story, mode=mode, characters=args.characters)
                     audit = verify_content_accuracy(topic_to_use, dialogue)
                     print(f"🔍 [Accuracy Agent] Score: {audit['accuracy_score']}/10 | Verdict: {audit['verdict']}")
                     if audit["verdict"] == "APPROVED":
@@ -336,7 +376,7 @@ def main():
                         topic_to_use = story.get("title", "Fresh Tech Fact")
             except Exception as ver_err:
                 print(f"ℹ️ Verifier integration note: {ver_err}")
-                dialogue = generate_cartoon_dialogue_json(topic=topic_to_use, story=story, mode=mode)
+                dialogue = generate_cartoon_dialogue_json(topic=topic_to_use, story=story, mode=mode, characters=args.characters)
 
             safe_title = sanitize_filename(dialogue.get("headline", dialogue.get("hook", "dyk_update")))
 
@@ -374,6 +414,7 @@ def main():
                 prefix="carousel_",
                 bg_images=bg_images,
                 theme=args.theme,
+                characters=args.characters,
                 platform=args.platform,
             )
 
@@ -389,6 +430,7 @@ def main():
                     prefix="facebook_",
                     bg_images=bg_images,
                     theme=args.theme,
+                    characters=args.characters,
                     platform=args.platform,
                 )
 

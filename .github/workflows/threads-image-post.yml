@@ -30,12 +30,38 @@ on:
         type: choice
         options:
           - auto
+          - monochrome_noir
+          - paper_editorial
+          - crimson_ember
+          - emerald_terminal
+          - luxury_gold
+          - arctic_frost
+          - tokyo_midnight
           - neon_cyber
           - cyber_matrix
           - tech_blueprint
           - amber_solaris
           - synthwave_plum
           - swiss_minimal
+        default: auto
+      characters:
+        description: 'Mascot duo (auto or choose a gadget mascots)'
+        required: false
+        type: choice
+        options:
+          - auto
+          - vj_byte
+          - vj_phone
+          - vj_computer
+          - vj_watch
+          - vj_chip
+          - vj_camera
+          - vj_earbuds
+          - vj_battery
+          - vj_vr
+          - vj_server
+          - vj_controller
+          - vj_drone
         default: auto
       mode:
         description: 'Content mode (did_you_know, news, or auto)'
@@ -123,12 +149,13 @@ jobs:
           TOPIC: ${{ github.event.inputs.topic || '' }}
           STYLE: ${{ github.event.inputs.style || 'cartoon_dialogue' }}
           THEME: ${{ github.event.inputs.theme || 'auto' }}
+          CHARACTERS: ${{ github.event.inputs.characters || 'auto' }}
           MODE:  ${{ github.event.inputs.mode  || 'did_you_know' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           python -u generate_decorator_images.py --now \
-            --topic "$TOPIC" --style "$STYLE" --theme "$THEME" --mode "$MODE" \
+            --topic "$TOPIC" --style "$STYLE" --theme "$THEME" --characters "$CHARACTERS" --mode "$MODE" \
             --hashtags-file hashtags.txt \
             --platform threads
 
@@ -146,6 +173,7 @@ jobs:
             --hashtags-file hashtags.txt \
             --style "${{ github.event.inputs.style || 'cartoon_dialogue' }}" \
             --theme "${{ github.event.inputs.theme || 'auto' }}" \
+            --characters "${{ github.event.inputs.characters || 'auto' }}" \
             --mode "${{ github.event.inputs.mode || 'did_you_know' }}"
 
       - name: Post Directly to Threads

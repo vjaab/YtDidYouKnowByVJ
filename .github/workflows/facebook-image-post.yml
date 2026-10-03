@@ -30,12 +30,38 @@ on:
         type: choice
         options:
           - auto
+          - monochrome_noir
+          - paper_editorial
+          - crimson_ember
+          - emerald_terminal
+          - luxury_gold
+          - arctic_frost
+          - tokyo_midnight
           - neon_cyber
           - cyber_matrix
           - tech_blueprint
           - amber_solaris
           - synthwave_plum
           - swiss_minimal
+        default: auto
+      characters:
+        description: 'Mascot duo (auto or choose a gadget mascots)'
+        required: false
+        type: choice
+        options:
+          - auto
+          - vj_byte
+          - vj_phone
+          - vj_computer
+          - vj_watch
+          - vj_chip
+          - vj_camera
+          - vj_earbuds
+          - vj_battery
+          - vj_vr
+          - vj_server
+          - vj_controller
+          - vj_drone
         default: auto
       mode:
         description: 'Content mode'
@@ -138,6 +164,7 @@ jobs:
             --topic "${{ github.event.inputs.topic || '' }}" \
             --style "${{ github.event.inputs.style || 'cartoon_dialogue' }}" \
             --theme "${{ github.event.inputs.theme || 'auto' }}" \
+            --characters "${{ github.event.inputs.characters || 'auto' }}" \
             --mode "${{ github.event.inputs.mode || 'did_you_know' }}" \
             --hashtags-file hashtags.txt \
             --platform facebook
@@ -156,6 +183,7 @@ jobs:
             --hashtags-file hashtags.txt \
             --style "${{ github.event.inputs.style || 'cartoon_dialogue' }}" \
             --theme "${{ github.event.inputs.theme || 'auto' }}" \
+            --characters "${{ github.event.inputs.characters || 'auto' }}" \
             --mode "${{ github.event.inputs.mode || 'did_you_know' }}"
 
       - name: Send to Telegram for Approval

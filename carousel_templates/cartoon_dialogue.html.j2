@@ -22,12 +22,10 @@
       --color-byte-glow: {{ theme.accent_glow|default('rgba(0, 242, 254, 0.35)') }};
       --color-vj-primary: {{ theme.accent_secondary|default('#38BDF8') }};
       --color-vj-glow: {{ theme.accent_glow|default('rgba(56, 189, 248, 0.38)') }};
-      --color-asha-primary: {{ theme.accent_secondary|default('#38BDF8') }};
-      --color-asha-glow: {{ theme.accent_glow|default('rgba(56, 189, 248, 0.38)') }};
       --color-bg-dark: {{ theme.bg_dark|default('#0B0F19') }};
       --color-card-bg: {{ theme.card_bg|default('rgba(16, 24, 44, 0.90)') }};
-      --color-text-main: #FFFFFF;
-      --color-text-sub: #94A3B8;
+      --color-text-main: {{ theme.text_main|default('#FFFFFF') }};
+      --color-text-sub: {{ theme.text_sub|default('#94A3B8') }};
       --color-accent-tag-bg: {{ theme.accent_tag_bg|default('linear-gradient(135deg, #00F2FE 0%, #0077FE 100%)') }};
       --color-accent-tag-color: {{ theme.accent_tag_color|default('#031427') }};
       --color-secondary-tag-bg: {{ theme.secondary_tag_bg|default('linear-gradient(135deg, #38BDF8 0%, #0284C7 100%)') }};
@@ -214,12 +212,11 @@
       align-items: center;
     }
 
-    .character-wrap.speaker-byte {
+    .stage-speaker-left .character-wrap {
       left: 10px;
     }
 
-    .character-wrap.speaker-asha,
-    .character-wrap.speaker-vj {
+    .stage-speaker-right .character-wrap {
       right: 10px;
     }
 
@@ -231,12 +228,11 @@
       filter: drop-shadow(0 24px 32px rgba(0, 0, 0, 0.5));
     }
 
-    .speaker-byte .character-img {
+    .stage-speaker-left .character-img {
       filter: drop-shadow(0 20px 36px var(--color-byte-glow)) drop-shadow(0 10px 20px rgba(0,0,0,0.6));
     }
 
-    .speaker-asha .character-img,
-    .speaker-vj .character-img {
+    .stage-speaker-right .character-img {
       filter: drop-shadow(0 20px 36px var(--color-vj-glow)) drop-shadow(0 10px 20px rgba(0,0,0,0.6));
     }
 
@@ -253,14 +249,13 @@
       z-index: 15;
     }
 
-    .speaker-byte .speaker-tag {
+    .stage-speaker-left .speaker-tag {
       background: var(--color-accent-tag-bg);
       color: var(--color-accent-tag-color);
       border: 2px solid rgba(255, 255, 255, 0.4);
     }
 
-    .speaker-asha .speaker-tag,
-    .speaker-vj .speaker-tag {
+    .stage-speaker-right .speaker-tag {
       background: var(--color-secondary-tag-bg);
       color: var(--color-secondary-tag-color);
       border: 2px solid rgba(255, 255, 255, 0.4);
@@ -364,7 +359,7 @@
       font-size: 44px;
       font-weight: 700;
       line-height: 1.36;
-      color: #FFFFFF;
+      color: var(--color-text-main);
       letter-spacing: -0.3px;
       word-break: break-word;
     }
@@ -667,13 +662,15 @@
       </div>
 
       <div class="takeaway-mascots-row">
-        {% if character_byte_path %}
-        <img class="mini-mascot-left" src="{{ character_byte_path }}" alt="Byte Robot">
+        {% if character_left_path %}
+        <img class="mini-mascot-left" src="{{ character_left_path }}" alt="Mascot">
+        {% elif character_byte_path %}
+        <img class="mini-mascot-left" src="{{ character_byte_path }}" alt="Mascot">
         {% endif %}
-        {% if character_vj_path %}
+        {% if character_right_path %}
+        <img class="mini-mascot-right" src="{{ character_right_path }}" alt="VJ">
+        {% elif character_vj_path %}
         <img class="mini-mascot-right" src="{{ character_vj_path }}" alt="VJ">
-        {% elif character_asha_path %}
-        <img class="mini-mascot-right" src="{{ character_asha_path }}" alt="VJ">
         {% endif %}
       </div>
 
@@ -681,7 +678,7 @@
 
     {% else %}
     <!-- ── Standard Dialogue Slide Layout ─────────────────── -->
-    <div class="dialogue-stage {{ 'stage-speaker-left' if speaker == 'byte' else 'stage-speaker-right' }}">
+    <div class="dialogue-stage {{ 'stage-speaker-right' if is_speaker_right else 'stage-speaker-left' }}">
       
       <!-- Character Mascot -->
       <div class="character-wrap speaker-{{ speaker }}">
@@ -689,7 +686,7 @@
         <img class="character-img" src="{{ character_img_path }}" alt="{{ speaker }}">
         {% endif %}
         <div class="speaker-tag">
-          {% if speaker == 'byte' %}🤖 BYTE{% else %}👨‍💻 VJ{% endif %}
+          {{ speaker_tag|default('🤖 BYTE') }}
         </div>
       </div>
 

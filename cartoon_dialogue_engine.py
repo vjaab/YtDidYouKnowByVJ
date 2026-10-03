@@ -26,9 +26,133 @@ BASE_DIR = Path(__file__).parent
 CHARACTERS_DIR = BASE_DIR / "assets" / "characters"
 TEMPLATE_DIR = BASE_DIR / "carousel_templates"
 
-# Mascot configuration
-VALID_SPEAKERS = ["byte", "vj"]
+# Mascot configuration: VJ + Byte + 11 Living Tech Gadget Characters
+VALID_SPEAKERS = [
+    "vj", "byte", "phone", "computer", "watch", "chip",
+    "camera", "earbuds", "battery", "vr", "server", "controller", "drone"
+]
 VALID_EMOTIONS = ["neutral", "curious", "excited", "shocked", "thinking", "smug"]
+
+# Character metadata registry
+CHARACTER_METADATA = {
+    "vj": {
+        "name": "VJ",
+        "emoji": "👨‍💻",
+        "title": "Tech Host",
+        "tag": "👨‍💻 VJ",
+        "role": "Lead human educator & host",
+        "desc": "the human tech creator and host of 'Did You Know By VJ', wearing a blue hoodie, explaining complex tech simply and clearly",
+        "side": "right"
+    },
+    "byte": {
+        "name": "Byte",
+        "emoji": "🤖",
+        "title": "AI Robot",
+        "tag": "🤖 BYTE",
+        "role": "Curious AI robot mascot",
+        "desc": "a curious, smart white and cyan robot mascot who asks sharp, fun questions",
+        "side": "left"
+    },
+    "phone": {
+        "name": "Phony",
+        "emoji": "📱",
+        "title": "Smartphone",
+        "tag": "📱 PHONE",
+        "role": "Sleek smartphone mascot",
+        "desc": "a friendly, energetic smartphone mascot with a glowing screen face, always tuned to notifications, apps, and everyday mobile tech",
+        "side": "left"
+    },
+    "computer": {
+        "name": "Compute",
+        "emoji": "💻",
+        "title": "Computer",
+        "tag": "💻 COMPUTER",
+        "role": "Laptop / PC mascot",
+        "desc": "a brainy laptop computer mascot with terminal-style screen eyes, obsessed with software, coding, and heavy-duty computing",
+        "side": "left"
+    },
+    "watch": {
+        "name": "Chrono",
+        "emoji": "⌚",
+        "title": "Smartwatch",
+        "tag": "⌚ WATCH",
+        "role": "Smartwatch mascot",
+        "desc": "a witty, fast-talking digital smartwatch mascot with silicone strap limbs and a glowing pulse face",
+        "side": "left"
+    },
+    "chip": {
+        "name": "Silicon",
+        "emoji": "⚡",
+        "title": "AI Microchip",
+        "tag": "⚡ CHIP",
+        "role": "Microchip processor mascot",
+        "desc": "a proud, tiny powerhouse microchip mascot with golden pin legs and glowing nanometer circuit traces",
+        "side": "left"
+    },
+    "camera": {
+        "name": "Shutter",
+        "emoji": "📷",
+        "title": "Camera",
+        "tag": "📷 CAMERA",
+        "role": "Digital camera mascot",
+        "desc": "a curious camera mascot with a giant glowing optical lens eye, fascinated by image sensors, pixels, and optics",
+        "side": "left"
+    },
+    "earbuds": {
+        "name": "Pod",
+        "emoji": "🎧",
+        "title": "Earbuds",
+        "tag": "🎧 EARBUDS",
+        "role": "Wireless headphones mascot",
+        "desc": "a musical, sleek headphones mascot with glowing soundwave eyes, curious about audio physics and acoustics",
+        "side": "left"
+    },
+    "battery": {
+        "name": "Volt",
+        "emoji": "🔋",
+        "title": "Battery",
+        "tag": "🔋 BATTERY",
+        "role": "Power bank mascot",
+        "desc": "an energetic power bank mascot with a glowing green charge-bar smile, sensitive to heat, voltage, and fast charging",
+        "side": "left"
+    },
+    "vr": {
+        "name": "Vision",
+        "emoji": "🥽",
+        "title": "VR Headset",
+        "tag": "🥽 VR HEADSET",
+        "role": "Spatial computing headset mascot",
+        "desc": "a futuristic spatial headset mascot with holographic visor eyes, passionate about 3D worlds and spatial vision",
+        "side": "left"
+    },
+    "server": {
+        "name": "Server",
+        "emoji": "🖧",
+        "title": "Cloud Server",
+        "tag": "🖧 SERVER",
+        "role": "Cloud server rack mascot",
+        "desc": "a towering cloud server rack mascot with blinking LED array eyes and ethernet cable arms, keeper of global internet data",
+        "side": "left"
+    },
+    "controller": {
+        "name": "Joy",
+        "emoji": "🎮",
+        "title": "Game Controller",
+        "tag": "🎮 CONTROLLER",
+        "role": "Gamepad mascot",
+        "desc": "a playful video game controller mascot with glowing thumbstick eyes, hyped about GPUs, ray tracing, and frame rates",
+        "side": "left"
+    },
+    "drone": {
+        "name": "Aero",
+        "emoji": "🛸",
+        "title": "Drone",
+        "tag": "🛸 DRONE",
+        "role": "Quadcopter drone mascot",
+        "desc": "an adventurous drone mascot with 4 spinning rotors and a camera eye, surveying GPS, navigation, and flight tech",
+        "side": "left"
+    },
+}
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
@@ -56,7 +180,6 @@ def get_character_image_path(speaker: str, emotion: str) -> Optional[Path]:
     speaker = speaker.lower().strip()
     emotion = emotion.lower().strip()
     
-    # Backward compatibility alias
     if speaker == "asha":
         speaker = "vj"
     
@@ -65,12 +188,12 @@ def get_character_image_path(speaker: str, emotion: str) -> Optional[Path]:
     if emotion not in VALID_EMOTIONS:
         emotion = "neutral"
         
-    # Check folder structure: assets/characters/vj/curious.png
+    # Check folder structure: assets/characters/phone/curious.png
     nested_path = CHARACTERS_DIR / speaker / f"{emotion}.png"
     if nested_path.exists():
         return nested_path
         
-    # Check flat structure: assets/characters/vj_curious.png
+    # Check flat structure: assets/characters/phone_curious.png
     flat_path = CHARACTERS_DIR / f"{speaker}_{emotion}.png"
     if flat_path.exists():
         return flat_path
@@ -83,7 +206,70 @@ def get_character_image_path(speaker: str, emotion: str) -> Optional[Path]:
     if flat_fallback.exists():
         return flat_fallback
         
+    speaker_dir = CHARACTERS_DIR / speaker
+    if speaker_dir.exists() and speaker_dir.is_dir():
+        pngs = list(speaker_dir.glob("*.png"))
+        if pngs:
+            return pngs[0]
+            
+    if speaker != "byte":
+        return get_character_image_path("byte", emotion)
     return None
+
+
+def resolve_dialogue_characters(
+    characters: Optional[str] = "auto",
+    topic: str = "",
+    story: Optional[Dict] = None,
+) -> Tuple[str, str]:
+    """Resolve the two dialogue speakers (speaker_left, speaker_right)."""
+    chars = (characters or "auto").strip().lower()
+    
+    # Explicit pair format like 'vj_phone' or 'phone_vj'
+    if "_" in chars and chars != "auto":
+        parts = chars.split("_", 1)
+        c1, c2 = parts[0], parts[1]
+        if c1 in VALID_SPEAKERS and c2 in VALID_SPEAKERS:
+            if c1 == "vj":
+                return c2, "vj"
+            elif c2 == "vj":
+                return c1, "vj"
+            return c1, c2
+        elif c1 in VALID_SPEAKERS:
+            return c1, "vj"
+        elif c2 in VALID_SPEAKERS:
+            return c2, "vj"
+            
+    if chars in VALID_SPEAKERS and chars != "vj":
+        return chars, "vj"
+        
+    # Auto topic matching
+    combined_text = f"{topic or ''} {story.get('title', '') if story else ''} {story.get('description', '') if story else ''} {story.get('fact_summary', '') if story else ''}".lower()
+    
+    if any(k in combined_text for k in ["camera", "photo", "lens", "pixel", "sensor size", "aperture", "optical", "shutter"]):
+        return "camera", "vj"
+    if any(k in combined_text for k in ["earbuds", "headphone", "audio", "noise cancell", "sound", "acoustics", "voice clone"]):
+        return "earbuds", "vj"
+    if any(k in combined_text for k in ["battery", "charge", "lithium", "power bank", "overheat", "voltage", "energy"]):
+        return "battery", "vj"
+    if any(k in combined_text for k in ["vr", "ar", "headset", "spatial", "metaverse", "vision pro", "oculus", "quest"]):
+        return "vr", "vj"
+    if any(k in combined_text for k in ["underwater", "submarine cable", "fiber optic", "datacenter", "server", "data center", "cloud", "internet backbone"]):
+        return "server", "vj"
+    if any(k in combined_text for k in ["game", "gaming", "controller", "playstation", "xbox", "nintendo", "ray tracing", "unreal engine"]):
+        return "controller", "vj"
+    if any(k in combined_text for k in ["drone", "satellite", "gps", "flying", "orbit", "space", "robotics navigation"]):
+        return "drone", "vj"
+    if any(k in combined_text for k in ["chip", "semiconductor", "transistor", "nanometer", "gpu", "tpu", "silicon", "moore's law", "processor"]):
+        return "chip", "vj"
+    if any(k in combined_text for k in ["watch", "smartwatch", "heart rate", "biometric", "pulse", "wearable", "chrono", "clock frequency"]):
+        return "watch", "vj"
+    if any(k in combined_text for k in ["computer", "laptop", "pc", "code", "programming", "software", "linux", "compiler", "terminal", "memory leak", "context window", "llm", "chatgpt"]):
+        return "computer", "vj"
+    if any(k in combined_text for k in ["phone", "smartphone", "mobile", "screen", "android", "iphone", "ios", "cellular", "5g", "sim card", "touchscreen"]):
+        return "phone", "vj"
+        
+    return "byte", "vj"
 
 
 try:
@@ -94,9 +280,176 @@ except ImportError:
 
 
 # ── CAROUSEL THEME SYSTEM ──────────────────────────────────────────────────
-# 6 distinct, high-engagement visual themes that dynamically match the topic vector
-# or platform, eliminating visual monotony across social media channels.
+# 13 high-engagement visual themes including Black & White (Dark Noir & Light Editorial)
+# and modern vibrant colorways, dynamically matching the topic vector or platform.
 CAROUSEL_THEMES = {
+    # ── 1. Black & White: Monochrome Noir (Pure OLED Dark) ───
+    "monochrome_noir": {
+        "id": "monochrome_noir",
+        "name": "Monochrome Noir",
+        "bg_gradient": "radial-gradient(circle at 50% 0%, #18181B 0%, #09090B 60%, #000000 100%)",
+        "mesh_glow": "radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, rgba(161, 161, 170, 0.08) 50%, transparent 75%)",
+        "bg_dark": "#000000",
+        "card_bg": "rgba(24, 24, 27, 0.94)",
+        "accent_primary": "#FFFFFF",
+        "accent_secondary": "#E4E4E7",
+        "accent_glow": "rgba(255, 255, 255, 0.28)",
+        "accent_tag_bg": "linear-gradient(135deg, #FFFFFF 0%, #A1A1AA 100%)",
+        "accent_tag_color": "#000000",
+        "secondary_tag_bg": "linear-gradient(135deg, #E4E4E7 0%, #71717A 100%)",
+        "secondary_tag_color": "#000000",
+        "badge_border": "rgba(255, 255, 255, 0.45)",
+        "badge_bg": "rgba(255, 255, 255, 0.10)",
+        "bubble_border_left": "rgba(255, 255, 255, 0.5)",
+        "bubble_border_right": "rgba(228, 228, 231, 0.5)",
+        "cta_bg": "linear-gradient(135deg, #27272A 0%, #18181B 50%, #09090B 100%)",
+        "takeaway_border": "rgba(255, 255, 255, 0.5)",
+        "accent_gradient": "linear-gradient(90deg, #FFFFFF 0%, #D4D4D8 50%, #71717A 100%)",
+        "text_main": "#FFFFFF",
+        "text_sub": "#A1A1AA",
+    },
+    # ── 2. Black & White: Paper Editorial (Clean Light Mode) ───
+    "paper_editorial": {
+        "id": "paper_editorial",
+        "name": "Paper Editorial",
+        "bg_gradient": "radial-gradient(circle at 50% 0%, #FFFFFF 0%, #F8FAFC 60%, #EEF2F6 100%)",
+        "mesh_glow": "radial-gradient(circle, rgba(15, 23, 42, 0.06) 0%, rgba(100, 116, 139, 0.04) 50%, transparent 75%)",
+        "bg_dark": "#F8FAFC",
+        "card_bg": "rgba(255, 255, 255, 0.95)",
+        "accent_primary": "#0F172A",
+        "accent_secondary": "#334155",
+        "accent_glow": "rgba(15, 23, 42, 0.18)",
+        "accent_tag_bg": "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
+        "accent_tag_color": "#FFFFFF",
+        "secondary_tag_bg": "linear-gradient(135deg, #334155 0%, #475569 100%)",
+        "secondary_tag_color": "#FFFFFF",
+        "badge_border": "rgba(15, 23, 42, 0.35)",
+        "badge_bg": "rgba(15, 23, 42, 0.07)",
+        "bubble_border_left": "rgba(15, 23, 42, 0.35)",
+        "bubble_border_right": "rgba(51, 65, 85, 0.35)",
+        "cta_bg": "linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%)",
+        "takeaway_border": "rgba(15, 23, 42, 0.35)",
+        "accent_gradient": "linear-gradient(90deg, #0F172A 0%, #334155 50%, #64748B 100%)",
+        "text_main": "#0F172A",
+        "text_sub": "#475569",
+        "is_light": True,
+    },
+    # ── 3. Crimson Ember (Urgent & Breaking) ───
+    "crimson_ember": {
+        "id": "crimson_ember",
+        "name": "Crimson Ember",
+        "bg_gradient": "radial-gradient(circle at 50% 0%, #450A0A 0%, #150507 60%, #080203 100%)",
+        "mesh_glow": "radial-gradient(circle, rgba(239, 68, 68, 0.28) 0%, rgba(249, 115, 22, 0.18) 50%, transparent 75%)",
+        "bg_dark": "#150507",
+        "card_bg": "rgba(30, 8, 12, 0.92)",
+        "accent_primary": "#EF4444",
+        "accent_secondary": "#F97316",
+        "accent_glow": "rgba(239, 68, 68, 0.35)",
+        "accent_tag_bg": "linear-gradient(135deg, #EF4444 0%, #B91C1C 100%)",
+        "accent_tag_color": "#FFFFFF",
+        "secondary_tag_bg": "linear-gradient(135deg, #F97316 0%, #C2410C 100%)",
+        "secondary_tag_color": "#FFFFFF",
+        "badge_border": "rgba(239, 68, 68, 0.4)",
+        "badge_bg": "rgba(239, 68, 68, 0.12)",
+        "bubble_border_left": "rgba(239, 68, 68, 0.45)",
+        "bubble_border_right": "rgba(249, 115, 22, 0.45)",
+        "cta_bg": "linear-gradient(135deg, #EF4444 0%, #DC2626 50%, #991B1B 100%)",
+        "takeaway_border": "rgba(239, 68, 68, 0.45)",
+        "accent_gradient": "linear-gradient(90deg, #EF4444 0%, #F97316 50%, #FBBF24 100%)",
+    },
+    # ── 4. Emerald Terminal (Hacker / Matrix) ───
+    "emerald_terminal": {
+        "id": "emerald_terminal",
+        "name": "Emerald Terminal",
+        "bg_gradient": "radial-gradient(circle at 50% 0%, #022C22 0%, #03140F 60%, #010705 100%)",
+        "mesh_glow": "radial-gradient(circle, rgba(16, 185, 129, 0.30) 0%, rgba(52, 211, 153, 0.15) 50%, transparent 75%)",
+        "bg_dark": "#03140F",
+        "card_bg": "rgba(6, 28, 20, 0.94)",
+        "accent_primary": "#10B981",
+        "accent_secondary": "#34D399",
+        "accent_glow": "rgba(16, 185, 129, 0.38)",
+        "accent_tag_bg": "linear-gradient(135deg, #10B981 0%, #059669 100%)",
+        "accent_tag_color": "#021A11",
+        "secondary_tag_bg": "linear-gradient(135deg, #34D399 0%, #047857 100%)",
+        "secondary_tag_color": "#021A11",
+        "badge_border": "rgba(16, 185, 129, 0.4)",
+        "badge_bg": "rgba(16, 185, 129, 0.12)",
+        "bubble_border_left": "rgba(16, 185, 129, 0.45)",
+        "bubble_border_right": "rgba(52, 211, 153, 0.45)",
+        "cta_bg": "linear-gradient(135deg, #10B981 0%, #059669 50%, #047857 100%)",
+        "takeaway_border": "rgba(16, 185, 129, 0.45)",
+        "accent_gradient": "linear-gradient(90deg, #10B981 0%, #34D399 50%, #A7F3D0 100%)",
+    },
+    # ── 5. Luxury Gold (Enterprise & Hardware) ───
+    "luxury_gold": {
+        "id": "luxury_gold",
+        "name": "Luxury Gold",
+        "bg_gradient": "radial-gradient(circle at 50% 0%, #2A1B07 0%, #110B03 60%, #050301 100%)",
+        "mesh_glow": "radial-gradient(circle, rgba(245, 158, 11, 0.28) 0%, rgba(251, 191, 36, 0.16) 50%, transparent 75%)",
+        "bg_dark": "#110B03",
+        "card_bg": "rgba(28, 19, 7, 0.94)",
+        "accent_primary": "#FBBF24",
+        "accent_secondary": "#F59E0B",
+        "accent_glow": "rgba(251, 191, 36, 0.35)",
+        "accent_tag_bg": "linear-gradient(135deg, #FBBF24 0%, #D97706 100%)",
+        "accent_tag_color": "#1B0F00",
+        "secondary_tag_bg": "linear-gradient(135deg, #FDE68A 0%, #B45309 100%)",
+        "secondary_tag_color": "#1B0F00",
+        "badge_border": "rgba(251, 191, 36, 0.4)",
+        "badge_bg": "rgba(251, 191, 36, 0.12)",
+        "bubble_border_left": "rgba(251, 191, 36, 0.45)",
+        "bubble_border_right": "rgba(245, 158, 11, 0.45)",
+        "cta_bg": "linear-gradient(135deg, #F59E0B 0%, #D97706 50%, #92400E 100%)",
+        "takeaway_border": "rgba(251, 191, 36, 0.45)",
+        "accent_gradient": "linear-gradient(90deg, #FDE68A 0%, #FBBF24 50%, #D97706 100%)",
+    },
+    # ── 6. Arctic Frost (Data & Cloud) ───
+    "arctic_frost": {
+        "id": "arctic_frost",
+        "name": "Arctic Frost",
+        "bg_gradient": "radial-gradient(circle at 50% 0%, #082F49 0%, #031422 60%, #01060B 100%)",
+        "mesh_glow": "radial-gradient(circle, rgba(56, 189, 248, 0.28) 0%, rgba(147, 197, 253, 0.16) 50%, transparent 75%)",
+        "bg_dark": "#031422",
+        "card_bg": "rgba(8, 28, 48, 0.94)",
+        "accent_primary": "#38BDF8",
+        "accent_secondary": "#BAE6FD",
+        "accent_glow": "rgba(56, 189, 248, 0.35)",
+        "accent_tag_bg": "linear-gradient(135deg, #38BDF8 0%, #0284C7 100%)",
+        "accent_tag_color": "#021A2C",
+        "secondary_tag_bg": "linear-gradient(135deg, #BAE6FD 0%, #0369A1 100%)",
+        "secondary_tag_color": "#021A2C",
+        "badge_border": "rgba(56, 189, 248, 0.4)",
+        "badge_bg": "rgba(56, 189, 248, 0.12)",
+        "bubble_border_left": "rgba(56, 189, 248, 0.45)",
+        "bubble_border_right": "rgba(186, 230, 253, 0.45)",
+        "cta_bg": "linear-gradient(135deg, #38BDF8 0%, #0284C7 50%, #0369A1 100%)",
+        "takeaway_border": "rgba(56, 189, 248, 0.45)",
+        "accent_gradient": "linear-gradient(90deg, #BAE6FD 0%, #38BDF8 50%, #0284C7 100%)",
+    },
+    # ── 7. Tokyo Midnight (Cyber Magenta) ───
+    "tokyo_midnight": {
+        "id": "tokyo_midnight",
+        "name": "Tokyo Midnight",
+        "bg_gradient": "radial-gradient(circle at 50% 0%, #3B0764 0%, #150325 60%, #07010C 100%)",
+        "mesh_glow": "radial-gradient(circle, rgba(236, 72, 153, 0.28) 0%, rgba(139, 92, 246, 0.20) 50%, transparent 75%)",
+        "bg_dark": "#150325",
+        "card_bg": "rgba(28, 7, 48, 0.94)",
+        "accent_primary": "#F43F5E",
+        "accent_secondary": "#A855F7",
+        "accent_glow": "rgba(244, 63, 94, 0.38)",
+        "accent_tag_bg": "linear-gradient(135deg, #F43F5E 0%, #9333EA 100%)",
+        "accent_tag_color": "#FFFFFF",
+        "secondary_tag_bg": "linear-gradient(135deg, #A855F7 0%, #7E22CE 100%)",
+        "secondary_tag_color": "#FFFFFF",
+        "badge_border": "rgba(244, 63, 94, 0.4)",
+        "badge_bg": "rgba(244, 63, 94, 0.12)",
+        "bubble_border_left": "rgba(244, 63, 94, 0.45)",
+        "bubble_border_right": "rgba(168, 85, 247, 0.45)",
+        "cta_bg": "linear-gradient(135deg, #F43F5E 0%, #A855F7 50%, #7C3AED 100%)",
+        "takeaway_border": "rgba(244, 63, 94, 0.45)",
+        "accent_gradient": "linear-gradient(90deg, #F43F5E 0%, #A855F7 50%, #38BDF8 100%)",
+    },
+    # ── 8. Neon Cyber ───
     "neon_cyber": {
         "id": "neon_cyber",
         "name": "Neon Cyber",
@@ -119,6 +472,7 @@ CAROUSEL_THEMES = {
         "takeaway_border": "rgba(56, 189, 248, 0.45)",
         "accent_gradient": "linear-gradient(90deg, #00F2FE 0%, #A855F7 50%, #FF5E8E 100%)",
     },
+    # ── 9. Cyber Matrix ───
     "cyber_matrix": {
         "id": "cyber_matrix",
         "name": "Cyber Matrix",
@@ -141,6 +495,7 @@ CAROUSEL_THEMES = {
         "takeaway_border": "rgba(16, 185, 129, 0.45)",
         "accent_gradient": "linear-gradient(90deg, #10B981 0%, #34D399 50%, #6EE7B7 100%)",
     },
+    # ── 10. Tech Blueprint ───
     "tech_blueprint": {
         "id": "tech_blueprint",
         "name": "Tech Blueprint",
@@ -163,6 +518,7 @@ CAROUSEL_THEMES = {
         "takeaway_border": "rgba(96, 165, 250, 0.45)",
         "accent_gradient": "linear-gradient(90deg, #60A5FA 0%, #38BDF8 50%, #818CF8 100%)",
     },
+    # ── 11. Amber Solaris ───
     "amber_solaris": {
         "id": "amber_solaris",
         "name": "Amber Solaris",
@@ -185,6 +541,7 @@ CAROUSEL_THEMES = {
         "takeaway_border": "rgba(245, 158, 11, 0.45)",
         "accent_gradient": "linear-gradient(90deg, #F59E0B 0%, #F97316 50%, #EF4444 100%)",
     },
+    # ── 12. Synthwave Plum ───
     "synthwave_plum": {
         "id": "synthwave_plum",
         "name": "Synthwave Plum",
@@ -207,6 +564,7 @@ CAROUSEL_THEMES = {
         "takeaway_border": "rgba(255, 51, 102, 0.45)",
         "accent_gradient": "linear-gradient(90deg, #FF3366 0%, #C084FC 50%, #38BDF8 100%)",
     },
+    # ── 13. Swiss Minimal ───
     "swiss_minimal": {
         "id": "swiss_minimal",
         "name": "Swiss Minimal",
@@ -242,20 +600,20 @@ def resolve_carousel_theme(
 
     # Vector-to-theme mapping
     vector_map = {
-        "ai_secrets": "cyber_matrix",
-        "everyday_tech_mysteries": "tech_blueprint",
-        "hardware_megastructures": "amber_solaris",
-        "internet_infrastructure": "neon_cyber",
-        "forgotten_tech_history": "swiss_minimal",
+        "ai_secrets": "tokyo_midnight",
+        "everyday_tech_mysteries": "paper_editorial",
+        "hardware_megastructures": "luxury_gold",
+        "internet_infrastructure": "arctic_frost",
+        "forgotten_tech_history": "monochrome_noir",
     }
     if vector and vector in vector_map:
         return CAROUSEL_THEMES[vector_map[vector]]
 
     # Platform default / fallback mapping
     platform_map = {
-        "threads": "swiss_minimal",
+        "threads": "paper_editorial",
         "facebook": "tech_blueprint",
-        "instagram": "synthwave_plum",
+        "instagram": "neon_cyber",
     }
     pref = platform_map.get((platform or "").lower(), "neon_cyber")
     return CAROUSEL_THEMES[pref]
@@ -1297,9 +1655,17 @@ def clean_bubble_text(text: str, max_words: int = 18) -> str:
     return text
 
 
-def build_dialogue_prompt(mode: str, topic: Optional[str] = None, story: Optional[Dict] = None) -> str:
+def build_dialogue_prompt(
+    mode: str,
+    topic: Optional[str] = None,
+    story: Optional[Dict] = None,
+    characters: Optional[str] = "auto",
+) -> str:
     """Build the prompt for Gemini / OpenRouter dialogue script generation."""
     current_date = datetime.now().strftime("%d %B %Y")
+    speaker_left, speaker_right = resolve_dialogue_characters(characters=characters, topic=topic or "", story=story)
+    meta_left = CHARACTER_METADATA.get(speaker_left, CHARACTER_METADATA["byte"])
+    meta_right = CHARACTER_METADATA.get(speaker_right, CHARACTER_METADATA["vj"])
     
     # ── Did You Know Mode (High-Attraction Tech & Science Facts) ───────────
     if mode in ["did_you_know", "dyk"]:
@@ -1310,8 +1676,8 @@ def build_dialogue_prompt(mode: str, topic: Optional[str] = None, story: Optiona
         
         prompt = f"""You are the viral tech writer and visual director for 'Did You Know By VJ' (@vijayakumarj_ai).
 Create a high-attraction, scroll-stopping Instagram dialogue carousel (exactly 6 to 7 slides) between:
-1. "byte" (a curious, smart robot mascot who represents the fascinated audience. Expresses shock, disbelief, and asks the burning questions)
-2. "vj" (the human tech creator and host of 'Did You Know By VJ', wearing a blue hoodie with 'TECH' logo. Explains the mind-blowing reality with calm expertise, exact numbers, and vivid analogies)
+1. "{speaker_left}" ({meta_left['desc']})
+2. "{speaker_right}" ({meta_right['desc']})
 
 MIND-BLOWING FACT TO COVER:
 - Core Fact: {fact_title}
@@ -1325,15 +1691,15 @@ CRITICAL RULES FOR MAXIMUM VIEWER ATTRACTION & LAYMAN UNDERSTANDING:
 3. MODE: "did_you_know"
 4. CATEGORY: "🧠 DID YOU KNOW?"
 5. SLIDE 1 HOOK: Must start with a scroll-stopping question: "Did you know that...?" or a counter-intuitive paradox. Max 14 words.
-6. SPEAKERS ALTERNATE: Slide 1 byte, Slide 2 vj, Slide 3 byte, Slide 4 vj, Slide 5 byte, Slide 6 vj (Slide 7 takeaway).
+6. SPEAKERS ALTERNATE: Slide 1 {speaker_left}, Slide 2 {speaker_right}, Slide 3 {speaker_left}, Slide 4 {speaker_right}, Slide 5 {speaker_left}, Slide 6 {speaker_right} (Slide 7 takeaway).
 7. SPEECH BUBBLE LENGTH: STRICTLY 18 WORDS OR FEWER PER BUBBLE. Short, punchy, conversational, mind-blowing!
 8. EMOTIONAL ARC:
-   - Byte: "shocked" or "curious" on slide 1 ("Wait, did you know that...?").
-   - VJ: "excited" or "thinking" on slide 2 revealing the scale & numbers.
-   - Byte: "curious" or "thinking" on slide 3 asking the technical question.
-   - VJ: "smug" or "excited" on slide 4 explaining the engineering mechanism with a simple analogy.
-   - Byte: "shocked" on slide 5 asking the crazy consequence or edge case.
-   - VJ: "thinking" or "smug" on slide 6 delivering the punchline.
+   - {meta_left['name']}: "shocked" or "curious" on slide 1 ("Wait, did you know that...?").
+   - {meta_right['name']}: "excited" or "thinking" on slide 2 revealing the scale & numbers.
+   - {meta_left['name']}: "curious" or "thinking" on slide 3 asking the technical question.
+   - {meta_right['name']}: "smug" or "excited" on slide 4 explaining the engineering mechanism with a simple analogy.
+   - {meta_left['name']}: "shocked" on slide 5 asking the crazy consequence or edge case.
+   - {meta_right['name']}: "thinking" or "smug" on slide 6 delivering the punchline.
 9. FINAL SLIDE: Mark "is_takeaway": true. Provide a punchy summary in "takeaway" field.
 10. SLIDE TITLES: Every single slide MUST include a "title" property (2-5 words, plus an optional emoji) matching what that specific slide discusses! Slide 1 title should be the hook.
 11. CAPTION: Engaging Instagram caption with Did You Know format, 3 bullet points, an engagement question ("Did you already know this? Drop a 🤯 below!"), and viral hashtags.
@@ -1342,17 +1708,19 @@ Return ONLY valid JSON matching this schema with NO markdown fences, NO preamble
 {{
   "mode": "did_you_know",
   "category": "🧠 DID YOU KNOW?",
+  "speaker_left": "{speaker_left}",
+  "speaker_right": "{speaker_right}",
   "hook": "Did You Know 99% of the Internet is Underwater? 🌊",
   "headline": "{fact_title}",
   "source": "{fact_source}",
   "slides": [
-    {{"speaker": "byte", "emotion": "shocked", "title": "Internet Under the Sea? 🌊", "bubble": "Wait, did you know that 99% of the internet is underwater?!"}},
-    {{"speaker": "vj", "emotion": "excited", "title": "1.4M km of Glass Fiber 🌐", "bubble": "Yes! Over 1.4 million kilometers of fiber optic cables sit on the ocean floor."}},
-    {{"speaker": "byte", "emotion": "curious", "title": "Shark & Anchor Defense 🦈", "bubble": "What stops sharks or anchors from destroying them?"}},
-    {{"speaker": "vj", "emotion": "smug", "title": "Garden-Hose Thin ⚙️", "bubble": "Near shore they have heavy steel armor, deep down they are barely garden-hose thick!"}},
-    {{"speaker": "byte", "emotion": "shocked", "title": "When Cables Break 🚢", "bubble": "What happens if an anchor snags one?"}},
-    {{"speaker": "vj", "emotion": "thinking", "title": "Instant Reroute ⚡", "bubble": "Entire countries can go offline until specialized repair ships arrive."}},
-    {{"speaker": "byte", "emotion": "excited", "title": "Mind-Blowing Fact 💡", "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!", "is_takeaway": true}}
+    {{"speaker": "{speaker_left}", "emotion": "shocked", "title": "Internet Under the Sea? 🌊", "bubble": "Wait, did you know that 99% of the internet is underwater?!"}},
+    {{"speaker": "{speaker_right}", "emotion": "excited", "title": "1.4M km of Glass Fiber 🌐", "bubble": "Yes! Over 1.4 million kilometers of fiber optic cables sit on the ocean floor."}},
+    {{"speaker": "{speaker_left}", "emotion": "curious", "title": "Shark & Anchor Defense 🦈", "bubble": "What stops sharks or anchors from destroying them?"}},
+    {{"speaker": "{speaker_right}", "emotion": "smug", "title": "Garden-Hose Thin ⚙️", "bubble": "Near shore they have heavy steel armor, deep down they are barely garden-hose thick!"}},
+    {{"speaker": "{speaker_left}", "emotion": "shocked", "title": "When Cables Break 🚢", "bubble": "What happens if an anchor snags one?"}},
+    {{"speaker": "{speaker_right}", "emotion": "thinking", "title": "Instant Reroute ⚡", "bubble": "Entire countries can go offline until specialized repair ships arrive."}},
+    {{"speaker": "{speaker_left}", "emotion": "excited", "title": "Mind-Blowing Fact 💡", "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!", "is_takeaway": true}}
   ],
   "takeaway": "99% of international data relies on physical seafloor cables, not satellites. The cloud is literally on the ocean floor!",
   "caption": "🧠 DID YOU KNOW? 🤯\\n\\n99% of the internet is not in the sky... it is sitting on the ocean floor!\\n\\nHere is the mind-blowing reality:\\n🔹 Over 500 undersea fiber optic cables carry global data.\\n🔹 They transmit data at 99.7% the speed of light.\\n🔹 Deep-sea cables are only as thick as a garden hose, but carry trillions of dollars daily!\\n\\n💬 Did you already know this, or did this blow your mind? Drop a 🤯 in the comments!\\n\\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\\n#DidYouKnow #TechFacts #MindBlowingFacts #Engineering #ComputerScience"
@@ -1368,8 +1736,8 @@ Return ONLY valid JSON matching this schema with NO markdown fences, NO preamble
         url = story.get("url", "")
         
         prompt = f"""You are a senior tech writer creating a high-engagement, viral Instagram dialogue carousel (6-7 slides) between two characters:
-1. "byte" (a curious, smart robot mascot)
-2. "vj" (the human tech creator and host of 'Did You Know By VJ', wearing a blue hoodie, explaining complex tech simply and clearly)
+1. "{speaker_left}" ({meta_left['desc']})
+2. "{speaker_right}" ({meta_right['desc']})
 
 The carousel is grounded STRICTLY in this verified AI news event:
 - Headline: {title}
@@ -1382,7 +1750,7 @@ CRITICAL ACCURACY RULES:
 1. GROUNDED IN REALITY: Do NOT invent features, benchmarks, or claims not provided in the verified details above.
 2. MODE: "news"
 3. SLIDE COUNT: Exactly 6 to 7 slides.
-4. SPEAKERS ALTERNATE: Alternate between "byte" and "vj" on every slide (e.g., slide 1 byte, slide 2 vj, slide 3 byte, etc.).
+4. SPEAKERS ALTERNATE: Alternate between "{speaker_left}" and "{speaker_right}" on every slide (e.g., slide 1 {speaker_left}, slide 2 {speaker_right}, slide 3 {speaker_left}, etc.).
 5. CONCISE BUBBLES: Each speech bubble MUST BE 18 WORDS OR FEWER. Short, punchy, conversational, engaging!
 6. EMOTIONS: Each slide must have a valid emotion: ["curious", "thinking", "excited", "shocked", "neutral", "smug"].
 7. SLIDE TITLES: Every single slide MUST include a "title" property (2-5 words) matching that slide's content.
@@ -1391,17 +1759,19 @@ CRITICAL ACCURACY RULES:
 Return ONLY valid JSON matching this schema with NO markdown fences, NO preamble:
 {{
   "mode": "news",
+  "speaker_left": "{speaker_left}",
+  "speaker_right": "{speaker_right}",
   "hook": "Punchy hook question or breaking statement (max 8 words)",
   "headline": "{title}",
   "source": "{source}",
   "date": "{date}",
   "slides": [
-    {{"speaker": "byte", "emotion": "shocked", "title": "Breaking Update 🚨", "bubble": "Did OpenAI really just drop GPT-5 preview?"}},
-    {{"speaker": "vj", "emotion": "excited", "title": "Autonomous Tools ⚡", "bubble": "Yes! It introduces native autonomous tool orchestration."}},
-    {{"speaker": "byte", "emotion": "curious", "title": "Developer Impact 🛠️", "bubble": "How does that help everyday engineers?"}},
-    {{"speaker": "vj", "emotion": "thinking", "title": "Internal Planning 🧠", "bubble": "No more brittle agent loops. It handles planning internally."}},
-    {{"speaker": "byte", "emotion": "smug", "title": "10x Faster Debugging 💻", "bubble": "My debugging sessions just got 10x faster."}},
-    {{"speaker": "vj", "emotion": "excited", "title": "Key Takeaway 💡", "bubble": "Follow @vijayakumarj_ai for daily updates!", "is_takeaway": true}}
+    {{"speaker": "{speaker_left}", "emotion": "shocked", "title": "Breaking Update 🚨", "bubble": "Did OpenAI really just drop GPT-5 preview?"}},
+    {{"speaker": "{speaker_right}", "emotion": "excited", "title": "Autonomous Tools ⚡", "bubble": "Yes! It introduces native autonomous tool orchestration."}},
+    {{"speaker": "{speaker_left}", "emotion": "curious", "title": "Developer Impact 🛠️", "bubble": "How does that help everyday engineers?"}},
+    {{"speaker": "{speaker_right}", "emotion": "thinking", "title": "Internal Planning 🧠", "bubble": "No more brittle agent loops. It handles planning internally."}},
+    {{"speaker": "{speaker_left}", "emotion": "smug", "title": "10x Faster Debugging 💻", "bubble": "My debugging sessions just got 10x faster."}},
+    {{"speaker": "{speaker_right}", "emotion": "excited", "title": "Key Takeaway 💡", "bubble": "Follow @vijayakumarj_ai for daily updates!", "is_takeaway": true}}
   ],
   "takeaway": "Autonomous tool calling cuts agent boilerplate and boosts pipeline reliability.",
   "caption": "Breaking AI Update: {title}\\n\\nHere is what developers need to know...\\n\\nSource: {source} ({date})\\n\\nFollow @vijayakumarj_ai for daily AI breakdowns!\\n#AI #TechNews #DevCommunity"
@@ -1412,15 +1782,15 @@ Return ONLY valid JSON matching this schema with NO markdown fences, NO preamble
     # Concept Mode (Educational)
     concept_topic = topic or "Why does ChatGPT forget you?"
     prompt = f"""You are a world-class tech educator creating an engaging, easy-to-understand Instagram educational carousel (6-7 slides) between two mascot characters:
-1. "byte" (a curious, smart robot mascot who asks great questions)
-2. "vj" (the human tech creator and host of 'Did You Know By VJ', wearing a blue hoodie, who explains complex tech simply)
+1. "{speaker_left}" ({meta_left['desc']})
+2. "{speaker_right}" ({meta_right['desc']})
 
 TOPIC TO EXPLAIN: "{concept_topic}"
 
 CRITICAL RULES:
 1. MODE: "concept"
 2. SLIDE COUNT: Exactly 6 to 7 slides.
-3. SPEAKERS ALTERNATE: Alternate between "byte" and "vj" on every slide.
+3. SPEAKERS ALTERNATE: Alternate between "{speaker_left}" and "{speaker_right}" on every slide.
 4. PUNCHY BUBBLES: Every single speech bubble MUST BE 18 WORDS OR FEWER. No exceptions.
 5. EMOTIONS: Valid emotions for each slide: ["curious", "thinking", "excited", "shocked", "neutral", "smug"].
 6. HOOK: Must start with a magnetic hook question that stops the user's scroll.
@@ -1430,16 +1800,18 @@ CRITICAL RULES:
 Return ONLY valid JSON with NO markdown formatting:
 {{
   "mode": "concept",
+  "speaker_left": "{speaker_left}",
+  "speaker_right": "{speaker_right}",
   "hook": "Why does ChatGPT forget you?",
   "headline": "{concept_topic}",
   "slides": [
-    {{"speaker": "byte", "emotion": "curious", "title": "Why ChatGPT Forgets? 🤯", "bubble": "Why does ChatGPT forget what I said earlier?"}},
-    {{"speaker": "vj", "emotion": "thinking", "title": "The Context Window 🧠", "bubble": "Think of it as the AI's short-term memory: the context window."}},
-    {{"speaker": "byte", "emotion": "curious", "title": "When Limits Hit 🛑", "bubble": "What happens when that window fills up?"}},
-    {{"speaker": "vj", "emotion": "shocked", "title": "Silent Token Drop ✂️", "bubble": "Older messages drop off, so it literally cannot see them anymore!"}},
-    {{"speaker": "byte", "emotion": "thinking", "title": "Memory Solutions 💡", "bubble": "So prompt summaries prevent memory loss?"}},
-    {{"speaker": "vj", "emotion": "smug", "title": "Vector Memory ⚡", "bubble": "Exactly! Summarize older context or use vector memory."}},
-    {{"speaker": "byte", "emotion": "excited", "title": "Key Takeaway 💡", "bubble": "Follow @vijayakumarj_ai for daily AI breakdowns!", "is_takeaway": true}}
+    {{"speaker": "{speaker_left}", "emotion": "curious", "title": "Why ChatGPT Forgets? 🤯", "bubble": "Why does ChatGPT forget what I said earlier?"}},
+    {{"speaker": "{speaker_right}", "emotion": "thinking", "title": "The Context Window 🧠", "bubble": "Think of it as the AI's short-term memory: the context window."}},
+    {{"speaker": "{speaker_left}", "emotion": "curious", "title": "When Limits Hit 🛑", "bubble": "What happens when that window fills up?"}},
+    {{"speaker": "{speaker_right}", "emotion": "shocked", "title": "Silent Token Drop ✂️", "bubble": "Older messages drop off, so it literally cannot see them anymore!"}},
+    {{"speaker": "{speaker_left}", "emotion": "thinking", "title": "Memory Solutions 💡", "bubble": "So prompt summaries prevent memory loss?"}},
+    {{"speaker": "{speaker_right}", "emotion": "smug", "title": "Vector Memory ⚡", "bubble": "Exactly! Summarize older context or use vector memory."}},
+    {{"speaker": "{speaker_left}", "emotion": "excited", "title": "Key Takeaway 💡", "bubble": "Follow @vijayakumarj_ai for daily AI breakdowns!", "is_takeaway": true}}
   ],
   "takeaway": "LLMs have finite context windows. To avoid memory drop, summarize long chats and prune prompts!",
   "caption": "Why does ChatGPT forget you?\\n\\nEver noticed your long chat losing its train of thought? Here is how context windows actually work...\\n\\nFollow @vijayakumarj_ai for daily AI engineering breakdowns!\\n#AI #MachineLearning #ChatGPT #TechTips"
@@ -1448,7 +1820,14 @@ Return ONLY valid JSON with NO markdown formatting:
     return prompt
 
 
-def build_tailored_dyk_dialogue(title: str, hook: str, fact_summary: str, source: str) -> Dict:
+def build_tailored_dyk_dialogue(
+    title: str,
+    hook: str,
+    fact_summary: str,
+    source: str,
+    speaker_left: str = "byte",
+    speaker_right: str = "vj",
+) -> Dict:
     """Dynamically construct 6-7 slide dialogue tailored strictly to the given topic and summary."""
     current_date = datetime.now().strftime("%d %b %Y")
     clean_summary = fact_summary.strip()
@@ -1460,49 +1839,51 @@ def build_tailored_dyk_dialogue(title: str, hook: str, fact_summary: str, source
     return {
         "mode": "did_you_know",
         "category": "🧠 DID YOU KNOW?",
+        "speaker_left": speaker_left,
+        "speaker_right": speaker_right,
         "hook": hook,
         "headline": title,
         "source": source,
         "date": current_date,
         "slides": [
             {
-                "speaker": "byte",
+                "speaker": speaker_left,
                 "emotion": "shocked",
                 "title": hook,
                 "bubble": clean_bubble_text(f"Wait, did you know that {part1}?!", 18)
             },
             {
-                "speaker": "vj",
+                "speaker": speaker_right,
                 "emotion": "excited",
                 "title": "The Reality ⚙️",
                 "bubble": clean_bubble_text(f"Yes! {part2}", 18)
             },
             {
-                "speaker": "byte",
+                "speaker": speaker_left,
                 "emotion": "curious",
                 "title": "How Does It Work? 🔍",
                 "bubble": clean_bubble_text(f"What makes this happen in modern engineering?", 18)
             },
             {
-                "speaker": "vj",
+                "speaker": speaker_right,
                 "emotion": "smug",
                 "title": "The Mechanism ⚡",
                 "bubble": clean_bubble_text("Underlying physics and software architectures make this fully operational.", 18)
             },
             {
-                "speaker": "byte",
+                "speaker": speaker_left,
                 "emotion": "shocked",
                 "title": "Why It Matters 🚨",
                 "bubble": clean_bubble_text("What happens if this system glitches or fails?", 18)
             },
             {
-                "speaker": "vj",
+                "speaker": speaker_right,
                 "emotion": "thinking",
                 "title": "Fail-Safe Design 🛡️",
                 "bubble": clean_bubble_text("Automated fail-safes and redundancy keep the entire system from failing.", 18)
             },
             {
-                "speaker": "byte",
+                "speaker": speaker_left,
                 "emotion": "excited",
                 "title": "Mind-Blowing Fact 💡",
                 "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!",
@@ -1827,7 +2208,8 @@ def parse_and_validate_dialogue(data: Any, mode: str, topic: Optional[str] = Non
 def generate_cartoon_dialogue_json(
     topic: Optional[str] = None,
     story: Optional[Dict] = None,
-    mode: str = "auto"
+    mode: str = "auto",
+    characters: str = "auto",
 ) -> Dict:
     """Generate the mascot dialogue JSON script using Gemini / OpenRouter."""
     # Determine mode if auto
@@ -1843,7 +2225,7 @@ def generate_cartoon_dialogue_json(
         else:
             mode = "did_you_know"
 
-    prompt = build_dialogue_prompt(mode=mode, topic=topic, story=story)
+    prompt = build_dialogue_prompt(mode=mode, topic=topic, story=story, characters=characters)
     dialogue_data = None
 
     # Priority 1: OpenRouter models if key is present
@@ -1912,6 +2294,10 @@ def generate_cartoon_dialogue_json(
 
     # Validate and fallback if needed
     result = parse_and_validate_dialogue(dialogue_data, mode=mode, topic=topic, story=story)
+    speaker_left, speaker_right = resolve_dialogue_characters(characters=characters, topic=topic or "", story=story)
+    result["speaker_left"] = result.get("speaker_left") or speaker_left
+    result["speaker_right"] = result.get("speaker_right") or speaker_right
+    result["characters"] = characters
     return result
 
 
@@ -1924,6 +2310,7 @@ def render_cartoon_dialogue_carousel(
     bg_images: Optional[List[str]] = None,
     theme: Optional[str] = "auto",
     platform: Optional[str] = "instagram",
+    characters: Optional[str] = "auto",
 ) -> List[Path]:
     """Render the cartoon dialogue slides using cartoon_dialogue.html.j2 & Playwright."""
     slides = dialogue.get("slides", [])
@@ -1951,20 +2338,34 @@ def render_cartoon_dialogue_carousel(
     safe_title = re.sub(r'[\s\-]+', '_', re.sub(r'[^\w\s-]', '', dialogue.get("hook", "dialogue"))).strip('_')[:30].lower()
     slide_html_items = []
     
-    # Mascot image paths for final celebratory slide
-    byte_excited_path = get_character_image_path("byte", "excited") or get_character_image_path("byte", "neutral")
-    vj_excited_path = get_character_image_path("vj", "excited") or get_character_image_path("vj", "neutral")
-    asha_excited_path = vj_excited_path or get_character_image_path("asha", "excited")
+    # Resolve character duo
+    speaker_left = dialogue.get("speaker_left")
+    speaker_right = dialogue.get("speaker_right")
+    if not speaker_left or not speaker_right:
+        s_left, s_right = resolve_dialogue_characters(
+            characters=characters or dialogue.get("characters", "auto"),
+            topic=dialogue.get("hook", "") or dialogue.get("headline", ""),
+            story=dialogue
+        )
+        speaker_left = speaker_left or s_left
+        speaker_right = speaker_right or s_right
+
+    mascot_left_path = get_character_image_path(speaker_left, "excited") or get_character_image_path(speaker_left, "neutral")
+    mascot_right_path = get_character_image_path(speaker_right, "excited") or get_character_image_path(speaker_right, "neutral")
     
     for i, slide in enumerate(slides):
         slide_num = i + 1
-        speaker = slide.get("speaker", "byte")
+        speaker = slide.get("speaker", speaker_left)
         emotion = slide.get("emotion", "neutral")
         is_takeaway = (slide_num == total_slides) or slide.get("is_takeaway", False)
         slide_title = slide.get("title") or (dialogue.get("hook") if i == 0 else dialogue.get("headline", ""))
         
         char_img = get_character_image_path(speaker, emotion)
         char_img_uri = f"file://{char_img.resolve()}" if char_img else ""
+        
+        speaker_meta = CHARACTER_METADATA.get(speaker, CHARACTER_METADATA.get("byte", {}))
+        speaker_tag = speaker_meta.get("tag", f"🤖 {speaker.upper()}")
+        is_speaker_right = (speaker == speaker_right or speaker == "vj")
         
         bg_uri = None
         if bg_images and i < len(bg_images) and bg_images[i]:
@@ -1998,6 +2399,8 @@ def render_cartoon_dialogue_carousel(
             "headline": dialogue.get("headline", ""),
             "speaker": speaker,
             "emotion": emotion,
+            "speaker_tag": speaker_tag,
+            "is_speaker_right": is_speaker_right,
             "slide_data": slide_copy,
             "is_takeaway": is_takeaway,
             "takeaway": dialogue.get("takeaway", ""),
@@ -2005,9 +2408,10 @@ def render_cartoon_dialogue_carousel(
             "date": dialogue.get("date", ""),
             "brand": {"handle": "@vijayakumarj_ai", "name": "Vijayakumar J"},
             "character_img_path": char_img_uri,
-            "character_byte_path": f"file://{byte_excited_path.resolve()}" if byte_excited_path else "",
-            "character_vj_path": f"file://{vj_excited_path.resolve()}" if vj_excited_path else "",
-            "character_asha_path": f"file://{asha_excited_path.resolve()}" if asha_excited_path else "",
+            "character_left_path": f"file://{mascot_left_path.resolve()}" if mascot_left_path else "",
+            "character_right_path": f"file://{mascot_right_path.resolve()}" if mascot_right_path else "",
+            "character_byte_path": f"file://{mascot_left_path.resolve()}" if mascot_left_path else "",
+            "character_vj_path": f"file://{mascot_right_path.resolve()}" if mascot_right_path else "",
             "background_image_url": bg_uri,
             "theme": theme_cfg,
             "platform": platform,
