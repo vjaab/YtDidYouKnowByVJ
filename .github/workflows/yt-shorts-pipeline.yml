@@ -191,7 +191,7 @@ jobs:
           DRY_RUN: ${{ github.event.inputs.dry_run }}
           TOPIC_TYPE: ${{ github.event.inputs.topic_type }}
           TOPIC_SOURCE: ${{ github.event.inputs.topic_source }}
-          ENABLE_KINETIC_CAPTIONS: "0"
+          ENABLE_KINETIC_CAPTIONS: "1"
           DISABLE_ENTITY_TAGS: "1"
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
         run: |

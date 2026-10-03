@@ -134,25 +134,33 @@ def fetch_video_analytics(service, video_id, start_date: str, end_date: str) -> 
         rows = response.get("rows", [])
         if rows:
             row = rows[0]
-            # Validate that row[0] is numeric (views)
+            # With dimensions="video" the first column is the video ID, so map
+            # values by column header name rather than by fixed position.
+            headers = [h.get("name") for h in response.get("columnHeaders", [])]
+            if len(headers) != len(row):
+                # Fallback: assume dimension column first, then metrics in request order
+                headers = ["video", "views", "estimatedMinutesWatched", "averageViewDuration",
+                           "averageViewPercentage", "subscribersGained", "likes", "comments", "shares"][:len(row)]
+            data = dict(zip(headers, row))
+
             try:
-                views_val = int(row[0])
-            except (ValueError, TypeError, IndexError):
-                print(f"[WARNING] Invalid views data for {video_id}: {row[0]!r}")
+                views_val = int(data.get("views", 0) or 0)
+            except (ValueError, TypeError):
+                print(f"[WARNING] Invalid views data for {video_id}: {data.get('views')!r}")
                 return {}
-            
-            avg_view_pct = row[3] if len(row) > 3 else 0
+
+            avg_view_pct = float(data.get("averageViewPercentage", 0) or 0)
             swipe_away_rate = max(0.0, 1.0 - (avg_view_pct / 100.0)) if avg_view_pct else 1.0
             return {
                 "views": views_val,
-                "estimated_minutes_watched": row[1],
-                "avg_view_duration_sec": row[2],
+                "estimated_minutes_watched": data.get("estimatedMinutesWatched", 0),
+                "avg_view_duration_sec": data.get("averageViewDuration", 0),
                 "avg_view_percentage": avg_view_pct,
                 "swipe_away_rate": swipe_away_rate,
-                "subscribers_gained": row[4] if len(row) > 4 else 0,
-                "likes": row[5] if len(row) > 5 else 0,
-                "comments": row[6] if len(row) > 6 else 0,
-                "shares": row[7] if len(row) > 7 else 0
+                "subscribers_gained": data.get("subscribersGained", 0),
+                "likes": data.get("likes", 0),
+                "comments": data.get("comments", 0),
+                "shares": data.get("shares", 0),
             }
         else:
             print(f"[INFO] No analytics rows returned for {video_id}")

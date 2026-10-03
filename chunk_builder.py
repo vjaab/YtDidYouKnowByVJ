@@ -87,7 +87,68 @@ def build_chunks(word_timestamps, subtitle_chunks):
              final_chunks[i+1]["start"] = final_chunks[i]["end"]
              final_chunks[i+1]["duration"] = max(0.1, final_chunks[i+1]["end"] - final_chunks[i+1]["start"])
 
-    return final_chunks
+    return split_long_chunks(final_chunks)
+
+
+# Retention pacing: viral Shorts change the visual every ~1.5-3s. Any chunk
+# longer than this is split at word boundaries.
+MAX_VISUAL_CHUNK_SEC = 3.0
+TARGET_VISUAL_CHUNK_SEC = 2.2
+_FRAMING_VARIANTS = [
+    "extreme close-up detail shot",
+    "wide establishing shot, different angle",
+    "dramatic low-angle shot with bold lighting",
+    "top-down overhead view",
+]
+
+
+def split_long_chunks(chunks, max_sec=MAX_VISUAL_CHUNK_SEC, target_sec=TARGET_VISUAL_CHUNK_SEC):
+    """Split chunks longer than `max_sec` into ~`target_sec` sub-chunks.
+
+    Visual metadata is copied to each sub-chunk; follow-up sub-chunks get a
+    framing hint appended to `nano_visual_prompt` so the generator produces a
+    fresh shot instead of the identical image.
+    """
+    out = []
+    for ch in chunks:
+        words = ch.get("words") or []
+        dur = ch.get("end", 0) - ch.get("start", 0)
+        if dur <= max_sec or len(words) < 4:
+            out.append(ch)
+            continue
+
+        groups, cur = [], []
+        for w in words:
+            cur.append(w)
+            cur_dur = cur[-1]["end"] - cur[0]["start"]
+            at_punct = bool(re.search(r'[.!?,;:]$', w["word"].strip()))
+            if len(cur) >= 2 and (cur_dur >= target_sec or (at_punct and cur_dur >= target_sec * 0.6)):
+                groups.append(cur)
+                cur = []
+        if cur:
+            # Merge a tiny tail into the previous group
+            if groups and (len(cur) < 2 or cur[-1]["end"] - cur[0]["start"] < 0.8):
+                groups[-1].extend(cur)
+            else:
+                groups.append(cur)
+
+        for gi, g in enumerate(groups):
+            sub = dict(ch)
+            sub["words"] = g
+            sub["text"] = " ".join(w["word"] for w in g)
+            sub["start"] = g[0]["start"]
+            sub["end"] = g[-1]["end"]
+            sub["duration"] = sub["end"] - sub["start"]
+            if gi > 0:
+                hint = _FRAMING_VARIANTS[(gi - 1) % len(_FRAMING_VARIANTS)]
+                if sub.get("nano_visual_prompt"):
+                    sub["nano_visual_prompt"] = f"{sub['nano_visual_prompt']}, {hint}"
+                sub["is_split_continuation"] = True
+            out.append(sub)
+
+    for i, ch in enumerate(out, start=1):
+        ch["chunk_id"] = i
+    return out
 
 def _fallback_build_chunks(word_timestamps, subtitle_chunks=None):
     MIN_DURATION  = 1.0

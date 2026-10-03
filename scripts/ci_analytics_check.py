@@ -11,7 +11,7 @@ import json
 print('🔄 Syncing hook analytics with YouTube...')
 try:
     from hook_analytics_sync import sync_hook_analytics_with_youtube
-    sync_hook_analytics_with_youtube(days_back=7)
+    sync_hook_analytics_with_youtube(days_back=28)
 except Exception as e:
     print(f'⚠️ Analytics sync failed: {e}')
 

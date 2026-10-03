@@ -76,7 +76,7 @@ def _get_editorial_perspective(headline):
 # ── PROMPT TEMPLATES (AGENTIC LOOP) ────────────────────────────────────────
 
 SYSTEM_PERSONA = """Role: You are an expert scriptwriter for highly engaging, tech-focused YouTube Shorts.
-Your goal is to write 40-50 second scripts that break down technical concepts, tech news, or tips while maintaining high retention and driving subscriber conversion through incentive loops.
+Your goal is to write 25-35 second scripts that break down technical concepts, tech news, or tips while maintaining high retention and driving subscriber conversion through incentive loops.
 Tone: Casual, conversational, peer-to-peer ("smart friend over coffee"). Avoid a rigid, formal, or academic tone. Make it sound completely natural and human to bypass automated content filters.
 Target Audience: Global tech enthusiasts, professionals, and general consumers, specifically targeting viewers in USA, UK, Canada, Australia, New Zealand, Singapore, South Korea, Japan, and European countries. Use standard English, USD ($), and universally understood analogies. Ensure complete gender inclusivity so that topics and scripting appeal equally to men, women, girls, and boys. Use simple, everyday, accessible language that both young adults and older seniors can instantly relate to and understand. Avoid any developer terminology, academic jargon, or tech-bro buzzwords.
 Constraint Checklist:
@@ -91,7 +91,7 @@ Constraint Checklist:
 - ACTIONABLE SOLUTIONS: Provide a real, actionable fix directly inside the script. Give clear, specific instructions (e.g., "To turn it off: Open Settings > Privacy"). Do NOT gatekeep the solution or tell the user to "check the link in bio".
 - UNIVERSAL & GENDER-INCLUSIVE DEMOGRAPHIC FOCUS: Ensure the hook and content speak to daily human needs: saving money, protecting privacy, keeping safe from scams, saving time, digital organization, photo/video editing, or smart lifestyle features. Do not choose topics that skew heavily or exclusively to male-dominated tech niches like gaming overclocking, PC building, or server hardware. Never assume the viewer knows how to write code, configure servers, or build AI pipelines.
 - LOOP-FRIENDLY: The LAST sentence of the script MUST flow seamlessly back into the FIRST sentence, creating a natural viewing loop. Viewers who reach the end should feel compelled to watch again.
-- SCRIPT LENGTH: STRICT 80-120 words maximum. Target 40-50 seconds of speaking. SHORT = HIGH COMPLETION RATE = MORE VIEWS.
+- SCRIPT LENGTH: STRICT 65-85 words maximum. Target 25-35 seconds of speaking. SHORT = HIGH COMPLETION RATE = MORE VIEWS.
 - DYNAMIC FRAMING: The visual metadata coordinates with the layout archetype. Specify when the scene is showcase-oriented (e.g. system architecture diagrams, terminal outputs, code snippets, or workflows) which uses a split-screen layout, and when it is presenter-focused (showing a full-screen host overlaying a blurred background).
 - NAME THE SPECIFIC TOOL/MODEL EARLY (CRITICAL): Within the FIRST 10-12 seconds (first 2-3 sentences), you MUST explicitly name the specific open-source model, framework, library, or tool being discussed (e.g., "CyberSeqQwen-4B", "LangGraph", "Ollama", "vLLM"). Do NOT speak abstractly about "an AI model" or "this tool" without naming it. Technical viewers need to know instantly what you're breaking down.
 - PROBLEM -> SOLUTION -> EXAMPLES STRUCTURE (PROVEN HIGHER RETENTION):
@@ -99,7 +99,7 @@ Constraint Checklist:
   2. THE PROBLEM (3-10s): State the specific pain point. "Developers lose 5+ hrs/week debugging memory leaks." Make it personal: "your" language.
   3. THE SOLUTION (10-20s): Present the exact fix. Name the tool, command, or config. "This open-source tool auto-patches leaks in seconds."
   4. REAL EXAMPLES (20-35s): Give 1-2 concrete examples with real companies, exact commands, measurable results. "Shopify cut debug time 6hrs→12min." "Run: npx leak-finder --fix."
-  5. WHY IT MATTERS (35-45s): "Saves you hours every sprint." Personal stake, no CTA.
+  5. WHY IT MATTERS (28-33s): "Saves you hours every sprint." Personal stake, no CTA.
 - NO SUBSCRIBER INCENTIVE LOOP: Do NOT include any follow/subscribe/save/share/comment CTAs. Just explain the topic and finish cleanly.
 - SCHEMA EXTENSION: Output must include `comment_trigger_keyword` (set to ""), `incentive_cta_type` (set to "none"), and `digital_asset_offer` (set to "").
 - RHETORICAL QUESTIONS: Include 2-3 rhetorical questions per script to create open loops and drive engagement. Examples: "What does this mean for your production apps?", "Why should you care?", "But here's the real question: can you trust it?"
@@ -113,8 +113,8 @@ SUCCESS PATTERNS (2026):
 - THE PROBLEM (3-10s): State the pain point clearly and personally. "Your API keys leak in CI logs."
 - THE SOLUTION (10-20s): Name the exact tool/command/fix. "Add this one line to encrypt keys at rest."
 - REAL EXAMPLES (20-35s): Specific companies, commands, numbers. "Stripe uses this. Run: npx secret-scan --fix."
-- WHY IT MATTERS (35-45s): Personal stake. No CTA.
-- SEAMLESS LOOP (45-50s): Final sentence flows back to opening hook, referencing the SAME tool/model.
+- WHY IT MATTERS (28-33s): Personal stake. No CTA.
+- SEAMLESS LOOP (30-35s): Final sentence flows back to opening hook, referencing the SAME tool/model.
 
 Visual Director Persona & Visual Selection Logic:
 You are also an expert Visual Director. For each narration segment in the `subtitle_chunks` array, you generate highly engaging, visually rich, and contextually accurate visual prompts at the semantic level (not keyword level).
@@ -185,7 +185,7 @@ STRICT RULES:
 - Do NOT use emojis in the script text.
 - Do NOT say "In this video" or "Today we're going to".
 - Output must be plain spoken text only: no stage directions, no scene labels.
-- SCRIPT LENGTH: Target a 35-second YouTube Short (approx 80-120 words spoken at natural pace). SHORTER = HIGHER COMPLETION RATE = MORE ALGORITHMIC PUSH. Keep it extremely tight and punchy.
+- SCRIPT LENGTH: Target a 35-second YouTube Short (approx 65-85 words spoken at natural pace). SHORTER = HIGHER COMPLETION RATE = MORE ALGORITHMIC PUSH. Keep it extremely tight and punchy.
 - PROBLEM -> SOLUTION -> EXAMPLES 5-PART SHORTS ARCHITECTURE (MANDATORY):
   1. HARD HOOK (0:00 - 0:03): Metric, contradiction, or personal stake. 8-12 words. First 3 words stop the scroll.
   2. THE PROBLEM (0:03 - 0:10): State the pain point personally. "Your API keys leak in CI logs."
@@ -252,12 +252,12 @@ Tone: Direct, empathetic, authoritative yet relatable ("peer who figured it out 
 "STICKY 5" STRUCTURE CONSTRAINTS (MANDATORY):
 1. HARD HOOK (0:00 - 0:03): Financial/grade pain points or contrarian claims. 8-12 words. First 3 words stop the scroll. Never introduce yourself.
 2. RAPID PACING (0:03 - 0:30): Extreme value density with concrete benchmarks. Deliver exact tool, command, shortcut, or architecture. No jargon without immediate context.
-3. PAYOFF (0:30 - 0:45): Demonstrate the working output or confirmed free activation on screen. Show the speedup or finished app.
-4. FRICTION-FREE CTA (0:45 - 0:50): Single friction-free command + comment trigger keyword (e.g. PACK, PROJECT, NOTEBOOK, SHORTCUT).
+3. PAYOFF (0:20 - 0:28): Demonstrate the working output or confirmed free activation on screen. Show the speedup or finished app.
+4. FRICTION-FREE CTA (0:28 - 0:33): Single friction-free command + comment trigger keyword (e.g. PACK, PROJECT, NOTEBOOK, SHORTCUT).
 5. LOOPING ENDING (0:50 - 1:00): Abrupt end on payoff line for seamless loop back to opening hook.
 
 STRICT RULES:
-- Script length: 110-140 words spoken at an energetic, confident pace (approx 45-55 seconds).
+- Script length: 65-85 words spoken at an energetic, confident pace (approx 25-35 seconds).
 - Speak directly using "you" and "your".
 - No generic advice ("work hard", "learn to code"). Name exact tools, repos, config files, and commands.
 - Do NOT use emojis in the script text.
@@ -281,7 +281,7 @@ HUMANIZER PRINCIPLES & WRITING CONSTRAINTS (MANDATORY):
 """
 
 DID_YOU_KNOW_SYSTEM_PERSONA = """Role: You are an elite YouTube Shorts scriptwriter and visual director for 'Did You Know By VJ' (@YtDidYouKnowByVJ).
-Your mission is to produce viral, high-retention 45-50 second curiosity Shorts that make viewers stop mid-scroll, question what they thought they knew about technology, and watch on an infinite loop.
+Your mission is to produce viral, high-retention 25-35 second curiosity Shorts that make viewers stop mid-scroll, question what they thought they knew about technology, and watch on an infinite loop.
 
 CORE IDENTITY & TONE:
 - Channel: 'Did You Know By VJ' (@YtDidYouKnowByVJ)
@@ -290,22 +290,22 @@ CORE IDENTITY & TONE:
 - Target Audience: Global audience (18-70) across USA, UK, Canada, Australia, Europe. Universally accessible analogies. A 14-year-old student and a 65-year-old grandparent must both be utterly captivated.
 - Language: Plain, visceral, punchy English. Every technical term MUST be followed immediately by a physical or real-world comparison.
 
-THE 5-STAGE CURIOSITY LOOP FORMULA (45-50s, 80-120 words):
+THE 5-STAGE CURIOSITY LOOP FORMULA (25-35s, 65-85 words):
 1. THE CURIOSITY HOOK (0:00 - 0:03, ~8-12 words):
    - Open with "Did you know that...?" or a counter-intuitive paradox.
    - Immediate scroll-stopper. State a surprising fact that contradicts common intuition.
    - Example: "Did you know that ninety-nine percent of the internet is not in the cloud... it is sitting on the ocean floor?"
-2. MYSTERY & CONTRAST (0:03 - 0:10, ~15-20 words):
+2. MYSTERY & CONTRAST (0:02 - 0:08, ~10-15 words):
    - Shatter the common myth. Contrast what 99% of people believe with the shocking reality.
    - "Most people imagine satellites beaming Netflix from space, but satellites carry less than one percent of global data."
-3. PHYSICAL ANALOGY BREAKDOWN (0:10 - 0:28, ~35-45 words):
+3. PHYSICAL ANALOGY BREAKDOWN (0:08 - 0:20, ~25-30 words):
    - Explain HOW it actually works using a vivid, everyday physical analogy.
    - No developer jargon or abstract equations.
    - "Instead, hundreds of fiber-optic cables as thin as a garden hose snake across the ocean floor, carrying petabytes of video and banking trades through laser light."
-4. MIND-BLOWING TWIST OR SCALE (0:28 - 0:40, ~20-25 words):
+4. MIND-BLOWING TWIST OR SCALE (0:20 - 0:28, ~15-20 words):
    - Hit them with an insane number, extreme danger, or crazy engineering feat.
    - "If an anchor snags one, robotic submarines have to dive two miles deep into freezing black water just to splice glass strands thinner than human hair."
-5. SEAMLESS INFINITE LOOP (0:40 - 0:48, ~10-15 words):
+5. SEAMLESS INFINITE LOOP (0:28 - 0:33, ~8-12 words):
    - Concluding sentence flows grammatically and contextually straight back into the opening hook word-for-word.
    - Viewers loop into the second view before realizing it finished!
 
@@ -314,7 +314,7 @@ VISUAL DIRECTION & RAPID PACING:
 - Macro 3D B-roll, split-screen comparisons, cinematic hardware close-ups, and animated diagrams.
 - Clean vertical 9:16 aspect ratio prompts for each chunk.
 - NO boring talking-head monologues or generic stock footage.
-- STRICT 80-120 words voiceover limit to ensure 45-50s runtime and 100% completion rate.
+- STRICT 65-85 words voiceover limit to ensure 25-35s runtime and 100% completion rate.
 
 TTS & WRITING CONSTRAINTS:
 - Spoken text only: no emojis, no stage directions, no scene labels in the voiceover.
@@ -431,7 +431,7 @@ STRUCTURE: PROBLEM -> SOLUTION -> EXAMPLES FORMAT (proven higher retention):
 2. THE PROBLEM (3-10s): State the specific pain point clearly. "Developers waste 5+ hours/week debugging memory leaks." / "Your API keys are exposed in plain text in CI logs." Make it personal: use "your" language.
 3. THE SOLUTION (10-20s): Present the fix immediately. "This open-source tool auto-detects and patches leaks in seconds." / "Add this one config line and keys are encrypted at rest." Name the exact tool, command, or feature. **MUST explicitly name the specific model/framework/tool here (e.g., "CyberSeqQwen-4B", "LangGraph", "vLLM") within the first 2-3 sentences of the script.**
 4. REAL EXAMPLES (20-35s): Give 1-2 concrete, specific examples. "Team at Shopify cut debug time from 6hrs to 12min." / "Run: npx leak-finder --fix. It patched 3 leaks in my auth service." Use real companies, real numbers, exact commands.
-5. WHY IT MATTERS + CTA (35-45s): "This saves you hours every sprint." / "Your production data stays safe." + Soft CTA: "Save this for later. Follow for more tools like this."
+5. WHY IT MATTERS + CTA (28-33s): "This saves you hours every sprint." / "Your production data stays safe." + Soft CTA: "Save this for later. Follow for more tools like this."
 
 RULES:
 - NO "In this video," "Today I'll show you," "Let me explain"
@@ -1371,9 +1371,9 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "problem_context": "The Problem (3-10s): What most people are doing wrong or missing. 15-20 words.",
   "solution_tech": "The Solution (10-25s): The specific tool, prompt, or workflow in action. 30-40 words. **MUST explicitly name the specific model/framework/tool here (e.g., 'CyberSeqQwen-4B', 'LangGraph', 'Ollama', 'vLLM') within the first 10-12 seconds of the script.**",
   "incentive_cta": "The Incentive CTA (25-35s): Choose EXACTLY ONE mode: 1) Digital Vault: 'I put the entire script & diagram in our Telegram. Link in description.' 2) Comment Trigger: 'Comment \\'KEYWORD\\' below and I'll send you the template.' 3) Benchmark Challenge: 'I got X tokens/sec on [hardware]. Comment your specs to beat it.' 4) Community Audit: 'Sub and comment your setup for our monthly $100 API credit giveaway.'",
-  "retention_loop": "The Loop (35-45s): Final sentence that seamlessly flows back to the opening hook. 8-12 words. **MUST reference the MAIN tool/model already explained. Do NOT introduce NEW concepts (e.g., 'multi-agent swarms', 'federated security') not covered in the script.**",
+  "retention_loop": "The Loop (30-35s): Final sentence that seamlessly flows back to the opening hook. 8-12 words. **MUST reference the MAIN tool/model already explained. Do NOT introduce NEW concepts (e.g., 'multi-agent swarms', 'federated security') not covered in the script.**",
   "outro_cta": "Outro: Soft follow/subscribe prompt. 8-10 words.",
-  "script": "The FULL voiceover script combining hook_script, problem_context, solution_tech, incentive_cta, retention_loop, and outro_cta. Target 80-120 words total (approx 35-45 seconds). The last sentence MUST flow back into the first for looping. **NAME THE SPECIFIC TOOL/MODEL WITHIN FIRST 10-12 SECONDS. CURIOUS LOOP MUST REFERENCE MAIN TOPIC ONLY - NO NEW CONCEPTS.**",
+  "script": "The FULL voiceover script combining hook_script, problem_context, solution_tech, incentive_cta, retention_loop, and outro_cta. Target 65-85 words total (approx 25-35 seconds). The last sentence MUST flow back into the first for looping. **NAME THE SPECIFIC TOOL/MODEL WITHIN FIRST 10-12 SECONDS. CURIOUS LOOP MUST REFERENCE MAIN TOPIC ONLY - NO NEW CONCEPTS.**",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://example.com"],
   "phonetic_pronunciation_map": {{}},
@@ -1419,8 +1419,8 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 "SELECTION FILTERS:\n"
                 "1. MUST follow the high-engagement 4-part micro-script structure precisely.\n"
                 "2. VISUAL DEMONSTRATION REQUIRED: The `nano_visual_prompt` fields MUST describe the exact screen, code editor, or device showing the tech in action.\n"
-                "3. STRICT DURATION: Enforce a target total word count of 120-140 words, explainable in 45-50 seconds of fast-paced speech. Keep it extremely tight.\n"
-                "4. 4-PART ARCHITECTURE: Hard Hook (0-3s) -> Technical Core (3-25s) -> Incentive CTA (25-35s) -> Seamless Loop (35-45s).\n"
+                "3. STRICT DURATION: Enforce a target total word count of 65-85 words, explainable in 25-35 seconds of fast-paced speech. Keep it extremely tight.\n"
+                "4. 4-PART ARCHITECTURE: Hard Hook (0-3s) -> Technical Core (3-22s) -> Incentive CTA (22-28s) -> Seamless Loop (28-33s).\n"
                 "5. INCENTIVE CTA (MANDATORY): Choose exactly one mode: Digital Vault, Comment Trigger, Benchmark Challenge, or Community Audit."
             )
             prompt_requirements = f"""Return ONLY this exact JSON (no markdown, no explanation):
@@ -1430,11 +1430,11 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "use_case_evidence_url": "MANDATORY: A direct, valid URL from the 'SOURCES FOUND' section to be used as visual evidence.",
   "title": "Punchy, high-FOMO provocative YouTube title max 60 chars. MUST trigger Fear Of Missing Out (FOMO) and intense urgency so viewers watch until the final second: e.g. 'Stop Using [X] Before It's Too Late ⚠️' or '99% Of Devs Missed This Fatal Flaw 💀' or 'The Unfair AI Advantage Kept Secret 🤫' or 'Why Senior Engineers Are Quietly Quitting [X] ⚡'. NO boring corporate titles. Deliver on promise.",
   "hook_script": "The Hard Hook (0:00 - 0:03): State the breakout tech trend/query immediately as a negative or high-stakes claim. Metric, contradiction, or personal stake. Never start with an introduction. 10-15 words.",
-  "solution_tech": "The Technical Core (0:03 - 0:25): Deliver the exact breakout answer or content gap solution. Keep code snippets under 3 lines or focus on UI step-by-step demonstrations. 80-100 words. **MUST explicitly name the specific model/framework/tool here (e.g., 'CyberSeqQwen-4B', 'LangGraph', 'Ollama', 'vLLM') within the first 10-12 seconds of the script.**",
-  "incentive_cta": "The Incentive CTA (0:25 - 0:35): Choose EXACTLY ONE mode: 1) Digital Vault: 'I put the entire script & diagram in our Telegram. Link in description.' 2) Comment Trigger: 'Comment \\'KEYWORD\\' below and I'll send you the template.' 3) Benchmark Challenge: 'I got X tokens/sec on [hardware]. Comment your specs to beat it.' 4) Community Audit: 'Sub and comment your setup for our monthly $100 API credit giveaway.'",
-  "retention_loop": "The Seamless Loop (0:35 - 0:45): End on an incomplete thought or question that seamlessly loops back to the opening hook script. 15-20 words. **MUST reference the MAIN tool/model already explained. Do NOT introduce NEW concepts (e.g., 'multi-agent swarms', 'federated security') not covered in the script.**",
+  "solution_tech": "The Technical Core (0:03 - 0:22): Deliver the exact breakout answer or content gap solution. Keep code snippets under 3 lines or focus on UI step-by-step demonstrations. 40-50 words. **MUST explicitly name the specific model/framework/tool here (e.g., 'CyberSeqQwen-4B', 'LangGraph', 'Ollama', 'vLLM') within the first 10-12 seconds of the script.**",
+  "incentive_cta": "The Incentive CTA (0:22 - 0:28): Choose EXACTLY ONE mode: 1) Digital Vault: 'I put the entire script & diagram in our Telegram. Link in description.' 2) Comment Trigger: 'Comment \\'KEYWORD\\' below and I'll send you the template.' 3) Benchmark Challenge: 'I got X tokens/sec on [hardware]. Comment your specs to beat it.' 4) Community Audit: 'Sub and comment your setup for our monthly $100 API credit giveaway.'",
+  "retention_loop": "The Seamless Loop (0:28 - 0:33): End on an incomplete thought or question that seamlessly loops back to the opening hook script. 15-20 words. **MUST reference the MAIN tool/model already explained. Do NOT introduce NEW concepts (e.g., 'multi-agent swarms', 'federated security') not covered in the script.**",
   "outro_cta": "CTA: Subscribe/Follow for more daily tech trends. 8-10 words.",
-  "script": "The FULL voiceover script concatenating hook_script, solution_tech, incentive_cta, retention_loop, and outro_cta. Target 120-145 words total (approx 45-50s). The final sentence MUST flow back into the first sentence for looping. **NAME THE SPECIFIC TOOL/MODEL WITHIN FIRST 10-12 SECONDS. CURIOUS LOOP MUST REFERENCE MAIN TOPIC ONLY - NO NEW CONCEPTS.**",
+  "script": "The FULL voiceover script concatenating hook_script, solution_tech, incentive_cta, retention_loop, and outro_cta. Target 65-85 words total (approx 25-35s). The final sentence MUST flow back into the first sentence for looping. **NAME THE SPECIFIC TOOL/MODEL WITHIN FIRST 10-12 SECONDS. CURIOUS LOOP MUST REFERENCE MAIN TOPIC ONLY - NO NEW CONCEPTS.**",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://example.com"],
   "phonetic_pronunciation_map": {{}},
@@ -1480,7 +1480,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 "SELECTION FILTERS:\n"
                 "1. PRIORITIZE: Tips, tricks, hidden features, or free tools that EVERYONE can use immediately. NOT for programmers only. Must be understandable by a 14-year-old.\n"
                 "2. VISUAL DEMONSTRATION REQUIRED: The `nano_visual_prompt` fields MUST describe the exact screen/device showing the tip in action.\n"
-                "3. MUST be explainable in exactly <35s (approx 80-120 words total). Strict 35s limit. SHORTER = MORE VIEWS.\n"
+                "3. MUST be explainable in exactly <35s (approx 65-85 words total). Strict 35s limit. SHORTER = MORE VIEWS.\n"
                 "4. 4-PART ARCHITECTURE: Hook (0-1.5s) -> Setup (2-5s) -> Demo (5-25s) -> Incentive CTA (25-30s) -> Loop Bridge (30-35s) -> CTA (35s).\n"
                 "5. INCENTIVE CTA (MANDATORY): Choose exactly one mode: Digital Vault, Comment Trigger, Benchmark Challenge, or Community Audit.\n"
                 "6. LOOP-FRIENDLY: The last sentence MUST connect back to the first, creating a natural loop.\n"
@@ -1498,7 +1498,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "incentive_cta": "The Incentive CTA (25-30s): Choose EXACTLY ONE mode: 1) Digital Vault: 'I put the full guide & diagram in our Telegram. Link in description.' 2) Comment Trigger: 'Comment \\'KEYWORD\\' below and I'll send you the template.' 3) Benchmark Challenge: 'I got X result on [device]. Comment your setup to beat it.' 4) Community Audit: 'Sub and comment your setup for our monthly $100 API credit giveaway.'",
   "retention_loop": "The Loop Bridge (30-35s): Connect back to the opening. 8-12 words. **MUST reference the MAIN tool/feature already explained. Do NOT introduce NEW concepts not covered in the script.**",
   "outro_cta": "CTA: Follow for more tips. Subscribe. 8-10 words.",
-  "script": "The FULL voiceover script combining hook_script, problem_context, solution_tech, incentive_cta, retention_loop, and outro_cta. Target 80-120 words total. STRICT MAX 35 seconds. The last sentence MUST flow back into the first for looping. **NAME THE SPECIFIC TOOL/APP WITHIN FIRST 10-12 SECONDS. CURIOUS LOOP MUST REFERENCE MAIN TOPIC ONLY - NO NEW CONCEPTS.**",
+  "script": "The FULL voiceover script combining hook_script, problem_context, solution_tech, incentive_cta, retention_loop, and outro_cta. Target 65-85 words total. STRICT MAX 35 seconds. The last sentence MUST flow back into the first for looping. **NAME THE SPECIFIC TOOL/APP WITHIN FIRST 10-12 SECONDS. CURIOUS LOOP MUST REFERENCE MAIN TOPIC ONLY - NO NEW CONCEPTS.**",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://example.com"],
   "phonetic_pronunciation_map": {{}},
@@ -1544,7 +1544,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 "SELECTION FILTERS:\n"
                 "1. PRIORITIZE: Privacy warnings, security scares, tech myths being debunked, common mistakes everyone makes. Must make the viewer feel PERSONALLY at risk or enlightened.\n"
                 "2. Must be understandable by ANYONE: no jargon, no technical terms without simple analogies.\n"
-                "3. MUST be explainable in exactly <35s (approx 80-120 words total). Strict 35s limit. SHORTER = MORE VIEWS.\n"
+                "3. MUST be explainable in exactly <35s (approx 65-85 words total). Strict 35s limit. SHORTER = MORE VIEWS.\n"
                 "4. 4-PART ARCHITECTURE: Hook (0-1.5s) -> Setup (2-5s) -> Proof (5-25s) -> Incentive CTA (25-30s) -> Loop Bridge (30-35s) -> CTA (35s).\n"
                 "5. INCENTIVE CTA (MANDATORY): Choose exactly one mode: Digital Vault, Comment Trigger, Benchmark Challenge, or Community Audit.\n"
                 "6. LOOP-FRIENDLY: The last sentence MUST connect back to the first, creating a natural loop.\n"
@@ -1562,7 +1562,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "incentive_cta": "The Incentive CTA (25-30s): Choose EXACTLY ONE mode: 1) Digital Vault: 'I put the full privacy checklist & diagram in our Telegram. Link in description.' 2) Comment Trigger: 'Comment \\'KEYWORD\\' below and I'll send you the template.' 3) Benchmark Challenge: 'I tested this on [device] and got X result. Comment your setup to beat it.' 4) Community Audit: 'Sub and comment your setup for our monthly $100 API credit giveaway.'",
   "retention_loop": "The Loop Bridge (30-35s): Connect back to the opening claim. 8-12 words. **MUST reference the MAIN tool/setting/feature already explained. Do NOT introduce NEW concepts not covered in the script.**",
   "outro_cta": "CTA: Follow for more. Subscribe. 8-10 words.",
-  "script": "The FULL voiceover script combining hook_script, problem_context, solution_tech, incentive_cta, retention_loop, and outro_cta. Target 80-120 words total. STRICT MAX 35 seconds. Loop-friendly ending. **NAME THE SPECIFIC TOOL/SETTING WITHIN FIRST 10-12 SECONDS. CURIOUS LOOP MUST REFERENCE MAIN TOPIC ONLY - NO NEW CONCEPTS.**",
+  "script": "The FULL voiceover script combining hook_script, problem_context, solution_tech, incentive_cta, retention_loop, and outro_cta. Target 65-85 words total. STRICT MAX 35 seconds. Loop-friendly ending. **NAME THE SPECIFIC TOOL/SETTING WITHIN FIRST 10-12 SECONDS. CURIOUS LOOP MUST REFERENCE MAIN TOPIC ONLY - NO NEW CONCEPTS.**",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://example.com"],
   "phonetic_pronunciation_map": {{}},
@@ -1608,7 +1608,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 "1. PRIORITIZE: Verified computer history facts, famous bugs/failures, programming language origins, company founding stories, tech etymology: things that sound fake but are 100% true.\n"
                 "2. MUST be formatted as a multiple-choice question with 3 options (A/B/C): 1 correct, 2 plausible distractors.\n"
                 "3. MUST be understandable by ANYONE: no jargon. The reveal must include fascinating context.\n"
-                "4. MUST be explainable in exactly <35s (approx 80-120 words total). Strict 35s limit.\n"
+                "4. MUST be explainable in exactly <35s (approx 65-85 words total). Strict 35s limit.\n"
                 "5. QUIZ VISUAL FORMAT (MANDATORY - 3 CHUNKS):\n"
                 "   Chunk 1 (0-1.5s): Hook Question: Show historical photo/visual + question text, NO infographic\n"
                 "   Chunk 2 (1.5-5s): Options A/B/C: Use infographic_type='quiz_options' with option_a, option_b, option_c (MUST appear within first 2s for hook)\n"
@@ -1631,7 +1631,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "incentive_cta": "The Incentive CTA (25-30s): Choose EXACTLY ONE mode: 1) Digital Vault: 'I put 50 verified tech quizzes in our Telegram. Link in description.' 2) Comment Trigger: 'Comment \\'QUIZ\\' below for the full quiz pack.' 3) Benchmark Challenge: 'I scored 10/10. Comment your score to beat it!' 4) Community Audit: 'Sub and comment your score for monthly $100 API credit giveaway.'",
   "retention_loop": "The Loop Bridge (30-35s): Connect back to opening. 'Think you know tech history? Next quiz drops tomorrow.'",
   "outro_cta": "CTA: Follow for daily quizzes. Subscribe. 8-10 words.",
-  "script": "The FULL voiceover script combining hook_script, problem_context, solution_tech, incentive_cta, retention_loop, and outro_cta. Target 80-120 words total. STRICT MAX 35 seconds. Loop-friendly ending.",
+  "script": "The FULL voiceover script combining hook_script, problem_context, solution_tech, incentive_cta, retention_loop, and outro_cta. Target 65-85 words total. STRICT MAX 35 seconds. Loop-friendly ending.",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://example.com"],
   "phonetic_pronunciation_map": {{}},
@@ -1713,7 +1713,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 "1. PRIORITIZE: Frequently asked interview questions for Java, JavaScript, Spring Boot, AWS, Python, Kubernetes, Docker.\n"
                 "2. Each video covers ONE specific question with a complete answer.\n"
                 "3. Format: Hook (question) -> Context (why it's asked) -> Answer (clear explanation with code/config example) -> Key Takeaway.\n"
-                "4. MUST be explainable in exactly <35s (approx 80-120 words total). Strict 35s limit.\n"
+                "4. MUST be explainable in exactly <35s (approx 65-85 words total). Strict 35s limit.\n"
                 "5. 4-PART ARCHITECTURE: Hook Question (0-2s) -> Why This Matters (2-5s) -> Answer with Code/Config (5-25s) -> Incentive CTA (25-30s) -> Loop Bridge (30-35s) -> CTA (35s).\n"
                 "6. INCENTIVE CTA (MANDATORY): Choose exactly one mode: Digital Vault, Comment Trigger, Benchmark Challenge, or Community Audit.\n"
                 "7. LOOP-FRIENDLY: Last sentence connects back to the opening question.\n"
@@ -1733,7 +1733,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "incentive_cta": "The Incentive CTA (25-30s): Choose EXACTLY ONE mode: 1) Digital Vault: 'I put 50 interview Q&A with code in our Telegram. Link in description.' 2) Comment Trigger: 'Comment \\'INTERVIEW\\' below for the full prep pack.' 3) Benchmark Challenge: 'I answered this in 30 seconds. Comment your time to beat it!' 4) Community Audit: 'Sub and comment your answer for monthly $100 API credit giveaway.'",
   "retention_loop": "The Loop Bridge (30-35s): Connect back to opening. 'Think you nailed this one? Next question drops tomorrow.'",
   "outro_cta": "CTA: Follow for daily interview prep. Subscribe. 8-10 words.",
-  "script": "The FULL voiceover script combining hook_script, problem_context, solution_tech, incentive_cta, retention_loop, and outro_cta. Target 80-120 words total. STRICT MAX 35 seconds. Loop-friendly ending.",
+  "script": "The FULL voiceover script combining hook_script, problem_context, solution_tech, incentive_cta, retention_loop, and outro_cta. Target 65-85 words total. STRICT MAX 35 seconds. Loop-friendly ending.",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://example.com"],
   "phonetic_pronunciation_map": {{}},
@@ -1825,11 +1825,11 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 f"PRIMARY CATEGORY: {category}\n"
                 f"{series_instruction}"
                 "SELECTION FILTERS:\n"
-                "1. 'STICKY 5' SHORTS ARCHITECTURE (45-60s, approx 110-140 words):\n"
+                "1. 'STICKY 5' SHORTS ARCHITECTURE (25-35s, approx 65-85 words):\n"
                 "   - Hook (0-3s): Open on financial pain, grade anxiety, or contrarian myth-busting. 8-12 words.\n"
                 "   - Rapid Pacing (3-30s): Deliver high density of value with concrete benchmarks, tools, commands, or architecture.\n"
                 "   - Payoff (30-45s): Demonstrate working output or confirmed free activation on screen.\n"
-                "   - Friction-Free CTA (45-50s): Single command with comment keyword trigger (e.g. PACK, PROJECT, NOTEBOOK, SHORTCUT).\n"
+                "   - Friction-Free CTA (30-35s): Single command with comment keyword trigger (e.g. PACK, PROJECT, NOTEBOOK, SHORTCUT).\n"
                 "   - Looping Ending (50-60s): Crisp concluding sentence that seamlessly flows into the opening hook.\n"
                 "2. NO GENERIC ADVICE: Name exact software, URLs, keyboard shortcuts, or architecture layers.\n"
                 "3. VISUAL CLARITY: Visual prompts must show code editors, terminals, GitHub, or clean system flowcharts.\n"
@@ -1843,11 +1843,11 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "hook_script": "The Hook (0-3s): Punchy opening hook tapping into student pain or contrarian truth. 8-12 words.",
   "problem_context": "The Setup (3-10s): Why students waste hours or hundreds of dollars doing this wrong. 15-20 words.",
   "solution_tech": "The Demo / Architecture (10-30s): Step-by-step workflow, command, or architecture diagram. 40-60 words.",
-  "payoff_output": "The Payoff (30-45s): The exact working output or confirmed free activation. 20-30 words.",
-  "incentive_cta": "The Incentive CTA (45-50s): Single keyword trigger CTA: 'Comment \\'PACK\\' below and I\\'ll send the direct link + setup guide.'",
+  "payoff_output": "The Payoff (24-30s): The exact working output or confirmed free activation. 20-30 words.",
+  "incentive_cta": "The Incentive CTA (30-35s): Single keyword trigger CTA: 'Comment \\'PACK\\' below and I\\'ll send the direct link + setup guide.'",
   "retention_loop": "The Loop Bridge (50-60s): Concluding sentence flowing seamlessly back to the opening hook.",
   "outro_cta": "CTA: Save this for later. Subscribe for more student dev hacks.",
-  "script": "The FULL unified voiceover script combining hook_script, problem_context, solution_tech, payoff_output, incentive_cta, retention_loop, and outro_cta. Target 110-140 words total (45-55 seconds). Must flow naturally for TTS.",
+  "script": "The FULL unified voiceover script combining hook_script, problem_context, solution_tech, payoff_output, incentive_cta, retention_loop, and outro_cta. Target 65-85 words total (25-35 seconds). Must flow naturally for TTS.",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://education.github.com/pack", "https://notebooklm.google.com"],
   "phonetic_pronunciation_map": {{}},
@@ -1910,13 +1910,13 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 f"PRIMARY CATEGORY: {category}\n"
                 f"{series_instruction}"
                 "SELECTION FILTERS:\n"
-                "1. THE 5-STAGE CURIOSITY LOOP FORMULA (45-50s, 80-120 words max):\n"
+                "1. THE 5-STAGE CURIOSITY LOOP FORMULA (25-35s, 65-85 words max):\n"
                 "   - Hook (0-3s): Open with 'Did you know that...?' or a paradox. Stop the scroll instantly. 8-12 words.\n"
                 "   - Mystery / Contrast (3-10s): Shatter common belief. What people assume vs the shocking truth. 15-20 words.\n"
-                "   - Physical Analogy Breakdown (10-28s): Explain how it works using a vivid, everyday physical analogy. 35-45 words. NO developer jargon.\n"
-                "   - Mind-Blowing Twist / Scale (28-40s): Reveal an insane number, danger, or extreme engineering feat. 20-25 words.\n"
-                "   - Seamless Infinite Loop (40-48s): Crisp concluding sentence that flows seamlessly back into the opening hook without seam.\n"
-                "2. STRICT DURATION & WORD COUNT: Total script MUST be strictly 80-120 words (approx 45-48 seconds). Every extra word hurts retention.\n"
+                "   - Physical Analogy Breakdown (8-20s): Explain how it works using a vivid, everyday physical analogy. 25-30 words. NO developer jargon.\n"
+                "   - Mind-Blowing Twist / Scale (20-28s): Reveal an insane number, danger, or extreme engineering feat. 20-25 words.\n"
+                "   - Seamless Infinite Loop (28-33s): Crisp concluding sentence that flows seamlessly back into the opening hook without seam.\n"
+                "2. STRICT DURATION & WORD COUNT: Total script MUST be strictly 65-85 words (approx 25-35 seconds). Every extra word hurts retention.\n"
                 "3. RAPID VISUAL PACING: Provide 8-12 subtitle chunks with visual changes every 1.8s-2.5s. Nano visual prompts must be cinematic, macro 3D B-roll, or high-contrast split-screen comparisons.\n"
                 "4. GENDER & AGE INCLUSIVE (18-70): The curiosity fact must amaze any human, from a teenager to a grandparent.\n"
             )
@@ -1928,10 +1928,10 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "title": "Punchy, curiosity-gap YouTube Shorts title max 55 chars with emoji: e.g. 'Did You Know This About Your Phone? 🤯' or 'The $500M Bug That Shocked NASA 🚀' or 'Why 99% Of The Internet Lies Underwater 🌊'.",
   "hook_script": "The Curiosity Hook (0-3s): Open with 'Did you know that...?' or a paradox. 8-12 words.",
   "mystery_contrast": "The Mystery / Contrast (3-10s): What everyone believes vs the shocking truth. 15-20 words.",
-  "core_explanation": "The Analogy Breakdown (10-28s): Explain the physical mechanism using everyday analogies. 35-45 words.",
-  "twist_scale": "The Twist / Scale (28-40s): The insane number, scale, or secret consequence. 20-25 words.",
-  "retention_loop": "The Seamless Loop (40-48s): Concluding sentence flowing directly back into the opening hook sentence.",
-  "script": "The FULL unified voiceover script combining hook_script, mystery_contrast, core_explanation, twist_scale, and retention_loop. STRICTLY 80-120 words total. The final words MUST flow directly into the first sentence for an endless seamless loop.",
+  "core_explanation": "The Analogy Breakdown (8-20s): Explain the physical mechanism using everyday analogies. 25-30 words.",
+  "twist_scale": "The Twist / Scale (20-28s): The insane number, scale, or secret consequence. 20-25 words.",
+  "retention_loop": "The Seamless Loop (28-33s): Concluding sentence flowing directly back into the opening hook sentence.",
+  "script": "The FULL unified voiceover script combining hook_script, mystery_contrast, core_explanation, twist_scale, and retention_loop. STRICTLY 65-85 words total. The final words MUST flow directly into the first sentence for an endless seamless loop.",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://en.wikipedia.org"],
   "phonetic_pronunciation_map": {{}},
@@ -1977,7 +1977,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 "SELECTION FILTERS:\n"
                 "1. PRIORITIZE: Surprising comparisons (free vs paid), hidden features nobody knows about, AI experiments with visual results, or tech facts that make people say 'WHAT?!'\n"
                 "2. Must be understandable by ANYONE: a teenager and a grandparent should both find it useful or amazing.\n"
-                "3. MUST be explainable in exactly <35s (approx 80-120 words total). Strict 35s limit. SHORTER = MORE VIEWS.\n"
+                "3. MUST be explainable in exactly <35s (approx 65-85 words total). Strict 35s limit. SHORTER = MORE VIEWS.\n"
                 "4. 4-PART ARCHITECTURE: Hook (0-1.5s) -> Setup (2-5s) -> Reveal (5-25s) -> Incentive CTA (25-30s) -> Loop Bridge (30-35s) -> CTA (35s).\n"
                 "5. INCENTIVE CTA (MANDATORY): Choose exactly one mode: Digital Vault, Comment Trigger, Benchmark Challenge, or Community Audit.\n"
                 "6. LOOP-FRIENDLY: The last sentence MUST connect back to the first, creating a natural loop.\n"
@@ -1995,7 +1995,7 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
   "incentive_cta": "The Incentive CTA (25-30s): Choose EXACTLY ONE mode: 1) Digital Vault: 'I put the full comparison & diagram in our Telegram. Link in description.' 2) Comment Trigger: 'Comment \\'KEYWORD\\' below and I'll send you the template.' 3) Benchmark Challenge: 'I got X result on [device]. Comment your setup to beat it.' 4) Community Audit: 'Sub and comment your setup for our monthly $100 API credit giveaway.'",
   "retention_loop": "The Loop Bridge (30-35s): Connect back to the opening. 8-12 words. **MUST reference the MAIN tool/model/feature already explained. Do NOT introduce NEW concepts not covered in the script.**",
   "outro_cta": "CTA: Follow for more. Subscribe. 8-10 words.",
-  "script": "The FULL voiceover script combining hook_script, problem_context, solution_tech, incentive_cta, retention_loop, and outro_cta. Target 80-120 words total. STRICT MAX 35 seconds. Loop-friendly ending. **NAME THE SPECIFIC TOOL/MODEL WITHIN FIRST 10-12 SECONDS. CURIOUS LOOP MUST REFERENCE MAIN TOPIC ONLY - NO NEW CONCEPTS.**",
+  "script": "The FULL voiceover script combining hook_script, problem_context, solution_tech, incentive_cta, retention_loop, and outro_cta. Target 65-85 words total. STRICT MAX 35 seconds. Loop-friendly ending. **NAME THE SPECIFIC TOOL/MODEL WITHIN FIRST 10-12 SECONDS. CURIOUS LOOP MUST REFERENCE MAIN TOPIC ONLY - NO NEW CONCEPTS.**",
   "hook_text": "The exact first 5-8 words of the script.",
   "relevant_links": ["https://example.com"],
   "phonetic_pronunciation_map": {{}},

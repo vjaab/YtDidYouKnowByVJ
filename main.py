@@ -258,15 +258,17 @@ def generate_pinned_comment(script_data, next_series_slot):
     if script_data.get("pinned_comment"):
         return script_data["pinned_comment"]
     series = get_series_identity(next_series_slot)
-    tease  = script_data.get("next_video_tease", "something big tomorrow")
-    hook   = script_data.get("comment_hook", "What do you think?")
-    cta    = script_data.get("identity_cta", "Join the elite builders.")
+    tease  = (script_data.get("next_video_tease") or "").strip()
+    hook   = script_data.get("comment_hook") or "What do you think?"
+    cta    = script_data.get("identity_cta") or "Follow for more tech secrets."
 
-    return (
-        f"🔔 {hook}\n\n"
-        f"Tomorrow on {series['name']}: {tease}\n\n"
-        f"👇 {cta}"
-    )
+    parts = [f"🔔 {hook}"]
+    # Only tease the next video when we have a concrete teaser — a generic
+    # placeholder ("something big tomorrow") reads as spam and hurts trust.
+    if tease and tease.lower() not in {"something big tomorrow", "something big"}:
+        parts.append(f"Tomorrow on {series['name']}: {tease}")
+    parts.append(f"👇 {cta}")
+    return "\n\n".join(parts)
 
 
 def format_instagram_caption(description, hashtags, youtube_url, script_data=None):
@@ -709,6 +711,7 @@ def run_pipeline(topic_type="auto", dry_run=False, topic_source="auto"):
     # rewards 15-35s Shorts with higher completion rates. All types now use
     # the config-level TARGET_AUDIO_DURATION (15, 35).
     failed_topics = []  # Track topics whose screenshots failed so Gemini avoids them
+    shorten_retries = 0  # Over-length script rewrites requested this run (capped)
 
     while attempts < MAX_RETRY_ATTEMPTS:
         log_message(f"STEP 3 (Attempt {attempts+1}/{MAX_RETRY_ATTEMPTS}): Gemini Searching & Generating Script...")
@@ -903,6 +906,20 @@ def run_pipeline(topic_type="auto", dry_run=False, topic_source="auto"):
             script_data = None
             continue
 
+        # Upper bound: long Shorts kill completion rate. Measured TTS pace is
+        # ~2.1-2.6 words/sec, so cap at ~85 words (≈ 33-40s). Retry at most
+        # twice per run, then accept to avoid starving the pipeline.
+        MAX_SCRIPT_WORDS = int(max_dur * 2.4)  # 35s → 84 words
+        if word_count > MAX_SCRIPT_WORDS and shorten_retries < 2:
+            shorten_retries += 1
+            log_message(f"⚠️ Script too long ({word_count} words > {MAX_SCRIPT_WORDS}). Asking for a tighter rewrite (shorten retry {shorten_retries}/2) before GPU work.")
+            extra_instruction = (
+                f"The previous script was TOO LONG at {word_count} words. Rewrite it in {int(max_dur * 1.9)}-{MAX_SCRIPT_WORDS} words "
+                f"(20-35 seconds). Keep the hook in the first 8 words, cut filler, keep the loop ending."
+            )
+            attempts += 1
+            script_data = None
+            continue
         if has_kaggle and not use_local_only:
             results = trigger_kaggle_gpu_job(script_data, custom_map)
             

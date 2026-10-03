@@ -577,11 +577,9 @@ def get_optimized_metadata(
             norm_people.append(p)
     initial_people = norm_people
     
-    # Add editorial perspective to keywords for metadata diversity
-    if editorial_perspective:
-        initial_keywords.append(editorial_perspective.lower().replace(" ", "_"))
-    if content_fingerprint:
-        initial_keywords.append(f"fp_{content_fingerprint[:8]}")
+    # NOTE: editorial_perspective and content_fingerprint are internal IDs used
+    # for diversity tracking. They are intentionally NOT added to public tags /
+    # hashtags (they previously leaked as e.g. "#FpCa66d099", "builders_lens").
     
     full_text = f"{title} {script} {sub_category}".lower()
     
