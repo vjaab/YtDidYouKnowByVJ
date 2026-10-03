@@ -81,14 +81,10 @@
     "Medium (technology): Shrinking Big Models for Local AI: A Practical Ro",
     "Medium (technology): Chapter 5: Democracy Is Just Paint and Wax\u2013It\u2019s A",
     "Medium (artificial-intelligence): Your AI Agent Is Holding a Productio",
-    "Medium (artificial-intelligence): Your AI Agent Is Holding a Productio"
+    "Medium (artificial-intelligence): Your AI Agent Is Holding a Productio",
+    "AI Image Generators Have Invisible Watermarks You Cannot See"
   ],
   "used_keywords": [
-    "internet",
-    "fiber optics",
-    "ocean floor",
-    "did you know",
-    "nfc",
     "rfid",
     "contactless payments",
     "electromagnetic induction",
@@ -283,7 +279,12 @@
     "your",
     "agent",
     "threads",
-    "tech"
+    "tech",
+    "synthid",
+    "ai watermark",
+    "image generation",
+    "deepmind",
+    "did you know"
   ],
   "history": [
     {
@@ -1460,6 +1461,20 @@
       ],
       "source": "Threads Post",
       "timestamp": "2026-10-02T20:09:40.504104+00:00"
+    },
+    {
+      "title": "AI Image Generators Have Invisible Watermarks You Cannot See",
+      "news_source_url": "",
+      "keywords": [
+        "synthid",
+        "ai watermark",
+        "image generation",
+        "deepmind",
+        "did you know"
+      ],
+      "source": "Google DeepMind SynthID Paper",
+      "platform": "unknown",
+      "timestamp": "2026-10-03T09:46:23.378243+00:00"
     }
   ]
 }

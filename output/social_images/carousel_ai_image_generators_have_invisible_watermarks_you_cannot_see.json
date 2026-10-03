@@ -1,0 +1,61 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "hook": "Did You Know AI Images Have Hidden Invisible Watermarks? \ud83d\udd0d",
+  "headline": "AI Image Generators Have Invisible Watermarks You Cannot See",
+  "source": "Google DeepMind SynthID Paper",
+  "slides": [
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "Hidden AI Watermarks? \ud83d\udd0d",
+      "bubble": "Wait, did you know that AI images have hidden invisible watermarks? \ud83d\udd0d",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "SynthID Revealed! \ud83e\udd16",
+      "bubble": "Yes! Google DeepMind's SynthID adds unseen patterns to AI-generated images.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "curious",
+      "title": "Totally Invisible? \ud83e\udd14",
+      "bubble": "Invisible? How can a watermark be completely unseen yet still there?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Pixel Secrets \ud83e\udd2b",
+      "bubble": "It subtly shifts pixels, creating a pattern human eyes can't detect. Like a scent.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "Survives Filters? \ud83e\udd2f",
+      "bubble": "Wait, so even if I crop it or add a filter, the watermark stays?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Authenticity Proof \u2705",
+      "bubble": "Absolutely! It even survives screenshots. This proves an image is AI-generated.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "excited",
+      "title": "More Tech Facts! \ud83d\udd25",
+      "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Google DeepMind's SynthID embeds invisible watermarks into AI images at the pixel level, detectable even after editing, to prove AI origin.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nAI-generated images often come with a secret you can't see! \n\nHere's the mind-blowing reality:\n\ud83d\udd39 Google DeepMind's SynthID embeds imperceptible patterns into AI images.\n\ud83d\udd39 These 'invisible watermarks' subtly shift pixels, undetectable to the human eye.\n\ud83d\udd39 They survive cropping, filtering, and even screenshots, proving an image's AI origin!\n\n\ud83d\udcac Did you already know about these hidden AI watermarks? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #AI #TechFacts #InvisibleWatermarks #DeepMind #SynthID #ArtificialIntelligence #Tech",
+  "vector": "ai_secrets"
+}
