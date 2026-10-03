@@ -84,14 +84,10 @@
     "Medium (artificial-intelligence): Your AI Agent Is Holding a Productio",
     "AI Image Generators Have Invisible Watermarks You Cannot See",
     "QR Codes Still Work Even When 30% Is Destroyed",
-    "QR Codes Still Work Even When 30% Is Destroyed"
+    "QR Codes Still Work Even When 30% Is Destroyed",
+    "ChatGPT Uses More Electricity Per Query Than a Google Search Uses in a Day"
   ],
   "used_keywords": [
-    "semiconductors",
-    "did you know",
-    "asml",
-    "euv",
-    "semiconductors",
     "chip making",
     "microprocessors",
     "did you know",
@@ -286,7 +282,12 @@
     "barcode",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "ai energy",
+    "chatgpt power",
+    "gpu electricity",
+    "sustainability",
+    "did you know"
   ],
   "history": [
     {
@@ -1502,6 +1503,20 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-03T10:36:08.654248+00:00"
+    },
+    {
+      "title": "ChatGPT Uses More Electricity Per Query Than a Google Search Uses in a Day",
+      "news_source_url": "",
+      "keywords": [
+        "ai energy",
+        "chatgpt power",
+        "gpu electricity",
+        "sustainability",
+        "did you know"
+      ],
+      "source": "IEA & Goldman Sachs AI Energy Reports",
+      "platform": "instagram",
+      "timestamp": "2026-10-03T15:28:04.108497+00:00"
     }
   ]
 }
