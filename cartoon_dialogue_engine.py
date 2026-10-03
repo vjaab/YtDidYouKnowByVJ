@@ -1095,7 +1095,7 @@ def fetch_or_select_did_you_know_fact(topic: Optional[str] = None, platform: str
     # CASE B: Auto-selection (Prioritize high-attraction, layman-friendly concepts with zero duplicates)
     if not selected:
         try:
-            from topic_tracker import get_did_you_know_sub_vector
+            from topic_tracker import get_did_you_know_sub_vector, DID_YOU_KNOW_VECTORS
             # Apply platform offset to vector rotation so each platform starts on a different vector
             base_vector = get_did_you_know_sub_vector()
             vector_idx = DID_YOU_KNOW_VECTORS.index(base_vector) if base_vector in DID_YOU_KNOW_VECTORS else 0
@@ -1103,7 +1103,14 @@ def fetch_or_select_did_you_know_fact(topic: Optional[str] = None, platform: str
             current_vector = DID_YOU_KNOW_VECTORS[offset_idx]
         except Exception:
             # Fallback: use platform offset directly
-            current_vector = DID_YOU_KNOW_VECTORS[platform_offset % len(DID_YOU_KNOW_VECTORS)]
+            fallback_vectors = [
+                "ai_secrets",
+                "everyday_tech_mysteries",
+                "hardware_megastructures",
+                "bizarre_tech_history",
+                "cybersecurity_secrets",
+            ]
+            current_vector = fallback_vectors[platform_offset % len(fallback_vectors)]
 
         print(f"🧠 [{platform.upper()}] Selecting layman-friendly fact for vector: '{current_vector}'...")
 
