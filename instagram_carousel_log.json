@@ -85,12 +85,11 @@
     "AI Image Generators Have Invisible Watermarks You Cannot See",
     "QR Codes Still Work Even When 30% Is Destroyed",
     "QR Codes Still Work Even When 30% Is Destroyed",
-    "ChatGPT Uses More Electricity Per Query Than a Google Search Uses in a Day"
+    "ChatGPT Uses More Electricity Per Query Than a Google Search Uses in a Day",
+    "Bluetooth is Named After a 10th-Century Viking King",
+    "Bluetooth is Named After a 10th-Century Viking King"
   ],
   "used_keywords": [
-    "chip making",
-    "microprocessors",
-    "did you know",
     "quartz crystal",
     "binary",
     "watches",
@@ -287,7 +286,10 @@
     "chatgpt power",
     "gpu electricity",
     "sustainability",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
     {
@@ -1517,6 +1519,27 @@
       "source": "IEA & Goldman Sachs AI Energy Reports",
       "platform": "instagram",
       "timestamp": "2026-10-03T15:28:04.108497+00:00"
+    },
+    {
+      "title": "Bluetooth is Named After a 10th-Century Viking King",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-03T17:29:29.193468+00:00"
+    },
+    {
+      "title": "Bluetooth is Named After a 10th-Century Viking King",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-03T17:30:47.671601+00:00"
     }
   ]
 }

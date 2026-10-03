@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know Bluetooth is Named After a Viking?",
+  "headline": "Bluetooth is Named After a 10th-Century Viking King",
+  "source": "Bluetooth SIG Official History",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Bluetooth & Vikings? \ud83d\udee1\ufe0f",
+      "bubble": "Wait, did you know Bluetooth is named after a 10th-century Viking King?!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "King Harald Gormsson \ud83d\udc51",
+      "bubble": "Yep! Harald 'Bluetooth' Gormsson united warring Scandinavian tribes. A tech legacy!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Uniting Tribes? \ud83e\udd14",
+      "bubble": "So, he connected people? Like Bluetooth connects devices today?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Connecting Tech! \ud83d\udd17",
+      "bubble": "Exactly! Just as Harald united tribes, Bluetooth aims to unite communication protocols wirelessly.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "The Logo's Secret! \ud83e\udd2b",
+      "bubble": "No way! Does that mean the actual logo has a Viking secret too?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Runes H & B \u2728",
+      "bubble": "It does! The Bluetooth logo merges Harald's runic initials: 'H' for Hagall and 'B' for Berkana.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Mind-Blown Fact! \ud83e\udd2f",
+      "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Bluetooth's name honors a Viking king who united tribes, and its logo combines his runic initials, connecting ancient history to modern tech.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour wireless headphones, smart devices, and car's connectivity all share a surprising link to a 10th-century Viking King!\n\nHere's the mind-blowing reality:\n\ud83d\udd39 Bluetooth is named after Harald 'Bluetooth' Gormsson, a Viking King who united warring Scandinavian tribes.\n\ud83d\udd39 His ability to 'unite' became the perfect metaphor for Bluetooth's aim to connect different communication protocols.\n\ud83d\udd39 The iconic Bluetooth logo is actually a clever merge of his runic initials: \u16bc (Hagall) for H, and \u16d2 (Berkana) for B!\n\n\ud83d\udcac Did you already know this crazy piece of history, or did this fact blow your mind? Drop a \ud83d\udee1\ufe0f or \ud83e\udd2f in the comments!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #Bluetooth #VikingHistory #TechFacts #MindBlown #HistoryOfTech #WirelessTech #HaraldBluetooth #TechDiscovery",
+  "vector": "everyday_tech_mysteries",
+  "characters": "auto"
+}
