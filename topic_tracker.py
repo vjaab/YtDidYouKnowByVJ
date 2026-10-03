@@ -293,27 +293,23 @@ def _get_core_topic_type(tracker_file=TRACKER_FILE):
     tracker = load_tracker(tracker_file)
     history = tracker.get("history", [])
     
+    # Mass-appeal Shorts ratios: 50% Mind-blowing facts/secrets, 30% Useful tools/tricks, 20% News/warnings
     target_ratios = {
-        "did_you_know": 0.35,
-        "tools": 0.20,
-        "news": 0.15,
-        "research": 0.15,
-        "interview_questions": 0.15
+        "did_you_know": 0.50,
+        "tools": 0.30,
+        "news": 0.20,
     }
     
-    # Only analyze core entries (non-student) from last 30
+    # Only analyze recent entries from last 30
     recent_entries = history[-30:] if history else []
     
-    counts = {"did_you_know": 0, "tools": 0, "news": 0, "research": 0, "interview_questions": 0}
+    counts = {"did_you_know": 0, "tools": 0, "news": 0}
     total_counted = 0
     
     for entry in recent_entries:
         if not isinstance(entry, dict):
             continue
         ttype = entry.get("topic_type")
-        # Skip student entries for core ratio calculation
-        if ttype == "student":
-            continue
         if ttype in counts:
             counts[ttype] += 1
             total_counted += 1
@@ -329,14 +325,8 @@ def _get_core_topic_type(tracker_file=TRACKER_FILE):
             elif "tool" in sub_cat or "app" in sub_cat or "feature" in sub_cat or "tip" in title or "trick" in title or "hidden" in title or "hack" in title:
                 counts["tools"] += 1
                 total_counted += 1
-            elif "myth" in sub_cat or "privacy" in sub_cat or "scary" in sub_cat or "wrong" in title or "mistake" in title or "stop" in title or "myth" in title:
-                counts["news"] += 1
-                total_counted += 1
-            elif "interview" in sub_cat or "interview" in title or "interview" in headline:
-                counts["interview_questions"] += 1
-                total_counted += 1
             else:
-                counts["research"] += 1
+                counts["news"] += 1
                 total_counted += 1
                 
     if total_counted == 0:
@@ -344,77 +334,35 @@ def _get_core_topic_type(tracker_file=TRACKER_FILE):
         
     deficits = {}
     for t, target in target_ratios.items():
-        current_ratio = counts[t] / total_counted
+        current_ratio = counts.get(t, 0) / total_counted
         deficits[t] = target - current_ratio
         
     selected = max(deficits, key=deficits.get)
-    print(f"📊 Core ratio calculation: counts={counts}, deficits={deficits} -> Selected: {selected}")
+    print(f"📊 Mass-appeal ratio calculation: counts={counts}, deficits={deficits} -> Selected: {selected}")
     return selected
 
 
 def get_next_topic_type_by_ratio(tracker_file=TRACKER_FILE):
     """
-    2-Tier Weighted Allocation System:
-    
-    TIER 1: Decides between 'student' (40%) and 'core' (60%) content.
-    Uses a sliding window of the last 10 entries to enforce the 40/60 split.
-    Every 5 generated Shorts should contain exactly 2 student-targeted scripts.
-    
-    TIER 2: 
-      - If student: returns 'student' (sub-vector selected separately via get_student_sub_vector())
-      - If core: delegates to _get_core_topic_type() for deficit-based ratio balancing
-        among tools/news/research/quiz/interview_questions.
+    Mass-Appeal Topic Allocation System:
+    Focuses 100% of pipeline runs on high-retention discovery formats:
+      - 50% did_you_know (Mind-blowing tech facts, secrets, hidden features, easter eggs)
+      - 30% tools (Consumer AI tools, smartphone hacks, productivity shortcuts)
+      - 20% news (Major tech warnings, scam alerts, high-stakes breakthroughs)
     """
-    tracker = load_tracker(tracker_file)
-    history = tracker.get("history", [])
-    
-    # Tier 1: Student vs Core allocation (sliding window of last 10)
-    recent_10 = history[-10:] if history else []
-    
-    student_count = 0
-    core_count = 0
-    for entry in recent_10:
-        if not isinstance(entry, dict):
-            continue
-        ttype = entry.get("topic_type", "")
-        if ttype == "student":
-            student_count += 1
-        else:
-            core_count += 1
-    
-    total = student_count + core_count
-    
-    if total == 0:
-        # Cold start: begin with student content to seed the ratio
-        print("📊 Tier 1: Cold start -> Selecting 'student'")
-        return "student"
-    
-    # Target: 40% student, 60% core
-    student_ratio = student_count / total
-    student_deficit = 0.40 - student_ratio
-    core_deficit = 0.60 - (core_count / total)
-    
-    if student_deficit > core_deficit:
-        # Student content is underrepresented
-        print(f"📊 Tier 1: student={student_count}/{total} ({student_ratio:.0%}), deficit={student_deficit:+.2f} -> Selecting 'student'")
-        return "student"
-    else:
-        # Core content is underrepresented or balanced
-        core_type = _get_core_topic_type(tracker_file)
-        print(f"📊 Tier 1: student={student_count}/{total} ({student_ratio:.0%}), deficit={student_deficit:+.2f} -> Selecting core: '{core_type}'")
-        return core_type
+    return _get_core_topic_type(tracker_file)
 
 
 def get_next_target_country(tracker_file=TRACKER_FILE):
     """
     Determines the next target country in the sequence:
-    US -> GB -> CA -> AU -> NZ -> SG -> KR -> JP -> DE -> FR -> IE
+    IN -> US -> GB -> CA -> AU -> SG -> DE -> FR
     based on the last recorded story's target country.
     """
     tracker = load_tracker(tracker_file)
     history = tracker.get("history", [])
     
-    country_sequence = ["US", "GB", "CA", "AU", "NZ", "SG", "KR", "JP", "DE", "FR", "IE"]
+    country_sequence = ["IN", "US", "GB", "CA", "AU", "SG", "DE", "FR"]
     
     # Traverse history backwards to find the last target country
     last_country = None
@@ -427,14 +375,14 @@ def get_next_target_country(tracker_file=TRACKER_FILE):
             break
             
     if not last_country:
-        return "US"
+        return "IN"
         
     try:
         idx = country_sequence.index(last_country)
         next_idx = (idx + 1) % len(country_sequence)
         return country_sequence[next_idx]
     except ValueError:
-        return "US"
+        return "IN"
 
 
 def get_next_avatar(intro_videos, tracker_file=TRACKER_FILE):

@@ -18,14 +18,16 @@ ALL_CATEGORIES = [
     "Student Capstone Projects",
 ]
 
+# Mass-appeal 2026 Shorts Schedule: Focused on high-retention, high-curiosity pillars
+# (Facts & Trivia, AI & Tech Tools, Tech Gadgets & Inventions, Coding & Tech Hacks)
 WEEKLY_SCHEDULE = {
-    "Mon": ["Quiz & Trivia", "AI & Tech Tools"],
-    "Tue": ["Interview Questions", "Tech Gadgets & Inventions"],
-    "Wed": ["Finance & Tech Economy", "Facts & Trivia"],
-    "Thu": ["Tech Company Founding Stories", "Programming Language Origins"],
-    "Fri": ["Quiz & Trivia", "Interview Questions"],
-    "Sat": ["Famous Bugs & Glitches", "Interview Questions"],
-    "Sun": ["Coding & Development Hacks", "Python Libraries & Frameworks"],
+    "Mon": ["Facts & Trivia", "AI & Tech Tools"],
+    "Tue": ["Tech Gadgets & Inventions", "Coding & Development Hacks"],
+    "Wed": ["Facts & Trivia", "AI & Tech Tools"],
+    "Thu": ["Tech Gadgets & Inventions", "Coding & Development Hacks"],
+    "Fri": ["Facts & Trivia", "AI & Tech Tools"],
+    "Sat": ["Tech Gadgets & Inventions", "Facts & Trivia"],
+    "Sun": ["AI & Tech Tools", "Tech Gadgets & Inventions"],
 }
 
 SCHEDULE_TRACKER_FILE = os.path.join(os.path.dirname(__file__), "schedule_tracker.json")

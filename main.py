@@ -680,13 +680,17 @@ def run_pipeline(topic_type="auto", dry_run=False, topic_source="auto"):
         recent_topics = get_recent_topic_embeddings(TRACKER_FILE, limit=30)
         log_message(f"📚 Loaded {len(recent_topics)} recent topics for deduplication")
         
+        # Sort all incoming signals by audience-weighted rank score BEFORE deduplicating
+        # so the top 20 candidates are the highest-potential mass-appeal topics
+        rss_articles.sort(key=lambda x: x.get("_rank_score", x.get("_engagement_score", 0)), reverse=True)
+
         # Filter and classify candidates
         original_count = len(rss_articles)
         rss_articles = filter_and_classify_candidates(rss_articles, recent_topics, max_candidates=20)
         log_message(f"🔍 Deduplication & classification: {original_count} → {len(rss_articles)} candidates")
         
-        # Re-sort by engagement score after filtering
-        rss_articles.sort(key=lambda x: x.get("_engagement_score", 0), reverse=True)
+        # Re-sort by audience-weighted rank score after filtering
+        rss_articles.sort(key=lambda x: x.get("_rank_score", x.get("_engagement_score", 0)), reverse=True)
         
         # Update category based on zero-shot classification if available
         if rss_articles and rss_articles[0].get("_predicted_category"):

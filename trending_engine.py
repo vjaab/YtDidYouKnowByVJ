@@ -1076,10 +1076,12 @@ def fetch_youtube_outlier_trends(target_country="US", category="AI & Tech Tools"
         return []
 
     signals = CATEGORY_SIGNALS.get(category, CATEGORY_SIGNALS["AI & Tech Tools"])
-    keywords = signals.get("youtube_outlier_keywords", ["new AI tool", "developer update", "github open source", "coding hack"])
+    category_kw = signals.get("youtube_outlier_keywords", ["new AI tool", "tech secrets", "gadget hack"])
+    mass_appeal_kw = ["tech secrets you need to know", "phone hidden features", "did you know tech", "stop doing this phone", "secret AI tools free"]
+    keywords = list(dict.fromkeys(category_kw + mass_appeal_kw))[:6]
     
-    print(f"📺 Running YouTube Outlier Hunter for region={target_country}, category='{category}'...")
-    published_after = (datetime.now(timezone.utc) - timedelta(hours=48)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    print(f"📺 Running YouTube Shorts Outlier Hunter for region={target_country}, category='{category}'...")
+    published_after = (datetime.now(timezone.utc) - timedelta(hours=72)).strftime("%Y-%m-%dT%H:%M:%SZ")
     
     video_candidates = {}
     
@@ -1090,6 +1092,7 @@ def fetch_youtube_outlier_trends(target_country="US", category="AI & Tech Tools"
                 "part": "snippet",
                 "q": kw,
                 "type": "video",
+                "videoDuration": "short",  # Strictly search for YouTube Shorts (<60s)
                 "publishedAfter": published_after,
                 "maxResults": 25,
                 "relevanceLanguage": "en",
@@ -1825,7 +1828,66 @@ def compute_engagement_score(article):
     if eng.get("engagement_estimated"):
         score = int(score * 0.4)
     
+    # Compute audience-size multiplier for mass-appeal Shorts
+    multiplier = compute_audience_reach_multiplier(article)
+    article["_audience_reach_multiplier"] = multiplier
+    article["_rank_score"] = min(100, max(1, int(score * multiplier)))
+    
     return min(100, score)
+
+
+def compute_audience_reach_multiplier(article: dict) -> float:
+    """
+    Computes an audience-size multiplier (0.35x - 1.8x) based on consumer appeal.
+    Mass-appeal topics (smartphones, everyday apps, consumer AI, high curiosity)
+    get boosted. Ultra-niche developer concepts (GGUF, quantizations, checkpoints)
+    are strongly de-prioritized to protect YouTube Shorts swipe-away rates.
+    """
+    title = (article.get("title") or "").lower()
+    desc = (article.get("description") or "").lower()
+    full_text = f"{title} {desc}"
+
+    # 1. Heavy penalty for ultra-niche ML/dev jargon
+    niche_dev_keywords = [
+        "gguf", "quantization", "quantized", "q4_k_m", "q8_0", "lora", "qlora",
+        "safetensors", "checkpoint", "weights release", "fine-tune", "finetuning",
+        "27b", "32b", "70b", "vllm", "sglang", "unsloth", "deepspeed",
+        "arxiv", "ablation", "benchmark score", "loss function", "backpropagation",
+        "pull request", "merge request", "dockerfile", "kubernetes cluster",
+        "spring boot", "speaker diarization", "tokenizer vocabulary"
+    ]
+    if any(kw in full_text for kw in niche_dev_keywords):
+        return 0.35
+
+    multiplier = 1.0
+
+    # 2. Consumer tech & brands boost
+    consumer_brands = [
+        "iphone", "android", "apple", "google", "samsung", "windows", "mac", "macbook",
+        "whatsapp", "chrome", "instagram", "youtube", "tiktok", "gmail", "netflix",
+        "chatgpt", "gemini", "claude", "deepseek", "copilot", "openai"
+    ]
+    if any(kw in full_text for kw in consumer_brands):
+        multiplier += 0.35
+
+    # 3. Everyday hardware & settings
+    consumer_hardware = [
+        "phone", "smartphone", "battery", "camera", "charger", "charging", "wifi", "bluetooth",
+        "screen", "storage", "laptop", "pc", "headphones", "smartwatch", "tv"
+    ]
+    if any(kw in full_text for kw in consumer_hardware):
+        multiplier += 0.25
+
+    # 4. High-curiosity hook triggers
+    curiosity_triggers = [
+        "hidden", "secret", "trick", "hack", "stop doing", "don't do", "never do",
+        "mistake", "spying", "tracking", "scam", "danger", "privacy", "delete",
+        "did you know", "myth", "actually", "insane", "crazy", "shocking", "mind-blowing"
+    ]
+    if any(kw in full_text for kw in curiosity_triggers):
+        multiplier += 0.30
+
+    return min(1.8, multiplier)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1978,16 +2040,22 @@ def fetch_all_trending_signals(target_country="US", category="AI & Tech Tools", 
             print(f"    ⚠️ {source_name} fetch failed: {e}")
             source_stats[source_name] = 0
     
-    # Apply priority boost to engagement scores
+    # Apply priority boost and audience-reach weighting to engagement scores
     for art in all_articles:
         boost = art.pop("_source_priority_boost", 1.0)
-        if "_engagement_score" in art:
-            art["_engagement_score"] = min(100, int(art["_engagement_score"] * boost))
-        else:
-            art["_engagement_score"] = min(100, int(compute_engagement_score(art) * boost))
+        base_score = art.get("_engagement_score")
+        if base_score is None:
+            base_score = compute_engagement_score(art)
+        boosted_eng = min(100, int(base_score * boost))
+        art["_engagement_score"] = boosted_eng
+        
+        # Audience reach multiplier boosts consumer/viral tech and penalizes ultra-niche dev topics
+        reach_mult = compute_audience_reach_multiplier(art)
+        art["_audience_reach_multiplier"] = reach_mult
+        art["_rank_score"] = min(150, max(1, int(boosted_eng * reach_mult)))
     
-    # Sort by boosted engagement score
-    all_articles.sort(key=lambda x: x.get("_engagement_score", 0), reverse=True)
+    # Sort by audience-reach-weighted rank score (ensures mass-appeal candidates top the list)
+    all_articles.sort(key=lambda x: x.get("_rank_score", x.get("_engagement_score", 0)), reverse=True)
     
     # Record source usage for rotation tracking
     if SOURCE_ROTATION_ENABLED:

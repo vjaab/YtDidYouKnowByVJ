@@ -928,8 +928,18 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 elif any(k in title_lower or k in desc_lower for k in cat3_keywords):
                     is_viral_category = True
                 
+                # Hard filter: raw model weights / quantizations / low-level ML artifacts
+                # NEVER succeed on YouTube Shorts feeds (they lead to immediate >80% swipe-away rates).
+                raw_ml_antikeywords = [
+                    "gguf", "quantization", "quantized", "q4_k_m", "q8_0", "safetensors",
+                    "checkpoint", "weights release", "ablation study", "loss function",
+                    "speaker diarization", "tokenizer vocabulary"
+                ]
+                if any(kw in title_lower or kw in desc_lower for kw in raw_ml_antikeywords):
+                    continue
+
                 # Dev-centric or Niche Filtering for General Consumer Appeal (18-70)
-                # Bypassed if the article falls under a viral category, GitHub trending, Medium RSS, or Hugging Face Hub.
+                # Bypassed only if the article falls under a viral category, GitHub trending, Medium RSS, or Hugging Face Hub.
                 if not is_viral_category and art.get("type") not in ["github_trending", "medium_rss", "huggingface_hub_model", "huggingface_hub_dataset", "huggingface_trending"]:
                     dev_antikeywords = [
                         "repository", "git commit", "api endpoint", "npm package", "pip install", 
@@ -1085,38 +1095,28 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
                 if is_viral_category:
                     hot_score += 150.0  # Massive score boost to prioritize this topic
                 if art.get("type") == "github_trending":
-                    hot_score += 100.0  # Boost GitHub trending repos to prioritize them for selection
-                    hot_score += art.get("_relevance_score", 0)  # Boost further if technical topic relevance matches
+                    hot_score += 35.0  # Balanced boost for GitHub trending repos
+                    hot_score += art.get("_relevance_score", 0)
                 elif art.get("type") == "medium_rss":
-                    hot_score += 100.0  # Baseline parity with GitHub & HuggingFace
+                    hot_score += 35.0
                 elif art.get("type") in ["huggingface_hub_model", "huggingface_hub_dataset", "huggingface_trending"]:
-                    hot_score += 100.0
+                    hot_score += 25.0
                     hot_score += art.get("_relevance_score", 0)
                 
-                # Sequential rotation boost: decisively boost articles matching target_source
+                # Sequential rotation boost: boost articles matching target_source
                 if target_source and target_source.lower() in source_type_map:
                     if art.get("type") in source_type_map[target_source.lower()]:
-                        hot_score += 60.0
-                else:
-                    # Periodic HuggingFace boost when running without target_source
-                    runs_since_hf = 999
-                    try:
-                        from config import TRACKER_FILE
-                        from topic_tracker import load_tracker
-                        _tracker = load_tracker(TRACKER_FILE)
-                        _history = _tracker.get("history", [])
-                        for idx_h, entry_h in enumerate(reversed(_history)):
-                            _src = (entry_h.get("news_source_url") or "").lower()
-                            _tit = (entry_h.get("title") or "").lower()
-                            if "huggingface.co" in _src or "hf trending" in _tit or "hugging face" in _tit:
-                                runs_since_hf = idx_h
-                                break
-                    except Exception:
-                        runs_since_hf = 5
-                    
-                    if runs_since_hf >= 2 and art.get("type") in ["huggingface_hub_model", "huggingface_hub_dataset", "huggingface_trending"]:
-                        hf_rotation_boost = min(60.0, 20.0 + (runs_since_hf * 10.0))
-                        hot_score += hf_rotation_boost
+                        hot_score += 30.0
+
+                # ── AUDIENCE REACH MULTIPLIER (Mass-Appeal Gate) ──
+                # Boosts everyday consumer tech & secrets (1.35x-1.8x), penalizes niche dev jargon (0.35x)
+                try:
+                    from trending_engine import compute_audience_reach_multiplier
+                    reach_mult = compute_audience_reach_multiplier(art)
+                except Exception:
+                    reach_mult = 1.0
+                
+                hot_score *= reach_mult
 
                 art['_hot_score'] = round(hot_score, 1)
                 art['_score_breakdown'] = {
