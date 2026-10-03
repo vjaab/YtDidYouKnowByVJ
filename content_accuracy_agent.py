@@ -91,11 +91,12 @@ def _query_llm(prompt: str) -> Optional[Dict]:
             print(f"ℹ️ Google GenAI note: {e}")
 
     # 2. OpenRouter fallback
-    if OPENROUTER_API_KEY:
+    openrouter_key = os.getenv("OPENROUTER_API_KEY", "") or OPENROUTER_API_KEY
+    if openrouter_key:
         try:
             import requests
             headers = {
-                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                "Authorization": f"Bearer {openrouter_key}",
                 "HTTP-Referer": "https://github.com/vjaab/YtDidYouKnowByVJ",
                 "X-Title": "Content Accuracy Agent",
             }
@@ -169,8 +170,8 @@ def verify_content_accuracy(topic: str, carousel_data: dict, caption: str = "") 
     all_texts = [topic, headline, takeaway, caption]
     for s in slides:
         all_texts.append(s.get("title", ""))
+        all_texts.append(s.get("bubble", ""))
         all_texts.append(s.get("dialogue_vj", ""))
-        all_texts.append(s.get("dialogue_asha", ""))
         all_texts.append(s.get("dialogue_byte", ""))
         all_texts.append(s.get("did_you_know", ""))
         all_texts.append(s.get("body", ""))
@@ -202,10 +203,12 @@ def verify_content_accuracy(topic: str, carousel_data: dict, caption: str = "") 
     dialogue_summary = []
     for i, s in enumerate(slides):
         speaker_texts = []
+        spk = s.get("speaker", "character").capitalize()
+        bubble = s.get("bubble", "")
+        if bubble:
+            speaker_texts.append(f"{spk}: \"{bubble}\"")
         if s.get("dialogue_vj"):
             speaker_texts.append(f"VJ: \"{s.get('dialogue_vj')}\"")
-        if s.get("dialogue_asha"):
-            speaker_texts.append(f"Asha: \"{s.get('dialogue_asha')}\"")
         if s.get("dialogue_byte"):
             speaker_texts.append(f"Byte: \"{s.get('dialogue_byte')}\"")
         if s.get("did_you_know"):
@@ -319,8 +322,8 @@ def regenerate_and_verify_carousel(
     for attempt in range(1, max_attempts + 1):
         print(f"\n🔄 [Content Accuracy Agent] Generation & Verification Loop: Attempt {attempt}/{max_attempts}...")
 
-        # 1. Pick a brand-new, unique DYK fact with platform awareness
-        story = fetch_or_select_did_you_know_fact(topic="", platform=platform)
+        # 1. Pick a brand-new, unique DYK fact with platform awareness (record=False to avoid premature tracker collision)
+        story = fetch_or_select_did_you_know_fact(topic="", platform=platform, record=False)
         topic = story.get("title", "Fascinating Tech Fact")
 
         # Double check uniqueness against history
@@ -401,6 +404,30 @@ def regenerate_and_verify_carousel(
 
         save_metadata(output_dir, carousel, ig_paths, fb_paths, caption, hashtags, poll_path)
 
+        # 5. Record verified and generated topic in trackers
+        try:
+            from ai_news_carousel import record_carousel_topic
+            record_carousel_topic(
+                title=topic,
+                url=story.get("news_source_url", ""),
+                keywords=story.get("keywords", ["did you know"]),
+                source=story.get("source", "Did You Know By VJ"),
+                platform=platform
+            )
+        except Exception as e:
+            print(f"⚠️ Note recording carousel topic: {e}")
+
+        try:
+            from telegram_approval_handler import record_topic_in_tracker
+            record_topic_in_tracker(
+                topic=topic,
+                source_url=story.get("news_source_url", ""),
+                keywords=story.get("keywords", ["did you know"]),
+                subcategory="Did You Know Fact"
+            )
+        except Exception as e:
+            print(f"⚠️ Note recording in news_log: {e}")
+
         return True, dialogue, ig_paths, fb_paths, caption_path, carousel_path
 
     return False, {}, [], [], Path(""), Path("")
@@ -449,6 +476,30 @@ def main():
             if audit["verdict"] == "APPROVED":
                 approved = True
                 print(f"\n🎉 [Content Accuracy Agent] Existing content VERIFIED & AUTO-APPROVED!")
+
+                # Record verified concept in trackers
+                try:
+                    from ai_news_carousel import record_carousel_topic
+                    record_carousel_topic(
+                        title=topic,
+                        url=carousel_data.get("source_url", ""),
+                        keywords=["did you know"],
+                        source="Did You Know By VJ",
+                        platform=args.platform
+                    )
+                except Exception:
+                    pass
+                try:
+                    from telegram_approval_handler import record_topic_in_tracker
+                    record_topic_in_tracker(
+                        topic=topic,
+                        source_url=carousel_data.get("source_url", ""),
+                        keywords=["did you know"],
+                        subcategory="Did You Know Fact"
+                    )
+                except Exception:
+                    pass
+
                 _set_gha_output("approved", "true")
                 _set_gha_output("topic", topic)
                 _set_gha_output("accuracy_score", str(audit["accuracy_score"]))

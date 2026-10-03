@@ -1385,7 +1385,7 @@ Return ONLY valid JSON (no markdown):
     return None
 
 
-def fetch_or_select_did_you_know_fact(topic: Optional[str] = None, platform: str = "instagram") -> Dict:
+def fetch_or_select_did_you_know_fact(topic: Optional[str] = None, platform: str = "instagram", record: bool = False) -> Dict:
     """
     Selects or generates a high-attraction, 100% unique 'Did You Know' fact that is
     easily understandable by a common layperson (not overly niche or dry).
@@ -1393,6 +1393,7 @@ def fetch_or_select_did_you_know_fact(topic: Optional[str] = None, platform: str
     - Uses engagement-weighted selection to prioritize high-like topics.
     - Platform-aware offsets prevent Instagram/Threads/Facebook from selecting the same topic
       during simultaneous cron runs.
+    - If record=False (default), does NOT pollute trackers before generation/verification.
     - PRIORITY 1: Curated Layman-Friendly Seed Catalog (verified, high curiosity).
     - PRIORITY 2: Real-Time Dynamic LLM Synthesis (new layman facts, deduplicated).
     - PRIORITY 3: Live Trending Signals (filtered for layman interest).
@@ -1550,15 +1551,27 @@ def fetch_or_select_did_you_know_fact(topic: Optional[str] = None, platform: str
                     used_titles_list.extend(c_tracker.get("used_titles", []))
                 except Exception:
                     pass
+            try:
+                from topic_tracker import load_topic_tracker
+                yt_tracker = load_topic_tracker()
+                used_titles_list.extend(yt_tracker.get("used_titles", []))
+            except Exception:
+                pass
             
-            synth = synthesize_unique_dyk_fact(current_vector, used_titles_list)
-            if synth:
-                if is_topic_unique:
-                    uniq, _ = is_topic_unique(synth["title"], "", synth.get("keywords", []), check_youtube=True, check_carousel=True)
-                    if uniq:
+            for synth_attempt in range(3):
+                synth = synthesize_unique_dyk_fact(current_vector, used_titles_list)
+                if synth:
+                    if is_topic_unique:
+                        uniq, reason = is_topic_unique(synth["title"], "", synth.get("keywords", []), check_youtube=True, check_carousel=True)
+                        if uniq:
+                            selected = synth
+                            print(f"✨ [{platform.upper()}] Synthesized unique fact: '{selected['title']}'")
+                            break
+                        else:
+                            print(f"⚠️ Synthesized fact duplicate ({reason}), retrying ({synth_attempt+1}/3)...")
+                    else:
                         selected = synth
-                else:
-                    selected = synth
+                        break
 
         # ── PRIORITY 3: Live Trending Signals (Filtered for Layman-Friendliness) ────
         if not selected and fetch_ai_news_stories and filter_unique_stories:
@@ -1598,28 +1611,30 @@ def fetch_or_select_did_you_know_fact(topic: Optional[str] = None, platform: str
     selected["mode"] = "did_you_know"
     selected["category"] = "🧠 DID YOU KNOW?"
 
-    # ── Record in Trackers to Prevent Future Duplication ───────────────────────
-    if record_carousel_topic:
-        try:
-            record_carousel_topic(
-                title=selected["title"],
-                url=selected.get("news_source_url", ""),
-                keywords=selected.get("keywords", ["did you know"]),
-                source=selected.get("source", "Did You Know By VJ")
-            )
-        except Exception as e:
-            print(f"⚠️ Note recording carousel topic: {e}")
+    # ── Record in Trackers to Prevent Future Duplication (Only if requested) ────
+    if record:
+        if record_carousel_topic:
+            try:
+                record_carousel_topic(
+                    title=selected["title"],
+                    url=selected.get("news_source_url", ""),
+                    keywords=selected.get("keywords", ["did you know"]),
+                    source=selected.get("source", "Did You Know By VJ"),
+                    platform=platform
+                )
+            except Exception as e:
+                print(f"⚠️ Note recording carousel topic: {e}")
 
-    if record_topic_in_tracker:
-        try:
-            record_topic_in_tracker(
-                topic=selected["title"],
-                source_url=selected.get("news_source_url", ""),
-                keywords=selected.get("keywords", ["did you know"]),
-                subcategory="Did You Know Fact"
-            )
-        except Exception as e:
-            print(f"⚠️ Note recording in news_log: {e}")
+        if record_topic_in_tracker:
+            try:
+                record_topic_in_tracker(
+                    topic=selected["title"],
+                    source_url=selected.get("news_source_url", ""),
+                    keywords=selected.get("keywords", ["did you know"]),
+                    subcategory="Did You Know Fact"
+                )
+            except Exception as e:
+                print(f"⚠️ Note recording in news_log: {e}")
 
     print(f"🚀 [{platform.upper()}] Final Selected Fact: '{selected['title']}' (Hook: '{selected.get('hook', '')}')")
     return selected

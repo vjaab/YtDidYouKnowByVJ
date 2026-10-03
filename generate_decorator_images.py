@@ -337,7 +337,7 @@ def main():
 
             if mode in ["did_you_know", "dyk"]:
                 print("🧠 Mode: 'did_you_know' — Selecting high-attraction tech fact...")
-                story = fetch_or_select_did_you_know_fact(topic=args.topic, platform=args.platform)
+                story = fetch_or_select_did_you_know_fact(topic=args.topic, platform=args.platform, record=False)
                 topic_to_use = story.get("title", args.topic or "Did You Know Tech Fact")
             elif mode == "news":
                 try:
@@ -372,7 +372,7 @@ def main():
                         break
                     else:
                         print(f"⚠️ [Accuracy Agent] Rejected: {audit['reason']}. Picking fresh topic...")
-                        story = fetch_or_select_did_you_know_fact(topic="", platform=args.platform)
+                        story = fetch_or_select_did_you_know_fact(topic="", platform=args.platform, record=False)
                         topic_to_use = story.get("title", "Fresh Tech Fact")
             except Exception as ver_err:
                 print(f"ℹ️ Verifier integration note: {ver_err}")
