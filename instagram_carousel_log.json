@@ -82,16 +82,11 @@
     "Medium (technology): Chapter 5: Democracy Is Just Paint and Wax\u2013It\u2019s A",
     "Medium (artificial-intelligence): Your AI Agent Is Holding a Productio",
     "Medium (artificial-intelligence): Your AI Agent Is Holding a Productio",
-    "AI Image Generators Have Invisible Watermarks You Cannot See"
+    "AI Image Generators Have Invisible Watermarks You Cannot See",
+    "QR Codes Still Work Even When 30% Is Destroyed",
+    "QR Codes Still Work Even When 30% Is Destroyed"
   ],
   "used_keywords": [
-    "rfid",
-    "contactless payments",
-    "electromagnetic induction",
-    "did you know",
-    "hbm3e",
-    "gpu memory",
-    "nvidia blackwell",
     "semiconductors",
     "did you know",
     "asml",
@@ -284,7 +279,14 @@
     "ai watermark",
     "image generation",
     "deepmind",
-    "did you know"
+    "did you know",
+    "qr code",
+    "error correction",
+    "reed solomon",
+    "barcode",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
     {
@@ -1475,6 +1477,31 @@
       "source": "Google DeepMind SynthID Paper",
       "platform": "unknown",
       "timestamp": "2026-10-03T09:46:23.378243+00:00"
+    },
+    {
+      "title": "QR Codes Still Work Even When 30% Is Destroyed",
+      "news_source_url": "",
+      "keywords": [
+        "qr code",
+        "error correction",
+        "reed solomon",
+        "barcode",
+        "did you know"
+      ],
+      "source": "ISO/IEC 18004 QR Code Standard",
+      "platform": "unknown",
+      "timestamp": "2026-10-03T10:34:11.848002+00:00"
+    },
+    {
+      "title": "QR Codes Still Work Even When 30% Is Destroyed",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-03T10:36:08.654248+00:00"
     }
   ]
 }

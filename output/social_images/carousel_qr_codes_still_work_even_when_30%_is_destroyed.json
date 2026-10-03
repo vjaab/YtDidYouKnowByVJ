@@ -1,0 +1,61 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "hook": "Did you know QR codes work even when damaged? \ud83d\udcf1",
+  "headline": "QR Codes Still Work Even When 30% Is Destroyed",
+  "source": "ISO/IEC 18004 QR Code Standard",
+  "slides": [
+    {
+      "speaker": "byte",
+      "emotion": "curious",
+      "title": "Damaged QR Codes? \ud83e\udd2f",
+      "bubble": "Did you know QR codes can still be scanned even if they are damaged?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Up to 30% Lost! \u2705",
+      "bubble": "Yes! Up to 30% of a QR code can be missing, and it still works perfectly.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "How Is That Possible? \ud83e\uddd0",
+      "bubble": "What?! How can a missing piece still make sense? Is it magic?!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Like a Torn Book \ud83d\udcd6",
+      "bubble": "It's like having a book with a few torn pages. The story can still be understood!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "Scribble-Proof Codes? \u270d\ufe0f",
+      "bubble": "So, even if I scribble on a QR code, it might still scan?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Error Correction Tech \u2728",
+      "bubble": "Exactly! QR codes use 'error correction' technology. They store extra data for backup.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "excited",
+      "title": "Mind-Blowing Tech! \ud83d\udca1",
+      "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "QR codes have built-in 'superpowers' (Reed-Solomon error correction) that let them fix themselves, scanning perfectly even if up to 30% is destroyed!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour humble QR code is a lot tougher than it looks! It can literally fix itself!\n\nHere is the mind-blowing reality:\n\ud83d\udd39 QR codes aren't just simple images; they have built-in 'superpowers'.\n\ud83d\udd39 This technology, called Reed-Solomon error correction, stores redundant data.\n\ud83d\udd39 At the highest level, a QR code can lose 30% of its data and still scan perfectly!\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #QRcode #ErrorCorrection #TechInnovation #ComputerScience",
+  "vector": "everyday_tech_mysteries"
+}
