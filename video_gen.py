@@ -9780,7 +9780,13 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 avatar_clip = expr_clip
                 print(f"   ✅ Expression compositing applied: {len(expression_segments)} segments")
 
-            avatar_pip = avatar_clip.with_position(pip_position).with_start(0)
+            # Viral Frame 0 retention: Keep the opening 0.0-2.2s dedicated to the full visual payoff
+            # and bold kinetic hook overlay without the avatar PiP blocking the view. The host fades in at 2.2s.
+            if not is_longform:
+                avatar_start_time = 2.2
+                avatar_pip = avatar_clip.with_position(pip_position).with_start(avatar_start_time).with_effects([vfx.CrossFadeIn(0.4)])
+            else:
+                avatar_pip = avatar_clip.with_position(pip_position).with_start(0)
 
     # ── LAYERS ───────────────────────────────────────────────────────────
     if is_longform:

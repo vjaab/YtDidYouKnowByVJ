@@ -2,13 +2,11 @@ name: Daily Tech News Shorts Pipeline
 
 on:
   schedule:
-    # AUDIENCE-OPTIMIZED SCHEDULE (EST → UTC conversion, UTC-5)
-    # Weekdays (Mon-Fri): 11 AM & 7 PM EST → 16:00 & 00:00 UTC
-    - cron: '0 16 * * 1-5'  # Mon-Fri 11:00 AM EST
-    - cron: '0 0 * * 2-6'   # Tue-Sat 12:00 AM UTC (Mon-Fri 7:00 PM EST)
-    # Weekends (Sat-Sun): 10 AM & 3 PM EST → 15:00 & 20:00 UTC
-    - cron: '0 15 * * 6,0'  # Sat-Sun 10:00 AM EST
-    - cron: '0 20 * * 6,0'  # Sat-Sun 3:00 PM EST
+    # AUDIENCE-OPTIMIZED SCHEDULE (IST & Global Peak Viewing Hours)
+    # Slot 1 (Lunch Peak): 1:30 PM IST / 9:00 AM CET / 4:00 AM EST -> 08:00 UTC
+    - cron: '0 8 * * *'
+    # Slot 2 (Evening Prime): 8:00 PM IST / 4:30 PM CET / 10:30 AM EST -> 14:30 UTC
+    - cron: '30 14 * * *'
   workflow_dispatch:
     inputs:
       dry_run:

@@ -2292,6 +2292,68 @@ def _update_groq_token_usage(model_name, tokens_increment):
         print(f"⚠️ Warning: failed to save Groq token usage to cache ({e})")
 
 
+def score_hook_candidate(h: dict) -> float:
+    """
+    Algorithmic evaluation of hook candidates based on 2026 Shorts retention rules:
+    - Optimal length: 4-8 words (spoken in <2s, before swipe). Heavy penalty if >8 words.
+    - Zero filler phrases (e.g. 'In this video', 'Today we').
+    - High-tension / curiosity power word bonuses.
+    - Strong first word (verb, negative command, or high-focus pronoun).
+    """
+    text = (h.get("text") or "").strip()
+    words = text.split()
+    word_count = len(words)
+    if word_count == 0:
+        return -100.0
+
+    score = 50.0
+
+    # 1. Brevity penalty/reward: optimal is 4-8 words (<2s speech)
+    if 4 <= word_count <= 7:
+        score += 25.0
+    elif word_count == 8:
+        score += 15.0
+    elif word_count < 4:
+        score += 5.0
+    else:  # > 8 words
+        score -= (word_count - 8) * 8.0  # Heavy penalty for long hooks
+
+    text_lower = text.lower()
+
+    # 2. Filler words penalty
+    filler_phrases = [
+        "in this video", "today we", "let's talk about", "here is how", "check out",
+        "did you know that", "i will show you", "watch this to", "have you ever heard"
+    ]
+    if any(fp in text_lower for fp in filler_phrases):
+        score -= 40.0
+
+    # 3. High-tension / curiosity power triggers (+8 pts each)
+    power_triggers = [
+        "stop", "never", "secret", "hidden", "illegal", "free", "warning",
+        "delete", "exposed", "hack", "actually", "truth", "everyone", "nobody",
+        "lie", "scam", "wrong", "mistake", "banned", "insane", "crazy", "shocking"
+    ]
+    for pt in power_triggers:
+        if pt in text_lower:
+            score += 8.0
+
+    # 4. First word impact: verb, negative command, or high-focus pronoun
+    first_word = words[0].lower().rstrip(".,!?")
+    if first_word in ["stop", "never", "don't", "this", "your", "why", "how", "nobody", "everyone"]:
+        score += 15.0
+
+    # 5. Blend model self-assessed scores (if present)
+    try:
+        curiosity = float(h.get("curiosity_score") or 5)
+        swipe_stop = float(h.get("swipe_stop_score") or 5)
+        score += (curiosity + swipe_stop) * 1.5
+    except (ValueError, TypeError):
+        pass
+
+    return score
+
+
 class MultiAgentGenerationEngine:
     def __init__(self, client, context, slot, category, strategy_enhancement, is_longform, raw_articles=None, topic_type=None, failed_topics=None, run_index=0):
         self.client = client
@@ -2696,11 +2758,7 @@ class MultiAgentGenerationEngine:
 
         script_data_ab_variants = ab_variants_structured if ab_variants_structured else None
 
-        best_hook = max(all_hooks, key=lambda h: (
-            (h.get("curiosity_score") if isinstance(h.get("curiosity_score"), (int, float)) else 0) + 
-            (h.get("emotional_trigger_score") if isinstance(h.get("emotional_trigger_score"), (int, float)) else 0) + 
-            (h.get("swipe_stop_score") if isinstance(h.get("swipe_stop_score"), (int, float)) else 0)
-        ))
+        best_hook = max(all_hooks, key=score_hook_candidate)
         hook_text = best_hook.get('text', '')
         hook_variant = best_hook.get('variant_id', 'A')
         hook_pattern = best_hook.get('pattern', 'general')
