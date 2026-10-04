@@ -695,7 +695,11 @@
         "QR Codes Still Work Even When 30% Is Destroyed",
         "ChatGPT Uses More Electricity Per Query Than a Google Search Uses in a Day",
         "Bluetooth is Named After a 10th-Century Viking King",
-        "Bluetooth is Named After a 10th-Century Viking King"
+        "Bluetooth is Named After a 10th-Century Viking King",
+        "GPT-4 Was Trained on More Text Than You Could Read in 20,000 Years",
+        "The Original iPhone Had No Copy-Paste for Two Full Years",
+        "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
+        "Airplane Mode Doesn't Actually Stop Your Phone From Being Tracked"
     ],
     "used_keywords": [
         "AI",
@@ -2369,21 +2373,22 @@
         "Did You Know Fact": 70,
         "Threads Post": 8,
         "AI Engineering": 1,
-        "AI Models & Security": 1
+        "AI Models & Security": 1,
+        "Rejected Non-Accurate Concept": 4
     },
     "last_7_days_stories": [
-        "GitHub Trending: pablostanley/yoinks \u2014 yoink any video from your terminal. no shady ads.",
-        "AI Image Generators Have Invisible Watermarks You Cannot See",
-        "QR Codes Still Work Even When 30% Is Destroyed",
-        "QR Codes Still Work Even When 30% Is Destroyed",
         "ChatGPT Uses More Electricity Per Query Than a Google Search Uses in a Day",
         "Bluetooth is Named After a 10th-Century Viking King",
-        "Bluetooth is Named After a 10th-Century Viking King"
+        "Bluetooth is Named After a 10th-Century Viking King",
+        "GPT-4 Was Trained on More Text Than You Could Read in 20,000 Years",
+        "The Original iPhone Had No Copy-Paste for Two Full Years",
+        "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
+        "Airplane Mode Doesn't Actually Stop Your Phone From Being Tracked"
     ],
     "last_3_days_subcategories": [
-        "Did You Know Fact",
-        "Did You Know Fact",
-        "Threads Post"
+        "Rejected Non-Accurate Concept",
+        "Rejected Non-Accurate Concept",
+        "Rejected Non-Accurate Concept"
     ],
     "last_3_days_companies": [
         "Hugging Face",
@@ -2392,8 +2397,8 @@
         "Google",
         "Microsoft"
     ],
-    "total_uploaded": 385,
-    "last_upload": "2026-10-03",
+    "total_uploaded": 389,
+    "last_upload": "2026-10-04",
     "history": [
         {
             "date": "2026-02-23",
@@ -11262,6 +11267,70 @@
             "title": "Bluetooth is Named After a 10th-Century Viking King",
             "news_headline": "Bluetooth is Named After a 10th-Century Viking King",
             "sub_category": "Threads Post",
+            "companies": [],
+            "keywords": [],
+            "breaking_news_level": "normal",
+            "voice_used": "system",
+            "youtube_url": "",
+            "facebook_post_id": null,
+            "news_source_url": "",
+            "target_country": "US",
+            "avatar_used": null,
+            "topic_type": "instagram_carousel"
+        },
+        {
+            "date": "2026-10-04",
+            "title": "GPT-4 Was Trained on More Text Than You Could Read in 20,000 Years",
+            "news_headline": "GPT-4 Was Trained on More Text Than You Could Read in 20,000 Years",
+            "sub_category": "Rejected Non-Accurate Concept",
+            "companies": [],
+            "keywords": [],
+            "breaking_news_level": "normal",
+            "voice_used": "system",
+            "youtube_url": "",
+            "facebook_post_id": null,
+            "news_source_url": "",
+            "target_country": "US",
+            "avatar_used": null,
+            "topic_type": "instagram_carousel"
+        },
+        {
+            "date": "2026-10-04",
+            "title": "The Original iPhone Had No Copy-Paste for Two Full Years",
+            "news_headline": "The Original iPhone Had No Copy-Paste for Two Full Years",
+            "sub_category": "Rejected Non-Accurate Concept",
+            "companies": [],
+            "keywords": [],
+            "breaking_news_level": "normal",
+            "voice_used": "system",
+            "youtube_url": "",
+            "facebook_post_id": null,
+            "news_source_url": "",
+            "target_country": "US",
+            "avatar_used": null,
+            "topic_type": "instagram_carousel"
+        },
+        {
+            "date": "2026-10-04",
+            "title": "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
+            "news_headline": "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
+            "sub_category": "Rejected Non-Accurate Concept",
+            "companies": [],
+            "keywords": [],
+            "breaking_news_level": "normal",
+            "voice_used": "system",
+            "youtube_url": "",
+            "facebook_post_id": null,
+            "news_source_url": "",
+            "target_country": "US",
+            "avatar_used": null,
+            "topic_type": "instagram_carousel"
+        },
+        {
+            "date": "2026-10-04",
+            "title": "Airplane Mode Doesn't Actually Stop Your Phone From Being Tracked",
+            "news_headline": "Airplane Mode Doesn't Actually Stop Your Phone From Being Tracked",
+            "sub_category": "Rejected Non-Accurate Concept",
             "companies": [],
             "keywords": [],
             "breaking_news_level": "normal",
