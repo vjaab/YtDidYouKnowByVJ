@@ -87,12 +87,11 @@
     "QR Codes Still Work Even When 30% Is Destroyed",
     "ChatGPT Uses More Electricity Per Query Than a Google Search Uses in a Day",
     "Bluetooth is Named After a 10th-Century Viking King",
-    "Bluetooth is Named After a 10th-Century Viking King"
+    "Bluetooth is Named After a 10th-Century Viking King",
+    "Your Phone Knows You're in Your Pocket Using a Proximity Infrared Beam",
+    "Your Phone Knows You're in Your Pocket Using a Proximity Infrared Beam"
   ],
   "used_keywords": [
-    "quartz crystal",
-    "binary",
-    "watches",
     "piezoelectric",
     "did you know",
     "ariane 5",
@@ -287,6 +286,9 @@
     "gpu electricity",
     "sustainability",
     "did you know",
+    "did you know",
+    "threads",
+    "tech",
     "did you know",
     "threads",
     "tech"
@@ -1540,6 +1542,27 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-03T17:30:47.671601+00:00"
+    },
+    {
+      "title": "Your Phone Knows You're in Your Pocket Using a Proximity Infrared Beam",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-04T11:15:56.506551+00:00"
+    },
+    {
+      "title": "Your Phone Knows You're in Your Pocket Using a Proximity Infrared Beam",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-04T11:17:14.602918+00:00"
     }
   ]
 }

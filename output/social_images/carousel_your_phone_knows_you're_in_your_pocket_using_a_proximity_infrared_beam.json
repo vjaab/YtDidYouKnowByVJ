@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "camera",
+  "speaker_right": "vj",
+  "hook": "Did You Know Your Phone Shoots Invisible Light at Your Face? \ud83d\udc41\ufe0f",
+  "headline": "Your Phone Knows You're in Your Pocket Using a Proximity Infrared Beam",
+  "source": "Smartphone Sensor Design Engineering",
+  "slides": [
+    {
+      "speaker": "camera",
+      "emotion": "curious",
+      "title": "Invisible Light? \ud83d\udc41\ufe0f",
+      "bubble": "Did you know your phone shoots invisible light at your face?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Secret Sensor! \ud83d\udca1",
+      "bubble": "Yes! It's a tiny sensor near your camera that sends out an invisible infrared beam.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "thinking",
+      "title": "How Does it Work? \ud83e\udd14",
+      "bubble": "Invisible light? How does that even help my phone?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Proximity Magic \u2728",
+      "bubble": "When it bounces off your ear or pocket, your phone knows you're close and turns off the screen!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "shocked",
+      "title": "Why Turn Off? \ud83d\udd0b",
+      "bubble": "So it saves battery and stops accidental touches? That's seriously clever!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "No More Pocket Dials! \ud83d\udeab",
+      "bubble": "Exactly! This invisible beam prevents accidental calls and saves precious battery life. Pure tech genius!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "excited",
+      "title": "Tiny Tech, Big Impact \ud83d\ude80",
+      "bubble": "This invisible light sensor constantly makes your phone smarter, saving power and preventing mistakes!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your phone uses an invisible infrared beam to detect proximity, turning off the screen to save battery and prevent accidental touches, a silent guardian against pocket dials.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour phone is secretly scanning your face with invisible light \u2013 and for a brilliant reason!\n\nHere\u2019s how this mind-blowing tech works:\n\ud83d\udd39 A tiny infrared (IR) LED next to your front camera emits invisible light.\n\ud83d\udd39 When this light bounces back from your ear or pocket, your phone instantly knows you're close.\n\ud83d\udd39 This clever detection turns off your display, saving battery and preventing those dreaded \"pocket dials\" or accidental touches!\n\n\ud83d\udcac Did you already know this invisible tech was at play in your daily life? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #SmartphoneTech #InvisibleLight #ProximitySensor #Engineering #VJAi #MindBlown",
+  "vector": "everyday_tech_mysteries",
+  "characters": "auto"
+}
