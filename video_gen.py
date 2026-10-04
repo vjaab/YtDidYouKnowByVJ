@@ -9871,11 +9871,6 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         # For Shorts: single mid-point engagement
         mid_point = audio_duration * 0.50
         if mid_point < audio_duration - 3:
-            # Quick summary
-            slide = _summary_slide_clip("Here's the key takeaway...", accent_color, audio_duration, mid_point, duration=2.5)
-            if slide:
-                engagement_clips.append(slide)
-            
             # Pattern interrupt
             marker = _pattern_interrupt_marker(accent_color, audio_duration, mid_point, "shift", duration=1.0)
             if marker:
