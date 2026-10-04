@@ -154,12 +154,12 @@
             ]
           },
           "A": {
-            "views": 0,
-            "retention": 0.0,
+            "views": 5,
+            "retention": 0.03636363636363636,
             "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 1,
+            "swipe_away_rate": 0.4613,
+            "avg_view_percentage": 3.8699999999999997,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "Stop paying AssemblyAI for speaker diarization",
@@ -169,12 +169,12 @@
             ]
           }
         },
-        "total_views": 0,
-        "total_videos": 2,
-        "avg_retention": 0.0,
+        "total_views": 5,
+        "total_videos": 3,
+        "avg_retention": 0.024242424242424242,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.0,
-        "avg_view_percentage": 0.0
+        "avg_swipe_away": 0.3075333333333333,
+        "avg_view_percentage": 2.5799999999999996
       },
       "result_first": {
         "variants": {
@@ -505,12 +505,12 @@
       "personal_stake": {
         "variants": {
           "A": {
-            "views": 0,
-            "retention": 0.0,
+            "views": 20,
+            "retention": 0.1864406779661017,
             "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 1,
+            "swipe_away_rate": 0.3069,
+            "avg_view_percentage": 19.31,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "Your AI agents leak data daily",
@@ -520,12 +520,12 @@
             ]
           }
         },
-        "total_views": 0,
-        "total_videos": 1,
-        "avg_retention": 0.0,
+        "total_views": 20,
+        "total_videos": 2,
+        "avg_retention": 0.1864406779661017,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.0,
-        "avg_view_percentage": 0.0
+        "avg_swipe_away": 0.3069,
+        "avg_view_percentage": 19.31
       }
     },
     "Tech Company Safety Decisions": {
@@ -933,12 +933,12 @@
       "result_first": {
         "variants": {
           "A": {
-            "views": 0,
-            "retention": 0.0,
+            "views": 17,
+            "retention": 0.11046511627906977,
             "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 3,
+            "swipe_away_rate": 0.13435000000000002,
+            "avg_view_percentage": 11.565,
+            "count": 4,
             "hook_texts": [
               {
                 "text": "Free fix stops the endless reboot",
@@ -958,12 +958,12 @@
             ]
           }
         },
-        "total_views": 0,
-        "total_videos": 3,
-        "avg_retention": 0.0,
+        "total_views": 17,
+        "total_videos": 4,
+        "avg_retention": 0.11046511627906977,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.0,
-        "avg_view_percentage": 0.0
+        "avg_swipe_away": 0.13435000000000002,
+        "avg_view_percentage": 11.565
       },
       "personal_stake": {
         "variants": {
@@ -1070,12 +1070,12 @@
       "stat_contradiction": {
         "variants": {
           "B": {
-            "views": 0,
-            "retention": 0.0,
+            "views": 5,
+            "retention": 0.17647058823529413,
             "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 1,
+            "swipe_away_rate": 0.31655,
+            "avg_view_percentage": 18.345,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "Amazon just built a constant neighborhood surveillance device.",
@@ -1085,12 +1085,12 @@
             ]
           }
         },
-        "total_views": 0,
-        "total_videos": 1,
-        "avg_retention": 0.0,
+        "total_views": 5,
+        "total_videos": 2,
+        "avg_retention": 0.17647058823529413,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.0,
-        "avg_view_percentage": 0.0
+        "avg_swipe_away": 0.31655,
+        "avg_view_percentage": 18.345
       }
     },
     "News & Analysis": {
@@ -1210,12 +1210,12 @@
       "curiosity_gap": {
         "variants": {
           "A": {
-            "views": 0,
-            "retention": 0.0,
+            "views": 9,
+            "retention": 0.1320754716981132,
             "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 1,
+            "swipe_away_rate": 0.36150000000000004,
+            "avg_view_percentage": 13.849999999999998,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "Most developers ignore this ZDTaichu model",
@@ -1225,24 +1225,24 @@
             ]
           }
         },
-        "total_views": 0,
-        "total_videos": 1,
-        "avg_retention": 0.0,
+        "total_views": 9,
+        "total_videos": 2,
+        "avg_retention": 0.1320754716981132,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.0,
-        "avg_view_percentage": 0.0
+        "avg_swipe_away": 0.36150000000000004,
+        "avg_view_percentage": 13.849999999999998
       }
     },
     "Data Science & AI": {
       "stat_contradiction": {
         "variants": {
           "A": {
-            "views": 0,
-            "retention": 0.0,
+            "views": 5,
+            "retention": 0.32926829268292684,
             "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 1,
+            "swipe_away_rate": 0.16899999999999998,
+            "avg_view_percentage": 33.1,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "2.5 million papers free on Hugging Face",
@@ -1252,24 +1252,24 @@
             ]
           }
         },
-        "total_views": 0,
-        "total_videos": 1,
-        "avg_retention": 0.0,
+        "total_views": 5,
+        "total_videos": 2,
+        "avg_retention": 0.32926829268292684,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.0,
-        "avg_view_percentage": 0.0
+        "avg_swipe_away": 0.16899999999999998,
+        "avg_view_percentage": 33.1
       }
     },
     "AI Development": {
       "personal_stake": {
         "variants": {
           "A": {
-            "views": 0,
-            "retention": 0.0,
+            "views": 6,
+            "retention": 0.045454545454545456,
             "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 1,
+            "swipe_away_rate": 0.4508,
+            "avg_view_percentage": 4.92,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "Your code is running too slow",
@@ -1279,24 +1279,24 @@
             ]
           }
         },
-        "total_views": 0,
-        "total_videos": 1,
-        "avg_retention": 0.0,
+        "total_views": 6,
+        "total_videos": 2,
+        "avg_retention": 0.045454545454545456,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.0,
-        "avg_view_percentage": 0.0
+        "avg_swipe_away": 0.4508,
+        "avg_view_percentage": 4.92
       }
     },
     "AI Engineering": {
       "curiosity_gap": {
         "variants": {
           "A": {
-            "views": 0,
-            "retention": 0.0,
+            "views": 12,
+            "retention": 0.05555555555555555,
             "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 1,
+            "swipe_away_rate": 0.4394,
+            "avg_view_percentage": 6.06,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "Most developers don't know GLiNER2.5-Decide exists.",
@@ -1306,12 +1306,12 @@
             ]
           }
         },
-        "total_views": 0,
-        "total_videos": 1,
-        "avg_retention": 0.0,
+        "total_views": 12,
+        "total_videos": 2,
+        "avg_retention": 0.05555555555555555,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.0,
-        "avg_view_percentage": 0.0
+        "avg_swipe_away": 0.4394,
+        "avg_view_percentage": 6.06
       }
     },
     "AI Models & Security": {
@@ -1344,45 +1344,45 @@
   },
   "global": {
     "negative_warning": {
-      "views": 0,
-      "retention": 0.0,
-      "engagement": 0.0,
-      "count": 13,
-      "swipe_away_rate": 0.0,
-      "avg_view_percentage": 0.0
-    },
-    "result_first": {
-      "views": 0,
-      "retention": 0.0,
+      "views": 5,
+      "retention": 0.005194805194805195,
       "engagement": 0.0,
       "count": 14,
-      "swipe_away_rate": 0.0,
-      "avg_view_percentage": 0.0
+      "swipe_away_rate": 0.0659,
+      "avg_view_percentage": 0.5528571428571428
+    },
+    "result_first": {
+      "views": 17,
+      "retention": 0.02945736434108527,
+      "engagement": 0.0,
+      "count": 15,
+      "swipe_away_rate": 0.03582666666666667,
+      "avg_view_percentage": 3.084
     },
     "stat_contradiction": {
-      "views": 0,
-      "retention": 0.0,
+      "views": 10,
+      "retention": 0.07224841155974585,
       "engagement": 0.0,
-      "count": 12,
-      "swipe_away_rate": 0.0,
-      "avg_view_percentage": 0.0
+      "count": 14,
+      "swipe_away_rate": 0.06936428571428571,
+      "avg_view_percentage": 7.349285714285714
     },
     "curiosity_gap": {
-      "views": 0,
-      "retention": 0.0,
+      "views": 21,
+      "retention": 0.026804432464809822,
       "engagement": 0.0,
-      "count": 12,
-      "swipe_away_rate": 0.0,
-      "avg_view_percentage": 0.0
+      "count": 14,
+      "swipe_away_rate": 0.11441428571428572,
+      "avg_view_percentage": 2.844285714285714
     },
     "personal_stake": {
-      "views": 0,
-      "retention": 0.0,
+      "views": 26,
+      "retention": 0.03312788906009245,
       "engagement": 0.0,
-      "count": 12,
-      "swipe_away_rate": 0.0,
-      "avg_view_percentage": 0.0
+      "count": 14,
+      "swipe_away_rate": 0.10824285714285715,
+      "avg_view_percentage": 3.461428571428571
     }
   },
-  "last_updated": "2026-10-03T04:52:54.296109"
+  "last_updated": "2026-10-04T12:11:01.460542"
 }

@@ -487,7 +487,21 @@
     "category": "Artificial Intelligence",
     "title": "Most Developers Ignore This Open Model... \ud83e\udde0",
     "uploaded_at": "2026-09-27T19:35:53.765875",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-04T12:10:59.214343",
+    "last_metrics": {
+      "views": 9,
+      "avg_view_duration_sec": 14.0,
+      "avg_view_percentage": 27.7,
+      "swipe_away_rate": 0.723,
+      "duration_sec": 53.0,
+      "retention_rate": 0.2642,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "Eiz8sjP9BaI": {
     "video_id": "Eiz8sjP9BaI",
@@ -497,7 +511,21 @@
     "category": "AI & Machine Learning",
     "title": "Are Your Searches Safe From CLM-v0.1-8B? \ud83d\udd0d",
     "uploaded_at": "2026-09-27T23:47:48.892082",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-04T12:10:59.587424",
+    "last_metrics": {
+      "views": 17,
+      "avg_view_duration_sec": 19.0,
+      "avg_view_percentage": 46.26,
+      "swipe_away_rate": 0.5374,
+      "duration_sec": 43.0,
+      "retention_rate": 0.4419,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "eJHygJ9QHck": {
     "video_id": "eJHygJ9QHck",
@@ -507,7 +535,21 @@
     "category": "Data Science & AI",
     "title": "Can You Trust Academic AI Datasets? \ud83e\udde0",
     "uploaded_at": "2026-09-28T18:59:32.436612",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-04T12:10:59.944254",
+    "last_metrics": {
+      "views": 5,
+      "avg_view_duration_sec": 27.0,
+      "avg_view_percentage": 66.2,
+      "swipe_away_rate": 0.338,
+      "duration_sec": 41.0,
+      "retention_rate": 0.6585,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "Q9gDves08eA": {
     "video_id": "Q9gDves08eA",
@@ -517,7 +559,21 @@
     "category": "AI Development",
     "title": "Make Your Code 7x Faster Overnight \u26a1",
     "uploaded_at": "2026-09-28T22:36:01.959822",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-04T12:11:00.254048",
+    "last_metrics": {
+      "views": 6,
+      "avg_view_duration_sec": 4.0,
+      "avg_view_percentage": 9.84,
+      "swipe_away_rate": 0.9016,
+      "duration_sec": 44.0,
+      "retention_rate": 0.0909,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "LAyHCSLh9IE": {
     "video_id": "LAyHCSLh9IE",
@@ -527,7 +583,21 @@
     "category": "Interview Questions",
     "title": "[STUDY HACK] Run SOTA Speaker Diarization Locally For Zero Cost",
     "uploaded_at": "2026-09-29T05:51:55.268297",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-04T12:11:00.570622",
+    "last_metrics": {
+      "views": 5,
+      "avg_view_duration_sec": 4.0,
+      "avg_view_percentage": 7.74,
+      "swipe_away_rate": 0.9226,
+      "duration_sec": 55.0,
+      "retention_rate": 0.0727,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "c1wHDt3-tmA": {
     "video_id": "c1wHDt3-tmA",
@@ -537,7 +607,21 @@
     "category": "AI Engineering",
     "title": "Stop wasting hours on custom token classification!",
     "uploaded_at": "2026-09-30T22:14:36.462191",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-04T12:11:00.882769",
+    "last_metrics": {
+      "views": 12,
+      "avg_view_duration_sec": 5.0,
+      "avg_view_percentage": 12.12,
+      "swipe_away_rate": 0.8788,
+      "duration_sec": 45.0,
+      "retention_rate": 0.1111,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "aDOsgLFdm6Y": {
     "video_id": "aDOsgLFdm6Y",
@@ -547,7 +631,21 @@
     "category": "Tech Company Founding Stories",
     "title": "[SECRET] OpenShell Blocks Credential Access",
     "uploaded_at": "2026-10-01T05:46:33.973548",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-04T12:11:01.153536",
+    "last_metrics": {
+      "views": 20,
+      "avg_view_duration_sec": 22.0,
+      "avg_view_percentage": 38.62,
+      "swipe_away_rate": 0.6138,
+      "duration_sec": 59.0,
+      "retention_rate": 0.3729,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "qzZMpAIamEA": {
     "video_id": "qzZMpAIamEA",
@@ -557,7 +655,21 @@
     "category": "Privacy & Security",
     "title": "Amazon's New Spy Device? \ud83d\udd76\ufe0f",
     "uploaded_at": "2026-10-01T21:37:47.235895",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-04T12:11:01.462225",
+    "last_metrics": {
+      "views": 5,
+      "avg_view_duration_sec": 12.0,
+      "avg_view_percentage": 36.69,
+      "swipe_away_rate": 0.6331,
+      "duration_sec": 34.0,
+      "retention_rate": 0.3529,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "pn5SjTKxN08": {
     "video_id": "pn5SjTKxN08",
