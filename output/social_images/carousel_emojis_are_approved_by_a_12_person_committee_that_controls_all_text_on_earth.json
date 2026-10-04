@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did you know just 12 people control every emoji you use? \ud83d\ude31",
+  "headline": "Emojis Are Approved by a 12-Person Committee That Controls All Text on Earth",
+  "source": "Unicode Consortium Emoji Technical Reports",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "12 People Control Emojis? \ud83d\ude31",
+      "bubble": "Wait, did you know just 12 people decide every single emoji you use?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "The Unicode Committee \ud83e\udd2b",
+      "bubble": "Yep! The Unicode Consortium's Emoji Subcommittee, with only 12 members, approves them all.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "How Do They Decide? \ud83e\udd14",
+      "bubble": "Only 12? How do they even choose? Do they just vote on random ideas?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Global Text Standard \ud83c\udf10",
+      "bubble": "They review thousands! It's about global consistency for all digital text, not just fun.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "They Control EVERYTHING? \ud83e\udd2f",
+      "bubble": "So, they literally control every single letter, number, and symbol on my screen?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "The Text Masters \u270d\ufe0f",
+      "bubble": "Essentially, yes. They control the universal text code that makes your devices understand each other!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Mind-Blown! \ud83e\udd2f",
+      "bubble": "This is wild! Follow @vijayakumarj_ai for more mind-blowing tech facts!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Every emoji, letter, and digital symbol on Earth is standardized and approved by the 12-member Unicode Consortium's Emoji Subcommittee. They literally control how all digital text appears!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nEver wonder who decides on new emojis? It's not a secret society, but a tiny, powerful committee!\n\nHere\u2019s the mind-blowing reality:\n\ud83d\udd39 Every emoji you use is approved by a small 12-person committee.\n\ud83d\udd39 This committee is part of the Unicode Consortium, which standardizes ALL digital text, globally.\n\ud83d\udd39 They review thousands of emoji proposals yearly to ensure global compatibility across all devices and platforms!\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f in the comments!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #Emojis #UnicodeConsortium #DigitalText #BehindTheScenes #TechExplained",
+  "vector": "cybersecurity_secrets",
+  "characters": "auto"
+}
