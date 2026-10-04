@@ -43,8 +43,7 @@ Example: "A hand cursor clicking a large button"
         # 2. Call Imagen to generate a whiteboard drawing of this concept
         imagen_prompt = f"A simple whiteboard marker sketch of {doodle_concept}, black marker hand-drawn outline on a clean white whiteboard background, minimalist doodle, professional sketch, no text."
         
-        # Try fast generate model first
-        models = ["imagen-4.0-fast-generate-001", "imagen-4.0-generate-001"]
+        models = ["imagen-3.0-generate-002", "imagen-3.0-fast-generate-001", "imagen-4.0-fast-generate-001", "imagen-4.0-generate-001"]
         for model in models:
             try:
                 print(f"🎨 Generating whiteboard doodle using {model}...")

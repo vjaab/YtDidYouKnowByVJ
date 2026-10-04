@@ -120,13 +120,12 @@ from moviepy import (
 )
 import moviepy.video.fx as vfx
 import moviepy.audio.fx as afx
-from config import OUTPUT_DIR, ASSETS_DIR, MUSIC_DIR, BGM_VOLUME, LOGS_DIR, BASE_DIR, GEMINI_API_KEY, GEMINI_FLASH_MODEL
+from config import OUTPUT_DIR, ASSETS_DIR, MUSIC_DIR, BGM_VOLUME, LOGS_DIR, BASE_DIR, GEMINI_API_KEY, GEMINI_FLASH_MODEL, DISABLE_ENTITY_TAGS
 import imageio_ffmpeg
 from pydub import AudioSegment
 AudioSegment.converter = imageio_ffmpeg.get_ffmpeg_exe()
 
 CI_LITE = os.environ.get("CI_LITE", "0") == "1"
-DISABLE_ENTITY_TAGS = os.environ.get("DISABLE_ENTITY_TAGS", "0") == "1"
 
 # Cloudflare config
 CF_ACCOUNT_ID = os.environ.get("CF_ACCOUNT_ID") or os.environ.get("CLOUDFLARE_ACCOUNT_ID")

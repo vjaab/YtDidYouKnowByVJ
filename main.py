@@ -42,7 +42,7 @@ import traceback
 import json
 from datetime import datetime
 
-from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY, ENABLE_TRENDING_ENGINE, TRENDING_SOURCES, TRACKER_FILE
+from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_DIR, GEMINI_API_KEY, ENABLE_TRENDING_ENGINE, TRENDING_SOURCES, TRACKER_FILE, DISABLE_ENTITY_TAGS
 from fetch_research_papers import fetch_tech_news, fetch_ai_tools
 from topic_tracker import record_story, update_youtube_url, update_facebook_post_id, get_next_topic_type_by_ratio, get_next_target_country, get_next_avatar, get_next_topic_source
 from gemini_script import pick_and_generate_script
@@ -850,10 +850,12 @@ def run_pipeline(topic_type="auto", dry_run=False, topic_source="auto"):
             else:
                 log_message("No valid evidence URL found for secondary screenshot.")
 
-        # ── STEP 3d: Fetch and Validate Entity Tags (MANDATORY for Shorts) ──
+        # ── STEP 3d: Entity Tags (Optional / Disabled on Shorts) ────────────
         is_longform = "Slot C" in slot
-        if not is_longform:
-            log_message("STEP 3d: Fetching and validating entity tags for Short...")
+        if not is_longform and DISABLE_ENTITY_TAGS:
+            log_message("ℹ️ STEP 3d: Entity tags disabled on Shorts (DISABLE_ENTITY_TAGS=1). Skipping.")
+        elif not is_longform:
+            log_message("STEP 3d: Fetching entity tags for Short...")
             script_data = fetch_all_entities(script_data)
             
             # Find entities with name, description, and successfully downloaded logo
@@ -868,12 +870,7 @@ def run_pipeline(topic_type="auto", dry_run=False, topic_source="auto"):
                             valid_entities.append(ent)
             
             if not valid_entities:
-                log_message("❌ Short validation FAILED: No valid entity tags (logo + name + description) found.")
-                failed_headline = script_data.get("original_news_headline", title)
-                failed_topics.append(failed_headline)
-                script_data = None
-                attempts += 1
-                continue
+                log_message("ℹ️ No valid entity tags found; continuing without entity tag overlay.")
             else:
                 log_message(f"✅ Found {len(valid_entities)} valid entity tags for the Short.")
 
@@ -1061,8 +1058,11 @@ def run_pipeline(topic_type="auto", dry_run=False, topic_source="auto"):
     log_message(f"Built {len(chunks)} visual chunks from {len(word_timestamps)} words.")
 
     # ── STEP 6: Fetch Entities (People/Companies) ─────────────────────────────
-    log_message("STEP 6: Fetching entity photos and company logos...")
-    script_data = fetch_all_entities(script_data)
+    if not DISABLE_ENTITY_TAGS:
+        log_message("STEP 6: Fetching entity photos and company logos...")
+        script_data = fetch_all_entities(script_data)
+    else:
+        log_message("STEP 6: Entity tags disabled (DISABLE_ENTITY_TAGS=1) — skipping entity photo/logo fetch.")
     
     # Enable Kinetic Layers (Production Spec 2026)
     retention_config = get_retention_layers_config()

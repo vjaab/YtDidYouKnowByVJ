@@ -266,6 +266,8 @@ def generate_images(prompts, image_url=None, keywords=None, aspect_ratio="9:16")
 
     # Updated to 4.0 models as 3.0 is missing from the API in this environment
     models_to_try = [
+        "imagen-3.0-generate-002",
+        "imagen-3.0-fast-generate-001",
         "imagen-4.0-fast-generate-001",
         "imagen-4.0-generate-001",
         "imagen-4.0-ultra-generate-001"

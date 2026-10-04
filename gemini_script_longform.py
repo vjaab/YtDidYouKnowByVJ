@@ -27,6 +27,7 @@ from config import (
     GEMINI_RPM_SLEEP
 )
 from topic_tracker import load_tracker, check_story_uniqueness
+from llm_fallback import call_fallback_chain, call_fallback_chain as call_fallback_model
 from config_longform import (
     LONGFORM_MAX_CHAPTERS, LONGFORM_VISUAL_BEATS_PER_CHAPTER,
     LONGFORM_WORD_COUNT_TARGET, LONGFORM_TARGET_AUDIO_DURATION,
