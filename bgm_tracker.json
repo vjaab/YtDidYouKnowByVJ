@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_Energy.mp3",
+      "headline": "Memory Is Not Retrieval: Building a Programmable Memory Runtime for AI Agents",
+      "topic_type": "auto",
+      "timestamp": "37223793273"
+    },
+    {
       "track": "Destiny.mp3",
       "headline": "mobile-next/mobile-mcp \u2014 Model Context Protocol Server for Mobile Automation and",
       "topic_type": "auto",
@@ -134,7 +140,7 @@
     }
   ],
   "usage_counts": {
-    "jam_Energy.mp3": 3,
+    "jam_Energy.mp3": 4,
     "jam_Action_Inspiration_Trailer.mp3": 3,
     "jam_The_Epic.mp3": 3,
     "jam_Escape_From_The_Machine_Planet.mp3": 2,

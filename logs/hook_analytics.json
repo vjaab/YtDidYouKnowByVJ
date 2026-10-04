@@ -881,12 +881,12 @@
       "result_first": {
         "variants": {
           "A": {
-            "views": 0,
-            "retention": 0.0,
+            "views": 14,
+            "retention": 0.13636363636363635,
             "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 1,
+            "swipe_away_rate": 0.357,
+            "avg_view_percentage": 14.3,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "Free AI repo saves devs thousands monthly",
@@ -896,12 +896,12 @@
             ]
           }
         },
-        "total_views": 0,
-        "total_videos": 1,
-        "avg_retention": 0.0,
+        "total_views": 14,
+        "total_videos": 2,
+        "avg_retention": 0.13636363636363635,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.0,
-        "avg_view_percentage": 0.0
+        "avg_swipe_away": 0.357,
+        "avg_view_percentage": 14.3
       }
     },
     "AI & Machine Learning": {
@@ -1366,25 +1366,50 @@
         "avg_engagement": 0.0,
         "avg_swipe_away": 0.0,
         "avg_view_percentage": 0.0
+      },
+      "negative_warning": {
+        "variants": {
+          "C": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "You are probably building AI memory completely wrong.",
+                "video_id": "4B8fp5-weZ4",
+                "recorded_at": "2026-10-04T19:06:32.273016"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
       }
     }
   },
   "global": {
     "negative_warning": {
       "views": 417,
-      "retention": 0.1558448686989691,
-      "engagement": 0.006140955004591369,
-      "count": 22,
-      "swipe_away_rate": 0.24830454545454544,
-      "avg_view_percentage": 16.078636363636363
+      "retention": 0.14906900484249216,
+      "engagement": 0.005873956960913483,
+      "count": 23,
+      "swipe_away_rate": 0.23750869565217392,
+      "avg_view_percentage": 15.379565217391304
     },
     "result_first": {
-      "views": 993,
-      "retention": 0.18385789046351855,
-      "engagement": 0.0066276284851446736,
-      "count": 24,
-      "swipe_away_rate": 0.2707291666666667,
-      "avg_view_percentage": 18.863333333333333
+      "views": 1007,
+      "retention": 0.18741266575406873,
+      "engagement": 0.0063625233457388864,
+      "count": 25,
+      "swipe_away_rate": 0.28846000000000005,
+      "avg_view_percentage": 19.2528
     },
     "stat_contradiction": {
       "views": 248,
@@ -1411,5 +1436,5 @@
       "avg_view_percentage": 13.76909090909091
     }
   },
-  "last_updated": "2026-10-04T17:09:39.782552"
+  "last_updated": "2026-10-04T19:09:02.689632"
 }

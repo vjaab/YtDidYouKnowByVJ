@@ -1211,7 +1211,21 @@
     "category": "Quiz & Trivia",
     "title": "Big Tech Charging You Per Prompt? Build AI for Free Instead \ud83d\udd25",
     "uploaded_at": "2026-10-02T05:35:34.832078",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-04T19:09:02.691778",
+    "last_metrics": {
+      "views": 14,
+      "avg_view_duration_sec": 15.0,
+      "avg_view_percentage": 28.6,
+      "swipe_away_rate": 0.714,
+      "duration_sec": 55.0,
+      "retention_rate": 0.2727,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "mRZqOH-tv_k": {
     "video_id": "mRZqOH-tv_k",
@@ -1241,6 +1255,16 @@
     "category": "AI & Tech Tools",
     "title": "Did You Know This About Your Phone? \ud83e\udd2f",
     "uploaded_at": "2026-10-04T17:09:39.785087",
+    "synced": false
+  },
+  "4B8fp5-weZ4": {
+    "video_id": "4B8fp5-weZ4",
+    "hook_pattern": "negative_warning",
+    "hook_variant": "C",
+    "hook_text": "You are probably building AI memory completely wrong.",
+    "category": "AI & Tech Tools",
+    "title": "Why AI Forgets Everything You Say \ud83e\udd16",
+    "uploaded_at": "2026-10-04T19:06:32.275506",
     "synced": false
   }
 }

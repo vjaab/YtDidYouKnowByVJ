@@ -527,7 +527,25 @@
       "articles_count": 23,
       "timestamp": "2026-10-02T20:28:10.200926",
       "video_number": 88
+    },
+    {
+      "source": "github",
+      "articles_count": 158,
+      "timestamp": "2026-10-04T18:24:15.174120",
+      "video_number": 89
+    },
+    {
+      "source": "medium",
+      "articles_count": 6,
+      "timestamp": "2026-10-04T18:24:15.174955",
+      "video_number": 90
+    },
+    {
+      "source": "huggingface_hub",
+      "articles_count": 23,
+      "timestamp": "2026-10-04T18:24:15.175775",
+      "video_number": 91
     }
   ],
-  "video_count": 88
+  "video_count": 91
 }
