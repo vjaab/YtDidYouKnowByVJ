@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know Internet Data Travels as Light Bouncing Inside Glass? \ud83d\udca1",
+  "headline": "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection",
+  "source": "Corning Optical Fiber Engineering",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Internet Travels As Light? \ud83d\udca1",
+      "bubble": "Wait, did you know your internet travels as light, bouncing inside glass?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Light Speed Data \ud83d\udca8",
+      "bubble": "That's right! Millions of kilometers of hair-thin glass fibers carry data at 200,000 km/s.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "How Does Light Bend? \ud83e\udd14",
+      "bubble": "Light usually goes straight. How does it stay *inside* a bending glass wire?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Bouncing Off Walls! \ud83d\udca1",
+      "bubble": "It's like skipping a stone off water. Light bounces off inner walls, millions of times, never escaping!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Lasers for Netflix? \ud83e\udd2f",
+      "bubble": "So, my binge-watching movie is just tiny laser lights bouncing inside glass threads?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "World of Light \ud83c\udf10",
+      "bubble": "Exactly! Each tiny fiber carries terabytes, making your entire digital world possible with light pulses.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Mind-Blowing Tech! \u2728",
+      "bubble": "Mind blown! Follow @vijayakumarj_ai for daily tech facts and visual breakdowns!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your entire internet experience, from streaming to scrolling, travels as laser light bouncing inside hair-thin glass fibers, thanks to total internal reflection!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour internet data isn't just 'in the cloud'... it's actually traveling as LIGHT, bouncing endlessly inside hair-thin GLASS threads!\n\nHere's the mind-blowing reality:\n\ud83d\udd39 Fiber optic cables guide laser light by bouncing it off their inner walls (called total internal reflection).\n\ud83d\udd39 This happens thousands of times per meter, at nearly 200,000 kilometers per second!\n\ud83d\udd39 It's how 99% of global data moves with near-zero loss, powering your entire digital life.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f in the comments!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #FiberOptics #TotalInternalReflection #Internet #HowInternetWorks #ScienceFacts",
+  "vector": "hardware_megastructures",
+  "characters": "auto"
+}

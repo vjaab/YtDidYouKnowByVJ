@@ -90,12 +90,11 @@
     "Bluetooth is Named After a 10th-Century Viking King",
     "Your Phone Knows You're in Your Pocket Using a Proximity Infrared Beam",
     "Your Phone Knows You're in Your Pocket Using a Proximity Infrared Beam",
-    "Emojis Are Approved by a 12-Person Committee That Controls All Text on Earth"
+    "Emojis Are Approved by a 12-Person Committee That Controls All Text on Earth",
+    "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection",
+    "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection"
   ],
   "used_keywords": [
-    "did you know",
-    "ariane 5",
-    "integer overflow",
     "software bug",
     "rocket science",
     "did you know",
@@ -292,7 +291,10 @@
     "did you know",
     "threads",
     "tech",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
     {
@@ -1574,6 +1576,27 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-04T16:11:03.314506+00:00"
+    },
+    {
+      "title": "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-04T17:44:39.609198+00:00"
+    },
+    {
+      "title": "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-04T17:46:15.160759+00:00"
     }
   ]
 }
