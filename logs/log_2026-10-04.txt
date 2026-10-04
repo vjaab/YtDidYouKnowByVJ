@@ -1,0 +1,104 @@
+[13:58:15] === STARTING DAILY AI PIPELINE (DID_YOU_KNOW) | COUNTRY: GB | SOURCE: MEDIUM ===
+[13:58:15] 🔄 Sequential Topic Source: Active='MEDIUM' (Rotation: github → medium → huggingface_hub)
+[13:58:15] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[13:58:15] STEP 1: Content Ecosystem Check -> Day: Sun, Slot: Slot A (Discovery), Category: AI & Tech Tools (Run 1/3)
+[13:58:15] STEP 2: Fetching articles (RSS + Trending Engine)...
+[13:58:38] 🔥 Trending Engine injected 198 high-signal articles (active_source='medium', sources=['medium', 'github', 'huggingface_hub']).
+[13:58:38] 📈 vidIQ: Injected 8 high-signal topics.
+[13:59:40] ✅ Fetched 405 total articles (198 trending engine [medium], 8 vidIQ, 137 research, 53 tools, 9 X.com).
+[13:59:40] 📚 Loaded 30 recent topics for deduplication
+[14:01:36] 🔍 Deduplication & classification: 405 → 20 candidates
+[14:01:36] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[14:02:43] Selected Headline: I Was Tired of Context Switching, So I Built a Local Git Automation Tool in Rust
+[14:02:43] Selected URL: https://medium.com/@rothyyorn9/i-was-tired-of-context-switching-so-i-built-a-local-git-automation-tool-in-rust-3bf5183f6a2f?source=rss------technology-5
+[14:02:43] Breaking Level: 9
+[14:02:43] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[14:03:02] ❌ Article screenshot FAILED for: I Was Tired of Context Switching, So I Built a Local Git Automation Tool in Rust
+[14:03:02]    URL was: https://medium.com/@rothyyorn9/i-was-tired-of-context-switching-so-i-built-a-local-git-automation-tool-in-rust-3bf5183f6a2f?source=rss------technology-5
+[14:03:02]    Rejecting this topic and picking a different one... (2 items rejected so far)
+[14:03:02] STEP 3 (Attempt 2/10): Gemini Searching & Generating Script...
+[14:04:31] Selected Headline: Your AI Agent Doesn’t Need More Tools. It Needs a Harness.
+[14:04:31] Selected URL: https://medium.com/@technovaworldai/your-ai-agent-doesnt-need-more-tools-it-needs-a-harness-3d392e2b5032?source=rss------machine_learning-5
+[14:04:31] Breaking Level: 9
+[14:04:31] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[14:04:49] ❌ Article screenshot FAILED for: Your AI Agent Doesn’t Need More Tools. It Needs a Harness.
+[14:04:49]    URL was: https://medium.com/@technovaworldai/your-ai-agent-doesnt-need-more-tools-it-needs-a-harness-3d392e2b5032?source=rss------machine_learning-5
+[14:04:49]    Rejecting this topic and picking a different one... (4 items rejected so far)
+[14:04:49] STEP 3 (Attempt 3/10): Gemini Searching & Generating Script...
+[14:06:23] Selected Headline: AI Coding Agents Didn’t Kill Technical Debt. They Industrialized It.
+[14:06:23] Selected URL: https://medium.com/engineering-playbook/ai-coding-agents-didnt-kill-technical-debt-they-industrialized-it-00c0688910bd
+[14:06:23] Breaking Level: 9
+[14:06:23] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[14:06:27] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261004_140623.png
+[14:06:31] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261004_140627.png
+[14:06:31] STEP 3d: Fetching and validating entity tags for Short...
+[14:06:37] ❌ Short validation FAILED: No valid entity tags (logo + name + description) found.
+[14:06:37] STEP 3 (Attempt 4/10): Gemini Searching & Generating Script...
+[14:07:15] Selected Headline: Most of Us Have Been Cyberattack Targets, Consumer Reports Finds. AI Isn’t Helping
+[14:07:15] Selected URL: https://www.cnet.com/tech/services-and-software/most-of-us-have-been-cyber-attack-targets-consumer-reports-finds-ai-isnt-helping/
+[14:07:15] Breaking Level: 9
+[14:07:15] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[14:07:22] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261004_140715.png
+[14:07:27] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261004_140722.png
+[14:07:27] STEP 3d: Fetching and validating entity tags for Short...
+[14:07:28] ❌ Short validation FAILED: No valid entity tags (logo + name + description) found.
+[14:07:28] STEP 3 (Attempt 5/10): Gemini Searching & Generating Script...
+[14:08:03] Selected Headline: Free ChatGPT Prompts That Help Freelancers Land Premium Clients
+[14:08:03] Selected URL: https://medium.com/@ojoniniola223/free-chatgpt-prompts-that-help-freelancers-land-premium-clients-fd1619724a11
+[14:08:03] Breaking Level: 9
+[14:08:03] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[14:08:07] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261004_140803.png
+[14:08:11] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261004_140807.png
+[14:08:11] STEP 3d: Fetching and validating entity tags for Short...
+[14:08:14] ❌ Short validation FAILED: No valid entity tags (logo + name + description) found.
+[14:08:14] STEP 3 (Attempt 6/10): Gemini Searching & Generating Script...
+[14:08:49] Selected Headline: Free ChatGPT Prompts That Help Freelancers Land Premium Clients
+[14:08:49] Selected URL: https://medium.com/@ojoniniola223/free-chatgpt-prompts-that-help-freelancers-land-premium-clients-fd1619724a11?source=rss------artificial_intelligence-5
+[14:08:49] Breaking Level: 8
+[14:08:49] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[14:08:53] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261004_140849.png
+[14:08:57] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261004_140853.png
+[14:08:57] STEP 3d: Fetching and validating entity tags for Short...
+[14:08:57] ❌ Short validation FAILED: No valid entity tags (logo + name + description) found.
+[14:08:57] STEP 3 (Attempt 7/10): Gemini Searching & Generating Script...
+[14:09:33] Selected Headline: Your AI Agent Doesn't Need More Tools. It Needs a Harness.
+[14:09:33] Selected URL: https://medium.com/@technovaworldai/your-ai-agent-doesnt-need-more-tools-it-needs-a-harness-3d392e2b5032
+[14:09:33] Breaking Level: 9
+[14:09:33] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[14:09:38] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261004_140933.png
+[14:09:43] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261004_140938.png
+[14:09:43] STEP 3d: Fetching and validating entity tags for Short...
+[14:09:49] ✅ Found 1 valid entity tags for the Short.
+[14:09:49] STEP 4: Generating voiceover + word timestamps...
+[14:09:49] Selected Lip-Sync Template: assets/video/gemini.mp4 (from 41 options)
+[14:09:49] ⚠️ Script too long (85 words > 84). Asking for a tighter rewrite (shorten retry 1/2) before GPU work.
+[14:09:49] STEP 3 (Attempt 8/10): Gemini Searching & Generating Script...
+[14:10:26] Selected Headline: Some Retailers Are Opting Out of Selling Smart Glasses
+[14:10:26] Selected URL: https://gizmodo.com/smart-glasses-ban-hans-anders-2000820931
+[14:10:26] Breaking Level: 8
+[14:10:26] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[14:10:31] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261004_141026.png
+[14:10:35] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261004_141031.png
+[14:10:35] STEP 3d: Fetching and validating entity tags for Short...
+[14:10:36] ❌ Short validation FAILED: No valid entity tags (logo + name + description) found.
+[14:10:36] STEP 3 (Attempt 9/10): Gemini Searching & Generating Script...
+[14:11:13] Selected Headline: GitHub Gem #9: Agent harness framework for production LLM tooling
+[14:11:13] Selected URL: https://github.com/microsoft/agent-framework
+[14:11:13] Breaking Level: 9
+[14:11:13] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[14:11:19] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261004_141113.png
+[14:11:19] 🐙 GitHub repo detected — capturing README as evidence screenshot (MANDATORY)...
+[14:11:25] ✅ GitHub README captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_readme_20261004_141119.png
+[14:11:25] ℹ️ GitHub README already captured as evidence — skipping secondary screenshot
+[14:11:25] STEP 3d: Fetching and validating entity tags for Short...
+[14:11:27] ❌ Short validation FAILED: No valid entity tags (logo + name + description) found.
+[14:11:27] STEP 3 (Attempt 10/10): Gemini Searching & Generating Script...
+[14:12:04] Selected Headline: Chrome for Android might soon force a biometric scan before filling your passwords
+[14:12:04] Selected URL: https://www.androidcentral.com/apps-software/chrome-for-android-might-soon-force-a-biometric-scan-before-filling-your-passwords
+[14:12:04] Breaking Level: 9
+[14:12:04] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[14:12:16] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261004_141204.png
+[14:12:28] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261004_141216.png
+[14:12:28] STEP 3d: Fetching and validating entity tags for Short...
+[14:12:31] ❌ Short validation FAILED: No valid entity tags (logo + name + description) found.
+[14:12:31] ERROR: Could not generate valid assets. Aborting.
