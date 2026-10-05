@@ -96,12 +96,11 @@
     "Wi-Fi Signals Pass Through Walls Using Quantum-Like Wave Diffraction",
     "Nintendo Started as a Playing Card Company in 1889",
     "Nintendo Started as a Playing Card Company in 1889",
-    "The Microwave Oven Was Invented When a Candy Bar Melted in an Engineer's Pocket"
+    "The Microwave Oven Was Invented When a Candy Bar Melted in an Engineer's Pocket",
+    "Medium (programming): Vibe Coding Is a Financial Trap: Why Your Weeken",
+    "Medium (programming): Vibe Coding Is a Financial Trap: Why Your Weeken"
   ],
   "used_keywords": [
-    "did you know",
-    "stanislav petrov",
-    "nuclear false alarm",
     "cold war tech",
     "satellites",
     "did you know",
@@ -298,7 +297,10 @@
     "did you know",
     "threads",
     "tech",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
     {
@@ -1650,6 +1652,27 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-05T19:13:54.759506+00:00"
+    },
+    {
+      "title": "Medium (programming): Vibe Coding Is a Financial Trap: Why Your Weeken",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-05T19:47:43.439480+00:00"
+    },
+    {
+      "title": "Medium (programming): Vibe Coding Is a Financial Trap: Why Your Weeken",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-05T19:49:06.461286+00:00"
     }
   ]
 }
