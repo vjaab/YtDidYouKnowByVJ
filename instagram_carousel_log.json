@@ -98,10 +98,10 @@
     "Nintendo Started as a Playing Card Company in 1889",
     "The Microwave Oven Was Invented When a Candy Bar Melted in an Engineer's Pocket",
     "Medium (programming): Vibe Coding Is a Financial Trap: Why Your Weeken",
-    "Medium (programming): Vibe Coding Is a Financial Trap: Why Your Weeken"
+    "Medium (programming): Vibe Coding Is a Financial Trap: Why Your Weeken",
+    "GPS Would Drift 11 Kilometers Daily Without Einstein"
   ],
   "used_keywords": [
-    "cold war tech",
     "satellites",
     "did you know",
     "AI",
@@ -300,7 +300,8 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
     {
@@ -1673,6 +1674,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-05T19:49:06.461286+00:00"
+    },
+    {
+      "title": "GPS Would Drift 11 Kilometers Daily Without Einstein",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-05T21:26:30.296090+00:00"
     }
   ]
 }
