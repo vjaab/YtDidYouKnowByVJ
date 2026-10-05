@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "OpenAI Releases GPT-4o with Real-time Voice and Vision",
-    "Cursor AI Editor Raises $60M at $400M Valuation",
     "GitHub Trending: tokio-rs/topcoat \u2014 A batteries-included framework for building web apps",
     "GitHub Trending: akitaonrails/ai-memory \u2014 Solution for long term memory for agent coding CLIs and to facilitate handoff between different agen",
     "GitHub Trending: HakanSeven12/OpenCADStudio \u2014 A CAD application built with Rust \u2014 2D/3D drawing, DWG/DXF support, and GPU-accelerated rendering",
@@ -99,12 +97,11 @@
     "The Microwave Oven Was Invented When a Candy Bar Melted in an Engineer's Pocket",
     "Medium (programming): Vibe Coding Is a Financial Trap: Why Your Weeken",
     "Medium (programming): Vibe Coding Is a Financial Trap: Why Your Weeken",
-    "GPS Would Drift 11 Kilometers Daily Without Einstein"
+    "GPS Would Drift 11 Kilometers Daily Without Einstein",
+    "Your Phone: A City of Billions",
+    "Your Phone: A City of Billions"
   ],
   "used_keywords": [
-    "satellites",
-    "did you know",
-    "AI",
     "chatbots",
     "artificial intelligence",
     "hallucination",
@@ -301,66 +298,12 @@
     "did you know",
     "threads",
     "tech",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "OpenAI Releases GPT-4o with Real-time Voice and Vision",
-      "news_source_url": "https://openai.com/index/gpt-4o/",
-      "keywords": [
-        "openai",
-        "launched",
-        "multimodal",
-        "model",
-        "with",
-        "real",
-        "time",
-        "voice",
-        "conversation",
-        "vision",
-        "understanding",
-        "improved",
-        "coding",
-        "capabilities",
-        "available",
-        "with",
-        "lower",
-        "cost",
-        "than",
-        "turbo"
-      ],
-      "source": "OpenAI",
-      "timestamp": "2026-09-18T19:52:59.434584+00:00"
-    },
-    {
-      "title": "Cursor AI Editor Raises $60M at $400M Valuation",
-      "news_source_url": "https://cursor.sh/blog/series-a",
-      "keywords": [
-        "powered",
-        "code",
-        "editor",
-        "cursor",
-        "secured",
-        "series",
-        "funding",
-        "features",
-        "include",
-        "natural",
-        "language",
-        "editing",
-        "multi",
-        "file",
-        "changes",
-        "deep",
-        "codebase",
-        "understanding",
-        "developers",
-        "using",
-        "daily"
-      ],
-      "source": "Cursor",
-      "timestamp": "2026-09-18T19:53:32.347865+00:00"
-    },
     {
       "title": "GitHub Trending: tokio-rs/topcoat \u2014 A batteries-included framework for building web apps",
       "news_source_url": "https://github.com/tokio-rs/topcoat",
@@ -1684,6 +1627,27 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-05T21:26:30.296090+00:00"
+    },
+    {
+      "title": "Your Phone: A City of Billions",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-05T22:10:01.648198+00:00"
+    },
+    {
+      "title": "Your Phone: A City of Billions",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-05T22:11:34.329532+00:00"
     }
   ]
 }
