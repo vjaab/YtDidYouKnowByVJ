@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know Your 'Deleted' Files Are Never Truly Erased?",
+  "headline": "Your Deleted Files Are Never Actually Erased From Your Hard Drive",
+  "source": "NIST SP 800-88 Media Sanitization Guidelines",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Deleted Files Stay? \ud83e\udd2f",
+      "bubble": "Did you know 'deleted' files are never truly gone from your hard drive?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Just the Pointer \ud83d\uddfa\ufe0f",
+      "bubble": "Yep! Your computer just removes the address pointer in its file system, not the actual data.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Invisible Data? \ud83d\udc7b",
+      "bubble": "So, the data is still sitting there, taking up space, just... invisible to me?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Library Analogy \ud83d\udcda",
+      "bubble": "Imagine a library book's index card is removed. The book is still physically on the shelf!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Recovery Risk? \ud83d\udea8",
+      "bubble": "So, someone could potentially recover my old 'deleted' personal documents or photos? That's scary!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Until Overwritten \u270d\ufe0f",
+      "bubble": "Yes, until new information physically writes over those exact sectors, recovery is often possible!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "byte",
+      "emotion": "excited",
+      "title": "Data Security Pro-Tip \u2705",
+      "bubble": "For true erasure, use special software or physically overwrite the data many times. Stay secure!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Deleting a file only removes its address. The actual data stays on your disk until new information physically writes over it, making recovery possible!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour \"deleted\" files are actually still on your hard drive! They don't vanish into thin air.\n\nHere's the mind-blowing reality:\n\ud83d\udd39 When you hit 'delete,' your computer only removes the *pointer* (like a bookmark) to the file, not the file itself.\n\ud83d\udd39 The actual data remains on your disk until new information physically overwrites those exact sectors.\n\ud83d\udd39 This means old, 'deleted' data could potentially be recovered using specialized tools if not properly sanitized!\n\n\ud83d\udcac Did this fact surprise you? Or did you already know this tech secret? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #DataSecurity #Privacy #HardDrive #ComputerScience #DigitalForensics #VJTech #MindBlown",
+  "vector": "cybersecurity_secrets",
+  "characters": "auto"
+}

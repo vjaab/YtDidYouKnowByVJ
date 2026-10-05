@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did you know how Wi-Fi passes through solid walls? \ud83d\udcf6",
+  "headline": "Wi-Fi Signals Pass Through Walls Using Wave Diffraction",
+  "source": "IEEE 802.11 Radio Physics Standards",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Wi-Fi Through Walls? \ud83d\udcf6",
+      "bubble": "Wait, did you know how your Wi-Fi signals actually travel through solid walls?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Invisible Radio Waves \u3030\ufe0f",
+      "bubble": "It's all about invisible radio waves! They're like very long, wiggly light waves.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Wave Size Matters \ud83d\udccf",
+      "bubble": "Long wiggly waves? How big are these invisible 'waves' that pass through a house?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Bending & Diffracting \ud83c\udf0a",
+      "bubble": "Wi-Fi waves are 6-12 cm long! They're big enough to bend around objects and diffract through drywall.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "What Blocks Wi-Fi? \ud83d\udeab",
+      "bubble": "So, it's not magic, just smart physics! What actually stops or blocks these waves then?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Water & Metal Are Foes \ud83d\udee1\ufe0f",
+      "bubble": "Thick metal, concrete, or lots of water absorb them. That's why your body can block signals!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Mind-Blown! \ud83e\udd2f",
+      "bubble": "Mind blown! Follow @vijayakumarj_ai for daily mind-blowing tech facts!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Wi-Fi signals use wave diffraction, like water bending around obstacles, to pass through walls. They are absorbed by metal and water.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nEver wonder how your Wi-Fi reaches you through walls? It's not magic, it's fascinating physics!\n\nHere's the mind-blowing reality:\n\ud83d\udd39 Wi-Fi signals are radio waves (6-12 cm long!) big enough to *diffract* and bend around objects.\n\ud83d\udd39 They can pass through drywall and open doorframes by 'bending' like water flowing around a rock.\n\ud83d\udd39 But beware! Thick metal, concrete, and lots of water (like your own body!) can absorb and block these signals.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #WiFiFacts #TechExplained #Physics #HowItWorks #WirelessTechnology #MindBlown #VJ",
+  "vector": "everyday_tech_mysteries",
+  "characters": "auto"
+}

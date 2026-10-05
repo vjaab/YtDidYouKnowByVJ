@@ -92,14 +92,10 @@
     "Your Phone Knows You're in Your Pocket Using a Proximity Infrared Beam",
     "Emojis Are Approved by a 12-Person Committee That Controls All Text on Earth",
     "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection",
-    "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection"
+    "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection",
+    "Wi-Fi Signals Pass Through Walls Using Quantum-Like Wave Diffraction"
   ],
   "used_keywords": [
-    "software bug",
-    "rocket science",
-    "did you know",
-    "wifi",
-    "invention",
     "black holes",
     "radio astronomy",
     "csiro",
@@ -294,7 +290,12 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "wifi",
+    "radio waves",
+    "diffraction",
+    "physics",
+    "did you know"
   ],
   "history": [
     {
@@ -1597,6 +1598,20 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-04T17:46:15.160759+00:00"
+    },
+    {
+      "title": "Wi-Fi Signals Pass Through Walls Using Quantum-Like Wave Diffraction",
+      "news_source_url": "",
+      "keywords": [
+        "wifi",
+        "radio waves",
+        "diffraction",
+        "physics",
+        "did you know"
+      ],
+      "source": "IEEE 802.11 Radio Physics Standards",
+      "platform": "instagram",
+      "timestamp": "2026-10-05T07:50:38.176745+00:00"
     }
   ]
 }
