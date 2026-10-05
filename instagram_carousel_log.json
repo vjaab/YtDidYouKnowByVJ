@@ -95,10 +95,10 @@
     "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection",
     "Wi-Fi Signals Pass Through Walls Using Quantum-Like Wave Diffraction",
     "Nintendo Started as a Playing Card Company in 1889",
-    "Nintendo Started as a Playing Card Company in 1889"
+    "Nintendo Started as a Playing Card Company in 1889",
+    "The Microwave Oven Was Invented When a Candy Bar Melted in an Engineer's Pocket"
   ],
   "used_keywords": [
-    "engineering history",
     "did you know",
     "stanislav petrov",
     "nuclear false alarm",
@@ -297,7 +297,8 @@
     "tech companies",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
     {
@@ -1639,6 +1640,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-05T15:14:15.041503+00:00"
+    },
+    {
+      "title": "The Microwave Oven Was Invented When a Candy Bar Melted in an Engineer's Pocket",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-05T19:13:54.759506+00:00"
     }
   ]
 }
