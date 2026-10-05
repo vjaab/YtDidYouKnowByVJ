@@ -1235,7 +1235,21 @@
     "category": "AI Models & Security",
     "title": "[SECRET] Bypass Cloud Filters With This Uncensored 27B Model",
     "uploaded_at": "2026-10-02T21:21:23.153375",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-05T14:16:50.474857",
+    "last_metrics": {
+      "views": 7,
+      "avg_view_duration_sec": 51.0,
+      "avg_view_percentage": 131.54,
+      "swipe_away_rate": 1.0,
+      "duration_sec": 0.0,
+      "retention_rate": 0.0,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "otc1my_n4Ns": {
     "video_id": "otc1my_n4Ns",

@@ -1318,12 +1318,12 @@
       "negative_warning": {
         "variants": {
           "A": {
-            "views": 0,
+            "views": 7,
             "retention": 0.0,
             "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 1,
+            "swipe_away_rate": 0.5,
+            "avg_view_percentage": 65.77,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "Stop using censored models for local cybersecurity work.",
@@ -1333,12 +1333,12 @@
             ]
           }
         },
-        "total_views": 0,
-        "total_videos": 1,
+        "total_views": 7,
+        "total_videos": 2,
         "avg_retention": 0.0,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.0,
-        "avg_view_percentage": 0.0
+        "avg_swipe_away": 0.5,
+        "avg_view_percentage": 65.77
       }
     },
     "AI & Tech Tools": {
@@ -1396,12 +1396,12 @@
   },
   "global": {
     "negative_warning": {
-      "views": 417,
-      "retention": 0.14906900484249216,
-      "engagement": 0.005873956960913483,
-      "count": 23,
-      "swipe_away_rate": 0.23750869565217392,
-      "avg_view_percentage": 15.379565217391304
+      "views": 424,
+      "retention": 0.14285779630738832,
+      "engagement": 0.005629208754208755,
+      "count": 24,
+      "swipe_away_rate": 0.2692791666666667,
+      "avg_view_percentage": 20.219583333333333
     },
     "result_first": {
       "views": 1007,
@@ -1436,5 +1436,5 @@
       "avg_view_percentage": 13.76909090909091
     }
   },
-  "last_updated": "2026-10-04T19:09:02.689632"
+  "last_updated": "2026-10-05T14:16:50.472501"
 }
