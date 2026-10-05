@@ -93,16 +93,11 @@
     "Emojis Are Approved by a 12-Person Committee That Controls All Text on Earth",
     "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection",
     "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection",
-    "Wi-Fi Signals Pass Through Walls Using Quantum-Like Wave Diffraction"
+    "Wi-Fi Signals Pass Through Walls Using Quantum-Like Wave Diffraction",
+    "Nintendo Started as a Playing Card Company in 1889",
+    "Nintendo Started as a Playing Card Company in 1889"
   ],
   "used_keywords": [
-    "black holes",
-    "radio astronomy",
-    "csiro",
-    "did you know",
-    "alfa class",
-    "titanium submarine",
-    "nuclear reactor",
     "engineering history",
     "did you know",
     "stanislav petrov",
@@ -295,7 +290,14 @@
     "radio waves",
     "diffraction",
     "physics",
-    "did you know"
+    "did you know",
+    "nintendo",
+    "gaming history",
+    "hanafuda",
+    "tech companies",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
     {
@@ -1612,6 +1614,31 @@
       "source": "IEEE 802.11 Radio Physics Standards",
       "platform": "instagram",
       "timestamp": "2026-10-05T07:50:38.176745+00:00"
+    },
+    {
+      "title": "Nintendo Started as a Playing Card Company in 1889",
+      "news_source_url": "",
+      "keywords": [
+        "nintendo",
+        "gaming history",
+        "hanafuda",
+        "tech companies",
+        "did you know"
+      ],
+      "source": "Nintendo Corporate History Archives",
+      "platform": "threads",
+      "timestamp": "2026-10-05T15:12:58.325614+00:00"
+    },
+    {
+      "title": "Nintendo Started as a Playing Card Company in 1889",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-05T15:14:15.041503+00:00"
     }
   ]
 }
