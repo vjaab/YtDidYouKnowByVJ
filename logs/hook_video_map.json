@@ -1259,7 +1259,21 @@
     "category": "Famous Bugs & Glitches",
     "title": "[STUDY HACK] Replace Shady Video Downloaders With This",
     "uploaded_at": "2026-10-03T04:52:54.298759",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-06T13:12:07.729776",
+    "last_metrics": {
+      "views": 7,
+      "avg_view_duration_sec": 9.0,
+      "avg_view_percentage": 44.04,
+      "swipe_away_rate": 0.5596,
+      "duration_sec": 22.0,
+      "retention_rate": 0.4091,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "ayST2bwLHHQ": {
     "video_id": "ayST2bwLHHQ",

@@ -725,12 +725,12 @@
       "result_first": {
         "variants": {
           "A": {
-            "views": 0,
-            "retention": 0.0,
+            "views": 7,
+            "retention": 0.20454545454545456,
             "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 1,
+            "swipe_away_rate": 0.2798,
+            "avg_view_percentage": 22.02,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "This terminal tool saves developers hours",
@@ -740,12 +740,12 @@
             ]
           }
         },
-        "total_views": 0,
-        "total_videos": 1,
-        "avg_retention": 0.0,
+        "total_views": 7,
+        "total_videos": 2,
+        "avg_retention": 0.20454545454545456,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.0,
-        "avg_view_percentage": 0.0
+        "avg_swipe_away": 0.2798,
+        "avg_view_percentage": 22.02
       }
     },
     "Tech Tips & Savings": {
@@ -1431,12 +1431,12 @@
       "avg_view_percentage": 20.219583333333333
     },
     "result_first": {
-      "views": 1007,
-      "retention": 0.18741266575406873,
-      "engagement": 0.0063625233457388864,
-      "count": 25,
-      "swipe_away_rate": 0.28846000000000005,
-      "avg_view_percentage": 19.2528
+      "views": 1014,
+      "retention": 0.19593875203625488,
+      "engagement": 0.0061178109093643135,
+      "count": 26,
+      "swipe_away_rate": 0.29888846153846155,
+      "avg_view_percentage": 20.206153846153846
     },
     "stat_contradiction": {
       "views": 248,
@@ -1463,5 +1463,5 @@
       "avg_view_percentage": 13.76909090909091
     }
   },
-  "last_updated": "2026-10-05T17:54:38.408178"
+  "last_updated": "2026-10-06T13:12:07.727720"
 }
