@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "GitHub Trending: akitaonrails/ai-memory \u2014 Solution for long term memory for agent coding CLIs and to facilitate handoff between different agen",
-    "GitHub Trending: HakanSeven12/OpenCADStudio \u2014 A CAD application built with Rust \u2014 2D/3D drawing, DWG/DXF support, and GPU-accelerated rendering",
     "GitHub Trending: lmnr-ai/lmnr \u2014 Laminar - open-source observability platform purpose-built for AI agents. YC S24.",
     "GitHub Trending: TNT-Likely/PanWatch \u2014 \u76ef\u76d8\u4fa0 PanWatch \u00b7 \u81ea\u6258\u7ba1 AI \u76ef\u76d8\u52a9\u624b\uff0c\u96c6\u6210 TradingAgents \u591a Agent \u6295\u8d44\u51b3\u7b56 | A\u80a1/\u6e2f\u80a1/\u7f8e\u80a1\u5b9e\u65f6\u76d1\u63a7\u3001\u6301\u4ed3\u7ba1\u7406\u3001\u667a\u80fd\u5206\u6790\u3001\u5168\u6e20\u9053\u63a8\u9001",
     "GitHub Trending: lahfir/agent-desktop \u2014 Agent Desktop gives any agent reliable computer use on the desktop. Built with Rust, it sees any app",
@@ -99,12 +97,11 @@
     "GPS Would Drift 11 Kilometers Daily Without Einstein",
     "Your Phone: A City of Billions",
     "Your Phone: A City of Billions",
-    "Your Screen Feels Your Electricity"
+    "Your Screen Feels Your Electricity",
+    "Internet's Invisible Address Book",
+    "Internet's Invisible Address Book"
   ],
   "used_keywords": [
-    "artificial intelligence",
-    "hallucination",
-    "language models",
     "did you know",
     "AI learning",
     "computer vision",
@@ -301,50 +298,12 @@
     "did you know",
     "threads",
     "tech",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "GitHub Trending: akitaonrails/ai-memory \u2014 Solution for long term memory for agent coding CLIs and to facilitate handoff between different agen",
-      "news_source_url": "https://github.com/akitaonrails/ai-memory",
-      "keywords": [
-        "stars",
-        "rust",
-        "solution",
-        "long",
-        "term",
-        "memory",
-        "agent",
-        "coding",
-        "clis",
-        "facilitate",
-        "handoff",
-        "between",
-        "different",
-        "agent",
-        "vendors"
-      ],
-      "source": "GitHub (akitaonrails/ai-memory)",
-      "timestamp": "2026-09-22T16:47:47.892656+00:00"
-    },
-    {
-      "title": "GitHub Trending: HakanSeven12/OpenCADStudio \u2014 A CAD application built with Rust \u2014 2D/3D drawing, DWG/DXF support, and GPU-accelerated rendering",
-      "news_source_url": "https://github.com/HakanSeven12/OpenCADStudio",
-      "keywords": [
-        "stars",
-        "rust",
-        "application",
-        "built",
-        "with",
-        "rust",
-        "drawing",
-        "support",
-        "accelerated",
-        "rendering"
-      ],
-      "source": "GitHub (HakanSeven12/OpenCADStudio)",
-      "timestamp": "2026-09-22T16:48:36.134008+00:00"
-    },
     {
       "title": "GitHub Trending: lmnr-ai/lmnr \u2014 Laminar - open-source observability platform purpose-built for AI agents. YC S24.",
       "news_source_url": "https://github.com/lmnr-ai/lmnr",
@@ -1643,6 +1602,27 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-06T08:15:35.473050+00:00"
+    },
+    {
+      "title": "Internet's Invisible Address Book",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-06T13:34:17.983552+00:00"
+    },
+    {
+      "title": "Internet's Invisible Address Book",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-06T13:35:40.968160+00:00"
     }
   ]
 }

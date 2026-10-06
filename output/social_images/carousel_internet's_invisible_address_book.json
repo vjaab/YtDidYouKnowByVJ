@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "server",
+  "speaker_right": "vj",
+  "hook": "Did you know the internet has a secret address book? \ud83d\uddfa\ufe0f",
+  "headline": "Internet's Invisible Address Book",
+  "source": "ICANN (Internet Corporation for Assigned Names and Numbers)",
+  "slides": [
+    {
+      "speaker": "server",
+      "emotion": "shocked",
+      "title": "Internet's Secret Map? \ud83d\uddfa\ufe0f",
+      "bubble": "Did you know the internet has a secret, constantly updated address book for every website?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "DNS Explained \ud83c\udf10",
+      "bubble": "Absolutely! It\u2019s called DNS: the Domain Name System. It\u2019s like the world's biggest phonebook.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "server",
+      "emotion": "curious",
+      "title": "Finding Websites? \ud83e\udd14",
+      "bubble": "So, when I type youtube.com, how does my computer actually find YouTube's server?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Name to Number \ud83d\udd22",
+      "bubble": "DNS translates 'youtube.com' into a unique numeric IP address, like a website's street address.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "server",
+      "emotion": "shocked",
+      "title": "Remembering Numbers? \ud83e\udd2f",
+      "bubble": "Wait, so without DNS, I\u2019d have to remember complex number sequences for every single website?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Internet Would Break! \ud83d\udca5",
+      "bubble": "Exactly! The internet as we know it would be impossible to navigate. DNS works silently.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "server",
+      "emotion": "excited",
+      "title": "Follow for Tech! \ud83d\udc47",
+      "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts and visual breakdowns!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "The Domain Name System (DNS) is the internet's invisible address book. It translates website names into numeric IP addresses, making the internet we know possible to navigate!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nEver wonder how your browser finds ANY website from just a simple name? There's an incredible, hidden system making it all happen!\n\nHere\u2019s the mind-blowing reality:\n\ud83d\udd39 Every time you type a website name, a silent hero called the Domain Name System (DNS) kicks in.\n\ud83d\udd39 DNS translates that easy-to-remember name (like youtube.com) into a unique numeric IP address (like 172.217.160.142) that computers need to find the exact server.\n\ud83d\udd39 Without this invisible, constantly updated address book, you'd have to remember complex number sequences for every site, making the internet impossible to use!\n\n\ud83d\udcac Did you already know about this invisible system, or did this blow your mind? Drop a \ud83e\udd2f in the comments!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #DNS #Internet #HowItWorks #MindBlown #ComputerScience #InvisibleTech #WebDevelopment #VJExplains",
+  "vector": "cybersecurity_secrets",
+  "characters": "auto"
+}
