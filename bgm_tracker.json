@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_Groovy_SIX.mp3",
+      "headline": "XiaomiMiMo MiMo-V2.6-RL-oss Dataset on Hugging Face",
+      "topic_type": "auto",
+      "timestamp": "37520824130"
+    },
+    {
       "track": "modern_tech.mp3",
       "headline": "Your Chat Is Deleted in 30 Days. The Score About It Lasts Seven Years.",
       "topic_type": "auto",
@@ -163,6 +169,7 @@
     "jam_Upbeat.mp3": 2,
     "modern_tech.mp3": 2,
     "jam_Elite.mp3": 1,
-    "jam_Energetic_Pop.mp3": 1
+    "jam_Energetic_Pop.mp3": 1,
+    "jam_Groovy_SIX.mp3": 1
   }
 }

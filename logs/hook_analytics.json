@@ -1360,12 +1360,12 @@
       "personal_stake": {
         "variants": {
           "C": {
-            "views": 0,
-            "retention": 0.0,
+            "views": 12,
+            "retention": 0.4,
             "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 1,
+            "swipe_away_rate": 0.09799999999999998,
+            "avg_view_percentage": 40.2,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "Your phone automation is completely outdated now.",
@@ -1375,22 +1375,22 @@
             ]
           }
         },
-        "total_views": 0,
-        "total_videos": 1,
-        "avg_retention": 0.0,
+        "total_views": 12,
+        "total_videos": 2,
+        "avg_retention": 0.4,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.0,
-        "avg_view_percentage": 0.0
+        "avg_swipe_away": 0.09799999999999998,
+        "avg_view_percentage": 40.2
       },
       "negative_warning": {
         "variants": {
           "C": {
-            "views": 0,
-            "retention": 0.0,
+            "views": 16,
+            "retention": 0.30357142857142855,
             "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 1,
+            "swipe_away_rate": 0.17945,
+            "avg_view_percentage": 32.055,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "You are probably building AI memory completely wrong.",
@@ -1400,12 +1400,12 @@
             ]
           }
         },
-        "total_views": 0,
-        "total_videos": 1,
-        "avg_retention": 0.0,
+        "total_views": 16,
+        "total_videos": 2,
+        "avg_retention": 0.30357142857142855,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.0,
-        "avg_view_percentage": 0.0
+        "avg_swipe_away": 0.17945,
+        "avg_view_percentage": 32.055
       }
     },
     "Facts & Trivia": {
@@ -1433,17 +1433,42 @@
         "avg_engagement": 0.0,
         "avg_swipe_away": 0.0,
         "avg_view_percentage": 0.0
+      },
+      "personal_stake": {
+        "variants": {
+          "B": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "This hidden dataset is training your competitors",
+                "video_id": "mfB0j5_S5XQ",
+                "recorded_at": "2026-10-06T20:27:57.729141"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
       }
     }
   },
   "global": {
     "negative_warning": {
-      "views": 424,
-      "retention": 0.14285779630738832,
-      "engagement": 0.005629208754208755,
-      "count": 24,
-      "swipe_away_rate": 0.2692791666666667,
-      "avg_view_percentage": 20.219583333333333
+      "views": 440,
+      "retention": 0.16142919874080708,
+      "engagement": 0.005404040404040404,
+      "count": 25,
+      "swipe_away_rate": 0.272864,
+      "avg_view_percentage": 21.9752
     },
     "result_first": {
       "views": 1014,
@@ -1470,13 +1495,13 @@
       "avg_view_percentage": 17.172608695652176
     },
     "personal_stake": {
-      "views": 318,
-      "retention": 0.13306625434284297,
-      "engagement": 0.004132231404958678,
-      "count": 22,
-      "swipe_away_rate": 0.2714000000000001,
-      "avg_view_percentage": 13.76909090909091
+      "views": 330,
+      "retention": 0.15531073314760604,
+      "engagement": 0.0037878787878787876,
+      "count": 24,
+      "swipe_away_rate": 0.25695000000000007,
+      "avg_view_percentage": 15.97166666666667
     }
   },
-  "last_updated": "2026-10-06T15:55:42.811898"
+  "last_updated": "2026-10-06T20:30:45.986823"
 }

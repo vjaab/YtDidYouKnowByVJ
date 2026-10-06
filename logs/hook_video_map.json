@@ -1283,7 +1283,21 @@
     "category": "AI & Tech Tools",
     "title": "Did You Know This About Your Phone? \ud83e\udd2f",
     "uploaded_at": "2026-10-04T17:09:39.785087",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-06T20:30:45.649659",
+    "last_metrics": {
+      "views": 12,
+      "avg_view_duration_sec": 24.0,
+      "avg_view_percentage": 80.4,
+      "swipe_away_rate": 0.196,
+      "duration_sec": 30.0,
+      "retention_rate": 0.8,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "4B8fp5-weZ4": {
     "video_id": "4B8fp5-weZ4",
@@ -1293,7 +1307,21 @@
     "category": "AI & Tech Tools",
     "title": "Why AI Forgets Everything You Say \ud83e\udd16",
     "uploaded_at": "2026-10-04T19:06:32.275506",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-06T20:30:45.988991",
+    "last_metrics": {
+      "views": 16,
+      "avg_view_duration_sec": 17.0,
+      "avg_view_percentage": 64.11,
+      "swipe_away_rate": 0.3589,
+      "duration_sec": 28.0,
+      "retention_rate": 0.6071,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "QlGLJ04ArYY": {
     "video_id": "QlGLJ04ArYY",
@@ -1313,6 +1341,16 @@
     "category": "Artificial Intelligence",
     "title": "The Secret 7 Year AI Score Nobody Knows \ud83e\udd2b",
     "uploaded_at": "2026-10-06T15:55:42.815012",
+    "synced": false
+  },
+  "mfB0j5_S5XQ": {
+    "video_id": "mfB0j5_S5XQ",
+    "hook_pattern": "personal_stake",
+    "hook_variant": "B",
+    "hook_text": "This hidden dataset is training your competitors",
+    "category": "Facts & Trivia",
+    "title": "The Hidden AI Model Everyone Downloads \ud83e\udd2b",
+    "uploaded_at": "2026-10-06T20:27:57.731834",
     "synced": false
   }
 }
