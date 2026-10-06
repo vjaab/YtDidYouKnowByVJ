@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "How AI Generates Images from Pure Static Noise",
-    "Jev: Simpler AI Models Dethrone LLMs",
     "Now It\u2019s Replacing Code Reviews",
     "Medium (artificial-intelligence): Isomorphic Structural Theory: Decoup",
     "Naive Vector Search Fails Production RAG",
@@ -99,12 +97,11 @@
     "Voice AI's Secret Ear",
     "Why AI Can Count to Billions But Fails at Strawberry 'r's",
     "Why AI Can Count to Billions But Fails at Strawberry 'r's",
-    "Medium (technology): ChatGPT Has Ads Now. Here\u2019s What Actually Changed"
+    "Medium (technology): ChatGPT Has Ads Now. Here\u2019s What Actually Changed",
+    "99% of Global Internet is on the Ocean Floor",
+    "99% of Global Internet is on the Ocean Floor"
   ],
   "used_keywords": [
-    "did you know",
-    "did you know",
-    "tech trending",
     "medium",
     "artificial",
     "intelligence",
@@ -301,37 +298,12 @@
     "did you know",
     "threads",
     "tech",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "How AI Generates Images from Pure Static Noise",
-      "news_source_url": "",
-      "keywords": [
-        "diffusion models",
-        "midjourney",
-        "image generation",
-        "ai art",
-        "did you know"
-      ],
-      "source": "Denoising Diffusion Probabilistic Models",
-      "timestamp": "2026-09-29T19:56:41.908082+00:00"
-    },
-    {
-      "title": "Jev: Simpler AI Models Dethrone LLMs",
-      "news_source_url": "https://medium.com/@martin.jurado.p/jev-when-something-simpler-can-be-better-than-an-llm-562fb12a434d?source=rss------artificial_intelligence-5",
-      "keywords": [
-        "Jev AI",
-        "LLM",
-        "AI efficiency",
-        "breakthrough",
-        "smaller models",
-        "artificial intelligence",
-        "did you know"
-      ],
-      "source": "Medium - artificial-intelligence",
-      "timestamp": "2026-09-29T20:09:46.760687+00:00"
-    },
     {
       "title": "Now It\u2019s Replacing Code Reviews",
       "news_source_url": "https://medium.com/tailed-tech/ai-replaced-coding-by-hand-now-its-replacing-code-reviews-3450fd722f17?source=rss------artificial_intelligence-5",
@@ -1582,6 +1554,27 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-06T19:22:26.654264+00:00"
+    },
+    {
+      "title": "99% of Global Internet is on the Ocean Floor",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-06T20:30:39.398067+00:00"
+    },
+    {
+      "title": "99% of Global Internet is on the Ocean Floor",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-06T20:32:02.004688+00:00"
     }
   ]
 }
