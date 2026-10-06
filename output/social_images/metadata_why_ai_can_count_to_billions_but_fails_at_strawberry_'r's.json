@@ -1,0 +1,21 @@
+{
+  "topic": "Why AI Can Count to Billions But Fails at Strawberry 'r's",
+  "category": "AI News",
+  "type": "carousel",
+  "slides": 7,
+  "instagram_images": [
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_why_cant_ai_count_letters_in_s_01.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_why_cant_ai_count_letters_in_s_02.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_why_cant_ai_count_letters_in_s_03.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_why_cant_ai_count_letters_in_s_04.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_why_cant_ai_count_letters_in_s_05.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_why_cant_ai_count_letters_in_s_06.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_why_cant_ai_count_letters_in_s_07.jpg"
+  ],
+  "facebook_images": [],
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nWhy can AI solve differential equations but fail to count letters in 'strawberry'?\n\nHere is the answer:\n\ud83d\udd39 Language models do not read individual characters.\n\ud83d\udd39 Words are tokenized into subword IDs (e.g. 'straw' + 'berry').\n\ud83d\udd39 Without seeing individual letters, character counting becomes a statistical guess!\n\nFollow @vijayakumarj_ai for daily tech breakthroughs!\n#DidYouKnow #AI #Tokenization #MachineLearning #TechFacts\n\n\ud83d\udd01 Repost this to blow your friends' minds! | \ud83d\udcac Tag someone who needs to see this!\n\n#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets",
+  "hashtags": "#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets",
+  "poll_file": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/poll_why_ai_can_count_to_billions_but_fails_at_strawberry_'r's.json",
+  "carousel_json": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_why_ai_can_count_to_billions_but_fails_at_strawberry_'r's.json",
+  "generated_at": "2026-10-06T17:21:02.617840+00:00"
+}

@@ -1,0 +1,58 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "hook": "Why Can't AI Count Letters in 'Strawberry'? \ud83c\udf53",
+  "headline": "Why AI Can Count to Billions But Fails at Strawberry 'r's",
+  "source": "Byte-Pair Encoding Tokenization",
+  "date": "06 Oct 2026",
+  "slides": [
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "Why Can't AI Count 'r's? \ud83c\udf53",
+      "bubble": "Why does ChatGPT struggle to count how many 'r's are in 'strawberry'?"
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Subword Tokenization \ud83e\udde9",
+      "bubble": "Because LLMs never see letters! Words are chopped into numeric chunks called tokens."
+    },
+    {
+      "speaker": "byte",
+      "emotion": "curious",
+      "title": "Token Blindspot \ud83d\udd76\ufe0f",
+      "bubble": "So the word 'strawberry' isn't stored as ten individual characters?"
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Tokens Over Letters \ud83d\udd22",
+      "bubble": "Right! It sees token IDs like 'straw' and 'berry', completely hiding the raw letters."
+    },
+    {
+      "speaker": "byte",
+      "emotion": "shocked",
+      "title": "How Do Newer AIs Fix It? \u26a1",
+      "bubble": "Can reasoning models fix this by spelling out the word internally?"
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Chain-of-Thought Power \ud83e\udde0",
+      "bubble": "Yes! Reasoning models spell each letter in their scratchpad to count accurately."
+    },
+    {
+      "speaker": "byte",
+      "emotion": "excited",
+      "title": "Mind-Blowing Fact \ud83d\udca1",
+      "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "AI doesn't see letters\u2014it sees token chunks. Asking for letter counts breaks subword tokenization!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nWhy can AI solve differential equations but fail to count letters in 'strawberry'?\n\nHere is the answer:\n\ud83d\udd39 Language models do not read individual characters.\n\ud83d\udd39 Words are tokenized into subword IDs (e.g. 'straw' + 'berry').\n\ud83d\udd39 Without seeing individual letters, character counting becomes a statistical guess!\n\nFollow @vijayakumarj_ai for daily tech breakthroughs!\n#DidYouKnow #AI #Tokenization #MachineLearning #TechFacts",
+  "speaker_left": "byte",
+  "speaker_right": "vj",
+  "characters": "auto"
+}
