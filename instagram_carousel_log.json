@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "GitHub Trending: tokio-rs/topcoat \u2014 A batteries-included framework for building web apps",
     "GitHub Trending: akitaonrails/ai-memory \u2014 Solution for long term memory for agent coding CLIs and to facilitate handoff between different agen",
     "GitHub Trending: HakanSeven12/OpenCADStudio \u2014 A CAD application built with Rust \u2014 2D/3D drawing, DWG/DXF support, and GPU-accelerated rendering",
     "GitHub Trending: lmnr-ai/lmnr \u2014 Laminar - open-source observability platform purpose-built for AI agents. YC S24.",
@@ -99,10 +98,10 @@
     "Medium (programming): Vibe Coding Is a Financial Trap: Why Your Weeken",
     "GPS Would Drift 11 Kilometers Daily Without Einstein",
     "Your Phone: A City of Billions",
-    "Your Phone: A City of Billions"
+    "Your Phone: A City of Billions",
+    "Your Screen Feels Your Electricity"
   ],
   "used_keywords": [
-    "chatbots",
     "artificial intelligence",
     "hallucination",
     "language models",
@@ -301,24 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "GitHub Trending: tokio-rs/topcoat \u2014 A batteries-included framework for building web apps",
-      "news_source_url": "https://github.com/tokio-rs/topcoat",
-      "keywords": [
-        "stars",
-        "rust",
-        "batteries",
-        "included",
-        "framework",
-        "building",
-        "apps"
-      ],
-      "source": "GitHub (tokio-rs/topcoat)",
-      "timestamp": "2026-09-22T16:46:55.333675+00:00"
-    },
     {
       "title": "GitHub Trending: akitaonrails/ai-memory \u2014 Solution for long term memory for agent coding CLIs and to facilitate handoff between different agen",
       "news_source_url": "https://github.com/akitaonrails/ai-memory",
@@ -1648,6 +1633,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-05T22:11:34.329532+00:00"
+    },
+    {
+      "title": "Your Screen Feels Your Electricity",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-06T08:15:35.473050+00:00"
     }
   ]
 }

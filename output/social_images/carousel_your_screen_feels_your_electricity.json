@@ -1,0 +1,57 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "battery",
+  "speaker_right": "vj",
+  "hook": "Did you know your phone screen actually *feels* your electricity?",
+  "headline": "Your Screen Feels Your Electricity",
+  "source": "ExplainThatStuff.com, Scientific American",
+  "slides": [
+    {
+      "speaker": "battery",
+      "emotion": "shocked",
+      "title": "Screen Doesn't 'See'? \ud83e\uddd0",
+      "bubble": "Wait, did you know your phone screen doesn't actually 'see' your finger?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "It *Feels* Electricity \u2728",
+      "bubble": "That's right! It *feels* a tiny electric charge from you, almost like magic.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "curious",
+      "title": "How Does It Feel? \ud83e\udd14",
+      "bubble": "Feels electricity? How does a screen sense that tiny charge?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Invisible Electric 'Skin' \ud83c\udf0a",
+      "bubble": "Your screen has an invisible electrical 'skin.' Your finger disrupts it, like a tiny boat on water.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "shocked",
+      "title": "Gloves Block Charge? \ud83e\udde4",
+      "bubble": "So, if I wore thick gloves, it wouldn't work? Because no electricity?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Your Electrical Field! \u26a1",
+      "bubble": "Exactly! It needs your body's tiny electrical field to register that connection. So cool!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your phone screen doesn't detect physical pressure; it senses the tiny electrical field from your finger to react!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour phone screen isn't 'seeing' your finger... it's *feeling* your electricity!\n\nHere's the mind-blowing reality of how touchscreens work:\n\ud83d\udd39 Every modern screen has an invisible electrical 'skin' that's constantly scanning.\n\ud83d\udd39 Your finger naturally carries a tiny static electric charge.\n\ud83d\udd39 When you touch, this charge creates a ripple in the screen's field, allowing it to pinpoint your exact tap!\n\n\ud83d\udcac Did you already know your screen felt your electricity, or did this blow your mind? Drop a \ud83e\udd2f in the comments!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #Touchscreen #HowTechWorks #CapacitiveTouch #ScreenTech",
+  "vector": "bizarre_tech_history",
+  "characters": "auto"
+}
