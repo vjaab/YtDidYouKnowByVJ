@@ -3,62 +3,62 @@
   "category": "\ud83e\udde0 DID YOU KNOW?",
   "speaker_left": "vr",
   "speaker_right": "vj",
-  "hook": "Did You Know GPT-4 Read More Than 20,000 Lifetimes of Text? \ud83d\udcda",
+  "hook": "Did You Know GPT-4 Read More Than 20,000 Years of Text? \ud83d\udcda",
   "headline": "GPT-4 Was Trained on More Text Than You Could Read in 20,000 Years",
   "source": "OpenAI Technical Reports & Estimates",
   "slides": [
     {
       "speaker": "vr",
       "emotion": "shocked",
-      "title": "20,000 Lifetimes?! \ud83e\udd2f",
-      "bubble": "Wait, did you know GPT-4 read more text than you could in 20,000 human lifetimes?!",
+      "title": "GPT-4's Epic Library? \ud83d\udcda",
+      "bubble": "Did you know GPT-4 read more text than you could in 20,000 years?!",
       "is_takeaway": false
     },
     {
       "speaker": "vj",
       "emotion": "excited",
-      "title": "Trillions of Tokens \ud83d\udcda",
-      "bubble": "That's right! Its training data is about 13 trillion 'tokens'. Imagine millions of books!",
+      "title": "13 Trillion Tokens! \ud83e\udd2f",
+      "bubble": "That's right! It processed about 13 trillion 'tokens' of text during its training.",
       "is_takeaway": false
     },
     {
       "speaker": "vr",
       "emotion": "curious",
-      "title": "How Many Books? \ud83d\udcd6",
-      "bubble": "Trillions of tokens? How much text is that really? Like, the entire internet?",
+      "title": "A Human Couldn't! \u23f3",
+      "bubble": "But how can it 'read' for so long? Humans can't do that!",
       "is_takeaway": false
     },
     {
       "speaker": "vj",
       "emotion": "smug",
-      "title": "Library of Humanity \ud83e\udde0",
-      "bubble": "If you read 250 words per minute, 24/7, it would take you 20,000 years to finish!",
+      "title": "Nonstop Reading AI \ud83d\ude80",
+      "bubble": "Exactly! A human reading nonstop at 250 words/min would take over 20,000 years.",
       "is_takeaway": false
     },
     {
       "speaker": "vr",
       "emotion": "shocked",
-      "title": "What Did It Learn? \ud83e\udd14",
-      "bubble": "20,000 years! So, it knows everything? Every single piece of human knowledge?",
+      "title": "Everything Ever Written? \ud83c\udf0d",
+      "bubble": "So, has it basically read everything ever written on the internet? And more?!",
       "is_takeaway": false
     },
     {
       "speaker": "vj",
       "emotion": "thinking",
-      "title": "Learning vs. Memorizing \ud83e\udde0",
-      "bubble": "Not everything! It learns patterns, language structure, and reasoning. Not just memorizing facts.",
+      "title": "Vast Knowledge Base \ud83d\udca1",
+      "bubble": "Pretty much! It's seen vast amounts of web data, books, and articles to learn language.",
       "is_takeaway": false
     },
     {
-      "speaker": "byte",
+      "speaker": "vr",
       "emotion": "excited",
-      "title": "Unfathomable Scale \ud83e\udd2f",
-      "bubble": "The scale is mind-boggling, showing AI's incredible potential and vast capabilities!",
+      "title": "AI's Brain Power! \ud83e\udde0",
+      "bubble": "That's insane! Follow @vijayakumarj_ai for more mind-blowing tech facts daily!",
       "is_takeaway": true
     }
   ],
-  "takeaway": "GPT-4 consumed a 'library' of text equivalent to 20,000 human reading years, teaching it language patterns and reasoning on an unimaginable scale.",
-  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nGPT-4's brain is bigger than you can even imagine! It 'read' more text than you could in 20,000 human lifetimes! \ud83d\udcda\n\nHere's the mind-blowing scale of its training:\n\ud83d\udd39 GPT-4's training data contains roughly 13 trillion 'tokens' \u2013 tiny pieces of text.\n\ud83d\udd39 A human reading non-stop at 250 words per minute would take over 20,000 years to get through it all!\n\ud83d\udd39 This gargantuan dataset allows GPT-4 to understand language, reason, and generate incredibly human-like text.\n\n\ud83d\udcac Did you already know GPT-4 trained on this much data? Drop a \ud83e\udd2f in the comments if your mind is blown!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #GPT4 #AI #ArtificialIntelligence #OpenAI #TechFacts #MindBlown #LLM #MachineLearning #DeepLearning #FutureTech",
+  "takeaway": "GPT-4 processed a training dataset equivalent to over 20,000 human years of nonstop reading, absorbing colossal amounts of human language and knowledge.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nGPT-4 has absorbed more human text than you could ever imagine \u2013 or read in many lifetimes!\n\nHere's the mind-blowing reality:\n\ud83d\udd39 GPT-4 was trained on approximately 13 trillion 'tokens' of text data.\n\ud83d\udd39 If a human read 250 words per minute nonstop, it would take over 20,000 years to get through that much text.\n\ud83d\udd39 This incredible amount of data allows AI models to understand, generate, and process human language with astonishing accuracy.\n\n\ud83d\udcac Did you already know about the sheer scale of AI training data? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #GPT4 #AI #ArtificialIntelligence #TechFacts #MindBlowingFacts #OpenAI #LLM #FutureTech",
   "vector": "ai_secrets",
   "characters": "auto"
 }
