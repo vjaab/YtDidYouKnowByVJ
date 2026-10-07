@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Naive Vector Search Fails Production RAG",
     "AI's 5 Secrets: Not All Bots Learn",
     "GPT-6 Astra: The Next Generation of AI",
     "Self-Attention Costs Double When You Double Text Length",
@@ -99,10 +98,10 @@
     "99% of Global Internet is on the Ocean Floor",
     "99% of Global Internet is on the Ocean Floor",
     "The Original iPhone Had No Copy-Paste for Two Full Years",
-    "The Original iPhone Had No Copy-Paste for Two Full Years"
+    "The Original iPhone Had No Copy-Paste for Two Full Years",
+    "GPT-4 Was Trained on More Text Than You Could Read in 20,000 Years"
   ],
   "used_keywords": [
-    "beyond",
     "assertions",
     "threads",
     "tech",
@@ -301,23 +300,10 @@
     "tech",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "Naive Vector Search Fails Production RAG",
-      "news_source_url": "https://medium.com/@ronomahedi/beyond-naive-vector-search-why-production-rag-fails-without-hybrid-search-bm25-dense-vectors-608d837688b0?source=rss------artificial_intelligence-5",
-      "keywords": [
-        "Hybrid Search",
-        "RAG",
-        "Vector Search",
-        "BM25",
-        "AI",
-        "did you know"
-      ],
-      "source": "Medium - artificial-intelligence",
-      "timestamp": "2026-09-29T20:31:17.517874+00:00"
-    },
     {
       "title": "AI's 5 Secrets: Not All Bots Learn",
       "news_source_url": "https://julitreedesign.medium.com/cinco-tipos-de-agentes-de-ia-de-reaccionar-a-aprender-52423a72d8c1?source=rss------artificial_intelligence-5",
@@ -1568,6 +1554,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-07T13:48:22.718141+00:00"
+    },
+    {
+      "title": "GPT-4 Was Trained on More Text Than You Could Read in 20,000 Years",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-07T17:25:36.449145+00:00"
     }
   ]
 }
