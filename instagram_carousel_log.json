@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Self-Attention Costs Double When You Double Text Length",
     "Training AI on AI-Generated Text Causes Model Collapse",
     "RLHF Makes AI Sycophantic Rather Than Honest",
     "RLHF Makes AI Sycophantic Rather Than Honest",
@@ -99,10 +98,10 @@
     "The Original iPhone Had No Copy-Paste for Two Full Years",
     "GPT-4 Was Trained on More Text Than You Could Read in 20,000 Years",
     "Airplane Mode Doesn't Actually Stop Your Phone From Being Tracked",
-    "Airplane Mode Doesn't Actually Stop Your Phone From Being Tracked"
+    "Airplane Mode Doesn't Actually Stop Your Phone From Being Tracked",
+    "How AI Generates Images from Pure Static Noise"
   ],
   "used_keywords": [
-    "touchscreen",
     "capacitive",
     "smartphone",
     "electric field",
@@ -301,22 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "Self-Attention Costs Double When You Double Text Length",
-      "news_source_url": "",
-      "keywords": [
-        "transformer",
-        "self attention",
-        "quadratic cost",
-        "context length",
-        "did you know"
-      ],
-      "source": "Attention Is All You Need (Vaswani et al.)",
-      "timestamp": "2026-09-29T21:02:32.035827+00:00"
-    },
     {
       "title": "Training AI on AI-Generated Text Causes Model Collapse",
       "news_source_url": "",
@@ -1558,6 +1545,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-07T17:55:34.882188+00:00"
+    },
+    {
+      "title": "How AI Generates Images from Pure Static Noise",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-07T19:53:55.322136+00:00"
     }
   ]
 }

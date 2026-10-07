@@ -1,60 +1,64 @@
 {
   "mode": "did_you_know",
   "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
   "hook": "Did You Know AI Paints from Pure TV Static? \ud83c\udfa8",
   "headline": "How AI Generates Images from Pure Static Noise",
   "source": "Denoising Diffusion Probabilistic Models",
   "slides": [
     {
-      "speaker": "byte",
+      "speaker": "vr",
       "emotion": "shocked",
-      "title": "AI from Static? \ud83e\udd2f",
-      "bubble": "Wait, did you know AI paints amazing images starting from pure static noise?!",
+      "title": "AI Paints from Static? \ud83c\udfa8",
+      "bubble": "Did you know AI can paint incredible pictures, starting from pure TV static?!",
       "is_takeaway": false
     },
     {
       "speaker": "vj",
       "emotion": "excited",
-      "title": "Diffusion Magic \u2728",
-      "bubble": "Absolutely! Diffusion models begin with 100% random static. Like TV fuzz before a channel.",
+      "title": "Noise to Image Magic \u2728",
+      "bubble": "Absolutely! AI models like Midjourney begin with 100% random fuzz, like old TV snow.",
       "is_takeaway": false
     },
     {
-      "speaker": "byte",
+      "speaker": "vr",
       "emotion": "curious",
-      "title": "How Does It Work? \ud83d\uddbc\ufe0f",
-      "bubble": "100% static? How does it even know what to paint from that chaos?!",
+      "title": "How Does It Work? \ud83e\udd2f",
+      "bubble": "So it just *removes* the static until an image appears? How does it know what to remove?",
       "is_takeaway": false
     },
     {
       "speaker": "vj",
       "emotion": "smug",
-      "title": "Denoising Steps \ud83d\udcc9",
-      "bubble": "It's like reverse-engineering. It gradually subtracts noise, step by step, over 50 iterations.",
+      "title": "Denoising Step by Step \ud83e\udde9",
+      "bubble": "Imagine cleaning a smudged window. AI takes tiny steps, guessing what's behind the 'smudges'.",
       "is_takeaway": false
     },
     {
-      "speaker": "byte",
+      "speaker": "vr",
       "emotion": "shocked",
-      "title": "50 Steps?! \ud83c\udfa8",
-      "bubble": "So, from pure random fuzz to a crisp image in just 50 steps? That's insane!",
+      "title": "50 Steps to Art? \ud83d\uddbc\ufe0f",
+      "bubble": "So it's literally turning chaos into art in about 50 tiny steps? That's insane!",
       "is_takeaway": false
     },
     {
       "speaker": "vj",
       "emotion": "thinking",
-      "title": "Refining the Vision \ud83c\udfaf",
-      "bubble": "Each step refines the image, making it clearer until the final masterpiece crystallizes.",
+      "title": "From Noise to Vision \ud83d\udca1",
+      "bubble": "Yes! It's like finding a masterpiece hidden within pure randomness, one subtraction at a time.",
       "is_takeaway": false
     },
     {
-      "speaker": "byte",
+      "speaker": "vr",
       "emotion": "excited",
-      "title": "Mind-Blown Tech \ud83e\udd2f",
-      "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts and AI insights!",
+      "title": "Mind-Blowing AI Art! \ud83d\ude80",
+      "bubble": "Follow @vijayakumarj_ai for more mind-bending tech facts and visual breakdowns!",
       "is_takeaway": true
     }
   ],
-  "takeaway": "AI's image generation is reverse entropy: transforming pure random noise into structured images by gradually subtracting noise over many steps, like magic.",
-  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nEver wondered how AI can create stunning images from nothing? It literally starts from pure TV static!\n\nHere's the mind-blowing reality of Diffusion Models:\n\ud83d\udd39 They begin with 100% random pixel noise, like an old TV with no signal.\n\ud83d\udd39 An AI model then iteratively 'denoises' this static over 50+ steps.\n\ud83d\udd39 With each step, it subtracts noise, gradually revealing the intended image, pixel by pixel!\n\n\ud83d\udcac Did you already know this, or did this process blow your mind? Drop a \ud83e\udd2f in the comments!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #AIGenArt #DiffusionModels #TechFacts #MindBlowingFacts #Midjourney #StableDiffusion #AIArt"
+  "takeaway": "AI-powered Diffusion models start with pure visual static and gradually remove noise over many steps, revealing a perfect image from chaos!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nAI can paint astonishing images starting from nothing but random TV static!\n\nHere is the mind-blowing reality:\n\ud83d\udd39 AI Diffusion models begin with 100% pure visual noise.\n\ud83d\udd39 They 'denoise' this static over around 50 precise steps.\n\ud83d\udd39 Each step subtly removes noise, revealing a clear image, like cleaning a window!\n\n\ud83d\udcac Did you already know AI paints from static? Drop a \ud83c\udfa8 in the comments!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #AIGenerated #DiffusionModels #TechFacts #Midjourney #ArtificialIntelligence #ArtFromNoise",
+  "vector": "ai_secrets",
+  "characters": "auto"
 }
