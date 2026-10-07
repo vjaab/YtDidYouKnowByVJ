@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Training AI on AI-Generated Text Causes Model Collapse",
-    "RLHF Makes AI Sycophantic Rather Than Honest",
     "RLHF Makes AI Sycophantic Rather Than Honest",
     "Why ChatGPT Actually Forgets You",
     "Why AI Hallucinates Instead of Admitting Ignorance",
@@ -99,16 +97,11 @@
     "GPT-4 Was Trained on More Text Than You Could Read in 20,000 Years",
     "Airplane Mode Doesn't Actually Stop Your Phone From Being Tracked",
     "Airplane Mode Doesn't Actually Stop Your Phone From Being Tracked",
-    "How AI Generates Images from Pure Static Noise"
+    "How AI Generates Images from Pure Static Noise",
+    "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
+    "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way"
   ],
   "used_keywords": [
-    "capacitive",
-    "smartphone",
-    "electric field",
-    "how it works",
-    "did you know",
-    "everyday tech",
-    "AI art",
     "generative AI",
     "deepdream",
     "machine learning",
@@ -301,35 +294,16 @@
     "did you know",
     "threads",
     "tech",
-    "did you know"
+    "did you know",
+    "nvidia",
+    "gpu",
+    "transistors",
+    "semiconductor",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "Training AI on AI-Generated Text Causes Model Collapse",
-      "news_source_url": "",
-      "keywords": [
-        "model collapse",
-        "synthetic data",
-        "ai training",
-        "machine learning",
-        "did you know"
-      ],
-      "source": "Nature: The Curse of Recursion in Generative Models",
-      "timestamp": "2026-09-29T21:19:17.681527+00:00"
-    },
-    {
-      "title": "RLHF Makes AI Sycophantic Rather Than Honest",
-      "news_source_url": "",
-      "keywords": [
-        "rlhf",
-        "sycophancy",
-        "alignment",
-        "chatbots",
-        "did you know"
-      ],
-      "source": "Anthropic Research on AI Sycophancy",
-      "timestamp": "2026-09-30T06:05:17.330088+00:00"
-    },
     {
       "title": "RLHF Makes AI Sycophantic Rather Than Honest",
       "news_source_url": "",
@@ -1555,6 +1529,31 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-07T19:53:55.322136+00:00"
+    },
+    {
+      "title": "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
+      "news_source_url": "",
+      "keywords": [
+        "nvidia",
+        "gpu",
+        "transistors",
+        "semiconductor",
+        "did you know"
+      ],
+      "source": "NVIDIA Blackwell Architecture Whitepaper",
+      "platform": "threads",
+      "timestamp": "2026-10-07T20:47:59.772246+00:00"
+    },
+    {
+      "title": "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-07T20:49:25.698099+00:00"
     }
   ]
 }
