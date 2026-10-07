@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know the Original iPhone Couldn't Copy-Paste? \ud83d\udccb",
+  "headline": "The Original iPhone Had No Copy-Paste for Two Full Years",
+  "source": "Apple iOS Version History",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "No Copy-Paste? \ud83e\udd2f",
+      "bubble": "Wait, did you know the original iPhone couldn't even copy and paste text?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Missing Feature \ud83d\udcf5",
+      "bubble": "That's right! When it launched in 2007, this basic feature was totally missing!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Why Apple Skipped It \ud83e\udd14",
+      "bubble": "But... copy-paste is so fundamental! Why would Apple skip something so essential?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Gesture Focus \ud83d\udd90\ufe0f",
+      "bubble": "They wanted 'perfect' multi-touch gestures. It took two years to develop 'shake to undo'!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Daily Struggle \ud83d\ude2b",
+      "bubble": "Two years without it? How did anyone send an address or a phone number then?!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Finally Arrived! \ud83c\udf89",
+      "bubble": "People just retyped everything! Copy-paste finally arrived with iPhone OS 3.0 in June 2009.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "More Tech Facts! \ud83d\udca1",
+      "bubble": "Mind-blown! Follow @vijayakumarj_ai for more incredible tech facts daily!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Imagine a world without copy-paste! The original iPhone, a revolution in many ways, surprisingly lacked this basic feature for its first two years, prioritizing groundbreaking touch gestures instead.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nThe original iPhone, a device that changed the world, launched without one of the most basic features we use every day: Copy and Paste!\n\nHere's why this mind-blowing fact is true:\n\ud83d\udd39 Launched in 2007, the iPhone prioritized innovative multi-touch gestures.\n\ud83d\udd39 Apple wanted to ensure a 'perfect' copy-paste experience with gestures, taking time.\n\ud83d\udd39 The feature finally arrived two years later in 2009 with iPhone OS 3.0!\n\n\ud83d\udcac Did you already know this, or did this fact blow your mind? Drop a \ud83e\udd2f in the comments!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #iPhoneFacts #AppleHistory #Innovation #TechHistory #MindBlowingFacts",
+  "vector": "bizarre_tech_history",
+  "characters": "auto"
+}

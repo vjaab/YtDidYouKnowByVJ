@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Now It\u2019s Replacing Code Reviews",
-    "Medium (artificial-intelligence): Isomorphic Structural Theory: Decoup",
     "Naive Vector Search Fails Production RAG",
     "AI's 5 Secrets: Not All Bots Learn",
     "GPT-6 Astra: The Next Generation of AI",
@@ -99,12 +97,11 @@
     "Why AI Can Count to Billions But Fails at Strawberry 'r's",
     "Medium (technology): ChatGPT Has Ads Now. Here\u2019s What Actually Changed",
     "99% of Global Internet is on the Ocean Floor",
-    "99% of Global Internet is on the Ocean Floor"
+    "99% of Global Internet is on the Ocean Floor",
+    "The Original iPhone Had No Copy-Paste for Two Full Years",
+    "The Original iPhone Had No Copy-Paste for Two Full Years"
   ],
   "used_keywords": [
-    "medium",
-    "artificial",
-    "intelligence",
     "beyond",
     "assertions",
     "threads",
@@ -301,37 +298,12 @@
     "did you know",
     "did you know",
     "threads",
+    "tech",
+    "did you know",
+    "threads",
     "tech"
   ],
   "history": [
-    {
-      "title": "Now It\u2019s Replacing Code Reviews",
-      "news_source_url": "https://medium.com/tailed-tech/ai-replaced-coding-by-hand-now-its-replacing-code-reviews-3450fd722f17?source=rss------artificial_intelligence-5",
-      "keywords": [
-        "did you know",
-        "tech trending",
-        "replacing",
-        "code",
-        "reviews"
-      ],
-      "source": "Medium - artificial-intelligence",
-      "timestamp": "2026-09-29T20:11:06.747220+00:00"
-    },
-    {
-      "title": "Medium (artificial-intelligence): Isomorphic Structural Theory: Decoup",
-      "news_source_url": "https://ramy-habib2112.medium.com/isomorphic-structural-theory-decoupling-semantic-generation-from-structural-identity-in-llm-0aca8fbdf3a0?source=rss------artificial_intelligence-5",
-      "keywords": [
-        "did you know",
-        "tech trending",
-        "medium",
-        "artificial",
-        "intelligence",
-        "isomorphic",
-        "structural"
-      ],
-      "source": "Medium - artificial-intelligence",
-      "timestamp": "2026-09-29T20:21:31.533448+00:00"
-    },
     {
       "title": "Naive Vector Search Fails Production RAG",
       "news_source_url": "https://medium.com/@ronomahedi/beyond-naive-vector-search-why-production-rag-fails-without-hybrid-search-bm25-dense-vectors-608d837688b0?source=rss------artificial_intelligence-5",
@@ -1575,6 +1547,27 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-06T20:32:02.004688+00:00"
+    },
+    {
+      "title": "The Original iPhone Had No Copy-Paste for Two Full Years",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-07T13:47:08.805426+00:00"
+    },
+    {
+      "title": "The Original iPhone Had No Copy-Paste for Two Full Years",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-07T13:48:22.718141+00:00"
     }
   ]
 }
