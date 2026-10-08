@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Mixture of Experts Only Wakes Up 3% of the Brain",
-    "AI Can Steal Passwords Just by Listening to Keyboard Audio",
     "EV Batteries Check Cell Health 1,000 Times Every Second",
     "Your Smartphone Screen Steals Your Electrons",
     "The 14 People Who Hold 7 Physical Keys to the Global Internet",
@@ -99,12 +97,11 @@
     "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
     "Why ChatGPT Actually Forgets You",
     "Why ChatGPT Actually Forgets You",
-    "Self-Attention Costs Double When You Double Text Length"
+    "Self-Attention Costs Double When You Double Text Length",
+    "RLHF Makes AI Sycophantic Rather Than Honest",
+    "RLHF Makes AI Sycophantic Rather Than Honest"
   ],
   "used_keywords": [
-    "GPU",
-    "silicon",
-    "technology",
     "did you know",
     "wireless",
     "electromagnetic",
@@ -301,35 +298,12 @@
     "self attention",
     "quadratic cost",
     "context length",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "Mixture of Experts Only Wakes Up 3% of the Brain",
-      "news_source_url": "",
-      "keywords": [
-        "mixture of experts",
-        "moe",
-        "deepseek",
-        "neural networks",
-        "did you know"
-      ],
-      "source": "Sparse Mixture-of-Experts Architecture Papers",
-      "timestamp": "2026-09-30T07:36:52.141463+00:00"
-    },
-    {
-      "title": "AI Can Steal Passwords Just by Listening to Keyboard Audio",
-      "news_source_url": "",
-      "keywords": [
-        "acoustic attack",
-        "keyboard snooping",
-        "passwords",
-        "ai audio",
-        "did you know"
-      ],
-      "source": "IEEE European Symposium on Security and Privacy",
-      "timestamp": "2026-09-30T07:36:52.343808+00:00"
-    },
     {
       "title": "EV Batteries Check Cell Health 1,000 Times Every Second",
       "news_source_url": "",
@@ -1552,6 +1526,27 @@
       "source": "Attention Is All You Need (Vaswani et al.)",
       "platform": "instagram",
       "timestamp": "2026-10-08T17:21:51.713694+00:00"
+    },
+    {
+      "title": "RLHF Makes AI Sycophantic Rather Than Honest",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-08T17:57:11.139254+00:00"
+    },
+    {
+      "title": "RLHF Makes AI Sycophantic Rather Than Honest",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-08T17:58:24.457758+00:00"
     }
   ]
 }
