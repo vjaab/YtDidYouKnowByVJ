@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "battery",
+  "speaker_right": "vj",
+  "hook": "Did You Know EV Batteries Run 1,000 Safety Checks a Second? \u26a1",
+  "headline": "EV Batteries Check Cell Health 1,000 Times Every Second",
+  "source": "Automotive BMS Functional Safety (ISO 26262)",
+  "slides": [
+    {
+      "speaker": "battery",
+      "emotion": "shocked",
+      "title": "EV Batteries: 1000 Checks?! \u26a1",
+      "bubble": "Wait, did you know EV batteries run 1,000 safety checks *every second*?!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Constant Health Monitor \ud83e\ude7a",
+      "bubble": "Absolutely! They monitor thousands of tiny cells in real-time, 1,000 times a second. Mind-blowing, right?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "curious",
+      "title": "Why So Many Checks? \ud83e\udd14",
+      "bubble": "Thousands of cells? Why do they need so many checks? What are they even looking for?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Microscopic Detail \ud83d\udd2c",
+      "bubble": "Imagine tiny doctors checking each cell's 'heartbeat' for the smallest fever or stress. It's incredibly precise.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "shocked",
+      "title": "Preventing Meltdown? \ud83d\udd25",
+      "bubble": "Whoa! So, this prevents the battery from overheating and becoming dangerous? Like a meltdown?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Safety First, Always \u2705",
+      "bubble": "Exactly! It\u2019s like having an invisible superhero ensuring your EV is super safe, detecting issues before you do.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "excited",
+      "title": "Unseen EV Superpower \ud83d\udd0b",
+      "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts and unseen superpowers!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "EV batteries run 1,000 health checks per second on thousands of cells. This constant vigilance prevents overheating and ensures your ride is always safe.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour EV battery is a safety superstar working overtime!\n\nHere\u2019s the mind-blowing reality:\n\ud83d\udd39 EV battery packs contain thousands of tiny lithium cells.\n\ud83d\udd39 A dedicated chip monitors each cell's health 1,000 times every single second.\n\ud83d\udd39 This constant vigilance prevents thermal issues, ensuring your electric vehicle stays super safe!\n\n\ud83d\udcac Did you already know this advanced safety feature, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #EVBatteries #ElectricVehicles #TechFacts #MindBlowingFacts #BatterySafety #FutureTech #BMS #Innovation",
+  "vector": "hardware_megastructures",
+  "characters": "auto"
+}
