@@ -1331,7 +1331,21 @@
     "category": "Facts & Trivia",
     "title": "Why 99% Of People Get Console Gaming Wrong \u26a1",
     "uploaded_at": "2026-10-05T17:54:38.410694",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-08T13:13:59.249655",
+    "last_metrics": {
+      "views": 61,
+      "avg_view_duration_sec": 21.0,
+      "avg_view_percentage": 57.74,
+      "swipe_away_rate": 0.4226,
+      "duration_sec": 38.0,
+      "retention_rate": 0.5526,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "EltnC-eSNBA": {
     "video_id": "EltnC-eSNBA",

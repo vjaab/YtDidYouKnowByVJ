@@ -1412,12 +1412,12 @@
       "curiosity_gap": {
         "variants": {
           "B": {
-            "views": 0,
-            "retention": 0.0,
+            "views": 61,
+            "retention": 0.27631578947368424,
             "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 1,
+            "swipe_away_rate": 0.2113,
+            "avg_view_percentage": 28.87,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "Your PC is secretly running console games",
@@ -1427,12 +1427,12 @@
             ]
           }
         },
-        "total_views": 0,
-        "total_videos": 1,
-        "avg_retention": 0.0,
+        "total_views": 61,
+        "total_videos": 2,
+        "avg_retention": 0.27631578947368424,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.0,
-        "avg_view_percentage": 0.0
+        "avg_swipe_away": 0.2113,
+        "avg_view_percentage": 28.87
       },
       "personal_stake": {
         "variants": {
@@ -1487,12 +1487,12 @@
       "avg_view_percentage": 16.595238095238095
     },
     "curiosity_gap": {
-      "views": 294,
-      "retention": 0.16814248072900967,
-      "engagement": 0.0037510656436487637,
-      "count": 23,
-      "swipe_away_rate": 0.21957826086956522,
-      "avg_view_percentage": 17.172608695652176
+      "views": 355,
+      "retention": 0.1841628598214413,
+      "engagement": 0.003594771241830065,
+      "count": 24,
+      "swipe_away_rate": 0.2280375,
+      "avg_view_percentage": 18.862916666666667
     },
     "personal_stake": {
       "views": 330,
@@ -1503,5 +1503,5 @@
       "avg_view_percentage": 15.97166666666667
     }
   },
-  "last_updated": "2026-10-06T20:30:45.986823"
+  "last_updated": "2026-10-08T13:13:59.247395"
 }
