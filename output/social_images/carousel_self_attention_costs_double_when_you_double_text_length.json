@@ -11,54 +11,54 @@
       "speaker": "vr",
       "emotion": "shocked",
       "title": "AI Memory Explodes? \ud83d\udca5",
-      "bubble": "Did you know giving AI more text makes its \"thinking\" explode, not just grow?",
+      "bubble": "Did you know AI's 'memory' explodes super fast with longer texts you give it?",
       "is_takeaway": false
     },
     {
       "speaker": "vj",
       "emotion": "excited",
-      "title": "Quadratic Cost \ud83d\udcc8",
-      "bubble": "Yes! Doubling what you tell an AI quadruples the effort it needs to understand!",
+      "title": "Quadruple Thinking \ud83e\udd2f",
+      "bubble": "Yes! Doubling what you tell an AI doesn't just double its thinking, it quadruples the effort!",
       "is_takeaway": false
     },
     {
       "speaker": "vr",
       "emotion": "curious",
       "title": "Why Quadruple? \ud83e\udd14",
-      "bubble": "Quadruples? Why not just double? What makes it so much harder?",
+      "bubble": "Wait, why does it quadruple? That seems really inefficient for such powerful computers!",
       "is_takeaway": false
     },
     {
       "speaker": "vj",
       "emotion": "smug",
-      "title": "Attention's Secret \ud83d\udd75\ufe0f\u200d\u2642\ufe0f",
-      "bubble": "Each word checks every other word! More words mean vastly more connections to calculate. Think of it like...",
+      "title": "Party Analogy \ud83e\udd73",
+      "bubble": "Imagine a party! Everyone talks to everyone else. Double guests, quadruple conversations!",
       "is_takeaway": false
     },
     {
       "speaker": "vr",
       "emotion": "shocked",
-      "title": "AI Overload! \ud83e\udd2f",
-      "bubble": "So, a super long prompt could literally break the AI, or make it super slow?",
+      "title": "Huge Books for AI? \ud83d\udcda",
+      "bubble": "So if you give an AI a huge book, it literally struggles way more than we think?",
       "is_takeaway": false
     },
     {
       "speaker": "vj",
-      "emotion": "smug",
-      "title": "Expensive Genius \ud83d\udcb0",
-      "bubble": "Exactly! Long prompts are expensive. It's a huge challenge for AI model design!",
+      "emotion": "thinking",
+      "title": "Crazy AI Power! \u26a1",
+      "bubble": "Exactly! That's why large language models need crazy amounts of computing power for long tasks.",
       "is_takeaway": false
     },
     {
       "speaker": "vr",
       "emotion": "excited",
-      "title": "AI's Hidden Cost \ud83d\udca1",
+      "title": "Mind-Blowing Fact \ud83d\udca1",
       "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!",
       "is_takeaway": true
     }
   ],
-  "takeaway": "AI models like ChatGPT use 'attention' where every word interacts with every other. This means giving AI more text increases its computation cost quadratically, not linearly!",
-  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f AI memory explodes quadratically!\n\nEver wonder why super long prompts make AI models like ChatGPT chug? Here's the mind-blowing reality:\n\n\ud83d\udd39 Doubling the length of text you give an AI makes its processing effort *quadruple*, not just double!\n\ud83d\udd39 This is due to 'self-attention': every single word needs to consider every other word to understand context.\n\ud83d\udd39 So, those really long conversations or code analyses aren't just a little more work for the AI\u2014they're vastly more expensive in terms of computation!\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f in the comments!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #AI #ArtificialIntelligence #ChatGPT #MachineLearning #Transformer #SelfAttention #CodingFacts #TechExplainer",
+  "takeaway": "AI's 'self-attention' mechanism means processing longer text isn't just a bit harder, it gets exponentially tougher. Doubling length quadruples cost!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nAI's 'memory' doesn't just grow linearly; it explodes quadratically with longer texts! \ud83d\udca5\n\nHere's the mind-blowing reality of how AI processes information:\n\ud83d\udd39 When an AI processes text, every single word must calculate attention with every other word.\n\ud83d\udd39 This 'self-attention' means if you double the text length, the computational effort multiplies by FOUR!\n\ud83d\udd39 It's like inviting more guests to a party: conversations don't just double, they explode as everyone tries to talk to everyone else!\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f in the comments!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #AI #MachineLearning #Transformers #SelfAttention",
   "vector": "ai_secrets",
   "characters": "auto"
 }

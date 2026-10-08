@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Why AI Hallucinates Instead of Admitting Ignorance",
     "Mixture of Experts Only Wakes Up 3% of the Brain",
     "AI Can Steal Passwords Just by Listening to Keyboard Audio",
     "EV Batteries Check Cell Health 1,000 Times Every Second",
@@ -99,14 +98,10 @@
     "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
     "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
     "Why ChatGPT Actually Forgets You",
-    "Why ChatGPT Actually Forgets You"
+    "Why ChatGPT Actually Forgets You",
+    "Self-Attention Costs Double When You Double Text Length"
   ],
   "used_keywords": [
-    "did you know",
-    "transistors",
-    "microchip",
-    "smartphone",
-    "CPU",
     "GPU",
     "silicon",
     "technology",
@@ -301,22 +296,14 @@
     "tech",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "transformer",
+    "self attention",
+    "quadratic cost",
+    "context length",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "Why AI Hallucinates Instead of Admitting Ignorance",
-      "news_source_url": "",
-      "keywords": [
-        "ai hallucination",
-        "transformers",
-        "machine learning",
-        "probability",
-        "did you know"
-      ],
-      "source": "Transformer Probabilistic Modeling",
-      "timestamp": "2026-09-30T07:36:52.109194+00:00"
-    },
     {
       "title": "Mixture of Experts Only Wakes Up 3% of the Brain",
       "news_source_url": "",
@@ -1551,6 +1538,20 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-08T13:57:41.351358+00:00"
+    },
+    {
+      "title": "Self-Attention Costs Double When You Double Text Length",
+      "news_source_url": "",
+      "keywords": [
+        "transformer",
+        "self attention",
+        "quadratic cost",
+        "context length",
+        "did you know"
+      ],
+      "source": "Attention Is All You Need (Vaswani et al.)",
+      "platform": "instagram",
+      "timestamp": "2026-10-08T17:21:51.713694+00:00"
     }
   ]
 }
