@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "RLHF Makes AI Sycophantic Rather Than Honest",
-    "Why ChatGPT Actually Forgets You",
     "Why AI Hallucinates Instead of Admitting Ignorance",
     "Mixture of Experts Only Wakes Up 3% of the Brain",
     "AI Can Steal Passwords Just by Listening to Keyboard Audio",
@@ -99,12 +97,11 @@
     "Airplane Mode Doesn't Actually Stop Your Phone From Being Tracked",
     "How AI Generates Images from Pure Static Noise",
     "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
-    "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way"
+    "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
+    "Why ChatGPT Actually Forgets You",
+    "Why ChatGPT Actually Forgets You"
   ],
   "used_keywords": [
-    "generative AI",
-    "deepdream",
-    "machine learning",
     "did you know",
     "transistors",
     "microchip",
@@ -301,33 +298,12 @@
     "semiconductor",
     "did you know",
     "threads",
+    "tech",
+    "did you know",
+    "threads",
     "tech"
   ],
   "history": [
-    {
-      "title": "RLHF Makes AI Sycophantic Rather Than Honest",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "timestamp": "2026-09-30T06:06:54.932656+00:00"
-    },
-    {
-      "title": "Why ChatGPT Actually Forgets You",
-      "news_source_url": "",
-      "keywords": [
-        "chatgpt",
-        "context window",
-        "ai memory",
-        "tokens",
-        "llm",
-        "did you know"
-      ],
-      "source": "Transformer Attention & Context Windows",
-      "timestamp": "2026-09-30T07:36:03.143092+00:00"
-    },
     {
       "title": "Why AI Hallucinates Instead of Admitting Ignorance",
       "news_source_url": "",
@@ -1554,6 +1530,27 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-07T20:49:25.698099+00:00"
+    },
+    {
+      "title": "Why ChatGPT Actually Forgets You",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-08T13:56:22.757797+00:00"
+    },
+    {
+      "title": "Why ChatGPT Actually Forgets You",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-08T13:57:41.351358+00:00"
     }
   ]
 }
