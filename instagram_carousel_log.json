@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "EV Batteries Check Cell Health 1,000 Times Every Second",
     "Your Smartphone Screen Steals Your Electrons",
     "The 14 People Who Hold 7 Physical Keys to the Global Internet",
     "The 14 People Who Hold 7 Physical Keys to the Global Internet",
@@ -99,10 +98,10 @@
     "Why ChatGPT Actually Forgets You",
     "Self-Attention Costs Double When You Double Text Length",
     "RLHF Makes AI Sycophantic Rather Than Honest",
-    "RLHF Makes AI Sycophantic Rather Than Honest"
+    "RLHF Makes AI Sycophantic Rather Than Honest",
+    "Mixture of Experts Only Wakes Up 3% of the Brain"
   ],
   "used_keywords": [
-    "did you know",
     "wireless",
     "electromagnetic",
     "Wi-Fi",
@@ -301,22 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "EV Batteries Check Cell Health 1,000 Times Every Second",
-      "news_source_url": "",
-      "keywords": [
-        "ev battery",
-        "battery management",
-        "electric vehicles",
-        "automotive tech",
-        "did you know"
-      ],
-      "source": "Automotive BMS Functional Safety (ISO 26262)",
-      "timestamp": "2026-09-30T07:36:52.497987+00:00"
-    },
     {
       "title": "Your Smartphone Screen Steals Your Electrons",
       "news_source_url": "",
@@ -1547,6 +1534,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-08T17:58:24.457758+00:00"
+    },
+    {
+      "title": "Mixture of Experts Only Wakes Up 3% of the Brain",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-08T19:44:49.479143+00:00"
     }
   ]
 }

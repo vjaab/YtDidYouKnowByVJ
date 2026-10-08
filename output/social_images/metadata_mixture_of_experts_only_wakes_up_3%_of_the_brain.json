@@ -1,0 +1,21 @@
+{
+  "topic": "Mixture of Experts Only Wakes Up 3% of the Brain",
+  "category": "AI News",
+  "type": "carousel",
+  "slides": 7,
+  "instagram_images": [
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_giant_ais_sleep_t_01.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_giant_ais_sleep_t_02.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_giant_ais_sleep_t_03.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_giant_ais_sleep_t_04.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_giant_ais_sleep_t_05.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_giant_ais_sleep_t_06.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_giant_ais_sleep_t_07.jpg"
+  ],
+  "facebook_images": [],
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nEver wonder how giant AIs handle so much information? Turns out, they're not using their whole 'brain' all the time!\n\nHere's the mind-blowing reality:\n\ud83d\udd39 Models like Mixtral have hundreds of billions of parameters (like brain connections).\n\ud83d\udd39 But for each word or 'token,' only a tiny fraction (2 out of 64 'expert' networks) actually activate.\n\ud83d\udd39 This 'Mixture of Experts' (MoE) technique makes these massive AIs incredibly fast and efficient, even though 97% of their 'brain' is sleeping!\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f in the comments!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #AI #ArtificialIntelligence #MachineLearning #SparseModels #MixtureOfExperts #DeepLearning\n\n\ud83d\udccc Save this for later! | \ud83d\udcac Drop a \ud83e\udd2f if this blew your mind!\n\n#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets",
+  "hashtags": "#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets",
+  "poll_file": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/poll_mixture_of_experts_only_wakes_up_3%_of_the_brain.json",
+  "carousel_json": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_mixture_of_experts_only_wakes_up_3%_of_the_brain.json",
+  "generated_at": "2026-10-08T19:44:48.041036+00:00"
+}

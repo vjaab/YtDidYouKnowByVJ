@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know Giant AIs Sleep Through Most Words? \ud83e\udde0",
+  "headline": "Mixture of Experts Only Wakes Up 3% of the Brain",
+  "source": "Sparse Mixture-of-Experts Architecture Papers",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "AI Brain Sleeps? \ud83e\udde0",
+      "bubble": "Wait, did you know giant AI models actually sleep through most of what they 'read'?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Billions of Parameters! \ud83e\udd2f",
+      "bubble": "Yep! Models like Mixtral have hundreds of billions of parameters, but only use a tiny bit.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "How Can They Work? \ud83e\udd14",
+      "bubble": "How can an AI understand anything if it's only using a 'tiny bit' of its brain?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Expert Wake Up! \ud83d\udca1",
+      "bubble": "Imagine a giant library. Only 2 of 64 expert librarians wake up for each new word!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Only 3% Active? \ud83d\ude2e",
+      "bubble": "So, out of billions of connections, only about 3% are active for each word?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Mixture of Experts \ud83d\ude80",
+      "bubble": "Exactly! This 'Mixture of Experts' trick makes them super-fast and surprisingly efficient. Mind-blowing!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "More AI Secrets! \u2728",
+      "bubble": "Follow @vijayakumarj_ai for more mind-blowing AI tech explained simply every day!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Giant AI models use a 'Mixture of Experts' trick. Only 3% of their vast 'brain' activates for each word, making them incredibly efficient!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nEver wonder how giant AIs handle so much information? Turns out, they're not using their whole 'brain' all the time!\n\nHere's the mind-blowing reality:\n\ud83d\udd39 Models like Mixtral have hundreds of billions of parameters (like brain connections).\n\ud83d\udd39 But for each word or 'token,' only a tiny fraction (2 out of 64 'expert' networks) actually activate.\n\ud83d\udd39 This 'Mixture of Experts' (MoE) technique makes these massive AIs incredibly fast and efficient, even though 97% of their 'brain' is sleeping!\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f in the comments!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #AI #ArtificialIntelligence #MachineLearning #SparseModels #MixtureOfExperts #DeepLearning",
+  "vector": "ai_secrets",
+  "characters": "auto"
+}
