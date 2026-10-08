@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know AI Memory Explodes Quadratically? \ud83d\udca5",
+  "headline": "Self-Attention Costs Double When You Double Text Length",
+  "source": "Attention Is All You Need (Vaswani et al.)",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "AI Memory Explodes? \ud83d\udca5",
+      "bubble": "Did you know giving AI more text makes its \"thinking\" explode, not just grow?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Quadratic Cost \ud83d\udcc8",
+      "bubble": "Yes! Doubling what you tell an AI quadruples the effort it needs to understand!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Why Quadruple? \ud83e\udd14",
+      "bubble": "Quadruples? Why not just double? What makes it so much harder?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Attention's Secret \ud83d\udd75\ufe0f\u200d\u2642\ufe0f",
+      "bubble": "Each word checks every other word! More words mean vastly more connections to calculate. Think of it like...",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "AI Overload! \ud83e\udd2f",
+      "bubble": "So, a super long prompt could literally break the AI, or make it super slow?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Expensive Genius \ud83d\udcb0",
+      "bubble": "Exactly! Long prompts are expensive. It's a huge challenge for AI model design!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "AI's Hidden Cost \ud83d\udca1",
+      "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "AI models like ChatGPT use 'attention' where every word interacts with every other. This means giving AI more text increases its computation cost quadratically, not linearly!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f AI memory explodes quadratically!\n\nEver wonder why super long prompts make AI models like ChatGPT chug? Here's the mind-blowing reality:\n\n\ud83d\udd39 Doubling the length of text you give an AI makes its processing effort *quadruple*, not just double!\n\ud83d\udd39 This is due to 'self-attention': every single word needs to consider every other word to understand context.\n\ud83d\udd39 So, those really long conversations or code analyses aren't just a little more work for the AI\u2014they're vastly more expensive in terms of computation!\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f in the comments!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #AI #ArtificialIntelligence #ChatGPT #MachineLearning #Transformer #SelfAttention #CodingFacts #TechExplainer",
+  "vector": "ai_secrets",
+  "characters": "auto"
+}
