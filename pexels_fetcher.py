@@ -1223,7 +1223,6 @@ def fetch_chunk_visual(chunk, script_data, topic_context="", global_style_guide=
     """
     Executes the Visual Fetching Decision Tree with Switch-Back Logic
     """
-    from entity_fetcher import fetch_person_photo, fetch_company_logo
     cid = chunk["chunk_id"]
     text = chunk["text"]
     dur = chunk["duration"]

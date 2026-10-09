@@ -48,7 +48,7 @@ from screenshot_gen import capture_article_screenshot, is_github_repo_url, captu
 from thumbnail_gen import generate_thumbnail
 from youtube_upload import upload_video
 from telegram_selector import notify_telegram
-from entity_fetcher import fetch_all_entities, get_retention_layers_config
+from entity_fetcher import get_retention_layers_config
 from tags_helper import get_optimized_metadata
 
 
@@ -600,9 +600,8 @@ def run_longform_pipeline(dry_run=False):
     chunks = redistribute_to_audio_duration(chunks, duration)
     log_message(f"Built {len(chunks)} visual chunks from {len(word_timestamps)} words.")
 
-    # ── STEP 6: Fetch Entities ───────────────────────────────────────────
-    log_message("STEP 6: Fetching entity photos and logos...")
-    script_data = fetch_all_entities(script_data)
+    # ── STEP 6: Engagement & Retention Layers ────────────────────────────
+    # Entity fetching is completely disabled across the pipeline.
 
     retention_config = get_retention_layers_config()
     script_data["retention_config"] = retention_config

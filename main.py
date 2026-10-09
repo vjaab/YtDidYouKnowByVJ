@@ -60,7 +60,7 @@ from instagram_upload import upload_reel_to_instagram
 from facebook_upload import post_video_to_facebook_page, post_video_to_facebook_page_fallback
 from telegram_selector import notify_telegram as real_notify_telegram, send_video_to_telegram
 from threads_upload import upload_video_to_threads
-from entity_fetcher import fetch_all_entities, get_retention_layers_config
+from entity_fetcher import get_retention_layers_config
 from kaggle_handover import trigger_kaggle_gpu_job
 from tags_helper import get_optimized_metadata
 
@@ -850,31 +850,8 @@ def run_pipeline(topic_type="auto", dry_run=False, topic_source="auto"):
             else:
                 log_message("No valid evidence URL found for secondary screenshot.")
 
-        # ── STEP 3d: Entity Tags (Optional / Disabled on Shorts) ────────────
-        is_longform = "Slot C" in slot
-        if not is_longform and DISABLE_ENTITY_TAGS:
-            log_message("ℹ️ STEP 3d: Entity tags disabled on Shorts (DISABLE_ENTITY_TAGS=1). Skipping.")
-        elif not is_longform:
-            log_message("STEP 3d: Fetching entity tags for Short...")
-            script_data = fetch_all_entities(script_data)
-            
-            # Find entities with name, description, and successfully downloaded logo
-            valid_entities = []
-            for ent_list_key in ["companies", "people", "key_entities"]:
-                for ent in script_data.get(ent_list_key, []):
-                    if not isinstance(ent, dict):
-                        continue
-                    name = ent.get("name")
-                    desc = ent.get("description")
-                    logo_path = ent.get("local_logo_path") or ent.get("local_hq_path") or ent.get("local_image_path")
-                    if name and desc and logo_path and os.path.exists(logo_path):
-                        if not any(e.get("name") == name for e in valid_entities):
-                            valid_entities.append(ent)
-            
-            if not valid_entities:
-                log_message("ℹ️ No valid entity tags found; continuing without entity tag overlay.")
-            else:
-                log_message(f"✅ Found {len(valid_entities)} valid entity tags for the Short.")
+        # ── STEP 3d: Entity Tags (Removed / Disabled) ───────────────────────
+        # Entity fetching is completely disabled across the pipeline.
 
         # ── STEP 4: Generate Audio + Word Timestamps ──────────────────────────
         log_message("STEP 4: Generating voiceover + word timestamps...")
@@ -1059,12 +1036,8 @@ def run_pipeline(topic_type="auto", dry_run=False, topic_source="auto"):
     chunks = redistribute_to_audio_duration(chunks, duration)
     log_message(f"Built {len(chunks)} visual chunks from {len(word_timestamps)} words.")
 
-    # ── STEP 6: Fetch Entities (People/Companies) ─────────────────────────────
-    if not DISABLE_ENTITY_TAGS:
-        log_message("STEP 6: Fetching entity photos and company logos...")
-        script_data = fetch_all_entities(script_data)
-    else:
-        log_message("STEP 6: Entity tags disabled (DISABLE_ENTITY_TAGS=1) — skipping entity photo/logo fetch.")
+    # ── STEP 6: Engagement & Retention Layers ─────────────────────────────────
+    # Entity fetching is completely disabled across the pipeline.
     
     # Enable Kinetic Layers (Production Spec 2026)
     retention_config = get_retention_layers_config()

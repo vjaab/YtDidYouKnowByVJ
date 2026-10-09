@@ -204,7 +204,7 @@ ENABLE_PERIODIC_CUTS = True
 ENABLE_EVIDENCE_SCREENSHOTS = True
 ENABLE_SCREENSHOT_VALIDATION = True
 ENABLE_HORMOZI_STYLING = True
-DISABLE_ENTITY_TAGS = os.environ.get("DISABLE_ENTITY_TAGS", "1") == "1"  # Entity tags disabled on Shorts
+DISABLE_ENTITY_TAGS = True  # Entity fetching & tags completely disabled across pipeline
 
 # Retention Engine Settings (Phase 3 & 4)
 VISUAL_CUT_TARGET_SECONDS = 2.0   # Target visual change frequency (was ~4s, now 2s)
