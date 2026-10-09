@@ -1,0 +1,21 @@
+{
+  "topic": "Medium (machine-learning): Don\u2019t Buy a Mac for Local AI Until You Unde",
+  "category": "AI News",
+  "type": "carousel",
+  "slides": 7,
+  "instagram_images": [
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_about_this_new_br_01.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_about_this_new_br_02.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_about_this_new_br_03.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_about_this_new_br_04.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_about_this_new_br_05.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_about_this_new_br_06.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_about_this_new_br_07.jpg"
+  ],
+  "facebook_images": [],
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nThinking of getting a new Mac for running AI models locally? Hold up! You might be about to make an expensive mistake.\n\nHere's why your fast new Mac might not be the AI powerhouse you expect:\n\ud83d\udd39 **Memory vs. Speed:** For large AI models, it's not about how fast your chip is, but how much memory (RAM) the model needs to simply *fit*.\n\ud83d\udd39 **Unified Memory Limits:** Apple's awesome unified memory is fast, but it often maxes out at lower capacities compared to traditional systems needed for huge AI workloads.\n\ud83d\udd39 **The 'No Fit' Problem:** If the AI model demands more RAM than your Mac has, it simply won't run locally, making that super-fast chip completely useless for *that* task!\n\n\ud83d\udcac Did you already know this, or did this fact blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #AIMac #LocalAI #MachineLearning #Apple #MacBook #TechMistakes #GenerativeAI #Hardware #TechAdvice #VjExplains\n\n\ud83d\udd01 Repost this to blow your friends' minds! | \ud83d\udcac Tag someone who needs to see this!\n\n#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets",
+  "hashtags": "#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets",
+  "poll_file": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/poll_medium_(machine_learning)_don\u2019t_buy_a_mac_for_local_ai_until_you_unde.json",
+  "carousel_json": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_medium_(machine_learning)_don\u2019t_buy_a_mac_for_local_ai_until_you_unde.json",
+  "generated_at": "2026-10-09T20:16:01.707976+00:00"
+}

@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Cleanrooms are 10,000x Cleaner Than Hospital Surgery Rooms",
-    "GPS Would Drift 11 Kilometers Daily Without Einstein",
     "The First Computer Bug Was an Actual Moth",
     "How Airplanes Get Wi-Fi at 35,000 Feet Over Oceans",
     "The First 1GB Hard Drive in 1980 Weighed 550 Pounds",
@@ -99,12 +97,11 @@
     "Your GPS Uses Einstein's Physics",
     "AI's Secret Water Bill",
     "AI's Secret Water Bill",
-    "Your Phone's Invisible Fingerprint Grid"
+    "Your Phone's Invisible Fingerprint Grid",
+    "Medium (machine-learning): Don\u2019t Buy a Mac for Local AI Until You Unde",
+    "Medium (machine-learning): Don\u2019t Buy a Mac for Local AI Until You Unde"
   ],
   "used_keywords": [
-    "AI coding",
-    "human-AI collaboration",
-    "software engineering",
     "developer productivity",
     "did you know",
     "GPS",
@@ -301,36 +298,12 @@
     "did you know",
     "threads",
     "tech",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "Cleanrooms are 10,000x Cleaner Than Hospital Surgery Rooms",
-      "news_source_url": "",
-      "keywords": [
-        "cleanroom",
-        "semiconductors",
-        "fab",
-        "transistors",
-        "did you know"
-      ],
-      "source": "Semiconductor Fab Standards (ISO 14644)",
-      "timestamp": "2026-09-30T18:54:46.679503+00:00"
-    },
-    {
-      "title": "GPS Would Drift 11 Kilometers Daily Without Einstein",
-      "news_source_url": "",
-      "keywords": [
-        "gps",
-        "einstein",
-        "relativity",
-        "time dilation",
-        "satellites",
-        "did you know"
-      ],
-      "source": "General & Special Relativity in GNSS",
-      "timestamp": "2026-09-30T20:27:59.653370+00:00"
-    },
     {
       "title": "The First Computer Bug Was an Actual Moth",
       "news_source_url": "",
@@ -1527,6 +1500,27 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-09T19:21:02.841987+00:00"
+    },
+    {
+      "title": "Medium (machine-learning): Don\u2019t Buy a Mac for Local AI Until You Unde",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-09T20:16:03.567513+00:00"
+    },
+    {
+      "title": "Medium (machine-learning): Don\u2019t Buy a Mac for Local AI Until You Unde",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-09T20:17:17.719205+00:00"
     }
   ]
 }

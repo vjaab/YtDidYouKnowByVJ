@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+  "headline": "Medium (machine-learning): Don\u2019t Buy a Mac for Local AI Until You Unde",
+  "source": "Medium - machine-learning",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Mac for AI? \ud83d\udcb8",
+      "bubble": "Did you know that buying a brand new Mac for local AI could be a huge waste of...",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Too Much AI Model \ud83e\udd2f",
+      "bubble": "Yes! Even with powerful M-chips, if the AI model is too big for its memory, it won't run!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Speed vs. Memory \ud83e\udde0",
+      "bubble": "So, it's not about how fast the Mac is, but how much memory (RAM) it has?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Giant Book Analogy \ud83d\udcda",
+      "bubble": "Exactly! Like a giant book. A fast reader needs a big desk. Speed won't help if the book...",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Expensive Mistake! \ud83d\udcb8",
+      "bubble": "So, I could buy the most expensive Mac, and my AI model still wouldn't work?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "RAM is Key \ud83d\udd11",
+      "bubble": "Yes! Many big AI models need more RAM than Macs offer. Especially 70B parameter models. Check your needs...",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Smart Buying! \u2705",
+      "bubble": "Mind-blowing! Follow @vijayakumarj_ai for daily tech facts and smart buying advice!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "For local AI, especially large models, RAM capacity is often more critical than raw processor speed. A fast chip is useless if the model doesn't fit in memory. Always check RAM needs!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nThinking of getting a new Mac for running AI models locally? Hold up! You might be about to make an expensive mistake.\n\nHere's why your fast new Mac might not be the AI powerhouse you expect:\n\ud83d\udd39 **Memory vs. Speed:** For large AI models, it's not about how fast your chip is, but how much memory (RAM) the model needs to simply *fit*.\n\ud83d\udd39 **Unified Memory Limits:** Apple's awesome unified memory is fast, but it often maxes out at lower capacities compared to traditional systems needed for huge AI workloads.\n\ud83d\udd39 **The 'No Fit' Problem:** If the AI model demands more RAM than your Mac has, it simply won't run locally, making that super-fast chip completely useless for *that* task!\n\n\ud83d\udcac Did you already know this, or did this fact blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #AIMac #LocalAI #MachineLearning #Apple #MacBook #TechMistakes #GenerativeAI #Hardware #TechAdvice #VjExplains",
+  "vector": "trending_breakthroughs",
+  "characters": "auto"
+}
