@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Rowhammer Flips Memory Bits in Physical DRAM Without Permissions",
     "Cleanrooms are 10,000x Cleaner Than Hospital Surgery Rooms",
     "GPS Would Drift 11 Kilometers Daily Without Einstein",
     "The First Computer Bug Was an Actual Moth",
@@ -99,10 +98,10 @@
     "Your Smartphone Screen Steals Your Electrons",
     "Your GPS Uses Einstein's Physics",
     "AI's Secret Water Bill",
-    "AI's Secret Water Bill"
+    "AI's Secret Water Bill",
+    "Your Phone's Invisible Fingerprint Grid"
   ],
   "used_keywords": [
-    "did you know",
     "AI coding",
     "human-AI collaboration",
     "software engineering",
@@ -301,22 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "Rowhammer Flips Memory Bits in Physical DRAM Without Permissions",
-      "news_source_url": "",
-      "keywords": [
-        "rowhammer",
-        "dram",
-        "hardware exploit",
-        "cybersecurity",
-        "did you know"
-      ],
-      "source": "ACM SIGARCH Computer Architecture Research",
-      "timestamp": "2026-09-30T17:08:39.679753+00:00"
-    },
     {
       "title": "Cleanrooms are 10,000x Cleaner Than Hospital Surgery Rooms",
       "news_source_url": "",
@@ -1530,6 +1517,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-09T17:32:19.152319+00:00"
+    },
+    {
+      "title": "Your Phone's Invisible Fingerprint Grid",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-09T19:21:02.841987+00:00"
     }
   ]
 }
