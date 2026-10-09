@@ -5575,8 +5575,14 @@ def _create_entity_logo_pip_clips(script_json, avatar_pip_func, audio_duration, 
     entities = []
     for key in ["companies_mentioned", "tools_mentioned", "key_entities", "people"]:
         for ent in script_json.get(key, []):
-            name = ent.get("name") if isinstance(ent, dict) else ent
-            logo_path = ent.get("local_logo_path") or ent.get("local_hq_path") or ent.get("local_image_path")
+            if isinstance(ent, dict):
+                name = ent.get("name")
+                logo_path = ent.get("local_logo_path") or ent.get("local_hq_path") or ent.get("local_image_path")
+            elif isinstance(ent, str) and ent.strip():
+                name = ent.strip()
+                logo_path = None
+            else:
+                continue
             if name and logo_path and os.path.exists(logo_path):
                 entities.append({"name": name, "logo_path": logo_path, "type": key})
     
@@ -10270,7 +10276,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         for ent_list_key in ["people", "companies", "key_entities"]:
             for ent in script_json.get(ent_list_key, []):
                 if len(branding_entities) >= 4: break
-                
+                if not isinstance(ent, dict): continue
                 lp = ent.get("local_logo_path") or ent.get("local_image_path")
                 if lp and os.path.exists(lp):
                     branding_entities.append((ent.get("name", "Entity"), lp, ent_list_key == "people"))

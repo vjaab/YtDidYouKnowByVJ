@@ -2205,8 +2205,8 @@ def generate_thumbnail_prompt(script_json: dict) -> str:
     subcat = script_json.get("sub_category", "AI & Tech")
     
     # Extract key entities for visual metaphor
-    companies = [c.get("name", "") for c in script_json.get("companies_mentioned", [])]
-    tools = [t.get("name", "") for t in script_json.get("tools_mentioned", [])]
+    companies = [c.get("name", "") if isinstance(c, dict) else str(c) for c in script_json.get("companies_mentioned", []) if c]
+    tools = [t.get("name", "") if isinstance(t, dict) else str(t) for t in script_json.get("tools_mentioned", []) if t]
     entities = companies + tools
     
     # Determine the "Old vs New" visual metaphor based on content

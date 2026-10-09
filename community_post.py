@@ -298,7 +298,10 @@ def _pick_template_and_fill(script_data=None):
     
     if script_data:
         topic = script_data.get("original_news_headline", topic)[:60]
-        tool = (script_data.get("companies_mentioned", [{}])[0].get("name") if script_data.get("companies_mentioned") else tool)
+        raw_cm = script_data.get("companies_mentioned")
+        if raw_cm:
+            first_c = raw_cm[0]
+            tool = (first_c.get("name") if isinstance(first_c, dict) else str(first_c)) or tool
     
     text = template["text"]
     replacements = {

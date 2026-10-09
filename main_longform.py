@@ -700,7 +700,18 @@ def run_longform_pipeline(dry_run=False):
         keywords=keywords
     )
 
-    initial_people = [p.get("name") for p in script_data.get("people", [])] if script_data.get("people") else []
+    raw_people = script_data.get("people", [])
+    initial_people = []
+    if isinstance(raw_people, list):
+        for p in raw_people:
+            if isinstance(p, dict):
+                p_name = p.get("name")
+                if p_name:
+                    initial_people.append(p_name)
+            elif isinstance(p, str) and p.strip():
+                initial_people.append(p.strip())
+    elif isinstance(raw_people, str) and raw_people.strip():
+        initial_people.append(raw_people.strip())
     target_country = script_data.get("target_country", "US")
     optimized_metadata = get_optimized_metadata(
         title=title,
