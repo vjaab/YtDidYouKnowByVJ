@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "The 14 People Who Hold 7 Physical Keys to the Global Internet",
     "The Year 2038 Problem: When Unix Time Runs Out",
     "Cerebras Built a Single Chip with 4 Trillion Transistors",
     "Hard Drive Heads Fly Just 3 Nanometers Above Platters",
@@ -99,14 +98,10 @@
     "RLHF Makes AI Sycophantic Rather Than Honest",
     "Mixture of Experts Only Wakes Up 3% of the Brain",
     "EV Batteries Check Cell Health 1,000 Times Every Second",
-    "EV Batteries Check Cell Health 1,000 Times Every Second"
+    "EV Batteries Check Cell Health 1,000 Times Every Second",
+    "Training AI on AI-Generated Text Causes Model Collapse"
   ],
   "used_keywords": [
-    "radio",
-    "signals",
-    "invisible",
-    "technology",
-    "data",
     "communication",
     "did you know",
     "facial recognition",
@@ -301,19 +296,14 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "model collapse",
+    "synthetic data",
+    "ai training",
+    "machine learning",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "The 14 People Who Hold 7 Physical Keys to the Global Internet",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "timestamp": "2026-09-30T12:59:44.720931+00:00"
-    },
     {
       "title": "The Year 2038 Problem: When Unix Time Runs Out",
       "news_source_url": "",
@@ -1539,6 +1529,20 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-08T20:48:53.652662+00:00"
+    },
+    {
+      "title": "Training AI on AI-Generated Text Causes Model Collapse",
+      "news_source_url": "",
+      "keywords": [
+        "model collapse",
+        "synthetic data",
+        "ai training",
+        "machine learning",
+        "did you know"
+      ],
+      "source": "Nature: The Curse of Recursion in Generative Models",
+      "platform": "instagram",
+      "timestamp": "2026-10-09T08:08:40.998913+00:00"
     }
   ]
 }
