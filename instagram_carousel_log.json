@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "The Year 2038 Problem: When Unix Time Runs Out",
-    "Cerebras Built a Single Chip with 4 Trillion Transistors",
     "Hard Drive Heads Fly Just 3 Nanometers Above Platters",
     "Quantum Computers Will Break RSA Encryption with Shor's Algorithm",
     "Tempest Leaks: Spies Can Rebuild Your Screen from Radio Waves",
@@ -99,12 +97,11 @@
     "Mixture of Experts Only Wakes Up 3% of the Brain",
     "EV Batteries Check Cell Health 1,000 Times Every Second",
     "EV Batteries Check Cell Health 1,000 Times Every Second",
-    "Training AI on AI-Generated Text Causes Model Collapse"
+    "Training AI on AI-Generated Text Causes Model Collapse",
+    "Your Smartphone Screen Steals Your Electrons",
+    "Your Smartphone Screen Steals Your Electrons"
   ],
   "used_keywords": [
-    "communication",
-    "did you know",
-    "facial recognition",
     "AI",
     "computer vision",
     "biometrics",
@@ -301,35 +298,12 @@
     "synthetic data",
     "ai training",
     "machine learning",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "The Year 2038 Problem: When Unix Time Runs Out",
-      "news_source_url": "",
-      "keywords": [
-        "y2038",
-        "unix epoch",
-        "integer overflow",
-        "32 bit bug",
-        "did you know"
-      ],
-      "source": "POSIX Standard & Unix Time Architecture",
-      "timestamp": "2026-09-30T16:25:24.933107+00:00"
-    },
-    {
-      "title": "Cerebras Built a Single Chip with 4 Trillion Transistors",
-      "news_source_url": "",
-      "keywords": [
-        "cerebras",
-        "wafer scale",
-        "ai chips",
-        "hardware megastructures",
-        "did you know"
-      ],
-      "source": "Cerebras Systems Architectural Whitepaper",
-      "timestamp": "2026-09-30T17:08:05.319116+00:00"
-    },
     {
       "title": "Hard Drive Heads Fly Just 3 Nanometers Above Platters",
       "news_source_url": "",
@@ -1543,6 +1517,27 @@
       "source": "Nature: The Curse of Recursion in Generative Models",
       "platform": "instagram",
       "timestamp": "2026-10-09T08:08:40.998913+00:00"
+    },
+    {
+      "title": "Your Smartphone Screen Steals Your Electrons",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-09T13:40:12.800173+00:00"
+    },
+    {
+      "title": "Your Smartphone Screen Steals Your Electrons",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-09T13:41:35.496479+00:00"
     }
   ]
 }

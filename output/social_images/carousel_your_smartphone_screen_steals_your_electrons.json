@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "battery",
+  "speaker_right": "vj",
+  "hook": "Did You Know Your Phone Steals Your Electrons? \ud83d\udcf1",
+  "headline": "Your Smartphone Screen Steals Your Electrons",
+  "source": "Capacitive Sensing Physics & IEEE",
+  "slides": [
+    {
+      "speaker": "battery",
+      "emotion": "shocked",
+      "title": "Phone Steals Electrons? \ud83e\udd2f",
+      "bubble": "Did you know your phone screen actually *steals* electrons from your fingers?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Yes, Your Electrons! \u26a1",
+      "bubble": "Yep! Every tap and swipe transfers tiny electrical charges, your electrons, to the screen!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "curious",
+      "title": "How Does It Work? \ud83e\udd14",
+      "bubble": "But... how? I thought glass doesn't detect pressure or anything like that!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Invisible Electric Grid \ud83c\udf10",
+      "bubble": "It's an invisible electric grid on your screen. Your finger completes a circuit, like a tiny switch!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "shocked",
+      "title": "Gloves Don't Work? \ud83e\udde4",
+      "bubble": "So THAT'S why my phone doesn't respond when I try to use it with gloves on!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "No Electron Transfer \ud83d\udeab",
+      "bubble": "Exactly! Gloves block the electron transfer, so the screen can't 'feel' your touch.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "excited",
+      "title": "Mind-Blown Tech Facts! \ud83e\udd2f",
+      "bubble": "Whoa! Follow @vijayakumarj_ai for more mind-blowing tech facts daily!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your smartphone screen senses touch by 'stealing' tiny electrical charges (electrons) from your finger, completing an invisible circuit. That's why gloves don't work!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour smartphone screen isn't detecting pressure when you tap it. It's actually 'stealing' tiny bits of you to register your touch!\n\nHere's the mind-blowing reality:\n\ud83d\udd39 Your screen has an invisible electric grid, constantly sending out a small charge.\n\ud83d\udd39 When your finger (a conductor) touches it, you absorb a tiny charge, completing a circuit.\n\ud83d\udd39 That's why gloves don't work! They block the transfer of your electrons, leaving your screen clueless.\n\n\ud83d\udcac Did you already know your phone was an electron thief, or did this blow your mind? Drop a \ud83e\udd2f in the comments!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #Smartphone #CapacitiveTouch #Physics #Electronics #Science #DidYouKnowByVJ",
+  "vector": "everyday_tech_mysteries",
+  "characters": "auto"
+}
