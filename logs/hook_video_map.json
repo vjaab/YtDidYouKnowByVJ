@@ -1355,7 +1355,21 @@
     "category": "Artificial Intelligence",
     "title": "The Secret 7 Year AI Score Nobody Knows \ud83e\udd2b",
     "uploaded_at": "2026-10-06T15:55:42.815012",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-09T13:00:57.829701",
+    "last_metrics": {
+      "views": 6,
+      "avg_view_duration_sec": 11.0,
+      "avg_view_percentage": 35.91,
+      "swipe_away_rate": 0.6409,
+      "duration_sec": 33.0,
+      "retention_rate": 0.3333,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "mfB0j5_S5XQ": {
     "video_id": "mfB0j5_S5XQ",
@@ -1365,6 +1379,20 @@
     "category": "Facts & Trivia",
     "title": "The Hidden AI Model Everyone Downloads \ud83e\udd2b",
     "uploaded_at": "2026-10-06T20:27:57.731834",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-09T13:00:58.127103",
+    "last_metrics": {
+      "views": 30,
+      "avg_view_duration_sec": 24.0,
+      "avg_view_percentage": 96.77,
+      "swipe_away_rate": 0.0323,
+      "duration_sec": 25.0,
+      "retention_rate": 0.96,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   }
 }
