@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Hard Drive Heads Fly Just 3 Nanometers Above Platters",
     "Quantum Computers Will Break RSA Encryption with Shor's Algorithm",
     "Tempest Leaks: Spies Can Rebuild Your Screen from Radio Waves",
     "Rowhammer Flips Memory Bits in Physical DRAM Without Permissions",
@@ -99,10 +98,10 @@
     "EV Batteries Check Cell Health 1,000 Times Every Second",
     "Training AI on AI-Generated Text Causes Model Collapse",
     "Your Smartphone Screen Steals Your Electrons",
-    "Your Smartphone Screen Steals Your Electrons"
+    "Your Smartphone Screen Steals Your Electrons",
+    "Your GPS Uses Einstein's Physics"
   ],
   "used_keywords": [
-    "AI",
     "computer vision",
     "biometrics",
     "smartphone unlock",
@@ -301,22 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "Hard Drive Heads Fly Just 3 Nanometers Above Platters",
-      "news_source_url": "",
-      "keywords": [
-        "hard drive",
-        "hdd",
-        "aerodynamics",
-        "magnetic storage",
-        "did you know"
-      ],
-      "source": "Seagate & Western Digital Advanced Storage Physics",
-      "timestamp": "2026-09-30T17:08:39.194718+00:00"
-    },
     {
       "title": "Quantum Computers Will Break RSA Encryption with Shor's Algorithm",
       "news_source_url": "",
@@ -1538,6 +1525,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-09T13:41:35.496479+00:00"
+    },
+    {
+      "title": "Your GPS Uses Einstein's Physics",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-09T16:57:39.276479+00:00"
     }
   ]
 }

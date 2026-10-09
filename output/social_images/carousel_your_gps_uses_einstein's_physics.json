@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know your phone\u2019s GPS relies on Einstein\u2019s mind-bending theories to find you? \ud83e\udd2f",
+  "headline": "Your GPS Uses Einstein's Physics",
+  "source": "NASA / National Institute of Standards and Technology (NIST)",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "GPS Needs Einstein? \ud83e\udd2f",
+      "bubble": "Did you know your phone's GPS relies on Einstein's physics to find you?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Space-Time Magic \u2728",
+      "bubble": "Yep! Satellite clocks in space tick differently than ours because of his mind-bending theories.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Time in Space? \u23f1\ufe0f",
+      "bubble": "Wait, clocks in space? How do orbiting satellites affect time itself?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Relativity's Clocks \ud83d\ude80",
+      "bubble": "Einstein's Relativity means moving clocks, like satellites, tick faster than stationary ones on Earth.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "GPS Errors? \ud83d\uddfa\ufe0f",
+      "bubble": "So, if they don't correct this, my GPS would just get confused over time?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "6 Miles Off Daily! \ud83e\udd2f",
+      "bubble": "Exactly! Without corrections, your location would drift by 6 miles every single day!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Einstein's Everyday! \u2728",
+      "bubble": "Incredible! Einstein's mind-bending physics guides your every step, all thanks to GPS!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your GPS relies on Einstein's Relativity to correct for tiny time differences between Earth and orbiting satellites, preventing a 6-mile daily location drift. Physics keeps you precisely on track!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour phone's GPS isn't just satellites... it's Einstein's Relativity in action! Without his mind-bending physics, your location would be wildly inaccurate.\n\nHere's the mind-blowing reality:\n\ud83d\udd39 GPS satellites orbit at incredible speeds, causing their clocks to tick slightly differently than ours on Earth.\n\ud83d\udd39 Einstein's theories of Relativity explain this time difference, which needs constant correction.\n\ud83d\udd39 Without these corrections, your GPS location would drift by about 6 miles (10 kilometers) *every single day*!\n\n\ud83d\udcac Did you already know Einstein's physics was guiding your phone? Drop a \ud83e\udd2f below if this blew your mind!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #GPS #Einstein #Relativity #Physics #TechFacts #MindBlowingFacts #Science #EverydayTech",
+  "vector": "everyday_tech_mysteries",
+  "characters": "auto"
+}
