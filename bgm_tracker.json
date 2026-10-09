@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_Elite.mp3",
+      "headline": "mattpocock/skills: Skills for Real Engineers. Straight from my .agents directory",
+      "topic_type": "auto",
+      "timestamp": "37956032378"
+    },
+    {
       "track": "jam_Groovy_SIX.mp3",
       "headline": "XiaomiMiMo MiMo-V2.6-RL-oss Dataset on Hugging Face",
       "topic_type": "auto",
@@ -168,7 +174,7 @@
     "jam_Confidence.mp3": 1,
     "jam_Upbeat.mp3": 2,
     "modern_tech.mp3": 2,
-    "jam_Elite.mp3": 1,
+    "jam_Elite.mp3": 2,
     "jam_Energetic_Pop.mp3": 1,
     "jam_Groovy_SIX.mp3": 1
   }
