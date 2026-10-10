@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "camera",
+  "speaker_right": "vj",
+  "hook": "Did You Know AI doesn't truly 'see' images like humans do? \ud83e\udd2f",
+  "headline": "How AI 'Sees' The World: Pixel By Pixel",
+  "source": "Principles of Computer Vision and Deep Learning (e.g., Convolutional Neural Networks)",
+  "slides": [
+    {
+      "speaker": "camera",
+      "emotion": "shocked",
+      "title": "AI Doesn't 'See'?",
+      "bubble": "Did you know AI doesn't *really* see images like humans do? Mind-blowing!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Pixels & Math! \ud83d\udd22",
+      "bubble": "Exactly! When AI 'sees' your face, it's just millions of tiny number puzzles, pixel by pixel.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "curious",
+      "title": "How Does It Work? \ud83e\uddd0",
+      "bubble": "So, it's not recognizing a cat, but rather just a huge grid of numbers and patterns?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Jigsaw Puzzle Brain! \ud83e\udde9",
+      "bubble": "Think of it like a colossal digital jigsaw! It finds edges, colors, shapes, layer by layer, mathematically.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "shocked",
+      "title": "No Real Understanding? \ud83e\udd16",
+      "bubble": "Wow! So AI can perfectly identify a dog without actually *knowing* what a dog is?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Predicting Patterns! \u2705",
+      "bubble": "Precisely! It makes incredibly accurate predictions from patterns. No feeling, just pure, cold data logic.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "excited",
+      "title": "AI's Vision Revealed! \u2728",
+      "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts and visual breakdowns!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "AI doesn't have consciousness or 'understanding' like humans. It's a master pattern-matcher, breaking down images into pure mathematical data to make predictions.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nAI doesn't *see* your photos like you do. It's an incredible digital detective, but without a human brain's understanding or emotions!\n\nHere's the mind-blowing reality:\n\ud83d\udd39 AI breaks images into millions of tiny pixel values \u2013 like a massive numerical grid.\n\ud83d\udd39 It identifies patterns: edges, colors, and shapes, layer by layer, through complex math.\n\ud83d\udd39 This allows AI to make incredibly accurate predictions (like 'cat' or 'face') without truly 'knowing' or 'feeling' what they are.\n\n\ud83d\udcac Did you already know AI's secret vision? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #AIVision #ComputerVision #DeepLearning #TechFacts #MindBlown",
+  "vector": "everyday_tech_mysteries",
+  "characters": "auto"
+}
