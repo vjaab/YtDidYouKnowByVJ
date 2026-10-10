@@ -204,15 +204,15 @@ jobs:
           fi
           
           # Add tracking files and technical logs (force add since logs/ is gitignored)
-          git add news_log.json facts_log.json || echo "Root logs missing"
+          git add news_log.json facts_log.json longform_news_log.json || echo "Root logs missing"
           if [ -d "logs" ]; then
             git add -f logs/*.txt 2>/dev/null || echo "No txt logs"
             git add -f logs/*.json 2>/dev/null || echo "No json logs"
           fi
           
-          # Safety check: Ensure no conflict markers exist in news_log.json or facts_log.json
-          if grep -q "^<<<<<<<" news_log.json facts_log.json 2>/dev/null; then
-            echo "❌ Conflict markers found in news_log.json or facts_log.json. Aborting commit."
+          # Safety check: Ensure no conflict markers exist in tracking logs
+          if grep -q "^<<<<<<<" news_log.json facts_log.json longform_news_log.json 2>/dev/null; then
+            echo "❌ Conflict markers found in news_log.json, facts_log.json, or longform_news_log.json. Aborting commit."
             exit 1
           fi
           
