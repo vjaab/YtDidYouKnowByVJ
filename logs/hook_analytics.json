@@ -1373,14 +1373,29 @@
                 "recorded_at": "2026-10-04T17:09:39.782522"
               }
             ]
+          },
+          "A": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "Your computer runs AI all wrong",
+                "video_id": "mnlJLLwjxIg",
+                "recorded_at": "2026-10-10T19:37:58.584626"
+              }
+            ]
           }
         },
         "total_views": 12,
-        "total_videos": 2,
-        "avg_retention": 0.4,
+        "total_videos": 3,
+        "avg_retention": 0.26666666666666666,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.09799999999999998,
-        "avg_view_percentage": 40.2
+        "avg_swipe_away": 0.06533333333333331,
+        "avg_view_percentage": 26.8
       },
       "negative_warning": {
         "variants": {
@@ -1523,12 +1538,12 @@
     },
     "personal_stake": {
       "views": 360,
-      "retention": 0.18749830382170182,
-      "engagement": 0.003636363636363636,
-      "count": 25,
-      "swipe_away_rate": 0.2479640000000001,
-      "avg_view_percentage": 19.2036
+      "retention": 0.18028683059779022,
+      "engagement": 0.003496503496503496,
+      "count": 26,
+      "swipe_away_rate": 0.23842692307692318,
+      "avg_view_percentage": 18.465
     }
   },
-  "last_updated": "2026-10-10T15:32:06.822547"
+  "last_updated": "2026-10-10T19:37:58.584659"
 }

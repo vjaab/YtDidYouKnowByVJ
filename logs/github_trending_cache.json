@@ -4,8 +4,13 @@
     "full_name": "hugohe3/ppt-master",
     "description": "AI turns documents or topics into real, native PowerPoint decks\u2014with native shapes, transitions and animations, data-backed charts and tables on demand, audio narration from speaker notes, and support for your own .pptx templates. \u00b7 by Hugo He",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 59238,
     "forks_count": 4668,
+=======
+    "stargazers_count": 59255,
+    "forks_count": 4669,
+>>>>>>> Stashed changes
     "stars_in_period": 515,
     "url": "https://github.com/hugohe3/ppt-master",
     "html_url": "https://github.com/hugohe3/ppt-master"
@@ -15,8 +20,13 @@
     "full_name": "pytorch/pytorch",
     "description": "Tensors and Dynamic neural networks in Python with strong GPU acceleration",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 104088,
     "forks_count": 31909,
+=======
+    "stargazers_count": 104091,
+    "forks_count": 31919,
+>>>>>>> Stashed changes
     "stars_in_period": 81,
     "url": "https://github.com/pytorch/pytorch",
     "html_url": "https://github.com/pytorch/pytorch"
@@ -26,8 +36,13 @@
     "full_name": "huggingface/transformers",
     "description": "\ud83e\udd17 Transformers: the model-definition framework for state-of-the-art machine learning models in text, vision, audio, and multimodal models, for both inference and training.",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 167122,
     "forks_count": 34795,
+=======
+    "stargazers_count": 167137,
+    "forks_count": 34796,
+>>>>>>> Stashed changes
     "stars_in_period": 94,
     "url": "https://github.com/huggingface/transformers",
     "html_url": "https://github.com/huggingface/transformers"
@@ -37,8 +52,13 @@
     "full_name": "anthropics/knowledge-work-plugins",
     "description": "Open source repository of plugins primarily intended for knowledge workers to use in Claude Cowork",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 28686,
     "forks_count": 3269,
+=======
+    "stargazers_count": 28703,
+    "forks_count": 3270,
+>>>>>>> Stashed changes
     "stars_in_period": 626,
     "url": "https://github.com/anthropics/knowledge-work-plugins",
     "html_url": "https://github.com/anthropics/knowledge-work-plugins"
@@ -59,8 +79,13 @@
     "full_name": "home-assistant/core",
     "description": "\ud83c\udfe1 Open source home automation that puts local control and privacy first.",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 91357,
     "forks_count": 38860,
+=======
+    "stargazers_count": 91359,
+    "forks_count": 38861,
+>>>>>>> Stashed changes
     "stars_in_period": 18,
     "url": "https://github.com/home-assistant/core",
     "html_url": "https://github.com/home-assistant/core"
@@ -70,8 +95,13 @@
     "full_name": "debpalash/VoiceStudio",
     "description": "VoiceStudio is the open-source, fully-local ElevenLabs alternative \u2014 voice cloning, voice design, video dubbing, dictation, transcription & audiobook creation in 646 languages.",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 57020,
     "forks_count": 6397,
+=======
+    "stargazers_count": 57048,
+    "forks_count": 6400,
+>>>>>>> Stashed changes
     "stars_in_period": 1066,
     "url": "https://github.com/debpalash/VoiceStudio",
     "html_url": "https://github.com/debpalash/VoiceStudio"
@@ -92,7 +122,11 @@
     "full_name": "Robbyant/lingbot-map",
     "description": "[ECCV 2026 Best Paper Award Candidate] LingBot-Map: Geometric Context Transformer for Streaming 3D Reconstruction",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 17933,
+=======
+    "stargazers_count": 17937,
+>>>>>>> Stashed changes
     "forks_count": 1965,
     "stars_in_period": 392,
     "url": "https://github.com/Robbyant/lingbot-map",
@@ -125,7 +159,11 @@
     "full_name": "microsoft/TRELLIS.2",
     "description": "Native and Compact Structured Latents for 3D Generation",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 11756,
+=======
+    "stargazers_count": 11763,
+>>>>>>> Stashed changes
     "forks_count": 1427,
     "stars_in_period": 207,
     "url": "https://github.com/microsoft/TRELLIS.2",
@@ -136,7 +174,11 @@
     "full_name": "BitterSecurity/Decepticon",
     "description": "Autonomous Hacking Agent for Red Team",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 5812,
+=======
+    "stargazers_count": 5817,
+>>>>>>> Stashed changes
     "forks_count": 1099,
     "stars_in_period": 80,
     "url": "https://github.com/BitterSecurity/Decepticon",
@@ -147,8 +189,13 @@
     "full_name": "morluto/rea",
     "description": "Reverse engineer anything with agents, from app behavior down to native binaries.",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 67121,
     "forks_count": 14151,
+=======
+    "stargazers_count": 67790,
+    "forks_count": 14293,
+>>>>>>> Stashed changes
     "stars_in_period": 25784,
     "url": "https://github.com/morluto/rea",
     "html_url": "https://github.com/morluto/rea"
@@ -158,8 +205,13 @@
     "full_name": "mksglu/context-mode",
     "description": "Context window optimization for AI coding agents. Sandboxes tool output (98% reduction), persists session memory, and enforces routing across 17 platforms via MCP + hooks.",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 26184,
     "forks_count": 1882,
+=======
+    "stargazers_count": 26199,
+    "forks_count": 1884,
+>>>>>>> Stashed changes
     "stars_in_period": 178,
     "url": "https://github.com/mksglu/context-mode",
     "html_url": "https://github.com/mksglu/context-mode"
@@ -170,7 +222,11 @@
     "description": "Deliver web apps with confidence \ud83d\ude80",
     "language": "TypeScript",
     "stargazers_count": 101025,
+<<<<<<< Updated upstream
     "forks_count": 29904,
+=======
+    "forks_count": 29912,
+>>>>>>> Stashed changes
     "stars_in_period": 9,
     "url": "https://github.com/angular/angular",
     "html_url": "https://github.com/angular/angular"
@@ -180,8 +236,13 @@
     "full_name": "remotion-dev/remotion",
     "description": "\ud83c\udfa5 Make videos programmatically with React",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 63034,
     "forks_count": 4947,
+=======
+    "stargazers_count": 63041,
+    "forks_count": 4951,
+>>>>>>> Stashed changes
     "stars_in_period": 288,
     "url": "https://github.com/remotion-dev/remotion",
     "html_url": "https://github.com/remotion-dev/remotion"
@@ -191,7 +252,11 @@
     "full_name": "zenbu-labs/terminal-browser",
     "description": "A browser inside your terminal",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 3778,
+=======
+    "stargazers_count": 3781,
+>>>>>>> Stashed changes
     "forks_count": 180,
     "stars_in_period": 26,
     "url": "https://github.com/zenbu-labs/terminal-browser",
@@ -202,8 +267,13 @@
     "full_name": "microsoft/vscode",
     "description": "Visual Studio Code",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 193519,
     "forks_count": 44959,
+=======
+    "stargazers_count": 193521,
+    "forks_count": 44966,
+>>>>>>> Stashed changes
     "stars_in_period": 43,
     "url": "https://github.com/microsoft/vscode",
     "html_url": "https://github.com/microsoft/vscode"
@@ -213,7 +283,11 @@
     "full_name": "Vincentwei1021/video-shotcraft",
     "description": "AI video skill for Claude Code & Codex \u2014 cinematic product videos with Remotion: 152 shot recipe cards, 209 motion previews, a production-ready template",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 11156,
+=======
+    "stargazers_count": 11161,
+>>>>>>> Stashed changes
     "forks_count": 994,
     "stars_in_period": 143,
     "url": "https://github.com/Vincentwei1021/video-shotcraft",
@@ -224,8 +298,13 @@
     "full_name": "appwrite/appwrite",
     "description": "The open-source cloud for agents & devs. Including Auth, Databases, Storage, Functions, Messaging, Hosting, Realtime, WAF and more",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 57623,
     "forks_count": 5777,
+=======
+    "stargazers_count": 57624,
+    "forks_count": 5776,
+>>>>>>> Stashed changes
     "stars_in_period": 11,
     "url": "https://github.com/appwrite/appwrite",
     "html_url": "https://github.com/appwrite/appwrite"
@@ -235,8 +314,13 @@
     "full_name": "anthropics/claude-code",
     "description": "Claude Code is an agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster by executing routine tasks, explaining complex code, and handling git workflows - all through natural language commands.",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 150025,
     "forks_count": 26048,
+=======
+    "stargazers_count": 150031,
+    "forks_count": 26064,
+>>>>>>> Stashed changes
     "stars_in_period": 195,
     "url": "https://github.com/anthropics/claude-code",
     "html_url": "https://github.com/anthropics/claude-code"
@@ -257,7 +341,11 @@
     "full_name": "immich-app/immich",
     "description": "High performance self-hosted photo and video management solution.",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 115951,
+=======
+    "stargazers_count": 115956,
+>>>>>>> Stashed changes
     "forks_count": 7176,
     "stars_in_period": 97,
     "url": "https://github.com/immich-app/immich",
@@ -268,8 +356,13 @@
     "full_name": "storytold/artcraft",
     "description": "ArtCraft is an intentional crafting engine for artists, designers, and filmmakers",
     "language": "Rust",
+<<<<<<< Updated upstream
     "stargazers_count": 13712,
     "forks_count": 2130,
+=======
+    "stargazers_count": 13788,
+    "forks_count": 2155,
+>>>>>>> Stashed changes
     "stars_in_period": 3217,
     "url": "https://github.com/storytold/artcraft",
     "html_url": "https://github.com/storytold/artcraft"
@@ -279,7 +372,11 @@
     "full_name": "microsoft/mxc",
     "description": "Policy-driven, layered isolation and containment",
     "language": "Rust",
+<<<<<<< Updated upstream
     "stargazers_count": 2549,
+=======
+    "stargazers_count": 2555,
+>>>>>>> Stashed changes
     "forks_count": 127,
     "stars_in_period": 332,
     "url": "https://github.com/microsoft/mxc",
@@ -290,7 +387,11 @@
     "full_name": "bevyengine/bevy",
     "description": "A refreshingly simple data-driven game engine built in Rust",
     "language": "Rust",
+<<<<<<< Updated upstream
     "stargazers_count": 48839,
+=======
+    "stargazers_count": 48842,
+>>>>>>> Stashed changes
     "forks_count": 4906,
     "stars_in_period": 76,
     "url": "https://github.com/bevyengine/bevy",
@@ -301,8 +402,13 @@
     "full_name": "HakanSeven12/OpenCADStudio",
     "description": "A CAD application built with Rust \u2014 2D/3D drawing, DWG/DXF support, and GPU-accelerated rendering",
     "language": "Rust",
+<<<<<<< Updated upstream
     "stargazers_count": 2702,
     "forks_count": 297,
+=======
+    "stargazers_count": 2706,
+    "forks_count": 298,
+>>>>>>> Stashed changes
     "stars_in_period": 90,
     "url": "https://github.com/HakanSeven12/OpenCADStudio",
     "html_url": "https://github.com/HakanSeven12/OpenCADStudio"
@@ -323,8 +429,13 @@
     "full_name": "denoland/deno",
     "description": "A modern runtime for JavaScript and TypeScript.",
     "language": "Rust",
+<<<<<<< Updated upstream
     "stargazers_count": 108720,
     "forks_count": 6427,
+=======
+    "stargazers_count": 108722,
+    "forks_count": 6428,
+>>>>>>> Stashed changes
     "stars_in_period": 57,
     "url": "https://github.com/denoland/deno",
     "html_url": "https://github.com/denoland/deno"
@@ -334,8 +445,13 @@
     "full_name": "GLinnik21/plx-native",
     "description": "Fast, unofficial Plex client for LG webOS TVs \u2014 native 60 fps UI, 4K HEVC/Dolby Vision, no Chromium or WebView.",
     "language": "Rust",
+<<<<<<< Updated upstream
     "stargazers_count": 525,
     "forks_count": 44,
+=======
+    "stargazers_count": 527,
+    "forks_count": 45,
+>>>>>>> Stashed changes
     "stars_in_period": 167,
     "url": "https://github.com/GLinnik21/plx-native",
     "html_url": "https://github.com/GLinnik21/plx-native"
@@ -345,7 +461,11 @@
     "full_name": "earthtojake/text-to-cad",
     "description": "Give your agent CAD superpowers.",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 18946,
+=======
+    "stargazers_count": 18951,
+>>>>>>> Stashed changes
     "forks_count": 1869,
     "stars_in_period": 2125,
     "url": "https://github.com/earthtojake/text-to-cad",
@@ -356,7 +476,11 @@
     "full_name": "Panniantong/Agent-Reach",
     "description": "Give your AI agent eyes to see the entire internet. Read & search Twitter, Reddit, YouTube, GitHub, Bilibili, XiaoHongShu \u2014 one CLI, zero API fees.",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 95409,
+=======
+    "stargazers_count": 95426,
+>>>>>>> Stashed changes
     "forks_count": 8351,
     "stars_in_period": 7084,
     "url": "https://github.com/Panniantong/Agent-Reach",
@@ -367,8 +491,13 @@
     "full_name": "p-e-w/heretic",
     "description": "Fully automatic censorship removal for language models",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 34466,
     "forks_count": 3860,
+=======
+    "stargazers_count": 34472,
+    "forks_count": 3862,
+>>>>>>> Stashed changes
     "stars_in_period": 1546,
     "url": "https://github.com/p-e-w/heretic",
     "html_url": "https://github.com/p-e-w/heretic"
@@ -378,8 +507,13 @@
     "full_name": "calesthio/OpenMontage",
     "description": "World's first open-source, agentic video production system. 12 production pipelines, 100+ tools, 700+ agent skill and production-knowledge files. Turn your AI coding assistant into a full video production studio.",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 66056,
     "forks_count": 8406,
+=======
+    "stargazers_count": 66068,
+    "forks_count": 8409,
+>>>>>>> Stashed changes
     "stars_in_period": 3479,
     "url": "https://github.com/calesthio/OpenMontage",
     "html_url": "https://github.com/calesthio/OpenMontage"
@@ -389,7 +523,11 @@
     "full_name": "Robbyant/lingbot-map",
     "description": "[ECCV 2026 Best Paper Award Candidate] LingBot-Map: Geometric Context Transformer for Streaming 3D Reconstruction",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 17933,
+=======
+    "stargazers_count": 17937,
+>>>>>>> Stashed changes
     "forks_count": 1965,
     "stars_in_period": 446,
     "url": "https://github.com/Robbyant/lingbot-map",
@@ -400,8 +538,13 @@
     "full_name": "anthropics/knowledge-work-plugins",
     "description": "Open source repository of plugins primarily intended for knowledge workers to use in Claude Cowork",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 28686,
     "forks_count": 3269,
+=======
+    "stargazers_count": 28703,
+    "forks_count": 3270,
+>>>>>>> Stashed changes
     "stars_in_period": 2601,
     "url": "https://github.com/anthropics/knowledge-work-plugins",
     "html_url": "https://github.com/anthropics/knowledge-work-plugins"
@@ -411,7 +554,11 @@
     "full_name": "Tracer-Cloud/opensre",
     "description": "Build your own AI SRE agents. The open source toolkit for the AI era.",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 11732,
+=======
+    "stargazers_count": 11733,
+>>>>>>> Stashed changes
     "forks_count": 1716,
     "stars_in_period": 356,
     "url": "https://github.com/Tracer-Cloud/opensre",
@@ -422,8 +569,13 @@
     "full_name": "rohitg00/ai-engineering-from-scratch",
     "description": "Learn AI Engineering! Learn it. Build it. Ship it for others.",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 66670,
     "forks_count": 11675,
+=======
+    "stargazers_count": 66690,
+    "forks_count": 11680,
+>>>>>>> Stashed changes
     "stars_in_period": 3627,
     "url": "https://github.com/rohitg00/ai-engineering-from-scratch",
     "html_url": "https://github.com/rohitg00/ai-engineering-from-scratch"
@@ -433,8 +585,13 @@
     "full_name": "666ghj/MiroFish",
     "description": "A Simple and Universal Swarm Intelligence Engine, Predicting Anything. \u7b80\u6d01\u901a\u7528\u7684\u7fa4\u4f53\u667a\u80fd\u5f15\u64ce\uff0c\u9884\u6d4b\u4e07\u7269",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 77744,
     "forks_count": 11876,
+=======
+    "stargazers_count": 77755,
+    "forks_count": 11881,
+>>>>>>> Stashed changes
     "stars_in_period": 1861,
     "url": "https://github.com/666ghj/MiroFish",
     "html_url": "https://github.com/666ghj/MiroFish"
@@ -455,8 +612,13 @@
     "full_name": "shiyu-coder/Kronos",
     "description": "Kronos: A Foundation Model for the Language of Financial Markets",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 40441,
     "forks_count": 6736,
+=======
+    "stargazers_count": 40445,
+    "forks_count": 6737,
+>>>>>>> Stashed changes
     "stars_in_period": 610,
     "url": "https://github.com/shiyu-coder/Kronos",
     "html_url": "https://github.com/shiyu-coder/Kronos"
@@ -466,8 +628,13 @@
     "full_name": "HunxByts/GhostTrack",
     "description": "Useful tool to track location or mobile number",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 18045,
     "forks_count": 2462,
+=======
+    "stargazers_count": 18048,
+    "forks_count": 2464,
+>>>>>>> Stashed changes
     "stars_in_period": 1166,
     "url": "https://github.com/HunxByts/GhostTrack",
     "html_url": "https://github.com/HunxByts/GhostTrack"
@@ -477,8 +644,13 @@
     "full_name": "thedotmack/claude-mem",
     "description": "Persistent Context Across Sessions for Every Agent \u2013 Captures everything your agent does during sessions, compresses it with AI, and injects relevant context back into future sessions. Works with Claude Code, OpenClaw, Codex, Gemini, Hermes, Copilot, OpenCode + More",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 99163,
     "forks_count": 8681,
+=======
+    "stargazers_count": 99173,
+    "forks_count": 8683,
+>>>>>>> Stashed changes
     "stars_in_period": 3850,
     "url": "https://github.com/thedotmack/claude-mem",
     "html_url": "https://github.com/thedotmack/claude-mem"
@@ -488,7 +660,11 @@
     "full_name": "heygen-com/hyperframes",
     "description": "Write HTML. Render video. Built for agents.",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 60262,
+=======
+    "stargazers_count": 60273,
+>>>>>>> Stashed changes
     "forks_count": 5379,
     "stars_in_period": 4003,
     "url": "https://github.com/heygen-com/hyperframes",
@@ -499,7 +675,11 @@
     "full_name": "mvschwarz/openrig",
     "description": "Build your own network of agents from Claude Code, Codex and Pi: persistent teams with roles, shared context and owned work.",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 6679,
+=======
+    "stargazers_count": 6686,
+>>>>>>> Stashed changes
     "forks_count": 491,
     "stars_in_period": 2338,
     "url": "https://github.com/mvschwarz/openrig",
@@ -510,8 +690,13 @@
     "full_name": "cursor/plugins",
     "description": "Cursor plugin specification and official plugins",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 10720,
     "forks_count": 1021,
+=======
+    "stargazers_count": 10725,
+    "forks_count": 1022,
+>>>>>>> Stashed changes
     "stars_in_period": 1125,
     "url": "https://github.com/cursor/plugins",
     "html_url": "https://github.com/cursor/plugins"
@@ -521,8 +706,13 @@
     "full_name": "pingdotgg/t3code",
     "description": "",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 26768,
     "forks_count": 7004,
+=======
+    "stargazers_count": 26777,
+    "forks_count": 7009,
+>>>>>>> Stashed changes
     "stars_in_period": 2379,
     "url": "https://github.com/pingdotgg/t3code",
     "html_url": "https://github.com/pingdotgg/t3code"
@@ -532,7 +722,11 @@
     "full_name": "ranxianglei/billion-context",
     "description": "A context-compression plugin for small context windows (a 100K context is enough), token savings (5x fewer tokens), and month-long single sessions (billions of tokens).\u4e0a\u4e0b\u6587\u538b\u7f29\u63d2\u4ef6\uff0c\u517c\u987e\u5c0f\u7a97\u53e3(100k\u4e0a\u4e0b\u6587\u8db3\u77e3)\u7701token(\u77015\u500dtoken)\u548c\u8d85\u957f\u4f1a\u8bdd(\u6570\u6708\u7ea7\u522b\u51e0\u5341\u4ebftoken\u5355\u4f1a\u8bdd)\u3002billion-context is all you need",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 760,
+=======
+    "stargazers_count": 761,
+>>>>>>> Stashed changes
     "forks_count": 73,
     "stars_in_period": 246,
     "url": "https://github.com/ranxianglei/billion-context",
@@ -543,8 +737,13 @@
     "full_name": "tester-army/e2e",
     "description": "Next generation e2e testing framework for web and mobile apps.",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 8650,
     "forks_count": 417,
+=======
+    "stargazers_count": 8658,
+    "forks_count": 418,
+>>>>>>> Stashed changes
     "stars_in_period": 6566,
     "url": "https://github.com/tester-army/e2e",
     "html_url": "https://github.com/tester-army/e2e"
@@ -565,8 +764,13 @@
     "full_name": "OpenCut-app/OpenCut",
     "description": "The open-source CapCut alternative",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 93448,
     "forks_count": 9173,
+=======
+    "stargazers_count": 93456,
+    "forks_count": 9174,
+>>>>>>> Stashed changes
     "stars_in_period": 2264,
     "url": "https://github.com/OpenCut-app/OpenCut",
     "html_url": "https://github.com/OpenCut-app/OpenCut"
@@ -587,8 +791,13 @@
     "full_name": "tashfeenahmed/freellmapi",
     "description": "7.4 billion tokens per month. 34 free LLM providers. 635 free model endpoints. All behind one /v1 endpoint, plus any custom OpenAI-compatible endpoint. Smart routing, automatic failover, encrypted keys. Personal experimentation only.",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 32847,
     "forks_count": 4541,
+=======
+    "stargazers_count": 32860,
+    "forks_count": 4543,
+>>>>>>> Stashed changes
     "stars_in_period": 2397,
     "url": "https://github.com/tashfeenahmed/freellmapi",
     "html_url": "https://github.com/tashfeenahmed/freellmapi"
@@ -609,7 +818,11 @@
     "full_name": "AtomicBot-ai/atomic-agent",
     "description": "Atomic Agent is a local-first AI agent. Runs open-weight models on your own machine via llama.cpp.",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 3221,
+=======
+    "stargazers_count": 3222,
+>>>>>>> Stashed changes
     "forks_count": 264,
     "stars_in_period": 671,
     "url": "https://github.com/AtomicBot-ai/atomic-agent",
@@ -620,8 +833,13 @@
     "full_name": "reconurge/flowsint",
     "description": "A modern platform for visual, flexible, and extensible graph-based investigations. For cybersecurity analysts and investigators.",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 9602,
     "forks_count": 1179,
+=======
+    "stargazers_count": 9607,
+    "forks_count": 1180,
+>>>>>>> Stashed changes
     "stars_in_period": 514,
     "url": "https://github.com/reconurge/flowsint",
     "html_url": "https://github.com/reconurge/flowsint"
@@ -642,7 +860,11 @@
     "full_name": "nanobrowser/nanobrowser",
     "description": "Open-Source Chrome extension for AI-powered web automation. Run multi-agent workflows using your own LLM API key. Alternative to OpenAI Operator.",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 14049,
+=======
+    "stargazers_count": 14052,
+>>>>>>> Stashed changes
     "forks_count": 1483,
     "stars_in_period": 179,
     "url": "https://github.com/nanobrowser/nanobrowser",
@@ -664,8 +886,13 @@
     "full_name": "lexmount/moli",
     "description": "Best headless browser for AI agents. Lite, Fast, High-Compatibility. Built in Rust",
     "language": "Rust",
+<<<<<<< Updated upstream
     "stargazers_count": 15534,
     "forks_count": 374,
+=======
+    "stargazers_count": 15543,
+    "forks_count": 375,
+>>>>>>> Stashed changes
     "stars_in_period": 10105,
     "url": "https://github.com/lexmount/moli",
     "html_url": "https://github.com/lexmount/moli"
@@ -675,7 +902,11 @@
     "full_name": "zerx-lab/FluxDown",
     "description": "Rust \u9a71\u52a8\u7684\u591a\u534f\u8bae\u4e0b\u8f7d\u7ba1\u7406\u5668\uff0c\u652f\u6301 HTTP/FTP/BitTorrent \u78c1\u529b\u94fe\u63a5\u53ca HLS/DASH \u6d41\u5a92\u4f53\uff0c\u667a\u80fd\u591a\u7ebf\u7a0b\u52a0\u901f\u4e0e\u6d4f\u89c8\u5668\u65e0\u7f1d\u96c6\u6210\u3002\u7cbe\u7f8e\u754c\u9762\uff0c\u6781\u81f4\u6027\u80fd\uff0c\u6c38\u4e45\u514d\u8d39\uff0c\u96f6\u5e7f\u544a\u3002",
     "language": "Rust",
+<<<<<<< Updated upstream
     "stargazers_count": 4190,
+=======
+    "stargazers_count": 4194,
+>>>>>>> Stashed changes
     "forks_count": 244,
     "stars_in_period": 772,
     "url": "https://github.com/zerx-lab/FluxDown",
@@ -686,7 +917,11 @@
     "full_name": "xingkongliang/skills-manager",
     "description": "A lightweight desktop app to manage, sync, and organize AI agent skills across 50+ coding tools \u2014 Claude Code, Codex, Cursor, Copilot, Gemini CLI, and more.",
     "language": "Rust",
+<<<<<<< Updated upstream
     "stargazers_count": 5944,
+=======
+    "stargazers_count": 5948,
+>>>>>>> Stashed changes
     "forks_count": 497,
     "stars_in_period": 457,
     "url": "https://github.com/xingkongliang/skills-manager",
@@ -697,7 +932,11 @@
     "full_name": "longbridge/gpui-kit",
     "description": "Rust GUI components for building fantastic cross-platform desktop application by using GPUI.",
     "language": "Rust",
+<<<<<<< Updated upstream
     "stargazers_count": 16766,
+=======
+    "stargazers_count": 16773,
+>>>>>>> Stashed changes
     "forks_count": 1033,
     "stars_in_period": 1063,
     "url": "https://github.com/longbridge/gpui-kit",
@@ -708,7 +947,11 @@
     "full_name": "Pumpkin-MC/Pumpkin",
     "description": "Empowering everyone to host fast and efficient Minecraft servers",
     "language": "Rust",
+<<<<<<< Updated upstream
     "stargazers_count": 12263,
+=======
+    "stargazers_count": 12266,
+>>>>>>> Stashed changes
     "forks_count": 907,
     "stars_in_period": 375,
     "url": "https://github.com/Pumpkin-MC/Pumpkin",
@@ -719,7 +962,11 @@
     "full_name": "sharkdp/hyperfine",
     "description": "A command-line benchmarking tool",
     "language": "Rust",
+<<<<<<< Updated upstream
     "stargazers_count": 29049,
+=======
+    "stargazers_count": 29050,
+>>>>>>> Stashed changes
     "forks_count": 522,
     "stars_in_period": 106,
     "url": "https://github.com/sharkdp/hyperfine",
@@ -730,7 +977,11 @@
     "full_name": "spacedriveapp/spacedrive",
     "description": "Spacedrive is an open source cross-platform file explorer, powered by a virtual distributed filesystem written in Rust.",
     "language": "Rust",
+<<<<<<< Updated upstream
     "stargazers_count": 39090,
+=======
+    "stargazers_count": 39091,
+>>>>>>> Stashed changes
     "forks_count": 1355,
     "stars_in_period": 95,
     "url": "https://github.com/spacedriveapp/spacedrive",
@@ -741,7 +992,11 @@
     "full_name": "bevyengine/bevy",
     "description": "A refreshingly simple data-driven game engine built in Rust",
     "language": "Rust",
+<<<<<<< Updated upstream
     "stargazers_count": 48839,
+=======
+    "stargazers_count": 48842,
+>>>>>>> Stashed changes
     "forks_count": 4906,
     "stars_in_period": 294,
     "url": "https://github.com/bevyengine/bevy",
@@ -763,7 +1018,11 @@
     "full_name": "emilk/egui",
     "description": "egui: an easy-to-use immediate mode GUI in Rust that runs on both web and native",
     "language": "Rust",
+<<<<<<< Updated upstream
     "stargazers_count": 31150,
+=======
+    "stargazers_count": 31155,
+>>>>>>> Stashed changes
     "forks_count": 2185,
     "stars_in_period": 301,
     "url": "https://github.com/emilk/egui",
@@ -774,7 +1033,11 @@
     "full_name": "cjpais/Handy",
     "description": "A free, open source, and extensible speech-to-text application that works completely offline.",
     "language": "Rust",
+<<<<<<< Updated upstream
     "stargazers_count": 33434,
+=======
+    "stargazers_count": 33438,
+>>>>>>> Stashed changes
     "forks_count": 3111,
     "stars_in_period": 739,
     "url": "https://github.com/cjpais/Handy",
@@ -796,8 +1059,13 @@
     "full_name": "trymirai/uzu",
     "description": "A high-performance inference engine for AI models",
     "language": "Rust",
+<<<<<<< Updated upstream
     "stargazers_count": 2144,
     "forks_count": 115,
+=======
+    "stargazers_count": 2146,
+    "forks_count": 116,
+>>>>>>> Stashed changes
     "stars_in_period": 311,
     "url": "https://github.com/trymirai/uzu",
     "html_url": "https://github.com/trymirai/uzu"
@@ -818,7 +1086,11 @@
     "full_name": "eolix/photosuite",
     "description": "A desktop image editor, faithful to classic Adobe Photoshop, with native PSD/PSB compatibility",
     "language": "Rust",
+<<<<<<< Updated upstream
     "stargazers_count": 1037,
+=======
+    "stargazers_count": 1038,
+>>>>>>> Stashed changes
     "forks_count": 48,
     "stars_in_period": 697,
     "url": "https://github.com/eolix/photosuite",
@@ -829,7 +1101,11 @@
     "full_name": "microsoft/mxc",
     "description": "Policy-driven, layered isolation and containment",
     "language": "Rust",
+<<<<<<< Updated upstream
     "stargazers_count": 2549,
+=======
+    "stargazers_count": 2555,
+>>>>>>> Stashed changes
     "forks_count": 127,
     "stars_in_period": 1128,
     "url": "https://github.com/microsoft/mxc",
