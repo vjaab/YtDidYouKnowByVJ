@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Li-Fi Transmits 224 Gigabits Per Second Through Room Bulbs",
     "Why NASA Lost a $327M Mars Orbiter Over Metric Units",
     "BadUSB Firmware Tricks Computers by Pretending to be Keyboards",
     "Microsoft Sunk a Datacenter 117 Feet Under the Sea",
@@ -99,10 +98,10 @@
     "Medium (machine-learning): Don\u2019t Buy a Mac for Local AI Until You Unde",
     "How AI 'Sees' The World: Pixel By Pixel",
     "Medium (artificial-intelligence): Local AI vs Cloud AI: Which Is Bette",
-    "Medium (artificial-intelligence): Local AI vs Cloud AI: Which Is Bette"
+    "Medium (artificial-intelligence): Local AI vs Cloud AI: Which Is Bette",
+    "Your Smart Speaker's Tiny Brain"
   ],
   "used_keywords": [
-    "tech trending",
     "medium",
     "programming",
     "used",
@@ -301,22 +300,10 @@
     "local",
     "cloud",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "Li-Fi Transmits 224 Gigabits Per Second Through Room Bulbs",
-      "news_source_url": "",
-      "keywords": [
-        "lifi",
-        "visible light",
-        "wireless communication",
-        "photonics",
-        "did you know"
-      ],
-      "source": "IEEE 802.11bb Light Wireless Standard",
-      "timestamp": "2026-09-30T20:28:49.037410+00:00"
-    },
     {
       "title": "Why NASA Lost a $327M Mars Orbiter Over Metric Units",
       "news_source_url": "",
@@ -1519,6 +1506,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-10T11:23:11.350810+00:00"
+    },
+    {
+      "title": "Your Smart Speaker's Tiny Brain",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-10T16:37:52.936330+00:00"
     }
   ]
 }
