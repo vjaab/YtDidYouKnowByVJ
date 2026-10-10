@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Microsoft Sunk a Datacenter 117 Feet Under the Sea",
     "Stuxnet Destroyed 1,000 Centrifuges Without Any Explosives",
     "The $100 Billion Y2K Fix That Actually Worked",
     "Blue OLED Subpixels Die 3 Times Faster Than Red or Green",
@@ -99,10 +98,10 @@
     "Medium (artificial-intelligence): Local AI vs Cloud AI: Which Is Bette",
     "Your Smart Speaker's Tiny Brain",
     "Your Phone's Tiny Speakers are Sound Wizards",
-    "Your Phone's Tiny Speakers are Sound Wizards"
+    "Your Phone's Tiny Speakers are Sound Wizards",
+    "Why Cold Kills Battery Life: IEEE Insights"
   ],
   "used_keywords": [
-    "claude",
     "code",
     "did you know",
     "tech trending",
@@ -301,22 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "Microsoft Sunk a Datacenter 117 Feet Under the Sea",
-      "news_source_url": "",
-      "keywords": [
-        "project natick",
-        "underwater datacenter",
-        "cloud servers",
-        "microsoft",
-        "did you know"
-      ],
-      "source": "Microsoft Project Natick Research",
-      "timestamp": "2026-10-01T07:57:38.786472+00:00"
-    },
     {
       "title": "Stuxnet Destroyed 1,000 Centrifuges Without Any Explosives",
       "news_source_url": "",
@@ -1511,6 +1498,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-10T18:01:30.878165+00:00"
+    },
+    {
+      "title": "Why Cold Kills Battery Life: IEEE Insights",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-10T20:05:34.507911+00:00"
     }
   ]
 }

@@ -1,0 +1,128 @@
+{
+  "topic": "Why Cold Kills Battery Life: IEEE Insights",
+  "topic_type": "research_paper",
+  "domain": "programming",
+  "difficulty": "intermediate",
+  "audience": "students_and_professionals",
+  "visual_theme": "BLUEPRINT",
+  "theme_css_class": "theme--blueprint",
+  "theme_colors": {
+    "bg": "#0A1628",
+    "card_bg": "#0F2140",
+    "card_border": "#1A3A6B",
+    "text_primary": "#E0F0FF",
+    "text_secondary": "#7EB8E0",
+    "text_muted": "#4A7BA8",
+    "accent": "#00B4D8",
+    "accent_secondary": "#0096C7",
+    "accent_success": "#48CAE4",
+    "accent_danger": "#FF6B6B",
+    "accent_warning": "#FFD166",
+    "code_bg": "#071120",
+    "gradient_start": "#00B4D8",
+    "gradient_end": "#0077B6"
+  },
+  "visual_concept": "algorithmic_rigor",
+  "visual_motifs": [
+    "benchmark_radar",
+    "matrix_transform",
+    "coordinate_grid",
+    "proof_graph"
+  ],
+  "hero_visual": "methodology_flow",
+  "accent_style": "academic_precision",
+  "storytelling_pattern": "architecture_walkthrough",
+  "slide_count": 7,
+  "layout_pattern": [
+    "hero_hook",
+    "what_happened",
+    "process_flow",
+    "architecture_diagram",
+    "metrics_cards",
+    "before_after",
+    "takeaway"
+  ],
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "big_idea_hook",
+      "purpose": "big_idea_hook",
+      "layout_type": "hero_hook",
+      "title_position": "center",
+      "supports": [
+        "title",
+        "subtitle",
+        "emoji_icon"
+      ]
+    },
+    {
+      "slide_number": 2,
+      "role": "problem_solved",
+      "purpose": "problem_solved",
+      "layout_type": "what_happened",
+      "title_position": "top-center",
+      "supports": []
+    },
+    {
+      "slide_number": 3,
+      "role": "new_methodology",
+      "purpose": "new_methodology",
+      "layout_type": "process_flow",
+      "title_position": "top-left",
+      "supports": [
+        "steps"
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "method_architecture",
+      "purpose": "method_architecture",
+      "layout_type": "architecture_diagram",
+      "title_position": "top-center",
+      "supports": [
+        "nodes",
+        "connections",
+        "labels"
+      ]
+    },
+    {
+      "slide_number": 5,
+      "role": "experimental_results",
+      "purpose": "experimental_results",
+      "layout_type": "metrics_cards",
+      "title_position": "top-left",
+      "supports": [
+        "metrics"
+      ]
+    },
+    {
+      "slide_number": 6,
+      "role": "paradigm_comparison",
+      "purpose": "paradigm_comparison",
+      "layout_type": "before_after",
+      "title_position": "top-center",
+      "supports": [
+        "before_title",
+        "before_items",
+        "after_title",
+        "after_items"
+      ]
+    },
+    {
+      "slide_number": 7,
+      "role": "why_it_matters",
+      "purpose": "why_it_matters",
+      "layout_type": "takeaway",
+      "title_position": "top-left",
+      "supports": [
+        "takeaways",
+        "cta_text"
+      ]
+    }
+  ],
+  "brand": {
+    "handle": "@vijayakumarj_ai",
+    "name": "Vijayakumar J",
+    "short_name": "VJ"
+  }
+}
