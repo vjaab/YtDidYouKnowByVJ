@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "earbuds",
+  "speaker_right": "vj",
+  "hook": "Did you know your phone speaker uses tiny explosions for sound? \ud83e\udd2f",
+  "headline": "Your Phone's Tiny Speakers are Sound Wizards",
+  "source": "Based on principles of electroacoustics and speaker design.",
+  "slides": [
+    {
+      "speaker": "earbuds",
+      "emotion": "shocked",
+      "title": "Tiny Explosions? \ud83d\udca5",
+      "bubble": "Wait, did you know that your phone speaker uses tiny explosions to make sound?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Millions of Tiny Puffs \ud83d\udca8",
+      "bubble": "Yes! It's a controlled electromagnetic 'explosion' happening millions of times a second!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "earbuds",
+      "emotion": "curious",
+      "title": "How Does That Work? \ud83e\udd14",
+      "bubble": "So, a tiny puff of air creates all the music and calls I hear?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Electromagnetism Magic \u2728",
+      "bubble": "Exactly! Like a super-fast mini-fan pushing air in and out!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "earbuds",
+      "emotion": "shocked",
+      "title": "From a Tiny Chip? \ud83e\udd0f",
+      "bubble": "All from a speaker chip smaller than my fingernail? That's wild!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Engineering Genius \ud83d\udca1",
+      "bubble": "It's amazing how much power and sound comes from such tiny components!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "earbuds",
+      "emotion": "excited",
+      "title": "Sound Wizards! \ud83c\udfb6",
+      "bubble": "Follow @vijayakumarj_ai for more mind-blowing tech secrets!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your phone speaker creates sound using rapid, controlled electromagnetic 'explosions' that push air, like a tiny, super-fast fan.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour phone's tiny speakers are actual sound wizards, using miniature explosions to create your favorite music and calls!\n\nHere's the breakdown:\n\ud83d\udd39 It's a super-fast, controlled electromagnetic 'explosion'.\n\ud83d\udd39 This creates rapid air puffs, millions of times per second.\n\ud83d\udd39 All from a chip smaller than your fingernail!\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #PhoneSpeaker #AudioPhysics #Engineering #MindBlowingFacts #VijayaKumarAI",
+  "vector": "bizarre_tech_history",
+  "characters": "auto"
+}
