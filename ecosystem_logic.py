@@ -16,19 +16,69 @@ ALL_CATEGORIES = [
     "Famous Bugs & Glitches",
     "Student Dev & AI Tools",
     "Student Capstone Projects",
+    # ── High-Retention 2026 Expansion Pillars ──
+    "Tools That Feel Illegal",
+    "Famous Bugs & Tech Heists",
+    "Under-the-Hood / Teardown",
+    "Hidden OS & App Killswitches",
+    "AI Benchmark Showdowns",
+    "Student & Dev Shortcuts",
 ]
 
 # Mass-appeal 2026 Shorts Schedule: Focused on high-retention, high-curiosity pillars
-# (Facts & Trivia, AI & Tech Tools, Tech Gadgets & Inventions, Coding & Tech Hacks)
 WEEKLY_SCHEDULE = {
-    "Mon": ["Facts & Trivia", "AI & Tech Tools"],
-    "Tue": ["Tech Gadgets & Inventions", "Coding & Development Hacks"],
-    "Wed": ["Facts & Trivia", "AI & Tech Tools"],
-    "Thu": ["Tech Gadgets & Inventions", "Coding & Development Hacks"],
-    "Fri": ["Facts & Trivia", "AI & Tech Tools"],
-    "Sat": ["Tech Gadgets & Inventions", "Facts & Trivia"],
-    "Sun": ["AI & Tech Tools", "Tech Gadgets & Inventions"],
+    "Mon": ["Facts & Trivia", "Tools That Feel Illegal", "AI & Tech Tools"],
+    "Tue": ["Tech Gadgets & Inventions", "Hidden OS & App Killswitches", "Coding & Development Hacks"],
+    "Wed": ["Under-the-Hood / Teardown", "Famous Bugs & Tech Heists", "AI & Tech Tools"],
+    "Thu": ["AI Benchmark Showdowns", "Tools That Feel Illegal", "Coding & Development Hacks"],
+    "Fri": ["Facts & Trivia", "Student & Dev Shortcuts", "AI & Tech Tools"],
+    "Sat": ["Famous Bugs & Tech Heists", "Tech Gadgets & Inventions", "Hidden OS & App Killswitches"],
+    "Sun": ["AI Benchmark Showdowns", "Under-the-Hood / Teardown", "Tech Gadgets & Inventions"],
 }
+
+# ── Dynamic Narrative Formats ──
+NARRATIVE_FORMATS = [
+    "SOLO_EXPLAINER",      # Proven single-presenter hook -> problem -> solution -> loop
+    "MASCOT_DEBATE",       # Banter between VJ and Byte/Tech Gadget mascot
+    "MYTH_BUSTER",         # Myth stamp vs Reality proof teardown
+    "SPEEDRUN",            # High-intensity 30s challenge with countdown timer
+    "PAUSE_AND_GUESS",     # Interactive challenge: Spot the bug / guess the output (3s pause)
+]
+
+DAILY_NARRATIVE_FORMATS = {
+    "Mon": ["SOLO_EXPLAINER", "MYTH_BUSTER"],
+    "Tue": ["SPEEDRUN", "MASCOT_DEBATE"],
+    "Wed": ["PAUSE_AND_GUESS", "SOLO_EXPLAINER"],
+    "Thu": ["MYTH_BUSTER", "SPEEDRUN"],
+    "Fri": ["MASCOT_DEBATE", "SOLO_EXPLAINER"],
+    "Sat": ["PAUSE_AND_GUESS", "MASCOT_DEBATE"],
+    "Sun": ["SPEEDRUN", "MYTH_BUSTER"],
+}
+
+def get_narrative_format(day_name=None, category=None, run_index=0):
+    """
+    Returns the narrative format for the given day/category/run_index.
+    """
+    if day_name is None:
+        try:
+            import pytz
+            ist = pytz.timezone("Asia/Kolkata")
+            day_name = datetime.datetime.now(ist).strftime("%a")
+        except Exception:
+            day_name = datetime.datetime.utcnow().strftime("%a")
+            
+    if category in ["Famous Bugs & Glitches", "Famous Bugs & Tech Heists"]:
+        formats = ["PAUSE_AND_GUESS", "SPEEDRUN", "MASCOT_DEBATE"]
+        return formats[run_index % len(formats)]
+    elif category in ["Tools That Feel Illegal", "Hidden OS & App Killswitches"]:
+        formats = ["SOLO_EXPLAINER", "SPEEDRUN", "MASCOT_DEBATE"]
+        return formats[run_index % len(formats)]
+    elif category in ["AI Benchmark Showdowns"]:
+        formats = ["MASCOT_DEBATE", "SPEEDRUN", "SOLO_EXPLAINER"]
+        return formats[run_index % len(formats)]
+        
+    day_formats = DAILY_NARRATIVE_FORMATS.get(day_name, ["SOLO_EXPLAINER", "MASCOT_DEBATE"])
+    return day_formats[run_index % len(day_formats)]
 
 SCHEDULE_TRACKER_FILE = os.path.join(os.path.dirname(__file__), "schedule_tracker.json")
 
@@ -79,6 +129,14 @@ def get_slot_info(run_index=None):
     category = day_schedule[run_index % len(day_schedule)]
     
     return day_name, slot, category
+
+def get_slot_and_format_info(run_index=None):
+    """
+    Returns (day_name, slot, category, narrative_format) for complete pipeline orchestration.
+    """
+    day_name, slot, category = get_slot_info(run_index=run_index)
+    narrative_format = get_narrative_format(day_name=day_name, category=category, run_index=run_index or 0)
+    return day_name, slot, category, narrative_format
 
 def get_longform_slot_info():
     """
@@ -173,6 +231,13 @@ CONTENT_LAYOUT_MAP = {
     "AWS Cloud Services": "terminal_ide",          # Cloud CLI & architecture
     "Student Dev & AI Tools": "terminal_ide",      # Student dev tools & terminal
     "Student Capstone Projects": "split_screen_faceoff", # Project comparison faceoff
+    # ── High-Retention Expansion Mappings ──
+    "Tools That Feel Illegal": "split_screen_faceoff",
+    "Famous Bugs & Tech Heists": "terminal_ide",
+    "Under-the-Hood / Teardown": "side_strip",
+    "Hidden OS & App Killswitches": "hero_center",
+    "AI Benchmark Showdowns": "split_screen_faceoff",
+    "Student & Dev Shortcuts": "terminal_ide",
 }
 
 # Visual type to layout mapping (overrides category default)
@@ -211,6 +276,13 @@ CATEGORY_AVATAR_X_OFFSET = {
     "AWS Cloud Services": 20,             # Right - architecture + presenter
     "Student Dev & AI Tools": -40,        # Left - code + terminal
     "Student Capstone Projects": 30,      # Right - project showcase
+    # ── High-Retention Expansion Offsets ──
+    "Tools That Feel Illegal": -35,
+    "Famous Bugs & Tech Heists": 25,
+    "Under-the-Hood / Teardown": 0,
+    "Hidden OS & App Killswitches": 40,
+    "AI Benchmark Showdowns": -45,
+    "Student & Dev Shortcuts": -30,
 }
 
 def get_dynamic_layout(category, visual_type=None, chunk_index=0, total_chunks=1, headline="", chunk_text=""):
@@ -614,9 +686,116 @@ def get_category_prompt_enhancement(category, slot):
                 4. CTA (45-50s): "Comment 'PROJECT' for the full source code and setup guide."
                 5. Seamless Loop (50-60s): Crisp concluding sentence that flows into the hook.
 """,
+        "Tools That Feel Illegal": f"""
+            CATEGORY: Tools That Feel Illegal (Extreme Curiosity & SaaS Replacement).
+            STRATEGY: {base_discovery}
+            AUDIENCE: Devs, founders, students, creators paying too much for expensive SaaS subscriptions.
+            GOAL: Show a 100% free, open-source or underrated tool that replaces a $50-$200/month software.
+            HOOK STYLE: 'Stop paying Adobe $30/month when this 100% free repo exists...' or 'This open-source tool feels illegal to know.'
+            EMOTIONAL TRIGGER: Saving money + finding a secret cheat code + immediate utility.
+            CONTENT FORMAT: Price anchor of expensive tool -> Free repo reveal -> 1-click feature demo -> Zero cost payoff.
+""",
+        "Famous Bugs & Tech Heists": f"""
+            CATEGORY: Famous Bugs & Tech Heists (Fascinating High-Stakes Tech Drama).
+            STRATEGY: {base_discovery}
+            AUDIENCE: Software engineers, tech nerds, curious general public.
+            GOAL: Break down a famous engineering outage, glitch, or hack that cost millions in minutes.
+            HOOK STYLE: 'How a single missing semicolon cost this Wall Street firm $440 Million in 45 minutes...'
+            EMOTIONAL TRIGGER: High stakes + schadenfreude + engineering lesson.
+            CONTENT FORMAT: Shocking loss figure -> The exact code bug or architectural flaw -> The lesson.
+""",
+        "Under-the-Hood / Teardown": f"""
+            CATEGORY: Under-the-Hood / Teardown (System Design Simplified).
+            STRATEGY: {base_discovery}
+            AUDIENCE: Curious developers, system designers, tech enthusiasts.
+            GOAL: Explain the hidden engineering architecture behind apps everyone uses daily.
+            HOOK STYLE: 'What actually happens when you swipe right on Tinder? (System Design)' or 'How Netflix streams 4K video without ever buffering.'
+            EMOTIONAL TRIGGER: "I always wondered how that worked" + aha moment.
+            CONTENT FORMAT: The user action -> The hidden server/database mechanics -> The engineering genius.
+""",
+        "Hidden OS & App Killswitches": f"""
+            CATEGORY: Hidden OS & App Killswitches (Actionable Device Optimization).
+            STRATEGY: {base_discovery}
+            AUDIENCE: Everyone with an iPhone, Android, Chrome, or Windows PC.
+            GOAL: Reveal a hidden setting, privacy toggle, or battery-saving trick that actually works.
+            HOOK STYLE: 'Turn off this ONE hidden setting in Chrome before your battery dies.' or 'Apple hides this privacy killswitch in Settings.'
+            EMOTIONAL TRIGGER: Regaining control + privacy protection + device speedup.
+            CONTENT FORMAT: Alarming problem -> Exact menu navigation path -> Toggle demonstration.
+""",
+        "AI Benchmark Showdowns": f"""
+            CATEGORY: AI Benchmark Showdowns (Direct Tool vs Tool Battle).
+            STRATEGY: {base_discovery}
+            AUDIENCE: AI enthusiasts, developers, tech early adopters.
+            GOAL: Side-by-side prompt or benchmark battle between top AI models (e.g. Claude vs GPT vs DeepSeek).
+            HOOK STYLE: 'We gave the exact same impossible coding problem to Claude 3.7 vs GPT-4.5. Winner shocked us.'
+            EMOTIONAL TRIGGER: Rivalry + objective benchmarks + discovering the superior tool.
+            CONTENT FORMAT: The challenge prompt -> Side-by-side response speed & quality -> Clear verdict.
+""",
+        "Student & Dev Shortcuts": f"""
+            CATEGORY: Student & Dev Shortcuts (High Utility Career & Portfolio Boost).
+            STRATEGY: {base_discovery}
+            AUDIENCE: CS students, junior developers, self-taught coders.
+            GOAL: Share free student perks, GitHub Student Pack hacks, portfolio cheatsheets, and terminal shortcuts.
+            HOOK STYLE: 'The 3 GitHub repos that guarantee an interview callback in 2026.'
+            EMOTIONAL TRIGGER: Career boost + unlocking free developer credits ($1,000+ value).
+            CONTENT FORMAT: The free perk or shortcut -> How to claim or run it -> Immediate output.
+""",
     }
     
     return enhancements.get(category, enhancements.get("AI & Tech Tools", ""))
+
+
+def get_narrative_format_enhancement(narrative_format: str) -> str:
+    """
+    Returns specific prompt requirements for the selected narrative format.
+    """
+    if narrative_format == "MASCOT_DEBATE":
+        return """
+        ─── NARRATIVE FORMAT: MASCOT DEBATE (VJ & BYTE) ───
+        Structure this script as an energetic dialogue between two characters:
+        1. VJ (Lead Host): Smart, encouraging, practical tech expert.
+        2. BYTE (AI Robot Mascot): Curious, cheeky, brings up the naive question or common misconception.
+        - DIALOGUE FLOW:
+          * 0-4s: Byte opens with a naive doubt: "VJ, why don't we just feed the whole 10GB database into Claude?!"
+          * 4-9s: VJ shuts it down playfully: "Because your token bill will hit $4,000! You use vector RAG instead."
+          * 9-24s: Byte asks "How?", VJ breaks down the exact tool name, command, and fix.
+          * 24-32s: Byte reacts in awe ("Wait, so it's 100% free?!"), VJ gives the punchy closing loop.
+        - IN THE SCRIPT TEXT: Explicitly label lines with '[VJ]:' and '[Byte]:' so speech and visuals can sync.
+        """
+    elif narrative_format == "MYTH_BUSTER":
+        return """
+        ─── NARRATIVE FORMAT: MYTH-BUSTER (LIE DETECTION) ───
+        Structure this script as a high-retention myth debunking format:
+        - 0-4s: State the widespread myth clearly with '[MYTH]': "MYTH: You need a $2,000 GPU to run AI locally."
+        - 4-10s: Explain why 90% of people get fooled by this misconception.
+        - 10-24s: Drop the truth with '[REALITY]': "REALITY: Ollama runs quantized 8B models on a $300 Mac Mini at 40 tokens per second." Name the exact tool.
+        - 24-32s: Wrap with the seamless loop returning to the initial myth.
+        """
+    elif narrative_format == "SPEEDRUN":
+        return """
+        ─── NARRATIVE FORMAT: 30-SECOND CHALLENGE / SPEEDRUN ───
+        Structure this script as a high-octane race against time:
+        - 0-3s: Opening challenge: "Can we build a complete autonomous AI agent in under 30 seconds? Starting now!"
+        - 3-12s: Rapid action: "Step 1: Run pip install [tool]..."
+        - 12-22s: "Step 2: Drop in this 3-line configuration..."
+        - 22-28s: "Step 3: Run the command. Done! Working agent with 5 seconds to spare."
+        - 28-32s: Fast-paced loop flowing back to the opening challenge.
+        """
+    elif narrative_format == "PAUSE_AND_GUESS":
+        return """
+        ─── NARRATIVE FORMAT: INTERACTIVE PAUSE-AND-GUESS ───
+        Structure this script as an interactive brain teaser that forces viewer retention:
+        - 0-4s: "Spot the fatal security flaw in this code. 95% of developers miss it."
+        - 4-8s: "Look closely... pausing 3 seconds to test your skills... 3... 2... 1..."
+        - 8-24s: Reveal: "Did you spot it? Line 4 accepts unsanitized input! Here is the 1-line patch that fixes it..."
+        - 24-32s: "Have you seen this in production? Drop your thoughts below."
+        """
+    else: # SOLO_EXPLAINER
+        return """
+        ─── NARRATIVE FORMAT: SOLO EXPLAINER ───
+        Structure: Hard Hook (0-3s) -> Problem Pain Point (3-10s) -> Solution & Exact Tool Name (10-22s) -> Real-world Proof (22-28s) -> Seamless Loop (28-33s).
+        """
+
 
 
 # ─────────────────────────────────────────────────────────────────────────────

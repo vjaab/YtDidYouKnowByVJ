@@ -46,7 +46,7 @@ from config import TARGET_AUDIO_DURATION, MAX_RETRY_ATTEMPTS, LOGS_DIR, OUTPUT_D
 from fetch_research_papers import fetch_tech_news, fetch_ai_tools
 from topic_tracker import record_story, update_youtube_url, update_facebook_post_id, get_next_topic_type_by_ratio, get_next_target_country, get_next_avatar, get_next_topic_source
 from gemini_script import pick_and_generate_script
-from ecosystem_logic import get_slot_info, get_series_identity, get_next_slot
+from ecosystem_logic import get_slot_info, get_series_identity, get_next_slot, get_narrative_format
 from audio_gen import generate_voiceover, clean_tts_text
 from chunk_builder import build_chunks, redistribute_to_audio_duration
 from pexels_fetcher import fetch_all_chunk_visuals, generate_visual_style_guide
@@ -601,7 +601,8 @@ def run_pipeline(topic_type="auto", dry_run=False, topic_source="auto"):
     if current_time_str in day_times:
         run_index = day_times.index(current_time_str)
     day_name, slot, category = get_slot_info(run_index=run_index)
-    log_message(f"STEP 1: Content Ecosystem Check -> Day: {day_name}, Slot: {slot}, Category: {category} (Run {run_index+1}/{len(day_times)})")
+    narrative_format = get_narrative_format(day_name=day_name, category=category, run_index=run_index)
+    log_message(f"STEP 1: Content Ecosystem Check -> Day: {day_name}, Slot: {slot}, Category: {category}, Format: {narrative_format} (Run {run_index+1}/{len(day_times)})")
     
     # ── QUIZ SHORTS: Force quiz topic_type for Quiz & Trivia days ──
     if category == "Quiz & Trivia":

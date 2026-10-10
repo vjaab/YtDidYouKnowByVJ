@@ -36,7 +36,34 @@ def generate_musetalk_sync(face_path, audio_path, output_path, timeout=10800):
     result_dir = os.path.join(os.path.abspath(musetalk_dir), "results", "pipeline_run")
     os.makedirs(result_dir, exist_ok=True)
 
-    # ── Pre-process: Extract a high-quality reference frame ──────────────
+    # ── Pre-process 1: Normalize audio to strict 16kHz mono PCM for Whisper alignment ──
+    norm_audio = os.path.join(tempfile.gettempdir(), f"clean_16k_mono_{os.path.basename(audio_path)}.wav")
+    try:
+        subprocess.run([
+            "ffmpeg", "-y", "-i", audio_path,
+            "-acodec", "pcm_s16le", "-ac", "1", "-ar", "16000",
+            norm_audio
+        ], check=True, capture_output=True)
+        audio_path = norm_audio
+        print(f"   🎙️ Normalized audio to 16kHz mono PCM: {audio_path}")
+    except Exception as e:
+        print(f"   ⚠ Audio 16kHz normalization notice: {e}")
+
+    # ── Pre-process 2: Conform template video to 25 fps matching MuseTalk inference ──
+    conformed_video = os.path.join(tempfile.gettempdir(), f"conformed_25fps_{os.path.basename(face_path)}")
+    try:
+        subprocess.run([
+            "ffmpeg", "-y", "-i", face_path,
+            "-an", "-r", "25", "-vf", "scale=512:-2",
+            "-c:v", "libx264", "-crf", "18", "-preset", "veryfast",
+            conformed_video
+        ], check=True, capture_output=True)
+        face_path = conformed_video
+        print(f"   🎬 Conformed template video to 25 fps / 512px: {face_path}")
+    except Exception as e:
+        print(f"   ⚠ Video 25fps conform notice: {e}")
+
+    # ── Pre-process 3: Extract a high-quality reference frame ──────────────
     ref_frame_path = os.path.join(os.path.dirname(output_path_abs), "musetalk_ref_frame.png")
     try:
         subprocess.run([
@@ -49,18 +76,20 @@ def generate_musetalk_sync(face_path, audio_path, output_path, timeout=10800):
         print(f"   ⚠ Reference frame extraction failed: {e}")
         ref_frame_path = None
 
-    # ── Create YAML config with tasks (dictionary of tasks expected by MuseTalk) ──
+    # ── Create YAML config with tuned bbox_shift (default 0 for natural jaw alignment) ──
+    bbox_shift = int(os.environ.get("LIPSYNC_BBOX_SHIFT", "0"))
     config_tasks = {
         "main_task": {
             "video_path": face_path,
             "audio_path": audio_path,
-            "bbox_shift": 5,
+            "bbox_shift": bbox_shift,
         }
     }
     config_path = os.path.join(os.path.abspath(musetalk_dir), "configs", "inference", "_pipeline_run.yaml")
     os.makedirs(os.path.dirname(config_path), exist_ok=True)
     with open(config_path, "w") as f:
         yaml.dump(config_tasks, f)
+    print(f"   🎯 Configured bbox_shift={bbox_shift} (prevents jaw stretching & teeth blur)")
 
     # ── Determine model version (prefer v1.5 if available) ───────────────
     v15_path = os.path.join(musetalk_dir, "models", "musetalkV15", "unet.pth")

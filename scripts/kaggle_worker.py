@@ -708,28 +708,28 @@ def process_job():
         # 🔓 Unload F5-TTS
         unload_f5_model()
 
-        # 🔄 Final Audio Format Check: Ensure .wav for MuseTalk
-        if audio_path and audio_path.endswith(".mp3"):
-            print("🔄 Converting Edge TTS mp3 to wav for MuseTalk compatibility...")
-            wav_path = audio_path.replace(".mp3", ".wav")
-            run_cmd(["ffmpeg", "-y", "-i", audio_path, wav_path])
-            audio_path = wav_path
+        # 🔄 Final Audio Format Check: Normalize to 16kHz mono PCM for Whisper/Audio-to-Video alignment
+        wav_path = audio_path.rsplit(".", 1)[0] + "_16k_mono.wav"
+        print("🔄 Normalizing audio to 16kHz mono PCM for SOTA lip-sync alignment...")
+        run_cmd(["ffmpeg", "-y", "-i", audio_path, "-acodec", "pcm_s16le", "-ac", "1", "-ar", "16000", wav_path])
+        audio_path = wav_path
         
-        # 🟢 STEP 2: Prep Assets & Optimize
+        # 🟢 STEP 2: Prep Assets & Optimize (Conform to 25 fps & 512px)
         face_path = job_data.get("face_path", "assets/video/Firefly_video_final.mp4")
         optimized_face = "assets/Firefly_video_optimized.mp4"
         lipsync_out = "kaggle_lipsync.mp4"
         
-        print("🏎️ Optimizing template resolution (512px) and REMOVING audio for RAM safety...")
+        print("🏎️ Conforming template resolution (512px), 25 fps, and REMOVING audio for zero drift...")
         run_cmd([
             "ffmpeg", "-y", "-i", face_path, 
             "-an", # REMOVE original background music/audio from the reference video
+            "-r", "25",
             "-vf", "scale=512:-2", 
-            "-c:v", "libx264", "-crf", "23", "-preset", "veryfast",
+            "-c:v", "libx264", "-crf", "18", "-preset", "veryfast",
             optimized_face
         ])
         
-        # 🏅 MuseTalk Lip-Sync — HARD REQUIREMENT
+        # 🏅 SOTA Lip-Sync / Portrait Animation (LivePortrait / EchoMimic / MuseTalk)
         import gc
         import torch
         
@@ -737,20 +737,20 @@ def process_job():
         try:
             gc.collect()
             torch.cuda.empty_cache()
-            lipsync_path = generate_musetalk_sync(
+            lipsync_path = generate_lip_sync(
                 face_path=optimized_face,
                 audio_path=audio_path,
                 output_path=lipsync_out
             )
         except Exception as e:
-            print(f"❌ MuseTalk Lip-Sync FAILED: {e}")
-            raise RuntimeError(f"Pipeline aborted: MuseTalk lip-sync failed — {e}")
+            print(f"❌ Lip-Sync FAILED: {e}")
+            raise RuntimeError(f"Pipeline aborted: Lip-sync failed — {e}")
         finally:
             gc.collect()
             torch.cuda.empty_cache()
 
         if not lipsync_path or not os.path.exists(lipsync_path):
-            raise RuntimeError("Pipeline aborted: MuseTalk produced no lip-sync output.")
+            raise RuntimeError("Pipeline aborted: Lip-sync produced no output.")
         
         # 🟢 STEP 3: Save Results
         output_root = os.path.join(os.getcwd(), "..")

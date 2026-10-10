@@ -12,7 +12,14 @@ from config import (
     GEMINI_RPM_SLEEP
 )
 from topic_tracker import load_tracker, check_story_uniqueness, check_cooldowns
-from ecosystem_logic import get_slot_info, get_category_prompt_enhancement, get_series_for_category, get_series_info
+from ecosystem_logic import (
+    get_slot_info,
+    get_category_prompt_enhancement,
+    get_series_for_category,
+    get_series_info,
+    get_narrative_format,
+    get_narrative_format_enhancement,
+)
 from hook_analytics import (
     get_hook_analytics,
     record_hook_performance,
@@ -797,7 +804,10 @@ def _pick_and_generate_script_attempt(articles=None, extra_instruction="", force
     client = genai.Client(api_key=active_key)
     
     day_name, slot, category = get_slot_info(run_index=run_index)
-    strategy_enhancement = get_category_prompt_enhancement(category, slot)
+    narrative_format = get_narrative_format(day_name=day_name, category=category, run_index=run_index)
+    format_enhancement = get_narrative_format_enhancement(narrative_format)
+    strategy_enhancement = get_category_prompt_enhancement(category, slot) + "\n" + format_enhancement
+    print(f"🎭 Narrative Format Selected: {narrative_format}")
     
     # ── SERIES TRACKING: Get recurring series for this category ──────────────────────
     series_info = get_series_for_category(category)
@@ -2081,10 +2091,14 @@ This perspective MUST shape your hook, analysis, and solution framing. Do NOT ju
         selection_instruction += perspective_instruction
         print(f"🎯 Editorial Perspective Applied: {perspective['name']}")
 
+    if 'format_enhancement' in locals() and format_enhancement:
+        selection_instruction += "\n" + format_enhancement
+
     engine = MultiAgentGenerationEngine(client, news_context, slot, category, strategy_enhancement, is_longform, raw_articles=articles, topic_type=topic_type, failed_topics=failed_topics, run_index=run_index)
     script_data = engine.execute(selection_instruction, prompt_requirements)
     
     if script_data:
+        script_data["narrative_format"] = narrative_format if 'narrative_format' in locals() else "SOLO_EXPLAINER"
         script_data["series_name"] = series_name
         script_data["series_episode"] = series_episode
         # ── Post-generation sanitization: strip LLM artifacts from script text ──

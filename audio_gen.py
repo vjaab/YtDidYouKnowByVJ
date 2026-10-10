@@ -143,6 +143,23 @@ def trim_audio_silence(path, word_timestamps):
     print(f"Audio trimmed: -{shift_sec:.2f}s from start. New duration: {new_dur:.2f}s")
     return new_dur, new_ts
 
+def apply_robot_mascot_voice_modulation(segment):
+    """
+    Applies high-tech AI robotic modulation (frequency pitch shift + bandpass filtering)
+    to voice segments spoken by the robot mascot (Byte) for distinct dual-voice personality.
+    """
+    try:
+        # Pitch shift up ~14% for distinctive cheerful robot tone
+        new_sample_rate = int(segment.frame_rate * 1.14)
+        pitched = segment._spawn(segment.raw_data, overrides={'frame_rate': new_sample_rate})
+        robot = pitched.set_frame_rate(segment.frame_rate)
+        # Apply gentle high-pass and low-pass for a broadcast-synthetic EQ curve
+        robot = robot.high_pass_filter(300).low_pass_filter(4200)
+        return robot + 1.5
+    except Exception as e:
+        print(f"⚠️ Mascot voice modulation notice: {e}")
+        return segment
+
 def optimize_audio_gaps(audio_path, word_timestamps, max_gap_s=0.5, target_gap_s=0.2):
     """
     Detects silent gaps between words and shortens them if they exceed max_gap_s.
@@ -790,6 +807,11 @@ def sanitize_script_for_tts(text):
     # 4. Remove scene/section labels that shouldn't be spoken
     cleaned = re.sub(r'(?i)^\s*(HOOK|PROBLEM|SOLUTION|CTA|OUTRO|INTRO|SCENE|PART)\s*[:\-]\s*', '', cleaned, flags=re.MULTILINE)
     cleaned = re.sub(r'(?i)\b(HOOK|PROBLEM|SOLUTION|CTA|SECTION)\s*\d*\s*:', ' ', cleaned)
+    
+    # 4b. Remove speaker dialogue markers and format tags: [VJ]:, [Byte]:, [MYTH]:, [REALITY]:, VJ:, Byte:
+    cleaned = re.sub(r'\[?\s*(?:VJ|Byte|Phony|Robot|Host|Guest)\s*\]?\s*:\s*', '', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\[?\s*(?:MYTH|REALITY|FACT|TRUTH|VERIFIED)\s*\]?\s*:\s*', '', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\[\s*PAUSE[^\]]*\]', ' ... ', cleaned, flags=re.IGNORECASE)
     
     # 5. Remove numbered list formatting ("1. ", "2. ", etc.)
     cleaned = re.sub(r'(?m)^\s*\d+\.\s+', '', cleaned)

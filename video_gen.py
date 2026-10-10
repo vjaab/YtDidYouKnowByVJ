@@ -7139,12 +7139,234 @@ def render_persistent_topic_header(topic_title, accent_color, width, height):
     
     return img
 
-def composite_frame(background_frame, timestamp, header_img, subtitle_img, transparency_img=None, entity_tags_img=None):
-    """Clean talking-head composite: header + subtitles + entity tags."""
+# ══════════════════════════════════════════════════════════════════════════════
+# DYNAMIC PIPELINE VARIATION RENDERERS (Visual, Topic, Style Variations)
+# ══════════════════════════════════════════════════════════════════════════════
+
+def render_glowing_laser_progress_bar(timestamp, duration, frame_w, frame_h, accent_color=(0, 229, 255)):
+    """
+    Renders a sleek glowing laser progress bar with rounded pill head and neon gradient.
+    Positioned in safe zone below header at top of frame.
+    """
+    img = Image.new('RGBA', (frame_w, frame_h), (0, 0, 0, 0))
+    if duration <= 0:
+        return img
+    prog = min(1.0, max(0.0, timestamp / duration))
+    if prog <= 0.001:
+        return img
+
+    draw = ImageDraw.Draw(img)
+    bar_y = 110  # safe margin below top header
+    bar_h = 6
+    total_w = frame_w - 80  # 40px margin on each side
+    current_w = max(4, int(total_w * prog))
+    x1 = 40
+    x2 = x1 + current_w
+
+    # Background track (translucent obsidian)
+    draw.rounded_rectangle([x1, bar_y, x1 + total_w, bar_y + bar_h], radius=3, fill=(15, 15, 25, 130))
+    
+    # Active fill
+    r, g, b = accent_color[:3]
+    draw.rounded_rectangle([x1, bar_y, x2, bar_y + bar_h], radius=3, fill=(r, g, b, 230))
+    
+    # Glowing head point
+    head_size = 10
+    head_x = x2
+    head_y = bar_y + bar_h // 2
+    draw.ellipse([head_x - head_size // 2, head_y - head_size // 2, 
+                  head_x + head_size // 2, head_y + head_size // 2], fill=(255, 255, 255, 255))
+    return img
+
+def render_speedrun_hud(timestamp, duration, frame_w, frame_h, accent_color=(255, 50, 80)):
+    """
+    Renders a high-tech digital stopwatch HUD in the top right corner.
+    Countdown with active hundredths of seconds for extreme pacing momentum.
+    """
+    img = Image.new('RGBA', (frame_w, frame_h), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    remaining = max(0.0, duration - timestamp)
+    mins = int(remaining // 60)
+    secs = int(remaining % 60)
+    ms = int((remaining - int(remaining)) * 100)
+
+    timer_str = f"⏱️ {mins:02d}:{secs:02d}:{ms:02d}"
+    font = gf(28, bold=True)
+    tb = draw.textbbox((0, 0), timer_str, font=font)
+    tw, th = tb[2] - tb[0], tb[3] - tb[1]
+
+    badge_w = tw + 32
+    badge_h = th + 18
+    x1 = frame_w - badge_w - 40
+    y1 = 130
+    x2 = x1 + badge_w
+    y2 = y1 + badge_h
+
+    # Card with neon border
+    r, g, b = accent_color[:3]
+    draw.rounded_rectangle([x1, y1, x2, y2], radius=12, fill=(10, 10, 18, 220), outline=(r, g, b, 230), width=2)
+    draw.text((x1 + 16, y1 + 9), timer_str, font=font, fill=(255, 255, 255, 255))
+    return img
+
+def render_pause_and_guess_hud(timestamp, frame_w, frame_h, accent_color=(255, 215, 0)):
+    """
+    Renders an interactive countdown badge during the challenge pause (seconds 4.0 - 8.5).
+    """
+    img = Image.new('RGBA', (frame_w, frame_h), (0, 0, 0, 0))
+    if timestamp < 4.0 or timestamp > 11.0:
+        return img
+
+    draw = ImageDraw.Draw(img)
+    cx = frame_w // 2
+    cy = int(frame_h * 0.42)
+
+    if 4.0 <= timestamp < 7.5:
+        # Countdown 3... 2... 1...
+        rem_sec = int(7.5 - timestamp) + 1
+        rem_sec = max(1, min(3, rem_sec))
+        prompt_txt = f"⏳ CAN YOU SPOT IT? {rem_sec}..."
+        bg_col = (20, 20, 35, 230)
+        border_col = (255, 200, 0, 240)
+        txt_col = (255, 235, 120, 255)
+    else:  # 7.5 <= timestamp <= 11.0
+        prompt_txt = "💡 REVEALED! HERE'S THE FIX"
+        bg_col = (10, 35, 20, 230)
+        border_col = (0, 255, 120, 240)
+        txt_col = (180, 255, 200, 255)
+
+    font = gf(34, bold=True)
+    tb = draw.textbbox((0, 0), prompt_txt, font=font)
+    tw, th = tb[2] - tb[0], tb[3] - tb[1]
+    
+    pad_x, pad_y = 32, 16
+    x1 = cx - tw // 2 - pad_x
+    y1 = cy - th // 2 - pad_y
+    x2 = cx + tw // 2 + pad_x
+    y2 = cy + th // 2 + pad_y
+
+    draw.rounded_rectangle([x1, y1, x2, y2], radius=18, fill=bg_col, outline=border_col, width=3)
+    draw.text((cx - tw // 2, cy - th // 2), prompt_txt, font=font, fill=txt_col)
+    return img
+
+def render_myth_buster_stamp(timestamp, frame_w, frame_h):
+    """
+    Renders an impactful distressed stamp badge for myth busting:
+    - 0s to 7.0s: ❌ [MYTH]
+    - 7.0s to 16.0s: ✅ [REALITY]
+    """
+    img = Image.new('RGBA', (frame_w, frame_h), (0, 0, 0, 0))
+    if timestamp > 18.0:
+        return img
+
+    if timestamp < 7.0:
+        stamp_text = "❌ [MYTH]"
+        border_color = (255, 50, 50, 240)
+        bg_color = (40, 10, 10, 210)
+        text_color = (255, 120, 120, 255)
+    else:
+        stamp_text = "✅ [REALITY]"
+        border_color = (0, 255, 100, 240)
+        bg_color = (10, 40, 20, 210)
+        text_color = (120, 255, 170, 255)
+
+    font = gf(34, bold=True)
+    fake_d = ImageDraw.Draw(img)
+    tb = fake_d.textbbox((0, 0), stamp_text, font=font)
+    tw, th = tb[2] - tb[0], tb[3] - tb[1]
+
+    # Position in upper left
+    x1 = 45
+    y1 = 135
+
+    card = Image.new('RGBA', (tw + 40, th + 24), (0, 0, 0, 0))
+    c_draw = ImageDraw.Draw(card)
+    c_draw.rounded_rectangle([0, 0, tw + 38, th + 22], radius=10, fill=bg_color, outline=border_color, width=3)
+    c_draw.text((19, 11), stamp_text, font=font, fill=text_color)
+    
+    rot = card.rotate(-3, expand=True, resample=Image.BILINEAR)
+    img.alpha_composite(rot, dest=(x1, y1))
+    return img
+
+_MASCOT_CACHE = {}
+
+def render_mascot_reaction_overlay(timestamp, duration, frame_w, frame_h, character="byte"):
+    """
+    Renders an animated living tech mascot (Byte the Robot or Gadget) in the bottom-left corner
+    with dynamic emotional states and a bobbing idle cycle.
+    """
+    img = Image.new('RGBA', (frame_w, frame_h), (0, 0, 0, 0))
+    
+    prog = timestamp / max(1.0, duration)
+    if prog < 0.25:
+        emotion = "curious"
+        badge_txt = "🤖 BYTE: CURIOUS"
+    elif prog < 0.65:
+        emotion = "thinking"
+        badge_txt = "🤖 BYTE: PROCESSING"
+    elif prog < 0.88:
+        emotion = "excited"
+        badge_txt = "🤖 BYTE: MIND BLOWN"
+    else:
+        emotion = "neutral"
+        badge_txt = "🤖 BYTE: APPROVED"
+
+    cache_key = f"{character}_{emotion}"
+    if cache_key not in _MASCOT_CACHE:
+        char_dir = os.path.join(ASSETS_DIR, "characters")
+        cand_paths = [
+            os.path.join(char_dir, f"{character}_{emotion}.png"),
+            os.path.join(char_dir, character, f"{character}_{emotion}.png"),
+            os.path.join(char_dir, f"{character}_neutral.png"),
+            os.path.join(char_dir, "byte_neutral.png")
+        ]
+        found_img = None
+        for p in cand_paths:
+            if os.path.exists(p):
+                try:
+                    found_img = Image.open(p).convert("RGBA")
+                    break
+                except Exception:
+                    pass
+        _MASCOT_CACHE[cache_key] = found_img
+
+    mascot_img = _MASCOT_CACHE.get(cache_key)
+    if not mascot_img:
+        return img
+
+    target_size = 190
+    ratio = target_size / max(mascot_img.width, mascot_img.height)
+    mw, mh = int(mascot_img.width * ratio), int(mascot_img.height * ratio)
+    scaled_mascot = mascot_img.resize((mw, mh), Image.LANCZOS)
+
+    # Bobbing motion
+    bob_y = int(math.sin(timestamp * 4.0) * 5)
+    dest_x = 40
+    dest_y = frame_h - mh - 160 + bob_y
+
+    img.alpha_composite(scaled_mascot, dest=(dest_x, dest_y))
+
+    # Badge card below mascot
+    draw = ImageDraw.Draw(img)
+    badge_font = gf(17, bold=True)
+    tb = draw.textbbox((0, 0), badge_txt, font=badge_font)
+    bw, bh = tb[2] - tb[0], tb[3] - tb[1]
+    
+    bx1 = dest_x + (mw - bw) // 2 - 12
+    by1 = dest_y + mh - 8
+    bx2 = bx1 + bw + 24
+    by2 = by1 + bh + 10
+
+    draw.rounded_rectangle([bx1, by1, bx2, by2], radius=8, fill=(15, 15, 25, 220), outline=(0, 229, 255, 200), width=1)
+    draw.text((bx1 + 12, by1 + 5), badge_txt, font=badge_font, fill=(0, 229, 255, 255))
+    return img
+
+def composite_frame(background_frame, timestamp, header_img, subtitle_img, transparency_img=None, entity_tags_img=None, extra_overlay_img=None):
+    """Clean talking-head composite: header + subtitles + entity tags + dynamic variation overlays."""
     frame = Image.fromarray(background_frame).convert('RGBA')
     
     # 1. Header at top
-    frame.alpha_composite(header_img, dest=(0, 0))
+    if header_img is not None:
+        frame.alpha_composite(header_img, dest=(0, 0))
     
     # 2. Transparency Watermark (2026 Compliance)
     if transparency_img is not None:
@@ -7153,6 +7375,10 @@ def composite_frame(background_frame, timestamp, header_img, subtitle_img, trans
     # 3. Dynamic Entity Tags (Shorts spoken topics)
     if entity_tags_img is not None:
         frame.alpha_composite(entity_tags_img, dest=(0, 0))
+        
+    # 3b. Dynamic Narrative Format Overlays (Laser progress bar, HUD, Stamps, Mascots)
+    if extra_overlay_img is not None:
+        frame.alpha_composite(extra_overlay_img, dest=(0, 0))
     
     # 4. Subtitles
     if subtitle_img is not None:
@@ -10550,6 +10776,19 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                     "type": "pop",
                     "timestamp": start_t
                 })
+                
+    # 4. Format-Specific Kinetic SFX Cues
+    narrative_fmt = script_json.get("narrative_format", "")
+    if narrative_fmt == "MYTH_BUSTER":
+        sfx_cues.append({"type": "glitch", "timestamp": 0.2})
+        if audio_duration > 7.5:
+            sfx_cues.append({"type": "pop", "timestamp": 7.0})
+    elif narrative_fmt == "PAUSE_AND_GUESS":
+        sfx_cues.append({"type": "woosh", "timestamp": 4.0})
+        if audio_duration > 8.0:
+            sfx_cues.append({"type": "pop", "timestamp": 7.5})
+    elif narrative_fmt == "SPEEDRUN":
+        sfx_cues.append({"type": "woosh", "timestamp": 0.2})
     
     _mix_and_master_audio(
         voice_path=audio_path,
@@ -10868,7 +11107,31 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 main_pil.alpha_composite(card_img, dest=(1550, 610))
                 bg_frame = np.array(main_pil.convert("RGB"))
 
-        return composite_frame(bg_frame, t, header_img, subtitle_img, this_transparency_img, entity_tags_img)
+        # ── DYNAMIC PIPELINE VARIATION OVERLAYS ──
+        extra_overlay_img = Image.new('RGBA', (FRAME_W, FRAME_H), (0, 0, 0, 0))
+        if not is_longform:
+            # 1. Glowing Laser Progress Bar
+            enable_laser_bar = os.environ.get("ENABLE_LASER_PROGRESS_BAR", "1") == "1"
+            if enable_laser_bar:
+                laser_bar = render_glowing_laser_progress_bar(t, audio_duration, FRAME_W, FRAME_H, accent_color)
+                extra_overlay_img.alpha_composite(laser_bar)
+            
+            # 2. Format-Specific Enhancements (Visual / Narrative Archetypes)
+            narrative_fmt = script_json.get("narrative_format", "")
+            if narrative_fmt == "SPEEDRUN":
+                speedrun_hud = render_speedrun_hud(t, audio_duration, FRAME_W, FRAME_H)
+                extra_overlay_img.alpha_composite(speedrun_hud)
+            elif narrative_fmt == "PAUSE_AND_GUESS":
+                pause_hud = render_pause_and_guess_hud(t, FRAME_W, FRAME_H, accent_color)
+                extra_overlay_img.alpha_composite(pause_hud)
+            elif narrative_fmt == "MYTH_BUSTER":
+                myth_stamp = render_myth_buster_stamp(t, FRAME_W, FRAME_H)
+                extra_overlay_img.alpha_composite(myth_stamp)
+            elif narrative_fmt == "MASCOT_DEBATE":
+                mascot_pip = render_mascot_reaction_overlay(t, audio_duration, FRAME_W, FRAME_H)
+                extra_overlay_img.alpha_composite(mascot_pip)
+
+        return composite_frame(bg_frame, t, header_img, subtitle_img, this_transparency_img, entity_tags_img, extra_overlay_img)
 
 
     final = VideoClip(make_final_frame, duration=audio_duration)
