@@ -20,6 +20,12 @@ import hashlib
 sys.path.insert(0, str(Path(__file__).parent))
 
 try:
+    from humanizer_engine import sanitize_text_for_human_voice
+except ImportError:
+    def sanitize_text_for_human_voice(text):
+        return text
+
+try:
     from trending_engine import fetch_all_trending_signals, compute_engagement_score
     TRENDING_ENGINE_AVAILABLE = True
 except ImportError:
@@ -41,8 +47,8 @@ TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 TELEGRAM_BASE_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}" if TELEGRAM_BOT_TOKEN else ""
 
 # Canvas sizes
-INSTAGRAM_W, INSTAGRAM_H = 1080, 1350  # 4:5
-FACEBOOK_W, FACEBOOK_H = 1200, 628     # 1.91:1 (FB link post)
+INSTAGRAM_W, INSTAGRAM_H = 1080, 1350  # 4:5 (Optimal vertical feed portrait)
+FACEBOOK_W, FACEBOOK_H = 1080, 1350    # 4:5 (Optimal vertical feed multi-photo album)
 FACEBOOK_STORY_W, FACEBOOK_STORY_H = 1080, 1920  # 9:16 (FB Stories/Reels)
 
 # Carousel settings
@@ -222,21 +228,20 @@ def save_metadata(output_dir: Path, carousel: dict, ig_paths: list, fb_paths: li
     return meta_path
 
 def generate_facebook_images_from_carousel(carousel: dict, ig_paths: list, output_dir: Path, strategy: dict = None) -> list:
-    """Generate Facebook 9:16 format images from carousel (for Stories/Reels)."""
-    # Render carousel slides directly in 9:16 format using HTML renderer
+    """Generate Facebook 4:5 vertical feed format images from carousel (for multi-photo album posts)."""
     fb_paths = []
     if ig_paths:
-        from carousel_renderer_html import render_carousel, DEFAULT_CANVAS_W, DEFAULT_CANVAS_H
+        from carousel_renderer_html import render_carousel
         
         safe_topic = sanitize_filename(carousel.get("headline", "carousel"))
         
-        # Render all slides in 9:16 format (1080x1920)
+        # Render all slides in 4:5 vertical feed format (1080x1350) for high-impact Facebook feed albums
         fb_slide_paths = render_carousel(
             carousel,
             output_dir,
             strategy=strategy,
-            canvas_width=FACEBOOK_STORY_W,
-            canvas_height=FACEBOOK_STORY_H,
+            canvas_width=FACEBOOK_W,
+            canvas_height=FACEBOOK_H,
         )
         
         # Rename to facebook_ prefix for clarity
@@ -245,9 +250,40 @@ def generate_facebook_images_from_carousel(carousel: dict, ig_paths: list, outpu
             if slide_path != fb_path:
                 slide_path.rename(fb_path)
             fb_paths.append(fb_path)
-            print(f"✅ Facebook 9:16 image generated: {fb_path.name}")
+            print(f"✅ Facebook 4:5 feed image generated: {fb_path.name}")
     
     return fb_paths
+
+def resolve_style_for_platform(platform: str, requested_style: str = "auto") -> str:
+    """Resolve visual style based on platform and day of week when set to 'auto'."""
+    if requested_style != "auto":
+        return requested_style
+    weekday = datetime.datetime.now().weekday()  # 0=Mon, 6=Sun
+    plat = (platform or "both").lower()
+    if plat == "threads":
+        # Threads: Mon/Wed/Fri=swiss_editorial (clean typography), Tue/Thu=cartoon_dialogue, Sat/Sun=side_by_side (debate)
+        if weekday in [0, 2, 4]:
+            return "swiss_editorial"
+        elif weekday in [1, 3]:
+            return "cartoon_dialogue"
+        else:
+            return "side_by_side"
+    elif plat == "facebook":
+        # Facebook: Mon/Wed/Fri=cartoon_dialogue, Tue/Sat=side_by_side, Thu/Sun=bento_infographic
+        if weekday in [0, 2, 4]:
+            return "cartoon_dialogue"
+        elif weekday in [1, 5]:
+            return "side_by_side"
+        else:
+            return "bento_infographic"
+    else:  # Instagram & both
+        # Instagram: Mon/Wed/Sat=cartoon_dialogue, Tue/Fri=bento_infographic, Thu/Sun=code_editor
+        if weekday in [0, 2, 5]:
+            return "cartoon_dialogue"
+        elif weekday in [1, 4]:
+            return "bento_infographic"
+        else:
+            return "code_editor"
 
 def main():
     parser = argparse.ArgumentParser(description="Generate AI News Carousel images for social media")
@@ -255,7 +291,12 @@ def main():
     parser.add_argument("--dry-run", action="store_true", help="Preview without posting to Telegram")
     parser.add_argument("--topic", type=str, help="Specific topic to generate")
     parser.add_argument("--hashtags-file", type=str, help="Path to hashtags file")
-    parser.add_argument("--style", choices=["cartoon_dialogue", "code_editor"], default="cartoon_dialogue", help="Carousel visual style")
+    parser.add_argument(
+        "--style",
+        choices=["auto", "cartoon_dialogue", "code_editor", "bento_infographic", "swiss_editorial", "side_by_side"],
+        default="auto",
+        help="Carousel visual style: auto, cartoon_dialogue, code_editor, bento_infographic, swiss_editorial, side_by_side"
+    )
     parser.add_argument(
         "--theme",
         choices=[
@@ -306,8 +347,22 @@ def main():
     if not args.now and not args.dry_run:
         print("Usage: python generate_decorator_images.py --now       # Generate and send to Telegram")
         print("       python generate_decorator_images.py --dry-run   # Generate only")
-        print("       python generate_decorator_images.py --now --topic 'OpenAI GPT-5' --style cartoon_dialogue")
+        print("       python generate_decorator_images.py --now --topic 'OpenAI GPT-5' --style auto")
         sys.exit(1)
+
+    # ── Platform-Smart Style & Slide Count Resolution ─────────────────────────
+    resolved_style = resolve_style_for_platform(args.platform, args.style)
+    print(f"🎨 Active Visual Style: '{resolved_style}' (Requested: '{args.style}')")
+
+    # Platform slide count targeting maximum completion rate and algorithm reach
+    if args.platform == "threads":
+        target_slide_count = 4
+    elif args.platform == "facebook":
+        target_slide_count = 4
+    elif args.platform == "instagram":
+        target_slide_count = 7
+    else:
+        target_slide_count = 6
 
     # Load hashtags
     hashtags = ""
@@ -317,11 +372,19 @@ def main():
     output_dir = Path(__file__).parent / "output" / "social_images"
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    # Platform-specific engagement CTAs that boost algorithmic engagement
+    platform_cta = {
+        "instagram": "\n\n📌 Save this cheatsheet for your toolkit! | 💬 Drop a 🤯 if this blew your mind!",
+        "threads": "\n\n💬 Which side are you on? I'll drop my take in the replies 👇\n🔁 Repost to see what your friends think!",
+        "facebook": "\n\n👉 Share this with your friends and family so they stay informed & safe!\n💬 Drop your reaction below!",
+        "both": "\n\n📌 Save & Share! | 💬 Drop a 🤯 if this blew your mind!",
+    }
+
     try:
         from ai_news_carousel import fetch_ai_news_stories, select_best_story
 
         # ── Style: cartoon_dialogue (Fixed Mascots + HTML Speech Bubbles) ───
-        if args.style == "cartoon_dialogue":
+        if resolved_style == "cartoon_dialogue":
             from cartoon_dialogue_engine import (
                 generate_cartoon_dialogue_json,
                 render_cartoon_dialogue_carousel,
@@ -336,7 +399,7 @@ def main():
             topic_to_use = args.topic
 
             if mode in ["did_you_know", "dyk"]:
-                print("🧠 Mode: 'did_you_know' — Selecting high-attraction tech fact...")
+                print(f"🧠 Mode: 'did_you_know' ({args.platform.upper()}) — Selecting high-attraction tech fact...")
                 story = fetch_or_select_did_you_know_fact(topic=args.topic, platform=args.platform, record=False)
                 topic_to_use = story.get("title", args.topic or "Did You Know Tech Fact")
             elif mode == "news":
@@ -363,8 +426,15 @@ def main():
             try:
                 from content_accuracy_agent import verify_content_accuracy
                 for diag_attempt in range(3):
-                    print(f"🎭 Generating Mascot Cartoon Dialogue ({mode} mode: '{topic_to_use}')...")
-                    dialogue = generate_cartoon_dialogue_json(topic=topic_to_use, story=story, mode=mode, characters=args.characters)
+                    print(f"🎭 Generating Mascot Cartoon Dialogue ({mode} mode: '{topic_to_use}' | {target_slide_count} slides)...")
+                    dialogue = generate_cartoon_dialogue_json(
+                        topic=topic_to_use,
+                        story=story,
+                        mode=mode,
+                        characters=args.characters,
+                        platform=args.platform,
+                        slide_count=target_slide_count
+                    )
                     audit = verify_content_accuracy(topic_to_use, dialogue)
                     print(f"🔍 [Accuracy Agent] Score: {audit['accuracy_score']}/10 | Verdict: {audit['verdict']}")
                     if audit["verdict"] == "APPROVED":
@@ -376,7 +446,14 @@ def main():
                         topic_to_use = story.get("title", "Fresh Tech Fact")
             except Exception as ver_err:
                 print(f"ℹ️ Verifier integration note: {ver_err}")
-                dialogue = generate_cartoon_dialogue_json(topic=topic_to_use, story=story, mode=mode, characters=args.characters)
+                dialogue = generate_cartoon_dialogue_json(
+                    topic=topic_to_use,
+                    story=story,
+                    mode=mode,
+                    characters=args.characters,
+                    platform=args.platform,
+                    slide_count=target_slide_count
+                )
 
             safe_title = sanitize_filename(dialogue.get("headline", dialogue.get("hook", "dyk_update")))
 
@@ -404,7 +481,7 @@ def main():
                     print(f"⚠️ AI background generation skipped: {bg_err}")
                     bg_images = None
 
-            # Render Instagram 4:5 slides
+            # Render Instagram / Threads 4:5 slides
             print(f"🎨 Rendering {len(dialogue.get('slides', []))} slides for {args.platform.capitalize()} (4:5)...")
             ig_paths = render_cartoon_dialogue_carousel(
                 dialogue,
@@ -418,15 +495,15 @@ def main():
                 platform=args.platform,
             )
 
-            # Render Facebook 9:16 format if needed
+            # Render Facebook feed carousel (4:5 format for clean multi-photo albums)
             fb_paths = []
             if args.platform in ["both", "facebook"]:
-                print(f"📘 Rendering Facebook 9:16 stories...")
+                print(f"📘 Rendering Facebook 4:5 feed carousel...")
                 fb_paths = render_cartoon_dialogue_carousel(
                     dialogue,
                     output_dir,
-                    canvas_width=FACEBOOK_STORY_W,
-                    canvas_height=FACEBOOK_STORY_H,
+                    canvas_width=FACEBOOK_W,
+                    canvas_height=FACEBOOK_H,
                     prefix="facebook_",
                     bg_images=bg_images,
                     theme=args.theme,
@@ -439,19 +516,15 @@ def main():
             if not caption:
                 caption = f"🧠 {dialogue.get('hook')}\n\n💡 {dialogue.get('takeaway')}\n\nFollow @vijayakumarj_ai for daily mind-blowing tech facts!"
             
-            # Platform-specific engagement CTAs that boost likes/saves/shares
-            platform_cta = {
-                "instagram": "\n\n📌 Save this for later! | 💬 Drop a 🤯 if this blew your mind!",
-                "threads": "\n\n🔁 Repost this to blow your friends' minds! | 💬 Tag someone who needs to see this!",
-                "facebook": "\n\n👉 Share this with a friend who needs to know! | 💬 Comment your reaction below!",
-                "both": "\n\n📌 Save & Share! | 💬 Drop a 🤯 if this blew your mind!",
-            }
             cta = platform_cta.get(args.platform, platform_cta["both"])
             if cta.strip() not in caption:
                 caption = f"{caption}{cta}"
             
             if hashtags and hashtags not in caption:
                 caption = f"{caption}\n\n{hashtags}"
+
+            # Sanitize caption through humanizer engine
+            caption = sanitize_text_for_human_voice(caption)
 
             caption_path = output_dir / f"caption_{safe_title}.txt"
             caption_path.write_text(caption, encoding="utf-8")
@@ -467,33 +540,83 @@ def main():
                 caption, hashtags, poll_path
             )
 
-        # ── Style: code_editor (Existing Tech/Code Cards) ──────────────
+        # ── Style: bento_infographic, swiss_editorial, side_by_side, code_editor ──
         else:
+            from cartoon_dialogue_engine import fetch_or_select_did_you_know_fact
             from ai_news_carousel import generate_carousel_json
             from carousel_renderer_html import render_carousel
             from visual_strategy import create_visual_strategy
 
-            # Get story
-            if args.topic:
+            mode = args.mode
+            if mode == "auto":
+                mode = "did_you_know"
+
+            # 1. Fetch story / concept
+            story = None
+            if mode in ["did_you_know", "dyk"]:
+                print(f"🧠 Selecting Did You Know fact for '{resolved_style}' style...")
+                story = fetch_or_select_did_you_know_fact(topic=args.topic, platform=args.platform, record=False)
+            elif args.topic:
                 stories = fetch_ai_news_stories()
                 story = next((s for s in stories if args.topic.lower() in s.get("title", "").lower()), None)
                 if not story:
-                    print(f"❌ Topic not found: {args.topic}")
-                    sys.exit(1)
+                    story = {
+                        "title": args.topic,
+                        "description": args.topic,
+                        "source": {"name": "Tech Architecture & Engineering"},
+                        "url": "",
+                        "date": datetime.datetime.now().strftime("%d %b %Y"),
+                    }
             else:
                 run_context = f"{datetime.datetime.now().strftime('%Y%m%d')}-{os.getenv('GITHUB_RUN_NUMBER', '0')}-{os.getenv('GITHUB_RUN_ATTEMPT', '1')}"
                 stories = fetch_ai_news_stories(run_context=run_context)
                 story = select_best_story(stories, run_context=run_context)
                 if not story:
-                    print("❌ No stories meet quality threshold")
-                    sys.exit(1)
+                    story = fetch_or_select_did_you_know_fact(topic="", platform=args.platform, record=False)
 
-            print(f"📰 Selected story: {story.get('title')}")
-            carousel = generate_carousel_json(story)
-            safe_title = sanitize_filename(carousel.get("headline", "ai_news"))
+            print(f"📰 Selected concept: {story.get('title')}")
+            min_s = max(3, target_slide_count - 1)
+            max_s = target_slide_count
+            carousel = generate_carousel_json(story, min_slides=min_s, max_slides=max_s)
+            safe_title = sanitize_filename(carousel.get("headline", story.get("title", "tech_update")))
 
             run_context = f"{datetime.datetime.now().strftime('%Y%m%d')}-{os.getenv('GITHUB_RUN_NUMBER', '0')}-{os.getenv('GITHUB_RUN_ATTEMPT', '1')}"
             strategy = create_visual_strategy(carousel, story=story, run_context=run_context)
+
+            # Apply style overrides to strategy
+            if resolved_style == "bento_infographic":
+                strategy["visual_theme"] = "DATA_DASHBOARD"
+                strategy["theme_css_class"] = "theme--dashboard"
+            elif resolved_style == "swiss_editorial":
+                strategy["visual_theme"] = "MINIMAL"
+                strategy["theme_css_class"] = "theme--minimal"
+            elif resolved_style == "side_by_side":
+                strategy["visual_theme"] = "BLUEPRINT"
+                strategy["theme_css_class"] = "theme--blueprint"
+            elif resolved_style == "code_editor":
+                strategy["visual_theme"] = "TERMINAL"
+                strategy["theme_css_class"] = "theme--terminal"
+
+            # Apply theme override if explicitly provided
+            if args.theme != "auto":
+                theme_map = {
+                    "monochrome_noir": ("MINIMAL", "theme--minimal"),
+                    "paper_editorial": ("MINIMAL", "theme--minimal"),
+                    "crimson_ember": ("FUTURISTIC", "theme--futuristic"),
+                    "emerald_terminal": ("TERMINAL", "theme--terminal"),
+                    "luxury_gold": ("DATA_DASHBOARD", "theme--dashboard"),
+                    "arctic_frost": ("BLUEPRINT", "theme--blueprint"),
+                    "tokyo_midnight": ("FUTURISTIC", "theme--futuristic"),
+                    "neon_cyber": ("FUTURISTIC", "theme--futuristic"),
+                    "cyber_matrix": ("TERMINAL", "theme--terminal"),
+                    "tech_blueprint": ("BLUEPRINT", "theme--blueprint"),
+                    "amber_solaris": ("DATA_DASHBOARD", "theme--dashboard"),
+                    "synthwave_plum": ("FUTURISTIC", "theme--futuristic"),
+                    "swiss_minimal": ("MINIMAL", "theme--minimal"),
+                }
+                if args.theme in theme_map:
+                    strategy["visual_theme"], strategy["theme_css_class"] = theme_map[args.theme]
+
             strategy_path = output_dir / f"strategy_{safe_title}.json"
             with open(strategy_path, "w", encoding="utf-8") as f:
                 json.dump(strategy, f, indent=2)
@@ -503,7 +626,7 @@ def main():
                 json.dump(carousel, f, indent=2)
 
             slide_count = len(carousel.get("slides", []))
-            print(f"\n🎨 Rendering {slide_count} carousel slides for Instagram (4:5) with theme {strategy.get('visual_theme')}...")
+            print(f"\n🎨 Rendering {slide_count} carousel slides for {args.platform.capitalize()} (4:5) with style '{resolved_style}' & theme '{strategy.get('visual_theme')}'...")
             ig_paths = render_carousel(carousel, output_dir, strategy=strategy, canvas_width=INSTAGRAM_W, canvas_height=INSTAGRAM_H)
 
             fb_paths = []
@@ -511,6 +634,11 @@ def main():
                 fb_paths = generate_facebook_images_from_carousel(carousel, ig_paths, output_dir, strategy=strategy)
 
             caption = generate_caption(carousel, hashtags)
+            cta = platform_cta.get(args.platform, platform_cta["both"])
+            if cta.strip() not in caption:
+                caption = f"{caption}{cta}"
+            caption = sanitize_text_for_human_voice(caption)
+
             caption_path = output_dir / f"caption_{safe_title}.txt"
             caption_path.write_text(caption, encoding="utf-8")
 

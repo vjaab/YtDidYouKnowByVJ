@@ -320,8 +320,16 @@ def regenerate_and_verify_carousel(
 
         print(f"🎯 Selected Topic: '{topic}'")
 
-        # 2. Generate dialogue JSON
-        dialogue = generate_cartoon_dialogue_json(topic=topic, story=story, mode=mode, characters=characters)
+        # 2. Generate dialogue JSON with platform awareness
+        target_s = 4 if platform in ["threads", "facebook"] else 7
+        dialogue = generate_cartoon_dialogue_json(
+            topic=topic,
+            story=story,
+            mode=mode,
+            characters=characters,
+            platform=platform,
+            slide_count=target_s
+        )
         n_stripped = strip_speaker_labels(dialogue)
         if n_stripped:
             print(f"🧹 Stripped {n_stripped} leading speaker label(s) from dialogue text")
@@ -359,31 +367,74 @@ def regenerate_and_verify_carousel(
         with open(carousel_path, "w", encoding="utf-8") as f:
             json.dump(dialogue, f, indent=2)
 
-        print(f"🎨 Rendering verified carousel slides for {platform.capitalize()} (4:5)...")
-        ig_paths = render_cartoon_dialogue_carousel(
-            dialogue,
-            output_dir,
-            canvas_width=INSTAGRAM_W,
-            canvas_height=INSTAGRAM_H,
-            prefix="carousel_",
-            theme=theme,
-            characters=characters,
-            platform=platform,
-        )
+        # Resolve visual style
+        try:
+            from generate_decorator_images import resolve_style_for_platform, render_html_carousel
+            actual_style = resolve_style_for_platform(platform, style)
+        except Exception:
+            actual_style = "cartoon_dialogue"
 
-        fb_paths = []
-        if platform in ["both", "facebook"]:
-            print(f"📘 Rendering verified Facebook 9:16 carousel stories...")
-            fb_paths = render_cartoon_dialogue_carousel(
+        print(f"🎨 Rendering verified carousel slides for {platform.capitalize()} (4:5) in style '{actual_style}'...")
+        ig_paths = []
+        if actual_style != "cartoon_dialogue":
+            try:
+                ig_paths = render_html_carousel(
+                    dialogue,
+                    output_dir,
+                    strategy=actual_style,
+                    canvas_width=INSTAGRAM_W,
+                    canvas_height=INSTAGRAM_H,
+                    theme=theme,
+                )
+            except Exception as e:
+                print(f"⚠️ HTML render fallback to cartoon dialogue: {e}")
+                ig_paths = []
+
+        if not ig_paths:
+            ig_paths = render_cartoon_dialogue_carousel(
                 dialogue,
                 output_dir,
-                canvas_width=FACEBOOK_STORY_W,
-                canvas_height=FACEBOOK_STORY_H,
-                prefix="facebook_",
+                canvas_width=INSTAGRAM_W,
+                canvas_height=INSTAGRAM_H,
+                prefix="carousel_",
                 theme=theme,
                 characters=characters,
                 platform=platform,
             )
+
+        fb_paths = []
+        if platform in ["both", "facebook"]:
+            print(f"📘 Rendering verified Facebook 4:5 carousel feed images...")
+            if actual_style != "cartoon_dialogue":
+                try:
+                    fb_raw = render_html_carousel(
+                        dialogue,
+                        output_dir,
+                        strategy=actual_style,
+                        canvas_width=INSTAGRAM_W,
+                        canvas_height=INSTAGRAM_H,
+                        theme=theme,
+                    )
+                    for i, sp in enumerate(fb_raw):
+                        fp = output_dir / f"facebook_{safe_title}_{i+1:02d}.jpg"
+                        if sp != fp:
+                            sp.rename(fp)
+                        fb_paths.append(fp)
+                except Exception as e:
+                    print(f"⚠️ FB HTML render fallback to cartoon dialogue: {e}")
+                    fb_paths = []
+
+            if not fb_paths:
+                fb_paths = render_cartoon_dialogue_carousel(
+                    dialogue,
+                    output_dir,
+                    canvas_width=INSTAGRAM_W,
+                    canvas_height=INSTAGRAM_H,
+                    prefix="facebook_",
+                    theme=theme,
+                    characters=characters,
+                    platform=platform,
+                )
 
         caption_path = output_dir / f"caption_{safe_title}.txt"
         caption_path.write_text(caption, encoding="utf-8")

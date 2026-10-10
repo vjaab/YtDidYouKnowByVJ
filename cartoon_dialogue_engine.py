@@ -22,6 +22,12 @@ from playwright.sync_api import sync_playwright
 
 load_dotenv()
 
+try:
+    from humanizer_engine import sanitize_text_for_human_voice
+except ImportError:
+    def sanitize_text_for_human_voice(text):
+        return text
+
 BASE_DIR = Path(__file__).parent
 CHARACTERS_DIR = BASE_DIR / "assets" / "characters"
 TEMPLATE_DIR = BASE_DIR / "carousel_templates"
@@ -1205,6 +1211,152 @@ DID_YOU_KNOW_SEED_FACTS = [
         "keywords": ["ai energy", "chatgpt power", "gpu electricity", "sustainability", "did you know"],
         "engagement_score": 9
     },
+
+    # ── Platform-Optimized: Threads Debates & Controversies ─────────────────
+    {
+        "vector": "threads_debates",
+        "title": "Will AI Truly Kill Junior Developer Jobs or Just Change Them?",
+        "hook": "Is AI Actually Killing Junior Dev Jobs? 💻",
+        "headline": "The Great Junior Developer Debate",
+        "fact_summary": "Companies using AI code assistants report 30% faster coding, but code reviews and debugging took 40% longer because juniors cannot spot subtle AI architectural bugs.",
+        "source": "Software Engineering Institute Empirical Study",
+        "keywords": ["ai coding", "junior developers", "software engineering", "career", "threads_debates", "did you know"],
+        "engagement_score": 10
+    },
+    {
+        "vector": "threads_debates",
+        "title": "Why 90% of Startups Regret Moving to Microservices",
+        "hook": "Did You Know Most Teams Regret Microservices? 🏗️",
+        "headline": "The Microservice Complexity Tax",
+        "fact_summary": "Splitting a small app into dozens of microservices often multiplies network latency, deployment fragility, and AWS bills by 5x without solving team scaling issues.",
+        "source": "Distributed Systems Architecture Reports",
+        "keywords": ["microservices", "monolith", "cloud architecture", "system design", "threads_debates", "did you know"],
+        "engagement_score": 10
+    },
+    {
+        "vector": "threads_debates",
+        "title": "Tabs vs Spaces Was Solved: Spaces Cost Silicon Valley Millions",
+        "hook": "Did You Know Spaces in Code Waste Millions in Bandwidth? ⌨️",
+        "headline": "The Storage Cost of Indentation",
+        "fact_summary": "Replacing 4 spaces with a single tab character across massive GitHub repos saves gigabytes of wire transfer and disk storage across millions of git clones daily.",
+        "source": "GitHub Infrastructure & Indentation Analysis",
+        "keywords": ["tabs vs spaces", "coding standards", "git", "clean code", "threads_debates", "did you know"],
+        "engagement_score": 9
+    },
+    {
+        "vector": "threads_debates",
+        "title": "Why Python Will Not Be Replaced by Rust Anytime Soon",
+        "hook": "Why Won't Python Ever Die to Rust? 🐍",
+        "headline": "The Ecosystem Velocity Moat",
+        "fact_summary": "Rust has unbeatable memory safety, but Python dominates AI and data science because PyTorch and NumPy are already written in C++ and CUDA under the hood.",
+        "source": "TIOBE & PyPI Ecosystem Benchmarks",
+        "keywords": ["python", "rust", "ai libraries", "programming languages", "threads_debates", "did you know"],
+        "engagement_score": 9
+    },
+    {
+        "vector": "threads_debates",
+        "title": "Open Source AI Models Are Catching Up to Closed Tech Monopolies",
+        "hook": "Can Open-Source AI Beat Closed Trillion-Dollar Labs? 🔓",
+        "headline": "The Open Weights Revolution",
+        "fact_summary": "Fine-tuned open models running locally on consumer GPUs now match or exceed GPT-4 on specialized coding benchmarks at 1% of the inference cost.",
+        "source": "OpenLLM Leaderboard & HuggingFace Analysis",
+        "keywords": ["open source ai", "local llm", "huggingface", "deepseek", "threads_debates", "did you know"],
+        "engagement_score": 9
+    },
+
+    # ── Platform-Optimized: Facebook Consumer Utility & Scam Alerts ─────────
+    {
+        "vector": "consumer_utility",
+        "title": "Why You Should Never Charge Your Smartphone to 100% Overnight",
+        "hook": "Why You Should Stop Charging Your Phone to 100% 🔋",
+        "headline": "Lithium-Ion Chemical Degradation",
+        "fact_summary": "Holding a phone battery at 100% under high voltage and heat causes micro-cracks in lithium electrodes. Keeping charge between 20% and 80% doubles total battery lifespan.",
+        "source": "Battery University & Journal of The Electrochemical Society",
+        "keywords": ["battery life", "phone charger", "lithium ion", "tech tips", "consumer_utility", "did you know"],
+        "engagement_score": 10
+    },
+    {
+        "vector": "consumer_utility",
+        "title": "How Scammers Clone a Family Member Voice in Just 3 Seconds",
+        "hook": "Scam Alert: How Criminals Clone Voices in 3 Seconds 🚨",
+        "headline": "AI Neural Voice Synthesis Scams",
+        "fact_summary": "Scammers take a 3-second audio clip from Instagram or Facebook video and feed it into zero-shot neural voice cloners to call family demanding fake emergency ransoms.",
+        "source": "FTC Consumer Protection Warnings",
+        "keywords": ["voice clone scam", "cybercrime", "ai fraud", "phone security", "consumer_utility", "did you know"],
+        "engagement_score": 10
+    },
+    {
+        "vector": "consumer_utility",
+        "title": "Why Free Public Airport USB Charging Ports Are a Major Security Risk",
+        "hook": "Did You Know Free Airport USB Ports Can Hack Your Phone? 🔌",
+        "headline": "Juice Jacking Data Pin Exploit",
+        "fact_summary": "A standard USB cable contains data pins alongside power pins. Compromised airport chargers can silently install malware or siphon photos while your phone charges.",
+        "source": "FCC & Cybersecurity Infrastructure Security Agency (CISA)",
+        "keywords": ["juice jacking", "public usb", "airport charging", "travel security", "consumer_utility", "did you know"],
+        "engagement_score": 10
+    },
+    {
+        "vector": "consumer_utility",
+        "title": "Deleting a File on Your Computer Does Not Actually Erase It",
+        "hook": "Did You Know Deleted Files Aren't Actually Gone? 🗑️",
+        "headline": "File System Index Dereferencing",
+        "fact_summary": "Emptying the trash only deletes the pointer in the directory index. The actual bytes remain on your hard drive until overwritten, allowing data recovery in minutes.",
+        "source": "NIST Guidelines for Media Sanitization",
+        "keywords": ["deleted files", "hard drive", "data privacy", "computer tips", "consumer_utility", "did you know"],
+        "engagement_score": 9
+    },
+    {
+        "vector": "consumer_utility",
+        "title": "Why Your Smartphone Suddenly Loses 30% Battery in Cold Weather",
+        "hook": "Why Does Your Phone Battery Die Instantly in the Cold? ❄️",
+        "headline": "Electrolyte Internal Resistance Spike",
+        "fact_summary": "Sub-zero temperatures freeze the liquid electrolyte inside your battery, raising electrical resistance so high that the phone thinks voltage dropped to zero and turns off.",
+        "source": "IEEE Transactions on Industrial Electronics",
+        "keywords": ["cold battery", "smartphone shutdown", "battery science", "winter tech", "consumer_utility", "did you know"],
+        "engagement_score": 9
+    },
+
+    # ── Platform-Optimized: Instagram Visual Engineering Wonders ────────────
+    {
+        "vector": "visual_engineering",
+        "title": "Why Modern Jet Airplanes Still Rely on 1980s 3.5-inch Floppy Disks",
+        "hook": "Why Do Boeing Jets Still Use Floppy Disks? ✈️",
+        "headline": "Aviation Avionics Certification Safety",
+        "fact_summary": "Boeing 747 navigation databases are updated every 28 days via 3.5-inch floppy disks because re-certifying modern USB systems with aviation safety regulators costs tens of millions.",
+        "source": "FAA Avionics Certification & Aviation Security Audits",
+        "keywords": ["floppy disk", "boeing 747", "aviation tech", "legacy systems", "visual_engineering", "did you know"],
+        "engagement_score": 10
+    },
+    {
+        "vector": "visual_engineering",
+        "title": "How Active Noise Cancelling Headphones Invert Physical Sound Waves",
+        "hook": "How Headphones Delete Sound Waves in Mid-Air 🎧",
+        "headline": "Destructive Acoustic Phase Inversion",
+        "fact_summary": "External microphones capture incoming engine rumble, compute the exact inverse soundwave in microseconds, and play anti-noise to collide with and cancel physical air pressure waves.",
+        "source": "Acoustical Society of America Principles of ANC",
+        "keywords": ["noise cancelling", "headphones", "sound waves", "acoustics", "visual_engineering", "did you know"],
+        "engagement_score": 10
+    },
+    {
+        "vector": "visual_engineering",
+        "title": "How ASML Machines Use Exploding Tin Droplets to Print 2nm Chips",
+        "hook": "How Computer Chips are Printed with 50,000 Laser Blasts 🔬",
+        "headline": "Extreme Ultraviolet Photolithography",
+        "fact_summary": "ASML machines vaporize 50,000 molten tin droplets per second with high-power CO2 lasers, generating extreme ultraviolet light to etch billions of nanometer transistors.",
+        "source": "ASML EUV Photolithography Engineering Whitepaper",
+        "keywords": ["asml", "euv lithography", "microchips", "semiconductors", "visual_engineering", "did you know"],
+        "engagement_score": 10
+    },
+    {
+        "vector": "visual_engineering",
+        "title": "Why NASA Spacecraft Use 30-Year-Old 1990s Microprocessors",
+        "hook": "Why Does NASA Use 1990s Computer Chips in Mars Rovers? 🚀",
+        "headline": "Radiation-Hardened Silicon Architecture",
+        "fact_summary": "Cosmic rays flip memory bits and fry modern 3nm chips in outer space. NASA uses rugged 250nm PowerPC chips from the 1990s wrapped in heavy silicon-on-insulator shields.",
+        "source": "NASA Jet Propulsion Laboratory Avionics Specifications",
+        "keywords": ["nasa", "spacecraft chips", "radiation hardening", "mars rover", "visual_engineering", "did you know"],
+        "engagement_score": 10
+    },
 ]
 
 
@@ -1484,23 +1636,34 @@ def fetch_or_select_did_you_know_fact(topic: Optional[str] = None, platform: str
 
     # CASE B: Auto-selection (Prioritize high-attraction, layman-friendly concepts with zero duplicates)
     if not selected:
-        try:
-            from topic_tracker import get_did_you_know_sub_vector, DID_YOU_KNOW_VECTORS
-            # Apply platform offset to vector rotation so each platform starts on a different vector
-            base_vector = get_did_you_know_sub_vector()
-            vector_idx = DID_YOU_KNOW_VECTORS.index(base_vector) if base_vector in DID_YOU_KNOW_VECTORS else 0
-            offset_idx = (vector_idx + platform_offset) % len(DID_YOU_KNOW_VECTORS)
-            current_vector = DID_YOU_KNOW_VECTORS[offset_idx]
-        except Exception:
-            # Fallback: use platform offset directly
-            fallback_vectors = [
-                "ai_secrets",
-                "everyday_tech_mysteries",
-                "hardware_megastructures",
-                "bizarre_tech_history",
-                "cybersecurity_secrets",
-            ]
-            current_vector = fallback_vectors[platform_offset % len(fallback_vectors)]
+        PLATFORM_VECTOR_PREFS = {
+            "threads": ["threads_debates", "ai_secrets", "cybersecurity_secrets", "bizarre_tech_history"],
+            "facebook": ["consumer_utility", "everyday_tech_mysteries", "cybersecurity_secrets", "ai_secrets"],
+            "instagram": ["visual_engineering", "everyday_tech_mysteries", "hardware_megastructures", "ai_secrets"],
+        }
+        plat_key = (platform or "instagram").lower()
+        if plat_key in PLATFORM_VECTOR_PREFS:
+            pref_vectors = PLATFORM_VECTOR_PREFS[plat_key]
+            # Use deterministic rotation based on run number or day
+            import datetime as _dt
+            hour_rot = int(_dt.datetime.now().strftime("%d%H")) % len(pref_vectors)
+            current_vector = pref_vectors[(hour_rot + platform_offset) % len(pref_vectors)]
+        else:
+            try:
+                from topic_tracker import get_did_you_know_sub_vector, DID_YOU_KNOW_VECTORS
+                base_vector = get_did_you_know_sub_vector()
+                vector_idx = DID_YOU_KNOW_VECTORS.index(base_vector) if base_vector in DID_YOU_KNOW_VECTORS else 0
+                offset_idx = (vector_idx + platform_offset) % len(DID_YOU_KNOW_VECTORS)
+                current_vector = DID_YOU_KNOW_VECTORS[offset_idx]
+            except Exception:
+                fallback_vectors = [
+                    "ai_secrets",
+                    "everyday_tech_mysteries",
+                    "hardware_megastructures",
+                    "bizarre_tech_history",
+                    "cybersecurity_secrets",
+                ]
+                current_vector = fallback_vectors[platform_offset % len(fallback_vectors)]
 
         print(f"🧠 [{platform.upper()}] Selecting layman-friendly fact for vector: '{current_vector}'...")
 
@@ -1707,12 +1870,28 @@ def build_dialogue_prompt(
     topic: Optional[str] = None,
     story: Optional[Dict] = None,
     characters: Optional[str] = "auto",
+    platform: str = "instagram",
+    slide_count: Optional[int] = None,
 ) -> str:
-    """Build the prompt for Gemini / OpenRouter dialogue script generation."""
+    """Build the prompt for Gemini / OpenRouter dialogue script generation with platform-aware narrative arcs and slide counts."""
     current_date = datetime.now().strftime("%d %B %Y")
     speaker_left, speaker_right = resolve_dialogue_characters(characters=characters, topic=topic or "", story=story)
     meta_left = CHARACTER_METADATA.get(speaker_left, CHARACTER_METADATA["byte"])
     meta_right = CHARACTER_METADATA.get(speaker_right, CHARACTER_METADATA["vj"])
+    plat = (platform or "instagram").lower()
+
+    # Determine optimal slide count for maximum engagement on each platform
+    if not slide_count:
+        if plat == "threads":
+            target_slides = 4  # Short, snappy debate carousel for high swipe-completion & replies
+        elif plat == "facebook":
+            target_slides = 4  # 4-image grid/carousel format optimal for Facebook feed sharing
+        elif plat == "instagram":
+            target_slides = 7  # 7-slide deep dossier driving saves & bookmarks
+        else:
+            target_slides = 6
+    else:
+        target_slides = max(3, min(slide_count, 8))
     
     # ── Did You Know Mode (High-Attraction Tech & Science Facts) ───────────
     if mode in ["did_you_know", "dyk"]:
@@ -1721,8 +1900,54 @@ def build_dialogue_prompt(
         fact_summary = (story.get("fact_summary") if story else None) or (story.get("description") if story else None) or fact_title
         fact_source = (story.get("source") if story else None) or "Tech Architecture & Science"
         
+        # Platform-specific virality rules
+        if plat == "threads":
+            platform_virality_instructions = f"""
+CRITICAL VIRALITY RULES FOR THREADS (TEXT-FIRST DEBATES & 1M+ SWIPE COMPLETION):
+1. SLIDE COUNT: EXACTLY {target_slides} SLIDES. Threads rewards ultra-short swipe completion.
+2. SLIDE 1 HOOK: A bold counter-intuitive question or controversial claim (Max 12 words).
+3. MIDDLE SLIDES: Reveal shocking real-world evidence and the counter-intuitive mechanism.
+4. FINAL SLIDE: An open-ended question that sparks debate in the comments (e.g., 'Which side are you on? Drop your honest take below 👇').
+5. CAPTION: Conversational, debate-starting question inviting quick replies."""
+            sample_slides = f"""    {{"speaker": "{speaker_left}", "emotion": "shocked", "title": "Bold Shocker ⚡", "bubble": "Wait, did you know that 99% of the internet is underwater?!"}},
+    {{"speaker": "{speaker_right}", "emotion": "excited", "title": "The Reality 🌐", "bubble": "Yes! Over 1.4 million km of subsea fiber cables carry almost all global data."}},
+    {{"speaker": "{speaker_left}", "emotion": "curious", "title": "Garden-Hose Thin ⚙️", "bubble": "And deep down in the ocean, they are barely as thick as a garden hose!"}},
+    {{"speaker": "{speaker_right}", "emotion": "thinking", "title": "Your Take? 💬", "bubble": "Did you think it was all satellites? Drop your honest take below!", "is_takeaway": true}}"""
+            sample_caption = f"🧠 Did you know 99% of the internet is actually underwater on the ocean floor?\\n\\nNot in the sky. Over 500 undersea cables power the modern web.\\n\\n💬 Did you think it was all satellites, or did you already know this? Drop your thoughts below! 👇\\n#TechDebate #DidYouKnow #Engineering"
+
+        elif plat == "facebook":
+            platform_virality_instructions = f"""
+CRITICAL VIRALITY RULES FOR FACEBOOK (RELATABLE CONSUMER SAFETY & PUBLIC SHARES):
+1. SLIDE COUNT: EXACTLY {target_slides} SLIDES. Perfectly fitted for Facebook multi-photo album previews.
+2. SLIDE 1 HOOK: A relatable everyday tech dilemma, scam warning, or device mystery anyone understands.
+3. MIDDLE SLIDES: The hidden physical or software reason, plus simple actionable protection/advice.
+4. FINAL SLIDE: A high-value takeaway prompting viewers to share with friends and family (e.g., 'Share this with someone who needs to see this!').
+5. CAPTION: Clear, helpful, family/friend shareable tip."""
+            sample_slides = f"""    {{"speaker": "{speaker_left}", "emotion": "shocked", "title": "Everyday Shocker 📱", "bubble": "Wait, does charging my phone to 100% actually ruin the battery?!"}},
+    {{"speaker": "{speaker_right}", "emotion": "excited", "title": "The High Voltage Risk ⚡", "bubble": "Yes! Holding 100% causes micro-cracks in lithium electrodes."}},
+    {{"speaker": "{speaker_left}", "emotion": "curious", "title": "The Golden Rule 💡", "bubble": "So keeping battery between 20% and 80% doubles its life?"}},
+    {{"speaker": "{speaker_right}", "emotion": "thinking", "title": "Share the Tip 📢", "bubble": "Exactly! Share this with someone whose phone is always on 1%!", "is_takeaway": true}}"""
+            sample_caption = f"🔋 Did you know keeping your phone charged at 100% actually damages battery health over time?\\n\\nHere is how to make your smartphone last twice as long:\\n👉 Keep your charge between 20% and 80%.\\n👉 Avoid heavy gaming while fast-charging.\\n\\nShare this with a friend whose phone is always dying! 📱👇\\n#PhoneTips #TechHacks #BatteryCare"
+
+        else: # Instagram & default
+            platform_virality_instructions = f"""
+CRITICAL VIRALITY RULES FOR INSTAGRAM (VISUAL CURIOSITY, DOSSIER DEPTH & SAVES):
+1. SLIDE COUNT: EXACTLY {target_slides} SLIDES. A comprehensive educational carousel that viewers save for later.
+2. SLIDE 1 HOOK: A scroll-stopping curiosity paradox (Max 14 words).
+3. MIDDLE SLIDES: Step-by-step mechanism, vivid numbers, simple analogies, and edge cases.
+4. FINAL SLIDE: A crystal-clear takeaway prompting viewers to bookmark and save ('📌 Tap Save so you have this in your toolkit!').
+5. CAPTION: Bullet points + save CTA and trending tags."""
+            sample_slides = f"""    {{"speaker": "{speaker_left}", "emotion": "shocked", "title": "Internet Under the Sea? 🌊", "bubble": "Wait, did you know that 99% of the internet is underwater?!"}},
+    {{"speaker": "{speaker_right}", "emotion": "excited", "title": "1.4M km of Glass Fiber 🌐", "bubble": "Yes! Over 1.4 million kilometers of fiber optic cables sit on the ocean floor."}},
+    {{"speaker": "{speaker_left}", "emotion": "curious", "title": "Shark & Anchor Defense 🦈", "bubble": "What stops sharks or ship anchors from destroying them?"}},
+    {{"speaker": "{speaker_right}", "emotion": "smug", "title": "Garden-Hose Thin ⚙️", "bubble": "Near shore they have heavy steel armor, deep down they are barely garden-hose thick!"}},
+    {{"speaker": "{speaker_left}", "emotion": "shocked", "title": "When Cables Break 🚢", "bubble": "What happens if an anchor snags one?"}},
+    {{"speaker": "{speaker_right}", "emotion": "thinking", "title": "Instant Reroute ⚡", "bubble": "Entire countries can go offline until specialized repair ships arrive."}},
+    {{"speaker": "{speaker_left}", "emotion": "excited", "title": "Mind-Blowing Fact 💡", "bubble": "📌 Save this for later & follow @vijayakumarj_ai for daily tech facts!", "is_takeaway": true}}"""
+            sample_caption = f"🧠 DID YOU KNOW? 🤯\\n\\n99% of the internet is not in the sky... it is sitting on the ocean floor!\\n\\nHere is the mind-blowing reality:\\n🔹 Over 500 undersea fiber optic cables carry global data.\\n🔹 They transmit data at 99.7% the speed of light.\\n🔹 Deep-sea cables are only as thick as a garden hose, but carry trillions of dollars daily!\\n\\n📌 Tap Save so you don't lose this!\\n\\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\\n#DidYouKnow #TechFacts #MindBlowingFacts #Engineering #ComputerScience"
+
         prompt = f"""You are the viral tech writer and visual director for 'Did You Know By VJ' (@vijayakumarj_ai).
-Create a high-attraction, scroll-stopping Instagram dialogue carousel (exactly 6 to 7 slides) between:
+Create a high-attraction, scroll-stopping {plat.upper()} dialogue carousel (exactly {target_slides} slides) between:
 1. "{speaker_left}" ({meta_left['desc']})
 2. "{speaker_right}" ({meta_right['desc']})
 
@@ -1731,25 +1956,17 @@ MIND-BLOWING FACT TO COVER:
 - Hook Idea: {fact_hook}
 - Verified Details: {fact_summary}
 - Source: {fact_source}
+{platform_virality_instructions}
 
 CRITICAL RULES FOR MAXIMUM VIEWER ATTRACTION & LAYMAN UNDERSTANDING:
 1. COMMON LAYMAN UNDERSTANDABLE: Must be crystal clear and instantly understandable by a common layman (a 12-year-old student or non-technical adult). Zero complex jargon without an immediate simple analogy.
 2. ABSOLUTELY NO SCRIPT ARTIFACTS: NEVER use words or stage directions like '[pause]', '(pause)', 'pause', '[break]', '(break)', 'break', '[continue]', '(continue)', 'continue' anywhere in speech bubbles. Every bubble must be pure, clean, natural conversational English.
 3. MODE: "did_you_know"
 4. CATEGORY: "🧠 DID YOU KNOW?"
-5. SLIDE 1 HOOK: Must start with a scroll-stopping question: "Did you know that...?" or a counter-intuitive paradox. Max 14 words.
-6. SPEAKERS ALTERNATE: Slide 1 {speaker_left}, Slide 2 {speaker_right}, Slide 3 {speaker_left}, Slide 4 {speaker_right}, Slide 5 {speaker_left}, Slide 6 {speaker_right} (Slide 7 takeaway).
-7. SPEECH BUBBLE LENGTH: STRICTLY 18 WORDS OR FEWER PER BUBBLE. Short, punchy, conversational, mind-blowing!
-8. EMOTIONAL ARC:
-   - {meta_left['name']}: "shocked" or "curious" on slide 1 ("Wait, did you know that...?").
-   - {meta_right['name']}: "excited" or "thinking" on slide 2 revealing the scale & numbers.
-   - {meta_left['name']}: "curious" or "thinking" on slide 3 asking the technical question.
-   - {meta_right['name']}: "smug" or "excited" on slide 4 explaining the engineering mechanism with a simple analogy.
-   - {meta_left['name']}: "shocked" on slide 5 asking the crazy consequence or edge case.
-   - {meta_right['name']}: "thinking" or "smug" on slide 6 delivering the punchline.
-9. FINAL SLIDE: Mark "is_takeaway": true. Provide a punchy summary in "takeaway" field.
-10. SLIDE TITLES: Every single slide MUST include a "title" property (2-5 words, plus an optional emoji) matching what that specific slide discusses! Slide 1 title should be the hook.
-11. CAPTION: Engaging Instagram caption with Did You Know format, 3 bullet points, an engagement question ("Did you already know this? Drop a 🤯 below!"), and viral hashtags.
+5. SPEAKERS ALTERNATE: Slide 1 {speaker_left}, Slide 2 {speaker_right}, Slide 3 {speaker_left}, Slide 4 {speaker_right}, etc.
+6. SPEECH BUBBLE LENGTH: STRICTLY 18 WORDS OR FEWER PER BUBBLE. Short, punchy, conversational, mind-blowing!
+7. FINAL SLIDE: Mark "is_takeaway": true. Provide a punchy summary in "takeaway" field.
+8. SLIDE TITLES: Every single slide MUST include a "title" property (2-5 words, plus an optional emoji) matching what that specific slide discusses! Slide 1 title should be the hook.
 
 Return ONLY valid JSON matching this schema with NO markdown fences, NO preamble:
 {{
@@ -1757,20 +1974,14 @@ Return ONLY valid JSON matching this schema with NO markdown fences, NO preamble
   "category": "🧠 DID YOU KNOW?",
   "speaker_left": "{speaker_left}",
   "speaker_right": "{speaker_right}",
-  "hook": "Did You Know 99% of the Internet is Underwater? 🌊",
+  "hook": "{fact_hook}",
   "headline": "{fact_title}",
   "source": "{fact_source}",
   "slides": [
-    {{"speaker": "{speaker_left}", "emotion": "shocked", "title": "Internet Under the Sea? 🌊", "bubble": "Wait, did you know that 99% of the internet is underwater?!"}},
-    {{"speaker": "{speaker_right}", "emotion": "excited", "title": "1.4M km of Glass Fiber 🌐", "bubble": "Yes! Over 1.4 million kilometers of fiber optic cables sit on the ocean floor."}},
-    {{"speaker": "{speaker_left}", "emotion": "curious", "title": "Shark & Anchor Defense 🦈", "bubble": "What stops sharks or anchors from destroying them?"}},
-    {{"speaker": "{speaker_right}", "emotion": "smug", "title": "Garden-Hose Thin ⚙️", "bubble": "Near shore they have heavy steel armor, deep down they are barely garden-hose thick!"}},
-    {{"speaker": "{speaker_left}", "emotion": "shocked", "title": "When Cables Break 🚢", "bubble": "What happens if an anchor snags one?"}},
-    {{"speaker": "{speaker_right}", "emotion": "thinking", "title": "Instant Reroute ⚡", "bubble": "Entire countries can go offline until specialized repair ships arrive."}},
-    {{"speaker": "{speaker_left}", "emotion": "excited", "title": "Mind-Blowing Fact 💡", "bubble": "Follow @vijayakumarj_ai for daily mind-blowing tech facts!", "is_takeaway": true}}
+{sample_slides}
   ],
-  "takeaway": "99% of international data relies on physical seafloor cables, not satellites. The cloud is literally on the ocean floor!",
-  "caption": "🧠 DID YOU KNOW? 🤯\\n\\n99% of the internet is not in the sky... it is sitting on the ocean floor!\\n\\nHere is the mind-blowing reality:\\n🔹 Over 500 undersea fiber optic cables carry global data.\\n🔹 They transmit data at 99.7% the speed of light.\\n🔹 Deep-sea cables are only as thick as a garden hose, but carry trillions of dollars daily!\\n\\n💬 Did you already know this, or did this blow your mind? Drop a 🤯 in the comments!\\n\\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\\n#DidYouKnow #TechFacts #MindBlowingFacts #Engineering #ComputerScience"
+  "takeaway": "{fact_summary[:120]}",
+  "caption": "{sample_caption}"
 }}
 """
         return prompt
@@ -2165,18 +2376,31 @@ def get_curated_fallback_dialogue(mode: str, topic: Optional[str] = None, story:
     }
 
 
-def parse_and_validate_dialogue(data: Any, mode: str, topic: Optional[str] = None, story: Optional[Dict] = None) -> Dict:
-    """Ensure strict adherence to alternating speakers, word limits, slide titles, and slide count."""
+def parse_and_validate_dialogue(
+    data: Any,
+    mode: str,
+    topic: Optional[str] = None,
+    story: Optional[Dict] = None,
+    platform: str = "instagram",
+    slide_count: Optional[int] = None,
+) -> Dict:
+    """Ensure strict adherence to alternating speakers, word limits, slide titles, and platform slide count."""
     if not isinstance(data, dict):
         raise DialogueGenerationError("LLM returned no usable dialogue JSON")
 
-    slides = data.get("slides", [])
-    if not isinstance(slides, list) or len(slides) < 4:
-        raise DialogueGenerationError(f"LLM dialogue has too few slides ({len(slides) if isinstance(slides, list) else 0})")
+    plat = (platform or "instagram").lower()
+    min_required = 3 if plat in ["threads", "facebook"] else 4
+    max_allowed = 4 if plat in ["threads", "facebook"] else 8
+    if slide_count:
+        max_allowed = max(min_required, min(slide_count, 8))
 
-    # Ensure 6–7 slides
-    if len(slides) > 7:
-        slides = slides[:7]
+    slides = data.get("slides", [])
+    if not isinstance(slides, list) or len(slides) < min_required:
+        raise DialogueGenerationError(f"LLM dialogue has too few slides ({len(slides) if isinstance(slides, list) else 0}, min {min_required})")
+
+    # Slice to platform maximum
+    if len(slides) > max_allowed:
+        slides = slides[:max_allowed]
 
     hook = data.get("hook") or data.get("headline") or "Did You Know?"
     headline = data.get("headline") or hook
@@ -2258,8 +2482,12 @@ def generate_cartoon_dialogue_json(
     story: Optional[Dict] = None,
     mode: str = "auto",
     characters: str = "auto",
+    platform: str = "instagram",
+    slide_count: Optional[int] = None,
 ) -> Dict:
     """Generate the mascot dialogue JSON script using Gemini / OpenRouter."""
+    plat = (platform or "instagram").lower()
+
     # Determine mode if auto
     if mode == "auto":
         if story and story.get("mode") in ["did_you_know", "dyk"]:
@@ -2273,7 +2501,14 @@ def generate_cartoon_dialogue_json(
         else:
             mode = "did_you_know"
 
-    prompt = build_dialogue_prompt(mode=mode, topic=topic, story=story, characters=characters)
+    prompt = build_dialogue_prompt(
+        mode=mode,
+        topic=topic,
+        story=story,
+        characters=characters,
+        platform=plat,
+        slide_count=slide_count
+    )
     prompt += (
         "\n\nIMPORTANT: The JSON above is ONLY a format example. Every slide title and bubble "
         "MUST be written specifically about the topic given above, with concrete facts, numbers "
@@ -2281,13 +2516,14 @@ def generate_cartoon_dialogue_json(
     )
 
     example_bubbles = {b.lower() for b in re.findall(r'"bubble":\s*"([^"]+)"', prompt)}
+    min_slides_check = 3 if plat in ["threads", "facebook"] else 4
 
     def _is_valid_dialogue(d: Dict) -> bool:
         slides = d.get("slides")
-        if not isinstance(slides, list) or len(slides) < 4:
+        if not isinstance(slides, list) or len(slides) < min_slides_check:
             return False
         bubbles = [str(s.get("bubble", "")).strip().lower() for s in slides if isinstance(s, dict)]
-        if len([b for b in bubbles if b]) < 4:
+        if len([b for b in bubbles if b]) < min_slides_check:
             return False
         # Reject output that just parrots the prompt's format example.
         copied = sum(1 for b in bubbles[:-1] if b in example_bubbles)
@@ -2299,7 +2535,7 @@ def generate_cartoon_dialogue_json(
         return True
 
     from llm_json_client import query_json
-    print(f"🤖 Generating cartoon dialogue script for '{(story or {}).get('title') or topic}'...")
+    print(f"🤖 Generating cartoon dialogue script for '{(story or {}).get('title') or topic}' ({plat.upper()} mode)...")
     dialogue_data = query_json(prompt, temperature=0.7, label="Dialogue LLM", validator=_is_valid_dialogue)
     if not dialogue_data:
         raise DialogueGenerationError(
@@ -2309,11 +2545,37 @@ def generate_cartoon_dialogue_json(
     print(f"✅ Generated {len(dialogue_data.get('slides', []))} topic-specific dialogue slides")
 
     # Validate structure (raises DialogueGenerationError if invalid)
-    result = parse_and_validate_dialogue(dialogue_data, mode=mode, topic=topic, story=story)
+    result = parse_and_validate_dialogue(
+        dialogue_data,
+        mode=mode,
+        topic=topic,
+        story=story,
+        platform=plat,
+        slide_count=slide_count
+    )
     speaker_left, speaker_right = resolve_dialogue_characters(characters=characters, topic=topic or "", story=story)
     result["speaker_left"] = result.get("speaker_left") or speaker_left
     result["speaker_right"] = result.get("speaker_right") or speaker_right
     result["characters"] = characters
+
+    # ── Apply Humanizer Sanitization (0 Em-Dashes, No AI Buzzwords, Natural Voice) ──
+    try:
+        for s in result.get("slides", []):
+            if "bubble" in s:
+                s["bubble"] = sanitize_text_for_human_voice(s["bubble"])
+            if "title" in s:
+                s["title"] = sanitize_text_for_human_voice(s["title"])
+        if "caption" in result:
+            result["caption"] = sanitize_text_for_human_voice(result["caption"])
+        if "takeaway" in result:
+            result["takeaway"] = sanitize_text_for_human_voice(result["takeaway"])
+        if "hook" in result:
+            result["hook"] = sanitize_text_for_human_voice(result["hook"])
+        if "headline" in result:
+            result["headline"] = sanitize_text_for_human_voice(result["headline"])
+    except Exception as h_err:
+        print(f"⚠️ Note on humanizer sanitization: {h_err}")
+
     return result
 
 

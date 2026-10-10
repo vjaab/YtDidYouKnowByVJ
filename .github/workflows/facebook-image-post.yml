@@ -17,13 +17,17 @@ on:
         required: false
         type: string
       style:
-        description: 'Carousel visual style'
+        description: 'Carousel visual style (auto, cartoon_dialogue, side_by_side, bento_infographic, swiss_editorial, code_editor)'
         required: false
         type: choice
         options:
+          - auto
           - cartoon_dialogue
+          - side_by_side
+          - bento_infographic
+          - swiss_editorial
           - code_editor
-        default: cartoon_dialogue
+        default: auto
       theme:
         description: 'Carousel visual theme'
         required: false
@@ -156,7 +160,7 @@ jobs:
         run: |
           python -u generate_decorator_images.py --now \
             --topic "${{ github.event.inputs.topic || '' }}" \
-            --style "${{ github.event.inputs.style || 'cartoon_dialogue' }}" \
+            --style "${{ github.event.inputs.style || 'auto' }}" \
             --theme "${{ github.event.inputs.theme || 'auto' }}" \
             --characters "${{ github.event.inputs.characters || 'auto' }}" \
             --mode "${{ github.event.inputs.mode || 'did_you_know' }}" \
@@ -178,7 +182,7 @@ jobs:
             --caption-file "${{ steps.gen.outputs.caption_file }}" \
             --topic "${{ steps.gen.outputs.topic }}" \
             --hashtags-file hashtags.txt \
-            --style "${{ github.event.inputs.style || 'cartoon_dialogue' }}" \
+            --style "${{ github.event.inputs.style || 'auto' }}" \
             --theme "${{ github.event.inputs.theme || 'auto' }}" \
             --characters "${{ github.event.inputs.characters || 'auto' }}" \
             --mode "${{ github.event.inputs.mode || 'did_you_know' }}"

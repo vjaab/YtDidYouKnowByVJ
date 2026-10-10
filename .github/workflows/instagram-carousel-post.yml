@@ -17,13 +17,17 @@ on:
         required: false
         type: string
       style:
-        description: 'Carousel visual style'
+        description: 'Carousel visual style (auto, cartoon_dialogue, bento_infographic, code_editor, side_by_side, swiss_editorial)'
         required: false
         type: choice
         options:
+          - auto
           - cartoon_dialogue
+          - bento_infographic
           - code_editor
-        default: cartoon_dialogue
+          - side_by_side
+          - swiss_editorial
+        default: auto
       theme:
         description: 'Carousel visual theme'
         required: false
@@ -148,7 +152,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TOPIC: ${{ github.event.inputs.topic || '' }}
-          STYLE: ${{ github.event.inputs.style || 'cartoon_dialogue' }}
+          STYLE: ${{ github.event.inputs.style || 'auto' }}
           THEME: ${{ github.event.inputs.theme || 'auto' }}
           CHARACTERS: ${{ github.event.inputs.characters || 'auto' }}
           MODE:  ${{ github.event.inputs.mode  || 'did_you_know' }}
@@ -178,7 +182,7 @@ jobs:
             --caption-file "${{ steps.gen.outputs.caption_file }}" \
             --topic "${{ steps.gen.outputs.topic }}" \
             --hashtags-file hashtags.txt \
-            --style "${{ github.event.inputs.style || 'cartoon_dialogue' }}" \
+            --style "${{ github.event.inputs.style || 'auto' }}" \
             --theme "${{ github.event.inputs.theme || 'auto' }}" \
             --characters "${{ github.event.inputs.characters || 'auto' }}" \
             --mode "${{ github.event.inputs.mode || 'did_you_know' }}"

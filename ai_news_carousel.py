@@ -579,12 +579,15 @@ def classify_topic(story: Dict, client=None) -> Dict[str, Any]:
     title = story.get("title", "")
     description = story.get("description", "")
     
+    src_obj = story.get("source")
+    source_name = src_obj.get("name", "Unknown") if isinstance(src_obj, dict) else (str(src_obj) if src_obj else "Unknown")
+    
     classification_prompt = f"""You are a senior tech editor analyzing an AI & engineering news story for an educational developer carousel.
 Analyze this story and output strictly a JSON object:
 
 Story Title: {title}
 Story Description: {description}
-Source: {story.get('source', {}).get('name', 'Unknown')}
+Source: {source_name}
 
 Choose topic_type from EXACTLY one of:
 - "model_release" (Foundation models, weights, new LLMs, multimodal models)
@@ -2256,7 +2259,8 @@ def main():
     
     print(f"📰 Selected story: {story.get('title')}")
     print(f"   Score: {story.get('_score', 'N/A')}")
-    print(f"   Source: {story.get('source', {}).get('name')}")
+    src_obj = story.get('source')
+    print(f"   Source: {src_obj.get('name') if isinstance(src_obj, dict) else src_obj}")
     
     carousel = generate_carousel_json(story)
     
