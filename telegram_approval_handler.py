@@ -508,6 +508,7 @@ def main():
     parser = argparse.ArgumentParser(description="Telegram approval handler")
     parser.add_argument("--send-for-approval", action="store_true", help="Send images for approval")
     parser.add_argument("--wait-and-post", action="store_true", help="Wait for approval and post")
+    parser.add_argument("--post-now", action="store_true", help="Post immediately without waiting for Telegram approval")
     parser.add_argument("--topic", required=True, help="Topic name")
     parser.add_argument("--ig-images", nargs="+", help="Instagram image paths")
     parser.add_argument("--fb-images", nargs="+", help="Facebook image paths")
@@ -552,8 +553,12 @@ def main():
         )
         print("✅ Approval request sent to Telegram")
         
-    elif args.wait_and_post:
-        state = wait_for_approval(args.timeout)
+    elif args.wait_and_post or args.post_now:
+        if args.post_now:
+            print("🚀 Direct posting mode: skipping Telegram approval")
+            state = {"action": "approve_all", "topic": args.topic, "is_carousel": args.carousel}
+        else:
+            state = wait_for_approval(args.timeout)
         
         action = state.get("action", "timeout")
         set_gha_output("approval_action", action)
@@ -625,18 +630,25 @@ def main():
         
         # Send completion message
         result_text = "\n".join([f"{'✅' if 'ERROR' not in str(v) else '❌'} {k}: {v}" for k, v in results.items()])
-        requests.post(
-            f"{TELEGRAM_BASE_URL}/sendMessage",
-            json={
-                "chat_id": TELEGRAM_CHAT_ID,
-                "text": f"📊 <b>Posting Complete</b>\n\n{result_text}",
-                "parse_mode": "HTML",
-            },
-            timeout=10,
-        )
+        try:
+            requests.post(
+                f"{TELEGRAM_BASE_URL}/sendMessage",
+                json={
+                    "chat_id": TELEGRAM_CHAT_ID,
+                    "text": f"📊 <b>Posting Complete</b>\n\n{result_text or 'No posts made'}",
+                    "parse_mode": "HTML",
+                },
+                timeout=10,
+            )
+        except Exception as e:
+            print(f"⚠️ Telegram notification failed: {e}")
+        
+        if args.post_now and not success:
+            print("❌ Direct posting failed on all platforms")
+            sys.exit(1)
         
     else:
-        print("Use --send-for-approval or --wait-and-post")
+        print("Use --send-for-approval, --wait-and-post or --post-now")
         sys.exit(1)
 
 if __name__ == "__main__":

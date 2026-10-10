@@ -74,7 +74,7 @@ on:
           - auto
         default: did_you_know
       auto_post:
-        description: 'Auto-post after Telegram approval'
+        description: 'Auto-post directly to Facebook (no Telegram approval)'
         required: false
         type: boolean
         default: true
@@ -186,20 +186,6 @@ jobs:
             --characters "${{ github.event.inputs.characters || 'auto' }}" \
             --mode "${{ github.event.inputs.mode || 'did_you_know' }}"
 
-      - name: Send to Telegram for Approval
-        if: (github.event.inputs.auto_post == 'true') && (steps.verifier.outputs.approved == 'true')
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          python -u telegram_approval_handler.py --send-for-approval \
-            --topic "${{ steps.verifier.outputs.topic || steps.gen.outputs.topic }}" \
-            --fb-images "${{ steps.verifier.outputs.fb_images || steps.gen.outputs.fb_images }}" \
-            --caption-file "${{ steps.verifier.outputs.caption_file || steps.gen.outputs.caption_file }}" \
-            --poll-file "${{ steps.verifier.outputs.poll_file || steps.gen.outputs.poll_file }}" \
-            --platform facebook \
-            --carousel
-
       - name: Upload Generated Images
         if: always()
         uses: actions/upload-artifact@v4
@@ -210,7 +196,8 @@ jobs:
 
   facebook-post:
     needs: generate-carousel
-    if: (github.event.inputs.auto_post == 'true') && (needs.generate-carousel.outputs.approved == 'true')
+    # Runs on schedule (no inputs) and on manual dispatch unless auto_post is explicitly false
+    if: (github.event.inputs.auto_post != 'false') && (needs.generate-carousel.outputs.approved == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -234,7 +221,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests python-dotenv aiohttp
 
-      - name: Wait for Telegram Approval & Post to Facebook
+      - name: Post to Facebook (direct, no approval)
         id: approval
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -242,14 +229,13 @@ jobs:
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
         run: |
-          python -u telegram_approval_handler.py --wait-and-post \
+          python -u telegram_approval_handler.py --post-now \
             --topic "${{ needs.generate-carousel.outputs.topic }}" \
             --fb-images "${{ needs.generate-carousel.outputs.fb_images }}" \
             --caption-file "${{ needs.generate-carousel.outputs.caption_file }}" \
             --hashtags "${{ needs.generate-carousel.outputs.hashtags }}" \
             --poll-file "${{ needs.generate-carousel.outputs.poll_file }}" \
             --carousel \
-            --timeout 3600 \
             --platform facebook
 
       - name: Check Approval Result
