@@ -807,7 +807,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Chaptered Deep-Dive Long-Form AI Video Pipeline")
     parser.add_argument("--now", action="store_true", help="Run pipeline immediately.")
     parser.add_argument("--dry-run", action="store_true", help="Run without uploading to YouTube.")
+    parser.add_argument("--ai-flag", default="true", help="Altered/Synthetic content disclosure (default: true)")
     args = parser.parse_args()
+
+    ai_flag_val = "true" if str(args.ai_flag).lower() in ("true", "1", "yes") else "false"
+    os.environ["AI_FLAG"] = ai_flag_val
 
     if args.now or args.dry_run:
         success = run_longform_pipeline(dry_run=args.dry_run)

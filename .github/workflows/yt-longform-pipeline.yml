@@ -6,7 +6,12 @@ on:
     # Triggers daily at 13:30 UTC (09:30 AM EST / 02:30 PM GMT / 07:00 PM IST)
     # Peak global viewer overlap window for US & Europe tech professionals
     - cron: '30 13 * * *'
-  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      ai_flag:
+        description: 'Altered or Synthetic Content disclosure (AI flag)'
+        type: boolean
+        default: true
 
 jobs:
   run-pipeline:
@@ -182,8 +187,9 @@ jobs:
           ENABLE_PERSISTENT_HEADER: "1"
           BRAND_WATERMARK: "@vijayakumarj-ai"
           ENABLE_SOUND_DESIGN_CUES: "1"
+          AI_FLAG: ${{ github.event.inputs.ai_flag != 'false' }}
         run: |
-          python -u main_longform.py --now
+          python -u main_longform.py --now --ai-flag "${{ github.event.inputs.ai_flag != 'false' }}"
         
       - name: Commit Updated Tracking File & Logs
         if: always()

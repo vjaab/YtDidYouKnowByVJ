@@ -484,10 +484,14 @@ def main():
     parser.add_argument("--theme", default="auto")
     parser.add_argument("--characters", default="auto")
     parser.add_argument("--mode", default="did_you_know")
+    parser.add_argument("--ai-flag", default="true", help="Self-disclose AI generated/assisted media (default: true)")
     args = parser.parse_args()
 
+    ai_flag_val = "true" if str(args.ai_flag).lower() in ("true", "1", "yes") else "false"
+    os.environ["AI_FLAG"] = ai_flag_val
+
     print("\n" + "=" * 65)
-    print("🤖 [Content Accuracy Verification Agent] Starting Audit")
+    print(f"🤖 [Content Accuracy Verification Agent] Starting Audit (AI Flag: {ai_flag_val})")
     print("=" * 65)
 
     approved = False

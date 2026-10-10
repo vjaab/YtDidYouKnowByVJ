@@ -373,20 +373,25 @@ def post_community_post(youtube, text, post_type="text"):
         print(f"❌ Community post failed: {e}")
         return False, str(e)
 
-def create_community_post(script_data=None, dry_run=False):
-    """Create and post a community post."""
+def create_community_post(script_data=None, dry_run=False, ai_flag=None):
+    """Create and post a community post with AI disclosure if enabled."""
+    if ai_flag is None:
+        ai_flag = os.getenv("AI_FLAG", "true").lower() in ("true", "1", "yes")
+
+    text, tags = _pick_template_and_fill(script_data)
+    if ai_flag and "#CreatedWithAI" not in text:
+        text = f"{text}\n\n🤖 #CreatedWithAI #DidYouKnowByVJ"
+
     if dry_run:
-        text, tags = _pick_template_and_fill(script_data)
         print("🧪 [DRY RUN] Community post preview:")
         print(f"Text: {text[:200]}...")
         print(f"Tags: {tags}")
+        print(f"AI Flag: {ai_flag}")
         return True, "MOCK_POST_ID"
     
     youtube = get_authenticated_service()
     if not youtube:
         return False, "Failed to authenticate"
-    
-    text, tags = _pick_template_and_fill(script_data)
     
     success, result = post_community_post(youtube, text)
     return success, result
@@ -405,10 +410,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--dry-run", action="store_true", help="Preview without posting")
     parser.add_argument("--now", action="store_true", help="Post immediately")
+    parser.add_argument("--ai-flag", default="true", help="Disclose AI-assisted content (default: true)")
     args = parser.parse_args()
     
+    ai_flag_val = str(args.ai_flag).lower() in ("true", "1", "yes")
+
     if args.now or args.dry_run:
-        success, result = create_community_post(dry_run=args.dry_run)
+        success, result = create_community_post(dry_run=args.dry_run, ai_flag=ai_flag_val)
         if not success:
             print(f"Failed: {result}")
             exit(1)

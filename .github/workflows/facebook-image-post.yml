@@ -82,6 +82,11 @@ on:
         required: false
         type: boolean
         default: true
+      ai_flag:
+        description: 'Mark media as Created with AI (is_ai_generated flag)'
+        required: false
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -139,6 +144,7 @@ jobs:
           echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> .env
           echo "CF_API_TOKEN=${{ secrets.CF_API_TOKEN }}" >> .env
           echo "CF_ACCOUNT_ID=${{ secrets.CF_ACCOUNT_ID }}" >> .env
+          echo "AI_FLAG=${{ github.event.inputs.ai_flag != 'false' }}" >> .env
 
       - name: Fetch Trending Hashtags
         id: hashtags
@@ -152,6 +158,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TOPIC: ${{ github.event.inputs.topic || '' }}
+          AI_FLAG: ${{ github.event.inputs.ai_flag != 'false' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -165,7 +172,8 @@ jobs:
             --characters "${{ github.event.inputs.characters || 'auto' }}" \
             --mode "${{ github.event.inputs.mode || 'did_you_know' }}" \
             --hashtags-file hashtags.txt \
-            --platform facebook
+            --platform facebook \
+            --ai-flag "${{ github.event.inputs.ai_flag != 'false' }}"
 
       - name: Verify Content Accuracy & Auto-Approve Agent
         id: verifier
@@ -175,6 +183,7 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          AI_FLAG: ${{ github.event.inputs.ai_flag != 'false' }}
         run: |
           python -u content_accuracy_agent.py \
             --platform facebook \
@@ -185,7 +194,8 @@ jobs:
             --style "${{ github.event.inputs.style || 'auto' }}" \
             --theme "${{ github.event.inputs.theme || 'auto' }}" \
             --characters "${{ github.event.inputs.characters || 'auto' }}" \
-            --mode "${{ github.event.inputs.mode || 'did_you_know' }}"
+            --mode "${{ github.event.inputs.mode || 'did_you_know' }}" \
+            --ai-flag "${{ github.event.inputs.ai_flag != 'false' }}"
 
       - name: Post to Facebook
         if: (github.event_name == 'schedule' || github.event.inputs.auto_post != 'false') && steps.verifier.outputs.approved == 'true'
@@ -195,6 +205,7 @@ jobs:
           FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          AI_FLAG: ${{ github.event.inputs.ai_flag != 'false' }}
         run: |
           python -u telegram_approval_handler.py --post-now \
             --topic "${{ steps.verifier.outputs.topic || steps.gen.outputs.topic }}" \
@@ -203,7 +214,8 @@ jobs:
             --hashtags "${{ steps.hashtags.outputs.hashtags }}" \
             --poll-file "${{ steps.verifier.outputs.poll_file || steps.gen.outputs.poll_file }}" \
             --carousel \
-            --platform facebook
+            --platform facebook \
+            --ai-flag "${{ github.event.inputs.ai_flag != 'false' }}"
 
       - name: Upload Generated Images
         if: always()

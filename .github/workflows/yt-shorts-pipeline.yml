@@ -36,6 +36,10 @@ on:
           - medium
           - huggingface_hub
         default: auto
+      ai_flag:
+        description: 'Altered or Synthetic Content disclosure (AI flag)'
+        type: boolean
+        default: true
 
 concurrency:
   group: yt-shorts-pipeline
@@ -192,13 +196,14 @@ jobs:
           ENABLE_KINETIC_CAPTIONS: "1"
           DISABLE_ENTITY_TAGS: "1"
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          AI_FLAG: ${{ github.event.inputs.ai_flag != 'false' }}
         run: |
           DRY_RUN_FLAG=""
           if [ "$DRY_RUN" = "true" ]; then DRY_RUN_FLAG="--dry-run"; fi
           TOPIC_TYPE="${TOPIC_TYPE:-auto}"
           SOURCE_FLAG=""
           if [ -n "$TOPIC_SOURCE" ] && [ "$TOPIC_SOURCE" != "auto" ]; then SOURCE_FLAG="--source $TOPIC_SOURCE"; fi
-          python -u main.py --now --type "$TOPIC_TYPE" $SOURCE_FLAG $DRY_RUN_FLAG
+          python -u main.py --now --type "$TOPIC_TYPE" $SOURCE_FLAG $DRY_RUN_FLAG --ai-flag "${{ github.event.inputs.ai_flag != 'false' }}"
 
       - name: Platform-Native Optimization & A/B Test Setup
         if: always()

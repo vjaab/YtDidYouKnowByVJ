@@ -357,23 +357,41 @@ def delete_github_release(release_id):
 
 # ── Instagram Graph API: 3-Step Container Workflow ────────────────────────
 
+def _post_media_container_with_ai_fallback(url: str, data: dict, timeout: int = 30) -> requests.Response:
+    """Post to /{ig_user_id}/media with is_ai_generated if enabled; fall back gracefully if account unsupported."""
+    ai_flag = os.getenv("AI_FLAG", "true").lower() in ("true", "1", "yes")
+    # Meta Graph API: is_ai_generated is only set on standalone media or top-level carousel, never carousel item
+    if ai_flag and not data.get("is_carousel_item"):
+        data["is_ai_generated"] = "true"
+
+    resp = requests.post(url, data=data, timeout=timeout)
+    if resp.status_code == 400 and "is_ai_generated" in data:
+        err_msg = resp.text.lower()
+        if "is_ai_generated" in err_msg or "param" in err_msg:
+            print("⚠️ Note: Instagram Graph API rejected is_ai_generated parameter on this account tier. Retrying without it...")
+            data_retry = {k: v for k, v in data.items() if k != "is_ai_generated"}
+            resp = requests.post(url, data=data_retry, timeout=timeout)
+    resp.raise_for_status()
+    return resp
+
+
 def create_reels_container(video_url: str, caption: str, share_to_feed: bool = True) -> str:
     """Step 1: create a media container. Returns the container/creation ID."""
     ig_user_id = os.getenv("IG_USER_ID")
     access_token = os.getenv("IG_ACCESS_TOKEN")
     
-    resp = requests.post(
+    data = {
+        "media_type": "REELS",
+        "video_url": video_url,
+        "caption": caption[:2200],  # Instagram caption limit
+        "share_to_feed": str(share_to_feed).lower(),
+        "access_token": access_token,
+    }
+    resp = _post_media_container_with_ai_fallback(
         f"{GRAPH_API_BASE}/{ig_user_id}/media",
-        data={
-            "media_type": "REELS",
-            "video_url": video_url,
-            "caption": caption[:2200],  # Instagram caption limit
-            "share_to_feed": str(share_to_feed).lower(),
-            "access_token": access_token,
-        },
+        data=data,
         timeout=30,
     )
-    resp.raise_for_status()
     try:
         data = resp.json()
     except Exception:
@@ -444,12 +462,11 @@ def create_image_container(image_url: str, caption: str = "", is_carousel_item: 
     if is_carousel_item:
         data["is_carousel_item"] = "true"
     
-    resp = requests.post(
+    resp = _post_media_container_with_ai_fallback(
         f"{GRAPH_API_BASE}/{ig_user_id}/media",
         data=data,
         timeout=30,
     )
-    resp.raise_for_status()
     try:
         result = resp.json()
     except Exception:
@@ -464,17 +481,17 @@ def create_carousel_container(child_ids: list, caption: str) -> str:
     ig_user_id = os.getenv("IG_USER_ID")
     access_token = os.getenv("IG_ACCESS_TOKEN")
     
-    resp = requests.post(
+    data = {
+        "media_type": "CAROUSEL",
+        "children": ",".join(child_ids),
+        "caption": caption[:2200],
+        "access_token": access_token,
+    }
+    resp = _post_media_container_with_ai_fallback(
         f"{GRAPH_API_BASE}/{ig_user_id}/media",
-        data={
-            "media_type": "CAROUSEL",
-            "children": ",".join(child_ids),
-            "caption": caption[:2200],
-            "access_token": access_token,
-        },
+        data=data,
         timeout=30,
     )
-    resp.raise_for_status()
     try:
         result = resp.json()
     except Exception:

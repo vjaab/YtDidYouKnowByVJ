@@ -1533,7 +1533,11 @@ if __name__ == "__main__":
     parser.add_argument("--type", type=str, choices=["auto", "did_you_know", "research", "tools", "news", "tech_trends", "vaibhav", "interview_questions", "student"], default="auto", help="Content type mapped to the schedule")
     parser.add_argument("--dry-run", action="store_true", help="Run without uploading to YouTube/X.com/Telegram.")
     parser.add_argument("--source", type=str, choices=["auto", "github", "medium", "huggingface_hub"], default="auto", help="Trending source rotation: github, medium, huggingface_hub")
+    parser.add_argument("--ai-flag", default="true", help="Altered/Synthetic content disclosure (default: true)")
     args = parser.parse_args()
+
+    ai_flag_val = "true" if str(args.ai_flag).lower() in ("true", "1", "yes") else "false"
+    os.environ["AI_FLAG"] = ai_flag_val
 
     if args.now or args.dry_run:
         run_local(topic_type=args.type, dry_run=args.dry_run, topic_source=args.source)

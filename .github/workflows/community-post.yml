@@ -10,7 +10,12 @@ on:
     - cron: '30 4 * * 4'
     # Thursday 16:00 IST (10:30 UTC)
     - cron: '30 10 * * 4'
-  workflow_dispatch:  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      ai_flag:
+        description: 'Include AI Disclosure in community post'
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -48,9 +53,10 @@ jobs:
           
       - name: Run Community Post
         run: |
-          python community_post.py --now
+          python community_post.py --now --ai-flag "${{ github.event.inputs.ai_flag != 'false' }}"
         env:
           PYTHONPATH: .
+          AI_FLAG: ${{ github.event.inputs.ai_flag != 'false' }}
        
       - name: Upload logs on failure
         if: failure()

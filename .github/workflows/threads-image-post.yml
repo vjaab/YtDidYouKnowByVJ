@@ -81,6 +81,11 @@ on:
         required: false
         type: boolean
         default: true
+      ai_flag:
+        description: 'Mark media as Created with AI (is_ai_generated flag)'
+        required: false
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -138,6 +143,7 @@ jobs:
           echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> .env
           echo "CF_API_TOKEN=${{ secrets.CF_API_TOKEN }}" >> .env
           echo "CF_ACCOUNT_ID=${{ secrets.CF_ACCOUNT_ID }}" >> .env
+          echo "AI_FLAG=${{ github.event.inputs.ai_flag != 'false' }}" >> .env
 
       - name: Fetch Trending Hashtags
         id: hashtags
@@ -155,6 +161,7 @@ jobs:
           THEME: ${{ github.event.inputs.theme || 'auto' }}
           CHARACTERS: ${{ github.event.inputs.characters || 'auto' }}
           MODE:  ${{ github.event.inputs.mode  || 'did_you_know' }}
+          AI_FLAG: ${{ github.event.inputs.ai_flag != 'false' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -164,7 +171,8 @@ jobs:
           python -u generate_decorator_images.py --now \
             --topic "$TOPIC" --style "$STYLE" --theme "$THEME" --characters "$CHARACTERS" --mode "$MODE" \
             --hashtags-file hashtags.txt \
-            --platform threads
+            --platform threads \
+            --ai-flag "${{ github.event.inputs.ai_flag != 'false' }}"
 
       - name: Verify Content Accuracy & Auto-Approve Agent
         id: verifier
@@ -174,6 +182,7 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          AI_FLAG: ${{ github.event.inputs.ai_flag != 'false' }}
         run: |
           python -u content_accuracy_agent.py \
             --platform threads \
@@ -184,7 +193,8 @@ jobs:
             --style "${{ github.event.inputs.style || 'auto' }}" \
             --theme "${{ github.event.inputs.theme || 'auto' }}" \
             --characters "${{ github.event.inputs.characters || 'auto' }}" \
-            --mode "${{ github.event.inputs.mode || 'did_you_know' }}"
+            --mode "${{ github.event.inputs.mode || 'did_you_know' }}" \
+            --ai-flag "${{ github.event.inputs.ai_flag != 'false' }}"
 
       - name: Post Directly to Threads
         if: (github.event_name == 'schedule' || github.event.inputs.auto_post != 'false') && steps.verifier.outputs.approved == 'true'
@@ -196,6 +206,7 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          AI_FLAG: ${{ github.event.inputs.ai_flag != 'false' }}
         run: |
           python -u post_to_threads.py \
             --image "${{ steps.verifier.outputs.threads_images || steps.gen.outputs.threads_images }}" \

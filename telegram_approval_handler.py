@@ -519,8 +519,12 @@ def main():
     parser.add_argument("--timeout", type=int, default=3600, help="Approval timeout (seconds)")
     parser.add_argument("--carousel", action="store_true", help="Images form a carousel")
     parser.add_argument("--platform", choices=["both", "instagram", "facebook", "threads"], default="both", help="Platform to post to")
+    parser.add_argument("--ai-flag", default="true", help="Self-disclose AI generated/assisted media (default: true)")
     args = parser.parse_args()
-    
+
+    ai_flag_val = "true" if str(args.ai_flag).lower() in ("true", "1", "yes") else "false"
+    os.environ["AI_FLAG"] = ai_flag_val
+
     def set_gha_output(key: str, value: str):
         github_output = os.getenv("GITHUB_OUTPUT")
         if github_output:

@@ -291,7 +291,7 @@ def get_authenticated_service():
         return None
 
 
-def upload_video(video_path, title, description, tags, thumbnail_path=None, category_id="28", comment_hook=None, is_longform=False, script_data=None):
+def upload_video(video_path, title, description, tags, thumbnail_path=None, category_id="28", comment_hook=None, is_longform=False, script_data=None, ai_flag=None):
     youtube = get_authenticated_service()
     if not youtube:
         return False, "Failed to authenticate with YouTube API"
@@ -308,11 +308,15 @@ def upload_video(video_path, title, description, tags, thumbnail_path=None, cate
     if not category_id or category_id == "22":
         category_id = "28"
 
-    # YouTube Policy: Informational commentary with AI voiceover and stock/conceptual visuals
-    # is production assistance, NOT deceptive synthetic media of real people.
-    # Setting containsSyntheticMedia=True causes YouTube to place a prominent warning badge
-    # on mobile screens that triggers immediate swipe-aways.
-    requires_ai_disclosure = False
+    # YouTube Altered / Synthetic Media (AI Flag) Disclosure:
+    # Fulfills YouTube's transparency policy for AI-generated or AI-assisted content.
+    if ai_flag is not None:
+        requires_ai_disclosure = bool(ai_flag)
+    else:
+        requires_ai_disclosure = os.getenv("AI_FLAG", "true").lower() in ("true", "1", "yes") or \
+                                 os.getenv("AI_DISCLOSURE", "false").lower() in ("true", "1", "yes")
+
+    print(f"🤖 [YouTube Upload] Altered/Synthetic Media (AI flag): {requires_ai_disclosure}")
 
     # Optimize title: Ensure #Shorts tag is present for Shorts shelf indexing
     formatted_title = title.strip()

@@ -15,6 +15,25 @@ FB_PAGE_ID = os.getenv("FB_PAGE_ID", "")
 FB_PAGE_ACCESS_TOKEN = os.getenv("FB_PAGE_ACCESS_TOKEN", "")
 GRAPH_API_BASE = "https://graph.facebook.com/v20.0"
 
+def _post_fb_with_ai_fallback(url: str, data: dict, files: dict = None, timeout: int = 30) -> requests.Response:
+    """Post to Facebook Graph API with is_ai_generated flag if enabled, with automatic fallback."""
+    ai_flag = os.getenv("AI_FLAG", "true").lower() in ("true", "1", "yes")
+    if ai_flag:
+        data["is_ai_generated"] = "true"
+
+    resp = requests.post(url, data=data, files=files, timeout=timeout)
+    if resp.status_code == 400 and "is_ai_generated" in data:
+        err_msg = resp.text.lower()
+        if "is_ai_generated" in err_msg or "param" in err_msg:
+            print("⚠️ Note: Facebook Graph API rejected is_ai_generated parameter on this endpoint. Retrying without it...")
+            data_retry = {k: v for k, v in data.items() if k != "is_ai_generated"}
+            if files:
+                for f in files.values():
+                    if hasattr(f, "seek"):
+                        f.seek(0)
+            resp = requests.post(url, data=data_retry, files=files, timeout=timeout)
+    return resp
+
 def post_to_facebook(image_paths, caption: str) -> str:
     """Post single image or carousel/multi-photo post to Facebook Page feed.
 
@@ -53,7 +72,7 @@ def post_to_facebook(image_paths, caption: str) -> str:
                 "caption": caption,
                 "access_token": FB_PAGE_ACCESS_TOKEN,
             }
-            resp = requests.post(url, data=data, timeout=30)
+            resp = _post_fb_with_ai_fallback(url, data=data, timeout=30)
         else:
             with open(img, "rb") as f:
                 files = {"source": f}
@@ -61,7 +80,7 @@ def post_to_facebook(image_paths, caption: str) -> str:
                     "caption": caption,
                     "access_token": FB_PAGE_ACCESS_TOKEN,
                 }
-                resp = requests.post(url, data=data, files=files, timeout=60)
+                resp = _post_fb_with_ai_fallback(url, data=data, files=files, timeout=60)
         resp.raise_for_status()
         result = resp.json()
         return result.get("post_id") or result.get("id")
@@ -106,7 +125,7 @@ def post_to_facebook(image_paths, caption: str) -> str:
         "attached_media": json.dumps(attached_media),
         "access_token": FB_PAGE_ACCESS_TOKEN,
     }
-    resp = requests.post(feed_url, data=data, timeout=30)
+    resp = _post_fb_with_ai_fallback(feed_url, data=data, timeout=30)
     resp.raise_for_status()
     result = resp.json()
     post_id = result.get("id")

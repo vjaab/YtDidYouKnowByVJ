@@ -292,6 +292,22 @@ def _truncate_threads_text(text: str, max_len: int = THREADS_TEXT_LIMIT) -> str:
     return truncated.rstrip() + "..."
 
 
+def _post_threads_with_ai_fallback(url: str, data: dict, timeout: int = 30) -> requests.Response:
+    """Post to Threads API with is_ai_generated if enabled; fall back gracefully if account unsupported."""
+    ai_flag = os.getenv("AI_FLAG", "true").lower() in ("true", "1", "yes")
+    if ai_flag and not data.get("is_carousel_item"):
+        data["is_ai_generated"] = "true"
+
+    resp = requests.post(url, data=data, timeout=timeout)
+    if resp.status_code == 400 and "is_ai_generated" in data:
+        err_msg = resp.text.lower()
+        if "is_ai_generated" in err_msg or "param" in err_msg:
+            print("⚠️ Note: Threads API rejected is_ai_generated parameter on this account tier. Retrying without it...")
+            data_retry = {k: v for k, v in data.items() if k != "is_ai_generated"}
+            resp = requests.post(url, data=data_retry, timeout=timeout)
+    return resp
+
+
 def create_threads_container(video_url: str, caption: str, reply_to_id: str = None) -> str:
     """Step 1: create a media container. Returns the container/creation ID.
     
@@ -312,7 +328,7 @@ def create_threads_container(video_url: str, caption: str, reply_to_id: str = No
     if reply_to_id:
         data["reply_to_id"] = reply_to_id
 
-    resp = requests.post(
+    resp = _post_threads_with_ai_fallback(
         f"{GRAPH_API_BASE}/{threads_user_id}/threads",
         data=data,
         timeout=30,
@@ -458,7 +474,7 @@ def create_threads_image_container(image_url: str, caption: str = "", is_carouse
     last_err = None
     for attempt in range(1, max_retries + 1):
         try:
-            resp = requests.post(
+            resp = _post_threads_with_ai_fallback(
                 f"{GRAPH_API_BASE}/{threads_user_id}/threads",
                 data=data,
                 timeout=30,
@@ -515,7 +531,7 @@ def create_threads_carousel_container(child_ids: list, caption: str, max_retries
     last_err = None
     for attempt in range(1, max_retries + 1):
         try:
-            resp = requests.post(
+            resp = _post_threads_with_ai_fallback(
                 f"{GRAPH_API_BASE}/{threads_user_id}/threads",
                 data=data,
                 timeout=30,

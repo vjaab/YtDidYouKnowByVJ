@@ -342,7 +342,11 @@ def main():
     parser.add_argument("--ai-backgrounds", action="store_true", help="Optionally generate AI backgrounds per slide")
     parser.add_argument("--platform", choices=["both", "instagram", "facebook", "threads"], default="both", help="Target platform(s)")
     parser.add_argument("--send-telegram-preview", action="store_true", help="Explicitly send preview images to Telegram")
+    parser.add_argument("--ai-flag", default="true", help="Self-disclose AI generated/assisted media (default: true)")
     args = parser.parse_args()
+
+    ai_flag_val = "true" if str(args.ai_flag).lower() in ("true", "1", "yes") else "false"
+    os.environ["AI_FLAG"] = ai_flag_val
 
     if not args.now and not args.dry_run:
         print("Usage: python generate_decorator_images.py --now       # Generate and send to Telegram")
@@ -352,7 +356,7 @@ def main():
 
     # ── Platform-Smart Style & Slide Count Resolution ─────────────────────────
     resolved_style = resolve_style_for_platform(args.platform, args.style)
-    print(f"🎨 Active Visual Style: '{resolved_style}' (Requested: '{args.style}')")
+    print(f"🎨 Active Visual Style: '{resolved_style}' (Requested: '{args.style}', AI Flag: '{ai_flag_val}')")
 
     # Platform slide count targeting maximum completion rate and algorithm reach
     if args.platform == "threads":
