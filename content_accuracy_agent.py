@@ -70,74 +70,10 @@ def _set_gha_output(name: str, value: str):
 
 
 def _query_llm(prompt: str) -> Optional[Dict]:
-    """Query Gemini or OpenRouter for structured JSON response."""
-    # 1. Primary: Google GenAI SDK (gemini-2.5-flash)
-    api_key = os.getenv("GEMINI_API_KEY") or GEMINI_API_KEY
-    if api_key:
-        try:
-            from google import genai
-            client = genai.Client(api_key=api_key)
-            resp = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt,
-            )
-            raw = resp.text.strip()
-            raw = re.sub(r"^```(?:json)?\s*", "", raw.strip(), flags=re.MULTILINE)
-            raw = re.sub(r"\s*```$", "", raw.strip(), flags=re.MULTILINE)
-            data = json.loads(raw)
-            if isinstance(data, dict):
-                return data
-        except Exception as e:
-            print(f"ℹ️ Google GenAI note: {e}")
+    """Query Gemini / OpenRouter / Cloudflare / HuggingFace for structured JSON audit response."""
+    from llm_json_client import query_json
+    return query_json(prompt, temperature=0.2, label="Verifier LLM")
 
-    # 2. OpenRouter fallback
-    openrouter_key = os.getenv("OPENROUTER_API_KEY", "") or OPENROUTER_API_KEY
-    if openrouter_key:
-        try:
-            import requests
-            headers = {
-                "Authorization": f"Bearer {openrouter_key}",
-                "HTTP-Referer": "https://github.com/vjaab/YtDidYouKnowByVJ",
-                "X-Title": "Content Accuracy Agent",
-            }
-            body = {
-                "model": "google/gemini-2.0-flash-001",
-                "messages": [{"role": "user", "content": prompt}],
-                "temperature": 0.1,
-                "response_format": {"type": "json_object"}
-            }
-            res = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=body, timeout=25)
-            if res.status_code == 200:
-                raw = res.json().get("choices", [{}])[0].get("message", {}).get("content", "")
-                raw = re.sub(r"^```(?:json)?\s*", "", raw.strip(), flags=re.MULTILINE)
-                raw = re.sub(r"\s*```$", "", raw.strip(), flags=re.MULTILINE)
-                data = json.loads(raw)
-                if isinstance(data, dict):
-                    return data
-        except Exception as e:
-            print(f"ℹ️ OpenRouter verifier note: {e}")
-
-    # 3. Legacy GenerativeAI SDK fallback
-    if api_key:
-        try:
-            import google.generativeai as genai_legacy
-            genai_legacy.configure(api_key=api_key)
-            for m in ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-pro"]:
-                try:
-                    model_inst = genai_legacy.GenerativeModel(m)
-                    resp = model_inst.generate_content(prompt)
-                    raw = resp.text.strip()
-                    raw = re.sub(r"^```(?:json)?\s*", "", raw.strip(), flags=re.MULTILINE)
-                    raw = re.sub(r"\s*```$", "", raw.strip(), flags=re.MULTILINE)
-                    data = json.loads(raw)
-                    if isinstance(data, dict):
-                        return data
-                except Exception:
-                    continue
-        except Exception as e:
-            print(f"ℹ️ Legacy Gemini note: {e}")
-
-    return None
 
 
 def scan_for_script_artifacts(text_blocks: List[str]) -> Tuple[bool, str]:
@@ -214,12 +150,17 @@ def verify_content_accuracy(topic: str, carousel_data: dict, caption: str = "") 
         all_texts.append(s.get("did_you_know", ""))
         all_texts.append(s.get("body", ""))
 
-    # 1. Fast local deterministic artifact scan (stage directions + visible speaker labels)
+    # 1. Fast local deterministic artifact scan (stage directions + visible speaker labels + generic template phrases)
     clean, artifact_msg = scan_for_script_artifacts(all_texts)
     if clean:
         labelled = find_speaker_labels(carousel_data)
         if labelled:
             clean, artifact_msg = False, f"Dialogue text starts with a speaker label: '{labelled[:80]}'"
+    if clean:
+        from cartoon_dialogue_engine import find_generic_template_phrase
+        generic_p = find_generic_template_phrase(carousel_data)
+        if generic_p:
+            clean, artifact_msg = False, f"Stale generic template phrase detected: '{generic_p}'"
     if not clean:
         return {
             "is_accurate": False,

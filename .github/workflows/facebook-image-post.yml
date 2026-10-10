@@ -84,18 +84,9 @@ permissions:
   id-token: write
 
 jobs:
-  generate-carousel:
+  facebook-post:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    outputs:
-      topic: ${{ steps.verifier.outputs.topic || steps.gen.outputs.topic }}
-      fb_images: ${{ steps.verifier.outputs.fb_images || steps.gen.outputs.fb_images }}
-      caption_file: ${{ steps.verifier.outputs.caption_file || steps.gen.outputs.caption_file }}
-      hashtags: ${{ steps.hashtags.outputs.hashtags }}
-      poll_file: ${{ steps.verifier.outputs.poll_file || steps.gen.outputs.poll_file }}
-      carousel_json: ${{ steps.verifier.outputs.carousel_json || steps.gen.outputs.carousel_json }}
-      is_carousel: ${{ steps.gen.outputs.is_carousel }}
-      approved: ${{ steps.verifier.outputs.approved }}
 
     steps:
       - name: Checkout Code
@@ -159,6 +150,9 @@ jobs:
           TOPIC: ${{ github.event.inputs.topic || '' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
         run: |
           python -u generate_decorator_images.py --now \
             --topic "${{ github.event.inputs.topic || '' }}" \
@@ -174,6 +168,9 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
         run: |
           python -u content_accuracy_agent.py \
             --platform facebook \
@@ -186,6 +183,24 @@ jobs:
             --characters "${{ github.event.inputs.characters || 'auto' }}" \
             --mode "${{ github.event.inputs.mode || 'did_you_know' }}"
 
+      - name: Post to Facebook
+        if: (github.event_name == 'schedule' || github.event.inputs.auto_post != 'false') && steps.verifier.outputs.approved == 'true'
+        id: post_fb
+        env:
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python -u telegram_approval_handler.py --post-now \
+            --topic "${{ steps.verifier.outputs.topic || steps.gen.outputs.topic }}" \
+            --fb-images "${{ steps.verifier.outputs.fb_images || steps.gen.outputs.fb_images }}" \
+            --caption-file "${{ steps.verifier.outputs.caption_file || steps.gen.outputs.caption_file }}" \
+            --hashtags "${{ steps.hashtags.outputs.hashtags }}" \
+            --poll-file "${{ steps.verifier.outputs.poll_file || steps.gen.outputs.poll_file }}" \
+            --carousel \
+            --platform facebook
+
       - name: Upload Generated Images
         if: always()
         uses: actions/upload-artifact@v4
@@ -194,83 +209,8 @@ jobs:
           path: output/social_images/
           retention-days: 7
 
-  facebook-post:
-    needs: generate-carousel
-    # Runs on schedule (no inputs) and on manual dispatch unless auto_post is explicitly false
-    if: (github.event.inputs.auto_post != 'false') && (needs.generate-carousel.outputs.approved == 'true')
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Download Generated Images
-        uses: actions/download-artifact@v4
-        with:
-          name: generated-images
-          path: output/social_images/
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests python-dotenv aiohttp
-
-      - name: Post to Facebook (direct, no approval)
-        id: approval
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
-          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
-        run: |
-          python -u telegram_approval_handler.py --post-now \
-            --topic "${{ needs.generate-carousel.outputs.topic }}" \
-            --fb-images "${{ needs.generate-carousel.outputs.fb_images }}" \
-            --caption-file "${{ needs.generate-carousel.outputs.caption_file }}" \
-            --hashtags "${{ needs.generate-carousel.outputs.hashtags }}" \
-            --poll-file "${{ needs.generate-carousel.outputs.poll_file }}" \
-            --carousel \
-            --platform facebook
-
-      - name: Check Approval Result
-        if: always()
-        run: |
-          ACTION="${{ steps.approval.outputs.approval_action }}"
-          echo "Approval action: $ACTION"
-          if [ "$ACTION" = "reject" ]; then
-            echo "❌ Posting rejected by user"
-            exit 1
-          elif [ "$ACTION" = "timeout" ]; then
-            echo "⏰ Approval timed out"
-            exit 1
-          elif [ "$ACTION" = "regenerate" ]; then
-            echo "🔄 Regeneration requested"
-            exit 2
-          elif [ -z "$ACTION" ]; then
-            echo "⚠️ No approval action recorded"
-            exit 1
-          fi
-
-      - name: Track Engagement (after 1 hour)
-        if: success()
-        run: |
-          python -u track_engagement.py --topic "${{ needs.generate-carousel.outputs.topic }}" --delay 3600 --platform facebook
-
-  commit-logs:
-    needs: [generate-carousel, facebook-post]
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
       - name: Commit Updated Logs
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -285,7 +225,10 @@ jobs:
           if [ -d "logs" ]; then git add -f logs/*.txt logs/*.json 2>/dev/null || true; fi
           if [ -d "output/social_images" ]; then git add -f output/social_images/*.json 2>/dev/null || true; fi
           if [ -f "facebook_image_post_log.json" ]; then git add facebook_image_post_log.json; fi
-          if grep -q "^<<<<<<<" facebook_image_post_log.json 2>/dev/null; then
+          if [ -f "instagram_carousel_log.json" ]; then git add instagram_carousel_log.json; fi
+          if [ -f "news_log.json" ]; then git add news_log.json; fi
+          if [ -f "topic_tracker.json" ]; then git add topic_tracker.json; fi
+          if grep -q "^<<<<<<<" news_log.json topic_tracker.json instagram_carousel_log.json facebook_image_post_log.json 2>/dev/null; then
             echo "❌ Conflict markers found in JSON tracking files. Aborting commit."
             exit 1
           fi

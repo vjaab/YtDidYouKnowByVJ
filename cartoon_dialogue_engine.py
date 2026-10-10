@@ -1208,8 +1208,39 @@ DID_YOU_KNOW_SEED_FACTS = [
 ]
 
 
+class DialogueGenerationError(RuntimeError):
+    """Raised when no LLM provider could produce a topic-specific dialogue."""
+
+
+# Phrases from the old generic fallback template. If any of these appear, the dialogue
+# is NOT topic-specific and must never be published.
+GENERIC_TEMPLATE_PHRASES = [
+    "what makes this happen in modern engineering",
+    "underlying physics and software architectures make this fully operational",
+    "what happens if this system glitches or fails",
+    "automated fail-safes and redundancy keep the entire system from failing",
+    "it completely defies our daily intuition",
+]
+
+
+def find_generic_template_phrase(dialogue: Dict) -> Optional[str]:
+    """Return the first generic/stale template phrase found in the dialogue, if any."""
+    for s in (dialogue or {}).get("slides", []) or []:
+        text = f"{s.get('title', '')} {s.get('bubble', '')}".lower()
+        for phrase in GENERIC_TEMPLATE_PHRASES:
+            if phrase in text:
+                return phrase
+    return None
+
+
 def query_llm_for_json(prompt: str) -> Optional[Dict]:
-    """Helper to query OpenRouter or Gemini and return parsed JSON."""
+    """Helper to query all configured LLM providers and return parsed JSON."""
+    from llm_json_client import query_json
+    return query_json(prompt, temperature=0.7, label="Topic LLM")
+
+
+def _legacy_query_llm_for_json(prompt: str) -> Optional[Dict]:
+    """Deprecated: original OpenRouter/Gemini helper (kept for reference, unused)."""
     openrouter_key = os.getenv("OPENROUTER_API_KEY", "") or OPENROUTER_API_KEY
     if openrouter_key:
         try:
@@ -1318,7 +1349,7 @@ Return ONLY valid JSON (no markdown):
         }
 
     # Rule-based fallback if LLM is unavailable
-    clean_title = re.sub(r'^(GitHub Trending:\s*|Show HN:\s*|Ask HN:\s*)', '', title).strip()
+    clean_title = re.sub(r'^(GitHub Trending:\s*|Show HN:\s*|Ask HN:\s*|Medium\s*\([^)]*\):\s*|Reddit\s*\([^)]*\):\s*)', '', title).strip()
     if " — " in clean_title:
         parts = clean_title.split(" — ")
         clean_title = parts[1].strip() if len(parts[1].strip()) > 15 else parts[0].strip()
@@ -1485,8 +1516,9 @@ def fetch_or_select_did_you_know_fact(topic: Optional[str] = None, platform: str
             # Deterministic seed based on date + platform to ensure different selection per platform per day
             import hashlib
             from datetime import datetime
-            day_key = datetime.now().strftime("%Y-%m-%d")
-            seed_str = f"{day_key}-{platform}-{current_vector}"
+            day_key = datetime.now().strftime("%Y-%m-%d-%H")
+            run_key = os.getenv("GITHUB_RUN_ID", "") or str(random.random())
+            seed_str = f"{day_key}-{platform}-{current_vector}-{run_key}"
             seed_val = int(hashlib.sha256(seed_str.encode()).hexdigest()[:8], 16)
             rng = random.Random(seed_val)
             r = rng.uniform(0, total)
@@ -2083,10 +2115,11 @@ def get_curated_fallback_dialogue(mode: str, topic: Optional[str] = None, story:
                 "caption": "🧠 DID YOU KNOW? 🤯\n\n99% of the internet is not in the sky... it is sitting on the ocean floor!\n\nHere is the mind-blowing reality:\n🔹 Over 500 undersea fiber optic cables carry global data.\n🔹 They transmit data at 99.7% the speed of light.\n🔹 Deep-sea cables are only as thick as a garden hose, but carry trillions of dollars daily!\n\n💬 Did you already know this, or did this blow your mind? Drop a 🤯 below!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #Engineering #ComputerScience"
             }
 
-        # 8. Dynamic Tailored Fallback for any other topic
-        t = topic_str or "99% of the Internet is Underwater"
-        hook = hook_str or f"Did You Know: {t[:40]}? 🤯"
-        return build_tailored_dyk_dialogue(title=t, hook=hook, fact_summary=summary_str, source=source_str)
+        # 8. No topic-specific dialogue available. Do NOT emit the generic template
+        # (it produced identical slides 3-6 on every run). Fail loudly instead.
+        raise DialogueGenerationError(
+            f"No LLM-generated dialogue available for topic '{topic_str[:80]}'; refusing to publish generic template."
+        )
 
     if mode == "news" and story:
         title = story.get("title", topic or "New AI System Released")
@@ -2135,11 +2168,11 @@ def get_curated_fallback_dialogue(mode: str, topic: Optional[str] = None, story:
 def parse_and_validate_dialogue(data: Any, mode: str, topic: Optional[str] = None, story: Optional[Dict] = None) -> Dict:
     """Ensure strict adherence to alternating speakers, word limits, slide titles, and slide count."""
     if not isinstance(data, dict):
-        return get_curated_fallback_dialogue(mode, topic, story)
+        raise DialogueGenerationError("LLM returned no usable dialogue JSON")
 
     slides = data.get("slides", [])
     if not isinstance(slides, list) or len(slides) < 4:
-        return get_curated_fallback_dialogue(mode, topic, story)
+        raise DialogueGenerationError(f"LLM dialogue has too few slides ({len(slides) if isinstance(slides, list) else 0})")
 
     # Ensure 6–7 slides
     if len(slides) > 7:
@@ -2241,73 +2274,41 @@ def generate_cartoon_dialogue_json(
             mode = "did_you_know"
 
     prompt = build_dialogue_prompt(mode=mode, topic=topic, story=story, characters=characters)
-    dialogue_data = None
+    prompt += (
+        "\n\nIMPORTANT: The JSON above is ONLY a format example. Every slide title and bubble "
+        "MUST be written specifically about the topic given above, with concrete facts, numbers "
+        "and analogies for THIS topic. Never reuse the example sentences."
+    )
 
-    # Priority 1: OpenRouter models if key is present
-    openrouter_key = os.getenv("OPENROUTER_API_KEY", "") or OPENROUTER_API_KEY
-    if openrouter_key:
-        try:
-            print("🤖 Generating cartoon dialogue script with OpenRouter...")
-            headers = {
-                "Authorization": f"Bearer {openrouter_key}",
-                "Content-Type": "application/json",
-                "HTTP-Referer": "https://github.com/vjaab/YtDidYouKnowByVJ",
-                "X-Title": "YtDidYouKnowByVJ Cartoon Dialogue",
-            }
-            models = ["google/gemini-2.5-flash", "meta-llama/llama-3.3-70b-instruct", "openai/gpt-4o-mini"]
-            for m in models:
-                res = requests.post(
-                    "https://openrouter.ai/api/v1/chat/completions",
-                    headers=headers,
-                    json={
-                        "model": m,
-                        "messages": [{"role": "user", "content": prompt}],
-                        "temperature": 0.4,
-                    },
-                    timeout=30,
-                )
-                if res.status_code == 200:
-                    raw = res.json().get("choices", [{}])[0].get("message", {}).get("content", "")
-                    raw = re.sub(r"^```(?:json)?\s*", "", raw.strip(), flags=re.MULTILINE)
-                    raw = re.sub(r"\s*```$", "", raw.strip(), flags=re.MULTILINE)
-                    dialogue_data = json.loads(raw)
-                    print(f"✅ OpenRouter ({m}) generated {len(dialogue_data.get('slides', []))} dialogue slides")
-                    break
-        except Exception as e:
-            print(f"⚠️ OpenRouter generation note: {e}")
+    example_bubbles = {b.lower() for b in re.findall(r'"bubble":\s*"([^"]+)"', prompt)}
 
-    # Priority 2: Google GenAI (Gemini) — supports both new `google.genai` and legacy `google.generativeai`
-    if not dialogue_data and GEMINI_AVAILABLE and GEMINI_API_KEY:
-        models = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.5-pro"]
-        for m in models:
-            try:
-                raw = ""
-                if GEMINI_GENAI_AVAILABLE:
-                    client = genai.Client(api_key=GEMINI_API_KEY)
-                    resp = client.models.generate_content(
-                        model=m,
-                        contents=prompt,
-                    )
-                    raw = resp.text.strip()
-                elif GEMINI_LEGACY_AVAILABLE:
-                    genai_legacy.configure(api_key=GEMINI_API_KEY)
-                    model_inst = genai_legacy.GenerativeModel(m)
-                    resp = model_inst.generate_content(prompt)
-                    raw = resp.text.strip()
+    def _is_valid_dialogue(d: Dict) -> bool:
+        slides = d.get("slides")
+        if not isinstance(slides, list) or len(slides) < 4:
+            return False
+        bubbles = [str(s.get("bubble", "")).strip().lower() for s in slides if isinstance(s, dict)]
+        if len([b for b in bubbles if b]) < 4:
+            return False
+        # Reject output that just parrots the prompt's format example.
+        copied = sum(1 for b in bubbles[:-1] if b in example_bubbles)
+        if copied >= 2:
+            print(f"⚠️ Dialogue copied {copied} example bubbles from the prompt; rejecting")
+            return False
+        if find_generic_template_phrase(d):
+            return False
+        return True
 
-                if raw:
-                    raw = re.sub(r"^```(?:json)?\s*", "", raw, flags=re.MULTILINE)
-                    raw = re.sub(r"\s*```$", "", raw, flags=re.MULTILINE)
-                    parsed = json.loads(raw)
-                    if isinstance(parsed, dict) and "slides" in parsed and len(parsed["slides"]) >= 4:
-                        dialogue_data = parsed
-                        print(f"✅ Gemini ({m}) generated {len(dialogue_data.get('slides', []))} dialogue slides")
-                        break
-            except Exception as model_err:
-                print(f"⚠️ Gemini model {m} note: {model_err}")
-                continue
+    from llm_json_client import query_json
+    print(f"🤖 Generating cartoon dialogue script for '{(story or {}).get('title') or topic}'...")
+    dialogue_data = query_json(prompt, temperature=0.7, label="Dialogue LLM", validator=_is_valid_dialogue)
+    if not dialogue_data:
+        raise DialogueGenerationError(
+            "All LLM providers failed to generate a topic-specific dialogue. "
+            "Check GEMINI_API_KEY quota / OPENROUTER_API_KEY credits / CF_API_TOKEN."
+        )
+    print(f"✅ Generated {len(dialogue_data.get('slides', []))} topic-specific dialogue slides")
 
-    # Validate and fallback if needed
+    # Validate structure (raises DialogueGenerationError if invalid)
     result = parse_and_validate_dialogue(dialogue_data, mode=mode, topic=topic, story=story)
     speaker_left, speaker_right = resolve_dialogue_characters(characters=characters, topic=topic or "", story=story)
     result["speaker_left"] = result.get("speaker_left") or speaker_left
