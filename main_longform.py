@@ -33,7 +33,9 @@ from config_longform import (
     LONGFORM_TARGET_AUDIO_DURATION, LONGFORM_MAX_CHAPTERS,
     LONGFORM_VISUAL_BEATS_PER_CHAPTER, LONGFORM_BGM_VOLUME,
     LONGFORM_MAX_RETRY_ATTEMPTS, LONGFORM_TRACKER_FILE,
-    LONGFORM_WORD_COUNT_TARGET, get_topic_depth_mode
+    LONGFORM_WORD_COUNT_TARGET, get_topic_depth_mode,
+    LONGFORM_ENABLE_LASER_BAR, LONGFORM_ENABLE_CHAPTER_HUD,
+    LONGFORM_ENABLE_MASCOT_COHOST, LONGFORM_ENABLE_SOUND_DESIGN
 )
 from fetch_research_papers import fetch_tech_news, fetch_ai_tools, fetch_trending_from_newsapi, fetch_reddit_news
 from kaggle_handover import trigger_kaggle_gpu_job
@@ -490,11 +492,13 @@ def run_longform_pipeline(dry_run=False):
                     script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY
                 )
                 script_data["kaggle_lipsync_path"] = None
-                script_data["skip_avatar"] = True
+                # Keep avatar active for local rendering (facecam corner PiP)
+                script_data["skip_avatar"] = False
         else:
             audio_path, duration, word_timestamps = generate_voiceover(
                 script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY
             )
+            script_data["skip_avatar"] = False
 
         if not audio_path:
             log_message("ERROR: Audio generation failed.")
@@ -550,11 +554,12 @@ def run_longform_pipeline(dry_run=False):
                         script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY
                     )
                     script_data["kaggle_lipsync_path"] = None
-                    script_data["skip_avatar"] = True
+                    script_data["skip_avatar"] = False
             else:
                 audio_path, duration, word_timestamps = generate_voiceover(
                     script, custom_phonetic_map=custom_map, api_key=GEMINI_API_KEY
                 )
+                script_data["skip_avatar"] = False
 
     if not audio_path or not script_data:
         log_message("ERROR: Could not generate valid assets. Aborting.")
@@ -575,8 +580,15 @@ def run_longform_pipeline(dry_run=False):
         "AI Deep Dive", companies_all, keywords, 7,
         "deep_dive", "pending_upload", script_data.get("original_news_url"),
         avatar_used=script_data.get("lipsync_face_path"),
-        tracker_file=LONGFORM_TRACKER_FILE
+        tracker_file=LONGFORM_TRACKER_FILE,
+        creator_archetype=script_data.get("creator_archetype")
     )
+
+    # Attach dynamic overlay configuration flags for 16:9 renderer
+    script_data["enable_laser_bar"] = LONGFORM_ENABLE_LASER_BAR
+    script_data["enable_chapter_hud"] = LONGFORM_ENABLE_CHAPTER_HUD
+    script_data["enable_mascot_cohost"] = LONGFORM_ENABLE_MASCOT_COHOST
+    script_data["enable_sound_design"] = LONGFORM_ENABLE_SOUND_DESIGN
 
     # ── STEP 5: Build Visual Chunks (CHAPTER-AWARE) ──────────────────────
     log_message("STEP 5: Building visual chunks...")

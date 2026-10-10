@@ -81,3 +81,45 @@ SHORTS_VISUAL_CUT_DURATION = (1.5, 2.5)       # Rapid visual pacing: 1.5-2.5s pe
 SHORTS_CAPTION_Y_POS = 0.52                   # Center-screen dynamic kinetic captions
 SHORTS_MAX_WORDS_PER_CHUNK = 3                # 1-3 words per kinetic caption chunk
 
+# ── 1M+ View Creator Archetypes & Rotation ────────────────────────────────────
+# 4 distinct high-performing YouTube narrative styles rotated on each run:
+# 1. FIRESHIP_FAST: High-density, fast-paced, terminal/code focus, meme humor & pragmatic takeaways
+# 2. CLEO_INVESTIGATIVE: Optimistic investigative storytelling, historical context, clear timelines & future vision
+# 3. VERITASIUM_MYSTERY: Unintuitive mystery/paradox hook, experiment framing, myth-busting & aha payoff
+# 4. STUDENT_PROJECT: Portfolio projects, free tools/tiers, beginner pitfalls & "build this this weekend"
+LONGFORM_CREATOR_ARCHETYPES = [
+    "FIRESHIP_FAST",
+    "CLEO_INVESTIGATIVE",
+    "VERITASIUM_MYSTERY",
+    "STUDENT_PROJECT"
+]
+
+def get_next_creator_archetype(tracker_file=LONGFORM_TRACKER_FILE):
+    """Rotates sequentially through the 4 creator archetypes based on tracker history."""
+    import json
+    last_idx = 0
+    try:
+        if os.path.exists(tracker_file):
+            with open(tracker_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                history = data.get("history", []) if isinstance(data, dict) else (data if isinstance(data, list) else [])
+                for item in reversed(history):
+                    arch = item.get("creator_archetype")
+                    if arch in LONGFORM_CREATOR_ARCHETYPES:
+                        last_idx = (LONGFORM_CREATOR_ARCHETYPES.index(arch) + 1) % len(LONGFORM_CREATOR_ARCHETYPES)
+                        break
+    except Exception as e:
+        print(f"⚠️ Could not read archetype tracker: {e}")
+        last_idx = datetime.now().weekday() % len(LONGFORM_CREATOR_ARCHETYPES)
+    
+    selected = LONGFORM_CREATOR_ARCHETYPES[last_idx]
+    return selected
+
+# ── 16:9 Dynamic Overlays & Aesthetics ────────────────────────────────────────
+LONGFORM_ENABLE_LASER_BAR = True              # 16:9 sleek glowing laser timeline
+LONGFORM_ENABLE_CHAPTER_HUD = True            # Floating glassmorphic chapter badges
+LONGFORM_ENABLE_MASCOT_COHOST = True          # Byte the Robot reaction cameos
+LONGFORM_ENABLE_SOUND_DESIGN = True           # Subconscious UI whooshes, risers, pop sounds
+LONGFORM_AVATAR_CORNER = "bottom_right"       # High-end cinematic corner PiP (16:9)
+LONGFORM_AVATAR_FRAME_SHAPE = "circle"        # "circle" with breathing accent ring or "rounded_rect"
+

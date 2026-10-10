@@ -32,44 +32,81 @@ from config_longform import (
     LONGFORM_MAX_CHAPTERS, LONGFORM_VISUAL_BEATS_PER_CHAPTER,
     LONGFORM_WORD_COUNT_TARGET, LONGFORM_TARGET_AUDIO_DURATION,
     LONGFORM_TRACKER_FILE, LONGFORM_COLD_OPEN_DURATION,
+    LONGFORM_CREATOR_ARCHETYPES, get_next_creator_archetype,
     get_topic_depth_mode
 )
+from humanizer_engine import verify_and_humanize_script, HumanizerAuditor
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# PROMPT TEMPLATES (CHAPTERED DEEP-DIVE FORMAT)
+# PROMPT TEMPLATES & ROTATING 1M+ VIEW CREATOR ARCHETYPES
 # ═══════════════════════════════════════════════════════════════════════════════
 
-SYSTEM_PERSONA_LONGFORM = """Role: You are an elite tech video scriptwriter who creates chaptered deep-dive videos combining Fireship's density, MKBHD's clarity, and Johnny Harris's narrative structure. You target engineers, founders, and tech professionals who want substance, not surface-level coverage, while remaining effortlessly accessible to curious everyday people.
+def get_creator_persona(archetype="FIRESHIP_FAST") -> str:
+    """Builds a customized high-performing system persona based on the rotated creator archetype."""
+    archetype_flavors = {
+        "FIRESHIP_FAST": """CREATOR STYLE: Fireship / NetworkChuck (High-Density, Satirical & Pragmatic)
+- Fast-paced (140-155 WPM), cynical and entertaining developer perspective.
+- Direct reality check on corporate hype: "Let's be real," "Marketing called this magic, but it's literally just..."
+- Highlight terminal commands, code architecture, speedrun benchmarks, and actionable dev takeaways.
+- Include subtle self-deprecating developer humor and meme-level clarity.
+- Student/Career Angle: How engineers and students can run this locally without paying big cloud bills.""",
 
-Format: 16:9 Landscape, strictly 2 to 3 minutes duration only (120-180 seconds), chaptered deep-dive.
+        "CLEO_INVESTIGATIVE": """CREATOR STYLE: Cleo Abram / Vox / Johnny Harris (Optimistic Investigative Journey)
+- Narrative-driven, journalistic optimism. Frame technology as an exciting human adventure rather than impending doom.
+- Visual storytelling: Connect historical breakthroughs to today's moment with clear chronological timelines.
+- Focus on the fascinating question of *how* and *why* this was built, and what it unlocks for humanity.
+- Tone is warm, curious, deeply intelligent, and inspiring.
+- Student/Career Angle: Why this paradigm shift creates completely new career paths for anyone entering tech today.""",
 
-Tone: Dense, fast-paced, technically precise. Short sentences. Active voice. No throat-clearing, no filler. React to facts with genuine surprise or opinion. Use contractions naturally (it's, you're, don't, can't). Mix punchy 5-word sentences with longer 15-word flowing ones.
+        "VERITASIUM_MYSTERY": """CREATOR STYLE: Veritasium / Mark Rober (Curiosity & Counterintuitive Paradox)
+- Hook the audience with a paradox, counterintuitive riddle, or startling misconception ("Why adding more memory actually makes this slower").
+- Structure as a scientific investigation: Pose the hypothesis, show where conventional wisdom fails, test the evidence, and reveal the counterintuitive truth.
+- Build tension between chapters with unresolved questions that demand the next answer.
+- Student/Career Angle: The foundational CS concept that 90% of students and junior engineers get backwards.""",
 
-Target Audience: Engineers, founders, creators from high-RPM countries (USA, UK, Canada, Australia, Singapore, India), plus tech-curious non-technical viewers. Standard English, clean numbers, clear physical analogies.
+        "STUDENT_PROJECT": """CREATOR STYLE: Student & Builder Magnet (NeetCode / Theo t3.gg / FreeCodeCamp)
+- Actionable, empowering, weekend-project focus for students, self-taught devs, and aspiring engineers.
+- Core value proposition: "How you can build this this weekend for $0 on your laptop."
+- Break down open-source GitHub repos, free API tiers, system architecture diagrams, and resume portfolio value.
+- Highlight common beginner pitfalls: "The trap junior devs make when implementing this."
+- Direct interview talking points: "If this comes up in a system design interview, here is how you explain it." """
+    }
+
+    selected_flavor = archetype_flavors.get(archetype, archetype_flavors["FIRESHIP_FAST"])
+
+    return f"""Role: You are an elite YouTube tech creator producing a 16:9 chaptered deep-dive video (strictly 2 to 3 minutes / 120-180 seconds).
+
+{selected_flavor}
+
+Format: 16:9 Landscape, strictly 2 to 3 minutes duration only (120-180 seconds, 280-420 words), chaptered deep-dive.
+
+Tone & Personality: Dense, conversational, human, and authentic. Have real opinions: react to facts with genuine surprise, skepticism, or excitement. Vary sentence rhythm: mix punchy 4-word statements with flowing 15-word explanations. Use natural contractions (it's, you're, don't, can't, wouldn't). Do NOT sound like an AI assistant or PR press release.
+
+Target Audience: Tech students, software engineers, founders, and curious tech enthusiasts worldwide.
 
 MANDATORY "ELI5" (EXPLAIN LIKE I'M 5) ANALOGY RULE:
-- Every abstract, complex, or technical concept MUST use a real-world physical metaphor that anyone can instantly visualize.
+- Every abstract or complex concept MUST use a real-world physical metaphor that anyone can instantly visualize.
 - Examples:
-  * Server load/concurrency -> rush-hour highway traffic or airport security checkpoints
-  * Token context / context window -> physical desk space that gets cluttered or a whiteboard with limited space
-  * Embeddings / vector database -> organizing a supermarket by flavor and texture instead of alphabetical aisles
-  * Quantization / weights compression -> packing a travel suitcase using vacuum compression bags
-  * AI Agents / Mixture-of-Experts -> a high-end restaurant kitchen with specialized line cooks and executive chefs
-- Never present pure abstract jargon without immediately grounding it in a tactile, everyday physical comparison.
+  * Server concurrency -> rush-hour highway traffic or airport security queues
+  * Context window / token limit -> physical desk space that gets cluttered or a whiteboard
+  * Vector embeddings -> organizing a supermarket by taste and cooking style instead of alphabetical aisles
+  * Quantization / compression -> packing travel luggage using vacuum compression bags
+  * Mixture-of-Experts -> a Michelin-star restaurant kitchen with specialized line cooks
+- Never present abstract jargon without immediately grounding it in a tactile, everyday physical comparison.
 
-MANDATORY WRITING CONSTRAINTS:
-- First sentence must immediately state high stakes. NO "hey guys", NO channel intros, NO welcomes.
-- Every sentence must earn its place. If it doesn't add a new fact, stake, or turn, cut it.
-- Hard constraint: ZERO em dashes, en dashes, spaced em dashes, or double hyphens. Use commas, colons, periods, or parentheses.
-- Do NOT use: "delve", "fostering", "tapestry", "intricate", "pivotal", "vibrant", "enduring", "enhance", "additionally", "landscape", "testament", "underscore", "showcase", "groundbreaking", "breathtaking".
-- Do NOT use: "serves as", "stands as", "is a testament", "evolving landscape", "Not only... but...", "boasts a".
-- Do NOT use passive voice or subjectless fragments ("No configuration needed" -> "You don't need a configuration").
-- Avoid vague attributions: "Experts say", "Industry reports", "Observers note". Name specific sources or cut the claim.
-- Use simple copulas: "is", "are", "has". Not "serves as", "features", "stands as".
+STRICT ANTI-AI "HUMANIZER" CONSTRAINTS (Wikipedia AI Cleanup Guidelines):
+- First sentence must immediately state high stakes or an intriguing question. NO greetings, NO "hey guys", NO channel intros.
+- Hard constraint: ZERO em dashes (—), en dashes (–), spaced em dashes, or double hyphens. Use commas, colons, or periods.
+- Do NOT use AI buzzwords: "delve", "fostering", "tapestry", "intricate", "pivotal", "vibrant", "enduring", "enhance", "additionally", "landscape", "testament", "underscore", "showcase", "groundbreaking", "breathtaking", "crucial".
+- Do NOT use copula avoidance: replace "serves as", "stands as", "is a testament to", "boasts a" with simple "is", "has", "shows".
+- Do NOT use negative parallelisms: replace "Not only... but also..." or "It's not just about X, it's..." with direct active statements.
+- Do NOT use passive voice or subjectless fragments ("No configuration needed" -> "You don't need any configuration").
+- Avoid vague attributions: "Experts say", "Industry reports". Name specific people/companies or cut the claim.
 - Do NOT force descriptions into groups of three (rule of three).
-- Use heavy punctuation (commas, ellipses, ALL CAPS on key words, exclamation points) for TTS vocal dynamics."""
+- Use strategic vocal punctuation (commas for breath pauses, ellipses for suspense, ALL CAPS on key punchy words)."""
 
+SYSTEM_PERSONA_LONGFORM = get_creator_persona("FIRESHIP_FAST")
 
 TOPIC_DISCOVERY_SINGLE_TEMPLATE = """{persona}
 
@@ -537,13 +574,16 @@ def execute_with_timeout(func, timeout, *args, **kwargs):
 
 
 class ChapteredScriptEngine:
-    """4-agent chaptered deep-dive script generation engine."""
+    """4-agent chaptered deep-dive script generation engine with 1M+ view Creator Archetypes."""
 
-    def __init__(self, client, news_context, avoid_list_str, depth_mode="single"):
+    def __init__(self, client, news_context, avoid_list_str, depth_mode="single", creator_archetype=None):
         self.client = client
         self.news_context = news_context
         self.avoid_list_str = avoid_list_str
         self.depth_mode = depth_mode  # "single" or "multi"
+        self.creator_archetype = creator_archetype or get_next_creator_archetype(tracker_file=LONGFORM_TRACKER_FILE)
+        self.persona = get_creator_persona(self.creator_archetype)
+        print(f"🎭 [CREATOR ARCHETYPE] Selected Style: {self.creator_archetype}")
 
     def _call_gemini(self, prompt, model=GEMINI_FLASH_MODEL, use_search=False):
         """Call Gemini with strict retry logic and fast model fallback."""
@@ -671,7 +711,7 @@ class ChapteredScriptEngine:
             template = TOPIC_DISCOVERY_SINGLE_TEMPLATE
 
         prompt = template.format(
-            persona=SYSTEM_PERSONA_LONGFORM,
+            persona=self.persona,
             news_context=enriched_context,
             avoid_list=self.avoid_list_str
         )
@@ -709,7 +749,7 @@ class ChapteredScriptEngine:
             context += f"\nSOURCES:\n" + "\n".join(search_links[:5])
 
         prompt = RESEARCH_TEMPLATE.format(
-            persona=SYSTEM_PERSONA_LONGFORM,
+            persona=self.persona,
             headline=headline,
             source_url=source_url,
             context=context
@@ -719,7 +759,7 @@ class ChapteredScriptEngine:
     # ── AGENT 2: Chaptered Script Architect ───────────────────────────────────
     def generate_chaptered_script(self, stories, research_results):
         """Generate the full chaptered script from researched stories."""
-        print("📝 [AGENT 2] Chaptered Script Architect...")
+        print(f"📝 [AGENT 2] Chaptered Script Architect ({self.creator_archetype})...")
 
         # Build story context
         story_parts = []
@@ -748,7 +788,7 @@ Write the deepest possible analysis of this one story across 2-3 chapters.
         max_min = max_words // 140
 
         prompt = CHAPTERED_SCRIPT_TEMPLATE.format(
-            persona=SYSTEM_PERSONA_LONGFORM,
+            persona=self.persona,
             story_context=story_context,
             min_words=min_words,
             max_words=max_words,
@@ -761,11 +801,11 @@ Write the deepest possible analysis of this one story across 2-3 chapters.
     # ── AGENT 3: Retention + Humanizer ───────────────────────────────────────
     def optimize_and_humanize(self, script_data):
         """Combined retention optimization and humanization pass."""
-        print("⚡ [AGENT 3] Retention Optimizer + Humanizer...")
+        print(f"⚡ [AGENT 3] Retention Optimizer + Humanizer ({self.creator_archetype})...")
 
         script = script_data.get("script", "")
         prompt = RETENTION_HUMANIZER_TEMPLATE.format(
-            persona=SYSTEM_PERSONA_LONGFORM,
+            persona=self.persona,
             script=script,
             compilation_data=json.dumps(script_data, indent=2)
         )
@@ -828,6 +868,24 @@ Write the deepest possible analysis of this one story across 2-3 chapters.
             final_data["script"] = script_data["script"]
             final_data["chapters"] = script_data.get("chapters", [])
 
+        # Attach Archetype and Narrative Layout Format
+        final_data["creator_archetype"] = self.creator_archetype
+        archetype_to_format = {
+            "FIRESHIP_FAST": "SPEEDRUN",
+            "CLEO_INVESTIGATIVE": "PAUSE_AND_GUESS",
+            "VERITASIUM_MYSTERY": "MYTH_BUSTER",
+            "STUDENT_PROJECT": "MASCOT_DEBATE"
+        }
+        final_data["narrative_format"] = archetype_to_format.get(self.creator_archetype, "SPEEDRUN")
+
+        # 4. Mandatory Wikipedia-Based Anti-AI Humanizer Audit & Sanitizer
+        print("🛡️ [HUMANIZER CHECK] Running Wikipedia-based AI Pattern Sanitizer...")
+        final_data = verify_and_humanize_script(final_data)
+        h_stats = final_data.get("humanizer_stats", {})
+        print(f"   ✅ Humanic Score: {h_stats.get('main_script_score', 100)}/100 | "
+              f"Em dashes removed: {h_stats.get('em_dashes_removed', 0)} | "
+              f"AI buzzwords cleaned: {h_stats.get('ai_words_replaced', 0)}")
+
         # Ensure critical fields
         today_str = datetime.now().strftime("%Y-%m-%d")
         if not final_data.get("original_news_headline"):
@@ -878,7 +936,7 @@ Write the deepest possible analysis of this one story across 2-3 chapters.
         final_wc = len(final_data.get("script", "").split())
         print(f"⭐ [LONGFORM] Pipeline complete: {final_wc} words, "
               f"{len(final_data.get('chapters', []))} chapters, "
-              f"{len(stories)} story/stories (mode={self.depth_mode})")
+              f"{len(stories)} story/stories (archetype={self.creator_archetype})")
         return final_data
 
     def generate_layman_shorts_script(self, primary_story, longform_data):
@@ -945,7 +1003,7 @@ Write the deepest possible analysis of this one story across 2-3 chapters.
 # PUBLIC ENTRY POINT
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def generate_longform_script(articles=None, failed_topics=None):
+def generate_longform_script(articles=None, failed_topics=None, creator_archetype=None):
     """Main entry point for longform chaptered deep-dive script generation."""
     from gemini_script import _get_active_gemini_key
     active_key = _get_active_gemini_key()
@@ -989,8 +1047,8 @@ def generate_longform_script(articles=None, failed_topics=None):
             + news_context
         )
 
-    # Run the chaptered pipeline
-    engine = ChapteredScriptEngine(client, news_context, avoid_list_str, depth_mode)
+    # Run the chaptered pipeline with selected creator archetype
+    engine = ChapteredScriptEngine(client, news_context, avoid_list_str, depth_mode, creator_archetype=creator_archetype)
     script_data = engine.execute()
 
     if script_data:

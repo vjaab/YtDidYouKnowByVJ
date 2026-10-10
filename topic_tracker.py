@@ -115,7 +115,7 @@ def check_cooldowns(companies, subcategory, tracker_file=TRACKER_FILE):
         
     return True, "Cooldowns OK"
 
-def record_story(title, news_headline, subcategory, companies, keywords, breaking_news_level, voice_used, youtube_url, news_source_url, topic_type=None, target_country=None, avatar_used=None, student_vector=None, dyk_vector=None, topic_source=None, tracker_file=TRACKER_FILE):
+def record_story(title, news_headline, subcategory, companies, keywords, breaking_news_level, voice_used, youtube_url, news_source_url, topic_type=None, target_country=None, avatar_used=None, student_vector=None, dyk_vector=None, topic_source=None, tracker_file=TRACKER_FILE, creator_archetype=None):
     tracker = load_tracker(tracker_file)
     today = datetime.now().strftime("%Y-%m-%d")
     
@@ -173,6 +173,8 @@ def record_story(title, news_headline, subcategory, companies, keywords, breakin
         "target_country": target_country,
         "avatar_used": avatar_used
     }
+    if creator_archetype:
+        history_entry["creator_archetype"] = creator_archetype
     if topic_type:
         history_entry["topic_type"] = topic_type
     if student_vector:

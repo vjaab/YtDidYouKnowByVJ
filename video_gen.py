@@ -7146,7 +7146,7 @@ def render_persistent_topic_header(topic_title, accent_color, width, height):
 def render_glowing_laser_progress_bar(timestamp, duration, frame_w, frame_h, accent_color=(0, 229, 255)):
     """
     Renders a sleek glowing laser progress bar with rounded pill head and neon gradient.
-    Positioned in safe zone below header at top of frame.
+    Positioned in safe zone below header at top of frame for Shorts, or sleek bottom line for 16:9.
     """
     img = Image.new('RGBA', (frame_w, frame_h), (0, 0, 0, 0))
     if duration <= 0:
@@ -7156,26 +7156,80 @@ def render_glowing_laser_progress_bar(timestamp, duration, frame_w, frame_h, acc
         return img
 
     draw = ImageDraw.Draw(img)
-    bar_y = 110  # safe margin below top header
-    bar_h = 6
-    total_w = frame_w - 80  # 40px margin on each side
+    is_landscape = frame_w > frame_h
+    if is_landscape:
+        bar_y = frame_h - 18
+        bar_h = 5
+        total_w = frame_w - 60
+        x1 = 30
+        head_size = 10
+    else:
+        bar_y = 110  # safe margin below top header for vertical shorts
+        bar_h = 6
+        total_w = frame_w - 80  # 40px margin on each side
+        x1 = 40
+        head_size = 10
+
     current_w = max(4, int(total_w * prog))
-    x1 = 40
     x2 = x1 + current_w
 
     # Background track (translucent obsidian)
-    draw.rounded_rectangle([x1, bar_y, x1 + total_w, bar_y + bar_h], radius=3, fill=(15, 15, 25, 130))
+    draw.rounded_rectangle([x1, bar_y, x1 + total_w, bar_y + bar_h], radius=3, fill=(15, 15, 25, 140))
     
     # Active fill
     r, g, b = accent_color[:3]
     draw.rounded_rectangle([x1, bar_y, x2, bar_y + bar_h], radius=3, fill=(r, g, b, 230))
     
     # Glowing head point
-    head_size = 10
     head_x = x2
     head_y = bar_y + bar_h // 2
     draw.ellipse([head_x - head_size // 2, head_y - head_size // 2, 
                   head_x + head_size // 2, head_y + head_size // 2], fill=(255, 255, 255, 255))
+    return img
+
+def render_chapter_hud(timestamp, chapters, frame_w, frame_h, accent_color=(0, 229, 255)):
+    """
+    Renders a sleek glassmorphic chapter pill badge in the top-left corner for 16:9 videos.
+    """
+    img = Image.new('RGBA', (frame_w, frame_h), (0, 0, 0, 0))
+    if not chapters or frame_w <= frame_h:
+        return img
+
+    # Find the current active chapter
+    active_ch = None
+    for ch in chapters:
+        start_s = ch.get("approx_start_seconds", 0)
+        if timestamp >= start_s:
+            active_ch = ch
+        else:
+            break
+            
+    if not active_ch:
+        active_ch = chapters[0]
+
+    ch_num = active_ch.get("chapter_number", 1)
+    ch_title = active_ch.get("chapter_title", f"CHAPTER {ch_num}").upper()
+    pill_text = f"CHAPTER {ch_num}  •  {ch_title[:38]}"
+
+    font = gf(22, bold=True)
+    draw = ImageDraw.Draw(img)
+    tb = draw.textbbox((0, 0), pill_text, font=font)
+    tw, th = tb[2] - tb[0], tb[3] - tb[1]
+
+    pad_x, pad_y = 20, 10
+    x1 = 50
+    y1 = 45
+    x2 = x1 + tw + pad_x * 2
+    y2 = y1 + th + pad_y * 2
+
+    r, g, b = accent_color[:3]
+    draw.rounded_rectangle([x1, y1, x2, y2], radius=14, fill=(12, 14, 22, 210), outline=(r, g, b, 180), width=2)
+    # Accent indicator dot
+    dot_radius = 5
+    dot_cx = x1 + pad_x + dot_radius
+    dot_cy = y1 + (y2 - y1) // 2
+    draw.ellipse([dot_cx - dot_radius, dot_cy - dot_radius, dot_cx + dot_radius, dot_cy + dot_radius], fill=(r, g, b, 255))
+    draw.text((x1 + pad_x + 18, y1 + pad_y), pill_text, font=font, fill=(255, 255, 255, 240))
     return img
 
 def render_speedrun_hud(timestamp, duration, frame_w, frame_h, accent_color=(255, 50, 80)):
@@ -11107,29 +11161,34 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 main_pil.alpha_composite(card_img, dest=(1550, 610))
                 bg_frame = np.array(main_pil.convert("RGB"))
 
-        # ── DYNAMIC PIPELINE VARIATION OVERLAYS ──
+        # ── DYNAMIC PIPELINE VARIATION OVERLAYS (16:9 Longform & 9:16 Shorts) ──
         extra_overlay_img = Image.new('RGBA', (FRAME_W, FRAME_H), (0, 0, 0, 0))
-        if not is_longform:
-            # 1. Glowing Laser Progress Bar
-            enable_laser_bar = os.environ.get("ENABLE_LASER_PROGRESS_BAR", "1") == "1"
-            if enable_laser_bar:
-                laser_bar = render_glowing_laser_progress_bar(t, audio_duration, FRAME_W, FRAME_H, accent_color)
-                extra_overlay_img.alpha_composite(laser_bar)
-            
-            # 2. Format-Specific Enhancements (Visual / Narrative Archetypes)
-            narrative_fmt = script_json.get("narrative_format", "")
-            if narrative_fmt == "SPEEDRUN":
-                speedrun_hud = render_speedrun_hud(t, audio_duration, FRAME_W, FRAME_H)
-                extra_overlay_img.alpha_composite(speedrun_hud)
-            elif narrative_fmt == "PAUSE_AND_GUESS":
-                pause_hud = render_pause_and_guess_hud(t, FRAME_W, FRAME_H, accent_color)
-                extra_overlay_img.alpha_composite(pause_hud)
-            elif narrative_fmt == "MYTH_BUSTER":
-                myth_stamp = render_myth_buster_stamp(t, FRAME_W, FRAME_H)
-                extra_overlay_img.alpha_composite(myth_stamp)
-            elif narrative_fmt == "MASCOT_DEBATE":
-                mascot_pip = render_mascot_reaction_overlay(t, audio_duration, FRAME_W, FRAME_H)
-                extra_overlay_img.alpha_composite(mascot_pip)
+        
+        # 1. Glowing Laser Progress Bar
+        enable_laser_bar = script_json.get("enable_laser_bar", True) and (os.environ.get("ENABLE_LASER_PROGRESS_BAR", "1") == "1")
+        if enable_laser_bar:
+            laser_bar = render_glowing_laser_progress_bar(t, audio_duration, FRAME_W, FRAME_H, accent_color)
+            extra_overlay_img.alpha_composite(laser_bar)
+
+        # 2. 16:9 Longform Chapter HUD (Displays current chapter label & title)
+        if is_longform and script_json.get("enable_chapter_hud", True):
+            chapter_hud = render_chapter_hud(t, script_json.get("chapters", []), FRAME_W, FRAME_H, accent_color)
+            extra_overlay_img.alpha_composite(chapter_hud)
+
+        # 3. Format-Specific Narrative Archetype Enhancements
+        narrative_fmt = script_json.get("narrative_format", "")
+        if narrative_fmt == "SPEEDRUN":
+            speedrun_hud = render_speedrun_hud(t, audio_duration, FRAME_W, FRAME_H)
+            extra_overlay_img.alpha_composite(speedrun_hud)
+        elif narrative_fmt == "PAUSE_AND_GUESS":
+            pause_hud = render_pause_and_guess_hud(t, FRAME_W, FRAME_H, accent_color)
+            extra_overlay_img.alpha_composite(pause_hud)
+        elif narrative_fmt == "MYTH_BUSTER":
+            myth_stamp = render_myth_buster_stamp(t, FRAME_W, FRAME_H)
+            extra_overlay_img.alpha_composite(myth_stamp)
+        elif narrative_fmt in ["MASCOT_DEBATE", "STUDENT_WORKSHOP"]:
+            mascot_pip = render_mascot_reaction_overlay(t, audio_duration, FRAME_W, FRAME_H)
+            extra_overlay_img.alpha_composite(mascot_pip)
 
         return composite_frame(bg_frame, t, header_img, subtitle_img, this_transparency_img, entity_tags_img, extra_overlay_img)
 
