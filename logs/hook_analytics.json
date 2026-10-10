@@ -1459,16 +1459,43 @@
         "avg_swipe_away": 0.016149999999999998,
         "avg_view_percentage": 48.385
       }
+    },
+    "Tech Gadgets & Inventions": {
+      "negative_warning": {
+        "variants": {
+          "B": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "Stop buying expensive smartphones right now.",
+                "video_id": "iSK_IoU7y7A",
+                "recorded_at": "2026-10-10T15:32:06.822516"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
+      }
     }
   },
   "global": {
     "negative_warning": {
       "views": 440,
-      "retention": 0.16142919874080708,
-      "engagement": 0.005404040404040404,
-      "count": 25,
-      "swipe_away_rate": 0.272864,
-      "avg_view_percentage": 21.9752
+      "retention": 0.1552203834046222,
+      "engagement": 0.005196192696192697,
+      "count": 26,
+      "swipe_away_rate": 0.2623692307692308,
+      "avg_view_percentage": 21.13
     },
     "result_first": {
       "views": 1014,
@@ -1503,5 +1530,5 @@
       "avg_view_percentage": 19.2036
     }
   },
-  "last_updated": "2026-10-09T13:00:58.082627"
+  "last_updated": "2026-10-10T15:32:06.822547"
 }

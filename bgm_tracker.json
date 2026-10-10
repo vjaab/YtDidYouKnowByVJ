@@ -1,6 +1,18 @@
 {
   "history": [
     {
+      "track": "jam_Energy.mp3",
+      "headline": "Smart Contact Lenses May Arrive as Soon as 2030. Here\u2019s What They Do",
+      "topic_type": "auto",
+      "timestamp": "38059428399"
+    },
+    {
+      "track": "jam_Energetic_Pop.mp3",
+      "headline": "Smart Contact Lenses May Arrive as Soon as 2030. Here\u2019s What They Do",
+      "topic_type": "auto",
+      "timestamp": "38059428399"
+    },
+    {
       "track": "jam_Elite.mp3",
       "headline": "mattpocock/skills: Skills for Real Engineers. Straight from my .agents directory",
       "topic_type": "auto",
@@ -164,7 +176,7 @@
     }
   ],
   "usage_counts": {
-    "jam_Energy.mp3": 4,
+    "jam_Energy.mp3": 5,
     "jam_Action_Inspiration_Trailer.mp3": 3,
     "jam_The_Epic.mp3": 3,
     "jam_Escape_From_The_Machine_Planet.mp3": 2,
@@ -175,7 +187,7 @@
     "jam_Upbeat.mp3": 2,
     "modern_tech.mp3": 2,
     "jam_Elite.mp3": 2,
-    "jam_Energetic_Pop.mp3": 1,
+    "jam_Energetic_Pop.mp3": 2,
     "jam_Groovy_SIX.mp3": 1
   }
 }

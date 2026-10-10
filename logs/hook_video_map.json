@@ -1394,5 +1394,15 @@
       "shares": 0,
       "subscribers_gained": 0
     }
+  },
+  "iSK_IoU7y7A": {
+    "video_id": "iSK_IoU7y7A",
+    "hook_pattern": "negative_warning",
+    "hook_variant": "B",
+    "hook_text": "Stop buying expensive smartphones right now.",
+    "category": "Tech Gadgets & Inventions",
+    "title": "Why Smartphones Might Completely Disappear \u26a1",
+    "uploaded_at": "2026-10-10T15:32:06.824699",
+    "synced": false
   }
 }
