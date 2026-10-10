@@ -1,0 +1,131 @@
+{
+  "topic": "Public USB Ports Threat Analysis by FCC & CISA",
+  "topic_type": "security_incident",
+  "domain": "security",
+  "difficulty": "intermediate",
+  "audience": "students_and_professionals",
+  "visual_theme": "BLUEPRINT",
+  "theme_css_class": "theme--blueprint",
+  "theme_colors": {
+    "bg": "#0A1628",
+    "card_bg": "#0F2140",
+    "card_border": "#1A3A6B",
+    "text_primary": "#E0F0FF",
+    "text_secondary": "#7EB8E0",
+    "text_muted": "#4A7BA8",
+    "accent": "#00B4D8",
+    "accent_secondary": "#0096C7",
+    "accent_success": "#48CAE4",
+    "accent_danger": "#FF6B6B",
+    "accent_warning": "#FFD166",
+    "code_bg": "#071120",
+    "gradient_start": "#00B4D8",
+    "gradient_end": "#0077B6"
+  },
+  "visual_concept": "threat_vector",
+  "visual_motifs": [
+    "attack_path",
+    "lock_shield",
+    "warning_badge",
+    "perimeter_mesh"
+  ],
+  "hero_visual": "security_perimeter",
+  "accent_style": "threat_alert",
+  "storytelling_pattern": "security_incident",
+  "slide_count": 7,
+  "layout_pattern": [
+    "scenario_question",
+    "what_happened",
+    "process_flow",
+    "architecture_diagram",
+    "common_mistake",
+    "side_by_side",
+    "checklist"
+  ],
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "threat_hook",
+      "purpose": "threat_hook",
+      "layout_type": "scenario_question",
+      "title_position": "center",
+      "supports": [
+        "scenario",
+        "question",
+        "context_icon"
+      ]
+    },
+    {
+      "slide_number": 2,
+      "role": "what_happened",
+      "purpose": "what_happened",
+      "layout_type": "what_happened",
+      "title_position": "top-center",
+      "supports": []
+    },
+    {
+      "slide_number": 3,
+      "role": "attack_chain",
+      "purpose": "attack_chain",
+      "layout_type": "process_flow",
+      "title_position": "top-left",
+      "supports": [
+        "steps"
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "vulnerable_architecture",
+      "purpose": "vulnerable_architecture",
+      "layout_type": "architecture_diagram",
+      "title_position": "top-center",
+      "supports": [
+        "nodes",
+        "connections",
+        "labels"
+      ]
+    },
+    {
+      "slide_number": 5,
+      "role": "root_cause_analysis",
+      "purpose": "root_cause_analysis",
+      "layout_type": "common_mistake",
+      "title_position": "top-left",
+      "supports": [
+        "wrong_title",
+        "wrong_items",
+        "right_title",
+        "right_items"
+      ]
+    },
+    {
+      "slide_number": 6,
+      "role": "defense_architecture",
+      "purpose": "defense_architecture",
+      "layout_type": "side_by_side",
+      "title_position": "top-center",
+      "supports": [
+        "left_title",
+        "left_items",
+        "right_title",
+        "right_items"
+      ]
+    },
+    {
+      "slide_number": 7,
+      "role": "security_checklist",
+      "purpose": "security_checklist",
+      "layout_type": "checklist",
+      "title_position": "top-left",
+      "supports": [
+        "items",
+        "title"
+      ]
+    }
+  ],
+  "brand": {
+    "handle": "@vijayakumarj_ai",
+    "name": "Vijayakumar J",
+    "short_name": "VJ"
+  }
+}

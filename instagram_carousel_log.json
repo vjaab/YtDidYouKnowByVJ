@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Stuxnet Destroyed 1,000 Centrifuges Without Any Explosives",
     "The $100 Billion Y2K Fix That Actually Worked",
     "Blue OLED Subpixels Die 3 Times Faster Than Red or Green",
     "Blue OLED Subpixels Die 3 Times Faster Than Red or Green",
@@ -99,10 +98,10 @@
     "Your Smart Speaker's Tiny Brain",
     "Your Phone's Tiny Speakers are Sound Wizards",
     "Your Phone's Tiny Speakers are Sound Wizards",
-    "Why Cold Kills Battery Life: IEEE Insights"
+    "Why Cold Kills Battery Life: IEEE Insights",
+    "Public USB Ports Threat Analysis by FCC & CISA"
   ],
   "used_keywords": [
-    "code",
     "did you know",
     "tech trending",
     "medium",
@@ -301,23 +300,10 @@
     "did you know",
     "threads",
     "tech",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Stuxnet Destroyed 1,000 Centrifuges Without Any Explosives",
-      "news_source_url": "",
-      "keywords": [
-        "stuxnet",
-        "cybersecurity",
-        "plc",
-        "zero day",
-        "malware",
-        "did you know"
-      ],
-      "source": "Symantec W32.Stuxnet Dossier",
-      "timestamp": "2026-10-01T07:57:38.880630+00:00"
-    },
     {
       "title": "The $100 Billion Y2K Fix That Actually Worked",
       "news_source_url": "",
@@ -1508,6 +1494,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-10-10T20:05:34.507911+00:00"
+    },
+    {
+      "title": "Public USB Ports Threat Analysis by FCC & CISA",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-10T20:24:11.812169+00:00"
     }
   ]
 }
