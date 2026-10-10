@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "How Airplanes Get Wi-Fi at 35,000 Feet Over Oceans",
-    "The First 1GB Hard Drive in 1980 Weighed 550 Pounds",
     "Li-Fi Transmits 224 Gigabits Per Second Through Room Bulbs",
     "Why NASA Lost a $327M Mars Orbiter Over Metric Units",
     "BadUSB Firmware Tricks Computers by Pretending to be Keyboards",
@@ -99,18 +97,11 @@
     "Your Phone's Invisible Fingerprint Grid",
     "Medium (machine-learning): Don\u2019t Buy a Mac for Local AI Until You Unde",
     "Medium (machine-learning): Don\u2019t Buy a Mac for Local AI Until You Unde",
-    "How AI 'Sees' The World: Pixel By Pixel"
+    "How AI 'Sees' The World: Pixel By Pixel",
+    "Medium (artificial-intelligence): Local AI vs Cloud AI: Which Is Bette",
+    "Medium (artificial-intelligence): Local AI vs Cloud AI: Which Is Bette"
   ],
   "used_keywords": [
-    "did you know",
-    "GPS",
-    "Einstein",
-    "Relativity",
-    "Satellites",
-    "Time",
-    "Physics",
-    "did you know",
-    "did you know",
     "tech trending",
     "medium",
     "programming",
@@ -301,35 +292,18 @@
     "did you know",
     "threads",
     "tech",
-    "did you know"
+    "did you know",
+    "did you know",
+    "tech trending",
+    "medium",
+    "artificial",
+    "intelligence",
+    "local",
+    "cloud",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "How Airplanes Get Wi-Fi at 35,000 Feet Over Oceans",
-      "news_source_url": "",
-      "keywords": [
-        "airplane wifi",
-        "satellite",
-        "aviation tech",
-        "phased array",
-        "did you know"
-      ],
-      "source": "Aeronautical Satellite Telecommunications",
-      "timestamp": "2026-09-30T20:28:48.747296+00:00"
-    },
-    {
-      "title": "The First 1GB Hard Drive in 1980 Weighed 550 Pounds",
-      "news_source_url": "",
-      "keywords": [
-        "ibm 3380",
-        "1gb hard drive",
-        "computer history",
-        "storage",
-        "did you know"
-      ],
-      "source": "IBM Archives & Computer History Museum",
-      "timestamp": "2026-09-30T20:28:48.893060+00:00"
-    },
     {
       "title": "Li-Fi Transmits 224 Gigabits Per Second Through Room Bulbs",
       "news_source_url": "",
@@ -1518,6 +1492,33 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-10T10:22:22.276806+00:00"
+    },
+    {
+      "title": "Medium (artificial-intelligence): Local AI vs Cloud AI: Which Is Bette",
+      "news_source_url": "https://swaeth.medium.com/local-ai-vs-cloud-ai-which-is-better-for-privacy-2632aa1fdc9e?source=rss------artificial_intelligence-5",
+      "keywords": [
+        "did you know",
+        "tech trending",
+        "medium",
+        "artificial",
+        "intelligence",
+        "local",
+        "cloud"
+      ],
+      "source": "Medium - artificial-intelligence",
+      "platform": "threads",
+      "timestamp": "2026-10-10T11:21:54.504646+00:00"
+    },
+    {
+      "title": "Medium (artificial-intelligence): Local AI vs Cloud AI: Which Is Bette",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-10T11:23:11.350810+00:00"
     }
   ]
 }
