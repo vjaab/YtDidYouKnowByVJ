@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Blue OLED Subpixels Die 3 Times Faster Than Red or Green",
-    "CPU Interconnects are 10,000x Thinner Than a Human Hair",
     "99% of Global Internet is on the Ocean Floor",
     "Credit Cards Have Zero Battery and Power Themselves from Air",
     "HBM3e Stacks DRAM with 50,000 Microscopic Silicon Vias",
@@ -99,12 +97,11 @@
     "Why Cold Kills Battery Life: IEEE Insights",
     "Public USB Ports Threat Analysis by FCC & CISA",
     "ASML's Tin Droplet Revolution: Printing 2nm Chips",
-    "FCC/CISA Alert: Juice Jacking Risks at Public USB Ports"
+    "FCC/CISA Alert: Juice Jacking Risks at Public USB Ports",
+    "AI & Junior Devs: Threat or Transformation?",
+    "AI & Junior Devs: Threat or Transformation?"
   ],
   "used_keywords": [
-    "medium",
-    "programming",
-    "already",
     "solved",
     "java",
     "did you know",
@@ -301,32 +298,12 @@
     "did you know",
     "did you know",
     "did you know",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "Blue OLED Subpixels Die 3 Times Faster Than Red or Green",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "timestamp": "2026-10-01T13:52:32.327067+00:00"
-    },
-    {
-      "title": "CPU Interconnects are 10,000x Thinner Than a Human Hair",
-      "news_source_url": "",
-      "keywords": [
-        "semiconductor",
-        "interconnects",
-        "3nm",
-        "copper wiring",
-        "did you know"
-      ],
-      "source": "IEEE Transactions on Electron Devices",
-      "timestamp": "2026-10-01T17:01:26.663025+00:00"
-    },
     {
       "title": "99% of Global Internet is on the Ocean Floor",
       "news_source_url": "",
@@ -1498,6 +1475,27 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-11T10:51:58.944000+00:00"
+    },
+    {
+      "title": "AI & Junior Devs: Threat or Transformation?",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-11T11:36:47.626544+00:00"
+    },
+    {
+      "title": "AI & Junior Devs: Threat or Transformation?",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-11T11:37:56.850312+00:00"
     }
   ]
 }
