@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "The $100 Billion Y2K Fix That Actually Worked",
     "Blue OLED Subpixels Die 3 Times Faster Than Red or Green",
     "Blue OLED Subpixels Die 3 Times Faster Than Red or Green",
     "CPU Interconnects are 10,000x Thinner Than a Human Hair",
@@ -99,10 +98,10 @@
     "Your Phone's Tiny Speakers are Sound Wizards",
     "Your Phone's Tiny Speakers are Sound Wizards",
     "Why Cold Kills Battery Life: IEEE Insights",
-    "Public USB Ports Threat Analysis by FCC & CISA"
+    "Public USB Ports Threat Analysis by FCC & CISA",
+    "ASML's Tin Droplet Revolution: Printing 2nm Chips"
   ],
   "used_keywords": [
-    "did you know",
     "tech trending",
     "medium",
     "programming",
@@ -301,22 +300,10 @@
     "threads",
     "tech",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "The $100 Billion Y2K Fix That Actually Worked",
-      "news_source_url": "",
-      "keywords": [
-        "y2k",
-        "millennium bug",
-        "legacy code",
-        "software engineering",
-        "did you know"
-      ],
-      "source": "US Department of Commerce Y2K Economic Report",
-      "timestamp": "2026-10-01T07:57:38.984962+00:00"
-    },
     {
       "title": "Blue OLED Subpixels Die 3 Times Faster Than Red or Green",
       "news_source_url": "",
@@ -1504,6 +1491,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-10-10T20:24:11.812169+00:00"
+    },
+    {
+      "title": "ASML's Tin Droplet Revolution: Printing 2nm Chips",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-11T10:33:24.071342+00:00"
     }
   ]
 }
