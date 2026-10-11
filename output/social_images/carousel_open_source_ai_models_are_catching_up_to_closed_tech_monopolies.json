@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Can Open-Source AI Beat Closed Trillion-Dollar Labs? \ud83d\udd13",
+  "headline": "Open Source AI Models Are Catching Up to Closed Tech Monopolies",
+  "source": "OpenLLM Leaderboard & HuggingFace Analysis",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "AI Price Shock! \ud83d\udcb8",
+      "bubble": "My friend pays a fortune for AI! Is powerful AI always so expensive?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Open AI's Secret! \ud83d\udd13",
+      "bubble": "Nope! Open-source AI models are now catching up to giant tech companies for free!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Local AI Power! \ud83e\udd2f",
+      "bubble": "Wait, so free AI on my home computer can be as good as GPT-4 for coding?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Future of AI! \u2728",
+      "bubble": "Yes! At 1% the cost! Share this AI revolution with everyone you know!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Fine-tuned open models running locally on consumer GPUs now match or exceed GPT-4 on specialized coding benchmarks at 1% of the inference cost.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nCan Open-Source AI Beat Closed Trillion-Dollar Labs? \ud83d\udd13\n\n\ud83d\udca1 Fine-tuned open models running locally on consumer GPUs now match or exceed GPT-4 on specialized coding benchmarks at 1% of the inference cost.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "threads_debates",
+  "characters": "auto"
+}
