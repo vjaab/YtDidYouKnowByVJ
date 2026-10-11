@@ -1424,5 +1424,15 @@
     "title": "Why Claude Design Dies Dec 14! \ud83d\uded1",
     "uploaded_at": "2026-10-11T15:45:58.702346",
     "synced": false
+  },
+  "i5__YpHJCN0": {
+    "video_id": "i5__YpHJCN0",
+    "hook_pattern": "stat_contradiction",
+    "hook_variant": "B",
+    "hook_text": "This hidden separator breaks desktop security.",
+    "category": "Facts & Trivia",
+    "title": "Did You Know This About Telegram? \ud83e\udd2f",
+    "uploaded_at": "2026-10-11T20:10:07.861970",
+    "synced": false
   }
 }

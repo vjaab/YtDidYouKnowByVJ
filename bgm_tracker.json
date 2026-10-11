@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "modern_tech.mp3",
+      "headline": "Telegram Desktop One-Click Account Takeover",
+      "topic_type": "auto",
+      "timestamp": "38166564621"
+    },
+    {
       "track": "jam_Upbeat.mp3",
       "headline": "Standalone Claude Design Closes Dec 14. 5 Moves Before It Does",
       "topic_type": "auto",
@@ -173,12 +179,6 @@
       "headline": "HF Trending Model: Qwen-Image-2.1",
       "topic_type": "auto",
       "timestamp": "35951957127"
-    },
-    {
-      "track": "jam_Action_Inspiration_Trailer.mp3",
-      "headline": "HF Trending Model: convaiinnovations/laya",
-      "topic_type": "auto",
-      "timestamp": "35909197182"
     }
   ],
   "usage_counts": {
@@ -191,7 +191,7 @@
     "Defiance.mp3": 1,
     "jam_Confidence.mp3": 1,
     "jam_Upbeat.mp3": 3,
-    "modern_tech.mp3": 2,
+    "modern_tech.mp3": 3,
     "jam_Elite.mp3": 2,
     "jam_Energetic_Pop.mp3": 2,
     "jam_Groovy_SIX.mp3": 1
