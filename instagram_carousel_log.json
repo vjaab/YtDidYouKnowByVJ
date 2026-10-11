@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "HBM3e Stacks DRAM with 50,000 Microscopic Silicon Vias",
-    "ASML Chip Lasers Fire 50,000 Times a Second at Molten Tin",
     "Quartz Clocks Vibrate Exactly 32,768 Times Every Second",
     "The $500M Rocket Crash Caused by 64-Bit to 16-Bit Conversion",
     "Wi-Fi Was Accidentally Invented by an Astronomer Studying Black Holes",
@@ -99,12 +97,11 @@
     "AI & Junior Devs: Threat or Transformation?",
     "AI & Junior Devs: Threat or Transformation?",
     "Why 90% of Startups Regret Moving to Microservices",
-    "Open Source AI Models Are Catching Up to Closed Tech Monopolies"
+    "Open Source AI Models Are Catching Up to Closed Tech Monopolies",
+    "Why Deleting a File Doesn't Erase It (NIST Standard)",
+    "Why Deleting a File Doesn't Erase It (NIST Standard)"
   ],
   "used_keywords": [
-    "pull",
-    "requests",
-    "AI",
     "water consumption",
     "data centers",
     "energy use",
@@ -301,36 +298,12 @@
     "huggingface",
     "deepseek",
     "threads_debates",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "HBM3e Stacks DRAM with 50,000 Microscopic Silicon Vias",
-      "news_source_url": "",
-      "keywords": [
-        "hbm3e",
-        "gpu memory",
-        "nvidia blackwell",
-        "semiconductors",
-        "did you know"
-      ],
-      "source": "JEDEC High Bandwidth Memory Specification",
-      "timestamp": "2026-10-01T17:02:48.797418+00:00"
-    },
-    {
-      "title": "ASML Chip Lasers Fire 50,000 Times a Second at Molten Tin",
-      "news_source_url": "",
-      "keywords": [
-        "asml",
-        "euv",
-        "semiconductors",
-        "chip making",
-        "microprocessors",
-        "did you know"
-      ],
-      "source": "ASML High-NA EUV Engineering",
-      "timestamp": "2026-10-01T17:02:48.891912+00:00"
-    },
     {
       "title": "Quartz Clocks Vibrate Exactly 32,768 Times Every Second",
       "news_source_url": "",
@@ -1495,6 +1468,27 @@
       "source": "OpenLLM Leaderboard & HuggingFace Analysis",
       "platform": "facebook",
       "timestamp": "2026-10-11T17:43:30.332193+00:00"
+    },
+    {
+      "title": "Why Deleting a File Doesn't Erase It (NIST Standard)",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-11T18:15:32.508009+00:00"
+    },
+    {
+      "title": "Why Deleting a File Doesn't Erase It (NIST Standard)",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-11T18:16:48.888262+00:00"
     }
   ]
 }
