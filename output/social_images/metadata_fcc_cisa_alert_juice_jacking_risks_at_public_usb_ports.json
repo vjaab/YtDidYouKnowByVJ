@@ -1,0 +1,29 @@
+{
+  "topic": "FCC/CISA Alert: Juice Jacking Risks at Public USB Ports",
+  "category": "AI News",
+  "type": "carousel",
+  "slides": 7,
+  "instagram_images": [
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_FCCCISA_Alert_Juice_Jacking_Ri_01_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_FCCCISA_Alert_Juice_Jacking_Ri_02_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_FCCCISA_Alert_Juice_Jacking_Ri_03_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_FCCCISA_Alert_Juice_Jacking_Ri_04_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_FCCCISA_Alert_Juice_Jacking_Ri_05_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_FCCCISA_Alert_Juice_Jacking_Ri_06_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_FCCCISA_Alert_Juice_Jacking_Ri_07_1080x1350.jpg"
+  ],
+  "facebook_images": [
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_fcc_cisa_alert_juice_jacking_risks_at_public_usb_ports_01.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_fcc_cisa_alert_juice_jacking_risks_at_public_usb_ports_02.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_fcc_cisa_alert_juice_jacking_risks_at_public_usb_ports_03.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_fcc_cisa_alert_juice_jacking_risks_at_public_usb_ports_04.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_fcc_cisa_alert_juice_jacking_risks_at_public_usb_ports_05.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_fcc_cisa_alert_juice_jacking_risks_at_public_usb_ports_06.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_fcc_cisa_alert_juice_jacking_risks_at_public_usb_ports_07.jpg"
+  ],
+  "caption": "\ud83d\udcf0 FCC/CISA Alert: Juice Jacking Risks at Public USB Ports\n\nThe FCC and CISA warn that free public USB charging ports in airports, hotels, and cafes can be weaponized to steal data or install malware via the USB data pins\u2014a technique known as 'juice jacking.' This carousel breaks down the attack chain, vulnerable topology, and practical hardware/software mitigations for travelers and developers.\n\n\ud83d\udcc5 11 Oct 2026 | Source: FCC & Cybersecurity Infrastructure Security Agency (CISA)\n\ud83d\udd17 \n\nFollow @vijayakumarj_ai for daily AI updates!\n\n#MachineLearning #DeepLearning #AI #ArtificialIntelligence #LLM #GenerativeAI #RAG #LangChain #PyTorch #TensorFlow #HuggingFace #MLOps #DataScience #Tech #Technology\n\n\ud83d\udc49 Share this with your friends and family so they stay informed & safe!\n\ud83d\udcac Drop your reaction below!",
+  "hashtags": "#MachineLearning #DeepLearning #AI #ArtificialIntelligence #LLM #GenerativeAI #RAG #LangChain #PyTorch #TensorFlow #HuggingFace #MLOps #DataScience #Tech #Technology",
+  "poll_file": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/poll_fcc_cisa_alert_juice_jacking_risks_at_public_usb_ports.json",
+  "carousel_json": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_fcc_cisa_alert_juice_jacking_risks_at_public_usb_ports.json",
+  "generated_at": "2026-10-11T10:51:44.318897+00:00"
+}

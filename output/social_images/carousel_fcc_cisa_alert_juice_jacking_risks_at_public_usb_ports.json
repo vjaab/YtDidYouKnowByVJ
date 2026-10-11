@@ -1,0 +1,214 @@
+{
+  "headline": "FCC/CISA Alert: Juice Jacking Risks at Public USB Ports",
+  "summary": "The FCC and CISA warn that free public USB charging ports in airports, hotels, and cafes can be weaponized to steal data or install malware via the USB data pins\u2014a technique known as 'juice jacking.' This carousel breaks down the attack chain, vulnerable topology, and practical hardware/software mitigations for travelers and developers.",
+  "source": "FCC & Cybersecurity Infrastructure Security Agency (CISA)",
+  "source_url": "",
+  "date": "11 Oct 2026",
+  "category": "SECURITY",
+  "topic_type": "security_incident",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "threat_hook",
+      "layout_type": "scenario_question",
+      "eyebrow": "SECURITY ALERT",
+      "title": "That Free Airport USB Port Might Be Stealing Your Data",
+      "subtitle": "How a simple charge can become a full device compromise",
+      "body": "You plug in at a public USB port to top up your phone. Unknown to you, the port's data pins are active\u2014silently pulling photos, contacts, or installing spyware. The FCC and CISA have issued a joint warning: treat every public USB port as hostile.",
+      "deep_dive": "USB was designed for both power and data. A standard USB-A port has four pins: VCC (power), D- and D+ (data), and GND. When you plug into a charger, only VCC and GND should be connected. Malicious ports\u2014or compromised charging stations\u2014keep the data pins live, turning a power connection into a bidirectional data channel. This is 'juice jacking': the attacker's hardware negotiates a data session with your device, then exfiltrates data or pushes malware, all while your battery icon shows charging.",
+      "key_fact": "Public USB ports can activate data pins to access your device without any user interaction beyond plugging in.",
+      "why_it_matters": "Engineers and travelers routinely charge devices in airports, hotels, and conferences. A single compromised port can breach corporate credentials, 2FA tokens, or proprietary code on a developer's phone."
+    },
+    {
+      "slide_number": 2,
+      "role": "what_happened",
+      "layout_type": "what_happened",
+      "eyebrow": "THE INCIDENT",
+      "title": "What Is Juice Jacking?",
+      "body": "Juice jacking is a hardware-based attack where a USB charging port is modified\u2014or a malicious cable is used\u2014to establish a data connection with the plugged-in device. The attacker can then: (1) extract files, contacts, messages, and authentication tokens; (2) install monitoring software or persistent backdoors; (3) trigger automated backups to an attacker-controlled server. No software vulnerability on the device is required\u2014the USB protocol itself permits this when data pins are active. FCC and CISA emphasize that any public USB port (airport kiosks, hotel lamps, rental cars) should be assumed compromised.",
+      "key_fact": "The attack exploits the USB specification's dual-use design for power and data, requiring zero user consent or device vulnerability.",
+      "why_it_matters": "This is not a theoretical risk. Demonstrations at DEF CON and Black Hat have shown complete device takeover via malicious charging stations. For engineers carrying SSH keys, API tokens, or unreleased code, the impact is immediate and severe."
+    },
+    {
+      "slide_number": 3,
+      "role": "attack_chain",
+      "layout_type": "process_flow",
+      "eyebrow": "ATTACK CHAIN",
+      "title": "From Plug to Pwn: The Juice Jacking Kill Chain",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Physical Access & Port Preparation",
+          "desc": "Attacker modifies a public USB port or leaves a malicious cable. Data pins (D+, D-) are wired to a hidden controller (e.g., Raspberry Pi, USB Rubber Ducky) instead of\u2014or in addition to\u2014the power supply."
+        },
+        {
+          "step": "2",
+          "title": "Device Enumeration & Trust Establishment",
+          "desc": "When the victim plugs in, the device detects the data lines and enumerates as a USB peripheral. The attacker's controller speaks USB protocols (ADB, MTP, PTP, or proprietary) to negotiate a trusted data session\u2014often without any prompt on modern OSes if USB debugging or 'trust this computer' was previously enabled."
+        },
+        {
+          "step": "3",
+          "title": "Data Exfiltration / Payload Delivery",
+          "desc": "The controller issues commands to pull databases (contacts, SMS, photos), extract authentication tokens, or push a malicious app/configuration profile. The device continues to charge, so the victim sees only a battery icon\u2014not a data transfer indicator."
+        }
+      ],
+      "key_fact": "The attack completes in seconds while the user believes they are only charging.",
+      "why_it_matters": "Understanding each step reveals where defenses\u2014hardware blockers, OS settings, and user habits\u2014can break the chain."
+    },
+    {
+      "slide_number": 4,
+      "role": "vulnerable_architecture",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "VULNERABLE TOPOLOGY",
+      "title": "Where the Exploit Enters: The USB Port Boundary",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "Public USB Port",
+            "sub": "VCC, GND, D+, D- all connected"
+          },
+          {
+            "name": "Attacker Controller",
+            "sub": "Hidden SBC / USB attack tool"
+          },
+          {
+            "name": "Victim Device",
+            "sub": "Phone, laptop, tablet \u2014 USB OTG / host mode"
+          },
+          {
+            "name": "Device Data",
+            "sub": "Files, keys, tokens, backups"
+          }
+        ],
+        "connections": [
+          {
+            "label": "Power + Data lines"
+          },
+          {
+            "label": "Data lines to controller"
+          },
+          {
+            "label": "USB protocol negotiation"
+          },
+          {
+            "label": "Exfiltration / injection"
+          }
+        ]
+      },
+      "body": "The trust boundary is the USB port itself. In a legitimate charger, only VCC and GND cross the boundary. In a juice-jacking port, the data pins cross the boundary into an attacker-controlled controller. The device sees a standard USB host and happily enumerates. No network, no Wi-Fi, no Bluetooth\u2014just the copper wires you plugged into.",
+      "key_fact": "The attack surface is the physical USB interface; no network connectivity is required.",
+      "why_it_matters": "Network firewalls, VPNs, and endpoint detection do not protect against a direct hardware data path. Defense must happen at the port or device configuration level."
+    },
+    {
+      "slide_number": 5,
+      "role": "root_cause_analysis",
+      "layout_type": "common_mistake",
+      "eyebrow": "VULNERABLE VS SECURE",
+      "title": "Why Default USB Behavior Enables Juice Jacking",
+      "before_title": "Vulnerable Default (Most Devices Today)",
+      "before_items": [
+        "Data pins active on all USB connections",
+        "Automatic enumeration as MTP/PTP/ADB device",
+        "No user prompt for new USB host (if previously trusted)",
+        "Charging indicator shows only power, not data activity"
+      ],
+      "after_title": "Secure Configuration (Defense-in-Depth)",
+      "after_items": [
+        "Hardware data blockers (USB condoms) physically disconnect D+/D-",
+        "OS setting: 'Charge only' / 'No data transfer' default for new ports",
+        "Require explicit user consent for each new USB host connection",
+        "Visible data-transfer indicator in status bar when D+/D- are active"
+      ],
+      "body": "The root cause is a design trade-off: USB prioritizes convenience (plug-and-play data) over security. Devices assume any USB host is trustworthy once the user has approved one. Attackers exploit this by presenting a malicious host that the device treats as familiar. The fix is to invert the default: data pins off unless the user explicitly enables them for a specific, trusted connection.",
+      "key_fact": "USB's default 'data-on' behavior is a feature, not a bug\u2014but it becomes a vulnerability in untrusted physical environments.",
+      "why_it_matters": "Developers can enforce secure defaults in custom hardware (e.g., corporate devices) and advocate for OS-level 'charge-only' modes. Travelers must carry hardware blockers."
+    },
+    {
+      "slide_number": 6,
+      "role": "defense_architecture",
+      "layout_type": "side_by_side",
+      "eyebrow": "SECURITY HARDENING",
+      "title": "Perimeter Defense vs. Zero-Trust USB Architecture",
+      "left_title": "Vulnerable Perimeter (Current Norm)",
+      "left_items": [
+        "Public USB port \u2192 direct data path to device",
+        "Device trusts any USB host after first approval",
+        "No visibility into data-pin activity",
+        "Relies on user vigilance (unreliable)"
+      ],
+      "right_title": "Zero-Trust Defense-in-Depth (Recommended)",
+      "right_items": [
+        "Hardware: USB data blocker / 'charge-only' cable (physically cuts D+/D-)",
+        "Device OS: Default 'charge-only' mode; per-host authorization required",
+        "Firmware: USB port controller enforces power-only negotiation (USB-PD without data)",
+        "Policy: Ban public USB ports for corporate devices; provide portable trusted chargers",
+        "Monitoring: Log USB enumeration events; alert on unexpected data-role swaps"
+      ],
+      "body": "Zero-trust for USB means: never trust a port just because it delivers power. Every layer\u2014cable, port controller, OS, policy\u2014must independently verify that data pins are inactive unless explicitly authorized. This mirrors network zero-trust: verify explicitly, least privilege, assume breach.",
+      "key_fact": "A $5 USB data blocker physically severs the attack path; no software update can bypass a missing copper trace.",
+      "why_it_matters": "Layered defenses ensure that even if one control fails (e.g., OS bug), the hardware blocker still prevents data exfiltration."
+    },
+    {
+      "slide_number": 7,
+      "role": "security_checklist",
+      "layout_type": "checklist",
+      "eyebrow": "DEFENSE CHECKLIST",
+      "title": "Immediate Actions for Travelers, Engineers & Security Teams",
+      "items": [
+        "Carry a USB data blocker ('USB condom') on every trip\u2014keep one on your keyring.",
+        "Use only your own AC charger + cable plugged into a wall outlet\u2014never a public USB port.",
+        "Enable 'Charge only' / 'No data transfer' default in Android (Settings \u2192 USB preferences) or iOS (Lockdown Mode / USB Restricted Mode).",
+        "For corporate devices: enforce USB Restricted Mode via MDM; provision hardware data blockers.",
+        "Developers: design custom hardware with USB-PD controllers that negotiate power only (no data role) for charging ports.",
+        "Audit: run `lsusb -t` (Linux) or `system_profiler SPUSBDataType` (macOS) after charging in public to verify no data endpoints enumerated.",
+        "Rotate any credentials (SSH keys, API tokens) that were on a device charged via public USB in the last 90 days.",
+        "Report suspicious public charging stations to facility security and CISA via their incident reporting portal."
+      ],
+      "key_fact": "Physical data blockers are the single most effective, lowest-cost mitigation\u2014no software required.",
+      "why_it_matters": "This checklist turns awareness into habit. For engineers, it protects intellectual property; for organizations, it reduces the attack surface of a ubiquitous but overlooked vector."
+    }
+  ],
+  "_model_used": "OpenRouter:nvidia/nemotron-3-ultra-550b-a55b:free",
+  "_topic_intelligence": {
+    "topic_type": "security_incident",
+    "domain": "security",
+    "primary_entity": "FCC / CISA",
+    "content_depth": "moderate",
+    "best_story_angle": "technical_breakdown",
+    "audience": [
+      "software_engineers",
+      "security_engineers",
+      "devops"
+    ],
+    "key_questions": [
+      "What is 'juice jacking' and how does it exploit USB data pins?",
+      "What specific risks do public USB ports pose to device integrity?",
+      "What mitigations do FCC and CISA recommend for travelers and developers?",
+      "How can developers implement USB data-blocking or secure charging in hardware/software?"
+    ],
+    "recommended_slide_count": 7
+  },
+  "_archetype": "Security Vulnerability & Threat Analysis",
+  "_story": {
+    "vector": "consumer_utility",
+    "title": "Why Free Public Airport USB Charging Ports Are a Major Security Risk",
+    "hook": "Did You Know Free Airport USB Ports Can Hack Your Phone? \ud83d\udd0c",
+    "headline": "Juice Jacking Data Pin Exploit",
+    "fact_summary": "A standard USB cable contains data pins alongside power pins. Compromised airport chargers can silently install malware or siphon photos while your phone charges.",
+    "source": "FCC & Cybersecurity Infrastructure Security Agency (CISA)",
+    "keywords": [
+      "juice jacking",
+      "public usb",
+      "airport charging",
+      "travel security",
+      "consumer_utility",
+      "did you know"
+    ],
+    "engagement_score": 10,
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?"
+  }
+}
