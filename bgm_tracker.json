@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_Upbeat.mp3",
+      "headline": "Standalone Claude Design Closes Dec 14. 5 Moves Before It Does",
+      "topic_type": "auto",
+      "timestamp": "38148798817"
+    },
+    {
       "track": "jam_Escape_From_The_Machine_Planet.mp3",
       "headline": "GitHub Gem #13: AtomicBot-ai/atomic-agent \u2014 Local-First AI Agent Running on Your",
       "topic_type": "auto",
@@ -173,12 +179,6 @@
       "headline": "HF Trending Model: convaiinnovations/laya",
       "topic_type": "auto",
       "timestamp": "35909197182"
-    },
-    {
-      "track": "jam_Energy.mp3",
-      "headline": "Wikipedia's Entire Knowledge Base \u2014 Now a 268K-Download AI Training Dataset",
-      "topic_type": "auto",
-      "timestamp": "35815375937"
     }
   ],
   "usage_counts": {
@@ -190,7 +190,7 @@
     "Destiny.mp3": 3,
     "Defiance.mp3": 1,
     "jam_Confidence.mp3": 1,
-    "jam_Upbeat.mp3": 2,
+    "jam_Upbeat.mp3": 3,
     "modern_tech.mp3": 2,
     "jam_Elite.mp3": 2,
     "jam_Energetic_Pop.mp3": 2,

@@ -1501,6 +1501,33 @@
         "avg_swipe_away": 0.0,
         "avg_view_percentage": 0.0
       }
+    },
+    "AI Benchmark Showdowns": {
+      "curiosity_gap": {
+        "variants": {
+          "B": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "Your design tool is secretly dying",
+                "video_id": "YJww0CoGpaE",
+                "recorded_at": "2026-10-11T15:45:58.699590"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
+      }
     }
   },
   "global": {
@@ -1530,11 +1557,11 @@
     },
     "curiosity_gap": {
       "views": 361,
-      "retention": 0.19012967876191694,
-      "engagement": 0.0034509803921568627,
-      "count": 25,
-      "swipe_away_rate": 0.24455200000000002,
-      "avg_view_percentage": 19.5448
+      "retention": 0.18281699880953553,
+      "engagement": 0.0033182503770739064,
+      "count": 26,
+      "swipe_away_rate": 0.23514615384615387,
+      "avg_view_percentage": 18.79307692307692
     },
     "personal_stake": {
       "views": 360,
@@ -1545,5 +1572,5 @@
       "avg_view_percentage": 18.465
     }
   },
-  "last_updated": "2026-10-10T19:37:58.584659"
+  "last_updated": "2026-10-11T15:45:58.699619"
 }
