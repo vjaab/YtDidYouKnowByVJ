@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "AI Chatbots Just 'Make Stuff Up'",
-    "AI's 'Eyes' See Billions",
     "Medium (artificial-intelligence): Beyond Assertions: A Practical Guide",
     "Medium (artificial-intelligence): Beyond Assertions: A Practical Guide",
     "Your Smartphone Feels Your Invisible Touch",
@@ -99,17 +97,11 @@
     "Why Free Public Airport USB Charging Ports Are a Major Security Risk",
     "Will AI Truly Kill Junior Developer Jobs or Just Change Them?",
     "Will AI Truly Kill Junior Developer Jobs or Just Change Them?",
-    "Why Your Smartphone Suddenly Loses 30% Battery in Cold Weather"
+    "Why Your Smartphone Suddenly Loses 30% Battery in Cold Weather",
+    "How ASML Machines Use Exploding Tin Droplets to Print 2nm Chips",
+    "How ASML Machines Use Exploding Tin Droplets to Print 2nm Chips"
   ],
   "used_keywords": [
-    "AI security",
-    "data privacy",
-    "LLM risks",
-    "AI ethics",
-    "digital blackmail",
-    "inbox access",
-    "Claude AI",
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,36 +293,17 @@
     "did you know",
     "threads",
     "tech",
-    "did you know"
+    "did you know",
+    "asml",
+    "euv lithography",
+    "microchips",
+    "semiconductors",
+    "visual_engineering",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "AI Chatbots Just 'Make Stuff Up'",
-      "news_source_url": "",
-      "keywords": [
-        "AI",
-        "chatbots",
-        "artificial intelligence",
-        "hallucination",
-        "language models",
-        "did you know"
-      ],
-      "source": "Leading AI Research Institutions like OpenAI and Google DeepMind on Large Language Model limitations.",
-      "timestamp": "2026-10-01T17:29:29.893749+00:00"
-    },
-    {
-      "title": "AI's 'Eyes' See Billions",
-      "news_source_url": "",
-      "keywords": [
-        "AI learning",
-        "computer vision",
-        "machine learning",
-        "neural networks",
-        "did you know"
-      ],
-      "source": "Leading AI research institutions (e.g., Google, OpenAI, Meta) routinely publish papers detailing training datasets in the billions (e.g., LAION-5B, ImageNet for conceptual understanding).",
-      "timestamp": "2026-10-01T19:21:58.229044+00:00"
-    },
     {
       "title": "Medium (artificial-intelligence): Beyond Assertions: A Practical Guide",
       "news_source_url": "https://medium.com/@divyamani.24/beyond-assertions-a-practical-guide-to-testing-agentic-ai-a660c109a76e?source=rss------artificial_intelligence-5",
@@ -1479,6 +1452,32 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-12T19:46:57.887388+00:00"
+    },
+    {
+      "title": "How ASML Machines Use Exploding Tin Droplets to Print 2nm Chips",
+      "news_source_url": "",
+      "keywords": [
+        "asml",
+        "euv lithography",
+        "microchips",
+        "semiconductors",
+        "visual_engineering",
+        "did you know"
+      ],
+      "source": "ASML EUV Photolithography Engineering Whitepaper",
+      "platform": "threads",
+      "timestamp": "2026-10-12T20:24:18.794932+00:00"
+    },
+    {
+      "title": "How ASML Machines Use Exploding Tin Droplets to Print 2nm Chips",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-12T20:25:17.067317+00:00"
     }
   ]
 }
