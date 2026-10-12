@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Why Does NASA Use 1990s Computer Chips in Mars Rovers? \ud83d\ude80",
+  "headline": "Why NASA Spacecraft Use 30-Year-Old 1990s Microprocessors",
+  "source": "NASA Jet Propulsion Laboratory Avionics Specifications",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "thinking",
+      "title": "Old Tech in Space? \ud83d\udef0\ufe0f",
+      "bubble": "Wait, why is NASA using computer chips from the 1990s for Mars missions?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Space Radiation Hazard \u2622\ufe0f",
+      "bubble": "Outer space is full of cosmic rays that mess with electronics. Think of them as tiny, powerful bullets.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Modern Chip Vulnerability? \ud83d\udca1",
+      "bubble": "So, new, tiny chips would just... break? How so?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Bit Flipping Explained \ud83d\udd04",
+      "bubble": "Yes! Cosmic rays flip memory bits, causing errors or frying them completely. Modern chips are too sensitive.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "thinking",
+      "title": "Rugged 1990s PowerPC \u2699\ufe0f",
+      "bubble": "So NASA uses older, bigger chips? Like from my dad's old computer?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Shielded for Survival \ud83d\udee1\ufe0f",
+      "bubble": "Exactly! They use robust 250nm chips, often with extra silicon shielding, built tough like tanks.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Spaceproof Tech \ud83d\ude80",
+      "bubble": "\ud83d\udccc Tap Save so you have this space tech fact in your toolkit!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Cosmic rays flip memory bits and fry modern 3nm chips in outer space. NASA uses rugged 250nm PowerPC chips from the 1990s wrapped in heavy silicon-on-insulator shields.",
+  "caption": "\ud83e\udd2f DID YOU KNOW? \ud83e\udd2f\n\nWhy are NASA's Mars rovers still running on 1990s computer chips?\n\nIt's not about budget cuts; it's about survival!\n\n\ud83d\udd39 Space is full of high-energy cosmic rays.\n\ud83d\udd39 These rays can flip memory bits or fry sensitive modern chips.\n\ud83d\udd39 Older, larger 250nm chips (like PowerPC) are more resistant.\n\ud83d\udd39 NASA uses these rugged chips, often with extra shielding, for reliability.\n\n\ud83d\udccc Tap Save so you have this space tech fact in your toolkit!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & mind-blowing facts!\n\n#NASA #SpaceTech #DidYouKnow #TechFacts #MarsRover #SpaceExploration #Engineering #ComputerScience #VintageTech",
+  "vector": "visual_engineering",
+  "characters": "auto"
+}
