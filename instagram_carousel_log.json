@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Wi-Fi Was Accidentally Invented by an Astronomer Studying Black Holes",
-    "Soviet Titanium Submarines Were Driven by Liquid Metal Reactors",
     "A Cloud Reflection Almost Triggered Nuclear War in 1983",
     "AI Chatbots Just 'Make Stuff Up'",
     "AI's 'Eyes' See Billions",
@@ -99,17 +97,11 @@
     "Why Deleting a File Doesn't Erase It (NIST Standard)",
     "Why Deleting a File Doesn't Erase It (NIST Standard)",
     "Why NASA Spacecraft Use 30-Year-Old 1990s Microprocessors",
-    "Why Free Public Airport USB Charging Ports Are a Major Security Risk"
+    "Why Free Public Airport USB Charging Ports Are a Major Security Risk",
+    "Will AI Truly Kill Junior Developer Jobs or Just Change Them?",
+    "Will AI Truly Kill Junior Developer Jobs or Just Change Them?"
   ],
   "used_keywords": [
-    "energy use",
-    "did you know",
-    "did you know",
-    "tech trending",
-    "medium",
-    "programming",
-    "building",
-    "triple",
     "workstation",
     "AI security",
     "data privacy",
@@ -301,36 +293,17 @@
     "threads",
     "tech",
     "did you know",
-    "did you know"
+    "did you know",
+    "ai coding",
+    "junior developers",
+    "software engineering",
+    "career",
+    "threads_debates",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "Wi-Fi Was Accidentally Invented by an Astronomer Studying Black Holes",
-      "news_source_url": "",
-      "keywords": [
-        "wifi",
-        "invention",
-        "black holes",
-        "radio astronomy",
-        "csiro",
-        "did you know"
-      ],
-      "source": "CSIRO Wireless LAN Patent History",
-      "timestamp": "2026-10-01T17:29:16.890210+00:00"
-    },
-    {
-      "title": "Soviet Titanium Submarines Were Driven by Liquid Metal Reactors",
-      "news_source_url": "",
-      "keywords": [
-        "alfa class",
-        "titanium submarine",
-        "nuclear reactor",
-        "engineering history",
-        "did you know"
-      ],
-      "source": "Naval Nuclear Propulsion History Archives",
-      "timestamp": "2026-10-01T17:29:17.073234+00:00"
-    },
     {
       "title": "A Cloud Reflection Almost Triggered Nuclear War in 1983",
       "news_source_url": "",
@@ -1483,6 +1456,32 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-12T09:11:01.858280+00:00"
+    },
+    {
+      "title": "Will AI Truly Kill Junior Developer Jobs or Just Change Them?",
+      "news_source_url": "",
+      "keywords": [
+        "ai coding",
+        "junior developers",
+        "software engineering",
+        "career",
+        "threads_debates",
+        "did you know"
+      ],
+      "source": "Software Engineering Institute Empirical Study",
+      "platform": "threads",
+      "timestamp": "2026-10-12T16:03:57.266716+00:00"
+    },
+    {
+      "title": "Will AI Truly Kill Junior Developer Jobs or Just Change Them?",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-12T16:04:56.460035+00:00"
     }
   ]
 }
