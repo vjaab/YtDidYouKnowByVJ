@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Your Smartphone Feels Your Invisible Touch",
-    "AI's Digital Dreams From Pure Static",
     "Chips: Billions of Invisible Switches",
     "Your Body: Invisible Signal Hub",
     "AI Sees Faces As Secret Math",
@@ -99,12 +97,11 @@
     "How ASML Machines Use Exploding Tin Droplets to Print 2nm Chips",
     "How ASML Machines Use Exploding Tin Droplets to Print 2nm Chips",
     "How Active Noise Cancelling Headphones Invert Physical Sound Waves",
-    "How Scammers Clone a Family Member Voice in Just 3 Seconds"
+    "How Scammers Clone a Family Member Voice in Just 3 Seconds",
+    "Tabs vs Spaces Solved on GitHub Infrastructure",
+    "Tabs vs Spaces Solved on GitHub Infrastructure"
   ],
   "used_keywords": [
-    "did you know",
-    "tech trending",
-    "medium",
     "programming",
     "lets",
     "everyone",
@@ -301,37 +298,12 @@
     "threads",
     "tech",
     "did you know",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "Your Smartphone Feels Your Invisible Touch",
-      "news_source_url": "",
-      "keywords": [
-        "touchscreen",
-        "capacitive",
-        "smartphone",
-        "electric field",
-        "how it works",
-        "did you know",
-        "everyday tech"
-      ],
-      "source": "IEEE Spectrum, How Capacitive Touchscreens Work; MIT Technology Review, The Science Behind Touchscreens",
-      "timestamp": "2026-10-02T07:37:43.170511+00:00"
-    },
-    {
-      "title": "AI's Digital Dreams From Pure Static",
-      "news_source_url": "",
-      "keywords": [
-        "AI art",
-        "generative AI",
-        "deepdream",
-        "machine learning",
-        "did you know"
-      ],
-      "source": "Google DeepDream (seminal research on neural network visualization and generation), modern generative AI models (e.g., Stable Diffusion, Midjourney)",
-      "timestamp": "2026-10-02T07:38:35.646217+00:00"
-    },
     {
       "title": "Chips: Billions of Invisible Switches",
       "news_source_url": "",
@@ -1473,6 +1445,27 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-12T22:09:55.085165+00:00"
+    },
+    {
+      "title": "Tabs vs Spaces Solved on GitHub Infrastructure",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-12T22:35:35.910306+00:00"
+    },
+    {
+      "title": "Tabs vs Spaces Solved on GitHub Infrastructure",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-12T22:36:53.295479+00:00"
     }
   ]
 }
