@@ -1,4 +1,8 @@
 import unittest
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from config_longform import (
     LONGFORM_TARGET_AUDIO_DURATION,
     LONGFORM_WORD_COUNT_TARGET,

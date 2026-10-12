@@ -9325,20 +9325,32 @@ def _build_cohost_sidekick_clip(cohost_info, audio_duration, accent_color=(0, 24
         pos_x = 45 if not avatar_on_left else (FRAME_W - cur_w - 45)
         pos_y = FRAME_H - cur_h - 170
 
-    start_time = 2.4 if not is_longform else 0.5
+    start_time = 2.4 if not is_longform else 2.6
     clip_dur = max(0.5, audio_duration - start_time)
     
     # Emotion timeline
     def get_frame_for_time(t):
         global_t = start_time + t
-        if global_t < 6.0:
-            preferred = "curious"
-        elif global_t < 18.0:
-            preferred = "thinking"
-        elif global_t < 26.0:
-            preferred = "shocked"
+        if is_longform:
+            # Multi-chapter progression (120-180s): cycles emotions dynamically across chapters
+            cycle_t = global_t % 45.0
+            if cycle_t < 12.0:
+                preferred = "curious"
+            elif cycle_t < 25.0:
+                preferred = "thinking"
+            elif cycle_t < 35.0:
+                preferred = "shocked"
+            else:
+                preferred = "excited"
         else:
-            preferred = "excited"
+            if global_t < 6.0:
+                preferred = "curious"
+            elif global_t < 18.0:
+                preferred = "thinking"
+            elif global_t < 26.0:
+                preferred = "shocked"
+            else:
+                preferred = "excited"
         if preferred in loaded_emotions:
             return loaded_emotions[preferred]
         if "neutral" in loaded_emotions:
@@ -10425,7 +10437,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                         return (int(x_pos), int(y_pos))
                     return (int(home_x), int(home_y))
 
-            if not is_longform:
+            if screenshot_intervals:
                 def hide_avatar_during_screenshots(t):
                     # Fade out/in slightly (0.3s) at boundaries
                     for s_start, s_end in screenshot_intervals:
@@ -10480,13 +10492,10 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 avatar_clip = expr_clip
                 print(f"   ✅ Expression compositing applied: {len(expression_segments)} segments")
 
-            # Viral Frame 0 retention: Keep the opening 0.0-2.2s dedicated to the full visual payoff
-            # and bold kinetic hook overlay without the avatar PiP blocking the view. The host fades in at 2.2s.
-            if not is_longform:
-                avatar_start_time = 2.2
-                avatar_pip = avatar_clip.with_position(pip_position).with_start(avatar_start_time).with_effects([vfx.CrossFadeIn(0.4)])
-            else:
-                avatar_pip = avatar_clip.with_position(pip_position).with_start(0)
+            # Viral Frame 0 retention: Keep the opening 0.0-2.2s (Shorts) / 0.0-2.5s (Longform) dedicated to
+            # full visual hook b-roll and kinetic hook overlay without the avatar PiP blocking the view. The host fades in with smooth crossfade.
+            avatar_start_time = 2.2 if not is_longform else 2.5
+            avatar_pip = avatar_clip.with_position(pip_position).with_start(avatar_start_time).with_effects([vfx.CrossFadeIn(0.4 if not is_longform else 0.5)])
 
     # ── CO-HOST GADGET MASCOT COMPANION (Option 1 Duo) ─────────────────
     enable_cohost = script_json.get("enable_cohost", True) and (os.environ.get("ENABLE_COHOST", "1") == "1")
@@ -11137,8 +11146,8 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 print(f"   ⚠️ Boundary darkeners failed (non-fatal): {e}")
 
             # IMPROVEMENT #4: Generate snap-zoom timestamps for per-frame processing
-            snap_zoom_timestamps = _generate_snap_zoom_interrupts(chunks, audio_duration, interval=5.0)
-            print(f"   ⚡ Longform snap-zoom interrupts scheduled ({len(snap_zoom_timestamps)} zooms every 5s).")
+            snap_zoom_timestamps = _generate_snap_zoom_interrupts(chunks, audio_duration, interval=3.5)
+            print(f"   ⚡ Longform snap-zoom interrupts scheduled ({len(snap_zoom_timestamps)} zooms every 3.5s).")
         elif not is_longform:
             # Shorts: Generate high-tempo snap-zoom interrupts every 2.2s for maximum pattern disruption (10M view velocity)
             snap_zoom_timestamps = _generate_snap_zoom_interrupts(chunks, audio_duration, interval=2.2)

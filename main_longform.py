@@ -209,6 +209,10 @@ def format_longform_description(script_data, hashtags):
         if url:
             sources_str += f"🔗 {headline} ({name}): {url}\n"
 
+    # Pinned comment discussion trigger
+    comment_hook = script_data.get("comment_hook", "")
+    comment_hook_section = f"💬 PINNED DISCUSSION: {comment_hook}\n━━━━━━━━━━━━━━━━━━━━━━\n" if comment_hook else ""
+
     # Rotate between description templates
     desc_seed = int(hashlib.md5(title.encode()).hexdigest(), 16)
     template_idx = desc_seed % 3
@@ -218,7 +222,7 @@ def format_longform_description(script_data, hashtags):
 🚀 Telegram → https://t.me/technewsbyvj
 💬 WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
 ━━━━━━━━━━━━━━━━━━━━━━
-🧠 {description_ai}
+{comment_hook_section}🧠 {description_ai}
 
 {timestamps_str}
 ━━━━━━━━━━━━━━━━━━━━━━
@@ -234,7 +238,7 @@ def format_longform_description(script_data, hashtags):
 🚀 Telegram: https://t.me/technewsbyvj
 💬 WhatsApp: https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
 ━━━━━━━━━━━━━━━━━━━━━━
-⚡ A deep dive into one of the biggest stories in AI this week.
+{comment_hook_section}⚡ A deep dive into one of the biggest stories in AI this week: {description_ai}
 
 {timestamps_str}
 {sources_str}
@@ -249,7 +253,7 @@ def format_longform_description(script_data, hashtags):
 🚀 Telegram → https://t.me/technewsbyvj
 💬 WhatsApp → https://whatsapp.com/channel/0029Vb75sw08vd1GsBm3RD1Z
 ━━━━━━━━━━━━━━━━━━━━━━
-👆 What's your take? Drop your thoughts in the comments!
+{comment_hook_section}👆 What's your take? Drop your thoughts in the comments!
 
 {timestamps_str}
 ━━━━━━━━━━━━━━━━━━━━━━

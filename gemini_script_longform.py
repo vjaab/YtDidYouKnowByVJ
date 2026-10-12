@@ -111,7 +111,13 @@ SYSTEM_PERSONA_LONGFORM = get_creator_persona("FIRESHIP_FAST")
 TOPIC_DISCOVERY_SINGLE_TEMPLATE = """{persona}
 
 TOPIC DISCOVERY AGENT TASK (SINGLE DEEP STORY MODE):
-Find the ONE story from the last 72 hours with the most depth, narrative potential, and utility for a tech audience. This story must be rich enough to sustain a 2 to 3 minute chaptered deep-dive.
+Find the ONE story from the last 72 hours with the most depth, narrative potential, and utility for a broad tech audience. This story must be rich enough to sustain a 2 to 3 minute chaptered deep-dive.
+
+MASS APPEAL & HIGH-REACH PRIORITIZATION (1M+ VIEWS CRITERIA):
+- Prioritize stories with high personal stakes for everyday viewers: consumer tech, smartphone features, battery life, privacy protections, security leaks, scam warnings, developer workflows, local open-source tools ($0 setups), tangible breakthroughs.
+- Demote narrow academic benchmark fine-tuning papers that only 100 researchers care about.
+- Universal & Gender-Inclusive Appeal: Choose topics that speak to practical daily utility, curiosity, and empowerment rather than male-skewed overclocking/hardware niches.
+- The "Personal Impact Factor": The story must answer: "How does this change the viewer's device, privacy, money, job, or workflow right now?"
 
 Prioritize stories that have:
 1. A specific, surprising claim or data point (not just "company X released Y")
@@ -132,7 +138,7 @@ Return ONLY a JSON object:
       "headline": "The specific story headline",
       "source_url": "Direct source URL",
       "source_name": "Company or publication name",
-      "why_this_story": "2-3 sentences on why this has the most depth and narrative potential",
+      "why_this_story": "2-3 sentences on why this has the most depth, mass reach, and narrative potential",
       "search_keywords": ["keyword1", "keyword2", "keyword3"],
       "suggested_chapters": ["Chapter angle 1", "Chapter angle 2", "Chapter angle 3"]
     }}
@@ -145,6 +151,11 @@ TOPIC_DISCOVERY_MULTI_TEMPLATE = """{persona}
 
 TOPIC DISCOVERY AGENT TASK (MULTI-STORY MODE):
 Find 2-3 stories from the last 72 hours that are THEMATICALLY CONNECTED by a single throughline. Do NOT combine unrelated stories. The throughline must be a genuine shared trend, cause, or consequence.
+
+MASS APPEAL & HIGH-REACH PRIORITIZATION (1M+ VIEWS CRITERIA):
+- Prioritize topics affecting the viewer personally: consumer tech changes, smartphone updates, privacy leaks, everyday AI tools, developer speedruns, $0 open-source setups.
+- Demote obscure academic benchmark papers with zero everyday relevance.
+- Universal Appeal: Speak to practical human needs (privacy, money, safety, speed, creativity).
 
 Examples of valid throughlines:
 - "Three companies all racing to solve the same problem this week"
@@ -168,7 +179,7 @@ Return ONLY a JSON object:
       "headline": "Story headline",
       "source_url": "Direct source URL",
       "source_name": "Company or publication name",
-      "why_this_story": "How this connects to the throughline",
+      "why_this_story": "How this connects to the throughline and why it matters to everyday viewers",
       "search_keywords": ["keyword1", "keyword2"]
     }}
   ],
@@ -218,20 +229,22 @@ STRUCTURAL RULES (non-negotiable):
 
 1. COLD OPEN HOOK (0-15s): Start with the single sharpest, most specific claim or question from the story. No channel intro, no "hey guys welcome back." The hook must be answerable only by watching further.
 
-2. 2 TO 3 CHAPTERS: Each chapter is a self-contained beat that:
-   - Answers ONE sub-question completely (good abandonment: a viewer who only wanted that answer can leave satisfied, and that's rewarded in 2026 retention scoring)
-   - Has its own mini-payoff or "aha" moment
-   - Naturally escalates in stakes from Chapter 1 to the final chapter
+2. NAME THE SPECIFIC TOOL/MODEL EARLY (CRITICAL): Within the FIRST 10-15 seconds (first 2-3 sentences), you MUST explicitly name the specific tool, model, framework, app, or setting being discussed (e.g., "DeepSeek-V3", "Ollama", "Claude 3.7", "Apple Intelligence"). Do NOT speak abstractly about "an AI model" or "this new tool" without naming it.
 
-3. STRICT DURATION (2 TO 3 MINUTES ONLY): Target range: {min_words}-{max_words} words (~{min_min}-{max_min} minutes at 140 WPM). Never exceed 3 minutes or fall short of 2 minutes. Write tightly, punchily, with no fluff.
+3. 2 TO 3 CHAPTERS WITH OPEN-LOOP BRIDGES: Each chapter is a self-contained beat that:
+   - Answers ONE sub-question completely with its own mini-payoff or "aha" moment.
+   - Micro-Cliffhanger Bridges: Chapter 1 MUST end with an unresolved question or tension that requires Chapter 2 to answer. Chapter 2 MUST end with a high-stakes question pulling into Chapter 3. This eliminates mid-video drop-off and secures >70% average percentage viewed (APV).
+   - Naturally escalates in stakes from Chapter 1 to the final chapter.
 
-4. VISUAL ECONOMY: Write in beats that can each hold ONE strong supporting visual for 8-15 seconds of narration. Do NOT fragment into one visual per sentence. Group related claims into a single narrated beat. Max {max_beats} visual beats per chapter.
+4. STRICT DURATION (2 TO 3 MINUTES ONLY): Target range: {min_words}-{max_words} words (~{min_min}-{max_min} minutes at 140 WPM). Never exceed 3 minutes or fall short of 2 minutes. Write tightly, punchily, with no fluff.
 
-5. PACING: Short sentences, active voice, no throat-clearing. If a sentence doesn't add a new fact, stake, or turn, remove it.
+5. VISUAL ECONOMY: Write in beats that can each hold ONE strong supporting visual for 8-15 seconds of narration. Do NOT fragment into one visual per sentence. Group related claims into a single narrated beat. Max {max_beats} visual beats per chapter.
 
-6. ENDING: Close the final chapter with a direct payoff, then a single-sentence takeaway, then a natural CTA: "If you found this useful, subscribe for more deep-dives like this. I'll see you in the next one."
+6. PACING: Short sentences, active voice, varied rhythm (punchy 4-word statements mixed with clear 12-word explanations), no throat-clearing. If a sentence doesn't add a new fact, stake, or turn, remove it.
 
-7. PROVOCATIVE HIGH-FOMO & CURIOSITY TITLES (MANDATORY):
+7. ENDING & PAYOFF: Close the final chapter with a direct practical payoff (e.g. how the viewer can use, test, or protect themselves with this today), then a single-sentence takeaway, then a natural CTA: "If you found this useful, subscribe for more deep-dives like this. I'll see you in the next one."
+
+8. PROVOCATIVE HIGH-FOMO & CURIOSITY TITLES (MANDATORY):
    - Every title must trigger Fear Of Missing Out (FOMO), extreme urgency, or everyday human curiosity.
    - Non-technical and broad audiences respond to everyday curiosity, personal safety, money, jobs, and wonder:
      * Everyday Device / Feature Hook: "Your iPhone/Phone Is About to Change and Nobody Noticed" or "The Hidden AI Feature Already Running on Your Device"
@@ -242,7 +255,7 @@ STRUCTURAL RULES (non-negotiable):
    - It MUST create an open cognitive loop that can ONLY be resolved by watching the complete video to the end.
    - Length: Strictly 50 to 72 characters (optimal for mobile and desktop YouTube feeds).
 
-8. ENFORCE THE "ELI5" ANALOGY RULE:
+9. ENFORCE THE "ELI5" ANALOGY RULE:
    - Throughout every chapter, ground every abstract concept into a real physical metaphor (highways, desk space, restaurant kitchens, physical luggage).
 
 Return ONLY valid JSON matching this schema exactly:
@@ -899,6 +912,26 @@ Write the deepest possible analysis of this one story across 2-3 chapters.
         final_data["longform_format"] = "chaptered"
         final_data["depth_mode"] = self.depth_mode
         final_data["num_facts"] = len(stories)
+
+        # Contextual Alter-Ego Skin & Mascot Co-Host Companion Duo
+        try:
+            from video_gen import get_vj_alter_ego_skin, get_cohost_sidekick_for_topic
+            vj_skin = get_vj_alter_ego_skin(
+                topic_text=final_data.get("title", stories[0].get("headline", "") if stories else ""),
+                category=final_data.get("sub_category", "AI Models"),
+                script_text=final_data.get("script", "")
+            )
+            cohost = get_cohost_sidekick_for_topic(
+                topic_text=final_data.get("title", stories[0].get("headline", "") if stories else ""),
+                category=final_data.get("sub_category", "AI Models"),
+                script_text=final_data.get("script", "")
+            )
+            final_data["vj_skin"] = vj_skin.get("skin", "standard")
+            final_data["cohost_mascot"] = cohost.get("key", "byte")
+            final_data["enable_cohost"] = True
+            print(f"🎭 [AVATAR & CO-HOST] Selected Skin: {vj_skin.get('name', 'Standard')} | Co-Host: {cohost.get('tag', 'Byte')}")
+        except Exception as e_av:
+            print(f"⚠️ Could not resolve avatar alter-ego / cohost: {e_av}")
 
         # Build fact_scripts for backward compatibility with shorts_teaser.py
         combined_fact_scripts = []
