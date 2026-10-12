@@ -94,6 +94,7 @@ def generate_liveportrait_sync(face_path, audio_path, output_path, timeout=10800
         "--flag_pasteback", "True",
         "--flag_eye_retargeting", "True",
         "--flag_lip_retargeting", "True",
+        "--driving_multiplier", "1.15",
     ]
 
     print(f"   CMD: {' '.join(cmd)}")

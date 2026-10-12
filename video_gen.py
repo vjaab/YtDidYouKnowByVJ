@@ -9815,11 +9815,25 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                     # Offset shadow (5px down, 3px right)
                     M = np.float32([[1, 0, 3], [0, 1, 5]])
                     shadow = cv2.warpAffine(shadow, M, (w_mask, h_mask), borderMode=cv2.BORDER_CONSTANT)
-                    # Reduce opacity to 30%
-                    shadow = shadow * 0.3
+                    # Reduce opacity to 35%
+                    shadow = shadow * 0.35
                     
                     shadow_cache[frame_idx] = shadow
                     return shadow
+                
+                rim_cache = {}
+                def make_rim_glow_frame(t):
+                    """Generate subtle neon rim lighting around presenter silhouette."""
+                    frame_idx = int(round(t * fps))
+                    if frame_idx in rim_cache:
+                        return rim_cache[frame_idx]
+                    base_m = make_mask_frame(t)
+                    kernel_rim = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
+                    dilated = cv2.dilate(base_m, kernel_rim, iterations=1)
+                    rim_edge = cv2.subtract(dilated, base_m)
+                    rim_glow = (cv2.GaussianBlur(rim_edge, (9, 9), 0) * 0.55).astype(np.float32)
+                    rim_cache[frame_idx] = rim_glow
+                    return rim_glow
                 
                 mclip = VideoClip(make_mask_frame, is_mask=True, duration=audio_duration)
                 avatar_clip = avatar_clip.with_mask(mclip)
@@ -9829,11 +9843,16 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 shadow_mask_clip = VideoClip(make_shadow_frame, is_mask=True, duration=audio_duration)
                 shadow_clip = shadow_clip.with_mask(shadow_mask_clip)
                 
-                # Store shadow clip for later compositing (will be added to base_layers)
-                # We'll return it via a closure or attach to avatar_clip
-                avatar_clip.shadow_clip = shadow_clip
+                # Create neon rim glow clip (rendered right behind avatar with brand accent color)
+                rim_clip = VideoClip(lambda t: np.full((cur_h, cur_w, 3), accent_color, dtype=np.uint8), duration=audio_duration)
+                rim_mask_clip = VideoClip(make_rim_glow_frame, is_mask=True, duration=audio_duration)
+                rim_clip = rim_clip.with_mask(rim_mask_clip)
                 
-                print("   ✅ Dynamic AI background removal with edge feathering & drop shadow applied.")
+                # Store clips on avatar_clip for compositing
+                avatar_clip.shadow_clip = shadow_clip
+                avatar_clip.rim_clip = rim_clip
+                
+                print("   ✅ Dynamic AI background removal with edge feathering, drop shadow & neon rim glow applied.")
                 
             except Exception as e:
                 print(f"⚠️ rembg failed: {e}. Falling back to Rounded Authority Card.")
@@ -9854,37 +9873,27 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
             # Calculate a slow zoom that increases scale by 10% over the full video
             zoom_speed = 0.10 / max(audio_duration, 1.0)
             
-            # Combined dynamic scale: shrink/glide for Shorts intro + continuous micro-breathing/slow zoom
+            # Combined dynamic scale: hook prominence (0-2s) + PiP demonstration + climax reaction punch-in (20-25s)
             def avatar_resize_fn(t):
-                base_scale = 1.0 + zoom_speed * t + 0.006 * math.sin(t * 1.8)
+                # Subtle micro-breathing oscillation for organic life (never static/frozen)
+                base_scale = 1.0 + zoom_speed * t + 0.008 * math.sin(t * 2.2)
                 if is_longform:
                     return base_scale
                     
-                # Zoom-reveal: start full-screen, zoom to PiP at hook (2.5s)
-                # Only for asymmetric layout (full-screen presenter)
-                layout_type = layout.get("layout_type", "asymmetric")
-                if layout_type == "asymmetric" and layout.get("zoom_reveal", True):
-                    reveal_time = 2.5
-                    if t < reveal_time:
-                        # Start at full-screen scale (cover 9:16 frame), ease to normal
-                        fullscreen_scale = max(FRAME_W / cur_w, FRAME_H / cur_h) * 1.1
-                        p = t / reveal_time
-                        p = 1.0 - (1.0 - p)**4  # quartic ease-out for dramatic slowdown
-                        intro_scale = fullscreen_scale + (1.0 - fullscreen_scale) * p
-                    else:
-                        intro_scale = 1.0
-                else:
-                    # Standard glide/shrink logic for Shorts
-                    glide_dur = 3.5
-                    scale_start = 1080.0 / cur_w
+                reveal_time = 2.0
+                if t < reveal_time:
+                    # Hook zone (0-2.0s): Start large and prominent to command eye contact and stop the scroll
+                    scale_start = max(1.50, 1080.0 / cur_w if cur_w > 0 else 1.50)
                     scale_end = 1.0
-                    
-                    if t < glide_dur:
-                        p = t / glide_dur
-                        p = 1.0 - (1.0 - p)**3  # cubic ease-out
-                        intro_scale = scale_start + (scale_end - scale_start) * p
-                    else:
-                        intro_scale = scale_end
+                    p = t / reveal_time
+                    p = 1.0 - (1.0 - p)**3  # cubic ease-out into PiP
+                    intro_scale = scale_start + (scale_end - scale_start) * p
+                elif 20.0 <= t < 25.0:
+                    # Climax reaction punch-in: punch in 1.15x
+                    punch_p = min(1.0, (t - 20.0) / 0.3) if t < 20.3 else max(0.0, 1.0 - (t - 24.5) / 0.5)
+                    intro_scale = 1.0 + 0.15 * punch_p
+                else:
+                    intro_scale = 1.0
                         
                 return intro_scale * base_scale
 
@@ -10549,9 +10558,11 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     
     if flare_layer: base_layers.append(flare_layer)
     if grain_layer: base_layers.append(grain_layer)
-    # Add presenter drop shadow BEFORE avatar (renders behind)
+    # Add presenter drop shadow and neon rim glow BEFORE avatar (renders behind)
     if avatar_pip and hasattr(avatar_pip, 'clip') and hasattr(avatar_pip.clip, 'shadow_clip'):
         base_layers.append(avatar_pip.clip.shadow_clip.with_position(pip_position).with_start(0))
+    if avatar_pip and hasattr(avatar_pip, 'clip') and hasattr(avatar_pip.clip, 'rim_clip'):
+        base_layers.append(avatar_pip.clip.rim_clip.with_position(pip_position).with_start(0))
     if avatar_pip: base_layers.append(avatar_pip)
     base_layers.extend(longform_badge_clips)
     
@@ -10887,6 +10898,15 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
     def make_final_frame(t):
         bg_frame = base_comp.get_frame(t)
+        
+        # Studio Bokeh: Gaussian blur background during hook (0-2.0s) to lock focal point onto presenter
+        if not is_longform and t < 2.0 and bg_frame is not None:
+            fade = max(0.0, (2.0 - t) / 2.0)
+            blur_k = int(fade * 17)
+            if blur_k % 2 == 0:
+                blur_k += 1
+            if blur_k >= 3:
+                bg_frame = cv2.GaussianBlur(bg_frame, (blur_k, blur_k), 0)
         
         # Subtitle logic map for the exact current timestamp
         subtitle_img = None
