@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "earbuds",
+  "speaker_right": "vj",
+  "hook": "How Headphones Delete Sound Waves in Mid-Air \ud83c\udfa7",
+  "headline": "How Active Noise Cancelling Headphones Invert Physical Sound Waves",
+  "source": "Acoustical Society of America Principles of ANC",
+  "slides": [
+    {
+      "speaker": "earbuds",
+      "emotion": "curious",
+      "title": "Sound Waves Vanish? \ud83e\udd2f",
+      "bubble": "How do headphones actually delete sound waves?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Microphones Hear Noise \ud83d\udc42",
+      "bubble": "External microphones on the headphones capture outside noise.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "earbuds",
+      "emotion": "shocked",
+      "title": "Instant Math Magic? \u2728",
+      "bubble": "What do they do with that captured sound?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Create Anti-Noise \ud83d\udca5",
+      "bubble": "They compute the exact opposite soundwave in microseconds.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "earbuds",
+      "emotion": "thinking",
+      "title": "Opposite Waves Collide? \u3030\ufe0f",
+      "bubble": "So, they play this opposite sound?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Waves Cancel Out \ud83e\udd2b",
+      "bubble": "Yes! The anti-noise waves collide and cancel the original noise.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "earbuds",
+      "emotion": "excited",
+      "title": "Your Personal Quiet Zone \ud83e\uddd8",
+      "bubble": "\ud83d\udccc Tap Save for this sound-silencing secret!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "ANC headphones compute and play inverse soundwaves to cancel out physical noise.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour headphones can delete sound waves in mid-air! Here's the mind-blowing science behind Active Noise Cancellation:\n\n\ud83d\udd39 External mics capture ambient noise (like engine rumble).\n\ud83d\udd39 In microseconds, the headphones calculate the exact 'anti-noise' wave.\n\ud83d\udd39 This anti-noise is played, colliding with and cancelling the original sound waves.\n\nIt's like physics magic for your ears!\n\n\ud83d\udccc Tap Save so you have this in your toolkit!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #ANC #NoiseCancelling #Headphones #AudioTech #ScienceExplained #MindBlown",
+  "vector": "visual_engineering",
+  "characters": "auto"
+}
