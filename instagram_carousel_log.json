@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "A Cloud Reflection Almost Triggered Nuclear War in 1983",
     "AI Chatbots Just 'Make Stuff Up'",
     "AI's 'Eyes' See Billions",
     "Medium (artificial-intelligence): Beyond Assertions: A Practical Guide",
@@ -99,10 +98,10 @@
     "Why NASA Spacecraft Use 30-Year-Old 1990s Microprocessors",
     "Why Free Public Airport USB Charging Ports Are a Major Security Risk",
     "Will AI Truly Kill Junior Developer Jobs or Just Change Them?",
-    "Will AI Truly Kill Junior Developer Jobs or Just Change Them?"
+    "Will AI Truly Kill Junior Developer Jobs or Just Change Them?",
+    "Why Your Smartphone Suddenly Loses 30% Battery in Cold Weather"
   ],
   "used_keywords": [
-    "workstation",
     "AI security",
     "data privacy",
     "LLM risks",
@@ -301,22 +300,10 @@
     "threads_debates",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "A Cloud Reflection Almost Triggered Nuclear War in 1983",
-      "news_source_url": "",
-      "keywords": [
-        "stanislav petrov",
-        "nuclear false alarm",
-        "cold war tech",
-        "satellites",
-        "did you know"
-      ],
-      "source": "United Nations Peace History & CIA Declassified Archives",
-      "timestamp": "2026-10-01T17:29:17.205446+00:00"
-    },
     {
       "title": "AI Chatbots Just 'Make Stuff Up'",
       "news_source_url": "",
@@ -1482,6 +1469,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-12T16:04:56.460035+00:00"
+    },
+    {
+      "title": "Why Your Smartphone Suddenly Loses 30% Battery in Cold Weather",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-12T19:46:57.887388+00:00"
     }
   ]
 }

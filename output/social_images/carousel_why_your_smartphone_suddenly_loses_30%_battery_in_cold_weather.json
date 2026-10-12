@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "battery",
+  "speaker_right": "vj",
+  "hook": "Why Does Your Phone Battery Die Instantly in the Cold? \u2744\ufe0f",
+  "headline": "Why Your Smartphone Suddenly Loses 30% Battery in Cold Weather",
+  "source": "IEEE Transactions on Industrial Electronics",
+  "slides": [
+    {
+      "speaker": "battery",
+      "emotion": "shocked",
+      "title": "Instant Death? \u2744\ufe0f",
+      "bubble": "Why does my phone battery instantly die in the cold? It's baffling!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Cold Chemistry \ud83e\uddea",
+      "bubble": "It's not truly dead! Sub-zero temperatures freeze a liquid inside your battery.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "curious",
+      "title": "Liquid Inside? \ud83d\udd0b",
+      "bubble": "A liquid? Inside my phone battery? What kind of liquid freezes in there?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Electrolyte Freeze \ud83e\udd76",
+      "bubble": "It's called the electrolyte. In the cold, it thickens, raising electrical resistance significantly.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "thinking",
+      "title": "Resistance Skyrockets? \ud83d\udcc8",
+      "bubble": "So, it's like trying to push thick syrup through a tiny straw? Power can't flow easily?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Sudden Shutdown \u26a1",
+      "bubble": "Exactly! The high resistance makes the voltage drop. Your phone thinks it's zero and turns off.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "excited",
+      "title": "Mind-Blowing Fact! \ud83e\udd2f",
+      "bubble": "\ud83d\udccc Tap Save so you have this mind-blowing tech fact in your toolkit! \ud83e\udd2f",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Sub-zero temperatures freeze the liquid electrolyte inside your battery, raising electrical resistance so high that the phone thinks voltage dropped to zero and turns off.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nEver wonder why your phone battery suddenly dies in the freezing cold? It's not magic, it's science!\n\nHere's the mind-blowing truth:\n\ud83d\udd39 **Electrolyte Freeze:** Sub-zero temperatures literally thicken the liquid electrolyte inside your battery.\n\ud83d\udd39 **Resistance Rises:** This 'thickening' dramatically increases electrical resistance, blocking current flow.\n\ud83d\udd39 **Voltage Drop:** Your phone misinterprets this high resistance as a sudden, massive voltage drop.\n\ud83d\udd39 **Self-Protection:** To protect itself, your phone thinks the battery is empty and shuts down, even with 30% charge left!\n\n\ud83d\udccc Tap Save so you have this in your toolkit for winter!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #BatteryLife #ColdWeatherTech #SmartphoneTips #MindBlown #Engineering #Science",
+  "vector": "consumer_utility",
+  "characters": "auto"
+}
