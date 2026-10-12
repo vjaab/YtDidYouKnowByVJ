@@ -662,23 +662,43 @@ def _extract_clean_search_query(chunk, topic_context=""):
         # Use first 3 words of topic context + 'technology'
         words = clean_topic.split()
         if words:
-            return " ".join(words[:3]) + " technology"
+            return " ".join(words[:3]) + " cyber technology"
 
-    return "technology"
+    # Viral high-production fallback pool (avoids generic corporate office footage)
+    VIRAL_TECH_VISUAL_POOL = [
+        "cyber neon dark technology",
+        "futuristic server glowing dark",
+        "digital matrix code network",
+        "cybersecurity dark code hud",
+        "hologram smartphone interface",
+        "data stream lights abstract motion",
+        "quantum computer glowing abstract",
+        "artificial intelligence neural network dark"
+    ]
+    return random.choice(VIRAL_TECH_VISUAL_POOL)
 
 
 def _filter_and_sort_candidates_by_relevance(chunk_text, candidates):
     """
     Scores the relevance of a list of candidates against the chunk text,
-    sorting them by highest score. Returns a list of (score, candidate) tuples.
+    sorting them by highest score. Demotes generic corporate/office stock footage.
+    Returns a list of (score, candidate) tuples.
     """
+    BORING_OFFICE_TERMS = {
+        "office", "meeting", "colleague", "colleagues", "handshake", 
+        "business suit", "corporate", "desk typing", "businesswoman", 
+        "businessman", "conference room", "casual meeting", "co-workers"
+    }
     scored_candidates = []
     for c in candidates:
-        desc = c.get("desc", "")
+        desc = c.get("desc", "").lower()
         if not desc:
             score = 5 # Default middle score if no description
         else:
             score = score_relevance(chunk_text, desc)
+            # Demote generic corporate slop that triggers swipe-away
+            if any(term in desc for term in BORING_OFFICE_TERMS):
+                score = max(1, score - 5)
         scored_candidates.append((score, c))
     
     # Sort by score in descending order

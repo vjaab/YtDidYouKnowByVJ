@@ -8003,15 +8003,24 @@ def _render_kinetic_caption(word_data, frame_width, frame_height, accent_color, 
     if active_idx == -1:
         active_idx = len(word_data) - 1
 
-    # ── ITEM 1: OPTIMIZE CAPTION "CHUNKING" (3-5 Words per Frame) ──
-    # Rapid, bite-sized caption changes create momentum and lock viewer attention
-    try:
-        max_chunk_words = int(os.environ.get("CAPTION_MAX_WORDS", "4"))
-    except ValueError:
-        max_chunk_words = 4
-    max_chunk_words = max(3, min(5, max_chunk_words))
-
-    bounds = get_chunk_boundaries(len(word_data), target=max_chunk_words, min_sz=3, max_sz=5)
+    # ── ITEM 1: OPTIMIZE CAPTION "CHUNKING" (Viral 1-2 Words for Shorts) ──
+    # Rapid, bite-sized caption changes create momentum and lock mobile viewer attention
+    if not is_landscape:
+        # Shorts viral format: 1-2 words per frame (max 3) for hyper-fast visual cadence
+        try:
+            target_words = int(os.environ.get("CAPTION_MAX_WORDS", "2"))
+        except ValueError:
+            target_words = 2
+        target_words = max(1, min(3, target_words))
+        bounds = get_chunk_boundaries(len(word_data), target=target_words, min_sz=1, max_sz=3)
+    else:
+        # Longform format: 3-5 words per line for horizontal balance
+        try:
+            target_words = int(os.environ.get("CAPTION_MAX_WORDS", "4"))
+        except ValueError:
+            target_words = 4
+        target_words = max(3, min(5, target_words))
+        bounds = get_chunk_boundaries(len(word_data), target=target_words, min_sz=3, max_sz=5)
     slice_start, slice_end = 0, len(word_data)
     active_in_line = active_idx
     for b_start, b_end in bounds:
@@ -10688,7 +10697,11 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
 
             # IMPROVEMENT #4: Generate snap-zoom timestamps for per-frame processing
             snap_zoom_timestamps = _generate_snap_zoom_interrupts(chunks, audio_duration, interval=5.0)
-            print(f"   ⚡ Snap-zoom interrupts scheduled ({len(snap_zoom_timestamps)} zooms every 5s).")
+            print(f"   ⚡ Longform snap-zoom interrupts scheduled ({len(snap_zoom_timestamps)} zooms every 5s).")
+        elif not is_longform:
+            # Shorts: Generate high-tempo snap-zoom interrupts every 2.2s for maximum pattern disruption (10M view velocity)
+            snap_zoom_timestamps = _generate_snap_zoom_interrupts(chunks, audio_duration, interval=2.2)
+            print(f"   ⚡ Shorts snap-zoom interrupts scheduled ({len(snap_zoom_timestamps)} zooms every 2.2s).")
     else:
         snap_zoom_timestamps = []
         print("   🔧 CI-LITE: Skipping LONGFORM RETENTION UPGRADE layers")
