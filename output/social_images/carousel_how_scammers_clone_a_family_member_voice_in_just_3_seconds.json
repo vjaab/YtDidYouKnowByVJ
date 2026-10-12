@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "earbuds",
+  "speaker_right": "vj",
+  "hook": "Scam Alert: How Criminals Clone Voices in 3 Seconds \ud83d\udea8",
+  "headline": "How Scammers Clone a Family Member Voice in Just 3 Seconds",
+  "source": "FTC Consumer Protection Warnings",
+  "slides": [
+    {
+      "speaker": "earbuds",
+      "emotion": "shocked",
+      "title": "Voice Cloning Scare \ud83d\ude31",
+      "bubble": "Wait, they can copy my voice from a tiny clip?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "The 3-Second Trick \ud83c\udfa4",
+      "bubble": "Yes! Just 3 seconds from social media is enough for them.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "earbuds",
+      "emotion": "thinking",
+      "title": "How It Works \ud83e\udd16",
+      "bubble": "They use AI to make it sound exactly like me?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Protect Your Loved Ones \ud83d\udee1\ufe0f",
+      "bubble": "Share this to warn family about fake ransom calls!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Scammers take a 3-second audio clip from Instagram or Facebook video and feed it into zero-shot neural voice cloners to call family demanding fake emergency ransoms.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nScam Alert: How Criminals Clone Voices in 3 Seconds \ud83d\udea8\n\n\ud83d\udca1 Scammers take a 3-second audio clip from Instagram or Facebook video and feed it into zero-shot neural voice cloners to call family demanding fake emergency ransoms.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "consumer_utility",
+  "characters": "auto"
+}

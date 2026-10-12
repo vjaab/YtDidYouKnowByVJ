@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Medium (artificial-intelligence): Beyond Assertions: A Practical Guide",
     "Your Smartphone Feels Your Invisible Touch",
     "AI's Digital Dreams From Pure Static",
     "Chips: Billions of Invisible Switches",
@@ -99,10 +98,10 @@
     "Why Your Smartphone Suddenly Loses 30% Battery in Cold Weather",
     "How ASML Machines Use Exploding Tin Droplets to Print 2nm Chips",
     "How ASML Machines Use Exploding Tin Droplets to Print 2nm Chips",
-    "How Active Noise Cancelling Headphones Invert Physical Sound Waves"
+    "How Active Noise Cancelling Headphones Invert Physical Sound Waves",
+    "How Scammers Clone a Family Member Voice in Just 3 Seconds"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "tech trending",
     "medium",
@@ -301,19 +300,10 @@
     "did you know",
     "threads",
     "tech",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Medium (artificial-intelligence): Beyond Assertions: A Practical Guide",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "timestamp": "2026-10-01T20:31:43.102465+00:00"
-    },
     {
       "title": "Your Smartphone Feels Your Invisible Touch",
       "news_source_url": "",
@@ -1473,6 +1463,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-12T22:02:24.083683+00:00"
+    },
+    {
+      "title": "How Scammers Clone a Family Member Voice in Just 3 Seconds",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-12T22:09:55.085165+00:00"
     }
   ]
 }
