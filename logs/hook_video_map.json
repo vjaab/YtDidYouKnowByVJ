@@ -1434,5 +1434,15 @@
     "title": "Did You Know This About Telegram? \ud83e\udd2f",
     "uploaded_at": "2026-10-11T20:10:07.861970",
     "synced": false
+  },
+  "FwO0fB5saK4": {
+    "video_id": "FwO0fB5saK4",
+    "hook_pattern": "personal_stake",
+    "hook_variant": "A",
+    "hook_text": "Your AI coding assistant draws terrible charts",
+    "category": "Facts & Trivia",
+    "title": "The Secret Fix For AI Diagram Slop \u26a1",
+    "uploaded_at": "2026-10-12T18:45:20.349856",
+    "synced": false
   }
 }
