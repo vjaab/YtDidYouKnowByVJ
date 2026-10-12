@@ -27,13 +27,13 @@ ALL_CATEGORIES = [
 
 # Mass-appeal 2026 Shorts Schedule: Focused on high-retention, high-curiosity pillars
 WEEKLY_SCHEDULE = {
-    "Mon": ["Facts & Trivia", "Tools That Feel Illegal", "AI & Tech Tools"],
-    "Tue": ["Tech Gadgets & Inventions", "Hidden OS & App Killswitches", "Coding & Development Hacks"],
-    "Wed": ["Under-the-Hood / Teardown", "Famous Bugs & Tech Heists", "AI & Tech Tools"],
-    "Thu": ["AI Benchmark Showdowns", "Tools That Feel Illegal", "Coding & Development Hacks"],
-    "Fri": ["Facts & Trivia", "Student & Dev Shortcuts", "AI & Tech Tools"],
-    "Sat": ["Famous Bugs & Tech Heists", "Tech Gadgets & Inventions", "Hidden OS & App Killswitches"],
-    "Sun": ["AI Benchmark Showdowns", "Under-the-Hood / Teardown", "Tech Gadgets & Inventions"],
+    "Mon": ["Facts & Trivia", "AI & Tech Tools"],
+    "Tue": ["Tech Gadgets & Inventions", "Coding & Development Hacks"],
+    "Wed": ["Facts & Trivia", "AI & Tech Tools"],
+    "Thu": ["Tech Gadgets & Inventions", "Coding & Development Hacks"],
+    "Fri": ["Facts & Trivia", "AI & Tech Tools"],
+    "Sat": ["Tech Gadgets & Inventions", "Facts & Trivia"],
+    "Sun": ["AI & Tech Tools", "Tech Gadgets & Inventions"],
 }
 
 # ── Dynamic Narrative Formats ──
