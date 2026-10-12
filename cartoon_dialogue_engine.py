@@ -1835,8 +1835,8 @@ def fetch_or_select_did_you_know_fact(topic: Optional[str] = None, platform: str
     return selected
 
 
-def clean_bubble_text(text: str, max_words: int = 18) -> str:
-    """Ensure bubble text is clean, layman-friendly, and concise (18 words or fewer).
+def clean_bubble_text(text: str, max_words: int = 12) -> str:
+    """Ensure bubble text is clean, layman-friendly, and concise (strictly 6-12 words).
     Removes pause, continue, break statements and any script/stage direction artifacts.
     """
     if not text:
@@ -1964,7 +1964,7 @@ CRITICAL RULES FOR MAXIMUM VIEWER ATTRACTION & LAYMAN UNDERSTANDING:
 3. MODE: "did_you_know"
 4. CATEGORY: "🧠 DID YOU KNOW?"
 5. SPEAKERS ALTERNATE: Slide 1 {speaker_left}, Slide 2 {speaker_right}, Slide 3 {speaker_left}, Slide 4 {speaker_right}, etc.
-6. SPEECH BUBBLE LENGTH: STRICTLY 18 WORDS OR FEWER PER BUBBLE. Short, punchy, conversational, mind-blowing!
+6. SPEECH BUBBLE LENGTH: STRICTLY 6 TO 12 WORDS PER BUBBLE. Crisp, punchy, single core thought per slide. ZERO text overload or compound sentences.
 7. FINAL SLIDE: Mark "is_takeaway": true. Provide a punchy summary in "takeaway" field.
 8. SLIDE TITLES: Every single slide MUST include a "title" property (2-5 words, plus an optional emoji) matching what that specific slide discusses! Slide 1 title should be the hook.
 
@@ -2009,7 +2009,7 @@ CRITICAL ACCURACY RULES:
 2. MODE: "news"
 3. SLIDE COUNT: Exactly 6 to 7 slides.
 4. SPEAKERS ALTERNATE: Alternate between "{speaker_left}" and "{speaker_right}" on every slide (e.g., slide 1 {speaker_left}, slide 2 {speaker_right}, slide 3 {speaker_left}, etc.).
-5. CONCISE BUBBLES: Each speech bubble MUST BE 18 WORDS OR FEWER. Short, punchy, conversational, engaging!
+5. CONCISE BUBBLES: Each speech bubble MUST BE 6 TO 12 WORDS. Single punchy takeaway, crisp, zero cognitive clutter!
 6. EMOTIONS: Each slide must have a valid emotion: ["curious", "thinking", "excited", "shocked", "neutral", "smug"].
 7. SLIDE TITLES: Every single slide MUST include a "title" property (2-5 words) matching that slide's content.
 8. LAST SLIDE: The final slide is a takeaway plus a follow CTA. Provide a "takeaway" field and note the source: "{source}, {date}".
@@ -2049,7 +2049,7 @@ CRITICAL RULES:
 1. MODE: "concept"
 2. SLIDE COUNT: Exactly 6 to 7 slides.
 3. SPEAKERS ALTERNATE: Alternate between "{speaker_left}" and "{speaker_right}" on every slide.
-4. PUNCHY BUBBLES: Every single speech bubble MUST BE 18 WORDS OR FEWER. No exceptions.
+4. PUNCHY BUBBLES: Every single speech bubble MUST BE 6 TO 12 WORDS. Crisp, simple, zero clutter. No exceptions.
 5. EMOTIONS: Valid emotions for each slide: ["curious", "thinking", "excited", "shocked", "neutral", "smug"].
 6. HOOK: Must start with a magnetic hook question that stops the user's scroll.
 7. SLIDE TITLES: Every single slide MUST include a "title" property (2-5 words) matching that slide's content.
@@ -2715,8 +2715,9 @@ def render_cartoon_dialogue_carousel(
         for slide_num, html_path, img_path in slide_html_items:
             page.goto(f"file://{html_path.absolute()}")
             page.wait_for_load_state("networkidle")
+            page.evaluate("() => document.fonts.ready")
             page.wait_for_timeout(200)
-            page.screenshot(path=str(img_path), type="jpeg", quality=95)
+            page.screenshot(path=str(img_path), type="jpeg", quality=98)
             output_paths.append(img_path)
             print(f"  ✅ Slide {slide_num}/{total_slides} rendered: {img_path.name}")
             

@@ -255,32 +255,32 @@ html, body {
 .eyebrow-badge {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 20px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--accent);
+  gap: 12px;
+  padding: 10px 24px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid var(--accent);
   border-radius: 9999px;
   font-family: var(--font-mono);
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--accent);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   width: fit-content;
 }
 
 .eyebrow-badge__dot {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 12px var(--accent);
+  box-shadow: 0 0 14px var(--accent);
 }
 
 .slide-title {
   font-family: var(--font-display);
-  font-size: 48px;
+  font-size: 56px;
   font-weight: 800;
   line-height: 1.16;
   color: var(--text-primary);
@@ -288,7 +288,7 @@ html, body {
 }
 
 .slide-title--huge {
-  font-size: 64px;
+  font-size: 72px;
   line-height: 1.12;
   font-weight: 900;
 }
@@ -300,11 +300,11 @@ html, body {
 }
 
 .slide-subtitle {
-  font-size: 24px;
-  line-height: 1.45;
+  font-size: 30px;
+  line-height: 1.42;
   color: var(--text-secondary);
-  font-weight: 400;
-  max-width: 92%;
+  font-weight: 500;
+  max-width: 95%;
 }
 
 /* ==========================================================================
@@ -388,11 +388,12 @@ html, body {
 }
 
 .hero-tag {
-  padding: 8px 18px;
+  padding: 10px 22px;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.06);
-  font-size: 16px;
-  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
   font-family: var(--font-mono);
 }
 
@@ -408,7 +409,7 @@ html, body {
 
 .big-number-value {
   font-family: var(--font-display);
-  font-size: 130px;
+  font-size: 140px;
   font-weight: 900;
   line-height: 1;
   letter-spacing: -0.04em;
@@ -419,17 +420,17 @@ html, body {
 }
 
 .big-number-label {
-  font-size: 32px;
-  font-weight: 700;
+  font-size: 38px;
+  font-weight: 800;
   color: var(--text-primary);
   margin-bottom: 16px;
 }
 
 .big-number-desc {
-  font-size: 22px;
-  line-height: 1.5;
+  font-size: 28px;
+  line-height: 1.45;
   color: var(--text-secondary);
-  max-width: 80%;
+  max-width: 88%;
 }
 
 /* 3. ARCHITECTURE DIAGRAM */
@@ -533,14 +534,14 @@ html, body {
 }
 
 .step-title {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 30px;
+  font-weight: 800;
   color: var(--text-primary);
 }
 
 .step-desc {
-  font-size: 19px;
-  line-height: 1.45;
+  font-size: 26px;
+  line-height: 1.42;
   color: var(--text-secondary);
 }
 
@@ -576,10 +577,10 @@ html, body {
 }
 
 .comp-badge {
-  padding: 6px 14px;
+  padding: 8px 16px;
   border-radius: 8px;
   font-family: var(--font-mono);
-  font-size: 15px;
+  font-size: 20px;
   font-weight: 800;
   letter-spacing: 0.06em;
 }
@@ -597,8 +598,8 @@ html, body {
 }
 
 .comp-title {
-  font-size: 22px;
-  font-weight: 700;
+  font-size: 28px;
+  font-weight: 800;
   color: var(--text-primary);
 }
 
@@ -613,13 +614,13 @@ html, body {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  font-size: 18px;
-  line-height: 1.45;
+  font-size: 24px;
+  line-height: 1.42;
   color: var(--text-secondary);
 }
 
 .comp-icon {
-  font-size: 18px;
+  font-size: 24px;
   flex-shrink: 0;
   margin-top: 2px;
 }
@@ -882,14 +883,14 @@ html, body {
   display: flex;
   align-items: flex-start;
   gap: 16px;
-  font-size: 22px;
-  line-height: 1.45;
+  font-size: 28px;
+  line-height: 1.42;
   color: var(--text-primary);
 }
 
 .takeaway-bullet {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: var(--accent);
   margin-top: 10px;
@@ -908,18 +909,18 @@ html, body {
 }
 
 .cta-text {
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 26px;
+  font-weight: 800;
   color: var(--text-primary);
 }
 
 .cta-badge {
-  padding: 8px 18px;
+  padding: 10px 22px;
   border-radius: 9999px;
   background: var(--accent);
   color: #FFFFFF;
-  font-weight: 700;
-  font-size: 16px;
+  font-weight: 800;
+  font-size: 22px;
 }
 
 /* ==========================================================================
@@ -943,8 +944,8 @@ html, body {
 }
 
 .footer-avatar {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
   color: #FFFFFF;
@@ -952,21 +953,21 @@ html, body {
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 16px;
+  font-size: 20px;
   font-family: var(--font-display);
 }
 
 .footer-handle {
   font-family: var(--font-mono);
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 700;
   color: var(--text-secondary);
 }
 
 .footer-counter {
   font-family: var(--font-mono);
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 800;
   color: var(--text-muted);
 }
 

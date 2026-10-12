@@ -9,11 +9,11 @@ class TemplateConfig(BaseModel):
     
     # Typography
     font_family: str = "Inter"
-    font_size_base: int = 16
-    font_size_sm: int = 14
-    font_size_lg: int = 20
-    font_size_xl: int = 24
-    font_size_2xl: int = 32
+    font_size_base: int = 28
+    font_size_sm: int = 22
+    font_size_lg: int = 36
+    font_size_xl: int = 48
+    font_size_2xl: int = 64
     
     # Spacing
     spacing_xs: int = 4

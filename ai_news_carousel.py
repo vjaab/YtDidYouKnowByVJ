@@ -822,6 +822,7 @@ ANTI-HALLUCINATION & RIGOR MANDATE:
 3. NO CODE SNIPPETS MANDATE: Do NOT include code snippets, raw code blocks, or syntax lines in ANY slide. Focus on conceptual architecture, mental models, workflows, and intuitive diagrams.
 4. COMMON LAYMAN UNDERSTANDABLE: The content must be accessible and fascinating to a common layperson (students, non-specialists). Always use intuitive real-world analogies so anyone who reads it can instantly understand and appreciate the concept.
 5. NO SCRIPT ARTIFACTS: Absolutely NO words or directions like '[pause]', '(pause)', 'pause', '[break]', '(break)', 'break', '[continue]', '(continue)', 'continue' anywhere in slide text. Text must be pure, clean, engaging, natural human writing.
+6. CRISP & CONCISE COPY (MOBILE READABILITY): Mobile viewers scroll quickly on Instagram, Facebook, and Threads. Keep all text crisp, punchy, and bite-sized. Every body paragraph or card description MUST be strictly under 25 words. Avoid cognitive clutter, run-on sentences, and wall-of-text explanations. Deliver one crystal-clear, high-impact idea per slide.
 
 NO-REPETITION MANDATE:
 Every single slide must advance the story and add genuinely new knowledge.

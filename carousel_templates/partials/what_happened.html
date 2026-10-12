@@ -3,7 +3,7 @@
 {% block content %}
 <div class="process-steps">
   {% if slide_data.body is string %}
-  <div class="card card--glow" style="font-size: 22px; line-height: 1.5; color: var(--text-primary); margin-bottom: 8px;">
+  <div class="card card--glow" style="font-size: 28px; line-height: 1.42; color: var(--text-primary); margin-bottom: 10px; font-weight: 500;">
     {{ slide_data.body }}
   </div>
   {% elif slide_data.body is iterable %}
@@ -11,7 +11,7 @@
     <div class="step-card">
       <div class="step-badge">0{{ loop.index }}</div>
       <div class="step-info">
-        <div class="step-title" style="font-size: 21px; line-height: 1.45;">{{ bullet }}</div>
+        <div class="step-title" style="font-size: 26px; line-height: 1.40; font-weight: 700;">{{ bullet }}</div>
       </div>
     </div>
     {% endfor %}

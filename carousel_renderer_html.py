@@ -285,10 +285,11 @@ def render_carousel(
         for slide_num, layout_type, html_path, img_path in slide_html_items:
             page.goto(f"file://{html_path.absolute()}")
             page.wait_for_load_state("networkidle")
+            page.evaluate("() => document.fonts.ready")
             page.wait_for_timeout(250)  # Font & rendering stabilization
             
             # Save as high-quality JPEG
-            page.screenshot(path=str(img_path), type="jpeg", quality=95)
+            page.screenshot(path=str(img_path), type="jpeg", quality=98)
             output_paths.append(img_path)
             print(f"  ✅ Slide {slide_num}/{total_slides} [{layout_type}]: {img_path.name}")
 
