@@ -9038,6 +9038,361 @@ DUAL_AVATAR_CONFIG = {
     "switch_on_speaker": True,                   # Auto-switch based on script markers
 }
 
+# ── THEMED ALTER-EGO SKINS REGISTRY ──────────────────────────────────────────
+# Retains the 4 non-negotiable identity anchors (facial likeness, hair/beard,
+# navy blue hoodie with 'TECH', and voice) while contextually adapting gear:
+# - Cyber VJ: cyber-hacker with glowing cyan code visor & neon rim light
+# - Detective VJ: tech detective with glowing digital HUD inspection lens
+# - Holo VJ: luminous cyan wireframe digital twin for futuristic AI / singularity
+VJ_ALTER_EGO_REGISTRY = {
+    "hacker": {
+        "name": "Cyber VJ",
+        "tag": "🛡️ CYBER VJ",
+        "description": "Cybersecurity & digital exploits specialist with glowing cyan visor & neon rim light",
+        "paths": [
+            os.path.join(ASSETS_DIR, "characters", "vj_hacker.png"),
+            os.path.join(ASSETS_DIR, "characters", "vj", "hacker.png"),
+        ],
+        "keywords": [
+            "hack", "hacker", "exploit", "zero-day", "zeroday", "malware", "ransomware",
+            "cyber", "breach", "backdoor", "vulnerability", "ddos", "dark web", "firewall",
+            "phishing", "spyware", "security flaw", "infiltrat", "bypass"
+        ],
+        "accent_color": (0, 242, 254),  # Cyber Cyan
+    },
+    "detective": {
+        "name": "Detective VJ",
+        "tag": "🔍 DETECTIVE VJ",
+        "description": "Tech detective investigating hidden settings, secrets, and tech mysteries with glowing HUD monocle",
+        "paths": [
+            os.path.join(ASSETS_DIR, "characters", "vj_detective.png"),
+            os.path.join(ASSETS_DIR, "characters", "vj", "detective.png"),
+        ],
+        "keywords": [
+            "detective", "secret", "hidden", "mystery", "investigat", "deleted", "myth",
+            "uncovered", "behind the scenes", "easter egg", "expose", "truth", "conspiracy",
+            "confidential", "banned", "unsolved", "declassified", "hidden setting", "why apple",
+            "why google", "the real reason", "what happened"
+        ],
+        "accent_color": (255, 184, 0),  # Amber Gold
+    },
+    "hologram": {
+        "name": "Holo VJ",
+        "tag": "⚡ HOLO VJ",
+        "description": "Futuristic cyan wireframe hologram for quantum AI, singularity, and 2050 tech",
+        "paths": [
+            os.path.join(ASSETS_DIR, "characters", "vj_hologram.png"),
+            os.path.join(ASSETS_DIR, "characters", "vj", "hologram.png"),
+        ],
+        "keywords": [
+            "hologram", "quantum", "singularity", "future", "futuristic", "neural",
+            "brain-computer", "bci", "cyborg", "2050", "superintelligence", "agi",
+            "sci-fi", "digital twin", "nanotech", "teleportation", "metaverse", "robotics"
+        ],
+        "accent_color": (0, 240, 255),  # Electric Hologram Cyan
+    },
+}
+
+def get_vj_alter_ego_skin(topic_text="", category="", script_text="", requested_skin=None):
+    """
+    Resolves the contextual alter-ego skin for VJ while preserving identity anchors.
+    Returns dict with keys: skin, name, tag, path, accent_color.
+    """
+    req = (requested_skin or "").strip().lower()
+    if req in VJ_ALTER_EGO_REGISTRY:
+        info = VJ_ALTER_EGO_REGISTRY[req]
+        for p in info["paths"]:
+            if os.path.exists(p):
+                return {"skin": req, "name": info["name"], "tag": info["tag"], "path": p, "accent_color": info["accent_color"]}
+    
+    # Keyword detection across topic, category, and script
+    corpus = f"{topic_text} {category} {script_text}".lower()
+    for skin_key, info in VJ_ALTER_EGO_REGISTRY.items():
+        if any(kw in corpus for kw in info["keywords"]):
+            for p in info["paths"]:
+                if os.path.exists(p):
+                    return {"skin": skin_key, "name": info["name"], "tag": info["tag"], "path": p, "accent_color": info["accent_color"]}
+    
+    # Default: standard VJ
+    return {
+        "skin": "standard",
+        "name": "VJ Standard",
+        "tag": "👨‍💻 VJ",
+        "path": os.path.join(ASSETS_DIR, "video", "Firefly_video_final.mp4"),
+        "accent_color": (0, 210, 255),
+    }
+
+
+# ── CO-HOST SIDEKICK REGISTRY ────────────────────────────────────────────────
+# Mascot companion duo: VJ (lead expert host) + Gadget Mascot (curious/reactive sidekick)
+COHOST_MASCOT_REGISTRY = {
+    "byte": {
+        "name": "Byte",
+        "tag": "🤖 BYTE",
+        "role": "Curious AI Robot Co-Host",
+        "keywords": ["ai", "robot", "chatgpt", "gemini", "claude", "algorithm", "intelligence", "neural", "software"],
+    },
+    "phone": {
+        "name": "Phony",
+        "tag": "📱 PHONE",
+        "role": "Smartphone & Mobile Co-Host",
+        "keywords": ["phone", "smartphone", "iphone", "android", "mobile", "app", "touchscreen", "cellular", "5g", "sim", "screen"],
+    },
+    "computer": {
+        "name": "Compute",
+        "tag": "💻 COMPUTER",
+        "role": "PC & Code Co-Host",
+        "keywords": ["computer", "laptop", "pc", "linux", "windows", "macbook", "code", "programming", "software", "terminal"],
+    },
+    "server": {
+        "name": "Server",
+        "tag": "🗄️ SERVER",
+        "role": "Cloud & Infrastructure Co-Host",
+        "keywords": ["server", "cloud", "datacenter", "data center", "submarine", "underwater cable", "internet backbone", "fiber optic"],
+    },
+    "chip": {
+        "name": "Silicon",
+        "tag": "⚡ CHIP",
+        "role": "Semiconductor & Hardware Co-Host",
+        "keywords": ["chip", "semiconductor", "transistor", "nanometer", "gpu", "tpu", "nvidia", "silicon", "processor", "hardware"],
+    },
+    "controller": {
+        "name": "Pixel",
+        "tag": "🎮 CONTROLLER",
+        "role": "Gaming & Graphics Co-Host",
+        "keywords": ["game", "gaming", "controller", "playstation", "ps5", "xbox", "nintendo", "unreal engine", "ray tracing", "gta"],
+    },
+    "camera": {
+        "name": "Optic",
+        "tag": "📷 CAMERA",
+        "role": "Imaging & Optics Co-Host",
+        "keywords": ["camera", "photo", "lens", "pixel", "sensor", "aperture", "optical", "shutter", "zoom"],
+    },
+    "watch": {
+        "name": "Chrono",
+        "tag": "⌚ WATCH",
+        "role": "Wearable & Health Tech Co-Host",
+        "keywords": ["watch", "smartwatch", "heart rate", "biometric", "pulse", "wearable", "chrono", "apple watch"],
+    },
+    "drone": {
+        "name": "Aero",
+        "tag": "🛸 DRONE",
+        "role": "Aviation & Robotics Co-Host",
+        "keywords": ["drone", "satellite", "gps", "flying", "orbit", "space", "uav", "aerospace"],
+    },
+    "vr": {
+        "name": "Visor",
+        "tag": "🥽 VR",
+        "role": "Spatial & Metaverse Co-Host",
+        "keywords": ["vr", "ar", "headset", "spatial", "metaverse", "vision pro", "quest", "virtual reality"],
+    },
+    "earbuds": {
+        "name": "Wave",
+        "tag": "🎧 EARBUDS",
+        "role": "Audio & Sound Co-Host",
+        "keywords": ["earbuds", "headphone", "audio", "noise cancell", "sound", "acoustics", "airpods"],
+    },
+    "battery": {
+        "name": "Volt",
+        "tag": "🔋 BATTERY",
+        "role": "Energy & Power Co-Host",
+        "keywords": ["battery", "charge", "lithium", "power bank", "overheat", "voltage", "energy", "mah"],
+    },
+}
+
+def get_cohost_sidekick_for_topic(topic_text="", category="", script_text="", requested_mascot=None):
+    """
+    Selects the most thematic gadget mascot companion for the topic.
+    Returns mascot metadata with available emotion sprite paths.
+    """
+    req = (requested_mascot or "").strip().lower()
+    selected_mascot = "byte"
+    if req in COHOST_MASCOT_REGISTRY:
+        selected_mascot = req
+    else:
+        corpus = f"{topic_text} {category} {script_text}".lower()
+        for mascot_key, meta in COHOST_MASCOT_REGISTRY.items():
+            if any(kw in corpus for kw in meta["keywords"]):
+                selected_mascot = mascot_key
+                break
+                
+    meta = COHOST_MASCOT_REGISTRY[selected_mascot]
+    char_dir = os.path.join(ASSETS_DIR, "characters", selected_mascot)
+    emotions = {}
+    for emo in ["neutral", "curious", "excited", "thinking", "shocked", "smug"]:
+        p = os.path.join(char_dir, f"{emo}.png")
+        if not os.path.exists(p):
+            p = os.path.join(ASSETS_DIR, "characters", f"{selected_mascot}_{emo}.png")
+        if not os.path.exists(p):
+            p = os.path.join(ASSETS_DIR, "characters", f"{selected_mascot}_neutral.png")
+        if os.path.exists(p):
+            emotions[emo] = p
+            
+    # Fallback to byte if no sprites found
+    if not emotions:
+        fallback_dir = os.path.join(ASSETS_DIR, "characters", "byte")
+        for emo in ["neutral", "curious", "excited", "thinking", "shocked", "smug"]:
+            p = os.path.join(fallback_dir, f"{emo}.png")
+            if os.path.exists(p):
+                emotions[emo] = p
+        selected_mascot = "byte"
+        meta = COHOST_MASCOT_REGISTRY["byte"]
+
+    return {
+        "mascot": selected_mascot,
+        "name": meta["name"],
+        "tag": meta["tag"],
+        "role": meta["role"],
+        "emotions": emotions,
+    }
+
+
+def _build_cohost_sidekick_clip(cohost_info, audio_duration, accent_color=(0, 240, 255), is_longform=False, avatar_on_left=False, screenshot_intervals=None):
+    """
+    Builds a dynamic co-host companion mascot clip (e.g. Byte, Phony, Server, Chip)
+    positioned in the opposite lower corner with:
+    - Reactive emotion switching across video acts (curious -> thinking -> shocked -> excited)
+    - Elastic bounce-in entrance at 2.4s (or 0.5s for longform)
+    - Micro-breathing idle bob motion
+    - Crisp transparent alpha mask
+    - Sleek glassmorphism pill name badge
+    - Screen fade during full-screen screenshots
+    """
+    if not cohost_info or not cohost_info.get("emotions"):
+        return None, None
+        
+    target_w = 210 if not is_longform else 200
+    badge_h = 32
+    
+    # First pass: find max sprite height to standardize canvas dimensions
+    prepared_sprites = {}
+    max_spr_h = target_w
+    for emo, path in cohost_info["emotions"].items():
+        if os.path.exists(path):
+            try:
+                img = Image.open(path).convert("RGBA")
+                aspect = img.height / max(1, img.width)
+                spr_h = int(target_w * aspect)
+                spr = img.resize((target_w, spr_h), Image.Resampling.LANCZOS)
+                prepared_sprites[emo] = (spr, spr_h)
+                max_spr_h = max(max_spr_h, spr_h)
+            except Exception as e:
+                print(f"⚠️ Note loading cohost sprite {emo}: {e}")
+
+    if not prepared_sprites:
+        return None, None
+
+    canvas_w = target_w
+    canvas_h = max_spr_h + badge_h + 8
+
+    # Second pass: paste onto uniform canvas
+    loaded_emotions = {}
+    badge_text = cohost_info.get("tag", "🤖 MASCOT")
+    pill_w = min(150, target_w - 20)
+    pill_x = (canvas_w - pill_w) // 2
+    pill_y = max_spr_h + 4
+
+    for emo, (spr, spr_h) in prepared_sprites.items():
+        canvas = Image.new("RGBA", (canvas_w, canvas_h), (0, 0, 0, 0))
+        # Ground sprite at bottom of sprite area
+        y_offset = max_spr_h - spr_h
+        canvas.paste(spr, (0, y_offset), spr)
+
+        draw = ImageDraw.Draw(canvas)
+        draw.rounded_rectangle(
+            [pill_x, pill_y, pill_x + pill_w, pill_y + 24],
+            radius=12,
+            fill=(10, 16, 32, 220),
+            outline=(accent_color[0], accent_color[1], accent_color[2], 230),
+            width=2
+        )
+        try:
+            draw.text((pill_x + 14, pill_y + 4), badge_text, fill=(255, 255, 255, 255))
+        except Exception:
+            pass
+
+        loaded_emotions[emo] = np.array(canvas)
+
+    fallback_frame = next(iter(loaded_emotions.values()))
+    cur_h, cur_w = fallback_frame.shape[:2]
+    
+    # Position: opposite corner from VJ
+    if is_longform:
+        pos_x = 60 if not avatar_on_left else (FRAME_W - cur_w - 60)
+        pos_y = FRAME_H - cur_h - 110
+    else:
+        # In Shorts: lower-left if VJ is bottom-center/right, or lower-right if VJ is on left
+        pos_x = 45 if not avatar_on_left else (FRAME_W - cur_w - 45)
+        pos_y = FRAME_H - cur_h - 170
+
+    start_time = 2.4 if not is_longform else 0.5
+    clip_dur = max(0.5, audio_duration - start_time)
+    
+    # Emotion timeline
+    def get_frame_for_time(t):
+        global_t = start_time + t
+        if global_t < 6.0:
+            preferred = "curious"
+        elif global_t < 18.0:
+            preferred = "thinking"
+        elif global_t < 26.0:
+            preferred = "shocked"
+        else:
+            preferred = "excited"
+        if preferred in loaded_emotions:
+            return loaded_emotions[preferred]
+        if "neutral" in loaded_emotions:
+            return loaded_emotions["neutral"]
+        return fallback_frame
+
+    screenshot_list = screenshot_intervals or []
+    def make_cohost_mask(t):
+        global_t = start_time + t
+        # Screenshot hiding
+        hide_factor = 1.0
+        fade_win = 0.3
+        for s_start, s_end in screenshot_list:
+            if s_start <= global_t <= s_end:
+                if global_t < s_start + fade_win:
+                    hide_factor = max(0.0, (s_start + fade_win - global_t) / fade_win)
+                elif global_t > s_end - fade_win:
+                    hide_factor = max(0.0, (global_t - (s_end - fade_win)) / fade_win)
+                else:
+                    hide_factor = 0.0
+                break
+        
+        # Entrance crossfade factor
+        intro_factor = min(1.0, t / 0.35) if t < 0.35 else 1.0
+        rgba = get_frame_for_time(t)
+        base_alpha = (rgba[:, :, 3] / 255.0).astype(np.float32)
+        return base_alpha * hide_factor * intro_factor
+
+    def make_cohost_rgb(t):
+        rgba = get_frame_for_time(t)
+        return rgba[:, :, :3]
+
+    def cohost_pos(t):
+        y_bob = int(math.sin(t * 3.4) * 4)
+        return (int(pos_x), int(pos_y + y_bob))
+
+    mask_clip = VideoClip(make_cohost_mask, is_mask=True, duration=clip_dur)
+    rgb_clip = VideoClip(make_cohost_rgb, duration=clip_dur)
+    cohost_clip = rgb_clip.with_mask(mask_clip).with_position(cohost_pos).with_start(start_time)
+    
+    # Drop shadow behind co-host
+    def make_cohost_shadow_mask(t):
+        base_m = make_cohost_mask(t)
+        shadow_m = cv2.GaussianBlur(base_m, (15, 15), 0)
+        M = np.float32([[1, 0, 3], [0, 1, 4]])
+        shadow_m = cv2.warpAffine(shadow_m, M, (cur_w, cur_h), borderMode=cv2.BORDER_CONSTANT)
+        return shadow_m * 0.40
+        
+    shadow_mask_clip = VideoClip(make_cohost_shadow_mask, is_mask=True, duration=clip_dur)
+    shadow_rgb_clip = VideoClip(lambda t: np.zeros((cur_h, cur_w, 3), dtype=np.uint8), duration=clip_dur)
+    cohost_shadow_clip = shadow_rgb_clip.with_mask(shadow_mask_clip).with_position(cohost_pos).with_start(start_time)
+    
+    return cohost_clip, cohost_shadow_clip
+
 
 
 def _get_avatar_expression_segments(script_text, audio_duration, word_timestamps):
@@ -9582,6 +9937,19 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     avatar_pip = None
     ring_clip = None
     ring_size = 0
+    cohost_clip = None
+    cohost_shadow_clip = None
+    is_static_avatar = False
+    source_alpha_arr = None
+    
+    # ── THEMED ALTER-EGO SKINS ──────────────────────────────────────────
+    # Contextually select themed alter-ego skin while maintaining VJ's 4 core identity anchors
+    vj_skin_info = get_vj_alter_ego_skin(
+        topic_text=headline,
+        category=category,
+        script_text=script_json.get("script", ""),
+        requested_skin=script_json.get("vj_skin") or script_json.get("avatar_skin")
+    )
     
     if skip_avatar:
         print("⏭️ Skipping Avatar PiP (Kaggle GPU fallback — no lip-sync available).")
@@ -9589,7 +9957,17 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     else:
         print("Preparing Dimension Avatar PiP...")
         lipsync_path = script_json.get("kaggle_lipsync_path")
-        face_template = script_json.get("lipsync_face_path") or os.path.join(ASSETS_DIR, "video", "Firefly_video_final.mp4")
+        default_face = os.path.join(ASSETS_DIR, "video", "Firefly_video_final.mp4")
+        
+        # If alter-ego skin is active, prefer the skin asset as face template for lipsync / appearance
+        if vj_skin_info.get("skin") != "standard" and os.path.exists(vj_skin_info.get("path", "")):
+            skin_path = vj_skin_info["path"]
+            face_template = script_json.get("lipsync_face_path") or skin_path
+            print(f"🎭 Contextual VJ Alter-Ego Activated: {vj_skin_info['name']} ({vj_skin_info['tag']}) -> {face_template}")
+            if vj_skin_info.get("accent_color"):
+                accent_color = vj_skin_info["accent_color"]
+        else:
+            face_template = script_json.get("lipsync_face_path") or default_face
     
         if not lipsync_path or not os.path.exists(lipsync_path):
             lipsync_path = _generate_lipsync_video(audio_path, face_template)
@@ -9597,11 +9975,15 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
         avatar_video_path = lipsync_path if lipsync_path else face_template
 
     if not skip_avatar and os.path.exists(avatar_video_path):
-        vid_clip = VideoFileClip(avatar_video_path)
-        if vid_clip.duration < audio_duration:
-            vid_clip = vid_clip.with_effects([vfx.Loop(duration=audio_duration)])
+        is_static_avatar = avatar_video_path.lower().endswith((".png", ".jpg", ".jpeg", ".webp"))
+        if is_static_avatar:
+            vid_clip = ImageClip(avatar_video_path).with_duration(audio_duration)
         else:
-            vid_clip = vid_clip.subclipped(0, audio_duration)
+            vid_clip = VideoFileClip(avatar_video_path)
+            if vid_clip.duration < audio_duration:
+                vid_clip = vid_clip.with_effects([vfx.Loop(duration=audio_duration)])
+            else:
+                vid_clip = vid_clip.subclipped(0, audio_duration)
 
         w, h = vid_clip.size
         
@@ -9751,16 +10133,42 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 # Keep a reference to the unmasked avatar clip for frame extraction
                 unmasked_avatar = avatar_clip
                 
+                # If static avatar is already a cutout PNG with transparency, extract alpha mask directly
+                if is_static_avatar:
+                    try:
+                        s_img = Image.open(avatar_video_path)
+                        if s_img.mode == "RGBA":
+                            s_w, s_h = s_img.size
+                            if s_w / s_h > target_aspect:
+                                s_new_w = int(s_h * target_aspect)
+                                s_x1 = (s_w - s_new_w) // 2
+                                s_img = s_img.crop((s_x1, 0, s_x1 + s_new_w, s_h))
+                            else:
+                                s_new_h = int(s_w / target_aspect)
+                                s_y1 = int((s_h - s_new_h) * 0.12) if s_h > s_new_h else 0
+                                s_img = s_img.crop((0, s_y1, s_w, s_y1 + s_new_h))
+                            s_img = s_img.resize((cur_w, cur_h), Image.Resampling.LANCZOS)
+                            source_alpha_arr = (np.array(s_img.split()[-1]).astype(np.float32) / 255.0)
+                    except Exception as e_alpha:
+                        print(f"⚠️ Note on static alpha extraction: {e_alpha}")
+
                 # Memoize computed masks to avoid redundant rembg processing
                 mask_cache = {}
                 shadow_cache = {}
                 fps = getattr(vid_clip, "fps", 30.0) or 30.0
                 
                 def make_mask_frame(t):
-                    # cache by integer frame index
-                    frame_idx = int(round(t * fps))
+                    # cache by integer frame index (frame 0 for static avatar)
+                    frame_idx = 0 if is_static_avatar else int(round(t * fps))
                     if frame_idx in mask_cache:
                         return mask_cache[frame_idx]
+                    
+                    if source_alpha_arr is not None:
+                        mask = source_alpha_arr.copy()
+                        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+                        mask = cv2.GaussianBlur(mask, (3, 3), 0)
+                        mask_cache[frame_idx] = mask
+                        return mask
                     
                     # Get the unmasked frame
                     frame = unmasked_avatar.get_frame(t)
@@ -9791,24 +10199,13 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 
                 def make_shadow_frame(t):
                     """Generate a drop shadow for the presenter to ground them against background."""
-                    frame_idx = int(round(t * fps))
+                    frame_idx = 0 if is_static_avatar else int(round(t * fps))
                     if frame_idx in shadow_cache:
                         return shadow_cache[frame_idx]
                     
                     # Get the base mask
-                    frame = unmasked_avatar.get_frame(t)
-                    rgba = remove(
-                        frame,
-                        session=rembg_session,
-                        alpha_matting=False,
-                        post_process_mask=True
-                    )
-                    mask = (rgba[:, :, 3] / 255.0).astype(np.float32)
-                    
-                    # Erase watermark area
+                    mask = make_mask_frame(t)
                     h_mask, w_mask = mask.shape
-                    watermark_height = int(h_mask * 0.12)
-                    mask[-watermark_height:, :] = 0.0
                     
                     # Create shadow: offset down-right, blur heavily, reduce opacity
                     shadow = cv2.GaussianBlur(mask, (21, 21), 0)
@@ -9824,7 +10221,7 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 rim_cache = {}
                 def make_rim_glow_frame(t):
                     """Generate subtle neon rim lighting around presenter silhouette."""
-                    frame_idx = int(round(t * fps))
+                    frame_idx = 0 if is_static_avatar else int(round(t * fps))
                     if frame_idx in rim_cache:
                         return rim_cache[frame_idx]
                     base_m = make_mask_frame(t)
@@ -10090,6 +10487,33 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
                 avatar_pip = avatar_clip.with_position(pip_position).with_start(avatar_start_time).with_effects([vfx.CrossFadeIn(0.4)])
             else:
                 avatar_pip = avatar_clip.with_position(pip_position).with_start(0)
+
+    # ── CO-HOST GADGET MASCOT COMPANION (Option 1 Duo) ─────────────────
+    enable_cohost = script_json.get("enable_cohost", True) and (os.environ.get("ENABLE_COHOST", "1") == "1")
+    if enable_cohost and not CI_LITE:
+        try:
+            cohost_info = get_cohost_sidekick_for_topic(
+                topic_text=headline,
+                category=category,
+                script_text=script_json.get("script", ""),
+                requested_mascot=script_json.get("cohost_mascot") or script_json.get("sidekick")
+            )
+            print(f"🤖 Assembling Co-Host Companion Duo: {cohost_info['tag']} ({cohost_info['role']})")
+            
+            # Determine avatar position side to ensure companion sits on OPPOSITE corner
+            avatar_on_left = layout.get("layout_type") in ["hero_center", "top_center", "side_strip"]
+            cohost_clip, cohost_shadow_clip = _build_cohost_sidekick_clip(
+                cohost_info=cohost_info,
+                audio_duration=audio_duration,
+                accent_color=accent_color,
+                is_longform=is_longform,
+                avatar_on_left=avatar_on_left,
+                screenshot_intervals=screenshot_intervals
+            )
+        except Exception as e_cohost:
+            print(f"⚠️ Co-Host companion generation note: {e_cohost}")
+            cohost_clip = None
+            cohost_shadow_clip = None
 
     # ── LAYERS ───────────────────────────────────────────────────────────
     if is_longform:
@@ -10558,6 +10982,12 @@ def _create_video_internal(audio_path, script_json, chunks, output_path=None, dy
     
     if flare_layer: base_layers.append(flare_layer)
     if grain_layer: base_layers.append(grain_layer)
+    # Add co-host sidekick mascot & drop shadow
+    if cohost_shadow_clip:
+        base_layers.append(cohost_shadow_clip)
+    if cohost_clip:
+        base_layers.append(cohost_clip)
+
     # Add presenter drop shadow and neon rim glow BEFORE avatar (renders behind)
     if avatar_pip and hasattr(avatar_pip, 'clip') and hasattr(avatar_pip.clip, 'shadow_clip'):
         base_layers.append(avatar_pip.clip.shadow_clip.with_position(pip_position).with_start(0))

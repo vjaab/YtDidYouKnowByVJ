@@ -37,7 +37,7 @@ VALID_SPEAKERS = [
     "vj", "byte", "phone", "computer", "watch", "chip",
     "camera", "earbuds", "battery", "vr", "server", "controller", "drone"
 ]
-VALID_EMOTIONS = ["neutral", "curious", "excited", "shocked", "thinking", "smug", "pointing", "whispering"]
+VALID_EMOTIONS = ["neutral", "curious", "excited", "shocked", "thinking", "smug", "pointing", "whispering", "hacker", "detective", "hologram"]
 
 # Character metadata registry
 CHARACTER_METADATA = {
