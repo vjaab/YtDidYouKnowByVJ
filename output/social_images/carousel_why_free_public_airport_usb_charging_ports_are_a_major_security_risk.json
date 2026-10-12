@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "camera",
+  "speaker_right": "vj",
+  "hook": "Did You Know Free Airport USB Ports Can Hack Your Phone? \ud83d\udd0c",
+  "headline": "Why Free Public Airport USB Charging Ports Are a Major Security Risk",
+  "source": "FCC & Cybersecurity Infrastructure Security Agency (CISA)",
+  "slides": [
+    {
+      "speaker": "camera",
+      "emotion": "curious",
+      "title": "Airport Charging Dilemma \u2708\ufe0f",
+      "bubble": "VJ, I love finding free charging ports, but are they really safe to use?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "The Hidden Danger \u26a0\ufe0f",
+      "bubble": "Not always, Camera! A USB cable has data wires too, not just power.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "shocked",
+      "title": "Data Theft Risk \ud83d\udcf8",
+      "bubble": "So bad guys can steal my photos or install viruses just by plugging in?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Protect Your Data! \ud83d\udee1\ufe0f",
+      "bubble": "Yes! Use your own power adapter or a portable power bank instead. Share this!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Compromised airport USB ports can silently install malware or siphon your personal data.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know Free Airport USB Ports Can Hack Your Phone? \ud83d\udd0c\n\n\ud83d\udca1 Compromised airport USB ports can silently install malware or siphon your personal data.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "consumer_utility",
+  "characters": "auto"
+}
