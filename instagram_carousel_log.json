@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Medium (programming): I Used Claude Code Every Day for 6 Months. I Fin",
     "Medium (programming): LangChain4j Already Solved Java Agents. So Why D",
     "Medium (programming): AI Generated 40 Pull Requests in a Week. Our Rev",
     "AI's Hidden Thirst",
@@ -99,10 +98,10 @@
     "Python vs Rust: Why Python's Lead Is Unshakable",
     "Why You Should Never Charge Your Smartphone to 100% Overnight",
     "Why You Should Never Charge Your Smartphone to 100% Overnight",
-    "Your Deleted Files Aren't Gone: NIST on Data Wiping"
+    "Your Deleted Files Aren't Gone: NIST on Data Wiping",
+    "Why Deleting Files Doesn't Erase Disk Data"
   ],
   "used_keywords": [
-    "tech trending",
     "medium",
     "machine",
     "learning",
@@ -301,24 +300,10 @@
     "did you know",
     "threads",
     "tech",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Medium (programming): I Used Claude Code Every Day for 6 Months. I Fin",
-      "news_source_url": "https://medium.com/engineering-playbook/i-used-claude-code-every-day-for-6-months-i-finally-stopped-letting-it-write-code-first-b36c9b44ba64?source=rss------programming-5",
-      "keywords": [
-        "did you know",
-        "tech trending",
-        "medium",
-        "programming",
-        "used",
-        "claude",
-        "code"
-      ],
-      "source": "Medium - programming",
-      "timestamp": "2026-10-02T13:06:00.076239+00:00"
-    },
     {
       "title": "Medium (programming): LangChain4j Already Solved Java Agents. So Why D",
       "news_source_url": "https://medium.com/@umeshcapg/langchain4j-already-solved-java-agents-so-why-did-the-creator-of-spring-build-embabel-9ecf742554f1?source=rss------programming-5",
@@ -1446,6 +1431,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-13T17:31:54.930775+00:00"
+    },
+    {
+      "title": "Why Deleting Files Doesn't Erase Disk Data",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-13T17:38:20.865056+00:00"
     }
   ]
 }

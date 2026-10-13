@@ -1,0 +1,29 @@
+{
+  "topic": "Why Deleting Files Doesn't Erase Disk Data",
+  "category": "AI News",
+  "type": "carousel",
+  "slides": 7,
+  "instagram_images": [
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_Why_Deleting_Files_Doesnt_Eras_01_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_Why_Deleting_Files_Doesnt_Eras_02_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_Why_Deleting_Files_Doesnt_Eras_03_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_Why_Deleting_Files_Doesnt_Eras_04_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_Why_Deleting_Files_Doesnt_Eras_05_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_Why_Deleting_Files_Doesnt_Eras_06_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_Why_Deleting_Files_Doesnt_Eras_07_1080x1350.jpg"
+  ],
+  "facebook_images": [
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_why_deleting_files_doesn't_erase_disk_data_01.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_why_deleting_files_doesn't_erase_disk_data_02.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_why_deleting_files_doesn't_erase_disk_data_03.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_why_deleting_files_doesn't_erase_disk_data_04.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_why_deleting_files_doesn't_erase_disk_data_05.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_why_deleting_files_doesn't_erase_disk_data_06.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_why_deleting_files_doesn't_erase_disk_data_07.jpg"
+  ],
+  "caption": "\ud83d\udcf0 Why Deleting Files Doesn't Erase Disk Data\n\nStandard operating system deletion only removes the pointer to a file, leaving raw bytes intact on storage blocks. Understanding NIST media sanitization standards is essential to prevent severe data leaks.\n\n\ud83d\udcc5 13 Oct 2026 | Source: NIST Guidelines for Media Sanitization\n\ud83d\udd17 \n\nFollow @vijayakumarj_ai for daily AI updates!\n\n#MachineLearning #DeepLearning #AI #ArtificialIntelligence #LLM #GenerativeAI #RAG #LangChain #PyTorch #TensorFlow #HuggingFace #MLOps #DataScience #Tech #Technology\n\n\ud83d\udc49 Share this with your friends and family so they stay informed & safe!\n\ud83d\udcac Drop your reaction below!",
+  "hashtags": "#MachineLearning #DeepLearning #AI #ArtificialIntelligence #LLM #GenerativeAI #RAG #LangChain #PyTorch #TensorFlow #HuggingFace #MLOps #DataScience #Tech #Technology",
+  "poll_file": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/poll_why_deleting_files_doesn't_erase_disk_data.json",
+  "carousel_json": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_why_deleting_files_doesn't_erase_disk_data.json",
+  "generated_at": "2026-10-13T17:38:19.137672+00:00"
+}
