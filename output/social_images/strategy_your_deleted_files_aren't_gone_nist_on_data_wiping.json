@@ -1,0 +1,143 @@
+{
+  "topic": "Your Deleted Files Aren't Gone: NIST on Data Wiping",
+  "topic_type": "security_incident",
+  "domain": "security",
+  "difficulty": "intermediate",
+  "audience": "students_and_professionals",
+  "visual_theme": "DATA_DASHBOARD",
+  "theme_css_class": "theme--dashboard",
+  "theme_colors": {
+    "bg": "#111827",
+    "card_bg": "#1F2937",
+    "card_border": "#374151",
+    "text_primary": "#F9FAFB",
+    "text_secondary": "#D1D5DB",
+    "text_muted": "#6B7280",
+    "accent": "#06B6D4",
+    "accent_secondary": "#8B5CF6",
+    "accent_success": "#10B981",
+    "accent_danger": "#EF4444",
+    "accent_warning": "#F59E0B",
+    "code_bg": "#0F172A",
+    "gradient_start": "#06B6D4",
+    "gradient_end": "#8B5CF6"
+  },
+  "visual_concept": "threat_vector",
+  "visual_motifs": [
+    "attack_path",
+    "lock_shield",
+    "warning_badge",
+    "perimeter_mesh"
+  ],
+  "hero_visual": "security_perimeter",
+  "accent_style": "threat_alert",
+  "storytelling_pattern": "security_incident",
+  "slide_count": 8,
+  "layout_pattern": [
+    "scenario_question",
+    "what_happened",
+    "process_flow",
+    "architecture_diagram",
+    "common_mistake",
+    "side_by_side",
+    "checklist",
+    "takeaway"
+  ],
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "threat_hook",
+      "purpose": "threat_hook",
+      "layout_type": "scenario_question",
+      "title_position": "center",
+      "supports": [
+        "scenario",
+        "question",
+        "context_icon"
+      ]
+    },
+    {
+      "slide_number": 2,
+      "role": "what_happened",
+      "purpose": "what_happened",
+      "layout_type": "what_happened",
+      "title_position": "top-center",
+      "supports": []
+    },
+    {
+      "slide_number": 3,
+      "role": "attack_chain",
+      "purpose": "attack_chain",
+      "layout_type": "process_flow",
+      "title_position": "top-left",
+      "supports": [
+        "steps"
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "vulnerable_architecture",
+      "purpose": "vulnerable_architecture",
+      "layout_type": "architecture_diagram",
+      "title_position": "top-center",
+      "supports": [
+        "nodes",
+        "connections",
+        "labels"
+      ]
+    },
+    {
+      "slide_number": 5,
+      "role": "root_cause_analysis",
+      "purpose": "root_cause_analysis",
+      "layout_type": "common_mistake",
+      "title_position": "top-left",
+      "supports": [
+        "wrong_title",
+        "wrong_items",
+        "right_title",
+        "right_items"
+      ]
+    },
+    {
+      "slide_number": 6,
+      "role": "defense_architecture",
+      "purpose": "defense_architecture",
+      "layout_type": "side_by_side",
+      "title_position": "top-center",
+      "supports": [
+        "left_title",
+        "left_items",
+        "right_title",
+        "right_items"
+      ]
+    },
+    {
+      "slide_number": 7,
+      "role": "security_checklist",
+      "purpose": "security_checklist",
+      "layout_type": "checklist",
+      "title_position": "top-left",
+      "supports": [
+        "items",
+        "title"
+      ]
+    },
+    {
+      "slide_number": 8,
+      "role": "takeaway",
+      "purpose": "takeaway",
+      "layout_type": "takeaway",
+      "title_position": "top-center",
+      "supports": [
+        "takeaways",
+        "cta_text"
+      ]
+    }
+  ],
+  "brand": {
+    "handle": "@vijayakumarj_ai",
+    "name": "Vijayakumar J",
+    "short_name": "VJ"
+  }
+}

@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "GPS Needs Einstein's Time Secrets",
     "Medium (programming): I Used Claude Code Every Day for 6 Months. I Fin",
     "Medium (programming): LangChain4j Already Solved Java Agents. So Why D",
     "Medium (programming): AI Generated 40 Pull Requests in a Week. Our Rev",
@@ -99,10 +98,10 @@
     "Why Jets Still Use 1980s Floppy Disks",
     "Python vs Rust: Why Python's Lead Is Unshakable",
     "Why You Should Never Charge Your Smartphone to 100% Overnight",
-    "Why You Should Never Charge Your Smartphone to 100% Overnight"
+    "Why You Should Never Charge Your Smartphone to 100% Overnight",
+    "Your Deleted Files Aren't Gone: NIST on Data Wiping"
   ],
   "used_keywords": [
-    "did you know",
     "tech trending",
     "medium",
     "machine",
@@ -301,24 +300,10 @@
     "consumer_utility",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "GPS Needs Einstein's Time Secrets",
-      "news_source_url": "",
-      "keywords": [
-        "GPS",
-        "Einstein",
-        "Relativity",
-        "Satellites",
-        "Time",
-        "Physics",
-        "did you know"
-      ],
-      "source": "NASA & European Space Agency scientific literature on GPS and relativity.",
-      "timestamp": "2026-10-02T13:05:44.046284+00:00"
-    },
     {
       "title": "Medium (programming): I Used Claude Code Every Day for 6 Months. I Fin",
       "news_source_url": "https://medium.com/engineering-playbook/i-used-claude-code-every-day-for-6-months-i-finally-stopped-letting-it-write-code-first-b36c9b44ba64?source=rss------programming-5",
@@ -1451,6 +1436,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-13T14:34:52.841614+00:00"
+    },
+    {
+      "title": "Your Deleted Files Aren't Gone: NIST on Data Wiping",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-13T17:31:54.930775+00:00"
     }
   ]
 }
