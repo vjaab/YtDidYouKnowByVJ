@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Medium (programming): LangChain4j Already Solved Java Agents. So Why D",
-    "Medium (programming): AI Generated 40 Pull Requests in a Week. Our Rev",
     "AI's Hidden Thirst",
     "Medium (programming): Building a Triple-RTX Workstation: How Far Shoul",
     "AI Inbox Blackmail: Your Data At Risk",
@@ -99,12 +97,11 @@
     "Why You Should Never Charge Your Smartphone to 100% Overnight",
     "Why You Should Never Charge Your Smartphone to 100% Overnight",
     "Your Deleted Files Aren't Gone: NIST on Data Wiping",
-    "Why Deleting Files Doesn't Erase Disk Data"
+    "Why Deleting Files Doesn't Erase Disk Data",
+    "Why Python Will Not Be Replaced by Rust Anytime Soon",
+    "Why Python Will Not Be Replaced by Rust Anytime Soon"
   ],
   "used_keywords": [
-    "medium",
-    "machine",
-    "learning",
     "rlhf",
     "series",
     "did you know",
@@ -301,39 +298,12 @@
     "threads",
     "tech",
     "did you know",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "Medium (programming): LangChain4j Already Solved Java Agents. So Why D",
-      "news_source_url": "https://medium.com/@umeshcapg/langchain4j-already-solved-java-agents-so-why-did-the-creator-of-spring-build-embabel-9ecf742554f1?source=rss------programming-5",
-      "keywords": [
-        "did you know",
-        "tech trending",
-        "medium",
-        "programming",
-        "already",
-        "solved",
-        "java"
-      ],
-      "source": "Medium - programming",
-      "timestamp": "2026-10-02T13:06:15.540881+00:00"
-    },
-    {
-      "title": "Medium (programming): AI Generated 40 Pull Requests in a Week. Our Rev",
-      "news_source_url": "https://medium.com/@coding_with_tech/ai-generated-40-pull-requests-in-a-week-our-review-queue-barely-moved-8ffc4ae95bb6?source=rss------programming-5",
-      "keywords": [
-        "did you know",
-        "tech trending",
-        "medium",
-        "programming",
-        "generated",
-        "pull",
-        "requests"
-      ],
-      "source": "Medium - programming",
-      "timestamp": "2026-10-02T13:06:31.254456+00:00"
-    },
     {
       "title": "AI's Hidden Thirst",
       "news_source_url": "",
@@ -1441,6 +1411,27 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-13T17:38:20.865056+00:00"
+    },
+    {
+      "title": "Why Python Will Not Be Replaced by Rust Anytime Soon",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-13T18:26:15.314200+00:00"
+    },
+    {
+      "title": "Why Python Will Not Be Replaced by Rust Anytime Soon",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-13T18:27:15.057132+00:00"
     }
   ]
 }
