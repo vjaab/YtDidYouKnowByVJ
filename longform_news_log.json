@@ -1,0 +1,64 @@
+{
+    "used_titles": [
+        "Why Senior Engineers Are Quietly Quitting Older Coding Tools",
+        "morluto/rea hits 100k stars as OpenAI drops GPT-5.5"
+    ],
+    "used_keywords": [
+        "OpenAI",
+        "GPT-5.5",
+        "AI agents",
+        "reverse engineering",
+        "REA",
+        "Ghidra"
+    ],
+    "used_companies": {
+        "GitHub": 2,
+        "The Time Lens": 1
+    },
+    "used_subcategories": {
+        "AI Deep Dive": 1
+    },
+    "last_7_days_stories": [
+        "morluto/rea hits 100k stars as OpenAI drops GPT-5.5"
+    ],
+    "last_3_days_subcategories": [
+        "AI Deep Dive"
+    ],
+    "last_3_days_companies": [
+        "GitHub",
+        "GitHub",
+        "The Time Lens"
+    ],
+    "total_uploaded": 1,
+    "last_upload": "2026-10-12",
+    "history": [
+        {
+            "date": "2026-10-12",
+            "title": "Why Senior Engineers Are Quietly Quitting Older Coding Tools",
+            "news_headline": "morluto/rea hits 100k stars as OpenAI drops GPT-5.5",
+            "sub_category": "AI Deep Dive",
+            "companies": [
+                "GitHub",
+                "GitHub",
+                "The Time Lens"
+            ],
+            "keywords": [
+                "REA",
+                "GPT-5.5",
+                "reverse engineering",
+                "AI agents",
+                "Ghidra",
+                "OpenAI"
+            ],
+            "breaking_news_level": 7,
+            "voice_used": "deep_dive",
+            "youtube_url": "https://youtu.be/xlqi_i706lg",
+            "facebook_post_id": null,
+            "news_source_url": "https://github.com/morluto/rea",
+            "target_country": null,
+            "avatar_used": "assets/video/C_white.mp4",
+            "creator_archetype": "FIRESHIP_FAST",
+            "topic_source": "github"
+        }
+    ]
+}
