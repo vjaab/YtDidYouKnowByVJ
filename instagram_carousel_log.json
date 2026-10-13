@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "AI Sees Faces As Secret Math",
-    "AI Code Improved: Humans Coded Smarter",
     "GPS Needs Einstein's Time Secrets",
     "Medium (programming): I Used Claude Code Every Day for 6 Months. I Fin",
     "Medium (programming): LangChain4j Already Solved Java Agents. So Why D",
@@ -99,17 +97,11 @@
     "Tabs vs Spaces Solved on GitHub Infrastructure",
     "Tabs vs Spaces Solved on GitHub Infrastructure",
     "Why Jets Still Use 1980s Floppy Disks",
-    "Python vs Rust: Why Python's Lead Is Unshakable"
+    "Python vs Rust: Why Python's Lead Is Unshakable",
+    "Why You Should Never Charge Your Smartphone to 100% Overnight",
+    "Why You Should Never Charge Your Smartphone to 100% Overnight"
   ],
   "used_keywords": [
-    "everyone",
-    "build",
-    "did you know",
-    "tech trending",
-    "medium",
-    "programming",
-    "percentile",
-    "queries",
     "did you know",
     "tech trending",
     "medium",
@@ -301,36 +293,17 @@
     "threads",
     "tech",
     "did you know",
-    "did you know"
+    "did you know",
+    "battery life",
+    "phone charger",
+    "lithium ion",
+    "tech tips",
+    "consumer_utility",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "AI Sees Faces As Secret Math",
-      "news_source_url": "",
-      "keywords": [
-        "facial recognition",
-        "AI",
-        "computer vision",
-        "biometrics",
-        "smartphone unlock",
-        "did you know"
-      ],
-      "source": "Leading research in artificial intelligence and computer vision.",
-      "timestamp": "2026-10-02T07:39:13.969957+00:00"
-    },
-    {
-      "title": "AI Code Improved: Humans Coded Smarter",
-      "news_source_url": "https://medium.com/engineering-playbook/i-used-claude-code-every-day-for-6-months-i-finally-stopped-letting-it-write-code-first-b36c9b44ba64?source=rss------artificial_intelligence-5",
-      "keywords": [
-        "AI coding",
-        "human-AI collaboration",
-        "software engineering",
-        "developer productivity",
-        "did you know"
-      ],
-      "source": "Medium - artificial-intelligence",
-      "timestamp": "2026-10-02T13:04:53.934021+00:00"
-    },
     {
       "title": "GPS Needs Einstein's Time Secrets",
       "news_source_url": "",
@@ -1452,6 +1425,32 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-13T09:26:56.878229+00:00"
+    },
+    {
+      "title": "Why You Should Never Charge Your Smartphone to 100% Overnight",
+      "news_source_url": "",
+      "keywords": [
+        "battery life",
+        "phone charger",
+        "lithium ion",
+        "tech tips",
+        "consumer_utility",
+        "did you know"
+      ],
+      "source": "Battery University & Journal of The Electrochemical Society",
+      "platform": "threads",
+      "timestamp": "2026-10-13T14:33:54.299746+00:00"
+    },
+    {
+      "title": "Why You Should Never Charge Your Smartphone to 100% Overnight",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-13T14:34:52.841614+00:00"
     }
   ]
 }

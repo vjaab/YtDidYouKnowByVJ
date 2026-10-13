@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know Spaces in Code Waste Millions in Bandwidth? \u2328\ufe0f",
+  "headline": "Tabs vs Spaces Was Solved: Spaces Cost Silicon Valley Millions",
+  "source": "GitHub Infrastructure & Indentation Analysis",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Code Wastes $M? \ud83d\udcb8",
+      "bubble": "Did you know empty spaces in code cost millions?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "The Costly Space \ud83d\udcbe",
+      "bubble": "Yes! GitHub found spaces waste storage and data transfers.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Gigabytes Saved! \ud83d\ude80",
+      "bubble": "Replacing 4 spaces with one tab saves huge data daily.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Tabs or Spaces? \ud83e\udd14",
+      "bubble": "Tabs vs spaces: which side are you on? Tell us below!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Replacing 4 spaces with a single tab character across massive GitHub repos saves gigabytes of wire transfer and disk storage across millions of git clones daily.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know Spaces in Code Waste Millions in Bandwidth? \u2328\ufe0f\n\n\ud83d\udca1 Replacing 4 spaces with a single tab character across massive GitHub repos saves gigabytes of wire transfer and disk storage across millions of git clones daily.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "threads_debates",
+  "characters": "auto"
+}
