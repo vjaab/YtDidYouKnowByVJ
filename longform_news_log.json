@@ -1,36 +1,48 @@
 {
     "used_titles": [
         "Why Senior Engineers Are Quietly Quitting Older Coding Tools",
-        "morluto/rea hits 100k stars as OpenAI drops GPT-5.5"
+        "morluto/rea hits 100k stars as OpenAI drops GPT-5.5",
+        "Why Senior Engineers Are Quietly Quitting This Old AI Tool",
+        "GitHub Trending Developer Tools Fix AI Agent Amnesia and Token Bloat"
     ],
     "used_keywords": [
+        "Ghidra",
+        "Rust search",
+        "claude-mem",
         "OpenAI",
-        "GPT-5.5",
-        "AI agents",
-        "reverse engineering",
         "REA",
-        "Ghidra"
+        "GPT-5.5",
+        "context-mode",
+        "AI coding agents",
+        "reverse engineering",
+        "xerj",
+        "AI agents",
+        "persistent memory"
     ],
     "used_companies": {
-        "GitHub": 2,
+        "GitHub": 5,
         "The Time Lens": 1
     },
     "used_subcategories": {
-        "AI Deep Dive": 1
+        "AI Deep Dive": 2
     },
     "last_7_days_stories": [
-        "morluto/rea hits 100k stars as OpenAI drops GPT-5.5"
+        "morluto/rea hits 100k stars as OpenAI drops GPT-5.5",
+        "GitHub Trending Developer Tools Fix AI Agent Amnesia and Token Bloat"
     ],
     "last_3_days_subcategories": [
+        "AI Deep Dive",
         "AI Deep Dive"
     ],
     "last_3_days_companies": [
         "GitHub",
+        "The Time Lens",
         "GitHub",
-        "The Time Lens"
+        "GitHub",
+        "GitHub"
     ],
-    "total_uploaded": 1,
-    "last_upload": "2026-10-12",
+    "total_uploaded": 2,
+    "last_upload": "2026-10-13",
     "history": [
         {
             "date": "2026-10-12",
@@ -58,6 +70,34 @@
             "target_country": null,
             "avatar_used": "assets/video/C_white.mp4",
             "creator_archetype": "FIRESHIP_FAST",
+            "topic_source": "github"
+        },
+        {
+            "date": "2026-10-13",
+            "title": "Why Senior Engineers Are Quietly Quitting This Old AI Tool",
+            "news_headline": "GitHub Trending Developer Tools Fix AI Agent Amnesia and Token Bloat",
+            "sub_category": "AI Deep Dive",
+            "companies": [
+                "GitHub",
+                "GitHub",
+                "GitHub"
+            ],
+            "keywords": [
+                "claude-mem",
+                "context-mode",
+                "xerj",
+                "AI coding agents",
+                "persistent memory",
+                "Rust search"
+            ],
+            "breaking_news_level": 7,
+            "voice_used": "deep_dive",
+            "youtube_url": "https://youtu.be/My7HLlHaJdU",
+            "facebook_post_id": null,
+            "news_source_url": "https://github.com/trending",
+            "target_country": null,
+            "avatar_used": "assets/video/Full_stack_black.mp4",
+            "creator_archetype": "CLEO_INVESTIGATIVE",
             "topic_source": "github"
         }
     ]
