@@ -1,0 +1,162 @@
+{
+  "headline": "Why Jets Still Use 1980s Floppy Disks",
+  "summary": "Certified avionics remain locked to 3.5-inch floppy disks due to FAA re-certification costs and timelines. Airlines sustain obsolete supply chains while modern storage alternatives face decade-long approval barriers.",
+  "source": "FAA Avionics Certification & Aviation Security Audits",
+  "source_url": "",
+  "date": "13 Oct 2026",
+  "category": "SECURITY",
+  "topic_type": "industry_trend",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "headline_hook",
+      "layout_type": "hero_hook",
+      "eyebrow": "INDUSTRY ANALYSIS",
+      "title": "Modern Jets Still Run on 1980s Floppy Disks",
+      "subtitle": "Critical avionics updates depend on 3.5-inch media",
+      "body": "Why do certified aircraft require obsolete storage? The answer lies in rigid FAA certification and supply-chain inertia.",
+      "deep_dive": "Avionics systems are certified with specific hardware configurations. Changing storage media requires re-certification, a multi-year, multi-million dollar process. Airlines maintain fleets of 3.5-inch drives and source disks from dwindling suppliers.",
+      "key_fact": "FAA certification locks avionics to 1980s-era 3.5-inch floppy disks.",
+      "why_it_matters": "Engineers maintaining legacy systems face security risks and supply-chain fragility."
+    },
+    {
+      "slide_number": 2,
+      "role": "market_context",
+      "layout_type": "what_happened",
+      "eyebrow": "WHY NOW",
+      "title": "Certification Barriers Outpace Modern Storage",
+      "body": "Re-certifying avionics for USB or solid-state storage costs millions and takes years. Airlines choose to sustain floppy supply chains instead.",
+      "deep_dive": "The DO-178C/DO-254 certification framework treats any hardware change as a new certification event. Economic analysis shows maintaining floppy logistics is cheaper than re-certifying fleets.",
+      "key_fact": "Re-certification for new storage media can exceed $10M per aircraft type.",
+      "why_it_matters": "Technical debt in safety-critical systems is measured in decades, not sprints."
+    },
+    {
+      "slide_number": 3,
+      "role": "technology_backbone",
+      "layout_type": "process_flow",
+      "eyebrow": "TECH DRIVER",
+      "title": "The Certification Lock-In Process",
+      "body": "A step-by-step flow shows why a simple storage swap becomes a decade-long project.",
+      "deep_dive": "Each step involves rigorous documentation, testing, and FAA review. The process is designed for safety, not agility.",
+      "key_fact": "Full re-certification cycles average 5-10 years for hardware changes.",
+      "why_it_matters": "Engineers must plan for hardware obsolescence at project inception.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Design Freeze",
+          "desc": "Avionics hardware frozen at initial certification."
+        },
+        {
+          "step": "2",
+          "title": "Change Trigger",
+          "desc": "Need for larger updates or media obsolescence arises."
+        },
+        {
+          "step": "3",
+          "title": "Re-certification",
+          "desc": "Full DO-178C/DO-254 re-evaluation required."
+        },
+        {
+          "step": "4",
+          "title": "Deployment",
+          "desc": "Years later, new media approved for fleet installation."
+        }
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "ecosystem_impact",
+      "layout_type": "side_by_side",
+      "eyebrow": "MARKET IMPACT",
+      "title": "Legacy Supply Chain vs. Modern Alternatives",
+      "body": "Airlines manage niche floppy suppliers while modern storage faces regulatory walls.",
+      "deep_dive": "The floppy ecosystem includes specialized manufacturers and custom drive refurbishment. Modern paths require new cybersecurity audits and wireless update approvals.",
+      "key_fact": "Physical floppy logistics remain cheaper than certification of alternatives.",
+      "why_it_matters": "Security teams must audit physical media supply chains as attack vectors.",
+      "left_title": "Current Reality (Floppy Ecosystem)",
+      "left_items": [
+        "Specialized disk manufacturers",
+        "Custom drive maintenance",
+        "Physical media logistics",
+        "Security via obscurity"
+      ],
+      "right_title": "Blocked Modern Path (Solid-State/Network)",
+      "right_items": [
+        "Re-certification cost >$10M per aircraft type",
+        "5-10 year approval timeline",
+        "Cybersecurity audit requirements",
+        "Regulatory hesitation on wireless updates"
+      ]
+    },
+    {
+      "slide_number": 5,
+      "role": "developer_implications",
+      "layout_type": "real_world_scenario",
+      "eyebrow": "WHAT IT MEANS FOR DEVS",
+      "title": "Engineering in a Frozen Hardware World",
+      "body": "Software engineers build update tools for floppy images. Security researchers find air-gapped systems vulnerable to physical media tampering. Startups face high barriers to enter avionics market.",
+      "deep_dive": "Development workflows include floppy image creation, checksum verification, and physical delivery procedures. Threat models must account for compromised disks during transit.",
+      "key_fact": "Avionics update toolchains often include floppy disk emulators for testing.",
+      "why_it_matters": "Legacy hardware constraints dictate software architecture and security posture."
+    },
+    {
+      "slide_number": 6,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "THE BIG PICTURE",
+      "title": "The Long Road to Modern Avionics Updates",
+      "body": "Certification inertia keeps 1980s media alive. Modular certification and supply-chain audits are the path forward.",
+      "deep_dive": "Industry groups push for \"certification credits\" for hardware upgrades. Until then, floppy disks remain a critical, if anachronistic, link in aviation safety.",
+      "key_fact": "No certified commercial jet uses USB or network updates for primary avionics loading.",
+      "why_it_matters": "Strategic planning must account for decades-long hardware lifecycles.",
+      "takeaways": [
+        "Expect legacy media in critical systems for decades; design tooling accordingly.",
+        "Advocate for modular certification pathways to enable incremental hardware upgrades.",
+        "Physical media supply chains are a hidden attack surface; audit them rigorously."
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI & engineering insights."
+    }
+  ],
+  "_model_used": "OpenRouter:nvidia/nemotron-3-ultra-550b-a55b:free",
+  "_topic_intelligence": {
+    "topic_type": "industry_trend",
+    "domain": "security",
+    "primary_entity": "FAA / Aviation Industry",
+    "content_depth": "deep",
+    "best_story_angle": "technical_breakdown",
+    "audience": [
+      "software_engineers",
+      "systems_engineers"
+    ],
+    "key_questions": [
+      "Why do certified avionics systems still require 3.5-inch floppy disks?",
+      "What FAA certification barriers prevent modern storage migration?",
+      "How do airlines manage supply chain for obsolete media?",
+      "What security implications arise from legacy update mechanisms?"
+    ],
+    "recommended_slide_count": 6
+  },
+  "_archetype": "AI Industry Strategy & Market Shift",
+  "_story": {
+    "vector": "visual_engineering",
+    "title": "Why Modern Jet Airplanes Still Rely on 1980s 3.5-inch Floppy Disks",
+    "hook": "Why Do Boeing Jets Still Use Floppy Disks? \u2708\ufe0f",
+    "headline": "Aviation Avionics Certification Safety",
+    "fact_summary": "Boeing 747 navigation databases are updated every 28 days via 3.5-inch floppy disks because re-certifying modern USB systems with aviation safety regulators costs tens of millions.",
+    "source": "FAA Avionics Certification & Aviation Security Audits",
+    "keywords": [
+      "floppy disk",
+      "boeing 747",
+      "aviation tech",
+      "legacy systems",
+      "visual_engineering",
+      "did you know"
+    ],
+    "engagement_score": 10,
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?"
+  }
+}

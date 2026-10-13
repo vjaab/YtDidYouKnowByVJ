@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Chips: Billions of Invisible Switches",
     "Your Body: Invisible Signal Hub",
     "AI Sees Faces As Secret Math",
     "AI Code Improved: Humans Coded Smarter",
@@ -99,10 +98,10 @@
     "How Active Noise Cancelling Headphones Invert Physical Sound Waves",
     "How Scammers Clone a Family Member Voice in Just 3 Seconds",
     "Tabs vs Spaces Solved on GitHub Infrastructure",
-    "Tabs vs Spaces Solved on GitHub Infrastructure"
+    "Tabs vs Spaces Solved on GitHub Infrastructure",
+    "Why Jets Still Use 1980s Floppy Disks"
   ],
   "used_keywords": [
-    "programming",
     "lets",
     "everyone",
     "build",
@@ -301,25 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "Chips: Billions of Invisible Switches",
-      "news_source_url": "",
-      "keywords": [
-        "transistors",
-        "microchip",
-        "smartphone",
-        "CPU",
-        "GPU",
-        "silicon",
-        "technology",
-        "did you know"
-      ],
-      "source": "Leading chip manufacturers (e.g., Apple A17 Pro, NVIDIA H100) regularly announce transistor counts in the tens to hundreds of billions for their latest processors.",
-      "timestamp": "2026-10-02T07:38:48.125930+00:00"
-    },
     {
       "title": "Your Body: Invisible Signal Hub",
       "news_source_url": "",
@@ -1466,6 +1450,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-12T22:36:53.295479+00:00"
+    },
+    {
+      "title": "Why Jets Still Use 1980s Floppy Disks",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-13T08:39:58.813328+00:00"
     }
   ]
 }
