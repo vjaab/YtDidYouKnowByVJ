@@ -1403,7 +1403,21 @@
     "category": "Tech Gadgets & Inventions",
     "title": "Why Smartphones Might Completely Disappear \u26a1",
     "uploaded_at": "2026-10-10T15:32:06.824699",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-13T14:00:22.104890",
+    "last_metrics": {
+      "views": 19,
+      "avg_view_duration_sec": 13.0,
+      "avg_view_percentage": 43.17,
+      "swipe_away_rate": 0.5683,
+      "duration_sec": 32.0,
+      "retention_rate": 0.4062,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "mnlJLLwjxIg": {
     "video_id": "mnlJLLwjxIg",
@@ -1413,7 +1427,21 @@
     "category": "AI & Tech Tools",
     "title": "Run AI Locally On Your PC \ud83e\udd2f",
     "uploaded_at": "2026-10-10T19:37:58.587232",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-13T14:00:22.538491",
+    "last_metrics": {
+      "views": 48,
+      "avg_view_duration_sec": 94.0,
+      "avg_view_percentage": 270.43,
+      "swipe_away_rate": 1.0,
+      "duration_sec": 35.0,
+      "retention_rate": 1.0,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "YJww0CoGpaE": {
     "video_id": "YJww0CoGpaE",
