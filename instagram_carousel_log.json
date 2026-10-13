@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI's Hidden Thirst",
     "Medium (programming): Building a Triple-RTX Workstation: How Far Shoul",
     "AI Inbox Blackmail: Your Data At Risk",
     "AI Inbox Blackmail: Your Data At Risk",
@@ -99,10 +98,10 @@
     "Your Deleted Files Aren't Gone: NIST on Data Wiping",
     "Why Deleting Files Doesn't Erase Disk Data",
     "Why Python Will Not Be Replaced by Rust Anytime Soon",
-    "Why Python Will Not Be Replaced by Rust Anytime Soon"
+    "Why Python Will Not Be Replaced by Rust Anytime Soon",
+    "NIST Data Sanitization: Why Deleting Files Is a Illusion"
   ],
   "used_keywords": [
-    "rlhf",
     "series",
     "did you know",
     "tech trending",
@@ -301,22 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "AI's Hidden Thirst",
-      "news_source_url": "",
-      "keywords": [
-        "AI",
-        "water consumption",
-        "data centers",
-        "energy use",
-        "did you know"
-      ],
-      "source": "University of California, Riverside and Google's 2023 Environmental Report have highlighted these significant water demands.",
-      "timestamp": "2026-10-02T16:13:22.397237+00:00"
-    },
     {
       "title": "Medium (programming): Building a Triple-RTX Workstation: How Far Shoul",
       "news_source_url": "https://tinkerd.medium.com/building-a-triple-rtx-workstation-how-far-should-local-ai-go-a67fa1aceaa5?source=rss------programming-5",
@@ -1432,6 +1419,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-13T18:27:15.057132+00:00"
+    },
+    {
+      "title": "NIST Data Sanitization: Why Deleting Files Is a Illusion",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-13T20:16:57.808534+00:00"
     }
   ]
 }
