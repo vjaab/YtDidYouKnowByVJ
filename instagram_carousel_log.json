@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Body: Invisible Signal Hub",
     "AI Sees Faces As Secret Math",
     "AI Code Improved: Humans Coded Smarter",
     "GPS Needs Einstein's Time Secrets",
@@ -99,10 +98,10 @@
     "How Scammers Clone a Family Member Voice in Just 3 Seconds",
     "Tabs vs Spaces Solved on GitHub Infrastructure",
     "Tabs vs Spaces Solved on GitHub Infrastructure",
-    "Why Jets Still Use 1980s Floppy Disks"
+    "Why Jets Still Use 1980s Floppy Disks",
+    "Python vs Rust: Why Python's Lead Is Unshakable"
   ],
   "used_keywords": [
-    "lets",
     "everyone",
     "build",
     "did you know",
@@ -301,27 +300,10 @@
     "did you know",
     "threads",
     "tech",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Body: Invisible Signal Hub",
-      "news_source_url": "",
-      "keywords": [
-        "wireless",
-        "electromagnetic",
-        "Wi-Fi",
-        "radio",
-        "signals",
-        "invisible",
-        "technology",
-        "data",
-        "communication",
-        "did you know"
-      ],
-      "source": "Basic principles of electromagnetism and wireless communication (e.g., IEEE, NASA)",
-      "timestamp": "2026-10-02T07:39:00.246464+00:00"
-    },
     {
       "title": "AI Sees Faces As Secret Math",
       "news_source_url": "",
@@ -1460,6 +1442,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-13T08:39:58.813328+00:00"
+    },
+    {
+      "title": "Python vs Rust: Why Python's Lead Is Unshakable",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-13T09:26:56.878229+00:00"
     }
   ]
 }
