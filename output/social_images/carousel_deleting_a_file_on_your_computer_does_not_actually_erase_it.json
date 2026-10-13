@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know Deleted Files Aren't Actually Gone? \ud83d\uddd1\ufe0f",
+  "headline": "Deleting a File on Your Computer Does Not Actually Erase It",
+  "source": "NIST Guidelines for Media Sanitization",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Deleted Files? \ud83d\ude33",
+      "bubble": "Wait, when I delete a file, it's really gone forever?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "The Truth! \ud83d\udca1",
+      "bubble": "Not quite! Emptying your trash just hides the file's location.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Bytes Remain! \ud83d\udcbe",
+      "bubble": "So the actual data stays on my drive until overwritten?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Recoverable Data? \ud83e\udd14",
+      "bubble": "Exactly! Data recovery is possible. What do you think about this?",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Emptying the trash only deletes the pointer in the directory index. The actual bytes remain on your hard drive until overwritten, allowing data recovery.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know Deleted Files Aren't Actually Gone? \ud83d\uddd1\ufe0f\n\n\ud83d\udca1 Emptying the trash only deletes the pointer in the directory index. The actual bytes remain on your hard drive until overwritten, allowing data recovery.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "consumer_utility",
+  "characters": "auto"
+}
