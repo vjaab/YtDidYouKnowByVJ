@@ -3,46 +3,56 @@
         "Why Senior Engineers Are Quietly Quitting Older Coding Tools",
         "morluto/rea hits 100k stars as OpenAI drops GPT-5.5",
         "Why Senior Engineers Are Quietly Quitting This Old AI Tool",
-        "GitHub Trending Developer Tools Fix AI Agent Amnesia and Token Bloat"
+        "GitHub Trending Developer Tools Fix AI Agent Amnesia and Token Bloat",
+        "Why Top Tech Firms Just Banned This AI Tool",
+        "OpenAI Decisions API and Sakana AI MASS Method Transform Agent Workflows"
     ],
     "used_keywords": [
-        "Ghidra",
-        "Rust search",
-        "claude-mem",
         "OpenAI",
+        "AI agents",
+        "AI coding agents",
+        "MASS framework",
+        "Decisions API",
+        "Sakana AI",
+        "persistent memory",
+        "Qwen3.6-27B",
         "REA",
         "GPT-5.5",
+        "claude-mem",
         "context-mode",
-        "AI coding agents",
-        "reverse engineering",
         "xerj",
-        "AI agents",
-        "persistent memory"
+        "Ghidra",
+        "reverse engineering",
+        "Rust search"
     ],
     "used_companies": {
         "GitHub": 5,
-        "The Time Lens": 1
+        "The Time Lens": 1,
+        "OpenAI": 1,
+        "Sakana AI": 1
     },
     "used_subcategories": {
-        "AI Deep Dive": 2
+        "AI Deep Dive": 3
     },
     "last_7_days_stories": [
         "morluto/rea hits 100k stars as OpenAI drops GPT-5.5",
-        "GitHub Trending Developer Tools Fix AI Agent Amnesia and Token Bloat"
+        "GitHub Trending Developer Tools Fix AI Agent Amnesia and Token Bloat",
+        "OpenAI Decisions API and Sakana AI MASS Method Transform Agent Workflows"
     ],
     "last_3_days_subcategories": [
+        "AI Deep Dive",
         "AI Deep Dive",
         "AI Deep Dive"
     ],
     "last_3_days_companies": [
         "GitHub",
-        "The Time Lens",
         "GitHub",
         "GitHub",
-        "GitHub"
+        "OpenAI",
+        "Sakana AI"
     ],
-    "total_uploaded": 2,
-    "last_upload": "2026-10-13",
+    "total_uploaded": 3,
+    "last_upload": "2026-10-14",
     "history": [
         {
             "date": "2026-10-12",
@@ -99,6 +109,31 @@
             "avatar_used": "assets/video/Full_stack_black.mp4",
             "creator_archetype": "CLEO_INVESTIGATIVE",
             "topic_source": "github"
+        },
+        {
+            "date": "2026-10-14",
+            "title": "Why Top Tech Firms Just Banned This AI Tool",
+            "news_headline": "OpenAI Decisions API and Sakana AI MASS Method Transform Agent Workflows",
+            "sub_category": "AI Deep Dive",
+            "companies": [
+                "OpenAI",
+                "Sakana AI"
+            ],
+            "keywords": [
+                "Decisions API",
+                "Qwen3.6-27B",
+                "MASS framework",
+                "OpenAI",
+                "Sakana AI"
+            ],
+            "breaking_news_level": 7,
+            "voice_used": "deep_dive",
+            "youtube_url": "https://youtu.be/EMH0JrmrhTE",
+            "facebook_post_id": null,
+            "news_source_url": "https://openai.com",
+            "target_country": null,
+            "avatar_used": "assets/video/ai_developer_white.mp4",
+            "creator_archetype": "VERITASIUM_MYSTERY"
         }
     ]
 }
