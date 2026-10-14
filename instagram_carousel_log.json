@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Medium (technology): Shrinking Big Models for Local AI: A Practical Ro",
     "Medium (technology): Chapter 5: Democracy Is Just Paint and Wax\u2013It\u2019s A",
     "Medium (artificial-intelligence): Your AI Agent Is Holding a Productio",
     "Medium (artificial-intelligence): Your AI Agent Is Holding a Productio",
@@ -99,10 +98,10 @@
     "Your GPS Relies on Einstein",
     "Undersea Cables Power Your Internet",
     "Invisible Waves: How Spectrum Powers Your Wireless World",
-    "Invisible Waves: How Spectrum Powers Your Wireless World"
+    "Invisible Waves: How Spectrum Powers Your Wireless World",
+    "Your Phone Screen's Invisible Electric Sense"
   ],
   "used_keywords": [
-    "did you know",
     "tech trending",
     "medium",
     "technology",
@@ -301,24 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "Medium (technology): Shrinking Big Models for Local AI: A Practical Ro",
-      "news_source_url": "https://mehmetozgenozdogan.medium.com/shrinking-big-models-for-local-ai-a-practical-roadmap-to-teacher-student-distillation-967fbc910447?source=rss------technology-5",
-      "keywords": [
-        "did you know",
-        "tech trending",
-        "medium",
-        "technology",
-        "shrinking",
-        "models",
-        "local"
-      ],
-      "source": "Medium - technology",
-      "timestamp": "2026-10-02T19:06:17.675297+00:00"
-    },
     {
       "title": "Medium (technology): Chapter 5: Democracy Is Just Paint and Wax\u2013It\u2019s A",
       "news_source_url": "https://medium.com/agent-x-and-the-edge-of-reality/chapter-5-democracy-is-just-paint-and-wax-its-all-police-state-under-the-hood-38cc41cbb1cd?source=rss------technology-5",
@@ -1406,6 +1391,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-14T12:21:25.576008+00:00"
+    },
+    {
+      "title": "Your Phone Screen's Invisible Electric Sense",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-14T15:00:55.331136+00:00"
     }
   ]
 }

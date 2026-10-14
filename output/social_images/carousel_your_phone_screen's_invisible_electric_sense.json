@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "battery",
+  "speaker_right": "vj",
+  "hook": "Did You Know your smartphone screen 'feels' your touch not by pressure, but by an invisible electrical trick? \ud83e\udd2f",
+  "headline": "Your Phone Screen's Invisible Electric Sense",
+  "source": "Electrical Engineering Principles",
+  "slides": [
+    {
+      "speaker": "battery",
+      "emotion": "shocked",
+      "title": "Screen's Invisible Sense? \ud83e\udd2f",
+      "bubble": "Did you know your phone screen 'feels' you electrically, not by pressure?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Tiny Electric Grid \u26a1",
+      "bubble": "Yes! Your screen has an invisible grid of tiny electrical circuits.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "curious",
+      "title": "Electric Field? \ud83e\udd14",
+      "bubble": "An electric grid? So, it's always sending out invisible energy?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Weak Electric Field \u2728",
+      "bubble": "Exactly! It creates a weak electric field, waiting for your touch.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "shocked",
+      "title": "My Finger's Charge? \ud83d\udd90\ufe0f",
+      "bubble": "And my finger has a tiny electric charge too, right?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Disturbance Detected! \ud83c\udfaf",
+      "bubble": "When your finger touches, it disturbs the field. Phone knows instantly!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "excited",
+      "title": "Invisible Electrical Map \ud83d\uddfa\ufe0f",
+      "bubble": "\ud83d\udccc Tap Save to remember this invisible electrical map trick!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your smartphone screen is covered in an invisible grid of tiny electrical circuits, constantly emitting a weak electric field that senses your finger's charge.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour smartphone screen isn't sensing pressure, it's sensing an invisible electrical disturbance!\n\nHere's the mind-blowing reality:\n\ud83d\udd39 Your screen has an invisible grid of electrical circuits.\n\ud83d\udd39 This grid constantly emits a weak electric field.\n\ud83d\udd39 Your finger, carrying its own tiny electrical charge, disturbs this field when it touches.\n\ud83d\udd39 The phone instantly detects where the disturbance occurred, acting like an 'invisible electrical map'!\n\n\ud83d\udccc Tap Save so you have this in your toolkit!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #SmartphoneTech #CapacitiveTouch",
+  "vector": "ai_secrets",
+  "characters": "auto"
+}
