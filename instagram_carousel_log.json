@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Medium (programming): SQL Percentile Queries",
-    "Medium (machine-learning): RLHF Series: 16/17 [Evaluating LLMs and RLH",
     "Medium (technology): Shrinking Big Models for Local AI: A Practical Ro",
     "Medium (technology): Chapter 5: Democracy Is Just Paint and Wax\u2013It\u2019s A",
     "Medium (artificial-intelligence): Your AI Agent Is Holding a Productio",
@@ -99,12 +97,11 @@
     "Deleting a File on Your Computer Does Not Actually Erase It",
     "Deleting a File on Your Computer Does Not Actually Erase It",
     "Your GPS Relies on Einstein",
-    "Undersea Cables Power Your Internet"
+    "Undersea Cables Power Your Internet",
+    "Invisible Waves: How Spectrum Powers Your Wireless World",
+    "Invisible Waves: How Spectrum Powers Your Wireless World"
   ],
   "used_keywords": [
-    "shrinking",
-    "models",
-    "local",
     "did you know",
     "tech trending",
     "medium",
@@ -301,38 +298,12 @@
     "threads",
     "tech",
     "did you know",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "Medium (programming): SQL Percentile Queries",
-      "news_source_url": "https://medium.com/@AlexanderObregon/sql-percentile-queries-1303a1ba4878?source=rss------programming-5",
-      "keywords": [
-        "did you know",
-        "tech trending",
-        "medium",
-        "programming",
-        "percentile",
-        "queries"
-      ],
-      "source": "Medium - programming",
-      "timestamp": "2026-10-02T19:05:41.874527+00:00"
-    },
-    {
-      "title": "Medium (machine-learning): RLHF Series: 16/17 [Evaluating LLMs and RLH",
-      "news_source_url": "https://medium.com/@deepakcse2k5/rlhf-series-16-17-evaluating-llms-and-rlhf-systems-33e49b48f49b?source=rss------machine_learning-5",
-      "keywords": [
-        "did you know",
-        "tech trending",
-        "medium",
-        "machine",
-        "learning",
-        "rlhf",
-        "series"
-      ],
-      "source": "Medium - machine-learning",
-      "timestamp": "2026-10-02T19:05:59.611994+00:00"
-    },
     {
       "title": "Medium (technology): Shrinking Big Models for Local AI: A Practical Ro",
       "news_source_url": "https://mehmetozgenozdogan.medium.com/shrinking-big-models-for-local-ai-a-practical-roadmap-to-teacher-student-distillation-967fbc910447?source=rss------technology-5",
@@ -1414,6 +1385,27 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-14T07:37:16.032896+00:00"
+    },
+    {
+      "title": "Invisible Waves: How Spectrum Powers Your Wireless World",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-14T12:20:04.000952+00:00"
+    },
+    {
+      "title": "Invisible Waves: How Spectrum Powers Your Wireless World",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-14T12:21:25.576008+00:00"
     }
   ]
 }
