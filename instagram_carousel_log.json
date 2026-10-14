@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI Image Generators Have Invisible Watermarks You Cannot See",
     "QR Codes Still Work Even When 30% Is Destroyed",
     "QR Codes Still Work Even When 30% Is Destroyed",
     "ChatGPT Uses More Electricity Per Query Than a Google Search Uses in a Day",
@@ -99,10 +98,10 @@
     "Your Phone Screen's Invisible Electric Sense",
     "Your Phone's Billion Switches",
     "How AI Sees Your World",
-    "How AI Sees Your World"
+    "How AI Sees Your World",
+    "VR's Mind-Bending Brain Illusion"
   ],
   "used_keywords": [
-    "democracy",
     "just",
     "did you know",
     "tech trending",
@@ -301,23 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "AI Image Generators Have Invisible Watermarks You Cannot See",
-      "news_source_url": "",
-      "keywords": [
-        "synthid",
-        "ai watermark",
-        "image generation",
-        "deepmind",
-        "did you know"
-      ],
-      "source": "Google DeepMind SynthID Paper",
-      "platform": "unknown",
-      "timestamp": "2026-10-03T09:46:23.378243+00:00"
-    },
     {
       "title": "QR Codes Still Work Even When 30% Is Destroyed",
       "news_source_url": "",
@@ -1392,6 +1378,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-14T15:56:38.736275+00:00"
+    },
+    {
+      "title": "VR's Mind-Bending Brain Illusion",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-14T18:25:28.642271+00:00"
     }
   ]
 }

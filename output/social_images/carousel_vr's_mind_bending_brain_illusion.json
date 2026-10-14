@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "VR headsets literally trick your brain into a new reality! \ud83e\udd2f",
+  "headline": "VR's Mind-Bending Brain Illusion",
+  "source": "IEEE Spectrum, The Science Behind Virtual Reality",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Your Brain Sees Double? \ud83d\udc6f",
+      "bubble": "Wait, how does VR make me feel like I'm truly there?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Two Images, One World \ud83c\udf0e",
+      "bubble": "It shows each eye a slightly different 3D image, just like real life.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "thinking",
+      "title": "Depth Perception Magic \u2728",
+      "bubble": "So my brain naturally sees depth with these two pictures?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Rapid Updates Fool Eyes \ud83d\udc40",
+      "bubble": "Yes! And it updates them super fast as you move your head.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Screens Become Real? \ud83d\ude32",
+      "bubble": "My brain thinks it's not looking at screens anymore?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Immersed in Digital Space \ud83d\ude80",
+      "bubble": "Exactly! You feel present in a place that doesn't physically exist.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Brain Trick Masterclass! \ud83d\udca1",
+      "bubble": "\ud83d\udccc Tap Save for this mind-bending tech insight!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "VR headsets trick your brain by showing slightly different images to each eye, rapidly updating as you move, creating a sense of presence in digital worlds.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nVR headsets are master illusionists, tricking your brain into believing you're somewhere else entirely!\n\nHere's the mind-bending science:\n\ud83d\udd39 Each eye sees a subtly different 3D image.\n\ud83d\udd39 Your brain naturally combines them to perceive depth.\n\ud83d\udd39 Ultra-fast updates as you move fool your brain into presence.\n\n\ud83d\udccc Tap Save so you have this in your toolkit!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #VR #VirtualReality #TechExplained #BrainFacts #Innovation",
+  "vector": "hardware_megastructures",
+  "characters": "auto"
+}
