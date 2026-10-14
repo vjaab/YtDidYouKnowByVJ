@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know AI can \"dream\" up entirely new things, even if they're not real? \ud83e\udd2f",
+  "headline": "AI's Creative 'Dreams' and Hallucinations",
+  "source": "Leading AI Research Labs and Academic Publications",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "AI's Weird Art? \ud83c\udfa8",
+      "bubble": "Ever seen an AI image with super weird, extra fingers or eyes?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "AI's Creative 'Dreams' \ud83e\udd2f",
+      "bubble": "That's AI 'dreaming' things up, even if they're not real!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "The Artist Analogy \ud83e\uddd1\u200d\ud83c\udfa8",
+      "bubble": "So, it's like an artist inventing but sometimes making mistakes?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Fact-Check AI! \u2705",
+      "bubble": "Exactly! AI combines patterns, sometimes creating imaginative, false facts.",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "AI can 'dream' up entirely new things, confidently producing believable but made-up information or visuals by combining patterns in novel ways.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know AI can \"dream\" up entirely new things, even if they're not real? \ud83e\udd2f\n\n\ud83d\udca1 AI can 'dream' up entirely new things, confidently producing believable but made-up information or visuals by combining patterns in novel ways.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "consumer_utility",
+  "characters": "auto"
+}

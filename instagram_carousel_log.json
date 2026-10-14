@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "QR Codes Still Work Even When 30% Is Destroyed",
-    "QR Codes Still Work Even When 30% Is Destroyed",
     "ChatGPT Uses More Electricity Per Query Than a Google Search Uses in a Day",
     "Bluetooth is Named After a 10th-Century Viking King",
     "Bluetooth is Named After a 10th-Century Viking King",
@@ -99,10 +98,10 @@
     "Your Phone's Billion Switches",
     "How AI Sees Your World",
     "How AI Sees Your World",
-    "VR's Mind-Bending Brain Illusion"
+    "VR's Mind-Bending Brain Illusion",
+    "AI's Creative 'Dreams' and Hallucinations"
   ],
   "used_keywords": [
-    "just",
     "did you know",
     "tech trending",
     "medium",
@@ -301,23 +300,10 @@
     "did you know",
     "threads",
     "tech",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "QR Codes Still Work Even When 30% Is Destroyed",
-      "news_source_url": "",
-      "keywords": [
-        "qr code",
-        "error correction",
-        "reed solomon",
-        "barcode",
-        "did you know"
-      ],
-      "source": "ISO/IEC 18004 QR Code Standard",
-      "platform": "unknown",
-      "timestamp": "2026-10-03T10:34:11.848002+00:00"
-    },
     {
       "title": "QR Codes Still Work Even When 30% Is Destroyed",
       "news_source_url": "",
@@ -1388,6 +1374,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-14T18:25:28.642271+00:00"
+    },
+    {
+      "title": "AI's Creative 'Dreams' and Hallucinations",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-14T18:38:34.531118+00:00"
     }
   ]
 }
