@@ -1492,12 +1492,12 @@
       "stat_contradiction": {
         "variants": {
           "B": {
-            "views": 0,
-            "retention": 0.0,
+            "views": 25,
+            "retention": 0.17647058823529413,
             "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 1,
+            "swipe_away_rate": 0.32175,
+            "avg_view_percentage": 17.825,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "This hidden separator breaks desktop security.",
@@ -1507,12 +1507,12 @@
             ]
           }
         },
-        "total_views": 0,
-        "total_videos": 1,
-        "avg_retention": 0.0,
+        "total_views": 25,
+        "total_videos": 2,
+        "avg_retention": 0.17647058823529413,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.0,
-        "avg_view_percentage": 0.0
+        "avg_swipe_away": 0.32175,
+        "avg_view_percentage": 17.825
       }
     },
     "Tech Gadgets & Inventions": {
@@ -1546,12 +1546,12 @@
       "curiosity_gap": {
         "variants": {
           "B": {
-            "views": 0,
-            "retention": 0.0,
-            "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 1,
+            "views": 116,
+            "retention": 0.21428571428571427,
+            "engagement": 0.004310344827586207,
+            "swipe_away_rate": 0.27135,
+            "avg_view_percentage": 22.865,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "Your design tool is secretly dying",
@@ -1561,12 +1561,12 @@
             ]
           }
         },
-        "total_views": 0,
-        "total_videos": 1,
-        "avg_retention": 0.0,
-        "avg_engagement": 0.0,
-        "avg_swipe_away": 0.0,
-        "avg_view_percentage": 0.0
+        "total_views": 116,
+        "total_videos": 2,
+        "avg_retention": 0.21428571428571427,
+        "avg_engagement": 0.004310344827586207,
+        "avg_swipe_away": 0.27135,
+        "avg_view_percentage": 22.865
       }
     }
   },
@@ -1588,20 +1588,20 @@
       "avg_view_percentage": 20.206153846153846
     },
     "stat_contradiction": {
-      "views": 248,
-      "retention": 0.15510524049592342,
-      "engagement": 0.00046382189239332086,
-      "count": 22,
-      "swipe_away_rate": 0.2506818181818182,
-      "avg_view_percentage": 15.840909090909092
+      "views": 273,
+      "retention": 0.16370680292960452,
+      "engagement": 0.00044365572315882866,
+      "count": 23,
+      "swipe_away_rate": 0.2677608695652174,
+      "avg_view_percentage": 16.702173913043477
     },
     "curiosity_gap": {
-      "views": 361,
-      "retention": 0.18281699880953553,
-      "engagement": 0.0033182503770739064,
-      "count": 26,
-      "swipe_away_rate": 0.23514615384615387,
-      "avg_view_percentage": 18.79307692307692
+      "views": 477,
+      "retention": 0.1919190147266427,
+      "engagement": 0.003514637017003481,
+      "count": 27,
+      "swipe_away_rate": 0.24653703703703705,
+      "avg_view_percentage": 19.790740740740738
     },
     "personal_stake": {
       "views": 408,
@@ -1612,5 +1612,5 @@
       "avg_view_percentage": 26.804285714285715
     }
   },
-  "last_updated": "2026-10-13T14:00:22.536116"
+  "last_updated": "2026-10-14T11:36:56.855581"
 }
