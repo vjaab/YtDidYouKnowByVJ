@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know your phone's GPS uses Einstein's physics to find you? \ud83e\udd2f",
+  "headline": "Your GPS Relies on Einstein",
+  "source": "Scientific consensus in physics and GPS engineering, validated by institutions like NASA.",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Einstein & Your GPS? \ud83e\udd2f",
+      "bubble": "Did you know your phone's GPS uses Einstein's physics?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Satellites & Speed \ud83d\ude80",
+      "bubble": "Yes! Satellites orbit Earth at incredible speeds, thousands of miles up.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Time Flies Differently? \u23f3",
+      "bubble": "Wait, so time actually passes differently for those satellites?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Einstein's Relativity \ud83d\udd70\ufe0f",
+      "bubble": "Exactly! Einstein proved speed and gravity change how time flows.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Tiny Time Shift? \u23f1\ufe0f",
+      "bubble": "How much time are we talking? Just a tiny, tiny bit?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Miles Off Daily! \ud83d\uddfa\ufe0f",
+      "bubble": "About 38 microseconds daily! Without correction, GPS would be miles off.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "GPS Needs Einstein! \u2705",
+      "bubble": "\ud83d\udccc Tap Save so you have this in your toolkit for later!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your GPS works because engineers precisely correct for Einstein's relativity, which makes satellite clocks run slightly faster. Without these tiny time adjustments, your navigation would be off by miles daily!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour phone's GPS relies on Albert Einstein's mind-bending physics to tell you where you are!\n\nHere's the mind-blowing reality:\n\ud83d\udd39 GPS satellites orbit thousands of miles above Earth at incredible speeds.\n\ud83d\udd39 Einstein's relativity predicts time passes differently for them due to speed and gravity.\n\ud83d\udd39 Satellite clocks actually run about 38 microseconds faster per day than clocks on Earth.\n\ud83d\udd39 Without constant, precise corrections for this time difference, your GPS would be wrong by several miles daily!\n\n\ud83d\udccc Tap Save so you don't lose this amazing fact!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #Einstein #GPS #Relativity #Physics #Engineering #Science",
+  "vector": "hardware_megastructures",
+  "characters": "auto"
+}

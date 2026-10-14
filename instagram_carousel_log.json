@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI Inbox Blackmail: Your Data At Risk",
     "Medium (programming): AI Lets Everyone Build Software. But Can They Tr",
     "Medium (programming): SQL Percentile Queries",
     "Medium (machine-learning): RLHF Series: 16/17 [Evaluating LLMs and RLH",
@@ -99,10 +98,10 @@
     "Why Python Will Not Be Replaced by Rust Anytime Soon",
     "NIST Data Sanitization: Why Deleting Files Is a Illusion",
     "Deleting a File on Your Computer Does Not Actually Erase It",
-    "Deleting a File on Your Computer Does Not Actually Erase It"
+    "Deleting a File on Your Computer Does Not Actually Erase It",
+    "Your GPS Relies on Einstein"
   ],
   "used_keywords": [
-    "medium",
     "technology",
     "shrinking",
     "models",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "AI Inbox Blackmail: Your Data At Risk",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "timestamp": "2026-10-02T16:47:40.797780+00:00"
-    },
     {
       "title": "Medium (programming): AI Lets Everyone Build Software. But Can They Tr",
       "news_source_url": "https://medium.com/@mahishdino/ai-lets-everyone-build-software-but-can-they-truly-engineer-it-9045896fe903?source=rss------programming-5",
@@ -1419,6 +1409,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-13T20:49:55.300463+00:00"
+    },
+    {
+      "title": "Your GPS Relies on Einstein",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-14T06:51:12.078889+00:00"
     }
   ]
 }
