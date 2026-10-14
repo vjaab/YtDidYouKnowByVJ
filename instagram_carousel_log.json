@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "QR Codes Still Work Even When 30% Is Destroyed",
-    "ChatGPT Uses More Electricity Per Query Than a Google Search Uses in a Day",
     "Bluetooth is Named After a 10th-Century Viking King",
     "Bluetooth is Named After a 10th-Century Viking King",
     "Your Phone Knows You're in Your Pocket Using a Proximity Infrared Beam",
@@ -99,12 +97,11 @@
     "How AI Sees Your World",
     "How AI Sees Your World",
     "VR's Mind-Bending Brain Illusion",
-    "AI's Creative 'Dreams' and Hallucinations"
+    "AI's Creative 'Dreams' and Hallucinations",
+    "Secret Language of Touch: Capacitive Screens",
+    "Secret Language of Touch: Capacitive Screens"
   ],
   "used_keywords": [
-    "did you know",
-    "tech trending",
-    "medium",
     "artificial",
     "intelligence",
     "your",
@@ -301,34 +298,12 @@
     "threads",
     "tech",
     "did you know",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "QR Codes Still Work Even When 30% Is Destroyed",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-03T10:36:08.654248+00:00"
-    },
-    {
-      "title": "ChatGPT Uses More Electricity Per Query Than a Google Search Uses in a Day",
-      "news_source_url": "",
-      "keywords": [
-        "ai energy",
-        "chatgpt power",
-        "gpu electricity",
-        "sustainability",
-        "did you know"
-      ],
-      "source": "IEA & Goldman Sachs AI Energy Reports",
-      "platform": "instagram",
-      "timestamp": "2026-10-03T15:28:04.108497+00:00"
-    },
     {
       "title": "Bluetooth is Named After a 10th-Century Viking King",
       "news_source_url": "",
@@ -1384,6 +1359,27 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-14T18:38:34.531118+00:00"
+    },
+    {
+      "title": "Secret Language of Touch: Capacitive Screens",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-14T19:37:52.231287+00:00"
+    },
+    {
+      "title": "Secret Language of Touch: Capacitive Screens",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-14T19:39:16.141896+00:00"
     }
   ]
 }
