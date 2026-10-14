@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_Elite.mp3",
+      "headline": "RuView Turns Commodity WiFi Into Real-Time Spatial Intelligence Without Video",
+      "topic_type": "auto",
+      "timestamp": "38572757994"
+    },
+    {
       "track": "jam_Groovy_SIX.mp3",
       "headline": "Designer's GitHub Repo Makes Mermaid Obsolete With 44 Pristine SVG Diagrams",
       "topic_type": "auto",
@@ -173,12 +179,6 @@
       "headline": "Can a 29B model run on your 8GB GPU?",
       "topic_type": "auto",
       "timestamp": "36091986610"
-    },
-    {
-      "track": "jam_Escape_From_The_Machine_Planet.mp3",
-      "headline": "HF Trending Model: Ternary-Bonsai-2-27B-gguf",
-      "topic_type": "auto",
-      "timestamp": "36050403237"
     }
   ],
   "usage_counts": {
@@ -192,7 +192,7 @@
     "jam_Confidence.mp3": 1,
     "jam_Upbeat.mp3": 3,
     "modern_tech.mp3": 3,
-    "jam_Elite.mp3": 2,
+    "jam_Elite.mp3": 3,
     "jam_Energetic_Pop.mp3": 2,
     "jam_Groovy_SIX.mp3": 2
   }

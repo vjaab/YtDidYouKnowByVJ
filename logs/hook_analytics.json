@@ -1472,22 +1472,27 @@
             "engagement": 0.0,
             "swipe_away_rate": 0.0,
             "avg_view_percentage": 0.0,
-            "count": 1,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "Your AI coding assistant draws terrible charts",
                 "video_id": "FwO0fB5saK4",
                 "recorded_at": "2026-10-12T18:45:20.347108"
+              },
+              {
+                "text": "Your router tracks your breathing.",
+                "video_id": "d1m4t_mmnQ4",
+                "recorded_at": "2026-10-14T14:25:26.271017"
               }
             ]
           }
         },
         "total_views": 30,
-        "total_videos": 3,
-        "avg_retention": 0.32,
+        "total_videos": 4,
+        "avg_retention": 0.24,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.010766666666666666,
-        "avg_view_percentage": 32.25666666666667
+        "avg_swipe_away": 0.008074999999999999,
+        "avg_view_percentage": 24.1925
       },
       "stat_contradiction": {
         "variants": {
@@ -1605,12 +1610,12 @@
     },
     "personal_stake": {
       "views": 408,
-      "retention": 0.2031234855550909,
-      "engagement": 0.0032467532467532465,
-      "count": 28,
-      "swipe_away_rate": 0.25711071428571436,
-      "avg_view_percentage": 26.804285714285715
+      "retention": 0.19611922743250157,
+      "engagement": 0.0031347962382445136,
+      "count": 29,
+      "swipe_away_rate": 0.24824482758620697,
+      "avg_view_percentage": 25.88
     }
   },
-  "last_updated": "2026-10-14T11:36:56.855581"
+  "last_updated": "2026-10-14T14:25:26.271042"
 }
