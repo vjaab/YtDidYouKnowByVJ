@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know your smartphone chip has more tiny switches than people in many countries? \ud83e\udd2f",
+  "headline": "Your Phone's Billion Switches",
+  "source": "IEEE Spectrum, leading semiconductor manufacturers' specifications",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Phone Power Mystery \ud83e\udd2f",
+      "bubble": "My phone feels like a supercomputer. How does it do so much?!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Billions of Switches \ud83d\udca1",
+      "bubble": "It has billions of tiny 'switches' called transistors inside.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Tiny City Inside \ud83c\udfd9\ufe0f",
+      "bubble": "Like a city, each switch helps every tap and swipe?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "15 Billion Switches! \ud83d\ude80",
+      "bubble": "Yes! Over 15 billion switches make your phone a supercomputer!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Every single action on your smartphone, from tapping an icon to watching a video, is controlled by billions of tiny electronic 'switches' called transistors.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know your smartphone chip has more tiny switches than people in many countries? \ud83e\udd2f\n\n\ud83d\udca1 Every single action on your smartphone, from tapping an icon to watching a video, is controlled by billions of tiny electronic 'switches' called transistors.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "everyday_tech_mysteries",
+  "characters": "auto"
+}

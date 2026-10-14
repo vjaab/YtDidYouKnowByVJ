@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Medium (technology): Chapter 5: Democracy Is Just Paint and Wax\u2013It\u2019s A",
     "Medium (artificial-intelligence): Your AI Agent Is Holding a Productio",
     "Medium (artificial-intelligence): Your AI Agent Is Holding a Productio",
     "AI Image Generators Have Invisible Watermarks You Cannot See",
@@ -99,10 +98,10 @@
     "Undersea Cables Power Your Internet",
     "Invisible Waves: How Spectrum Powers Your Wireless World",
     "Invisible Waves: How Spectrum Powers Your Wireless World",
-    "Your Phone Screen's Invisible Electric Sense"
+    "Your Phone Screen's Invisible Electric Sense",
+    "Your Phone's Billion Switches"
   ],
   "used_keywords": [
-    "tech trending",
     "medium",
     "technology",
     "chapter",
@@ -301,24 +300,10 @@
     "did you know",
     "threads",
     "tech",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Medium (technology): Chapter 5: Democracy Is Just Paint and Wax\u2013It\u2019s A",
-      "news_source_url": "https://medium.com/agent-x-and-the-edge-of-reality/chapter-5-democracy-is-just-paint-and-wax-its-all-police-state-under-the-hood-38cc41cbb1cd?source=rss------technology-5",
-      "keywords": [
-        "did you know",
-        "tech trending",
-        "medium",
-        "technology",
-        "chapter",
-        "democracy",
-        "just"
-      ],
-      "source": "Medium - technology",
-      "timestamp": "2026-10-02T19:06:35.695085+00:00"
-    },
     {
       "title": "Medium (artificial-intelligence): Your AI Agent Is Holding a Productio",
       "news_source_url": "https://medium.com/data-science-collective/your-ai-agent-is-holding-a-production-api-key-right-now-06d91ccd6e74?source=rss------artificial_intelligence-5",
@@ -1401,6 +1386,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-14T15:00:55.331136+00:00"
+    },
+    {
+      "title": "Your Phone's Billion Switches",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-14T15:10:00.025891+00:00"
     }
   ]
 }
