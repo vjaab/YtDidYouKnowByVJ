@@ -5,39 +5,47 @@
         "Why Senior Engineers Are Quietly Quitting This Old AI Tool",
         "GitHub Trending Developer Tools Fix AI Agent Amnesia and Token Bloat",
         "Why Top Tech Firms Just Banned This AI Tool",
-        "OpenAI Decisions API and Sakana AI MASS Method Transform Agent Workflows"
+        "OpenAI Decisions API and Sakana AI MASS Method Transform Agent Workflows",
+        "Why Top Tech Firms Are Quietly Banning OpenAI GPT-5.5",
+        "OpenAI and Anthropic Release Next-Gen Frontier Models"
     ],
     "used_keywords": [
-        "OpenAI",
-        "AI agents",
-        "AI coding agents",
-        "MASS framework",
-        "Decisions API",
         "Sakana AI",
-        "persistent memory",
-        "Qwen3.6-27B",
         "REA",
+        "OpenAI",
+        "Claude Opus 4.7",
+        "SWE-bench",
         "GPT-5.5",
+        "reverse engineering",
+        "persistent memory",
+        "AI agents",
+        "Ghidra",
+        "MASS framework",
+        "Qwen3.6-27B",
         "claude-mem",
         "context-mode",
         "xerj",
-        "Ghidra",
-        "reverse engineering",
-        "Rust search"
+        "Rust search",
+        "Decisions API",
+        "Autonomous Agents",
+        "AI coding agents",
+        "Mixture-of-Experts"
     ],
     "used_companies": {
         "GitHub": 5,
         "The Time Lens": 1,
-        "OpenAI": 1,
-        "Sakana AI": 1
+        "OpenAI": 2,
+        "Sakana AI": 1,
+        "Anthropic": 1
     },
     "used_subcategories": {
-        "AI Deep Dive": 3
+        "AI Deep Dive": 4
     },
     "last_7_days_stories": [
         "morluto/rea hits 100k stars as OpenAI drops GPT-5.5",
         "GitHub Trending Developer Tools Fix AI Agent Amnesia and Token Bloat",
-        "OpenAI Decisions API and Sakana AI MASS Method Transform Agent Workflows"
+        "OpenAI Decisions API and Sakana AI MASS Method Transform Agent Workflows",
+        "OpenAI and Anthropic Release Next-Gen Frontier Models"
     ],
     "last_3_days_subcategories": [
         "AI Deep Dive",
@@ -46,13 +54,13 @@
     ],
     "last_3_days_companies": [
         "GitHub",
-        "GitHub",
-        "GitHub",
         "OpenAI",
-        "Sakana AI"
+        "Sakana AI",
+        "OpenAI",
+        "Anthropic"
     ],
-    "total_uploaded": 3,
-    "last_upload": "2026-10-14",
+    "total_uploaded": 4,
+    "last_upload": "2026-10-15",
     "history": [
         {
             "date": "2026-10-12",
@@ -134,6 +142,31 @@
             "target_country": null,
             "avatar_used": "assets/video/ai_developer_white.mp4",
             "creator_archetype": "VERITASIUM_MYSTERY"
+        },
+        {
+            "date": "2026-10-15",
+            "title": "Why Top Tech Firms Are Quietly Banning OpenAI GPT-5.5",
+            "news_headline": "OpenAI and Anthropic Release Next-Gen Frontier Models",
+            "sub_category": "AI Deep Dive",
+            "companies": [
+                "OpenAI",
+                "Anthropic"
+            ],
+            "keywords": [
+                "GPT-5.5",
+                "Claude Opus 4.7",
+                "Mixture-of-Experts",
+                "Autonomous Agents",
+                "SWE-bench"
+            ],
+            "breaking_news_level": 7,
+            "voice_used": "deep_dive",
+            "youtube_url": "https://youtu.be/Nb86iSwtFV0",
+            "facebook_post_id": null,
+            "news_source_url": "https://openai.com/news",
+            "target_country": null,
+            "avatar_used": "assets/video/black_apple.mp4",
+            "creator_archetype": "STUDENT_PROJECT"
         }
     ]
 }
