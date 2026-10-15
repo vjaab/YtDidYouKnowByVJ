@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "earbuds",
+  "speaker_right": "vj",
+  "hook": "Did You Know tiny, invisible changes can completely trick even the smartest AI? \ud83e\udd2f",
+  "headline": "Tiny Glitches That Trick AI",
+  "source": "Goodfellow, I. J., Shlens, J., & Szegedy, C. (2015). Explaining and Harnessing Adversarial Examples. International Conference on Learning Representations (ICLR).",
+  "slides": [
+    {
+      "speaker": "earbuds",
+      "emotion": "shocked",
+      "title": "AI's Blind Spot \ud83e\udd2f",
+      "bubble": "Can AI really be tricked by things you can't even see?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Invisible Tricks \ud83e\udd2b",
+      "bubble": "Yes! A stop sign can become a speed sign to AI.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "earbuds",
+      "emotion": "curious",
+      "title": "Adversarial Noise \ud83e\udde9",
+      "bubble": "So, tiny, invisible noise fools it, like a magic trick?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Your Take? \ud83d\udc47",
+      "bubble": "Does this surprise you about AI's 'intelligence'? Tell me!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Imagine showing an AI a stop sign; it calls it a speed limit sign. Tiny, invisible 'noise' fools even the smartest AI, highlighting a surprising blind spot.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know tiny, invisible changes can completely trick even the smartest AI? \ud83e\udd2f\n\n\ud83d\udca1 Imagine showing an AI a stop sign; it calls it a speed limit sign. Tiny, invisible 'noise' fools even the smartest AI, highlighting a surprising blind spot.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "threads_debates",
+  "characters": "auto"
+}

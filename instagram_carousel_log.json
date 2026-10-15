@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Your Phone Knows You're in Your Pocket Using a Proximity Infrared Beam",
-    "Your Phone Knows You're in Your Pocket Using a Proximity Infrared Beam",
     "Emojis Are Approved by a 12-Person Committee That Controls All Text on Earth",
     "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection",
     "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection",
@@ -99,12 +97,11 @@
     "Secret Language of Touch: Capacitive Screens",
     "Secret Language of Touch: Capacitive Screens",
     "Cloud Infrastructure: Physical Realities Shaping Architecture",
-    "The Internet's Unbreakable Speed Limit"
+    "The Internet's Unbreakable Speed Limit",
+    "Tiny Glitches That Trick AI",
+    "Tiny Glitches That Trick AI"
   ],
   "used_keywords": [
-    "your",
-    "agent",
-    "threads",
     "tech",
     "synthid",
     "ai watermark",
@@ -301,30 +298,12 @@
     "threads",
     "tech",
     "did you know",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "Your Phone Knows You're in Your Pocket Using a Proximity Infrared Beam",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-04T11:15:56.506551+00:00"
-    },
-    {
-      "title": "Your Phone Knows You're in Your Pocket Using a Proximity Infrared Beam",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-04T11:17:14.602918+00:00"
-    },
     {
       "title": "Emojis Are Approved by a 12-Person Committee That Controls All Text on Earth",
       "news_source_url": "",
@@ -1379,6 +1358,27 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-15T07:29:43.470303+00:00"
+    },
+    {
+      "title": "Tiny Glitches That Trick AI",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-15T11:59:32.193182+00:00"
+    },
+    {
+      "title": "Tiny Glitches That Trick AI",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-15T12:00:23.678573+00:00"
     }
   ]
 }
