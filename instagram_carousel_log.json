@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Nintendo Started as a Playing Card Company in 1889",
     "The Microwave Oven Was Invented When a Candy Bar Melted in an Engineer's Pocket",
     "Medium (programming): Vibe Coding Is a Financial Trap: Why Your Weeken",
     "Medium (programming): Vibe Coding Is a Financial Trap: Why Your Weeken",
@@ -99,10 +98,10 @@
     "The Cloud's Thirsty Secret: Water Footprint of Hyperscale AI",
     "AI's Chat Secret: No Real Understanding",
     "AI's Chat Secret: No Real Understanding",
-    "Your Voice is a Digital Fingerprint"
+    "Your Voice is a Digital Fingerprint",
+    "Magnetic Memory Secrets: How Your Data Lives!"
   ],
   "used_keywords": [
-    "qr code",
     "error correction",
     "reed solomon",
     "barcode",
@@ -301,20 +300,10 @@
     "did you know",
     "threads",
     "tech",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Nintendo Started as a Playing Card Company in 1889",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-05T15:14:15.041503+00:00"
-    },
     {
       "title": "The Microwave Oven Was Invented When a Candy Bar Melted in an Engineer's Pocket",
       "news_source_url": "",
@@ -1371,6 +1360,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-15T18:08:39.866220+00:00"
+    },
+    {
+      "title": "Magnetic Memory Secrets: How Your Data Lives!",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-15T18:20:24.056755+00:00"
     }
   ]
 }
