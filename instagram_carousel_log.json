@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "Bluetooth is Named After a 10th-Century Viking King",
-    "Bluetooth is Named After a 10th-Century Viking King",
     "Your Phone Knows You're in Your Pocket Using a Proximity Infrared Beam",
     "Your Phone Knows You're in Your Pocket Using a Proximity Infrared Beam",
     "Emojis Are Approved by a 12-Person Committee That Controls All Text on Earth",
@@ -99,10 +98,10 @@
     "VR's Mind-Bending Brain Illusion",
     "AI's Creative 'Dreams' and Hallucinations",
     "Secret Language of Touch: Capacitive Screens",
-    "Secret Language of Touch: Capacitive Screens"
+    "Secret Language of Touch: Capacitive Screens",
+    "Cloud Infrastructure: Physical Realities Shaping Architecture"
   ],
   "used_keywords": [
-    "artificial",
     "intelligence",
     "your",
     "agent",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "Bluetooth is Named After a 10th-Century Viking King",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-03T17:29:29.193468+00:00"
-    },
     {
       "title": "Bluetooth is Named After a 10th-Century Viking King",
       "news_source_url": "",
@@ -1380,6 +1370,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-14T19:39:16.141896+00:00"
+    },
+    {
+      "title": "Cloud Infrastructure: Physical Realities Shaping Architecture",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-15T06:40:36.760726+00:00"
     }
   ]
 }
