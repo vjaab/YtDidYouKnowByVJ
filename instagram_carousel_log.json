@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "The Microwave Oven Was Invented When a Candy Bar Melted in an Engineer's Pocket",
-    "Medium (programming): Vibe Coding Is a Financial Trap: Why Your Weeken",
     "Medium (programming): Vibe Coding Is a Financial Trap: Why Your Weeken",
     "GPS Would Drift 11 Kilometers Daily Without Einstein",
     "Your Phone: A City of Billions",
@@ -99,12 +97,11 @@
     "AI's Chat Secret: No Real Understanding",
     "AI's Chat Secret: No Real Understanding",
     "Your Voice is a Digital Fingerprint",
-    "Magnetic Memory Secrets: How Your Data Lives!"
+    "Magnetic Memory Secrets: How Your Data Lives!",
+    "Your Wi-Fi's Secret Path Through Walls",
+    "Your Wi-Fi's Secret Path Through Walls"
   ],
   "used_keywords": [
-    "error correction",
-    "reed solomon",
-    "barcode",
     "did you know",
     "threads",
     "tech",
@@ -301,29 +298,12 @@
     "threads",
     "tech",
     "did you know",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "The Microwave Oven Was Invented When a Candy Bar Melted in an Engineer's Pocket",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-05T19:13:54.759506+00:00"
-    },
-    {
-      "title": "Medium (programming): Vibe Coding Is a Financial Trap: Why Your Weeken",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-05T19:47:43.439480+00:00"
-    },
     {
       "title": "Medium (programming): Vibe Coding Is a Financial Trap: Why Your Weeken",
       "news_source_url": "",
@@ -1370,6 +1350,27 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-15T18:20:24.056755+00:00"
+    },
+    {
+      "title": "Your Wi-Fi's Secret Path Through Walls",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-15T19:20:39.537165+00:00"
+    },
+    {
+      "title": "Your Wi-Fi's Secret Path Through Walls",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-15T19:21:42.602109+00:00"
     }
   ]
 }
