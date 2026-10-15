@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "Nintendo Started as a Playing Card Company in 1889",
-    "Nintendo Started as a Playing Card Company in 1889",
     "The Microwave Oven Was Invented When a Candy Bar Melted in an Engineer's Pocket",
     "Medium (programming): Vibe Coding Is a Financial Trap: Why Your Weeken",
     "Medium (programming): Vibe Coding Is a Financial Trap: Why Your Weeken",
@@ -99,10 +98,10 @@
     "Sand to Silicon: The 2026 Phone Brain Shift",
     "The Cloud's Thirsty Secret: Water Footprint of Hyperscale AI",
     "AI's Chat Secret: No Real Understanding",
-    "AI's Chat Secret: No Real Understanding"
+    "AI's Chat Secret: No Real Understanding",
+    "Your Voice is a Digital Fingerprint"
   ],
   "used_keywords": [
-    "did you know",
     "qr code",
     "error correction",
     "reed solomon",
@@ -301,23 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "Nintendo Started as a Playing Card Company in 1889",
-      "news_source_url": "",
-      "keywords": [
-        "nintendo",
-        "gaming history",
-        "hanafuda",
-        "tech companies",
-        "did you know"
-      ],
-      "source": "Nintendo Corporate History Archives",
-      "platform": "threads",
-      "timestamp": "2026-10-05T15:12:58.325614+00:00"
-    },
     {
       "title": "Nintendo Started as a Playing Card Company in 1889",
       "news_source_url": "",
@@ -1375,6 +1361,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-15T15:43:40.778733+00:00"
+    },
+    {
+      "title": "Your Voice is a Digital Fingerprint",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-15T18:08:39.866220+00:00"
     }
   ]
 }
