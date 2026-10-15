@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection",
-    "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection",
     "Wi-Fi Signals Pass Through Walls Using Quantum-Like Wave Diffraction",
     "Nintendo Started as a Playing Card Company in 1889",
     "Nintendo Started as a Playing Card Company in 1889",
@@ -99,10 +98,10 @@
     "The Internet's Unbreakable Speed Limit",
     "Tiny Glitches That Trick AI",
     "Tiny Glitches That Trick AI",
-    "Sand to Silicon: The 2026 Phone Brain Shift"
+    "Sand to Silicon: The 2026 Phone Brain Shift",
+    "The Cloud's Thirsty Secret: Water Footprint of Hyperscale AI"
   ],
   "used_keywords": [
-    "synthid",
     "ai watermark",
     "image generation",
     "deepmind",
@@ -301,19 +300,10 @@
     "did you know",
     "threads",
     "tech",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-04T17:44:39.609198+00:00"
-    },
     {
       "title": "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection",
       "news_source_url": "",
@@ -1379,6 +1369,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-15T14:56:07.653110+00:00"
+    },
+    {
+      "title": "The Cloud's Thirsty Secret: Water Footprint of Hyperscale AI",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-15T15:06:33.135956+00:00"
     }
   ]
 }
