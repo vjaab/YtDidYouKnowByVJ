@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection",
-    "Wi-Fi Signals Pass Through Walls Using Quantum-Like Wave Diffraction",
     "Nintendo Started as a Playing Card Company in 1889",
     "Nintendo Started as a Playing Card Company in 1889",
     "The Microwave Oven Was Invented When a Candy Bar Melted in an Engineer's Pocket",
@@ -99,12 +97,11 @@
     "Tiny Glitches That Trick AI",
     "Tiny Glitches That Trick AI",
     "Sand to Silicon: The 2026 Phone Brain Shift",
-    "The Cloud's Thirsty Secret: Water Footprint of Hyperscale AI"
+    "The Cloud's Thirsty Secret: Water Footprint of Hyperscale AI",
+    "AI's Chat Secret: No Real Understanding",
+    "AI's Chat Secret: No Real Understanding"
   ],
   "used_keywords": [
-    "ai watermark",
-    "image generation",
-    "deepmind",
     "did you know",
     "qr code",
     "error correction",
@@ -301,34 +298,12 @@
     "threads",
     "tech",
     "did you know",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-04T17:46:15.160759+00:00"
-    },
-    {
-      "title": "Wi-Fi Signals Pass Through Walls Using Quantum-Like Wave Diffraction",
-      "news_source_url": "",
-      "keywords": [
-        "wifi",
-        "radio waves",
-        "diffraction",
-        "physics",
-        "did you know"
-      ],
-      "source": "IEEE 802.11 Radio Physics Standards",
-      "platform": "instagram",
-      "timestamp": "2026-10-05T07:50:38.176745+00:00"
-    },
     {
       "title": "Nintendo Started as a Playing Card Company in 1889",
       "news_source_url": "",
@@ -1379,6 +1354,27 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-15T15:06:33.135956+00:00"
+    },
+    {
+      "title": "AI's Chat Secret: No Real Understanding",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-15T15:42:43.347850+00:00"
+    },
+    {
+      "title": "AI's Chat Secret: No Real Understanding",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-15T15:43:40.778733+00:00"
     }
   ]
 }
