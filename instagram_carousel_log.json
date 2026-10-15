@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Emojis Are Approved by a 12-Person Committee That Controls All Text on Earth",
     "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection",
     "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection",
     "Wi-Fi Signals Pass Through Walls Using Quantum-Like Wave Diffraction",
@@ -99,10 +98,10 @@
     "Cloud Infrastructure: Physical Realities Shaping Architecture",
     "The Internet's Unbreakable Speed Limit",
     "Tiny Glitches That Trick AI",
-    "Tiny Glitches That Trick AI"
+    "Tiny Glitches That Trick AI",
+    "Sand to Silicon: The 2026 Phone Brain Shift"
   ],
   "used_keywords": [
-    "tech",
     "synthid",
     "ai watermark",
     "image generation",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "Emojis Are Approved by a 12-Person Committee That Controls All Text on Earth",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-04T16:11:03.314506+00:00"
-    },
     {
       "title": "Fiber Optic Cables Carry Data Using Light Bouncing in Total Internal Reflection",
       "news_source_url": "",
@@ -1379,6 +1369,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-15T12:00:23.678573+00:00"
+    },
+    {
+      "title": "Sand to Silicon: The 2026 Phone Brain Shift",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-15T14:56:07.653110+00:00"
     }
   ]
 }
