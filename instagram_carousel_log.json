@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Voice AI's Secret Ear",
     "Why AI Can Count to Billions But Fails at Strawberry 'r's",
     "Why AI Can Count to Billions But Fails at Strawberry 'r's",
     "Medium (technology): ChatGPT Has Ads Now. Here\u2019s What Actually Changed",
@@ -99,10 +98,10 @@
     "How Your Phone Knows Which Way Is Up",
     "AI's Magic Photo Touch",
     "Your Computer's Forgetful Brain",
-    "Your Computer's Forgetful Brain"
+    "Your Computer's Forgetful Brain",
+    "AI Learns Like a Toddler: Efficient & Robust Learning"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "threads",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "Voice AI's Secret Ear",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-06T16:39:57.942733+00:00"
-    },
     {
       "title": "Why AI Can Count to Billions But Fails at Strawberry 'r's",
       "news_source_url": "",
@@ -1370,6 +1360,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-16T15:29:07.765106+00:00"
+    },
+    {
+      "title": "AI Learns Like a Toddler: Efficient & Robust Learning",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-16T17:53:50.021203+00:00"
     }
   ]
 }
