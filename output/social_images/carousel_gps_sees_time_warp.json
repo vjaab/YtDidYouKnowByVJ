@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know GPS satellites are actually time travelers \ud83e\udd2f?",
+  "headline": "GPS Sees Time Warp",
+  "source": "NASA",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Time Travelers \ud83d\udef0\ufe0f",
+      "bubble": "Are GPS satellites really time travelers in space?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Speed & Gravity \ud83d\ude80",
+      "bubble": "Yes! They move super fast and feel less gravity than us.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Einstein's Warp \u269b\ufe0f",
+      "bubble": "So their clocks tick faster because of relativity?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Share This Magic \ud83d\udcab",
+      "bubble": "Yep! Without adjustments, GPS would be miles off! Share this!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "GPS satellites are actually time travelers, their clocks tick faster due to speed and weaker gravity. Adjustments are vital!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know GPS satellites are actually time travelers \ud83e\udd2f?\n\n\ud83d\udca1 GPS satellites are actually time travelers, their clocks tick faster due to speed and weaker gravity. Adjustments are vital!\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "consumer_utility",
+  "characters": "auto"
+}

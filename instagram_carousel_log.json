@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "Why AI Can Count to Billions But Fails at Strawberry 'r's",
-    "Why AI Can Count to Billions But Fails at Strawberry 'r's",
     "Medium (technology): ChatGPT Has Ads Now. Here\u2019s What Actually Changed",
     "99% of Global Internet is on the Ocean Floor",
     "99% of Global Internet is on the Ocean Floor",
@@ -99,10 +98,10 @@
     "AI's Magic Photo Touch",
     "Your Computer's Forgetful Brain",
     "Your Computer's Forgetful Brain",
-    "AI Learns Like a Toddler: Efficient & Robust Learning"
+    "AI Learns Like a Toddler: Efficient & Robust Learning",
+    "GPS Sees Time Warp"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "did you know",
     "threads",
     "tech",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Why AI Can Count to Billions But Fails at Strawberry 'r's",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-06T17:21:04.225628+00:00"
-    },
     {
       "title": "Why AI Can Count to Billions But Fails at Strawberry 'r's",
       "news_source_url": "",
@@ -1370,6 +1360,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-16T17:53:50.021203+00:00"
+    },
+    {
+      "title": "GPS Sees Time Warp",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-16T18:04:04.596623+00:00"
     }
   ]
 }
