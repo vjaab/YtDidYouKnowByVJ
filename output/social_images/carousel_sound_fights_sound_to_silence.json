@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "earbuds",
+  "speaker_right": "vj",
+  "hook": "Did You Know your noise-cancelling headphones literally fight sound with sound? \ud83e\udd2f",
+  "headline": "Sound Fights Sound to Silence",
+  "source": "Acoustical Society of America / HowStuffWorks Science",
+  "slides": [
+    {
+      "speaker": "earbuds",
+      "emotion": "curious",
+      "title": "Mystery of Quiet \ud83c\udfa7",
+      "bubble": "How do noise-cancelling headphones make everything so quiet?!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Sound vs. Anti-Sound \ud83d\udca5",
+      "bubble": "They literally create an 'anti-sound' to cancel outside noise!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "earbuds",
+      "emotion": "thinking",
+      "title": "The Ripple Effect \ud83c\udf0a",
+      "bubble": "Like two waves crashing perfectly to flatten each other out?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Share the Magic! \u2728",
+      "bubble": "Exactly! Mics hear noise, then headphones play its exact opposite.",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Noise-cancelling headphones use microphones to detect external noise and then generate an 'anti-noise' sound wave\u2014an exact opposite\u2014to cancel out unwanted sounds before they reach your ear, creating astonishing quiet.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know your noise-cancelling headphones literally fight sound with sound? \ud83e\udd2f\n\n\ud83d\udca1 Noise-cancelling headphones use microphones to detect external noise and then generate an 'anti-noise' sound wave\u2014an exact opposite\u2014to cancel out unwanted sounds before they reach your ear, creating astonishing quiet.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "everyday_tech_mysteries",
+  "characters": "auto"
+}
