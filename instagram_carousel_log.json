@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Medium (programming): Vibe Coding Is a Financial Trap: Why Your Weeken",
     "GPS Would Drift 11 Kilometers Daily Without Einstein",
     "Your Phone: A City of Billions",
     "Your Phone: A City of Billions",
@@ -99,10 +98,10 @@
     "Your Voice is a Digital Fingerprint",
     "Magnetic Memory Secrets: How Your Data Lives!",
     "Your Wi-Fi's Secret Path Through Walls",
-    "Your Wi-Fi's Secret Path Through Walls"
+    "Your Wi-Fi's Secret Path Through Walls",
+    "Quantum Tunneling Powers Next-Gen Flash Memory"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "ai energy",
@@ -301,20 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "Medium (programming): Vibe Coding Is a Financial Trap: Why Your Weeken",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-05T19:49:06.461286+00:00"
-    },
     {
       "title": "GPS Would Drift 11 Kilometers Daily Without Einstein",
       "news_source_url": "",
@@ -1371,6 +1360,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-15T19:21:42.602109+00:00"
+    },
+    {
+      "title": "Quantum Tunneling Powers Next-Gen Flash Memory",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-16T06:41:08.618912+00:00"
     }
   ]
 }
