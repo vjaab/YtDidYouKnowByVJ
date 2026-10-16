@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Your Phone: A City of Billions",
-    "Your Phone: A City of Billions",
     "Your Screen Feels Your Electricity",
     "Internet's Invisible Address Book",
     "Internet's Invisible Address Book",
@@ -99,12 +97,11 @@
     "Your Wi-Fi's Secret Path Through Walls",
     "Your Wi-Fi's Secret Path Through Walls",
     "Quantum Tunneling Powers Next-Gen Flash Memory",
-    "Sound Fights Sound to Silence"
+    "Sound Fights Sound to Silence",
+    "How Your Phone Knows Which Way Is Up",
+    "How Your Phone Knows Which Way Is Up"
   ],
   "used_keywords": [
-    "tech",
-    "ai energy",
-    "chatgpt power",
     "gpu electricity",
     "sustainability",
     "did you know",
@@ -301,30 +298,12 @@
     "threads",
     "tech",
     "did you know",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "Your Phone: A City of Billions",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-05T22:10:01.648198+00:00"
-    },
-    {
-      "title": "Your Phone: A City of Billions",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-05T22:11:34.329532+00:00"
-    },
     {
       "title": "Your Screen Feels Your Electricity",
       "news_source_url": "",
@@ -1370,6 +1349,27 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-16T07:09:49.767026+00:00"
+    },
+    {
+      "title": "How Your Phone Knows Which Way Is Up",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-16T11:52:26.455556+00:00"
+    },
+    {
+      "title": "How Your Phone Knows Which Way Is Up",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-16T11:53:50.329935+00:00"
     }
   ]
 }
