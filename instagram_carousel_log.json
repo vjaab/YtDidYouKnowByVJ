@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Why AI Can Count to Billions But Fails at Strawberry 'r's",
-    "Medium (technology): ChatGPT Has Ads Now. Here\u2019s What Actually Changed",
     "99% of Global Internet is on the Ocean Floor",
     "99% of Global Internet is on the Ocean Floor",
     "The Original iPhone Had No Copy-Paste for Two Full Years",
@@ -99,12 +97,11 @@
     "Your Computer's Forgetful Brain",
     "Your Computer's Forgetful Brain",
     "AI Learns Like a Toddler: Efficient & Robust Learning",
-    "GPS Sees Time Warp"
+    "GPS Sees Time Warp",
+    "TeleGeography Ocean Cables: The Internet's Undersea Highways",
+    "TeleGeography Ocean Cables: The Internet's Undersea Highways"
   ],
   "used_keywords": [
-    "did you know",
-    "threads",
-    "tech",
     "did you know",
     "did you know",
     "threads",
@@ -301,30 +298,12 @@
     "threads",
     "tech",
     "did you know",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "Why AI Can Count to Billions But Fails at Strawberry 'r's",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-06T17:22:36.761115+00:00"
-    },
-    {
-      "title": "Medium (technology): ChatGPT Has Ads Now. Here\u2019s What Actually Changed",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-06T19:22:26.654264+00:00"
-    },
     {
       "title": "99% of Global Internet is on the Ocean Floor",
       "news_source_url": "",
@@ -1370,6 +1349,27 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-16T18:04:04.596623+00:00"
+    },
+    {
+      "title": "TeleGeography Ocean Cables: The Internet's Undersea Highways",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-16T18:57:04.903743+00:00"
+    },
+    {
+      "title": "TeleGeography Ocean Cables: The Internet's Undersea Highways",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-16T18:58:13.354819+00:00"
     }
   ]
 }
