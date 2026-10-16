@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Internet's Invisible Address Book",
-    "Internet's Invisible Address Book",
     "Voice AI's Secret Ear",
     "Why AI Can Count to Billions But Fails at Strawberry 'r's",
     "Why AI Can Count to Billions But Fails at Strawberry 'r's",
@@ -99,12 +97,11 @@
     "Sound Fights Sound to Silence",
     "How Your Phone Knows Which Way Is Up",
     "How Your Phone Knows Which Way Is Up",
-    "AI's Magic Photo Touch"
+    "AI's Magic Photo Touch",
+    "Your Computer's Forgetful Brain",
+    "Your Computer's Forgetful Brain"
   ],
   "used_keywords": [
-    "sustainability",
-    "did you know",
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,30 +298,12 @@
     "did you know",
     "threads",
     "tech",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "Internet's Invisible Address Book",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-06T13:34:17.983552+00:00"
-    },
-    {
-      "title": "Internet's Invisible Address Book",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-06T13:35:40.968160+00:00"
-    },
     {
       "title": "Voice AI's Secret Ear",
       "news_source_url": "",
@@ -1370,6 +1349,27 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-16T14:53:09.193275+00:00"
+    },
+    {
+      "title": "Your Computer's Forgetful Brain",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-16T15:27:59.047798+00:00"
+    },
+    {
+      "title": "Your Computer's Forgetful Brain",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-16T15:29:07.765106+00:00"
     }
   ]
 }
