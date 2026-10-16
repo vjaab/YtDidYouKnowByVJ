@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Screen Feels Your Electricity",
     "Internet's Invisible Address Book",
     "Internet's Invisible Address Book",
     "Voice AI's Secret Ear",
@@ -99,10 +98,10 @@
     "Quantum Tunneling Powers Next-Gen Flash Memory",
     "Sound Fights Sound to Silence",
     "How Your Phone Knows Which Way Is Up",
-    "How Your Phone Knows Which Way Is Up"
+    "How Your Phone Knows Which Way Is Up",
+    "AI's Magic Photo Touch"
   ],
   "used_keywords": [
-    "gpu electricity",
     "sustainability",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "Your Screen Feels Your Electricity",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-06T08:15:35.473050+00:00"
-    },
     {
       "title": "Internet's Invisible Address Book",
       "news_source_url": "",
@@ -1370,6 +1360,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-16T11:53:50.329935+00:00"
+    },
+    {
+      "title": "AI's Magic Photo Touch",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-16T14:53:09.193275+00:00"
     }
   ]
 }

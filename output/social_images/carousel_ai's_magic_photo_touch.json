@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "camera",
+  "speaker_right": "vj",
+  "hook": "Did You Know your phone camera doesn't just 'take' a photo, it often *builds* it using AI? \ud83e\udd2f",
+  "headline": "AI's Magic Photo Touch",
+  "source": "Google AI Blog: Computational Photography; Apple's Deep Fusion Whitepaper",
+  "slides": [
+    {
+      "speaker": "camera",
+      "emotion": "shocked",
+      "title": "My Photos Look TOO Good?! \ud83d\udcf8",
+      "bubble": "My phone photos look too perfect. Is it magic or a trick?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "AI's Hidden Art \ud83e\udde0",
+      "bubble": "It's AI magic! Your phone takes dozens of hidden shots.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "curious",
+      "title": "Building The Perfect Shot \u2728",
+      "bubble": "So, AI combines best parts from all those photos, instantly?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Share The Photo Secret \ud83e\udd2b",
+      "bubble": "Exactly! Share this AI photo secret with your friends now!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "When you snap a photo with your smartphone, it might feel like a single click captures a moment. But behind the scenes, your phone often takes *dozens* of rapid-fire pictures, then uses a tiny AI brain to instantly combine them. It intelligently picks the best parts \u2013 like the sharpest details, brightest colors, and clearest faces \u2013 to create one perfect, stunning image, all before you even see the final result!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know your phone camera doesn't just 'take' a photo, it often *builds* it using AI? \ud83e\udd2f\n\n\ud83d\udca1 When you snap a photo with your smartphone, it might feel like a single click captures a moment. But behind the scenes, your phone often takes *dozens* of rapid-fire pictures, then uses a tiny AI brain to instantly combine them. It intelligently picks the best parts \u2013 like the sharpest details, brightest colors, and clearest faces \u2013 to create one perfect, stunning image, all before you even see the final result!\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "consumer_utility",
+  "characters": "auto"
+}
