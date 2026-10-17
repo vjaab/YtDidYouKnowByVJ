@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "99% of Global Internet is on the Ocean Floor",
     "The Original iPhone Had No Copy-Paste for Two Full Years",
     "The Original iPhone Had No Copy-Paste for Two Full Years",
     "GPT-4 Was Trained on More Text Than You Could Read in 20,000 Years",
@@ -99,10 +98,10 @@
     "GPS Sees Time Warp",
     "TeleGeography Ocean Cables: The Internet's Undersea Highways",
     "TeleGeography Ocean Cables: The Internet's Undersea Highways",
-    "Your Phone's Secret Energy Kitchen"
+    "Your Phone's Secret Energy Kitchen",
+    "Your Internet: A Beam of Light"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "wifi",
@@ -301,20 +300,10 @@
     "did you know",
     "threads",
     "tech",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "99% of Global Internet is on the Ocean Floor",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-06T20:32:02.004688+00:00"
-    },
     {
       "title": "The Original iPhone Had No Copy-Paste for Two Full Years",
       "news_source_url": "",
@@ -1370,6 +1359,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-17T08:12:57.912615+00:00"
+    },
+    {
+      "title": "Your Internet: A Beam of Light",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-17T08:53:42.869714+00:00"
     }
   ]
 }
