@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know the very first computer 'bug' was an actual moth? \ud83d\udc1b\ud83e\udd2f",
+  "headline": "The Real Reason for 'Bugs' in Tech",
+  "source": "National Museum of American History, Smithsonian Institution",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Real 'Bug' in Computers? \ud83d\udc1b",
+      "bubble": "Did you know the first computer 'bug' was a real moth?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "1947 Moth Incident \ud83d\udd70\ufe0f",
+      "bubble": "Yes! In 1947, a real moth caused a computer malfunction.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "What Computer Was It? \ud83d\udcbb",
+      "bubble": "A real moth? What kind of computer was it?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Harvard Mark II \u2699\ufe0f",
+      "bubble": "It was the Harvard Mark II, a huge early computing machine.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "How Was It Found? \ud83d\udd75\ufe0f",
+      "bubble": "How did they find a tiny moth inside that giant machine?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Grace Hopper's Discovery \ud83d\udca1",
+      "bubble": "Pioneering scientist Grace Hopper found it, removing the insect.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Origin of 'Debugging' \u2728",
+      "bubble": "Mind-blowing! \ud83d\udccc Tap Save so you have this in your toolkit!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "The term 'bug' in tech comes from a real moth found in the Harvard Mark II computer in 1947 by Grace Hopper, who taped it into the logbook, coining 'debugging'.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nThe very first computer 'bug' was an actual moth! Yes, a real insect!\n\nHere's the mind-blowing reality:\n\ud83d\udc1b In 1947, engineers on the Harvard Mark II found a mysterious malfunction.\n\ud83d\udc69\u200d\ud83d\udcbb Pioneering computer scientist Grace Hopper discovered the culprit: a moth trapped in a relay!\n\ud83d\udcdc She famously taped the insect into the logbook, declaring they were 'debugging' the system.\n\nThis tiny creature quite literally gave us the term for fixing all our tech glitches today!\n\n\ud83d\udccc Tap Save so you don't lose this amazing fact!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #GraceHopper #ComputerScience #Debugging #TechHistory",
+  "vector": "hardware_megastructures",
+  "characters": "auto"
+}
