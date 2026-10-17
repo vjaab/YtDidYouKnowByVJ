@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "Airplane Mode Doesn't Actually Stop Your Phone From Being Tracked",
-    "Airplane Mode Doesn't Actually Stop Your Phone From Being Tracked",
     "How AI Generates Images from Pure Static Noise",
     "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
     "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
@@ -99,10 +98,10 @@
     "Your Internet: A Beam of Light",
     "Bayer Filter: Phone Camera Color Vision",
     "Bayer Filter: Phone Camera Color Vision",
-    "The Real Reason for 'Bugs' in Tech"
+    "The Real Reason for 'Bugs' in Tech",
+    "Mobile SoC Architecture: Your Phone's Tiny Hot Plate"
   ],
   "used_keywords": [
-    "diffraction",
     "physics",
     "did you know",
     "nintendo",
@@ -301,19 +300,10 @@
     "did you know",
     "threads",
     "tech",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Airplane Mode Doesn't Actually Stop Your Phone From Being Tracked",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-07T17:54:13.867274+00:00"
-    },
     {
       "title": "Airplane Mode Doesn't Actually Stop Your Phone From Being Tracked",
       "news_source_url": "",
@@ -1369,6 +1359,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-17T14:40:05.562174+00:00"
+    },
+    {
+      "title": "Mobile SoC Architecture: Your Phone's Tiny Hot Plate",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-17T15:33:15.625704+00:00"
     }
   ]
 }
