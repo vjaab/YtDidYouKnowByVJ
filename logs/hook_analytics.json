@@ -1467,12 +1467,12 @@
             ]
           },
           "A": {
-            "views": 53,
-            "retention": 0.0990990990990991,
+            "views": 54,
+            "retention": 0.07432432432432433,
             "engagement": 0.0,
-            "swipe_away_rate": 0.2253333333333333,
-            "avg_view_percentage": 10.799999999999999,
-            "count": 3,
+            "swipe_away_rate": 0.419,
+            "avg_view_percentage": 8.1,
+            "count": 4,
             "hook_texts": [
               {
                 "text": "Your AI coding assistant draws terrible charts",
@@ -1487,12 +1487,12 @@
             ]
           }
         },
-        "total_views": 83,
-        "total_videos": 5,
-        "avg_retention": 0.25145945945945947,
+        "total_views": 84,
+        "total_videos": 6,
+        "avg_retention": 0.20954954954954955,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.14165999999999998,
-        "avg_view_percentage": 25.833999999999996
+        "avg_swipe_away": 0.2847166666666667,
+        "avg_view_percentage": 21.528333333333332
       },
       "stat_contradiction": {
         "variants": {
@@ -1634,13 +1634,13 @@
       "avg_view_percentage": 19.08392857142857
     },
     "personal_stake": {
-      "views": 461,
-      "retention": 0.1994918297613281,
-      "engagement": 0.00303030303030303,
-      "count": 30,
-      "swipe_away_rate": 0.2625033333333334,
-      "avg_view_percentage": 26.09733333333333
+      "views": 462,
+      "retention": 0.19305660944644654,
+      "engagement": 0.0029325513196480934,
+      "count": 31,
+      "swipe_away_rate": 0.28629354838709686,
+      "avg_view_percentage": 25.25548387096774
     }
   },
-  "last_updated": "2026-10-15T14:19:12.669146"
+  "last_updated": "2026-10-17T10:29:42.489061"
 }
