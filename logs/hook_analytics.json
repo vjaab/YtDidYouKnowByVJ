@@ -1569,18 +1569,23 @@
             "engagement": 0.0,
             "swipe_away_rate": 0.0,
             "avg_view_percentage": 0.0,
-            "count": 1,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "Your cloud vision API is now obsolete",
                 "video_id": "LI-ILa4swg8",
                 "recorded_at": "2026-10-15T14:19:12.669114"
+              },
+              {
+                "text": "Your AI agent setup is secretly outdated.",
+                "video_id": "7ffX3VPhyn0",
+                "recorded_at": "2026-10-17T18:10:39.830846"
               }
             ]
           }
         },
         "total_views": 0,
-        "total_videos": 1,
+        "total_videos": 2,
         "avg_retention": 0.0,
         "avg_engagement": 0.0,
         "avg_swipe_away": 0.0,
@@ -1642,11 +1647,11 @@
     },
     "curiosity_gap": {
       "views": 477,
-      "retention": 0.18506476420069115,
-      "engagement": 0.0033891142663962136,
-      "count": 28,
-      "swipe_away_rate": 0.23773214285714286,
-      "avg_view_percentage": 19.08392857142857
+      "retention": 0.1786832206075639,
+      "engagement": 0.0032722482572101375,
+      "count": 29,
+      "swipe_away_rate": 0.2295344827586207,
+      "avg_view_percentage": 18.425862068965515
     },
     "personal_stake": {
       "views": 462,
@@ -1657,5 +1662,5 @@
       "avg_view_percentage": 25.25548387096774
     }
   },
-  "last_updated": "2026-10-17T13:09:25.530630"
+  "last_updated": "2026-10-17T18:10:39.830879"
 }

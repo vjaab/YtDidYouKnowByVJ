@@ -1558,5 +1558,15 @@
     "title": "Did You Know This $5 Chip Can Hack Hardware? \ud83e\udd2f",
     "uploaded_at": "2026-10-17T13:09:25.536644",
     "synced": false
+  },
+  "7ffX3VPhyn0": {
+    "video_id": "7ffX3VPhyn0",
+    "hook_pattern": "curiosity_gap",
+    "hook_variant": "C",
+    "hook_text": "Your AI agent setup is secretly outdated.",
+    "category": "Tech Gadgets & Inventions",
+    "title": "The Hidden AI Tool That Changes Everything \ud83e\udd2b",
+    "uploaded_at": "2026-10-17T18:10:39.834003",
+    "synced": false
   }
 }

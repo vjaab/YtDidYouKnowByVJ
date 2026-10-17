@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_Energetic_Pop.mp3",
+      "headline": "Cloudflare Clef Makes Your Agent Router Obsolete",
+      "topic_type": "auto",
+      "timestamp": "39053694510"
+    },
+    {
       "track": "jam_Energy.mp3",
       "headline": "geo-tp/ESP32-Bit-Pirate \u2014 A Hardware Hacking Tool with Web-Based CLI That Speaks",
       "topic_type": "auto",
@@ -173,12 +179,6 @@
       "headline": "XiaomiMiMo/MiMo-V2.6-Pro-RL on Hugging Face Hub",
       "topic_type": "auto",
       "timestamp": "36261558315"
-    },
-    {
-      "track": "Defiance.mp3",
-      "headline": "Bug Hunter #9: Audio8-ASR-Infinite \u2014 Free Local Transcription That Kills OpenAI ",
-      "topic_type": "auto",
-      "timestamp": "36216311576"
     }
   ],
   "usage_counts": {
@@ -193,7 +193,7 @@
     "jam_Upbeat.mp3": 3,
     "modern_tech.mp3": 3,
     "jam_Elite.mp3": 3,
-    "jam_Energetic_Pop.mp3": 2,
+    "jam_Energetic_Pop.mp3": 3,
     "jam_Groovy_SIX.mp3": 2
   }
 }
