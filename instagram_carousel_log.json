@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "99% of Global Internet is on the Ocean Floor",
-    "99% of Global Internet is on the Ocean Floor",
     "The Original iPhone Had No Copy-Paste for Two Full Years",
     "The Original iPhone Had No Copy-Paste for Two Full Years",
     "GPT-4 Was Trained on More Text Than You Could Read in 20,000 Years",
@@ -99,10 +98,10 @@
     "AI Learns Like a Toddler: Efficient & Robust Learning",
     "GPS Sees Time Warp",
     "TeleGeography Ocean Cables: The Internet's Undersea Highways",
-    "TeleGeography Ocean Cables: The Internet's Undersea Highways"
+    "TeleGeography Ocean Cables: The Internet's Undersea Highways",
+    "Your Phone's Secret Energy Kitchen"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "99% of Global Internet is on the Ocean Floor",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-06T20:30:39.398067+00:00"
-    },
     {
       "title": "99% of Global Internet is on the Ocean Floor",
       "news_source_url": "",
@@ -1370,6 +1360,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-16T18:58:13.354819+00:00"
+    },
+    {
+      "title": "Your Phone's Secret Energy Kitchen",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-17T08:12:57.912615+00:00"
     }
   ]
 }
