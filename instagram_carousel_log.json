@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "The Original iPhone Had No Copy-Paste for Two Full Years",
-    "The Original iPhone Had No Copy-Paste for Two Full Years",
     "GPT-4 Was Trained on More Text Than You Could Read in 20,000 Years",
     "Airplane Mode Doesn't Actually Stop Your Phone From Being Tracked",
     "Airplane Mode Doesn't Actually Stop Your Phone From Being Tracked",
@@ -99,12 +97,11 @@
     "TeleGeography Ocean Cables: The Internet's Undersea Highways",
     "TeleGeography Ocean Cables: The Internet's Undersea Highways",
     "Your Phone's Secret Energy Kitchen",
-    "Your Internet: A Beam of Light"
+    "Your Internet: A Beam of Light",
+    "Bayer Filter: Phone Camera Color Vision",
+    "Bayer Filter: Phone Camera Color Vision"
   ],
   "used_keywords": [
-    "threads",
-    "tech",
-    "wifi",
     "radio waves",
     "diffraction",
     "physics",
@@ -301,30 +298,12 @@
     "threads",
     "tech",
     "did you know",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "The Original iPhone Had No Copy-Paste for Two Full Years",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-07T13:47:08.805426+00:00"
-    },
-    {
-      "title": "The Original iPhone Had No Copy-Paste for Two Full Years",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-07T13:48:22.718141+00:00"
-    },
     {
       "title": "GPT-4 Was Trained on More Text Than You Could Read in 20,000 Years",
       "news_source_url": "",
@@ -1369,6 +1348,27 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-17T08:53:42.869714+00:00"
+    },
+    {
+      "title": "Bayer Filter: Phone Camera Color Vision",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-17T09:45:20.021677+00:00"
+    },
+    {
+      "title": "Bayer Filter: Phone Camera Color Vision",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-17T09:46:42.696871+00:00"
     }
   ]
 }
