@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_Energy.mp3",
+      "headline": "geo-tp/ESP32-Bit-Pirate \u2014 A Hardware Hacking Tool with Web-Based CLI That Speaks",
+      "topic_type": "auto",
+      "timestamp": "39031107308"
+    },
+    {
       "track": "jam_Action_Inspiration_Trailer.mp3",
       "headline": "MiniCPM-V-4.7-35B-A3B: The 3B Open Model That Just Killed Your Vision API Bill",
       "topic_type": "auto",
@@ -173,16 +179,10 @@
       "headline": "Bug Hunter #9: Audio8-ASR-Infinite \u2014 Free Local Transcription That Kills OpenAI ",
       "topic_type": "auto",
       "timestamp": "36216311576"
-    },
-    {
-      "track": "Destiny.mp3",
-      "headline": "HF Trending Model: Hemmingway-1",
-      "topic_type": "auto",
-      "timestamp": "36181858977"
     }
   ],
   "usage_counts": {
-    "jam_Energy.mp3": 5,
+    "jam_Energy.mp3": 6,
     "jam_Action_Inspiration_Trailer.mp3": 4,
     "jam_The_Epic.mp3": 3,
     "jam_Escape_From_The_Machine_Planet.mp3": 3,
