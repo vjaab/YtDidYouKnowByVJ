@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Airplane Mode Doesn't Actually Stop Your Phone From Being Tracked",
-    "How AI Generates Images from Pure Static Noise",
     "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
     "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
     "Why ChatGPT Actually Forgets You",
@@ -99,12 +97,11 @@
     "Bayer Filter: Phone Camera Color Vision",
     "Bayer Filter: Phone Camera Color Vision",
     "The Real Reason for 'Bugs' in Tech",
-    "Mobile SoC Architecture: Your Phone's Tiny Hot Plate"
+    "Mobile SoC Architecture: Your Phone's Tiny Hot Plate",
+    "Qi Standard: The Invisible Energy Bridge",
+    "Qi Standard: The Invisible Energy Bridge"
   ],
   "used_keywords": [
-    "physics",
-    "did you know",
-    "nintendo",
     "gaming history",
     "hanafuda",
     "tech companies",
@@ -301,30 +298,12 @@
     "threads",
     "tech",
     "did you know",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "Airplane Mode Doesn't Actually Stop Your Phone From Being Tracked",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-07T17:55:34.882188+00:00"
-    },
-    {
-      "title": "How AI Generates Images from Pure Static Noise",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-07T19:53:55.322136+00:00"
-    },
     {
       "title": "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
       "news_source_url": "",
@@ -1369,6 +1348,27 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-17T15:33:15.625704+00:00"
+    },
+    {
+      "title": "Qi Standard: The Invisible Energy Bridge",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-17T16:35:03.698781+00:00"
+    },
+    {
+      "title": "Qi Standard: The Invisible Energy Bridge",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-17T16:36:09.911467+00:00"
     }
   ]
 }
