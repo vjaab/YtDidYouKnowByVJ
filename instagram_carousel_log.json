@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Why ChatGPT Actually Forgets You",
-    "Why ChatGPT Actually Forgets You",
     "Self-Attention Costs Double When You Double Text Length",
     "RLHF Makes AI Sycophantic Rather Than Honest",
     "RLHF Makes AI Sycophantic Rather Than Honest",
@@ -99,17 +97,11 @@
     "Qi Standard: The Invisible Energy Bridge",
     "Qi Standard: The Invisible Energy Bridge",
     "DDPM: How AI Creates Images from Pure Noise",
-    "Touchscreen Tech: Capacitive Sensing & Gesture Engineering"
+    "Touchscreen Tech: Capacitive Sensing & Gesture Engineering",
+    "AI's Perfect Imposters: The Deepfake Reality",
+    "AI's Perfect Imposters: The Deepfake Reality"
   ],
   "used_keywords": [
-    "tech companies",
-    "did you know",
-    "threads",
-    "tech",
-    "did you know",
-    "did you know",
-    "threads",
-    "tech",
     "did you know",
     "did you know",
     "threads",
@@ -301,30 +293,17 @@
     "threads",
     "tech",
     "did you know",
-    "did you know"
+    "did you know",
+    "deepfake",
+    "AI",
+    "generative AI",
+    "fake video",
+    "digital illusion",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "Why ChatGPT Actually Forgets You",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-08T13:56:22.757797+00:00"
-    },
-    {
-      "title": "Why ChatGPT Actually Forgets You",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-08T13:57:41.351358+00:00"
-    },
     {
       "title": "Self-Attention Costs Double When You Double Text Length",
       "news_source_url": "",
@@ -1364,6 +1343,32 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-18T08:53:10.407255+00:00"
+    },
+    {
+      "title": "AI's Perfect Imposters: The Deepfake Reality",
+      "news_source_url": "",
+      "keywords": [
+        "deepfake",
+        "AI",
+        "generative AI",
+        "fake video",
+        "digital illusion",
+        "did you know"
+      ],
+      "source": "Leading AI research institutions and cybersecurity experts on generative AI and media manipulation.",
+      "platform": "threads",
+      "timestamp": "2026-10-18T09:53:30.168331+00:00"
+    },
+    {
+      "title": "AI's Perfect Imposters: The Deepfake Reality",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-18T09:54:25.035787+00:00"
     }
   ]
 }

@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know AI can make someone appear to say or do things they never did, so realistically it's hard to tell? \ud83e\udd2f",
+  "headline": "AI's Perfect Imposters: The Deepfake Reality",
+  "source": "Leading AI research institutions and cybersecurity experts on generative AI and media manipulation.",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Your Eyes Lie? \ud83d\udc41\ufe0f",
+      "bubble": "Can AI truly make people say things they never did?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Digital Puppets \ud83e\udd16",
+      "bubble": "Yes! AI learns your face, voice, then creates new fake videos.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Beyond Real! \ud83e\udd2f",
+      "bubble": "It's a digital puppeteer making anyone perform any script.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Truth or Tech? \ud83e\udd14",
+      "bubble": "Can you always trust what you see or hear online now?",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Imagine a digital puppeteer that can take a person's voice and face, then make them perform any script or action in a video, indistinguishable from reality.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know AI can make someone appear to say or do things they never did, so realistically it's hard to tell? \ud83e\udd2f\n\n\ud83d\udca1 Imagine a digital puppeteer that can take a person's voice and face, then make them perform any script or action in a video, indistinguishable from reality.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "cybersecurity_secrets",
+  "characters": "auto"
+}
