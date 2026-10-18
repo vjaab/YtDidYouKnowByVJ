@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
     "Why ChatGPT Actually Forgets You",
     "Why ChatGPT Actually Forgets You",
     "Self-Attention Costs Double When You Double Text Length",
@@ -99,10 +98,10 @@
     "Mobile SoC Architecture: Your Phone's Tiny Hot Plate",
     "Qi Standard: The Invisible Energy Bridge",
     "Qi Standard: The Invisible Energy Bridge",
-    "DDPM: How AI Creates Images from Pure Noise"
+    "DDPM: How AI Creates Images from Pure Noise",
+    "Touchscreen Tech: Capacitive Sensing & Gesture Engineering"
   ],
   "used_keywords": [
-    "hanafuda",
     "tech companies",
     "did you know",
     "threads",
@@ -301,20 +300,10 @@
     "did you know",
     "threads",
     "tech",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-07T20:49:25.698099+00:00"
-    },
     {
       "title": "Why ChatGPT Actually Forgets You",
       "news_source_url": "",
@@ -1365,6 +1354,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-18T08:30:33.940589+00:00"
+    },
+    {
+      "title": "Touchscreen Tech: Capacitive Sensing & Gesture Engineering",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-18T08:53:10.407255+00:00"
     }
   ]
 }
