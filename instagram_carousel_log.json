@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
-    "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
     "Why ChatGPT Actually Forgets You",
     "Why ChatGPT Actually Forgets You",
     "Self-Attention Costs Double When You Double Text Length",
@@ -99,10 +98,10 @@
     "The Real Reason for 'Bugs' in Tech",
     "Mobile SoC Architecture: Your Phone's Tiny Hot Plate",
     "Qi Standard: The Invisible Energy Bridge",
-    "Qi Standard: The Invisible Energy Bridge"
+    "Qi Standard: The Invisible Energy Bridge",
+    "DDPM: How AI Creates Images from Pure Noise"
   ],
   "used_keywords": [
-    "gaming history",
     "hanafuda",
     "tech companies",
     "did you know",
@@ -301,23 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
-      "news_source_url": "",
-      "keywords": [
-        "nvidia",
-        "gpu",
-        "transistors",
-        "semiconductor",
-        "did you know"
-      ],
-      "source": "NVIDIA Blackwell Architecture Whitepaper",
-      "platform": "threads",
-      "timestamp": "2026-10-07T20:47:59.772246+00:00"
-    },
     {
       "title": "A Single GPU Chip Contains More Transistors Than Stars in the Milky Way",
       "news_source_url": "",
@@ -1369,6 +1355,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-17T16:36:09.911467+00:00"
+    },
+    {
+      "title": "DDPM: How AI Creates Images from Pure Noise",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-18T08:30:33.940589+00:00"
     }
   ]
 }
