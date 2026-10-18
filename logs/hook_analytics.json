@@ -1401,26 +1401,31 @@
         "variants": {
           "C": {
             "views": 16,
-            "retention": 0.30357142857142855,
+            "retention": 0.20238095238095236,
             "engagement": 0.0,
-            "swipe_away_rate": 0.17945,
-            "avg_view_percentage": 32.055,
-            "count": 2,
+            "swipe_away_rate": 0.11963333333333333,
+            "avg_view_percentage": 21.37,
+            "count": 3,
             "hook_texts": [
               {
                 "text": "You are probably building AI memory completely wrong.",
                 "video_id": "4B8fp5-weZ4",
                 "recorded_at": "2026-10-04T19:06:32.273016"
+              },
+              {
+                "text": "Stop waiting for Apple Intelligence this exists",
+                "video_id": "oWkMtg--aY0",
+                "recorded_at": "2026-10-18T13:31:07.187387"
               }
             ]
           }
         },
         "total_views": 16,
-        "total_videos": 2,
-        "avg_retention": 0.30357142857142855,
+        "total_videos": 3,
+        "avg_retention": 0.20238095238095236,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.17945,
-        "avg_view_percentage": 32.055
+        "avg_swipe_away": 0.11963333333333333,
+        "avg_view_percentage": 21.37
       }
     },
     "Facts & Trivia": {
@@ -1623,11 +1628,11 @@
   "global": {
     "negative_warning": {
       "views": 459,
-      "retention": 0.15864214173286345,
-      "engagement": 0.004825036075036075,
-      "count": 28,
-      "swipe_away_rate": 0.2639250000000001,
-      "avg_view_percentage": 21.162499999999998
+      "retention": 0.15317172305241988,
+      "engagement": 0.004658655520724486,
+      "count": 29,
+      "swipe_away_rate": 0.2548241379310346,
+      "avg_view_percentage": 20.432758620689654
     },
     "result_first": {
       "views": 1014,
@@ -1662,5 +1667,5 @@
       "avg_view_percentage": 25.25548387096774
     }
   },
-  "last_updated": "2026-10-18T10:48:27.966143"
+  "last_updated": "2026-10-18T13:31:07.187435"
 }
