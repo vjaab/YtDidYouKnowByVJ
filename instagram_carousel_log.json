@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "RLHF Makes AI Sycophantic Rather Than Honest",
-    "RLHF Makes AI Sycophantic Rather Than Honest",
     "Mixture of Experts Only Wakes Up 3% of the Brain",
     "EV Batteries Check Cell Health 1,000 Times Every Second",
     "EV Batteries Check Cell Health 1,000 Times Every Second",
@@ -99,10 +98,10 @@
     "Touchscreen Tech: Capacitive Sensing & Gesture Engineering",
     "AI's Perfect Imposters: The Deepfake Reality",
     "AI's Perfect Imposters: The Deepfake Reality",
-    "Your Brain's AI Twin: Learning Speed"
+    "Your Brain's AI Twin: Learning Speed",
+    "Sand to Silicon: Chip Manufacturing Deep Dive"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "AI learning",
     "machine learning",
     "artificial intelligence",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "RLHF Makes AI Sycophantic Rather Than Honest",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-08T17:57:11.139254+00:00"
-    },
     {
       "title": "RLHF Makes AI Sycophantic Rather Than Honest",
       "news_source_url": "",
@@ -1368,6 +1358,16 @@
       "source": "MIT Technology Review on AI training speeds",
       "platform": "instagram",
       "timestamp": "2026-10-18T15:09:24.724433+00:00"
+    },
+    {
+      "title": "Sand to Silicon: Chip Manufacturing Deep Dive",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-18T15:52:12.825498+00:00"
     }
   ]
 }
