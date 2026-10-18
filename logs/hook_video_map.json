@@ -1547,7 +1547,21 @@
     "category": "Tech Gadgets & Inventions",
     "title": "Why 99% Of Vision APIs Just Died \u26a1",
     "uploaded_at": "2026-10-15T14:19:12.672195",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-18T10:48:27.967709",
+    "last_metrics": {
+      "views": 24,
+      "avg_view_duration_sec": 15.0,
+      "avg_view_percentage": 52.68,
+      "swipe_away_rate": 0.4732,
+      "duration_sec": 30.0,
+      "retention_rate": 0.5,
+      "engagement_rate": 0.0417,
+      "likes": 1,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "_YA11v0CKVA": {
     "video_id": "_YA11v0CKVA",
