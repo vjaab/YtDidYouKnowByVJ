@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "AI learns skills in seconds, brains take years? \ud83e\udd2f",
+  "headline": "Your Brain's AI Twin: Learning Speed",
+  "source": "MIT Technology Review on AI training speeds",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "AI Learns Super Fast? \u26a1",
+      "bubble": "VJ, can AI really learn a new skill in seconds?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Seconds vs. Years \u23f1\ufe0f",
+      "bubble": "Absolutely! Think recognizing a cat, AI does it in minutes!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "thinking",
+      "title": "Millions of Cat Pics \ud83d\udc08",
+      "bubble": "Minutes? How can it see millions of cat pictures so fast?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Data Overload \ud83d\udcc8",
+      "bubble": "It's fed massive datasets. Our brains build slowly through experience.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "thinking",
+      "title": "Brain Connections \ud83e\udde0",
+      "bubble": "So AI mimics learning, but not exactly human understanding?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Different Paths \ud83d\udee3\ufe0f",
+      "bubble": "Exactly. AI excels at pattern recognition, we learn context deeply.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Learn This Fact! \ud83d\udca1",
+      "bubble": "\ud83d\udccc Save this for your tech toolkit! Follow @vijayakumarj_ai!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "AI learns skills in seconds by processing vast data, while human brains learn gradually through experience over years.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nAI can learn a new skill in mere seconds, while our human brains can take years to master the same task! \ud83e\udd2f\n\nHere's the breakdown:\n\ud83d\udd39 AI trains on millions of data points in minutes.\n\ud83d\udd39 Our brains build connections slowly through experience and repetition.\n\ud83d\udd39 This highlights AI's power in pattern recognition versus human depth of understanding.\n\n\ud83d\udccc Tap Save so you have this in your toolkit!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #AI #ArtificialIntelligence #BrainVsAI #LearningSpeed #FutureTech #VijayaKumarAI",
+  "vector": "ai_secrets",
+  "characters": "auto"
+}

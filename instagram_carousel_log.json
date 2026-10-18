@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Self-Attention Costs Double When You Double Text Length",
     "RLHF Makes AI Sycophantic Rather Than Honest",
     "RLHF Makes AI Sycophantic Rather Than Honest",
     "Mixture of Experts Only Wakes Up 3% of the Brain",
@@ -99,13 +98,10 @@
     "DDPM: How AI Creates Images from Pure Noise",
     "Touchscreen Tech: Capacitive Sensing & Gesture Engineering",
     "AI's Perfect Imposters: The Deepfake Reality",
-    "AI's Perfect Imposters: The Deepfake Reality"
+    "AI's Perfect Imposters: The Deepfake Reality",
+    "Your Brain's AI Twin: Learning Speed"
   ],
   "used_keywords": [
-    "did you know",
-    "did you know",
-    "threads",
-    "tech",
     "did you know",
     "did you know",
     "threads",
@@ -301,23 +297,13 @@
     "digital illusion",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "AI learning",
+    "machine learning",
+    "artificial intelligence",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "Self-Attention Costs Double When You Double Text Length",
-      "news_source_url": "",
-      "keywords": [
-        "transformer",
-        "self attention",
-        "quadratic cost",
-        "context length",
-        "did you know"
-      ],
-      "source": "Attention Is All You Need (Vaswani et al.)",
-      "platform": "instagram",
-      "timestamp": "2026-10-08T17:21:51.713694+00:00"
-    },
     {
       "title": "RLHF Makes AI Sycophantic Rather Than Honest",
       "news_source_url": "",
@@ -1369,6 +1355,19 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-18T09:54:25.035787+00:00"
+    },
+    {
+      "title": "Your Brain's AI Twin: Learning Speed",
+      "news_source_url": "",
+      "keywords": [
+        "AI learning",
+        "machine learning",
+        "artificial intelligence",
+        "did you know"
+      ],
+      "source": "MIT Technology Review on AI training speeds",
+      "platform": "instagram",
+      "timestamp": "2026-10-18T15:09:24.724433+00:00"
     }
   ]
 }

@@ -1,0 +1,213 @@
+{
+  "headline": "AI Prompt Library: Ultimate Efficiency Hack",
+  "summary": "An open-source prompt library lets developers discover, version, and reuse battle-tested LLM prompts via a CLI, bringing software engineering rigor to prompt engineering.",
+  "source": "Medium - artificial-intelligence",
+  "source_url": "",
+  "date": "18 Oct 2026",
+  "category": "AI_ML",
+  "topic_type": "developer_tool",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "scenario_question",
+      "eyebrow": "COMMUNITY / OPEN SOURCE UPDATE",
+      "title": "Stop Rewriting Prompts From Scratch",
+      "subtitle": "A shared library eliminates repetitive prompt engineering.",
+      "body": "Developers waste hours crafting similar prompts for common AI tasks. What if a community-driven library gave you production-ready templates instantly?",
+      "deep_dive": "Prompt engineering often involves reinventing the wheel for recurring tasks like code generation, summarization, or data extraction. This open-source library collects battle-tested prompts, versioned and categorized, so teams can reuse and adapt them instead of starting from zero.",
+      "key_fact": "Community prompt libraries turn repetitive prompt writing into a reusable asset.",
+      "why_it_matters": "Reduces prompt engineering time from hours to minutes for common AI workflows."
+    },
+    {
+      "slide_number": 2,
+      "role": "tool_overview",
+      "layout_type": "whats_new",
+      "eyebrow": "WHAT IT DOES",
+      "title": "Curated, Versioned Prompt Templates",
+      "subtitle": "Search, fork, and adapt prompts for any LLM task.",
+      "body": "The library hosts categorized prompts with metadata, version history, and usage examples. Integrates via CLI or API into your IDE.",
+      "deep_dive": "Think of it as npm for prompts. Each prompt is a package with a schema, version, and test cases. You can pull a prompt for 'SQL generation' or 'code review' and customize it without losing the original.",
+      "key_fact": "Prompts are treated as first-class, versioned artifacts.",
+      "why_it_matters": "Enables prompt reuse, collaboration, and governance across teams.",
+      "before_title": "Before",
+      "before_items": [
+        "Copy-paste prompts from docs",
+        "No version control",
+        "Hard to share across team"
+      ],
+      "after_title": "After",
+      "after_items": [
+        "Searchable registry with metadata",
+        "Semantic versioning per prompt",
+        "CLI/API integration in IDE"
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "core_mechanism",
+      "layout_type": "process_flow",
+      "eyebrow": "EXECUTION FLOW",
+      "title": "From Search to Production in Seconds",
+      "subtitle": "Discover \u2192 Adapt \u2192 Test \u2192 Deploy",
+      "body": "Search by task, clone the prompt, tweak variables, run against test cases, then push to your LLM pipeline.",
+      "deep_dive": "The workflow mirrors code development: you browse a registry, pull a prompt template, fill in your context variables, run it against a test suite (if provided), and then deploy the rendered prompt to your LLM call. All steps are automatable via CLI.",
+      "key_fact": "Prompt lifecycle mirrors software development: version, test, deploy.",
+      "why_it_matters": "Brings software engineering rigor to prompt engineering.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Discover",
+          "desc": "Search registry by task or keyword"
+        },
+        {
+          "step": "2",
+          "title": "Adapt",
+          "desc": "Clone template and fill context variables"
+        },
+        {
+          "step": "3",
+          "title": "Test",
+          "desc": "Run provided test cases against your LLM"
+        },
+        {
+          "step": "4",
+          "title": "Deploy",
+          "desc": "Use rendered prompt in your application"
+        }
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "architecture",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "ARCHITECTURE",
+      "title": "Registry, CLI, and Your LLM Pipeline",
+      "subtitle": "Decoupled components for flexibility.",
+      "body": "A central registry stores prompts. CLI fetches and renders them. Your app calls the LLM with the rendered prompt.",
+      "deep_dive": "The architecture has three main parts: (1) a prompt registry (like a package registry) storing prompt templates with metadata, (2) a CLI tool that fetches, renders, and tests prompts locally, and (3) your application which receives the final prompt string and sends it to any LLM provider. No lock-in.",
+      "key_fact": "Registry + CLI + Your LLM = zero vendor lock-in.",
+      "why_it_matters": "Works with any LLM provider and fits into existing CI/CD.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "Prompt Registry",
+            "sub": "Stores versioned templates"
+          },
+          {
+            "name": "CLI Tool",
+            "sub": "Fetches, renders, tests locally"
+          },
+          {
+            "name": "Your App",
+            "sub": "Calls LLM with final prompt"
+          }
+        ],
+        "connections": [
+          {
+            "label": "Publish / Pull"
+          },
+          {
+            "label": "Render & Test"
+          },
+          {
+            "label": "Send Prompt"
+          }
+        ]
+      }
+    },
+    {
+      "slide_number": 5,
+      "role": "system_workflow",
+      "layout_type": "input_output",
+      "eyebrow": "EXECUTION MECHANICS",
+      "title": "Developer Query \u2192 Rendered Prompt \u2192 LLM Response",
+      "subtitle": "Input: task + context. Output: ready-to-send prompt.",
+      "body": "You specify the task and context variables. The tool resolves the template, injects variables, and outputs the final prompt.",
+      "deep_dive": "The input is a task identifier (e.g., 'generate-unit-tests') and a context object (e.g., code snippet, language). The tool looks up the template, performs variable substitution, runs any pre-flight checks, and returns the complete prompt string. Your code then sends it to the LLM.",
+      "key_fact": "Template resolution and variable injection happen locally, keeping secrets safe.",
+      "why_it_matters": "Keeps sensitive context out of the registry; only the template is shared.",
+      "input": "Task ID + Context Variables (code, language, etc.)",
+      "processing": "Template lookup \u2192 Variable injection \u2192 Pre-flight checks",
+      "output": "Complete prompt string ready for LLM API call"
+    },
+    {
+      "slide_number": 6,
+      "role": "limitations_and_gotchas",
+      "layout_type": "common_mistake",
+      "eyebrow": "PRO TIPS & MISTAKES",
+      "title": "Don't Treat Prompts as Static Strings",
+      "subtitle": "Version, test, and review prompts like code.",
+      "body": "Common mistake: copying a prompt once and never updating. Instead, pin versions, run tests on updates, and review diffs.",
+      "deep_dive": "Prompts degrade as models change. The library encourages pinning a prompt version, running the provided test suite when a new version is released, and reviewing the diff. Also, avoid hardcoding secrets in templates; use variable injection at runtime.",
+      "key_fact": "Prompt drift is real; treat prompts as living artifacts.",
+      "why_it_matters": "Prevents silent failures when models or requirements evolve.",
+      "items": [
+        "Pin prompt versions in your config",
+        "Run test suite on every upgrade",
+        "Review diffs before deploying",
+        "Never hardcode secrets in templates"
+      ]
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "GET STARTED",
+      "title": "Add the Library to Your Workflow Today",
+      "subtitle": "Install CLI, browse registry, ship better prompts faster.",
+      "body": "Run the install command, search for your task, and integrate in minutes. Join the community to contribute.",
+      "deep_dive": "Installation is a single command (e.g., `npm install -g promptlib-cli` or `pip install promptlib`). Then `promptlib search <task>` to find templates. Contribute by submitting PRs to the registry. The project is open source and community-driven.",
+      "key_fact": "One CLI command unlocks hundreds of production-ready prompts.",
+      "why_it_matters": "Immediate productivity boost for any team using LLMs.",
+      "takeaways": [
+        "Install the CLI tool",
+        "Search and test a prompt for your next task",
+        "Contribute improvements back to the community"
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI & engineering updates."
+    }
+  ],
+  "_model_used": "OpenRouter:nvidia/nemotron-3-ultra-550b-a55b:free",
+  "_topic_intelligence": {
+    "topic_type": "developer_tool",
+    "domain": "ai_ml",
+    "primary_entity": "Community / Open Source",
+    "content_depth": "medium",
+    "best_story_angle": "practical_guide",
+    "audience": [
+      "software_engineers",
+      "ai_engineers",
+      "prompt_engineers"
+    ],
+    "key_questions": [
+      "What prompts are included and for which use cases?",
+      "How does this library improve prompting efficiency?",
+      "What evidence or benchmarks show its effectiveness?",
+      "How can developers integrate this into their workflow?"
+    ],
+    "recommended_slide_count": 7
+  },
+  "_archetype": "Developer Tool & IDE Innovation",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "AI Prompt Library: Ultimate Efficiency Hack",
+    "hook": "Did You Know you're typing the same AI prompts hundreds of times? \ud83e\udd2f",
+    "headline": "Unified Large Language Model Prompt Repository Protocol",
+    "fact_summary": "AI users frequently re-enter identical instructions, often hundreds of times, across distinct platforms like ChatGPT, Claude, and Gemini. A breakthrough approach now enables the creation of a centralized, reusable prompt library, drastically reducing repetitive input and optimizing interaction with multiple generative AI models.",
+    "source": "Medium - artificial-intelligence",
+    "news_source_url": "https://medium.com/@REPECH/build-your-own-ai-prompt-library-save-and-reuse-prompts-across-chatgpt-claude-and-gemini-6c1f64e35ffe?source=rss------artificial_intelligence-5",
+    "keywords": [
+      "AI prompts",
+      "prompt engineering",
+      "LLM efficiency",
+      "cross-platform AI",
+      "did you know"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}
