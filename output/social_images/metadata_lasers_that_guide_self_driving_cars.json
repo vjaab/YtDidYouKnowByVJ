@@ -1,0 +1,23 @@
+{
+  "topic": "Lasers That Guide Self-Driving Cars",
+  "category": "AI News",
+  "type": "carousel",
+  "slides": 4,
+  "instagram_images": [
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_self_driving_cars_01.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_self_driving_cars_02.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_self_driving_cars_03.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_did_you_know_self_driving_cars_04.jpg"
+  ],
+  "facebook_images": [
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_did_you_know_self_driving_cars_01.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_did_you_know_self_driving_cars_02.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_did_you_know_self_driving_cars_03.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_did_you_know_self_driving_cars_04.jpg"
+  ],
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know self-driving cars use millions of tiny laser pulses to build a real-time 3D map of the world around them? \ud83e\udd2f\n\n\ud83d\udca1 Self-driving cars use millions of laser pulses to create a real-time 3D map, navigating safely like bats.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!\n\n\ud83d\udc49 Share this with your friends and family so they stay informed & safe!\n\ud83d\udcac Drop your reaction below!\n\n#MachineLearning #DeepLearning #AI #ArtificialIntelligence #LLM #GenerativeAI #RAG #LangChain #PyTorch #TensorFlow #HuggingFace #MLOps #DataScience #Tech #Technology",
+  "hashtags": "#MachineLearning #DeepLearning #AI #ArtificialIntelligence #LLM #GenerativeAI #RAG #LangChain #PyTorch #TensorFlow #HuggingFace #MLOps #DataScience #Tech #Technology",
+  "poll_file": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/poll_lasers_that_guide_self_driving_cars.json",
+  "carousel_json": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_lasers_that_guide_self_driving_cars.json",
+  "generated_at": "2026-10-19T07:46:04.005208+00:00"
+}

@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "earbuds",
+  "speaker_right": "vj",
+  "hook": "Did You Know self-driving cars use millions of tiny laser pulses to build a real-time 3D map of the world around them? \ud83e\udd2f",
+  "headline": "Lasers That Guide Self-Driving Cars",
+  "source": "Automotive & Robotics Engineering",
+  "slides": [
+    {
+      "speaker": "earbuds",
+      "emotion": "curious",
+      "title": "How Do Cars See? \ud83e\uddd0",
+      "bubble": "Self-driving cars only use cameras, right? How do they see at night?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Invisible Laser Vision! \ud83d\udca1",
+      "bubble": "Actually, they fire millions of tiny invisible laser pulses every second!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "earbuds",
+      "emotion": "shocked",
+      "title": "Like a Bat? \ud83e\udd87",
+      "bubble": "So they're like bats, using light to 'see' distances instantly?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Real-Time 3D Map \ud83c\udf0d",
+      "bubble": "Exactly! Creating a super-detailed 3D map for safe navigation. Share this!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Self-driving cars use millions of laser pulses to create a real-time 3D map, navigating safely like bats.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know self-driving cars use millions of tiny laser pulses to build a real-time 3D map of the world around them? \ud83e\udd2f\n\n\ud83d\udca1 Self-driving cars use millions of laser pulses to create a real-time 3D map, navigating safely like bats.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "everyday_tech_mysteries",
+  "characters": "auto"
+}
