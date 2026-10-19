@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "AI is designing future medicines and materials from scratch! \ud83e\udd2f",
+  "headline": "AI Designs Future Drugs & Materials",
+  "source": "Nature, Science, MIT Technology Review (various articles on AI in drug discovery and materials science)",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "AI's New Lab? \ud83e\uddea",
+      "bubble": "VJ, can AI really invent new medicines?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Super-Fast Chemist \u26a1",
+      "bubble": "Yes, VR! Think of AI as a chemist working billions of times faster.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "thinking",
+      "title": "Billions of Molecules \ud83e\uddec",
+      "bubble": "Billions of molecules? How does it even start?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Designing From Scratch \ud83c\udd95",
+      "bubble": "It doesn't just find them, it designs brand new ones.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "thinking",
+      "title": "Fighting Diseases Better? \ud83d\udcaa",
+      "bubble": "So it can design molecules to fight diseases?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "New Materials Too! \ud83d\ude80",
+      "bubble": "Exactly! And super-strong, lightweight materials for space or cars.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Future is Here! \ud83d\udca1",
+      "bubble": "\ud83d\udccc Tap Save for this amazing tech! Follow @vijayakumarj_ai!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "AI is like a super-fast chemist, designing new medicines and materials from scratch, accelerating discoveries for a healthier future.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nAI is not just helping scientists, it's designing brand new medicines and materials from scratch!\n\nHere's the mind-blowing part:\n\ud83d\udd39 AI sifts through billions of molecular possibilities in seconds.\n\ud83d\udd39 It can design entirely new molecules for specific purposes.\n\ud83d\udd39 This accelerates life-saving drug discovery and revolutionary material science.\n\n\ud83d\udccc Tap Save so you have this in your toolkit!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #AIdesign #FutureTech #DrugDiscovery #MaterialsScience #Innovation #TechExplained #VJ",
+  "vector": "ai_secrets",
+  "characters": "auto"
+}

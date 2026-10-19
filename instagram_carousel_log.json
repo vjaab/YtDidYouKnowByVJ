@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "EV Batteries Check Cell Health 1,000 Times Every Second",
-    "EV Batteries Check Cell Health 1,000 Times Every Second",
     "Training AI on AI-Generated Text Causes Model Collapse",
     "Your Smartphone Screen Steals Your Electrons",
     "Your Smartphone Screen Steals Your Electrons",
@@ -99,10 +98,10 @@
     "Your Brain's AI Twin: Learning Speed",
     "Sand to Silicon: Chip Manufacturing Deep Dive",
     "Hard Drives Float on Air: IBM's Nanometer Flight",
-    "Hard Drives Float on Air: IBM's Nanometer Flight"
+    "Hard Drives Float on Air: IBM's Nanometer Flight",
+    "AI Designs Future Drugs & Materials"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "EV Batteries Check Cell Health 1,000 Times Every Second",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-08T20:47:46.977474+00:00"
-    },
     {
       "title": "EV Batteries Check Cell Health 1,000 Times Every Second",
       "news_source_url": "",
@@ -1368,6 +1358,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-18T16:43:26.990715+00:00"
+    },
+    {
+      "title": "AI Designs Future Drugs & Materials",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-19T07:03:32.201948+00:00"
     }
   ]
 }
