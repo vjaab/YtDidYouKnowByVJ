@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_Groovy_SIX.mp3",
+      "headline": "ruvnet/ruflo - The original agent harness for intelligent multi-player swarms",
+      "topic_type": "auto",
+      "timestamp": "39278148243"
+    },
+    {
       "track": "jam_Upbeat.mp3",
       "headline": "ranxianglei/billion-context GitHub repository",
       "topic_type": "auto",
@@ -173,12 +179,6 @@
       "headline": "HF Trending Model: CLM-v0.1-8B",
       "topic_type": "auto",
       "timestamp": "36356800044"
-    },
-    {
-      "track": "jam_The_Epic.mp3",
-      "headline": "HF Trending Model: ZDTaichu5.0-9B",
-      "topic_type": "auto",
-      "timestamp": "36341836707"
     }
   ],
   "usage_counts": {
@@ -194,6 +194,6 @@
     "modern_tech.mp3": 3,
     "jam_Elite.mp3": 3,
     "jam_Energetic_Pop.mp3": 3,
-    "jam_Groovy_SIX.mp3": 2
+    "jam_Groovy_SIX.mp3": 3
   }
 }

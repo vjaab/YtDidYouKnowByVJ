@@ -1602,5 +1602,15 @@
     "title": "Why 99% Of People Waste AI Tokens \u26a1",
     "uploaded_at": "2026-10-18T18:07:36.170337",
     "synced": false
+  },
+  "xOTHSfRsSK0": {
+    "video_id": "xOTHSfRsSK0",
+    "hook_pattern": "negative_warning",
+    "hook_variant": "C",
+    "hook_text": "Don't write another line of code alone.",
+    "category": "Facts & Trivia",
+    "title": "Why 99% Of Developers Get AI Wrong \u26a1",
+    "uploaded_at": "2026-10-19T16:12:33.807742",
+    "synced": false
   }
 }
