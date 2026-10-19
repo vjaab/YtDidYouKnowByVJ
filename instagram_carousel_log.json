@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Phone's Invisible Fingerprint Grid",
     "Medium (machine-learning): Don\u2019t Buy a Mac for Local AI Until You Unde",
     "Medium (machine-learning): Don\u2019t Buy a Mac for Local AI Until You Unde",
     "How AI 'Sees' The World: Pixel By Pixel",
@@ -99,10 +98,10 @@
     "Wi-Fi: Invisible Waves Through Walls",
     "Your Phone's Invisible Listener Brain",
     "Your Phone's Invisible Listener Brain",
-    "Your Phone Listens to Silence"
+    "Your Phone Listens to Silence",
+    "Your Phone's Tiny Superpowers: Microphones"
   ],
   "used_keywords": [
-    "did you know",
     "nvidia",
     "gpu",
     "transistors",
@@ -301,19 +300,10 @@
     "did you know",
     "threads",
     "tech",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Phone's Invisible Fingerprint Grid",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-09T19:21:02.841987+00:00"
-    },
     {
       "title": "Medium (machine-learning): Don\u2019t Buy a Mac for Local AI Until You Unde",
       "news_source_url": "",
@@ -1368,6 +1358,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-19T19:44:25.081898+00:00"
+    },
+    {
+      "title": "Your Phone's Tiny Superpowers: Microphones",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-19T19:56:17.279994+00:00"
     }
   ]
 }
