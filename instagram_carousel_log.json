@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Your GPS Uses Einstein's Physics",
-    "AI's Secret Water Bill",
     "AI's Secret Water Bill",
     "Your Phone's Invisible Fingerprint Grid",
     "Medium (machine-learning): Don\u2019t Buy a Mac for Local AI Until You Unde",
@@ -99,12 +97,11 @@
     "Lasers That Guide Self-Driving Cars",
     "Your Photos' Invisible Shrinking Trick",
     "Your Photos' Invisible Shrinking Trick",
-    "Wi-Fi: Invisible Waves Through Walls"
+    "Wi-Fi: Invisible Waves Through Walls",
+    "Your Phone's Invisible Listener Brain",
+    "Your Phone's Invisible Listener Brain"
   ],
   "used_keywords": [
-    "did you know",
-    "did you know",
-    "threads",
     "tech",
     "did you know",
     "nvidia",
@@ -301,29 +298,12 @@
     "did you know",
     "threads",
     "tech",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "Your GPS Uses Einstein's Physics",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-09T16:57:39.276479+00:00"
-    },
-    {
-      "title": "AI's Secret Water Bill",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-09T17:31:13.501438+00:00"
-    },
     {
       "title": "AI's Secret Water Bill",
       "news_source_url": "",
@@ -1368,6 +1348,27 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-19T16:56:13.712013+00:00"
+    },
+    {
+      "title": "Your Phone's Invisible Listener Brain",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-19T17:39:33.886944+00:00"
+    },
+    {
+      "title": "Your Phone's Invisible Listener Brain",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-19T17:40:47.040801+00:00"
     }
   ]
 }
