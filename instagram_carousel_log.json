@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Training AI on AI-Generated Text Causes Model Collapse",
-    "Your Smartphone Screen Steals Your Electrons",
     "Your Smartphone Screen Steals Your Electrons",
     "Your GPS Uses Einstein's Physics",
     "AI's Secret Water Bill",
@@ -99,17 +97,11 @@
     "Hard Drives Float on Air: IBM's Nanometer Flight",
     "Hard Drives Float on Air: IBM's Nanometer Flight",
     "AI Designs Future Drugs & Materials",
-    "Lasers That Guide Self-Driving Cars"
+    "Lasers That Guide Self-Driving Cars",
+    "Your Photos' Invisible Shrinking Trick",
+    "Your Photos' Invisible Shrinking Trick"
   ],
   "used_keywords": [
-    "threads",
-    "tech",
-    "did you know",
-    "did you know",
-    "threads",
-    "tech",
-    "did you know",
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,33 +293,17 @@
     "threads",
     "tech",
     "did you know",
-    "did you know"
+    "did you know",
+    "image compression",
+    "JPEG",
+    "digital photos",
+    "data storage",
+    "technology",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "Training AI on AI-Generated Text Causes Model Collapse",
-      "news_source_url": "",
-      "keywords": [
-        "model collapse",
-        "synthetic data",
-        "ai training",
-        "machine learning",
-        "did you know"
-      ],
-      "source": "Nature: The Curse of Recursion in Generative Models",
-      "platform": "instagram",
-      "timestamp": "2026-10-09T08:08:40.998913+00:00"
-    },
-    {
-      "title": "Your Smartphone Screen Steals Your Electrons",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-09T13:40:12.800173+00:00"
-    },
     {
       "title": "Your Smartphone Screen Steals Your Electrons",
       "news_source_url": "",
@@ -1367,6 +1343,32 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-19T07:46:05.816686+00:00"
+    },
+    {
+      "title": "Your Photos' Invisible Shrinking Trick",
+      "news_source_url": "",
+      "keywords": [
+        "image compression",
+        "JPEG",
+        "digital photos",
+        "data storage",
+        "technology",
+        "did you know"
+      ],
+      "source": "JPEG (Joint Photographic Experts Group) Standard; Digital Image Processing Fundamentals",
+      "platform": "threads",
+      "timestamp": "2026-10-19T13:54:47.860085+00:00"
+    },
+    {
+      "title": "Your Photos' Invisible Shrinking Trick",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-19T13:55:42.031032+00:00"
     }
   ]
 }

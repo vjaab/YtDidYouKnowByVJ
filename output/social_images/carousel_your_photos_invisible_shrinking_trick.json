@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "camera",
+  "speaker_right": "vj",
+  "hook": "Did You Know how your phone stores thousands of photos in tiny files? \ud83e\udd2f",
+  "headline": "Your Photos' Invisible Shrinking Trick",
+  "source": "JPEG (Joint Photographic Experts Group) Standard; Digital Image Processing Fundamentals",
+  "slides": [
+    {
+      "speaker": "camera",
+      "emotion": "shocked",
+      "title": "Photos Shrink? \ud83e\udd2f",
+      "bubble": "Wait, your phone actually shrinks every photo you take?!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "The Invisible Trick \ud83e\ude84",
+      "bubble": "Yes! It uses clever compression, like JPEG, to save space.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "curious",
+      "title": "Artist's Secret \ud83c\udfa8",
+      "bubble": "So, it simplifies details without changing how we see it?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Your Take? \ud83d\udc47",
+      "bubble": "Exactly! Thousands of photos stored. Is this a good trade-off?",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your phone uses clever 'compression' algorithms, like JPEG, to shrink photos. This saves massive space, making them appear identical while storing thousands.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know how your phone stores thousands of photos in tiny files? \ud83e\udd2f\n\n\ud83d\udca1 Your phone uses clever 'compression' algorithms, like JPEG, to shrink photos. This saves massive space, making them appear identical while storing thousands.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "cybersecurity_secrets",
+  "characters": "auto"
+}
