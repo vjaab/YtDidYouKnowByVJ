@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Medium (machine-learning): Don\u2019t Buy a Mac for Local AI Until You Unde",
-    "Medium (machine-learning): Don\u2019t Buy a Mac for Local AI Until You Unde",
     "How AI 'Sees' The World: Pixel By Pixel",
     "Medium (artificial-intelligence): Local AI vs Cloud AI: Which Is Bette",
     "Medium (artificial-intelligence): Local AI vs Cloud AI: Which Is Bette",
@@ -99,12 +97,11 @@
     "Your Phone's Invisible Listener Brain",
     "Your Phone's Invisible Listener Brain",
     "Your Phone Listens to Silence",
-    "Your Phone's Tiny Superpowers: Microphones"
+    "Your Phone's Tiny Superpowers: Microphones",
+    "CMU Wi-Fi Vision: Smart Speakers Seeing Without Cameras",
+    "CMU Wi-Fi Vision: Smart Speakers Seeing Without Cameras"
   ],
   "used_keywords": [
-    "nvidia",
-    "gpu",
-    "transistors",
     "semiconductor",
     "did you know",
     "threads",
@@ -301,30 +298,12 @@
     "threads",
     "tech",
     "did you know",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "Medium (machine-learning): Don\u2019t Buy a Mac for Local AI Until You Unde",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-09T20:16:03.567513+00:00"
-    },
-    {
-      "title": "Medium (machine-learning): Don\u2019t Buy a Mac for Local AI Until You Unde",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-09T20:17:17.719205+00:00"
-    },
     {
       "title": "How AI 'Sees' The World: Pixel By Pixel",
       "news_source_url": "",
@@ -1368,6 +1347,27 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-19T19:56:17.279994+00:00"
+    },
+    {
+      "title": "CMU Wi-Fi Vision: Smart Speakers Seeing Without Cameras",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-19T20:44:16.876734+00:00"
+    },
+    {
+      "title": "CMU Wi-Fi Vision: Smart Speakers Seeing Without Cameras",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-19T20:45:35.078930+00:00"
     }
   ]
 }
