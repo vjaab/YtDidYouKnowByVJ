@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Smartphone Screen Steals Your Electrons",
     "Your GPS Uses Einstein's Physics",
     "AI's Secret Water Bill",
     "AI's Secret Water Bill",
@@ -99,10 +98,10 @@
     "AI Designs Future Drugs & Materials",
     "Lasers That Guide Self-Driving Cars",
     "Your Photos' Invisible Shrinking Trick",
-    "Your Photos' Invisible Shrinking Trick"
+    "Your Photos' Invisible Shrinking Trick",
+    "Wi-Fi: Invisible Waves Through Walls"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "threads",
@@ -301,20 +300,10 @@
     "technology",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "Your Smartphone Screen Steals Your Electrons",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-09T13:41:35.496479+00:00"
-    },
     {
       "title": "Your GPS Uses Einstein's Physics",
       "news_source_url": "",
@@ -1369,6 +1358,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-19T13:55:42.031032+00:00"
+    },
+    {
+      "title": "Wi-Fi: Invisible Waves Through Walls",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-19T16:56:13.712013+00:00"
     }
   ]
 }

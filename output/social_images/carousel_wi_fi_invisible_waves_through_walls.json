@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "earbuds",
+  "speaker_right": "vj",
+  "hook": "Did You Know your Wi-Fi uses invisible waves to pass through walls and connect your devices? \ud83d\udcf6\ud83e\udd2f",
+  "headline": "Wi-Fi: Invisible Waves Through Walls",
+  "source": "IEEE 802.11 Standards (Wi-Fi), Radio-Electronics.com",
+  "slides": [
+    {
+      "speaker": "earbuds",
+      "emotion": "shocked",
+      "title": "Invisible Internet? \ud83d\udc7b",
+      "bubble": "How does Wi-Fi pass through solid walls? That's mind-blowing!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Radio Waves \ud83d\udcfb",
+      "bubble": "Wi-Fi uses radio waves, just like your car radio or phone.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "earbuds",
+      "emotion": "curious",
+      "title": "Through Walls? \ud83e\uddf1",
+      "bubble": "So these invisible waves actually travel right through walls?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Common Materials \u2705",
+      "bubble": "Yes! Drywall, wood, and glass are usually no problem.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "earbuds",
+      "emotion": "thinking",
+      "title": "Like Sound? \ud83d\udd0a",
+      "bubble": "Is it like sound waves traveling through air and walls?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Digital Information \ud83d\udcbb",
+      "bubble": "Exactly! But instead of sound, it carries your videos and messages.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "earbuds",
+      "emotion": "excited",
+      "title": "Mind-Blowing Fact! \ud83e\udd2f",
+      "bubble": "\ud83d\udccc Tap Save for later & follow @vijayakumarj_ai for daily tech facts!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Wi-Fi uses invisible radio waves to transmit data through walls, connecting your devices wirelessly.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour Wi-Fi connects devices using invisible waves that pass through walls!\n\nHere's how it works:\n\ud83d\udd39 Wi-Fi sends data using radio waves, similar to a radio station or your cell phone.\n\ud83d\udd39 These invisible waves are designed to travel through common household materials like drywall, wood, and glass.\n\ud83d\udd39 They carry digital information \u2013 your videos, messages, and more \u2013 keeping your devices connected without cables.\n\ud83d\udd39 Think of it like sound waves through walls, but for digital data!\n\n\ud83d\udccc Tap Save so you don't lose this amazing tech fact!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #WiFi #TechFacts #InvisibleWaves #HowTechWorks #Wireless",
+  "vector": "visual_engineering",
+  "characters": "auto"
+}
