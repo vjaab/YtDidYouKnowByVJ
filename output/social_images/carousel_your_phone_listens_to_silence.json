@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Your phone is always listening, even when it seems off? \ud83e\udd2b\ud83e\udd2f",
+  "headline": "Your Phone Listens to Silence",
+  "source": "The Verge: 'Always-on' microphones in smartphones",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Phone Always Listening? \ud83d\udc42",
+      "bubble": "Wait, my phone listens even when it's 'off'? That's wild!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Low-Power Listening Mode \ud83d\udca1",
+      "bubble": "Yes! Its microphone is often in a low-power listening mode.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Not Recording Everything? \ud83e\udd14",
+      "bubble": "So it's not recording all my secrets when idle?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Ready for Wake Words \ud83d\udde3\ufe0f",
+      "bubble": "It's ready to wake for specific words like 'Hey Siri'.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "thinking",
+      "title": "Like a Guard \ud83d\udc6e",
+      "bubble": "So it's like a silent security guard, always alert?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Always On Post \ud83d\udee1\ufe0f",
+      "bubble": "Exactly! Always at its post, waiting for a signal.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Tech Toolkit \ud83d\udee0\ufe0f",
+      "bubble": "\ud83d\udccc Tap Save so you have this in your toolkit!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your phone's microphone can be in a low-power listening mode, ready for wake words even when seemingly off.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour phone might be listening even when you think it's silent!\n\nHere's the lowdown:\n\ud83d\udd39 Microphones often stay in a low-power 'listening' mode.\n\ud83d\udd39 They aren't recording everything constantly.\n\ud83d\udd39 They wait for specific 'wake words' like 'Hey Siri' or 'OK Google'.\n\ud83d\udd39 Think of it as a silent guard, always ready.\n\n\ud83d\udccc Tap Save so you have this in your toolkit!\n\nFollow @vijayakumarj_ai for daily tech insights!\n#DidYouKnow #TechFacts #Privacy #Smartphones #TechExplained #VijayaKumarAI",
+  "vector": "ai_secrets",
+  "characters": "auto"
+}

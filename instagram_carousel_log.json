@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI's Secret Water Bill",
     "Your Phone's Invisible Fingerprint Grid",
     "Medium (machine-learning): Don\u2019t Buy a Mac for Local AI Until You Unde",
     "Medium (machine-learning): Don\u2019t Buy a Mac for Local AI Until You Unde",
@@ -99,10 +98,10 @@
     "Your Photos' Invisible Shrinking Trick",
     "Wi-Fi: Invisible Waves Through Walls",
     "Your Phone's Invisible Listener Brain",
-    "Your Phone's Invisible Listener Brain"
+    "Your Phone's Invisible Listener Brain",
+    "Your Phone Listens to Silence"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "nvidia",
     "gpu",
@@ -301,20 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "AI's Secret Water Bill",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-09T17:32:19.152319+00:00"
-    },
     {
       "title": "Your Phone's Invisible Fingerprint Grid",
       "news_source_url": "",
@@ -1369,6 +1358,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-19T17:40:47.040801+00:00"
+    },
+    {
+      "title": "Your Phone Listens to Silence",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-19T19:44:25.081898+00:00"
     }
   ]
 }
