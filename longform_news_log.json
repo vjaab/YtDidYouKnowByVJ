@@ -9,48 +9,56 @@
         "Why Top Tech Firms Are Quietly Banning OpenAI GPT-5.5",
         "OpenAI and Anthropic Release Next-Gen Frontier Models",
         "Your Chatbot Now Builds Apps: GPT-6 GUI is HERE",
-        "OpenAI's GPT-6: The Intelligent UI Revolutionizes Chatbots"
+        "OpenAI's GPT-6: The Intelligent UI Revolutionizes Chatbots",
+        "Why Microsoft Just Classified AI Coders as Insider Threats",
+        "Microsoft classifies AI coding agents as insider threats and deploys Guardian Agents"
     ],
     "used_keywords": [
-        "Claude Opus 4.7",
-        "Intelligent UI",
-        "AI agents",
-        "developer tools",
-        "AI privacy",
         "Qwen3.6-27B",
-        "AI chatbots",
-        "xerj",
+        "voice cloning",
         "MASS framework",
         "reverse engineering",
-        "Mixture-of-Experts",
-        "context-mode",
-        "AI coding assistant",
-        "Decisions API",
-        "local AI voice",
-        "persistent memory",
-        "claude-mem",
-        "large context window",
-        "Ghidra",
-        "Autonomous Agents",
         "GitHub Copilot",
         "Gemini 4 Argon",
-        "AI cost savings",
         "HydraFusion",
-        "local AI setup",
+        "Ghidra",
+        "Mixture-of-Experts",
         "ElevenLabs alternative",
-        "voice cloning",
-        "AI benchmarks",
-        "Rust search",
+        "AI safety",
+        "AI chatbots",
+        "xerj",
+        "Claude Opus 4.7",
+        "autonomous agents",
         "VoiceStudio",
-        "interactive AI",
-        "Sakana AI",
         "GPT-6",
-        "OpenAI",
-        "open source AI",
-        "REA",
+        "persistent memory",
         "SWE-bench",
-        "GPT-5.5",
-        "AI coding agents"
+        "cybersecurity",
+        "interactive AI",
+        "local AI voice",
+        "AI coding agents",
+        "local AI setup",
+        "iFixAi",
+        "REA",
+        "developer tools",
+        "Autonomous Agents",
+        "AI privacy",
+        "large context window",
+        "Sakana AI",
+        "Microsoft",
+        "context-mode",
+        "AI cost savings",
+        "Decisions API",
+        "open source AI",
+        "AI benchmarks",
+        "Intelligent UI",
+        "Rust search",
+        "Claude Code",
+        "AI agents",
+        "AI coding assistant",
+        "claude-mem",
+        "OpenAI",
+        "GPT-5.5"
     ],
     "used_companies": {
         "GitHub": 5,
@@ -60,17 +68,20 @@
         "Anthropic": 1,
         "GitHub (debpalash/VoiceStudio)": 1,
         "Cloudflare (indirectly via OpenAI announcement)": 1,
-        "Cloudflare (indirectly via GitHub announcement)": 1
+        "Cloudflare (indirectly via GitHub announcement)": 1,
+        "GeekWire / Microsoft": 1,
+        "GitHub (ifixai-ai/iFixAi)": 1
     },
     "used_subcategories": {
-        "AI Deep Dive": 5
+        "AI Deep Dive": 6
     },
     "last_7_days_stories": [
         "morluto/rea hits 100k stars as OpenAI drops GPT-5.5",
         "GitHub Trending Developer Tools Fix AI Agent Amnesia and Token Bloat",
         "OpenAI Decisions API and Sakana AI MASS Method Transform Agent Workflows",
         "OpenAI and Anthropic Release Next-Gen Frontier Models",
-        "OpenAI's GPT-6: The Intelligent UI Revolutionizes Chatbots"
+        "OpenAI's GPT-6: The Intelligent UI Revolutionizes Chatbots",
+        "Microsoft classifies AI coding agents as insider threats and deploys Guardian Agents"
     ],
     "last_3_days_subcategories": [
         "AI Deep Dive",
@@ -78,14 +89,14 @@
         "AI Deep Dive"
     ],
     "last_3_days_companies": [
-        "OpenAI",
-        "Anthropic",
         "GitHub (debpalash/VoiceStudio)",
         "Cloudflare (indirectly via OpenAI announcement)",
-        "Cloudflare (indirectly via GitHub announcement)"
+        "Cloudflare (indirectly via GitHub announcement)",
+        "GeekWire / Microsoft",
+        "GitHub (ifixai-ai/iFixAi)"
     ],
-    "total_uploaded": 5,
-    "last_upload": "2026-10-16",
+    "total_uploaded": 6,
+    "last_upload": "2026-10-19",
     "history": [
         {
             "date": "2026-10-12",
@@ -232,6 +243,33 @@
             "target_country": null,
             "avatar_used": "assets/video/black_coat.mp4",
             "creator_archetype": "FIRESHIP_FAST"
+        },
+        {
+            "date": "2026-10-19",
+            "title": "Why Microsoft Just Classified AI Coders as Insider Threats",
+            "news_headline": "Microsoft classifies AI coding agents as insider threats and deploys Guardian Agents",
+            "sub_category": "AI Deep Dive",
+            "companies": [
+                "GeekWire / Microsoft",
+                "GitHub (ifixai-ai/iFixAi)"
+            ],
+            "keywords": [
+                "AI safety",
+                "autonomous agents",
+                "cybersecurity",
+                "GitHub Copilot",
+                "Claude Code",
+                "Microsoft",
+                "iFixAi"
+            ],
+            "breaking_news_level": 7,
+            "voice_used": "deep_dive",
+            "youtube_url": "https://youtu.be/ua0NJhvHTcg",
+            "facebook_post_id": null,
+            "news_source_url": "https://geekwire.com",
+            "target_country": null,
+            "avatar_used": "assets/video/black_grey_white_hoodie.mp4",
+            "creator_archetype": "CLEO_INVESTIGATIVE"
         }
     ]
 }
