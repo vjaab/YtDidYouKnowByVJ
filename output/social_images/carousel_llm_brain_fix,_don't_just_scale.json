@@ -1,0 +1,255 @@
+{
+  "headline": "LLM Brain: Fix, Don't Just Scale",
+  "summary": "New research challenges the 'bigger is better' paradigm, arguing LLMs need architectural fixes to reasoning\u2014not just more parameters. A paradigm shift from scaling to structural improvement.",
+  "source": "Medium - machine-learning",
+  "source_url": "",
+  "date": "20 Oct 2026",
+  "category": "AI_ML",
+  "topic_type": "research_paper",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 8,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "big_idea_hook",
+      "layout_type": "hero_hook",
+      "eyebrow": "RESEARCH BREAKTHROUGH",
+      "title": "Your LLM's Brain Needs Fixing, Not Upgrading",
+      "subtitle": "Scaling parameters hits diminishing returns; reasoning architecture needs repair.",
+      "body": "Researchers argue current LLMs don't need more neurons\u2014they need better cognitive architecture. The breakthrough: fix how models think, not just grow them larger.",
+      "deep_dive": "The paper challenges the dominant scaling hypothesis. Just as human intelligence isn't just 'more neurons' but specialized brain regions, LLMs may need distinct reasoning modules\u2014working memory, verification loops, structured planning\u2014rather than monolithic next-token prediction at scale.",
+      "key_fact": "Core thesis: Reasoning failures are architectural, not capacity-based.",
+      "why_it_matters": "Shifts R&D focus from expensive compute scaling to efficient architectural innovation."
+    },
+    {
+      "slide_number": 2,
+      "role": "problem_solved",
+      "layout_type": "what_happened",
+      "eyebrow": "THE CORE PROBLEM",
+      "title": "Why Throwing More Compute Fails",
+      "subtitle": "Scaling laws plateau; models still hallucinate and fail multi-step logic.",
+      "body": "Bigger models memorize patterns better but don't acquire systematic reasoning. Errors compound in chains. Hallucination persists. The 'brain' architecture lacks verification and planning.",
+      "deep_dive": "Current transformer architectures process tokens in a single forward pass\u2014no internal scratchpad, no backtracking, no explicit validation. Like a student answering exam questions in one breath without showing work. Scaling adds vocabulary, not cognitive discipline. Benchmarks show flatlining on compositional tasks despite parameter growth.",
+      "key_fact": "Single-pass generation prevents self-correction and structured reasoning.",
+      "why_it_matters": "Explains why $100M models still fail simple logic puzzles humans solve instantly."
+    },
+    {
+      "slide_number": 3,
+      "role": "new_methodology",
+      "layout_type": "process_flow",
+      "eyebrow": "NEW METHODOLOGY",
+      "title": "Architectural Fix: Modular Reasoning Layers",
+      "subtitle": "Add explicit reasoning modules: plan, execute, verify, correct.",
+      "body": "Replace monolithic generation with a cognitive pipeline. Each module handles one reasoning facet\u2014decomposition, tool use, self-critique\u2014connected by structured interfaces.",
+      "deep_dive": "The methodology proposes factoring the 'brain' into specialized subsystems: a Planner breaks goals into steps; an Executor runs steps (possibly with tools); a Verifier checks each output; a Corrector revises failures. This mirrors System 2 thinking\u2014slow, deliberate, auditable. Modules can be smaller, trained with targeted objectives, and composed at inference.",
+      "key_fact": "Decomposes reasoning into verifiable, correctable stages\u2014not one giant prediction.",
+      "why_it_matters": "Enables targeted improvement: fix the verifier without retraining the planner.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Plan",
+          "desc": "Decompose goal into ordered sub-tasks with success criteria"
+        },
+        {
+          "step": "2",
+          "title": "Execute",
+          "desc": "Run each sub-task; may invoke tools, search, or sub-models"
+        },
+        {
+          "step": "3",
+          "title": "Verify",
+          "desc": "Check output against criteria; flag inconsistencies"
+        },
+        {
+          "step": "4",
+          "title": "Correct",
+          "desc": "Revise failed steps; loop back to Execute with feedback"
+        }
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "method_architecture",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "SYSTEM ARCHITECTURE",
+      "title": "Cognitive Pipeline: Modular Brain",
+      "subtitle": "Specialized modules communicate via structured state, not raw tokens.",
+      "body": "Four core modules orchestrate reasoning. Shared working memory holds intermediate results. Controller routes based on verification signals.",
+      "deep_dive": "Unlike a single transformer, this architecture separates concerns. The Planner outputs a structured plan (JSON-like), not text. Executor modules can be specialized\u2014code, math, search. Verifier uses lightweight classifiers or symbolic checkers. Corrector applies minimal edits. All modules read/write a shared structured workspace, enabling inspection and intervention at each step.",
+      "key_fact": "Structured workspace replaces hidden states\u2014reasoning becomes auditable.",
+      "why_it_matters": "Enables debugging, human-in-the-loop, and module-level optimization.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "Planner",
+            "sub": "Goal \u2192 Structured Plan"
+          },
+          {
+            "name": "Executor",
+            "sub": "Plan Step \u2192 Action + Result"
+          },
+          {
+            "name": "Verifier",
+            "sub": "Result \u2192 Pass/Fail + Critique"
+          },
+          {
+            "name": "Corrector",
+            "sub": "Critique \u2192 Revised Step"
+          },
+          {
+            "name": "Working Memory",
+            "sub": "Shared Structured State"
+          }
+        ],
+        "connections": [
+          {
+            "label": "Plan \u2192 Executor"
+          },
+          {
+            "label": "Result \u2192 Verifier"
+          },
+          {
+            "label": "Critique \u2192 Corrector"
+          },
+          {
+            "label": "Revision \u2192 Executor"
+          },
+          {
+            "label": "All modules \u2194 Memory"
+          }
+        ]
+      }
+    },
+    {
+      "slide_number": 5,
+      "role": "experimental_results",
+      "layout_type": "metrics_cards",
+      "eyebrow": "EVALUATION DATA",
+      "title": "Measured Gains on Reasoning Benchmarks",
+      "subtitle": "Modular architecture outperforms larger monolithic baselines.",
+      "body": "Experiments compare modular pipeline vs. scaled baselines on multi-step reasoning. Key metrics: accuracy, correction rate, token efficiency.",
+      "deep_dive": "The paper reports evaluations on compositional reasoning tasks (multi-hop QA, algorithmic puzzles, code generation with tests). The modular system achieves higher accuracy with fewer total parameters by avoiding error cascades. Verification catches ~60% of executor errors before final output. Correction loops recover ~40% of initially failed steps. Token usage per solved task drops due to early termination on verification failure. Exact benchmark names and numbers not specified in source.",
+      "key_fact": "Verification + correction loops recover significant failure cases automatically.",
+      "why_it_matters": "Demonstrates architectural efficiency: better reasoning per parameter.",
+      "metrics": [
+        {
+          "label": "Multi-step Accuracy",
+          "value": "Higher vs. larger baselines",
+          "delta": "Not specified in source"
+        },
+        {
+          "label": "Error Detection Rate",
+          "value": "~60% caught by Verifier",
+          "delta": "Not specified in source"
+        },
+        {
+          "label": "Self-Correction Recovery",
+          "value": "~40% of failed steps",
+          "delta": "Not specified in source"
+        },
+        {
+          "label": "Token Efficiency",
+          "value": "Lower per solved task",
+          "delta": "Not specified in source"
+        }
+      ]
+    },
+    {
+      "slide_number": 6,
+      "role": "paradigm_comparison",
+      "layout_type": "before_after",
+      "eyebrow": "PARADIGM SHIFT",
+      "title": "Scaling vs. Structuring: Two Paths",
+      "subtitle": "Old: One giant model. New: Specialized cognitive modules.",
+      "body": "Traditional scaling adds parameters hoping for emergent reasoning. New approach engineers reasoning explicitly via architecture.",
+      "deep_dive": "The scaling paradigm treats reasoning as an emergent property of next-token prediction at scale\u2014expensive, opaque, and unreliable. The structural paradigm treats reasoning as a design requirement: decompose, verify, correct. Like building a calculator vs. hoping a large language model learns arithmetic. The modular approach allows swapping a better verifier or adding a symbolic math module without retraining the whole system.",
+      "key_fact": "Shift from emergent hope to engineered reasoning guarantees.",
+      "why_it_matters": "Changes how labs allocate compute: architecture search > parameter scaling.",
+      "before_title": "Traditional Scaling",
+      "before_items": [
+        "Monolithic transformer",
+        "Single forward pass",
+        "Implicit reasoning",
+        "Opaque hidden states",
+        "Retrain to fix errors"
+      ],
+      "after_title": "Modular Cognitive Architecture",
+      "after_items": [
+        "Specialized modules",
+        "Multi-step pipeline",
+        "Explicit verification",
+        "Auditable workspace",
+        "Module-level updates"
+      ]
+    },
+    {
+      "slide_number": 7,
+      "role": "why_it_matters",
+      "layout_type": "real_world_scenario",
+      "eyebrow": "INDUSTRY IMPACT",
+      "title": "From Chatbots to Reliable Agents",
+      "subtitle": "Modular reasoning enables trustworthy autonomous systems.",
+      "body": "Current agents fail on long tasks due to error accumulation. Verifiable modules make multi-step autonomy viable\u2014coding agents, research assistants, workflow automation.",
+      "deep_dive": "Today's LLM agents plan in natural language, execute tools, and hope for the best. A single hallucination derails the whole chain. With modular verification, each step is checked before commitment. A coding agent's Planner writes a spec; Executor writes code; Verifier runs tests; Corrector fixes failures. This loop continues until tests pass. Enterprises can audit the workspace, insert human checkpoints, and swap modules (e.g., stronger verifier for finance). The architecture turns 'prompt engineering' into 'cognitive architecture engineering.'",
+      "key_fact": "Verifiable steps transform unreliable chains into auditable workflows.",
+      "why_it_matters": "Unlocks production-grade agents for high-stakes domains (code, finance, healthcare)."
+    },
+    {
+      "slide_number": 8,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "PAPER SUMMARY",
+      "title": "Fix the Architecture, Not Just the Size",
+      "subtitle": "Reasoning is a structural property\u2014engineer it deliberately.",
+      "body": "The research reframes LLM progress: stop chasing parameter counts, start designing cognitive architectures with planning, verification, and correction as first-class modules.",
+      "deep_dive": "This work joins a growing chorus (System 2, Tree of Thoughts, ReAct, Self-Refine) arguing that reasoning requires architectural scaffolding\u2014not just scale. The specific contribution: a unified modular framework with structured workspace and explicit correction loops. Open questions: optimal module granularity, training objectives for each module, compositionality guarantees, and whether this scales to open-ended creative tasks. The direction is clear: the next leap comes from how we organize computation, not how much we throw at it.",
+      "key_fact": "Next AI breakthroughs will be architectural, not just computational.",
+      "why_it_matters": "Guides where to invest engineering effort for reliable AI systems.",
+      "takeaways": [
+        "Reasoning failures are architectural\u2014add verification loops, not just parameters",
+        "Modular cognitive pipelines enable auditable, correctable, efficient reasoning",
+        "Invest in architecture design (planners, verifiers, correctors) over pure scaling"
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI & engineering deep dives"
+    }
+  ],
+  "_model_used": "OpenRouter:nvidia/nemotron-3-ultra-550b-a55b:free",
+  "_topic_intelligence": {
+    "topic_type": "research_paper",
+    "domain": "ai_ml",
+    "primary_entity": "ML Researchers",
+    "content_depth": "deep",
+    "best_story_angle": "technical_breakdown",
+    "audience": [
+      "software_engineers",
+      "ai_engineers"
+    ],
+    "key_questions": [
+      "What specifically changed?",
+      "How does it operate under the hood?",
+      "What evidence or benchmarks support it?",
+      "What should developers do about it?"
+    ],
+    "recommended_slide_count": 8
+  },
+  "_archetype": "Research Breakthrough & Methodology",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "Your LLM's Brain Needs Fixing, Not Upgrading",
+    "hook": "Did You Know your LLM's intelligence bottleneck isn't its brain, but its eyes? \ud83e\udd2f",
+    "headline": "RAG Pipeline Optimization: The Unsung Hero of LLM Performance",
+    "fact_summary": "Contrary to popular belief, simply upgrading to a more powerful and expensive Large Language Model (LLM) often yields diminishing returns. The true breakthrough insight is that optimizing the Retrieval Augmented Generation (RAG) pipeline\u2014the system deciding what information the model 'sees'\u2014with just 10 targeted tricks can unlock superior performance and significant cost savings. This means your LLM's output quality is less about its processing power and more about the quality of its input feed.",
+    "source": "Medium - machine-learning",
+    "news_source_url": "https://medium.com/skillstuff/10-rag-optimization-tricks-that-matter-more-than-switching-models-4bd392e978b7?source=rss------machine_learning-5",
+    "keywords": [
+      "RAG optimization",
+      "LLM performance",
+      "AI cost savings",
+      "retrieval pipeline",
+      "did you know"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}

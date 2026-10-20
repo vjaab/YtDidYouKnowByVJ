@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "Medium (artificial-intelligence): Local AI vs Cloud AI: Which Is Bette",
-    "Medium (artificial-intelligence): Local AI vs Cloud AI: Which Is Bette",
     "Your Smart Speaker's Tiny Brain",
     "Your Phone's Tiny Speakers are Sound Wizards",
     "Your Phone's Tiny Speakers are Sound Wizards",
@@ -99,10 +98,10 @@
     "Your Phone's Tiny Superpowers: Microphones",
     "CMU Wi-Fi Vision: Smart Speakers Seeing Without Cameras",
     "CMU Wi-Fi Vision: Smart Speakers Seeing Without Cameras",
-    "Keystroke Dynamics: Continuous Auth Breakthrough"
+    "Keystroke Dynamics: Continuous Auth Breakthrough",
+    "LLM Brain: Fix, Don't Just Scale"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,25 +300,10 @@
     "did you know",
     "threads",
     "tech",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Medium (artificial-intelligence): Local AI vs Cloud AI: Which Is Bette",
-      "news_source_url": "https://swaeth.medium.com/local-ai-vs-cloud-ai-which-is-better-for-privacy-2632aa1fdc9e?source=rss------artificial_intelligence-5",
-      "keywords": [
-        "did you know",
-        "tech trending",
-        "medium",
-        "artificial",
-        "intelligence",
-        "local",
-        "cloud"
-      ],
-      "source": "Medium - artificial-intelligence",
-      "platform": "threads",
-      "timestamp": "2026-10-10T11:21:54.504646+00:00"
-    },
     {
       "title": "Medium (artificial-intelligence): Local AI vs Cloud AI: Which Is Bette",
       "news_source_url": "",
@@ -1368,6 +1352,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-20T06:49:07.714579+00:00"
+    },
+    {
+      "title": "LLM Brain: Fix, Don't Just Scale",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-20T07:34:56.419838+00:00"
     }
   ]
 }
