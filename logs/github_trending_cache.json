@@ -1,5 +1,6 @@
 [
   {
+<<<<<<< Updated upstream
     "repo": "MadsLorentzen/ai-job-search",
     "full_name": "MadsLorentzen/ai-job-search",
     "description": "The job search that runs on your machine. AI job application framework built on Claude Code: evaluate postings, tailor CVs, write cover letters, prep interviews. Fork it and own it.",
@@ -473,12 +474,173 @@
     "html_url": "https://github.com/agentgateway/agentgateway"
   },
   {
+=======
+>>>>>>> Stashed changes
     "repo": "MadsLorentzen/ai-job-search",
     "full_name": "MadsLorentzen/ai-job-search",
     "description": "The job search that runs on your machine. AI job application framework built on Claude Code: evaluate postings, tailor CVs, write cover letters, prep interviews. Fork it and own it.",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 59951,
     "forks_count": 18768,
+=======
+    "stargazers_count": 60014,
+    "forks_count": 18779,
+    "stars_in_period": 3890,
+    "url": "https://github.com/MadsLorentzen/ai-job-search",
+    "html_url": "https://github.com/MadsLorentzen/ai-job-search"
+  },
+  {
+    "repo": "cloudflare/security-audit-skill",
+    "full_name": "cloudflare/security-audit-skill",
+    "description": "A coding-agent skill for multi-phase security audits with independently verified, machine-readable findings",
+    "language": "JavaScript",
+    "stargazers_count": 33717,
+    "forks_count": 2114,
+    "stars_in_period": 1680,
+    "url": "https://github.com/cloudflare/security-audit-skill",
+    "html_url": "https://github.com/cloudflare/security-audit-skill"
+  },
+  {
+    "repo": "stablyai/orca",
+    "full_name": "stablyai/orca",
+    "description": "Orca is the place for working with a fleet of agents (e.g. Grok Bot, Claude Code). Run any coding agent with your own subscription. Available on desktop, mobile and remote runtime.",
+    "language": "TypeScript",
+    "stargazers_count": 99492,
+    "forks_count": 6331,
+    "stars_in_period": 1559,
+    "url": "https://github.com/stablyai/orca",
+    "html_url": "https://github.com/stablyai/orca"
+  },
+  {
+    "repo": "DietrichGebert/ponytail",
+    "full_name": "DietrichGebert/ponytail",
+    "description": "Makes your AI agent think like the laziest senior dev in the room. The best code is the code you never wrote.",
+    "language": "JavaScript",
+    "stargazers_count": 169280,
+    "forks_count": 9207,
+    "stars_in_period": 1396,
+    "url": "https://github.com/DietrichGebert/ponytail",
+    "html_url": "https://github.com/DietrichGebert/ponytail"
+  },
+  {
+    "repo": "Comfy-Org/ComfyUI",
+    "full_name": "Comfy-Org/ComfyUI",
+    "description": "The most powerful and modular diffusion model GUI, api and backend with a graph/nodes interface. The fastest local inference engine in the world.",
+    "language": "Python",
+    "stargazers_count": 140610,
+    "forks_count": 16647,
+    "stars_in_period": 1201,
+    "url": "https://github.com/Comfy-Org/ComfyUI",
+    "html_url": "https://github.com/Comfy-Org/ComfyUI"
+  },
+  {
+    "repo": "ruvnet/ruflo",
+    "full_name": "ruvnet/ruflo",
+    "description": "\ud83c\udf0a The original agent harness. Deploy intelligent multi-player swarms, coordinate autonomous workflows, and build conversational AI systems. Features adaptive memory, self-learning intelligence, federation, vector RAG integration, and native Claude Code / Codex / Hermes and many more Integrated",
+    "language": "TypeScript",
+    "stargazers_count": 77686,
+    "forks_count": 9143,
+    "stars_in_period": 683,
+    "url": "https://github.com/ruvnet/ruflo",
+    "html_url": "https://github.com/ruvnet/ruflo"
+  },
+  {
+    "repo": "Graphify-Labs/graphify",
+    "full_name": "Graphify-Labs/graphify",
+    "description": "Turn any codebase, with its docs, SQL schemas, configs, and PDFs, into a queryable knowledge graph. A /graphify skill for Claude Code, Cursor, Codex, and Gemini CLI: local deterministic AST parsing, every edge explained, no vector store.",
+    "language": "Python",
+    "stargazers_count": 129962,
+    "forks_count": 12518,
+    "stars_in_period": 906,
+    "url": "https://github.com/Graphify-Labs/graphify",
+    "html_url": "https://github.com/Graphify-Labs/graphify"
+  },
+  {
+    "repo": "anomalyco/opencode",
+    "full_name": "anomalyco/opencode",
+    "description": "The open source coding agent.",
+    "language": "TypeScript",
+    "stargazers_count": 218698,
+    "forks_count": 29185,
+    "stars_in_period": 1256,
+    "url": "https://github.com/anomalyco/opencode",
+    "html_url": "https://github.com/anomalyco/opencode"
+  },
+  {
+    "repo": "msitarzewski/agency-agents",
+    "full_name": "msitarzewski/agency-agents",
+    "description": "A complete AI agency at your fingertips - From frontend wizards to Reddit community ninjas, from whimsy injectors to reality checkers. Each agent is a specialized expert with personality, processes, and proven deliverables.",
+    "language": "Shell",
+    "stargazers_count": 162172,
+    "forks_count": 26232,
+    "stars_in_period": 590,
+    "url": "https://github.com/msitarzewski/agency-agents",
+    "html_url": "https://github.com/msitarzewski/agency-agents"
+  },
+  {
+    "repo": "headroomlabs-ai/headroom",
+    "full_name": "headroomlabs-ai/headroom",
+    "description": "Compress tool outputs, logs, files, and RAG chunks before they reach the LLM. 20% fewer tokens for coding agents, 60-95% fewer tokens for JSON, same answers. Library, proxy, MCP server.",
+    "language": "Python",
+    "stargazers_count": 76646,
+    "forks_count": 5950,
+    "stars_in_period": 555,
+    "url": "https://github.com/headroomlabs-ai/headroom",
+    "html_url": "https://github.com/headroomlabs-ai/headroom"
+  },
+  {
+    "repo": "anthropics/knowledge-work-plugins",
+    "full_name": "anthropics/knowledge-work-plugins",
+    "description": "Open source repository of plugins primarily intended for knowledge workers to use in Claude Cowork",
+    "language": "Python",
+    "stargazers_count": 30711,
+    "forks_count": 3463,
+    "stars_in_period": 262,
+    "url": "https://github.com/anthropics/knowledge-work-plugins",
+    "html_url": "https://github.com/anthropics/knowledge-work-plugins"
+  },
+  {
+    "repo": "shiyu-coder/Kronos",
+    "full_name": "shiyu-coder/Kronos",
+    "description": "Kronos: A Foundation Model for the Language of Financial Markets",
+    "language": "Python",
+    "stargazers_count": 42236,
+    "forks_count": 6998,
+    "stars_in_period": 719,
+    "url": "https://github.com/shiyu-coder/Kronos",
+    "html_url": "https://github.com/shiyu-coder/Kronos"
+  },
+  {
+    "repo": "vllm-project/vllm",
+    "full_name": "vllm-project/vllm",
+    "description": "A high-throughput and memory-efficient inference and serving engine for LLMs",
+    "language": "Python",
+    "stargazers_count": 94366,
+    "forks_count": 23659,
+    "stars_in_period": 98,
+    "url": "https://github.com/vllm-project/vllm",
+    "html_url": "https://github.com/vllm-project/vllm"
+  },
+  {
+    "repo": "morluto/rea",
+    "full_name": "morluto/rea",
+    "description": "Reverse engineer anything with agents, from app behavior down to native binaries.",
+    "language": "TypeScript",
+    "stargazers_count": 346253,
+    "forks_count": 87199,
+    "stars_in_period": 201065,
+    "url": "https://github.com/morluto/rea",
+    "html_url": "https://github.com/morluto/rea"
+  },
+  {
+    "repo": "MadsLorentzen/ai-job-search",
+    "full_name": "MadsLorentzen/ai-job-search",
+    "description": "The job search that runs on your machine. AI job application framework built on Claude Code: evaluate postings, tailor CVs, write cover letters, prep interviews. Fork it and own it.",
+    "language": "Python",
+    "stargazers_count": 60015,
+    "forks_count": 18779,
+>>>>>>> Stashed changes
     "stars_in_period": 9073,
     "url": "https://github.com/MadsLorentzen/ai-job-search",
     "html_url": "https://github.com/MadsLorentzen/ai-job-search"
@@ -488,35 +650,83 @@
     "full_name": "anthropics/claude-plugins-official",
     "description": "Official, Anthropic-managed directory of high quality Claude Code Plugins.",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 43353,
     "forks_count": 4581,
+=======
+    "stargazers_count": 43358,
+    "forks_count": 4582,
+>>>>>>> Stashed changes
     "stars_in_period": 5441,
     "url": "https://github.com/anthropics/claude-plugins-official",
     "html_url": "https://github.com/anthropics/claude-plugins-official"
+  },
+  {
+    "repo": "mksglu/context-mode",
+    "full_name": "mksglu/context-mode",
+    "description": "Context window optimization for AI coding agents. Sandboxes tool output (98% reduction), persists session memory, and enforces routing across 17 platforms via MCP + hooks.",
+    "language": "TypeScript",
+    "stargazers_count": 31312,
+    "forks_count": 2318,
+    "stars_in_period": 4224,
+    "url": "https://github.com/mksglu/context-mode",
+    "html_url": "https://github.com/mksglu/context-mode"
+  },
+  {
+    "repo": "NationalSecurityAgency/ghidra",
+    "full_name": "NationalSecurityAgency/ghidra",
+    "description": "Ghidra is a software reverse engineering (SRE) framework",
+    "language": "Java",
+    "stargazers_count": 92028,
+    "forks_count": 10307,
+    "stars_in_period": 7152,
+    "url": "https://github.com/NationalSecurityAgency/ghidra",
+    "html_url": "https://github.com/NationalSecurityAgency/ghidra"
   },
   {
     "repo": "K-Dense-AI/scientific-agent-skills",
     "full_name": "K-Dense-AI/scientific-agent-skills",
     "description": "Turn any AI agent into an AI Scientist. The #1 Agent Skills library for science, used by 250,000+ scientists worldwide. 177 ready-to-use validated skills plus 100+ scientific databases covering biology, chemistry, medicine, and drug discovery. Compatible with Cursor, Claude Code, Codex, Pi, Antigravity, and the open Agent Skills standard.",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 53218,
+=======
+    "stargazers_count": 53226,
+>>>>>>> Stashed changes
     "forks_count": 4702,
     "stars_in_period": 4355,
     "url": "https://github.com/K-Dense-AI/scientific-agent-skills",
     "html_url": "https://github.com/K-Dense-AI/scientific-agent-skills"
   },
   {
+    "repo": "heygen-com/hyperframes",
+    "full_name": "heygen-com/hyperframes",
+    "description": "Write HTML. Render video. Built for agents.",
+    "language": "TypeScript",
+    "stargazers_count": 68325,
+    "forks_count": 6169,
+    "stars_in_period": 5945,
+    "url": "https://github.com/heygen-com/hyperframes",
+    "html_url": "https://github.com/heygen-com/hyperframes"
+  },
+  {
     "repo": "debpalash/VoiceStudio",
     "full_name": "debpalash/VoiceStudio",
     "description": "VoiceStudio is the open-source, fully-local ElevenLabs alternative \u2014 voice cloning, voice design, video dubbing, dictation, transcription & audiobook creation in 646 languages.",
     "language": "Python",
+<<<<<<< Updated upstream
     "stargazers_count": 78641,
     "forks_count": 8633,
+=======
+    "stargazers_count": 78670,
+    "forks_count": 8640,
+>>>>>>> Stashed changes
     "stars_in_period": 17291,
     "url": "https://github.com/debpalash/VoiceStudio",
     "html_url": "https://github.com/debpalash/VoiceStudio"
   },
   {
+<<<<<<< Updated upstream
     "repo": "HKUDS/CLI-Anything",
     "full_name": "HKUDS/CLI-Anything",
     "description": "\"CLI-Anything: Making ALL Software Agent-Native\" -- CLI-Hub:https://clianything.cc/",
@@ -836,10 +1046,68 @@
     "html_url": "https://github.com/ErTasselli/OpenTerminal"
   },
   {
+=======
+    "repo": "ruvnet/ruflo",
+    "full_name": "ruvnet/ruflo",
+    "description": "\ud83c\udf0a The original agent harness. Deploy intelligent multi-player swarms, coordinate autonomous workflows, and build conversational AI systems. Features adaptive memory, self-learning intelligence, federation, vector RAG integration, and native Claude Code / Codex / Hermes and many more Integrated",
+    "language": "TypeScript",
+    "stargazers_count": 77686,
+    "forks_count": 9143,
+    "stars_in_period": 2543,
+    "url": "https://github.com/ruvnet/ruflo",
+    "html_url": "https://github.com/ruvnet/ruflo"
+  },
+  {
+    "repo": "android/skills",
+    "full_name": "android/skills",
+    "description": "",
+    "language": "Kotlin",
+    "stargazers_count": 9036,
+    "forks_count": 584,
+    "stars_in_period": 1233,
+    "url": "https://github.com/android/skills",
+    "html_url": "https://github.com/android/skills"
+  },
+  {
+    "repo": "boykopovar/AnyPS5",
+    "full_name": "boykopovar/AnyPS5",
+    "description": "Tool for automatic PS5 executables porting to Linux and Windows",
+    "language": "C++",
+    "stargazers_count": 45320,
+    "forks_count": 4154,
+    "stars_in_period": 12389,
+    "url": "https://github.com/boykopovar/AnyPS5",
+    "html_url": "https://github.com/boykopovar/AnyPS5"
+  },
+  {
+    "repo": "cursor/plugins",
+    "full_name": "cursor/plugins",
+    "description": "Cursor plugin specification and official plugins",
+    "language": "TypeScript",
+    "stargazers_count": 13216,
+    "forks_count": 1302,
+    "stars_in_period": 1975,
+    "url": "https://github.com/cursor/plugins",
+    "html_url": "https://github.com/cursor/plugins"
+  },
+  {
+    "repo": "cathrynlavery/diagram-design",
+    "full_name": "cathrynlavery/diagram-design",
+    "description": "Editorial diagram design for Claude Code, Codex, GitHub Copilot, Cursor, Factory Droid, and Pi. 44 diagram types. Self-contained HTML + SVG. No shadows. No Mermaid slop.",
+    "language": "HTML",
+    "stargazers_count": 58898,
+    "forks_count": 3787,
+    "stars_in_period": 6638,
+    "url": "https://github.com/cathrynlavery/diagram-design",
+    "html_url": "https://github.com/cathrynlavery/diagram-design"
+  },
+  {
+>>>>>>> Stashed changes
     "repo": "storytold/artcraft",
     "full_name": "storytold/artcraft",
     "description": "ArtCraft is an intentional crafting engine for artists, designers, and filmmakers",
     "language": "Rust",
+<<<<<<< Updated upstream
     "stargazers_count": 34362,
     "forks_count": 5439,
     "stars_in_period": 13572,
@@ -944,5 +1212,12 @@
     "stars_in_period": 1287,
     "url": "https://github.com/rust-lang/rust",
     "html_url": "https://github.com/rust-lang/rust"
+=======
+    "stargazers_count": 34377,
+    "forks_count": 5441,
+    "stars_in_period": 13572,
+    "url": "https://github.com/storytold/artcraft",
+    "html_url": "https://github.com/storytold/artcraft"
+>>>>>>> Stashed changes
   }
 ]

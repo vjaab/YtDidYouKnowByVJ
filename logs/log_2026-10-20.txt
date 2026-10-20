@@ -21,3 +21,26 @@
 [14:09:41] ❌ Kaggle Handover failed: [queued_timeout] Kaggle job stuck in QUEUED for 15 min (limit: 15 min). GPU likely unavailable or quota exhausted.
 [14:09:41] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
 [14:09:41] ⚠️ Lip-sync will be SKIPPED for this video (requires GPU).
+[18:44:15] === STARTING DAILY AI PIPELINE (DID_YOU_KNOW) | COUNTRY: GB | SOURCE: HUGGINGFACE_HUB ===
+[18:44:15] 🔄 Sequential Topic Source: Active='HUGGINGFACE_HUB' (Rotation: github → medium → huggingface_hub)
+[18:44:15] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[18:44:15] STEP 1: Content Ecosystem Check -> Day: Wed, Slot: Slot A (Discovery), Category: Facts & Trivia, Format: PAUSE_AND_GUESS (Run 1/3)
+[18:44:15] STEP 2: Fetching articles (RSS + Trending Engine)...
+[18:44:28] 🔥 Trending Engine injected 68 high-signal articles (active_source='huggingface_hub', sources=['huggingface_hub', 'github', 'medium']).
+[18:44:29] 📈 vidIQ: Injected 8 high-signal topics.
+[18:45:39] ✅ Fetched 428 total articles (68 trending engine [huggingface_hub], 8 vidIQ, 246 research, 97 tools, 9 X.com).
+[18:45:39] 📚 Loaded 30 recent topics for deduplication
+[18:46:49] 🔍 Deduplication & classification: 428 → 20 candidates
+[18:46:49] 🏷️ Zero-shot re-categorized top candidate: Facts & Trivia → Open Source Projects
+[18:46:49] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[18:49:56] Selected Headline: HF Trending Dataset: tiktok-5.6B-videos
+[18:49:56] Selected URL: https://huggingface.co/datasets/datasocial/tiktok-5.6B-videos
+[18:49:56] Breaking Level: 9
+[18:49:56] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[18:50:01] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261020_184956.png
+[18:50:06] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261020_185001.png
+[18:50:06] STEP 4: Generating voiceover + word timestamps...
+[18:50:06] Selected Lip-Sync Template: assets/video/vj_tech_ai.mp4 (from 41 options)
+[19:05:20] ❌ Kaggle Handover failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 15 min.
+[19:05:20] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
+[19:05:20] ⚠️ Lip-sync will be SKIPPED for this video (requires GPU).
