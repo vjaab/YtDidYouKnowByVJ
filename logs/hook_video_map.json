@@ -1571,7 +1571,21 @@
     "category": "Tech Gadgets & Inventions",
     "title": "Did You Know This $5 Chip Can Hack Hardware? \ud83e\udd2f",
     "uploaded_at": "2026-10-17T13:09:25.536644",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-20T11:19:29.238271",
+    "last_metrics": {
+      "views": 60,
+      "avg_view_duration_sec": 11.0,
+      "avg_view_percentage": 30.78,
+      "swipe_away_rate": 0.6922,
+      "duration_sec": 36.0,
+      "retention_rate": 0.3056,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "7ffX3VPhyn0": {
     "video_id": "7ffX3VPhyn0",
@@ -1581,7 +1595,21 @@
     "category": "Tech Gadgets & Inventions",
     "title": "The Hidden AI Tool That Changes Everything \ud83e\udd2b",
     "uploaded_at": "2026-10-17T18:10:39.834003",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-20T11:19:29.525524",
+    "last_metrics": {
+      "views": 29,
+      "avg_view_duration_sec": 9.0,
+      "avg_view_percentage": 25.91,
+      "swipe_away_rate": 0.7409,
+      "duration_sec": 35.0,
+      "retention_rate": 0.2571,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "oWkMtg--aY0": {
     "video_id": "oWkMtg--aY0",
