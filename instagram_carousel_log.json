@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Phone's Tiny Speakers are Sound Wizards",
     "Why Cold Kills Battery Life: IEEE Insights",
     "Public USB Ports Threat Analysis by FCC & CISA",
     "ASML's Tin Droplet Revolution: Printing 2nm Chips",
@@ -99,10 +98,10 @@
     "LLM Brain: Fix, Don't Just Scale",
     "AI Sees, Writes, and Understands Images!",
     "AI Sees, Writes, and Understands Images!",
-    "GPS & General Relativity: Einstein's Time in Orbit"
+    "GPS & General Relativity: Einstein's Time in Orbit",
+    "Deep-Sea Superhighways: Powering AI's Global Reach"
   ],
   "used_keywords": [
-    "tech",
     "transformer",
     "self attention",
     "quadratic cost",
@@ -301,20 +300,10 @@
     "did you know",
     "threads",
     "tech",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Phone's Tiny Speakers are Sound Wizards",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-10T18:01:30.878165+00:00"
-    },
     {
       "title": "Why Cold Kills Battery Life: IEEE Insights",
       "news_source_url": "",
@@ -1362,6 +1351,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-20T14:56:55.505817+00:00"
+    },
+    {
+      "title": "Deep-Sea Superhighways: Powering AI's Global Reach",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-20T15:06:44.094289+00:00"
     }
   ]
 }
