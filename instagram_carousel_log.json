@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Why Cold Kills Battery Life: IEEE Insights",
-    "Public USB Ports Threat Analysis by FCC & CISA",
     "ASML's Tin Droplet Revolution: Printing 2nm Chips",
     "FCC/CISA Alert: Juice Jacking Risks at Public USB Ports",
     "AI & Junior Devs: Threat or Transformation?",
@@ -99,12 +97,11 @@
     "AI Sees, Writes, and Understands Images!",
     "AI Sees, Writes, and Understands Images!",
     "GPS & General Relativity: Einstein's Time in Orbit",
-    "Deep-Sea Superhighways: Powering AI's Global Reach"
+    "Deep-Sea Superhighways: Powering AI's Global Reach",
+    "Your Digital World: Just Zeros & Ones",
+    "Your Digital World: Just Zeros & Ones"
   ],
   "used_keywords": [
-    "transformer",
-    "self attention",
-    "quadratic cost",
     "context length",
     "did you know",
     "did you know",
@@ -301,29 +298,12 @@
     "threads",
     "tech",
     "did you know",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "Why Cold Kills Battery Life: IEEE Insights",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-10T20:05:34.507911+00:00"
-    },
-    {
-      "title": "Public USB Ports Threat Analysis by FCC & CISA",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-10T20:24:11.812169+00:00"
-    },
     {
       "title": "ASML's Tin Droplet Revolution: Printing 2nm Chips",
       "news_source_url": "",
@@ -1361,6 +1341,27 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-20T15:06:44.094289+00:00"
+    },
+    {
+      "title": "Your Digital World: Just Zeros & Ones",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-20T15:45:37.942495+00:00"
+    },
+    {
+      "title": "Your Digital World: Just Zeros & Ones",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-20T15:46:29.228555+00:00"
     }
   ]
 }

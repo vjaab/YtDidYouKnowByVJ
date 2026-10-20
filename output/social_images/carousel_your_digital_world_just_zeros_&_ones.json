@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "camera",
+  "speaker_right": "vj",
+  "hook": "Did You Know your favorite song, photo, and even this text message are all just combinations of only TWO numbers? \ud83e\udd2f",
+  "headline": "Your Digital World: Just Zeros & Ones",
+  "source": "Computer Science Fundamentals",
+  "slides": [
+    {
+      "speaker": "camera",
+      "emotion": "shocked",
+      "title": "Digital Secret \ud83e\udd2f",
+      "bubble": "Wait, all your photos and songs are just two numbers?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Binary Magic \u2728",
+      "bubble": "Yes! Every digital thing is 0s and 1s, like tiny light switches.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "curious",
+      "title": "Billions of Switches \ud83d\udca1",
+      "bubble": "So, billions of on/off switches create everything we see?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Your Mind? \ud83e\udde0",
+      "bubble": "Does knowing this change how you see digital tech? Tell us!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Every digital experience, from songs to photos, is built from countless tiny 0s and 1s \u2013 like billions of invisible light switches. This binary code is the universal language of computers and AI.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know your favorite song, photo, and even this text message are all just combinations of only TWO numbers? \ud83e\udd2f\n\n\ud83d\udca1 Every digital experience, from songs to photos, is built from countless tiny 0s and 1s \u2013 like billions of invisible light switches. This binary code is the universal language of computers and AI.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "threads_debates",
+  "characters": "auto"
+}
