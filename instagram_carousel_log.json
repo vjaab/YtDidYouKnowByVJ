@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "ASML's Tin Droplet Revolution: Printing 2nm Chips",
     "FCC/CISA Alert: Juice Jacking Risks at Public USB Ports",
     "AI & Junior Devs: Threat or Transformation?",
     "AI & Junior Devs: Threat or Transformation?",
@@ -99,10 +98,10 @@
     "GPS & General Relativity: Einstein's Time in Orbit",
     "Deep-Sea Superhighways: Powering AI's Global Reach",
     "Your Digital World: Just Zeros & Ones",
-    "Your Digital World: Just Zeros & Ones"
+    "Your Digital World: Just Zeros & Ones",
+    "Apple's Taptic Engine Secrets"
   ],
   "used_keywords": [
-    "context length",
     "did you know",
     "did you know",
     "threads",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "ASML's Tin Droplet Revolution: Printing 2nm Chips",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-11T10:33:24.071342+00:00"
-    },
     {
       "title": "FCC/CISA Alert: Juice Jacking Risks at Public USB Ports",
       "news_source_url": "",
@@ -1362,6 +1352,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-20T15:46:29.228555+00:00"
+    },
+    {
+      "title": "Apple's Taptic Engine Secrets",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-20T18:25:57.033340+00:00"
     }
   ]
 }
