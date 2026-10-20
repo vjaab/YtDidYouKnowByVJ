@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "FCC/CISA Alert: Juice Jacking Risks at Public USB Ports",
-    "AI & Junior Devs: Threat or Transformation?",
     "AI & Junior Devs: Threat or Transformation?",
     "Why 90% of Startups Regret Moving to Microservices",
     "Open Source AI Models Are Catching Up to Closed Tech Monopolies",
@@ -99,12 +97,11 @@
     "Deep-Sea Superhighways: Powering AI's Global Reach",
     "Your Digital World: Just Zeros & Ones",
     "Your Digital World: Just Zeros & Ones",
-    "Apple's Taptic Engine Secrets"
+    "Apple's Taptic Engine Secrets",
+    "Your Phone's Battery Learns Your Habits",
+    "Your Phone's Battery Learns Your Habits"
   ],
   "used_keywords": [
-    "did you know",
-    "did you know",
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,29 +298,12 @@
     "did you know",
     "threads",
     "tech",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "FCC/CISA Alert: Juice Jacking Risks at Public USB Ports",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-11T10:51:58.944000+00:00"
-    },
-    {
-      "title": "AI & Junior Devs: Threat or Transformation?",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-11T11:36:47.626544+00:00"
-    },
     {
       "title": "AI & Junior Devs: Threat or Transformation?",
       "news_source_url": "",
@@ -1362,6 +1342,27 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-20T18:25:57.033340+00:00"
+    },
+    {
+      "title": "Your Phone's Battery Learns Your Habits",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-20T19:31:34.358688+00:00"
+    },
+    {
+      "title": "Your Phone's Battery Learns Your Habits",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-20T19:32:28.167222+00:00"
     }
   ]
 }
