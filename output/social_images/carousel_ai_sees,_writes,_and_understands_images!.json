@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "chip",
+  "speaker_right": "vj",
+  "hook": "AI can now SEE, WRITE, and UNDERSTAND images!",
+  "headline": "AI Sees, Writes, and Understands Images!",
+  "source": "Hugging Face Hub Models",
+  "slides": [
+    {
+      "speaker": "chip",
+      "emotion": "shocked",
+      "title": "AI Sees Photos? \ud83d\udcf8",
+      "bubble": "Wait, can AI really understand what's in a picture?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "It's True! \u2728",
+      "bubble": "Yes! New models like DeepSeek-V4.1-Flash-1017 can read and describe images.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "chip",
+      "emotion": "curious",
+      "title": "Like Magic Text? \u270d\ufe0f",
+      "bubble": "So it looks at a photo and writes a story about it?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Mind-Blowing Tech! \ud83e\udd2f",
+      "bubble": "Exactly! It turns visuals into words. What will AI see next?",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "New AI models can now process images and generate descriptive text, blurring sight and language.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nAI can now SEE, WRITE, and UNDERSTAND images!\n\n\ud83d\udca1 New AI models can now process images and generate descriptive text, blurring sight and language.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "trending_breakthroughs",
+  "characters": "auto"
+}
