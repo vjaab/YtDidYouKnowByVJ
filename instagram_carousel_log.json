@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Why Free Public Airport USB Charging Ports Are a Major Security Risk",
-    "Will AI Truly Kill Junior Developer Jobs or Just Change Them?",
     "Will AI Truly Kill Junior Developer Jobs or Just Change Them?",
     "Why Your Smartphone Suddenly Loses 30% Battery in Cold Weather",
     "How ASML Machines Use Exploding Tin Droplets to Print 2nm Chips",
@@ -99,12 +97,11 @@
     "How Touchscreens Sense Your Finger",
     "How Touchscreens Sense Your Finger",
     "Your Cloud Lives In Giant Buildings",
-    "Your Phone Sees You in 3D"
+    "Your Phone Sees You in 3D",
+    "AI Mimics Biological Neurons: Research Breakthrough",
+    "AI Mimics Biological Neurons: Research Breakthrough"
   ],
   "used_keywords": [
-    "ai training",
-    "machine learning",
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,34 +298,12 @@
     "threads",
     "tech",
     "did you know",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "Why Free Public Airport USB Charging Ports Are a Major Security Risk",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-12T09:11:01.858280+00:00"
-    },
-    {
-      "title": "Will AI Truly Kill Junior Developer Jobs or Just Change Them?",
-      "news_source_url": "",
-      "keywords": [
-        "ai coding",
-        "junior developers",
-        "software engineering",
-        "career",
-        "threads_debates",
-        "did you know"
-      ],
-      "source": "Software Engineering Institute Empirical Study",
-      "platform": "threads",
-      "timestamp": "2026-10-12T16:03:57.266716+00:00"
-    },
     {
       "title": "Will AI Truly Kill Junior Developer Jobs or Just Change Them?",
       "news_source_url": "",
@@ -1357,6 +1332,27 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-21T15:16:39.799897+00:00"
+    },
+    {
+      "title": "AI Mimics Biological Neurons: Research Breakthrough",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-21T16:04:05.768781+00:00"
+    },
+    {
+      "title": "AI Mimics Biological Neurons: Research Breakthrough",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-21T16:05:30.818284+00:00"
     }
   ]
 }
