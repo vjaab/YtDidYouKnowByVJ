@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "How ASML Machines Use Exploding Tin Droplets to Print 2nm Chips",
-    "How ASML Machines Use Exploding Tin Droplets to Print 2nm Chips",
     "How Active Noise Cancelling Headphones Invert Physical Sound Waves",
     "How Scammers Clone a Family Member Voice in Just 3 Seconds",
     "Tabs vs Spaces Solved on GitHub Infrastructure",
@@ -99,12 +97,11 @@
     "AI Mimics Biological Neurons: Research Breakthrough",
     "AI Mimics Biological Neurons: Research Breakthrough",
     "AI Invents Faces of Non-Existent People",
-    "Your Voice Unlocks Digital Doors"
+    "Your Voice Unlocks Digital Doors",
+    "Your Phone's Secret GPS Time Machine by NASA & NIST",
+    "Your Phone's Secret GPS Time Machine by NASA & NIST"
   ],
   "used_keywords": [
-    "tech",
-    "did you know",
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,35 +298,12 @@
     "threads",
     "tech",
     "did you know",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "How ASML Machines Use Exploding Tin Droplets to Print 2nm Chips",
-      "news_source_url": "",
-      "keywords": [
-        "asml",
-        "euv lithography",
-        "microchips",
-        "semiconductors",
-        "visual_engineering",
-        "did you know"
-      ],
-      "source": "ASML EUV Photolithography Engineering Whitepaper",
-      "platform": "threads",
-      "timestamp": "2026-10-12T20:24:18.794932+00:00"
-    },
-    {
-      "title": "How ASML Machines Use Exploding Tin Droplets to Print 2nm Chips",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-12T20:25:17.067317+00:00"
-    },
     {
       "title": "How Active Noise Cancelling Headphones Invert Physical Sound Waves",
       "news_source_url": "",
@@ -1352,6 +1326,27 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-21T18:38:26.477298+00:00"
+    },
+    {
+      "title": "Your Phone's Secret GPS Time Machine by NASA & NIST",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-21T19:30:26.464896+00:00"
+    },
+    {
+      "title": "Your Phone's Secret GPS Time Machine by NASA & NIST",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-21T19:31:43.307758+00:00"
     }
   ]
 }
