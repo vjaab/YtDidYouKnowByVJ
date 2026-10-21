@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "camera",
+  "speaker_right": "vj",
+  "hook": "Did You Know AI can create faces of people who have *never* lived? \ud83e\udd2f",
+  "headline": "AI Invents Faces of Non-Existent People",
+  "source": "Leading AI research institutions like NVIDIA (StyleGAN) and OpenAI demonstrate this capability, exemplified by projects like ThisPersonDoesNotExist.com.",
+  "slides": [
+    {
+      "speaker": "camera",
+      "emotion": "shocked",
+      "title": "AI Invents Faces? \ud83e\udd2f",
+      "bubble": "Did you know AI creates faces of people who never existed?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Hyper-Realistic AI \ud83d\uddbc\ufe0f",
+      "bubble": "It generates brand-new faces so realistic, they look like photos.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "curious",
+      "title": "How Is This Possible? \ud83e\udd14",
+      "bubble": "How does AI create faces without copying real ones?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "GANs Are The Key \ud83d\udd11",
+      "bubble": "It uses 'GANs': two AIs learning from countless real pictures.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "thinking",
+      "title": "Inventing New Humans? \ud83d\udc64",
+      "bubble": "So, AI learns features, then creatively invents totally new faces?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Not Just Copying \ud83c\udfa8",
+      "bubble": "Exactly! AI generates unique details, making them almost impossible to distinguish.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "excited",
+      "title": "Creative AI Power! \ud83d\ude80",
+      "bubble": "\ud83d\udccc Tap Save! AI isn't just copying, it's creating new realities!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "AI uses Generative Adversarial Networks (GANs) to invent hyper-realistic faces of non-existent people, demonstrating creative generation.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nAI can conjure up brand-new human faces so realistic, they look like photos, but that person has *never* existed!\n\nHere's the mind-blowing reality:\n\ud83d\udd39 AI creates faces of people who have literally never lived.\n\ud83d\udd39 It uses Generative Adversarial Networks (GANs) to learn from millions of real pictures.\n\ud83d\udd39 GANs invent unique faces, complete with expressions and details.\n\ud83d\udd39 It's almost impossible to tell these AI-generated faces apart from actual humans.\n\ud83d\udd39 This shows AI isn't just copying data, but creatively generating entirely new realities!\n\n\ud83d\udccc Tap Save so you have this in your toolkit!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #AI #GenerativeAI #GANs #NVIDIA #OpenAI #FutureTech",
+  "vector": "hardware_megastructures",
+  "characters": "auto"
+}

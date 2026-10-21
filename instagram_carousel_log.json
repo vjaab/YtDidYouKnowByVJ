@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Will AI Truly Kill Junior Developer Jobs or Just Change Them?",
     "Why Your Smartphone Suddenly Loses 30% Battery in Cold Weather",
     "How ASML Machines Use Exploding Tin Droplets to Print 2nm Chips",
     "How ASML Machines Use Exploding Tin Droplets to Print 2nm Chips",
@@ -99,10 +98,10 @@
     "Your Cloud Lives In Giant Buildings",
     "Your Phone Sees You in 3D",
     "AI Mimics Biological Neurons: Research Breakthrough",
-    "AI Mimics Biological Neurons: Research Breakthrough"
+    "AI Mimics Biological Neurons: Research Breakthrough",
+    "AI Invents Faces of Non-Existent People"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,20 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "Will AI Truly Kill Junior Developer Jobs or Just Change Them?",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-12T16:04:56.460035+00:00"
-    },
     {
       "title": "Why Your Smartphone Suddenly Loses 30% Battery in Cold Weather",
       "news_source_url": "",
@@ -1353,6 +1342,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-21T16:05:30.818284+00:00"
+    },
+    {
+      "title": "AI Invents Faces of Non-Existent People",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-21T18:30:40.207690+00:00"
     }
   ]
 }
