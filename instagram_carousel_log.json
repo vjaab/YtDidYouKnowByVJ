@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Why 90% of Startups Regret Moving to Microservices",
     "Open Source AI Models Are Catching Up to Closed Tech Monopolies",
     "Why Deleting a File Doesn't Erase It (NIST Standard)",
     "Why Deleting a File Doesn't Erase It (NIST Standard)",
@@ -99,10 +98,10 @@
     "Apple's Taptic Engine Secrets",
     "Your Phone's Battery Learns Your Habits",
     "Your Phone's Battery Learns Your Habits",
-    "Phone Camera's Invisible Light Catchers"
+    "Phone Camera's Invisible Light Catchers",
+    "AI's Instant Language Bridge"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "did you know",
     "threads",
     "tech",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Why 90% of Startups Regret Moving to Microservices",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-11T17:03:36.966431+00:00"
-    },
     {
       "title": "Open Source AI Models Are Catching Up to Closed Tech Monopolies",
       "news_source_url": "",
@@ -1362,6 +1352,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-21T06:43:05.059378+00:00"
+    },
+    {
+      "title": "AI's Instant Language Bridge",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-21T07:37:41.447860+00:00"
     }
   ]
 }
