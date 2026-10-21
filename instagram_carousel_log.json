@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Why Your Smartphone Suddenly Loses 30% Battery in Cold Weather",
     "How ASML Machines Use Exploding Tin Droplets to Print 2nm Chips",
     "How ASML Machines Use Exploding Tin Droplets to Print 2nm Chips",
     "How Active Noise Cancelling Headphones Invert Physical Sound Waves",
@@ -99,10 +98,10 @@
     "Your Phone Sees You in 3D",
     "AI Mimics Biological Neurons: Research Breakthrough",
     "AI Mimics Biological Neurons: Research Breakthrough",
-    "AI Invents Faces of Non-Existent People"
+    "AI Invents Faces of Non-Existent People",
+    "Your Voice Unlocks Digital Doors"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "threads",
     "tech",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Why Your Smartphone Suddenly Loses 30% Battery in Cold Weather",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-12T19:46:57.887388+00:00"
-    },
     {
       "title": "How ASML Machines Use Exploding Tin Droplets to Print 2nm Chips",
       "news_source_url": "",
@@ -1352,6 +1342,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-21T18:30:40.207690+00:00"
+    },
+    {
+      "title": "Your Voice Unlocks Digital Doors",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-21T18:38:26.477298+00:00"
     }
   ]
 }
