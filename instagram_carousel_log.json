@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Why NASA Spacecraft Use 30-Year-Old 1990s Microprocessors",
     "Why Free Public Airport USB Charging Ports Are a Major Security Risk",
     "Will AI Truly Kill Junior Developer Jobs or Just Change Them?",
     "Will AI Truly Kill Junior Developer Jobs or Just Change Them?",
@@ -99,10 +98,10 @@
     "AI's Instant Language Bridge",
     "How Touchscreens Sense Your Finger",
     "How Touchscreens Sense Your Finger",
-    "Your Cloud Lives In Giant Buildings"
+    "Your Cloud Lives In Giant Buildings",
+    "Your Phone Sees You in 3D"
   ],
   "used_keywords": [
-    "synthetic data",
     "ai training",
     "machine learning",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "threads",
     "tech",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Why NASA Spacecraft Use 30-Year-Old 1990s Microprocessors",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-12T08:11:09.598536+00:00"
-    },
     {
       "title": "Why Free Public Airport USB Charging Ports Are a Major Security Risk",
       "news_source_url": "",
@@ -1357,6 +1347,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-21T15:02:47.204184+00:00"
+    },
+    {
+      "title": "Your Phone Sees You in 3D",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-21T15:16:39.799897+00:00"
     }
   ]
 }

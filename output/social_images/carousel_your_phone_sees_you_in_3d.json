@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know your phone doesn't just *see* your face, it builds an invisible 3D map of it to unlock? \ud83e\udd2f",
+  "headline": "Your Phone Sees You in 3D",
+  "source": "Apple (Face ID technology overview)",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Phone Unlock Mystery \ud83d\udd12",
+      "bubble": "My phone unlocks just by seeing me. Is it magic or a trick?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Invisible 3D Map \ud83d\uddfa\ufe0f",
+      "bubble": "It projects thousands of invisible infrared dots onto your face!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Dot Distortion Power \ud83d\udcaa",
+      "bubble": "So it reads these dots to create a unique 3D depth map?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Unbreakable Security \ud83d\udee1\ufe0f",
+      "bubble": "Precisely! It even distinguishes twins, making your phone super secure.",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your phone projects invisible infrared dots to create a detailed 3D depth map of your face, ensuring secure unlocks.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know your phone doesn't just *see* your face, it builds an invisible 3D map of it to unlock? \ud83e\udd2f\n\n\ud83d\udca1 Your phone projects invisible infrared dots to create a detailed 3D depth map of your face, ensuring secure unlocks.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "everyday_tech_mysteries",
+  "characters": "auto"
+}
