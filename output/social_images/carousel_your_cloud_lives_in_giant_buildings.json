@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "camera",
+  "speaker_right": "vj",
+  "hook": "Your 'cloud' photos live in football-field-sized buildings! \ud83e\udd2f",
+  "headline": "Your Cloud Lives In Giant Buildings",
+  "source": "Google Cloud, Amazon Web Services (AWS), Microsoft Azure documentation on global infrastructure and data centers.",
+  "slides": [
+    {
+      "speaker": "camera",
+      "emotion": "curious",
+      "title": "Where is the Cloud? \ud83e\udd14",
+      "bubble": "VJ, where do my photos *actually* go when I save them to the cloud?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Not in the Sky! \u2601\ufe0f\u27a1\ufe0f\ud83c\udfe2",
+      "bubble": "They don't float! Your photos are stored on powerful computers, not in the sky.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "shocked",
+      "title": "Giant Computer Warehouses \ud83d\ude32",
+      "bubble": "Computers? Like, in a room? How many?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Football Field Sized \ud83c\udfdf\ufe0f",
+      "bubble": "Thousands of them, in massive warehouses the size of several football fields!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "thinking",
+      "title": "24/7 Power & Cooling \u26a1\u2744\ufe0f",
+      "bubble": "Wow! Do they need a lot of electricity and air conditioning?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Real-World Data Centers \ud83c\udf10",
+      "bubble": "Yes! These secure data centers run 24/7, powering your digital life.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "excited",
+      "title": "Real Cloud Storage! \ud83d\udccc",
+      "bubble": "\ud83d\udccc Tap Save so you have this in your toolkit!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "When you save photos 'to the cloud,' they are copied and stored on thousands of powerful computers in massive, secure warehouses called data centers.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour 'cloud' isn't a fluffy thing in the sky! It's actually massive, secure buildings.\n\nHere's the mind-blowing reality:\n\ud83d\udd39 When you save photos, they're copied onto thousands of computers.\n\ud83d\udd39 These computers are housed in giant warehouses called data centers.\n\ud83d\udd39 Many data centers are the size of multiple football fields!\n\ud83d\udd39 They run 24/7 with immense power and cooling systems.\n\n\ud83d\udccc Tap Save so you have this in your toolkit!\n\nFollow @vijayakumarj_ai for daily tech breakdowns & facts!\n#DidYouKnow #TechFacts #CloudComputing #DataCenter #VJTech #VijayaKumarAI #DigitalLife #TechnologyExplained",
+  "vector": "ai_secrets",
+  "characters": "auto"
+}

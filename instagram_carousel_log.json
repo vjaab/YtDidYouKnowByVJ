@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Why Deleting a File Doesn't Erase It (NIST Standard)",
     "Why NASA Spacecraft Use 30-Year-Old 1990s Microprocessors",
     "Why Free Public Airport USB Charging Ports Are a Major Security Risk",
     "Will AI Truly Kill Junior Developer Jobs or Just Change Them?",
@@ -99,10 +98,10 @@
     "Phone Camera's Invisible Light Catchers",
     "AI's Instant Language Bridge",
     "How Touchscreens Sense Your Finger",
-    "How Touchscreens Sense Your Finger"
+    "How Touchscreens Sense Your Finger",
+    "Your Cloud Lives In Giant Buildings"
   ],
   "used_keywords": [
-    "model collapse",
     "synthetic data",
     "ai training",
     "machine learning",
@@ -301,20 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "Why Deleting a File Doesn't Erase It (NIST Standard)",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-11T18:16:48.888262+00:00"
-    },
     {
       "title": "Why NASA Spacecraft Use 30-Year-Old 1990s Microprocessors",
       "news_source_url": "",
@@ -1358,6 +1347,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-21T12:17:48.576757+00:00"
+    },
+    {
+      "title": "Your Cloud Lives In Giant Buildings",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-21T15:02:47.204184+00:00"
     }
   ]
 }
