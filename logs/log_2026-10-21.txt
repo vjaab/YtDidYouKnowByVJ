@@ -1,0 +1,33 @@
+[13:45:15] === STARTING DAILY AI PIPELINE (DID_YOU_KNOW) | COUNTRY: GB | SOURCE: HUGGINGFACE_HUB ===
+[13:45:15] 🔄 Sequential Topic Source: Active='HUGGINGFACE_HUB' (Rotation: github → medium → huggingface_hub)
+[13:45:15] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[13:45:15] STEP 1: Content Ecosystem Check -> Day: Wed, Slot: Slot A (Discovery), Category: Facts & Trivia, Format: PAUSE_AND_GUESS (Run 1/3)
+[13:45:15] STEP 2: Fetching articles (RSS + Trending Engine)...
+[13:45:27] 🔥 Trending Engine injected 71 high-signal articles (active_source='huggingface_hub', sources=['huggingface_hub', 'github', 'medium']).
+[13:45:27] 📈 vidIQ: Injected 8 high-signal topics.
+[13:46:46] ✅ Fetched 421 total articles (71 trending engine [huggingface_hub], 8 vidIQ, 236 research, 97 tools, 9 X.com).
+[13:46:46] 📚 Loaded 30 recent topics for deduplication
+[13:48:39] 🔍 Deduplication & classification: 421 → 20 candidates
+[13:48:39] 🏷️ Zero-shot re-categorized top candidate: Facts & Trivia → Open Source Projects
+[13:48:39] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[13:51:41] Selected Headline: This Free Open-Weight Model Just Killed Your ChatGPT Vision Subscription
+[13:51:41] Selected URL: https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017
+[13:51:41] Breaking Level: 9
+[13:51:41] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[13:52:22] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261021_135141.png
+[13:52:34] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261021_135222.png
+[13:52:34] STEP 4: Generating voiceover + word timestamps...
+[13:52:34] Selected Lip-Sync Template: assets/video/vj_tech_ai.mp4 (from 41 options)
+[13:52:34] ⚠️ Script too long (119 words > 84). Asking for a tighter rewrite (shorten retry 1/2) before GPU work.
+[13:52:34] STEP 3 (Attempt 2/10): Gemini Searching & Generating Script...
+[13:56:51] Selected Headline: Flux Klein: Free Local Image-to-Image Model That Outperforms Midjourney
+[13:56:51] Selected URL: https://huggingface.co/black-forest-labs/flux-3-image-klein-comfy
+[13:56:51] Breaking Level: 9
+[13:56:51] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[13:57:14] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261021_135651.png
+[13:57:23] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261021_135714.png
+[13:57:23] STEP 4: Generating voiceover + word timestamps...
+[13:57:23] Selected Lip-Sync Template: assets/video/vj_tech_ai.mp4 (from 41 options)
+[14:27:49] ❌ Kaggle Handover failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 30 min.
+[14:27:49] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
+[14:27:49] ⚠️ Lip-sync will be SKIPPED for this video (requires GPU).
