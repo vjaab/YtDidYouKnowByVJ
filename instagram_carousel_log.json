@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI & Junior Devs: Threat or Transformation?",
     "Why 90% of Startups Regret Moving to Microservices",
     "Open Source AI Models Are Catching Up to Closed Tech Monopolies",
     "Why Deleting a File Doesn't Erase It (NIST Standard)",
@@ -99,10 +98,10 @@
     "Your Digital World: Just Zeros & Ones",
     "Apple's Taptic Engine Secrets",
     "Your Phone's Battery Learns Your Habits",
-    "Your Phone's Battery Learns Your Habits"
+    "Your Phone's Battery Learns Your Habits",
+    "Phone Camera's Invisible Light Catchers"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "threads",
@@ -301,20 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "AI & Junior Devs: Threat or Transformation?",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-11T11:37:56.850312+00:00"
-    },
     {
       "title": "Why 90% of Startups Regret Moving to Microservices",
       "news_source_url": "",
@@ -1363,6 +1352,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-20T19:32:28.167222+00:00"
+    },
+    {
+      "title": "Phone Camera's Invisible Light Catchers",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-21T06:43:05.059378+00:00"
     }
   ]
 }

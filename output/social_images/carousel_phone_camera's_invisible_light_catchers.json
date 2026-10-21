@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "camera",
+  "speaker_right": "vj",
+  "hook": "Did You Know your phone camera doesn't actually 'see' colors? \ud83c\udf08\ud83e\udd2f",
+  "headline": "Phone Camera's Invisible Light Catchers",
+  "source": "Digital Photography Principles (e.g., Bayer filter array)",
+  "slides": [
+    {
+      "speaker": "camera",
+      "emotion": "shocked",
+      "title": "Phone Cameras Blind? \ud83e\udd2f",
+      "bubble": "Wait, did you know your phone camera doesn't actually 'see' colors?!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Light-Catching Buckets \ud83d\udca1",
+      "bubble": "That's right! Sensors are millions of tiny light-catching 'buckets'.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "curious",
+      "title": "No Color Buckets? \ud83e\udd14",
+      "bubble": "But how do these 'buckets' know what color the light is?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Secret Color Filters \ud83d\udd34\ud83d\udfe2\ud83d\udd35",
+      "bubble": "Each tiny bucket is secretly covered by a red, green, or blue filter.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "shocked",
+      "title": "Combining Filtered Light? \u2728",
+      "bubble": "So, the phone combines light from these filtered buckets?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Smart Color Reconstruction \ud83e\udde0",
+      "bubble": "Exactly! Your phone's processor cleverly reconstructs all the vibrant colors.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "excited",
+      "title": "Invisible Color Magic! \ud83e\ude84",
+      "bubble": "\ud83d\udccc Tap Save to understand your camera's invisible color magic!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your phone camera sensor uses invisible color filters and smart processing to create vibrant images.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour phone camera doesn't actually 'see' colors like your eyes do! It's all invisible light catchers and clever processing!\n\nHere's the mind-blowing reality:\n\ud83d\udd39 Your camera sensor is a grid of millions of light-detecting 'buckets'.\n\ud83d\udd39 Each 'bucket' only measures light intensity, not color.\n\ud83d\udd39 To 'see' color, each bucket is secretly covered by a tiny red, green, or blue filter.\n\ud83d\udd39 Your phone's processor then combines data from these filtered buckets, reconstructing the full, vibrant colors you see!\n\n\ud83d\udccc Tap Save so you have this in your toolkit!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #PhoneCamera #Photography #HowItWorks #BayerFilter",
+  "vector": "hardware_megastructures",
+  "characters": "auto"
+}
