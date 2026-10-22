@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "How Scammers Clone a Family Member Voice in Just 3 Seconds",
     "Tabs vs Spaces Solved on GitHub Infrastructure",
     "Tabs vs Spaces Solved on GitHub Infrastructure",
     "Why Jets Still Use 1980s Floppy Disks",
@@ -99,10 +98,10 @@
     "Your Voice Unlocks Digital Doors",
     "Your Phone's Secret GPS Time Machine by NASA & NIST",
     "Your Phone's Secret GPS Time Machine by NASA & NIST",
-    "Your Phone's Secret Code for Speed"
+    "Your Phone's Secret Code for Speed",
+    "Flash Memory: No Moving Parts, Infinite Possibilities"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "threads",
@@ -301,19 +300,10 @@
     "did you know",
     "threads",
     "tech",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "How Scammers Clone a Family Member Voice in Just 3 Seconds",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-12T22:09:55.085165+00:00"
-    },
     {
       "title": "Tabs vs Spaces Solved on GitHub Infrastructure",
       "news_source_url": "",
@@ -1347,6 +1337,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-22T06:51:29.345645+00:00"
+    },
+    {
+      "title": "Flash Memory: No Moving Parts, Infinite Possibilities",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-22T07:34:19.403330+00:00"
     }
   ]
 }
