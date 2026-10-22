@@ -11,54 +11,59 @@
         "Your Chatbot Now Builds Apps: GPT-6 GUI is HERE",
         "OpenAI's GPT-6: The Intelligent UI Revolutionizes Chatbots",
         "Why Microsoft Just Classified AI Coders as Insider Threats",
-        "Microsoft classifies AI coding agents as insider threats and deploys Guardian Agents"
+        "Microsoft classifies AI coding agents as insider threats and deploys Guardian Agents",
+        "Why Senior Engineers Are Quietly Quitting Cloud AI APIs",
+        "Trending Open Source Repositories: VoiceStudio and XERJ"
     ],
     "used_keywords": [
-        "Qwen3.6-27B",
-        "voice cloning",
-        "MASS framework",
-        "reverse engineering",
-        "GitHub Copilot",
-        "Gemini 4 Argon",
         "HydraFusion",
-        "Ghidra",
-        "Mixture-of-Experts",
-        "ElevenLabs alternative",
-        "AI safety",
-        "AI chatbots",
-        "xerj",
-        "Claude Opus 4.7",
-        "autonomous agents",
-        "VoiceStudio",
-        "GPT-6",
-        "persistent memory",
-        "SWE-bench",
-        "cybersecurity",
-        "interactive AI",
-        "local AI voice",
-        "AI coding agents",
         "local AI setup",
-        "iFixAi",
-        "REA",
-        "developer tools",
+        "AI coding agents",
         "Autonomous Agents",
         "AI privacy",
-        "large context window",
-        "Sakana AI",
-        "Microsoft",
-        "context-mode",
-        "AI cost savings",
-        "Decisions API",
-        "open source AI",
-        "AI benchmarks",
-        "Intelligent UI",
-        "Rust search",
-        "Claude Code",
-        "AI agents",
-        "AI coding assistant",
+        "AI safety",
+        "GPT-5.5",
+        "Claude Opus 4.7",
         "claude-mem",
+        "Gemini 4 Argon",
+        "GitHub Copilot",
+        "autonomous agents",
+        "MASS framework",
+        "MCP server",
+        "interactive AI",
+        "context-mode",
+        "cybersecurity",
         "OpenAI",
-        "GPT-5.5"
+        "developer tools",
+        "Microsoft",
+        "Ghidra",
+        "Qwen3.6-27B",
+        "xerj",
+        "AI coding assistant",
+        "GPT-6",
+        "local AI voice",
+        "Mixture-of-Experts",
+        "persistent memory",
+        "Claude Code",
+        "VoiceStudio",
+        "XERJ",
+        "large context window",
+        "Rust search",
+        "AI cost savings",
+        "AI chatbots",
+        "open source AI",
+        "ElevenLabs alternative",
+        "iFixAi",
+        "Intelligent UI",
+        "Decisions API",
+        "AI agents",
+        "AI benchmarks",
+        "SWE-bench",
+        "voice cloning",
+        "reverse engineering",
+        "REA",
+        "local AI",
+        "Sakana AI"
     ],
     "used_companies": {
         "GitHub": 5,
@@ -66,14 +71,15 @@
         "OpenAI": 2,
         "Sakana AI": 1,
         "Anthropic": 1,
-        "GitHub (debpalash/VoiceStudio)": 1,
+        "GitHub (debpalash/VoiceStudio)": 2,
         "Cloudflare (indirectly via OpenAI announcement)": 1,
         "Cloudflare (indirectly via GitHub announcement)": 1,
         "GeekWire / Microsoft": 1,
-        "GitHub (ifixai-ai/iFixAi)": 1
+        "GitHub (ifixai-ai/iFixAi)": 1,
+        "GitHub (xerj-org/xerj)": 1
     },
     "used_subcategories": {
-        "AI Deep Dive": 6
+        "AI Deep Dive": 7
     },
     "last_7_days_stories": [
         "morluto/rea hits 100k stars as OpenAI drops GPT-5.5",
@@ -81,7 +87,8 @@
         "OpenAI Decisions API and Sakana AI MASS Method Transform Agent Workflows",
         "OpenAI and Anthropic Release Next-Gen Frontier Models",
         "OpenAI's GPT-6: The Intelligent UI Revolutionizes Chatbots",
-        "Microsoft classifies AI coding agents as insider threats and deploys Guardian Agents"
+        "Microsoft classifies AI coding agents as insider threats and deploys Guardian Agents",
+        "Trending Open Source Repositories: VoiceStudio and XERJ"
     ],
     "last_3_days_subcategories": [
         "AI Deep Dive",
@@ -89,14 +96,14 @@
         "AI Deep Dive"
     ],
     "last_3_days_companies": [
-        "GitHub (debpalash/VoiceStudio)",
-        "Cloudflare (indirectly via OpenAI announcement)",
         "Cloudflare (indirectly via GitHub announcement)",
         "GeekWire / Microsoft",
-        "GitHub (ifixai-ai/iFixAi)"
+        "GitHub (ifixai-ai/iFixAi)",
+        "GitHub (debpalash/VoiceStudio)",
+        "GitHub (xerj-org/xerj)"
     ],
-    "total_uploaded": 6,
-    "last_upload": "2026-10-19",
+    "total_uploaded": 7,
+    "last_upload": "2026-10-22",
     "history": [
         {
             "date": "2026-10-12",
@@ -270,6 +277,32 @@
             "target_country": null,
             "avatar_used": "assets/video/black_grey_white_hoodie.mp4",
             "creator_archetype": "CLEO_INVESTIGATIVE"
+        },
+        {
+            "date": "2026-10-22",
+            "title": "Why Senior Engineers Are Quietly Quitting Cloud AI APIs",
+            "news_headline": "Trending Open Source Repositories: VoiceStudio and XERJ",
+            "sub_category": "AI Deep Dive",
+            "companies": [
+                "GitHub (debpalash/VoiceStudio)",
+                "GitHub (xerj-org/xerj)"
+            ],
+            "keywords": [
+                "VoiceStudio",
+                "XERJ",
+                "local AI",
+                "MCP server",
+                "ElevenLabs alternative"
+            ],
+            "breaking_news_level": 7,
+            "voice_used": "deep_dive",
+            "youtube_url": "https://youtu.be/DMP6J6IunM8",
+            "facebook_post_id": null,
+            "news_source_url": "https://github.com/trending",
+            "target_country": null,
+            "avatar_used": "assets/video/black_terminal.mp4",
+            "creator_archetype": "VERITASIUM_MYSTERY",
+            "topic_source": "github"
         }
     ]
 }
