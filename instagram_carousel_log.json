@@ -1,7 +1,5 @@
 {
   "used_titles": [
-    "Python vs Rust: Why Python's Lead Is Unshakable",
-    "Why You Should Never Charge Your Smartphone to 100% Overnight",
     "Why You Should Never Charge Your Smartphone to 100% Overnight",
     "Your Deleted Files Aren't Gone: NIST on Data Wiping",
     "Why Deleting Files Doesn't Erase Disk Data",
@@ -99,12 +97,11 @@
     "Flash Memory: No Moving Parts, Infinite Possibilities",
     "AI Knows What You'll Love Next",
     "AI Knows What You'll Love Next",
-    "Wi-Fi's Invisible Wall-Piercing Power"
+    "Wi-Fi's Invisible Wall-Piercing Power",
+    "Sand: The Secret to Your Tech's Brain",
+    "Sand: The Secret to Your Tech's Brain"
   ],
   "used_keywords": [
-    "did you know",
-    "did you know",
-    "tech trending",
     "medium",
     "artificial",
     "intelligence",
@@ -301,34 +298,12 @@
     "did you know",
     "threads",
     "tech",
-    "did you know"
+    "did you know",
+    "did you know",
+    "threads",
+    "tech"
   ],
   "history": [
-    {
-      "title": "Python vs Rust: Why Python's Lead Is Unshakable",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-13T09:26:56.878229+00:00"
-    },
-    {
-      "title": "Why You Should Never Charge Your Smartphone to 100% Overnight",
-      "news_source_url": "",
-      "keywords": [
-        "battery life",
-        "phone charger",
-        "lithium ion",
-        "tech tips",
-        "consumer_utility",
-        "did you know"
-      ],
-      "source": "Battery University & Journal of The Electrochemical Society",
-      "platform": "threads",
-      "timestamp": "2026-10-13T14:33:54.299746+00:00"
-    },
     {
       "title": "Why You Should Never Charge Your Smartphone to 100% Overnight",
       "news_source_url": "",
@@ -1347,6 +1322,27 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-22T15:05:10.908405+00:00"
+    },
+    {
+      "title": "Sand: The Secret to Your Tech's Brain",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-22T15:58:42.162371+00:00"
+    },
+    {
+      "title": "Sand: The Secret to Your Tech's Brain",
+      "news_source_url": "",
+      "keywords": [
+        "threads",
+        "tech"
+      ],
+      "source": "Threads Post",
+      "platform": "unknown",
+      "timestamp": "2026-10-22T15:59:39.726325+00:00"
     }
   ]
 }
