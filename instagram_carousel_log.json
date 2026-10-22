@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Why You Should Never Charge Your Smartphone to 100% Overnight",
     "Your Deleted Files Aren't Gone: NIST on Data Wiping",
     "Why Deleting Files Doesn't Erase Disk Data",
     "Why Python Will Not Be Replaced by Rust Anytime Soon",
@@ -99,10 +98,10 @@
     "AI Knows What You'll Love Next",
     "Wi-Fi's Invisible Wall-Piercing Power",
     "Sand: The Secret to Your Tech's Brain",
-    "Sand: The Secret to Your Tech's Brain"
+    "Sand: The Secret to Your Tech's Brain",
+    "How Your Phone Senses Gravity's Pull"
   ],
   "used_keywords": [
-    "medium",
     "artificial",
     "intelligence",
     "local",
@@ -301,20 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "Why You Should Never Charge Your Smartphone to 100% Overnight",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-13T14:34:52.841614+00:00"
-    },
     {
       "title": "Your Deleted Files Aren't Gone: NIST on Data Wiping",
       "news_source_url": "",
@@ -1343,6 +1332,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-22T15:59:39.726325+00:00"
+    },
+    {
+      "title": "How Your Phone Senses Gravity's Pull",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-22T18:33:08.149204+00:00"
     }
   ]
 }
