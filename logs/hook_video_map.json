@@ -1667,6 +1667,20 @@
     "category": "Facts & Trivia",
     "title": "Why 99% Of Developers Get AI Wrong \u26a1",
     "uploaded_at": "2026-10-19T16:12:33.807742",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-22T11:35:35.078605",
+    "last_metrics": {
+      "views": 11,
+      "avg_view_duration_sec": 300.0,
+      "avg_view_percentage": 968.02,
+      "swipe_away_rate": 1.0,
+      "duration_sec": 31.0,
+      "retention_rate": 1.0,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   }
 }

@@ -1552,12 +1552,12 @@
       "negative_warning": {
         "variants": {
           "C": {
-            "views": 0,
-            "retention": 0.0,
+            "views": 11,
+            "retention": 0.5,
             "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 1,
+            "swipe_away_rate": 0.5,
+            "avg_view_percentage": 484.01,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "Don't write another line of code alone.",
@@ -1567,12 +1567,12 @@
             ]
           }
         },
-        "total_views": 0,
-        "total_videos": 1,
-        "avg_retention": 0.0,
+        "total_views": 11,
+        "total_videos": 2,
+        "avg_retention": 0.5,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.0,
-        "avg_view_percentage": 0.0
+        "avg_swipe_away": 0.5,
+        "avg_view_percentage": 484.01
       }
     },
     "Tech Gadgets & Inventions": {
@@ -1677,12 +1677,12 @@
   },
   "global": {
     "negative_warning": {
-      "views": 547,
-      "retention": 0.17961048512736663,
-      "engagement": 0.004221906565656566,
-      "count": 32,
-      "swipe_away_rate": 0.2838156250000001,
-      "avg_view_percentage": 81.62593749999999
+      "views": 558,
+      "retention": 0.20447077345684037,
+      "engagement": 0.004093970003060912,
+      "count": 33,
+      "swipe_away_rate": 0.30551818181818197,
+      "avg_view_percentage": 108.48636363636363
     },
     "result_first": {
       "views": 1248,
@@ -1717,5 +1717,5 @@
       "avg_view_percentage": 25.25548387096774
     }
   },
-  "last_updated": "2026-10-20T19:05:29.993851"
+  "last_updated": "2026-10-22T11:35:35.076294"
 }
