@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "How Active Noise Cancelling Headphones Invert Physical Sound Waves",
     "How Scammers Clone a Family Member Voice in Just 3 Seconds",
     "Tabs vs Spaces Solved on GitHub Infrastructure",
     "Tabs vs Spaces Solved on GitHub Infrastructure",
@@ -99,10 +98,10 @@
     "AI Invents Faces of Non-Existent People",
     "Your Voice Unlocks Digital Doors",
     "Your Phone's Secret GPS Time Machine by NASA & NIST",
-    "Your Phone's Secret GPS Time Machine by NASA & NIST"
+    "Your Phone's Secret GPS Time Machine by NASA & NIST",
+    "Your Phone's Secret Code for Speed"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "How Active Noise Cancelling Headphones Invert Physical Sound Waves",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-12T22:02:24.083683+00:00"
-    },
     {
       "title": "How Scammers Clone a Family Member Voice in Just 3 Seconds",
       "news_source_url": "",
@@ -1347,6 +1337,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-21T19:31:43.307758+00:00"
+    },
+    {
+      "title": "Your Phone's Secret Code for Speed",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-22T06:51:29.345645+00:00"
     }
   ]
 }
