@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Why Jets Still Use 1980s Floppy Disks",
     "Python vs Rust: Why Python's Lead Is Unshakable",
     "Why You Should Never Charge Your Smartphone to 100% Overnight",
     "Why You Should Never Charge Your Smartphone to 100% Overnight",
@@ -99,10 +98,10 @@
     "Your Phone's Secret Code for Speed",
     "Flash Memory: No Moving Parts, Infinite Possibilities",
     "AI Knows What You'll Love Next",
-    "AI Knows What You'll Love Next"
+    "AI Knows What You'll Love Next",
+    "Wi-Fi's Invisible Wall-Piercing Power"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "tech trending",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "threads",
-    "tech"
+    "tech",
+    "did you know"
   ],
   "history": [
-    {
-      "title": "Why Jets Still Use 1980s Floppy Disks",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-13T08:39:58.813328+00:00"
-    },
     {
       "title": "Python vs Rust: Why Python's Lead Is Unshakable",
       "news_source_url": "",
@@ -1347,6 +1337,16 @@
       "source": "Threads Post",
       "platform": "unknown",
       "timestamp": "2026-10-22T12:19:28.072578+00:00"
+    },
+    {
+      "title": "Wi-Fi's Invisible Wall-Piercing Power",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-22T15:05:10.908405+00:00"
     }
   ]
 }
