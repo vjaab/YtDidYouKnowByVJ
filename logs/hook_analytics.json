@@ -1573,6 +1573,31 @@
         "avg_engagement": 0.0,
         "avg_swipe_away": 0.5,
         "avg_view_percentage": 484.01
+      },
+      "result_first": {
+        "variants": {
+          "B": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "This free model replaces paid tools.",
+                "video_id": "W5ITqDWYpl0",
+                "recorded_at": "2026-10-22T21:04:21.034997"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
       }
     },
     "Tech Gadgets & Inventions": {
@@ -1686,11 +1711,11 @@
     },
     "result_first": {
       "views": 1248,
-      "retention": 0.1947636397113209,
-      "engagement": 0.005680824415838291,
-      "count": 28,
-      "swipe_away_rate": 0.29991428571428574,
-      "avg_view_percentage": 20.096785714285716
+      "retention": 0.18804765213506847,
+      "engagement": 0.00548493391874042,
+      "count": 29,
+      "swipe_away_rate": 0.28957241379310344,
+      "avg_view_percentage": 19.403793103448276
     },
     "stat_contradiction": {
       "views": 273,
@@ -1717,5 +1742,5 @@
       "avg_view_percentage": 25.25548387096774
     }
   },
-  "last_updated": "2026-10-22T11:35:35.076294"
+  "last_updated": "2026-10-22T21:04:21.035146"
 }

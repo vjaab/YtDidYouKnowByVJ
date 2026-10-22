@@ -1682,5 +1682,15 @@
       "shares": 0,
       "subscribers_gained": 0
     }
+  },
+  "W5ITqDWYpl0": {
+    "video_id": "W5ITqDWYpl0",
+    "hook_pattern": "result_first",
+    "hook_variant": "B",
+    "hook_text": "This free model replaces paid tools.",
+    "category": "Facts & Trivia",
+    "title": "Why 99% Of People Miss This AI Tool \u26a1",
+    "uploaded_at": "2026-10-22T21:04:21.037652",
+    "synced": false
   }
 }
