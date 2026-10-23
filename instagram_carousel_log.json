@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Deleted Files Aren't Gone: NIST on Data Wiping",
     "Why Deleting Files Doesn't Erase Disk Data",
     "Why Python Will Not Be Replaced by Rust Anytime Soon",
     "Why Python Will Not Be Replaced by Rust Anytime Soon",
@@ -99,10 +98,10 @@
     "Wi-Fi's Invisible Wall-Piercing Power",
     "Sand: The Secret to Your Tech's Brain",
     "Sand: The Secret to Your Tech's Brain",
-    "How Your Phone Senses Gravity's Pull"
+    "How Your Phone Senses Gravity's Pull",
+    "AI Learns Like Babies: Developmental Breakthrough"
   ],
   "used_keywords": [
-    "artificial",
     "intelligence",
     "local",
     "cloud",
@@ -301,19 +300,10 @@
     "did you know",
     "threads",
     "tech",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Deleted Files Aren't Gone: NIST on Data Wiping",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-13T17:31:54.930775+00:00"
-    },
     {
       "title": "Why Deleting Files Doesn't Erase Disk Data",
       "news_source_url": "",
@@ -1342,6 +1332,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-22T18:33:08.149204+00:00"
+    },
+    {
+      "title": "AI Learns Like Babies: Developmental Breakthrough",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-23T06:44:18.265033+00:00"
     }
   ]
 }
