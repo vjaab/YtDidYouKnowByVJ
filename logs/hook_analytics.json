@@ -1670,6 +1670,31 @@
         "avg_engagement": 0.010416666666666666,
         "avg_swipe_away": 0.303525,
         "avg_view_percentage": 19.6475
+      },
+      "result_first": {
+        "variants": {
+          "B": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "This skill file teaches AI to hack.",
+                "video_id": "Oe6slPLc87o",
+                "recorded_at": "2026-10-23T19:26:28.196295"
+              }
+            ]
+          }
+        },
+        "total_views": 0,
+        "total_videos": 1,
+        "avg_retention": 0.0,
+        "avg_engagement": 0.0,
+        "avg_swipe_away": 0.0,
+        "avg_view_percentage": 0.0
       }
     },
     "AI Benchmark Showdowns": {
@@ -1711,11 +1736,11 @@
     },
     "result_first": {
       "views": 1248,
-      "retention": 0.18804765213506847,
-      "engagement": 0.00548493391874042,
-      "count": 29,
-      "swipe_away_rate": 0.28957241379310344,
-      "avg_view_percentage": 19.403793103448276
+      "retention": 0.18177939706389953,
+      "engagement": 0.005302102788115739,
+      "count": 30,
+      "swipe_away_rate": 0.27992,
+      "avg_view_percentage": 18.757
     },
     "stat_contradiction": {
       "views": 273,
@@ -1742,5 +1767,5 @@
       "avg_view_percentage": 25.25548387096774
     }
   },
-  "last_updated": "2026-10-22T21:04:21.035146"
+  "last_updated": "2026-10-23T19:26:28.196325"
 }

@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "modern_tech.mp3",
+      "headline": "SnailSploit/Claude-Red: Curated library of offensive security skills for Claude",
+      "topic_type": "auto",
+      "timestamp": "40004651868"
+    },
+    {
       "track": "jam_Inspiring_Epic_Glory.mp3",
       "headline": "HF Trending Model: DeepSeek-V4.1-Flash-1017",
       "topic_type": "auto",
@@ -173,12 +179,6 @@
       "headline": "The Overnight Speed Loop: Asking AI Agents to Make Code 7x Faster",
       "topic_type": "auto",
       "timestamp": "36486895404"
-    },
-    {
-      "track": "jam_Inspiring_Epic_Glory.mp3",
-      "headline": "Hugging Face Trending Dataset: arxiv-complete - 98K Downloads of Full arXiv Corp",
-      "topic_type": "auto",
-      "timestamp": "36456574538"
     }
   ],
   "usage_counts": {
@@ -191,7 +191,7 @@
     "Defiance.mp3": 1,
     "jam_Confidence.mp3": 1,
     "jam_Upbeat.mp3": 4,
-    "modern_tech.mp3": 3,
+    "modern_tech.mp3": 4,
     "jam_Elite.mp3": 3,
     "jam_Energetic_Pop.mp3": 3,
     "jam_Groovy_SIX.mp3": 3
