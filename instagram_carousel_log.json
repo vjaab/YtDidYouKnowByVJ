@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Why Deleting Files Doesn't Erase Disk Data",
     "Why Python Will Not Be Replaced by Rust Anytime Soon",
     "Why Python Will Not Be Replaced by Rust Anytime Soon",
     "NIST Data Sanitization: Why Deleting Files Is a Illusion",
@@ -99,10 +98,10 @@
     "Sand: The Secret to Your Tech's Brain",
     "Sand: The Secret to Your Tech's Brain",
     "How Your Phone Senses Gravity's Pull",
-    "AI Learns Like Babies: Developmental Breakthrough"
+    "AI Learns Like Babies: Developmental Breakthrough",
+    "AI's Creative Lies: When Machines Invent"
   ],
   "used_keywords": [
-    "intelligence",
     "local",
     "cloud",
     "threads",
@@ -301,19 +300,10 @@
     "threads",
     "tech",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Why Deleting Files Doesn't Erase Disk Data",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-13T17:38:20.865056+00:00"
-    },
     {
       "title": "Why Python Will Not Be Replaced by Rust Anytime Soon",
       "news_source_url": "",
@@ -1342,6 +1332,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-23T06:44:18.265033+00:00"
+    },
+    {
+      "title": "AI's Creative Lies: When Machines Invent",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-23T07:32:11.080707+00:00"
     }
   ]
 }

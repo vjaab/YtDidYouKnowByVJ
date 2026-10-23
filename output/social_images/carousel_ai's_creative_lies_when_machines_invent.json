@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know AI can invent facts and stories that aren't true? \ud83e\udd2f",
+  "headline": "AI's Creative Lies: When Machines Invent",
+  "source": "Leading AI research institutions and academic publications on large language models (e.g., Google AI, OpenAI, MIT CSAIL)",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "AI's Strange Answers? \ud83e\udd28",
+      "bubble": "I asked AI about history, but it gave me weird answers?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Machines Can Invent \ud83d\udca1",
+      "bubble": "AI can invent facts, people, or even entire fake events!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Like Dreams? \ud83d\udcad",
+      "bubble": "Like our brains creating vivid dreams from fragmented memories?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Verify AI Info! \u2705",
+      "bubble": "Always double-check AI facts! Share this truth with everyone!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "AI can 'hallucinate' or invent entirely false facts, people, or events, creating convincing but imaginary realities.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know AI can invent facts and stories that aren't true? \ud83e\udd2f\n\n\ud83d\udca1 AI can 'hallucinate' or invent entirely false facts, people, or events, creating convincing but imaginary realities.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "everyday_tech_mysteries",
+  "characters": "auto"
+}
