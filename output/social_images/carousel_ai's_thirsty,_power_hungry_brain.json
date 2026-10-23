@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "battery",
+  "speaker_right": "vj",
+  "hook": "Did You Know training advanced AI can use as much energy as many cars? \u26a1\ufe0f",
+  "headline": "AI's Thirsty, Power-Hungry Brain",
+  "source": "Stanford University's AI Index Report 2023, MIT Technology Review",
+  "slides": [
+    {
+      "speaker": "battery",
+      "emotion": "curious",
+      "title": "Your Energy Bill? \ud83d\udca1",
+      "bubble": "My energy bill is high! Is it my gadgets or something bigger?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "AI's Hidden Hunger \ud83e\udde0",
+      "bubble": "Actually, AI's brainpower consumes energy like dozens of homes!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "shocked",
+      "title": "Cars vs. Code \ud83d\ude97",
+      "bubble": "Dozens of homes? Or even several cars' entire lifespan?!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Share This Shock! \ud83e\udd2f",
+      "bubble": "Billions of calculations make AI surprisingly power-hungry. Share this fact!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Training a single advanced AI model can consume electricity like dozens of homes for a year, or several cars over their lifetime!",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know training advanced AI can use as much energy as many cars? \u26a1\ufe0f\n\n\ud83d\udca1 Training a single advanced AI model can consume electricity like dozens of homes for a year, or several cars over their lifetime!\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "everyday_tech_mysteries",
+  "characters": "auto"
+}

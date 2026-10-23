@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Why Python Will Not Be Replaced by Rust Anytime Soon",
     "NIST Data Sanitization: Why Deleting Files Is a Illusion",
     "Deleting a File on Your Computer Does Not Actually Erase It",
     "Deleting a File on Your Computer Does Not Actually Erase It",
@@ -99,10 +98,10 @@
     "How Your Phone Senses Gravity's Pull",
     "AI Learns Like Babies: Developmental Breakthrough",
     "AI's Creative Lies: When Machines Invent",
-    "Your Screen's Secret Color Magic"
+    "Your Screen's Secret Color Magic",
+    "AI's Thirsty, Power-Hungry Brain"
   ],
   "used_keywords": [
-    "cloud",
     "threads",
     "tech",
     "did you know",
@@ -301,20 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Why Python Will Not Be Replaced by Rust Anytime Soon",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-13T18:27:15.057132+00:00"
-    },
     {
       "title": "NIST Data Sanitization: Why Deleting Files Is a Illusion",
       "news_source_url": "",
@@ -1342,6 +1331,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-23T14:56:28.336609+00:00"
+    },
+    {
+      "title": "AI's Thirsty, Power-Hungry Brain",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-23T15:07:19.214069+00:00"
     }
   ]
 }
