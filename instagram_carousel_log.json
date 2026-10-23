@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "Why Python Will Not Be Replaced by Rust Anytime Soon",
-    "Why Python Will Not Be Replaced by Rust Anytime Soon",
     "NIST Data Sanitization: Why Deleting Files Is a Illusion",
     "Deleting a File on Your Computer Does Not Actually Erase It",
     "Deleting a File on Your Computer Does Not Actually Erase It",
@@ -99,10 +98,10 @@
     "Sand: The Secret to Your Tech's Brain",
     "How Your Phone Senses Gravity's Pull",
     "AI Learns Like Babies: Developmental Breakthrough",
-    "AI's Creative Lies: When Machines Invent"
+    "AI's Creative Lies: When Machines Invent",
+    "Your Screen's Secret Color Magic"
   ],
   "used_keywords": [
-    "local",
     "cloud",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "tech",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Why Python Will Not Be Replaced by Rust Anytime Soon",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-13T18:26:15.314200+00:00"
-    },
     {
       "title": "Why Python Will Not Be Replaced by Rust Anytime Soon",
       "news_source_url": "",
@@ -1342,6 +1332,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-23T07:32:11.080707+00:00"
+    },
+    {
+      "title": "Your Screen's Secret Color Magic",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-23T14:56:28.336609+00:00"
     }
   ]
 }
