@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your GPS Relies on Einstein",
     "Undersea Cables Power Your Internet",
     "Invisible Waves: How Spectrum Powers Your Wireless World",
     "Invisible Waves: How Spectrum Powers Your Wireless World",
@@ -99,10 +98,10 @@
     "AI's Thirsty, Power-Hungry Brain",
     "How Active Noise Cancellation Rewrites Reality",
     "How Search Engines Find Answers",
-    "AI Learns Best From Its Mistakes"
+    "AI Learns Best From Its Mistakes",
+    "How Submarine Cables Power Cloud Regions"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your GPS Relies on Einstein",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-14T06:51:12.078889+00:00"
-    },
     {
       "title": "Undersea Cables Power Your Internet",
       "news_source_url": "",
@@ -1340,6 +1330,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-24T08:35:20.869948+00:00"
+    },
+    {
+      "title": "How Submarine Cables Power Cloud Regions",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-24T08:56:13.304243+00:00"
     }
   ]
 }
