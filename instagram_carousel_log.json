@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Deleting a File on Your Computer Does Not Actually Erase It",
     "Your GPS Relies on Einstein",
     "Undersea Cables Power Your Internet",
     "Invisible Waves: How Spectrum Powers Your Wireless World",
@@ -99,10 +98,10 @@
     "Your Screen's Secret Color Magic",
     "AI's Thirsty, Power-Hungry Brain",
     "How Active Noise Cancellation Rewrites Reality",
-    "How Search Engines Find Answers"
+    "How Search Engines Find Answers",
+    "AI Learns Best From Its Mistakes"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,20 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Deleting a File on Your Computer Does Not Actually Erase It",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-13T20:49:55.300463+00:00"
-    },
     {
       "title": "Your GPS Relies on Einstein",
       "news_source_url": "",
@@ -1341,6 +1330,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-23T18:20:22.559808+00:00"
+    },
+    {
+      "title": "AI Learns Best From Its Mistakes",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-24T08:35:20.869948+00:00"
     }
   ]
 }

@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know AI often learns *more* from being wrong than from being right? \ud83e\udd2f",
+  "headline": "AI Learns Best From Its Mistakes",
+  "source": "MIT Technology Review",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "AI Loves Mistakes? \ud83e\udd2f",
+      "bubble": "Did you know AI learns *more* from being wrong than right?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "AI Thrives on Errors! \ud83e\udde0",
+      "bubble": "Humans avoid errors. AI systems actually thrive on making them!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "How Does That Work? \ud83e\udd14",
+      "bubble": "So, mistakes actually make AI smarter? How does it happen?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "The Cat-Dog Error \ud83d\udc3e",
+      "bubble": "AI misidentifies a cat as a dog? That's a crucial learning moment.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "thinking",
+      "title": "Adjusting Its 'Brain' \u2699\ufe0f",
+      "bubble": "So, it adjusts its internal 'brain' based on that mistake?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "The 'Backpropagation' Teacher \ud83c\udf93",
+      "bubble": "This is 'backpropagation,' like a smart teacher showing *how* wrong.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Smart From Errors! \u2728",
+      "bubble": "\ud83d\udccc Tap Save so you have this in your toolkit!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "AI learns best by making and correcting mistakes. Through a process called 'backpropagation,' errors fine-tune its neural network, making it smarter with every misstep.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nAI often learns *more* from being wrong than from being right! It's a mind-blowing paradox!\n\nHere's the mind-blowing reality:\n\ud83d\udd39 Unlike humans, AI systems are *designed* to thrive on errors.\n\ud83d\udd39 When an AI makes a mistake (like misidentifying a cat), it meticulously adjusts its internal 'brain' (neural network).\n\ud83d\udd39 This process, called 'backpropagation,' is like a super-smart teacher telling the AI exactly *how* wrong it was.\n\ud83d\udd39 Every single error it corrects makes the AI smarter and more precise!\n\n\ud83d\udccc Tap Save so you don't lose this! \n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #ArtificialIntelligence #MachineLearning #AIExplained #Innovation",
+  "vector": "visual_engineering",
+  "characters": "auto"
+}
