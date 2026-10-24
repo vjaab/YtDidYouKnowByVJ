@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know AI can learn to recognize almost anything from just a handful of examples? \ud83e\udd2f",
+  "headline": "AI Learns From Just a Few Glimpses",
+  "source": "Research in few-shot learning and meta-learning in artificial intelligence (e.g., Google AI, OpenAI, academic papers on meta-learning)",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "AI's Quick Learn? \ud83e\udd2f",
+      "bubble": "AI recognizes new objects from just a few pictures, how?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "The 'Few-Shot' Secret \u2728",
+      "bubble": "Like a child learning a new flower from just three photos!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Beyond Big Data! \ud83e\udde0",
+      "bubble": "So AI doesn't need millions of examples to understand?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Share AI's Magic! \ud83d\ude80",
+      "bubble": "Exactly! It grasps key features incredibly fast. Share this!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "AI can learn to recognize almost anything from just a handful of examples, just like a child learning a new flower from three pictures.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know AI can learn to recognize almost anything from just a handful of examples? \ud83e\udd2f\n\n\ud83d\udca1 AI can learn to recognize almost anything from just a handful of examples, just like a child learning a new flower from three pictures.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "everyday_tech_mysteries",
+  "characters": "auto"
+}

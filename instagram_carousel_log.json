@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Invisible Waves: How Spectrum Powers Your Wireless World",
     "Your Phone Screen's Invisible Electric Sense",
     "Your Phone's Billion Switches",
     "How AI Sees Your World",
@@ -99,15 +98,10 @@
     "AI Learns Best From Its Mistakes",
     "How Submarine Cables Power Cloud Regions",
     "Your Mouse's Secret Invisible Eye",
-    "VR's Brain-Tricking 3D World"
+    "VR's Brain-Tricking 3D World",
+    "AI Learns From Just a Few Glimpses"
   ],
   "used_keywords": [
-    "did you know",
-    "did you know",
-    "did you know",
-    "did you know",
-    "did you know",
-    "threads",
     "tech",
     "did you know",
     "open source ai",
@@ -301,20 +295,15 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
+    "AI",
+    "learning",
+    "recognition",
+    "efficiency",
+    "technology",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Invisible Waves: How Spectrum Powers Your Wireless World",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-14T12:21:25.576008+00:00"
-    },
     {
       "title": "Your Phone Screen's Invisible Electric Sense",
       "news_source_url": "",
@@ -1340,6 +1329,21 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-24T15:05:05.771740+00:00"
+    },
+    {
+      "title": "AI Learns From Just a Few Glimpses",
+      "news_source_url": "",
+      "keywords": [
+        "AI",
+        "learning",
+        "recognition",
+        "efficiency",
+        "technology",
+        "did you know"
+      ],
+      "source": "Research in few-shot learning and meta-learning in artificial intelligence (e.g., Google AI, OpenAI, academic papers on meta-learning)",
+      "platform": "facebook",
+      "timestamp": "2026-10-24T15:58:42.502605+00:00"
     }
   ]
 }

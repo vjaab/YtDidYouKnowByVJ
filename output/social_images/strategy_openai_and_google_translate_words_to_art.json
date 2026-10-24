@@ -1,0 +1,143 @@
+{
+  "topic": "OpenAI and Google Translate Words to Art",
+  "topic_type": "model_release",
+  "domain": "ai_ml",
+  "difficulty": "intermediate",
+  "audience": "students_and_professionals",
+  "visual_theme": "BLUEPRINT",
+  "theme_css_class": "theme--blueprint",
+  "theme_colors": {
+    "bg": "#111827",
+    "card_bg": "#1F2937",
+    "card_border": "#374151",
+    "text_primary": "#F9FAFB",
+    "text_secondary": "#D1D5DB",
+    "text_muted": "#6B7280",
+    "accent": "#06B6D4",
+    "accent_secondary": "#8B5CF6",
+    "accent_success": "#10B981",
+    "accent_danger": "#EF4444",
+    "accent_warning": "#F59E0B",
+    "code_bg": "#0F172A",
+    "gradient_start": "#06B6D4",
+    "gradient_end": "#8B5CF6"
+  },
+  "visual_concept": "neural_intelligence",
+  "visual_motifs": [
+    "attention_heads",
+    "activation_nodes",
+    "latent_vectors",
+    "context_streams"
+  ],
+  "hero_visual": "model_architecture",
+  "accent_style": "cyber_matrix",
+  "storytelling_pattern": "news_breakdown",
+  "slide_count": 8,
+  "layout_pattern": [
+    "hero_hook",
+    "whats_new",
+    "architecture_diagram",
+    "metrics_cards",
+    "before_after",
+    "real_world_scenario",
+    "checklist",
+    "takeaway"
+  ],
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "hook",
+      "purpose": "hook",
+      "layout_type": "hero_hook",
+      "title_position": "center",
+      "supports": [
+        "title",
+        "subtitle",
+        "emoji_icon"
+      ]
+    },
+    {
+      "slide_number": 2,
+      "role": "what_changed",
+      "purpose": "what_changed",
+      "layout_type": "whats_new",
+      "title_position": "top-center",
+      "supports": []
+    },
+    {
+      "slide_number": 3,
+      "role": "technical_mechanism",
+      "purpose": "technical_mechanism",
+      "layout_type": "architecture_diagram",
+      "title_position": "top-left",
+      "supports": [
+        "nodes",
+        "connections",
+        "labels"
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "benchmark_evidence",
+      "purpose": "benchmark_evidence",
+      "layout_type": "metrics_cards",
+      "title_position": "top-center",
+      "supports": [
+        "metrics"
+      ]
+    },
+    {
+      "slide_number": 5,
+      "role": "previous_vs_new",
+      "purpose": "previous_vs_new",
+      "layout_type": "before_after",
+      "title_position": "top-left",
+      "supports": [
+        "before_title",
+        "before_items",
+        "after_title",
+        "after_items"
+      ]
+    },
+    {
+      "slide_number": 6,
+      "role": "developer_impact",
+      "purpose": "developer_impact",
+      "layout_type": "real_world_scenario",
+      "title_position": "top-center",
+      "supports": [
+        "company",
+        "scenario",
+        "technical_detail",
+        "diagram"
+      ]
+    },
+    {
+      "slide_number": 7,
+      "role": "practical_action",
+      "purpose": "practical_action",
+      "layout_type": "checklist",
+      "title_position": "top-left",
+      "supports": [
+        "items",
+        "title"
+      ]
+    },
+    {
+      "slide_number": 8,
+      "role": "takeaway",
+      "purpose": "takeaway",
+      "layout_type": "takeaway",
+      "title_position": "top-center",
+      "supports": [
+        "takeaways",
+        "cta_text"
+      ]
+    }
+  ],
+  "brand": {
+    "handle": "@vijayakumarj_ai",
+    "name": "Vijayakumar J",
+    "short_name": "VJ"
+  }
+}
