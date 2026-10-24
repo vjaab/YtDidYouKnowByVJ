@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "Invisible Waves: How Spectrum Powers Your Wireless World",
-    "Invisible Waves: How Spectrum Powers Your Wireless World",
     "Your Phone Screen's Invisible Electric Sense",
     "Your Phone's Billion Switches",
     "How AI Sees Your World",
@@ -99,10 +98,10 @@
     "How Search Engines Find Answers",
     "AI Learns Best From Its Mistakes",
     "How Submarine Cables Power Cloud Regions",
-    "Your Mouse's Secret Invisible Eye"
+    "Your Mouse's Secret Invisible Eye",
+    "VR's Brain-Tricking 3D World"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Invisible Waves: How Spectrum Powers Your Wireless World",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-14T12:20:04.000952+00:00"
-    },
     {
       "title": "Invisible Waves: How Spectrum Powers Your Wireless World",
       "news_source_url": "",
@@ -1340,6 +1330,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-10-24T09:46:55.034625+00:00"
+    },
+    {
+      "title": "VR's Brain-Tricking 3D World",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-24T15:05:05.771740+00:00"
     }
   ]
 }

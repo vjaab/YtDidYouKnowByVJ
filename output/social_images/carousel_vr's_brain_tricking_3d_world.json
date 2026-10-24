@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know virtual reality tricks your brain into seeing depth where there isn't any? \ud83e\udd2f",
+  "headline": "VR's Brain-Tricking 3D World",
+  "source": "Cognitive science and computer graphics research",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "VR's Depth Illusion? \ud83e\udd2f",
+      "bubble": "Did you know VR tricks your brain into seeing 3D?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Two Flat Images \ud83d\uddbc\ufe0f\ud83d\uddbc\ufe0f",
+      "bubble": "Yes! VR shows each eye a slightly different flat image.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Like Real Life? \ud83d\udc40",
+      "bubble": "Just like our eyes see slightly different perspectives naturally?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Brain Stitches Views \ud83e\udde0",
+      "bubble": "Exactly! Your brain stitches these two flat views together.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Creating Deep Worlds \ud83c\udf0c",
+      "bubble": "This creates the powerful illusion of a deep 3D world!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Instant Immersion \u2728",
+      "bubble": "This ingenious trick makes you feel truly immersed in digital space.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Bookmark This Fact! \ud83d\udccc",
+      "bubble": "\ud83d\udccc Tap Save this mind-blowing fact for your toolkit!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "VR headsets show separate images to each eye. Your brain combines them for a powerful 3D illusion.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nVR isn't magic, it's just really clever science! Your brain is the real magician here.\n\nHere's the mind-blowing reality:\n\ud83d\udd39 VR headsets show a slightly different flat image to each of your eyes.\n\ud83d\udd39 Just like how you see the real world, but digitally!\n\ud83d\udd39 Your brain then cleverly stitches these two images together.\n\ud83d\udd39 This creates the powerful illusion of a deep, three-dimensional world, making you feel truly immersed!\n\n\ud83d\udccc Tap Save so you don't lose this mind-bending fact!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #VRTech #VirtualReality #BrainTricks #TechFacts #SpatialComputing #Metaverse #AugmentedReality",
+  "vector": "ai_secrets",
+  "characters": "auto"
+}
