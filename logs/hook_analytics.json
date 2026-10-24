@@ -1679,18 +1679,23 @@
             "engagement": 0.0,
             "swipe_away_rate": 0.0,
             "avg_view_percentage": 0.0,
-            "count": 1,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "This skill file teaches AI to hack.",
                 "video_id": "Oe6slPLc87o",
                 "recorded_at": "2026-10-23T19:26:28.196295"
+              },
+              {
+                "text": "Stop treating your AI like Google search.",
+                "video_id": "UVpyqGIbRsY",
+                "recorded_at": "2026-10-24T13:55:24.088351"
               }
             ]
           }
         },
         "total_views": 0,
-        "total_videos": 1,
+        "total_videos": 2,
         "avg_retention": 0.0,
         "avg_engagement": 0.0,
         "avg_swipe_away": 0.0,
@@ -1736,11 +1741,11 @@
     },
     "result_first": {
       "views": 1248,
-      "retention": 0.18177939706389953,
-      "engagement": 0.005302102788115739,
-      "count": 30,
-      "swipe_away_rate": 0.27992,
-      "avg_view_percentage": 18.757
+      "retention": 0.1759155455457092,
+      "engagement": 0.005131067214305554,
+      "count": 31,
+      "swipe_away_rate": 0.27089032258064516,
+      "avg_view_percentage": 18.151935483870968
     },
     "stat_contradiction": {
       "views": 273,
@@ -1767,5 +1772,5 @@
       "avg_view_percentage": 25.25548387096774
     }
   },
-  "last_updated": "2026-10-23T19:26:28.196325"
+  "last_updated": "2026-10-24T13:55:24.088373"
 }

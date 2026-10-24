@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_Energy.mp3",
+      "headline": "GitHub Trending: colbymchenry/codegraph \u2014 Pre-indexed code knowledge graph, auto",
+      "topic_type": "auto",
+      "timestamp": "40094506742"
+    },
+    {
       "track": "modern_tech.mp3",
       "headline": "SnailSploit/Claude-Red: Curated library of offensive security skills for Claude",
       "topic_type": "auto",
@@ -173,16 +179,10 @@
       "headline": "NVIDIA Nemotron-3-Diarization: Free Open-Weight Speaker Diarization Model",
       "topic_type": "auto",
       "timestamp": "36522678799"
-    },
-    {
-      "track": "jam_Confidence.mp3",
-      "headline": "The Overnight Speed Loop: Asking AI Agents to Make Code 7x Faster",
-      "topic_type": "auto",
-      "timestamp": "36486895404"
     }
   ],
   "usage_counts": {
-    "jam_Energy.mp3": 6,
+    "jam_Energy.mp3": 7,
     "jam_Action_Inspiration_Trailer.mp3": 4,
     "jam_The_Epic.mp3": 4,
     "jam_Escape_From_The_Machine_Planet.mp3": 3,
