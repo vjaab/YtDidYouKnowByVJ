@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Phone Screen's Invisible Electric Sense",
     "Your Phone's Billion Switches",
     "How AI Sees Your World",
     "How AI Sees Your World",
@@ -99,10 +98,10 @@
     "How Submarine Cables Power Cloud Regions",
     "Your Mouse's Secret Invisible Eye",
     "VR's Brain-Tricking 3D World",
-    "AI Learns From Just a Few Glimpses"
+    "AI Learns From Just a Few Glimpses",
+    "Supercharging AI Search: Hybrid RAG & Cache"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "open source ai",
     "local llm",
@@ -301,19 +300,10 @@
     "recognition",
     "efficiency",
     "technology",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Phone Screen's Invisible Electric Sense",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-14T15:00:55.331136+00:00"
-    },
     {
       "title": "Your Phone's Billion Switches",
       "news_source_url": "",
@@ -1344,6 +1334,16 @@
       "source": "Research in few-shot learning and meta-learning in artificial intelligence (e.g., Google AI, OpenAI, academic papers on meta-learning)",
       "platform": "facebook",
       "timestamp": "2026-10-24T15:58:42.502605+00:00"
+    },
+    {
+      "title": "Supercharging AI Search: Hybrid RAG & Cache",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-24T16:49:19.181122+00:00"
     }
   ]
 }

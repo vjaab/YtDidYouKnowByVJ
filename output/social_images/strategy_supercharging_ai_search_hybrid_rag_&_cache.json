@@ -1,0 +1,132 @@
+{
+  "topic": "Supercharging AI Search: Hybrid RAG & Cache",
+  "topic_type": "framework_update",
+  "domain": "ai_ml",
+  "difficulty": "intermediate",
+  "audience": "students_and_professionals",
+  "visual_theme": "BLUEPRINT",
+  "theme_css_class": "theme--blueprint",
+  "theme_colors": {
+    "bg": "#111827",
+    "card_bg": "#1F2937",
+    "card_border": "#374151",
+    "text_primary": "#F9FAFB",
+    "text_secondary": "#D1D5DB",
+    "text_muted": "#6B7280",
+    "accent": "#06B6D4",
+    "accent_secondary": "#8B5CF6",
+    "accent_success": "#10B981",
+    "accent_danger": "#EF4444",
+    "accent_warning": "#F59E0B",
+    "code_bg": "#0F172A",
+    "gradient_start": "#06B6D4",
+    "gradient_end": "#8B5CF6"
+  },
+  "visual_concept": "agent_orchestration",
+  "visual_motifs": [
+    "cyclic_graph",
+    "state_node",
+    "tool_dispatch",
+    "checkpoint_queue"
+  ],
+  "hero_visual": "state_graph",
+  "accent_style": "agentic_high_tech",
+  "storytelling_pattern": "tutorial_flow",
+  "slide_count": 7,
+  "layout_pattern": [
+    "hero_hook",
+    "whats_new",
+    "architecture_diagram",
+    "side_by_side",
+    "before_after",
+    "checklist",
+    "takeaway"
+  ],
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "hook",
+      "purpose": "hook",
+      "layout_type": "hero_hook",
+      "title_position": "center",
+      "supports": [
+        "title",
+        "subtitle",
+        "emoji_icon"
+      ]
+    },
+    {
+      "slide_number": 2,
+      "role": "whats_new",
+      "purpose": "whats_new",
+      "layout_type": "whats_new",
+      "title_position": "top-center",
+      "supports": []
+    },
+    {
+      "slide_number": 3,
+      "role": "execution_graph",
+      "purpose": "execution_graph",
+      "layout_type": "architecture_diagram",
+      "title_position": "top-left",
+      "supports": [
+        "nodes",
+        "connections",
+        "labels"
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "capability_breakdown",
+      "purpose": "capability_breakdown",
+      "layout_type": "side_by_side",
+      "title_position": "top-center",
+      "supports": [
+        "left_title",
+        "left_items",
+        "right_title",
+        "right_items"
+      ]
+    },
+    {
+      "slide_number": 5,
+      "role": "migration_comparison",
+      "purpose": "migration_comparison",
+      "layout_type": "before_after",
+      "title_position": "top-left",
+      "supports": [
+        "before_title",
+        "before_items",
+        "after_title",
+        "after_items"
+      ]
+    },
+    {
+      "slide_number": 6,
+      "role": "upgrade_checklist",
+      "purpose": "upgrade_checklist",
+      "layout_type": "checklist",
+      "title_position": "top-center",
+      "supports": [
+        "items",
+        "title"
+      ]
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "purpose": "takeaway",
+      "layout_type": "takeaway",
+      "title_position": "top-left",
+      "supports": [
+        "takeaways",
+        "cta_text"
+      ]
+    }
+  ],
+  "brand": {
+    "handle": "@vijayakumarj_ai",
+    "name": "Vijayakumar J",
+    "short_name": "VJ"
+  }
+}
