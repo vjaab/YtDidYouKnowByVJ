@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Undersea Cables Power Your Internet",
     "Invisible Waves: How Spectrum Powers Your Wireless World",
     "Invisible Waves: How Spectrum Powers Your Wireless World",
     "Your Phone Screen's Invisible Electric Sense",
@@ -99,10 +98,10 @@
     "How Active Noise Cancellation Rewrites Reality",
     "How Search Engines Find Answers",
     "AI Learns Best From Its Mistakes",
-    "How Submarine Cables Power Cloud Regions"
+    "How Submarine Cables Power Cloud Regions",
+    "Your Mouse's Secret Invisible Eye"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Undersea Cables Power Your Internet",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-14T07:37:16.032896+00:00"
-    },
     {
       "title": "Invisible Waves: How Spectrum Powers Your Wireless World",
       "news_source_url": "",
@@ -1340,6 +1330,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-24T08:56:13.304243+00:00"
+    },
+    {
+      "title": "Your Mouse's Secret Invisible Eye",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-24T09:46:55.034625+00:00"
     }
   ]
 }
