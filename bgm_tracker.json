@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_Energetic_Rock.mp3",
+      "headline": "HF Trending Dataset: tiktok-5.6B-videos",
+      "topic_type": "auto",
+      "timestamp": "40116487976"
+    },
+    {
       "track": "jam_Energy.mp3",
       "headline": "GitHub Trending: colbymchenry/codegraph \u2014 Pre-indexed code knowledge graph, auto",
       "topic_type": "auto",
@@ -173,12 +179,6 @@
       "headline": "NVIDIA Launches Open Agent Safety Platform and Developers Flock to Agent Orchest",
       "topic_type": "auto",
       "timestamp": "36614629685"
-    },
-    {
-      "track": "Destiny.mp3",
-      "headline": "NVIDIA Nemotron-3-Diarization: Free Open-Weight Speaker Diarization Model",
-      "topic_type": "auto",
-      "timestamp": "36522678799"
     }
   ],
   "usage_counts": {
@@ -194,6 +194,7 @@
     "modern_tech.mp3": 4,
     "jam_Elite.mp3": 3,
     "jam_Energetic_Pop.mp3": 3,
-    "jam_Groovy_SIX.mp3": 3
+    "jam_Groovy_SIX.mp3": 3,
+    "jam_Energetic_Rock.mp3": 1
   }
 }

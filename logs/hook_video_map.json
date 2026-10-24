@@ -1712,5 +1712,15 @@
     "title": "The Local AI Secret Nobody Tells You \ud83e\udd2b",
     "uploaded_at": "2026-10-24T13:55:24.090689",
     "synced": false
+  },
+  "VBwI6gEzNc0": {
+    "video_id": "VBwI6gEzNc0",
+    "hook_pattern": "result_first",
+    "hook_variant": "C",
+    "hook_text": "This hidden Hugging Face dataset changes machine learning",
+    "category": "Artificial Intelligence",
+    "title": "Why 99% Of People Get AI Training Wrong \u26a1",
+    "uploaded_at": "2026-10-24T18:28:26.201684",
+    "synced": false
   }
 }
