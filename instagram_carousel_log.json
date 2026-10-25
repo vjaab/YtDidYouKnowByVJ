@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "Secret Language of Touch: Capacitive Screens",
-    "Secret Language of Touch: Capacitive Screens",
     "Cloud Infrastructure: Physical Realities Shaping Architecture",
     "The Internet's Unbreakable Speed Limit",
     "Tiny Glitches That Trick AI",
@@ -99,10 +98,10 @@
     "IBM Quantum: Many Answers At Once",
     "Your Data Lives on Tiny Magnets",
     "AI Decodes Search Intent: SEO Automation Breakthrough",
-    "How Self-Driving Cars Actually See"
+    "How Self-Driving Cars Actually See",
+    "ChatGPT: Trillions of Words, Hidden Biases"
   ],
   "used_keywords": [
-    "did you know",
     "ai coding",
     "junior developers",
     "software engineering",
@@ -301,19 +300,10 @@
     "content briefs",
     "AI strategy",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Secret Language of Touch: Capacitive Screens",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-14T19:37:52.231287+00:00"
-    },
     {
       "title": "Secret Language of Touch: Capacitive Screens",
       "news_source_url": "",
@@ -1349,6 +1339,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-25T16:18:32.727547+00:00"
+    },
+    {
+      "title": "ChatGPT: Trillions of Words, Hidden Biases",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-25T17:10:48.172812+00:00"
     }
   ]
 }
