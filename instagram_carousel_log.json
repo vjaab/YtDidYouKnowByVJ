@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Phone's Billion Switches",
     "How AI Sees Your World",
     "How AI Sees Your World",
     "VR's Mind-Bending Brain Illusion",
@@ -99,10 +98,10 @@
     "Your Mouse's Secret Invisible Eye",
     "VR's Brain-Tricking 3D World",
     "AI Learns From Just a Few Glimpses",
-    "Supercharging AI Search: Hybrid RAG & Cache"
+    "Supercharging AI Search: Hybrid RAG & Cache",
+    "AI's Universal Language Brain: The Interlingua Shift"
   ],
   "used_keywords": [
-    "did you know",
     "open source ai",
     "local llm",
     "huggingface",
@@ -301,19 +300,10 @@
     "efficiency",
     "technology",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Phone's Billion Switches",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-14T15:10:00.025891+00:00"
-    },
     {
       "title": "How AI Sees Your World",
       "news_source_url": "",
@@ -1344,6 +1334,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-10-24T16:49:19.181122+00:00"
+    },
+    {
+      "title": "AI's Universal Language Brain: The Interlingua Shift",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-25T08:54:55.848333+00:00"
     }
   ]
 }
