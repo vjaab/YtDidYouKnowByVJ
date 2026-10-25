@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "How AI Sees Your World",
     "VR's Mind-Bending Brain Illusion",
     "AI's Creative 'Dreams' and Hallucinations",
     "Secret Language of Touch: Capacitive Screens",
@@ -99,10 +98,10 @@
     "AI Learns From Just a Few Glimpses",
     "Supercharging AI Search: Hybrid RAG & Cache",
     "AI's Universal Language Brain: The Interlingua Shift",
-    "IBM Quantum: Many Answers At Once"
+    "IBM Quantum: Many Answers At Once",
+    "Your Data Lives on Tiny Magnets"
   ],
   "used_keywords": [
-    "local llm",
     "huggingface",
     "deepseek",
     "threads_debates",
@@ -301,20 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "How AI Sees Your World",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-14T15:56:38.736275+00:00"
-    },
     {
       "title": "VR's Mind-Bending Brain Illusion",
       "news_source_url": "",
@@ -1344,6 +1333,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-25T09:16:19.485400+00:00"
+    },
+    {
+      "title": "Your Data Lives on Tiny Magnets",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-25T10:07:53.213401+00:00"
     }
   ]
 }
