@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_Confidence.mp3",
+      "headline": "stablyai/orca: Run any coding agent with your own subscription across a fleet of",
+      "topic_type": "auto",
+      "timestamp": "40196155396"
+    },
+    {
       "track": "jam_Energetic_Rock.mp3",
       "headline": "HF Trending Dataset: tiktok-5.6B-videos",
       "topic_type": "auto",
@@ -173,12 +179,6 @@
       "headline": "HF Trending Model: GLiNER2.5-Decide",
       "topic_type": "auto",
       "timestamp": "36773076742"
-    },
-    {
-      "track": "jam_Energy.mp3",
-      "headline": "NVIDIA Launches Open Agent Safety Platform and Developers Flock to Agent Orchest",
-      "topic_type": "auto",
-      "timestamp": "36614629685"
     }
   ],
   "usage_counts": {
@@ -189,7 +189,7 @@
     "jam_Inspiring_Epic_Glory.mp3": 3,
     "Destiny.mp3": 3,
     "Defiance.mp3": 1,
-    "jam_Confidence.mp3": 1,
+    "jam_Confidence.mp3": 2,
     "jam_Upbeat.mp3": 4,
     "modern_tech.mp3": 4,
     "jam_Elite.mp3": 3,
