@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know AI can now strategize your entire content plan? \ud83e\udd2f",
+  "headline": "AI Decodes Search Intent: SEO Automation Breakthrough",
+  "source": "Medium - artificial-intelligence",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "AI Plans Your Content? \ud83e\udd2f",
+      "bubble": "Did you know AI can now plan all your content?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "AI's SEO Power-Up \u2728",
+      "bubble": "Yes! AI now masters strategic SEO's core.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Beyond Just Writing? \ud83e\udd14",
+      "bubble": "So, it's more than just writing articles now?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Deciphering Search Intent \ud83d\udd0d",
+      "bubble": "AI decodes complex search intent and keyword research.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "thinking",
+      "title": "Full Content Briefs? \ud83d\udcdd",
+      "bubble": "Wait, it creates entire content strategies and briefs?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Automating Expertise \ud83d\ude80",
+      "bubble": "It automates tasks needing extensive human expertise.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Game-Changer Alert! \ud83d\udca1",
+      "bubble": "\ud83d\udccc Tap Save so you have this in your toolkit!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "AI now decodes search intent, automates SEO strategy, and creates full content plans, revolutionizing digital marketing.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nAI can now strategize your ENTIRE content plan, from nuanced keyword research to full content briefs!\n\nHere is the mind-blowing reality:\n\ud83d\udd39 Latest AI models like ChatGPT & Gemini master strategic SEO.\n\ud83d\udd39 They autonomously perform complex keyword research.\n\ud83d\udd39 AI deciphers search intent, automating human-level analysis.\n\ud83d\udd39 It generates comprehensive content briefs, revolutionizing efficiency.\n\n\ud83d\udccc Tap Save so you don't miss this SEO game-changer!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #AIDecodesSearchIntent #SEOAi #ContentStrategy #DigitalMarketing #ChatGPT #GoogleGemini #AIAutomation #vijayakumarj_ai",
+  "vector": "trending_breakthroughs",
+  "characters": "auto"
+}

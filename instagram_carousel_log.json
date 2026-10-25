@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "VR's Mind-Bending Brain Illusion",
     "AI's Creative 'Dreams' and Hallucinations",
     "Secret Language of Touch: Capacitive Screens",
     "Secret Language of Touch: Capacitive Screens",
@@ -99,16 +98,10 @@
     "Supercharging AI Search: Hybrid RAG & Cache",
     "AI's Universal Language Brain: The Interlingua Shift",
     "IBM Quantum: Many Answers At Once",
-    "Your Data Lives on Tiny Magnets"
+    "Your Data Lives on Tiny Magnets",
+    "AI Decodes Search Intent: SEO Automation Breakthrough"
   ],
   "used_keywords": [
-    "huggingface",
-    "deepseek",
-    "threads_debates",
-    "did you know",
-    "did you know",
-    "threads",
-    "tech",
     "did you know",
     "did you know",
     "ai coding",
@@ -301,19 +294,16 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
+    "ChatGPT",
+    "Gemini AI",
+    "SEO automation",
+    "keyword research",
+    "content briefs",
+    "AI strategy",
     "did you know"
   ],
   "history": [
-    {
-      "title": "VR's Mind-Bending Brain Illusion",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-14T18:25:28.642271+00:00"
-    },
     {
       "title": "AI's Creative 'Dreams' and Hallucinations",
       "news_source_url": "",
@@ -1343,6 +1333,22 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-10-25T10:07:53.213401+00:00"
+    },
+    {
+      "title": "AI Decodes Search Intent: SEO Automation Breakthrough",
+      "news_source_url": "https://medium.com/ai-made-practical/chatgpt-vs-gemini-for-seo-keyword-research-outlines-and-content-briefs-5c7617a0233e?source=rss------artificial_intelligence-5",
+      "keywords": [
+        "ChatGPT",
+        "Gemini AI",
+        "SEO automation",
+        "keyword research",
+        "content briefs",
+        "AI strategy",
+        "did you know"
+      ],
+      "source": "Medium - artificial-intelligence",
+      "platform": "instagram",
+      "timestamp": "2026-10-25T15:19:00.141824+00:00"
     }
   ]
 }
