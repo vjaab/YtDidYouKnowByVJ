@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "How AI Sees Your World",
-    "How AI Sees Your World",
     "VR's Mind-Bending Brain Illusion",
     "AI's Creative 'Dreams' and Hallucinations",
     "Secret Language of Touch: Capacitive Screens",
@@ -99,10 +98,10 @@
     "VR's Brain-Tricking 3D World",
     "AI Learns From Just a Few Glimpses",
     "Supercharging AI Search: Hybrid RAG & Cache",
-    "AI's Universal Language Brain: The Interlingua Shift"
+    "AI's Universal Language Brain: The Interlingua Shift",
+    "IBM Quantum: Many Answers At Once"
   ],
   "used_keywords": [
-    "open source ai",
     "local llm",
     "huggingface",
     "deepseek",
@@ -301,19 +300,10 @@
     "technology",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "How AI Sees Your World",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-14T15:55:17.121023+00:00"
-    },
     {
       "title": "How AI Sees Your World",
       "news_source_url": "",
@@ -1344,6 +1334,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-25T08:54:55.848333+00:00"
+    },
+    {
+      "title": "IBM Quantum: Many Answers At Once",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-25T09:16:19.485400+00:00"
     }
   ]
 }
