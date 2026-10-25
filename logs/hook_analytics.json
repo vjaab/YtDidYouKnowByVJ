@@ -1468,14 +1468,29 @@
                 "recorded_at": "2026-10-18T18:07:36.167364"
               }
             ]
+          },
+          "C": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "This open weight AI transforms images in seconds.",
+                "video_id": "XcSzHI1hZVA",
+                "recorded_at": "2026-10-25T18:39:53.598828"
+              }
+            ]
           }
         },
         "total_views": 234,
-        "total_videos": 2,
-        "avg_retention": 0.1794871794871795,
+        "total_videos": 3,
+        "avg_retention": 0.11965811965811966,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.31325000000000003,
-        "avg_view_percentage": 18.675
+        "avg_swipe_away": 0.20883333333333334,
+        "avg_view_percentage": 12.450000000000001
       },
       "curiosity_gap": {
         "variants": {
@@ -1791,11 +1806,11 @@
     },
     "result_first": {
       "views": 1253,
-      "retention": 0.17925476449614186,
-      "engagement": 0.004820093443741581,
-      "count": 33,
-      "swipe_away_rate": 0.2707666666666667,
-      "avg_view_percentage": 18.452727272727273
+      "retention": 0.173982565540373,
+      "engagement": 0.004678325989513887,
+      "count": 34,
+      "swipe_away_rate": 0.26280294117647063,
+      "avg_view_percentage": 17.91
     },
     "stat_contradiction": {
       "views": 273,
@@ -1822,5 +1837,5 @@
       "avg_view_percentage": 25.25548387096774
     }
   },
-  "last_updated": "2026-10-25T14:20:11.255396"
+  "last_updated": "2026-10-25T18:39:53.598847"
 }

@@ -1746,5 +1746,15 @@
     "title": "How One Tool Runs Every AI Coder \ud83e\udd2b",
     "uploaded_at": "2026-10-25T14:20:11.257513",
     "synced": false
+  },
+  "XcSzHI1hZVA": {
+    "video_id": "XcSzHI1hZVA",
+    "hook_pattern": "result_first",
+    "hook_variant": "C",
+    "hook_text": "This open weight AI transforms images in seconds.",
+    "category": "AI & Tech Tools",
+    "title": "Why 99% Of People Get AI Images Wrong \u26a1",
+    "uploaded_at": "2026-10-25T18:39:53.600785",
+    "synced": false
   }
 }
