@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "battery",
+  "speaker_right": "vj",
+  "hook": "Your phone charges through thin air? \u26a1\ufe0f\ud83e\udd2f",
+  "headline": "Wireless Charging's Invisible Energy Trick",
+  "source": "Qi Wireless Power Consortium / Principles of Electromagnetic Induction",
+  "slides": [
+    {
+      "speaker": "battery",
+      "emotion": "curious",
+      "title": "Invisible Power? \u2728",
+      "bubble": "Does my phone really get power from nothing?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Thin Air Power \u26a1",
+      "bubble": "Not quite nothing! It's called electromagnetic induction, a clever trick!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "shocked",
+      "title": "Magnetic Field Magic? \ud83e\uddf2",
+      "bubble": "Induction? What magic makes that happen?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Coil Creates Field \ud83c\udf00",
+      "bubble": "Charger coil makes an invisible, fluctuating magnetic field.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "thinking",
+      "title": "Phone Coil Reacts? \ud83d\udcf1",
+      "bubble": "And my phone's coil does what exactly?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Energy Conveyor Belt \ud83d\ude80",
+      "bubble": "It catches the field, turning it into power for you!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "excited",
+      "title": "Save This Tech! \ud83d\udca1",
+      "bubble": "\ud83d\udccc Tap Save so you have this toolkit!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Wireless charging uses electromagnetic induction, where a magnetic field from the charger's coil powers your phone's coil.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour phone charges through thin air, and it's not magic!\n\nHere's how this invisible energy trick works:\n\ud83d\udd39 A coil in the wireless charger creates a fluctuating magnetic field.\n\ud83d\udd39 When your phone gets close, its own coil 'induces' an electric current from that field.\n\ud83d\udd39 This creates a tiny, invisible conveyor belt of energy!\n\n\ud83d\udccc Tap Save so you have this in your toolkit!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #WirelessCharging #ElectromagneticInduction #VJTech",
+  "vector": "ai_secrets",
+  "characters": "auto"
+}

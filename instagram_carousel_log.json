@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Sand to Silicon: The 2026 Phone Brain Shift",
     "The Cloud's Thirsty Secret: Water Footprint of Hyperscale AI",
     "AI's Chat Secret: No Real Understanding",
     "AI's Chat Secret: No Real Understanding",
@@ -99,10 +98,10 @@
     "Internet's Hidden Highway: Data by Light",
     "Your Fingerprint: A Tiny Electric Map",
     "Satellites Use Einstein's Time Trick",
-    "Your Voice's Invisible Digital Twin"
+    "Your Voice's Invisible Digital Twin",
+    "Wireless Charging's Invisible Energy Trick"
   ],
   "used_keywords": [
-    "visual_engineering",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "AI Voice Cloning",
     "Speech Synthesis",
     "Digital Twin",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Sand to Silicon: The 2026 Phone Brain Shift",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-15T14:56:07.653110+00:00"
-    },
     {
       "title": "The Cloud's Thirsty Secret: Water Footprint of Hyperscale AI",
       "news_source_url": "",
@@ -1355,6 +1345,16 @@
       "source": "Generative AI Voice Synthesis Research",
       "platform": "threads",
       "timestamp": "2026-10-26T17:31:55.250796+00:00"
+    },
+    {
+      "title": "Wireless Charging's Invisible Energy Trick",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-26T19:49:52.991895+00:00"
     }
   ]
 }
