@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "The Internet's Unbreakable Speed Limit",
     "Tiny Glitches That Trick AI",
     "Tiny Glitches That Trick AI",
     "Sand to Silicon: The 2026 Phone Brain Shift",
@@ -99,10 +98,10 @@
     "How Self-Driving Cars Actually See",
     "ChatGPT: Trillions of Words, Hidden Biases",
     "Phone's Secret Night Vision Power",
-    "Internet's Hidden Highway: Data by Light"
+    "Internet's Hidden Highway: Data by Light",
+    "Your Fingerprint: A Tiny Electric Map"
   ],
   "used_keywords": [
-    "software engineering",
     "career",
     "threads_debates",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "The Internet's Unbreakable Speed Limit",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-15T07:29:43.470303+00:00"
-    },
     {
       "title": "Tiny Glitches That Trick AI",
       "news_source_url": "",
@@ -1348,6 +1338,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-26T07:48:59.614985+00:00"
+    },
+    {
+      "title": "Your Fingerprint: A Tiny Electric Map",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-26T16:43:49.963619+00:00"
     }
   ]
 }

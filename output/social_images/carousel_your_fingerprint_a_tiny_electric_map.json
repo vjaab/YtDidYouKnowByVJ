@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "battery",
+  "speaker_right": "vj",
+  "hook": "Did You Know your phone \"sees\" your fingerprint using tiny electric fields? \u26a1",
+  "headline": "Your Fingerprint: A Tiny Electric Map",
+  "source": "Capacitive Fingerprint Sensor Technology",
+  "slides": [
+    {
+      "speaker": "battery",
+      "emotion": "shocked",
+      "title": "Electric Fingerprints? \u26a1",
+      "bubble": "Did you know your phone 'sees' your fingerprint using electricity?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Not Just a Photo! \ud83d\udcf8",
+      "bubble": "It scans an electrical map, not a simple flat picture.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "curious",
+      "title": "How Does It Map? \ud83e\udd14",
+      "bubble": "An electrical map? How does it actually 'see' my finger shape?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Capacitive Sensing! \ud83d\udca1",
+      "bubble": "Tiny electric charges measure skin contact, forming a detailed map.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "shocked",
+      "title": "Ridges & Valleys! \ud83d\udcc8",
+      "bubble": "So, different charges show my unique fingerprint ridges and valleys?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Instant 3D Scan! \ud83d\ude80",
+      "bubble": "Precisely! It's a super fast, secure 3D electrical scan.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "excited",
+      "title": "Invisible Electric Map! \u2728",
+      "bubble": "\ud83d\udccc Tap Save so you have this amazing electrical map fact!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your smartphone's fingerprint sensor doesn't just take a simple picture; it creates a detailed 3D electrical map of your unique finger ridges and valleys.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour phone's fingerprint sensor isn't taking a photo; it's mapping you with electricity!\n\nHere's the mind-blowing reality:\n\ud83d\udd39 Your phone uses tiny electric fields to 'see' your unique fingerprint.\n\ud83d\udd39 It measures electrical changes when your skin touches the sensor.\n\ud83d\udd39 This creates a detailed 3D electrical map of your ridges and valleys.\n\ud83d\udd39 This invisible scan is why your phone unlocks instantly and securely!\n\n\ud83d\udccc Tap Save so you don't lose this mind-blowing tech fact!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #FingerprintSensor #CapacitiveSensing #SmartphoneTech",
+  "vector": "visual_engineering",
+  "characters": "auto"
+}
