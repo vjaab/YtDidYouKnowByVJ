@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Cloud Infrastructure: Physical Realities Shaping Architecture",
     "The Internet's Unbreakable Speed Limit",
     "Tiny Glitches That Trick AI",
     "Tiny Glitches That Trick AI",
@@ -99,10 +98,10 @@
     "AI Decodes Search Intent: SEO Automation Breakthrough",
     "How Self-Driving Cars Actually See",
     "ChatGPT: Trillions of Words, Hidden Biases",
-    "Phone's Secret Night Vision Power"
+    "Phone's Secret Night Vision Power",
+    "Internet's Hidden Highway: Data by Light"
   ],
   "used_keywords": [
-    "junior developers",
     "software engineering",
     "career",
     "threads_debates",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Cloud Infrastructure: Physical Realities Shaping Architecture",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-15T06:40:36.760726+00:00"
-    },
     {
       "title": "The Internet's Unbreakable Speed Limit",
       "news_source_url": "",
@@ -1348,6 +1338,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-26T07:11:08.428272+00:00"
+    },
+    {
+      "title": "Internet's Hidden Highway: Data by Light",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-26T07:48:59.614985+00:00"
     }
   ]
 }
