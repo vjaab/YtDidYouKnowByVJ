@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "Tiny Glitches That Trick AI",
-    "Tiny Glitches That Trick AI",
     "Sand to Silicon: The 2026 Phone Brain Shift",
     "The Cloud's Thirsty Secret: Water Footprint of Hyperscale AI",
     "AI's Chat Secret: No Real Understanding",
@@ -99,15 +98,10 @@
     "ChatGPT: Trillions of Words, Hidden Biases",
     "Phone's Secret Night Vision Power",
     "Internet's Hidden Highway: Data by Light",
-    "Your Fingerprint: A Tiny Electric Map"
+    "Your Fingerprint: A Tiny Electric Map",
+    "Satellites Use Einstein's Time Trick"
   ],
   "used_keywords": [
-    "career",
-    "threads_debates",
-    "did you know",
-    "threads",
-    "tech",
-    "did you know",
     "asml",
     "euv lithography",
     "microchips",
@@ -301,19 +295,15 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
+    "GPS",
+    "Einstein",
+    "relativity",
+    "time",
+    "satellites",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Tiny Glitches That Trick AI",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-15T11:59:32.193182+00:00"
-    },
     {
       "title": "Tiny Glitches That Trick AI",
       "news_source_url": "",
@@ -1348,6 +1338,21 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-26T16:43:49.963619+00:00"
+    },
+    {
+      "title": "Satellites Use Einstein's Time Trick",
+      "news_source_url": "",
+      "keywords": [
+        "GPS",
+        "Einstein",
+        "relativity",
+        "time",
+        "satellites",
+        "did you know"
+      ],
+      "source": "National Institute of Standards and Technology (NIST)",
+      "platform": "facebook",
+      "timestamp": "2026-10-26T16:51:44.538001+00:00"
     }
   ]
 }

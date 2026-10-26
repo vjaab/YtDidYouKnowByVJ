@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know your next Uber ride could be powered by ChatGPT? \ud83e\udd2f",
+  "headline": "Uber's AI Leap: ChatGPT Powers Your Ride",
+  "source": "Medium - artificial-intelligence",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Ride AI Mystery \ud83d\ude97",
+      "bubble": "Is my next Uber ride actually using AI from ChatGPT?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "ChatGPT Everywhere! \ud83e\udd16",
+      "bubble": "Yes! Uber is going all-in with ChatGPT for millions of rides.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "How AI Helps Us \ud83e\udd14",
+      "bubble": "Will it make customer service and my ride recommendations better?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Share the Future! \ud83d\ude80",
+      "bubble": "It's transforming experiences globally! Share this with your frequent rider friends!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Uber is integrating ChatGPT to enhance millions of daily ride and delivery experiences globally.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know your next Uber ride could be powered by ChatGPT? \ud83e\udd2f\n\n\ud83d\udca1 Uber is integrating ChatGPT to enhance millions of daily ride and delivery experiences globally.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "trending_breakthroughs",
+  "characters": "auto"
+}

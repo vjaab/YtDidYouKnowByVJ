@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know GPS satellites are tiny time travelers \ud83d\ude80?",
+  "headline": "Satellites Use Einstein's Time Trick",
+  "source": "National Institute of Standards and Technology (NIST)",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "GPS Magic? \ud83d\uddfa\ufe0f",
+      "bubble": "My phone's GPS is always spot on! How does it know?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Satellite Clocks \ud83d\udef0\ufe0f",
+      "bubble": "Tiny atomic clocks on orbiting satellites make it work perfectly!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Time Bends? \u23f3",
+      "bubble": "But I heard satellite clocks actually tick faster up there?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Einstein's GPS Fix \u2705",
+      "bubble": "Yes! Einstein's relativity makes time bend. Scientists adjust them daily.",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "GPS works because satellites account for Einstein's time-bending effects.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know GPS satellites are tiny time travelers \ud83d\ude80?\n\n\ud83d\udca1 GPS works because satellites account for Einstein's time-bending effects.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "cybersecurity_secrets",
+  "characters": "auto"
+}
