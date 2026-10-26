@@ -1739,7 +1739,21 @@
     "category": "Tech Gadgets & Inventions",
     "title": "The Local AI Secret Nobody Tells You \ud83e\udd2b",
     "uploaded_at": "2026-10-24T13:55:24.090689",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-26T21:13:55.494068",
+    "last_metrics": {
+      "views": 42,
+      "avg_view_duration_sec": 14.0,
+      "avg_view_percentage": 43.92,
+      "swipe_away_rate": 0.5608,
+      "duration_sec": 33.0,
+      "retention_rate": 0.4242,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "VBwI6gEzNc0": {
     "video_id": "VBwI6gEzNc0",
@@ -1749,7 +1763,21 @@
     "category": "Artificial Intelligence",
     "title": "Why 99% Of People Get AI Training Wrong \u26a1",
     "uploaded_at": "2026-10-24T18:28:26.201684",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-26T21:13:55.971038",
+    "last_metrics": {
+      "views": 20,
+      "avg_view_duration_sec": 15.0,
+      "avg_view_percentage": 49.76,
+      "swipe_away_rate": 0.5024,
+      "duration_sec": 32.0,
+      "retention_rate": 0.4688,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "9eQ1wLZSmno": {
     "video_id": "9eQ1wLZSmno",
@@ -1769,6 +1797,16 @@
     "category": "AI & Tech Tools",
     "title": "Why 99% Of People Get AI Images Wrong \u26a1",
     "uploaded_at": "2026-10-25T18:39:53.600785",
+    "synced": false
+  },
+  "5YPtnAn_Meg": {
+    "video_id": "5YPtnAn_Meg",
+    "hook_pattern": "personal_stake",
+    "hook_variant": "B",
+    "hook_text": "Your video editor is stealing your data",
+    "category": "Tech Gadgets & Inventions",
+    "title": "The Secret Video Editor Nobody Talks About \ud83e\udd2b",
+    "uploaded_at": "2026-10-26T21:11:03.965283",
     "synced": false
   }
 }
