@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Tiny Glitches That Trick AI",
     "Sand to Silicon: The 2026 Phone Brain Shift",
     "The Cloud's Thirsty Secret: Water Footprint of Hyperscale AI",
     "AI's Chat Secret: No Real Understanding",
@@ -99,13 +98,10 @@
     "Phone's Secret Night Vision Power",
     "Internet's Hidden Highway: Data by Light",
     "Your Fingerprint: A Tiny Electric Map",
-    "Satellites Use Einstein's Time Trick"
+    "Satellites Use Einstein's Time Trick",
+    "Your Voice's Invisible Digital Twin"
   ],
   "used_keywords": [
-    "asml",
-    "euv lithography",
-    "microchips",
-    "semiconductors",
     "visual_engineering",
     "did you know",
     "threads",
@@ -301,20 +297,13 @@
     "relativity",
     "time",
     "satellites",
+    "did you know",
+    "AI Voice Cloning",
+    "Speech Synthesis",
+    "Digital Twin",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Tiny Glitches That Trick AI",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-15T12:00:23.678573+00:00"
-    },
     {
       "title": "Sand to Silicon: The 2026 Phone Brain Shift",
       "news_source_url": "",
@@ -1353,6 +1342,19 @@
       "source": "National Institute of Standards and Technology (NIST)",
       "platform": "facebook",
       "timestamp": "2026-10-26T16:51:44.538001+00:00"
+    },
+    {
+      "title": "Your Voice's Invisible Digital Twin",
+      "news_source_url": "",
+      "keywords": [
+        "AI Voice Cloning",
+        "Speech Synthesis",
+        "Digital Twin",
+        "did you know"
+      ],
+      "source": "Generative AI Voice Synthesis Research",
+      "platform": "threads",
+      "timestamp": "2026-10-26T17:31:55.250796+00:00"
     }
   ]
 }

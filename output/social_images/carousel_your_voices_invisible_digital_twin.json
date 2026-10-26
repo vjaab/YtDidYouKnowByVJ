@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "earbuds",
+  "speaker_right": "vj",
+  "hook": "Did You Know Your Voice has a Secret Digital Twin? \ud83d\udde3\ufe0f",
+  "headline": "Your Voice's Invisible Digital Twin",
+  "source": "Generative AI Voice Synthesis Research",
+  "slides": [
+    {
+      "speaker": "earbuds",
+      "emotion": "shocked",
+      "title": "Your Voice Twin? \ud83e\udd2f",
+      "bubble": "Wait, can my voice really have a digital twin?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "AI Copies You Perfectly \u2705",
+      "bubble": "Yes! AI learns your unique voice from samples, then speaks anything.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "earbuds",
+      "emotion": "curious",
+      "title": "Like a Voice Actor \ud83c\udfad",
+      "bubble": "So it's like a voice actor who is *me* but reads new scripts?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Future Voice? \ud83e\udd14",
+      "bubble": "Exactly! What are the implications of this voice cloning tech?",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "AI can create a 'digital twin' of your voice from small samples, saying new phrases perfectly. It's like having your own AI voice actor.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know Your Voice has a Secret Digital Twin? \ud83d\udde3\ufe0f\n\n\ud83d\udca1 AI can create a 'digital twin' of your voice from small samples, saying new phrases perfectly. It's like having your own AI voice actor.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "cybersecurity_secrets",
+  "characters": "auto"
+}
