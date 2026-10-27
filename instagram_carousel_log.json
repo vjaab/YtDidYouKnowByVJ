@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "AI's Chat Secret: No Real Understanding",
-    "AI's Chat Secret: No Real Understanding",
     "Your Voice is a Digital Fingerprint",
     "Magnetic Memory Secrets: How Your Data Lives!",
     "Your Wi-Fi's Secret Path Through Walls",
@@ -99,10 +98,10 @@
     "Satellites Use Einstein's Time Trick",
     "Your Voice's Invisible Digital Twin",
     "Wireless Charging's Invisible Energy Trick",
-    "DALL-E vs Midjourney vs Stable Diffusion: Architecture Showdown"
+    "DALL-E vs Midjourney vs Stable Diffusion: Architecture Showdown",
+    "Your Watch Sees Your Heartbeat"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "Digital Twin",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI's Chat Secret: No Real Understanding",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-15T15:42:43.347850+00:00"
-    },
     {
       "title": "AI's Chat Secret: No Real Understanding",
       "news_source_url": "",
@@ -1355,6 +1345,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-27T06:57:45.366311+00:00"
+    },
+    {
+      "title": "Your Watch Sees Your Heartbeat",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-27T12:38:17.570492+00:00"
     }
   ]
 }
