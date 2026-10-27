@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "The Cloud's Thirsty Secret: Water Footprint of Hyperscale AI",
     "AI's Chat Secret: No Real Understanding",
     "AI's Chat Secret: No Real Understanding",
     "Your Voice is a Digital Fingerprint",
@@ -99,10 +98,10 @@
     "Your Fingerprint: A Tiny Electric Map",
     "Satellites Use Einstein's Time Trick",
     "Your Voice's Invisible Digital Twin",
-    "Wireless Charging's Invisible Energy Trick"
+    "Wireless Charging's Invisible Energy Trick",
+    "DALL-E vs Midjourney vs Stable Diffusion: Architecture Showdown"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,19 +300,10 @@
     "Speech Synthesis",
     "Digital Twin",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "The Cloud's Thirsty Secret: Water Footprint of Hyperscale AI",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-15T15:06:33.135956+00:00"
-    },
     {
       "title": "AI's Chat Secret: No Real Understanding",
       "news_source_url": "",
@@ -1355,6 +1345,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-26T19:49:52.991895+00:00"
+    },
+    {
+      "title": "DALL-E vs Midjourney vs Stable Diffusion: Architecture Showdown",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-27T06:57:45.366311+00:00"
     }
   ]
 }
