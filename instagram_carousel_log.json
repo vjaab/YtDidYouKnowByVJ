@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Magnetic Memory Secrets: How Your Data Lives!",
     "Your Wi-Fi's Secret Path Through Walls",
     "Your Wi-Fi's Secret Path Through Walls",
     "Quantum Tunneling Powers Next-Gen Flash Memory",
@@ -99,10 +98,10 @@
     "DALL-E vs Midjourney vs Stable Diffusion: Architecture Showdown",
     "Your Watch Sees Your Heartbeat",
     "Your Finger's Secret Electric Touch",
-    "The Invisible Clocks That Run Your World"
+    "The Invisible Clocks That Run Your World",
+    "Wi-Fi: Invisible Waves, Your Data's Highway"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Magnetic Memory Secrets: How Your Data Lives!",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-15T18:20:24.056755+00:00"
-    },
     {
       "title": "Your Wi-Fi's Secret Path Through Walls",
       "news_source_url": "",
@@ -1354,6 +1344,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-27T19:18:16.602983+00:00"
+    },
+    {
+      "title": "Wi-Fi: Invisible Waves, Your Data's Highway",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-27T20:13:33.639391+00:00"
     }
   ]
 }

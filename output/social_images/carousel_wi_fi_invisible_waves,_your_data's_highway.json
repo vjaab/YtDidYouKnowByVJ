@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know your Wi-Fi uses invisible radio waves to send data through your walls and even air? \ud83e\udd2f",
+  "headline": "Wi-Fi: Invisible Waves, Your Data's Highway",
+  "source": "IEEE 802.11 Standards (Wi-Fi) / Basic Principles of Radio Frequency Communication",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Invisible Internet? \ud83e\udd2f",
+      "bubble": "Wait, Wi-Fi sends data right through walls, invisibly?!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Radio Magic \u2728",
+      "bubble": "Yes! It's like a tiny radio station broadcasting your internet data.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Through Air?! \ud83d\udce1",
+      "bubble": "So, my phone catches these invisible waves from anywhere?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "How Does It Feel? \ud83e\udd14",
+      "bubble": "Did you know it was radio waves? Drop your honest take below!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Wi-Fi uses invisible radio waves to send your data through walls and air, instantly decoding it.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know your Wi-Fi uses invisible radio waves to send data through your walls and even air? \ud83e\udd2f\n\n\ud83d\udca1 Wi-Fi uses invisible radio waves to send your data through walls and air, instantly decoding it.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "ai_secrets",
+  "characters": "auto"
+}
