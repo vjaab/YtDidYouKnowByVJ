@@ -1710,11 +1710,11 @@
         "variants": {
           "C": {
             "views": 53,
-            "retention": 0.18928571428571428,
-            "engagement": 0.010416666666666666,
-            "swipe_away_rate": 0.303525,
-            "avg_view_percentage": 19.6475,
-            "count": 4,
+            "retention": 0.1514285714285714,
+            "engagement": 0.008333333333333333,
+            "swipe_away_rate": 0.24281999999999998,
+            "avg_view_percentage": 15.718,
+            "count": 5,
             "hook_texts": [
               {
                 "text": "Your cloud vision API is now obsolete",
@@ -1725,16 +1725,21 @@
                 "text": "Your AI agent setup is secretly outdated.",
                 "video_id": "7ffX3VPhyn0",
                 "recorded_at": "2026-10-17T18:10:39.830846"
+              },
+              {
+                "text": "This secret code bypasses memory bottlenecks entirely.",
+                "video_id": "0hYEwGMlCy0",
+                "recorded_at": "2026-10-27T15:41:36.991809"
               }
             ]
           }
         },
         "total_views": 53,
-        "total_videos": 4,
-        "avg_retention": 0.18928571428571428,
-        "avg_engagement": 0.010416666666666666,
-        "avg_swipe_away": 0.303525,
-        "avg_view_percentage": 19.6475
+        "total_videos": 5,
+        "avg_retention": 0.1514285714285714,
+        "avg_engagement": 0.008333333333333333,
+        "avg_swipe_away": 0.24281999999999998,
+        "avg_view_percentage": 15.718
       },
       "result_first": {
         "variants": {
@@ -1847,11 +1852,11 @@
     },
     "curiosity_gap": {
       "views": 530,
-      "retention": 0.18559238296131905,
-      "engagement": 0.0042675583164300205,
-      "count": 32,
-      "swipe_away_rate": 0.24595625000000004,
-      "avg_view_percentage": 19.154374999999998
+      "retention": 0.1799683713564306,
+      "engagement": 0.004138238367447293,
+      "count": 33,
+      "swipe_away_rate": 0.23850303030303036,
+      "avg_view_percentage": 18.57393939393939
     },
     "personal_stake": {
       "views": 462,
@@ -1862,5 +1867,5 @@
       "avg_view_percentage": 24.46625
     }
   },
-  "last_updated": "2026-10-26T21:13:55.968217"
+  "last_updated": "2026-10-27T15:41:36.991841"
 }
