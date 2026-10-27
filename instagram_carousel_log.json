@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI's Chat Secret: No Real Understanding",
     "Your Voice is a Digital Fingerprint",
     "Magnetic Memory Secrets: How Your Data Lives!",
     "Your Wi-Fi's Secret Path Through Walls",
@@ -99,10 +98,10 @@
     "Your Voice's Invisible Digital Twin",
     "Wireless Charging's Invisible Energy Trick",
     "DALL-E vs Midjourney vs Stable Diffusion: Architecture Showdown",
-    "Your Watch Sees Your Heartbeat"
+    "Your Watch Sees Your Heartbeat",
+    "Your Finger's Secret Electric Touch"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "did you know",
@@ -301,20 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI's Chat Secret: No Real Understanding",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-15T15:43:40.778733+00:00"
-    },
     {
       "title": "Your Voice is a Digital Fingerprint",
       "news_source_url": "",
@@ -1355,6 +1344,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-10-27T12:38:17.570492+00:00"
+    },
+    {
+      "title": "Your Finger's Secret Electric Touch",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-27T15:51:32.994309+00:00"
     }
   ]
 }
