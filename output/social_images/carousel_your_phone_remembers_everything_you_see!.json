@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "camera",
+  "speaker_right": "vj",
+  "hook": "Did You Know Your Smartphone Camera Can See in the Dark? \ud83d\udcf1\ud83c\udf19",
+  "headline": "Your Phone Remembers Everything You See!",
+  "source": "Advanced Camera Sensor Technology",
+  "slides": [
+    {
+      "speaker": "camera",
+      "emotion": "shocked",
+      "title": "Can it See in Dark? \ud83e\udd2f",
+      "bubble": "My lens is seeing things even when it's pitch black!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Super Sensitive Sensors \u2728",
+      "bubble": "Your phone's tiny sensors detect light our eyes miss!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "curious",
+      "title": "Like a Light Thermometer? \ud83c\udf21\ufe0f",
+      "bubble": "So it measures light levels like a thermometer measures heat?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Share This Secret \ud83e\udd2b",
+      "bubble": "Yes! It sees much more than you think. Share this eye-opener!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your phone's camera sensors are incredibly sensitive to light, seeing in near-total darkness where our eyes can't.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know Your Smartphone Camera Can See in the Dark? \ud83d\udcf1\ud83c\udf19\n\n\ud83d\udca1 Your phone's camera sensors are incredibly sensitive to light, seeing in near-total darkness where our eyes can't.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "everyday_tech_mysteries",
+  "characters": "auto"
+}
