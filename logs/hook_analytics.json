@@ -1630,14 +1630,29 @@
                 "recorded_at": "2026-10-19T16:12:33.805837"
               }
             ]
+          },
+          "B": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "Stop paying for cloud AI",
+                "video_id": "tc4wpRzPSGQ",
+                "recorded_at": "2026-10-28T16:12:57.578140"
+              }
+            ]
           }
         },
         "total_views": 11,
-        "total_videos": 2,
-        "avg_retention": 0.5,
+        "total_videos": 3,
+        "avg_retention": 0.3333333333333333,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.5,
-        "avg_view_percentage": 484.01
+        "avg_swipe_away": 0.3333333333333333,
+        "avg_view_percentage": 322.67333333333335
       },
       "result_first": {
         "variants": {
@@ -1828,11 +1843,11 @@
   "global": {
     "negative_warning": {
       "views": 558,
-      "retention": 0.20447077345684037,
-      "engagement": 0.004093970003060912,
-      "count": 33,
-      "swipe_away_rate": 0.30551818181818197,
-      "avg_view_percentage": 108.48636363636363
+      "retention": 0.198456927178698,
+      "engagement": 0.003973559120617944,
+      "count": 34,
+      "swipe_away_rate": 0.2965323529411766,
+      "avg_view_percentage": 105.2955882352941
     },
     "result_first": {
       "views": 1367,
@@ -1867,5 +1882,5 @@
       "avg_view_percentage": 24.46625
     }
   },
-  "last_updated": "2026-10-28T12:35:17.248728"
+  "last_updated": "2026-10-28T16:12:57.578181"
 }

@@ -1846,5 +1846,15 @@
     "title": "Run Giant AI On Your Old Laptop? \ud83e\udd2f",
     "uploaded_at": "2026-10-27T15:41:36.995062",
     "synced": false
+  },
+  "tc4wpRzPSGQ": {
+    "video_id": "tc4wpRzPSGQ",
+    "hook_pattern": "negative_warning",
+    "hook_variant": "B",
+    "hook_text": "Stop paying for cloud AI",
+    "category": "Facts & Trivia",
+    "title": "Why 99% Of People Pay For Cloud AI Wrong \u26a1",
+    "uploaded_at": "2026-10-28T16:12:57.581547",
+    "synced": false
   }
 }
