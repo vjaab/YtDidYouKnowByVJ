@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Wi-Fi's Secret Path Through Walls",
     "Quantum Tunneling Powers Next-Gen Flash Memory",
     "Sound Fights Sound to Silence",
     "How Your Phone Knows Which Way Is Up",
@@ -99,10 +98,10 @@
     "Your Finger's Secret Electric Touch",
     "The Invisible Clocks That Run Your World",
     "Wi-Fi: Invisible Waves, Your Data's Highway",
-    "AI Invents Faces: People Who Never Were"
+    "AI Invents Faces: People Who Never Were",
+    "Tiny Worlds Inside Your Tech"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,20 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Wi-Fi's Secret Path Through Walls",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-15T19:21:42.602109+00:00"
-    },
     {
       "title": "Quantum Tunneling Powers Next-Gen Flash Memory",
       "news_source_url": "",
@@ -1354,6 +1343,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-28T07:38:19.880594+00:00"
+    },
+    {
+      "title": "Tiny Worlds Inside Your Tech",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-28T08:27:36.633819+00:00"
     }
   ]
 }

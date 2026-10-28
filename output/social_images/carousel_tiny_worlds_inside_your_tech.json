@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know your phone has cities of circuits smaller than a human hair? \ud83c\udfd9\ufe0f\ud83e\udd2f",
+  "headline": "Tiny Worlds Inside Your Tech",
+  "source": "IEEE Spectrum, Intel, TSMC",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Phone's Secret Power? \ud83e\udd2f",
+      "bubble": "How can my tiny phone do so much? It's mind-boggling!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Invisible Cities Inside \ud83c\udfd9\ufe0f",
+      "bubble": "Your phone has tiny cities of circuits smaller than human hair!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Billions of Switches! \ud83d\udca1",
+      "bubble": "So, billions of microscopic switches power everything at lightning speed?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Share This Tech Fact! \ud83d\ude80",
+      "bubble": "Exactly! It's a metropolis of logic in a fingernail-sized chip.",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Every smartphone and computer relies on tiny microchips, which are like miniature cities built layer by layer on silicon",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know your phone has cities of circuits smaller than a human hair? \ud83c\udfd9\ufe0f\ud83e\udd2f\n\n\ud83d\udca1 Every smartphone and computer relies on tiny microchips, which are like miniature cities built layer by layer on silicon\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "cybersecurity_secrets",
+  "characters": "auto"
+}
