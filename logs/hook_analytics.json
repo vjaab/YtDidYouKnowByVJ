@@ -1470,12 +1470,12 @@
             ]
           },
           "C": {
-            "views": 0,
-            "retention": 0.0,
+            "views": 43,
+            "retention": 0.5,
             "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 1,
+            "swipe_away_rate": 0.5,
+            "avg_view_percentage": 60.95,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "This open weight AI transforms images in seconds.",
@@ -1485,22 +1485,22 @@
             ]
           }
         },
-        "total_views": 234,
-        "total_videos": 3,
-        "avg_retention": 0.11965811965811966,
+        "total_views": 277,
+        "total_videos": 4,
+        "avg_retention": 0.33974358974358976,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.20883333333333334,
-        "avg_view_percentage": 12.450000000000001
+        "avg_swipe_away": 0.406625,
+        "avg_view_percentage": 39.8125
       },
       "curiosity_gap": {
         "variants": {
           "B": {
-            "views": 0,
-            "retention": 0.0,
+            "views": 3,
+            "retention": 0.4827586206896552,
             "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 1,
+            "swipe_away_rate": 0.00024999999999997247,
+            "avg_view_percentage": 49.975,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "Your coding setup is secretly completely outdated.",
@@ -1510,12 +1510,12 @@
             ]
           }
         },
-        "total_views": 0,
-        "total_videos": 1,
-        "avg_retention": 0.0,
+        "total_views": 3,
+        "total_videos": 2,
+        "avg_retention": 0.4827586206896552,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.0,
-        "avg_view_percentage": 0.0
+        "avg_swipe_away": 0.00024999999999997247,
+        "avg_view_percentage": 49.975
       }
     },
     "Facts & Trivia": {
@@ -1835,12 +1835,12 @@
       "avg_view_percentage": 108.48636363636363
     },
     "result_first": {
-      "views": 1324,
-      "retention": 0.18810580551703399,
-      "engagement": 0.004299002260634383,
-      "count": 37,
-      "swipe_away_rate": 0.29254324324324327,
-      "avg_view_percentage": 19.461081081081083
+      "views": 1367,
+      "retention": 0.20947144221395417,
+      "engagement": 0.004185870622196636,
+      "count": 38,
+      "swipe_away_rate": 0.3111605263157895,
+      "avg_view_percentage": 22.15684210526316
     },
     "stat_contradiction": {
       "views": 273,
@@ -1851,12 +1851,12 @@
       "avg_view_percentage": 16.702173913043477
     },
     "curiosity_gap": {
-      "views": 530,
-      "retention": 0.1799683713564306,
-      "engagement": 0.004138238367447293,
-      "count": 33,
-      "swipe_away_rate": 0.23850303030303036,
-      "avg_view_percentage": 18.57393939393939
+      "views": 533,
+      "retention": 0.2030727498865153,
+      "engagement": 0.004016525474287078,
+      "count": 34,
+      "swipe_away_rate": 0.23150294117647063,
+      "avg_view_percentage": 20.967352941176472
     },
     "personal_stake": {
       "views": 462,
@@ -1867,5 +1867,5 @@
       "avg_view_percentage": 24.46625
     }
   },
-  "last_updated": "2026-10-27T15:41:36.991841"
+  "last_updated": "2026-10-28T12:35:17.248728"
 }

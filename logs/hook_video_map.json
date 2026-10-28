@@ -1787,7 +1787,21 @@
     "category": "AI & Tech Tools",
     "title": "How One Tool Runs Every AI Coder \ud83e\udd2b",
     "uploaded_at": "2026-10-25T14:20:11.257513",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-28T12:35:16.907095",
+    "last_metrics": {
+      "views": 3,
+      "avg_view_duration_sec": 28.0,
+      "avg_view_percentage": 99.95,
+      "swipe_away_rate": 0.0005,
+      "duration_sec": 29.0,
+      "retention_rate": 0.9655,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "XcSzHI1hZVA": {
     "video_id": "XcSzHI1hZVA",
@@ -1797,7 +1811,21 @@
     "category": "AI & Tech Tools",
     "title": "Why 99% Of People Get AI Images Wrong \u26a1",
     "uploaded_at": "2026-10-25T18:39:53.600785",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-28T12:35:17.251637",
+    "last_metrics": {
+      "views": 43,
+      "avg_view_duration_sec": 35.0,
+      "avg_view_percentage": 121.9,
+      "swipe_away_rate": 1.0,
+      "duration_sec": 29.0,
+      "retention_rate": 1.0,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "5YPtnAn_Meg": {
     "video_id": "5YPtnAn_Meg",
