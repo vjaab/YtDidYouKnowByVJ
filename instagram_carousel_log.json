@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Quantum Tunneling Powers Next-Gen Flash Memory",
     "Sound Fights Sound to Silence",
     "How Your Phone Knows Which Way Is Up",
     "How Your Phone Knows Which Way Is Up",
@@ -99,10 +98,10 @@
     "The Invisible Clocks That Run Your World",
     "Wi-Fi: Invisible Waves, Your Data's Highway",
     "AI Invents Faces: People Who Never Were",
-    "Tiny Worlds Inside Your Tech"
+    "Tiny Worlds Inside Your Tech",
+    "AI as Invisible Lab Partner: Research Breakthrough"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "battery life",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Quantum Tunneling Powers Next-Gen Flash Memory",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-16T06:41:08.618912+00:00"
-    },
     {
       "title": "Sound Fights Sound to Silence",
       "news_source_url": "",
@@ -1353,6 +1343,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-28T08:27:36.633819+00:00"
+    },
+    {
+      "title": "AI as Invisible Lab Partner: Research Breakthrough",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-28T13:28:51.185051+00:00"
     }
   ]
 }
