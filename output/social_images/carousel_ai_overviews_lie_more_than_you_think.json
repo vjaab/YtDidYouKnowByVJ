@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Your AI Overviews Might Be Lying! \ud83e\udd2f",
+  "headline": "AI Overviews Lie More Than You Think",
+  "source": "Medium - artificial-intelligence",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "AI Says It Knows Best? \ud83e\udd14",
+      "bubble": "Wait, does AI always give us the correct answers?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Not Always Accurate \u26a0\ufe0f",
+      "bubble": "Sadly, AI Overviews and chatbots can sometimes be very wrong.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Misleading Tech Tips? \ud83d\udca1",
+      "bubble": "So, AI advice about using tech is not always true?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Fact-Checking Needed \u2705",
+      "bubble": "Many tips fail when checked against official platform documentation.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "thinking",
+      "title": "AI Makes Mistakes Too? \ud83e\udd16",
+      "bubble": "Even smart AI can provide confidently incorrect information?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "AI is Not Infallible \ud83d\udea8",
+      "bubble": "These models are powerful but not perfect truth machines.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Stay Savvy! \ud83d\udccc",
+      "bubble": "\ud83d\udccc Tap Save so you have this in your toolkit!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Many AI Overviews and chatbot tips are misleading and not always accurate when fact-checked.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour AI Overviews might not be telling the whole truth!\n\nHere's the scoop:\n\ud83d\udd39 AI chatbots like ChatGPT can confidently give wrong information.\n\ud83d\udd39 Tips from AI often fail when checked against official docs.\n\ud83d\udd39 They are powerful tools, but not perfect sources.\n\n\ud83d\udccc Tap Save so you have this in your toolkit!\n\nFollow @vijayakumarj_ai for daily tech insights and simple explanations!\n#AI #ArtificialIntelligence #TechFacts #DidYouKnow #ChatGPT #AIOverviews #TechExplained #DigitalLiteracy",
+  "vector": "trending_breakthroughs",
+  "characters": "auto"
+}

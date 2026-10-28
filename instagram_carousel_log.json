@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "How Your Phone Knows Which Way Is Up",
     "AI's Magic Photo Touch",
     "Your Computer's Forgetful Brain",
     "Your Computer's Forgetful Brain",
@@ -99,10 +98,10 @@
     "Tiny Worlds Inside Your Tech",
     "AI as Invisible Lab Partner: Research Breakthrough",
     "Your Photos Are Secret Number Grids",
-    "Zeros & Ones: Computing's Secret Language"
+    "Zeros & Ones: Computing's Secret Language",
+    "AI Overviews Lie More Than You Think"
   ],
   "used_keywords": [
-    "battery life",
     "phone charger",
     "lithium ion",
     "tech tips",
@@ -301,20 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "How Your Phone Knows Which Way Is Up",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-16T11:53:50.329935+00:00"
-    },
     {
       "title": "AI's Magic Photo Touch",
       "news_source_url": "",
@@ -1353,6 +1342,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-10-28T17:19:17.095298+00:00"
+    },
+    {
+      "title": "AI Overviews Lie More Than You Think",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-28T19:27:10.162556+00:00"
     }
   ]
 }
