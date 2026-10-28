@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Sound Fights Sound to Silence",
     "How Your Phone Knows Which Way Is Up",
     "How Your Phone Knows Which Way Is Up",
     "AI's Magic Photo Touch",
@@ -99,10 +98,10 @@
     "Wi-Fi: Invisible Waves, Your Data's Highway",
     "AI Invents Faces: People Who Never Were",
     "Tiny Worlds Inside Your Tech",
-    "AI as Invisible Lab Partner: Research Breakthrough"
+    "AI as Invisible Lab Partner: Research Breakthrough",
+    "Your Photos Are Secret Number Grids"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "battery life",
     "phone charger",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Sound Fights Sound to Silence",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-16T07:09:49.767026+00:00"
-    },
     {
       "title": "How Your Phone Knows Which Way Is Up",
       "news_source_url": "",
@@ -1353,6 +1343,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-10-28T13:28:51.185051+00:00"
+    },
+    {
+      "title": "Your Photos Are Secret Number Grids",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-28T16:37:09.398656+00:00"
     }
   ]
 }
