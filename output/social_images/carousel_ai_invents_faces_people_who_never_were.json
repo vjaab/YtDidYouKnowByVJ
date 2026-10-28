@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know the 'people' you see in some online photos might actually be 100% fake, created by AI? \ud83e\udd2f",
+  "headline": "AI Invents Faces: People Who Never Were",
+  "source": "Deep Learning research on Generative Adversarial Networks (GANs)",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Fake Faces Online? \ud83e\udd2f",
+      "bubble": "Did you know some online faces are 100% AI-generated fakes? \ud83e\udd2f",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "AI's Cat & Mouse \ud83d\udc2d",
+      "bubble": "Yes! AI uses a \"cat and mouse\" game to create them.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "How the Game Works? \ud83e\udd14",
+      "bubble": "One AI creates fake faces, the other tries to spot them.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Learning to Fool \ud83e\uddd1\u200d\ud83d\udcbb",
+      "bubble": "This constant 'game' makes AI incredibly good at faking faces.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "thinking",
+      "title": "Perfectly Real Fakes \u2728",
+      "bubble": "Result? AI generates incredibly lifelike people who never existed!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Hard to Spot \ud83d\udd75\ufe0f\u200d\u2640\ufe0f",
+      "bubble": "It's almost impossible for humans to tell they aren't real.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "AI's Creative Power \ud83e\udde0",
+      "bubble": "\ud83d\udccc Tap Save so you have this in your toolkit!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "AI systems called GANs play a 'cat and mouse' game to generate incredibly lifelike faces of people who never existed, making them almost indistinguishable from real photos.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nThose 'people' you see online? Many could be 100% fake, invented by AI!\n\nHere's how AI creates faces that never existed:\n\ud83d\udd39 AI uses a clever \"cat and mouse\" game called GANs (Generative Adversarial Networks).\n\ud83d\udd39 One AI generates fake faces, trying to fool the other AI which acts as a detective.\n\ud83d\udd39 This constant challenge refines the AI, allowing it to create incredibly lifelike, unique faces.\n\ud83d\udd39 These AI-generated individuals have unique features, expressions, and are almost impossible to distinguish from real photos!\n\n\ud83d\udccc Tap Save so you don't lose this mind-blowing fact!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #AIArt #AIGenerated #DeepLearning #GANs #FakeFaces #TechFacts #MindBlown #ArtificialIntelligence",
+  "vector": "ai_secrets",
+  "characters": "auto"
+}
