@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Your phone's brain works on tiny lightning bolts! \u26a1\ufe0f\ud83e\udd2f",
+  "headline": "Your Phone's Brain Works on Tiny Lightning",
+  "source": "Intel, IBM Research",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Lightning Brain? \u26a1\ufe0f",
+      "bubble": "My processor uses tiny lightning to think. Is this true?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Billions of Switches!",
+      "bubble": "Yes! It's like a city of billions of tiny light switches.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Flipping Fast! \ud83d\udca1",
+      "bubble": "These switches, transistors, flip on and off billions of times per second!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Your Take? \ud83d\udcac",
+      "bubble": "Mind blown! Did you guess lightning powered your phone? Share below! \ud83d\udc47",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your phone's chip has billions of transistors acting like light switches, flipping billions of times per second, creating miniature lightning signals for processing.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour phone's brain works on tiny lightning bolts! \u26a1\ufe0f\ud83e\udd2f\n\n\ud83d\udca1 Your phone's chip has billions of transistors acting like light switches, flipping billions of times per second, creating miniature lightning signals for processing.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "ai_secrets",
+  "characters": "auto"
+}
