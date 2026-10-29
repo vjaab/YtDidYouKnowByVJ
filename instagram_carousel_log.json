@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "GPS Sees Time Warp",
     "TeleGeography Ocean Cables: The Internet's Undersea Highways",
     "TeleGeography Ocean Cables: The Internet's Undersea Highways",
     "Your Phone's Secret Energy Kitchen",
@@ -99,10 +98,10 @@
     "Your Phone Remembers Everything You See!",
     "How Your Phone's Screen Sees Your Finger",
     "Your Phone's Brain: Born from Sand",
-    "AI Fills Missing Picture Pieces: Generative Inpainting Breakthrough"
+    "AI Fills Missing Picture Pieces: Generative Inpainting Breakthrough",
+    "Phone's Secret Inner Ear"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "GPS Sees Time Warp",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-16T18:04:04.596623+00:00"
-    },
     {
       "title": "TeleGeography Ocean Cables: The Internet's Undersea Highways",
       "news_source_url": "",
@@ -1351,6 +1341,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-29T08:32:09.010881+00:00"
+    },
+    {
+      "title": "Phone's Secret Inner Ear",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-29T13:35:56.158437+00:00"
     }
   ]
 }
