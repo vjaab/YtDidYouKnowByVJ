@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Your phone's smart brain is made from ordinary sand? \ud83e\udd2f",
+  "headline": "Your Phone's Brain is Made of Sand!",
+  "source": "Intel Museum",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Sand Brain?! \ud83d\ude2e",
+      "bubble": "Wait, my phone's brain is actually made from sand?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Silicon Power! \u2728",
+      "bubble": "Yes! Those fast chips are pure silicon, the main ingredient in sand!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Tiny Circuits \ud83d\udd2c",
+      "bubble": "Purified sand becomes intricate circuits running everything.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Your Thoughts? \ud83e\udd14",
+      "bubble": "Mind blown? What else is tech secretly made from? Drop your guess!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your phone's lightning-fast chips are crafted from silicon, the main ingredient found in ordinary sand.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour phone's smart brain is made from ordinary sand? \ud83e\udd2f\n\n\ud83d\udca1 Your phone's lightning-fast chips are crafted from silicon, the main ingredient found in ordinary sand.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "cybersecurity_secrets",
+  "characters": "auto"
+}
