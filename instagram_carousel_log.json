@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Computer's Forgetful Brain",
     "AI Learns Like a Toddler: Efficient & Robust Learning",
     "GPS Sees Time Warp",
     "TeleGeography Ocean Cables: The Internet's Undersea Highways",
@@ -99,10 +98,10 @@
     "Zeros & Ones: Computing's Secret Language",
     "AI Overviews Lie More Than You Think",
     "Your Phone Remembers Everything You See!",
-    "How Your Phone's Screen Sees Your Finger"
+    "How Your Phone's Screen Sees Your Finger",
+    "Your Phone's Brain: Born from Sand"
   ],
   "used_keywords": [
-    "tech tips",
     "consumer_utility",
     "did you know",
     "threads",
@@ -301,20 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Computer's Forgetful Brain",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-16T15:29:07.765106+00:00"
-    },
     {
       "title": "AI Learns Like a Toddler: Efficient & Robust Learning",
       "news_source_url": "",
@@ -1352,6 +1341,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-10-28T20:30:31.753518+00:00"
+    },
+    {
+      "title": "Your Phone's Brain: Born from Sand",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-29T07:47:29.566978+00:00"
     }
   ]
 }
