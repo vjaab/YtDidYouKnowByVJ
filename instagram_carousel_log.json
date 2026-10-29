@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Phone's Secret Energy Kitchen",
     "Your Internet: A Beam of Light",
     "Bayer Filter: Phone Camera Color Vision",
     "Bayer Filter: Phone Camera Color Vision",
@@ -99,10 +98,10 @@
     "AI Fills Missing Picture Pieces: Generative Inpainting Breakthrough",
     "Phone's Secret Inner Ear",
     "Smartphone Photo Superpower: AI vs Optics",
-    "Your Phone's Brain is Made of Sand!"
+    "Your Phone's Brain is Made of Sand!",
+    "How Your Phone Shrinks Big Files"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "threads",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Phone's Secret Energy Kitchen",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-17T08:12:57.912615+00:00"
-    },
     {
       "title": "Your Internet: A Beam of Light",
       "news_source_url": "",
@@ -1350,6 +1340,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-10-29T17:30:49.390787+00:00"
+    },
+    {
+      "title": "How Your Phone Shrinks Big Files",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-29T19:33:40.794438+00:00"
     }
   ]
 }
