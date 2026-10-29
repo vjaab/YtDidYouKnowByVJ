@@ -1835,7 +1835,21 @@
     "category": "Tech Gadgets & Inventions",
     "title": "The Secret Video Editor Nobody Talks About \ud83e\udd2b",
     "uploaded_at": "2026-10-26T21:11:03.965283",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-10-29T12:45:38.061368",
+    "last_metrics": {
+      "views": 29,
+      "avg_view_duration_sec": 12.0,
+      "avg_view_percentage": 40.44,
+      "swipe_away_rate": 0.5956,
+      "duration_sec": 32.0,
+      "retention_rate": 0.375,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 1
+    }
   },
   "0hYEwGMlCy0": {
     "video_id": "0hYEwGMlCy0",
