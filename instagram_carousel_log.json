@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI Learns Like a Toddler: Efficient & Robust Learning",
     "GPS Sees Time Warp",
     "TeleGeography Ocean Cables: The Internet's Undersea Highways",
     "TeleGeography Ocean Cables: The Internet's Undersea Highways",
@@ -99,10 +98,10 @@
     "AI Overviews Lie More Than You Think",
     "Your Phone Remembers Everything You See!",
     "How Your Phone's Screen Sees Your Finger",
-    "Your Phone's Brain: Born from Sand"
+    "Your Phone's Brain: Born from Sand",
+    "AI Fills Missing Picture Pieces: Generative Inpainting Breakthrough"
   ],
   "used_keywords": [
-    "consumer_utility",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI Learns Like a Toddler: Efficient & Robust Learning",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-16T17:53:50.021203+00:00"
-    },
     {
       "title": "GPS Sees Time Warp",
       "news_source_url": "",
@@ -1351,6 +1341,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-29T07:47:29.566978+00:00"
+    },
+    {
+      "title": "AI Fills Missing Picture Pieces: Generative Inpainting Breakthrough",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-29T08:32:09.010881+00:00"
     }
   ]
 }
