@@ -1724,12 +1724,12 @@
       "curiosity_gap": {
         "variants": {
           "C": {
-            "views": 53,
-            "retention": 0.1514285714285714,
-            "engagement": 0.008333333333333333,
-            "swipe_away_rate": 0.24281999999999998,
-            "avg_view_percentage": 15.718,
-            "count": 5,
+            "views": 120,
+            "retention": 0.18174603174603174,
+            "engagement": 0.006944444444444444,
+            "swipe_away_rate": 0.31275000000000003,
+            "avg_view_percentage": 18.724999999999998,
+            "count": 6,
             "hook_texts": [
               {
                 "text": "Your cloud vision API is now obsolete",
@@ -1749,12 +1749,12 @@
             ]
           }
         },
-        "total_views": 53,
-        "total_videos": 5,
-        "avg_retention": 0.1514285714285714,
-        "avg_engagement": 0.008333333333333333,
-        "avg_swipe_away": 0.24281999999999998,
-        "avg_view_percentage": 15.718
+        "total_views": 120,
+        "total_videos": 6,
+        "avg_retention": 0.18174603174603174,
+        "avg_engagement": 0.006944444444444444,
+        "avg_swipe_away": 0.31275000000000003,
+        "avg_view_percentage": 18.724999999999998
       },
       "result_first": {
         "variants": {
@@ -1866,12 +1866,12 @@
       "avg_view_percentage": 16.702173913043477
     },
     "curiosity_gap": {
-      "views": 533,
-      "retention": 0.2030727498865153,
-      "engagement": 0.004016525474287078,
-      "count": 34,
-      "swipe_away_rate": 0.23150294117647063,
-      "avg_view_percentage": 20.967352941176472
+      "views": 600,
+      "retention": 0.20679448084213867,
+      "engagement": 0.0039017676035931616,
+      "count": 35,
+      "swipe_away_rate": 0.24381428571428576,
+      "avg_view_percentage": 21.332857142857147
     },
     "personal_stake": {
       "views": 491,
@@ -1882,5 +1882,5 @@
       "avg_view_percentage": 24.950303030303026
     }
   },
-  "last_updated": "2026-10-29T12:45:38.059626"
+  "last_updated": "2026-10-29T22:45:49.667733"
 }
