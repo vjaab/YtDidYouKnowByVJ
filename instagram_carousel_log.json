@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "DDPM: How AI Creates Images from Pure Noise",
     "Touchscreen Tech: Capacitive Sensing & Gesture Engineering",
     "AI's Perfect Imposters: The Deepfake Reality",
     "AI's Perfect Imposters: The Deepfake Reality",
@@ -99,10 +98,10 @@
     "Your AI's Invisible Preference Predictor",
     "Your Cloud Runs on Real Steel",
     "Super-Sense Vision: AV Perception Breakthrough",
-    "BCI & Wearable Sensor Edge Decoding Breakthrough"
+    "BCI & Wearable Sensor Edge Decoding Breakthrough",
+    "Undersea Internet Cables: The Global Data Highway"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "DDPM: How AI Creates Images from Pure Noise",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-18T08:30:33.940589+00:00"
-    },
     {
       "title": "Touchscreen Tech: Capacitive Sensing & Gesture Engineering",
       "news_source_url": "",
@@ -1348,6 +1338,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-10-30T17:08:52.799499+00:00"
+    },
+    {
+      "title": "Undersea Internet Cables: The Global Data Highway",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-30T19:03:43.609406+00:00"
     }
   ]
 }
