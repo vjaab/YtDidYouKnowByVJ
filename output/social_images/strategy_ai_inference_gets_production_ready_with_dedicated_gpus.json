@@ -1,0 +1,129 @@
+{
+  "topic": "AI Inference Gets Production-Ready with Dedicated GPUs",
+  "topic_type": "cloud_service",
+  "domain": "cloud",
+  "difficulty": "intermediate",
+  "audience": "students_and_professionals",
+  "visual_theme": "MINIMAL",
+  "theme_css_class": "theme--minimal",
+  "theme_colors": {
+    "bg": "#0A1628",
+    "card_bg": "#0F2140",
+    "card_border": "#1A3A6B",
+    "text_primary": "#E0F0FF",
+    "text_secondary": "#7EB8E0",
+    "text_muted": "#4A7BA8",
+    "accent": "#00B4D8",
+    "accent_secondary": "#0096C7",
+    "accent_success": "#48CAE4",
+    "accent_danger": "#FF6B6B",
+    "accent_warning": "#FFD166",
+    "code_bg": "#071120",
+    "gradient_start": "#00B4D8",
+    "gradient_end": "#0077B6"
+  },
+  "visual_concept": "distributed_cloud",
+  "visual_motifs": [
+    "vpc_edges",
+    "service_clusters",
+    "ingress_gateway",
+    "data_mesh"
+  ],
+  "hero_visual": "cloud_topology",
+  "accent_style": "cloud_blueprint",
+  "storytelling_pattern": "architecture_walkthrough",
+  "slide_count": 7,
+  "layout_pattern": [
+    "hero_hook",
+    "whats_new",
+    "architecture_diagram",
+    "metrics_cards",
+    "before_after",
+    "checklist",
+    "takeaway"
+  ],
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "service_hook",
+      "purpose": "service_hook",
+      "layout_type": "hero_hook",
+      "title_position": "center",
+      "supports": [
+        "title",
+        "subtitle",
+        "emoji_icon"
+      ]
+    },
+    {
+      "slide_number": 2,
+      "role": "system_overview",
+      "purpose": "system_overview",
+      "layout_type": "whats_new",
+      "title_position": "top-center",
+      "supports": []
+    },
+    {
+      "slide_number": 3,
+      "role": "infrastructure_topology",
+      "purpose": "infrastructure_topology",
+      "layout_type": "architecture_diagram",
+      "title_position": "top-left",
+      "supports": [
+        "nodes",
+        "connections",
+        "labels"
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "metrics_or_sla",
+      "purpose": "metrics_or_sla",
+      "layout_type": "metrics_cards",
+      "title_position": "top-center",
+      "supports": [
+        "metrics"
+      ]
+    },
+    {
+      "slide_number": 5,
+      "role": "architecture_comparison",
+      "purpose": "architecture_comparison",
+      "layout_type": "before_after",
+      "title_position": "top-left",
+      "supports": [
+        "before_title",
+        "before_items",
+        "after_title",
+        "after_items"
+      ]
+    },
+    {
+      "slide_number": 6,
+      "role": "deployment_checklist",
+      "purpose": "deployment_checklist",
+      "layout_type": "checklist",
+      "title_position": "top-center",
+      "supports": [
+        "items",
+        "title"
+      ]
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "purpose": "takeaway",
+      "layout_type": "takeaway",
+      "title_position": "top-left",
+      "supports": [
+        "takeaways",
+        "cta_text"
+      ]
+    }
+  ],
+  "brand": {
+    "handle": "@vijayakumarj_ai",
+    "name": "Vijayakumar J",
+    "short_name": "VJ"
+  }
+}

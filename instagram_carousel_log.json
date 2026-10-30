@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "AI's Perfect Imposters: The Deepfake Reality",
-    "AI's Perfect Imposters: The Deepfake Reality",
     "Your Brain's AI Twin: Learning Speed",
     "Sand to Silicon: Chip Manufacturing Deep Dive",
     "Hard Drives Float on Air: IBM's Nanometer Flight",
@@ -99,10 +98,10 @@
     "Super-Sense Vision: AV Perception Breakthrough",
     "BCI & Wearable Sensor Edge Decoding Breakthrough",
     "Undersea Internet Cables: The Global Data Highway",
-    "Your Photos Are Smart Puzzles"
+    "Your Photos Are Smart Puzzles",
+    "AI Inference Gets Production-Ready with Dedicated GPUs"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,24 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI's Perfect Imposters: The Deepfake Reality",
-      "news_source_url": "",
-      "keywords": [
-        "deepfake",
-        "AI",
-        "generative AI",
-        "fake video",
-        "digital illusion",
-        "did you know"
-      ],
-      "source": "Leading AI research institutions and cybersecurity experts on generative AI and media manipulation.",
-      "platform": "threads",
-      "timestamp": "2026-10-18T09:53:30.168331+00:00"
-    },
     {
       "title": "AI's Perfect Imposters: The Deepfake Reality",
       "news_source_url": "",
@@ -1348,6 +1333,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-30T19:21:43.887573+00:00"
+    },
+    {
+      "title": "AI Inference Gets Production-Ready with Dedicated GPUs",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-30T20:01:38.593048+00:00"
     }
   ]
 }
