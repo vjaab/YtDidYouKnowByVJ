@@ -1,0 +1,6 @@
+[19:13:36] === STARTING CHAPTERED DEEP-DIVE PIPELINE (mode=multi) | COUNTRY: GB ===
+[19:13:36] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[19:13:36] STEP 1: Fetching RSS articles...
+[19:13:37] 📈 vidIQ: 8 topics.
+[19:15:16] ✅ Fetched 535 total articles.
+[19:15:16] STEP 2 (Attempt 1/5): Generating chaptered deep-dive script...
