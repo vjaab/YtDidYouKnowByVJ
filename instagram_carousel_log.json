@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Bayer Filter: Phone Camera Color Vision",
     "The Real Reason for 'Bugs' in Tech",
     "Mobile SoC Architecture: Your Phone's Tiny Hot Plate",
     "Qi Standard: The Invisible Energy Bridge",
@@ -99,10 +98,10 @@
     "Your Phone's Brain is Made of Sand!",
     "How Your Phone Shrinks Big Files",
     "Silence Magic: Headphones That Hear Noise",
-    "Your Phone's Brain Works on Tiny Lightning"
+    "Your Phone's Brain Works on Tiny Lightning",
+    "Neuromorphic Chips: Tiny Sparks, Big Learning"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,20 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Bayer Filter: Phone Camera Color Vision",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-17T09:46:42.696871+00:00"
-    },
     {
       "title": "The Real Reason for 'Bugs' in Tech",
       "news_source_url": "",
@@ -1350,6 +1339,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-10-29T20:31:54.435239+00:00"
+    },
+    {
+      "title": "Neuromorphic Chips: Tiny Sparks, Big Learning",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-30T07:51:20.493724+00:00"
     }
   ]
 }
