@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know how Netflix always knows what you want to watch next? \ud83c\udfac\ud83e\udd2f",
+  "headline": "Your AI's Invisible Preference Predictor",
+  "source": "AI and Machine Learning Research (e.g., Collaborative Filtering, Recommender Systems)",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Netflix Magic? \ud83c\udfac",
+      "bubble": "How does Netflix always know exactly what I want to watch next?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "AI's Secret Sauce \ud83e\udde0",
+      "bubble": "AI compares your choices to millions of users like you!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Digital Matchmaker \ud83d\udc96",
+      "bubble": "So it's a digital matchmaker for my preferences?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Your Tailored World \u2728",
+      "bubble": "It creates a personalized online world just for you! Share this!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "When you stream or like, AI matches your tastes to millions, creating your personalized online world.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know how Netflix always knows what you want to watch next? \ud83c\udfac\ud83e\udd2f\n\n\ud83d\udca1 When you stream or like, AI matches your tastes to millions, creating your personalized online world.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "cybersecurity_secrets",
+  "characters": "auto"
+}

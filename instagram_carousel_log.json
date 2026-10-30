@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "The Real Reason for 'Bugs' in Tech",
     "Mobile SoC Architecture: Your Phone's Tiny Hot Plate",
     "Qi Standard: The Invisible Energy Bridge",
     "Qi Standard: The Invisible Energy Bridge",
@@ -99,10 +98,10 @@
     "How Your Phone Shrinks Big Files",
     "Silence Magic: Headphones That Hear Noise",
     "Your Phone's Brain Works on Tiny Lightning",
-    "Neuromorphic Chips: Tiny Sparks, Big Learning"
+    "Neuromorphic Chips: Tiny Sparks, Big Learning",
+    "Your AI's Invisible Preference Predictor"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "threads",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "The Real Reason for 'Bugs' in Tech",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-17T14:40:05.562174+00:00"
-    },
     {
       "title": "Mobile SoC Architecture: Your Phone's Tiny Hot Plate",
       "news_source_url": "",
@@ -1349,6 +1339,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-10-30T07:51:20.493724+00:00"
+    },
+    {
+      "title": "Your AI's Invisible Preference Predictor",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-30T08:38:26.791399+00:00"
     }
   ]
 }
