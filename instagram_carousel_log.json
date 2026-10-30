@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Mobile SoC Architecture: Your Phone's Tiny Hot Plate",
     "Qi Standard: The Invisible Energy Bridge",
     "Qi Standard: The Invisible Energy Bridge",
     "DDPM: How AI Creates Images from Pure Noise",
@@ -99,10 +98,10 @@
     "Silence Magic: Headphones That Hear Noise",
     "Your Phone's Brain Works on Tiny Lightning",
     "Neuromorphic Chips: Tiny Sparks, Big Learning",
-    "Your AI's Invisible Preference Predictor"
+    "Your AI's Invisible Preference Predictor",
+    "Your Cloud Runs on Real Steel"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Mobile SoC Architecture: Your Phone's Tiny Hot Plate",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-17T15:33:15.625704+00:00"
-    },
     {
       "title": "Qi Standard: The Invisible Energy Bridge",
       "news_source_url": "",
@@ -1349,6 +1339,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-30T08:38:26.791399+00:00"
+    },
+    {
+      "title": "Your Cloud Runs on Real Steel",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-30T13:28:11.518138+00:00"
     }
   ]
 }
