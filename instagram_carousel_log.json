@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "Qi Standard: The Invisible Energy Bridge",
-    "Qi Standard: The Invisible Energy Bridge",
     "DDPM: How AI Creates Images from Pure Noise",
     "Touchscreen Tech: Capacitive Sensing & Gesture Engineering",
     "AI's Perfect Imposters: The Deepfake Reality",
@@ -99,10 +98,10 @@
     "Your Phone's Brain Works on Tiny Lightning",
     "Neuromorphic Chips: Tiny Sparks, Big Learning",
     "Your AI's Invisible Preference Predictor",
-    "Your Cloud Runs on Real Steel"
+    "Your Cloud Runs on Real Steel",
+    "Super-Sense Vision: AV Perception Breakthrough"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Qi Standard: The Invisible Energy Bridge",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-17T16:35:03.698781+00:00"
-    },
     {
       "title": "Qi Standard: The Invisible Energy Bridge",
       "news_source_url": "",
@@ -1349,6 +1339,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-10-30T13:28:11.518138+00:00"
+    },
+    {
+      "title": "Super-Sense Vision: AV Perception Breakthrough",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-10-30T16:41:44.403198+00:00"
     }
   ]
 }
