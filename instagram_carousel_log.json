@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI Designs Future Drugs & Materials",
     "Lasers That Guide Self-Driving Cars",
     "Your Photos' Invisible Shrinking Trick",
     "Your Photos' Invisible Shrinking Trick",
@@ -99,10 +98,10 @@
     "Neural Machine Translation: Core Principles",
     "AI's Secret Language Decoder",
     "Your Tech's Invisible Memory Locks",
-    "Qualcomm's Ultrasonic Sound Map Biometrics"
+    "Qualcomm's Ultrasonic Sound Map Biometrics",
+    "Why Phone Cameras See More Than Human Eyes"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,19 +300,10 @@
     "electrons",
     "non-volatile",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI Designs Future Drugs & Materials",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-19T07:03:32.201948+00:00"
-    },
     {
       "title": "Lasers That Guide Self-Driving Cars",
       "news_source_url": "",
@@ -1348,6 +1338,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-31T17:22:18.694743+00:00"
+    },
+    {
+      "title": "Why Phone Cameras See More Than Human Eyes",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-10-31T17:57:01.954985+00:00"
     }
   ]
 }
