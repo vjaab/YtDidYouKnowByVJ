@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Sand to Silicon: Chip Manufacturing Deep Dive",
     "Hard Drives Float on Air: IBM's Nanometer Flight",
     "Hard Drives Float on Air: IBM's Nanometer Flight",
     "AI Designs Future Drugs & Materials",
@@ -99,16 +98,10 @@
     "Your Photos Are Smart Puzzles",
     "AI Inference Gets Production-Ready with Dedicated GPUs",
     "GPS: Einstein's Invisible Guide",
-    "Neural Machine Translation: Core Principles"
+    "Neural Machine Translation: Core Principles",
+    "AI's Secret Language Decoder"
   ],
   "used_keywords": [
-    "tech",
-    "did you know",
-    "did you know",
-    "did you know",
-    "threads",
-    "tech",
-    "did you know",
     "did you know",
     "did you know",
     "threads",
@@ -301,19 +294,16 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
+    "AI",
+    "natural language processing",
+    "NLP",
+    "sentiment analysis",
+    "language understanding",
+    "chatbots",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Sand to Silicon: Chip Manufacturing Deep Dive",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-18T15:52:12.825498+00:00"
-    },
     {
       "title": "Hard Drives Float on Air: IBM's Nanometer Flight",
       "news_source_url": "",
@@ -1339,6 +1329,22 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-10-31T10:24:53.957716+00:00"
+    },
+    {
+      "title": "AI's Secret Language Decoder",
+      "news_source_url": "",
+      "keywords": [
+        "AI",
+        "natural language processing",
+        "NLP",
+        "sentiment analysis",
+        "language understanding",
+        "chatbots",
+        "did you know"
+      ],
+      "source": "Natural Language Processing (NLP) research and applications (e.g., Google AI, OpenAI, academic papers on sentiment analysis)",
+      "platform": "threads",
+      "timestamp": "2026-10-31T11:09:05.788166+00:00"
     }
   ]
 }
