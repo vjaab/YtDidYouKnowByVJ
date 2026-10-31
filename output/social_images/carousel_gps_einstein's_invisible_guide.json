@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know your phone's GPS relies on Einstein's mind-bending theories of relativity just to work? \ud83e\udd2f",
+  "headline": "GPS: Einstein's Invisible Guide",
+  "source": "NASA, European Space Agency (ESA), and various physics textbooks on General and Special Relativity.",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "GPS: Einstein's Secret? \ud83e\udd2f",
+      "bubble": "Your GPS needs Einstein's relativity to even work. Crazy!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Satellites Zoom Fast! \ud83d\ude80",
+      "bubble": "Yes! GPS satellites zoom around Earth incredibly fast.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Time Ticks Differently? \u23f3",
+      "bubble": "So, their fast speed changes how time passes?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Time is Relative! \u23f1\ufe0f",
+      "bubble": "Exactly! Time actually ticks faster for these satellites.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "What if No Correction? \ud83d\uddfa\ufe0f",
+      "bubble": "Without correction, how far off would my map be?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Miles Off Course! \ud83d\udccd",
+      "bubble": "Your navigation would be off by several miles daily.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Cosmic Physics Daily! \u2728",
+      "bubble": "\ud83d\udccc Tap Save for this daily cosmic physics fact!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "GPS relies on Einstein's relativity because time ticks faster for speeding satellites, preventing miles of error daily.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour phone's GPS isn't just clever tech; it's a daily dance with Einstein's mind-bending theories of relativity!\n\nHere's the mind-blowing reality:\n\ud83d\udd39 GPS satellites zoom around Earth at incredible speeds.\n\ud83d\udd39 Due to relativity, time ticks slightly faster for them than on Earth.\n\ud83d\udd39 This tiny difference, millionths of a second, would throw your GPS off by miles daily.\n\ud83d\udd39 Without Einstein's equations, your navigation wouldn't be spot-on!\n\n\ud83d\udccc Tap Save so you have this in your toolkit!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #Einstein #GPS #Relativity #ScienceFacts #Physics #Navigation",
+  "vector": "hardware_megastructures",
+  "characters": "auto"
+}
