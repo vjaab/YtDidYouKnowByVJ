@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Hard Drives Float on Air: IBM's Nanometer Flight",
     "AI Designs Future Drugs & Materials",
     "Lasers That Guide Self-Driving Cars",
     "Your Photos' Invisible Shrinking Trick",
@@ -99,10 +98,10 @@
     "GPS: Einstein's Invisible Guide",
     "Neural Machine Translation: Core Principles",
     "AI's Secret Language Decoder",
-    "Your Tech's Invisible Memory Locks"
+    "Your Tech's Invisible Memory Locks",
+    "Qualcomm's Ultrasonic Sound Map Biometrics"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,20 +300,10 @@
     "data storage",
     "electrons",
     "non-volatile",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Hard Drives Float on Air: IBM's Nanometer Flight",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-18T16:43:26.990715+00:00"
-    },
     {
       "title": "AI Designs Future Drugs & Materials",
       "news_source_url": "",
@@ -1349,6 +1338,16 @@
       "source": "Principles of NAND Flash Memory, widely documented by major semiconductor manufacturers (e.g., Micron Technology, Samsung) and science/tech education platforms.",
       "platform": "instagram",
       "timestamp": "2026-10-31T16:34:06.061570+00:00"
+    },
+    {
+      "title": "Qualcomm's Ultrasonic Sound Map Biometrics",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-10-31T17:22:18.694743+00:00"
     }
   ]
 }
