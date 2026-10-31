@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "camera",
+  "speaker_right": "vj",
+  "hook": "Did You Know your phone remembers everything, even when it's off, using tiny trapped particles? \ud83e\udd2f",
+  "headline": "Your Tech's Invisible Memory Locks",
+  "source": "Principles of NAND Flash Memory, widely documented by major semiconductor manufacturers (e.g., Micron Technology, Samsung) and science/tech education platforms.",
+  "slides": [
+    {
+      "speaker": "camera",
+      "emotion": "shocked",
+      "title": "Phone Remembers OFF? \ud83e\udd2f",
+      "bubble": "Did your phone remember everything, even when it's off?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Invisible Electron Locks \ud83d\udd12",
+      "bubble": "Yes! Tiny invisible electrons are literally trapped inside your phone.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "curious",
+      "title": "How Electrons Store? \ud83e\udd14",
+      "bubble": "But how do these tiny trapped electrons store my photos?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Digital Vaults Explained \ud83d\udce6",
+      "bubble": "Each electron is a '1', an empty spot is a '0'. Millions of these!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "shocked",
+      "title": "Always Stay Trapped? \ud83d\udee1\ufe0f",
+      "bubble": "So, these electron 'vaults' stay sealed forever, even without power?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Permanently Sealed Data \u2705",
+      "bubble": "Absolutely! They are perfectly sealed, making your data truly permanent memory.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "excited",
+      "title": "Mind-Blowing Memory! \ud83e\udde0",
+      "bubble": "\ud83d\udccc Tap Save so you have this in your toolkit!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your tech stores all data, even when off, by trapping tiny electrons in microscopic 'digital vaults'. Each trapped electron is a '1', an empty vault is a '0', ensuring permanent memory.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour phone remembers EVERYTHING, even when it's off! It's not magic, it's invisible particles!\n\nHere's the mind-blowing reality:\n\ud83d\udd39 Your phone, tablet, and USB drives use billions of microscopic 'digital vaults' on a silicon chip.\n\ud83d\udd39 Each vault literally traps tiny, invisible electrons.\n\ud83d\udd39 A trapped electron means '1', an empty vault means '0'. That's how your data is stored!\n\ud83d\udd39 These electron 'locks' stay perfectly sealed, holding your digital memories safe and sound, even when your device is completely powered off.\n\n\ud83d\udccc Tap Save so you have this in your toolkit!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #NANDFlash #ComputerScience #TechExplained #VJAI",
+  "vector": "visual_engineering",
+  "characters": "auto"
+}

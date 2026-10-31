@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know your brain can be easily tricked into seeing entire virtual worlds? \ud83e\udd2f",
+  "headline": "Your Brain's Virtual World Trick",
+  "source": "Virtual Reality (VR) and Augmented Reality (AR) foundational principles of stereoscopic vision and real-time rendering.",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Brain's VR Trick \ud83e\udde0",
+      "bubble": "Did You Know your brain can be easily tricked into seeing entire virtual worlds? \ud83e\udd2f",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Two Views, One World \u2728",
+      "bubble": "Your VR headset shows a slightly different picture to each eye.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Depth from Flat? \ud83e\udd14",
+      "bubble": "So, two flat images magically create a convincing 3D world?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Brain's Illusionist Skill \ud83c\udfa9",
+      "bubble": "Yes! Your brain combines them, just like your natural vision.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "AI Makes It Real \ud83d\ude80",
+      "bubble": "How does it feel so incredibly real and seamless then?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Real-Time Rendering \u26a1",
+      "bubble": "AI tracks your head, rendering new scenes unbelievably fast.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Mind-Blowing Brain Fact \ud83d\udca1",
+      "bubble": "\ud83d\udccc Save this brain secret and follow @vijayakumarj_ai for more!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your brain creates a convincing 3D world from two flat images, powered by VR tech.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour brain is an amazing illusionist, easily tricked into seeing entire virtual worlds!\n\nHere's how this mind-bending trick works:\n\ud83d\udd39 VR headsets show a slightly different image to each eye.\n\ud83d\udd39 Your brain then masterfully combines these flat images to create a feeling of incredible depth and 3D.\n\ud83d\udd39 AI steps in, tracking your movements and rendering new scenes so fast it feels completely real, transforming simple screens into vast digital landscapes!\n\n\ud83d\udccc Tap Save so you have this in your toolkit!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #VR #VirtualReality #BrainFacts #TechFacts #MindBlowingFacts #AI #Illusion",
+  "vector": "visual_engineering",
+  "characters": "auto"
+}

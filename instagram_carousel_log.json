@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "Hard Drives Float on Air: IBM's Nanometer Flight",
-    "Hard Drives Float on Air: IBM's Nanometer Flight",
     "AI Designs Future Drugs & Materials",
     "Lasers That Guide Self-Driving Cars",
     "Your Photos' Invisible Shrinking Trick",
@@ -99,14 +98,10 @@
     "AI Inference Gets Production-Ready with Dedicated GPUs",
     "GPS: Einstein's Invisible Guide",
     "Neural Machine Translation: Core Principles",
-    "AI's Secret Language Decoder"
+    "AI's Secret Language Decoder",
+    "Your Tech's Invisible Memory Locks"
   ],
   "used_keywords": [
-    "did you know",
-    "did you know",
-    "threads",
-    "tech",
-    "did you know",
     "did you know",
     "did you know",
     "threads",
@@ -301,19 +296,14 @@
     "sentiment analysis",
     "language understanding",
     "chatbots",
+    "did you know",
+    "flash memory",
+    "data storage",
+    "electrons",
+    "non-volatile",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Hard Drives Float on Air: IBM's Nanometer Flight",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-18T16:42:03.387638+00:00"
-    },
     {
       "title": "Hard Drives Float on Air: IBM's Nanometer Flight",
       "news_source_url": "",
@@ -1345,6 +1335,20 @@
       "source": "Natural Language Processing (NLP) research and applications (e.g., Google AI, OpenAI, academic papers on sentiment analysis)",
       "platform": "threads",
       "timestamp": "2026-10-31T11:09:05.788166+00:00"
+    },
+    {
+      "title": "Your Tech's Invisible Memory Locks",
+      "news_source_url": "",
+      "keywords": [
+        "flash memory",
+        "data storage",
+        "electrons",
+        "non-volatile",
+        "did you know"
+      ],
+      "source": "Principles of NAND Flash Memory, widely documented by major semiconductor manufacturers (e.g., Micron Technology, Samsung) and science/tech education platforms.",
+      "platform": "instagram",
+      "timestamp": "2026-10-31T16:34:06.061570+00:00"
     }
   ]
 }
