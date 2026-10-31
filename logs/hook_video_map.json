@@ -1898,5 +1898,15 @@
       "shares": 0,
       "subscribers_gained": 0
     }
+  },
+  "lqg5rM40U0w": {
+    "video_id": "lqg5rM40U0w",
+    "hook_pattern": "curiosity_gap",
+    "hook_variant": "A",
+    "hook_text": "This GitHub workspace lets AIs collaborate silently",
+    "category": "AI & Tech Tools",
+    "title": "The Secret AI Team Running on Your PC \ud83e\udd2b",
+    "uploaded_at": "2026-10-31T19:36:27.223851",
+    "synced": false
   }
 }
