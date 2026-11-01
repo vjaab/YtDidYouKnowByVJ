@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Wi-Fi: Invisible Waves Through Walls",
     "Your Phone's Invisible Listener Brain",
     "Your Phone's Invisible Listener Brain",
     "Your Phone Listens to Silence",
@@ -99,10 +98,10 @@
     "Why Phone Cameras See More Than Human Eyes",
     "AI Video Synthesis: Photorealism Breakthrough",
     "Wi-Fi's Ghostly Path",
-    "Digital Storage: Magnets vs Quantum Traps"
+    "Digital Storage: Magnets vs Quantum Traps",
+    "How AlphaZero Learns Like a Super-Fast Baby"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "electromagnetic spectrum",
     "data transfer",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Wi-Fi: Invisible Waves Through Walls",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-19T16:56:13.712013+00:00"
-    },
     {
       "title": "Your Phone's Invisible Listener Brain",
       "news_source_url": "",
@@ -1347,6 +1337,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-01T12:05:23.492402+00:00"
+    },
+    {
+      "title": "How AlphaZero Learns Like a Super-Fast Baby",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-01T17:29:02.870503+00:00"
     }
   ]
 }
