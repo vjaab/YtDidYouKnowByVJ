@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Lasers That Guide Self-Driving Cars",
     "Your Photos' Invisible Shrinking Trick",
     "Your Photos' Invisible Shrinking Trick",
     "Wi-Fi: Invisible Waves Through Walls",
@@ -99,10 +98,10 @@
     "AI's Secret Language Decoder",
     "Your Tech's Invisible Memory Locks",
     "Qualcomm's Ultrasonic Sound Map Biometrics",
-    "Why Phone Cameras See More Than Human Eyes"
+    "Why Phone Cameras See More Than Human Eyes",
+    "AI Video Synthesis: Photorealism Breakthrough"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "non-volatile",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Lasers That Guide Self-Driving Cars",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-19T07:46:05.816686+00:00"
-    },
     {
       "title": "Your Photos' Invisible Shrinking Trick",
       "news_source_url": "",
@@ -1348,6 +1338,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-10-31T17:57:01.954985+00:00"
+    },
+    {
+      "title": "AI Video Synthesis: Photorealism Breakthrough",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-01T11:04:43.890540+00:00"
     }
   ]
 }
