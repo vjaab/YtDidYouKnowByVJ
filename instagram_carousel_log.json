@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Photos' Invisible Shrinking Trick",
     "Wi-Fi: Invisible Waves Through Walls",
     "Your Phone's Invisible Listener Brain",
     "Your Phone's Invisible Listener Brain",
@@ -99,10 +98,10 @@
     "Qualcomm's Ultrasonic Sound Map Biometrics",
     "Why Phone Cameras See More Than Human Eyes",
     "AI Video Synthesis: Photorealism Breakthrough",
-    "Wi-Fi's Ghostly Path"
+    "Wi-Fi's Ghostly Path",
+    "Digital Storage: Magnets vs Quantum Traps"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "threads",
@@ -301,20 +300,10 @@
     "invisible tech",
     "electromagnetic spectrum",
     "data transfer",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Photos' Invisible Shrinking Trick",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-19T13:55:42.031032+00:00"
-    },
     {
       "title": "Wi-Fi: Invisible Waves Through Walls",
       "news_source_url": "",
@@ -1348,6 +1337,16 @@
       "source": "NASA - The Electromagnetic Spectrum",
       "platform": "facebook",
       "timestamp": "2026-11-01T11:19:35.445084+00:00"
+    },
+    {
+      "title": "Digital Storage: Magnets vs Quantum Traps",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-01T12:05:23.492402+00:00"
     }
   ]
 }
