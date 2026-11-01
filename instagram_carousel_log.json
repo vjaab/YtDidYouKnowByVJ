@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "Your Photos' Invisible Shrinking Trick",
-    "Your Photos' Invisible Shrinking Trick",
     "Wi-Fi: Invisible Waves Through Walls",
     "Your Phone's Invisible Listener Brain",
     "Your Phone's Invisible Listener Brain",
@@ -99,15 +98,10 @@
     "Your Tech's Invisible Memory Locks",
     "Qualcomm's Ultrasonic Sound Map Biometrics",
     "Why Phone Cameras See More Than Human Eyes",
-    "AI Video Synthesis: Photorealism Breakthrough"
+    "AI Video Synthesis: Photorealism Breakthrough",
+    "Wi-Fi's Ghostly Path"
   ],
   "used_keywords": [
-    "tech",
-    "did you know",
-    "did you know",
-    "did you know",
-    "threads",
-    "tech",
     "did you know",
     "did you know",
     "did you know",
@@ -301,24 +295,15 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
+    "Wi-Fi",
+    "radio waves",
+    "invisible tech",
+    "electromagnetic spectrum",
+    "data transfer",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Photos' Invisible Shrinking Trick",
-      "news_source_url": "",
-      "keywords": [
-        "image compression",
-        "JPEG",
-        "digital photos",
-        "data storage",
-        "technology",
-        "did you know"
-      ],
-      "source": "JPEG (Joint Photographic Experts Group) Standard; Digital Image Processing Fundamentals",
-      "platform": "threads",
-      "timestamp": "2026-10-19T13:54:47.860085+00:00"
-    },
     {
       "title": "Your Photos' Invisible Shrinking Trick",
       "news_source_url": "",
@@ -1348,6 +1333,21 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-01T11:04:43.890540+00:00"
+    },
+    {
+      "title": "Wi-Fi's Ghostly Path",
+      "news_source_url": "",
+      "keywords": [
+        "Wi-Fi",
+        "radio waves",
+        "invisible tech",
+        "electromagnetic spectrum",
+        "data transfer",
+        "did you know"
+      ],
+      "source": "NASA - The Electromagnetic Spectrum",
+      "platform": "facebook",
+      "timestamp": "2026-11-01T11:19:35.445084+00:00"
     }
   ]
 }

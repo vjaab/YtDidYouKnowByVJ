@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "battery",
+  "speaker_right": "vj",
+  "hook": "Did You Know your internet data travels through walls like a ghost? \ud83d\udc7b",
+  "headline": "Wi-Fi's Ghostly Path",
+  "source": "NASA - The Electromagnetic Spectrum",
+  "slides": [
+    {
+      "speaker": "battery",
+      "emotion": "shocked",
+      "title": "Wi-Fi's Magic Trick \ud83d\udc7b",
+      "bubble": "My Wi-Fi works through walls? How does it do that?!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Invisible Messengers \ud83d\udce1",
+      "bubble": "It uses invisible radio waves, like tiny energetic messengers.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "curious",
+      "title": "Wiggling Through Walls! \ud83d\ude2e",
+      "bubble": "So, not like light bouncing off, but wiggling through?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Share Wi-Fi Wisdom! \ud83d\udca1",
+      "bubble": "Exactly! They phase through obstacles, connecting your whole home.",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your Wi-Fi uses invisible radio waves, a type of electromagnetic energy, that easily pass through walls and furniture, connecting your devices throughout your home.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know your internet data travels through walls like a ghost? \ud83d\udc7b\n\n\ud83d\udca1 Your Wi-Fi uses invisible radio waves, a type of electromagnetic energy, that easily pass through walls and furniture, connecting your devices throughout your home.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "everyday_tech_mysteries",
+  "characters": "auto"
+}
