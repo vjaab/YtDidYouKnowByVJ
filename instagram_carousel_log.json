@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Phone's Invisible Listener Brain",
     "Your Phone Listens to Silence",
     "Your Phone's Tiny Superpowers: Microphones",
     "CMU Wi-Fi Vision: Smart Speakers Seeing Without Cameras",
@@ -99,10 +98,10 @@
     "Wi-Fi's Ghostly Path",
     "Digital Storage: Magnets vs Quantum Traps",
     "How AlphaZero Learns Like a Super-Fast Baby",
-    "Why AI Invents Facts: The Architecture of Hallucination"
+    "Why AI Invents Facts: The Architecture of Hallucination",
+    "AI's Internet Brain: Unlocking Global Scale"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,20 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Phone's Invisible Listener Brain",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-19T17:40:47.040801+00:00"
-    },
     {
       "title": "Your Phone Listens to Silence",
       "news_source_url": "",
@@ -1347,6 +1336,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-01T17:59:52.705230+00:00"
+    },
+    {
+      "title": "AI's Internet Brain: Unlocking Global Scale",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-01T18:32:28.717776+00:00"
     }
   ]
 }
