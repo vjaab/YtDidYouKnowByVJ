@@ -1386,16 +1386,21 @@
         "variants": {
           "C": {
             "views": 12,
-            "retention": 0.4,
+            "retention": 0.26666666666666666,
             "engagement": 0.0,
-            "swipe_away_rate": 0.09799999999999998,
-            "avg_view_percentage": 40.2,
-            "count": 2,
+            "swipe_away_rate": 0.06533333333333331,
+            "avg_view_percentage": 26.8,
+            "count": 3,
             "hook_texts": [
               {
                 "text": "Your phone automation is completely outdated now.",
                 "video_id": "ayST2bwLHHQ",
                 "recorded_at": "2026-10-04T17:09:39.782522"
+              },
+              {
+                "text": "Your computer lacks this native AI agent",
+                "video_id": "FM_kBrmWHrw",
+                "recorded_at": "2026-11-01T16:10:44.032968"
               }
             ]
           },
@@ -1416,11 +1421,11 @@
           }
         },
         "total_views": 60,
-        "total_videos": 4,
-        "avg_retention": 0.45,
+        "total_videos": 5,
+        "avg_retention": 0.36,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.299,
-        "avg_view_percentage": 87.70750000000001
+        "avg_swipe_away": 0.2392,
+        "avg_view_percentage": 70.16600000000001
       },
       "negative_warning": {
         "variants": {
@@ -1890,12 +1895,12 @@
     },
     "personal_stake": {
       "views": 491,
-      "retention": 0.192719845237571,
-      "engagement": 0.002754820936639118,
-      "count": 33,
-      "swipe_away_rate": 0.2869909090909092,
-      "avg_view_percentage": 24.950303030303026
+      "retention": 0.18705161449528948,
+      "engagement": 0.00267379679144385,
+      "count": 34,
+      "swipe_away_rate": 0.2785500000000001,
+      "avg_view_percentage": 24.216470588235293
     }
   },
-  "last_updated": "2026-10-31T19:36:27.220548"
+  "last_updated": "2026-11-01T16:10:44.033004"
 }

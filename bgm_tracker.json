@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "modern_tech.mp3",
+      "headline": "GitHub Trending: google-gemini/gemini-cli",
+      "topic_type": "auto",
+      "timestamp": "41318470201"
+    },
+    {
       "track": "jam_Energy.mp3",
       "headline": "nightly-labs/openbot: The Local-First Desktop Workspace for AI Teammates",
       "topic_type": "auto",
@@ -173,12 +179,6 @@
       "headline": "mobile-next/mobile-mcp \u2014 Model Context Protocol Server for Mobile Automation and",
       "topic_type": "auto",
       "timestamp": "37216468155"
-    },
-    {
-      "track": "jam_Energetic_Pop.mp3",
-      "headline": "GitHub Trending: pablostanley/yoinks \u2014 yoink any video from your terminal. no sh",
-      "topic_type": "auto",
-      "timestamp": "37095681940"
     }
   ],
   "usage_counts": {
@@ -191,7 +191,7 @@
     "Defiance.mp3": 1,
     "jam_Confidence.mp3": 2,
     "jam_Upbeat.mp3": 5,
-    "modern_tech.mp3": 4,
+    "modern_tech.mp3": 5,
     "jam_Elite.mp3": 3,
     "jam_Energetic_Pop.mp3": 3,
     "jam_Groovy_SIX.mp3": 3,
