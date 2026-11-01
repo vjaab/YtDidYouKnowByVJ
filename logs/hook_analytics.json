@@ -1638,16 +1638,21 @@
         "variants": {
           "C": {
             "views": 11,
-            "retention": 0.5,
+            "retention": 0.3333333333333333,
             "engagement": 0.0,
-            "swipe_away_rate": 0.5,
-            "avg_view_percentage": 484.01,
-            "count": 2,
+            "swipe_away_rate": 0.3333333333333333,
+            "avg_view_percentage": 322.67333333333335,
+            "count": 3,
             "hook_texts": [
               {
                 "text": "Don't write another line of code alone.",
                 "video_id": "xOTHSfRsSK0",
                 "recorded_at": "2026-10-19T16:12:33.805837"
+              },
+              {
+                "text": "Stop ignoring multimodal AI.",
+                "video_id": "5L71VRRfgyA",
+                "recorded_at": "2026-11-01T20:11:22.413181"
               }
             ]
           },
@@ -1668,11 +1673,11 @@
           }
         },
         "total_views": 40,
-        "total_videos": 4,
-        "avg_retention": 0.325,
+        "total_videos": 5,
+        "avg_retention": 0.26,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.423375,
-        "avg_view_percentage": 249.6675
+        "avg_swipe_away": 0.3387,
+        "avg_view_percentage": 199.73399999999998
       },
       "result_first": {
         "variants": {
@@ -1863,11 +1868,11 @@
   "global": {
     "negative_warning": {
       "views": 587,
-      "retention": 0.2013581578307352,
-      "engagement": 0.0038600288600288604,
-      "count": 35,
-      "swipe_away_rate": 0.3078742857142858,
-      "avg_view_percentage": 103.16285714285713
+      "retention": 0.19576487566877032,
+      "engagement": 0.0037528058361391697,
+      "count": 36,
+      "swipe_away_rate": 0.2993222222222223,
+      "avg_view_percentage": 100.29722222222222
     },
     "result_first": {
       "views": 1367,
@@ -1902,5 +1907,5 @@
       "avg_view_percentage": 24.216470588235293
     }
   },
-  "last_updated": "2026-11-01T16:10:44.033004"
+  "last_updated": "2026-11-01T20:11:22.413227"
 }

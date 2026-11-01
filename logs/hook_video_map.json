@@ -1918,5 +1918,15 @@
     "title": "Why 99% Of Devs Miss This Tool \u26a1",
     "uploaded_at": "2026-11-01T16:10:44.036294",
     "synced": false
+  },
+  "5L71VRRfgyA": {
+    "video_id": "5L71VRRfgyA",
+    "hook_pattern": "negative_warning",
+    "hook_variant": "C",
+    "hook_text": "Stop ignoring multimodal AI.",
+    "category": "Facts & Trivia",
+    "title": "Why 99% Of People Get Open AI Wrong \ud83d\udc41\ufe0f",
+    "uploaded_at": "2026-11-01T20:11:22.416716",
+    "synced": false
   }
 }
