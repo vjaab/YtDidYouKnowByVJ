@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "camera",
+  "speaker_right": "vj",
+  "hook": "Did You Know how self-driving cars actually 'see' the road and everything around them, even in the dark? \ud83e\udd2f",
+  "headline": "Cars See World with Invisible Senses",
+  "source": "Leading Autonomous Vehicle Research & Development",
+  "slides": [
+    {
+      "speaker": "camera",
+      "emotion": "shocked",
+      "title": "Invisible Eyes? \ud83e\udd2f",
+      "bubble": "Self-driving cars see everything, even in pitch black darkness. But how?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Super-Senses Unveiled \ud83d\udce1",
+      "bubble": "They use invisible lasers, radio waves, and sound for 3D maps.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "curious",
+      "title": "AI's 3D Vision \ud83e\udde0",
+      "bubble": "So, AI stitches all this data into one detailed 3D map?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Human vs AI? \ud83d\udc47",
+      "bubble": "Do you trust AI's invisible senses more than human eyes?",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Self-driving cars use a super-sense combo of LiDAR, radar, and ultrasonic sensors to build a detailed 3D map, seeing the world far better than humans.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know how self-driving cars actually 'see' the road and everything around them, even in the dark? \ud83e\udd2f\n\n\ud83d\udca1 Self-driving cars use a super-sense combo of LiDAR, radar, and ultrasonic sensors to build a detailed 3D map, seeing the world far better than humans.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "ai_secrets",
+  "characters": "auto"
+}
