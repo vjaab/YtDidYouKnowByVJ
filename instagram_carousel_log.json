@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "CMU Wi-Fi Vision: Smart Speakers Seeing Without Cameras",
     "Keystroke Dynamics: Continuous Auth Breakthrough",
     "LLM Brain: Fix, Don't Just Scale",
     "AI Sees, Writes, and Understands Images!",
@@ -99,10 +98,10 @@
     "AI's Internet Brain: Unlocking Global Scale",
     "Your Phone Charges Through Thin Air!",
     "Your Music Travels on Light",
-    "Cars See World with Invisible Senses"
+    "Cars See World with Invisible Senses",
+    "Your Phone Sees Your Face as Numbers!"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,20 +300,10 @@
     "LiDAR",
     "AI vision",
     "robotics",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "CMU Wi-Fi Vision: Smart Speakers Seeing Without Cameras",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-19T20:45:35.078930+00:00"
-    },
     {
       "title": "Keystroke Dynamics: Continuous Auth Breakthrough",
       "news_source_url": "",
@@ -1350,6 +1339,16 @@
       "source": "Leading Autonomous Vehicle Research & Development",
       "platform": "threads",
       "timestamp": "2026-11-02T16:33:25.876523+00:00"
+    },
+    {
+      "title": "Your Phone Sees Your Face as Numbers!",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-02T20:13:54.542869+00:00"
     }
   ]
 }

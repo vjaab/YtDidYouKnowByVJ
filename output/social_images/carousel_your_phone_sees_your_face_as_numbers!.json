@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know your phone doesn't actually 'see' your face like you do, but as a secret math puzzle? \ud83e\udd2f",
+  "headline": "Your Phone Sees Your Face as Numbers!",
+  "source": "Computer Vision & Biometric Security Research (e.g., IEEE, MIT Technology Review)",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Face as a Math Puzzle? \ud83e\udd2f",
+      "bubble": "Did you know your phone sees your face as a secret math puzzle?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Not a Photo, It's Data!",
+      "bubble": "Exactly! It doesn't store your actual face as a picture.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "How Does It 'See'? \ud83e\udd14",
+      "bubble": "So, how does it recognize me without my actual face?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Sensors Map Your Face \ud83d\udccd",
+      "bubble": "Advanced sensors map hundreds of unique points on your face.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "thinking",
+      "title": "Measuring Features Precisely \ud83d\udcd0",
+      "bubble": "Like the width of my nose or eye socket depth?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Converts to Math Formula \ud83d\udd22",
+      "bubble": "Yes! These become a complex mathematical formula, your \"face-print.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Your Unique 'Math Password'! \u2705",
+      "bubble": "\ud83d\udccc Tap Save for this mind-blowing tech fact!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your phone maps your face as hundreds of unique points, converting them into a mathematical 'face-print' for secure unlocking.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour phone doesn't 'see' your face like you do. It's all about numbers, not images!\n\nHere's how your phone unlocks with your face:\n\ud83d\udd39 Your phone doesn't store a picture of you for Face ID.\n\ud83d\udd39 Instead, advanced sensors map hundreds of unique facial points and distances.\n\ud83d\udd39 These precise measurements are converted into a complex mathematical formula \u2013 your unique 'face-print'.\n\ud83d\udd39 Every time you glance, it instantly recalculates and compares this 'math password' for a perfect match.\n\n\ud83d\udccc Tap Save so you have this in your toolkit!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #FaceID #Biometrics #ComputerVision #AIExplained #VijayKumarJAi #ScrollStoppingTech",
+  "vector": "visual_engineering",
+  "characters": "auto"
+}
