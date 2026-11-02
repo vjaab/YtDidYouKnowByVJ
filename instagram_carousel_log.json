@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "AI Sees, Writes, and Understands Images!",
-    "AI Sees, Writes, and Understands Images!",
     "GPS & General Relativity: Einstein's Time in Orbit",
     "Deep-Sea Superhighways: Powering AI's Global Reach",
     "Your Digital World: Just Zeros & Ones",
@@ -99,10 +98,10 @@
     "Cars See World with Invisible Senses",
     "Your Phone Sees Your Face as Numbers!",
     "AI Paints Worlds from Your Words",
-    "CPU Performance Race: Apple, Qualcomm, Intel"
+    "CPU Performance Race: Apple, Qualcomm, Intel",
+    "Your Phone's Secret Language Translator"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "threads",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI Sees, Writes, and Understands Images!",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-20T12:00:25.138059+00:00"
-    },
     {
       "title": "AI Sees, Writes, and Understands Images!",
       "news_source_url": "",
@@ -1349,6 +1339,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-02T20:54:37.718034+00:00"
+    },
+    {
+      "title": "Your Phone's Secret Language Translator",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-02T22:39:41.086868+00:00"
     }
   ]
 }
