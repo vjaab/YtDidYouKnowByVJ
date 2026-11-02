@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Keystroke Dynamics: Continuous Auth Breakthrough",
     "LLM Brain: Fix, Don't Just Scale",
     "AI Sees, Writes, and Understands Images!",
     "AI Sees, Writes, and Understands Images!",
@@ -99,10 +98,10 @@
     "Your Phone Charges Through Thin Air!",
     "Your Music Travels on Light",
     "Cars See World with Invisible Senses",
-    "Your Phone Sees Your Face as Numbers!"
+    "Your Phone Sees Your Face as Numbers!",
+    "AI Paints Worlds from Your Words"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "AI vision",
     "robotics",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Keystroke Dynamics: Continuous Auth Breakthrough",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-20T06:49:07.714579+00:00"
-    },
     {
       "title": "LLM Brain: Fix, Don't Just Scale",
       "news_source_url": "",
@@ -1349,6 +1339,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-02T20:13:54.542869+00:00"
+    },
+    {
+      "title": "AI Paints Worlds from Your Words",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-02T20:24:11.348907+00:00"
     }
   ]
 }

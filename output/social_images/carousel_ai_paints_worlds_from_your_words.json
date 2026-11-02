@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "camera",
+  "speaker_right": "vj",
+  "hook": "Did You Know AI can draw anything you imagine, just by reading your thoughts? \ud83e\udd2f",
+  "headline": "AI Paints Worlds from Your Words",
+  "source": "OpenAI (DALL-E), Stability AI (Stable Diffusion), Google (Imagen)",
+  "slides": [
+    {
+      "speaker": "camera",
+      "emotion": "shocked",
+      "title": "AI's Magic Brush \ud83c\udfa8",
+      "bubble": "Wait, AI just finds existing pictures for our prompts, right?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Beyond Recognition \ud83e\udde0",
+      "bubble": "Nope! AI actually paints entirely new worlds from your words.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "curious",
+      "title": "Imagination Unleashed \u2728",
+      "bubble": "So it can draw 'a cat in space with pizza' from scratch?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Your Ideas, Real \ud83e\udd2f",
+      "bubble": "Exactly! It learns from billions to 'dream up' unique images. Share this!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "AI doesn't just find images; it creates unique visual worlds from your text descriptions.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know AI can draw anything you imagine, just by reading your thoughts? \ud83e\udd2f\n\n\ud83d\udca1 AI doesn't just find images; it creates unique visual worlds from your text descriptions.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "cybersecurity_secrets",
+  "characters": "auto"
+}
