@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Phone's Tiny Superpowers: Microphones",
     "CMU Wi-Fi Vision: Smart Speakers Seeing Without Cameras",
     "CMU Wi-Fi Vision: Smart Speakers Seeing Without Cameras",
     "Keystroke Dynamics: Continuous Auth Breakthrough",
@@ -99,10 +98,10 @@
     "How AlphaZero Learns Like a Super-Fast Baby",
     "Why AI Invents Facts: The Architecture of Hallucination",
     "AI's Internet Brain: Unlocking Global Scale",
-    "Your Phone Charges Through Thin Air!"
+    "Your Phone Charges Through Thin Air!",
+    "Your Music Travels on Light"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "threads",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Phone's Tiny Superpowers: Microphones",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-19T19:56:17.279994+00:00"
-    },
     {
       "title": "CMU Wi-Fi Vision: Smart Speakers Seeing Without Cameras",
       "news_source_url": "",
@@ -1346,6 +1336,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-02T08:31:39.506651+00:00"
+    },
+    {
+      "title": "Your Music Travels on Light",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-02T09:28:33.517826+00:00"
     }
   ]
 }
