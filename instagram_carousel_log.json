@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "GPS & General Relativity: Einstein's Time in Orbit",
     "Deep-Sea Superhighways: Powering AI's Global Reach",
     "Your Digital World: Just Zeros & Ones",
     "Your Digital World: Just Zeros & Ones",
@@ -99,10 +98,10 @@
     "AI Paints Worlds from Your Words",
     "CPU Performance Race: Apple, Qualcomm, Intel",
     "Your Phone's Secret Language Translator",
-    "Your Earbuds Hear the World Differently"
+    "Your Earbuds Hear the World Differently",
+    "Wearable Biometrics: Reading Mind Signals"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "GPS & General Relativity: Einstein's Time in Orbit",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-20T14:56:55.505817+00:00"
-    },
     {
       "title": "Deep-Sea Superhighways: Powering AI's Global Reach",
       "news_source_url": "",
@@ -1348,6 +1338,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-02T22:48:25.840242+00:00"
+    },
+    {
+      "title": "Wearable Biometrics: Reading Mind Signals",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-02T23:20:04.248013+00:00"
     }
   ]
 }
