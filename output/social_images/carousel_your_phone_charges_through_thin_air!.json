@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "battery",
+  "speaker_right": "vj",
+  "hook": "Your phone charges through thin air? No cables needed! \u26a1\ufe0f",
+  "headline": "Your Phone Charges Through Thin Air!",
+  "source": "Wireless Power Consortium (Qi standard)",
+  "slides": [
+    {
+      "speaker": "battery",
+      "emotion": "shocked",
+      "title": "Charges Without Cables? \ud83e\udd2f",
+      "bubble": "Wait, my phone charges through thin air? No cables?!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Invisible Power Field \u2728",
+      "bubble": "Exactly! An invisible energy field powers your phone wirelessly.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "curious",
+      "title": "How Does It Start? \ud83e\udd14",
+      "bubble": "But how does this invisible power even begin?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Magic Coils Inside \ud83c\udf00",
+      "bubble": "Both phone and pad have special wire coils, like tiny antennas.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "thinking",
+      "title": "Magnetic Energy Bridge! \ud83c\udf09",
+      "bubble": "So the pad creates a magnetic field for my phone?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Catching Invisible Power \ud83d\udd0b",
+      "bubble": "Yes! Your phone's coil catches it, converting to electricity.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "battery",
+      "emotion": "thinking",
+      "title": "Invisible Power Unlocked! \u26a1",
+      "bubble": "\ud83d\udccc Tap Save! Follow @vijayakumarj_ai for daily tech magic!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your phone charges wirelessly using invisible magnetic fields between special coils.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour phone charges through thin air! No cables needed, thanks to an invisible power field.\n\nHere's the mind-blowing reality:\n\ud83d\udd39 Your phone and charging pad both have special wire coils inside.\n\ud83d\udd39 The charging pad sends electricity through its coil, creating an invisible, pulsating magnetic field.\n\ud83d\udd39 Your phone's coil 'catches' this magnetic field, converting it back into electricity.\n\ud83d\udd39 This silent energy bridge powers up your battery without any physical connection! It's called Qi wireless charging.\n\n\ud83d\udccc Tap Save so you don't lose this mind-blowing fact!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #WirelessCharging #QiStandard #InvisiblePower #MindBlowingFacts #Engineering #Science",
+  "vector": "visual_engineering",
+  "characters": "auto"
+}

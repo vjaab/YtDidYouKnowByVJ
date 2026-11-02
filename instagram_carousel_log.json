@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Phone Listens to Silence",
     "Your Phone's Tiny Superpowers: Microphones",
     "CMU Wi-Fi Vision: Smart Speakers Seeing Without Cameras",
     "CMU Wi-Fi Vision: Smart Speakers Seeing Without Cameras",
@@ -99,10 +98,10 @@
     "Digital Storage: Magnets vs Quantum Traps",
     "How AlphaZero Learns Like a Super-Fast Baby",
     "Why AI Invents Facts: The Architecture of Hallucination",
-    "AI's Internet Brain: Unlocking Global Scale"
+    "AI's Internet Brain: Unlocking Global Scale",
+    "Your Phone Charges Through Thin Air!"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Phone Listens to Silence",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-19T19:44:25.081898+00:00"
-    },
     {
       "title": "Your Phone's Tiny Superpowers: Microphones",
       "news_source_url": "",
@@ -1346,6 +1336,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-01T18:32:28.717776+00:00"
+    },
+    {
+      "title": "Your Phone Charges Through Thin Air!",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-02T08:31:39.506651+00:00"
     }
   ]
 }
