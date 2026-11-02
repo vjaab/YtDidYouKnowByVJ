@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "LLM Brain: Fix, Don't Just Scale",
     "AI Sees, Writes, and Understands Images!",
     "AI Sees, Writes, and Understands Images!",
     "GPS & General Relativity: Einstein's Time in Orbit",
@@ -99,10 +98,10 @@
     "Your Music Travels on Light",
     "Cars See World with Invisible Senses",
     "Your Phone Sees Your Face as Numbers!",
-    "AI Paints Worlds from Your Words"
+    "AI Paints Worlds from Your Words",
+    "CPU Performance Race: Apple, Qualcomm, Intel"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "robotics",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "LLM Brain: Fix, Don't Just Scale",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-20T07:34:56.419838+00:00"
-    },
     {
       "title": "AI Sees, Writes, and Understands Images!",
       "news_source_url": "",
@@ -1349,6 +1339,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-02T20:24:11.348907+00:00"
+    },
+    {
+      "title": "CPU Performance Race: Apple, Qualcomm, Intel",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-02T20:54:37.718034+00:00"
     }
   ]
 }
