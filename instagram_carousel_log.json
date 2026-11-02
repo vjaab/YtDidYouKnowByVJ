@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI Sees, Writes, and Understands Images!",
     "GPS & General Relativity: Einstein's Time in Orbit",
     "Deep-Sea Superhighways: Powering AI's Global Reach",
     "Your Digital World: Just Zeros & Ones",
@@ -99,10 +98,10 @@
     "Your Phone Sees Your Face as Numbers!",
     "AI Paints Worlds from Your Words",
     "CPU Performance Race: Apple, Qualcomm, Intel",
-    "Your Phone's Secret Language Translator"
+    "Your Phone's Secret Language Translator",
+    "Your Earbuds Hear the World Differently"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,20 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI Sees, Writes, and Understands Images!",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-20T12:01:22.741807+00:00"
-    },
     {
       "title": "GPS & General Relativity: Einstein's Time in Orbit",
       "news_source_url": "",
@@ -1349,6 +1338,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-02T22:39:41.086868+00:00"
+    },
+    {
+      "title": "Your Earbuds Hear the World Differently",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-02T22:48:25.840242+00:00"
     }
   ]
 }

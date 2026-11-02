@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "earbuds",
+  "speaker_right": "vj",
+  "hook": "Did You Know Your Earbuds Can Hear Things You Can't? \ud83e\udd2f",
+  "headline": "Your Earbuds Hear the World Differently",
+  "source": "Apple AirPods Pro Technical Specifications",
+  "slides": [
+    {
+      "speaker": "earbuds",
+      "emotion": "curious",
+      "title": "My Earbuds Hear? \ud83c\udfa7",
+      "bubble": "VJ, do my earbuds actually hear things I can't?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Tiny Mics Secret \ud83e\udd2b",
+      "bubble": "Yes! Hidden microphones precisely measure ambient sound around you.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "earbuds",
+      "emotion": "thinking",
+      "title": "Anti-Sound Magic \u2728",
+      "bubble": "So that's how noise cancellation creates 'anti-sound' to block noise?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Share the Ear-Fact! \ud83d\udce2",
+      "bubble": "Exactly! Your earbuds are tiny scientists analyzing the world's noise.",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Those tiny microphones in your earbuds aren't just for calls; they're like tiny scientists analyzing the world's noise for features like noise cancellation.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know Your Earbuds Can Hear Things You Can't? \ud83e\udd2f\n\n\ud83d\udca1 Those tiny microphones in your earbuds aren't just for calls; they're like tiny scientists analyzing the world's noise for features like noise cancellation.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "consumer_utility",
+  "characters": "auto"
+}
