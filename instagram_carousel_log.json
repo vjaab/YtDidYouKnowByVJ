@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "Your Digital World: Just Zeros & Ones",
-    "Your Digital World: Just Zeros & Ones",
     "Apple's Taptic Engine Secrets",
     "Your Phone's Battery Learns Your Habits",
     "Your Phone's Battery Learns Your Habits",
@@ -99,10 +98,10 @@
     "Your Phone's Secret Language Translator",
     "Your Earbuds Hear the World Differently",
     "Wearable Biometrics: Reading Mind Signals",
-    "MIT: Screens That Feel Touch Force"
+    "MIT: Screens That Feel Touch Force",
+    "IEEE: Inside Your Phone's Transistor Army"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Digital World: Just Zeros & Ones",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-20T15:45:37.942495+00:00"
-    },
     {
       "title": "Your Digital World: Just Zeros & Ones",
       "news_source_url": "",
@@ -1348,6 +1338,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-03T08:45:33.962294+00:00"
+    },
+    {
+      "title": "IEEE: Inside Your Phone's Transistor Army",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-03T09:33:56.862101+00:00"
     }
   ]
 }
