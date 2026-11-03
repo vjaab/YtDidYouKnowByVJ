@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Deep-Sea Superhighways: Powering AI's Global Reach",
     "Your Digital World: Just Zeros & Ones",
     "Your Digital World: Just Zeros & Ones",
     "Apple's Taptic Engine Secrets",
@@ -99,10 +98,10 @@
     "CPU Performance Race: Apple, Qualcomm, Intel",
     "Your Phone's Secret Language Translator",
     "Your Earbuds Hear the World Differently",
-    "Wearable Biometrics: Reading Mind Signals"
+    "Wearable Biometrics: Reading Mind Signals",
+    "MIT: Screens That Feel Touch Force"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Deep-Sea Superhighways: Powering AI's Global Reach",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-20T15:06:44.094289+00:00"
-    },
     {
       "title": "Your Digital World: Just Zeros & Ones",
       "news_source_url": "",
@@ -1348,6 +1338,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-02T23:20:04.248013+00:00"
+    },
+    {
+      "title": "MIT: Screens That Feel Touch Force",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-03T08:45:33.962294+00:00"
     }
   ]
 }
