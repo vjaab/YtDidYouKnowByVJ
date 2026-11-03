@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know AI can predict the exact shapes of tiny 'life-building blocks' in our bodies? \ud83e\uddec",
+  "headline": "AI's Invisible Life Decoder",
+  "source": "DeepMind AlphaFold (Nature, Science journals)",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Mind-Blowing AI! \ud83e\udd2f",
+      "bubble": "AI can now see inside your body's smallest building blocks?!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Decoding Life's Shapes \ud83e\uddec",
+      "bubble": "Yes! AI predicts exact 3D protein shapes, life's tiny machines.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Years to Minutes! \u23f1\ufe0f",
+      "bubble": "This used to take scientists years, now AI does it in minutes!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Future of Cures? \ud83d\udc8a",
+      "bubble": "Will AI find cures for everything faster? Your take below! \ud83d\udc47",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "AI now predicts complex protein shapes, accelerating new medicines and treatments for illnesses.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know AI can predict the exact shapes of tiny 'life-building blocks' in our bodies? \ud83e\uddec\n\n\ud83d\udca1 AI now predicts complex protein shapes, accelerating new medicines and treatments for illnesses.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "bizarre_tech_history",
+  "characters": "auto"
+}

@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Apple's Taptic Engine Secrets",
     "Your Phone's Battery Learns Your Habits",
     "Your Phone's Battery Learns Your Habits",
     "Phone Camera's Invisible Light Catchers",
@@ -99,10 +98,10 @@
     "Wearable Biometrics: Reading Mind Signals",
     "MIT: Screens That Feel Touch Force",
     "IEEE: Inside Your Phone's Transistor Army",
-    "Quantum Computers: Beyond 0 and 1"
+    "Quantum Computers: Beyond 0 and 1",
+    "AI's Invisible Life Decoder"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Apple's Taptic Engine Secrets",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-20T18:25:57.033340+00:00"
-    },
     {
       "title": "Your Phone's Battery Learns Your Habits",
       "news_source_url": "",
@@ -1347,6 +1337,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-03T14:36:12.848191+00:00"
+    },
+    {
+      "title": "AI's Invisible Life Decoder",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-03T18:42:14.866876+00:00"
     }
   ]
 }
