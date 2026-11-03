@@ -1802,14 +1802,29 @@
                 "recorded_at": "2026-10-24T13:55:24.088351"
               }
             ]
+          },
+          "C": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "This secret software instantly fixes Windows.",
+                "video_id": "sTbaQbEeb3c",
+                "recorded_at": "2026-11-03T17:38:17.002730"
+              }
+            ]
           }
         },
         "total_views": 51,
-        "total_videos": 4,
-        "avg_retention": 0.14393939393939395,
+        "total_videos": 5,
+        "avg_retention": 0.11515151515151516,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.3466,
-        "avg_view_percentage": 15.34
+        "avg_swipe_away": 0.27728,
+        "avg_view_percentage": 12.272
       },
       "personal_stake": {
         "variants": {
@@ -1876,11 +1891,11 @@
     },
     "result_first": {
       "views": 1367,
-      "retention": 0.20947144221395417,
-      "engagement": 0.004185870622196636,
-      "count": 38,
-      "swipe_away_rate": 0.3111605263157895,
-      "avg_view_percentage": 22.15684210526316
+      "retention": 0.20410037959308355,
+      "engagement": 0.004078540606242876,
+      "count": 39,
+      "swipe_away_rate": 0.30318205128205133,
+      "avg_view_percentage": 21.58871794871795
     },
     "stat_contradiction": {
       "views": 273,
@@ -1907,5 +1922,5 @@
       "avg_view_percentage": 24.216470588235293
     }
   },
-  "last_updated": "2026-11-03T13:59:35.431413"
+  "last_updated": "2026-11-03T17:38:17.002774"
 }
