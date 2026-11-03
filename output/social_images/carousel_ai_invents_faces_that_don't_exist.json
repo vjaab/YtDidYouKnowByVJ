@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "camera",
+  "speaker_right": "vj",
+  "hook": "AI can create faces of people who don't exist! \ud83e\udd2f",
+  "headline": "AI Invents Faces That Don't Exist",
+  "source": "NVIDIA AI Lab (StyleGAN research), OpenAI, general AI research",
+  "slides": [
+    {
+      "speaker": "camera",
+      "emotion": "shocked",
+      "title": "Fake Faces?! \ud83d\ude2e",
+      "bubble": "You mean AI makes up people's faces from nothing?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Digital Artists \ud83c\udfa8",
+      "bubble": "Exactly! It studies millions of real faces to invent new ones.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "curious",
+      "title": "Perfectly Real? \u2728",
+      "bubble": "But they look so real! How can they be fake?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Your Take? \ud83e\udd14",
+      "bubble": "Are you amazed or worried by AI's face-making skills? Tell me!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Advanced AI like GANs studies real photos to create photorealistic faces of people who have never lived.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nAI can create faces of people who don't exist! \ud83e\udd2f\n\n\ud83d\udca1 Advanced AI like GANs studies real photos to create photorealistic faces of people who have never lived.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "cybersecurity_secrets",
+  "characters": "auto"
+}
