@@ -1515,12 +1515,12 @@
             ]
           },
           "A": {
-            "views": 0,
-            "retention": 0.0,
-            "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 1,
+            "views": 125,
+            "retention": 0.15,
+            "engagement": 0.004,
+            "swipe_away_rate": 0.34809999999999997,
+            "avg_view_percentage": 15.190000000000001,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "This GitHub workspace lets AIs collaborate silently",
@@ -1530,12 +1530,12 @@
             ]
           }
         },
-        "total_views": 3,
-        "total_videos": 3,
-        "avg_retention": 0.3218390804597701,
-        "avg_engagement": 0.0,
-        "avg_swipe_away": 0.0001666666666666483,
-        "avg_view_percentage": 33.31666666666667
+        "total_views": 128,
+        "total_videos": 4,
+        "avg_retention": 0.3163793103448276,
+        "avg_engagement": 0.002,
+        "avg_swipe_away": 0.17417499999999997,
+        "avg_view_percentage": 32.5825
       }
     },
     "Facts & Trivia": {
@@ -1891,12 +1891,12 @@
       "avg_view_percentage": 16.702173913043477
     },
     "curiosity_gap": {
-      "views": 600,
-      "retention": 0.2010501897076348,
-      "engagement": 0.0037933851701600183,
-      "count": 36,
-      "swipe_away_rate": 0.2370416666666667,
-      "avg_view_percentage": 20.740277777777784
+      "views": 725,
+      "retention": 0.20372450890472577,
+      "engagement": 0.003907077462858397,
+      "count": 37,
+      "swipe_away_rate": 0.24945135135135138,
+      "avg_view_percentage": 21.000810810810815
     },
     "personal_stake": {
       "views": 491,
@@ -1907,5 +1907,5 @@
       "avg_view_percentage": 24.216470588235293
     }
   },
-  "last_updated": "2026-11-01T20:11:22.413227"
+  "last_updated": "2026-11-03T13:59:35.431413"
 }

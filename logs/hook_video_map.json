@@ -1907,7 +1907,21 @@
     "category": "AI & Tech Tools",
     "title": "The Secret AI Team Running on Your PC \ud83e\udd2b",
     "uploaded_at": "2026-10-31T19:36:27.223851",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-11-03T13:59:35.434072",
+    "last_metrics": {
+      "views": 125,
+      "avg_view_duration_sec": 9.0,
+      "avg_view_percentage": 30.38,
+      "swipe_away_rate": 0.6962,
+      "duration_sec": 30.0,
+      "retention_rate": 0.3,
+      "engagement_rate": 0.008,
+      "likes": 1,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "FM_kBrmWHrw": {
     "video_id": "FM_kBrmWHrw",
