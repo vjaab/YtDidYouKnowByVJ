@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "Your Phone's Battery Learns Your Habits",
-    "Your Phone's Battery Learns Your Habits",
     "Phone Camera's Invisible Light Catchers",
     "AI's Instant Language Bridge",
     "How Touchscreens Sense Your Finger",
@@ -99,10 +98,10 @@
     "MIT: Screens That Feel Touch Force",
     "IEEE: Inside Your Phone's Transistor Army",
     "Quantum Computers: Beyond 0 and 1",
-    "AI's Invisible Life Decoder"
+    "AI's Invisible Life Decoder",
+    "Intel Transistor Breakthrough Powers Edge AI"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Phone's Battery Learns Your Habits",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-20T19:31:34.358688+00:00"
-    },
     {
       "title": "Your Phone's Battery Learns Your Habits",
       "news_source_url": "",
@@ -1347,6 +1337,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-03T18:42:14.866876+00:00"
+    },
+    {
+      "title": "Intel Transistor Breakthrough Powers Edge AI",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-03T20:33:04.347913+00:00"
     }
   ]
 }
