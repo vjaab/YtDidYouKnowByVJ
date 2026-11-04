@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Cloud Lives In Giant Buildings",
     "Your Phone Sees You in 3D",
     "AI Mimics Biological Neurons: Research Breakthrough",
     "AI Mimics Biological Neurons: Research Breakthrough",
@@ -99,10 +98,10 @@
     "Microchips: Built with Atomic Precision",
     "Your Phone Blends Digital and Real",
     "Submarine Cables: The Ocean's Invisible Internet Backbone",
-    "AI Knows Your Next Favorite Thing"
+    "AI Knows Your Next Favorite Thing",
+    "Your Phone Talks to Satellites"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Cloud Lives In Giant Buildings",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-21T15:02:47.204184+00:00"
-    },
     {
       "title": "Your Phone Sees You in 3D",
       "news_source_url": "",
@@ -1345,6 +1335,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-04T17:56:21.239172+00:00"
+    },
+    {
+      "title": "Your Phone Talks to Satellites",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-04T18:03:47.486267+00:00"
     }
   ]
 }
