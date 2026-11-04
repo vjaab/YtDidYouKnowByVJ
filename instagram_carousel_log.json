@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI Invents Faces of Non-Existent People",
     "Your Voice Unlocks Digital Doors",
     "Your Phone's Secret GPS Time Machine by NASA & NIST",
     "Your Phone's Secret GPS Time Machine by NASA & NIST",
@@ -99,10 +98,10 @@
     "Your Phone Talks to Satellites",
     "AI Agents Need Keys, Not Full Access",
     "Einstein's Relativity Makes GPS Accurate",
-    "The 'Cloud' Isn't in the Sky"
+    "The 'Cloud' Isn't in the Sky",
+    "Headphones Silence Noise with Anti-Sound"
   ],
   "used_keywords": [
-    "deepfake",
     "AI",
     "generative AI",
     "fake video",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI Invents Faces of Non-Existent People",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-21T18:30:40.207690+00:00"
-    },
     {
       "title": "Your Voice Unlocks Digital Doors",
       "news_source_url": "",
@@ -1344,6 +1334,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-04T20:51:35.071245+00:00"
+    },
+    {
+      "title": "Headphones Silence Noise with Anti-Sound",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-04T21:27:27.246213+00:00"
     }
   ]
 }
