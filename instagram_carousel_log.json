@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "How Touchscreens Sense Your Finger",
-    "How Touchscreens Sense Your Finger",
     "Your Cloud Lives In Giant Buildings",
     "Your Phone Sees You in 3D",
     "AI Mimics Biological Neurons: Research Breakthrough",
@@ -99,10 +98,10 @@
     "Intel Transistor Breakthrough Powers Edge AI",
     "AI Invents Faces That Don't Exist",
     "Microchips: Built with Atomic Precision",
-    "Your Phone Blends Digital and Real"
+    "Your Phone Blends Digital and Real",
+    "Submarine Cables: The Ocean's Invisible Internet Backbone"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "How Touchscreens Sense Your Finger",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-21T12:16:41.445037+00:00"
-    },
     {
       "title": "How Touchscreens Sense Your Finger",
       "news_source_url": "",
@@ -1346,6 +1336,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-04T09:09:36.874827+00:00"
+    },
+    {
+      "title": "Submarine Cables: The Ocean's Invisible Internet Backbone",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-04T14:52:36.158941+00:00"
     }
   ]
 }
