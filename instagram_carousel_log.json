@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Phone Camera's Invisible Light Catchers",
     "AI's Instant Language Bridge",
     "How Touchscreens Sense Your Finger",
     "How Touchscreens Sense Your Finger",
@@ -99,10 +98,10 @@
     "Quantum Computers: Beyond 0 and 1",
     "AI's Invisible Life Decoder",
     "Intel Transistor Breakthrough Powers Edge AI",
-    "AI Invents Faces That Don't Exist"
+    "AI Invents Faces That Don't Exist",
+    "Microchips: Built with Atomic Precision"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Phone Camera's Invisible Light Catchers",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-21T06:43:05.059378+00:00"
-    },
     {
       "title": "AI's Instant Language Bridge",
       "news_source_url": "",
@@ -1346,6 +1336,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-03T21:16:01.588729+00:00"
+    },
+    {
+      "title": "Microchips: Built with Atomic Precision",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-04T08:13:24.463583+00:00"
     }
   ]
 }

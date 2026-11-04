@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know your phone's brain is built with unimaginable precision? \ud83e\udd2f",
+  "headline": "Microchips: Built with Atomic Precision",
+  "source": "Semiconductor Industry Consortium / Leading Chip Manufacturers (e.g., Intel, TSMC)",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Phone's Brain Precision? \ud83e\udd2f",
+      "bubble": "Your phone's brain is built with unimaginable precision. Did you know?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Tiny Chip Cities \ud83c\udfd9\ufe0f",
+      "bubble": "Yes! Every microchip is a miniature city with billions of pathways.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "How Tiny Are They? \ud83d\udd2c",
+      "bubble": "Billions of pathways? How tiny are these components inside?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Atom-Wide Lines! \ud83d\udccf",
+      "bubble": "Engineers carve lines just a few atoms wide. Mind-boggling!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "thinking",
+      "title": "Thinner Than Hair? \ud83d\ude32",
+      "bubble": "Atoms wide? That's thousands of times thinner than a human hair!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Continent Hair Line \ud83d\uddfa\ufe0f",
+      "bubble": "Imagine drawing a perfect hair-thin line across an entire continent.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Atomic Accuracy! \ud83d\udcaf",
+      "bubble": "\ud83d\udccc Tap Save to remember this atomic-level accuracy!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Every microchip in your devices is an atomic-scale marvel, etched with precision far beyond imagination.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour phone's brain, the microchip, is built with unimaginable precision!\n\nHere's the mind-blowing reality:\n\ud83d\udd39 Microchips are miniature cities with billions of transistors.\n\ud83d\udd39 Engineers carve lines just a few atoms wide \u2013 thousands of times thinner than a human hair!\n\ud83d\udd39 This atomic-scale accuracy creates the invisible marvels that power our digital world.\n\ud83d\udd39 It's like drawing a perfect hair-thin line across an entire continent!\n\n\ud83d\udccc Tap Save so you have this in your toolkit!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #Microchips #AtomicPrecision #Engineering #Semiconductors #MindBlowingFacts #ComputerScience",
+  "vector": "visual_engineering",
+  "characters": "auto"
+}
