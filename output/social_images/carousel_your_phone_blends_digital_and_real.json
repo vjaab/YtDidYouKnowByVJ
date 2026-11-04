@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "camera",
+  "speaker_right": "vj",
+  "hook": "Did You Know your phone can make invisible digital objects appear right in your room? \ud83d\udc7b",
+  "headline": "Your Phone Blends Digital and Real",
+  "source": "Augmented Reality (AR) technology, e.g., Apple ARKit, Google ARCore",
+  "slides": [
+    {
+      "speaker": "camera",
+      "emotion": "shocked",
+      "title": "Digital Ghosts? \ud83d\udc7b",
+      "bubble": "Wait, how does my phone put digital characters right in my room?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Your Phone's Secret Eye \ud83d\udc41\ufe0f",
+      "bubble": "It uses its camera and AI to map your room constantly!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "curious",
+      "title": "Blending Worlds! \u2728",
+      "bubble": "So, it makes digital objects walk on my real carpet?!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Share This Magic! \ud83e\ude84",
+      "bubble": "Exactly! Your phone creates a blended digital-physical interactive world.",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your phone's camera and AI map your environment, making digital objects appear and interact realistically in your physical space.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know your phone can make invisible digital objects appear right in your room? \ud83d\udc7b\n\n\ud83d\udca1 Your phone's camera and AI map your environment, making digital objects appear and interact realistically in your physical space.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "ai_secrets",
+  "characters": "auto"
+}
