@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Phone Sees You in 3D",
     "AI Mimics Biological Neurons: Research Breakthrough",
     "AI Mimics Biological Neurons: Research Breakthrough",
     "AI Invents Faces of Non-Existent People",
@@ -99,10 +98,10 @@
     "Your Phone Blends Digital and Real",
     "Submarine Cables: The Ocean's Invisible Internet Backbone",
     "AI Knows Your Next Favorite Thing",
-    "Your Phone Talks to Satellites"
+    "Your Phone Talks to Satellites",
+    "AI Agents Need Keys, Not Full Access"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "deepfake",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Phone Sees You in 3D",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-21T15:16:39.799897+00:00"
-    },
     {
       "title": "AI Mimics Biological Neurons: Research Breakthrough",
       "news_source_url": "",
@@ -1345,6 +1335,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-04T18:03:47.486267+00:00"
+    },
+    {
+      "title": "AI Agents Need Keys, Not Full Access",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-04T18:52:49.058400+00:00"
     }
   ]
 }
