@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "AI Mimics Biological Neurons: Research Breakthrough",
-    "AI Mimics Biological Neurons: Research Breakthrough",
     "AI Invents Faces of Non-Existent People",
     "Your Voice Unlocks Digital Doors",
     "Your Phone's Secret GPS Time Machine by NASA & NIST",
@@ -99,10 +98,10 @@
     "Submarine Cables: The Ocean's Invisible Internet Backbone",
     "AI Knows Your Next Favorite Thing",
     "Your Phone Talks to Satellites",
-    "AI Agents Need Keys, Not Full Access"
+    "AI Agents Need Keys, Not Full Access",
+    "Einstein's Relativity Makes GPS Accurate"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "deepfake",
     "AI",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI Mimics Biological Neurons: Research Breakthrough",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-21T16:04:05.768781+00:00"
-    },
     {
       "title": "AI Mimics Biological Neurons: Research Breakthrough",
       "news_source_url": "",
@@ -1345,6 +1335,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-04T18:52:49.058400+00:00"
+    },
+    {
+      "title": "Einstein's Relativity Makes GPS Accurate",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-04T20:45:42.135852+00:00"
     }
   ]
 }

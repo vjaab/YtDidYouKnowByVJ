@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did you know your phone\u2019s GPS relies on Einstein\u2019s theories of time? \ud83e\udd2f",
+  "headline": "Einstein's Relativity Makes GPS Accurate",
+  "source": "NASA (National Aeronautics and Space Administration)",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "Your Phone's Secret \ud83e\udd2b",
+      "bubble": "Hey VJ, how does my phone know where I am exactly?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Satellite Time Signals \ud83d\udef0\ufe0f",
+      "bubble": "It listens to super-precise clocks on satellites orbiting Earth!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Clocks Tick Differently?! \u23f1\ufe0f",
+      "bubble": "Wait, clocks on satellites tick differently than mine?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Einstein's Prediction \u269b\ufe0f",
+      "bubble": "Yes! Einstein's relativity says speed and gravity affect time.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "thinking",
+      "title": "Speed & Gravity's Effect \ud83e\udd14",
+      "bubble": "So satellites moving fast and far away change time?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Miles Off Daily! \u2757",
+      "bubble": "Without adjustments, your GPS would be miles off daily!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Relativity's GPS Power \ud83d\ude80",
+      "bubble": "\ud83d\udccc Save this for precision & follow @vijayakumarj_ai!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your phone's GPS relies on precise time signals from satellites. Einstein's relativity explains why their clocks tick differently, making GPS accuracy possible.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nYour phone's GPS is a direct application of Einstein's mind-bending theories of relativity!\n\nHere's the cosmic connection:\n\ud83d\udd39 GPS works by timing signals from orbiting satellites.\n\ud83d\udd39 These satellites move incredibly fast and are in weaker gravity.\n\ud83d\udd39 Einstein's relativity predicts their clocks tick at a different rate than ours.\n\ud83d\udd39 Tiny adjustments for these time differences are crucial for accuracy.\n\ud83d\udd39 Without them, GPS would be off by miles every day!\n\n\ud83d\udccc Tap Save so you have this in your toolkit!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #Einstein #Relativity #GPS #ScienceExplained #Space #Technology #Physics",
+  "vector": "visual_engineering",
+  "characters": "auto"
+}
