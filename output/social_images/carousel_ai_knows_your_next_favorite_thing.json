@@ -1,0 +1,64 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "vr",
+  "speaker_right": "vj",
+  "hook": "Did You Know that the AI recommending your next movie or song is essentially a super-smart digital detective? \ud83e\udd2f",
+  "headline": "AI Knows Your Next Favorite Thing",
+  "source": "Leading research in AI and Machine Learning, applied by major tech companies like Netflix and Amazon.",
+  "slides": [
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "AI Knows YOU? \ud83e\udd2f",
+      "bubble": "Can AI truly predict your next favorite thing?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Digital Detective \ud83d\udd75\ufe0f\u200d\u2642\ufe0f",
+      "bubble": "It's a super-smart digital detective, watching your choices.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "curious",
+      "title": "My Tastes? \ud83e\udd14",
+      "bubble": "But how does it know *my* unique taste so well?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "smug",
+      "title": "Millions of YOU \ud83d\udc65",
+      "bubble": "It compares your choices with millions of similar people.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "shocked",
+      "title": "Hidden Patterns \ud83d\udca1",
+      "bubble": "So, it finds hidden patterns in our collective preferences?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Predicting Desires \u2728",
+      "bubble": "Exactly! It suggests what you'll love, often before you do.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vr",
+      "emotion": "excited",
+      "title": "Save This Fact! \ud83d\udccc",
+      "bubble": "\ud83d\udccc Tap Save to keep this mind-blowing tech insight!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "AI's digital detective sifts through massive data, finding hidden patterns to predict your next favorite thing, often before you even know.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nAI isn't just smart, it's a digital detective for your taste!\n\nHere's how AI knows your next favorite thing:\n\ud83d\udd39 It analyzes your viewing/listening history and interactions.\n\ud83d\udd39 Compares your patterns with millions of users *just like you*.\n\ud83d\udd39 Finds hidden connections and predicts what you'll love.\n\ud83d\udd39 Often, it knows your desires even before you consciously do!\n\n\ud83d\udccc Tap Save so you have this in your toolkit for your next AI conversation!\n\nFollow @vijayakumarj_ai for daily visual tech breakdowns & facts!\n#DidYouKnow #TechFacts #MindBlowingFacts #AI #MachineLearning #Recommendations #Netflix #Amazon #FutureTech #DigitalDetective",
+  "vector": "everyday_tech_mysteries",
+  "characters": "auto"
+}

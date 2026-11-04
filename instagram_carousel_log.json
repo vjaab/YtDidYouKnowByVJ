@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "How Touchscreens Sense Your Finger",
     "Your Cloud Lives In Giant Buildings",
     "Your Phone Sees You in 3D",
     "AI Mimics Biological Neurons: Research Breakthrough",
@@ -99,10 +98,10 @@
     "AI Invents Faces That Don't Exist",
     "Microchips: Built with Atomic Precision",
     "Your Phone Blends Digital and Real",
-    "Submarine Cables: The Ocean's Invisible Internet Backbone"
+    "Submarine Cables: The Ocean's Invisible Internet Backbone",
+    "AI Knows Your Next Favorite Thing"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,20 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "How Touchscreens Sense Your Finger",
-      "news_source_url": "",
-      "keywords": [
-        "threads",
-        "tech"
-      ],
-      "source": "Threads Post",
-      "platform": "unknown",
-      "timestamp": "2026-10-21T12:17:48.576757+00:00"
-    },
     {
       "title": "Your Cloud Lives In Giant Buildings",
       "news_source_url": "",
@@ -1346,6 +1335,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-04T14:52:36.158941+00:00"
+    },
+    {
+      "title": "AI Knows Your Next Favorite Thing",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-04T17:56:21.239172+00:00"
     }
   ]
 }
