@@ -1385,12 +1385,12 @@
       "personal_stake": {
         "variants": {
           "C": {
-            "views": 12,
-            "retention": 0.26666666666666666,
-            "engagement": 0.0,
-            "swipe_away_rate": 0.06533333333333331,
-            "avg_view_percentage": 26.8,
-            "count": 3,
+            "views": 739,
+            "retention": 0.29848484848484846,
+            "engagement": 0.003094910591471802,
+            "swipe_away_rate": 0.19972499999999999,
+            "avg_view_percentage": 30.027500000000003,
+            "count": 4,
             "hook_texts": [
               {
                 "text": "Your phone automation is completely outdated now.",
@@ -1420,12 +1420,12 @@
             ]
           }
         },
-        "total_views": 60,
-        "total_videos": 5,
-        "avg_retention": 0.36,
-        "avg_engagement": 0.0,
-        "avg_swipe_away": 0.2392,
-        "avg_view_percentage": 70.16600000000001
+        "total_views": 787,
+        "total_videos": 6,
+        "avg_retention": 0.3656565656565656,
+        "avg_engagement": 0.0020632737276478678,
+        "avg_swipe_away": 0.2998166666666667,
+        "avg_view_percentage": 65.09
       },
       "negative_warning": {
         "variants": {
@@ -1637,12 +1637,12 @@
       "negative_warning": {
         "variants": {
           "C": {
-            "views": 11,
-            "retention": 0.3333333333333333,
-            "engagement": 0.0,
-            "swipe_away_rate": 0.3333333333333333,
-            "avg_view_percentage": 322.67333333333335,
-            "count": 3,
+            "views": 76,
+            "retention": 0.3269230769230769,
+            "engagement": 0.0038461538461538464,
+            "swipe_away_rate": 0.420525,
+            "avg_view_percentage": 249.9525,
+            "count": 4,
             "hook_texts": [
               {
                 "text": "Don't write another line of code alone.",
@@ -1672,12 +1672,12 @@
             ]
           }
         },
-        "total_views": 40,
-        "total_videos": 5,
-        "avg_retention": 0.26,
-        "avg_engagement": 0.0,
-        "avg_swipe_away": 0.3387,
-        "avg_view_percentage": 199.73399999999998
+        "total_views": 105,
+        "total_videos": 6,
+        "avg_retention": 0.26794871794871794,
+        "avg_engagement": 0.002564102564102564,
+        "avg_swipe_away": 0.3959333333333333,
+        "avg_view_percentage": 171.74333333333334
       },
       "result_first": {
         "variants": {
@@ -1882,12 +1882,12 @@
   },
   "global": {
     "negative_warning": {
-      "views": 587,
-      "retention": 0.19576487566877032,
-      "engagement": 0.0037528058361391697,
-      "count": 36,
-      "swipe_away_rate": 0.2993222222222223,
-      "avg_view_percentage": 100.29722222222222
+      "views": 652,
+      "retention": 0.1987899413991362,
+      "engagement": 0.004067179067179068,
+      "count": 37,
+      "swipe_away_rate": 0.3096675675675677,
+      "avg_view_percentage": 98.44567567567567
     },
     "result_first": {
       "views": 1367,
@@ -1914,13 +1914,13 @@
       "avg_view_percentage": 21.000810810810815
     },
     "personal_stake": {
-      "views": 491,
-      "retention": 0.18705161449528948,
-      "engagement": 0.00267379679144385,
-      "count": 34,
-      "swipe_away_rate": 0.2785500000000001,
-      "avg_view_percentage": 24.216470588235293
+      "views": 1218,
+      "retention": 0.19296269390797818,
+      "engagement": 0.0029511066649993744,
+      "count": 35,
+      "swipe_away_rate": 0.28781714285714294,
+      "avg_view_percentage": 24.659142857142854
     }
   },
-  "last_updated": "2026-11-03T17:38:17.002774"
+  "last_updated": "2026-11-04T14:14:49.234412"
 }
