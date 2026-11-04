@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "camera",
+  "speaker_right": "vj",
+  "hook": "Did You Know the 'Cloud' is actually on Earth? \ud83e\udd2f",
+  "headline": "The 'Cloud' Isn't in the Sky",
+  "source": "Major Cloud Providers (e.g., Google Cloud, Amazon Web Services, Microsoft Azure)",
+  "slides": [
+    {
+      "speaker": "camera",
+      "emotion": "thinking",
+      "title": "Where is the Cloud? \u2601\ufe0f",
+      "bubble": "VJ, I thought the cloud was way up in the sky!",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "It's On The Ground! \ud83c\udfe2",
+      "bubble": "Nope! Your data lives in massive buildings called data centers.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "camera",
+      "emotion": "thinking",
+      "title": "Digital Libraries! \ud83d\udcda",
+      "bubble": "So my photos are in giant computer rooms on Earth?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Share This Fact! \ud83d\udce2",
+      "bubble": "Exactly! Share this with anyone who uses the internet!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "When you save photos or stream movies to 'the cloud,' your data isn't floating in a mysterious digital ether. Instead, it's stored on countless powerful computers packed into massive, secure buildings called data centers.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know the 'Cloud' is actually on Earth? \ud83e\udd2f\n\n\ud83d\udca1 When you save photos or stream movies to 'the cloud,' your data isn't floating in a mysterious digital ether. Instead, it's stored on countless powerful computers packed into massive, secure buildings called data centers.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "cybersecurity_secrets",
+  "characters": "auto"
+}
