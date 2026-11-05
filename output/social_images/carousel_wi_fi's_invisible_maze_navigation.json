@@ -1,0 +1,43 @@
+{
+  "mode": "did_you_know",
+  "category": "\ud83e\udde0 DID YOU KNOW?",
+  "speaker_left": "earbuds",
+  "speaker_right": "vj",
+  "hook": "Did You Know your Wi-Fi signal literally bounces off walls and furniture to reach your devices? \ud83e\udd2f",
+  "headline": "Wi-Fi's Invisible Maze Navigation",
+  "source": "IEEE Communications Society",
+  "slides": [
+    {
+      "speaker": "earbuds",
+      "emotion": "shocked",
+      "title": "Bold Shocker \ud83e\udd2f",
+      "bubble": "Did you know your Wi-Fi literally bounces off walls?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "excited",
+      "title": "Invisible Waves \ud83c\udf0a",
+      "bubble": "Yes! It's invisible waves, like sound echoing off surfaces.",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "earbuds",
+      "emotion": "curious",
+      "title": "Complex Maze \ud83e\udde9",
+      "bubble": "So, it creates countless reflective paths, an invisible maze?",
+      "is_takeaway": false
+    },
+    {
+      "speaker": "vj",
+      "emotion": "thinking",
+      "title": "Your Take? \ud83d\udc47",
+      "bubble": "Did you imagine Wi-Fi was this complex? Share your thoughts!",
+      "is_takeaway": true
+    }
+  ],
+  "takeaway": "Your Wi-Fi signal literally bounces off walls, ceilings, and objects, navigating an invisible maze to connect your devices.",
+  "caption": "\ud83e\udde0 DID YOU KNOW? \ud83e\udd2f\n\nDid You Know your Wi-Fi signal literally bounces off walls and furniture to reach your devices? \ud83e\udd2f\n\n\ud83d\udca1 Your Wi-Fi signal literally bounces off walls, ceilings, and objects, navigating an invisible maze to connect your devices.\n\n\ud83d\udcac Did you already know this, or did this blow your mind? Drop a \ud83e\udd2f below!\n\nFollow @vijayakumarj_ai for daily mind-blowing tech & science facts!",
+  "vector": "bizarre_tech_history",
+  "characters": "auto"
+}
