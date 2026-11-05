@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "Your Phone's Secret GPS Time Machine by NASA & NIST",
-    "Your Phone's Secret GPS Time Machine by NASA & NIST",
     "Your Phone's Secret Code for Speed",
     "Flash Memory: No Moving Parts, Infinite Possibilities",
     "AI Knows What You'll Love Next",
@@ -99,10 +98,10 @@
     "Einstein's Relativity Makes GPS Accurate",
     "The 'Cloud' Isn't in the Sky",
     "Headphones Silence Noise with Anti-Sound",
-    "Capacitive Touch: The Invisible Engineering Behind Every Tap"
+    "Capacitive Touch: The Invisible Engineering Behind Every Tap",
+    "Deep Learning Fundamentals: The Architecture of Intelligence"
   ],
   "used_keywords": [
-    "generative AI",
     "fake video",
     "digital illusion",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Phone's Secret GPS Time Machine by NASA & NIST",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-21T19:30:26.464896+00:00"
-    },
     {
       "title": "Your Phone's Secret GPS Time Machine by NASA & NIST",
       "news_source_url": "",
@@ -1344,6 +1334,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-05T08:43:27.915588+00:00"
+    },
+    {
+      "title": "Deep Learning Fundamentals: The Architecture of Intelligence",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-05T09:30:46.436804+00:00"
     }
   ]
 }
