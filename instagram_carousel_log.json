@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "AI Knows What You'll Love Next",
-    "AI Knows What You'll Love Next",
     "Wi-Fi's Invisible Wall-Piercing Power",
     "Sand: The Secret to Your Tech's Brain",
     "Sand: The Secret to Your Tech's Brain",
@@ -99,10 +98,10 @@
     "Deep Learning Fundamentals: The Architecture of Intelligence",
     "Wi-Fi's Invisible Maze Navigation",
     "AI Engineering: Neural Core Unleashed",
-    "AI's Billions of Learning Knobs"
+    "AI's Billions of Learning Knobs",
+    "Your Phone Battery: A Tiny Chemical Powerhouse"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "AI learning",
     "machine learning",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI Knows What You'll Love Next",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-22T12:18:30.817295+00:00"
-    },
     {
       "title": "AI Knows What You'll Love Next",
       "news_source_url": "",
@@ -1343,6 +1333,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-05T18:55:54.235573+00:00"
+    },
+    {
+      "title": "Your Phone Battery: A Tiny Chemical Powerhouse",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-05T21:00:04.797786+00:00"
     }
   ]
 }
