@@ -1,0 +1,20 @@
+[16:30:10] === STARTING DAILY AI PIPELINE (DID_YOU_KNOW) | COUNTRY: GB | SOURCE: MEDIUM ===
+[16:30:10] 🔄 Sequential Topic Source: Active='MEDIUM' (Rotation: github → medium → huggingface_hub)
+[16:30:10] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[16:30:10] STEP 1: Content Ecosystem Check -> Day: Thu, Slot: Slot A (Discovery), Category: Tech Gadgets & Inventions, Format: MYTH_BUSTER (Run 1/3)
+[16:30:10] STEP 2: Fetching articles (RSS + Trending Engine)...
+[16:30:43] 🔥 Trending Engine injected 195 high-signal articles (active_source='medium', sources=['medium', 'github', 'huggingface_hub']).
+[16:30:43] 📈 vidIQ: Injected 8 high-signal topics.
+[16:32:19] ✅ Fetched 545 total articles (195 trending engine [medium], 8 vidIQ, 240 research, 93 tools, 9 X.com).
+[16:32:19] 📚 Loaded 30 recent topics for deduplication
+[16:34:10] 🔍 Deduplication & classification: 545 → 20 candidates
+[16:34:10] 🏷️ Zero-shot re-categorized top candidate: Tech Gadgets & Inventions → AI & Tech Tools
+[16:34:10] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[16:50:01] Selected Headline: Magnetic Alignment & Thermal Dynamics: Analyzing the Efficiency of Modern MagSafe Power Banks
+[16:50:01] Selected URL: https://medium.com/@sambennett.tech/magnetic-alignment-thermal-dynamics-analyzing-the-efficiency-of-modern-magsafe-power-banks-9a15c8df10f0?source=rss------technology-5
+[16:50:01] Breaking Level: 9
+[16:50:01] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[16:50:24] ❌ Article screenshot FAILED for: Magnetic Alignment & Thermal Dynamics: Analyzing the Efficiency of Modern MagSafe Power Banks
+[16:50:24]    URL was: https://medium.com/@sambennett.tech/magnetic-alignment-thermal-dynamics-analyzing-the-efficiency-of-modern-magsafe-power-banks-9a15c8df10f0?source=rss------technology-5
+[16:50:24]    Rejecting this topic and picking a different one... (2 items rejected so far)
+[16:50:24] STEP 3 (Attempt 2/10): Gemini Searching & Generating Script...
