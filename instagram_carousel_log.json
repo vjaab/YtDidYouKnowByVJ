@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Voice Unlocks Digital Doors",
     "Your Phone's Secret GPS Time Machine by NASA & NIST",
     "Your Phone's Secret GPS Time Machine by NASA & NIST",
     "Your Phone's Secret Code for Speed",
@@ -99,10 +98,10 @@
     "AI Agents Need Keys, Not Full Access",
     "Einstein's Relativity Makes GPS Accurate",
     "The 'Cloud' Isn't in the Sky",
-    "Headphones Silence Noise with Anti-Sound"
+    "Headphones Silence Noise with Anti-Sound",
+    "Capacitive Touch: The Invisible Engineering Behind Every Tap"
   ],
   "used_keywords": [
-    "AI",
     "generative AI",
     "fake video",
     "digital illusion",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Voice Unlocks Digital Doors",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-21T18:38:26.477298+00:00"
-    },
     {
       "title": "Your Phone's Secret GPS Time Machine by NASA & NIST",
       "news_source_url": "",
@@ -1344,6 +1334,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-04T21:27:27.246213+00:00"
+    },
+    {
+      "title": "Capacitive Touch: The Invisible Engineering Behind Every Tap",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-05T08:43:27.915588+00:00"
     }
   ]
 }
