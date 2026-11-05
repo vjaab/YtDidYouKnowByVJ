@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Phone's Secret Code for Speed",
     "Flash Memory: No Moving Parts, Infinite Possibilities",
     "AI Knows What You'll Love Next",
     "AI Knows What You'll Love Next",
@@ -99,10 +98,10 @@
     "Headphones Silence Noise with Anti-Sound",
     "Capacitive Touch: The Invisible Engineering Behind Every Tap",
     "Deep Learning Fundamentals: The Architecture of Intelligence",
-    "Wi-Fi's Invisible Maze Navigation"
+    "Wi-Fi's Invisible Maze Navigation",
+    "AI Engineering: Neural Core Unleashed"
   ],
   "used_keywords": [
-    "digital illusion",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Phone's Secret Code for Speed",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-22T06:51:29.345645+00:00"
-    },
     {
       "title": "Flash Memory: No Moving Parts, Infinite Possibilities",
       "news_source_url": "",
@@ -1343,6 +1333,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-05T14:58:19.816129+00:00"
+    },
+    {
+      "title": "AI Engineering: Neural Core Unleashed",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-05T18:01:07.049798+00:00"
     }
   ]
 }
