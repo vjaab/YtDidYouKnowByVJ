@@ -1,0 +1,262 @@
+{
+  "headline": "Anthropic Unveils Claude Duet: Personal AI Agent",
+  "summary": "Anthropic launches Claude Duet, a personal AI agent designed for autonomous task execution. The system introduces a dual-model architecture separating planning from execution, enabling persistent context across sessions. Early access signals a shift toward agentic workflows for developers.",
+  "source": "Medium - artificial-intelligence",
+  "source_url": "",
+  "date": "06 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "model_release",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "hook",
+      "layout_type": "hero_hook",
+      "eyebrow": "ANTHROPIC RELEASE",
+      "title": "Claude Duet: Your Personal AI Agent",
+      "subtitle": "Dual-model architecture enables autonomous, persistent task execution.",
+      "body": "Anthropic introduces Claude Duet, a personal AI agent built on a planner-executor split. It maintains context across sessions, handles multi-step workflows, and integrates with developer tools. How does this change AI-assisted engineering?",
+      "deep_dive": "Claude Duet represents Anthropic's first dedicated agentic product. Unlike chat models that respond and forget, Duet persists a working memory across interactions. The architecture separates a high-level planner (reasoning, decomposition) from a low-level executor (tool use, code generation). This mirrors how senior engineers delegate: one defines the approach, another implements. The system targets software engineers and tech leads who need reliable automation for repetitive, context-heavy tasks like refactoring, test generation, and dependency upgrades.",
+      "key_fact": "First Anthropic product with persistent cross-session memory and planner-executor separation.",
+      "why_it_matters": "Shifts AI from reactive assistant to proactive teammate for engineering workflows."
+    },
+    {
+      "slide_number": 2,
+      "role": "what_changed",
+      "layout_type": "whats_new",
+      "eyebrow": "WHAT CHANGED",
+      "title": "From Chat to Persistent Agent",
+      "subtitle": "Architectural shift enables memory, delegation, and tool orchestration.",
+      "body": "Previous Claude models were stateless per session. Duet adds persistent memory, a planner-executor split, and native tool orchestration. No benchmark numbers specified in source.",
+      "deep_dive": "The core architectural change is statefulness. Standard LLMs treat each conversation as independent. Duet introduces a durable context store \u2014 think of it as a project notebook the agent updates after every task. The planner model (larger, slower) breaks goals into steps. The executor model (smaller, faster) runs tools, writes code, and reports results. This separation lets each model specialize: planner for reasoning breadth, executor for latency-sensitive action. Tool orchestration is now native \u2014 the agent can chain git, test runners, linters, and APIs without explicit prompting.",
+      "key_fact": "Planner-executor dual-model design replaces single-model chat paradigm.",
+      "why_it_matters": "Enables multi-hour, multi-step engineering tasks without context loss.",
+      "before_title": "Previous Claude (Chat)",
+      "before_items": [
+        "Stateless per conversation",
+        "Single model for all tasks",
+        "Manual tool invocation",
+        "No cross-session memory"
+      ],
+      "after_title": "Claude Duet (Agent)",
+      "after_items": [
+        "Persistent working memory",
+        "Planner + Executor models",
+        "Native tool orchestration",
+        "Autonomous multi-step execution"
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "technical_mechanism",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "HOW IT WORKS",
+      "title": "Dual-Model Loop with Shared Memory",
+      "subtitle": "Planner reasons, Executor acts, Memory persists \u2014 like a lead and staff engineer.",
+      "body": "User goal enters Planner, which decomposes into steps. Executor runs tools per step. Results update shared Memory. Loop repeats until goal met.",
+      "deep_dive": "Imagine a tech lead (Planner) and a staff engineer (Executor) sharing a Notion doc (Memory). The lead reads the goal, writes a plan in the doc. The staff engineer picks up the first task, runs tests, edits code, updates the doc with results. The lead reviews, adjusts the plan, assigns the next task. This loop continues until the goal is done. The Planner uses a larger context window for reasoning. The Executor uses a smaller, faster model optimized for tool calls and code generation. Both read/write the same Memory store \u2014 a structured log of decisions, file diffs, test outputs, and environment state. This avoids the 'lost in context' problem of long single-model conversations.",
+      "key_fact": "Shared memory store is the synchronization layer enabling coherent long-horizon tasks.",
+      "why_it_matters": "Separation of concerns lets each model optimize for its role \u2014 reasoning vs. latency.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "User Goal",
+            "sub": "Natural language intent"
+          },
+          {
+            "name": "Planner Model",
+            "sub": "Decomposes \u2192 writes plan to Memory"
+          },
+          {
+            "name": "Shared Memory",
+            "sub": "Plan, state, diffs, test results"
+          },
+          {
+            "name": "Executor Model",
+            "sub": "Reads step \u2192 runs tools \u2192 writes results"
+          },
+          {
+            "name": "Tool Layer",
+            "sub": "Git, shell, linter, test runner, APIs"
+          }
+        ],
+        "connections": [
+          {
+            "label": "submits goal"
+          },
+          {
+            "label": "writes plan"
+          },
+          {
+            "label": "reads/writes state"
+          },
+          {
+            "label": "executes step"
+          },
+          {
+            "label": "invokes tools"
+          },
+          {
+            "label": "returns observations"
+          }
+        ]
+      }
+    },
+    {
+      "slide_number": 4,
+      "role": "benchmark_evidence",
+      "layout_type": "metrics_cards",
+      "eyebrow": "BENCHMARKS",
+      "title": "Performance Not Publicly Disclosed",
+      "subtitle": "Anthropic has not released standardized benchmark scores for Duet.",
+      "body": "No HumanEval, MMLU, latency, or token cost figures provided in source. Evaluation likely focuses on task completion rate and user studies.",
+      "deep_dive": "Agent benchmarks differ fundamentally from LLM benchmarks. Static QA suites (MMLU, HumanEval) measure single-turn accuracy. Agents require multi-turn, tool-using, stateful evaluation \u2014 think 'complete this PR' not 'solve this function.' Anthropic likely uses internal simulation environments (e.g., SWE-bench style repos) measuring: task success rate, steps to completion, tool error recovery, and memory consistency over hours. Latency matters differently: Planner latency is acceptable (seconds), Executor latency must be low (milliseconds) for tight tool loops. Token cost shifts: Planner uses more tokens per turn but fewer turns; Executor uses fewer tokens per call but many calls. Without published numbers, treat claims cautiously.",
+      "key_fact": "No public benchmark metrics released; agent evaluation requires new methodologies.",
+      "why_it_matters": "Cannot compare Duet vs. competitors on standard leaderboards yet.",
+      "metrics": [
+        {
+          "label": "HumanEval / MMLU",
+          "value": "Not specified in source",
+          "delta": "N/A"
+        },
+        {
+          "label": "Task Success Rate",
+          "value": "Not specified in source",
+          "delta": "N/A"
+        },
+        {
+          "label": "Planner Latency",
+          "value": "Not specified in source",
+          "delta": "N/A"
+        },
+        {
+          "label": "Executor Latency",
+          "value": "Not specified in source",
+          "delta": "N/A"
+        }
+      ]
+    },
+    {
+      "slide_number": 5,
+      "role": "previous_vs_new",
+      "layout_type": "before_after",
+      "eyebrow": "OLD VS NEW",
+      "title": "Chat Assistant \u2192 Autonomous Teammate",
+      "subtitle": "Fundamental shift in how engineers delegate work to AI.",
+      "body": "Old: You prompt, review, reprompt. New: You assign outcome, agent plans and executes, you verify result.",
+      "deep_dive": "The old model: Engineer acts as orchestrator. You break down tasks, paste context, copy-paste code, run tests, fix errors, repeat. Cognitive load stays on you. The new model: Engineer acts as reviewer. You describe the outcome ('add OAuth to the API'), Duet reads the repo, writes a plan, implements across files, runs tests, fixes failures, summarizes changes. You review the diff. This mirrors how you'd delegate to a junior engineer \u2014 but the 'junior' has perfect recall of the codebase, runs tests in milliseconds, and never gets tired. The constraint shifts from 'can the model do this step?' to 'can I specify the outcome clearly enough?'",
+      "key_fact": "Delegation model shifts from step-by-step prompting to outcome-based assignment.",
+      "why_it_matters": "Reduces engineer cognitive load; enables parallel task streams.",
+      "before_title": "Chat Workflow (Manual Orchestration)",
+      "before_items": [
+        "Engineer decomposes task",
+        "Copy-paste context each turn",
+        "Manual tool execution",
+        "Engineer tracks state mentally",
+        "Single-threaded interaction"
+      ],
+      "after_title": "Agent Workflow (Outcome Delegation)",
+      "after_items": [
+        "Engineer defines outcome",
+        "Agent reads live codebase",
+        "Autonomous tool chains",
+        "Persistent shared memory",
+        "Parallel task streams possible"
+      ]
+    },
+    {
+      "slide_number": 6,
+      "role": "developer_impact",
+      "layout_type": "real_world_scenario",
+      "eyebrow": "IN PRODUCTION",
+      "title": "Real Engineering Workflows Transformed",
+      "subtitle": "Refactoring, test generation, dependency upgrades \u2014 hands-off.",
+      "body": "Teams assign outcomes like 'upgrade React 17\u219218 across 40 components.' Duet plans, edits, tests, fixes, opens PR. Engineer reviews.",
+      "deep_dive": "Consider a tech lead managing a legacy migration. Today: they audit code, write a migration guide, assign tickets, review 40 PRs, chase test failures. With Duet: they write one spec \u2014 'migrate all class components to hooks, preserve behavior, update tests.' Duet clones the repo, builds a dependency graph, plans the order (leaf components first), executes edits file-by-file, runs the test suite after each, reverts and retries on failure, aggregates a summary PR. The lead reviews one cohesive diff instead of 40 fragmented ones. Other use cases: generating integration tests for untested endpoints, adding observability instrumentation across services, enforcing lint/format rules on stale code. The agent becomes a force multiplier for the 'janitorial' work that blocks feature velocity.",
+      "key_fact": "Agents excel at high-volume, pattern-based tasks with verifiable outcomes (tests, types, builds).",
+      "why_it_matters": "Frees senior engineers for design decisions; automates maintenance debt reduction."
+    },
+    {
+      "slide_number": 7,
+      "role": "practical_action",
+      "layout_type": "checklist",
+      "eyebrow": "INTEGRATION CHECKLIST",
+      "title": "Adopting Duet in Your Engineering Workflow",
+      "subtitle": "Start with low-risk, high-verifiability tasks. Measure before scaling.",
+      "body": "Evaluate on isolated tasks first. Adapt prompts to outcome specs. Monitor memory drift. Optimize executor latency. No fine-tuning API specified in source.",
+      "deep_dive": "Treat Duet like a new team member \u2014 onboard gradually. 1) Evaluation: Pick 5 repetitive tasks (e.g., 'add unit tests for utils/'). Run Duet, measure success rate vs. manual time. 2) Prompt adaptation: Shift from 'how-to' instructions to 'what' specifications \u2014 define acceptance criteria, not steps. 3) Memory hygiene: Set memory TTL or reset policies; stale context causes drift. 4) Latency budget: Executor calls must stay fast; cache tool results, batch operations. 5) Safety gates: Require human approval for destructive actions (force push, prod deploy). 6) Observability: Log plan versions, tool calls, memory snapshots for debugging. 7) Cost tracking: Planner tokens are expensive; limit replanning loops. 8) Team norms: Define when to use agent vs. chat vs. human. No fine-tuning or custom memory APIs mentioned in source.",
+      "key_fact": "Outcome-based prompting and memory management are the new skills for agent adoption.",
+      "why_it_matters": "Prevents runaway agents, cost surprises, and silent failures in production.",
+      "items": [
+        "Evaluate on 5 isolated, verifiable tasks first",
+        "Rewrite prompts as outcome specs, not step lists",
+        "Set memory TTL and reset policies to prevent drift",
+        "Cache executor tool results; batch calls for latency",
+        "Require human approval for destructive actions",
+        "Log plans, tool calls, memory for observability",
+        "Track planner token costs; cap replanning loops",
+        "Document team norms: agent vs. chat vs. human"
+      ]
+    },
+    {
+      "slide_number": 8,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "KEY TAKEAWAY",
+      "title": "Agentic AI Enters the Engineer's Toolkit",
+      "subtitle": "Claude Duet marks the shift from AI-as-assistant to AI-as-teammate.",
+      "body": "Persistent memory + planner-executor architecture enables autonomous multi-step engineering. No public benchmarks yet. Early access rolling out. Evaluate on verifiable tasks first.",
+      "deep_dive": "Claude Duet is a architectural milestone: the first mainstream AI product built from the ground up for agency, not chat. The planner-executor split solves the reasoning-vs-latency tradeoff. Shared memory solves the context-loss problem. Together, they unlock a new delegation model \u2014 engineers specify outcomes, agents handle execution. But the ecosystem is early. No standardized benchmarks exist. No fine-tuning API is documented. Memory management patterns are unproven at scale. Treat this as a powerful beta: adopt for high-verifiability tasks (tests, migrations, linting), instrument heavily, and build your team's agent literacy. The winners will be teams that learn to specify outcomes clearly and trust-but-verify agent output.",
+      "key_fact": "Duet introduces the planner-executor-memory triad as the new agent primitive.",
+      "why_it_matters": "Teams that master outcome delegation gain compounding leverage on maintenance work.",
+      "takeaways": [
+        "Adopt for high-verifiability tasks first (tests, migrations, linting)",
+        "Master outcome-based prompting \u2014 specify what, not how",
+        "Build observability and safety gates before scaling"
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI & engineering deep dives."
+    }
+  ],
+  "_model_used": "OpenRouter:nvidia/nemotron-3-ultra-550b-a55b:free",
+  "_topic_intelligence": {
+    "topic_type": "model_release",
+    "domain": "ai_ml",
+    "primary_entity": "Anthropic",
+    "content_depth": "deep",
+    "best_story_angle": "technical_breakdown",
+    "audience": [
+      "software_engineers",
+      "ai_engineers"
+    ],
+    "key_questions": [
+      "What specifically changed?",
+      "How does it operate under the hood?",
+      "What evidence or benchmarks support it?",
+      "What should developers do about it?"
+    ],
+    "recommended_slide_count": 8
+  },
+  "_archetype": "AI Model Release & Architecture",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "Anthropic Just Launched Claude Duet: The Personal AI Agent That Can Ac",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "Anthropic Just Launched Claude Duet: The Personal AI Agent T",
+    "fact_summary": "From Answering Questions to Taking Action &#x2014; A Complete Guide to How Claude Duet Works, Its Features, Practical Workflows, and What It&#x2026;Continue reading on Medium \u00bb",
+    "source": "Medium - artificial-intelligence",
+    "news_source_url": "https://medium.com/@www.farabiahmedfahim5607/anthropic-just-launched-claude-duet-the-personal-ai-agent-that-can-actually-work-for-you-9924a18df6c9?source=rss------artificial_intelligence-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "anthropic",
+      "just",
+      "launched",
+      "claude",
+      "duet"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}
