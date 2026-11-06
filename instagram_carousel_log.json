@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "How Your Phone Senses Gravity's Pull",
     "AI Learns Like Babies: Developmental Breakthrough",
     "AI's Creative Lies: When Machines Invent",
     "Your Screen's Secret Color Magic",
@@ -99,10 +98,10 @@
     "Wi-Fi Bounces: New Era of Spatial Sensing Unlocked!",
     "Anthropic Unveils Claude Duet: Personal AI Agent",
     "10 AWS Mistakes to Avoid in Production",
-    "AI Agent Disk Bloat: Main Sessions vs Subagents"
+    "AI Agent Disk Bloat: Main Sessions vs Subagents",
+    "Why Decision Models Outperform LLMs in Logic"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "threads",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "How Your Phone Senses Gravity's Pull",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-22T18:33:08.149204+00:00"
-    },
     {
       "title": "AI Learns Like Babies: Developmental Breakthrough",
       "news_source_url": "",
@@ -1341,6 +1331,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-06T18:12:17.678556+00:00"
+    },
+    {
+      "title": "Why Decision Models Outperform LLMs in Logic",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-06T20:20:07.304325+00:00"
     }
   ]
 }

@@ -1,0 +1,209 @@
+{
+  "headline": "Why Decision Models Outperform LLMs in Logic",
+  "summary": "Exploring why traditional probabilistic language models fall short on rigorous business logic and how explicit decision models bridge the deterministic gap.",
+  "source": "Medium - machine-learning",
+  "source_url": "",
+  "date": "06 Nov 2026",
+  "category": "ai_ml",
+  "topic_type": "programming_concept",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "hero_hook",
+      "eyebrow": "ARCHITECTURE PATTERN",
+      "title": "When Probabilistic Guessing Breaks Business Logic",
+      "subtitle": "Why standard AI models struggle with rigid rules",
+      "body": "LLMs predict the next likely token, but enterprise rules demand absolute certainty. Relying solely on generation for strict compliance creates silent failures.",
+      "deep_dive": "Like asking an artist to calculate tax returns instead of an accountant, probabilistic tools lack native adherence to deterministic constraints.",
+      "key_fact": "Generative models guess outcomes; business logic requires absolute certainty.",
+      "why_it_matters": "Prevents catastrophic compliance errors in production pipelines."
+    },
+    {
+      "slide_number": 2,
+      "role": "concept_mental_model",
+      "layout_type": "process_flow",
+      "eyebrow": "MENTAL MODEL",
+      "title": "The Dual-Brain System of Modern Architecture",
+      "subtitle": "Pairing creative generation with rigid execution",
+      "body": "Think of an airline crew: the pilot handles fluid navigation, but the flight computer executes hard safety limits. AI needs the same division of labor.",
+      "deep_dive": "Isolating fluid language tasks from rigid rule processing ensures safety while maintaining system flexibility.",
+      "key_fact": "Separate creative reasoning from exact rule execution.",
+      "why_it_matters": "Enables robust scaling without sacrificing safety limits.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Intent Capture",
+          "desc": "LLM interprets unstructured user requests."
+        },
+        {
+          "step": "2",
+          "title": "Decision Model",
+          "desc": "Deterministic logic evaluates strict constraints."
+        },
+        {
+          "step": "3",
+          "title": "Execution",
+          "desc": "System acts with 100 percent predictable outcomes."
+        }
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "execution_mechanics",
+      "layout_type": "input_output",
+      "eyebrow": "HOW IT WORKS",
+      "title": "From Raw Input to Validated State",
+      "subtitle": "The clean pipeline of explicit decision routing",
+      "body": "Inputs pass through strict governance checks before state changes occur, ensuring every branch is accounted for.",
+      "deep_dive": "Unlike hidden prompt instructions, explicit decision trees provide complete auditability at every step of execution.",
+      "key_fact": "Traceable paths replace black-box generation.",
+      "why_it_matters": "Guarantees complete system auditability for regulators.",
+      "input": "Unstructured prompt or query",
+      "processing": "Explicit decision matrix evaluation",
+      "output": "Deterministic, compliant execution"
+    },
+    {
+      "slide_number": 4,
+      "role": "architectural_deep_dive",
+      "layout_type": "side_by_side",
+      "eyebrow": "PATTERN TRADE-OFFS",
+      "title": "Weighing Speed Against Absolute Certainty",
+      "subtitle": "Choosing the right engine for your workload",
+      "body": "Balancing flexibility against strict correctness dictates how you structure core system pipelines.",
+      "deep_dive": "Generative models offer high adaptability but unpredictable output, while decision models offer zero variance but require upfront rule authoring.",
+      "key_fact": "Match architectural rigor to your exact failure tolerance.",
+      "why_it_matters": "Optimizes latency and reliability across distributed services.",
+      "left_title": "Generative AI",
+      "left_items": [
+        "High adaptability",
+        "Probabilistic output",
+        "Risk of silent failures",
+        "Creative task mastery"
+      ],
+      "right_title": "Decision Models",
+      "right_items": [
+        "Absolute consistency",
+        "Deterministic rules",
+        "Complete auditability",
+        "Rigid constraint enforcement"
+      ]
+    },
+    {
+      "slide_number": 5,
+      "role": "common_antipattern",
+      "layout_type": "common_mistake",
+      "eyebrow": "AVOID THIS MISTAKE",
+      "title": "Relying on Prompts for Financial or Safety Rules",
+      "subtitle": "The trap of asking LLMs to act as calculators",
+      "body": "Never trust an open-ended prompt to enforce core compliance laws or financial transactions without a hard guardrail layer.",
+      "deep_dive": "Prompt instructions degrade under edge cases. Hardcoded decision tables never hallucinate new rules on a whim.",
+      "key_fact": "Prompt engineering cannot replace domain rule engines.",
+      "why_it_matters": "Stops costly production bugs caused by unexpected token drift.",
+      "before_title": "\u274c The Naive Approach",
+      "before_items": [
+        "Complex prompt engineering for rules",
+        "Trusting LLM output for validation",
+        "Silent drift in production logic"
+      ],
+      "after_title": "\u2705 The Robust Solution",
+      "after_items": [
+        "Explicit decision matrix tables",
+        "Deterministic post-processing checks",
+        "Immutable governance boundaries"
+      ]
+    },
+    {
+      "slide_number": 6,
+      "role": "production_case_study",
+      "layout_type": "real_world_scenario",
+      "eyebrow": "SCALE IN PRODUCTION",
+      "title": "Orchestrating Complex Enterprise Workflows",
+      "subtitle": "How high-throughput systems stay reliable",
+      "body": "Modern enterprise applications leverage LLMs for user intent parsing while delegating state transitions to rigid decision models.",
+      "deep_dive": "This hybrid approach allows teams to update business rules independently without retraining massive underlying models.",
+      "key_fact": "Decouple rule updates from model weights entirely.",
+      "why_it_matters": "Reduces deployment overhead and eliminates model drift."
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "ENGINEERING CHEAT SHEET",
+      "title": "Mastering Deterministic AI Architecture",
+      "subtitle": "Core principles for modern tech leads",
+      "body": "Combine the creative power of language models with the bulletproof reliability of explicit decision models.",
+      "deep_dive": "Future-proof your systems by knowing precisely when to use probabilistic generation versus deterministic execution.",
+      "key_fact": "Use AI for generation, decision models for governance.",
+      "why_it_matters": "Builds resilient, auditable, and scalable AI applications.",
+      "takeaways": [
+        "Use LLMs for intent parsing, not final rule checks.",
+        "Implement explicit decision models for business logic.",
+        "Maintain clear separation between creativity and safety."
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI and system design breakdowns."
+    },
+    {
+      "slide_number": 8,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "JOIN THE DISCUSSION",
+      "title": "Where Do You Draw the Line?",
+      "subtitle": "Share your architectural approach",
+      "body": "How are you handling validation and logic checks in your current AI pipelines? Drop a comment below.",
+      "deep_dive": "Engage with the engineering community to refine best practices for hybrid AI system design.",
+      "key_fact": "Community insights drive better software architecture.",
+      "why_it_matters": "Collaborative learning accelerates engineering excellence.",
+      "takeaways": [
+        "Share your experience with hybrid pipelines.",
+        "Tag a tech lead who needs to see this pattern.",
+        "Save this post for your next system design review."
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily engineering architecture insights."
+    }
+  ],
+  "_model_used": "gemini-3.5-flash-lite",
+  "_topic_intelligence": {
+    "topic_type": "programming_concept",
+    "domain": "ai_ml",
+    "primary_entity": "Decision Models",
+    "content_depth": "deep",
+    "best_story_angle": "architectural_critique",
+    "audience": [
+      "software_engineers",
+      "ai_engineers",
+      "system_architects"
+    ],
+    "key_questions": [
+      "Why are traditional LLMs insufficient for complex business logic?",
+      "How do explicit decision models differ from probabilistic generation?",
+      "When should developers choose deterministic logic over generative AI?",
+      "How can decision models be integrated alongside modern AI systems?"
+    ],
+    "recommended_slide_count": 8
+  },
+  "_archetype": "Programming Concept & Architecture Pattern",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "Decision models are what many AI systems actually need",
+    "hook": "Did You Know: Decision models are what many AI systems actually need? \u26a1",
+    "headline": "Decision models are what many AI systems actually need",
+    "fact_summary": "Ask an LLM almost anything and you get back a fluent, well-organized answer. But that answer often leaves you with more work. Someone has&#x2026;Continue reading on Medium \u00bb",
+    "source": "Medium - machine-learning",
+    "news_source_url": "https://medium.com/@drayke_monogram/decision-models-are-what-many-ai-systems-actually-need-7b96e39e360d?source=rss------machine_learning-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "decision",
+      "models",
+      "what",
+      "many",
+      "systems"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}
