@@ -1979,6 +1979,20 @@
     "category": "Tech Gadgets & Inventions",
     "title": "Microsoft Hid This Secret Windows Tool! \ud83e\udd2f",
     "uploaded_at": "2026-11-03T17:38:17.006548",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-11-06T14:06:54.642831",
+    "last_metrics": {
+      "views": 126,
+      "avg_view_duration_sec": 15.0,
+      "avg_view_percentage": 45.72,
+      "swipe_away_rate": 0.5428,
+      "duration_sec": 34.0,
+      "retention_rate": 0.4412,
+      "engagement_rate": 0.0079,
+      "likes": 1,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   }
 }

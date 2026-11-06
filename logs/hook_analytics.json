@@ -1804,12 +1804,12 @@
             ]
           },
           "C": {
-            "views": 0,
-            "retention": 0.0,
-            "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 1,
+            "views": 126,
+            "retention": 0.22058823529411764,
+            "engagement": 0.003968253968253968,
+            "swipe_away_rate": 0.2714,
+            "avg_view_percentage": 22.86,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "This secret software instantly fixes Windows.",
@@ -1819,12 +1819,12 @@
             ]
           }
         },
-        "total_views": 51,
-        "total_videos": 5,
-        "avg_retention": 0.11515151515151516,
-        "avg_engagement": 0.0,
-        "avg_swipe_away": 0.27728,
-        "avg_view_percentage": 12.272
+        "total_views": 177,
+        "total_videos": 6,
+        "avg_retention": 0.16948900772430187,
+        "avg_engagement": 0.0013227513227513227,
+        "avg_swipe_away": 0.32153333333333334,
+        "avg_view_percentage": 17.846666666666668
       },
       "personal_stake": {
         "variants": {
@@ -1890,12 +1890,12 @@
       "avg_view_percentage": 98.44567567567567
     },
     "result_first": {
-      "views": 1367,
-      "retention": 0.20410037959308355,
-      "engagement": 0.004078540606242876,
-      "count": 39,
-      "swipe_away_rate": 0.30318205128205133,
-      "avg_view_percentage": 21.58871794871795
+      "views": 1493,
+      "retention": 0.21002728186796235,
+      "engagement": 0.004174989789499503,
+      "count": 40,
+      "swipe_away_rate": 0.3091725,
+      "avg_view_percentage": 22.192
     },
     "stat_contradiction": {
       "views": 273,
@@ -1922,5 +1922,5 @@
       "avg_view_percentage": 24.659142857142854
     }
   },
-  "last_updated": "2026-11-04T14:14:49.234412"
+  "last_updated": "2026-11-06T14:06:54.640150"
 }
