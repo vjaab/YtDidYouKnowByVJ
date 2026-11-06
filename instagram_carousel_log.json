@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI Learns Like Babies: Developmental Breakthrough",
     "AI's Creative Lies: When Machines Invent",
     "Your Screen's Secret Color Magic",
     "AI's Thirsty, Power-Hungry Brain",
@@ -99,10 +98,10 @@
     "Anthropic Unveils Claude Duet: Personal AI Agent",
     "10 AWS Mistakes to Avoid in Production",
     "AI Agent Disk Bloat: Main Sessions vs Subagents",
-    "Why Decision Models Outperform LLMs in Logic"
+    "Why Decision Models Outperform LLMs in Logic",
+    "Claude Code Email Leak: User-Agent Header Vulnerability"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI Learns Like Babies: Developmental Breakthrough",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-23T06:44:18.265033+00:00"
-    },
     {
       "title": "AI's Creative Lies: When Machines Invent",
       "news_source_url": "",
@@ -1341,6 +1331,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-06T20:20:07.304325+00:00"
+    },
+    {
+      "title": "Claude Code Email Leak: User-Agent Header Vulnerability",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-06T21:07:50.821061+00:00"
     }
   ]
 }
