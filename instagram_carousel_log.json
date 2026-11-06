@@ -1,7 +1,6 @@
 {
   "used_titles": [
     "Sand: The Secret to Your Tech's Brain",
-    "Sand: The Secret to Your Tech's Brain",
     "How Your Phone Senses Gravity's Pull",
     "AI Learns Like Babies: Developmental Breakthrough",
     "AI's Creative Lies: When Machines Invent",
@@ -99,10 +98,10 @@
     "AI's Billions of Learning Knobs",
     "Your Phone Battery: A Tiny Chemical Powerhouse",
     "Wi-Fi Bounces: New Era of Spatial Sensing Unlocked!",
-    "Anthropic Unveils Claude Duet: Personal AI Agent"
+    "Anthropic Unveils Claude Duet: Personal AI Agent",
+    "10 AWS Mistakes to Avoid in Production"
   ],
   "used_keywords": [
-    "machine learning",
     "artificial intelligence",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Sand: The Secret to Your Tech's Brain",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-22T15:58:42.162371+00:00"
-    },
     {
       "title": "Sand: The Secret to Your Tech's Brain",
       "news_source_url": "",
@@ -1342,6 +1332,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-06T08:42:28.021775+00:00"
+    },
+    {
+      "title": "10 AWS Mistakes to Avoid in Production",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-06T14:36:00.381979+00:00"
     }
   ]
 }
