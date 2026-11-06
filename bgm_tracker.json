@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_Upbeat.mp3",
+      "headline": "Atlas of Intelligence: A First-Principles Roadmap to AI",
+      "topic_type": "auto",
+      "timestamp": "42246681460"
+    },
+    {
       "track": "jam_Elite.mp3",
       "headline": "Microsoft PowerToys GitHub Repository",
       "topic_type": "auto",
@@ -173,12 +179,6 @@
       "headline": "Your Chat Is Deleted in 30 Days. The Score About It Lasts Seven Years.",
       "topic_type": "auto",
       "timestamp": "37483371707"
-    },
-    {
-      "track": "jam_Upbeat.mp3",
-      "headline": "GitHub Trending: boykopovar/AnyPS5 \u2014 Tool for automatic PS5 executables porting ",
-      "topic_type": "auto",
-      "timestamp": "37345385428"
     }
   ],
   "usage_counts": {
@@ -190,7 +190,7 @@
     "Destiny.mp3": 3,
     "Defiance.mp3": 1,
     "jam_Confidence.mp3": 2,
-    "jam_Upbeat.mp3": 5,
+    "jam_Upbeat.mp3": 6,
     "modern_tech.mp3": 5,
     "jam_Elite.mp3": 4,
     "jam_Energetic_Pop.mp3": 3,

@@ -1994,5 +1994,15 @@
       "shares": 0,
       "subscribers_gained": 0
     }
+  },
+  "SI-nOgpFMrs": {
+    "video_id": "SI-nOgpFMrs",
+    "hook_pattern": "personal_stake",
+    "hook_variant": "C",
+    "hook_text": "Your code misses core intelligence principles",
+    "category": "Facts & Trivia",
+    "title": "The Hidden AI Nobody Talks About \ud83e\udd2b",
+    "uploaded_at": "2026-11-06T17:18:30.724982",
+    "synced": false
   }
 }
