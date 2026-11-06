@@ -1,0 +1,215 @@
+{
+  "headline": "AI Agent Disk Bloat: Main Sessions vs Subagents",
+  "summary": "An investigation into multi-agent storage leaks reveals that hidden disk bloat accumulates in main sessions rather than delegated subagents. This update explores parent-child resource management and mitigation strategies.",
+  "source": "Medium - artificial-intelligence",
+  "source_url": "",
+  "date": "06 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "framework_update",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "hook",
+      "layout_type": "hero_hook",
+      "eyebrow": "AI AGENT SYSTEMS UPDATE",
+      "title": "The Storage Mystery in Multi-Agent Loops",
+      "subtitle": "Why long-running agent tasks quietly consume server storage.",
+      "body": "When storage alarms sound during complex AI tasks, engineers instantly inspect delegated workers. But the true culprit hides upstream in the core orchestration layer.",
+      "deep_dive": "Investigating production infrastructure reveals unexpected bottlenecks in how persistent state is retained during iterative tool execution cycles.",
+      "key_fact": "Main orchestration sessions accumulate excessive disk usage during prolonged execution loops.",
+      "why_it_matters": "Misidentifying resource leaks delays proper architectural fixes and risks infrastructure outages."
+    },
+    {
+      "slide_number": 2,
+      "role": "whats_new",
+      "layout_type": "whats_new",
+      "eyebrow": "WHAT'S NEW",
+      "title": "Uncovering Root Causes of Agentic Bloat",
+      "subtitle": "New insights into parent session resource retention.",
+      "body": "Recent diagnostic updates highlight how context retention mechanisms behave differently across hierarchical agent architectures.",
+      "before_title": "Assumed Culprit",
+      "before_items": [
+        "Ephemeral subagent workers",
+        "Temporary file generations",
+        "Isolated task workspaces"
+      ],
+      "after_title": "Actual Culprit",
+      "after_items": [
+        "Persistent parent session history",
+        "Accumulated state snapshots",
+        "Unpruned execution logs"
+      ],
+      "deep_dive": "Understanding this dynamic changes how engineers monitor distributed AI frameworks and allocate persistent storage.",
+      "key_fact": "Subagents clean up effectively, while parent controllers retain cumulative context indefinitely.",
+      "why_it_matters": "Directs monitoring efforts toward the correct architectural layers to prevent unexpected storage exhaustion."
+    },
+    {
+      "slide_number": 3,
+      "role": "execution_graph",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "GRAPH ARCHITECTURE",
+      "title": "Parent-Child Execution Flow",
+      "subtitle": "Mapping where data accumulates in the agentic loop.",
+      "body": "Think of the main session like a master librarian who holds onto every draft, while subagents are interns who shred their notes after finishing an errand.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "Main Session",
+            "sub": "Holds persistent context"
+          },
+          {
+            "name": "Subagent Worker",
+            "sub": "Executes isolated tasks"
+          },
+          {
+            "name": "Storage Layer",
+            "sub": "Accumulates master state"
+          }
+        ],
+        "connections": [
+          {
+            "label": "Delegates task"
+          },
+          {
+            "label": "Returns result"
+          },
+          {
+            "label": "Retains bloated history"
+          }
+        ]
+      },
+      "deep_dive": "The parent controller aggregates all intermediate states from multiple child runs without automatic pruning mechanisms.",
+      "key_fact": "Master orchestration loops grow heavy as subagents complete work and return payloads upward.",
+      "why_it_matters": "Visualizing execution graphs helps spot where state retention policies fail during long tasks."
+    },
+    {
+      "slide_number": 4,
+      "role": "capability_breakdown",
+      "layout_type": "side_by_side",
+      "eyebrow": "CAPABILITY UPGRADE",
+      "title": "Old Bottlenecks vs New Resource Controls",
+      "subtitle": "Transitioning from blind storage growth to active pruning.",
+      "body": "Modern agent frameworks are evolving past simple task delegation to introduce rigorous memory lifecycle management.",
+      "left_title": "Legacy Behavior",
+      "left_items": [
+        "Infinite context accumulation",
+        "No automatic session pruning",
+        "Manual storage intervention"
+      ],
+      "right_title": "Optimized Primitives",
+      "right_items": [
+        "Granular checkpoint cleanup",
+        "Scoped parent state limits",
+        "Automated workspace sweeps"
+      ],
+      "deep_dive": "Upgraded primitives allow developers to define retention boundaries before scaling agentic workflows to production.",
+      "key_fact": "Proactive lifecycle controls replace reactive disk cleanup scripts.",
+      "why_it_matters": "Protects cloud environments from sudden storage spikes during complex multi-step reasoning."
+    },
+    {
+      "slide_number": 5,
+      "role": "migration_comparison",
+      "layout_type": "before_after",
+      "eyebrow": "MIGRATION GUIDE",
+      "title": "Refactoring Session Management",
+      "subtitle": "Shifting from unmanaged loops to bounded persistence.",
+      "body": "Adapting your agent architecture requires restructuring how parent controllers handle intermediate execution artifacts.",
+      "before_title": "Unbounded State Setup",
+      "before_items": [
+        "Default persistent logging enabled globally",
+        "Subagents inherit full parent history blindly",
+        "Zero lifecycle policies configured"
+      ],
+      "after_title": "Bounded Lifecycle Setup",
+      "after_items": [
+        "Explicit session retention limits applied",
+        "Summarized checkpoints passed to parents",
+        "Automated cleanup hooks activated"
+      ],
+      "deep_dive": "This architectural pivot ensures long-running agent workflows remain lean and responsive over time.",
+      "key_fact": "Explicit retention policies prevent background storage bloat in production environments.",
+      "why_it_matters": "Ensures predictable infrastructure costs and prevents sudden out-of-disk failures."
+    },
+    {
+      "slide_number": 6,
+      "role": "upgrade_checklist",
+      "layout_type": "checklist",
+      "eyebrow": "UPGRADE STEPS",
+      "title": "Production Deployment Checklist",
+      "subtitle": "Essential steps to secure your agent storage pipelines.",
+      "body": "Before rolling out updated multi-agent workflows, verify your resource monitoring and state management configuration.",
+      "items": [
+        "Audit existing parent session storage consumption patterns",
+        "Enable automated state pruning on orchestration controllers",
+        "Configure strict memory boundaries for long-running loops",
+        "Set up alerting thresholds for unexpected disk growth",
+        "Test subagent offloading with bounded context payloads"
+      ],
+      "deep_dive": "Following this checklist guarantees stability and prevents hidden bottlenecks from impacting system performance.",
+      "key_fact": "Systematic auditing uncovers hidden resource leaks before they trigger production incidents.",
+      "why_it_matters": "Maintains high reliability and operational excellence for complex AI applications."
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "KEY TAKEAWAY",
+      "title": "Mastering Agentic Resource Control",
+      "subtitle": "Keep your main sessions lean and your infrastructure healthy.",
+      "body": "Never assume subagents cause all your storage overhead. Focus optimization efforts on parent orchestration layers for true reliability.",
+      "takeaways": [
+        "Audit parent sessions for unpruned execution history",
+        "Implement explicit lifecycle policies for multi-agent loops",
+        "Monitor orchestration storage separate from worker tasks"
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI and engineering updates.",
+      "deep_dive": "As agent systems scale, disciplined state management separates robust enterprise applications from fragile prototypes.",
+      "key_fact": "Parent orchestration sessions demand the same resource scrutiny as worker subagents.",
+      "why_it_matters": "Empowers tech leads and AI engineers to build scalable, production-grade agent ecosystems."
+    }
+  ],
+  "_model_used": "gemini-3.5-flash-lite",
+  "_topic_intelligence": {
+    "topic_type": "framework_update",
+    "domain": "ai_ml",
+    "primary_entity": "AI Agent Systems",
+    "content_depth": "deep",
+    "best_story_angle": "technical_breakdown",
+    "audience": [
+      "ai_engineers",
+      "software_engineers",
+      "devops_engineers"
+    ],
+    "key_questions": [
+      "Why did the main sessions accumulate excessive disk usage instead of the subagents?",
+      "How do parent-child execution contexts handle resource management in agentic loops?",
+      "What architectural patterns cause hidden disk bloat during long-running agent tasks?",
+      "How can developers monitor and mitigate storage leaks in multi-agent systems?"
+    ],
+    "recommended_slide_count": 7
+  },
+  "_archetype": "Framework & Agent SDK Release",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "We Blamed Subagents for an AI Agent\u2019s Disk Use. The Main Sessions Held",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "We Blamed Subagents for an AI Agent\u2019s Disk Use. The Main Ses",
+    "fact_summary": "On one Mac, root sessions held 32.9 GiB and subagents 15.1 GiB. What was in them, and what hashing alone cannot tell you before you delete.Continue reading on Medium \u00bb",
+    "source": "Medium - artificial-intelligence",
+    "news_source_url": "https://medium.com/@dev_89017/we-blamed-subagents-for-an-ai-agents-disk-use-the-main-sessions-held-more-than-twice-as-much-1bd96ea12ee2?source=rss------artificial_intelligence-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "blamed",
+      "subagents",
+      "agent",
+      "disk",
+      "main"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "topic": "AI Agent Disk Bloat: Main Sessions vs Subagents",
+  "category": "AI News",
+  "type": "carousel",
+  "slides": 7,
+  "instagram_images": [
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_AI_Agent_Disk_Bloat_Main_Sessi_01_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_AI_Agent_Disk_Bloat_Main_Sessi_02_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_AI_Agent_Disk_Bloat_Main_Sessi_03_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_AI_Agent_Disk_Bloat_Main_Sessi_04_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_AI_Agent_Disk_Bloat_Main_Sessi_05_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_AI_Agent_Disk_Bloat_Main_Sessi_06_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_AI_Agent_Disk_Bloat_Main_Sessi_07_1080x1350.jpg"
+  ],
+  "facebook_images": [],
+  "caption": "\ud83d\udcf0 AI Agent Disk Bloat: Main Sessions vs Subagents\n\nAn investigation into multi-agent storage leaks reveals that hidden disk bloat accumulates in main sessions rather than delegated subagents. This update explores parent-child resource management and mitigation strategies.\n\n\ud83d\udcc5 06 Nov 2026 | Source: Medium - artificial-intelligence\n\ud83d\udd17 \n\nFollow @vijayakumarj_ai for daily AI updates!\n\n#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets\n\n\ud83d\udcac Which side are you on? I'll drop my take in the replies \ud83d\udc47\n\ud83d\udd01 Repost to see what your friends think!",
+  "hashtags": "#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets",
+  "poll_file": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/poll_ai_agent_disk_bloat_main_sessions_vs_subagents.json",
+  "carousel_json": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_ai_agent_disk_bloat_main_sessions_vs_subagents.json",
+  "generated_at": "2026-11-06T18:12:15.282241+00:00"
+}
