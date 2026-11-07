@@ -2014,5 +2014,15 @@
     "title": "Did You Know This About AI? \ud83e\udd2f",
     "uploaded_at": "2026-11-07T16:14:58.662282",
     "synced": false
+  },
+  "nnVreUA_03A": {
+    "video_id": "nnVreUA_03A",
+    "hook_pattern": "negative_warning",
+    "hook_variant": "B",
+    "hook_text": "Stop paying for AI chat tools.",
+    "category": "AI & Tech Tools",
+    "title": "Why 99% Of People Use AI Wrong \u26a1",
+    "uploaded_at": "2026-11-07T19:57:38.473528",
+    "synced": false
   }
 }

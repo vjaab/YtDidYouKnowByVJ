@@ -1463,14 +1463,29 @@
                 "recorded_at": "2026-10-18T13:31:07.187387"
               }
             ]
+          },
+          "B": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "Stop paying for AI chat tools.",
+                "video_id": "nnVreUA_03A",
+                "recorded_at": "2026-11-07T19:57:38.470796"
+              }
+            ]
           }
         },
         "total_views": 44,
-        "total_videos": 4,
-        "avg_retention": 0.4017857142857143,
+        "total_videos": 5,
+        "avg_retention": 0.32142857142857145,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.339725,
-        "avg_view_percentage": 513.2025
+        "avg_swipe_away": 0.27178,
+        "avg_view_percentage": 410.562
       },
       "result_first": {
         "variants": {
@@ -1913,11 +1928,11 @@
   "global": {
     "negative_warning": {
       "views": 652,
-      "retention": 0.1987899413991362,
-      "engagement": 0.004067179067179068,
-      "count": 37,
-      "swipe_away_rate": 0.3096675675675677,
-      "avg_view_percentage": 98.44567567567567
+      "retention": 0.1935586271517905,
+      "engagement": 0.003960148039095408,
+      "count": 38,
+      "swipe_away_rate": 0.3015184210526317,
+      "avg_view_percentage": 95.85499999999999
     },
     "result_first": {
       "views": 1493,
@@ -1952,5 +1967,5 @@
       "avg_view_percentage": 23.974166666666665
     }
   },
-  "last_updated": "2026-11-07T16:14:58.659985"
+  "last_updated": "2026-11-07T19:57:38.470837"
 }

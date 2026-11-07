@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_Energetic_Pop.mp3",
+      "headline": "CopilotKit/OpenBot: Open-Source AI Coworkers With Their Own Computers",
+      "topic_type": "auto",
+      "timestamp": "42403897801"
+    },
+    {
       "track": "jam_Action_Inspiration_Trailer.mp3",
       "headline": "DeepSeek-V4-Pro-Qwen3.5-9B-UNCENSORED-heretic: A Trending Open-Weight, Uncensore",
       "topic_type": "auto",
@@ -173,12 +179,6 @@
       "headline": "mattpocock/skills: Skills for Real Engineers. Straight from my .agents directory",
       "topic_type": "auto",
       "timestamp": "37956032378"
-    },
-    {
-      "track": "jam_Groovy_SIX.mp3",
-      "headline": "XiaomiMiMo MiMo-V2.6-RL-oss Dataset on Hugging Face",
-      "topic_type": "auto",
-      "timestamp": "37520824130"
     }
   ],
   "usage_counts": {
@@ -193,7 +193,7 @@
     "jam_Upbeat.mp3": 6,
     "modern_tech.mp3": 5,
     "jam_Elite.mp3": 4,
-    "jam_Energetic_Pop.mp3": 3,
+    "jam_Energetic_Pop.mp3": 4,
     "jam_Groovy_SIX.mp3": 3,
     "jam_Energetic_Rock.mp3": 1
   }
