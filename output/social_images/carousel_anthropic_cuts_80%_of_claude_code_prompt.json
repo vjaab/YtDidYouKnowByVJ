@@ -1,0 +1,221 @@
+{
+  "headline": "Anthropic Cuts 80% of Claude Code Prompt",
+  "summary": "Anthropic removed 80% of Claude Code's system prompt, shifting responsibility to developers for providing explicit context. This changes how the AI pair programmer behaves and requires updates to prompt templates and workflows.",
+  "source": "Medium - programming",
+  "source_url": "",
+  "date": "07 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "developer_tool",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "scenario_question",
+      "eyebrow": "ANTHROPIC UPDATE",
+      "title": "Claude Code's System Prompt Cut by 80%",
+      "subtitle": "What changed and why your templates may break",
+      "body": "Anthropic removed most of Claude Code's built-in instructions. How does this affect your AI coding workflow?",
+      "deep_dive": "Anthropic's Claude Code previously shipped with a massive system prompt that guided its behavior as an AI pair programmer. In a recent update, they stripped away roughly 80% of that prompt, leaving a leaner core. This means the model now relies more heavily on user-provided context and less on baked-in heuristics. Developers who built custom prompt templates around the old system prompt may see degraded performance unless they adapt.",
+      "key_fact": "80% of the system prompt was deleted in the latest update.",
+      "why_it_matters": "Your existing prompt templates and workflow assumptions may no longer hold; you must adjust how you instruct Claude Code."
+    },
+    {
+      "slide_number": 2,
+      "role": "tool_overview",
+      "layout_type": "whats_new",
+      "eyebrow": "WHAT IT DOES",
+      "title": "Claude Code: Local AI Pair Programmer",
+      "subtitle": "Runs in your IDE, indexes code, proposes diffs",
+      "body": "Claude Code operates locally, understands your codebase, and suggests changes via structured diffs.",
+      "deep_dive": "Claude Code is an AI coding assistant that runs as a local agent within your development environment. It builds an abstract syntax tree (AST) index of your project, enabling deep codebase awareness. When you ask it to implement a feature or fix a bug, it reasons over the indexed code and outputs a structured diff that you can apply directly. This local-first design keeps your code private and reduces latency.",
+      "key_fact": "Local agent with full codebase indexing via AST.",
+      "why_it_matters": "Enables context-aware AI assistance without sending code to the cloud.",
+      "before_title": "Previous System Prompt",
+      "before_items": [
+        "Large prompt with many built-in behaviors",
+        "Implicit test generation and style enforcement",
+        "Architectural patterns baked in"
+      ],
+      "after_title": "Current System Prompt",
+      "after_items": [
+        "Lean core prompt (~20% of original)",
+        "Requires explicit user-provided context",
+        "No default behaviors; all must be specified"
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "core_mechanism",
+      "layout_type": "process_flow",
+      "eyebrow": "EXECUTION FLOW",
+      "title": "From Query to Diff: The Execution Flow",
+      "subtitle": "Four stages transform your request into code changes",
+      "body": "User query \u2192 AST indexing \u2192 LLM reasoning \u2192 structured diff output.",
+      "deep_dive": "The process starts when a developer submits a natural language query. The local agent first updates or queries the AST index to gather relevant code context. Then it constructs a prompt combining the reduced system prompt, the user query, and the retrieved context. The LLM (Claude) reasons over this and produces a structured diff artifact. Finally, the agent presents the diff for review and application.",
+      "key_fact": "Reduced system prompt shifts burden to user-provided context.",
+      "why_it_matters": "Understanding this flow helps you craft queries that yield better diffs.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Developer Input",
+          "desc": "Natural language query entered in the editor"
+        },
+        {
+          "step": "2",
+          "title": "AST Index & State Machine",
+          "desc": "Agent retrieves relevant code context from local index"
+        },
+        {
+          "step": "3",
+          "title": "LLM Reasoning",
+          "desc": "Claude processes prompt (reduced system + query + context)"
+        },
+        {
+          "step": "4",
+          "title": "Structured Diff Output",
+          "desc": "Agent returns a reviewable unified diff"
+        }
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "architecture",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "ARCHITECTURE",
+      "title": "Claude Code Architecture Overview",
+      "subtitle": "Editor \u2194 Local Agent \u2194 Code Index \u2194 LLM",
+      "body": "Four components interact locally for privacy and speed.",
+      "deep_dive": "The architecture centers on a local agent that mediates between your editor, a code index (AST-based), and the LLM. The editor sends queries and receives diffs. The agent manages the code index, which is incrementally updated as you edit. The LLM runs locally or via a local server, ensuring code never leaves your machine. This design prioritizes data privacy and low latency.",
+      "key_fact": "All components run locally; no code leaves your machine.",
+      "why_it_matters": "Local execution enables use in air-gapped or sensitive environments.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "Editor",
+            "sub": "IDE / CLI"
+          },
+          {
+            "name": "Local Agent",
+            "sub": "Orchestrator"
+          },
+          {
+            "name": "Code Index",
+            "sub": "AST Database"
+          },
+          {
+            "name": "LLM",
+            "sub": "Claude Model"
+          }
+        ],
+        "connections": [
+          {
+            "label": "Query / Diff"
+          },
+          {
+            "label": "Context Request"
+          },
+          {
+            "label": "Prompt + Context"
+          },
+          {
+            "label": "Structured Diff"
+          }
+        ]
+      }
+    },
+    {
+      "slide_number": 5,
+      "role": "system_workflow",
+      "layout_type": "input_output",
+      "eyebrow": "EXECUTION MECHANICS",
+      "title": "Input-Output Mechanics",
+      "subtitle": "Natural language in, structured diff out",
+      "body": "Input: developer query. Processing: AST index + LLM. Output: reviewable diff.",
+      "deep_dive": "The developer provides a natural language request (e.g., 'Add error handling to the login function'). The agent retrieves relevant code snippets from the AST index, combines them with the reduced system prompt and the query, and feeds this to the LLM. The LLM outputs a structured diff in a standardized format (e.g., unified diff). The agent then presents this diff in the editor for acceptance or modification.",
+      "key_fact": "Output is a structured diff, not raw code, enabling safe review.",
+      "why_it_matters": "Structured diffs integrate cleanly with version control and code review.",
+      "input": "Natural language query + optional project prompt file",
+      "processing": "AST index retrieval \u2192 prompt assembly \u2192 LLM inference",
+      "output": "Unified diff artifact with file paths and changes"
+    },
+    {
+      "slide_number": 6,
+      "role": "limitations_and_gotchas",
+      "layout_type": "common_mistake",
+      "eyebrow": "PRO TIPS & MISTAKES",
+      "title": "Common Pitfalls After Prompt Reduction",
+      "subtitle": "Less built-in guidance means you must be more explicit",
+      "body": "Mistake: vague prompts. Fix: provide concrete context and examples.",
+      "deep_dive": "With 80% of the system prompt gone, Claude Code loses many default behaviors like automatic test generation, style enforcement, and architectural patterns. Developers who previously relied on these implicit behaviors now see incomplete or generic outputs. The solution is to externalize those expectations: include style guides, testing requirements, and architectural constraints directly in your queries or in a project-specific prompt file.",
+      "key_fact": "Implicit behaviors (tests, style, patterns) are no longer automatic.",
+      "why_it_matters": "You must now explicitly specify requirements that were previously baked in.",
+      "items": [
+        "Mistake: Assuming Claude writes tests automatically \u2192 Fix: Add 'write unit tests' to every query",
+        "Mistake: Expecting consistent code style \u2192 Fix: Provide a style guide in project prompt",
+        "Mistake: Relying on architectural patterns \u2192 Fix: Explicitly state pattern (e.g., 'use repository pattern')",
+        "Mistake: Using old prompt templates unchanged \u2192 Fix: Audit and remove references to deleted system prompt sections"
+      ]
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "GET STARTED",
+      "title": "Adapt Your Workflow in Three Steps",
+      "subtitle": "Update templates, test, and iterate",
+      "body": "1. Audit templates. 2. Add explicit context. 3. Validate outputs.",
+      "deep_dive": "Start by reviewing your existing prompt templates and identifying sections that relied on the old system prompt. Replace implicit assumptions with explicit instructions. Then run a suite of typical tasks (refactoring, feature addition, bug fix) and compare outputs. Iterate your templates until the diffs meet your standards. Consider maintaining a project-level prompt file that the agent loads automatically.",
+      "key_fact": "Explicit context replaces the deleted 80% system prompt.",
+      "why_it_matters": "Proactive adaptation restores productivity and prevents subtle bugs.",
+      "takeaways": [
+        "Audit and rewrite prompt templates to include explicit requirements",
+        "Create a project-level prompt file for shared context (style, testing, architecture)",
+        "Run a validation suite after each template change to catch regressions early"
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI & engineering updates"
+    }
+  ],
+  "_model_used": "OpenRouter:nvidia/nemotron-3-ultra-550b-a55b:free",
+  "_topic_intelligence": {
+    "topic_type": "developer_tool",
+    "domain": "ai_ml",
+    "primary_entity": "Anthropic",
+    "content_depth": "deep",
+    "best_story_angle": "technical_breakdown",
+    "audience": [
+      "software_engineers",
+      "ai_engineers"
+    ],
+    "key_questions": [
+      "What specifically changed in Claude Code's system prompt?",
+      "How does the reduced prompt affect model behavior and capabilities?",
+      "What evidence or benchmarks support the claim that 80% was removed?",
+      "What should developers do about it \u2014 adapt templates, adjust workflows?"
+    ],
+    "recommended_slide_count": 7
+  },
+  "_archetype": "Developer Tool & IDE Innovation",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "Anthropic Deleted 80% of Claude Code\u2019s Own Prompt. Your Template Is Ne",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "Anthropic Deleted 80% of Claude Code\u2019s Own Prompt. Your Temp",
+    "fact_summary": "The role-goal-steps prompt template was written for a model that no longer exists. Here is the three-line prompt Anthropic&#x2019;s own engineers&#x2026;Continue reading on Medium \u00bb",
+    "source": "Medium - programming",
+    "news_source_url": "https://medium.com/@anup.karanjkar08/anthropic-deleted-80-of-claude-codes-own-prompt-your-template-is-next-0ce42c88c57f?source=rss------programming-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "anthropic",
+      "deleted",
+      "claude",
+      "code",
+      "prompt"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}

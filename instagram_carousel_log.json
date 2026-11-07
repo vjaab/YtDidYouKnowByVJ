@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Screen's Secret Color Magic",
     "AI's Thirsty, Power-Hungry Brain",
     "How Active Noise Cancellation Rewrites Reality",
     "How Search Engines Find Answers",
@@ -99,10 +98,10 @@
     "AI Agent Disk Bloat: Main Sessions vs Subagents",
     "Why Decision Models Outperform LLMs in Logic",
     "Claude Code Email Leak: User-Agent Header Vulnerability",
-    "Why AI Images Look Flat: The 15-Part Prompt Formula"
+    "Why AI Images Look Flat: The 15-Part Prompt Formula",
+    "Anthropic Cuts 80% of Claude Code Prompt"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Screen's Secret Color Magic",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-23T14:56:28.336609+00:00"
-    },
     {
       "title": "AI's Thirsty, Power-Hungry Brain",
       "news_source_url": "",
@@ -1341,6 +1331,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-07T11:04:55.312816+00:00"
+    },
+    {
+      "title": "Anthropic Cuts 80% of Claude Code Prompt",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-07T11:55:40.240516+00:00"
     }
   ]
 }
