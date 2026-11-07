@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI's Creative Lies: When Machines Invent",
     "Your Screen's Secret Color Magic",
     "AI's Thirsty, Power-Hungry Brain",
     "How Active Noise Cancellation Rewrites Reality",
@@ -99,10 +98,10 @@
     "10 AWS Mistakes to Avoid in Production",
     "AI Agent Disk Bloat: Main Sessions vs Subagents",
     "Why Decision Models Outperform LLMs in Logic",
-    "Claude Code Email Leak: User-Agent Header Vulnerability"
+    "Claude Code Email Leak: User-Agent Header Vulnerability",
+    "Why AI Images Look Flat: The 15-Part Prompt Formula"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI's Creative Lies: When Machines Invent",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-23T07:32:11.080707+00:00"
-    },
     {
       "title": "Your Screen's Secret Color Magic",
       "news_source_url": "",
@@ -1341,6 +1331,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-06T21:07:50.821061+00:00"
+    },
+    {
+      "title": "Why AI Images Look Flat: The 15-Part Prompt Formula",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-07T11:04:55.312816+00:00"
     }
   ]
 }
