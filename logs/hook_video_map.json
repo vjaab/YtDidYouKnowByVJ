@@ -2004,5 +2004,15 @@
     "title": "The Hidden AI Nobody Talks About \ud83e\udd2b",
     "uploaded_at": "2026-11-06T17:18:30.724982",
     "synced": false
+  },
+  "81SPHpykRs0": {
+    "video_id": "81SPHpykRs0",
+    "hook_pattern": "result_first",
+    "hook_variant": "C",
+    "hook_text": "This free model answers every banned question.",
+    "category": "AI & Machine Learning",
+    "title": "Did You Know This About AI? \ud83e\udd2f",
+    "uploaded_at": "2026-11-07T16:14:58.662282",
+    "synced": false
   }
 }

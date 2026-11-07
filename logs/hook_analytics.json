@@ -956,14 +956,29 @@
                 "recorded_at": "2026-09-27T23:47:48.890127"
               }
             ]
+          },
+          "C": {
+            "views": 0,
+            "retention": 0.0,
+            "engagement": 0.0,
+            "swipe_away_rate": 0.0,
+            "avg_view_percentage": 0.0,
+            "count": 1,
+            "hook_texts": [
+              {
+                "text": "This free model answers every banned question.",
+                "video_id": "81SPHpykRs0",
+                "recorded_at": "2026-11-07T16:14:58.659963"
+              }
+            ]
           }
         },
         "total_views": 139,
-        "total_videos": 6,
-        "avg_retention": 0.21688665409595642,
+        "total_videos": 7,
+        "avg_retention": 0.18590284636796264,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.2772333333333334,
-        "avg_view_percentage": 22.276666666666667
+        "avg_swipe_away": 0.23762857142857147,
+        "avg_view_percentage": 19.094285714285714
       },
       "personal_stake": {
         "variants": {
@@ -1906,11 +1921,11 @@
     },
     "result_first": {
       "views": 1493,
-      "retention": 0.21002728186796235,
-      "engagement": 0.004174989789499503,
-      "count": 40,
-      "swipe_away_rate": 0.3091725,
-      "avg_view_percentage": 22.192
+      "retention": 0.20490466523703643,
+      "engagement": 0.004073160770243418,
+      "count": 41,
+      "swipe_away_rate": 0.30163170731707317,
+      "avg_view_percentage": 21.650731707317075
     },
     "stat_contradiction": {
       "views": 273,
@@ -1937,5 +1952,5 @@
       "avg_view_percentage": 23.974166666666665
     }
   },
-  "last_updated": "2026-11-06T17:18:30.722719"
+  "last_updated": "2026-11-07T16:14:58.659985"
 }
