@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI's Thirsty, Power-Hungry Brain",
     "How Active Noise Cancellation Rewrites Reality",
     "How Search Engines Find Answers",
     "AI Learns Best From Its Mistakes",
@@ -99,10 +98,10 @@
     "Why Decision Models Outperform LLMs in Logic",
     "Claude Code Email Leak: User-Agent Header Vulnerability",
     "Why AI Images Look Flat: The 15-Part Prompt Formula",
-    "Anthropic Cuts 80% of Claude Code Prompt"
+    "Anthropic Cuts 80% of Claude Code Prompt",
+    "Neo-Localist: Inside Bias-Only Hand-Written Networks"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "image compression",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI's Thirsty, Power-Hungry Brain",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-23T15:07:19.214069+00:00"
-    },
     {
       "title": "How Active Noise Cancellation Rewrites Reality",
       "news_source_url": "",
@@ -1341,6 +1331,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-07T11:55:40.240516+00:00"
+    },
+    {
+      "title": "Neo-Localist: Inside Bias-Only Hand-Written Networks",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-07T17:48:16.224301+00:00"
     }
   ]
 }
