@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "How Submarine Cables Power Cloud Regions",
     "Your Mouse's Secret Invisible Eye",
     "VR's Brain-Tricking 3D World",
     "AI Learns From Just a Few Glimpses",
@@ -99,10 +98,10 @@
     "Neo-Localist: Inside Bias-Only Hand-Written Networks",
     "Anthropic Claude Audits Fire TV Shell",
     "AI Agents: Autonomy's Double-Edged Sword",
-    "DeepSeek V4.1 Flash: 12GB GPU Breakthrough"
+    "DeepSeek V4.1 Flash: 12GB GPU Breakthrough",
+    "5 Free Local LLM Tools for Developers"
   ],
   "used_keywords": [
-    "JPEG",
     "digital photos",
     "data storage",
     "technology",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "How Submarine Cables Power Cloud Regions",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-24T08:56:13.304243+00:00"
-    },
     {
       "title": "Your Mouse's Secret Invisible Eye",
       "news_source_url": "",
@@ -1341,6 +1331,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-08T11:18:49.342133+00:00"
+    },
+    {
+      "title": "5 Free Local LLM Tools for Developers",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-08T12:09:56.408211+00:00"
     }
   ]
 }
