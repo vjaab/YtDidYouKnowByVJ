@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI Learns From Just a Few Glimpses",
     "Supercharging AI Search: Hybrid RAG & Cache",
     "AI's Universal Language Brain: The Interlingua Shift",
     "IBM Quantum: Many Answers At Once",
@@ -99,10 +98,10 @@
     "DeepSeek V4.1 Flash: 12GB GPU Breakthrough",
     "5 Free Local LLM Tools for Developers",
     "AI Agents Write Their Own Memory Notes",
-    "Anthropic's IPO Hints at Claude's Usage Limits"
+    "Anthropic's IPO Hints at Claude's Usage Limits",
+    "Aligning SmolLM2-135M"
   ],
   "used_keywords": [
-    "technology",
     "did you know",
     "threads",
     "tech",
@@ -301,24 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI Learns From Just a Few Glimpses",
-      "news_source_url": "",
-      "keywords": [
-        "AI",
-        "learning",
-        "recognition",
-        "efficiency",
-        "technology",
-        "did you know"
-      ],
-      "source": "Research in few-shot learning and meta-learning in artificial intelligence (e.g., Google AI, OpenAI, academic papers on meta-learning)",
-      "platform": "facebook",
-      "timestamp": "2026-10-24T15:58:42.502605+00:00"
-    },
     {
       "title": "Supercharging AI Search: Hybrid RAG & Cache",
       "news_source_url": "",
@@ -1341,6 +1326,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-08T17:59:14.624223+00:00"
+    },
+    {
+      "title": "Aligning SmolLM2-135M",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-08T18:27:40.759180+00:00"
     }
   ]
 }
