@@ -1578,26 +1578,31 @@
         "variants": {
           "B": {
             "views": 61,
-            "retention": 0.27631578947368424,
+            "retention": 0.1842105263157895,
             "engagement": 0.0,
-            "swipe_away_rate": 0.2113,
-            "avg_view_percentage": 28.87,
-            "count": 2,
+            "swipe_away_rate": 0.14086666666666667,
+            "avg_view_percentage": 19.246666666666666,
+            "count": 3,
             "hook_texts": [
               {
                 "text": "Your PC is secretly running console games",
                 "video_id": "QlGLJ04ArYY",
                 "recorded_at": "2026-10-05T17:54:38.408146"
+              },
+              {
+                "text": "Your coding workflow is missing this secret AI.",
+                "video_id": "q4hQX3zN6CM",
+                "recorded_at": "2026-11-08T19:49:36.707411"
               }
             ]
           }
         },
         "total_views": 61,
-        "total_videos": 2,
-        "avg_retention": 0.27631578947368424,
+        "total_videos": 3,
+        "avg_retention": 0.1842105263157895,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.2113,
-        "avg_view_percentage": 28.87
+        "avg_swipe_away": 0.14086666666666667,
+        "avg_view_percentage": 19.246666666666666
       },
       "personal_stake": {
         "variants": {
@@ -1957,11 +1962,11 @@
     },
     "curiosity_gap": {
       "views": 725,
-      "retention": 0.1983633376177593,
-      "engagement": 0.003804259634888439,
-      "count": 38,
-      "swipe_away_rate": 0.24288684210526318,
-      "avg_view_percentage": 20.44815789473685
+      "retention": 0.1932770981916629,
+      "engagement": 0.003706714516045146,
+      "count": 39,
+      "swipe_away_rate": 0.2366589743589744,
+      "avg_view_percentage": 19.92384615384616
     },
     "personal_stake": {
       "views": 1218,
@@ -1972,5 +1977,5 @@
       "avg_view_percentage": 23.974166666666665
     }
   },
-  "last_updated": "2026-11-08T16:22:11.198990"
+  "last_updated": "2026-11-08T19:49:36.707432"
 }
