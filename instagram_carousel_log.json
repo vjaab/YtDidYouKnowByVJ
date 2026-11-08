@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "How Search Engines Find Answers",
     "AI Learns Best From Its Mistakes",
     "How Submarine Cables Power Cloud Regions",
     "Your Mouse's Secret Invisible Eye",
@@ -99,10 +98,10 @@
     "Why AI Images Look Flat: The 15-Part Prompt Formula",
     "Anthropic Cuts 80% of Claude Code Prompt",
     "Neo-Localist: Inside Bias-Only Hand-Written Networks",
-    "Anthropic Claude Audits Fire TV Shell"
+    "Anthropic Claude Audits Fire TV Shell",
+    "AI Agents: Autonomy's Double-Edged Sword"
   ],
   "used_keywords": [
-    "did you know",
     "image compression",
     "JPEG",
     "digital photos",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "How Search Engines Find Answers",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-23T18:20:22.559808+00:00"
-    },
     {
       "title": "AI Learns Best From Its Mistakes",
       "news_source_url": "",
@@ -1341,6 +1331,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-07T18:12:50.075059+00:00"
+    },
+    {
+      "title": "AI Agents: Autonomy's Double-Edged Sword",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-08T11:00:11.801466+00:00"
     }
   ]
 }
