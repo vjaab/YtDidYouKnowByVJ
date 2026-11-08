@@ -1531,16 +1531,21 @@
         "variants": {
           "B": {
             "views": 3,
-            "retention": 0.4827586206896552,
+            "retention": 0.3218390804597701,
             "engagement": 0.0,
-            "swipe_away_rate": 0.00024999999999997247,
-            "avg_view_percentage": 49.975,
-            "count": 2,
+            "swipe_away_rate": 0.0001666666666666483,
+            "avg_view_percentage": 33.31666666666667,
+            "count": 3,
             "hook_texts": [
               {
                 "text": "Your coding setup is secretly completely outdated.",
                 "video_id": "9eQ1wLZSmno",
                 "recorded_at": "2026-10-25T14:20:11.255374"
+              },
+              {
+                "text": "Your coding agent is secretly generating cinematic promos.",
+                "video_id": "3TBu2LGZVDk",
+                "recorded_at": "2026-11-08T16:22:11.198945"
               }
             ]
           },
@@ -1561,11 +1566,11 @@
           }
         },
         "total_views": 128,
-        "total_videos": 4,
-        "avg_retention": 0.3163793103448276,
-        "avg_engagement": 0.002,
-        "avg_swipe_away": 0.17417499999999997,
-        "avg_view_percentage": 32.5825
+        "total_videos": 5,
+        "avg_retention": 0.25310344827586206,
+        "avg_engagement": 0.0016,
+        "avg_swipe_away": 0.13933999999999996,
+        "avg_view_percentage": 26.066000000000003
       }
     },
     "Facts & Trivia": {
@@ -1952,11 +1957,11 @@
     },
     "curiosity_gap": {
       "views": 725,
-      "retention": 0.20372450890472577,
-      "engagement": 0.003907077462858397,
-      "count": 37,
-      "swipe_away_rate": 0.24945135135135138,
-      "avg_view_percentage": 21.000810810810815
+      "retention": 0.1983633376177593,
+      "engagement": 0.003804259634888439,
+      "count": 38,
+      "swipe_away_rate": 0.24288684210526318,
+      "avg_view_percentage": 20.44815789473685
     },
     "personal_stake": {
       "views": 1218,
@@ -1967,5 +1972,5 @@
       "avg_view_percentage": 23.974166666666665
     }
   },
-  "last_updated": "2026-11-07T19:57:38.470837"
+  "last_updated": "2026-11-08T16:22:11.198990"
 }
