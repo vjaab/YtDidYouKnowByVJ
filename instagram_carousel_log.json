@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI Learns Best From Its Mistakes",
     "How Submarine Cables Power Cloud Regions",
     "Your Mouse's Secret Invisible Eye",
     "VR's Brain-Tricking 3D World",
@@ -99,10 +98,10 @@
     "Anthropic Cuts 80% of Claude Code Prompt",
     "Neo-Localist: Inside Bias-Only Hand-Written Networks",
     "Anthropic Claude Audits Fire TV Shell",
-    "AI Agents: Autonomy's Double-Edged Sword"
+    "AI Agents: Autonomy's Double-Edged Sword",
+    "DeepSeek V4.1 Flash: 12GB GPU Breakthrough"
   ],
   "used_keywords": [
-    "image compression",
     "JPEG",
     "digital photos",
     "data storage",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI Learns Best From Its Mistakes",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-24T08:35:20.869948+00:00"
-    },
     {
       "title": "How Submarine Cables Power Cloud Regions",
       "news_source_url": "",
@@ -1341,6 +1331,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-08T11:00:11.801466+00:00"
+    },
+    {
+      "title": "DeepSeek V4.1 Flash: 12GB GPU Breakthrough",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-08T11:18:49.342133+00:00"
     }
   ]
 }
