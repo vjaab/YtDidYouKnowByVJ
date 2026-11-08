@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "VR's Brain-Tricking 3D World",
     "AI Learns From Just a Few Glimpses",
     "Supercharging AI Search: Hybrid RAG & Cache",
     "AI's Universal Language Brain: The Interlingua Shift",
@@ -99,10 +98,10 @@
     "AI Agents: Autonomy's Double-Edged Sword",
     "DeepSeek V4.1 Flash: 12GB GPU Breakthrough",
     "5 Free Local LLM Tools for Developers",
-    "AI Agents Write Their Own Memory Notes"
+    "AI Agents Write Their Own Memory Notes",
+    "Anthropic's IPO Hints at Claude's Usage Limits"
   ],
   "used_keywords": [
-    "data storage",
     "technology",
     "did you know",
     "threads",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "VR's Brain-Tricking 3D World",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-24T15:05:05.771740+00:00"
-    },
     {
       "title": "AI Learns From Just a Few Glimpses",
       "news_source_url": "",
@@ -1341,6 +1331,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-08T17:25:58.266913+00:00"
+    },
+    {
+      "title": "Anthropic's IPO Hints at Claude's Usage Limits",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-08T17:59:14.624223+00:00"
     }
   ]
 }
