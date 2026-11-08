@@ -1,0 +1,13 @@
+[18:17:25] === STARTING CHAPTERED DEEP-DIVE PIPELINE (mode=multi) | COUNTRY: GB ===
+[18:17:25] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[18:17:25] STEP 1: Fetching RSS articles...
+[18:17:26] 📈 vidIQ: 8 topics.
+[18:19:11] ✅ Fetched 509 total articles.
+[18:19:11] STEP 2 (Attempt 1/5): Generating chaptered deep-dive script...
+[18:24:39] Generated Title: Why Senior Engineers Are Quietly Quitting Paid AI APIs
+[18:24:39] Script: 367 words, 3 chapters
+[18:24:39]   Ch1: The Infinite Free Token Pipeline (2 beats)
+[18:24:39]   Ch2: Controlling Agents From Your Phone (2 beats)
+[18:24:39]   Ch3: Bypassing Bot Walls for Free (2 beats)
+[18:24:39] STEP 3: Generating voiceover...
+[18:24:39] STEP 2b: Capturing article screenshots (MANDATORY)...
