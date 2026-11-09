@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_Energy.mp3",
+      "headline": "anthropics/claude-quickstarts: A collection of quickstart apps built with the Cl",
+      "topic_type": "auto",
+      "timestamp": "42675650472"
+    },
+    {
       "track": "jam_The_Epic.mp3",
       "headline": "HF Trending Model: Qwen3.5-4B-3D-Coder",
       "topic_type": "auto",
@@ -173,16 +179,10 @@
       "headline": "GitHub Gem #13: AtomicBot-ai/atomic-agent \u2014 Local-First AI Agent Running on Your",
       "topic_type": "auto",
       "timestamp": "38077065579"
-    },
-    {
-      "track": "jam_Energy.mp3",
-      "headline": "Smart Contact Lenses May Arrive as Soon as 2030. Here\u2019s What They Do",
-      "topic_type": "auto",
-      "timestamp": "38059428399"
     }
   ],
   "usage_counts": {
-    "jam_Energy.mp3": 8,
+    "jam_Energy.mp3": 9,
     "jam_Action_Inspiration_Trailer.mp3": 6,
     "jam_The_Epic.mp3": 6,
     "jam_Escape_From_The_Machine_Planet.mp3": 4,

@@ -1885,26 +1885,31 @@
         "variants": {
           "B": {
             "views": 29,
-            "retention": 0.1875,
+            "retention": 0.125,
             "engagement": 0.0,
-            "swipe_away_rate": 0.2978,
-            "avg_view_percentage": 20.22,
-            "count": 2,
+            "swipe_away_rate": 0.19853333333333334,
+            "avg_view_percentage": 13.479999999999999,
+            "count": 3,
             "hook_texts": [
               {
                 "text": "Your video editor is stealing your data",
                 "video_id": "5YPtnAn_Meg",
                 "recorded_at": "2026-10-26T21:11:03.962088"
+              },
+              {
+                "text": "Stop paying for basic AI tools.",
+                "video_id": "Bsoej0oRhtw",
+                "recorded_at": "2026-11-09T19:48:14.543894"
               }
             ]
           }
         },
         "total_views": 29,
-        "total_videos": 2,
-        "avg_retention": 0.1875,
+        "total_videos": 3,
+        "avg_retention": 0.125,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.2978,
-        "avg_view_percentage": 20.22
+        "avg_swipe_away": 0.19853333333333334,
+        "avg_view_percentage": 13.479999999999999
       }
     },
     "AI Benchmark Showdowns": {
@@ -1970,12 +1975,12 @@
     },
     "personal_stake": {
       "views": 1255,
-      "retention": 0.20955930504808745,
-      "engagement": 0.002791587385810219,
-      "count": 37,
-      "swipe_away_rate": 0.29928648648648654,
-      "avg_view_percentage": 43.40351351351351
+      "retention": 0.2040445864941904,
+      "engagement": 0.002718124559867845,
+      "count": 38,
+      "swipe_away_rate": 0.29141052631578956,
+      "avg_view_percentage": 42.26131578947368
     }
   },
-  "last_updated": "2026-11-09T15:54:10.548313"
+  "last_updated": "2026-11-09T19:48:14.543914"
 }
