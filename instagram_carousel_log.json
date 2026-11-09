@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "IBM Quantum: Many Answers At Once",
     "Your Data Lives on Tiny Magnets",
     "AI Decodes Search Intent: SEO Automation Breakthrough",
     "How Self-Driving Cars Actually See",
@@ -99,10 +98,10 @@
     "Anthropic's IPO Hints at Claude's Usage Limits",
     "Aligning SmolLM2-135M",
     "OpenAI Releases GPT-6 Cyber: Autonomous Vulnerability Hunting",
-    "Claude Code Mac Sandbox Fails Open"
+    "Claude Code Mac Sandbox Fails Open",
+    "Why Anthropic Released the Same AI Twice"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "threads",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "IBM Quantum: Many Answers At Once",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-25T09:16:19.485400+00:00"
-    },
     {
       "title": "Your Data Lives on Tiny Magnets",
       "news_source_url": "",
@@ -1336,6 +1326,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-09T21:42:28.317692+00:00"
+    },
+    {
+      "title": "Why Anthropic Released the Same AI Twice",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-09T23:52:41.394422+00:00"
     }
   ]
 }
