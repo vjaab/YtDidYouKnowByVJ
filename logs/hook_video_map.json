@@ -2003,7 +2003,21 @@
     "category": "Facts & Trivia",
     "title": "The Hidden AI Nobody Talks About \ud83e\udd2b",
     "uploaded_at": "2026-11-06T17:18:30.724982",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-11-09T15:54:10.551128",
+    "last_metrics": {
+      "views": 37,
+      "avg_view_duration_sec": 252.0,
+      "avg_view_percentage": 742.86,
+      "swipe_away_rate": 1.0,
+      "duration_sec": 34.0,
+      "retention_rate": 1.0,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "81SPHpykRs0": {
     "video_id": "81SPHpykRs0",
