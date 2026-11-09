@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI's Universal Language Brain: The Interlingua Shift",
     "IBM Quantum: Many Answers At Once",
     "Your Data Lives on Tiny Magnets",
     "AI Decodes Search Intent: SEO Automation Breakthrough",
@@ -99,10 +98,10 @@
     "AI Agents Write Their Own Memory Notes",
     "Anthropic's IPO Hints at Claude's Usage Limits",
     "Aligning SmolLM2-135M",
-    "OpenAI Releases GPT-6 Cyber: Autonomous Vulnerability Hunting"
+    "OpenAI Releases GPT-6 Cyber: Autonomous Vulnerability Hunting",
+    "Claude Code Mac Sandbox Fails Open"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI's Universal Language Brain: The Interlingua Shift",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-25T08:54:55.848333+00:00"
-    },
     {
       "title": "IBM Quantum: Many Answers At Once",
       "news_source_url": "",
@@ -1336,6 +1326,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-09T16:59:05.520865+00:00"
+    },
+    {
+      "title": "Claude Code Mac Sandbox Fails Open",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-09T21:42:28.317692+00:00"
     }
   ]
 }
