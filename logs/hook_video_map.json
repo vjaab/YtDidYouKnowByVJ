@@ -2037,7 +2037,21 @@
     "category": "AI & Tech Tools",
     "title": "Why 99% Of People Use AI Wrong \u26a1",
     "uploaded_at": "2026-11-07T19:57:38.473528",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-11-10T14:44:14.434685",
+    "last_metrics": {
+      "views": 118,
+      "avg_view_duration_sec": 11.0,
+      "avg_view_percentage": 34.5,
+      "swipe_away_rate": 0.655,
+      "duration_sec": 32.0,
+      "retention_rate": 0.3438,
+      "engagement_rate": 0.0085,
+      "likes": 1,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "3TBu2LGZVDk": {
     "video_id": "3TBu2LGZVDk",

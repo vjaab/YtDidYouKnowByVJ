@@ -1465,12 +1465,12 @@
             ]
           },
           "B": {
-            "views": 0,
-            "retention": 0.0,
-            "engagement": 0.0,
-            "swipe_away_rate": 0.0,
-            "avg_view_percentage": 0.0,
-            "count": 1,
+            "views": 118,
+            "retention": 0.171875,
+            "engagement": 0.00423728813559322,
+            "swipe_away_rate": 0.3275,
+            "avg_view_percentage": 17.25,
+            "count": 2,
             "hook_texts": [
               {
                 "text": "Stop paying for AI chat tools.",
@@ -1480,12 +1480,12 @@
             ]
           }
         },
-        "total_views": 44,
-        "total_videos": 5,
-        "avg_retention": 0.32142857142857145,
-        "avg_engagement": 0.0,
-        "avg_swipe_away": 0.27178,
-        "avg_view_percentage": 410.562
+        "total_views": 162,
+        "total_videos": 6,
+        "avg_retention": 0.32514880952380953,
+        "avg_engagement": 0.0014124293785310734,
+        "avg_swipe_away": 0.33565,
+        "avg_view_percentage": 347.885
       },
       "result_first": {
         "variants": {
@@ -1942,12 +1942,12 @@
   },
   "global": {
     "negative_warning": {
-      "views": 652,
-      "retention": 0.1935586271517905,
-      "engagement": 0.003960148039095408,
-      "count": 38,
-      "swipe_away_rate": 0.3015184210526317,
-      "avg_view_percentage": 95.85499999999999
+      "views": 770,
+      "retention": 0.19740968799405229,
+      "engagement": 0.004075902609149024,
+      "count": 39,
+      "swipe_away_rate": 0.31058205128205135,
+      "avg_view_percentage": 94.28179487179487
     },
     "result_first": {
       "views": 1493,
@@ -1982,5 +1982,5 @@
       "avg_view_percentage": 42.26131578947368
     }
   },
-  "last_updated": "2026-11-09T19:48:14.543914"
+  "last_updated": "2026-11-10T14:44:14.432623"
 }
