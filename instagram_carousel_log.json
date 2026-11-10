@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "ChatGPT: Trillions of Words, Hidden Biases",
     "Phone's Secret Night Vision Power",
     "Internet's Hidden Highway: Data by Light",
     "Your Fingerprint: A Tiny Electric Map",
@@ -99,10 +98,10 @@
     "Why Anthropic Released the Same AI Twice",
     "LLM Firewalls: One Year of Guardrails in Production",
     "Autonomous AI Agents: Why You Still Can't Sleep",
-    "Claude 3.5 Family: Which AI Model?"
+    "Claude 3.5 Family: Which AI Model?",
+    "Anthropic Claude: Choose Your AI Power"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "ChatGPT: Trillions of Words, Hidden Biases",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-25T17:10:48.172812+00:00"
-    },
     {
       "title": "Phone's Secret Night Vision Power",
       "news_source_url": "",
@@ -1330,6 +1320,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-10T17:40:05.048057+00:00"
+    },
+    {
+      "title": "Anthropic Claude: Choose Your AI Power",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-10T17:51:40.331925+00:00"
     }
   ]
 }
