@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Data Lives on Tiny Magnets",
     "AI Decodes Search Intent: SEO Automation Breakthrough",
     "How Self-Driving Cars Actually See",
     "ChatGPT: Trillions of Words, Hidden Biases",
@@ -99,10 +98,10 @@
     "Aligning SmolLM2-135M",
     "OpenAI Releases GPT-6 Cyber: Autonomous Vulnerability Hunting",
     "Claude Code Mac Sandbox Fails Open",
-    "Why Anthropic Released the Same AI Twice"
+    "Why Anthropic Released the Same AI Twice",
+    "LLM Firewalls: One Year of Guardrails in Production"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Data Lives on Tiny Magnets",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-25T10:07:53.213401+00:00"
-    },
     {
       "title": "AI Decodes Search Intent: SEO Automation Breakthrough",
       "news_source_url": "https://medium.com/ai-made-practical/chatgpt-vs-gemini-for-seo-keyword-research-outlines-and-content-briefs-5c7617a0233e?source=rss------artificial_intelligence-5",
@@ -1336,6 +1326,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-09T23:52:41.394422+00:00"
+    },
+    {
+      "title": "LLM Firewalls: One Year of Guardrails in Production",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-10T08:57:38.888021+00:00"
     }
   ]
 }
