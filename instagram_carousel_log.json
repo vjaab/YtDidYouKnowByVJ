@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI Decodes Search Intent: SEO Automation Breakthrough",
     "How Self-Driving Cars Actually See",
     "ChatGPT: Trillions of Words, Hidden Biases",
     "Phone's Secret Night Vision Power",
@@ -99,10 +98,10 @@
     "OpenAI Releases GPT-6 Cyber: Autonomous Vulnerability Hunting",
     "Claude Code Mac Sandbox Fails Open",
     "Why Anthropic Released the Same AI Twice",
-    "LLM Firewalls: One Year of Guardrails in Production"
+    "LLM Firewalls: One Year of Guardrails in Production",
+    "Autonomous AI Agents: Why You Still Can't Sleep"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,25 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI Decodes Search Intent: SEO Automation Breakthrough",
-      "news_source_url": "https://medium.com/ai-made-practical/chatgpt-vs-gemini-for-seo-keyword-research-outlines-and-content-briefs-5c7617a0233e?source=rss------artificial_intelligence-5",
-      "keywords": [
-        "ChatGPT",
-        "Gemini AI",
-        "SEO automation",
-        "keyword research",
-        "content briefs",
-        "AI strategy",
-        "did you know"
-      ],
-      "source": "Medium - artificial-intelligence",
-      "platform": "instagram",
-      "timestamp": "2026-10-25T15:19:00.141824+00:00"
-    },
     {
       "title": "How Self-Driving Cars Actually See",
       "news_source_url": "",
@@ -1336,6 +1320,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-10T08:57:38.888021+00:00"
+    },
+    {
+      "title": "Autonomous AI Agents: Why You Still Can't Sleep",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-10T09:57:10.262404+00:00"
     }
   ]
 }
