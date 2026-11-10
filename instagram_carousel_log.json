@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "How Self-Driving Cars Actually See",
     "ChatGPT: Trillions of Words, Hidden Biases",
     "Phone's Secret Night Vision Power",
     "Internet's Hidden Highway: Data by Light",
@@ -99,10 +98,10 @@
     "Claude Code Mac Sandbox Fails Open",
     "Why Anthropic Released the Same AI Twice",
     "LLM Firewalls: One Year of Guardrails in Production",
-    "Autonomous AI Agents: Why You Still Can't Sleep"
+    "Autonomous AI Agents: Why You Still Can't Sleep",
+    "Claude 3.5 Family: Which AI Model?"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "How Self-Driving Cars Actually See",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-25T16:18:32.727547+00:00"
-    },
     {
       "title": "ChatGPT: Trillions of Words, Hidden Biases",
       "news_source_url": "",
@@ -1330,6 +1320,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-10T09:57:10.262404+00:00"
+    },
+    {
+      "title": "Claude 3.5 Family: Which AI Model?",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-10T17:40:05.048057+00:00"
     }
   ]
 }

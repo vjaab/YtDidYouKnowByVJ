@@ -1,0 +1,226 @@
+{
+  "headline": "Claude 3.5 Family: Which AI Model?",
+  "summary": "Anthropic's Claude 3.5 family introduces a tiered approach to AI model deployment, balancing capability with cost and latency. Understanding the unique strengths of Haiku, Sonnet, and Opus is crucial for optimizing production architectures and choosing the right model for specific engineering tasks.",
+  "source": "Medium - artificial-intelligence",
+  "source_url": "",
+  "date": "10 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "model_release",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "hook",
+      "layout_type": "hero_hook",
+      "eyebrow": "ANTHROPIC RELEASE",
+      "title": "Meet the Claude 3.5 Family",
+      "subtitle": "A New Era of AI Model Performance and Efficiency.",
+      "body": "Anthropic expands its AI model offerings with Claude 3.5, featuring a spectrum of capabilities designed for diverse engineering needs. This evolution brings significant advancements, prompting a critical look at model selection for production.",
+      "deep_dive": "The Claude 3.5 family represents Anthropic's commitment to democratizing advanced AI capabilities. By introducing distinct tiers, they aim to empower developers with granular control over performance, cost, and speed, moving beyond a one-size-fits-all approach to LLM deployment.",
+      "key_fact": "Claude 3.5 offers a spectrum of models to match specific application requirements.",
+      "why_it_matters": "Choosing the right Claude model directly impacts your application's responsiveness, cost-effectiveness, and user experience."
+    },
+    {
+      "slide_number": 2,
+      "role": "what_changed",
+      "layout_type": "whats_new",
+      "eyebrow": "WHAT CHANGED",
+      "title": "Architectural Evolution for Speed and Scale",
+      "subtitle": "Enhanced internal mechanisms unlock new performance frontiers.",
+      "body": "Claude 3.5 models feature architectural optimizations focusing on efficient inference and expanded context handling. This upgrade aims to reduce latency and increase throughput, making them more suitable for real-time applications.",
+      "before_title": "Previous Constraints",
+      "before_items": [
+        "Higher latency for complex queries.",
+        "Increased operational costs for high-volume tasks.",
+        "Limited efficiency in handling very long contexts."
+      ],
+      "after_title": "Claude 3.5 Advancements",
+      "after_items": [
+        "Significantly reduced inference latency.",
+        "Optimized for cost-efficiency at scale.",
+        "Improved handling of extensive textual data."
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "technical_mechanism",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "HOW IT WORKS",
+      "title": "Optimized Inference Pathways",
+      "subtitle": "Leveraging advanced routing and caching for faster responses.",
+      "body": "Claude 3.5 likely employs refined attention mechanisms and smarter routing logic to process inputs more efficiently. This includes optimized KV caching to retain computational gains during sequential processing.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "Input Prompt",
+            "sub": "User Query / Data"
+          },
+          {
+            "name": "Intelligent Router",
+            "sub": "Directs to specialized processing"
+          },
+          {
+            "name": "Core Reasoning Engine",
+            "sub": "Analyzes and generates response"
+          },
+          {
+            "name": "Optimized KV Cache",
+            "sub": "Stores intermediate computations"
+          },
+          {
+            "name": "Output Generation",
+            "sub": "Finalized Response"
+          }
+        ],
+        "connections": [
+          {
+            "from": "Input Prompt",
+            "to": "Intelligent Router",
+            "label": "Input"
+          },
+          {
+            "from": "Intelligent Router",
+            "to": "Core Reasoning Engine",
+            "label": "Task Assignment"
+          },
+          {
+            "from": "Core Reasoning Engine",
+            "to": "Optimized KV Cache",
+            "label": "State Management"
+          },
+          {
+            "from": "Optimized KV Cache",
+            "to": "Core Reasoning Engine",
+            "label": "Memory Recall"
+          },
+          {
+            "from": "Core Reasoning Engine",
+            "to": "Output Generation",
+            "label": "Result"
+          }
+        ]
+      }
+    },
+    {
+      "slide_number": 4,
+      "role": "benchmark_evidence",
+      "layout_type": "metrics_cards",
+      "eyebrow": "BENCHMARKS",
+      "title": "Performance Across the Family",
+      "subtitle": "Understanding the trade-offs in speed and capability.",
+      "body": "Each Claude 3.5 model offers distinct performance characteristics that matter for production deployment. Developers must weigh these against their specific use case needs.",
+      "metrics": [
+        {
+          "label": "Claude 3.5 Haiku Latency",
+          "value": "Extremely Low",
+          "delta": "Fastest response times"
+        },
+        {
+          "label": "Claude 3.5 Sonnet Balance",
+          "value": "Balanced",
+          "delta": "Optimal for general tasks"
+        },
+        {
+          "label": "Claude 3.5 Opus Capability",
+          "value": "Highest",
+          "delta": "Complex reasoning power"
+        },
+        {
+          "label": "Token Cost Delta",
+          "value": "Tiered",
+          "delta": "Lower tiers are more cost-effective"
+        }
+      ]
+    },
+    {
+      "slide_number": 5,
+      "role": "previous_vs_new",
+      "layout_type": "before_after",
+      "eyebrow": "OLD VS NEW",
+      "title": "From General Purpose to Precision Tools",
+      "subtitle": "Tailoring AI to specific engineering challenges.",
+      "body": "The Claude 3.5 family moves beyond monolithic models to a suite of specialized tools. This allows for more efficient resource allocation and targeted problem-solving.",
+      "before_title": "Previous Generation",
+      "before_items": [
+        "Single model for all tasks.",
+        "Compromises on speed or capability.",
+        "Higher operational overhead."
+      ],
+      "after_title": "Claude 3.5 Family",
+      "after_items": [
+        "Haiku: Instantaneous responses.",
+        "Sonnet: Balanced intelligence and speed.",
+        "Opus: Peak analytical performance.",
+        "Optimized for specific use cases."
+      ]
+    },
+    {
+      "slide_number": 6,
+      "role": "developer_impact",
+      "layout_type": "real_world_scenario",
+      "eyebrow": "IN PRODUCTION",
+      "title": "Strategic Model Deployment",
+      "subtitle": "Choosing the right Claude for your application's needs.",
+      "body": "Engineering teams can now strategically deploy Claude models based on project requirements. This means using Haiku for chatbots, Sonnet for content generation, and Opus for deep research analysis.",
+      "scenario": "Imagine an e-commerce platform: Haiku powers real-time customer support chat, Sonnet drafts product descriptions, and Opus analyzes user feedback for sentiment and trend identification. This tiered approach ensures optimal performance and cost efficiency across different features."
+    },
+    {
+      "slide_number": 7,
+      "role": "practical_action",
+      "layout_type": "checklist",
+      "eyebrow": "INTEGRATION CHECKLIST",
+      "title": "Adopting Claude 3.5",
+      "subtitle": "Key steps for successful implementation.",
+      "body": "Leveraging the full potential of the Claude 3.5 family requires thoughtful integration. Consider these essential checkpoints for your development workflow.",
+      "items": [
+        "Evaluate use case complexity vs. model capability.",
+        "Test latency requirements for real-time features.",
+        "Benchmark cost-effectiveness for high-volume tasks.",
+        "Adapt prompts for optimal performance on each model.",
+        "Consider fine-tuning for specialized domain knowledge."
+      ]
+    }
+  ],
+  "_model_used": "gemini-2.5-flash-lite",
+  "_topic_intelligence": {
+    "topic_type": "model_release",
+    "domain": "ai_ml",
+    "primary_entity": "Anthropic",
+    "content_depth": "practical",
+    "best_story_angle": "practical_guide",
+    "audience": [
+      "ai_engineers",
+      "software_engineers"
+    ],
+    "key_questions": [
+      "What are the distinct capabilities of each Claude model?",
+      "When should a developer choose Claude 3.5 Sonnet versus Haiku or Opus?",
+      "How do cost, latency, and context window trade-offs impact production architecture?",
+      "What specific use cases are best suited for each tier in the Claude family?"
+    ],
+    "recommended_slide_count": 7
+  },
+  "_archetype": "AI Model Release & Architecture",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "Which Claude Model Should You Actually Use?",
+    "hook": "Did You Know: Which Claude Model Should You Actually Use?? \u26a1",
+    "headline": "Which Claude Model Should You Actually Use?",
+    "fact_summary": "There are four now. Fable 5.2 just landed. They are not gimmicks, and most people are reaching for the wrong one.Continue reading on Medium \u00bb",
+    "source": "Medium - artificial-intelligence",
+    "news_source_url": "https://thedigipalms.medium.com/which-claude-model-should-you-actually-use-16c33d0bd3c4?source=rss------artificial_intelligence-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "which",
+      "claude",
+      "model",
+      "should",
+      "actually"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}
