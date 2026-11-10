@@ -1530,12 +1530,12 @@
       "curiosity_gap": {
         "variants": {
           "B": {
-            "views": 3,
-            "retention": 0.3218390804597701,
+            "views": 141,
+            "retention": 0.28207698476343224,
             "engagement": 0.0,
-            "swipe_away_rate": 0.0001666666666666483,
-            "avg_view_percentage": 33.31666666666667,
-            "count": 3,
+            "swipe_away_rate": 0.2092,
+            "avg_view_percentage": 29.080000000000005,
+            "count": 4,
             "hook_texts": [
               {
                 "text": "Your coding setup is secretly completely outdated.",
@@ -1565,24 +1565,24 @@
             ]
           }
         },
-        "total_views": 128,
-        "total_videos": 5,
-        "avg_retention": 0.25310344827586206,
-        "avg_engagement": 0.0016,
-        "avg_swipe_away": 0.13933999999999996,
-        "avg_view_percentage": 26.066000000000003
+        "total_views": 266,
+        "total_videos": 6,
+        "avg_retention": 0.2380513231756215,
+        "avg_engagement": 0.0013333333333333333,
+        "avg_swipe_away": 0.2555,
+        "avg_view_percentage": 24.450000000000003
       }
     },
     "Facts & Trivia": {
       "curiosity_gap": {
         "variants": {
           "B": {
-            "views": 61,
-            "retention": 0.1842105263157895,
-            "engagement": 0.0,
-            "swipe_away_rate": 0.14086666666666667,
-            "avg_view_percentage": 19.246666666666666,
-            "count": 3,
+            "views": 344,
+            "retention": 0.27481203007518795,
+            "engagement": 0.0007067137809187279,
+            "swipe_away_rate": 0.11988000000000001,
+            "avg_view_percentage": 28.012,
+            "count": 5,
             "hook_texts": [
               {
                 "text": "Your PC is secretly running console games",
@@ -1593,16 +1593,21 @@
                 "text": "Your coding workflow is missing this secret AI.",
                 "video_id": "q4hQX3zN6CM",
                 "recorded_at": "2026-11-08T19:49:36.707411"
+              },
+              {
+                "text": "Your simple script is secretly losing money",
+                "video_id": "S6ASZ5Vxtt0",
+                "recorded_at": "2026-11-10T22:24:19.861929"
               }
             ]
           }
         },
-        "total_views": 61,
-        "total_videos": 3,
-        "avg_retention": 0.1842105263157895,
-        "avg_engagement": 0.0,
-        "avg_swipe_away": 0.14086666666666667,
-        "avg_view_percentage": 19.246666666666666
+        "total_views": 344,
+        "total_videos": 5,
+        "avg_retention": 0.27481203007518795,
+        "avg_engagement": 0.0007067137809187279,
+        "avg_swipe_away": 0.11988000000000001,
+        "avg_view_percentage": 28.012
       },
       "personal_stake": {
         "variants": {
@@ -1966,12 +1971,12 @@
       "avg_view_percentage": 16.702173913043477
     },
     "curiosity_gap": {
-      "views": 725,
-      "retention": 0.1932770981916629,
-      "engagement": 0.003706714516045146,
-      "count": 39,
-      "swipe_away_rate": 0.2366589743589744,
-      "avg_view_percentage": 19.92384615384616
+      "views": 1146,
+      "retention": 0.20290538329947244,
+      "engagement": 0.003526081786437008,
+      "count": 42,
+      "swipe_away_rate": 0.2438761904761905,
+      "avg_view_percentage": 20.850476190476197
     },
     "personal_stake": {
       "views": 1255,
@@ -1982,5 +1987,5 @@
       "avg_view_percentage": 42.26131578947368
     }
   },
-  "last_updated": "2026-11-10T14:44:14.432623"
+  "last_updated": "2026-11-10T22:26:26.982409"
 }

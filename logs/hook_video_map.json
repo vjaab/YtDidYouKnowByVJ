@@ -2061,7 +2061,21 @@
     "category": "AI & Tech Tools",
     "title": "How Claude Code Became A Video Director \ud83e\udd2b",
     "uploaded_at": "2026-11-08T16:22:11.201969",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-11-10T22:26:26.713460",
+    "last_metrics": {
+      "views": 138,
+      "avg_view_duration_sec": 7.0,
+      "avg_view_percentage": 16.37,
+      "swipe_away_rate": 0.8363,
+      "duration_sec": 43.0,
+      "retention_rate": 0.1628,
+      "engagement_rate": 0.0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "q4hQX3zN6CM": {
     "video_id": "q4hQX3zN6CM",
@@ -2071,7 +2085,21 @@
     "category": "Facts & Trivia",
     "title": "The Hidden Coding AI Nobody Talks About \ud83e\udd2b",
     "uploaded_at": "2026-11-08T19:49:36.709855",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-11-10T22:26:26.985804",
+    "last_metrics": {
+      "views": 283,
+      "avg_view_duration_sec": 23.0,
+      "avg_view_percentage": 82.32,
+      "swipe_away_rate": 0.1768,
+      "duration_sec": 28.0,
+      "retention_rate": 0.8214,
+      "engagement_rate": 0.0035,
+      "likes": 1,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "Bsoej0oRhtw": {
     "video_id": "Bsoej0oRhtw",
@@ -2081,6 +2109,16 @@
     "category": "Tech Gadgets & Inventions",
     "title": "Did You Know This About AI Startups? \ud83e\udd2f",
     "uploaded_at": "2026-11-09T19:48:14.546338",
+    "synced": false
+  },
+  "S6ASZ5Vxtt0": {
+    "video_id": "S6ASZ5Vxtt0",
+    "hook_pattern": "curiosity_gap",
+    "hook_variant": "B",
+    "hook_text": "Your simple script is secretly losing money",
+    "category": "Facts & Trivia",
+    "title": "Did You Know This About Python? \ud83e\udd2f",
+    "uploaded_at": "2026-11-10T22:24:19.865821",
     "synced": false
   }
 }

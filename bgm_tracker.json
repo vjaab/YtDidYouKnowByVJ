@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "modern_tech.mp3",
+      "headline": "The Python Side Project That Quietly Earns Me $2,400 a Month",
+      "topic_type": "auto",
+      "timestamp": "42900153147"
+    },
+    {
       "track": "jam_Energy.mp3",
       "headline": "anthropics/claude-quickstarts: A collection of quickstart apps built with the Cl",
       "topic_type": "auto",
@@ -173,12 +179,6 @@
       "headline": "Standalone Claude Design Closes Dec 14. 5 Moves Before It Does",
       "topic_type": "auto",
       "timestamp": "38148798817"
-    },
-    {
-      "track": "jam_Escape_From_The_Machine_Planet.mp3",
-      "headline": "GitHub Gem #13: AtomicBot-ai/atomic-agent \u2014 Local-First AI Agent Running on Your",
-      "topic_type": "auto",
-      "timestamp": "38077065579"
     }
   ],
   "usage_counts": {
@@ -191,7 +191,7 @@
     "Defiance.mp3": 1,
     "jam_Confidence.mp3": 3,
     "jam_Upbeat.mp3": 6,
-    "modern_tech.mp3": 5,
+    "modern_tech.mp3": 6,
     "jam_Elite.mp3": 4,
     "jam_Energetic_Pop.mp3": 4,
     "jam_Groovy_SIX.mp3": 3,
