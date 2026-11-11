@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Internet's Hidden Highway: Data by Light",
     "Your Fingerprint: A Tiny Electric Map",
     "Satellites Use Einstein's Time Trick",
     "Your Voice's Invisible Digital Twin",
@@ -99,10 +98,10 @@
     "Autonomous AI Agents: Why You Still Can't Sleep",
     "Claude 3.5 Family: Which AI Model?",
     "Anthropic Claude: Choose Your AI Power",
-    "Building CareGuide: Engineering an Advanced RAG System\u2026"
+    "Building CareGuide: Engineering an Advanced RAG System\u2026",
+    "Meta's Hidden Small Model Leap"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Internet's Hidden Highway: Data by Light",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-26T07:48:59.614985+00:00"
-    },
     {
       "title": "Your Fingerprint: A Tiny Electric Map",
       "news_source_url": "",
@@ -1330,6 +1320,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-10T20:51:24.986762+00:00"
+    },
+    {
+      "title": "Meta's Hidden Small Model Leap",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-11T22:17:49.404811+00:00"
     }
   ]
 }
