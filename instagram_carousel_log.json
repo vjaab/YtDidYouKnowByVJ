@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Satellites Use Einstein's Time Trick",
     "Your Voice's Invisible Digital Twin",
     "Wireless Charging's Invisible Energy Trick",
     "DALL-E vs Midjourney vs Stable Diffusion: Architecture Showdown",
@@ -99,10 +98,10 @@
     "Anthropic Claude: Choose Your AI Power",
     "Building CareGuide: Engineering an Advanced RAG System\u2026",
     "Meta's Hidden Small Model Leap",
-    "Claude Fable 5.2: Developer & PM Guide"
+    "Claude Fable 5.2: Developer & PM Guide",
+    "Claude's 8 Secret Prompt Codes Revealed"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,24 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Satellites Use Einstein's Time Trick",
-      "news_source_url": "",
-      "keywords": [
-        "GPS",
-        "Einstein",
-        "relativity",
-        "time",
-        "satellites",
-        "did you know"
-      ],
-      "source": "National Institute of Standards and Technology (NIST)",
-      "platform": "facebook",
-      "timestamp": "2026-10-26T16:51:44.538001+00:00"
-    },
     {
       "title": "Your Voice's Invisible Digital Twin",
       "news_source_url": "",
@@ -1330,6 +1315,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-12T09:09:57.079707+00:00"
+    },
+    {
+      "title": "Claude's 8 Secret Prompt Codes Revealed",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-12T09:52:48.619512+00:00"
     }
   ]
 }
