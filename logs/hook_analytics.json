@@ -1578,11 +1578,11 @@
         "variants": {
           "B": {
             "views": 344,
-            "retention": 0.27481203007518795,
-            "engagement": 0.0007067137809187279,
-            "swipe_away_rate": 0.11988000000000001,
-            "avg_view_percentage": 28.012,
-            "count": 5,
+            "retention": 0.22901002506265664,
+            "engagement": 0.0005889281507656066,
+            "swipe_away_rate": 0.0999,
+            "avg_view_percentage": 23.343333333333334,
+            "count": 6,
             "hook_texts": [
               {
                 "text": "Your PC is secretly running console games",
@@ -1598,16 +1598,21 @@
                 "text": "Your simple script is secretly losing money",
                 "video_id": "S6ASZ5Vxtt0",
                 "recorded_at": "2026-11-10T22:24:19.861929"
+              },
+              {
+                "text": "Your standard watch is secretly hiding luxury features.",
+                "video_id": "EOZ5hTTk6pM",
+                "recorded_at": "2026-11-12T22:20:29.313792"
               }
             ]
           }
         },
         "total_views": 344,
-        "total_videos": 5,
-        "avg_retention": 0.27481203007518795,
-        "avg_engagement": 0.0007067137809187279,
-        "avg_swipe_away": 0.11988000000000001,
-        "avg_view_percentage": 28.012
+        "total_videos": 6,
+        "avg_retention": 0.22901002506265664,
+        "avg_engagement": 0.0005889281507656066,
+        "avg_swipe_away": 0.0999,
+        "avg_view_percentage": 23.343333333333334
       },
       "personal_stake": {
         "variants": {
@@ -1977,11 +1982,11 @@
     },
     "curiosity_gap": {
       "views": 1146,
-      "retention": 0.20290538329947244,
-      "engagement": 0.003526081786437008,
-      "count": 42,
-      "swipe_away_rate": 0.2438761904761905,
-      "avg_view_percentage": 20.850476190476197
+      "retention": 0.19818665345529868,
+      "engagement": 0.0034440798844268448,
+      "count": 43,
+      "swipe_away_rate": 0.23820465116279071,
+      "avg_view_percentage": 20.365581395348844
     },
     "personal_stake": {
       "views": 1290,
@@ -1992,5 +1997,5 @@
       "avg_view_percentage": 42.52871794871795
     }
   },
-  "last_updated": "2026-11-12T18:02:46.690969"
+  "last_updated": "2026-11-12T22:20:29.313817"
 }
