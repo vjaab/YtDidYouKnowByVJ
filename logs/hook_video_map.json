@@ -2109,7 +2109,21 @@
     "category": "Tech Gadgets & Inventions",
     "title": "Did You Know This About AI Startups? \ud83e\udd2f",
     "uploaded_at": "2026-11-09T19:48:14.546338",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-11-12T15:00:58.535775",
+    "last_metrics": {
+      "views": 35,
+      "avg_view_duration_sec": 17.0,
+      "avg_view_percentage": 52.69,
+      "swipe_away_rate": 0.4731,
+      "duration_sec": 33.0,
+      "retention_rate": 0.5152,
+      "engagement_rate": 0.0286,
+      "likes": 1,
+      "comments": 0,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "S6ASZ5Vxtt0": {
     "video_id": "S6ASZ5Vxtt0",
