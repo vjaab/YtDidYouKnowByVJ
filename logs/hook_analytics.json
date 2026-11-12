@@ -1770,16 +1770,21 @@
         "variants": {
           "B": {
             "views": 19,
-            "retention": 0.203125,
+            "retention": 0.13541666666666666,
             "engagement": 0.0,
-            "swipe_away_rate": 0.28415,
-            "avg_view_percentage": 21.585,
-            "count": 2,
+            "swipe_away_rate": 0.18943333333333334,
+            "avg_view_percentage": 14.39,
+            "count": 3,
             "hook_texts": [
               {
                 "text": "Stop buying expensive smartphones right now.",
                 "video_id": "iSK_IoU7y7A",
                 "recorded_at": "2026-10-10T15:32:06.822516"
+              },
+              {
+                "text": "Don't upload private IP to cloud video APIs",
+                "video_id": "-cfc_ypHfe8",
+                "recorded_at": "2026-11-12T18:02:46.690939"
               }
             ]
           },
@@ -1800,11 +1805,11 @@
           }
         },
         "total_views": 79,
-        "total_videos": 4,
-        "avg_retention": 0.1779513888888889,
+        "total_videos": 5,
+        "avg_retention": 0.1423611111111111,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.315125,
-        "avg_view_percentage": 18.4875
+        "avg_swipe_away": 0.2521,
+        "avg_view_percentage": 14.790000000000001
       },
       "curiosity_gap": {
         "variants": {
@@ -1948,11 +1953,11 @@
   "global": {
     "negative_warning": {
       "views": 770,
-      "retention": 0.19740968799405229,
-      "engagement": 0.004075902609149024,
-      "count": 39,
-      "swipe_away_rate": 0.31058205128205135,
-      "avg_view_percentage": 94.28179487179487
+      "retention": 0.19247444579420098,
+      "engagement": 0.003974005043920299,
+      "count": 40,
+      "swipe_away_rate": 0.3028175000000001,
+      "avg_view_percentage": 91.92475
     },
     "result_first": {
       "views": 1493,
@@ -1987,5 +1992,5 @@
       "avg_view_percentage": 42.52871794871795
     }
   },
-  "last_updated": "2026-11-12T15:00:58.533486"
+  "last_updated": "2026-11-12T18:02:46.690969"
 }
