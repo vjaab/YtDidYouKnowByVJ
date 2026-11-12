@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Fingerprint: A Tiny Electric Map",
     "Satellites Use Einstein's Time Trick",
     "Your Voice's Invisible Digital Twin",
     "Wireless Charging's Invisible Energy Trick",
@@ -99,10 +98,10 @@
     "Claude 3.5 Family: Which AI Model?",
     "Anthropic Claude: Choose Your AI Power",
     "Building CareGuide: Engineering an Advanced RAG System\u2026",
-    "Meta's Hidden Small Model Leap"
+    "Meta's Hidden Small Model Leap",
+    "Claude Fable 5.2: Developer & PM Guide"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Fingerprint: A Tiny Electric Map",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-26T16:43:49.963619+00:00"
-    },
     {
       "title": "Satellites Use Einstein's Time Trick",
       "news_source_url": "",
@@ -1330,6 +1320,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-11T22:17:49.404811+00:00"
+    },
+    {
+      "title": "Claude Fable 5.2: Developer & PM Guide",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-12T09:09:57.079707+00:00"
     }
   ]
 }
