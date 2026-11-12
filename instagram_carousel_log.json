@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Voice's Invisible Digital Twin",
     "Wireless Charging's Invisible Energy Trick",
     "DALL-E vs Midjourney vs Stable Diffusion: Architecture Showdown",
     "Your Watch Sees Your Heartbeat",
@@ -99,10 +98,10 @@
     "Building CareGuide: Engineering an Advanced RAG System\u2026",
     "Meta's Hidden Small Model Leap",
     "Claude Fable 5.2: Developer & PM Guide",
-    "Claude's 8 Secret Prompt Codes Revealed"
+    "Claude's 8 Secret Prompt Codes Revealed",
+    "ChatGPT's Anti-Sycophancy Setting Explained"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "did you know",
@@ -301,22 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Voice's Invisible Digital Twin",
-      "news_source_url": "",
-      "keywords": [
-        "AI Voice Cloning",
-        "Speech Synthesis",
-        "Digital Twin",
-        "did you know"
-      ],
-      "source": "Generative AI Voice Synthesis Research",
-      "platform": "threads",
-      "timestamp": "2026-10-26T17:31:55.250796+00:00"
-    },
     {
       "title": "Wireless Charging's Invisible Energy Trick",
       "news_source_url": "",
@@ -1325,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-12T09:52:48.619512+00:00"
+    },
+    {
+      "title": "ChatGPT's Anti-Sycophancy Setting Explained",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-12T18:24:27.177247+00:00"
     }
   ]
 }
