@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Wireless Charging's Invisible Energy Trick",
     "DALL-E vs Midjourney vs Stable Diffusion: Architecture Showdown",
     "Your Watch Sees Your Heartbeat",
     "Your Finger's Secret Electric Touch",
@@ -99,10 +98,10 @@
     "Meta's Hidden Small Model Leap",
     "Claude Fable 5.2: Developer & PM Guide",
     "Claude's 8 Secret Prompt Codes Revealed",
-    "ChatGPT's Anti-Sycophancy Setting Explained"
+    "ChatGPT's Anti-Sycophancy Setting Explained",
+    "Anthropic's MCP: Standardizing AI Context"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "threads",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Wireless Charging's Invisible Energy Trick",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-26T19:49:52.991895+00:00"
-    },
     {
       "title": "DALL-E vs Midjourney vs Stable Diffusion: Architecture Showdown",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-12T18:24:27.177247+00:00"
+    },
+    {
+      "title": "Anthropic's MCP: Standardizing AI Context",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-12T21:26:27.794221+00:00"
     }
   ]
 }
