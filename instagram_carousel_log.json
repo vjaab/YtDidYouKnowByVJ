@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI Invents Faces: People Who Never Were",
     "Tiny Worlds Inside Your Tech",
     "AI as Invisible Lab Partner: Research Breakthrough",
     "Your Photos Are Secret Number Grids",
@@ -99,10 +98,10 @@
     "MoE vs Dense: Local AI Model Showdown",
     "Demystifying LLM Architecture: Tokens, Roles & Context",
     "Anthropic Claude Developer Tool & IDE Innovation",
-    "Medium Shifts AI Strategy"
+    "Medium Shifts AI Strategy",
+    "Why Movie Spam Hijacks AI Data Feeds"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI Invents Faces: People Who Never Were",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-28T07:38:19.880594+00:00"
-    },
     {
       "title": "Tiny Worlds Inside Your Tech",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-13T20:50:15.460994+00:00"
+    },
+    {
+      "title": "Why Movie Spam Hijacks AI Data Feeds",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-13T21:33:10.373322+00:00"
     }
   ]
 }
