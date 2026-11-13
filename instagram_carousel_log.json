@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Watch Sees Your Heartbeat",
     "Your Finger's Secret Electric Touch",
     "The Invisible Clocks That Run Your World",
     "Wi-Fi: Invisible Waves, Your Data's Highway",
@@ -99,10 +98,10 @@
     "Claude's 8 Secret Prompt Codes Revealed",
     "ChatGPT's Anti-Sycophancy Setting Explained",
     "Anthropic's MCP: Standardizing AI Context",
-    "Anthropic: CLAUDE.md vs Scripts vs Hooks"
+    "Anthropic: CLAUDE.md vs Scripts vs Hooks",
+    "MoE vs Dense: Local AI Model Showdown"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Watch Sees Your Heartbeat",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-27T12:38:17.570492+00:00"
-    },
     {
       "title": "Your Finger's Secret Electric Touch",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-13T08:53:35.220419+00:00"
+    },
+    {
+      "title": "MoE vs Dense: Local AI Model Showdown",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-13T14:54:20.801699+00:00"
     }
   ]
 }
