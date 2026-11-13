@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "The Invisible Clocks That Run Your World",
     "Wi-Fi: Invisible Waves, Your Data's Highway",
     "AI Invents Faces: People Who Never Were",
     "Tiny Worlds Inside Your Tech",
@@ -99,10 +98,10 @@
     "Anthropic's MCP: Standardizing AI Context",
     "Anthropic: CLAUDE.md vs Scripts vs Hooks",
     "MoE vs Dense: Local AI Model Showdown",
-    "Demystifying LLM Architecture: Tokens, Roles & Context"
+    "Demystifying LLM Architecture: Tokens, Roles & Context",
+    "Anthropic Claude Developer Tool & IDE Innovation"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "The Invisible Clocks That Run Your World",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-27T19:18:16.602983+00:00"
-    },
     {
       "title": "Wi-Fi: Invisible Waves, Your Data's Highway",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-13T17:40:01.724245+00:00"
+    },
+    {
+      "title": "Anthropic Claude Developer Tool & IDE Innovation",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-13T18:41:43.431479+00:00"
     }
   ]
 }
