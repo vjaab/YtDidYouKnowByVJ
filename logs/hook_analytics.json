@@ -1577,12 +1577,12 @@
       "curiosity_gap": {
         "variants": {
           "B": {
-            "views": 344,
-            "retention": 0.22901002506265664,
-            "engagement": 0.0005889281507656066,
-            "swipe_away_rate": 0.0999,
-            "avg_view_percentage": 23.343333333333334,
-            "count": 6,
+            "views": 346,
+            "retention": 0.19629430719656282,
+            "engagement": 0.07193336698637053,
+            "swipe_away_rate": 0.22848571428571432,
+            "avg_view_percentage": 20.00857142857143,
+            "count": 7,
             "hook_texts": [
               {
                 "text": "Your PC is secretly running console games",
@@ -1607,12 +1607,12 @@
             ]
           }
         },
-        "total_views": 344,
-        "total_videos": 6,
-        "avg_retention": 0.22901002506265664,
-        "avg_engagement": 0.0005889281507656066,
-        "avg_swipe_away": 0.0999,
-        "avg_view_percentage": 23.343333333333334
+        "total_views": 346,
+        "total_videos": 7,
+        "avg_retention": 0.19629430719656282,
+        "avg_engagement": 0.07193336698637053,
+        "avg_swipe_away": 0.22848571428571432,
+        "avg_view_percentage": 20.00857142857143
       },
       "personal_stake": {
         "variants": {
@@ -1981,12 +1981,12 @@
       "avg_view_percentage": 16.702173913043477
     },
     "curiosity_gap": {
-      "views": 1146,
-      "retention": 0.19818665345529868,
-      "engagement": 0.0034440798844268448,
-      "count": 43,
-      "swipe_away_rate": 0.23820465116279071,
-      "avg_view_percentage": 20.365581395348844
+      "views": 1148,
+      "retention": 0.1936824113313146,
+      "engagement": 0.014729441705235324,
+      "count": 44,
+      "swipe_away_rate": 0.2555181818181818,
+      "avg_view_percentage": 19.90272727272728
     },
     "personal_stake": {
       "views": 1290,
@@ -1997,5 +1997,5 @@
       "avg_view_percentage": 42.52871794871795
     }
   },
-  "last_updated": "2026-11-12T22:20:29.313817"
+  "last_updated": "2026-11-13T14:25:46.503987"
 }

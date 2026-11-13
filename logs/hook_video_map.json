@@ -2133,7 +2133,21 @@
     "category": "Facts & Trivia",
     "title": "Did You Know This About Python? \ud83e\udd2f",
     "uploaded_at": "2026-11-10T22:24:19.865821",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-11-13T14:25:46.506912",
+    "last_metrics": {
+      "views": 2,
+      "avg_view_duration_sec": 0.0,
+      "avg_view_percentage": 0.0,
+      "swipe_away_rate": 1.0,
+      "duration_sec": 33.0,
+      "retention_rate": 0.0,
+      "engagement_rate": 0.5,
+      "likes": 0,
+      "comments": 1,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "-cfc_ypHfe8": {
     "video_id": "-cfc_ypHfe8",
