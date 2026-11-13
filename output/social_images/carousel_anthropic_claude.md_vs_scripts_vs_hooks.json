@@ -1,0 +1,221 @@
+{
+  "headline": "Anthropic: CLAUDE.md vs Scripts vs Hooks",
+  "summary": "Anthropic clarifies when to use CLAUDE.md instructions versus scripts or hooks in Claude Code. Each mechanism serves a distinct purpose: persistent context, one-off automation, and event-driven enforcement. Choosing correctly prevents context bloat and keeps team workflows clean.",
+  "source": "Medium - artificial-intelligence",
+  "source_url": "",
+  "date": "13 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "developer_tool",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "scenario_question",
+      "eyebrow": "ANTHROPIC UPDATE",
+      "title": "Your CLAUDE.md Is a Junk Drawer",
+      "subtitle": "Not every rule belongs in persistent context",
+      "body": "Teams stuff everything into CLAUDE.md \u2014 style guides, build commands, deployment steps. The file grows until the model drowns in irrelevant context. When does a rule belong elsewhere?",
+      "deep_dive": "CLAUDE.md loads into every conversation as system context. It's perfect for project-wide conventions: coding standards, architecture patterns, testing philosophy. But it becomes a liability when filled with situational commands, one-time setup steps, or rules that only apply during specific workflows. The model pays attention cost for every token, and irrelevant context degrades reasoning on the actual task.",
+      "key_fact": "CLAUDE.md loads as persistent context in every Claude Code session",
+      "why_it_matters": "Bloated context windows reduce model accuracy on your actual coding task"
+    },
+    {
+      "slide_number": 2,
+      "role": "tool_overview",
+      "layout_type": "whats_new",
+      "eyebrow": "WHAT IT DOES",
+      "title": "Three Mechanisms, Three Jobs",
+      "subtitle": "CLAUDE.md, scripts, and hooks each solve different problems",
+      "body": "CLAUDE.md = persistent project knowledge. Scripts = reusable automation. Hooks = event-triggered enforcement. Pick the right tool for the rule's lifecycle.",
+      "deep_dive": "Think of it like a kitchen: CLAUDE.md is the recipe book everyone references (persistent knowledge). Scripts are appliances \u2014 blender, food processor \u2014 you pull out for specific prep tasks (on-demand automation). Hooks are the smoke detector and timer \u2014 they react automatically when something happens (event-driven guardrails). Each has a distinct trigger model and persistence profile.",
+      "key_fact": "Three distinct automation primitives with different trigger models",
+      "why_it_matters": "Matching mechanism to use case prevents context pollution and missed enforcement",
+      "before_title": "CLAUDE.md (Persistent Context)",
+      "before_items": [
+        "Project-wide conventions",
+        "Architecture decisions",
+        "Team coding standards"
+      ],
+      "after_title": "Scripts & Hooks (Situational)",
+      "after_items": [
+        "One-off commands (scripts)",
+        "Pre-commit checks (hooks)",
+        "Build/deploy automation (scripts)"
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "core_mechanism",
+      "layout_type": "process_flow",
+      "eyebrow": "EXECUTION FLOW",
+      "title": "How Each Mechanism Activates",
+      "subtitle": "Different triggers, different persistence",
+      "body": "CLAUDE.md loads automatically. Scripts run on demand. Hooks fire on events. The activation model determines what fits where.",
+      "deep_dive": "CLAUDE.md is injected into the system prompt at session start \u2014 always present. Scripts are invoked explicitly by you or the agent via tool calls \u2014 ephemeral, purpose-built. Hooks register with the runtime (pre-tool-use, post-tool-use, notification) and execute automatically when their event fires \u2014 invisible guardrails. This fundamental difference in 'when they run' dictates 'what they should contain.'",
+      "key_fact": "Activation model (automatic vs on-demand vs event-driven) determines proper use case",
+      "why_it_matters": "Rules that shouldn't persist in context belong in scripts or hooks",
+      "steps": [
+        {
+          "step": "1",
+          "title": "CLAUDE.md",
+          "desc": "Loads at session start, persists throughout conversation"
+        },
+        {
+          "step": "2",
+          "title": "Scripts",
+          "desc": "Invoked explicitly via tool call, runs once, exits"
+        },
+        {
+          "step": "3",
+          "title": "Hooks",
+          "desc": "Registers event listeners, fires automatically on trigger"
+        }
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "architecture",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "ARCHITECTURE",
+      "title": "Where Each Lives in the Stack",
+      "subtitle": "Editor \u2192 Agent \u2192 Context \u2192 Execution",
+      "body": "CLAUDE.md sits in context layer. Scripts live in tool layer. Hooks hook into runtime events. Clean separation prevents leakage.",
+      "deep_dive": "Visualize the request flow: Your editor sends input to the local agent. The agent assembles context \u2014 CLAUDE.md is baked in here. When the agent needs to act, it calls tools \u2014 scripts are invokable tools here. Meanwhile, the runtime emits events (file write, command run) \u2014 hooks intercept these. Three distinct insertion points in the pipeline, each with different visibility and timing.",
+      "key_fact": "Three insertion points: context assembly, tool invocation, runtime events",
+      "why_it_matters": "Architecture placement determines scope, timing, and visibility of each rule",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "Editor / IDE",
+            "sub": "Developer input"
+          },
+          {
+            "name": "Local Agent",
+            "sub": "Reasoning & planning"
+          },
+          {
+            "name": "Context Layer",
+            "sub": "CLAUDE.md injected here"
+          },
+          {
+            "name": "Tool Layer",
+            "sub": "Scripts invoked here"
+          },
+          {
+            "name": "Runtime Events",
+            "sub": "Hooks intercept here"
+          }
+        ],
+        "connections": [
+          {
+            "label": "sends request"
+          },
+          {
+            "label": "assembles context"
+          },
+          {
+            "label": "calls tools"
+          },
+          {
+            "label": "emits events"
+          }
+        ]
+      }
+    },
+    {
+      "slide_number": 5,
+      "role": "system_workflow",
+      "layout_type": "input_output",
+      "eyebrow": "EXECUTION MECHANICS",
+      "title": "From Trigger to Outcome",
+      "subtitle": "Each mechanism transforms input differently",
+      "body": "CLAUDE.md shapes reasoning. Scripts produce artifacts. Hooks gate or mutate operations. The output type reveals the right choice.",
+      "deep_dive": "When you ask 'refactor this module,' CLAUDE.md influences how the agent thinks (style, patterns). When you run a script 'generate-api-docs,' it produces a file artifact. When a hook fires on 'pre-write,' it can block, modify, or log the operation. CLAUDE.md = cognitive influence. Scripts = artifact generation. Hooks = operational guardrails. The desired output \u2014 changed thinking, created file, or controlled action \u2014 maps directly to the mechanism.",
+      "key_fact": "Output type (influence, artifact, gate) determines mechanism selection",
+      "why_it_matters": "Don't use a hook to generate docs. Don't use CLAUDE.md to run builds.",
+      "input": "Developer request or runtime event",
+      "processing": "Context injection (CLAUDE.md) \u2192 Tool invocation (scripts) \u2192 Event interception (hooks)",
+      "output": "Shaped reasoning | Generated artifacts | Gated operations"
+    },
+    {
+      "slide_number": 6,
+      "role": "limitations_and_gotchas",
+      "layout_type": "common_mistake",
+      "eyebrow": "PRO TIPS & MISTAKES",
+      "title": "Antipatterns That Bloat Context",
+      "subtitle": "Stop putting these in CLAUDE.md",
+      "body": "Build commands, one-time setup, personal preferences, deprecated rules \u2014 these belong in scripts, docs, or hooks. Not in every conversation.",
+      "deep_dive": "Common mistakes: storing 'npm run build' in CLAUDE.md (use a script), adding 'run tests before commit' (use a pre-commit hook), keeping old migration steps (archive to docs), personal editor config (local settings only). Each adds tokens to every prompt without proportional value. The fix: audit CLAUDE.md quarterly. If a rule hasn't been relevant in 10 sessions, move it. Scripts for commands. Hooks for enforcement. Docs for reference.",
+      "key_fact": "Irrelevant CLAUDE.md entries degrade model performance on every task",
+      "why_it_matters": "Context hygiene directly impacts coding agent accuracy",
+      "items": [
+        "Build/deploy commands \u2192 scripts",
+        "Pre-commit checks \u2192 hooks",
+        "One-time setup steps \u2192 docs",
+        "Personal preferences \u2192 local config",
+        "Deprecated rules \u2192 archive"
+      ]
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "GET STARTED",
+      "title": "Audit Your CLAUDE.md This Week",
+      "subtitle": "Move situational rules to scripts and hooks",
+      "body": "Three-step cleanup: list every CLAUDE.md entry, classify by trigger type, migrate to the right mechanism. Your context window will thank you.",
+      "deep_dive": "Start by opening CLAUDE.md and tagging each section: [PERSISTENT] for always-relevant conventions, [COMMAND] for runnable steps, [GUARDRAIL] for enforcement rules. Create a .claude/scripts/ folder for commands. Configure hooks in .claude/settings.json for guardrails. Move reference material to docs/. The result: a lean CLAUDE.md that actually shapes reasoning, plus discoverable scripts and invisible hooks that fire exactly when needed.",
+      "key_fact": "Lean CLAUDE.md + targeted scripts + event hooks = cleaner context, reliable automation",
+      "why_it_matters": "Proper mechanism assignment scales team workflows without context bloat",
+      "takeaways": [
+        "Audit CLAUDE.md: tag each rule by trigger type",
+        "Migrate commands to .claude/scripts/",
+        "Configure enforcement via hooks in settings.json"
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI engineering workflows"
+    }
+  ],
+  "_model_used": "OpenRouter:nvidia/nemotron-3-ultra-550b-a55b:free",
+  "_topic_intelligence": {
+    "topic_type": "developer_tool",
+    "domain": "ai_ml",
+    "primary_entity": "Anthropic",
+    "content_depth": "medium",
+    "best_story_angle": "practical_guide",
+    "audience": [
+      "software_engineers",
+      "ai_engineers"
+    ],
+    "key_questions": [
+      "What is CLAUDE.md and what rules belong there?",
+      "When should you use scripts or hooks instead?",
+      "How do hooks differ from CLAUDE.md instructions?",
+      "What are the tradeoffs of each approach for team workflows?"
+    ],
+    "recommended_slide_count": 7
+  },
+  "_archetype": "Developer Tool & IDE Innovation",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "Not Every Rule Belongs in CLAUDE.md: When a Script or Hook Is Better",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "Not Every Rule Belongs in CLAUDE.md: When a Script or Hook I",
+    "fact_summary": "You have a line in your CLAUDE.md that says &quot;Never edit existing migrations.&quot; Claude Code follows it. Almost always. Then one afternoon it&#x2026;Continue reading on Medium \u00bb",
+    "source": "Medium - artificial-intelligence",
+    "news_source_url": "https://medium.com/@promptmastershop/not-every-rule-belongs-in-claude-md-when-a-script-or-hook-is-better-e857a0275d2d?source=rss------artificial_intelligence-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "every",
+      "rule",
+      "belongs",
+      "claude",
+      "when"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}

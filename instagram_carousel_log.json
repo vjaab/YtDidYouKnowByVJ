@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "DALL-E vs Midjourney vs Stable Diffusion: Architecture Showdown",
     "Your Watch Sees Your Heartbeat",
     "Your Finger's Secret Electric Touch",
     "The Invisible Clocks That Run Your World",
@@ -99,10 +98,10 @@
     "Claude Fable 5.2: Developer & PM Guide",
     "Claude's 8 Secret Prompt Codes Revealed",
     "ChatGPT's Anti-Sycophancy Setting Explained",
-    "Anthropic's MCP: Standardizing AI Context"
+    "Anthropic's MCP: Standardizing AI Context",
+    "Anthropic: CLAUDE.md vs Scripts vs Hooks"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "DALL-E vs Midjourney vs Stable Diffusion: Architecture Showdown",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-27T06:57:45.366311+00:00"
-    },
     {
       "title": "Your Watch Sees Your Heartbeat",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-12T21:26:27.794221+00:00"
+    },
+    {
+      "title": "Anthropic: CLAUDE.md vs Scripts vs Hooks",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-13T08:53:35.220419+00:00"
     }
   ]
 }
