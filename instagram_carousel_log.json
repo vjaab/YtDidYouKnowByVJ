@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Finger's Secret Electric Touch",
     "The Invisible Clocks That Run Your World",
     "Wi-Fi: Invisible Waves, Your Data's Highway",
     "AI Invents Faces: People Who Never Were",
@@ -99,10 +98,10 @@
     "ChatGPT's Anti-Sycophancy Setting Explained",
     "Anthropic's MCP: Standardizing AI Context",
     "Anthropic: CLAUDE.md vs Scripts vs Hooks",
-    "MoE vs Dense: Local AI Model Showdown"
+    "MoE vs Dense: Local AI Model Showdown",
+    "Demystifying LLM Architecture: Tokens, Roles & Context"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Finger's Secret Electric Touch",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-27T15:51:32.994309+00:00"
-    },
     {
       "title": "The Invisible Clocks That Run Your World",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-13T14:54:20.801699+00:00"
+    },
+    {
+      "title": "Demystifying LLM Architecture: Tokens, Roles & Context",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-13T17:40:01.724245+00:00"
     }
   ]
 }

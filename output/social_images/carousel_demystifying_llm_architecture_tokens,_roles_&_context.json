@@ -1,0 +1,208 @@
+{
+  "headline": "Demystifying LLM Architecture: Tokens, Roles & Context",
+  "summary": "An engineering breakdown of how Large Language Models process tokens, manage system roles, control output randomness via temperature, and handle memory limits within context windows.",
+  "source": "Medium - machine-learning",
+  "source_url": "",
+  "date": "13 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "programming_concept",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "hero_hook",
+      "eyebrow": "ARCHITECTURE PATTERN",
+      "title": "Why Does Your AI Hallucinate or Forget Context Mid-Chat?",
+      "subtitle": "Unlocking the mechanical layers behind Large Language Model execution.",
+      "body": "Building reliable AI applications requires understanding the invisible engine beneath prompts: tokens, system behaviors, and strict memory boundaries.",
+      "deep_dive": "Engineers often treat LLMs as black boxes. To scale production AI, you must understand how text transforms into mathematical tokens and how internal states govern output behavior.",
+      "key_fact": "LLMs do not process raw English text; they process numerical token IDs.",
+      "why_it_matters": "Mastering these core mechanics eliminates unpredictable model behaviors in production."
+    },
+    {
+      "slide_number": 2,
+      "role": "concept_mental_model",
+      "layout_type": "process_flow",
+      "eyebrow": "MENTAL MODEL",
+      "title": "How LLMs Chew Words: The Tokenization Pipeline",
+      "subtitle": "Text is chopped into sub-word chunks before entering the neural network.",
+      "body": "Think of tokens like puzzle pieces. Common words are single pieces; rare words are split into syllables for the model to digest.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Raw Input",
+          "desc": "User submits a standard text prompt."
+        },
+        {
+          "step": "2",
+          "title": "Tokenizer",
+          "desc": "Text maps to numerical token IDs using a vocabulary lookup table."
+        },
+        {
+          "step": "3",
+          "title": "Vector Embeddings",
+          "desc": "Numbers convert into high-dimensional vectors representing semantic meaning."
+        }
+      ],
+      "deep_dive": "Tokenization bridges human language and machine math. Efficient token usage prevents hitting token cost ceilings and latency bottlenecks.",
+      "key_fact": "One token equals roughly three-quarters of an English word.",
+      "why_it_matters": "API billing and context limits are calculated strictly by token count, not word count."
+    },
+    {
+      "slide_number": 3,
+      "role": "execution_mechanics",
+      "layout_type": "input_output",
+      "eyebrow": "HOW IT WORKS",
+      "title": "Steering Behavior: The Power of System Roles",
+      "subtitle": "Guiding AI personality and safety guardrails before user input.",
+      "body": "The system role acts as the foundational blueprint for the model, setting boundaries, tone, and operational rules before any conversation begins.",
+      "input": "System: Act as a strict code reviewer. User: Is this loop good?",
+      "processing": "Model evaluates user request strictly through the lens of the system persona.",
+      "output": "Critique focusing on performance bottlenecks and code readability.",
+      "deep_dive": "Without a system role, the model defaults to a generic assistant. Defining clear system instructions ensures consistent output format across microservice calls.",
+      "key_fact": "System roles anchor model attention throughout the entire interaction session.",
+      "why_it_matters": "Crucial for enforcing compliance, security guardrails, and deterministic API responses."
+    },
+    {
+      "slide_number": 4,
+      "role": "architectural_deep_dive",
+      "layout_type": "side_by_side",
+      "eyebrow": "PATTERN TRADE-OFFS",
+      "title": "The Temperature Dial: Creativity vs Determinism",
+      "subtitle": "Balancing predictable software outputs against creative generation.",
+      "body": "Temperature controls the probability distribution when the model selects the next token in a sequence.",
+      "left_title": "Low Temperature (0.0)",
+      "left_items": [
+        "Selects highest probability tokens",
+        "Highly deterministic and repetitive",
+        "Ideal for code generation and JSON extraction",
+        "Eliminates creative variance"
+      ],
+      "right_title": "High Temperature (1.0+)",
+      "right_items": [
+        "Flattens probability distribution",
+        "Introduces creative and diverse phrasing",
+        "Risk of hallucinations and drifting off-topic",
+        "Ideal for brainstorming and storytelling"
+      ],
+      "deep_dive": "Choosing temperature depends on your use case. Deterministic tasks require zero variance, while creative tasks thrive on high entropy.",
+      "key_fact": "Temperature modifies the softmax function applied to model logits.",
+      "why_it_matters": "Wrong temperature settings will break strict JSON parsing parsers in backend pipelines."
+    },
+    {
+      "slide_number": 5,
+      "role": "common_antipattern",
+      "layout_type": "common_mistake",
+      "eyebrow": "AVOID THIS MISTAKE",
+      "title": "Navigating the Context Window Bottleneck",
+      "subtitle": "Why your LLM forgets earlier parts of long conversations.",
+      "body": "The context window represents the maximum token memory limit. Once exceeded, older tokens drop out of active attention.",
+      "before_title": "\u274c Naive Approach",
+      "before_items": [
+        "Feeding entire multi-hour chat logs into every single API request",
+        "Hit token limits causing abrupt crashes or truncated context",
+        "Blown-up API costs and soaring latency"
+      ],
+      "after_title": "\u2705 Production Solution",
+      "after_items": [
+        "Implement sliding window history or vector database retrieval",
+        "Summarize past turns to retain core semantic state",
+        "Keep active token footprint lean and performant"
+      ],
+      "deep_dive": "Memory management in LLM apps resembles cache eviction policies in operating systems. Prune unneeded state to keep performance optimal.",
+      "key_fact": "Exceeding the context window causes immediate truncation of input or output.",
+      "why_it_matters": "Proper memory architecture prevents application failure in long-form enterprise workflows."
+    },
+    {
+      "slide_number": 6,
+      "role": "production_case_study",
+      "layout_type": "real_world_scenario",
+      "eyebrow": "SCALE IN PRODUCTION",
+      "title": "Designing Resilient AI Microservices",
+      "subtitle": "Orchestrating system roles, tokens, and temperature at enterprise scale.",
+      "body": "High-throughput AI systems decouple prompt engineering logic from core application code to maintain agility and rapid iteration.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Dynamic Prompt Assembly",
+          "desc": "Incorporate system roles and user inputs while respecting token budgets."
+        },
+        {
+          "step": "2",
+          "title": "Parameter Tuning",
+          "desc": "Set temperature dynamically based on whether the endpoint is chat or code generation."
+        },
+        {
+          "step": "3",
+          "title": "Monitoring & Caching",
+          "desc": "Cache frequent token completions to reduce latency and infrastructure costs."
+        }
+      ],
+      "deep_dive": "Treat LLM integrations like external APIs with strict rate limits, timeouts, and fallback strategies for degraded performance.",
+      "key_fact": "Production AI requires robust middleware to handle prompt validation and token tracking.",
+      "why_it_matters": "Separating concerns ensures your application remains maintainable as model versions evolve."
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "ENGINEERING CHEAT SHEET",
+      "title": "Mastering LLM Foundations for Robust Systems",
+      "subtitle": "Key engineering principles for building dependable AI products.",
+      "body": "Understand your tokens, lock down your system roles, tune temperature intentionally, and respect context limits.",
+      "takeaways": [
+        "Treat tokens as the core unit of compute and billing in AI systems.",
+        "Use system roles to enforce strict behavioral and security guardrails.",
+        "Match temperature to task type: low for code, high for creativity."
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI and engineering architecture deep dives.",
+      "deep_dive": "Engineering reliable AI is about controlling variables. Master these four pillars to build production-grade applications.",
+      "key_fact": "Architecture beats raw prompt engineering every time.",
+      "why_it_matters": "Foundational knowledge separates hobbyist scripts from enterprise-grade AI systems."
+    }
+  ],
+  "_model_used": "gemini-3.5-flash-lite",
+  "_topic_intelligence": {
+    "topic_type": "programming_concept",
+    "domain": "ai_ml",
+    "primary_entity": "LLM Architecture",
+    "content_depth": "intermediate",
+    "best_story_angle": "technical_breakdown",
+    "audience": [
+      "software_engineers",
+      "ai_engineers",
+      "junior_developers"
+    ],
+    "key_questions": [
+      "What are tokens and how do LLMs process them?",
+      "How does the system role influence model behavior?",
+      "What impact does temperature have on output randomness?",
+      "How do context windows limit memory and interaction length?"
+    ],
+    "recommended_slide_count": 7
+  },
+  "_archetype": "Programming Concept & Architecture Pattern",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "Understanding LLMs: System Role, Temperature, Tokens & Context Window",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "Understanding LLMs: System Role, Temperature, Tokens & Conte",
+    "fact_summary": "My Day 3of learning AI Engineering &#x2014; understanding what actually happens behind an LLM API call.Continue reading on Medium \u00bb",
+    "source": "Medium - machine-learning",
+    "news_source_url": "https://medium.com/@jawadsher/understanding-llms-system-role-temperature-tokens-context-window-2941a6e9153b?source=rss------machine_learning-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "understanding",
+      "llms",
+      "system",
+      "role",
+      "temperature"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "topic": "Demystifying LLM Architecture: Tokens, Roles & Context",
+  "category": "AI News",
+  "type": "carousel",
+  "slides": 7,
+  "instagram_images": [
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_Demystifying_LLM_Architecture__01_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_Demystifying_LLM_Architecture__02_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_Demystifying_LLM_Architecture__03_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_Demystifying_LLM_Architecture__04_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_Demystifying_LLM_Architecture__05_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_Demystifying_LLM_Architecture__06_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_Demystifying_LLM_Architecture__07_1080x1350.jpg"
+  ],
+  "facebook_images": [],
+  "caption": "\ud83d\udcf0 Demystifying LLM Architecture: Tokens, Roles & Context\n\nAn engineering breakdown of how Large Language Models process tokens, manage system roles, control output randomness via temperature, and handle memory limits within context windows.\n\n\ud83d\udcc5 13 Nov 2026 | Source: Medium - machine-learning\n\ud83d\udd17 \n\nFollow @vijayakumarj_ai for daily AI updates!\n\n#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets\n\n\ud83d\udccc Save this cheatsheet for your toolkit! | \ud83d\udcac Drop a \ud83e\udd2f if this blew your mind!",
+  "hashtags": "#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets",
+  "poll_file": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/poll_demystifying_llm_architecture_tokens,_roles_&_context.json",
+  "carousel_json": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_demystifying_llm_architecture_tokens,_roles_&_context.json",
+  "generated_at": "2026-11-13T17:39:59.172550+00:00"
+}
