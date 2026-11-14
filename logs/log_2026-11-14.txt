@@ -1,0 +1,12 @@
+[15:02:53] === STARTING DAILY AI PIPELINE (DID_YOU_KNOW) | COUNTRY: GB | SOURCE: MEDIUM ===
+[15:02:53] 🔄 Sequential Topic Source: Active='MEDIUM' (Rotation: github → medium → huggingface_hub)
+[15:02:53] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[15:02:53] STEP 1: Content Ecosystem Check -> Day: Sat, Slot: Slot A (Discovery), Category: Tech Gadgets & Inventions, Format: PAUSE_AND_GUESS (Run 1/3)
+[15:02:53] STEP 2: Fetching articles (RSS + Trending Engine)...
+[15:03:20] 🔥 Trending Engine injected 191 high-signal articles (active_source='medium', sources=['medium', 'github', 'huggingface_hub']).
+[15:03:20] 📈 vidIQ: Injected 8 high-signal topics.
+[15:04:40] ✅ Fetched 464 total articles (191 trending engine [medium], 8 vidIQ, 180 research, 76 tools, 9 X.com).
+[15:04:40] 📚 Loaded 30 recent topics for deduplication
+[15:06:36] 🔍 Deduplication & classification: 464 → 20 candidates
+[15:06:36] 🏷️ Zero-shot re-categorized top candidate: Tech Gadgets & Inventions → AI & Tech Tools
+[15:06:36] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
