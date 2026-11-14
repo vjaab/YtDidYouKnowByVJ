@@ -1491,16 +1491,21 @@
         "variants": {
           "B": {
             "views": 234,
-            "retention": 0.1794871794871795,
+            "retention": 0.11965811965811966,
             "engagement": 0.0,
-            "swipe_away_rate": 0.31325000000000003,
-            "avg_view_percentage": 18.675,
-            "count": 2,
+            "swipe_away_rate": 0.20883333333333334,
+            "avg_view_percentage": 12.450000000000001,
+            "count": 3,
             "hook_texts": [
               {
                 "text": "This plugin turns small AI into giants.",
                 "video_id": "95g1Emk80Hg",
                 "recorded_at": "2026-10-18T18:07:36.167364"
+              },
+              {
+                "text": "This custom engine hits two hundred tokens per second.",
+                "video_id": "Dto2WY45aDY",
+                "recorded_at": "2026-11-14T20:20:56.645540"
               }
             ]
           },
@@ -1521,11 +1526,11 @@
           }
         },
         "total_views": 277,
-        "total_videos": 4,
-        "avg_retention": 0.33974358974358976,
+        "total_videos": 5,
+        "avg_retention": 0.27179487179487183,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.406625,
-        "avg_view_percentage": 39.8125
+        "avg_swipe_away": 0.32530000000000003,
+        "avg_view_percentage": 31.85
       },
       "curiosity_gap": {
         "variants": {
@@ -1774,12 +1779,12 @@
       "negative_warning": {
         "variants": {
           "B": {
-            "views": 19,
-            "retention": 0.13541666666666666,
-            "engagement": 0.0,
-            "swipe_away_rate": 0.18943333333333334,
-            "avg_view_percentage": 14.39,
-            "count": 3,
+            "views": 20,
+            "retention": 0.13944128787878787,
+            "engagement": 0.25,
+            "swipe_away_rate": 0.3542,
+            "avg_view_percentage": 14.58,
+            "count": 4,
             "hook_texts": [
               {
                 "text": "Stop buying expensive smartphones right now.",
@@ -1809,12 +1814,12 @@
             ]
           }
         },
-        "total_views": 79,
-        "total_videos": 5,
-        "avg_retention": 0.1423611111111111,
-        "avg_engagement": 0.0,
-        "avg_swipe_away": 0.2521,
-        "avg_view_percentage": 14.790000000000001
+        "total_views": 80,
+        "total_videos": 6,
+        "avg_retention": 0.14388678451178452,
+        "avg_engagement": 0.16666666666666666,
+        "avg_swipe_away": 0.3515,
+        "avg_view_percentage": 14.85
       },
       "curiosity_gap": {
         "variants": {
@@ -1957,20 +1962,20 @@
   },
   "global": {
     "negative_warning": {
-      "views": 770,
-      "retention": 0.19247444579420098,
-      "engagement": 0.003974005043920299,
-      "count": 40,
-      "swipe_away_rate": 0.3028175000000001,
-      "avg_view_percentage": 91.92475
+      "views": 771,
+      "retention": 0.19147543861666316,
+      "engagement": 0.028267321994068582,
+      "count": 41,
+      "swipe_away_rate": 0.3161268292682928,
+      "avg_view_percentage": 90.05219512195123
     },
     "result_first": {
       "views": 1493,
-      "retention": 0.20490466523703643,
-      "engagement": 0.004073160770243418,
-      "count": 41,
-      "swipe_away_rate": 0.30163170731707317,
-      "avg_view_percentage": 21.650731707317075
+      "retention": 0.20002598273139272,
+      "engagement": 0.003976180751904289,
+      "count": 42,
+      "swipe_away_rate": 0.29445,
+      "avg_view_percentage": 21.135238095238098
     },
     "stat_contradiction": {
       "views": 273,
@@ -1997,5 +2002,5 @@
       "avg_view_percentage": 42.52871794871795
     }
   },
-  "last_updated": "2026-11-13T14:25:46.503987"
+  "last_updated": "2026-11-14T20:23:08.554738"
 }

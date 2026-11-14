@@ -1,12 +1,6 @@
 {
   "source_history": [
     {
-      "source": "medium",
-      "articles_count": 1,
-      "timestamp": "2026-09-12T00:45:46.498436",
-      "video_number": 1
-    },
-    {
       "source": "github",
       "articles_count": 174,
       "timestamp": "2026-09-12T00:45:46.499249",
@@ -587,7 +581,25 @@
       "articles_count": 23,
       "timestamp": "2026-10-22T18:48:22.703361",
       "video_number": 98
+    },
+    {
+      "source": "github",
+      "articles_count": 152,
+      "timestamp": "2026-11-14T19:30:22.254832",
+      "video_number": 99
+    },
+    {
+      "source": "medium",
+      "articles_count": 13,
+      "timestamp": "2026-11-14T19:30:22.255590",
+      "video_number": 100
+    },
+    {
+      "source": "huggingface_hub",
+      "articles_count": 23,
+      "timestamp": "2026-11-14T19:30:22.256299",
+      "video_number": 101
     }
   ],
-  "video_count": 98
+  "video_count": 101
 }

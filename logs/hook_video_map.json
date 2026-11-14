@@ -2157,7 +2157,21 @@
     "category": "Tech Gadgets & Inventions",
     "title": "Did You Know This AI Runs Free Locally? \ud83e\udd2f",
     "uploaded_at": "2026-11-12T18:02:46.694660",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-11-14T20:23:08.556624",
+    "last_metrics": {
+      "views": 1,
+      "avg_view_duration_sec": 5.0,
+      "avg_view_percentage": 15.15,
+      "swipe_away_rate": 0.8485,
+      "duration_sec": 33.0,
+      "retention_rate": 0.1515,
+      "engagement_rate": 1.0,
+      "likes": 0,
+      "comments": 1,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "EOZ5hTTk6pM": {
     "video_id": "EOZ5hTTk6pM",
@@ -2167,6 +2181,16 @@
     "category": "Facts & Trivia",
     "title": "Why 99% Of People Get [X] Wrong \u26a1",
     "uploaded_at": "2026-11-12T22:20:29.316586",
+    "synced": false
+  },
+  "Dto2WY45aDY": {
+    "video_id": "Dto2WY45aDY",
+    "hook_pattern": "result_first",
+    "hook_variant": "B",
+    "hook_text": "This custom engine hits two hundred tokens per second.",
+    "category": "AI & Tech Tools",
+    "title": "Why Your Laptop Can Run AI Fast \u26a1",
+    "uploaded_at": "2026-11-14T20:20:56.647853",
     "synced": false
   }
 }
