@@ -1,0 +1,212 @@
+{
+  "headline": "Stop Asking ChatGPT Wrong: Prompt Patterns That Work",
+  "summary": "Most developers treat LLMs like search engines, but they're reasoning engines. This carousel reveals the prompt architecture patterns that turn unreliable outputs into production-grade code generation.",
+  "source": "Medium - artificial-intelligence",
+  "source_url": "",
+  "date": "14 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "programming_concept",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "hero_hook",
+      "eyebrow": "ARCHITECTURE PATTERN",
+      "title": "You're Using LLMs Like Search Engines",
+      "subtitle": "LLMs are reasoning engines, not lookup tables",
+      "body": "Developers paste vague requests and expect perfect code. The model has no context of your codebase, constraints, or standards. Result: hallucinated APIs, wrong patterns, wasted review time.",
+      "deep_dive": "Large language models predict next tokens based on statistical patterns in training data. They don't 'know' your stack, your conventions, or your business logic. When you ask 'write a REST API,' the model averages every REST tutorial it saw \u2014 not your team's middleware, error handling, or auth strategy. The gap between average training output and your production requirements is where bugs live.",
+      "key_fact": "LLMs generate probable continuations, not verified solutions",
+      "why_it_matters": "Treating generation as retrieval creates technical debt you'll debug for weeks"
+    },
+    {
+      "slide_number": 2,
+      "role": "concept_mental_model",
+      "layout_type": "process_flow",
+      "eyebrow": "MENTAL MODEL",
+      "title": "How LLMs Actually Process Your Prompt",
+      "subtitle": "Context window \u2192 Attention \u2192 Next-token prediction",
+      "body": "Your prompt assembles a temporary 'working memory.' The model attends to relevant parts, then predicts tokens sequentially. No internal verification loop exists.",
+      "deep_dive": "Think of the context window as a whiteboard. Everything you write \u2014 instructions, examples, code snippets \u2014 gets written on that board. The model's attention mechanism highlights relevant sections as it generates each token. But there's no 'check your work' phase. Once a token is emitted, it conditions all future tokens. Early errors compound. This is why structure matters: you're not querying a database; you're setting up initial conditions for a generative process.",
+      "key_fact": "No built-in verification \u2014 output quality equals prompt structure quality",
+      "why_it_matters": "Prompt design is initial-condition engineering for a stochastic process",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Context Assembly",
+          "desc": "Instructions + examples + input form the prompt window"
+        },
+        {
+          "step": "2",
+          "title": "Attention Allocation",
+          "desc": "Model weights relevant context for each generation step"
+        },
+        {
+          "step": "3",
+          "title": "Sequential Prediction",
+          "desc": "Each token conditions the next \u2014 no backtracking"
+        }
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "execution_mechanics",
+      "layout_type": "input_output",
+      "eyebrow": "HOW IT WORKS",
+      "title": "Prompt Anatomy: Input \u2192 Transformation \u2192 Output",
+      "subtitle": "Structure determines whether reasoning activates",
+      "body": "Role + Context + Constraints + Examples + Task = Reliable reasoning trigger. Missing pieces default to training averages.",
+      "deep_dive": "A well-structured prompt acts like a function signature with preconditions. The role sets the persona (senior engineer, security reviewer). Context provides the 'global state' (tech stack, existing patterns). Constraints define postconditions (no external deps, follow style guide). Examples demonstrate the input-output mapping \u2014 this is few-shot priming. The task is the actual call. When all five align, the model's attention focuses on relevant training subspaces. Omit any, and the model fills gaps with statistical averages \u2014 which rarely match your reality.",
+      "key_fact": "Five-component structure activates task-specific reasoning pathways",
+      "why_it_matters": "Each missing component increases variance exponentially",
+      "input": "Role + Context + Constraints + Examples + Task",
+      "processing": "Attention focuses on relevant training subspaces",
+      "output": "Deterministic-style generation matching your patterns"
+    },
+    {
+      "slide_number": 4,
+      "role": "architectural_deep_dive",
+      "layout_type": "side_by_side",
+      "eyebrow": "PATTERN TRADE-OFFS",
+      "title": "Prompt Patterns: Latency vs Reliability Trade-offs",
+      "subtitle": "More context = better output but higher cost and latency",
+      "body": "Zero-shot is fast but brittle. Few-shot adds tokens but anchors behavior. Chain-of-thought adds reasoning tokens but catches errors early.",
+      "deep_dive": "Zero-shot: single prompt, lowest latency, highest variance. Good for exploration, bad for production. Few-shot: 3-5 examples consume context window but dramatically reduce output variance \u2014 the model learns the pattern in-context. Chain-of-thought: explicit reasoning steps ('think step by step') add generation tokens but expose logic errors before code emits. Self-consistency: multiple CoT runs with majority vote \u2014 highest reliability, 3-5x latency. Structured output (JSON schema): constrains format, enables parsing, slight token overhead. Choose based on failure cost: prototype \u2192 zero-shot; production API \u2192 few-shot + schema; critical logic \u2192 CoT + self-consistency.",
+      "key_fact": "Reliability scales with context investment \u2014 no free lunch",
+      "why_it_matters": "Match pattern to failure cost: prototype vs production vs safety-critical",
+      "left_title": "Low Context (Fast, Brittle)",
+      "left_items": [
+        "Zero-shot: single instruction",
+        "Direct answer request",
+        "No examples provided",
+        "High variance output"
+      ],
+      "right_title": "High Context (Slower, Reliable)",
+      "right_items": [
+        "Few-shot: 3-5 curated examples",
+        "Chain-of-thought reasoning",
+        "Structured output schemas",
+        "Self-consistency voting"
+      ]
+    },
+    {
+      "slide_number": 5,
+      "role": "common_antipattern",
+      "layout_type": "common_mistake",
+      "eyebrow": "AVOID THIS MISTAKE",
+      "title": "Vague Prompts vs Structured Prompts",
+      "subtitle": "The difference between 'write code' and 'write this specific code'",
+      "body": "Naive prompts omit role, context, constraints, examples. Result: generic training averages. Structured prompts specify every dimension.",
+      "deep_dive": "The naive prompt 'Write a Python function to parse JSON' yields a textbook example \u2014 no error handling, no typing, no logging, no validation. The structured prompt specifies: 'You are a senior Python engineer. Our codebase uses Pydantic v2, structlog, and custom exceptions. Write a parse_json function that validates against a schema, logs parsing errors with correlation IDs, and raises our ValidationError. Here are 3 examples from our codebase.' The second prompt activates the 'senior engineer with our stack' subspace. The first activates 'average Python tutorial.' Same model, wildly different outputs.",
+      "key_fact": "Unspecified dimensions default to training-set averages",
+      "why_it_matters": "Every omitted constraint becomes a review-cycle bug",
+      "before_title": "\u274c Naive Prompt",
+      "before_items": [
+        "\"Write a REST API endpoint\"",
+        "No stack specified",
+        "No error handling requirements",
+        "No code style examples",
+        "Output: generic tutorial code"
+      ],
+      "after_title": "\u2705 Structured Prompt",
+      "after_items": [
+        "Role: Senior backend engineer",
+        "Context: FastAPI, Pydantic, PostgreSQL",
+        "Constraints: Async, typed, logged, tested",
+        "Examples: 3 existing endpoints",
+        "Output: Production-ready pattern match"
+      ]
+    },
+    {
+      "slide_number": 6,
+      "role": "production_case_study",
+      "layout_type": "real_world_scenario",
+      "eyebrow": "SCALE IN PRODUCTION",
+      "title": "How Teams Build Prompt Pipelines, Not One-offs",
+      "subtitle": "Versioned prompts + automated eval + CI gates = reliable generation",
+      "body": "High-throughput teams treat prompts as code: versioned, tested, evaluated, gated. Not chat history \u2014 engineered artifacts.",
+      "deep_dive": "Production prompt engineering mirrors software engineering. Prompts live in version control with semantic versioning. Automated evaluation suites run on every change \u2014 unit tests for generation (schema validity, style compliance), integration tests (does the code compile, pass lint, run?). CI gates block merges if eval scores regress. A/B testing compares prompt versions on real tasks. Observability tracks latency, token cost, error rates per prompt version. Rollback is instant. This transforms prompting from art to engineering discipline. The prompt becomes a deterministic component in your build pipeline, not a chat session.",
+      "key_fact": "Prompts become versioned, tested, observable pipeline components",
+      "why_it_matters": "Eliminates 'works on my chat' syndrome; enables team collaboration",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Version Control",
+          "desc": "Prompts as code with semantic versioning"
+        },
+        {
+          "step": "2",
+          "title": "Automated Evaluation",
+          "desc": "Schema, style, compile, test gates on every change"
+        },
+        {
+          "step": "3",
+          "title": "Observability",
+          "desc": "Latency, cost, error rates per prompt version"
+        }
+      ]
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "ENGINEERING CHEAT SHEET",
+      "title": "Start These Three Habits Today",
+      "subtitle": "Small prompt investments compound into massive review-time savings",
+      "body": "Adopt structured prompts, few-shot examples, and eval gates. Your future self \u2014 and your reviewers \u2014 will thank you.",
+      "deep_dive": "The highest-leverage change is adding 3 curated examples to every generation task. This alone shifts output from 'average tutorial' to 'your codebase pattern.' Next, define a prompt template with role, context, constraints \u2014 reuse it. Finally, add one eval check: does generated code pass your linter? That single gate catches 80% of hallucinated APIs. Build from there. Prompt engineering isn't prompt writing \u2014 it's prompt lifecycle management.",
+      "key_fact": "Three examples + one eval gate = 80% hallucination reduction",
+      "why_it_matters": "Compound interest on prompt quality pays in saved review cycles",
+      "takeaways": [
+        "Add 3 curated examples matching your codebase patterns to every generation prompt",
+        "Create a reusable prompt template with role, context, constraints \u2014 version it",
+        "Gate generation with at least one automated check (lint, type-check, schema validation)"
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI engineering patterns that ship"
+    }
+  ],
+  "_model_used": "OpenRouter:nvidia/nemotron-3-ultra-550b-a55b:free",
+  "_topic_intelligence": {
+    "topic_type": "programming_concept",
+    "domain": "ai_ml",
+    "primary_entity": "OpenAI",
+    "content_depth": "medium",
+    "best_story_angle": "practical_guide",
+    "audience": [
+      "software_engineers",
+      "ai_engineers",
+      "developers"
+    ],
+    "key_questions": [
+      "What are the most common prompting mistakes developers make?",
+      "Which prompt patterns yield reliably better code outputs?",
+      "How do few-shot examples and chain-of-thought change results?",
+      "What should developers add to their prompt workflow starting today?"
+    ],
+    "recommended_slide_count": 7
+  },
+  "_archetype": "Programming Concept & Architecture Pattern",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "I Think You\u2019re Asking ChatGPT the Wrong Questions. Here\u2019s What to Try ",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "I Think You\u2019re Asking ChatGPT the Wrong Questions. Here\u2019s Wh",
+    "fact_summary": "Try asking ChatGPT more specificContinue reading on Medium \u00bb",
+    "source": "Medium - artificial-intelligence",
+    "news_source_url": "https://medium.com/@garthchickering/i-think-youre-asking-chatgpt-the-wrong-questions-here-s-what-to-try-instead-58e4efb9dcae?source=rss------artificial_intelligence-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "think",
+      "asking",
+      "chatgpt",
+      "wrong",
+      "questions"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}

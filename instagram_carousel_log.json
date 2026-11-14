@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Tiny Worlds Inside Your Tech",
     "AI as Invisible Lab Partner: Research Breakthrough",
     "Your Photos Are Secret Number Grids",
     "Zeros & Ones: Computing's Secret Language",
@@ -99,10 +98,10 @@
     "Demystifying LLM Architecture: Tokens, Roles & Context",
     "Anthropic Claude Developer Tool & IDE Innovation",
     "Medium Shifts AI Strategy",
-    "Why Movie Spam Hijacks AI Data Feeds"
+    "Why Movie Spam Hijacks AI Data Feeds",
+    "Stop Asking ChatGPT Wrong: Prompt Patterns That Work"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Tiny Worlds Inside Your Tech",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-28T08:27:36.633819+00:00"
-    },
     {
       "title": "AI as Invisible Lab Partner: Research Breakthrough",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-13T21:33:10.373322+00:00"
+    },
+    {
+      "title": "Stop Asking ChatGPT Wrong: Prompt Patterns That Work",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-14T12:28:41.586779+00:00"
     }
   ]
 }
