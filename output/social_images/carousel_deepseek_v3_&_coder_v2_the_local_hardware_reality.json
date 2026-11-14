@@ -1,0 +1,209 @@
+{
+  "headline": "DeepSeek-V3 & Coder-V2: The Local Hardware Reality",
+  "summary": "Deploying massive Mixture-of-Experts models locally flips hardware bottlenecks. While active compute stays lean, VRAM capacity dictates local feasibility.",
+  "source": "Medium - machine-learning",
+  "source_url": "",
+  "date": "14 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "model_release",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "hook",
+      "layout_type": "hero_hook",
+      "eyebrow": "DEEPSEEK RELEASE",
+      "title": "DeepSeek-V3 Local Hardware Reality",
+      "subtitle": "Can your workstation actually run modern open MoE models?",
+      "body": "Massive Mixture-of-Experts models promise frontier intelligence locally. But can standard developer hardware survive the staggering memory demands?",
+      "deep_dive": "Running open frontier models locally shifts the bottleneck from raw compute speed to memory bandwidth and multi-GPU interconnect topologies.",
+      "key_fact": "Total parameter footprint dictates VRAM capacity, while active parameters determine compute throughput.",
+      "why_it_matters": "Prevents engineering teams from misallocating hardware budgets on setups incapable of hosting multi-expert routing."
+    },
+    {
+      "slide_number": 2,
+      "role": "what_changed",
+      "layout_type": "whats_new",
+      "eyebrow": "WHAT CHANGED",
+      "title": "Dense Models vs Sparse MoE",
+      "body": "MoE architectures activate only a fraction of specialists per token. Compute demands drop, but all weights must stay in fast memory.",
+      "before_title": "Traditional Dense LLMs",
+      "before_items": [
+        "Every parameter activates on every token",
+        "Compute scales heavily with model size",
+        "Memory bandwidth limits throughput linearly"
+      ],
+      "after_title": "Sparse MoE Topologies",
+      "after_items": [
+        "Dynamic routing activates selective expert subsets",
+        "Drastically reduced compute per generated token",
+        "Full parameter footprint must remain resident in VRAM"
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "technical_mechanism",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "HOW IT WORKS",
+      "title": "The Hospital Triage Mental Model",
+      "body": "Think of MoE like a medical triage desk routing incoming patients to specific specialists. Only assigned doctors work, conserving energy.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "Input Tokens",
+            "sub": "Prompt context stream"
+          },
+          {
+            "name": "Router Gate",
+            "sub": "Triage desk decision"
+          },
+          {
+            "name": "Expert Pool",
+            "sub": "Specialized neural weights"
+          },
+          {
+            "name": "Synthesis",
+            "sub": "Combined token prediction"
+          }
+        ],
+        "connections": [
+          {
+            "label": "Routes to top specialists"
+          },
+          {
+            "label": "Executes active weights"
+          },
+          {
+            "label": "Emits unified response"
+          }
+        ]
+      }
+    },
+    {
+      "slide_number": 4,
+      "role": "benchmark_evidence",
+      "layout_type": "metrics_cards",
+      "eyebrow": "BENCHMARKS",
+      "title": "The Memory Footprint Bottleneck",
+      "body": "Without sufficient unified VRAM, massive MoE models suffer dramatic token throughput collapse when forced into system memory offloading.",
+      "metrics": [
+        {
+          "label": "VRAM Footprint",
+          "value": "Total Weights",
+          "delta": "High Capacity Required"
+        },
+        {
+          "label": "Active Compute",
+          "value": "Sparse Subset",
+          "delta": "Low FLOPS Demanded"
+        },
+        {
+          "label": "Offload Penalty",
+          "value": "Bus Congestion",
+          "delta": "Severe Latency Drop"
+        }
+      ]
+    },
+    {
+      "slide_number": 5,
+      "role": "previous_vs_new",
+      "layout_type": "before_after",
+      "eyebrow": "OLD VS NEW",
+      "title": "Host Workstation Constraints",
+      "body": "Standard consumer setups choke on high-parameter MoE architectures without strategic quantization and multi-GPU tensor sharding.",
+      "before_title": "Naive Local Setup",
+      "before_items": [
+        "Single-card out-of-memory crashes",
+        "PCIe bus saturated by RAM offloading",
+        "Interactive generation grinds to a halt"
+      ],
+      "after_title": "Optimized MoE Topology",
+      "after_items": [
+        "Quantized weights fit in fast GPU memory",
+        "Interconnect pools multiple workstation cards",
+        "Smooth, conversational generation speeds"
+      ]
+    },
+    {
+      "slide_number": 6,
+      "role": "developer_impact",
+      "layout_type": "real_world_scenario",
+      "eyebrow": "IN PRODUCTION",
+      "title": "Designing Workstation Clusters",
+      "body": "Engineering teams avoid costly enterprise clusters by combining dual high-VRAM workstation cards with high-speed peer-to-peer interconnects.",
+      "scenario": "A development team hosting internal code models needs low latency without sending proprietary code to third-party APIs.",
+      "impact": "Configuring efficient local MoE parallelism eliminates cloud subscription costs while guaranteeing zero data leakage."
+    },
+    {
+      "slide_number": 7,
+      "role": "practical_action",
+      "layout_type": "checklist",
+      "eyebrow": "INTEGRATION CHECKLIST",
+      "title": "Local MoE Readiness Plan",
+      "body": "Evaluate your local infrastructure before deploying massive Mixture-of-Experts architectures into team engineering workflows.",
+      "items": [
+        "Audit total pooled VRAM against full parameter sizes.",
+        "Verify PCIe lane bandwidth across all motherboard slots.",
+        "Test weight quantization to balance fidelity and memory.",
+        "Benchmark expert cache hit rates under concurrent load."
+      ]
+    },
+    {
+      "slide_number": 8,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "KEY TAKEAWAY",
+      "title": "Memory Capacity Trumps Raw Compute",
+      "body": "Sparse MoE flips AI hardware rules. You no longer need supercomputers for compute\u2014you need vast memory capacity to hold specialists.",
+      "takeaways": [
+        "Total VRAM determines whether modern MoE models run locally.",
+        "Sparse activation keeps inference fast once weights are resident.",
+        "Quantization and expert sharding make local hosting achievable."
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily deep-dives into modern AI architecture and local ML engineering."
+    }
+  ],
+  "_model_used": "gemini-3.8-flash",
+  "_topic_intelligence": {
+    "topic_type": "model_release",
+    "domain": "ai_ml",
+    "primary_entity": "DeepSeek",
+    "content_depth": "deep",
+    "best_story_angle": "technical_breakdown",
+    "audience": [
+      "ai_engineers",
+      "mlops_engineers",
+      "software_engineers"
+    ],
+    "key_questions": [
+      "What are the true VRAM and compute requirements for running DeepSeek-V3 and Coder-V2 locally?",
+      "How does Mixture-of-Experts (MoE) topology impact tensor and pipeline parallelism across consumer and workstation GPUs?",
+      "What quantization and offloading strategies make local execution feasible without catastrophic latency?",
+      "What specific hardware topologies provide the best cost-to-performance ratio for developers hosting these models?"
+    ],
+    "recommended_slide_count": 8
+  },
+  "_archetype": "AI Model Release & Architecture",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "DeepSeek-V3 & Coder-V2 Local Hardware Reality: MoE Topologies, VRAM & ",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "DeepSeek-V3 & Coder-V2 Local Hardware Reality: MoE Topologie",
+    "fact_summary": "Can consumer GPUs really handle 236B and 671B Mixture-of-Experts models? Here is what physical hardware benchmarks actually reveal.Continue reading on Medium \u00bb",
+    "source": "Medium - machine-learning",
+    "news_source_url": "https://abdulrahmanmaslmany.medium.com/deepseek-v3-coder-v2-local-hardware-reality-moe-topologies-vram-token-benchmarks-b85cda61ba93?source=rss------machine_learning-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "deepseek",
+      "coder",
+      "local",
+      "hardware",
+      "reality"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}
