@@ -1,0 +1,222 @@
+{
+  "headline": "7 Boring Prompt Patterns for Production AI",
+  "summary": "Discover how reusable prompt patterns replace ad-hoc prompting with versioned, testable infrastructure\u2014turning LLM interactions into reliable engineering components.",
+  "source": "Medium - artificial-intelligence",
+  "source_url": "",
+  "date": "15 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "programming_concept",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "hero_hook",
+      "eyebrow": "ARCHITECTURE PATTERN",
+      "title": "Ad-Hoc Prompting Is Technical Debt",
+      "subtitle": "Inconsistent prompts create unpredictable outputs and cognitive overhead.",
+      "body": "Engineers waste cycles reinventing prompts for every task. Unstructured prompting yields fragile, non-reproducible results. How do we systematize LLM interactions like we do code?",
+      "deep_dive": "Treating prompts as one-off strings ignores the engineering reality: LLMs are non-deterministic components in production pipelines. Without versioned, tested prompt templates, teams face drift, inconsistency, and inability to audit or improve LLM-driven workflows. This mirrors the pre-framework era of raw SQL strings in application code.",
+      "key_fact": "Ad-hoc prompting is the 'copy-paste code' of the LLM era\u2014unmaintainable and risky.",
+      "why_it_matters": "Production systems need deterministic, auditable LLM interfaces."
+    },
+    {
+      "slide_number": 2,
+      "role": "concept_mental_model",
+      "layout_type": "process_flow",
+      "eyebrow": "MENTAL MODEL",
+      "title": "Prompt Patterns Are Reusable Abstractions",
+      "subtitle": "Like design patterns, they encapsulate proven interaction structures.",
+      "body": "Boring prompts are battle-tested templates: role definition, constraint setting, output formatting. They transform vague intent into structured dialogue.",
+      "deep_dive": "A prompt pattern separates the invariant structure (role, format, reasoning steps) from the variable task content. This mirrors the Template Method pattern: define the skeleton of an algorithm in a base class, let subclasses fill in specifics. The 'boring' part is the scaffold; the 'interesting' part is your domain problem.",
+      "key_fact": "Patterns turn prompting from art into a disciplined engineering practice.",
+      "why_it_matters": "Reduces cognitive load; enables prompt reuse, testing, and versioning.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Identify Task Class",
+          "desc": "Recognize recurring LLM interaction types (critique, generation, analysis)."
+        },
+        {
+          "step": "2",
+          "title": "Select Proven Pattern",
+          "desc": "Choose a battle-tested template matching the task class."
+        },
+        {
+          "step": "3",
+          "title": "Inject Domain Context",
+          "desc": "Fill pattern variables with specific problem details."
+        },
+        {
+          "step": "4",
+          "title": "Execute & Validate",
+          "desc": "Run structured prompt; verify output against schema."
+        }
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "execution_mechanics",
+      "layout_type": "input_output",
+      "eyebrow": "HOW IT WORKS",
+      "title": "From Task to Structured Prompt",
+      "subtitle": "Pattern fills the gap between intent and reliable execution.",
+      "body": "Input: raw task. Processing: pattern injects role, constraints, format. Output: deterministic, parseable response.",
+      "deep_dive": "The pattern acts as a compiler: it takes high-level intent and emits a fully specified prompt with explicit role, step-by-step reasoning instructions, output schema, and failure-mode handling. This compilation step is deterministic and testable. The LLM then executes the compiled prompt, producing structured output that downstream systems can consume without fragile parsing.",
+      "key_fact": "The pattern is a pure function: (task, context) \u2192 structured_prompt.",
+      "why_it_matters": "Enables prompt CI/CD: lint, test, version, and rollback prompt templates.",
+      "input": "Raw engineering task (e.g., 'refactor this function')",
+      "processing": "Pattern applies: role=senior engineer, steps=analyze/plan/execute, output=diff+explanation",
+      "output": "Structured, reviewable response ready for automation"
+    },
+    {
+      "slide_number": 4,
+      "role": "pattern_catalog",
+      "layout_type": "checklist",
+      "eyebrow": "PATTERN CATALOG",
+      "title": "7 Archetypal Boring Prompts",
+      "subtitle": "High-leverage templates that generalize across domains.",
+      "body": "Each pattern solves a recurring LLM interaction class. Master these; stop reinventing.",
+      "deep_dive": "The seven patterns cover: 1) Expert Role Adoption, 2) Stepwise Reasoning, 3) Adversarial Critique, 4) Test Generation, 5) Specification Synthesis, 6) Refactoring Guidance, 7) Decision Documentation. They are 'boring' because they're standard, documented, and unglamorous\u2014like logging or config management\u2014but they carry the production load.",
+      "key_fact": "Patterns compose: chain critique after generation for self-improving loops.",
+      "why_it_matters": "A shared pattern vocabulary lets teams communicate LLM workflows precisely.",
+      "items": [
+        "Expert Role Adoption: \"Act as a principal engineer...\"",
+        "Stepwise Reasoning: \"Think step by step; verify each step.\"",
+        "Adversarial Critique: \"Find flaws in this approach.\"",
+        "Test Generation: \"Generate edge-case unit tests.\"",
+        "Specification Synthesis: \"Write a spec from this code.\"",
+        "Refactoring Guidance: \"Improve readability without changing behavior.\"",
+        "Decision Documentation: \"Record trade-offs in ADR format.\""
+      ]
+    },
+    {
+      "slide_number": 5,
+      "role": "architectural_deep_dive",
+      "layout_type": "side_by_side",
+      "eyebrow": "PATTERN TRADE-OFFS",
+      "title": "Rigidity vs. Flexibility",
+      "subtitle": "Patterns constrain the prompt space for reliability.",
+      "body": "Strict patterns reduce variance but limit creativity. Loose patterns allow exploration but increase failure modes.",
+      "deep_dive": "Tight patterns (fixed role, strict output schema) yield high consistency and parseability\u2014ideal for automation pipelines. Loose patterns (open-ended reasoning, flexible format) enable discovery but require human-in-the-loop validation. Token overhead: patterns add 200-500 tokens per call. Latency impact is negligible vs. model inference. The trade-off is design-time investment vs. runtime reliability.",
+      "key_fact": "Pattern strictness is a tunable dial: schema-enforced for pipelines, flexible for exploration.",
+      "why_it_matters": "Choose pattern strictness based on automation level and risk tolerance.",
+      "left_title": "Strict Patterns (Production)",
+      "left_items": [
+        "Fixed role & output schema",
+        "Deterministic parsing",
+        "Version-controlled templates",
+        "CI/CD testable",
+        "Higher token overhead"
+      ],
+      "right_title": "Flexible Patterns (Exploration)",
+      "right_items": [
+        "Open-ended reasoning",
+        "Human-in-the-loop",
+        "Rapid prototyping",
+        "Lower token overhead",
+        "Hard to automate"
+      ]
+    },
+    {
+      "slide_number": 6,
+      "role": "common_antipattern",
+      "layout_type": "common_mistake",
+      "eyebrow": "AVOID THIS MISTAKE",
+      "title": "Over-Engineered Prompts vs. Boring Templates",
+      "subtitle": "Clever prompting fails in production; boring patterns survive.",
+      "body": "\u274c Mega-prompts with 50 instructions. \u2705 Composable, single-responsibility patterns.",
+      "deep_dive": "The antipattern: a single 2000-token prompt trying to handle every edge case, written once and never tested. It becomes a 'god prompt'\u2014brittle, unreadable, impossible to debug. The robust approach: a library of small, focused patterns (each <500 tokens) that compose. Like Unix philosophy: do one thing well. Patterns are unit-tested, versioned, and swapped independently. This mirrors microservices vs. monolith.",
+      "key_fact": "God prompts are technical debt; pattern libraries are assets.",
+      "why_it_matters": "Composable patterns enable incremental improvement and A/B testing.",
+      "before_title": "\u274c Antipattern: God Prompt",
+      "before_items": [
+        "2000+ tokens, handles everything",
+        "Untested, unversioned",
+        "Brittle to model updates",
+        "Impossible to debug",
+        "Single point of failure"
+      ],
+      "after_title": "\u2705 Production: Pattern Library",
+      "after_items": [
+        "Focused, single-purpose patterns",
+        "Unit tested & versioned",
+        "Composable & swappable",
+        "Observable & auditable",
+        "Evolves independently"
+      ]
+    },
+    {
+      "slide_number": 7,
+      "role": "production_case_study",
+      "layout_type": "real_world_scenario",
+      "eyebrow": "SCALE IN PRODUCTION",
+      "title": "Prompt Libraries in Engineering Workflows",
+      "subtitle": "Teams embed patterns in CI, code review, and docs pipelines.",
+      "body": "Patterns become infrastructure: PR description generator, test scaffolder, ADR drafter. Versioned like code.",
+      "deep_dive": "A high-throughput team maintains a prompt registry (Git repo). CI jobs invoke 'generate-tests' pattern on new modules. Code review bot runs 'security-critique' pattern. Docs pipeline uses 'spec-from-code' pattern. Each pattern has owners, tests, and rollback. This turns prompting from chat into a managed service. Latency budgets allocate 2-3s per pattern call. Throughput scales horizontally via async queues.",
+      "key_fact": "Prompt patterns become first-class citizens in the SDLC, not chat artifacts.",
+      "why_it_matters": "Enables organizational learning: patterns capture and propagate best practices."
+    },
+    {
+      "slide_number": 8,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "ENGINEERING CHEAT SHEET",
+      "title": "Systematize Your Prompting",
+      "subtitle": "Adopt patterns; treat prompts as versioned, tested infrastructure.",
+      "body": "Start with one recurring task. Extract its pattern. Test it. Version it. Share it.",
+      "deep_dive": "The shift from ad-hoc to patterned prompting mirrors the evolution from scripts to frameworks. Identify your top 3 repetitive LLM tasks. For each, write a boring pattern: define role, reasoning steps, output schema, and failure handling. Add to a shared registry. Run in CI. Measure consistency gains. Iterate. The compounding value is a team-wide prompt vocabulary that accelerates every AI-assisted workflow.",
+      "key_fact": "Boring prompts are the standard library of LLM engineering.",
+      "why_it_matters": "Turns prompting from art into a scalable, auditable engineering discipline.",
+      "takeaways": [
+        "Audit repetitive LLM tasks; extract 3 patterns this week.",
+        "Store patterns in version control with tests and owners.",
+        "Compose patterns into pipelines; treat as infrastructure."
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI engineering patterns."
+    }
+  ],
+  "_model_used": "OpenRouter:nvidia/nemotron-3-ultra-550b-a55b:free",
+  "_topic_intelligence": {
+    "topic_type": "programming_concept",
+    "domain": "ai_ml",
+    "primary_entity": "OpenAI",
+    "content_depth": "medium",
+    "best_story_angle": "practical_guide",
+    "audience": [
+      "software_engineers",
+      "ai_engineers"
+    ],
+    "key_questions": [
+      "What are the high-leverage prompt patterns that generalize across tasks?",
+      "How do these prompts reduce cognitive load vs. ad-hoc prompting?",
+      "What makes a prompt 'boring' yet reliable in production workflows?",
+      "How can developers systematize prompt reuse across projects?"
+    ],
+    "recommended_slide_count": 8
+  },
+  "_archetype": "Programming Concept & Architecture Pattern",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "7 Boring ChatGPT Prompts I Actually Use Every Week",
+    "hook": "Did You Know: 7 Boring ChatGPT Prompts I Actually Use Every Week? \u26a1",
+    "headline": "7 Boring ChatGPT Prompts I Actually Use Every Week",
+    "fact_summary": "No clever tricks. Just the ones that survived a year of real use.Continue reading on Medium \u00bb",
+    "source": "Medium - artificial-intelligence",
+    "news_source_url": "https://medium.com/@aihustlenotes/7-boring-chatgpt-prompts-i-actually-use-every-week-00f66ae9b086?source=rss------artificial_intelligence-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "boring",
+      "chatgpt",
+      "prompts",
+      "actually",
+      "every"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}
