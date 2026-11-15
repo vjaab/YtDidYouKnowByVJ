@@ -1753,26 +1753,31 @@
         "variants": {
           "B": {
             "views": 5,
-            "retention": 0.2310126582278481,
+            "retention": 0.1540084388185654,
             "engagement": 0.0,
-            "swipe_away_rate": 0.26885000000000003,
-            "avg_view_percentage": 23.115,
-            "count": 2,
+            "swipe_away_rate": 0.17923333333333336,
+            "avg_view_percentage": 15.409999999999998,
+            "count": 3,
             "hook_texts": [
               {
                 "text": "This free model replaces paid tools.",
                 "video_id": "W5ITqDWYpl0",
                 "recorded_at": "2026-10-22T21:04:21.034997"
+              },
+              {
+                "text": "This free model runs vision AI offline.",
+                "video_id": "bwXIxrFArNQ",
+                "recorded_at": "2026-11-15T21:08:15.747794"
               }
             ]
           }
         },
         "total_views": 5,
-        "total_videos": 2,
-        "avg_retention": 0.2310126582278481,
+        "total_videos": 3,
+        "avg_retention": 0.1540084388185654,
         "avg_engagement": 0.0,
-        "avg_swipe_away": 0.26885000000000003,
-        "avg_view_percentage": 23.115
+        "avg_swipe_away": 0.17923333333333336,
+        "avg_view_percentage": 15.409999999999998
       }
     },
     "Tech Gadgets & Inventions": {
@@ -1971,11 +1976,11 @@
     },
     "result_first": {
       "views": 1493,
-      "retention": 0.20002598273139272,
-      "engagement": 0.003976180751904289,
-      "count": 42,
-      "swipe_away_rate": 0.29445,
-      "avg_view_percentage": 21.135238095238098
+      "retention": 0.19537421569112778,
+      "engagement": 0.0038837114320925616,
+      "count": 43,
+      "swipe_away_rate": 0.2876023255813953,
+      "avg_view_percentage": 20.64372093023256
     },
     "stat_contradiction": {
       "views": 273,
@@ -2002,5 +2007,5 @@
       "avg_view_percentage": 42.52871794871795
     }
   },
-  "last_updated": "2026-11-15T13:49:24.252028"
+  "last_updated": "2026-11-15T21:08:15.747856"
 }

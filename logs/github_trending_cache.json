@@ -1,5 +1,6 @@
 [
   {
+<<<<<<< Updated upstream
     "repo": "elementalsouls/Claude-BugHunter",
     "full_name": "elementalsouls/Claude-BugHunter",
     "description": "A Claude Code skill bundle for bug hunting and external red-team work - 82 skills, 15 slash commands, 681 disclosed-report patterns curated across 24 core vulnerability classes, plus enterprise identity + infrastructure attack matrices.",
@@ -187,12 +188,19 @@
     "html_url": "https://github.com/unslothai/unsloth"
   },
   {
+=======
+>>>>>>> Stashed changes
     "repo": "dream-num/univer",
     "full_name": "dream-num/univer",
     "description": "Build your own AI office with Univer Office SDK. Bring editing, calculation, collaboration, and file processing into your product for people and AI agents. Built on an extensible open-source core.",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 25476,
     "forks_count": 2328,
+=======
+    "stargazers_count": 25489,
+    "forks_count": 2330,
+>>>>>>> Stashed changes
     "stars_in_period": 1041,
     "url": "https://github.com/dream-num/univer",
     "html_url": "https://github.com/dream-num/univer"
@@ -202,8 +210,13 @@
     "full_name": "ag-ui-protocol/ag-ui",
     "description": "AG-UI: the Agent-User Interaction Protocol. Bring Agents into Frontend Applications.",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 17735,
     "forks_count": 1813,
+=======
+    "stargazers_count": 17746,
+    "forks_count": 1815,
+>>>>>>> Stashed changes
     "stars_in_period": 393,
     "url": "https://github.com/ag-ui-protocol/ag-ui",
     "html_url": "https://github.com/ag-ui-protocol/ag-ui"
@@ -213,8 +226,13 @@
     "full_name": "google-labs-code/stitch-skills",
     "description": "A library of Agent Skills designed to work with the Stitch MCP server. Each skill follows the Agent Skills open standard, for compatibility with coding agents such as Antigravity, Gemini CLI, Claude Code, Cursor.",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 9198,
     "forks_count": 1116,
+=======
+    "stargazers_count": 9209,
+    "forks_count": 1123,
+>>>>>>> Stashed changes
     "stars_in_period": 248,
     "url": "https://github.com/google-labs-code/stitch-skills",
     "html_url": "https://github.com/google-labs-code/stitch-skills"
@@ -224,8 +242,13 @@
     "full_name": "backnotprop/plannotator",
     "description": "The workspace to stay in the loop and on top of agents - shape, decide, plan, annotate, review code, share with team, and send all feedback to agents with one click.",
     "language": "TypeScript",
+<<<<<<< Updated upstream
     "stargazers_count": 11738,
     "forks_count": 1068,
+=======
+    "stargazers_count": 11741,
+    "forks_count": 1071,
+>>>>>>> Stashed changes
     "stars_in_period": 860,
     "url": "https://github.com/backnotprop/plannotator",
     "html_url": "https://github.com/backnotprop/plannotator"
@@ -234,6 +257,7 @@
     "repo": "ChromeDevTools/chrome-devtools-mcp",
     "full_name": "ChromeDevTools/chrome-devtools-mcp",
     "description": "Chrome DevTools for coding agents",
+<<<<<<< Updated upstream
     "language": "TypeScript",
     "stargazers_count": 56814,
     "forks_count": 4801,
@@ -823,19 +847,153 @@
     "stars_in_period": 9668,
     "url": "https://github.com/pingdotgg/t3code",
     "html_url": "https://github.com/pingdotgg/t3code"
+=======
+    "language": "TypeScript",
+    "stargazers_count": 56822,
+    "forks_count": 4803,
+    "stars_in_period": 718,
+    "url": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+    "html_url": "https://github.com/ChromeDevTools/chrome-devtools-mcp"
+  },
+  {
+    "repo": "alibaba/open-code-review",
+    "full_name": "alibaba/open-code-review",
+    "description": "Secure, fast, efficient, battle-tested at Alibaba's scale. Hybrid architecture code review tool: deterministic pipelines + LLM Agent, precise line-level comments, built-in multi-language ruleset (NPE, thread-safety, XSS, SQL injection), OpenAI & Anthropic compatible.",
+    "language": "Go",
+    "stargazers_count": 51926,
+    "forks_count": 4094,
+    "stars_in_period": 688,
+    "url": "https://github.com/alibaba/open-code-review",
+    "html_url": "https://github.com/alibaba/open-code-review"
+  },
+  {
+    "repo": "Tencent/LoopForge",
+    "full_name": "Tencent/LoopForge",
+    "description": "Self-hosted workflows for coding-agent delivery. Orchestrate CodeBuddy, Codex and Claude Code with scripts and human approval gates. Includes Local workflows for coding assistants.",
+    "language": "Go",
+    "stargazers_count": 1372,
+    "forks_count": 261,
+    "stars_in_period": 484,
+    "url": "https://github.com/Tencent/LoopForge",
+    "html_url": "https://github.com/Tencent/LoopForge"
+  },
+  {
+    "repo": "ggml-org/ggml",
+    "full_name": "ggml-org/ggml",
+    "description": "Tensor library for machine learning",
+    "language": "C++",
+    "stargazers_count": 15865,
+    "forks_count": 2014,
+    "stars_in_period": 53,
+    "url": "https://github.com/ggml-org/ggml",
+    "html_url": "https://github.com/ggml-org/ggml"
+  },
+  {
+    "repo": "elementalsouls/Claude-BugHunter",
+    "full_name": "elementalsouls/Claude-BugHunter",
+    "description": "A Claude Code skill bundle for bug hunting and external red-team work - 82 skills, 15 slash commands, 681 disclosed-report patterns curated across 24 core vulnerability classes, plus enterprise identity + infrastructure attack matrices.",
+    "language": "Python",
+    "stargazers_count": 6233,
+    "forks_count": 956,
+    "stars_in_period": 221,
+    "url": "https://github.com/elementalsouls/Claude-BugHunter",
+    "html_url": "https://github.com/elementalsouls/Claude-BugHunter"
+  },
+  {
+    "repo": "GoogleChrome/modern-web-guidance-src",
+    "full_name": "GoogleChrome/modern-web-guidance-src",
+    "description": "Keep your coding agent up to date with the latest web best practices",
+    "language": "TypeScript",
+    "stargazers_count": 6987,
+    "forks_count": 591,
+    "stars_in_period": 1220,
+    "url": "https://github.com/GoogleChrome/modern-web-guidance-src",
+    "html_url": "https://github.com/GoogleChrome/modern-web-guidance-src"
+  },
+  {
+    "repo": "tradermonty/claude-trading-skills",
+    "full_name": "tradermonty/claude-trading-skills",
+    "description": "Claude Code skills for equity investors and traders \u2014 market analysis, technical charting, economic calendars, screeners, and trading strategy development.",
+    "language": "Python",
+    "stargazers_count": 5402,
+    "forks_count": 1164,
+    "stars_in_period": 707,
+    "url": "https://github.com/tradermonty/claude-trading-skills",
+    "html_url": "https://github.com/tradermonty/claude-trading-skills"
+  },
+  {
+    "repo": "NVIDIA/SkillEvaluator",
+    "full_name": "NVIDIA/SkillEvaluator",
+    "description": "Multi-tier framework for evaluating AI agent skills with quality gates, semantic overlap detection, synthetic evaluation dataset generation, and live agent evaluation that measures how skills affect agent behavior.",
+    "language": "Python",
+    "stargazers_count": 1538,
+    "forks_count": 220,
+    "stars_in_period": 205,
+    "url": "https://github.com/NVIDIA/SkillEvaluator",
+    "html_url": "https://github.com/NVIDIA/SkillEvaluator"
+  },
+  {
+    "repo": "meta/astryx",
+    "full_name": "meta/astryx",
+    "description": "An open source design system that's fully customizable and agent ready",
+    "language": "TypeScript",
+    "stargazers_count": 28748,
+    "forks_count": 2246,
+    "stars_in_period": 13660,
+    "url": "https://github.com/meta/astryx",
+    "html_url": "https://github.com/meta/astryx"
+  },
+  {
+    "repo": "anthropics/skills",
+    "full_name": "anthropics/skills",
+    "description": "Public repository for Agent Skills",
+    "language": "Python",
+    "stargazers_count": 195273,
+    "forks_count": 22955,
+    "stars_in_period": 6220,
+    "url": "https://github.com/anthropics/skills",
+    "html_url": "https://github.com/anthropics/skills"
+  },
+  {
+    "repo": "sherlock-project/sherlock",
+    "full_name": "sherlock-project/sherlock",
+    "description": "Hunt down social media accounts by username across social networks",
+    "language": "Python",
+    "stargazers_count": 112380,
+    "forks_count": 12983,
+    "stars_in_period": 12401,
+    "url": "https://github.com/sherlock-project/sherlock",
+    "html_url": "https://github.com/sherlock-project/sherlock"
+  },
+  {
+    "repo": "backnotprop/plannotator",
+    "full_name": "backnotprop/plannotator",
+    "description": "The workspace to stay in the loop and on top of agents - shape, decide, plan, annotate, review code, share with team, and send all feedback to agents with one click.",
+    "language": "TypeScript",
+    "stargazers_count": 11741,
+    "forks_count": 1071,
+    "stars_in_period": 818,
+    "url": "https://github.com/backnotprop/plannotator",
+    "html_url": "https://github.com/backnotprop/plannotator"
+>>>>>>> Stashed changes
   },
   {
     "repo": "vercel-labs/agent-browser",
     "full_name": "vercel-labs/agent-browser",
     "description": "Browser automation CLI for AI agents",
     "language": "Rust",
+<<<<<<< Updated upstream
     "stargazers_count": 51545,
+=======
+    "stargazers_count": 51548,
+>>>>>>> Stashed changes
     "forks_count": 3601,
     "stars_in_period": 4601,
     "url": "https://github.com/vercel-labs/agent-browser",
     "html_url": "https://github.com/vercel-labs/agent-browser"
   },
   {
+<<<<<<< Updated upstream
     "repo": "block/buzz",
     "full_name": "block/buzz",
     "description": "A hive mind communication platform",
@@ -955,5 +1113,71 @@
     "stars_in_period": 593,
     "url": "https://github.com/ModernRelay/omnigraph",
     "html_url": "https://github.com/ModernRelay/omnigraph"
+=======
+    "repo": "ZhuLinsen/daily_stock_analysis",
+    "full_name": "ZhuLinsen/daily_stock_analysis",
+    "description": "LLM \u9a71\u52a8\u7684\u591a\u5e02\u573a\u80a1\u7968\u667a\u80fd\u5206\u6790\u7cfb\u7edf\uff1a\u591a\u6e90\u884c\u60c5\u3001\u5b9e\u65f6\u65b0\u95fb\u3001\u51b3\u7b56\u770b\u677f\u4e0e\u81ea\u52a8\u63a8\u9001\uff0c\u652f\u6301\u96f6\u6210\u672c\u5b9a\u65f6\u8fd0\u884c\u3002 LLM-powered multi-market stock analysis system with multi-source market data, real-time news, decision dashboard, automated notifications, and cost-free scheduled runs.",
+    "language": "Python",
+    "stargazers_count": 72464,
+    "forks_count": 57562,
+    "stars_in_period": 4526,
+    "url": "https://github.com/ZhuLinsen/daily_stock_analysis",
+    "html_url": "https://github.com/ZhuLinsen/daily_stock_analysis"
+  },
+  {
+    "repo": "we-promise/sure",
+    "full_name": "we-promise/sure",
+    "description": "The personal finance app for everyone (by everyone)",
+    "language": "Ruby",
+    "stargazers_count": 15643,
+    "forks_count": 1369,
+    "stars_in_period": 4483,
+    "url": "https://github.com/we-promise/sure",
+    "html_url": "https://github.com/we-promise/sure"
+  },
+  {
+    "repo": "milind-soni/OpenMausBot",
+    "full_name": "milind-soni/OpenMausBot",
+    "description": "Open-source Grok Bot alternative with a virtual machine that bots can use",
+    "language": "TypeScript",
+    "stargazers_count": 23255,
+    "forks_count": 3232,
+    "stars_in_period": 6413,
+    "url": "https://github.com/milind-soni/OpenMausBot",
+    "html_url": "https://github.com/milind-soni/OpenMausBot"
+  },
+  {
+    "repo": "google/elephant-goldfish-model",
+    "full_name": "google/elephant-goldfish-model",
+    "description": "Open-source plugin for designing and reviewing software with agents",
+    "language": "Python",
+    "stargazers_count": 19655,
+    "forks_count": 1458,
+    "stars_in_period": 5539,
+    "url": "https://github.com/google/elephant-goldfish-model",
+    "html_url": "https://github.com/google/elephant-goldfish-model"
+  },
+  {
+    "repo": "google-deepmind/mujoco",
+    "full_name": "google-deepmind/mujoco",
+    "description": "Multi-Joint dynamics with Contact. A general purpose physics simulator.",
+    "language": "C++",
+    "stargazers_count": 18060,
+    "forks_count": 2212,
+    "stars_in_period": 1859,
+    "url": "https://github.com/google-deepmind/mujoco",
+    "html_url": "https://github.com/google-deepmind/mujoco"
+  },
+  {
+    "repo": "addyosmani/agent-skills",
+    "full_name": "addyosmani/agent-skills",
+    "description": "Production-grade engineering skills for AI coding agents.",
+    "language": "JavaScript",
+    "stargazers_count": 117872,
+    "forks_count": 12335,
+    "stars_in_period": 3670,
+    "url": "https://github.com/addyosmani/agent-skills",
+    "html_url": "https://github.com/addyosmani/agent-skills"
+>>>>>>> Stashed changes
   }
 ]

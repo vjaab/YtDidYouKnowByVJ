@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_Action_Inspiration_Trailer.mp3",
+      "headline": "Trending Model: Inkling-2-Small",
+      "topic_type": "auto",
+      "timestamp": "43754920472"
+    },
+    {
       "track": "jam_Energetic_Pop.mp3",
       "headline": "How I Built an LLM Inference Engine From Scratch in CUDA",
       "topic_type": "auto",
@@ -173,17 +179,11 @@
       "headline": "MiniCPM-V-4.7-35B-A3B: The 3B Open Model That Just Killed Your Vision API Bill",
       "topic_type": "auto",
       "timestamp": "38741328872"
-    },
-    {
-      "track": "jam_Elite.mp3",
-      "headline": "RuView Turns Commodity WiFi Into Real-Time Spatial Intelligence Without Video",
-      "topic_type": "auto",
-      "timestamp": "38572757994"
     }
   ],
   "usage_counts": {
     "jam_Energy.mp3": 9,
-    "jam_Action_Inspiration_Trailer.mp3": 6,
+    "jam_Action_Inspiration_Trailer.mp3": 7,
     "jam_The_Epic.mp3": 6,
     "jam_Escape_From_The_Machine_Planet.mp3": 5,
     "jam_Inspiring_Epic_Glory.mp3": 4,

@@ -3,18 +3,6 @@
     {
       "source": "github",
       "articles_count": 174,
-      "timestamp": "2026-09-12T00:45:46.499249",
-      "video_number": 2
-    },
-    {
-      "source": "medium",
-      "articles_count": 1,
-      "timestamp": "2026-09-12T00:48:01.282333",
-      "video_number": 3
-    },
-    {
-      "source": "github",
-      "articles_count": 174,
       "timestamp": "2026-09-12T00:48:01.282928",
       "video_number": 4
     },
@@ -599,7 +587,19 @@
       "articles_count": 23,
       "timestamp": "2026-11-14T19:30:22.256299",
       "video_number": 101
+    },
+    {
+      "source": "github",
+      "articles_count": 42,
+      "timestamp": "2026-11-15T20:01:20.951506",
+      "video_number": 102
+    },
+    {
+      "source": "huggingface_hub",
+      "articles_count": 23,
+      "timestamp": "2026-11-15T20:01:20.952450",
+      "video_number": 103
     }
   ],
-  "video_count": 101
+  "video_count": 103
 }
