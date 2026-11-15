@@ -1,0 +1,213 @@
+{
+  "headline": "Advanced RAG Pipelines: Rewriting & Reranking Decoded",
+  "summary": "Exploring how query rewriting and reranking transform basic document retrieval into high-precision production systems. Understand the latency trade-offs and structural mechanics behind modern RAG pipelines.",
+  "source": "Medium - machine-learning",
+  "source_url": "",
+  "date": "15 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "framework_update",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "hook",
+      "layout_type": "hero_hook",
+      "eyebrow": "RAG SYSTEMS UPDATE",
+      "title": "Does Advanced RAG Actually Deliver Precision?",
+      "subtitle": "Unpacking the real-world impact of query rewriting and reranking.",
+      "body": "Imagine searching a massive library where your initial question is poorly phrased. Advanced RAG acts like a smart research assistant that refines your question before looking at books, then double-checks the answers for accuracy.",
+      "deep_dive": "Basic vector search often fails due to ambiguous user phrasing or mismatched vocabulary. Advanced pipelines introduce query transformation layers to bridge the gap between user intent and document semantics.",
+      "key_fact": "Query rewriting and reranking target the fundamental failure modes of naive vector search.",
+      "why_it_matters": "Crucial for engineers deciding whether to invest complexity into multi-stage retrieval pipelines."
+    },
+    {
+      "slide_number": 2,
+      "role": "whats_new",
+      "layout_type": "whats_new",
+      "eyebrow": "WHAT'S NEW",
+      "title": "The Evolution of Retrieval Primitives",
+      "subtitle": "Moving past simple vector distance matching.",
+      "body": "Modern retrieval stacks decouple raw vector search from final document presentation by adding deliberate processing steps.",
+      "before_title": "Legacy RAG Bottlenecks",
+      "before_items": [
+        "Direct keyword or vector lookup",
+        "Single-shot ambiguous queries",
+        "Blind trust in initial similarity scores"
+      ],
+      "after_title": "Modern Pipeline Capabilities",
+      "after_items": [
+        "Multi-angle query expansion",
+        "Context-aware intent translation",
+        "Cross-encoder relevance scoring"
+      ],
+      "key_fact": "Pipelines now treat retrieval as an iterative, multi-step refinement process.",
+      "why_it_matters": "Reduces irrelevant noise sent to expensive large language models."
+    },
+    {
+      "slide_number": 3,
+      "role": "execution_graph",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "GRAPH ARCHITECTURE",
+      "title": "The Multi-Stage Retrieval Loop",
+      "subtitle": "How data flows from user input to final context.",
+      "body": "A structured journey ensures only the highest-quality snippets reach the generation phase.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "Raw User Query",
+            "sub": "Initial input"
+          },
+          {
+            "name": "Query Rewriter",
+            "sub": "Intent expansion"
+          },
+          {
+            "name": "Vector Database",
+            "sub": "Broad retrieval"
+          },
+          {
+            "name": "Reranker Model",
+            "sub": "Precision filtering"
+          }
+        ],
+        "connections": [
+          {
+            "label": "transforms"
+          },
+          {
+            "label": "queries"
+          },
+          {
+            "label": "scores"
+          }
+        ]
+      },
+      "key_fact": "Execution loops systematically filter noise before generation.",
+      "why_it_matters": "Provides architectural clarity for building deterministic AI systems."
+    },
+    {
+      "slide_number": 4,
+      "role": "capability_breakdown",
+      "layout_type": "side_by_side",
+      "eyebrow": "CAPABILITY UPGRADE",
+      "title": "Rewriting vs. Reranking Mechanics",
+      "subtitle": "Balancing input optimization with output verification.",
+      "body": "Each component solves a distinct problem in the information retrieval lifecycle.",
+      "left_title": "Query Rewriting",
+      "left_items": [
+        "Clarifies vague user phrasing",
+        "Generates synonyms",
+        "Optimizes for embedding spaces"
+      ],
+      "right_title": "Reranking",
+      "right_items": [
+        "Evaluates document pairs deeply",
+        "Filters false positives",
+        "Maximizes contextual relevance"
+      ],
+      "key_fact": "Rewriting fixes the input; reranking fixes the output ranking.",
+      "why_it_matters": "Helps engineers debug specific failure points in production apps."
+    },
+    {
+      "slide_number": 5,
+      "role": "migration_comparison",
+      "layout_type": "before_after",
+      "eyebrow": "MIGRATION GUIDE",
+      "title": "Refactoring Retrieval Workflows",
+      "subtitle": "Transitioning from flat search to staged pipelines.",
+      "body": "Upgrading architecture requires changing how services interact with data stores.",
+      "before_title": "Single-Step Search",
+      "before_items": [
+        "Query sent straight to vector DB",
+        "Top K results returned immediately",
+        "High susceptibility to semantic drift"
+      ],
+      "after_title": "Staged Pipeline Architecture",
+      "after_items": [
+        "Query expanded into multiple variants",
+        "Wider net cast across vector space",
+        "Cross-encoder reorders top candidates"
+      ],
+      "key_fact": "Staged workflows trade minor CPU overhead for massive relevance gains.",
+      "why_it_matters": "Essential for maintaining high accuracy in domain-specific knowledge bases."
+    },
+    {
+      "slide_number": 6,
+      "role": "upgrade_checklist",
+      "layout_type": "checklist",
+      "eyebrow": "UPGRADE STEPS",
+      "title": "Production Deployment Checklist",
+      "subtitle": "Key milestones for implementing advanced RAG.",
+      "body": "Ensure your system is ready for the latency and computational demands of rerankers.",
+      "items": [
+        "Benchmark baseline retrieval latency before changes",
+        "Integrate lightweight query expansion service",
+        "Evaluate cross-encoder reranking models for accuracy",
+        "Monitor end-to-end response times under load",
+        "Establish caching layers for frequent rewritten queries"
+      ],
+      "key_fact": "Production readiness requires strict latency budget management.",
+      "why_it_matters": "Prevents user frustration caused by sluggish AI responses."
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "KEY TAKEAWAY",
+      "title": "Mastering Modern Retrieval Stacks",
+      "subtitle": "Summary of architectural best practices.",
+      "body": "Advanced RAG transforms naive search into robust enterprise intelligence.",
+      "takeaways": [
+        "Query rewriting bridges user intent and vector spaces.",
+        "Reranking eliminates false positives at the cost of latency.",
+        "Staged pipelines deliver superior production reliability."
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI engineering breakdowns.",
+      "key_fact": "Precision engineering beats brute-force context windows every time.",
+      "why_it_matters": "Empowers tech leads to build scalable, production-grade AI systems."
+    }
+  ],
+  "_model_used": "gemini-3.5-flash-lite",
+  "_topic_intelligence": {
+    "topic_type": "framework_update",
+    "domain": "ai_ml",
+    "primary_entity": "RAG Systems",
+    "content_depth": "deep",
+    "best_story_angle": "technical_breakdown",
+    "audience": [
+      "ai_engineers",
+      "software_engineers",
+      "data_scientists"
+    ],
+    "key_questions": [
+      "Does query rewriting actually improve retrieval precision?",
+      "When is reranking worth the latency penalty?",
+      "What do the benchmarks reveal about advanced RAG pipelines?",
+      "How should developers structure their retrieval stack for production?"
+    ],
+    "recommended_slide_count": 7
+  },
+  "_archetype": "Framework & Agent SDK Release",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "Advanced RAG in Practice: Does Query Rewriting and Reranking Really He",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "Advanced RAG in Practice: Does Query Rewriting and Reranking",
+    "fact_summary": "I built a basic RAG app, added an LLM query rewriter and a cross-encoder reranker, and measured all four versions on 16 questions&#x2026;Continue reading on Medium \u00bb",
+    "source": "Medium - machine-learning",
+    "news_source_url": "https://medium.com/@reddymanojkumar1518/advanced-rag-in-practice-does-query-rewriting-and-reranking-really-help-1f6f5114eb99?source=rss------machine_learning-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "advanced",
+      "practice",
+      "does",
+      "query",
+      "rewriting"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}

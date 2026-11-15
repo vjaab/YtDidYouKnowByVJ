@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Phone Remembers Everything You See!",
     "How Your Phone's Screen Sees Your Finger",
     "Your Phone's Brain: Born from Sand",
     "AI Fills Missing Picture Pieces: Generative Inpainting Breakthrough",
@@ -99,10 +98,10 @@
     "DeepSeek-V3 & Coder-V2: The Local Hardware Reality",
     "Proactive AI Coding Assistant Messages You First",
     "AI Agents Get Wallets: The New Payment Frontier",
-    "7 Boring Prompt Patterns for Production AI"
+    "7 Boring Prompt Patterns for Production AI",
+    "Advanced RAG Pipelines: Rewriting & Reranking Decoded"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Phone Remembers Everything You See!",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-28T19:34:49.790170+00:00"
-    },
     {
       "title": "How Your Phone's Screen Sees Your Finger",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-15T13:00:36.759906+00:00"
+    },
+    {
+      "title": "Advanced RAG Pipelines: Rewriting & Reranking Decoded",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-15T18:15:16.820449+00:00"
     }
   ]
 }
