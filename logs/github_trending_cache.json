@@ -1,329 +1,199 @@
 [
   {
-    "repo": "tradermonty/claude-trading-skills",
-    "full_name": "tradermonty/claude-trading-skills",
-    "description": "Claude Code skills for equity investors and traders \u2014 market analysis, technical charting, economic calendars, screeners, and trading strategy development.",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 4643,
-    "forks_count": 932,
-=======
-    "stargazers_count": 4667,
-    "forks_count": 940,
->>>>>>> Stashed changes
-    "stars_in_period": 556,
-    "url": "https://github.com/tradermonty/claude-trading-skills",
-    "html_url": "https://github.com/tradermonty/claude-trading-skills"
-  },
-  {
-    "repo": "andrewyng/openworker",
-    "full_name": "andrewyng/openworker",
-    "description": "",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 19194,
-=======
-    "stargazers_count": 19197,
->>>>>>> Stashed changes
-    "forks_count": 2736,
-    "stars_in_period": 94,
-    "url": "https://github.com/andrewyng/openworker",
-    "html_url": "https://github.com/andrewyng/openworker"
-  },
-  {
     "repo": "elementalsouls/Claude-BugHunter",
     "full_name": "elementalsouls/Claude-BugHunter",
     "description": "A Claude Code skill bundle for bug hunting and external red-team work - 82 skills, 15 slash commands, 681 disclosed-report patterns curated across 24 core vulnerability classes, plus enterprise identity + infrastructure attack matrices.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 5823,
-=======
-    "stargazers_count": 5826,
->>>>>>> Stashed changes
-    "forks_count": 894,
-    "stars_in_period": 127,
+    "stargazers_count": 6213,
+    "forks_count": 953,
+    "stars_in_period": 221,
     "url": "https://github.com/elementalsouls/Claude-BugHunter",
     "html_url": "https://github.com/elementalsouls/Claude-BugHunter"
+  },
+  {
+    "repo": "tradermonty/claude-trading-skills",
+    "full_name": "tradermonty/claude-trading-skills",
+    "description": "Claude Code skills for equity investors and traders \u2014 market analysis, technical charting, economic calendars, screeners, and trading strategy development.",
+    "language": "Python",
+    "stargazers_count": 5391,
+    "forks_count": 1158,
+    "stars_in_period": 707,
+    "url": "https://github.com/tradermonty/claude-trading-skills",
+    "html_url": "https://github.com/tradermonty/claude-trading-skills"
   },
   {
     "repo": "NVIDIA/SkillEvaluator",
     "full_name": "NVIDIA/SkillEvaluator",
     "description": "Multi-tier framework for evaluating AI agent skills with quality gates, semantic overlap detection, synthetic evaluation dataset generation, and live agent evaluation that measures how skills affect agent behavior.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 1218,
-=======
-    "stargazers_count": 1219,
->>>>>>> Stashed changes
-    "forks_count": 143,
-    "stars_in_period": 168,
+    "stargazers_count": 1531,
+    "forks_count": 215,
+    "stars_in_period": 205,
     "url": "https://github.com/NVIDIA/SkillEvaluator",
     "html_url": "https://github.com/NVIDIA/SkillEvaluator"
   },
   {
-    "repo": "Alishahryar1/free-claude-code",
-    "full_name": "Alishahryar1/free-claude-code",
-    "description": "Use Claude Code, Codex, Antigravity, VSCode, Pi, and OpenCode (and 6 other harnesses) for free (1.3B+ free tokens) from your terminal, app, IDE, or phone, and now from the browser with native browser sessions (multi-harness + multi-model) like OpenClaw (voice supported + ToS friendly)",
+    "repo": "bojieli/ai-infra-book",
+    "full_name": "bojieli/ai-infra-book",
+    "description": "\u300a\u6df1\u5165\u7406\u89e3 AI Infra\uff1a\u91cf\u5316\u5206\u6790\u4e0e\u7cfb\u7edf\u8bbe\u8ba1\u300b\uff08\u674e\u535a\u6770 \u8457\uff09\u5f00\u6e90\u4e66\u7a3f\uff1a\u4ece\u786c\u4ef6\u7ea6\u675f\u548c\u6a21\u578b\u67b6\u6784\u51fa\u53d1\uff0c\u91cf\u5316\u63a8\u5bfc LLM \u63a8\u7406\u4e0e\u8bad\u7ec3\u7cfb\u7edf\u8bbe\u8ba1\u3002\u542b\u5168\u4e66\u6b63\u6587\u3001PDF\u3001\u914d\u5957\u8ba1\u7b97\u5de5\u5177\u4e0e\u5b9e\u9a8c",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 70161,
-    "forks_count": 10888,
-=======
-    "stargazers_count": 70170,
-    "forks_count": 10890,
->>>>>>> Stashed changes
-    "stars_in_period": 367,
-    "url": "https://github.com/Alishahryar1/free-claude-code",
-    "html_url": "https://github.com/Alishahryar1/free-claude-code"
+    "stargazers_count": 7815,
+    "forks_count": 629,
+    "stars_in_period": 151,
+    "url": "https://github.com/bojieli/ai-infra-book",
+    "html_url": "https://github.com/bojieli/ai-infra-book"
   },
   {
-    "repo": "anthropics/claude-plugins-official",
-    "full_name": "anthropics/claude-plugins-official",
-    "description": "Official, Anthropic-managed directory of high quality Claude Code Plugins.",
+    "repo": "davila7/claude-code-templates",
+    "full_name": "davila7/claude-code-templates",
+    "description": "Open-source registry and CLI for Claude Code components: agents, commands, skills, hooks, MCPs, settings and mods",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 47280,
-=======
-    "stargazers_count": 47283,
->>>>>>> Stashed changes
-    "forks_count": 4910,
-    "stars_in_period": 137,
-    "url": "https://github.com/anthropics/claude-plugins-official",
-    "html_url": "https://github.com/anthropics/claude-plugins-official"
+    "stargazers_count": 33748,
+    "forks_count": 3982,
+    "stars_in_period": 179,
+    "url": "https://github.com/davila7/claude-code-templates",
+    "html_url": "https://github.com/davila7/claude-code-templates"
   },
   {
-    "repo": "pnnbao97/VieNeu-TTS",
-    "full_name": "pnnbao97/VieNeu-TTS",
-    "description": "Vietnamese TTS with instant voice cloning \u2022 On-device \u2022 Real-time CPU inference \u2022 48kHz audio quality \u2022 Chuy\u1ec3n v\u0103n b\u1ea3n th\u00e0nh gi\u1ecdng n\u00f3i ti\u1ebfng Vi\u1ec7t \u2022 Text to speech ti\u1ebfng Vi\u1ec7t \u2022 TTS ti\u1ebfng Vi\u1ec7t",
+    "repo": "kajisho5/ffmpeg-skill",
+    "full_name": "kajisho5/ffmpeg-skill",
+    "description": "Local video editor for coding agents: 42 FFmpeg tools with a machine-readable contract and an MCP server, for Claude Code, Cursor and Codex. Cut, captions, reframe, loudness, platform exports. No cloud, no API keys.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 3329,
-=======
-    "stargazers_count": 3331,
->>>>>>> Stashed changes
-    "forks_count": 1022,
+    "stargazers_count": 5925,
+    "forks_count": 517,
+    "stars_in_period": 285,
+    "url": "https://github.com/kajisho5/ffmpeg-skill",
+    "html_url": "https://github.com/kajisho5/ffmpeg-skill"
+  },
+  {
+    "repo": "huytieu/COG-second-brain",
+    "full_name": "huytieu/COG-second-brain",
+    "description": "Self-evolving second brain with 35 AI skills, 10 agents, and people CRM. Closed-loop harness: a V-model verification lifecycle where the worker never grades its own homework. Plus paired anti-slop design skills for marketing and product UI. Works with Claude Code, Cursor, Kiro, Gemini CLI, Codex.",
+    "language": "Python",
+    "stargazers_count": 1479,
+    "forks_count": 182,
     "stars_in_period": 37,
-    "url": "https://github.com/pnnbao97/VieNeu-TTS",
-    "html_url": "https://github.com/pnnbao97/VieNeu-TTS"
+    "url": "https://github.com/huytieu/COG-second-brain",
+    "html_url": "https://github.com/huytieu/COG-second-brain"
   },
   {
-    "repo": "0x0funky/agent-sprite-forge",
-    "full_name": "0x0funky/agent-sprite-forge",
-    "description": "Agent Skill for generating 2D sprite sheets and map, transparent PNG frames, and animated GIFs from prompts.",
+    "repo": "SnailSploit/Claude-Red",
+    "full_name": "SnailSploit/Claude-Red",
+    "description": "claude-red is a curated library of offensive security skills designed for the Claude skills system. Each skill is a structured SKILL.md file that primes Claude with expert-level methodology for a specific attack surface \u2014 from SQLi to shellcode, EDR evasion to exploit development.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 5724,
-    "forks_count": 558,
-=======
-    "stargazers_count": 5725,
-    "forks_count": 559,
->>>>>>> Stashed changes
+    "stargazers_count": 11006,
+    "forks_count": 1499,
+    "stars_in_period": 135,
+    "url": "https://github.com/SnailSploit/Claude-Red",
+    "html_url": "https://github.com/SnailSploit/Claude-Red"
+  },
+  {
+    "repo": "HKUDS/AutoSwarm",
+    "full_name": "HKUDS/AutoSwarm",
+    "description": "AutoSwarm: Unify All Your Agents. Break Context Barriers. Watch Them Work Together for You.",
+    "language": "Python",
+    "stargazers_count": 2533,
+    "forks_count": 424,
     "stars_in_period": 56,
-    "url": "https://github.com/0x0funky/agent-sprite-forge",
-    "html_url": "https://github.com/0x0funky/agent-sprite-forge"
+    "url": "https://github.com/HKUDS/AutoSwarm",
+    "html_url": "https://github.com/HKUDS/AutoSwarm"
   },
   {
-    "repo": "microsoft/PyRIT",
-    "full_name": "microsoft/PyRIT",
-    "description": "Open-source AI red teaming toolkit from Microsoft. Test generative AI systems with automated scans, adaptive multi-turn attacks, and a web UI.",
+    "repo": "PrefectHQ/fastmcp",
+    "full_name": "PrefectHQ/fastmcp",
+    "description": "\ud83d\ude80 The fast, Pythonic way to build MCP servers and clients.",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 4831,
-=======
-    "stargazers_count": 4832,
->>>>>>> Stashed changes
-    "forks_count": 1056,
-    "stars_in_period": 22,
-    "url": "https://github.com/microsoft/PyRIT",
-    "html_url": "https://github.com/microsoft/PyRIT"
+    "stargazers_count": 28515,
+    "forks_count": 2605,
+    "stars_in_period": 76,
+    "url": "https://github.com/PrefectHQ/fastmcp",
+    "html_url": "https://github.com/PrefectHQ/fastmcp"
   },
   {
-    "repo": "headroomlabs-ai/headroom",
-    "full_name": "headroomlabs-ai/headroom",
-    "description": "Compress tool outputs, logs, files, and RAG chunks before they reach the LLM. 20% fewer tokens for coding agents, 60-95% fewer tokens for JSON, same answers. Library, proxy, MCP server.",
+    "repo": "fqscfqj/Y2A-Auto",
+    "full_name": "fqscfqj/Y2A-Auto",
+    "description": "YouTube\u5230AcFun\u548cbilibili\u81ea\u52a8\u5316\u642c\u8fd0\u5de5\u5177\uff0c\u652f\u6301AI\u7ffb\u8bd1\u3001\u5b57\u5e55\u751f\u6210\u3001\u5185\u5bb9\u5ba1\u6838\u3001\u667a\u80fd\u76d1\u63a7",
     "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 79660,
-=======
-    "stargazers_count": 79662,
->>>>>>> Stashed changes
-    "forks_count": 6236,
-    "stars_in_period": 93,
-    "url": "https://github.com/headroomlabs-ai/headroom",
-    "html_url": "https://github.com/headroomlabs-ai/headroom"
-  },
-  {
-    "repo": "mukul975/Anthropic-Cybersecurity-Skills",
-    "full_name": "mukul975/Anthropic-Cybersecurity-Skills",
-    "description": "817 structured cybersecurity skills for AI agents \u00b7 Mapped to 6 frameworks: MITRE ATT&CK, NIST CSF 2.0, MITRE ATLAS, D3FEND, NIST AI RMF & MITRE F3 (Fight Fraud) \u00b7 agentskills.io standard \u00b7 Works with Claude Code, GitHub Copilot, Codex CLI, Cursor, Gemini CLI & 20+ platforms \u00b7 29 security domains \u00b7 Apache 2.0",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 36137,
-    "forks_count": 4422,
-=======
-    "stargazers_count": 36140,
-    "forks_count": 4423,
->>>>>>> Stashed changes
-    "stars_in_period": 66,
-    "url": "https://github.com/mukul975/Anthropic-Cybersecurity-Skills",
-    "html_url": "https://github.com/mukul975/Anthropic-Cybersecurity-Skills"
-  },
-  {
-    "repo": "dreammis/social-auto-upload",
-    "full_name": "dreammis/social-auto-upload",
-    "description": "\u81ea\u52a8\u5316\u4e0a\u4f20\u89c6\u9891\u5230\u793e\u4ea4\u5a92\u4f53\uff1a\u6296\u97f3\u3001\u5c0f\u7ea2\u4e66\u3001\u89c6\u9891\u53f7\u3001tiktok\u3001youtube\u3001bilibili",
-    "language": "Python",
-    "stargazers_count": 16542,
-    "forks_count": 2807,
-    "stars_in_period": 43,
-    "url": "https://github.com/dreammis/social-auto-upload",
-    "html_url": "https://github.com/dreammis/social-auto-upload"
-  },
-  {
-    "repo": "LibreTranslate/LibreTranslate",
-    "full_name": "LibreTranslate/LibreTranslate",
-    "description": "Free and Open Source Machine Translation API. Self-hosted, offline capable and easy to setup.",
-    "language": "Python",
-    "stargazers_count": 17706,
-    "forks_count": 1855,
-    "stars_in_period": 130,
-    "url": "https://github.com/LibreTranslate/LibreTranslate",
-    "html_url": "https://github.com/LibreTranslate/LibreTranslate"
-  },
-  {
-    "repo": "SigmaHQ/sigma",
-    "full_name": "SigmaHQ/sigma",
-    "description": "Main Sigma Rule Repository",
-    "language": "Python",
-    "stargazers_count": 11508,
-    "forks_count": 2943,
-    "stars_in_period": 12,
-    "url": "https://github.com/SigmaHQ/sigma",
-    "html_url": "https://github.com/SigmaHQ/sigma"
-  },
-  {
-    "repo": "bmad-code-org/BMAD-METHOD",
-    "full_name": "bmad-code-org/BMAD-METHOD",
-    "description": "Breakthrough Method for Agile Ai Driven Development",
-    "language": "Python",
-    "stargazers_count": 55367,
-<<<<<<< Updated upstream
-    "forks_count": 6168,
-=======
-    "forks_count": 6167,
->>>>>>> Stashed changes
-    "stars_in_period": 21,
-    "url": "https://github.com/bmad-code-org/BMAD-METHOD",
-    "html_url": "https://github.com/bmad-code-org/BMAD-METHOD"
-  },
-  {
-    "repo": "zulip/zulip",
-    "full_name": "zulip/zulip",
-    "description": "Zulip server and web application. Open-source team chat that helps teams stay productive and focused.",
-    "language": "Python",
-    "stargazers_count": 26227,
-<<<<<<< Updated upstream
-    "forks_count": 10594,
-=======
-    "forks_count": 10595,
->>>>>>> Stashed changes
-    "stars_in_period": 7,
-    "url": "https://github.com/zulip/zulip",
-    "html_url": "https://github.com/zulip/zulip"
-  },
-  {
-    "repo": "FujiwaraChoki/supoclip",
-    "full_name": "FujiwaraChoki/supoclip",
-    "description": "An open-source OpusClip alternative",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 3084,
-    "forks_count": 704,
-=======
-    "stargazers_count": 3087,
-    "forks_count": 705,
->>>>>>> Stashed changes
-    "stars_in_period": 91,
-    "url": "https://github.com/FujiwaraChoki/supoclip",
-    "html_url": "https://github.com/FujiwaraChoki/supoclip"
-  },
-  {
-    "repo": "backnotprop/plannotator",
-    "full_name": "backnotprop/plannotator",
-    "description": "The workspace to stay in the loop and on top of agents - shape, decide, plan, annotate, review code, share with team, and send all feedback to agents with one click.",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 10924,
+    "stargazers_count": 5009,
     "forks_count": 848,
-=======
-    "stargazers_count": 10956,
-    "forks_count": 862,
->>>>>>> Stashed changes
-    "stars_in_period": 412,
-    "url": "https://github.com/backnotprop/plannotator",
-    "html_url": "https://github.com/backnotprop/plannotator"
+    "stars_in_period": 99,
+    "url": "https://github.com/fqscfqj/Y2A-Auto",
+    "html_url": "https://github.com/fqscfqj/Y2A-Auto"
   },
   {
-    "repo": "GoogleChrome/modern-web-guidance-src",
-    "full_name": "GoogleChrome/modern-web-guidance-src",
-    "description": "Keep your coding agent up to date with the latest web best practices",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 5739,
-    "forks_count": 333,
-=======
-    "stargazers_count": 5768,
-    "forks_count": 348,
->>>>>>> Stashed changes
-    "stars_in_period": 1225,
-    "url": "https://github.com/GoogleChrome/modern-web-guidance-src",
-    "html_url": "https://github.com/GoogleChrome/modern-web-guidance-src"
+    "repo": "andrewyng/openworker",
+    "full_name": "andrewyng/openworker",
+    "description": "",
+    "language": "Python",
+    "stargazers_count": 19332,
+    "forks_count": 2757,
+    "stars_in_period": 139,
+    "url": "https://github.com/andrewyng/openworker",
+    "html_url": "https://github.com/andrewyng/openworker"
   },
   {
-    "repo": "ChromeDevTools/chrome-devtools-mcp",
-    "full_name": "ChromeDevTools/chrome-devtools-mcp",
-    "description": "Chrome DevTools for coding agents",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 56179,
-    "forks_count": 4693,
-=======
-    "stargazers_count": 56193,
-    "forks_count": 4709,
->>>>>>> Stashed changes
-    "stars_in_period": 673,
-    "url": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
-    "html_url": "https://github.com/ChromeDevTools/chrome-devtools-mcp"
+    "repo": "ManimCommunity/manim",
+    "full_name": "ManimCommunity/manim",
+    "description": "A community-maintained Python framework for creating mathematical animations.",
+    "language": "Python",
+    "stargazers_count": 42575,
+    "forks_count": 3343,
+    "stars_in_period": 73,
+    "url": "https://github.com/ManimCommunity/manim",
+    "html_url": "https://github.com/ManimCommunity/manim"
   },
   {
-    "repo": "QwenLM/qwen-code",
-    "full_name": "QwenLM/qwen-code",
-    "description": "An open-source AI coding agent that lives in your terminal.",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 30252,
-    "forks_count": 3451,
-=======
-    "stargazers_count": 30263,
-    "forks_count": 3464,
->>>>>>> Stashed changes
-    "stars_in_period": 116,
-    "url": "https://github.com/QwenLM/qwen-code",
-    "html_url": "https://github.com/QwenLM/qwen-code"
+    "repo": "HKUDS/Vibe-Trading",
+    "full_name": "HKUDS/Vibe-Trading",
+    "description": "\"Vibe-Trading: Your Personal Trading Agent\"",
+    "language": "Python",
+    "stargazers_count": 38311,
+    "forks_count": 6239,
+    "stars_in_period": 83,
+    "url": "https://github.com/HKUDS/Vibe-Trading",
+    "html_url": "https://github.com/HKUDS/Vibe-Trading"
+  },
+  {
+    "repo": "Canner/WrenAI",
+    "full_name": "Canner/WrenAI",
+    "description": "GenBI (Generative BI) for AI agents, an open-source, governed text-to-SQL through an open context layer that turns natural-language questions into trusted dashboards, charts, and SQL across 20+ data sources, such as BigQuery, Snowflake, PostgreSQL, ClickHouse, Amazon Redshift, Databricks and more.",
+    "language": "Python",
+    "stargazers_count": 18262,
+    "forks_count": 2108,
+    "stars_in_period": 52,
+    "url": "https://github.com/Canner/WrenAI",
+    "html_url": "https://github.com/Canner/WrenAI"
+  },
+  {
+    "repo": "internetarchive/openlibrary",
+    "full_name": "internetarchive/openlibrary",
+    "description": "One webpage for every book ever published!",
+    "language": "Python",
+    "stargazers_count": 6907,
+    "forks_count": 2113,
+    "stars_in_period": 9,
+    "url": "https://github.com/internetarchive/openlibrary",
+    "html_url": "https://github.com/internetarchive/openlibrary"
+  },
+  {
+    "repo": "unslothai/unsloth",
+    "full_name": "unslothai/unsloth",
+    "description": "Local UI to run and train LLMs and diffusion models. Supports GGUF, MLX, Qwen3.8, DeepSeek-V4.1, MiniMax-H3, Gemma 4, FLUX and more.",
+    "language": "Python",
+    "stargazers_count": 79563,
+    "forks_count": 7418,
+    "stars_in_period": 59,
+    "url": "https://github.com/unslothai/unsloth",
+    "html_url": "https://github.com/unslothai/unsloth"
   },
   {
     "repo": "dream-num/univer",
     "full_name": "dream-num/univer",
     "description": "Build your own AI office with Univer Office SDK. Bring editing, calculation, collaboration, and file processing into your product for people and AI agents. Built on an extensible open-source core.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 24371,
-    "forks_count": 2152,
-=======
-    "stargazers_count": 24386,
-    "forks_count": 2164,
->>>>>>> Stashed changes
-    "stars_in_period": 495,
+    "stargazers_count": 25476,
+    "forks_count": 2328,
+    "stars_in_period": 1041,
     "url": "https://github.com/dream-num/univer",
     "html_url": "https://github.com/dream-num/univer"
   },
@@ -332,565 +202,493 @@
     "full_name": "ag-ui-protocol/ag-ui",
     "description": "AG-UI: the Agent-User Interaction Protocol. Bring Agents into Frontend Applications.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 17277,
-    "forks_count": 1614,
-=======
-    "stargazers_count": 17285,
-    "forks_count": 1628,
->>>>>>> Stashed changes
-    "stars_in_period": 9,
+    "stargazers_count": 17735,
+    "forks_count": 1813,
+    "stars_in_period": 393,
     "url": "https://github.com/ag-ui-protocol/ag-ui",
     "html_url": "https://github.com/ag-ui-protocol/ag-ui"
   },
   {
-    "repo": "lidge-jun/opencodex",
-    "full_name": "lidge-jun/opencodex",
-    "description": "Universal provider proxy for OpenAI Codex & Claude Code \u2014 use any LLM (Claude, Gemini, Grok, DeepSeek, Ollama\u2026) with Codex CLI, App, SDK, and Claude Code",
+    "repo": "google-labs-code/stitch-skills",
+    "full_name": "google-labs-code/stitch-skills",
+    "description": "A library of Agent Skills designed to work with the Stitch MCP server. Each skill follows the Agent Skills open standard, for compatibility with coding agents such as Antigravity, Gemini CLI, Claude Code, Cursor.",
     "language": "TypeScript",
-    "stargazers_count": 18532,
-<<<<<<< Updated upstream
-    "forks_count": 1485,
-=======
-    "forks_count": 1494,
->>>>>>> Stashed changes
-    "stars_in_period": 49,
-    "url": "https://github.com/lidge-jun/opencodex",
-    "html_url": "https://github.com/lidge-jun/opencodex"
-  },
-  {
-    "repo": "CopilotKit/OpenBot",
-    "full_name": "CopilotKit/OpenBot",
-    "description": "Open-source AI coworkers that each get a computer of their own: a browser, files and tools, with every action decided before it happens and recorded after. Bring any AG-UI agent.",
-    "language": "TypeScript",
-    "stargazers_count": 12249,
-    "forks_count": 1507,
-    "stars_in_period": 209,
-    "url": "https://github.com/CopilotKit/OpenBot",
-    "html_url": "https://github.com/CopilotKit/OpenBot"
-  },
-  {
-    "repo": "CherryHQ/cherry-studio",
-    "full_name": "CherryHQ/cherry-studio",
-    "description": "Your AI workspace for models, agents, and productivity.",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 53513,
-    "forks_count": 5222,
-=======
-    "stargazers_count": 53515,
-    "forks_count": 5223,
->>>>>>> Stashed changes
-    "stars_in_period": 31,
-    "url": "https://github.com/CherryHQ/cherry-studio",
-    "html_url": "https://github.com/CherryHQ/cherry-studio"
-  },
-  {
-    "repo": "openai/codex-security",
-    "full_name": "openai/codex-security",
-    "description": "OpenAI's Codex Security CLI and TypeScript SDK for finding, validating, and fixing security vulnerabilities. npm:https://www.npmjs.com/package/@openai/codex-security",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 13506,
-=======
-    "stargazers_count": 13511,
->>>>>>> Stashed changes
-    "forks_count": 1051,
-    "stars_in_period": 599,
-    "url": "https://github.com/openai/codex-security",
-    "html_url": "https://github.com/openai/codex-security"
-  },
-  {
-    "repo": "a2ui-project/a2ui",
-    "full_name": "a2ui-project/a2ui",
-    "description": "Open-source generative UI framework: agents stream layout data, and apps render it with native components in React, Angular, Lit, Flutter, SwiftUI and Jetpack Compose.",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 17350,
-=======
-    "stargazers_count": 17351,
->>>>>>> Stashed changes
-    "forks_count": 1408,
-    "stars_in_period": 51,
-    "url": "https://github.com/a2ui-project/a2ui",
-    "html_url": "https://github.com/a2ui-project/a2ui"
-  },
-  {
-    "repo": "totec448-spec/chat-on-steroids",
-    "full_name": "totec448-spec/chat-on-steroids",
-    "description": "Cross-platform local MCP capabilities for ChatGPT with Chrome integration, Goal, Compact & Resume, and durable multi-agent workflows.",
-    "language": "TypeScript",
-    "stargazers_count": 5184,
-    "forks_count": 675,
-    "stars_in_period": 12,
-    "url": "https://github.com/totec448-spec/chat-on-steroids",
-    "html_url": "https://github.com/totec448-spec/chat-on-steroids"
-  },
-  {
-    "repo": "moeru-ai/airi",
-    "full_name": "moeru-ai/airi",
-    "description": "\ud83d\udc96\ud83e\uddf8 Self hosted, you-owned Grok Companion, a container of souls of waifu, cyber livings to bring them into our worlds, wishing to achieve Neuro-sama's altitude. Capable of realtime voice chat, Minecraft, Factorio playing. Web / macOS / Windows supported.",
-    "language": "TypeScript",
-    "stargazers_count": 51430,
-    "forks_count": 5186,
-    "stars_in_period": 51,
-    "url": "https://github.com/moeru-ai/airi",
-    "html_url": "https://github.com/moeru-ai/airi"
-  },
-  {
-    "repo": "Narcooo/inkos",
-    "full_name": "Narcooo/inkos",
-    "description": "Story Creation AI Agent for novel, scripts, translation, interactive games, and IP content",
-    "language": "TypeScript",
-    "stargazers_count": 11178,
-    "forks_count": 2025,
-    "stars_in_period": 19,
-    "url": "https://github.com/Narcooo/inkos",
-    "html_url": "https://github.com/Narcooo/inkos"
-  },
-  {
-    "repo": "LodyAI/Lody",
-    "full_name": "LodyAI/Lody",
-    "description": "Share coding agents with your team on phone and desktop",
-    "language": "TypeScript",
-    "stargazers_count": 1761,
-    "forks_count": 190,
-    "stars_in_period": 9,
-    "url": "https://github.com/LodyAI/Lody",
-    "html_url": "https://github.com/LodyAI/Lody"
-  },
-  {
-    "repo": "martin-olivier/airgorah",
-    "full_name": "martin-olivier/airgorah",
-    "description": "A WiFi security auditing software",
-    "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 5699,
-    "forks_count": 972,
-=======
-    "stargazers_count": 5714,
-    "forks_count": 981,
->>>>>>> Stashed changes
-    "stars_in_period": 269,
-    "url": "https://github.com/martin-olivier/airgorah",
-    "html_url": "https://github.com/martin-olivier/airgorah"
-  },
-  {
-    "repo": "ModernRelay/omnigraph",
-    "full_name": "ModernRelay/omnigraph",
-    "description": "Object-storage native graph database with branching and typed ontology",
-    "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 2386,
-=======
-    "stargazers_count": 2389,
->>>>>>> Stashed changes
-    "forks_count": 302,
-    "stars_in_period": 212,
-    "url": "https://github.com/ModernRelay/omnigraph",
-    "html_url": "https://github.com/ModernRelay/omnigraph"
-  },
-  {
-    "repo": "verus-lang/verus",
-    "full_name": "verus-lang/verus",
-    "description": "Verified Rust for low-level systems code",
-    "language": "Rust",
-    "stargazers_count": 3779,
-    "forks_count": 264,
-    "stars_in_period": 20,
-    "url": "https://github.com/verus-lang/verus",
-    "html_url": "https://github.com/verus-lang/verus"
-  },
-  {
-    "repo": "block/buzz",
-    "full_name": "block/buzz",
-    "description": "A hive mind communication platform",
-    "language": "Rust",
-    "stargazers_count": 37439,
-    "forks_count": 4947,
-    "stars_in_period": 275,
-    "url": "https://github.com/block/buzz",
-    "html_url": "https://github.com/block/buzz"
-  },
-  {
-    "repo": "aaif-goose/goose",
-    "full_name": "aaif-goose/goose",
-    "description": "an open source, extensible AI agent that goes beyond code suggestions - install, execute, edit, and test with any LLM",
-    "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 56611,
-    "forks_count": 6589,
-=======
-    "stargazers_count": 56613,
-    "forks_count": 6590,
->>>>>>> Stashed changes
-    "stars_in_period": 72,
-    "url": "https://github.com/aaif-goose/goose",
-    "html_url": "https://github.com/aaif-goose/goose"
-  },
-  {
-    "repo": "zeronsh/zeron",
-    "full_name": "zeronsh/zeron",
-    "description": "A native control plane for Claude Code, Codex, Cursor, Devin and other coding agents.",
-    "language": "Rust",
-    "stargazers_count": 3658,
-    "forks_count": 372,
-    "stars_in_period": 60,
-    "url": "https://github.com/zeronsh/zeron",
-    "html_url": "https://github.com/zeronsh/zeron"
-  },
-  {
-    "repo": "rust-lang/rust-clippy",
-    "full_name": "rust-lang/rust-clippy",
-    "description": "A bunch of lints to catch common mistakes and improve your Rust code. Book:https://doc.rust-lang.org/clippy/",
-    "language": "Rust",
-    "stargazers_count": 13645,
-    "forks_count": 2249,
-    "stars_in_period": 4,
-    "url": "https://github.com/rust-lang/rust-clippy",
-    "html_url": "https://github.com/rust-lang/rust-clippy"
-  },
-  {
-    "repo": "lance-format/lance",
-    "full_name": "lance-format/lance",
-    "description": "Open Lakehouse Format for Multimodal AI. Convert from Parquet in 2 lines of code for 100x faster random access, vector index, and data versioning. Compatible with Pandas, DuckDB, Polars, Pyarrow, and PyTorch with more integrations coming..",
-    "language": "Rust",
-    "stargazers_count": 7300,
-    "forks_count": 938,
-    "stars_in_period": 6,
-    "url": "https://github.com/lance-format/lance",
-    "html_url": "https://github.com/lance-format/lance"
-  },
-  {
-    "repo": "trymirai/uzu",
-    "full_name": "trymirai/uzu",
-    "description": "A high-performance inference engine for AI models",
-    "language": "Rust",
-    "stargazers_count": 3331,
-    "forks_count": 238,
-    "stars_in_period": 17,
-    "url": "https://github.com/trymirai/uzu",
-    "html_url": "https://github.com/trymirai/uzu"
-  },
-  {
-    "repo": "sherlock-project/sherlock",
-    "full_name": "sherlock-project/sherlock",
-    "description": "Hunt down social media accounts by username across social networks",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 111680,
-    "forks_count": 12924,
-=======
-    "stargazers_count": 111689,
-    "forks_count": 12926,
->>>>>>> Stashed changes
-    "stars_in_period": 13364,
-    "url": "https://github.com/sherlock-project/sherlock",
-    "html_url": "https://github.com/sherlock-project/sherlock"
-  },
-  {
-    "repo": "anthropics/skills",
-    "full_name": "anthropics/skills",
-    "description": "Public repository for Agent Skills",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 194520,
-    "forks_count": 22892,
-=======
-    "stargazers_count": 194530,
-    "forks_count": 22893,
->>>>>>> Stashed changes
-    "stars_in_period": 6169,
-    "url": "https://github.com/anthropics/skills",
-    "html_url": "https://github.com/anthropics/skills"
-  },
-  {
-    "repo": "google/elephant-goldfish-model",
-    "full_name": "google/elephant-goldfish-model",
-    "description": "Open-source plugin for designing and reviewing software with agents",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 19047,
-    "forks_count": 1416,
-=======
-    "stargazers_count": 19065,
-    "forks_count": 1417,
->>>>>>> Stashed changes
-    "stars_in_period": 5560,
-    "url": "https://github.com/google/elephant-goldfish-model",
-    "html_url": "https://github.com/google/elephant-goldfish-model"
-  },
-  {
-    "repo": "ZhuLinsen/daily_stock_analysis",
-    "full_name": "ZhuLinsen/daily_stock_analysis",
-    "description": "LLM \u9a71\u52a8\u7684\u591a\u5e02\u573a\u80a1\u7968\u667a\u80fd\u5206\u6790\u7cfb\u7edf\uff1a\u591a\u6e90\u884c\u60c5\u3001\u5b9e\u65f6\u65b0\u95fb\u3001\u51b3\u7b56\u770b\u677f\u4e0e\u81ea\u52a8\u63a8\u9001\uff0c\u652f\u6301\u96f6\u6210\u672c\u5b9a\u65f6\u8fd0\u884c\u3002 LLM-powered multi-market stock analysis system with multi-source market data, real-time news, decision dashboard, automated notifications, and cost-free scheduled runs.",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 72210,
-    "forks_count": 57463,
-=======
-    "stargazers_count": 72218,
-    "forks_count": 57467,
->>>>>>> Stashed changes
-    "stars_in_period": 3778,
-    "url": "https://github.com/ZhuLinsen/daily_stock_analysis",
-    "html_url": "https://github.com/ZhuLinsen/daily_stock_analysis"
-  },
-  {
-    "repo": "anthropics/claude-quickstarts",
-    "full_name": "anthropics/claude-quickstarts",
-    "description": "A collection of projects designed to help developers quickly get started with building deployable applications using the Claude API",
-    "language": "Python",
-    "stargazers_count": 20958,
-<<<<<<< Updated upstream
-    "forks_count": 3495,
-=======
-    "forks_count": 3496,
->>>>>>> Stashed changes
-    "stars_in_period": 1731,
-    "url": "https://github.com/anthropics/claude-quickstarts",
-    "html_url": "https://github.com/anthropics/claude-quickstarts"
-  },
-  {
-    "repo": "homeassistant-ai/ha-mcp",
-    "full_name": "homeassistant-ai/ha-mcp",
-    "description": "Configure and automate Home Assistant with Claude, ChatGPT, and other AI assistants.",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 7813,
-=======
-    "stargazers_count": 7816,
->>>>>>> Stashed changes
-    "forks_count": 474,
-    "stars_in_period": 2302,
-    "url": "https://github.com/homeassistant-ai/ha-mcp",
-    "html_url": "https://github.com/homeassistant-ai/ha-mcp"
-  },
-  {
-    "repo": "NVIDIA/auto-ontology",
-    "full_name": "NVIDIA/auto-ontology",
-    "description": "Auto Ontology is a Python framework for building semantic, graph-based reasoning layers over data. It enables deterministic query generation, better context retrieval, and more explainable AI for LLM and agent workflows.",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 12791,
-    "forks_count": 1070,
-=======
-    "stargazers_count": 12797,
-    "forks_count": 1071,
->>>>>>> Stashed changes
-    "stars_in_period": 4108,
-    "url": "https://github.com/NVIDIA/auto-ontology",
-    "html_url": "https://github.com/NVIDIA/auto-ontology"
-  },
-  {
-    "repo": "harry0703/MoneyPrinterTurbo",
-    "full_name": "harry0703/MoneyPrinterTurbo",
-    "description": "\u5229\u7528 AI \u5927\u6a21\u578b\u548c\u81ea\u52a8\u5316\u5de5\u4f5c\u6d41\uff0c\u6839\u636e\u4e3b\u9898\u6216\u5173\u952e\u8bcd\u4e00\u952e\u751f\u6210\u9ad8\u6e05\u77ed\u89c6\u9891\u3002Generate HD short videos from a topic or keyword with an automated AI workflow.",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 143547,
-    "forks_count": 22997,
-=======
-    "stargazers_count": 143551,
-    "forks_count": 22995,
->>>>>>> Stashed changes
-    "stars_in_period": 3217,
-    "url": "https://github.com/harry0703/MoneyPrinterTurbo",
-    "html_url": "https://github.com/harry0703/MoneyPrinterTurbo"
-  },
-  {
-    "repo": "soxoj/maigret",
-    "full_name": "soxoj/maigret",
-    "description": "\ud83d\udd75\ufe0f\u200d\u2642\ufe0f Collect a dossier on a person by username from 6K websites",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 40668,
-=======
-    "stargazers_count": 40672,
->>>>>>> Stashed changes
-    "forks_count": 3283,
-    "stars_in_period": 892,
-    "url": "https://github.com/soxoj/maigret",
-    "html_url": "https://github.com/soxoj/maigret"
-  },
-  {
-    "repo": "bradautomates/claude-video",
-    "full_name": "bradautomates/claude-video",
-    "description": "Give Claude the ability to watch any video. /watch downloads, extracts frames, transcribes, hands it all to Claude.",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 20804,
-=======
-    "stargazers_count": 20805,
->>>>>>> Stashed changes
-    "forks_count": 2210,
-    "stars_in_period": 707,
-    "url": "https://github.com/bradautomates/claude-video",
-    "html_url": "https://github.com/bradautomates/claude-video"
-  },
-  {
-    "repo": "tradermonty/claude-trading-skills",
-    "full_name": "tradermonty/claude-trading-skills",
-    "description": "Claude Code skills for equity investors and traders \u2014 market analysis, technical charting, economic calendars, screeners, and trading strategy development.",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 4643,
-    "forks_count": 932,
-=======
-    "stargazers_count": 4667,
-    "forks_count": 940,
->>>>>>> Stashed changes
-    "stars_in_period": 774,
-    "url": "https://github.com/tradermonty/claude-trading-skills",
-    "html_url": "https://github.com/tradermonty/claude-trading-skills"
-  },
-  {
-    "repo": "davila7/claude-code-templates",
-    "full_name": "davila7/claude-code-templates",
-    "description": "Open-source registry and CLI for Claude Code components: agents, commands, skills, hooks, MCPs, settings and mods",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 33598,
-    "forks_count": 3961,
-=======
-    "stargazers_count": 33604,
-    "forks_count": 3963,
->>>>>>> Stashed changes
-    "stars_in_period": 332,
-    "url": "https://github.com/davila7/claude-code-templates",
-    "html_url": "https://github.com/davila7/claude-code-templates"
-  },
-  {
-    "repo": "The-PR-Agent/pr-agent",
-    "full_name": "The-PR-Agent/pr-agent",
-    "description": "\ud83d\ude80 PR Agent: The Original Open-Source PR Reviewer. This project is not the Qodo free tier.",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 16166,
-=======
-    "stargazers_count": 16167,
->>>>>>> Stashed changes
-    "forks_count": 2200,
-    "stars_in_period": 850,
-    "url": "https://github.com/The-PR-Agent/pr-agent",
-    "html_url": "https://github.com/The-PR-Agent/pr-agent"
-  },
-  {
-    "repo": "elementalsouls/Claude-BugHunter",
-    "full_name": "elementalsouls/Claude-BugHunter",
-    "description": "A Claude Code skill bundle for bug hunting and external red-team work - 82 skills, 15 slash commands, 681 disclosed-report patterns curated across 24 core vulnerability classes, plus enterprise identity + infrastructure attack matrices.",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 5823,
-=======
-    "stargazers_count": 5826,
->>>>>>> Stashed changes
-    "forks_count": 894,
-    "stars_in_period": 326,
-    "url": "https://github.com/elementalsouls/Claude-BugHunter",
-    "html_url": "https://github.com/elementalsouls/Claude-BugHunter"
-  },
-  {
-    "repo": "NVIDIA/SkillSpector",
-    "full_name": "NVIDIA/SkillSpector",
-    "description": "Security scanner for AI agent skills. Detect vulnerabilities, malicious patterns, security risks, prompt injection, data exfiltration, and supply-chain risks in Claude Code, Codex, and MCP skills before you install them.",
-    "language": "Python",
-<<<<<<< Updated upstream
-    "stargazers_count": 26024,
-=======
-    "stargazers_count": 26030,
->>>>>>> Stashed changes
-    "forks_count": 2313,
-    "stars_in_period": 1212,
-    "url": "https://github.com/NVIDIA/SkillSpector",
-    "html_url": "https://github.com/NVIDIA/SkillSpector"
-  },
-  {
-    "repo": "jamiepine/voicebox",
-    "full_name": "jamiepine/voicebox",
-    "description": "The open-source AI voice studio. Clone, dictate, create.",
-    "language": "Python",
-    "stargazers_count": 60630,
-<<<<<<< Updated upstream
-    "forks_count": 7624,
-=======
-    "forks_count": 7625,
->>>>>>> Stashed changes
-    "stars_in_period": 1076,
-    "url": "https://github.com/jamiepine/voicebox",
-    "html_url": "https://github.com/jamiepine/voicebox"
-  },
-  {
-    "repo": "NVIDIA/skills",
-    "full_name": "NVIDIA/skills",
-    "description": "Agent Skills for NVIDIA products \u2014 install into Claude Code, Codex, and other coding agents to run Physical AI, robotics, simulation, CUDA, and RAG workflows end to end.",
-    "language": "Python",
-    "stargazers_count": 3988,
-    "forks_count": 524,
-    "stars_in_period": 92,
-    "url": "https://github.com/NVIDIA/skills",
-    "html_url": "https://github.com/NVIDIA/skills"
-  },
-  {
-    "repo": "meta/astryx",
-    "full_name": "meta/astryx",
-    "description": "An open source design system that's fully customizable and agent ready",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 27966,
-    "forks_count": 2174,
-=======
-    "stargazers_count": 27998,
-    "forks_count": 2176,
->>>>>>> Stashed changes
-    "stars_in_period": 13375,
-    "url": "https://github.com/meta/astryx",
-    "html_url": "https://github.com/meta/astryx"
-  },
-  {
-    "repo": "milind-soni/OpenMausBot",
-    "full_name": "milind-soni/OpenMausBot",
-    "description": "Open-source Grok Bot alternative with a virtual machine that bots can use",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 22680,
-    "forks_count": 3154,
-=======
-    "stargazers_count": 22689,
-    "forks_count": 3156,
->>>>>>> Stashed changes
-    "stars_in_period": 7763,
-    "url": "https://github.com/milind-soni/OpenMausBot",
-    "html_url": "https://github.com/milind-soni/OpenMausBot"
+    "stargazers_count": 9198,
+    "forks_count": 1116,
+    "stars_in_period": 248,
+    "url": "https://github.com/google-labs-code/stitch-skills",
+    "html_url": "https://github.com/google-labs-code/stitch-skills"
   },
   {
     "repo": "backnotprop/plannotator",
     "full_name": "backnotprop/plannotator",
     "description": "The workspace to stay in the loop and on top of agents - shape, decide, plan, annotate, review code, share with team, and send all feedback to agents with one click.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 10924,
-    "forks_count": 848,
-=======
-    "stargazers_count": 10956,
-    "forks_count": 862,
->>>>>>> Stashed changes
-    "stars_in_period": 511,
+    "stargazers_count": 11738,
+    "forks_count": 1068,
+    "stars_in_period": 860,
     "url": "https://github.com/backnotprop/plannotator",
     "html_url": "https://github.com/backnotprop/plannotator"
+  },
+  {
+    "repo": "ChromeDevTools/chrome-devtools-mcp",
+    "full_name": "ChromeDevTools/chrome-devtools-mcp",
+    "description": "Chrome DevTools for coding agents",
+    "language": "TypeScript",
+    "stargazers_count": 56814,
+    "forks_count": 4801,
+    "stars_in_period": 718,
+    "url": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+    "html_url": "https://github.com/ChromeDevTools/chrome-devtools-mcp"
+  },
+  {
+    "repo": "GoogleChrome/modern-web-guidance-src",
+    "full_name": "GoogleChrome/modern-web-guidance-src",
+    "description": "Keep your coding agent up to date with the latest web best practices",
+    "language": "TypeScript",
+    "stargazers_count": 6980,
+    "forks_count": 585,
+    "stars_in_period": 1220,
+    "url": "https://github.com/GoogleChrome/modern-web-guidance-src",
+    "html_url": "https://github.com/GoogleChrome/modern-web-guidance-src"
+  },
+  {
+    "repo": "motiondivision/motion",
+    "full_name": "motiondivision/motion",
+    "description": "A modern animation library for React and JavaScript",
+    "language": "TypeScript",
+    "stargazers_count": 35228,
+    "forks_count": 1548,
+    "stars_in_period": 74,
+    "url": "https://github.com/motiondivision/motion",
+    "html_url": "https://github.com/motiondivision/motion"
+  },
+  {
+    "repo": "assistant-ui/assistant-ui",
+    "full_name": "assistant-ui/assistant-ui",
+    "description": "Typescript/React Library for AI Chat \ud83d\udcac\ud83d\ude80",
+    "language": "TypeScript",
+    "stargazers_count": 13236,
+    "forks_count": 1342,
+    "stars_in_period": 92,
+    "url": "https://github.com/assistant-ui/assistant-ui",
+    "html_url": "https://github.com/assistant-ui/assistant-ui"
+  },
+  {
+    "repo": "nolly-studio/cult-ui",
+    "full_name": "nolly-studio/cult-ui",
+    "description": "Animated components for design engineers. 150+ free shadcn/ui components, built with Tailwind CSS and Motion. MIT licensed.",
+    "language": "TypeScript",
+    "stargazers_count": 7453,
+    "forks_count": 398,
+    "stars_in_period": 120,
+    "url": "https://github.com/nolly-studio/cult-ui",
+    "html_url": "https://github.com/nolly-studio/cult-ui"
+  },
+  {
+    "repo": "elder-plinius/G0DM0D3",
+    "full_name": "elder-plinius/G0DM0D3",
+    "description": "LIBERATED AI CHAT",
+    "language": "TypeScript",
+    "stargazers_count": 12415,
+    "forks_count": 2894,
+    "stars_in_period": 67,
+    "url": "https://github.com/elder-plinius/G0DM0D3",
+    "html_url": "https://github.com/elder-plinius/G0DM0D3"
+  },
+  {
+    "repo": "motion-canvas/motion-canvas",
+    "full_name": "motion-canvas/motion-canvas",
+    "description": "Visualize Your Ideas With Code",
+    "language": "TypeScript",
+    "stargazers_count": 19947,
+    "forks_count": 908,
+    "stars_in_period": 112,
+    "url": "https://github.com/motion-canvas/motion-canvas",
+    "html_url": "https://github.com/motion-canvas/motion-canvas"
+  },
+  {
+    "repo": "tashfeenahmed/freellmapi",
+    "full_name": "tashfeenahmed/freellmapi",
+    "description": "10.1 billion tokens per month. 87 free LLM providers. 1,313 free model endpoints. All behind one /v1 endpoint, plus any custom OpenAI-compatible endpoint. Smart routing, automatic failover, encrypted keys. Personal experimentation only.",
+    "language": "TypeScript",
+    "stargazers_count": 52815,
+    "forks_count": 7400,
+    "stars_in_period": 579,
+    "url": "https://github.com/tashfeenahmed/freellmapi",
+    "html_url": "https://github.com/tashfeenahmed/freellmapi"
+  },
+  {
+    "repo": "ModernRelay/omnigraph",
+    "full_name": "ModernRelay/omnigraph",
+    "description": "Object-storage native graph database with branching and typed ontology",
+    "language": "Rust",
+    "stargazers_count": 2572,
+    "forks_count": 317,
+    "stars_in_period": 174,
+    "url": "https://github.com/ModernRelay/omnigraph",
+    "html_url": "https://github.com/ModernRelay/omnigraph"
+  },
+  {
+    "repo": "harry0703/MangoDisk",
+    "full_name": "harry0703/MangoDisk",
+    "description": "Safety-first disk cleaner and space analyzer for macOS, Windows and Linux, with duplicate cleanup, app uninstall, startup management, system optimization, and maintenance.",
+    "language": "Rust",
+    "stargazers_count": 5760,
+    "forks_count": 403,
+    "stars_in_period": 57,
+    "url": "https://github.com/harry0703/MangoDisk",
+    "html_url": "https://github.com/harry0703/MangoDisk"
+  },
+  {
+    "repo": "martin-olivier/airgorah",
+    "full_name": "martin-olivier/airgorah",
+    "description": "A WiFi security auditing software",
+    "language": "Rust",
+    "stargazers_count": 6223,
+    "forks_count": 1058,
+    "stars_in_period": 708,
+    "url": "https://github.com/martin-olivier/airgorah",
+    "html_url": "https://github.com/martin-olivier/airgorah"
+  },
+  {
+    "repo": "tree-sitter/tree-sitter",
+    "full_name": "tree-sitter/tree-sitter",
+    "description": "An incremental parsing system for programming tools",
+    "language": "Rust",
+    "stargazers_count": 27470,
+    "forks_count": 3038,
+    "stars_in_period": 10,
+    "url": "https://github.com/tree-sitter/tree-sitter",
+    "html_url": "https://github.com/tree-sitter/tree-sitter"
+  },
+  {
+    "repo": "aaif-goose/goose",
+    "full_name": "aaif-goose/goose",
+    "description": "an open source, extensible AI agent that goes beyond code suggestions - install, execute, edit, and test with any LLM",
+    "language": "Rust",
+    "stargazers_count": 56658,
+    "forks_count": 6592,
+    "stars_in_period": 47,
+    "url": "https://github.com/aaif-goose/goose",
+    "html_url": "https://github.com/aaif-goose/goose"
+  },
+  {
+    "repo": "antithesishq/bombadil",
+    "full_name": "antithesishq/bombadil",
+    "description": "Property-based testing for web and terminal UIs",
+    "language": "Rust",
+    "stargazers_count": 1951,
+    "forks_count": 78,
+    "stars_in_period": 189,
+    "url": "https://github.com/antithesishq/bombadil",
+    "html_url": "https://github.com/antithesishq/bombadil"
+  },
+  {
+    "repo": "yynxxxxx/Codex-X",
+    "full_name": "yynxxxxx/Codex-X",
+    "description": "OpenAI Codex \u684c\u9762\u7aef/CLI \u7684\u53ef\u89c6\u5316\u7ba1\u7406\u5de5\u5177\uff0c\u5177\u6709Provider/API \u5207\u6362\u3001\u4f1a\u8bdd\u540c\u6b65\u3001\u63d0\u793a\u8bcd\u6ce8\u5165\u3001Skills/MCP \u7ba1\u7406\u3001TOML \u914d\u7f6e\u53ef\u89c6\u5316\u7684\u8de8\u5e73\u53f0\u5de5\u5177\u3002",
+    "language": "Rust",
+    "stargazers_count": 4528,
+    "forks_count": 591,
+    "stars_in_period": 68,
+    "url": "https://github.com/yynxxxxx/Codex-X",
+    "html_url": "https://github.com/yynxxxxx/Codex-X"
+  },
+  {
+    "repo": "dani-garcia/vaultwarden",
+    "full_name": "dani-garcia/vaultwarden",
+    "description": "Unofficial Bitwarden compatible server written in Rust, formerly known as bitwarden_rs",
+    "language": "Rust",
+    "stargazers_count": 70779,
+    "forks_count": 3460,
+    "stars_in_period": 44,
+    "url": "https://github.com/dani-garcia/vaultwarden",
+    "html_url": "https://github.com/dani-garcia/vaultwarden"
+  },
+  {
+    "repo": "lance-format/lance",
+    "full_name": "lance-format/lance",
+    "description": "Open Lakehouse Format for Multimodal AI. Convert from Parquet in 2 lines of code for 100x faster random access, vector index, and data versioning. Compatible with Pandas, DuckDB, Polars, Pyarrow, and PyTorch with more integrations coming..",
+    "language": "Rust",
+    "stargazers_count": 7316,
+    "forks_count": 942,
+    "stars_in_period": 19,
+    "url": "https://github.com/lance-format/lance",
+    "html_url": "https://github.com/lance-format/lance"
+  },
+  {
+    "repo": "zeronsh/zeron",
+    "full_name": "zeronsh/zeron",
+    "description": "A native control plane for Claude Code, Codex, Cursor, Devin and other coding agents.",
+    "language": "Rust",
+    "stargazers_count": 3680,
+    "forks_count": 375,
+    "stars_in_period": 25,
+    "url": "https://github.com/zeronsh/zeron",
+    "html_url": "https://github.com/zeronsh/zeron"
+  },
+  {
+    "repo": "qdrant/qdrant",
+    "full_name": "qdrant/qdrant",
+    "description": "Qdrant - High-performance, massive-scale Vector Database and Vector Search Engine for the next generation of AI. Also available in the cloudhttps://cloud.qdrant.io/",
+    "language": "Rust",
+    "stargazers_count": 35569,
+    "forks_count": 2819,
+    "stars_in_period": 22,
+    "url": "https://github.com/qdrant/qdrant",
+    "html_url": "https://github.com/qdrant/qdrant"
+  },
+  {
+    "repo": "ratatui/ratatui",
+    "full_name": "ratatui/ratatui",
+    "description": "A Rust crate for cooking up terminal user interfaces (TUIs) \ud83d\udc68\u200d\ud83c\udf73\ud83d\udc00https://ratatui.rs",
+    "language": "Rust",
+    "stargazers_count": 23296,
+    "forks_count": 826,
+    "stars_in_period": 19,
+    "url": "https://github.com/ratatui/ratatui",
+    "html_url": "https://github.com/ratatui/ratatui"
+  },
+  {
+    "repo": "block/buzz",
+    "full_name": "block/buzz",
+    "description": "A hive mind communication platform",
+    "language": "Rust",
+    "stargazers_count": 37478,
+    "forks_count": 4951,
+    "stars_in_period": 61,
+    "url": "https://github.com/block/buzz",
+    "html_url": "https://github.com/block/buzz"
+  },
+  {
+    "repo": "anthropics/skills",
+    "full_name": "anthropics/skills",
+    "description": "Public repository for Agent Skills",
+    "language": "Python",
+    "stargazers_count": 195265,
+    "forks_count": 22955,
+    "stars_in_period": 6220,
+    "url": "https://github.com/anthropics/skills",
+    "html_url": "https://github.com/anthropics/skills"
+  },
+  {
+    "repo": "sherlock-project/sherlock",
+    "full_name": "sherlock-project/sherlock",
+    "description": "Hunt down social media accounts by username across social networks",
+    "language": "Python",
+    "stargazers_count": 112368,
+    "forks_count": 12983,
+    "stars_in_period": 12401,
+    "url": "https://github.com/sherlock-project/sherlock",
+    "html_url": "https://github.com/sherlock-project/sherlock"
+  },
+  {
+    "repo": "ZhuLinsen/daily_stock_analysis",
+    "full_name": "ZhuLinsen/daily_stock_analysis",
+    "description": "LLM \u9a71\u52a8\u7684\u591a\u5e02\u573a\u80a1\u7968\u667a\u80fd\u5206\u6790\u7cfb\u7edf\uff1a\u591a\u6e90\u884c\u60c5\u3001\u5b9e\u65f6\u65b0\u95fb\u3001\u51b3\u7b56\u770b\u677f\u4e0e\u81ea\u52a8\u63a8\u9001\uff0c\u652f\u6301\u96f6\u6210\u672c\u5b9a\u65f6\u8fd0\u884c\u3002 LLM-powered multi-market stock analysis system with multi-source market data, real-time news, decision dashboard, automated notifications, and cost-free scheduled runs.",
+    "language": "Python",
+    "stargazers_count": 72461,
+    "forks_count": 57563,
+    "stars_in_period": 4526,
+    "url": "https://github.com/ZhuLinsen/daily_stock_analysis",
+    "html_url": "https://github.com/ZhuLinsen/daily_stock_analysis"
+  },
+  {
+    "repo": "google/elephant-goldfish-model",
+    "full_name": "google/elephant-goldfish-model",
+    "description": "Open-source plugin for designing and reviewing software with agents",
+    "language": "Python",
+    "stargazers_count": 19649,
+    "forks_count": 1458,
+    "stars_in_period": 5539,
+    "url": "https://github.com/google/elephant-goldfish-model",
+    "html_url": "https://github.com/google/elephant-goldfish-model"
+  },
+  {
+    "repo": "homeassistant-ai/ha-mcp",
+    "full_name": "homeassistant-ai/ha-mcp",
+    "description": "Configure and automate Home Assistant with Claude, ChatGPT, and other AI assistants.",
+    "language": "Python",
+    "stargazers_count": 7868,
+    "forks_count": 479,
+    "stars_in_period": 2348,
+    "url": "https://github.com/homeassistant-ai/ha-mcp",
+    "html_url": "https://github.com/homeassistant-ai/ha-mcp"
+  },
+  {
+    "repo": "anthropics/claude-quickstarts",
+    "full_name": "anthropics/claude-quickstarts",
+    "description": "A collection of projects designed to help developers quickly get started with building deployable applications using the Claude API",
+    "language": "Python",
+    "stargazers_count": 21039,
+    "forks_count": 3501,
+    "stars_in_period": 1794,
+    "url": "https://github.com/anthropics/claude-quickstarts",
+    "html_url": "https://github.com/anthropics/claude-quickstarts"
+  },
+  {
+    "repo": "soxoj/maigret",
+    "full_name": "soxoj/maigret",
+    "description": "\ud83d\udd75\ufe0f\u200d\u2642\ufe0f Collect a dossier on a person by username from 6K websites",
+    "language": "Python",
+    "stargazers_count": 40743,
+    "forks_count": 3291,
+    "stars_in_period": 900,
+    "url": "https://github.com/soxoj/maigret",
+    "html_url": "https://github.com/soxoj/maigret"
+  },
+  {
+    "repo": "davila7/claude-code-templates",
+    "full_name": "davila7/claude-code-templates",
+    "description": "Open-source registry and CLI for Claude Code components: agents, commands, skills, hooks, MCPs, settings and mods",
+    "language": "Python",
+    "stargazers_count": 33748,
+    "forks_count": 3982,
+    "stars_in_period": 401,
+    "url": "https://github.com/davila7/claude-code-templates",
+    "html_url": "https://github.com/davila7/claude-code-templates"
+  },
+  {
+    "repo": "harry0703/MoneyPrinterTurbo",
+    "full_name": "harry0703/MoneyPrinterTurbo",
+    "description": "\u5229\u7528 AI \u5927\u6a21\u578b\u548c\u81ea\u52a8\u5316\u5de5\u4f5c\u6d41\uff0c\u6839\u636e\u4e3b\u9898\u6216\u5173\u952e\u8bcd\u4e00\u952e\u751f\u6210\u9ad8\u6e05\u77ed\u89c6\u9891\u3002Generate HD short videos from a topic or keyword with an automated AI workflow.",
+    "language": "Python",
+    "stargazers_count": 143771,
+    "forks_count": 23035,
+    "stars_in_period": 3061,
+    "url": "https://github.com/harry0703/MoneyPrinterTurbo",
+    "html_url": "https://github.com/harry0703/MoneyPrinterTurbo"
+  },
+  {
+    "repo": "google/skills",
+    "full_name": "google/skills",
+    "description": "Agent Skills for Google products and technologies",
+    "language": "Python",
+    "stargazers_count": 24328,
+    "forks_count": 2017,
+    "stars_in_period": 697,
+    "url": "https://github.com/google/skills",
+    "html_url": "https://github.com/google/skills"
+  },
+  {
+    "repo": "elementalsouls/Claude-BugHunter",
+    "full_name": "elementalsouls/Claude-BugHunter",
+    "description": "A Claude Code skill bundle for bug hunting and external red-team work - 82 skills, 15 slash commands, 681 disclosed-report patterns curated across 24 core vulnerability classes, plus enterprise identity + infrastructure attack matrices.",
+    "language": "Python",
+    "stargazers_count": 6214,
+    "forks_count": 953,
+    "stars_in_period": 342,
+    "url": "https://github.com/elementalsouls/Claude-BugHunter",
+    "html_url": "https://github.com/elementalsouls/Claude-BugHunter"
+  },
+  {
+    "repo": "tradermonty/claude-trading-skills",
+    "full_name": "tradermonty/claude-trading-skills",
+    "description": "Claude Code skills for equity investors and traders \u2014 market analysis, technical charting, economic calendars, screeners, and trading strategy development.",
+    "language": "Python",
+    "stargazers_count": 5391,
+    "forks_count": 1158,
+    "stars_in_period": 878,
+    "url": "https://github.com/tradermonty/claude-trading-skills",
+    "html_url": "https://github.com/tradermonty/claude-trading-skills"
+  },
+  {
+    "repo": "NVIDIA/SkillSpector",
+    "full_name": "NVIDIA/SkillSpector",
+    "description": "Security scanner for AI agent skills. Detect vulnerabilities, malicious patterns, security risks, prompt injection, data exfiltration, and supply-chain risks in Claude Code, Codex, and MCP skills before you install them.",
+    "language": "Python",
+    "stargazers_count": 26198,
+    "forks_count": 2323,
+    "stars_in_period": 1248,
+    "url": "https://github.com/NVIDIA/SkillSpector",
+    "html_url": "https://github.com/NVIDIA/SkillSpector"
+  },
+  {
+    "repo": "mvanhorn/last30days-skill",
+    "full_name": "mvanhorn/last30days-skill",
+    "description": "AI agent skill that researches any topic across Reddit, X, YouTube, HN, Polymarket, and the web - then synthesizes a grounded summary",
+    "language": "Python",
+    "stargazers_count": 67757,
+    "forks_count": 5968,
+    "stars_in_period": 783,
+    "url": "https://github.com/mvanhorn/last30days-skill",
+    "html_url": "https://github.com/mvanhorn/last30days-skill"
+  },
+  {
+    "repo": "bradautomates/claude-video",
+    "full_name": "bradautomates/claude-video",
+    "description": "Give Claude the ability to watch any video. /watch downloads, extracts frames, transcribes, hands it all to Claude.",
+    "language": "Python",
+    "stargazers_count": 20886,
+    "forks_count": 2220,
+    "stars_in_period": 689,
+    "url": "https://github.com/bradautomates/claude-video",
+    "html_url": "https://github.com/bradautomates/claude-video"
+  },
+  {
+    "repo": "NVIDIA/auto-ontology",
+    "full_name": "NVIDIA/auto-ontology",
+    "description": "Auto Ontology is a Python framework for building semantic, graph-based reasoning layers over data. It enables deterministic query generation, better context retrieval, and more explainable AI for LLM and agent workflows.",
+    "language": "Python",
+    "stargazers_count": 13001,
+    "forks_count": 1093,
+    "stars_in_period": 3178,
+    "url": "https://github.com/NVIDIA/auto-ontology",
+    "html_url": "https://github.com/NVIDIA/auto-ontology"
+  },
+  {
+    "repo": "kajisho5/ffmpeg-skill",
+    "full_name": "kajisho5/ffmpeg-skill",
+    "description": "Local video editor for coding agents: 42 FFmpeg tools with a machine-readable contract and an MCP server, for Claude Code, Cursor and Codex. Cut, captions, reframe, loudness, platform exports. No cloud, no API keys.",
+    "language": "Python",
+    "stargazers_count": 5925,
+    "forks_count": 517,
+    "stars_in_period": 1030,
+    "url": "https://github.com/kajisho5/ffmpeg-skill",
+    "html_url": "https://github.com/kajisho5/ffmpeg-skill"
+  },
+  {
+    "repo": "meta/astryx",
+    "full_name": "meta/astryx",
+    "description": "An open source design system that's fully customizable and agent ready",
+    "language": "TypeScript",
+    "stargazers_count": 28734,
+    "forks_count": 2244,
+    "stars_in_period": 13660,
+    "url": "https://github.com/meta/astryx",
+    "html_url": "https://github.com/meta/astryx"
+  },
+  {
+    "repo": "backnotprop/plannotator",
+    "full_name": "backnotprop/plannotator",
+    "description": "The workspace to stay in the loop and on top of agents - shape, decide, plan, annotate, review code, share with team, and send all feedback to agents with one click.",
+    "language": "TypeScript",
+    "stargazers_count": 11738,
+    "forks_count": 1068,
+    "stars_in_period": 818,
+    "url": "https://github.com/backnotprop/plannotator",
+    "html_url": "https://github.com/backnotprop/plannotator"
+  },
+  {
+    "repo": "milind-soni/OpenMausBot",
+    "full_name": "milind-soni/OpenMausBot",
+    "description": "Open-source Grok Bot alternative with a virtual machine that bots can use",
+    "language": "TypeScript",
+    "stargazers_count": 23240,
+    "forks_count": 3230,
+    "stars_in_period": 6413,
+    "url": "https://github.com/milind-soni/OpenMausBot",
+    "html_url": "https://github.com/milind-soni/OpenMausBot"
   },
   {
     "repo": "openai/codex-security",
     "full_name": "openai/codex-security",
     "description": "OpenAI's Codex Security CLI and TypeScript SDK for finding, validating, and fixing security vulnerabilities. npm:https://www.npmjs.com/package/@openai/codex-security",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 13506,
-=======
-    "stargazers_count": 13511,
->>>>>>> Stashed changes
-    "forks_count": 1051,
-    "stars_in_period": 1712,
+    "stargazers_count": 13614,
+    "forks_count": 1061,
+    "stars_in_period": 2176,
     "url": "https://github.com/openai/codex-security",
     "html_url": "https://github.com/openai/codex-security"
   },
@@ -899,188 +697,163 @@
     "full_name": "QwenLM/qwen-code",
     "description": "An open-source AI coding agent that lives in your terminal.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 30252,
-    "forks_count": 3451,
-=======
-    "stargazers_count": 30263,
-    "forks_count": 3464,
->>>>>>> Stashed changes
-    "stars_in_period": 1116,
+    "stargazers_count": 30529,
+    "forks_count": 3534,
+    "stars_in_period": 1173,
     "url": "https://github.com/QwenLM/qwen-code",
     "html_url": "https://github.com/QwenLM/qwen-code"
-  },
-  {
-    "repo": "lobehub/lobehub",
-    "full_name": "lobehub/lobehub",
-    "description": "\ud83e\udd2f LobeHub - Super-Agents on Your Team. Add super-agents to the chats your team already uses.They take on work by themselves and get better every week.",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 85526,
-=======
-    "stargazers_count": 85525,
->>>>>>> Stashed changes
-    "forks_count": 16316,
-    "stars_in_period": 1126,
-    "url": "https://github.com/lobehub/lobehub",
-    "html_url": "https://github.com/lobehub/lobehub"
   },
   {
     "repo": "CopilotKit/OpenBot",
     "full_name": "CopilotKit/OpenBot",
     "description": "Open-source AI coworkers that each get a computer of their own: a browser, files and tools, with every action decided before it happens and recorded after. Bring any AG-UI agent.",
     "language": "TypeScript",
-    "stargazers_count": 12249,
-    "forks_count": 1507,
-    "stars_in_period": 1774,
+    "stargazers_count": 12405,
+    "forks_count": 1533,
+    "stars_in_period": 1900,
     "url": "https://github.com/CopilotKit/OpenBot",
     "html_url": "https://github.com/CopilotKit/OpenBot"
   },
   {
-    "repo": "immich-app/immich",
-    "full_name": "immich-app/immich",
-    "description": "High performance self-hosted photo and video management solution.",
+    "repo": "lobehub/lobehub",
+    "full_name": "lobehub/lobehub",
+    "description": "\ud83e\udd2f LobeHub - Super-Agents on Your Team. Add super-agents to the chats your team already uses.They take on work by themselves and get better every week.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 119186,
-    "forks_count": 7603,
-=======
-    "stargazers_count": 119190,
-    "forks_count": 7604,
->>>>>>> Stashed changes
-    "stars_in_period": 747,
-    "url": "https://github.com/immich-app/immich",
-    "html_url": "https://github.com/immich-app/immich"
+    "stargazers_count": 85570,
+    "forks_count": 16332,
+    "stars_in_period": 1258,
+    "url": "https://github.com/lobehub/lobehub",
+    "html_url": "https://github.com/lobehub/lobehub"
   },
   {
-    "repo": "every-app/open-seo",
-    "full_name": "every-app/open-seo",
-    "description": "Open source alternative to Semrush and Ahrefs",
+    "repo": "google-labs-code/stitch-skills",
+    "full_name": "google-labs-code/stitch-skills",
+    "description": "A library of Agent Skills designed to work with the Stitch MCP server. Each skill follows the Agent Skills open standard, for compatibility with coding agents such as Antigravity, Gemini CLI, Claude Code, Cursor.",
     "language": "TypeScript",
-    "stargazers_count": 27707,
-    "forks_count": 3877,
-    "stars_in_period": 1012,
-    "url": "https://github.com/every-app/open-seo",
-    "html_url": "https://github.com/every-app/open-seo"
+    "stargazers_count": 9198,
+    "forks_count": 1116,
+    "stars_in_period": 356,
+    "url": "https://github.com/google-labs-code/stitch-skills",
+    "html_url": "https://github.com/google-labs-code/stitch-skills"
   },
   {
-    "repo": "elie222/rakazo",
-    "full_name": "elie222/rakazo",
-    "description": "Open-source Grok Bot alternative. Choose your own model and sandbox.",
+    "repo": "a2ui-project/a2ui",
+    "full_name": "a2ui-project/a2ui",
+    "description": "Open-source generative UI framework: agents stream layout data, and apps render it with native components in React, Angular, Lit, Flutter, SwiftUI and Jetpack Compose.",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 8401,
-=======
-    "stargazers_count": 8404,
->>>>>>> Stashed changes
-    "forks_count": 1520,
-    "stars_in_period": 975,
-    "url": "https://github.com/elie222/rakazo",
-    "html_url": "https://github.com/elie222/rakazo"
-  },
-  {
-    "repo": "ranxianglei/billion-context",
-    "full_name": "ranxianglei/billion-context",
-    "description": "A context-compression plugin for month-long single sessions (billions of tokens) and small context windows (a 100K context is enough), billion-context is all you need .",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 7390,
-=======
-    "stargazers_count": 7393,
->>>>>>> Stashed changes
-    "forks_count": 609,
-    "stars_in_period": 3008,
-    "url": "https://github.com/ranxianglei/billion-context",
-    "html_url": "https://github.com/ranxianglei/billion-context"
-  },
-  {
-    "repo": "GoogleChrome/modern-web-guidance-src",
-    "full_name": "GoogleChrome/modern-web-guidance-src",
-    "description": "Keep your coding agent up to date with the latest web best practices",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 5739,
-    "forks_count": 333,
-=======
-    "stargazers_count": 5768,
-    "forks_count": 348,
->>>>>>> Stashed changes
-    "stars_in_period": 3377,
-    "url": "https://github.com/GoogleChrome/modern-web-guidance-src",
-    "html_url": "https://github.com/GoogleChrome/modern-web-guidance-src"
-  },
-  {
-    "repo": "pingdotgg/t3code",
-    "full_name": "pingdotgg/t3code",
-    "description": "The best way to control Claude Code, Codex and more from any computer or phone",
-    "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 60406,
-    "forks_count": 10882,
-=======
-    "stargazers_count": 60425,
-    "forks_count": 10888,
->>>>>>> Stashed changes
-    "stars_in_period": 10130,
-    "url": "https://github.com/pingdotgg/t3code",
-    "html_url": "https://github.com/pingdotgg/t3code"
+    "stargazers_count": 17427,
+    "forks_count": 1412,
+    "stars_in_period": 408,
+    "url": "https://github.com/a2ui-project/a2ui",
+    "html_url": "https://github.com/a2ui-project/a2ui"
   },
   {
     "repo": "garrytan/gbrain",
     "full_name": "garrytan/gbrain",
     "description": "Garry's Opinionated OpenClaw/Hermes Agent Brain",
     "language": "TypeScript",
-<<<<<<< Updated upstream
-    "stargazers_count": 32969,
-    "forks_count": 4928,
-=======
-    "stargazers_count": 32972,
-    "forks_count": 4929,
->>>>>>> Stashed changes
-    "stars_in_period": 1307,
+    "stargazers_count": 33082,
+    "forks_count": 4951,
+    "stars_in_period": 1351,
     "url": "https://github.com/garrytan/gbrain",
     "html_url": "https://github.com/garrytan/gbrain"
   },
   {
-    "repo": "vuejs/core",
-    "full_name": "vuejs/core",
-    "description": "\ud83d\udd96 Vue.js is a progressive, incrementally-adoptable JavaScript framework for building UI on the web.",
+    "repo": "every-app/open-seo",
+    "full_name": "every-app/open-seo",
+    "description": "Open source alternative to Semrush and Ahrefs",
     "language": "TypeScript",
-    "stargazers_count": 55018,
-    "forks_count": 9338,
-    "stars_in_period": 217,
-    "url": "https://github.com/vuejs/core",
-    "html_url": "https://github.com/vuejs/core"
+    "stargazers_count": 27796,
+    "forks_count": 3906,
+    "stars_in_period": 992,
+    "url": "https://github.com/every-app/open-seo",
+    "html_url": "https://github.com/every-app/open-seo"
+  },
+  {
+    "repo": "ranxianglei/billion-context",
+    "full_name": "ranxianglei/billion-context",
+    "description": "A context-compression plugin for month-long single sessions (billions of tokens) and small context windows (a 100K context is enough), billion-context is all you need .",
+    "language": "TypeScript",
+    "stargazers_count": 7525,
+    "forks_count": 621,
+    "stars_in_period": 2942,
+    "url": "https://github.com/ranxianglei/billion-context",
+    "html_url": "https://github.com/ranxianglei/billion-context"
+  },
+  {
+    "repo": "liguobao/ds-harness-remote",
+    "full_name": "liguobao/ds-harness-remote",
+    "description": "\u57fa\u4e8e DeepSeek Harness \u63d2\u4ef6\u673a\u5236\u6784\u5efa\u7684\u8fdc\u7a0b\u8bbf\u95ee\u65b9\u6848\uff0c\u901a\u8fc7\u4f4e\u5ef6\u8fdf\u3001\u7aef\u5230\u7aef\u52a0\u5bc6\u7684 P2P \u7f51\u7edc\uff0c\u652f\u6301\u4f7f\u7528 PC\u3001\u79fb\u52a8\u7aef \u548c Web \u968f\u65f6\u8bbf\u95ee\u672c\u5730\u8bbe\u5907\u4e0a\u7684DSH \u3001CodeX\u3001Cursor\u3001Claude Code\u7b49\u5de5\u4f5c\u533a\u3002 (Built on DeepSeek Harness plugins, this low-latency, end-to-end encrypted P2P solution lets PC, mobile, and web clients access local DSH, Codex, Cursor, and Claude Code workspaces.)",
+    "language": "TypeScript",
+    "stargazers_count": 2973,
+    "forks_count": 224,
+    "stars_in_period": 719,
+    "url": "https://github.com/liguobao/ds-harness-remote",
+    "html_url": "https://github.com/liguobao/ds-harness-remote"
+  },
+  {
+    "repo": "GoogleChrome/modern-web-guidance-src",
+    "full_name": "GoogleChrome/modern-web-guidance-src",
+    "description": "Keep your coding agent up to date with the latest web best practices",
+    "language": "TypeScript",
+    "stargazers_count": 6980,
+    "forks_count": 585,
+    "stars_in_period": 4363,
+    "url": "https://github.com/GoogleChrome/modern-web-guidance-src",
+    "html_url": "https://github.com/GoogleChrome/modern-web-guidance-src"
+  },
+  {
+    "repo": "elie222/rakazo",
+    "full_name": "elie222/rakazo",
+    "description": "Open-source Grok Bot alternative. Choose your own model and sandbox.",
+    "language": "TypeScript",
+    "stargazers_count": 8596,
+    "forks_count": 1549,
+    "stars_in_period": 966,
+    "url": "https://github.com/elie222/rakazo",
+    "html_url": "https://github.com/elie222/rakazo"
+  },
+  {
+    "repo": "pingdotgg/t3code",
+    "full_name": "pingdotgg/t3code",
+    "description": "The best way to control Claude Code, Codex and more from any computer or phone",
+    "language": "TypeScript",
+    "stargazers_count": 61361,
+    "forks_count": 11002,
+    "stars_in_period": 9668,
+    "url": "https://github.com/pingdotgg/t3code",
+    "html_url": "https://github.com/pingdotgg/t3code"
   },
   {
     "repo": "vercel-labs/agent-browser",
     "full_name": "vercel-labs/agent-browser",
     "description": "Browser automation CLI for AI agents",
     "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 51113,
-    "forks_count": 3565,
-=======
-    "stargazers_count": 51123,
-    "forks_count": 3568,
->>>>>>> Stashed changes
-    "stars_in_period": 4360,
+    "stargazers_count": 51545,
+    "forks_count": 3601,
+    "stars_in_period": 4601,
     "url": "https://github.com/vercel-labs/agent-browser",
     "html_url": "https://github.com/vercel-labs/agent-browser"
+  },
+  {
+    "repo": "block/buzz",
+    "full_name": "block/buzz",
+    "description": "A hive mind communication platform",
+    "language": "Rust",
+    "stargazers_count": 37478,
+    "forks_count": 4951,
+    "stars_in_period": 687,
+    "url": "https://github.com/block/buzz",
+    "html_url": "https://github.com/block/buzz"
   },
   {
     "repo": "vercel-labs/agent-desktop",
     "full_name": "vercel-labs/agent-desktop",
     "description": "Computer use CLI for AI agents",
     "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 23691,
-    "forks_count": 1763,
-=======
-    "stargazers_count": 23702,
-    "forks_count": 1764,
->>>>>>> Stashed changes
-    "stars_in_period": 5408,
+    "stargazers_count": 24139,
+    "forks_count": 1793,
+    "stars_in_period": 5171,
     "url": "https://github.com/vercel-labs/agent-desktop",
     "html_url": "https://github.com/vercel-labs/agent-desktop"
   },
@@ -1089,149 +862,98 @@
     "full_name": "ruvnet/RuView",
     "description": "\u03c0 RuView turns commodity WiFi signals into real-time spatial intelligence, vital sign monitoring, and presence detection \u2014 all without a single pixel of video.",
     "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 104278,
-    "forks_count": 13565,
-=======
-    "stargazers_count": 104283,
-    "forks_count": 13566,
->>>>>>> Stashed changes
-    "stars_in_period": 1639,
+    "stargazers_count": 104352,
+    "forks_count": 13576,
+    "stars_in_period": 1551,
     "url": "https://github.com/ruvnet/RuView",
     "html_url": "https://github.com/ruvnet/RuView"
-  },
-  {
-    "repo": "block/buzz",
-    "full_name": "block/buzz",
-    "description": "A hive mind communication platform",
-    "language": "Rust",
-    "stargazers_count": 37439,
-    "forks_count": 4947,
-    "stars_in_period": 683,
-    "url": "https://github.com/block/buzz",
-    "html_url": "https://github.com/block/buzz"
-  },
-  {
-    "repo": "astral-sh/ruff",
-    "full_name": "astral-sh/ruff",
-    "description": "An extremely fast Python linter and code formatter, written in Rust.",
-    "language": "Rust",
-    "stargazers_count": 51233,
-    "forks_count": 2668,
-    "stars_in_period": 940,
-    "url": "https://github.com/astral-sh/ruff",
-    "html_url": "https://github.com/astral-sh/ruff"
-  },
-  {
-    "repo": "herdrdev/herdr",
-    "full_name": "herdrdev/herdr",
-    "description": "the runtime your coding agents live on",
-    "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 50957,
-=======
-    "stargazers_count": 50959,
->>>>>>> Stashed changes
-    "forks_count": 4124,
-    "stars_in_period": 2423,
-    "url": "https://github.com/herdrdev/herdr",
-    "html_url": "https://github.com/herdrdev/herdr"
-  },
-  {
-    "repo": "longbridge/gpui-kit",
-    "full_name": "longbridge/gpui-kit",
-    "description": "Rust GUI components for building fantastic cross-platform desktop application by using GPUI.",
-    "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 20681,
-=======
-    "stargazers_count": 20683,
->>>>>>> Stashed changes
-    "forks_count": 1264,
-    "stars_in_period": 1012,
-    "url": "https://github.com/longbridge/gpui-kit",
-    "html_url": "https://github.com/longbridge/gpui-kit"
-  },
-  {
-    "repo": "CapSoftware/Cap",
-    "full_name": "CapSoftware/Cap",
-    "description": "Open source Loom alternative. Beautiful, shareable screen recordings.",
-    "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 25025,
-=======
-    "stargazers_count": 25026,
->>>>>>> Stashed changes
-    "forks_count": 2353,
-    "stars_in_period": 449,
-    "url": "https://github.com/CapSoftware/Cap",
-    "html_url": "https://github.com/CapSoftware/Cap"
-  },
-  {
-    "repo": "rustdesk/rustdesk",
-    "full_name": "rustdesk/rustdesk",
-    "description": "An open-source remote desktop application designed for self-hosting, as an alternative to TeamViewer.",
-    "language": "Rust",
-    "stargazers_count": 129454,
-<<<<<<< Updated upstream
-    "forks_count": 20699,
-=======
-    "forks_count": 20700,
->>>>>>> Stashed changes
-    "stars_in_period": 980,
-    "url": "https://github.com/rustdesk/rustdesk",
-    "html_url": "https://github.com/rustdesk/rustdesk"
   },
   {
     "repo": "tokio-rs/topcoat",
     "full_name": "tokio-rs/topcoat",
     "description": "A batteries-included framework for building web apps",
     "language": "Rust",
-    "stargazers_count": 7219,
+    "stargazers_count": 7230,
     "forks_count": 326,
-    "stars_in_period": 868,
+    "stars_in_period": 887,
     "url": "https://github.com/tokio-rs/topcoat",
     "html_url": "https://github.com/tokio-rs/topcoat"
   },
   {
-    "repo": "GyulyVGC/sniffnet",
-    "full_name": "GyulyVGC/sniffnet",
-    "description": "Comfortably monitor your network traffic \ud83d\udd75\ufe0f\u200d\u2642\ufe0f",
+    "repo": "astral-sh/ruff",
+    "full_name": "astral-sh/ruff",
+    "description": "An extremely fast Python linter and code formatter, written in Rust.",
     "language": "Rust",
-    "stargazers_count": 42776,
-    "forks_count": 2009,
-    "stars_in_period": 774,
-    "url": "https://github.com/GyulyVGC/sniffnet",
-    "html_url": "https://github.com/GyulyVGC/sniffnet"
+    "stargazers_count": 51251,
+    "forks_count": 2702,
+    "stars_in_period": 594,
+    "url": "https://github.com/astral-sh/ruff",
+    "html_url": "https://github.com/astral-sh/ruff"
   },
   {
-    "repo": "openai/codex",
-    "full_name": "openai/codex",
-    "description": "Lightweight coding agent that runs in your terminal",
+    "repo": "longbridge/gpui-kit",
+    "full_name": "longbridge/gpui-kit",
+    "description": "Rust GUI components for building fantastic cross-platform desktop application by using GPUI.",
     "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 135286,
-=======
-    "stargazers_count": 135287,
->>>>>>> Stashed changes
-    "forks_count": 21458,
-    "stars_in_period": 1929,
-    "url": "https://github.com/openai/codex",
-    "html_url": "https://github.com/openai/codex"
+    "stargazers_count": 20749,
+    "forks_count": 1272,
+    "stars_in_period": 914,
+    "url": "https://github.com/longbridge/gpui-kit",
+    "html_url": "https://github.com/longbridge/gpui-kit"
   },
   {
-    "repo": "Universal-Debloater-Alliance/universal-android-debloater-next-generation",
-    "full_name": "Universal-Debloater-Alliance/universal-android-debloater-next-generation",
-    "description": "Cross-platform GUI written in Rust using ADB to debloat non-rooted Android devices. Improve your privacy, the security and battery life of your device.",
+    "repo": "zellij-org/zellij",
+    "full_name": "zellij-org/zellij",
+    "description": "A terminal workspace with batteries included",
     "language": "Rust",
-<<<<<<< Updated upstream
-    "stargazers_count": 10079,
-=======
-    "stargazers_count": 10078,
->>>>>>> Stashed changes
-    "forks_count": 444,
-    "stars_in_period": 286,
-    "url": "https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation",
-    "html_url": "https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation"
+    "stargazers_count": 36078,
+    "forks_count": 1544,
+    "stars_in_period": 160,
+    "url": "https://github.com/zellij-org/zellij",
+    "html_url": "https://github.com/zellij-org/zellij"
+  },
+  {
+    "repo": "rustdesk/rustdesk",
+    "full_name": "rustdesk/rustdesk",
+    "description": "An open-source remote desktop application designed for self-hosting, as an alternative to TeamViewer.",
+    "language": "Rust",
+    "stargazers_count": 129577,
+    "forks_count": 20730,
+    "stars_in_period": 980,
+    "url": "https://github.com/rustdesk/rustdesk",
+    "html_url": "https://github.com/rustdesk/rustdesk"
+  },
+  {
+    "repo": "CapSoftware/Cap",
+    "full_name": "CapSoftware/Cap",
+    "description": "Open source Loom alternative. Beautiful, shareable screen recordings.",
+    "language": "Rust",
+    "stargazers_count": 25069,
+    "forks_count": 2367,
+    "stars_in_period": 446,
+    "url": "https://github.com/CapSoftware/Cap",
+    "html_url": "https://github.com/CapSoftware/Cap"
+  },
+  {
+    "repo": "herdrdev/herdr",
+    "full_name": "herdrdev/herdr",
+    "description": "the runtime your coding agents live on",
+    "language": "Rust",
+    "stargazers_count": 51152,
+    "forks_count": 4139,
+    "stars_in_period": 2026,
+    "url": "https://github.com/herdrdev/herdr",
+    "html_url": "https://github.com/herdrdev/herdr"
+  },
+  {
+    "repo": "ModernRelay/omnigraph",
+    "full_name": "ModernRelay/omnigraph",
+    "description": "Object-storage native graph database with branching and typed ontology",
+    "language": "Rust",
+    "stargazers_count": 2572,
+    "forks_count": 317,
+    "stars_in_period": 593,
+    "url": "https://github.com/ModernRelay/omnigraph",
+    "html_url": "https://github.com/ModernRelay/omnigraph"
   }
 ]
