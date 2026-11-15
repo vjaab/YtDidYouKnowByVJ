@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Phone's Brain: Born from Sand",
     "AI Fills Missing Picture Pieces: Generative Inpainting Breakthrough",
     "Phone's Secret Inner Ear",
     "Smartphone Photo Superpower: AI vs Optics",
@@ -99,10 +98,10 @@
     "AI Agents Get Wallets: The New Payment Frontier",
     "7 Boring Prompt Patterns for Production AI",
     "Advanced RAG Pipelines: Rewriting & Reranking Decoded",
-    "Demystifying AI Agents vs Standard LLMs"
+    "Demystifying AI Agents vs Standard LLMs",
+    "Demystifying AI Agent Architecture"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "threads",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Phone's Brain: Born from Sand",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-29T07:47:29.566978+00:00"
-    },
     {
       "title": "AI Fills Missing Picture Pieces: Generative Inpainting Breakthrough",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-15T18:50:47.397918+00:00"
+    },
+    {
+      "title": "Demystifying AI Agent Architecture",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-15T19:27:59.670321+00:00"
     }
   ]
 }
