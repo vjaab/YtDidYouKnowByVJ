@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Photos Are Secret Number Grids",
     "Zeros & Ones: Computing's Secret Language",
     "AI Overviews Lie More Than You Think",
     "Your Phone Remembers Everything You See!",
@@ -99,10 +98,10 @@
     "Medium Shifts AI Strategy",
     "Why Movie Spam Hijacks AI Data Feeds",
     "Stop Asking ChatGPT Wrong: Prompt Patterns That Work",
-    "DeepSeek-V3 & Coder-V2: The Local Hardware Reality"
+    "DeepSeek-V3 & Coder-V2: The Local Hardware Reality",
+    "Proactive AI Coding Assistant Messages You First"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "threads",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Photos Are Secret Number Grids",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-28T16:37:09.398656+00:00"
-    },
     {
       "title": "Zeros & Ones: Computing's Secret Language",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-14T18:56:50.844863+00:00"
+    },
+    {
+      "title": "Proactive AI Coding Assistant Messages You First",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-15T11:46:35.517519+00:00"
     }
   ]
 }
