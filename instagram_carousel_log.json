@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "How Your Phone's Screen Sees Your Finger",
     "Your Phone's Brain: Born from Sand",
     "AI Fills Missing Picture Pieces: Generative Inpainting Breakthrough",
     "Phone's Secret Inner Ear",
@@ -99,10 +98,10 @@
     "Proactive AI Coding Assistant Messages You First",
     "AI Agents Get Wallets: The New Payment Frontier",
     "7 Boring Prompt Patterns for Production AI",
-    "Advanced RAG Pipelines: Rewriting & Reranking Decoded"
+    "Advanced RAG Pipelines: Rewriting & Reranking Decoded",
+    "Demystifying AI Agents vs Standard LLMs"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "How Your Phone's Screen Sees Your Finger",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-28T20:30:31.753518+00:00"
-    },
     {
       "title": "Your Phone's Brain: Born from Sand",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-15T18:15:16.820449+00:00"
+    },
+    {
+      "title": "Demystifying AI Agents vs Standard LLMs",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-15T18:50:47.397918+00:00"
     }
   ]
 }
