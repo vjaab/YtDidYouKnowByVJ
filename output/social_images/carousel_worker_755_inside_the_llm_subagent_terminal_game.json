@@ -1,0 +1,212 @@
+{
+  "headline": "Worker 755: Inside the LLM Subagent Terminal Game",
+  "summary": "Discover Worker 755, a unique terminal game that flips the script by letting you experience software engineering from the perspective of an LLM subagent. Learn how command-line mechanics mimic autonomous agent execution flows.",
+  "source": "Medium - programming",
+  "source_url": "",
+  "date": "16 Nov 2026",
+  "category": "PROGRAMMING",
+  "topic_type": "developer_tool",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "scenario_question",
+      "eyebrow": "WORKER 755 UPDATE",
+      "title": "What if you were the AI's assistant?",
+      "subtitle": "Experience software engineering from the perspective of a constrained subagent.",
+      "body": "Modern developers orchestrate LLM agents daily, but rarely experience the terminal constraints and micro-tasks from the agent's point of view.",
+      "deep_dive": "Worker 755 turns this dynamic upside down by casting you as the subagent receiving tasks inside a retro terminal interface.",
+      "key_fact": "Simulates the exact lifecycle of an LLM micro-task executor.",
+      "why_it_matters": "Builds deep intuition for how autonomous coding agents parse and execute terminal commands.",
+      "visual_spec": {
+        "layout": "scenario_question",
+        "focus": "Hero text emphasizing the perspective shift."
+      }
+    },
+    {
+      "slide_number": 2,
+      "role": "tool_overview",
+      "layout_type": "whats_new",
+      "eyebrow": "WHAT IT DOES",
+      "title": "A terminal game about executing tasks",
+      "subtitle": "Navigate prompt instructions and command-line restrictions.",
+      "body": "Worker 755 combines text-adventure mechanics with realistic developer workflows inside an interactive command-line environment.",
+      "before_title": "Traditional Role",
+      "before_items": [
+        "Writing human code manually",
+        "Prompting AI models as a user",
+        "Debugging your own local environment"
+      ],
+      "after_title": "Worker 755 Role",
+      "after_items": [
+        "Acting as the LLM's subagent",
+        "Solving narrow terminal prompts",
+        "Operating under strict rule limits"
+      ],
+      "deep_dive": "Players receive automated prompts, interpret codebase objectives, and execute terminal actions to complete simulated engineering sprints.",
+      "key_fact": "Bridges gaming mechanics with practical developer terminal familiarity.",
+      "why_it_matters": "Explores human-AI interaction patterns through engaging, gamified storytelling.",
+      "visual_spec": {
+        "layout": "whats_new",
+        "focus": "Comparison between human developer and subagent workflows."
+      }
+    },
+    {
+      "slide_number": 3,
+      "role": "core_mechanism",
+      "layout_type": "process_flow",
+      "eyebrow": "EXECUTION FLOW",
+      "title": "How the subagent simulation loop runs",
+      "subtitle": "From prompt injection to final system validation.",
+      "body": "Every level in the terminal game mirrors the cognitive cycle of an automated coding assistant tackling a repository task.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Receive Prompt",
+          "desc": "Parse incoming user instructions and constraints."
+        },
+        {
+          "step": "2",
+          "title": "Inspect Environment",
+          "desc": "Check simulated file states and tool availability."
+        },
+        {
+          "step": "3",
+          "title": "Execute Command",
+          "desc": "Run terminal operations to fulfill the subtask."
+        }
+      ],
+      "deep_dive": "The step-by-step loop demonstrates how precise command selection dictates success when operating under rigid automation constraints.",
+      "key_fact": "Reflects real-world agent execution loops used by modern LLM coding tools.",
+      "why_it_matters": "Helps engineers understand where automated command sequences typically succeed or fail.",
+      "visual_spec": {
+        "layout": "process_flow",
+        "focus": "Sequential step cards highlighting the game loop."
+      }
+    },
+    {
+      "slide_number": 4,
+      "role": "architecture",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "ARCHITECTURE",
+      "title": "Inside the terminal interaction layer",
+      "subtitle": "Mapping the interface between player decisions and simulated system states.",
+      "body": "The simulation decouples user inputs from underlying engine rules, maintaining a deterministic state machine for every terminal action.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "Player Interface",
+            "sub": "Retro CLI view"
+          },
+          {
+            "name": "State Machine",
+            "sub": "Evaluates rules & outputs"
+          },
+          {
+            "name": "Simulated Workspace",
+            "sub": "Virtual files & constraints"
+          }
+        ],
+        "connections": [
+          {
+            "label": "Inputs commands"
+          },
+          {
+            "label": "Updates state"
+          }
+        ]
+      },
+      "deep_dive": "Clean separation of interface and state allows the game to accurately track complex multi-step terminal puzzles.",
+      "key_fact": "State machine design ensures predictable puzzle progression.",
+      "why_it_matters": "Demonstrates robust architecture principles applicable to building custom CLI tools.",
+      "visual_spec": {
+        "layout": "architecture_diagram",
+        "focus": "Three-tier block diagram showing interface to workspace flow."
+      }
+    },
+    {
+      "slide_number": 5,
+      "role": "system_workflow",
+      "layout_type": "input_output",
+      "eyebrow": "EXECUTION MECHANICS",
+      "title": "Input, processing, and output in action",
+      "subtitle": "How raw terminal commands translate into game outcomes.",
+      "body": "Observing the data flow reveals how simple text inputs get transformed into complex puzzle validations.",
+      "input": "Player types CLI command or text response",
+      "processing": "Engine validates against task parameters and limits",
+      "output": "Terminal feedback, status change, or level completion",
+      "deep_dive": "Fast feedback loops keep players immersed while reinforcing precise syntax and command-line habits.",
+      "key_fact": "Instant feedback loop mirrors efficient developer debugging.",
+      "why_it_matters": "Improves command-line fluency and mental modeling of automated systems.",
+      "visual_spec": {
+        "layout": "input_output",
+        "focus": "Linear pipeline from command entry to validation."
+      }
+    },
+    {
+      "slide_number": 6,
+      "role": "limitations_and_gotchas",
+      "layout_type": "checklist",
+      "eyebrow": "PRO TIPS & MISTAKES",
+      "title": "Mastering the subagent mindset",
+      "subtitle": "Best practices for approaching terminal puzzle games and LLM workflows.",
+      "body": "Avoid treating subagent simulations like casual typing exercises; treat them as logical optimization challenges.",
+      "items": [
+        "Read prompt constraints carefully before executing commands",
+        "Keep terminal command histories clean and deliberate",
+        "Follow @vijayakumarj_ai for daily AI and engineering updates"
+      ],
+      "deep_dive": "Embracing strict constraints sharpens problem-solving skills that translate directly to writing better prompts for real AI agents.",
+      "key_fact": "Mindset shift from creator to constrained assistant unlocks new engineering insights.",
+      "why_it_matters": "Equips developers with unique cognitive frameworks for collaborating with autonomous AI tools.",
+      "visual_spec": {
+        "layout": "checklist",
+        "focus": "Actionable takeaway list with clear call to action."
+      }
+    }
+  ],
+  "_model_used": "gemini-3.5-flash-lite",
+  "_topic_intelligence": {
+    "topic_type": "developer_tool",
+    "domain": "programming",
+    "primary_entity": "Worker 755",
+    "content_depth": "surface",
+    "best_story_angle": "fun_experiment",
+    "audience": [
+      "software_engineers",
+      "ai_engineers",
+      "hobbyist_devs"
+    ],
+    "key_questions": [
+      "What is the premise of Worker 755?",
+      "How does simulating an LLM subagent work as a terminal game?",
+      "What coding or terminal mechanics are involved?",
+      "Why is this perspective interesting for developers working with agents?"
+    ],
+    "recommended_slide_count": 6
+  },
+  "_archetype": "Developer Tool & IDE Innovation",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "Worker 755: a terminal game where you are an LLM\u2019s subagent",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "Worker 755: a terminal game where you are an LLM\u2019s subagent",
+    "fact_summary": "Most of my working hours lately look the same: I watch coding agents work. An orchestrator like Claude Code or Codex gets a high-level&#x2026;Continue reading on Medium \u00bb",
+    "source": "Medium - programming",
+    "news_source_url": "https://medium.com/@ivantgam_33304/worker-755-a-terminal-game-where-you-are-an-llms-subagent-69bdf95d9fac?source=rss------programming-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "worker",
+      "terminal",
+      "game",
+      "where",
+      "subagent"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}
