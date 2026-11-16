@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI Fills Missing Picture Pieces: Generative Inpainting Breakthrough",
     "Phone's Secret Inner Ear",
     "Smartphone Photo Superpower: AI vs Optics",
     "Your Phone's Brain is Made of Sand!",
@@ -99,10 +98,10 @@
     "7 Boring Prompt Patterns for Production AI",
     "Advanced RAG Pipelines: Rewriting & Reranking Decoded",
     "Demystifying AI Agents vs Standard LLMs",
-    "Demystifying AI Agent Architecture"
+    "Demystifying AI Agent Architecture",
+    "Weekly AI Digest: Nov 16, 2026"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI Fills Missing Picture Pieces: Generative Inpainting Breakthrough",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-29T08:32:09.010881+00:00"
-    },
     {
       "title": "Phone's Secret Inner Ear",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-15T19:27:59.670321+00:00"
+    },
+    {
+      "title": "Weekly AI Digest: Nov 16, 2026",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-16T16:25:19.466619+00:00"
     }
   ]
 }
