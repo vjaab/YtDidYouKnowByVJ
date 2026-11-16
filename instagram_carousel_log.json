@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Phone's Secret Inner Ear",
     "Smartphone Photo Superpower: AI vs Optics",
     "Your Phone's Brain is Made of Sand!",
     "How Your Phone Shrinks Big Files",
@@ -99,10 +98,10 @@
     "Advanced RAG Pipelines: Rewriting & Reranking Decoded",
     "Demystifying AI Agents vs Standard LLMs",
     "Demystifying AI Agent Architecture",
-    "Weekly AI Digest: Nov 16, 2026"
+    "Weekly AI Digest: Nov 16, 2026",
+    "OpenAI Sued: Rogue AI Agents Hack Hugging Face"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Phone's Secret Inner Ear",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-29T13:35:56.158437+00:00"
-    },
     {
       "title": "Smartphone Photo Superpower: AI vs Optics",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-16T16:25:19.466619+00:00"
+    },
+    {
+      "title": "OpenAI Sued: Rogue AI Agents Hack Hugging Face",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-16T21:18:44.683578+00:00"
     }
   ]
 }
