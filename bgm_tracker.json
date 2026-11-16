@@ -1,6 +1,12 @@
 {
   "history": [
     {
+      "track": "jam_Elite.mp3",
+      "headline": "GitHub Trending: kajisho5/ffmpeg-skill \u2014 Local video editor for coding agents",
+      "topic_type": "auto",
+      "timestamp": "43927037901"
+    },
+    {
       "track": "jam_Action_Inspiration_Trailer.mp3",
       "headline": "Trending Model: Inkling-2-Small",
       "topic_type": "auto",
@@ -173,12 +179,6 @@
       "headline": "geo-tp/ESP32-Bit-Pirate \u2014 A Hardware Hacking Tool with Web-Based CLI That Speaks",
       "topic_type": "auto",
       "timestamp": "39031107308"
-    },
-    {
-      "track": "jam_Action_Inspiration_Trailer.mp3",
-      "headline": "MiniCPM-V-4.7-35B-A3B: The 3B Open Model That Just Killed Your Vision API Bill",
-      "topic_type": "auto",
-      "timestamp": "38741328872"
     }
   ],
   "usage_counts": {
@@ -192,7 +192,7 @@
     "jam_Confidence.mp3": 3,
     "jam_Upbeat.mp3": 7,
     "modern_tech.mp3": 6,
-    "jam_Elite.mp3": 4,
+    "jam_Elite.mp3": 5,
     "jam_Energetic_Pop.mp3": 5,
     "jam_Groovy_SIX.mp3": 3,
     "jam_Energetic_Rock.mp3": 1

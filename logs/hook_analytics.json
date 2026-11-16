@@ -1910,11 +1910,11 @@
         "variants": {
           "B": {
             "views": 64,
-            "retention": 0.22253787878787878,
-            "engagement": 0.007142857142857143,
-            "swipe_away_rate": 0.26717500000000005,
-            "avg_view_percentage": 23.2825,
-            "count": 4,
+            "retention": 0.17803030303030304,
+            "engagement": 0.005714285714285714,
+            "swipe_away_rate": 0.21374000000000004,
+            "avg_view_percentage": 18.625999999999998,
+            "count": 5,
             "hook_texts": [
               {
                 "text": "Your video editor is stealing your data",
@@ -1925,16 +1925,21 @@
                 "text": "Stop paying for basic AI tools.",
                 "video_id": "Bsoej0oRhtw",
                 "recorded_at": "2026-11-09T19:48:14.543894"
+              },
+              {
+                "text": "Your video edits are now 100% private.",
+                "video_id": "8s5mLc2v2-0",
+                "recorded_at": "2026-11-16T19:17:05.936965"
               }
             ]
           }
         },
         "total_views": 64,
-        "total_videos": 4,
-        "avg_retention": 0.22253787878787878,
-        "avg_engagement": 0.007142857142857143,
-        "avg_swipe_away": 0.26717500000000005,
-        "avg_view_percentage": 23.2825
+        "total_videos": 5,
+        "avg_retention": 0.17803030303030304,
+        "avg_engagement": 0.005714285714285714,
+        "avg_swipe_away": 0.21374000000000004,
+        "avg_view_percentage": 18.625999999999998
       }
     },
     "AI Benchmark Showdowns": {
@@ -2000,12 +2005,12 @@
     },
     "personal_stake": {
       "views": 1290,
-      "retention": 0.2120216872289936,
-      "engagement": 0.0033810297909335043,
-      "count": 39,
-      "swipe_away_rate": 0.29606923076923086,
-      "avg_view_percentage": 42.52871794871795
+      "retention": 0.20672114504826875,
+      "engagement": 0.003296504046160167,
+      "count": 40,
+      "swipe_away_rate": 0.2886675000000001,
+      "avg_view_percentage": 41.4655
     }
   },
-  "last_updated": "2026-11-15T21:08:15.747856"
+  "last_updated": "2026-11-16T19:17:05.937001"
 }
