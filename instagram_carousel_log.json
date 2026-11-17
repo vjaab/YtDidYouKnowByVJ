@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your AI's Invisible Preference Predictor",
     "Your Cloud Runs on Real Steel",
     "Super-Sense Vision: AV Perception Breakthrough",
     "BCI & Wearable Sensor Edge Decoding Breakthrough",
@@ -99,10 +98,10 @@
     "Why AI Coding Agents Slow Down & 5 Caching Fixes",
     "The Rise of AI Debt: Beyond Technical Debt",
     "Transforming Data Workflows with Claude",
-    "The problem isn't ChatGPT. It's the brief."
+    "The problem isn't ChatGPT. It's the brief.",
+    "OpenAI Business Profiles: The Death of Traditional SEO"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your AI's Invisible Preference Predictor",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-30T08:38:26.791399+00:00"
-    },
     {
       "title": "Your Cloud Runs on Real Steel",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-17T22:12:37.755504+00:00"
+    },
+    {
+      "title": "OpenAI Business Profiles: The Death of Traditional SEO",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-17T22:20:24.328570+00:00"
     }
   ]
 }
