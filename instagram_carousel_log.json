@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Neuromorphic Chips: Tiny Sparks, Big Learning",
     "Your AI's Invisible Preference Predictor",
     "Your Cloud Runs on Real Steel",
     "Super-Sense Vision: AV Perception Breakthrough",
@@ -99,10 +98,10 @@
     "ChatGPT in Education: Delegate vs. Own",
     "Why AI Coding Agents Slow Down & 5 Caching Fixes",
     "The Rise of AI Debt: Beyond Technical Debt",
-    "Transforming Data Workflows with Claude"
+    "Transforming Data Workflows with Claude",
+    "The problem isn't ChatGPT. It's the brief."
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Neuromorphic Chips: Tiny Sparks, Big Learning",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-30T07:51:20.493724+00:00"
-    },
     {
       "title": "Your AI's Invisible Preference Predictor",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-17T19:16:33.848632+00:00"
+    },
+    {
+      "title": "The problem isn't ChatGPT. It's the brief.",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-17T22:12:37.755504+00:00"
     }
   ]
 }

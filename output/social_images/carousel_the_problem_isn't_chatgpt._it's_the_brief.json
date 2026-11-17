@@ -1,0 +1,191 @@
+{
+  "headline": "The problem isn't ChatGPT. It's the brief.",
+  "summary": "Discover why poor briefs and ambiguous context lead to hallucinated LLM outputs, and learn how to engineer robust structural components, constraints, and repeatable prompt patterns for production systems.",
+  "source": "Medium - artificial-intelligence",
+  "source_url": "",
+  "date": "17 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "programming_concept",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "hero_hook",
+      "eyebrow": "ARCHITECTURE PATTERN",
+      "title": "Why Your AI Output Fails",
+      "subtitle": "Blaming ChatGPT for bad code is like blaming a master carpenter for vague blueprints.",
+      "body": "When prompts lack strict boundaries and clear context, attention mechanisms drift and hallucination rates spike.",
+      "deep_dive": "Engineers often treat prompts like casual search queries instead of precise architectural contracts, resulting in brittle responses.",
+      "key_fact": "Vague instructions trigger probabilistic guessing loops.",
+      "why_it_matters": "Poor briefing destroys production reliability."
+    },
+    {
+      "slide_number": 2,
+      "role": "concept_mental_model",
+      "layout_type": "process_flow",
+      "eyebrow": "MENTAL MODEL",
+      "title": "The Junior Intern Analogy",
+      "subtitle": "Think of an LLM as a brilliant junior engineer working remotely without documentation.",
+      "body": "If you just say 'build something cool,' you get chaos. If you provide architectural specs, you get production-ready code.",
+      "deep_dive": "Context framing acts as the boundary layer that focuses model weights onto exact execution paths rather than random associative text generation.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Vague Request",
+          "desc": "Leaves massive room for random probabilistic drift."
+        },
+        {
+          "step": "2",
+          "title": "Mental Sandbox",
+          "desc": "Model guesses intentions based on weak signals."
+        },
+        {
+          "step": "3",
+          "title": "Structured Brief",
+          "desc": "Constrains attention weights to exact parameters."
+        }
+      ],
+      "key_fact": "Context shapes the probability distribution.",
+      "why_it_matters": "Clear mental models prevent costly debugging cycles."
+    },
+    {
+      "slide_number": 3,
+      "role": "execution_mechanics",
+      "layout_type": "input_output",
+      "eyebrow": "HOW IT WORKS",
+      "title": "From Ambiguity to Precision",
+      "subtitle": "Transforming unstructured intent into deterministic output structures.",
+      "body": "See how state transformation occurs when input prompts move from loose suggestions to strict specifications.",
+      "input": "Write an authentication system for my app.",
+      "processing": "Parsing constraints, defining JWT schemas, and mapping security rules.",
+      "output": "A production-grade auth module with explicit edge-case handling.",
+      "deep_dive": "Detailed briefs condition the hidden states of the transformer to prioritize rigorous software logic.",
+      "key_fact": "Explicit constraints eliminate guessing.",
+      "why_it_matters": "Deterministic inputs drive reliable software execution."
+    },
+    {
+      "slide_number": 4,
+      "role": "architectural_deep_dive",
+      "layout_type": "side_by_side",
+      "eyebrow": "PATTERN TRADE-OFFS",
+      "title": "Briefing Architecture Choices",
+      "subtitle": "Balancing instruction depth against latency and context window limits.",
+      "body": "Evaluating how rigid structural constraints impact token overhead and generation throughput.",
+      "left_title": "Lightweight Prompts",
+      "left_items": [
+        "Minimal token overhead",
+        "Faster initial time-to-first-token",
+        "High variance in output quality",
+        "Prone to logic hallucination"
+      ],
+      "right_title": "Production Briefs",
+      "right_items": [
+        "Higher upfront token consumption",
+        "Strict output determinism",
+        "Reduced error and retry rates",
+        "Predictable system behavior"
+      ],
+      "deep_dive": "Architects must trade minor prompt latency for massive gains in downstream reliability.",
+      "key_fact": "Richer context saves debugging time downstream.",
+      "why_it_matters": "Optimizes overall system throughput."
+    },
+    {
+      "slide_number": 5,
+      "role": "common_antipattern",
+      "layout_type": "side_by_side",
+      "eyebrow": "AVOID THIS MISTAKE",
+      "title": "Naive vs Robust Briefing",
+      "subtitle": "Spotting the anti-patterns that sink AI-driven engineering workflows.",
+      "body": "Stop writing conversational throwaway prompts and start treating prompts as configuration files.",
+      "left_title": "Na\u00efve Anti-Pattern",
+      "left_items": [
+        "Fix my bug please",
+        "No constraints or tech stack given",
+        "Assuming AI knows your architecture",
+        "Endless frustrating chat loops"
+      ],
+      "right_title": "Robust Solution",
+      "right_items": [
+        "Specify exact tech stack and version",
+        "Define strict error-handling criteria",
+        "Provide input and output schema examples",
+        "One-shot correct execution"
+      ],
+      "deep_dive": "Treating prompts as system specs eliminates frustrating back-and-forth loops.",
+      "key_fact": "Configuration-style prompts beat conversational chats.",
+      "why_it_matters": "Saves hours of developer intervention."
+    },
+    {
+      "slide_number": 6,
+      "role": "production_case_study",
+      "layout_type": "real_world_scenario",
+      "eyebrow": "SCALE IN PRODUCTION",
+      "title": "AI in High-Throughput Systems",
+      "subtitle": "How elite engineering teams automate code generation reliably.",
+      "body": "Automated pipelines rely on templated briefs containing strict validation schemas to guarantee zero-defect outputs.",
+      "deep_dive": "When scaling AI agents across microservices, unstructured text is replaced by rigorous JSON-schema driven prompt contracts.",
+      "key_fact": "Systemized briefs enable autonomous agent reliability.",
+      "why_it_matters": "Unlocks true enterprise automation potential."
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "ENGINEERING CHEAT SHEET",
+      "title": "Mastering LLM Briefs",
+      "subtitle": "Key rules for building robust AI integration workflows.",
+      "body": "Summarizing core engineering principles for better AI collaboration.",
+      "takeaways": [
+        "Treat every prompt as a strict technical specification document.",
+        "Include explicit tech stacks, boundaries, and expected output formats.",
+        "Eliminate conversational ambiguity to prevent hallucinations."
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI engineering systems design breakdowns.",
+      "deep_dive": "Mastering the brief is the single highest ROI skill for modern software engineers working with AI.",
+      "key_fact": "Quality in equals quality out.",
+      "why_it_matters": "Future-proofs your engineering career."
+    }
+  ],
+  "_model_used": "gemini-3.5-flash-lite",
+  "_topic_intelligence": {
+    "topic_type": "programming_concept",
+    "domain": "ai_ml",
+    "primary_entity": "ChatGPT",
+    "content_depth": "practical",
+    "best_story_angle": "best_practices",
+    "audience": [
+      "software_engineers",
+      "ai_engineers",
+      "product_engineers"
+    ],
+    "key_questions": [
+      "Why do poor briefs and ambiguous context lead to hallucinated or low-quality LLM outputs?",
+      "What structural components define an effective, production-grade LLM brief?",
+      "How does context and constraint engineering alter attention mechanisms and model behavior?",
+      "What reusable prompt design patterns should developers adopt in AI workflows?"
+    ],
+    "recommended_slide_count": 7
+  },
+  "_archetype": "Programming Concept & Architecture Pattern",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "The problem isn\u2019t ChatGPT. It\u2019s the brief.",
+    "hook": "Did You Know: The problem isn\u2019t ChatGPT. It\u2019s the brief.? \u26a1",
+    "headline": "The problem isn\u2019t ChatGPT. It\u2019s the brief.",
+    "fact_summary": "If you run a small business and have tried ChatGPT or Claude, you have probably seen the same thing: a caption that could belong to anyone&#x2026;Continue reading on Medium \u00bb",
+    "source": "Medium - artificial-intelligence",
+    "news_source_url": "https://medium.com/@kauam/the-problem-isnt-chatgpt-it-s-the-brief-8251c9f25836?source=rss------artificial_intelligence-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "problem",
+      "chatgpt",
+      "brief"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}
