@@ -1,0 +1,226 @@
+{
+  "headline": "Why AI Coding Agents Slow Down & 5 Caching Fixes",
+  "summary": "Extended AI coding sessions bog down as context windows bloat. Prompt caching reuses prior computations, keeping agents fast. Learn the mechanism, architecture, and five practical caching patterns to integrate into daily workflows.",
+  "source": "Medium - programming",
+  "source_url": "",
+  "date": "17 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "developer_tool",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "scenario_question",
+      "eyebrow": "AI CODING AGENTS (E.G., GITHUB COPILOT, CURSOR, CLAUDE CODE) UPDATE",
+      "title": "Why Your AI Pair Programmer Gets Sluggish",
+      "subtitle": "Long sessions choke on accumulated context.",
+      "body": "Ever notice Copilot or Cursor dragging after an hour? The model re-reads every prior turn, bloating the context window. Prompt caching solves this by reusing earlier work.",
+      "deep_dive": "AI coding agents maintain a rolling conversation history. Each new request carries the full transcript \u2014 system prompt, file contents, prior edits, user messages. As the session grows, the context window fills, forcing the model to process more tokens per inference. Latency rises, costs climb, and relevance drops. Prompt caching identifies stable prefixes (system instructions, unchanged files) and stores their computed attention keys/values, so the model skips recomputation on repeat passes.",
+      "key_fact": "Context-window bloat is the primary cause of slowdown in extended AI coding sessions.",
+      "why_it_matters": "Uncached sessions waste compute on identical prefixes, degrading developer flow and increasing API costs."
+    },
+    {
+      "slide_number": 2,
+      "role": "tool_overview",
+      "layout_type": "whats_new",
+      "eyebrow": "WHAT IT DOES",
+      "title": "Prompt Caching: Reuse, Don't Recompute",
+      "subtitle": "Stable prefixes skip the attention computation.",
+      "body": "Caching stores attention keys/values for unchanged prompt segments. On subsequent calls, the model retrieves them instead of recalculating. Latency drops, throughput rises.",
+      "deep_dive": "When you send a prompt, the transformer computes attention over every token. If the first 80% (system prompt, repo map, unchanged files) stays identical across requests, that computation is pure waste. Prompt caching lets the server cache the KV cache for that prefix. Next request: the server concatenates cached KV states with new tokens, jumping straight to generation. Supported by major providers (Anthropic, OpenAI) via explicit cache-control headers or automatic prefix matching.",
+      "key_fact": "Prompt caching eliminates redundant attention computation for stable prompt prefixes.",
+      "why_it_matters": "Directly reduces per-request latency and token cost in long-running agent loops.",
+      "before_title": "Without Caching",
+      "before_items": [
+        "Full prompt reprocessed every turn",
+        "Latency grows with session length",
+        "Higher token bills for repeated context"
+      ],
+      "after_title": "With Caching",
+      "after_items": [
+        "Stable prefix KV states reused",
+        "Near-constant latency per turn",
+        "Lower cost on repeated context"
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "core_mechanism",
+      "layout_type": "process_flow",
+      "eyebrow": "EXECUTION FLOW",
+      "title": "How a Cached Request Flows",
+      "subtitle": "Cache hit skips prefix attention entirely.",
+      "body": "Request arrives \u2192 cache lookup \u2192 prefix match \u2192 reuse KV cache \u2192 append new tokens \u2192 generate. Miss falls back to full compute.",
+      "deep_dive": "The server hashes the prompt prefix (often first N tokens). On hit, it loads the precomputed key/value tensors from memory, concatenates them with fresh query projections for new tokens, and runs attention only over the suffix. This is analogous to memoizing a pure function: same input prefix \u2192 same intermediate state. Cache eviction policies (LRU, TTL) manage memory pressure. Developers control cacheability via `cache_control` breakpoints in the prompt.",
+      "key_fact": "Cache hit serves precomputed attention states; miss computes from scratch.",
+      "why_it_matters": "Understanding the flow lets you structure prompts for maximum cache hits.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Request Received",
+          "desc": "Incoming prompt tokens arrive at inference server"
+        },
+        {
+          "step": "2",
+          "title": "Prefix Hash Lookup",
+          "desc": "Server hashes prompt prefix, checks KV cache store"
+        },
+        {
+          "step": "3",
+          "title": "Cache Hit Path",
+          "desc": "Load cached keys/values, concatenate with new token queries"
+        },
+        {
+          "step": "4",
+          "title": "Generate Response",
+          "desc": "Run attention only on suffix, stream completion"
+        }
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "architecture",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "ARCHITECTURE",
+      "title": "Editor \u2192 Agent \u2192 Index \u2192 LLM with Cache Layer",
+      "subtitle": "Cache sits between agent orchestrator and model.",
+      "body": "IDE sends context \u2192 local agent builds prompt \u2192 cache layer intercepts \u2192 LLM returns diff. Cache keyed on prompt prefix.",
+      "deep_dive": "The architecture inserts a caching proxy between the agent's prompt builder and the LLM endpoint. The agent assembles context: system prompt, repository map (AST index), open files, conversation history. Before calling the model, the proxy computes a prefix hash. If cached, it injects stored KV tensors into the model's attention layers. The repository map (code index) is a prime cache candidate \u2014 it changes only on file edits. The proxy also handles cache invalidation when the index updates.",
+      "key_fact": "Cache layer intercepts prompt, injects KV tensors on hit, falls through on miss.",
+      "why_it_matters": "Shows where caching lives in the toolchain \u2014 transparent to the developer.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "IDE / Editor",
+            "sub": "User edits, selections, commands"
+          },
+          {
+            "name": "Local Agent",
+            "sub": "Builds prompt, manages session state"
+          },
+          {
+            "name": "Code Index (AST)",
+            "sub": "Repository map, symbol definitions"
+          },
+          {
+            "name": "Cache Proxy",
+            "sub": "Prefix hash \u2192 KV cache store"
+          },
+          {
+            "name": "LLM Endpoint",
+            "sub": "Attention with optional cached KV"
+          }
+        ],
+        "connections": [
+          {
+            "label": "Context & query"
+          },
+          {
+            "label": "Repository map"
+          },
+          {
+            "label": "Prompt + cache key"
+          },
+          {
+            "label": "Cached KV / raw tokens"
+          }
+        ]
+      }
+    },
+    {
+      "slide_number": 5,
+      "role": "system_workflow",
+      "layout_type": "input_output",
+      "eyebrow": "EXECUTION MECHANICS",
+      "title": "Developer Query \u2192 Structured Diff",
+      "subtitle": "Input flows through index, cache, model to artifact.",
+      "body": "Query + repo state \u2192 AST index builds context \u2192 cache checks prefix \u2192 model emits structured edit.",
+      "deep_dive": "The developer types a request (\"add error handling to auth flow\"). The local agent queries the AST index for relevant symbols, constructs a prompt with system instructions, repo map, and history. The cache proxy checks if the system+repo-map prefix matches a stored KV cache. On hit, the model receives precomputed attention for that prefix and only processes the new query tokens. Output is a structured diff (unified diff, JSON patch) applied directly in the editor. This loop repeats; each turn reuses the stable prefix.",
+      "key_fact": "AST index and system prompt form the stable cacheable prefix; only the query changes.",
+      "why_it_matters": "Reveals why repo-map stability is the lever for cache efficiency.",
+      "input": "Developer query + session history + repo map",
+      "processing": "AST index \u2192 prompt builder \u2192 cache proxy (prefix hash \u2192 KV lookup) \u2192 LLM attention",
+      "output": "Structured diff / code artifact applied in editor"
+    },
+    {
+      "slide_number": 6,
+      "role": "limitations_and_gotchas",
+      "layout_type": "common_mistake",
+      "eyebrow": "PRO TIPS & MISTAKES",
+      "title": "Five Caching Patterns vs Common Pitfalls",
+      "subtitle": "Structure prompts for hits; avoid cache-busting habits.",
+      "body": "Pin system prompt, stabilize repo map, batch edits, version cache keys, monitor hit rate. Don't shuffle context, inject timestamps, or mutate prefixes.",
+      "deep_dive": "Pattern 1: Pin the system prompt at the very top \u2014 never modify it mid-session. Pattern 2: Keep the repository map (AST index) stable; only refresh on explicit file-save events. Pattern 3: Batch related edits into one request instead of many small turns \u2014 each turn extends the suffix, but the prefix stays cached. Pattern 4: Version cache keys with a hash of the repo map; invalidate only when the map changes. Pattern 5: Expose cache-hit metrics in your agent UI to debug misses. Pitfall: Adding timestamps or request IDs into the prefix busts the cache every turn. Pitfall: Reordering context sections changes the prefix hash. Pitfall: Including full file contents that change frequently \u2014 use symbol references instead.",
+      "key_fact": "Stable prefix ordering and content are the single biggest driver of cache hit rate.",
+      "why_it_matters": "Small prompt-structure changes yield large latency and cost savings.",
+      "items": [
+        "Pin system prompt at top \u2014 never mutate",
+        "Stabilize repo map; refresh only on file save",
+        "Batch related edits into single turns",
+        "Version cache keys by repo-map hash",
+        "Monitor cache-hit rate in agent UI"
+      ]
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "GET STARTED",
+      "title": "Integrate Caching Into Your Daily Loop",
+      "subtitle": "Three steps to faster, cheaper agent sessions.",
+      "body": "Enable cache in your IDE extension, structure prompts for stable prefixes, watch hit-rate dashboard. Flow stays fast for hours.",
+      "deep_dive": "Most modern AI coding extensions (Cursor, Copilot, Claude Code) already support prompt caching via provider APIs. Ensure your extension version is current. In your agent configuration, set `cache_control` breakpoints after the system prompt and repository map. Avoid putting dynamic content (timestamps, git SHAs, full file dumps) before those breakpoints. Add a small status indicator showing cache-hit percentage \u2014 if it drops below 80%, audit your prompt template. The payoff: sessions that stay snappy at hour four, not just minute one.",
+      "key_fact": "Prompt caching is natively supported by major providers; integration is often a config toggle.",
+      "why_it_matters": "Turns a hidden performance tax into a visible, controllable optimization.",
+      "takeaways": [
+        "Update IDE extension; enable cache in settings",
+        "Place cache breakpoints after system prompt + repo map",
+        "Add cache-hit indicator; investigate drops below 80%"
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI & engineering workflows."
+    }
+  ],
+  "_model_used": "OpenRouter:nvidia/nemotron-3-ultra-550b-a55b:free",
+  "_topic_intelligence": {
+    "topic_type": "developer_tool",
+    "domain": "ai_ml",
+    "primary_entity": "AI coding agents (e.g., GitHub Copilot, Cursor, Claude Code)",
+    "content_depth": "deep",
+    "best_story_angle": "technical_breakdown",
+    "audience": [
+      "software_engineers",
+      "ai_engineers"
+    ],
+    "key_questions": [
+      "What causes AI coding agents to slow down during extended sessions?",
+      "How does prompt caching work to mitigate context-window bloat?",
+      "What are the 5 specific prompt-caching strategies developers can apply?",
+      "How can engineers integrate these caching patterns into their daily workflow?"
+    ],
+    "recommended_slide_count": 7
+  },
+  "_archetype": "Developer Tool & IDE Innovation",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "Why AI coding agents slow down in long sessions, and 5 prompt-caching ",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "Why AI coding agents slow down in long sessions, and 5 promp",
+    "fact_summary": "If you use Claude Code, Codex or an open model through Ollama, you&#x2019;ve probably seen an agent that was quick at the start get slower and&#x2026;Continue reading on Medium \u00bb",
+    "source": "Medium - programming",
+    "news_source_url": "https://medium.com/@tabishhassan01998/why-ai-coding-agents-slow-down-in-long-sessions-and-5-prompt-caching-mistakes-to-avoid-8017437d0575?source=rss------programming-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "coding",
+      "agents",
+      "slow",
+      "down",
+      "long"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}

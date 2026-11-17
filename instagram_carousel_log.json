@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "How Your Phone Shrinks Big Files",
     "Silence Magic: Headphones That Hear Noise",
     "Your Phone's Brain Works on Tiny Lightning",
     "Neuromorphic Chips: Tiny Sparks, Big Learning",
@@ -99,10 +98,10 @@
     "Weekly AI Digest: Nov 16, 2026",
     "OpenAI Sued: Rogue AI Agents Hack Hugging Face",
     "Worker 755: Inside the LLM Subagent Terminal Game",
-    "ChatGPT in Education: Delegate vs. Own"
+    "ChatGPT in Education: Delegate vs. Own",
+    "Why AI Coding Agents Slow Down & 5 Caching Fixes"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "threads",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "How Your Phone Shrinks Big Files",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-29T19:33:40.794438+00:00"
-    },
     {
       "title": "Silence Magic: Headphones That Hear Noise",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-17T09:52:23.638231+00:00"
+    },
+    {
+      "title": "Why AI Coding Agents Slow Down & 5 Caching Fixes",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-17T10:46:00.563258+00:00"
     }
   ]
 }
