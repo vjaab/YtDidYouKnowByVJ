@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Silence Magic: Headphones That Hear Noise",
     "Your Phone's Brain Works on Tiny Lightning",
     "Neuromorphic Chips: Tiny Sparks, Big Learning",
     "Your AI's Invisible Preference Predictor",
@@ -99,10 +98,10 @@
     "OpenAI Sued: Rogue AI Agents Hack Hugging Face",
     "Worker 755: Inside the LLM Subagent Terminal Game",
     "ChatGPT in Education: Delegate vs. Own",
-    "Why AI Coding Agents Slow Down & 5 Caching Fixes"
+    "Why AI Coding Agents Slow Down & 5 Caching Fixes",
+    "The Rise of AI Debt: Beyond Technical Debt"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Silence Magic: Headphones That Hear Noise",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-29T19:55:36.290241+00:00"
-    },
     {
       "title": "Your Phone's Brain Works on Tiny Lightning",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-17T10:46:00.563258+00:00"
+    },
+    {
+      "title": "The Rise of AI Debt: Beyond Technical Debt",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-17T19:03:44.362492+00:00"
     }
   ]
 }
