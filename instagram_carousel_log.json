@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Phone's Brain Works on Tiny Lightning",
     "Neuromorphic Chips: Tiny Sparks, Big Learning",
     "Your AI's Invisible Preference Predictor",
     "Your Cloud Runs on Real Steel",
@@ -99,10 +98,10 @@
     "Worker 755: Inside the LLM Subagent Terminal Game",
     "ChatGPT in Education: Delegate vs. Own",
     "Why AI Coding Agents Slow Down & 5 Caching Fixes",
-    "The Rise of AI Debt: Beyond Technical Debt"
+    "The Rise of AI Debt: Beyond Technical Debt",
+    "Transforming Data Workflows with Claude"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Phone's Brain Works on Tiny Lightning",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-29T20:31:54.435239+00:00"
-    },
     {
       "title": "Neuromorphic Chips: Tiny Sparks, Big Learning",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-17T19:03:44.362492+00:00"
+    },
+    {
+      "title": "Transforming Data Workflows with Claude",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-17T19:16:33.848632+00:00"
     }
   ]
 }
