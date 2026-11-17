@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Phone's Brain is Made of Sand!",
     "How Your Phone Shrinks Big Files",
     "Silence Magic: Headphones That Hear Noise",
     "Your Phone's Brain Works on Tiny Lightning",
@@ -99,10 +98,10 @@
     "Demystifying AI Agent Architecture",
     "Weekly AI Digest: Nov 16, 2026",
     "OpenAI Sued: Rogue AI Agents Hack Hugging Face",
-    "Worker 755: Inside the LLM Subagent Terminal Game"
+    "Worker 755: Inside the LLM Subagent Terminal Game",
+    "ChatGPT in Education: Delegate vs. Own"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Phone's Brain is Made of Sand!",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-29T17:30:49.390787+00:00"
-    },
     {
       "title": "How Your Phone Shrinks Big Files",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-16T23:51:41.191742+00:00"
+    },
+    {
+      "title": "ChatGPT in Education: Delegate vs. Own",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-17T09:52:23.638231+00:00"
     }
   ]
 }
