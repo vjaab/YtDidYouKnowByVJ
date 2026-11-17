@@ -1490,12 +1490,12 @@
       "result_first": {
         "variants": {
           "B": {
-            "views": 234,
-            "retention": 0.11965811965811966,
-            "engagement": 0.0,
-            "swipe_away_rate": 0.20883333333333334,
-            "avg_view_percentage": 12.450000000000001,
-            "count": 3,
+            "views": 265,
+            "retention": 0.17724358974358972,
+            "engagement": 0.008064516129032258,
+            "swipe_away_rate": 0.313275,
+            "avg_view_percentage": 18.6725,
+            "count": 4,
             "hook_texts": [
               {
                 "text": "This plugin turns small AI into giants.",
@@ -1525,12 +1525,12 @@
             ]
           }
         },
-        "total_views": 277,
-        "total_videos": 5,
-        "avg_retention": 0.27179487179487183,
-        "avg_engagement": 0.0,
-        "avg_swipe_away": 0.32530000000000003,
-        "avg_view_percentage": 31.85
+        "total_views": 308,
+        "total_videos": 6,
+        "avg_retention": 0.2848290598290598,
+        "avg_engagement": 0.005376344086021505,
+        "avg_swipe_away": 0.37551666666666667,
+        "avg_view_percentage": 32.765
       },
       "curiosity_gap": {
         "variants": {
@@ -1980,12 +1980,12 @@
       "avg_view_percentage": 90.05219512195123
     },
     "result_first": {
-      "views": 1493,
-      "retention": 0.19537421569112778,
-      "engagement": 0.0038837114320925616,
-      "count": 43,
-      "swipe_away_rate": 0.2876023255813953,
-      "avg_view_percentage": 20.64372093023256
+      "views": 1524,
+      "retention": 0.19888843806178394,
+      "engagement": 0.004528583093093391,
+      "count": 44,
+      "swipe_away_rate": 0.29530681818181814,
+      "avg_view_percentage": 21.023181818181822
     },
     "stat_contradiction": {
       "views": 273,
@@ -2012,5 +2012,5 @@
       "avg_view_percentage": 41.4655
     }
   },
-  "last_updated": "2026-11-16T19:17:05.937001"
+  "last_updated": "2026-11-17T15:50:22.475450"
 }

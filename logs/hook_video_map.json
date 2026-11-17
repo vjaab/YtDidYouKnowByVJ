@@ -2205,7 +2205,21 @@
     "category": "AI & Tech Tools",
     "title": "Why Your Laptop Can Run AI Fast \u26a1",
     "uploaded_at": "2026-11-14T20:20:56.647853",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-11-17T15:50:22.477389",
+    "last_metrics": {
+      "views": 31,
+      "avg_view_duration_sec": 14.0,
+      "avg_view_percentage": 37.34,
+      "swipe_away_rate": 0.6266,
+      "duration_sec": 40.0,
+      "retention_rate": 0.35,
+      "engagement_rate": 0.0323,
+      "likes": 0,
+      "comments": 1,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "bwXIxrFArNQ": {
     "video_id": "bwXIxrFArNQ",
