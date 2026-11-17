@@ -1910,11 +1910,11 @@
         "variants": {
           "B": {
             "views": 64,
-            "retention": 0.17803030303030304,
-            "engagement": 0.005714285714285714,
-            "swipe_away_rate": 0.21374000000000004,
-            "avg_view_percentage": 18.625999999999998,
-            "count": 5,
+            "retention": 0.14835858585858586,
+            "engagement": 0.0047619047619047615,
+            "swipe_away_rate": 0.1781166666666667,
+            "avg_view_percentage": 15.521666666666667,
+            "count": 6,
             "hook_texts": [
               {
                 "text": "Your video editor is stealing your data",
@@ -1930,16 +1930,21 @@
                 "text": "Your video edits are now 100% private.",
                 "video_id": "8s5mLc2v2-0",
                 "recorded_at": "2026-11-16T19:17:05.936965"
+              },
+              {
+                "text": "Your favorite Mac browser is dead.",
+                "video_id": "yi5AnUV07LA",
+                "recorded_at": "2026-11-17T18:46:52.821521"
               }
             ]
           }
         },
         "total_views": 64,
-        "total_videos": 5,
-        "avg_retention": 0.17803030303030304,
-        "avg_engagement": 0.005714285714285714,
-        "avg_swipe_away": 0.21374000000000004,
-        "avg_view_percentage": 18.625999999999998
+        "total_videos": 6,
+        "avg_retention": 0.14835858585858586,
+        "avg_engagement": 0.0047619047619047615,
+        "avg_swipe_away": 0.1781166666666667,
+        "avg_view_percentage": 15.521666666666667
       }
     },
     "AI Benchmark Showdowns": {
@@ -2005,12 +2010,12 @@
     },
     "personal_stake": {
       "views": 1290,
-      "retention": 0.20672114504826875,
-      "engagement": 0.003296504046160167,
-      "count": 40,
-      "swipe_away_rate": 0.2886675000000001,
-      "avg_view_percentage": 41.4655
+      "retention": 0.20167916590075,
+      "engagement": 0.0032161015084489434,
+      "count": 41,
+      "swipe_away_rate": 0.28162682926829274,
+      "avg_view_percentage": 40.454146341463414
     }
   },
-  "last_updated": "2026-11-17T15:50:22.475450"
+  "last_updated": "2026-11-17T18:46:52.821547"
 }
