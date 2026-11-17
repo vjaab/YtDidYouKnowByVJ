@@ -2229,7 +2229,21 @@
     "category": "Facts & Trivia",
     "title": "Stop Paying For AI Vision Today \ud83e\udd2f",
     "uploaded_at": "2026-11-15T21:08:15.751431",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-11-17T23:16:21.334373",
+    "last_metrics": {
+      "views": 27,
+      "avg_view_duration_sec": 13.0,
+      "avg_view_percentage": 36.65,
+      "swipe_away_rate": 0.6335,
+      "duration_sec": 36.0,
+      "retention_rate": 0.3611,
+      "engagement_rate": 0.037,
+      "likes": 0,
+      "comments": 1,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   },
   "8s5mLc2v2-0": {
     "video_id": "8s5mLc2v2-0",
