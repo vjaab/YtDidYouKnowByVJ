@@ -21,3 +21,38 @@
 [17:38:07] ❌ Kaggle Handover failed: [queued_timeout] Kaggle job stuck in QUEUED for 15 min (limit: 15 min). GPU likely unavailable or quota exhausted.
 [17:38:07] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
 [17:38:07] ⚠️ Lip-sync will be SKIPPED for this video (requires GPU).
+[22:20:22] === STARTING DAILY AI PIPELINE (DID_YOU_KNOW) | COUNTRY: GB | SOURCE: HUGGINGFACE_HUB ===
+[22:20:22] 🔄 Sequential Topic Source: Active='HUGGINGFACE_HUB' (Rotation: github → medium → huggingface_hub)
+[22:20:22] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[22:20:22] STEP 1: Content Ecosystem Check -> Day: Thu, Slot: Slot A (Discovery), Category: Tech Gadgets & Inventions, Format: MYTH_BUSTER (Run 1/3)
+[22:20:22] STEP 2: Fetching articles (RSS + Trending Engine)...
+[22:20:50] 🔥 Trending Engine injected 194 high-signal articles (active_source='huggingface_hub', sources=['huggingface_hub', 'github', 'medium']).
+[22:20:50] 📈 vidIQ: Injected 8 high-signal topics.
+[22:21:45] ✅ Fetched 548 total articles (194 trending engine [huggingface_hub], 8 vidIQ, 238 research, 99 tools, 9 X.com).
+[22:21:45] 📚 Loaded 30 recent topics for deduplication
+[22:23:33] 🔍 Deduplication & classification: 548 → 20 candidates
+[22:23:33] 🏷️ Zero-shot re-categorized top candidate: Tech Gadgets & Inventions → AI & Tech Tools
+[22:23:33] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[22:44:20] Selected Headline: GitHub Trending: tradermonty/claude-trading-skills — Claude Code skills for equity investors and traders
+[22:44:20] Selected URL: https://github.com/tradermonty/claude-trading-skills
+[22:44:20] Breaking Level: 9
+[22:44:20] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[22:44:28] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261118_224420.png
+[22:44:28] 🐙 GitHub repo detected — capturing README as evidence screenshot (MANDATORY)...
+[22:44:33] ✅ GitHub README captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_readme_20261118_224428.png
+[22:44:33] ℹ️ GitHub README already captured as evidence — skipping secondary screenshot
+[22:44:33] STEP 4: Generating voiceover + word timestamps...
+[22:44:33] Selected Lip-Sync Template: assets/video/green_springboot.mp4 (from 41 options)
+[22:44:33] ⚠️ Script too long (86 words > 84). Asking for a tighter rewrite (shorten retry 1/2) before GPU work.
+[22:44:33] STEP 3 (Attempt 2/10): Gemini Searching & Generating Script...
+[22:50:11] Selected Headline: HF Trending Dataset: google/physical-engineerings-last-exam
+[22:50:11] Selected URL: https://huggingface.co/datasets/google/physical-engineerings-last-exam
+[22:50:11] Breaking Level: 9
+[22:50:11] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[22:50:15] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261118_225011.png
+[22:50:33] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261118_225015.png
+[22:50:33] STEP 4: Generating voiceover + word timestamps...
+[22:50:33] Selected Lip-Sync Template: assets/video/green_springboot.mp4 (from 41 options)
+[23:02:42] ❌ Kaggle Handover failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 12 min.
+[23:02:42] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
+[23:02:42] ⚠️ Lip-sync will be SKIPPED for this video (requires GPU).
