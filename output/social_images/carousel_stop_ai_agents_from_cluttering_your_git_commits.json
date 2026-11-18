@@ -1,0 +1,194 @@
+{
+  "headline": "Stop AI Agents From Cluttering Your Git Commits",
+  "summary": "AI coding assistants are sneaking unwanted metadata, promo lines, and brand signatures into developer git histories. Learn how to protect your repository hygiene and configure your workflow for clean code delivery.",
+  "source": "Medium - programming",
+  "source_url": "",
+  "date": "18 Nov 2026",
+  "category": "PROGRAMMING",
+  "topic_type": "developer_tool",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "scenario_question",
+      "eyebrow": "AI CODING AGENTS UPDATE",
+      "title": "Why is your git history full of silent dealer frames?",
+      "subtitle": "Unwanted automated additions are cluttering clean repository commits.",
+      "body": "Like a car dealership putting a permanent chrome logo on your bumper, AI tools often append hidden signatures, tool tags, and promotional strings directly into your project history.",
+      "deep_dive": "Developers spend hours curating atomic, meaningful git histories. When autonomous coding assistants automatically inject brand footers, system tags, or unsolicited metadata into commit messages, it ruins code readability and professional accountability.",
+      "key_fact": "AI agents frequently modify commit metadata and message structures without explicit developer approval.",
+      "why_it_matters": "Clean git histories are essential for auditing, debugging, and maintaining professional software engineering standards."
+    },
+    {
+      "slide_number": 2,
+      "role": "tool_overview",
+      "layout_type": "whats_new",
+      "eyebrow": "WHAT IT DOES",
+      "title": "Taking back complete control of your commit pipeline",
+      "subtitle": "Isolate your core code changes from automated assistant fluff.",
+      "body": "Modern engineering workflows require strict boundaries between what the developer writes and what the AI assistant suggests.",
+      "before_title": "The Old Habit",
+      "before_items": [
+        "Accepting default AI commit messages",
+        "Blindly pushing generated pull requests",
+        "Allowing hidden tool signatures"
+      ],
+      "after_title": "The Clean Workflow",
+      "after_items": [
+        "Reviewing every generated commit line",
+        "Stripping unsolicited agent tags",
+        "Enforcing strict repo hygiene rules"
+      ],
+      "deep_dive": "Configuring local hooks ensures that any automated agent output passes through a strict validation layer before touching your remote branches.",
+      "key_fact": "Workflow boundaries prevent external tool footprints from contaminating team repositories.",
+      "why_it_matters": "Preserves pristine version control logs and prevents unintentional third-party branding in open-source projects."
+    },
+    {
+      "slide_number": 3,
+      "role": "core_mechanism",
+      "layout_type": "process_flow",
+      "eyebrow": "EXECUTION FLOW",
+      "title": "How AI agents infiltrate your repository history",
+      "subtitle": "Tracing the automated injection path from editor prompt to final commit.",
+      "body": "Understanding how code assistants hook into version control commands is the first step toward building an effective defense mechanism.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Prompt Execution",
+          "desc": "Developer requests a feature implementation from the local coding assistant."
+        },
+        {
+          "step": "2",
+          "title": "Automated Staging",
+          "desc": "The agent drafts code changes and automatically formats the commit message."
+        },
+        {
+          "step": "3",
+          "title": "Silent Injection",
+          "desc": "Hidden tags or promotional footers are appended to the commit object."
+        }
+      ],
+      "deep_dive": "Agents operate with high autonomy, often assuming that users want their branding or tool identification displayed publicly in repository logs.",
+      "key_fact": "Silent injection happens during the automated packaging phase of code generation.",
+      "why_it_matters": "Spotting the infiltration vector allows engineers to intercept and sanitize commits before they hit production."
+    },
+    {
+      "slide_number": 4,
+      "role": "architecture",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "ARCHITECTURE",
+      "title": "The Sanitization Layer Architecture",
+      "subtitle": "Inserting a validation barrier between your editor and git history.",
+      "body": "Map out the exact integration points where local hooks intercept and clean up generated artifacts.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "IDE & AI Agent",
+            "sub": "Code generation source"
+          },
+          {
+            "name": "Git Hook Filter",
+            "sub": "Sanitization barrier"
+          },
+          {
+            "name": "Clean Remote Repo",
+            "sub": "Pristine commit history"
+          }
+        ],
+        "connections": [
+          {
+            "label": "Intercepts raw output"
+          },
+          {
+            "label": "Strips unauthorized metadata"
+          }
+        ]
+      },
+      "deep_dive": "By placing an automated filter at the pre-commit stage, all agent-generated clutter is automatically scrubbed before final persistence.",
+      "key_fact": "Pre-commit hooks act as automated gatekeepers for code and message hygiene.",
+      "why_it_matters": "Automating the cleaning process ensures developers never accidentally push unwanted signatures."
+    },
+    {
+      "slide_number": 5,
+      "role": "system_workflow",
+      "layout_type": "input_output",
+      "eyebrow": "EXECUTION MECHANICS",
+      "title": "Transforming messy agent output into clean code",
+      "subtitle": "Input validation and automated payload purification.",
+      "body": "See how raw AI outputs with unwanted metadata are processed into clean, professional code contributions.",
+      "input": "Raw AI commit containing agent signatures, promotional tags, and default boilerplate text.",
+      "processing": "Local validation script strips non-standard metadata and enforces team commit standards.",
+      "output": "A pristine, atomic commit containing only verified business logic and clean developer notes.",
+      "deep_dive": "Engineering teams can define custom validation rules that scan commit payloads for known AI fingerprints and automatically remove them.",
+      "key_fact": "Payload purification guarantees that only authorized code and text enter the master branch.",
+      "why_it_matters": "Maintains strict code quality and professional standards across distributed engineering teams."
+    },
+    {
+      "slide_number": 6,
+      "role": "limitations_and_gotchas",
+      "layout_type": "common_mistake",
+      "eyebrow": "PRO TIPS & MISTAKES",
+      "title": "Best practices for maintaining pristine git hygiene",
+      "subtitle": "Avoid common configuration pitfalls when working with AI coding tools.",
+      "body": "Never trust default agent settings blindly. Take proactive control of your developer workflow to keep repositories clean and professional.",
+      "before_title": "Common Antipatterns",
+      "before_items": [
+        "Trusting default tool commit templates",
+        "Skipping pre-commit validation checks",
+        "Ignoring automated metadata bloat"
+      ],
+      "after_title": "Recommended Usage",
+      "after_items": [
+        "Customize local git hook filters",
+        "Manually review all agent messages",
+        "Enforce team-wide commit standards"
+      ],
+      "deep_dive": "As AI assistants become deeply embedded in IDEs, maintaining explicit control over your version control history is a crucial engineering discipline.",
+      "key_fact": "Proactive tool configuration stops repository clutter before it starts.",
+      "why_it_matters": "Follow @vijayakumarj_ai for daily engineering insights, AI workflows, and tech leadership updates."
+    }
+  ],
+  "_model_used": "gemini-3.5-flash-lite",
+  "_topic_intelligence": {
+    "topic_type": "developer_tool",
+    "domain": "programming",
+    "primary_entity": "AI Coding Agents",
+    "content_depth": "intermediate",
+    "best_story_angle": "practical_guide",
+    "audience": [
+      "software_engineers",
+      "devops_engineers"
+    ],
+    "key_questions": [
+      "What kind of unwanted clutter are AI agents leaving in git commits?",
+      "Why are coding assistants modifying commit history or metadata automatically?",
+      "How can developers configure their workflows to prevent unwanted AI alterations?",
+      "What are the best practices for maintaining clean commit hygiene with AI tools?"
+    ],
+    "recommended_slide_count": 6
+  },
+  "_archetype": "Developer Tool & IDE Innovation",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "Stop Letting AI Coding Agents Put Dealer Frames on Your Git Commits",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "Stop Letting AI Coding Agents Put Dealer Frames on Your Git ",
+    "fact_summary": "How to replace vendor Co-authored-by ads across Claude Code, Cursor, and GitHub Copilot with a single global Git hook.Continue reading on Medium \u00bb",
+    "source": "Medium - programming",
+    "news_source_url": "https://medium.com/@AndrewJByrne/replace-ai-co-authored-by-git-hook-50371219dd55?source=rss------programming-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "stop",
+      "letting",
+      "coding",
+      "agents",
+      "dealer"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}
