@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Cloud Runs on Real Steel",
     "Super-Sense Vision: AV Perception Breakthrough",
     "BCI & Wearable Sensor Edge Decoding Breakthrough",
     "Undersea Internet Cables: The Global Data Highway",
@@ -99,10 +98,10 @@
     "The Rise of AI Debt: Beyond Technical Debt",
     "Transforming Data Workflows with Claude",
     "The problem isn't ChatGPT. It's the brief.",
-    "OpenAI Business Profiles: The Death of Traditional SEO"
+    "OpenAI Business Profiles: The Death of Traditional SEO",
+    "Anthropic Claude 5.2 Release"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "threads",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Cloud Runs on Real Steel",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-30T13:28:11.518138+00:00"
-    },
     {
       "title": "Super-Sense Vision: AV Perception Breakthrough",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-17T22:20:24.328570+00:00"
+    },
+    {
+      "title": "Anthropic Claude 5.2 Release",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-18T16:19:52.651554+00:00"
     }
   ]
 }
