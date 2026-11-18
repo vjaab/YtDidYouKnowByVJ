@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Super-Sense Vision: AV Perception Breakthrough",
     "BCI & Wearable Sensor Edge Decoding Breakthrough",
     "Undersea Internet Cables: The Global Data Highway",
     "Your Photos Are Smart Puzzles",
@@ -99,10 +98,10 @@
     "Transforming Data Workflows with Claude",
     "The problem isn't ChatGPT. It's the brief.",
     "OpenAI Business Profiles: The Death of Traditional SEO",
-    "Anthropic Claude 5.2 Release"
+    "Anthropic Claude 5.2 Release",
+    "AI Builds Games in Minutes: Zero-Code Dev Workflow Explored"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Super-Sense Vision: AV Perception Breakthrough",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-30T16:41:44.403198+00:00"
-    },
     {
       "title": "BCI & Wearable Sensor Edge Decoding Breakthrough",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-18T16:19:52.651554+00:00"
+    },
+    {
+      "title": "AI Builds Games in Minutes: Zero-Code Dev Workflow Explored",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-18T19:35:21.895177+00:00"
     }
   ]
 }
