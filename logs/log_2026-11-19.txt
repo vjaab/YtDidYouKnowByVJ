@@ -21,3 +21,36 @@
 [17:57:53] ❌ Kaggle Handover failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 16 min.
 [17:57:53] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
 [17:57:53] ⚠️ Lip-sync will be SKIPPED for this video (requires GPU).
+[22:29:52] === STARTING DAILY AI PIPELINE (DID_YOU_KNOW) | COUNTRY: GB | SOURCE: HUGGINGFACE_HUB ===
+[22:29:52] 🔄 Sequential Topic Source: Active='HUGGINGFACE_HUB' (Rotation: github → medium → huggingface_hub)
+[22:29:52] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[22:29:52] STEP 1: Content Ecosystem Check -> Day: Fri, Slot: Slot A (Discovery), Category: Facts & Trivia, Format: MASCOT_DEBATE (Run 1/3)
+[22:29:52] STEP 2: Fetching articles (RSS + Trending Engine)...
+[22:30:05] 🔥 Trending Engine injected 73 high-signal articles (active_source='huggingface_hub', sources=['huggingface_hub', 'github', 'medium']).
+[22:30:05] 📈 vidIQ: Injected 8 high-signal topics.
+[22:31:33] ✅ Fetched 432 total articles (73 trending engine [huggingface_hub], 8 vidIQ, 252 research, 96 tools, 3 X.com).
+[22:31:33] 📚 Loaded 30 recent topics for deduplication
+[22:33:20] 🔍 Deduplication & classification: 432 → 20 candidates
+[22:33:20] 🏷️ Zero-shot re-categorized top candidate: Facts & Trivia → AI & Tech Tools
+[22:33:20] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[22:35:36] Selected Headline: apple/FastFrames-L trending on Hugging Face
+[22:35:36] Selected URL: https://huggingface.co/apple/FastFrames-L
+[22:35:36] Breaking Level: 9
+[22:35:36] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[22:35:41] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261119_223536.png
+[22:35:46] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261119_223541.png
+[22:35:46] STEP 4: Generating voiceover + word timestamps...
+[22:35:46] Selected Lip-Sync Template: assets/video/green_springboot.mp4 (from 41 options)
+[22:35:46] ⚠️ Script too long (86 words > 84). Asking for a tighter rewrite (shorten retry 1/2) before GPU work.
+[22:35:46] STEP 3 (Attempt 2/10): Gemini Searching & Generating Script...
+[22:37:20] Selected Headline: Apple Releases Open-Weight Text-to-Video AI Model FastFrames-L
+[22:37:20] Selected URL: https://huggingface.co/apple/FastFrames-L
+[22:37:20] Breaking Level: 9
+[22:37:20] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[22:37:24] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261119_223720.png
+[22:41:09] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261119_223724.png
+[22:41:09] STEP 4: Generating voiceover + word timestamps...
+[22:41:09] Selected Lip-Sync Template: assets/video/green_springboot.mp4 (from 41 options)
+[22:51:48] ❌ Kaggle Handover failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 11 min.
+[22:51:48] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
+[22:51:48] ⚠️ Lip-sync will be SKIPPED for this video (requires GPU).

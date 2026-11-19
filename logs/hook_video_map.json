@@ -2263,6 +2263,20 @@
     "category": "Tech Gadgets & Inventions",
     "title": "Why 99% Of Mac Users Panic Now \u26a1",
     "uploaded_at": "2026-11-17T18:46:52.824527",
-    "synced": false
+    "synced": true,
+    "synced_at": "2026-11-19T22:52:01.218614",
+    "last_metrics": {
+      "views": 3,
+      "avg_view_duration_sec": 15.0,
+      "avg_view_percentage": 46.88,
+      "swipe_away_rate": 0.5312,
+      "duration_sec": 32.0,
+      "retention_rate": 0.4688,
+      "engagement_rate": 0.3333,
+      "likes": 0,
+      "comments": 1,
+      "shares": 0,
+      "subscribers_gained": 0
+    }
   }
 }
