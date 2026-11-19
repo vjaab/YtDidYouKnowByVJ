@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Undersea Internet Cables: The Global Data Highway",
     "Your Photos Are Smart Puzzles",
     "AI Inference Gets Production-Ready with Dedicated GPUs",
     "GPS: Einstein's Invisible Guide",
@@ -99,10 +98,10 @@
     "OpenAI Business Profiles: The Death of Traditional SEO",
     "Anthropic Claude 5.2 Release",
     "AI Builds Games in Minutes: Zero-Code Dev Workflow Explored",
-    "Stop AI Agents From Cluttering Your Git Commits"
+    "Stop AI Agents From Cluttering Your Git Commits",
+    "Anthropic Watermarks Claude Outputs: What Devs Must Know"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Undersea Internet Cables: The Global Data Highway",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-30T19:03:43.609406+00:00"
-    },
     {
       "title": "Your Photos Are Smart Puzzles",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-18T22:41:47.246561+00:00"
+    },
+    {
+      "title": "Anthropic Watermarks Claude Outputs: What Devs Must Know",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-19T09:37:13.175103+00:00"
     }
   ]
 }
