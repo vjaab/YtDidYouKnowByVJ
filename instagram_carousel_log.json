@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI Inference Gets Production-Ready with Dedicated GPUs",
     "GPS: Einstein's Invisible Guide",
     "Neural Machine Translation: Core Principles",
     "AI's Secret Language Decoder",
@@ -99,10 +98,10 @@
     "AI Builds Games in Minutes: Zero-Code Dev Workflow Explored",
     "Stop AI Agents From Cluttering Your Git Commits",
     "Anthropic Watermarks Claude Outputs: What Devs Must Know",
-    "7 New Claude Features for Dev Workflows"
+    "7 New Claude Features for Dev Workflows",
+    "Mastering Claude Code Workflows"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "threads",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI Inference Gets Production-Ready with Dedicated GPUs",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-30T20:01:38.593048+00:00"
-    },
     {
       "title": "GPS: Einstein's Invisible Guide",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-19T10:19:28.983030+00:00"
+    },
+    {
+      "title": "Mastering Claude Code Workflows",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-19T19:00:55.291331+00:00"
     }
   ]
 }
