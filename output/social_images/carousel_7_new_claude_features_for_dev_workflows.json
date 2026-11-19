@@ -1,0 +1,226 @@
+{
+  "headline": "7 New Claude Features for Dev Workflows",
+  "summary": "Anthropic shipped seven new Claude capabilities designed to embed AI deeper into daily engineering routines. The update targets context handling, tool integration, and team collaboration \u2014 moving beyond chat into true IDE-native assistance.",
+  "source": "Medium - programming",
+  "source_url": "",
+  "date": "19 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "developer_tool",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "scenario_question",
+      "eyebrow": "ANTHROPIC UPDATE",
+      "title": "Why Does AI Still Feel Disconnected From Your Editor?",
+      "subtitle": "Seven new Claude features close the gap between chat and code.",
+      "body": "You switch tabs, copy context, paste errors, and hope the model understands your codebase. Anthropic's latest drop targets that exact friction \u2014 seven features built to live inside your workflow, not beside it.",
+      "deep_dive": "Most AI coding assistants operate as external chat windows. They lack persistent awareness of your project structure, build state, or runtime behavior. This forces developers into a context-shuttling loop: extract snippets, explain intent, validate suggestions, re-apply. Anthropic's update rethinks this by embedding reasoning, tooling, and memory directly into the developer loop \u2014 treating the IDE as a first-class runtime, not a text source.",
+      "key_fact": "Seven new features announced; all aim to reduce context-switching between IDE and AI.",
+      "why_it_matters": "Eliminates the copy-paste tax that makes AI feel like a separate tool instead of a teammate."
+    },
+    {
+      "slide_number": 2,
+      "role": "tool_overview",
+      "layout_type": "whats_new",
+      "eyebrow": "WHAT IT DOES",
+      "title": "From Chat Companion to Workflow Native",
+      "subtitle": "Features span context, tools, memory, and team sharing.",
+      "body": "The release covers persistent project memory, native tool execution, cross-file reasoning, shared team contexts, cost-aware routing, offline-capable caching, and IDE-level diff previews. Each targets a specific workflow break point.",
+      "deep_dive": "Previous Claude interactions were stateless \u2014 each conversation started fresh. The new features introduce a layered architecture: a project index that builds semantic understanding of your codebase, a tool runtime that executes commands and reads outputs, a memory layer that persists decisions across sessions, and a team namespace for shared context. Pricing tiers gate some capabilities: Free gets basic memory and caching; Pro adds tool execution and diff previews; Team unlocks shared contexts and admin controls.",
+      "key_fact": "Features distributed across Free, Pro, and Team tiers \u2014 not all available on every plan.",
+      "why_it_matters": "You can now match Claude's capability tier to your team's workflow maturity and budget.",
+      "before_title": "Before This Release",
+      "before_items": [
+        "Stateless chat sessions",
+        "Manual context gathering",
+        "No persistent project memory",
+        "Single-user only"
+      ],
+      "after_title": "After This Release",
+      "after_items": [
+        "Persistent project index",
+        "Native tool execution",
+        "Cross-session memory",
+        "Team-shared contexts"
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "core_mechanism",
+      "layout_type": "process_flow",
+      "eyebrow": "EXECUTION FLOW",
+      "title": "How Claude Now Processes Your Codebase",
+      "subtitle": "Index \u2192 Reason \u2192 Act \u2192 Remember \u2192 Share",
+      "body": "A background indexer builds a semantic map. Queries trigger targeted retrieval. Tools execute in a sandbox. Results update the memory layer. Team members inherit context automatically.",
+      "deep_dive": "The indexer doesn't just embed files \u2014 it parses ASTs, resolves imports, tracks symbol references, and builds a call graph. When you ask a question, the retriever walks this graph to pull only relevant context, not entire files. The tool runtime spins up ephemeral containers with your project's dependencies pre-installed, runs commands, captures stdout/stderr, and feeds results back into the reasoning loop. The memory layer stores decisions (\"use library X for auth\") as structured facts, not chat history. Team sync merges these facts across members with conflict resolution.",
+      "key_fact": "Semantic code graph enables surgical context retrieval instead of brute-force file dumps.",
+      "why_it_matters": "Token efficiency and relevance improve dramatically \u2014 the model sees what matters, not everything.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Project Ingestion",
+          "desc": "AST parsing builds symbol graph and call hierarchy"
+        },
+        {
+          "step": "2",
+          "title": "Query Routing",
+          "desc": "Retriever walks graph to fetch minimal relevant context"
+        },
+        {
+          "step": "3",
+          "title": "Tool Execution",
+          "desc": "Sandbox runs tests, linters, builds \u2014 returns structured results"
+        },
+        {
+          "step": "4",
+          "title": "Memory Commit",
+          "desc": "Decisions stored as typed facts, not conversation logs"
+        },
+        {
+          "step": "5",
+          "title": "Team Sync",
+          "desc": "Facts merge across members with versioned conflict resolution"
+        }
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "architecture",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "ARCHITECTURE",
+      "title": "Editor \u2192 Local Agent \u2192 Code Index \u2192 Compiler/LLM",
+      "subtitle": "Four-layer stack keeps latency low and context fresh.",
+      "body": "A lightweight IDE extension talks to a local agent. The agent maintains the semantic index. The compiler/LLM layer executes tools and reasons. All state syncs to cloud for team sharing.",
+      "deep_dive": "The local agent is the keystone \u2014 it runs in-process with your editor, giving it instant access to unsaved buffers, cursor position, and git status. It incrementally updates the semantic index on every keystroke using a differential AST parser. The compiler/LLM layer is decoupled: it can run locally (for privacy/offline) or route to cloud (for heavier reasoning). Tool execution happens in project-matched containers spun up by the agent. Team sync uses CRDTs on the fact layer \u2014 no central server bottleneck for reads.",
+      "key_fact": "Local agent enables zero-latency context; cloud layer handles heavy reasoning and team sync.",
+      "why_it_matters": "Architecture separates hot-path context (local) from compute-intensive reasoning (flexible).",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "IDE Extension",
+            "sub": "Cursor position, unsaved buffers, git diff"
+          },
+          {
+            "name": "Local Agent",
+            "sub": "Incremental AST index, tool sandbox, fact store"
+          },
+          {
+            "name": "Compiler/LLM Layer",
+            "sub": "Local or cloud \u2014 reasoning, planning, code gen"
+          },
+          {
+            "name": "Team Sync Service",
+            "sub": "CRDT-based fact merge, access control, audit log"
+          }
+        ],
+        "connections": [
+          {
+            "label": "Real-time context stream"
+          },
+          {
+            "label": "Tool exec + reasoning requests"
+          },
+          {
+            "label": "Fact replication + conflict resolution"
+          }
+        ]
+      }
+    },
+    {
+      "slide_number": 5,
+      "role": "system_workflow",
+      "layout_type": "input_output",
+      "eyebrow": "EXECUTION MECHANICS",
+      "title": "Developer Intent \u2192 Structured Artifact",
+      "subtitle": "Natural language becomes verified diff, not suggestion.",
+      "body": "You describe a change. The system retrieves context, plans edits, runs tools to validate, and presents a reviewable diff. Acceptance commits to memory and index.",
+      "deep_dive": "The input isn't just text \u2014 it's intent enriched with implicit context: current file, test failures, recent commits, team conventions. The planner decomposes intent into atomic edits mapped to the semantic graph. Each edit runs through the tool sandbox: type-check, lint, test. Failures feed back into the planner for revision. The output is a structured diff with metadata: affected symbols, test coverage delta, migration notes. One-click apply stages changes in git. The fact layer records \"refactored auth to use library X\" \u2014 future queries inherit this knowledge.",
+      "key_fact": "Output is a verified, reviewable diff with test evidence \u2014 not a raw code block to vet manually.",
+      "why_it_matters": "Closes the verify-then-apply loop that consumes 60% of AI-assisted coding time.",
+      "input": "Natural language intent + implicit context (file, tests, git, conventions)",
+      "processing": "Semantic retrieval \u2192 edit planning \u2192 tool validation (type/lint/test) \u2192 revision loop",
+      "output": "Structured diff with metadata + one-click git staging + fact commit"
+    },
+    {
+      "slide_number": 6,
+      "role": "limitations_and_gotchas",
+      "layout_type": "common_mistake",
+      "eyebrow": "PRO TIPS & MISTAKES",
+      "title": "Antipatterns That Waste the New Capabilities",
+      "subtitle": "Treat it like chat and you'll miss 80% of the value.",
+      "body": "Don't paste code snippets \u2014 the index already knows. Don't ask for whole files \u2014 request surgical edits. Don't ignore team facts \u2014 they encode tribal knowledge. Don't skip diff review \u2014 validation is the feature.",
+      "deep_dive": "The biggest mistake is treating the new Claude like the old chat model. Pasted context pollutes the semantic graph with stale snapshots. Requesting full-file rewrites bypasses the surgical edit planner and triggers unnecessary token spend. Ignoring team facts means relearning decisions your colleagues already encoded. Skipping diff review defeats the validated-artifact guarantee \u2014 the tool sandbox catches errors, but human intent verification remains essential. Pro tip: use \"explain this decision\" queries to surface team facts before coding. Pro tip: bind \"accept diff\" to a keyboard shortcut \u2014 the workflow is designed for speed.",
+      "key_fact": "Pasting context, requesting full rewrites, and skipping diff review are the top three value-destroying habits.",
+      "why_it_matters": "The architecture rewards surgical, validated, team-aware interactions \u2014 not chat-style prompting.",
+      "items": [
+        "Pasting code snippets instead of trusting the live index",
+        "Asking for whole-file rewrites instead of targeted edits",
+        "Ignoring team fact layer \u2014 relearning known decisions",
+        "Skipping diff review \u2014 validated artifact is the contract",
+        "Using chat mental model for a workflow-native tool"
+      ]
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "GET STARTED",
+      "title": "From Zero to Power User in Three Steps",
+      "subtitle": "Install, index, iterate \u2014 team onboarding is automatic.",
+      "body": "Install the IDE extension. Open a project \u2014 indexing starts automatically. Ask a real task. Share the workspace with your team. Follow @vijayakumarj_ai for daily AI engineering updates.",
+      "deep_dive": "The extension installs in under a minute (VS Code, JetBrains, Neovim supported). First index takes seconds for small projects, minutes for monorepos \u2014 runs in background, no blocking. Your first query should be a real task: \"add error handling to the payment flow\" or \"migrate this component to the new design system.\" Watch the diff, review test results, accept. Invite teammates via the Team panel \u2014 they inherit the index and facts instantly. Tier upgrade is in-app: Free \u2192 Pro \u2192 Team unlocks progressively. Documentation lives in the extension's help menu with interactive tutorials.",
+      "key_fact": "Zero-config start; team onboarding is one click; tier upgrades are in-app.",
+      "why_it_matters": "No infrastructure setup, no context engineering \u2014 the tool adapts to your existing project.",
+      "takeaways": [
+        "Install IDE extension \u2192 open project \u2192 ask a real task",
+        "Invite team \u2192 they inherit index and facts instantly",
+        "Upgrade tier in-app as workflow needs grow"
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI & engineering updates"
+    }
+  ],
+  "_model_used": "OpenRouter:nvidia/nemotron-3-ultra-550b-a55b:free",
+  "_topic_intelligence": {
+    "topic_type": "developer_tool",
+    "domain": "ai_ml",
+    "primary_entity": "Anthropic",
+    "content_depth": "medium",
+    "best_story_angle": "practical_guide",
+    "audience": [
+      "software_engineers",
+      "ai_engineers"
+    ],
+    "key_questions": [
+      "What are the 7 new Claude features announced?",
+      "How do these features change daily coding workflows?",
+      "Which features are available on which Claude plans (Free/Pro/Team)?",
+      "What are concrete examples of each feature in action?"
+    ],
+    "recommended_slide_count": 7
+  },
+  "_archetype": "Developer Tool & IDE Innovation",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "7 New Claude Features That Make You a Claude Power User (Most People S",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "7 New Claude Features That Make You a Claude Power User (Mos",
+    "fact_summary": "Anthropic shipped all of this between November 9 and 12. Here is what each feature does, who gets it, and a prompt to try today.Continue reading on AI Engineering Simplified \u00bb",
+    "source": "Medium - programming",
+    "news_source_url": "https://medium.com/ai-engineering-simplified/7-new-claude-features-that-make-you-a-claude-power-user-most-people-still-use-it-the-old-way-7a1bb60a503f?source=rss------programming-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "claude",
+      "features",
+      "that",
+      "make",
+      "claude"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}

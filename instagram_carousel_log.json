@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Photos Are Smart Puzzles",
     "AI Inference Gets Production-Ready with Dedicated GPUs",
     "GPS: Einstein's Invisible Guide",
     "Neural Machine Translation: Core Principles",
@@ -99,10 +98,10 @@
     "Anthropic Claude 5.2 Release",
     "AI Builds Games in Minutes: Zero-Code Dev Workflow Explored",
     "Stop AI Agents From Cluttering Your Git Commits",
-    "Anthropic Watermarks Claude Outputs: What Devs Must Know"
+    "Anthropic Watermarks Claude Outputs: What Devs Must Know",
+    "7 New Claude Features for Dev Workflows"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Photos Are Smart Puzzles",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-30T19:21:43.887573+00:00"
-    },
     {
       "title": "AI Inference Gets Production-Ready with Dedicated GPUs",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-19T09:37:13.175103+00:00"
+    },
+    {
+      "title": "7 New Claude Features for Dev Workflows",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-19T10:19:28.983030+00:00"
     }
   ]
 }
