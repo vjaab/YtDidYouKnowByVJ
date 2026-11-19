@@ -1,0 +1,154 @@
+{
+  "headline": "Frontier AI Takes Korea's Toughest Exam",
+  "summary": "Three leading AI models tackled Korea's notoriously rigorous Suneung entrance exam and missed only three questions. The failures expose critical reasoning and cultural blindspots in modern LLMs.",
+  "source": "Medium - artificial-intelligence",
+  "source_url": "",
+  "date": "19 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "industry_trend",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "headline_hook",
+      "layout_type": "hero_hook",
+      "eyebrow": "INDUSTRY ANALYSIS",
+      "title": "Frontier AI Meets the Suneung Test",
+      "subtitle": "Three top frontier models tackled Korea's brutal college entrance exam.",
+      "body": "Korea's Suneung is famous for fiendishly difficult logic puzzles. Top models nearly aced it, but stumbled on three revealing edge cases.",
+      "deep_dive": "Standard AI benchmarks are hitting performance ceilings. Real-world standardized exams provide an unvarnished stress test for genuine deductive reasoning.",
+      "key_fact": "Frontier models missed only three questions across the entire high-stakes evaluation.",
+      "why_it_matters": "Proves frontier models excel at standard logic, but edge-case reasoning traps still break synthetic comprehension."
+    },
+    {
+      "slide_number": 2,
+      "role": "market_context",
+      "layout_type": "what_happened",
+      "eyebrow": "WHY NOW",
+      "title": "Beyond Saturated Western Benchmarks",
+      "subtitle": "Why existing AI evaluation suites no longer tell the full story.",
+      "body": "Traditional benchmarks suffer from test-set contamination and English bias. Highly guarded national exams offer tamper-proof benchmarks for true general intelligence.",
+      "deep_dive": "The Suneung features novel questions locked under state security until test day, preventing test contamination in LLM pre-training corpora.",
+      "key_fact": "Uncontaminated, freshly printed national exams eliminate training data memorization.",
+      "why_it_matters": "Engineering teams need fresh, non-contaminated evaluation sets to measure real model reasoning."
+    },
+    {
+      "slide_number": 3,
+      "role": "technology_backbone",
+      "layout_type": "process_flow",
+      "eyebrow": "TECH DRIVER",
+      "title": "Where Model Reasoning Breaks Down",
+      "subtitle": "Tracing how complex multi-step questions tripped up the models.",
+      "body": "The missed questions exposed a specific breakdown in high-order deduction when visual and linguistic traps intersect.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Linguistic Ambiguity",
+          "desc": "Subtle linguistic cues in Korean lost precision during internal token representation."
+        },
+        {
+          "step": "2",
+          "title": "Diagram-Text Fusion",
+          "desc": "Models struggled to correlate dense geometric constraints with nuanced textual prompts."
+        },
+        {
+          "step": "3",
+          "title": "Distractor Traps",
+          "desc": "Deliberately designed human elimination traps lured models toward plausible-sounding fallacies."
+        }
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "ecosystem_impact",
+      "layout_type": "side_by_side",
+      "eyebrow": "MARKET IMPACT",
+      "title": "Standard Evals vs Extreme Exams",
+      "subtitle": "How the Suneung differs from conventional academic benchmarks.",
+      "body": "Extreme national exams test capabilities that common synthetic benchmarks completely overlook.",
+      "left_title": "Standard Western Evals",
+      "left_items": [
+        "Heavily English-centric syntax",
+        "Susceptible to benchmark contamination",
+        "Direct question-to-answer deduction",
+        "Saturated performance metrics"
+      ],
+      "right_title": "The Suneung Challenge",
+      "right_items": [
+        "Dense non-Western context",
+        "Zero-contamination fresh puzzles",
+        "Multi-layered trick distractors",
+        "Combines visual and logical traps"
+      ]
+    },
+    {
+      "slide_number": 5,
+      "role": "developer_implications",
+      "layout_type": "real_world_scenario",
+      "eyebrow": "WHAT IT MEANS FOR DEVS",
+      "title": "Building Production-Grade Reasoning",
+      "subtitle": "Lessons for AI engineers designing mission-critical pipelines.",
+      "body": "Models can score in the top percentile while still failing basic cultural nuance or diagrammatic constraints in production.",
+      "deep_dive": "If your application relies on high-stakes enterprise logic, synthetic evals are insufficient. You must curate adversarial, out-of-distribution reasoning benchmarks.",
+      "key_fact": "High general test scores do not guarantee zero failure on adversarial edge cases.",
+      "why_it_matters": "Teams must implement multi-agent verification layers when processing culturally dense or multimodal data."
+    },
+    {
+      "slide_number": 6,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "THE BIG PICTURE",
+      "title": "The Next Frontier of Model Evaluation",
+      "subtitle": "Three key lessons from testing frontier AI on the Suneung.",
+      "body": "The race is shifting from memorized pattern matching to adversarial, cross-lingual logical deduction.",
+      "takeaways": [
+        "Uncontaminated real-world exams reveal blindspots that synthetic benchmarks hide.",
+        "Multimodal fusion and deceptive distractor filtering remain active frontier challenges.",
+        "Cross-lingual nuance requires deep semantic grounding, not simple token translation."
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily deep dives into AI engineering and frontier model breakthroughs."
+    }
+  ],
+  "_model_used": "gemini-3.8-flash",
+  "_topic_intelligence": {
+    "topic_type": "industry_trend",
+    "domain": "ai_ml",
+    "primary_entity": "Frontier LLMs (OpenAI / Anthropic / Google)",
+    "content_depth": "intermediate",
+    "best_story_angle": "benchmark_analysis",
+    "audience": [
+      "ai_engineers",
+      "software_engineers"
+    ],
+    "key_questions": [
+      "How do top frontier models handle high-stakes, culturally nuanced standardized exams like the Suneung?",
+      "Which specific failure modes and question types tripped up the models?",
+      "What do these results reveal about multilingual reasoning and multimodal comprehension?",
+      "What are the implications for evaluating reasoning capabilities beyond standard Western benchmarks?"
+    ],
+    "recommended_slide_count": 6
+  },
+  "_archetype": "AI Industry Strategy & Market Shift",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "I Gave Korea\u2019s College Entrance Exam to 3 AI Models. They Missed 3 Que",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "I Gave Korea\u2019s College Entrance Exam to 3 AI Models. They Mi",
+    "fact_summary": "39 runs across 13 sections on exam day. Claude and GPT were perfect. Gemini&#x2019;s only mistakes came from misreading figures, not from bad&#x2026;Continue reading on Medium \u00bb",
+    "source": "Medium - artificial-intelligence",
+    "news_source_url": "https://medium.com/@blueblud/i-gave-koreas-college-entrance-exam-to-3-ai-models-they-missed-3-questions-all-on-diagrams-f0e809da9332?source=rss------artificial_intelligence-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "gave",
+      "korea",
+      "college",
+      "entrance",
+      "exam"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}

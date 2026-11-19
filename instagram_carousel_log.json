@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "GPS: Einstein's Invisible Guide",
     "Neural Machine Translation: Core Principles",
     "AI's Secret Language Decoder",
     "Your Tech's Invisible Memory Locks",
@@ -99,10 +98,10 @@
     "Stop AI Agents From Cluttering Your Git Commits",
     "Anthropic Watermarks Claude Outputs: What Devs Must Know",
     "7 New Claude Features for Dev Workflows",
-    "Mastering Claude Code Workflows"
+    "Mastering Claude Code Workflows",
+    "Frontier AI Takes Korea's Toughest Exam"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "GPS: Einstein's Invisible Guide",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-10-31T10:08:07.304085+00:00"
-    },
     {
       "title": "Neural Machine Translation: Core Principles",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-19T19:00:55.291331+00:00"
+    },
+    {
+      "title": "Frontier AI Takes Korea's Toughest Exam",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-19T22:13:43.645628+00:00"
     }
   ]
 }
