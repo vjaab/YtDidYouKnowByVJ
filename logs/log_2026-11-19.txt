@@ -1,0 +1,23 @@
+[17:20:42] === STARTING DAILY AI PIPELINE (DID_YOU_KNOW) | COUNTRY: GB | SOURCE: HUGGINGFACE_HUB ===
+[17:20:42] 🔄 Sequential Topic Source: Active='HUGGINGFACE_HUB' (Rotation: github → medium → huggingface_hub)
+[17:20:42] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[17:20:42] STEP 1: Content Ecosystem Check -> Day: Thu, Slot: Slot A (Discovery), Category: Tech Gadgets & Inventions, Format: MYTH_BUSTER (Run 1/3)
+[17:20:42] STEP 2: Fetching articles (RSS + Trending Engine)...
+[17:21:11] 🔥 Trending Engine injected 202 high-signal articles (active_source='huggingface_hub', sources=['huggingface_hub', 'github', 'medium']).
+[17:21:11] 📈 vidIQ: Injected 8 high-signal topics.
+[17:22:36] ✅ Fetched 560 total articles (202 trending engine [huggingface_hub], 8 vidIQ, 244 research, 97 tools, 9 X.com).
+[17:22:36] 📚 Loaded 30 recent topics for deduplication
+[17:24:26] 🔍 Deduplication & classification: 560 → 20 candidates
+[17:24:26] 🏷️ Zero-shot re-categorized top candidate: Tech Gadgets & Inventions → AI & Tech Tools
+[17:24:26] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[17:39:32] Selected Headline: YouTube found a new way to inflate view counts
+[17:39:32] Selected URL: https://www.theverge.com/streaming/1035683/youtube-co-views-count
+[17:39:32] Breaking Level: 9
+[17:39:32] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[17:41:20] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261119_173932.png
+[17:41:39] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261119_174120.png
+[17:41:39] STEP 4: Generating voiceover + word timestamps...
+[17:41:39] Selected Lip-Sync Template: assets/video/green_springboot.mp4 (from 41 options)
+[17:57:53] ❌ Kaggle Handover failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 16 min.
+[17:57:53] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
+[17:57:53] ⚠️ Lip-sync will be SKIPPED for this video (requires GPU).
