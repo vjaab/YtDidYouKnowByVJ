@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Neural Machine Translation: Core Principles",
     "AI's Secret Language Decoder",
     "Your Tech's Invisible Memory Locks",
     "Qualcomm's Ultrasonic Sound Map Biometrics",
@@ -99,10 +98,10 @@
     "Anthropic Watermarks Claude Outputs: What Devs Must Know",
     "7 New Claude Features for Dev Workflows",
     "Mastering Claude Code Workflows",
-    "Frontier AI Takes Korea's Toughest Exam"
+    "Frontier AI Takes Korea's Toughest Exam",
+    "ChatGPT Voice vs Gemini Live: Language Learning Showdown"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Neural Machine Translation: Core Principles",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-31T10:24:53.957716+00:00"
-    },
     {
       "title": "AI's Secret Language Decoder",
       "news_source_url": "",
@@ -1322,6 +1312,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-19T22:13:43.645628+00:00"
+    },
+    {
+      "title": "ChatGPT Voice vs Gemini Live: Language Learning Showdown",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-20T09:19:47.207778+00:00"
     }
   ]
 }
