@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Why Phone Cameras See More Than Human Eyes",
     "AI Video Synthesis: Photorealism Breakthrough",
     "Wi-Fi's Ghostly Path",
     "Digital Storage: Magnets vs Quantum Traps",
@@ -99,10 +98,10 @@
     "ChatGPT Voice vs Gemini Live: Language Learning Showdown",
     "Detecting AI Writing: Perplexity & Burstiness",
     "Why the Average Lied to Your Data Pipelines",
-    "Procedural Generation: From Static to Worlds"
+    "Procedural Generation: From Static to Worlds",
+    "Can a Trillion-Parameter Diffusion LLM Actually Work?"
   ],
   "used_keywords": [
-    "did you know",
     "threads",
     "tech",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Why Phone Cameras See More Than Human Eyes",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-10-31T17:57:01.954985+00:00"
-    },
     {
       "title": "AI Video Synthesis: Photorealism Breakthrough",
       "news_source_url": "",
@@ -1312,6 +1302,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-20T19:13:07.251747+00:00"
+    },
+    {
+      "title": "Can a Trillion-Parameter Diffusion LLM Actually Work?",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-20T21:44:51.134183+00:00"
     }
   ]
 }
