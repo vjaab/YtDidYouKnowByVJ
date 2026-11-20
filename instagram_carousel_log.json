@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Qualcomm's Ultrasonic Sound Map Biometrics",
     "Why Phone Cameras See More Than Human Eyes",
     "AI Video Synthesis: Photorealism Breakthrough",
     "Wi-Fi's Ghostly Path",
@@ -99,10 +98,10 @@
     "Frontier AI Takes Korea's Toughest Exam",
     "ChatGPT Voice vs Gemini Live: Language Learning Showdown",
     "Detecting AI Writing: Perplexity & Burstiness",
-    "Why the Average Lied to Your Data Pipelines"
+    "Why the Average Lied to Your Data Pipelines",
+    "Procedural Generation: From Static to Worlds"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "threads",
     "tech",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Qualcomm's Ultrasonic Sound Map Biometrics",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-10-31T17:22:18.694743+00:00"
-    },
     {
       "title": "Why Phone Cameras See More Than Human Eyes",
       "news_source_url": "",
@@ -1312,6 +1302,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-20T18:30:10.435397+00:00"
+    },
+    {
+      "title": "Procedural Generation: From Static to Worlds",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-20T19:13:07.251747+00:00"
     }
   ]
 }
