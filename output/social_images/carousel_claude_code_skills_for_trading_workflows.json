@@ -1,0 +1,206 @@
+{
+  "headline": "Claude Code Skills for Trading Workflows",
+  "summary": "Discover how custom Claude Code developer utilities automate complex equity trading workflows, integrate live financial data sources, and structure local agent environments for modern traders.",
+  "source": "GitHub (tradermonty/claude-trading-skills)",
+  "source_url": "",
+  "date": "20 Nov 2026",
+  "category": "ai_ml",
+  "topic_type": "developer_tool",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "scenario_question",
+      "eyebrow": "CLAUDE CODE UPDATE",
+      "title": "Tired of manual financial data wrangling?",
+      "subtitle": "Bridging raw market data and automated code execution.",
+      "body": "Financial workflows require juggling multiple APIs, parsing messy data streams, and executing trades safely without human panic.",
+      "deep_dive": "Traders spend hours building custom scripts to fetch equity prices, compute indicators, and execute orders across fragmented platforms. Claude Code custom skills solve this bottleneck by turning conversational commands into rigorous, automated routines.",
+      "key_fact": "Custom developer skills streamline complex equity workflows directly from your command line.",
+      "why_it_matters": "Eliminates repetitive data gathering and lets developers focus on core trading strategies.",
+      "before_title": "Manual Trading Dev",
+      "before_items": [
+        "Juggling fragmented APIs",
+        "Writing boilerplate scripts",
+        "Slow manual data checks"
+      ],
+      "after_title": "Claude Code Workflow",
+      "after_items": [
+        "Conversational command parsing",
+        "Automated local execution",
+        "Instant equity insights"
+      ]
+    },
+    {
+      "slide_number": 2,
+      "role": "tool_overview",
+      "layout_type": "whats_new",
+      "eyebrow": "WHAT IT DOES",
+      "title": "Supercharging IDEs for Equity Analysis",
+      "subtitle": "Seamless platform integration and local setup.",
+      "body": "Integrates specialized trading intelligence directly into your terminal workspace with zero friction.",
+      "deep_dive": "The tradermonty repository equips Claude Code with domain-specific knowledge blocks. It acts as an expert financial assistant that understands tickers, historical pricing models, and risk parameters natively.",
+      "key_fact": "Transforms standard coding environments into dedicated quantitative trading stations.",
+      "why_it_matters": "Brings institutional-grade workflow automation right to your local development setup.",
+      "before_title": "Standard IDEs",
+      "before_items": [
+        "Zero financial domain context",
+        "Disconnected terminal tools",
+        "Manual parameter tuning"
+      ],
+      "after_title": "Equipped with Skills",
+      "after_items": [
+        "Native trading terminology",
+        "Unified agent workspace",
+        "Context-aware execution"
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "core_mechanism",
+      "layout_type": "process_flow",
+      "eyebrow": "EXECUTION FLOW",
+      "title": "How Trading Tasks Transform to Code",
+      "subtitle": "Step-by-step processing through local development layers.",
+      "body": "Watch how simple user prompts convert into complex automated financial routines.",
+      "deep_dive": "The execution pipeline parses natural language prompts, matches them against specialized trading skill definitions, and coordinates local execution loops securely on your machine.",
+      "key_fact": "Translates human intent into precise financial script generation and execution.",
+      "why_it_matters": "Provides a predictable, transparent pipeline for high-stakes financial data operations.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Prompt Input",
+          "desc": "User issues conversational trading command in the terminal."
+        },
+        {
+          "step": "2",
+          "title": "Skill Matching",
+          "desc": "Claude Code identifies the appropriate custom equity trading skill."
+        },
+        {
+          "step": "3",
+          "title": "Local Execution",
+          "desc": "Agent orchestrates data retrieval and runs validation routines."
+        }
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "architecture",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "ARCHITECTURE",
+      "title": "The Local Trading Agent Stack",
+      "subtitle": "Editor to local agent and external market feeds.",
+      "body": "A modular architecture connecting your code editor safely to external financial APIs.",
+      "deep_dive": "The system architecture decouples user interface prompts from heavy data processing, ensuring fast local response times and clean integration with third-party financial data providers.",
+      "key_fact": "Modular design ensures seamless integration between your editor and live data sources.",
+      "why_it_matters": "Keeps sensitive trading logic and execution securely controlled in your local environment.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "Code Editor",
+            "sub": "Claude Code CLI"
+          },
+          {
+            "name": "Local Agent",
+            "sub": "Skill State Machine"
+          },
+          {
+            "name": "Data Provider",
+            "sub": "External APIs"
+          }
+        ],
+        "connections": [
+          {
+            "label": "Sends Prompt"
+          },
+          {
+            "label": "Fetches Data"
+          }
+        ]
+      }
+    },
+    {
+      "slide_number": 5,
+      "role": "system_workflow",
+      "layout_type": "input_output",
+      "eyebrow": "EXECUTION MECHANICS",
+      "title": "From Query to Structured Financial Output",
+      "subtitle": "State management and structured data generation.",
+      "body": "Input a market query and receive structured financial insights and execution artifacts.",
+      "deep_dive": "The system processes raw inputs through validated state machines, cross-referencing live market feeds to output clean analytical reports or automated trading scripts.",
+      "key_fact": "Converts ambiguous queries into rigorously structured financial artifacts.",
+      "why_it_matters": "Reduces human error by standardizing the output format of complex trading analyses.",
+      "input": "Natural Language Ticker & Strategy Request",
+      "processing": "AST Indexing, Skill Matching, & API Data Fetch",
+      "output": "Structured Financial Diff & Execution Artifact"
+    },
+    {
+      "slide_number": 6,
+      "role": "limitations_and_gotchas",
+      "layout_type": "side_by_side",
+      "eyebrow": "PRO TIPS & MISTAKES",
+      "title": "Best Practices for Trading Utilities",
+      "subtitle": "Avoiding common developer antipatterns in financial tooling.",
+      "body": "Master safe implementation habits when deploying AI-driven trading skills locally.",
+      "deep_dive": "Building custom AI skills for finance requires rigorous safety checks. Avoid hardcoding credentials, always sandbox execution environments, and thoroughly test strategies in dry-run modes before deploying capital.",
+      "key_fact": "Proper sandboxing and credential management are essential for safe automated trading.",
+      "why_it_matters": "Protects your investments and ensures robust, dependable local agent performance.",
+      "left_title": "Common Antipatterns",
+      "left_items": [
+        "Hardcoding exchange API keys in prompts",
+        "Skipping local dry-run validation",
+        "Blindly trusting raw data feeds"
+      ],
+      "right_title": "Recommended Practice",
+      "right_items": [
+        "Use secure environment variable stores",
+        "Implement rigorous assertion checks",
+        "Follow @vijayakumarj_ai for daily AI engineering workflows"
+      ]
+    }
+  ],
+  "_model_used": "gemini-3.5-flash-lite",
+  "_topic_intelligence": {
+    "topic_type": "developer_tool",
+    "domain": "ai_ml",
+    "primary_entity": "Claude Code",
+    "content_depth": "moderate",
+    "best_story_angle": "practical_application",
+    "audience": [
+      "software_engineers",
+      "ai_engineers"
+    ],
+    "key_questions": [
+      "What specific financial workflows do these Claude Code skills automate?",
+      "How are custom skills structured for equity trading tasks?",
+      "What data sources and APIs do these developer utilities integrate with?",
+      "How can traders and developers implement these skills locally?"
+    ],
+    "recommended_slide_count": 6
+  },
+  "_archetype": "Developer Tool & IDE Innovation",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "Claude Code skills for equity investors and traders",
+    "hook": "Did You Know: Claude Code skills for equity investors and traders? \u26a1",
+    "headline": "Claude Code skills for equity investors and traders",
+    "fact_summary": "\u2b50 7411 stars (3385/day) | Python | Claude Code skills for equity investors and traders \u2014 market analysis, technical charting, economic calendars, screeners, and trading strategy development.",
+    "source": "GitHub (tradermonty/claude-trading-skills)",
+    "news_source_url": "https://github.com/tradermonty/claude-trading-skills",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "claude",
+      "code",
+      "skills",
+      "equity",
+      "investors"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}

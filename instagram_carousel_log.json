@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI Video Synthesis: Photorealism Breakthrough",
     "Wi-Fi's Ghostly Path",
     "Digital Storage: Magnets vs Quantum Traps",
     "How AlphaZero Learns Like a Super-Fast Baby",
@@ -99,10 +98,10 @@
     "Detecting AI Writing: Perplexity & Burstiness",
     "Why the Average Lied to Your Data Pipelines",
     "Procedural Generation: From Static to Worlds",
-    "Can a Trillion-Parameter Diffusion LLM Actually Work?"
+    "Can a Trillion-Parameter Diffusion LLM Actually Work?",
+    "Claude Code Skills for Trading Workflows"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI Video Synthesis: Photorealism Breakthrough",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-11-01T11:04:43.890540+00:00"
-    },
     {
       "title": "Wi-Fi's Ghostly Path",
       "news_source_url": "",
@@ -1312,6 +1302,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-20T21:44:51.134183+00:00"
+    },
+    {
+      "title": "Claude Code Skills for Trading Workflows",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-20T22:19:23.211240+00:00"
     }
   ]
 }
