@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI's Secret Language Decoder",
     "Your Tech's Invisible Memory Locks",
     "Qualcomm's Ultrasonic Sound Map Biometrics",
     "Why Phone Cameras See More Than Human Eyes",
@@ -99,10 +98,10 @@
     "7 New Claude Features for Dev Workflows",
     "Mastering Claude Code Workflows",
     "Frontier AI Takes Korea's Toughest Exam",
-    "ChatGPT Voice vs Gemini Live: Language Learning Showdown"
+    "ChatGPT Voice vs Gemini Live: Language Learning Showdown",
+    "Detecting AI Writing: Perplexity & Burstiness"
   ],
   "used_keywords": [
-    "threads",
     "tech",
     "did you know",
     "did you know",
@@ -301,25 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI's Secret Language Decoder",
-      "news_source_url": "",
-      "keywords": [
-        "AI",
-        "natural language processing",
-        "NLP",
-        "sentiment analysis",
-        "language understanding",
-        "chatbots",
-        "did you know"
-      ],
-      "source": "Natural Language Processing (NLP) research and applications (e.g., Google AI, OpenAI, academic papers on sentiment analysis)",
-      "platform": "threads",
-      "timestamp": "2026-10-31T11:09:05.788166+00:00"
-    },
     {
       "title": "Your Tech's Invisible Memory Locks",
       "news_source_url": "",
@@ -1322,6 +1306,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-20T09:19:47.207778+00:00"
+    },
+    {
+      "title": "Detecting AI Writing: Perplexity & Burstiness",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-20T15:45:56.117308+00:00"
     }
   ]
 }

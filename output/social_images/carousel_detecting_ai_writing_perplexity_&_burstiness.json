@@ -1,0 +1,145 @@
+{
+  "headline": "Detecting AI Writing: Perplexity & Burstiness",
+  "summary": "AI-generated text exhibits statistical fingerprints\u2014low perplexity and uniform burstiness\u2014that differ from human writing. Detection tools leverage these signals, but improving models constantly challenge static heuristics, requiring adaptive, human-in-the-loop systems.",
+  "source": "Medium - artificial-intelligence",
+  "source_url": "",
+  "date": "20 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "industry_trend",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "headline_hook",
+      "layout_type": "hero_hook",
+      "eyebrow": "INDUSTRY ANALYSIS",
+      "title": "Spotting AI-Generated Text: The New Literacy",
+      "subtitle": "Learn the linguistic fingerprints that separate ChatGPT output from human writing.",
+      "body": "As AI writing floods the internet, distinguishing human from machine text becomes critical for trust and quality.",
+      "deep_dive": "Large language models like ChatGPT produce text with statistical regularities\u2014predictable word choices, uniform sentence structures, and a lack of idiosyncratic errors\u2014that differ from human writing's natural variability and contextual nuance.",
+      "key_fact": "AI text shows lower perplexity and burstiness than human writing.",
+      "why_it_matters": "Engineers building content platforms need reliable detection to maintain authenticity and prevent spam."
+    },
+    {
+      "slide_number": 2,
+      "role": "market_context",
+      "layout_type": "what_happened",
+      "eyebrow": "WHY NOW",
+      "title": "The Explosion of AI Content Demands Detection",
+      "body": "Generative AI adoption has surged, flooding platforms with synthetic text that challenges moderation, SEO, and academic integrity."
+    },
+    {
+      "slide_number": 3,
+      "role": "technology_backbone",
+      "layout_type": "process_flow",
+      "eyebrow": "TECH DRIVER",
+      "title": "How Detection Works: Perplexity and Burstiness",
+      "body": "Detectors measure how surprised a model is by the text (perplexity) and variation in sentence complexity (burstiness).",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Calculate Perplexity",
+          "desc": "Low perplexity indicates predictable, AI-like word choices."
+        },
+        {
+          "step": "2",
+          "title": "Measure Burstiness",
+          "desc": "Human writing varies in sentence length and structure; AI tends to be uniform."
+        },
+        {
+          "step": "3",
+          "title": "Combine Signals",
+          "desc": "A weighted score flags text that is both too predictable and too uniform."
+        }
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "ecosystem_impact",
+      "layout_type": "side_by_side",
+      "eyebrow": "MARKET IMPACT",
+      "title": "Detection Tools vs. Evolving Models",
+      "body": "A race between detectors and increasingly human-like models.",
+      "left_title": "Current Detectors",
+      "left_items": [
+        "Statistical analysis (perplexity, burstiness)",
+        "Classifier models trained on AI/human pairs",
+        "Watermarking proposals for AI output"
+      ],
+      "right_title": "Emerging Challenges",
+      "right_items": [
+        "Models fine-tuned to mimic human burstiness",
+        "Adversarial attacks to evade detection",
+        "False positives on non-native English writers"
+      ]
+    },
+    {
+      "slide_number": 5,
+      "role": "developer_implications",
+      "layout_type": "input_output",
+      "eyebrow": "WHAT IT MEANS FOR DEVS",
+      "title": "Integrating Detection Into Your Workflow",
+      "body": "Add a detection layer to content pipelines to flag synthetic text before publication.",
+      "input": "User-generated content, articles, code comments",
+      "processing": "Run perplexity/burstiness scoring via API or local model",
+      "output": "Flagged items for human review, automated filtering, or metadata tagging"
+    },
+    {
+      "slide_number": 6,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "THE BIG PICTURE",
+      "title": "Detection Is a Moving Target, Not a Silver Bullet",
+      "body": "As models improve, detection must evolve from static heuristics to adaptive, context-aware systems.",
+      "takeaways": [
+        "Build detection as a service, not a one-time filter.",
+        "Combine statistical signals with metadata and user behavior.",
+        "Plan for false positives: keep human-in-the-loop for high-stakes content."
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI engineering insights."
+    }
+  ],
+  "_model_used": "OpenRouter:nvidia/nemotron-3-ultra-550b-a55b:free",
+  "_topic_intelligence": {
+    "topic_type": "industry_trend",
+    "domain": "ai_ml",
+    "primary_entity": "ChatGPT / OpenAI",
+    "content_depth": "medium",
+    "best_story_angle": "practical_guide",
+    "audience": [
+      "software_engineers",
+      "ai_engineers",
+      "technical_writers"
+    ],
+    "key_questions": [
+      "What linguistic patterns distinguish AI-generated text from human writing?",
+      "Which detection heuristics are most reliable vs. prone to false positives?",
+      "How can developers integrate AI-content detection into their workflows or products?",
+      "What are the limitations of current detection methods as models improve?"
+    ],
+    "recommended_slide_count": 6
+  },
+  "_archetype": "AI Industry Strategy & Market Shift",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "Here\u2019s How I Can Tell If A Writer Is Secretly Using ChatGPT",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "Here\u2019s How I Can Tell If A Writer Is Secretly Using ChatGPT",
+    "fact_summary": "They often give themselves away in the first paragraph.Continue reading on The Daily Draft \u00bb",
+    "source": "Medium - artificial-intelligence",
+    "news_source_url": "https://medium.com/the-daily-draft/heres-how-i-can-tell-if-a-writer-is-secretly-using-chatgpt-28210ab7a7db?source=rss------artificial_intelligence-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "here",
+      "tell",
+      "writer",
+      "secretly",
+      "using"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}
