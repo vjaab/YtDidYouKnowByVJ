@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Tech's Invisible Memory Locks",
     "Qualcomm's Ultrasonic Sound Map Biometrics",
     "Why Phone Cameras See More Than Human Eyes",
     "AI Video Synthesis: Photorealism Breakthrough",
@@ -99,10 +98,10 @@
     "Mastering Claude Code Workflows",
     "Frontier AI Takes Korea's Toughest Exam",
     "ChatGPT Voice vs Gemini Live: Language Learning Showdown",
-    "Detecting AI Writing: Perplexity & Burstiness"
+    "Detecting AI Writing: Perplexity & Burstiness",
+    "Why the Average Lied to Your Data Pipelines"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "threads",
@@ -301,23 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Tech's Invisible Memory Locks",
-      "news_source_url": "",
-      "keywords": [
-        "flash memory",
-        "data storage",
-        "electrons",
-        "non-volatile",
-        "did you know"
-      ],
-      "source": "Principles of NAND Flash Memory, widely documented by major semiconductor manufacturers (e.g., Micron Technology, Samsung) and science/tech education platforms.",
-      "platform": "instagram",
-      "timestamp": "2026-10-31T16:34:06.061570+00:00"
-    },
     {
       "title": "Qualcomm's Ultrasonic Sound Map Biometrics",
       "news_source_url": "",
@@ -1316,6 +1302,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-20T15:45:56.117308+00:00"
+    },
+    {
+      "title": "Why the Average Lied to Your Data Pipelines",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-20T18:30:10.435397+00:00"
     }
   ]
 }
