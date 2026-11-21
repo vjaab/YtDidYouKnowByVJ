@@ -1,0 +1,27 @@
+[16:08:29] === STARTING DAILY AI PIPELINE (DID_YOU_KNOW) | COUNTRY: GB | SOURCE: HUGGINGFACE_HUB ===
+[16:08:29] 🔄 Sequential Topic Source: Active='HUGGINGFACE_HUB' (Rotation: github → medium → huggingface_hub)
+[16:08:29] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[16:08:29] STEP 1: Content Ecosystem Check -> Day: Sat, Slot: Slot A (Discovery), Category: Tech Gadgets & Inventions, Format: PAUSE_AND_GUESS (Run 1/3)
+[16:08:29] STEP 2: Fetching articles (RSS + Trending Engine)...
+[16:08:56] 🔥 Trending Engine injected 199 high-signal articles (active_source='huggingface_hub', sources=['huggingface_hub', 'github', 'medium']).
+[16:08:57] 📈 vidIQ: Injected 8 high-signal topics.
+[16:10:05] ✅ Fetched 480 total articles (199 trending engine [huggingface_hub], 8 vidIQ, 189 research, 75 tools, 9 X.com).
+[16:10:05] 📚 Loaded 30 recent topics for deduplication
+[16:11:26] 🔍 Deduplication & classification: 480 → 20 candidates
+[16:11:26] 🏷️ Zero-shot re-categorized top candidate: Tech Gadgets & Inventions → AI & Tech Tools
+[16:11:26] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[17:24:42] ERROR: Script generation failed.
+[17:24:42] STEP 3 (Attempt 2/10): Gemini Searching & Generating Script...
+[17:28:17] ERROR: Script generation failed.
+[17:28:17] STEP 3 (Attempt 3/10): Gemini Searching & Generating Script...
+[17:51:23] Selected Headline: NVIDIA SimReady Assets on Hugging Face
+[17:51:23] Selected URL: https://huggingface.co/datasets/nvidia/simready-assets
+[17:51:23] Breaking Level: 9
+[17:51:23] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[17:51:27] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261121_175123.png
+[17:51:32] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261121_175127.png
+[17:51:32] STEP 4: Generating voiceover + word timestamps...
+[17:51:32] Selected Lip-Sync Template: assets/video/green_springboot.mp4 (from 41 options)
+[18:06:42] ❌ Kaggle Handover failed: [queued_timeout] Kaggle job stuck in QUEUED for 15 min (limit: 15 min). GPU likely unavailable or quota exhausted.
+[18:06:42] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
+[18:06:42] ⚠️ Lip-sync will be SKIPPED for this video (requires GPU).
