@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Wi-Fi's Ghostly Path",
     "Digital Storage: Magnets vs Quantum Traps",
     "How AlphaZero Learns Like a Super-Fast Baby",
     "Why AI Invents Facts: The Architecture of Hallucination",
@@ -99,10 +98,10 @@
     "Why the Average Lied to Your Data Pipelines",
     "Procedural Generation: From Static to Worlds",
     "Can a Trillion-Parameter Diffusion LLM Actually Work?",
-    "Claude Code Skills for Trading Workflows"
+    "Claude Code Skills for Trading Workflows",
+    "Claude Code: Explain Changes in Plain Words"
   ],
   "used_keywords": [
-    "tech",
     "did you know",
     "did you know",
     "did you know",
@@ -301,24 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Wi-Fi's Ghostly Path",
-      "news_source_url": "",
-      "keywords": [
-        "Wi-Fi",
-        "radio waves",
-        "invisible tech",
-        "electromagnetic spectrum",
-        "data transfer",
-        "did you know"
-      ],
-      "source": "NASA - The Electromagnetic Spectrum",
-      "platform": "facebook",
-      "timestamp": "2026-11-01T11:19:35.445084+00:00"
-    },
     {
       "title": "Digital Storage: Magnets vs Quantum Traps",
       "news_source_url": "",
@@ -1312,6 +1297,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-20T22:19:23.211240+00:00"
+    },
+    {
+      "title": "Claude Code: Explain Changes in Plain Words",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-21T12:37:41.257279+00:00"
     }
   ]
 }

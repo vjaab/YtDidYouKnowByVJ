@@ -1,0 +1,206 @@
+{
+  "headline": "Claude Code: Explain Changes in Plain Words",
+  "summary": "Anthropic introduces a natural-language explanation feature in Claude Code that translates code diffs into human-readable summaries. This reduces cognitive load during code review and onboarding by letting developers ask 'why' directly in their IDE.",
+  "source": "Medium - artificial-intelligence",
+  "source_url": "",
+  "date": "21 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "developer_tool",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "scenario_question",
+      "eyebrow": "ANTHROPIC UPDATE",
+      "title": "Ever Stared at a Diff and Wondered \"Why?\"",
+      "subtitle": "Claude Code now explains its own changes in plain English.",
+      "body": "Code reviews often stall when intent isn't clear. Developers waste time deciphering terse commit messages or cryptic diffs. What if the AI that wrote the code could also explain it like a senior teammate?",
+      "deep_dive": "Modern AI coding assistants generate vast amounts of code, but the explanation layer has been missing. Engineers still manually annotate PRs, write changelogs, or schedule sync meetings to convey intent. This feature closes that loop by embedding explanation directly into the generation workflow, turning every change into a self-documenting artifact.",
+      "key_fact": "Claude Code can now articulate the reasoning behind its edits in natural language on demand.",
+      "why_it_matters": "Reduces review cycles, accelerates onboarding, and preserves institutional knowledge without extra documentation effort."
+    },
+    {
+      "slide_number": 2,
+      "role": "tool_overview",
+      "layout_type": "whats_new",
+      "eyebrow": "WHAT IT DOES",
+      "title": "Ask \"Explain This Change\" Right in Your Editor",
+      "subtitle": "No context switching \u2014 explanation lives where you code.",
+      "body": "Invoke via slash command or context menu. Works on any diff: refactors, bug fixes, new features. Integrates with VS Code, JetBrains, and CLI. Zero config for most repos.",
+      "before_title": "Before",
+      "before_items": [
+        "Manual PR descriptions",
+        "Separate documentation passes",
+        "Tribal knowledge loss"
+      ],
+      "after_title": "After",
+      "after_items": [
+        "Instant plain-language summaries",
+        "Inline with code changes",
+        "Queryable by any team member"
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "core_mechanism",
+      "layout_type": "process_flow",
+      "eyebrow": "EXECUTION FLOW",
+      "title": "From Diff to Narrative in Seconds",
+      "subtitle": "How the explanation engine processes your changes.",
+      "body": "The agent analyzes the structured diff, correlates with repository context, and synthesizes a human-readable rationale.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Capture Diff",
+          "desc": "Extracts unified diff from working tree or staged changes."
+        },
+        {
+          "step": "2",
+          "title": "Enrich Context",
+          "desc": "Pulls related symbols, recent commits, and architectural patterns."
+        },
+        {
+          "step": "3",
+          "title": "Generate Narrative",
+          "desc": "LLM produces plain-words explanation targeting developer audience."
+        },
+        {
+          "step": "4",
+          "title": "Present Inline",
+          "desc": "Renders as hover tooltip, side panel, or comment thread."
+        }
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "architecture",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "ARCHITECTURE",
+      "title": "Editor-Centric Explanation Pipeline",
+      "subtitle": "Local agent bridges IDE, code index, and LLM.",
+      "body": "Lightweight local process maintains privacy and latency targets.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "IDE Extension",
+            "sub": "VS Code / JetBrains / CLI"
+          },
+          {
+            "name": "Local Agent",
+            "sub": "Diff capture & context assembly"
+          },
+          {
+            "name": "Code Index",
+            "sub": "AST, symbols, git history"
+          },
+          {
+            "name": "LLM Service",
+            "sub": "Claude model (cloud or local)"
+          }
+        ],
+        "connections": [
+          {
+            "label": "User triggers explain"
+          },
+          {
+            "label": "Requests context"
+          },
+          {
+            "label": "Returns enriched diff"
+          },
+          {
+            "label": "Streams explanation"
+          }
+        ]
+      }
+    },
+    {
+      "slide_number": 5,
+      "role": "system_workflow",
+      "layout_type": "input_output",
+      "eyebrow": "EXECUTION MECHANICS",
+      "title": "Developer Query \u2192 Structured Explanation",
+      "subtitle": "Input, processing, and output stages demystified.",
+      "body": "Treat the explanation as a first-class artifact you can search, share, and version.",
+      "input": "Natural language prompt (e.g., \"Why did you rename this function?\") or implicit via diff selection.",
+      "processing": "AST-aware diff parsing \u2192 semantic change classification \u2192 context retrieval \u2192 LLM prompt construction \u2192 streaming response.",
+      "output": "Markdown-formatted explanation with code references, linked symbols, and optional follow-up questions."
+    },
+    {
+      "slide_number": 6,
+      "role": "limitations_and_gotchas",
+      "layout_type": "checklist",
+      "eyebrow": "PRO TIPS & MISTAKES",
+      "title": "Get Better Explanations, Avoid Common Traps",
+      "subtitle": "Treat the AI like a junior dev \u2014 guide it with context.",
+      "body": "Explanation quality depends on repository hygiene and prompt clarity.",
+      "items": [
+        "\u2705 Keep commit history meaningful \u2014 AI uses it for context",
+        "\u2705 Ask specific questions (\"Why this algorithm?\") not vague ones",
+        "\u2705 Use for onboarding: generate explanations for legacy modules",
+        "\u274c Don't trust blindly \u2014 verify critical logic changes manually",
+        "\u274c Avoid on massive diffs (>500 lines) \u2014 break into smaller changes",
+        "\u274c Don't skip writing tests \u2014 explanations complement, not replace, verification"
+      ]
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "GET STARTED",
+      "title": "Enable Explanations in Your Workflow Today",
+      "subtitle": "Install, configure, and start asking \"why\" in minutes.",
+      "body": "Available now in Claude Code extension. No API key required for basic usage.",
+      "takeaways": [
+        "Install: `claude-code install` or via marketplace",
+        "Configure: Set explanation verbosity in settings.json",
+        "Habit: Add \"Explain change\" to your PR template checklist"
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI engineering workflows that ship."
+    }
+  ],
+  "_model_used": "OpenRouter:nvidia/nemotron-3-ultra-550b-a55b:free",
+  "_topic_intelligence": {
+    "topic_type": "developer_tool",
+    "domain": "ai_ml",
+    "primary_entity": "Anthropic",
+    "content_depth": "medium",
+    "best_story_angle": "feature_explanation",
+    "audience": [
+      "software_engineers",
+      "ai_engineers"
+    ],
+    "key_questions": [
+      "What is the 'explain in plain words' feature in Claude Code?",
+      "How do you invoke this explanation capability?",
+      "What types of code changes can it explain effectively?",
+      "How does this improve developer workflow and code review?",
+      "Are there limitations or cases where explanations fall short?"
+    ],
+    "recommended_slide_count": 7
+  },
+  "_archetype": "Developer Tool & IDE Innovation",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "Ask Claude Code to Explain Its Change in Plain Words First",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "Ask Claude Code to Explain Its Change in Plain Words First",
+    "fact_summary": "Before I accept an edit from Claude Code, I ask it to explain the change in plain words, as if it were telling a friend who has never&#x2026;Continue reading on Medium \u00bb",
+    "source": "Medium - artificial-intelligence",
+    "news_source_url": "https://medium.com/@metachain.art/ask-claude-code-to-explain-its-change-in-plain-words-first-f0f6d62fa5b9?source=rss------artificial_intelligence-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "claude",
+      "code",
+      "explain",
+      "change",
+      "plain"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}
