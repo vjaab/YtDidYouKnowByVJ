@@ -1,0 +1,222 @@
+{
+  "headline": "Cross-Device Agent Swarm with Local LLMs",
+  "summary": "A developer replaces cloud AI APIs with a local, cross-device agent swarm using Ollama, LangChain, and AutoGen. This approach cuts recurring costs, keeps data private, and enables resilient multi-agent workflows that run on heterogeneous hardware.",
+  "source": "Medium - technology",
+  "source_url": "",
+  "date": "21 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "developer_tool",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "scenario_question",
+      "eyebrow": "LOCAL LLM STACK (OLLAMA, LANGCHAIN, AUTOGEN) UPDATE",
+      "title": "Why Keep Renting Intelligence?",
+      "subtitle": "Cloud APIs charge per token and lock you into their uptime.",
+      "body": "Cloud LLM APIs meter every request, spike costs at scale, and send sensitive code off-premise. What if your agents ran locally, coordinated across devices, and cost near-zero per query?",
+      "deep_dive": "Relying on hosted models introduces three systemic frictions: variable latency that breaks real-time agent loops, per-token pricing that discourages experimentation, and data governance risk when proprietary code leaves your network. A local swarm inverts this: inference runs on hardware you own, coordination happens over standard protocols, and the marginal cost of an additional agent call approaches electricity only.",
+      "key_fact": "Local inference eliminates per-token fees and keeps code on-device.",
+      "why_it_matters": "Enables sustainable, private, and scalable agent workflows for teams of any size."
+    },
+    {
+      "slide_number": 2,
+      "role": "tool_overview",
+      "layout_type": "whats_new",
+      "eyebrow": "WHAT IT DOES",
+      "title": "Your Local Agent Operating System",
+      "subtitle": "Ollama serves models, LangChain orchestrates, AutoGen coordinates peers.",
+      "body": "Three open-source pieces form a complete stack: model runtime, orchestration framework, and multi-agent protocol.",
+      "deep_dive": "Ollama abstracts model quantization, GPU/CPU offloading, and model pulling into a single CLI. LangChain provides the chains, agents, and memory primitives to structure reasoning. AutoGen adds the conversation-driven agent abstraction, allowing specialized agents (coder, reviewer, tester) to negotiate via structured messages. Together they create a portable, version-controlled AI backend that runs on a laptop, a rack of Mac Minis, or a mixed fleet of Linux/Windows/macOS machines.",
+      "key_fact": "Stack runs on heterogeneous hardware without code changes.",
+      "why_it_matters": "Removes vendor lock-in; lets you scale compute by adding devices.",
+      "before_title": "Cloud-Dependent Workflow",
+      "before_items": [
+        "API keys & billing alerts",
+        "Latency spikes under load",
+        "Code leaves your network"
+      ],
+      "after_title": "Local Swarm Workflow",
+      "after_items": [
+        "Zero marginal cost per call",
+        "Consistent local latency",
+        "Full data sovereignty"
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "core_mechanism",
+      "layout_type": "process_flow",
+      "eyebrow": "EXECUTION FLOW",
+      "title": "How a Task Becomes a Swarm Job",
+      "subtitle": "User request \u2192 planner agent \u2192 specialist agents \u2192 synthesized result.",
+      "body": "A planner decomposes the goal, dispatches subtasks to role-specific agents, and merges their outputs.",
+      "deep_dive": "The flow starts with a user prompt entering a LangChain chain. A planner agent (powered by a local LLM via Ollama) breaks the prompt into discrete subtasks \u2014 e.g., write module, write tests, review security. Each subtask is wrapped in an AutoGen message and routed to a specialist agent running on any reachable device. Specialists execute, return structured artifacts (code diffs, test logs), and the planner aggregates them into a final deliverable. State persists in a local vector store so agents share context without re-sending full history.",
+      "key_fact": "Planner agent dynamically routes work to the best available device.",
+      "why_it_matters": "Turns a single prompt into a parallel, fault-tolerant pipeline.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Ingest",
+          "desc": "User prompt enters LangChain chain."
+        },
+        {
+          "step": "2",
+          "title": "Plan",
+          "desc": "Planner LLM decomposes into subtasks."
+        },
+        {
+          "step": "3",
+          "title": "Dispatch",
+          "desc": "AutoGen routes messages to specialist agents."
+        },
+        {
+          "step": "4",
+          "title": "Execute",
+          "desc": "Agents run locally on assigned devices."
+        },
+        {
+          "step": "5",
+          "title": "Aggregate",
+          "desc": "Planner merges artifacts into final output."
+        }
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "architecture",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "ARCHITECTURE",
+      "title": "Devices as Swarm Nodes",
+      "subtitle": "Each machine runs Ollama + agent runtime; mesh network shares tasks.",
+      "body": "No central server \u2014 peers discover each other and pull work via message bus.",
+      "deep_dive": "The architecture is a peer-to-peer mesh. Every device runs an Ollama server exposing a local OpenAI-compatible endpoint. An AutoGen agent container (Docker or native) registers with a lightweight discovery service (mDNS or a static config). When a planner emits a task, it publishes to a topic; any idle agent with matching capability subscribes, pulls the model if needed, executes, and publishes the result. This design tolerates nodes joining/leaving, handles heterogeneous compute (Apple Silicon, NVIDIA, CPU-only), and requires no Kubernetes cluster.",
+      "key_fact": "Peer-to-peer mesh eliminates single point of failure.",
+      "why_it_matters": "Scales horizontally by adding laptops, servers, or edge boxes.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "Laptop (Planner)",
+            "sub": "Ollama + AutoGen"
+          },
+          {
+            "name": "Desktop GPU Node",
+            "sub": "Ollama + Coder Agent"
+          },
+          {
+            "name": "Mac Mini",
+            "sub": "Ollama + Reviewer Agent"
+          },
+          {
+            "name": "Linux Server",
+            "sub": "Ollama + Tester Agent"
+          }
+        ],
+        "connections": [
+          {
+            "label": "mDNS Discovery"
+          },
+          {
+            "label": "Task Pub/Sub"
+          },
+          {
+            "label": "Artifact Sync"
+          }
+        ]
+      }
+    },
+    {
+      "slide_number": 5,
+      "role": "system_workflow",
+      "layout_type": "input_output",
+      "eyebrow": "EXECUTION MECHANICS",
+      "title": "From Prompt to Pull Request",
+      "subtitle": "Structured input \u2192 local index & state machine \u2192 verified code artifact.",
+      "body": "Developer asks; swarm plans, codes, tests, and returns a ready-to-merge diff.",
+      "deep_dive": "Input is a natural-language issue or feature request. The planner indexes the local codebase (using a vector store) to ground its reasoning. It then drives a state machine: PLAN \u2192 CODE \u2192 REVIEW \u2192 TEST \u2192 MERGE_PREP. Each state transition triggers an AutoGen conversation between the planner and a specialist. Specialists read/write files via tool calls, run linters and unit tests locally, and emit structured logs. The final output is a git diff, test report, and summary \u2014 all produced without ever calling an external API.",
+      "key_fact": "Local codebase indexing grounds agents in project context.",
+      "why_it_matters": "Produces review-ready artifacts, not just chat responses.",
+      "input": "Natural-language issue or feature request",
+      "processing": "Planner indexes codebase \u2192 state machine drives specialist agents \u2192 local tools execute & verify",
+      "output": "Git diff, test results, merge-ready summary"
+    },
+    {
+      "slide_number": 6,
+      "role": "limitations_and_gotchas",
+      "layout_type": "common_mistake",
+      "eyebrow": "PRO TIPS & MISTAKES",
+      "title": "Avoid These Swarm Antipatterns",
+      "subtitle": "Oversized models, chatty agents, and ignoring hardware limits kill performance.",
+      "body": "Pick right-sized models, batch messages, and match agents to device capability.",
+      "deep_dive": "Common mistakes: running 70B models on 8GB RAM (swaps to disk, kills latency); letting agents converse in long free-form threads (token bloat, lost focus); assuming all nodes are equal (assign heavy lifting to GPU nodes, lightweight tasks to laptops). Pro tips: quantize to 4-bit for most tasks; enforce strict message schemas so agents exchange only diffs and decisions; use a device-capability registry so the planner routes compute-intensive steps to the strongest node. Monitor VRAM/RAM per node to prevent OOM crashes mid-swarm.",
+      "key_fact": "Right-sizing models and message discipline are critical for local throughput.",
+      "why_it_matters": "Prevents resource exhaustion and keeps swarm responsive.",
+      "items": [
+        "Match model size to device RAM (quantize aggressively).",
+        "Enforce structured, minimal agent messages.",
+        "Route tasks by device capability registry."
+      ]
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "GET STARTED",
+      "title": "Launch Your First Swarm Tonight",
+      "subtitle": "Install Ollama, add LangChain & AutoGen, define two agents, run a task.",
+      "body": "Three commands bootstrap a working multi-agent loop on a single machine.",
+      "deep_dive": "Start with `ollama pull llama3.1:8b` (or your preferred model). Install Python packages: `pip install langchain autogen`. Write a tiny script that creates a planner and a coder agent, gives them a shared AutoGen conversation, and asks for a hello-world module. Run it \u2014 watch two local LLMs collaborate. Next, spin up a second machine, install Ollama, and add its endpoint to the agent config. The swarm now spans devices. Iterate: add a reviewer agent, wire in your real codebase index, and replace a daily cloud API call with a local swarm job.",
+      "key_fact": "A two-agent swarm runs on one laptop in minutes.",
+      "why_it_matters": "Immediate productivity gain; path to fleet-scale is incremental.",
+      "takeaways": [
+        "Install Ollama and pull a 4-bit model.",
+        "Create planner + specialist agents with AutoGen.",
+        "Add a second device to experience cross-device routing."
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI engineering workflows."
+    }
+  ],
+  "_model_used": "OpenRouter:nvidia/nemotron-3-ultra-550b-a55b:free",
+  "_topic_intelligence": {
+    "topic_type": "developer_tool",
+    "domain": "ai_ml",
+    "primary_entity": "Local LLM Stack (Ollama, LangChain, AutoGen)",
+    "content_depth": "deep",
+    "best_story_angle": "technical_breakdown",
+    "audience": [
+      "software_engineers",
+      "ai_engineers"
+    ],
+    "key_questions": [
+      "What architecture enables cross-device agent coordination?",
+      "How does local inference compare to cloud APIs on cost and latency?",
+      "What frameworks and protocols handle agent-to-agent communication?",
+      "What hardware requirements exist for viable local swarms?"
+    ],
+    "recommended_slide_count": 7
+  },
+  "_archetype": "Developer Tool & IDE Innovation",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "I Stopped Renting Intelligence: How I Built a Cross-Device Agent Swarm",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "I Stopped Renting Intelligence: How I Built a Cross-Device A",
+    "fact_summary": "My Windows workstation and Android phone now share learnings through a private agent channel. Here&#x2019;s the architecture, the cost math, and&#x2026;Continue reading on Medium \u00bb",
+    "source": "Medium - technology",
+    "news_source_url": "https://medium.com/@proloymitra/i-stopped-renting-intelligence-how-i-built-a-cross-device-agent-swarm-for-25-less-than-frontier-fc06a15a32c2?source=rss------technology-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "stopped",
+      "renting",
+      "intelligence",
+      "built",
+      "cross"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}

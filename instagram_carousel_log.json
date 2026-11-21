@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Digital Storage: Magnets vs Quantum Traps",
     "How AlphaZero Learns Like a Super-Fast Baby",
     "Why AI Invents Facts: The Architecture of Hallucination",
     "AI's Internet Brain: Unlocking Global Scale",
@@ -99,10 +98,10 @@
     "Procedural Generation: From Static to Worlds",
     "Can a Trillion-Parameter Diffusion LLM Actually Work?",
     "Claude Code Skills for Trading Workflows",
-    "Claude Code: Explain Changes in Plain Words"
+    "Claude Code: Explain Changes in Plain Words",
+    "Cross-Device Agent Swarm with Local LLMs"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Digital Storage: Magnets vs Quantum Traps",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-11-01T12:05:23.492402+00:00"
-    },
     {
       "title": "How AlphaZero Learns Like a Super-Fast Baby",
       "news_source_url": "",
@@ -1307,6 +1297,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-21T12:37:41.257279+00:00"
+    },
+    {
+      "title": "Cross-Device Agent Swarm with Local LLMs",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-21T13:42:56.737666+00:00"
     }
   ]
 }
