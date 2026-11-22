@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Phone Sees Your Face as Numbers!",
     "AI Paints Worlds from Your Words",
     "CPU Performance Race: Apple, Qualcomm, Intel",
     "Your Phone's Secret Language Translator",
@@ -99,10 +98,10 @@
     "Anthropic: 3 Checks Before Installing Claude Skills",
     "Event-Driven Architecture: Decouple Systems at Scale",
     "Running LLMs on Android: Memory Is the Bottleneck",
-    "Anthropic\u2019s IPO, Gemini Tasks and AI Agents That Shop:\u2026"
+    "Anthropic\u2019s IPO, Gemini Tasks and AI Agents That Shop:\u2026",
+    "Claude AI: Daily Dev Superpowers"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Phone Sees Your Face as Numbers!",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-11-02T20:13:54.542869+00:00"
-    },
     {
       "title": "AI Paints Worlds from Your Words",
       "news_source_url": "",
@@ -1303,6 +1293,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-22T18:54:24.083673+00:00"
+    },
+    {
+      "title": "Claude AI: Daily Dev Superpowers",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-22T19:33:44.166721+00:00"
     }
   ]
 }
