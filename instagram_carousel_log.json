@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI's Internet Brain: Unlocking Global Scale",
     "Your Phone Charges Through Thin Air!",
     "Your Music Travels on Light",
     "Cars See World with Invisible Senses",
@@ -99,10 +98,10 @@
     "Claude Code: Explain Changes in Plain Words",
     "Cross-Device Agent Swarm with Local LLMs",
     "Stop Building the Weekend Rota by Hand",
-    "Mastering Link Previews & Social Metatags"
+    "Mastering Link Previews & Social Metatags",
+    "Anthropic: 3 Checks Before Installing Claude Skills"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI's Internet Brain: Unlocking Global Scale",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-11-01T18:32:28.717776+00:00"
-    },
     {
       "title": "Your Phone Charges Through Thin Air!",
       "news_source_url": "",
@@ -1307,6 +1297,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-21T20:12:40.733211+00:00"
+    },
+    {
+      "title": "Anthropic: 3 Checks Before Installing Claude Skills",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-22T12:15:52.644877+00:00"
     }
   ]
 }

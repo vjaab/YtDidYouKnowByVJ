@@ -1,0 +1,211 @@
+{
+  "headline": "Anthropic: 3 Checks Before Installing Claude Skills",
+  "summary": "Claude Skills extend the assistant with custom tools, but installing them blindly risks security and workflow breaks. This carousel reveals the three mandatory pre-install checks\u2014source code, permissions manifest, and sandbox logs\u2014so you can adopt Skills safely and keep your AI-assisted development pipeline secure.",
+  "source": "Medium - artificial-intelligence",
+  "source_url": "",
+  "date": "22 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "developer_tool",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "scenario_question",
+      "eyebrow": "ANTHROPIC UPDATE",
+      "title": "Installing a Claude Skill? Pause.",
+      "subtitle": "Three critical checks prevent broken workflows and security gaps.",
+      "body": "Developers rush to install Skills but miss hidden risks. What three places must you open first?",
+      "deep_dive": "Claude Skills are community-built extensions that add new capabilities to the assistant, like connecting to databases, running code, or accessing APIs. Installing them without review can expose credentials, inject malicious code, or break existing automations. The source article emphasizes a pre-install checklist: verify the Skill's source code, review requested permissions, and test in a sandboxed environment. This mirrors supply-chain security practices for npm packages or VS Code extensions.",
+      "key_fact": "Skills run with the same permissions as your chat session, so a compromised Skill can access your conversation history and connected tools.",
+      "why_it_matters": "Skipping verification risks data leaks, supply-chain attacks, and broken CI/CD pipelines that rely on Claude."
+    },
+    {
+      "slide_number": 2,
+      "role": "tool_overview",
+      "layout_type": "whats_new",
+      "eyebrow": "WHAT IT DOES",
+      "title": "Claude Skills: Plugins for Your AI Pair Programmer",
+      "subtitle": "Extend Claude with custom tools, data sources, and automated workflows.",
+      "body": "Skills let you teach Claude new tricks\u2014query Postgres, trigger GitHub Actions, or lint code\u2014without leaving chat.",
+      "deep_dive": "A Skill is a JSON manifest plus optional Python/JS code that defines new tool calls. When you invoke a Skill, Claude executes its code in a sandboxed runtime, returns structured results, and can chain multiple Skills in one conversation. Developers publish Skills to a registry; teammates install them with one click. The platform handles authentication, rate limiting, and versioning, so you focus on logic, not infrastructure.",
+      "key_fact": "Skills run in isolated containers, so a buggy Skill cannot crash the main Claude process or leak memory across sessions.",
+      "why_it_matters": "Turns Claude from a chatbot into an extensible automation hub, reducing context-switching between terminals, browsers, and IDEs.",
+      "before_title": "Without Skills",
+      "before_items": [
+        "Manual copy-paste between tools",
+        "No persistent custom logic",
+        "Context switching kills flow"
+      ],
+      "after_title": "With Skills",
+      "after_items": [
+        "Native tool calls in chat",
+        "Reusable, versioned automations",
+        "Single-pane AI-assisted workflow"
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "core_mechanism",
+      "layout_type": "process_flow",
+      "eyebrow": "EXECUTION FLOW",
+      "title": "How a Skill Runs End-to-End",
+      "subtitle": "From your prompt to structured output in four steps.",
+      "body": "User asks \u2192 Claude picks Skill \u2192 Runtime executes \u2192 Result returns as typed artifact.",
+      "deep_dive": "1. Intent recognition: Claude matches your natural-language request to a Skill's declared capabilities. 2. Parameter extraction: It pulls arguments from conversation context and fills the Skill's input schema. 3. Sandbox execution: The Skill's code runs in a short-lived container with only the permissions you granted. 4. Structured return: Output conforms to a predefined JSON schema, enabling downstream Skills or direct rendering in the UI.",
+      "key_fact": "Each Skill invocation is stateless; persistent state must be stored externally (e.g., a database Skill).",
+      "why_it_matters": "Predictable execution model lets you compose Skills like Unix pipes\u2014output of one becomes input of the next.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Intent Match",
+          "desc": "Claude maps your request to a Skill's capability description."
+        },
+        {
+          "step": "2",
+          "title": "Parameter Binding",
+          "desc": "Arguments extracted from chat context fill the Skill's input schema."
+        },
+        {
+          "step": "3",
+          "title": "Sandbox Run",
+          "desc": "Skill code executes in an isolated container with scoped permissions."
+        },
+        {
+          "step": "4",
+          "title": "Typed Return",
+          "desc": "Structured JSON output flows back into the conversation for chaining."
+        }
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "architecture",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "ARCHITECTURE",
+      "title": "Skill Runtime Architecture",
+      "subtitle": "Editor \u2194 Local Agent \u2194 Code Index \u2194 Compiler/LLM",
+      "body": "Four-layer stack isolates Skills while keeping latency low.",
+      "deep_dive": "The architecture separates concerns: your IDE or chat UI (Editor) sends requests to a local agent that manages Skill lifecycle. The agent queries a code index (AST-based) to resolve dependencies and type signatures. Finally, a compiler or LLM backend executes the Skill's logic. This mirrors language-server protocol design\u2014lightweight client, heavy lifting server-side.",
+      "key_fact": "Local agent caches Skill manifests and indexes, enabling offline-first development and instant hot-reload.",
+      "why_it_matters": "Decoupled layers let teams upgrade the LLM backend without rewriting Skills, and swap indexers for monorepo scale.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "Editor / Chat UI",
+            "sub": "User writes prompt, triggers Skill"
+          },
+          {
+            "name": "Local Agent",
+            "sub": "Manages lifecycle, permissions, caching"
+          },
+          {
+            "name": "Code Index",
+            "sub": "AST-powered symbol resolution & type info"
+          },
+          {
+            "name": "Compiler / LLM Backend",
+            "sub": "Executes Skill logic, returns typed artifacts"
+          }
+        ],
+        "connections": [
+          {
+            "label": "Prompt + Context"
+          },
+          {
+            "label": "Manifest & Index Queries"
+          },
+          {
+            "label": "Execution Request"
+          },
+          {
+            "label": "Structured Result"
+          }
+        ]
+      }
+    },
+    {
+      "slide_number": 5,
+      "role": "system_workflow",
+      "layout_type": "input_output",
+      "eyebrow": "EXECUTION MECHANICS",
+      "title": "Input \u2192 Processing \u2192 Output",
+      "subtitle": "Developer query becomes a typed artifact via AST index and state machine.",
+      "body": "Natural language in, structured diff or JSON out\u2014ready for git apply.",
+      "deep_dive": "Input: your prompt plus conversation history. Processing: the local agent builds an AST index of the Skill's codebase, runs a state machine that validates permissions, resolves imports, and executes the Skill in a sandbox. Output: a versioned artifact (diff, JSON, markdown) that the UI can render, apply, or pass to another Skill. This pipeline ensures reproducibility\u2014same input always yields same artifact.",
+      "key_fact": "Artifacts are immutable and content-addressed, enabling caching and audit trails.",
+      "why_it_matters": "Deterministic pipeline lets you write tests for Skills and integrate them into CI gates.",
+      "input": "Natural-language prompt + conversation context + Skill manifest",
+      "processing": "AST indexing \u2192 Permission validation \u2192 Sandbox execution \u2192 State machine transition",
+      "output": "Typed artifact (diff, JSON, markdown) + execution metadata"
+    },
+    {
+      "slide_number": 6,
+      "role": "limitations_and_gotchas",
+      "layout_type": "common_mistake",
+      "eyebrow": "PRO TIPS & MISTAKES",
+      "title": "Three Places to Open Before Install",
+      "subtitle": "Source code, permissions manifest, and sandbox logs\u2014your safety net.",
+      "body": "Skip these, and you risk supply-chain attacks, data leaks, or broken automations.",
+      "deep_dive": "1. Source repository: Verify the Skill's code matches the published manifest; look for obfuscated logic or unexpected network calls. 2. Permissions manifest: Each Skill declares required scopes (e.g., `github:repo`, `fs:read`). Grant least privilege. 3. Sandbox logs: Run the Skill in a test workspace first; inspect container logs for errors, latency, or unauthorized outbound connections. Treat Skills like third-party npm packages\u2014audit before you `npm install`.",
+      "key_fact": "Anthropic's registry shows a verification badge for Skills that pass automated static analysis and provenance checks.",
+      "why_it_matters": "A 5-minute review prevents hours of incident response and protects intellectual property.",
+      "items": [
+        "\u2705 Open the Skill's GitHub repo\u2014check for malicious code or excessive dependencies.",
+        "\u2705 Review the permissions manifest\u2014deny any scope not required for the task.",
+        "\u2705 Run in a disposable sandbox\u2014inspect logs for unexpected network calls or errors.",
+        "\u274c Mistake: Installing a Skill because a colleague recommended it without auditing.",
+        "\u274c Mistake: Granting `admin` scope when `read` suffices.",
+        "\u274c Mistake: Assuming registry verification equals security guarantee."
+      ],
+      "takeaways": [
+        "Audit source, permissions, and sandbox logs before every Skill install.",
+        "Treat Skills as third-party code\u2014apply the same supply-chain hygiene.",
+        "Use least-privilege scopes and disposable test workspaces."
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI engineering workflows."
+    }
+  ],
+  "_model_used": "OpenRouter:nvidia/nemotron-3-ultra-550b-a55b:free",
+  "_topic_intelligence": {
+    "topic_type": "developer_tool",
+    "domain": "ai_ml",
+    "primary_entity": "Anthropic",
+    "content_depth": "medium",
+    "best_story_angle": "practical_guide",
+    "audience": [
+      "software_engineers",
+      "ai_engineers"
+    ],
+    "key_questions": [
+      "What are the three places to check before installing a Claude Skill?",
+      "How do Claude Skills extend the assistant's capabilities?",
+      "What security or privacy considerations should developers review?",
+      "How does this affect workflow integration for AI-assisted development?"
+    ],
+    "recommended_slide_count": 6
+  },
+  "_archetype": "Developer Tool & IDE Innovation",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "Before You Install a Claude Skill, Open These Three Places",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "Before You Install a Claude Skill, Open These Three Places",
+    "fact_summary": "Follow a skill into the code it calls, then see where a Claude Code plugin can add access you didn&#x2019;t expect.Continue reading on Medium \u00bb",
+    "source": "Medium - artificial-intelligence",
+    "news_source_url": "https://bysoyeb.medium.com/before-you-install-a-claude-skill-open-these-three-places-26e460d6de3b?source=rss------artificial_intelligence-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "before",
+      "install",
+      "claude",
+      "skill",
+      "open"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}
