@@ -1,0 +1,39 @@
+[16:16:20] === STARTING DAILY AI PIPELINE (DID_YOU_KNOW) | COUNTRY: GB | SOURCE: HUGGINGFACE_HUB ===
+[16:16:20] 🔄 Sequential Topic Source: Active='HUGGINGFACE_HUB' (Rotation: github → medium → huggingface_hub)
+[16:16:20] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[16:16:20] STEP 1: Content Ecosystem Check -> Day: Sun, Slot: Slot A (Discovery), Category: AI & Tech Tools, Format: SPEEDRUN (Run 1/3)
+[16:16:20] STEP 2: Fetching articles (RSS + Trending Engine)...
+[16:16:43] 🔥 Trending Engine injected 193 high-signal articles (active_source='huggingface_hub', sources=['huggingface_hub', 'github', 'medium']).
+[16:16:44] 📈 vidIQ: Injected 8 high-signal topics.
+[16:18:02] ✅ Fetched 403 total articles (193 trending engine [huggingface_hub], 8 vidIQ, 143 research, 50 tools, 9 X.com).
+[16:18:02] 📚 Loaded 30 recent topics for deduplication
+[16:19:46] 🔍 Deduplication & classification: 403 → 20 candidates
+[16:19:46] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[16:26:10] Selected Headline: GitHub Gem #36: FastFrames-L — Apple's open-source Sora killer runs offline on your MacBook
+[16:26:10] Selected URL: https://huggingface.co/apple/FastFrames-L
+[16:26:10] Breaking Level: 9
+[16:26:10] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[16:26:20] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261122_162610.png
+[16:28:45] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261122_162620.png
+[16:28:45] STEP 4: Generating voiceover + word timestamps...
+[16:28:45] Selected Lip-Sync Template: assets/video/green_springboot.mp4 (from 41 options)
+[16:28:45] ⚠️ Script too long (87 words > 84). Asking for a tighter rewrite (shorten retry 1/2) before GPU work.
+[16:28:45] STEP 3 (Attempt 2/10): Gemini Searching & Generating Script...
+[16:34:25] Selected Headline: Claude Code 'Don't Ask Again' Clicks Leak Secrets to GitHub: 1,379 Secrets Found in Public Settings Files
+[16:34:25] Selected URL: https://medium.com/@circuitbay/your-dont-ask-again-clicks-may-be-on-github-six-checks-for-claude-code-s-settings-file-a6c5d01c24ad
+[16:34:25] Breaking Level: 9
+[16:34:25] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[16:34:39] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261122_163425.png
+[16:34:58] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261122_163439.png
+[16:34:58] STEP 4: Generating voiceover + word timestamps...
+[16:34:58] Selected Lip-Sync Template: assets/video/green_springboot.mp4 (from 41 options)
+[16:34:58] ⚠️ Script too long (89 words > 84). Asking for a tighter rewrite (shorten retry 2/2) before GPU work.
+[16:34:58] STEP 3 (Attempt 3/10): Gemini Searching & Generating Script...
+[16:45:30] Selected Headline: Apple Open-Sources FastFrames-L: A Text-to-Video Model You Can Run Locally
+[16:45:30] Selected URL: https://huggingface.co/apple/FastFrames-L
+[16:45:30] Breaking Level: 9
+[16:45:30] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[16:45:48] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261122_164530.png
+[16:48:00] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261122_164548.png
+[16:48:00] STEP 4: Generating voiceover + word timestamps...
+[16:48:00] Selected Lip-Sync Template: assets/video/green_springboot.mp4 (from 41 options)
