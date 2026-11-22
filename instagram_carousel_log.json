@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Phone Charges Through Thin Air!",
     "Your Music Travels on Light",
     "Cars See World with Invisible Senses",
     "Your Phone Sees Your Face as Numbers!",
@@ -99,10 +98,10 @@
     "Cross-Device Agent Swarm with Local LLMs",
     "Stop Building the Weekend Rota by Hand",
     "Mastering Link Previews & Social Metatags",
-    "Anthropic: 3 Checks Before Installing Claude Skills"
+    "Anthropic: 3 Checks Before Installing Claude Skills",
+    "Event-Driven Architecture: Decouple Systems at Scale"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Phone Charges Through Thin Air!",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-11-02T08:31:39.506651+00:00"
-    },
     {
       "title": "Your Music Travels on Light",
       "news_source_url": "",
@@ -1307,6 +1297,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-22T12:15:52.644877+00:00"
+    },
+    {
+      "title": "Event-Driven Architecture: Decouple Systems at Scale",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-22T12:35:08.641014+00:00"
     }
   ]
 }
