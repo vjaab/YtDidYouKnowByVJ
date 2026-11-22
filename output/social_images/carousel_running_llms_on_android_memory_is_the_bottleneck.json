@@ -1,0 +1,240 @@
+{
+  "headline": "Running LLMs on Android: Memory Is the Bottleneck",
+  "summary": "On-device LLM inference is blocked by mobile memory limits, not compute. Quantization (4-bit/3-bit) and memory-mapped weight loading via MLC LLM and llama.cpp enable 7B models to run in 4GB RAM. This unlocks private, offline AI for Android apps.",
+  "source": "Medium - machine-learning",
+  "source_url": "",
+  "date": "22 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "developer_tool",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "scenario_question",
+      "eyebrow": "GOOGLE UPDATE",
+      "title": "Why Your Phone Can't Run LLMs (Yet)",
+      "subtitle": "Memory walls block on-device AI for developers",
+      "body": "LLMs need gigabytes of RAM, but phones have limited memory. How do we fit a 7B parameter model into 4GB? The answer changes mobile AI.",
+      "deep_dive": "Large language models typically require 16GB+ VRAM for inference. Mobile devices share unified memory (4-12GB total) between OS, apps, and the model. This forces aggressive quantization (4-bit, 3-bit) and memory-mapped weight loading to avoid OOM kills. The bottleneck isn't compute\u2014it's memory bandwidth and capacity.",
+      "key_fact": "Memory capacity, not compute, is the primary blocker for on-device LLM inference.",
+      "why_it_matters": "Enables private, offline, low-latency AI features without cloud dependency."
+    },
+    {
+      "slide_number": 2,
+      "role": "tool_overview",
+      "layout_type": "whats_new",
+      "eyebrow": "WHAT IT DOES",
+      "title": "Tools That Shrink LLMs for Android",
+      "subtitle": "MLC LLM and llama.cpp bring quantization and memory-mapping to mobile",
+      "body": "These open-source frameworks convert PyTorch/HuggingFace models to run on Android via GPU/NPU. They handle quantization, kernel optimization, and memory management automatically.",
+      "deep_dive": "MLC LLM uses TVM compiler stack to generate optimized kernels for mobile GPUs (Adreno, Mali) and NPUs. llama.cpp uses GGUF format with mmap() for zero-copy weight loading. Both support 4-bit/3-bit quantization (GPTQ, AWQ, GGML) reducing 7B models to ~4GB. They expose C++/Java/Kotlin APIs for app integration.",
+      "key_fact": "MLC LLM and llama.cpp are the two leading frameworks for on-device Android LLM deployment.",
+      "why_it_matters": "Developers can integrate local LLMs into Android apps without cloud APIs.",
+      "before_title": "Before (Cloud Only)",
+      "before_items": [
+        "Requires internet connection",
+        "Latency depends on network",
+        "User data leaves device",
+        "Recurring API costs"
+      ],
+      "after_title": "After (On-Device)",
+      "after_items": [
+        "Works offline",
+        "Sub-second latency",
+        "Data stays private",
+        "Zero marginal cost"
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "core_mechanism",
+      "layout_type": "process_flow",
+      "eyebrow": "EXECUTION FLOW",
+      "title": "From Model to Mobile App: The Pipeline",
+      "subtitle": "Quantize \u2192 Compile \u2192 Package \u2192 Run",
+      "body": "The workflow: 1) Quantize model to 4-bit, 2) Compile to mobile IR (TVM/GGUF), 3) Bundle weights in APK/AAB, 4) Load via mmap at runtime, 5) Execute on GPU/NPU.",
+      "deep_dive": "Quantization reduces weight precision from FP16 to INT4/INT3 using calibration data, cutting size 4x. TVM (MLC) or GGUF (llama.cpp) compiles operators to mobile GPU/NPU kernels. Weights are stored as memory-mappable files in app assets. At runtime, mmap() maps weights directly into virtual memory\u2014no full RAM copy. Inference streams weight shards from storage to compute units on demand.",
+      "key_fact": "Memory-mapped loading (mmap) avoids OOM by streaming weights from storage instead of loading entirely into RAM.",
+      "why_it_matters": "This pipeline makes 7B models runnable on 4GB phones without swapping.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Quantize",
+          "desc": "Reduce precision from FP16 to INT4/INT3 using calibration data."
+        },
+        {
+          "step": "2",
+          "title": "Compile",
+          "desc": "TVM (MLC) or GGUF (llama.cpp) generates mobile-optimized kernels."
+        },
+        {
+          "step": "3",
+          "title": "Package",
+          "desc": "Weights stored as memory-mappable files in app assets."
+        },
+        {
+          "step": "4",
+          "title": "Load",
+          "desc": "mmap() maps weights directly into virtual memory, no full RAM copy."
+        },
+        {
+          "step": "5",
+          "title": "Execute",
+          "desc": "Inference runs on GPU/NPU with custom kernels, streaming weights from mmap."
+        }
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "architecture",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "ARCHITECTURE",
+      "title": "On-Device LLM Runtime Architecture",
+      "subtitle": "App \u2192 Runtime \u2192 Compiler Kernels \u2192 Hardware",
+      "body": "The app calls a thin JNI layer. The runtime (MLC/llama.cpp) manages memory-mapped weights and dispatches compiled kernels to GPU/NPU drivers.",
+      "deep_dive": "Android app (Kotlin/Java) \u2192 JNI bridge \u2192 C++ runtime (MLC LLM TVM runtime or llama.cpp) \u2192 Memory-mapped weight store (GGUF/TVM params) \u2192 Compiled kernel library (OpenCL/Vulkan/Metal/NPU driver) \u2192 GPU/NPU hardware. The runtime handles tokenization, sampling, and KV-cache management entirely in C++ for zero-GC latency.",
+      "key_fact": "JNI bridge keeps hot path in C++; Kotlin only orchestrates high-level requests.",
+      "why_it_matters": "Separation of concerns: app handles UI, runtime handles heavy lifting.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "Android App",
+            "sub": "Kotlin/Java UI"
+          },
+          {
+            "name": "JNI Bridge",
+            "sub": "Native Interface"
+          },
+          {
+            "name": "LLM Runtime",
+            "sub": "MLC TVM / llama.cpp"
+          },
+          {
+            "name": "Weight Store",
+            "sub": "mmap GGUF/TVM Params"
+          },
+          {
+            "name": "Kernel Library",
+            "sub": "OpenCL/Vulkan/NPU"
+          },
+          {
+            "name": "Hardware",
+            "sub": "GPU / NPU"
+          }
+        ],
+        "connections": [
+          {
+            "label": "generate() call"
+          },
+          {
+            "label": "native invoke"
+          },
+          {
+            "label": "weight streaming"
+          },
+          {
+            "label": "kernel dispatch"
+          },
+          {
+            "label": "compute"
+          }
+        ]
+      }
+    },
+    {
+      "slide_number": 5,
+      "role": "system_workflow",
+      "layout_type": "input_output",
+      "eyebrow": "EXECUTION MECHANICS",
+      "title": "How Inference Works on Device",
+      "subtitle": "Prompt \u2192 Tokenize \u2192 Kernel Launch \u2192 Stream Tokens",
+      "body": "User input tokenized, then each decoding step: 1) Load weight shards via mmap, 2) Run attention/FFN kernels, 3) Sample next token, 4) Repeat until EOS.",
+      "deep_dive": "Input text \u2192 tokenizer (C++ port) \u2192 token IDs. For each step: runtime calculates required weight slices, mmap brings them into page cache, kernel library executes attention + FFN on GPU/NPU, logits copied back, sampler picks next token, appended to KV-cache. KV-cache stays in GPU memory. Process repeats until EOS or max tokens. Output tokens detokenized to text.",
+      "key_fact": "KV-cache resides in GPU memory; weight shards stream from mmap-backed storage per layer.",
+      "why_it_matters": "Streaming weights from mmap keeps RAM footprint constant regardless of model size.",
+      "input": "User prompt string",
+      "processing": "Tokenize \u2192 Loop: mmap weight shard \u2192 GPU kernel (attn+FFN) \u2192 Sample \u2192 Update KV-cache",
+      "output": "Generated text tokens streamed to UI"
+    },
+    {
+      "slide_number": 6,
+      "role": "limitations_and_gotchas",
+      "layout_type": "common_mistake",
+      "eyebrow": "PRO TIPS & MISTAKES",
+      "title": "Avoid These On-Device LLM Pitfalls",
+      "subtitle": "Quantization loss, thermal throttling, and memory leaks",
+      "body": "Don't quantize without calibration\u2014accuracy tanks. Don't ignore thermal limits\u2014sustained inference throttles. Don't load full weights into heap\u2014use mmap or OOM.",
+      "deep_dive": "Common antipatterns: 1) Using 4-bit without calibration data \u2192 perplexity spikes. 2) Running long generations without thermal monitoring \u2192 CPU/GPU throttles, latency doubles. 3) Loading weights via Bitmap/ByteBuffer into Java heap \u2192 immediate OOM. 4) Ignoring KV-cache eviction \u2192 memory grows unbounded. Recommended: calibrate with representative data, implement thermal callbacks, use mmap exclusively, cap context length.",
+      "key_fact": "Uncalibrated 4-bit quantization can degrade quality more than 3-bit calibrated.",
+      "why_it_matters": "These mistakes turn a working demo into a crashed production app.",
+      "items": [
+        "Quantize without calibration data \u2192 quality collapse",
+        "Run sustained inference without thermal throttling handling",
+        "Load weights into Java heap instead of mmap",
+        "Allow unbounded KV-cache growth",
+        "Skip NPU/GPU fallback for unsupported ops"
+      ]
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "GET STARTED",
+      "title": "Run Your First On-Device LLM Today",
+      "subtitle": "Add MLC LLM or llama.cpp to your Android project",
+      "body": "Clone MLC LLM Android demo or llama.cpp Android example. Add dependency, place quantized model in assets, call generate().",
+      "deep_dive": "MLC LLM: add `implementation 'org.mlc:mlc-llm-android:0.x.x'`, put `.so` libs and quantized model (`.params`) in `assets/`, call `MLCEngine.generate()`. llama.cpp: build `libllama.so` with NDK, add GGUF model to `assets/`, use JNI wrapper `LlamaContext.generate()`. Both provide Kotlin samples. Start with a 3B 4-bit model (~2GB) for broad device support.",
+      "key_fact": "A 3B 4-bit model runs on most 4GB+ phones; 7B needs 6GB+.",
+      "why_it_matters": "Zero-cloud LLM integration in under an hour.",
+      "takeaways": [
+        "Clone MLC LLM Android demo or llama.cpp Android example repo",
+        "Add Gradle dependency and place quantized model in assets/",
+        "Call generate() from Kotlin via JNI\u2014first token in <1s on modern phones"
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI & engineering updates"
+    }
+  ],
+  "_model_used": "OpenRouter:nvidia/nemotron-3-ultra-550b-a55b:free",
+  "_topic_intelligence": {
+    "topic_type": "developer_tool",
+    "domain": "ai_ml",
+    "primary_entity": "Google",
+    "content_depth": "deep",
+    "best_story_angle": "technical_breakdown",
+    "audience": [
+      "software_engineers",
+      "ai_engineers"
+    ],
+    "key_questions": [
+      "What are the memory constraints of running LLMs on Android devices?",
+      "How do quantization and memory-mapping techniques enable on-device inference?",
+      "What performance benchmarks exist for mobile LLM deployment?",
+      "Which tools (MLC LLM, llama.cpp, etc.) are viable for Android integration?"
+    ],
+    "recommended_slide_count": 7
+  },
+  "_archetype": "Developer Tool & IDE Innovation",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "Running an LLM on an Android phone: memory is the whole problem",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "Running an LLM on an Android phone: memory is the whole prob",
+    "fact_summary": "Onira writes a self-hypnosis session on the phone with a 2-billion-parameter model. Speed turned out to be the easy part.Continue reading on Medium \u00bb",
+    "source": "Medium - machine-learning",
+    "news_source_url": "https://medium.com/@charlesantoine.fournel/running-an-llm-on-an-android-phone-memory-is-the-whole-problem-5db427491b1e?source=rss------machine_learning-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "running",
+      "android",
+      "phone",
+      "memory",
+      "whole"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}

@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Music Travels on Light",
     "Cars See World with Invisible Senses",
     "Your Phone Sees Your Face as Numbers!",
     "AI Paints Worlds from Your Words",
@@ -99,10 +98,10 @@
     "Stop Building the Weekend Rota by Hand",
     "Mastering Link Previews & Social Metatags",
     "Anthropic: 3 Checks Before Installing Claude Skills",
-    "Event-Driven Architecture: Decouple Systems at Scale"
+    "Event-Driven Architecture: Decouple Systems at Scale",
+    "Running LLMs on Android: Memory Is the Bottleneck"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Music Travels on Light",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-11-02T09:28:33.517826+00:00"
-    },
     {
       "title": "Cars See World with Invisible Senses",
       "news_source_url": "",
@@ -1307,6 +1297,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-22T12:35:08.641014+00:00"
+    },
+    {
+      "title": "Running LLMs on Android: Memory Is the Bottleneck",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-22T13:35:46.502269+00:00"
     }
   ]
 }

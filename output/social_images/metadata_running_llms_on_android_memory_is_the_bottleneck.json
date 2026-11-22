@@ -1,0 +1,21 @@
+{
+  "topic": "Running LLMs on Android: Memory Is the Bottleneck",
+  "category": "AI News",
+  "type": "carousel",
+  "slides": 7,
+  "instagram_images": [
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_Running_LLMs_on_Android_Memory_01_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_Running_LLMs_on_Android_Memory_02_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_Running_LLMs_on_Android_Memory_03_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_Running_LLMs_on_Android_Memory_04_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_Running_LLMs_on_Android_Memory_05_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_Running_LLMs_on_Android_Memory_06_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_Running_LLMs_on_Android_Memory_07_1080x1350.jpg"
+  ],
+  "facebook_images": [],
+  "caption": "\ud83d\udcf0 Running LLMs on Android: Memory Is the Bottleneck\n\nOn-device LLM inference is blocked by mobile memory limits, not compute. Quantization (4-bit/3-bit) and memory-mapped weight loading via MLC LLM and llama.cpp enable 7B models to run in 4GB RAM. This unlocks private, offline AI for Android apps.\n\n\ud83d\udcc5 22 Nov 2026 | Source: Medium - machine-learning\n\ud83d\udd17 \n\nFollow @vijayakumarj_ai for daily AI updates!\n\n#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets\n\n\ud83d\udcac Which side are you on? I'll drop my take in the replies \ud83d\udc47\n\ud83d\udd01 Repost to see what your friends think!",
+  "hashtags": "#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets",
+  "poll_file": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/poll_running_llms_on_android_memory_is_the_bottleneck.json",
+  "carousel_json": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_running_llms_on_android_memory_is_the_bottleneck.json",
+  "generated_at": "2026-11-22T13:35:44.439021+00:00"
+}
