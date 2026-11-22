@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI Paints Worlds from Your Words",
     "CPU Performance Race: Apple, Qualcomm, Intel",
     "Your Phone's Secret Language Translator",
     "Your Earbuds Hear the World Differently",
@@ -99,10 +98,10 @@
     "Event-Driven Architecture: Decouple Systems at Scale",
     "Running LLMs on Android: Memory Is the Bottleneck",
     "Anthropic\u2019s IPO, Gemini Tasks and AI Agents That Shop:\u2026",
-    "Claude AI: Daily Dev Superpowers"
+    "Claude AI: Daily Dev Superpowers",
+    "Run Claude Code on a Timer"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "AI",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI Paints Worlds from Your Words",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-11-02T20:24:11.348907+00:00"
-    },
     {
       "title": "CPU Performance Race: Apple, Qualcomm, Intel",
       "news_source_url": "",
@@ -1303,6 +1293,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-22T19:33:44.166721+00:00"
+    },
+    {
+      "title": "Run Claude Code on a Timer",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-22T20:29:19.753477+00:00"
     }
   ]
 }

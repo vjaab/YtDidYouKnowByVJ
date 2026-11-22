@@ -1,0 +1,213 @@
+{
+  "headline": "Run Claude Code on a Timer",
+  "summary": "Discover six reliable methods to automate Claude Code executions on a schedule, ranging from local operating system schedulers to robust cloud pipelines and containerized runners.",
+  "source": "Medium - programming",
+  "source_url": "",
+  "date": "22 Nov 2026",
+  "category": "PROGRAMMING",
+  "topic_type": "developer_tool",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "scenario_question",
+      "eyebrow": "CLAUDE CODE UPDATE",
+      "title": "Tired of manual AI coding tasks?",
+      "subtitle": "Discover how to schedule autonomous AI runs effortlessly.",
+      "body": "Imagine your codebase improving overnight without lifting a finger. How do you transition from manual prompts to fully automated scheduled routines?",
+      "deep_dive": "Manual AI execution limits developers to synchronous workflows. Automating routines unlocks overnight code reviews and automated refactoring loops.",
+      "key_fact": "Transitioning from manual triggers to timed execution scales engineering productivity.",
+      "why_it_matters": "Saves hours of repetitive daily engineering overhead."
+    },
+    {
+      "slide_number": 2,
+      "role": "tool_overview",
+      "layout_type": "whats_new",
+      "eyebrow": "WHAT IT DOES",
+      "title": "Six Ways to Run on a Timer",
+      "subtitle": "Comparing local setup versus cloud runners.",
+      "body": "Explore diverse automation strategies spanning simple local utilities, advanced service managers, and distributed cloud pipelines.",
+      "before_title": "Local Approaches",
+      "before_items": [
+        "Traditional cron jobs",
+        "Systemd timer services",
+        "Background task daemons"
+      ],
+      "after_title": "Cloud & CI/CD Approaches",
+      "after_items": [
+        "Scheduled CI pipelines",
+        "Dedicated cloud runners",
+        "Containerized cron pods"
+      ],
+      "deep_dive": "Different environments offer distinct trade-offs regarding persistent authentication tokens, resource limits, and network access.",
+      "key_fact": "Choosing the right tier depends entirely on security and infrastructure maturity.",
+      "why_it_matters": "Prevents unexpected downtime during unattended execution."
+    },
+    {
+      "slide_number": 3,
+      "role": "core_mechanism",
+      "layout_type": "process_flow",
+      "eyebrow": "EXECUTION FLOW",
+      "title": "The Automated Lifecycle",
+      "subtitle": "How scheduled triggers initiate AI coding actions.",
+      "body": "A scheduled trigger fires, authenticates securely, loads codebase context, and executes the designated AI instruction set.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Trigger Event",
+          "desc": "Timer or cron activates the execution slot."
+        },
+        {
+          "step": "2",
+          "title": "Context Loading",
+          "desc": "Workspace state and environment variables bind."
+        },
+        {
+          "step": "3",
+          "title": "Agent Execution",
+          "desc": "Claude Code processes instructions against the repository."
+        }
+      ],
+      "deep_dive": "Reliable automation demands strict isolation between execution runs to prevent stale state corruption.",
+      "key_fact": "State persistence is the backbone of stable unattended runs.",
+      "why_it_matters": "Ensures predictable and repeatable code modifications."
+    },
+    {
+      "slide_number": 4,
+      "role": "architecture",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "ARCHITECTURE",
+      "title": "Infrastructure Blueprint",
+      "subtitle": "Mapping scheduler layers to the AI engine.",
+      "body": "The scheduler communicates directly with container isolation layers, passing secure API credentials to the language model.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "Scheduler",
+            "sub": "Cron / CI Trigger"
+          },
+          {
+            "name": "Runtime Env",
+            "sub": "Auth & State"
+          },
+          {
+            "name": "Claude Code",
+            "sub": "AI Engine"
+          }
+        ],
+        "connections": [
+          {
+            "label": "fires event"
+          },
+          {
+            "label": "initializes"
+          }
+        ]
+      },
+      "deep_dive": "Clean separation of scheduler logic from AI reasoning guarantees high fault tolerance.",
+      "key_fact": "Robust architecture isolates failures to individual job runs.",
+      "why_it_matters": "Protects core infrastructure from cascading automation errors."
+    },
+    {
+      "slide_number": 5,
+      "role": "system_workflow",
+      "layout_type": "input_output",
+      "eyebrow": "EXECUTION MECHANICS",
+      "title": "Input to Structured Output",
+      "subtitle": "Transforming raw prompts into verified pull requests.",
+      "body": "Feed scheduled prompts into the system to generate clean, verified code diffs and automated git commits.",
+      "input": "Scheduled prompt file & repo state",
+      "processing": "AST indexing & AI reasoning loop",
+      "output": "Structured git diff & summary report",
+      "deep_dive": "Automated workflows bridge the gap between static code analysis and dynamic generative problem solving.",
+      "key_fact": "Standardized inputs yield consistent, reviewable code outputs.",
+      "why_it_matters": "Simplifies human oversight for autonomous code changes."
+    },
+    {
+      "slide_number": 6,
+      "role": "limitations_and_gotchas",
+      "layout_type": "common_mistake",
+      "eyebrow": "PRO TIPS & MISTAKES",
+      "title": "Avoiding Unattended Pitfalls",
+      "subtitle": "Balancing autonomy with safety guards.",
+      "body": "Running AI loops without guardrails can cause runaway token costs or infinite error loops. Always enforce strict execution limits.",
+      "before_title": "Antipatterns",
+      "before_items": [
+        "Uncapped API spending limits",
+        "Running loops on main branches",
+        "Storing plaintext API keys"
+      ],
+      "after_title": "Recommended Practices",
+      "after_items": [
+        "Strict cost thresholds",
+        "Isolated staging branches",
+        "Secure secret managers"
+      ],
+      "deep_dive": "Autonomous coding agents require boundary conditions just like human junior developers.",
+      "key_fact": "Safety guards protect both your budget and your codebase integrity.",
+      "why_it_matters": "Prevents catastrophic unintended modifications in production."
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "GET STARTED",
+      "title": "Master Your Automation Workflow",
+      "subtitle": "Key steps to implement scheduled AI coding today.",
+      "body": "Start small with local timers before migrating complex workloads to robust cloud execution pipelines.",
+      "takeaways": [
+        "Audit your repetitive daily tasks to identify automation candidates.",
+        "Choose an execution method matching your security requirements.",
+        "Implement strict budget caps and isolated branch workflows."
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI and engineering updates.",
+      "deep_dive": "Embracing automated engineering workflows puts your team at the forefront of AI-native development.",
+      "key_fact": "Incremental adoption yields sustainable engineering velocity.",
+      "why_it_matters": "Future-proofs your development pipeline against manual bottlenecks."
+    }
+  ],
+  "_model_used": "gemini-3.5-flash-lite",
+  "_topic_intelligence": {
+    "topic_type": "developer_tool",
+    "domain": "programming",
+    "primary_entity": "Claude Code",
+    "content_depth": "intermediate",
+    "best_story_angle": "practical_implementation",
+    "audience": [
+      "software_engineers",
+      "devops_engineers",
+      "ai_engineers"
+    ],
+    "key_questions": [
+      "What are the most reliable ways to execute Claude Code on a schedule?",
+      "How do local methods like cron and systemd compare to CI/CD and cloud runners?",
+      "How should developers handle authentication, environment state, and context persistence during scheduled runs?",
+      "What are the cost and safety implications of running autonomous AI coding tasks on a loop?"
+    ],
+    "recommended_slide_count": 7
+  },
+  "_archetype": "Developer Tool & IDE Innovation",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "Claude Code Scheduled Tasks: 6 Ways to Run on a Timer, Ranked",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "Claude Code Scheduled Tasks: 6 Ways to Run on a Timer, Ranke",
+    "fact_summary": "Four fire with the lid shut, five can draw on your chat&apos;s weekly limit, one bills $0.08 a session-hour, and /loop now lasts 30 days, not 7.Continue reading on Medium \u00bb",
+    "source": "Medium - programming",
+    "news_source_url": "https://medium.com/@automation.labs/claude-code-scheduled-tasks-6-ways-to-run-on-a-timer-ranked-2779e1da5be4?source=rss------programming-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "claude",
+      "code",
+      "scheduled",
+      "tasks",
+      "ways"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}
