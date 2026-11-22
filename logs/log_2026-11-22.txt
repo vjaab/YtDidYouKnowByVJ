@@ -37,3 +37,26 @@
 [16:48:00] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261122_164548.png
 [16:48:00] STEP 4: Generating voiceover + word timestamps...
 [16:48:00] Selected Lip-Sync Template: assets/video/green_springboot.mp4 (from 41 options)
+[20:55:20] === STARTING DAILY AI PIPELINE (DID_YOU_KNOW) | COUNTRY: GB | SOURCE: HUGGINGFACE_HUB ===
+[20:55:20] 🔄 Sequential Topic Source: Active='HUGGINGFACE_HUB' (Rotation: github → medium → huggingface_hub)
+[20:55:20] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[20:55:20] STEP 1: Content Ecosystem Check -> Day: Mon, Slot: Slot A (Discovery), Category: Facts & Trivia, Format: SOLO_EXPLAINER (Run 1/3)
+[20:55:20] STEP 2: Fetching articles (RSS + Trending Engine)...
+[20:55:30] 🔥 Trending Engine injected 72 high-signal articles (active_source='huggingface_hub', sources=['huggingface_hub', 'github', 'medium']).
+[20:55:30] 📈 vidIQ: Injected 8 high-signal topics.
+[20:56:34] ✅ Fetched 279 total articles (72 trending engine [huggingface_hub], 8 vidIQ, 143 research, 47 tools, 9 X.com).
+[20:56:34] 📚 Loaded 30 recent topics for deduplication
+[20:58:25] 🔍 Deduplication & classification: 279 → 20 candidates
+[20:58:25] 🏷️ Zero-shot re-categorized top candidate: Facts & Trivia → AI & Tech Tools
+[20:58:25] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[21:01:32] Selected Headline: Google's Physical Engineering's Last Exam Dataset Challenges AI
+[21:01:32] Selected URL: https://huggingface.co/datasets/google/physical-engineerings-last-exam
+[21:01:32] Breaking Level: 9
+[21:01:32] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[21:01:37] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261122_210132.png
+[21:01:41] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261122_210137.png
+[21:01:41] STEP 4: Generating voiceover + word timestamps...
+[21:01:41] Selected Lip-Sync Template: assets/video/green_springboot.mp4 (from 41 options)
+[21:11:54] ❌ Kaggle Handover failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 10 min.
+[21:11:54] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
+[21:11:54] ⚠️ Lip-sync will be SKIPPED for this video (requires GPU).

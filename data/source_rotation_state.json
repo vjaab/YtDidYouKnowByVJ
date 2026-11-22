@@ -1,24 +1,6 @@
 {
   "source_history": [
     {
-      "source": "github",
-      "articles_count": 174,
-      "timestamp": "2026-09-12T00:48:01.282928",
-      "video_number": 4
-    },
-    {
-      "source": "arxiv",
-      "articles_count": 12,
-      "timestamp": "2026-09-12T00:48:01.283138",
-      "video_number": 5
-    },
-    {
-      "source": "hackernews",
-      "articles_count": 4,
-      "timestamp": "2026-09-12T00:48:01.283345",
-      "video_number": 6
-    },
-    {
       "source": "huggingface",
       "articles_count": 15,
       "timestamp": "2026-09-12T00:48:01.283532",
@@ -599,7 +581,25 @@
       "articles_count": 23,
       "timestamp": "2026-11-15T20:01:20.952450",
       "video_number": 103
+    },
+    {
+      "source": "github",
+      "articles_count": 47,
+      "timestamp": "2026-11-22T20:55:30.317694",
+      "video_number": 104
+    },
+    {
+      "source": "medium",
+      "articles_count": 2,
+      "timestamp": "2026-11-22T20:55:30.318626",
+      "video_number": 105
+    },
+    {
+      "source": "huggingface_hub",
+      "articles_count": 23,
+      "timestamp": "2026-11-22T20:55:30.319474",
+      "video_number": 106
     }
   ],
-  "video_count": 103
+  "video_count": 106
 }
