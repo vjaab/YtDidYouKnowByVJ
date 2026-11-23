@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "CPU Performance Race: Apple, Qualcomm, Intel",
     "Your Phone's Secret Language Translator",
     "Your Earbuds Hear the World Differently",
     "Wearable Biometrics: Reading Mind Signals",
@@ -99,10 +98,10 @@
     "Running LLMs on Android: Memory Is the Bottleneck",
     "Anthropic\u2019s IPO, Gemini Tasks and AI Agents That Shop:\u2026",
     "Claude AI: Daily Dev Superpowers",
-    "Run Claude Code on a Timer"
+    "Run Claude Code on a Timer",
+    "Google & IITs Ignite Decentralized AI Research"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "AI",
     "learning",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "CPU Performance Race: Apple, Qualcomm, Intel",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-11-02T20:54:37.718034+00:00"
-    },
     {
       "title": "Your Phone's Secret Language Translator",
       "news_source_url": "",
@@ -1303,6 +1293,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-22T20:29:19.753477+00:00"
+    },
+    {
+      "title": "Google & IITs Ignite Decentralized AI Research",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-23T18:41:46.460949+00:00"
     }
   ]
 }
