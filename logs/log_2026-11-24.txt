@@ -46,3 +46,26 @@
 [19:52:14] ❌ Kaggle Handover failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 12 min.
 [19:52:14] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
 [19:52:14] ⚠️ Lip-sync will be SKIPPED for this video (requires GPU).
+[23:41:46] === STARTING DAILY AI PIPELINE (DID_YOU_KNOW) | COUNTRY: GB | SOURCE: HUGGINGFACE_HUB ===
+[23:41:46] 🔄 Sequential Topic Source: Active='HUGGINGFACE_HUB' (Rotation: github → medium → huggingface_hub)
+[23:41:46] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[23:41:46] STEP 1: Content Ecosystem Check -> Day: Wed, Slot: Slot A (Discovery), Category: Facts & Trivia, Format: PAUSE_AND_GUESS (Run 1/3)
+[23:41:46] STEP 2: Fetching articles (RSS + Trending Engine)...
+[23:41:57] 🔥 Trending Engine injected 71 high-signal articles (active_source='huggingface_hub', sources=['huggingface_hub', 'github', 'medium']).
+[23:41:57] 📈 vidIQ: Injected 8 high-signal topics.
+[23:43:06] ✅ Fetched 417 total articles (71 trending engine [huggingface_hub], 8 vidIQ, 237 research, 92 tools, 9 X.com).
+[23:43:06] 📚 Loaded 30 recent topics for deduplication
+[23:44:49] 🔍 Deduplication & classification: 417 → 20 candidates
+[23:44:49] 🏷️ Zero-shot re-categorized top candidate: Facts & Trivia → AI & Tech Tools
+[23:44:49] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[23:45:38] Selected Headline: HF Trending Model: FastFrames-L
+[23:45:38] Selected URL: https://huggingface.co/apple/FastFrames-L
+[23:45:38] Breaking Level: 9
+[23:45:38] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[23:45:43] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261124_234538.png
+[23:45:47] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261124_234543.png
+[23:45:47] STEP 4: Generating voiceover + word timestamps...
+[23:45:47] Selected Lip-Sync Template: assets/video/green_springboot.mp4 (from 41 options)
+[23:56:57] ❌ Kaggle Handover failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 11 min.
+[23:56:57] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
+[23:56:57] ⚠️ Lip-sync will be SKIPPED for this video (requires GPU).
