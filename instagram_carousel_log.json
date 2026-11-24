@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Phone's Secret Language Translator",
     "Your Earbuds Hear the World Differently",
     "Wearable Biometrics: Reading Mind Signals",
     "MIT: Screens That Feel Touch Force",
@@ -99,10 +98,10 @@
     "Anthropic\u2019s IPO, Gemini Tasks and AI Agents That Shop:\u2026",
     "Claude AI: Daily Dev Superpowers",
     "Run Claude Code on a Timer",
-    "Google & IITs Ignite Decentralized AI Research"
+    "Google & IITs Ignite Decentralized AI Research",
+    "The ERF Blueprint: Replicators End AI Fragmentation"
   ],
   "used_keywords": [
-    "did you know",
     "AI",
     "learning",
     "recognition",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Phone's Secret Language Translator",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-11-02T22:39:41.086868+00:00"
-    },
     {
       "title": "Your Earbuds Hear the World Differently",
       "news_source_url": "",
@@ -1303,6 +1293,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-23T18:41:46.460949+00:00"
+    },
+    {
+      "title": "The ERF Blueprint: Replicators End AI Fragmentation",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-24T01:32:42.095423+00:00"
     }
   ]
 }
