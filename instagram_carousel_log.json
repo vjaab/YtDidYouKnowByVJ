@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "IEEE: Inside Your Phone's Transistor Army",
     "Quantum Computers: Beyond 0 and 1",
     "AI's Invisible Life Decoder",
     "Intel Transistor Breakthrough Powers Edge AI",
@@ -99,10 +98,10 @@
     "The ERF Blueprint: Replicators End AI Fragmentation",
     "The ERF Safety Net: Tracking Without Mass Surveillance",
     "Mastering Multi-Agent Orchestration",
-    "Claude's 5 Trending Developer Skills (Nov 2026)"
+    "Claude's 5 Trending Developer Skills (Nov 2026)",
+    "The Riemann Hypothesis Proof by Alp\u00f6ge and Claude,\u2026"
   ],
   "used_keywords": [
-    "efficiency",
     "technology",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "IEEE: Inside Your Phone's Transistor Army",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-11-03T09:33:56.862101+00:00"
-    },
     {
       "title": "Quantum Computers: Beyond 0 and 1",
       "news_source_url": "",
@@ -1303,6 +1293,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-24T12:28:42.056424+00:00"
+    },
+    {
+      "title": "The Riemann Hypothesis Proof by Alp\u00f6ge and Claude,\u2026",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-24T20:37:17.573599+00:00"
     }
   ]
 }
