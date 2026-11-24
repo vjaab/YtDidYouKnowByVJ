@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Earbuds Hear the World Differently",
     "Wearable Biometrics: Reading Mind Signals",
     "MIT: Screens That Feel Touch Force",
     "IEEE: Inside Your Phone's Transistor Army",
@@ -99,10 +98,10 @@
     "Claude AI: Daily Dev Superpowers",
     "Run Claude Code on a Timer",
     "Google & IITs Ignite Decentralized AI Research",
-    "The ERF Blueprint: Replicators End AI Fragmentation"
+    "The ERF Blueprint: Replicators End AI Fragmentation",
+    "The ERF Safety Net: Tracking Without Mass Surveillance"
   ],
   "used_keywords": [
-    "AI",
     "learning",
     "recognition",
     "efficiency",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Earbuds Hear the World Differently",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-11-02T22:48:25.840242+00:00"
-    },
     {
       "title": "Wearable Biometrics: Reading Mind Signals",
       "news_source_url": "",
@@ -1303,6 +1293,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-24T01:32:42.095423+00:00"
+    },
+    {
+      "title": "The ERF Safety Net: Tracking Without Mass Surveillance",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-24T01:41:19.932704+00:00"
     }
   ]
 }
