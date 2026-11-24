@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Quantum Computers: Beyond 0 and 1",
     "AI's Invisible Life Decoder",
     "Intel Transistor Breakthrough Powers Edge AI",
     "AI Invents Faces That Don't Exist",
@@ -99,10 +98,10 @@
     "The ERF Safety Net: Tracking Without Mass Surveillance",
     "Mastering Multi-Agent Orchestration",
     "Claude's 5 Trending Developer Skills (Nov 2026)",
-    "The Riemann Hypothesis Proof by Alp\u00f6ge and Claude,\u2026"
+    "The Riemann Hypothesis Proof by Alp\u00f6ge and Claude,\u2026",
+    "How to Spot ChatGPT Writing"
   ],
   "used_keywords": [
-    "technology",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Quantum Computers: Beyond 0 and 1",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-11-03T14:36:12.848191+00:00"
-    },
     {
       "title": "AI's Invisible Life Decoder",
       "news_source_url": "",
@@ -1303,6 +1293,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-24T20:37:17.573599+00:00"
+    },
+    {
+      "title": "How to Spot ChatGPT Writing",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-24T23:26:52.805377+00:00"
     }
   ]
 }
