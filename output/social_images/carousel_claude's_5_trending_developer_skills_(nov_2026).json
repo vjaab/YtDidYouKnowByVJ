@@ -1,0 +1,230 @@
+{
+  "headline": "Claude's 5 Trending Developer Skills (Nov 2026)",
+  "summary": "Anthropic Claude is evolving, offering developers new capabilities to streamline AI engineering. These trending skills enhance code comprehension, automate mundane tasks, and improve overall workflow efficiency, leading to faster, more robust development cycles.",
+  "source": "Medium - artificial-intelligence",
+  "source_url": "",
+  "date": "24 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "developer_tool",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "scenario_question",
+      "eyebrow": "ANTHROPIC CLAUDE UPDATE",
+      "title": "Stuck in Code Review Hell?",
+      "subtitle": "AI-powered workflows are changing everything.",
+      "body": "Modern AI development means complex codebases and endless refactoring. Manual processes slow teams down, introducing errors and delays.",
+      "deep_dive": "The increasing size and interconnectedness of AI models and infrastructure demand intelligent tooling that understands context deeply.",
+      "key_fact": "Claude's emerging skills directly target these critical workflow inefficiencies.",
+      "why_it_matters": "Accelerate development, reduce bugs, and free up engineers for innovation."
+    },
+    {
+      "slide_number": 2,
+      "role": "tool_overview",
+      "layout_type": "whats_new",
+      "eyebrow": "WHAT IT DOES",
+      "title": "Claude's 5 Trending Developer Skills Unveiled",
+      "subtitle": "Redefining how engineers build, test, and deploy AI.",
+      "body": "Developers are leveraging Claude for advanced code understanding, automated refactoring, and intelligent task orchestration today.",
+      "before_title": "OLD WORKFLOW CHALLENGES",
+      "before_items": [
+        "Manual boilerplate writing",
+        "Tedious debugging loops",
+        "Limited contextual understanding",
+        "Repetitive testing processes"
+      ],
+      "after_title": "CLAUDE'S NEW CAPABILITIES",
+      "after_items": [
+        "Advanced Code Comprehension",
+        "Intelligent Refactoring Suggestions",
+        "Agentic Workflow Orchestration",
+        "Dynamic Test Generation",
+        "Real-time Documentation Synthesis"
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "core_mechanism",
+      "layout_type": "process_flow",
+      "eyebrow": "EXECUTION FLOW",
+      "title": "Claude's Code-Aware Processing",
+      "subtitle": "How it understands and transforms your codebase.",
+      "body": "Claude doesn't just process text; it builds a rich understanding of your code's structure and intent.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Code Ingestion",
+          "desc": "Developer submits code snippets or an entire project context for analysis."
+        },
+        {
+          "step": "2",
+          "title": "Semantic Analysis",
+          "desc": "Claude builds an Abstract Syntax Tree (AST) and understands inter-code dependencies."
+        },
+        {
+          "step": "3",
+          "title": "Contextual Reasoning",
+          "desc": "It applies domain knowledge to infer intent and identify problem areas conceptually."
+        },
+        {
+          "step": "4",
+          "title": "Action Generation",
+          "desc": "Proposes solutions, refactors, or new code structures as a structured output."
+        }
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "architecture",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "ARCHITECTURE",
+      "title": "Claude's Integrated Development Loop",
+      "subtitle": "Bridging your IDE with advanced AI capabilities.",
+      "body": "This architecture ensures seamless interaction, turning developer ideas into actionable code changes.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "Developer IDE",
+            "sub": "VS Code, IntelliJ, etc."
+          },
+          {
+            "name": "Local Agent",
+            "sub": "Orchestrates AI requests"
+          },
+          {
+            "name": "Code Index",
+            "sub": "AST & Semantic Graph"
+          },
+          {
+            "name": "Anthropic Claude (LLM)",
+            "sub": "Core Reasoning Engine"
+          },
+          {
+            "name": "Version Control/Compiler",
+            "sub": "Integration & Verification"
+          }
+        ],
+        "connections": [
+          {
+            "label": "Prompt/Code Input"
+          },
+          {
+            "label": "Code Analysis Request"
+          },
+          {
+            "label": "Semantic Context"
+          },
+          {
+            "label": "Suggested Diff/Action"
+          },
+          {
+            "label": "Verified Output"
+          }
+        ]
+      }
+    },
+    {
+      "slide_number": 5,
+      "role": "system_workflow",
+      "layout_type": "input_output",
+      "eyebrow": "EXECUTION MECHANICS",
+      "title": "From Prompt to Precision Output",
+      "subtitle": "How Claude delivers actionable engineering artifacts.",
+      "body": "The system translates developer queries into precise, structured changes ready for review and integration.",
+      "input": {
+        "title": "DEVELOPER INPUT",
+        "items": [
+          "Natural language request: 'Refactor this helper function.'",
+          "Code snippet + surrounding context",
+          "Task command: 'Generate unit tests for X module.'"
+        ]
+      },
+      "processing": {
+        "title": "CLAUDE'S INTELLIGENT PROCESSING",
+        "items": [
+          "Query parsed & enriched with AST index",
+          "Internal state machine tracks context & goals",
+          "AI evaluates multiple solution paths",
+          "Selects optimal change based on constraints"
+        ]
+      },
+      "output": {
+        "title": "STRUCTURED ARTIFACT",
+        "items": [
+          "Granular, actionable code diffs",
+          "Auto-generated test cases and mocks",
+          "Updated documentation sections",
+          "Refactored function implementations"
+        ]
+      }
+    },
+    {
+      "slide_number": 6,
+      "role": "limitations_and_gotchas",
+      "layout_type": "common_mistake",
+      "eyebrow": "PRO TIPS & MISTAKES",
+      "title": "Master Claude: Best Practices for Engineers",
+      "subtitle": "Avoid common pitfalls and unlock its full potential.",
+      "body": "Effective prompt engineering and a human-in-the-loop approach are crucial for success with Claude.",
+      "left_title": "COMMON MISTAKES",
+      "left_items": [
+        "Vague, ambiguous prompts",
+        "Expecting perfect, unreviewed code",
+        "Treating it as a 'black box' solution",
+        "Ignoring context window limitations"
+      ],
+      "right_title": "PRO TIPS FOR USAGE",
+      "right_items": [
+        "Provide clear, specific instructions",
+        "Always review and iterate on output",
+        "Understand its internal workflow conceptually",
+        "Supply relevant code and documentation context"
+      ]
+    }
+  ],
+  "_model_used": "gemini-2.5-flash",
+  "_topic_intelligence": {
+    "topic_type": "developer_tool",
+    "domain": "ai_ml",
+    "primary_entity": "Anthropic Claude",
+    "content_depth": "practical",
+    "best_story_angle": "practical_guide",
+    "audience": [
+      "ai_engineers",
+      "software_engineers",
+      "full_stack_developers"
+    ],
+    "key_questions": [
+      "What specific Claude skills are trending among developers?",
+      "How can these capabilities be integrated into daily engineering workflows?",
+      "What makes these particular prompt patterns or tool-use setups effective?",
+      "How can developers start applying these skills right now?"
+    ],
+    "recommended_slide_count": 6
+  },
+  "_archetype": "Developer Tool & IDE Innovation",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "These 5 Claude Skills Are Blowing Up (November 2026)",
+    "hook": "Did You Know: These 5 Claude Skills Are Blowing Up (November 2026)? \u26a1",
+    "headline": "These 5 Claude Skills Are Blowing Up (November 2026)",
+    "fact_summary": "Overview of current Claude features of interestContinue reading on Medium \u00bb",
+    "source": "Medium - artificial-intelligence",
+    "news_source_url": "https://medium.com/@shubhamrathi_59816/these-5-claude-skills-are-blowing-up-november-2026-4b3e196ccaa5?source=rss------artificial_intelligence-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "these",
+      "claude",
+      "skills",
+      "blowing",
+      "november"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}

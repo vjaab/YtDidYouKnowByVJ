@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "MIT: Screens That Feel Touch Force",
     "IEEE: Inside Your Phone's Transistor Army",
     "Quantum Computers: Beyond 0 and 1",
     "AI's Invisible Life Decoder",
@@ -99,10 +98,10 @@
     "Google & IITs Ignite Decentralized AI Research",
     "The ERF Blueprint: Replicators End AI Fragmentation",
     "The ERF Safety Net: Tracking Without Mass Surveillance",
-    "Mastering Multi-Agent Orchestration"
+    "Mastering Multi-Agent Orchestration",
+    "Claude's 5 Trending Developer Skills (Nov 2026)"
   ],
   "used_keywords": [
-    "recognition",
     "efficiency",
     "technology",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "MIT: Screens That Feel Touch Force",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-11-03T08:45:33.962294+00:00"
-    },
     {
       "title": "IEEE: Inside Your Phone's Transistor Army",
       "news_source_url": "",
@@ -1303,6 +1293,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-24T11:45:01.203297+00:00"
+    },
+    {
+      "title": "Claude's 5 Trending Developer Skills (Nov 2026)",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-24T12:28:42.056424+00:00"
     }
   ]
 }
