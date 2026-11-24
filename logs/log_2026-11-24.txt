@@ -1,0 +1,25 @@
+[01:54:32] === STARTING DAILY AI PIPELINE (DID_YOU_KNOW) | COUNTRY: GB | SOURCE: HUGGINGFACE_HUB ===
+[01:54:32] 🔄 Sequential Topic Source: Active='HUGGINGFACE_HUB' (Rotation: github → medium → huggingface_hub)
+[01:54:32] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[01:54:32] STEP 1: Content Ecosystem Check -> Day: Tue, Slot: Slot A (Discovery), Category: Tech Gadgets & Inventions, Format: SPEEDRUN (Run 1/3)
+[01:54:32] STEP 2: Fetching articles (RSS + Trending Engine)...
+[01:54:59] 🔥 Trending Engine injected 201 high-signal articles (active_source='huggingface_hub', sources=['huggingface_hub', 'github', 'medium']).
+[01:55:00] 📈 vidIQ: Injected 8 high-signal topics.
+[01:56:27] ✅ Fetched 528 total articles (201 trending engine [huggingface_hub], 8 vidIQ, 214 research, 96 tools, 9 X.com).
+[01:56:27] 📚 Loaded 30 recent topics for deduplication
+[01:58:30] 🔍 Deduplication & classification: 528 → 20 candidates
+[01:58:30] 🏷️ Zero-shot re-categorized top candidate: Tech Gadgets & Inventions → AI & Tech Tools
+[01:58:30] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[01:59:47] Selected Headline: Organic Maps: Free offline maps for 12M travelers with zero tracking
+[01:59:47] Selected URL: https://github.com/organicmaps/organicmaps
+[01:59:47] Breaking Level: 5
+[01:59:47] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[01:59:53] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261124_015947.png
+[01:59:53] 🐙 GitHub repo detected — capturing README as evidence screenshot (MANDATORY)...
+[01:59:58] ✅ GitHub README captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_readme_20261124_015953.png
+[01:59:58] ℹ️ GitHub README already captured as evidence — skipping secondary screenshot
+[01:59:58] STEP 4: Generating voiceover + word timestamps...
+[01:59:58] Selected Lip-Sync Template: assets/video/green_springboot.mp4 (from 41 options)
+[02:11:40] ❌ Kaggle Handover failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 12 min.
+[02:11:40] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
+[02:11:40] ⚠️ Lip-sync will be SKIPPED for this video (requires GPU).
