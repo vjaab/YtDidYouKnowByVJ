@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI Invents Faces That Don't Exist",
     "Microchips: Built with Atomic Precision",
     "Your Phone Blends Digital and Real",
     "Submarine Cables: The Ocean's Invisible Internet Backbone",
@@ -99,10 +98,10 @@
     "The Riemann Hypothesis Proof by Alp\u00f6ge and Claude,\u2026",
     "How to Spot ChatGPT Writing",
     "3 Zero-Server Utilities You Can Build This Weekend",
-    "RAG from Scratch: Grounding LLMs in Your Data"
+    "RAG from Scratch: Grounding LLMs in Your Data",
+    "Harness Engineering: The Operator's Reality"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "ChatGPT",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI Invents Faces That Don't Exist",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-11-03T21:16:01.588729+00:00"
-    },
     {
       "title": "Microchips: Built with Atomic Precision",
       "news_source_url": "",
@@ -1303,6 +1293,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-25T17:33:53.264679+00:00"
+    },
+    {
+      "title": "Harness Engineering: The Operator's Reality",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-25T20:37:24.615029+00:00"
     }
   ]
 }
