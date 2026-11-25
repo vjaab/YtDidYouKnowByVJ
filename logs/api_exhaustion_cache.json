@@ -18,12 +18,12 @@
     }
   },
   "gemini_models": {
-    "gemini-2.5-flash": 1795526237.7975063,
-    "gemini-2.5-pro": 1795526260.0650632,
-    "gemini-2.5-flash-lite": 1795526263.3617518,
-    "gemini-3.8-flash": 1795562463.998135,
-    "gemini-3.1-pro-preview": 1795605631.290713,
-    "gemini-3.5-flash-lite": 1795562534.6295013
+    "gemini-2.5-flash": 1795690376.9214485,
+    "gemini-2.5-pro": 1795690405.5886745,
+    "gemini-2.5-flash-lite": 1795690388.9774978,
+    "gemini-3.8-flash": 1795690348.1029694,
+    "gemini-3.1-pro-preview": 1795690281.9837077,
+    "gemini-3.5-flash-lite": 1795647400.5129375
   },
   "groq_models": {
     "llama-3.3-70b-versatile": 1786987162.8149407,
