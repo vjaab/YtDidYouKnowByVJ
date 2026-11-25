@@ -1,0 +1,229 @@
+{
+  "headline": "3 Zero-Server Utilities You Can Build This Weekend",
+  "summary": "Discover three practical serverless utilities that run entirely on edge platforms like Cloudflare Workers, Vercel Edge, and Deno Deploy. No servers to manage, infinite scale, and deployable in minutes.",
+  "source": "Medium - programming",
+  "source_url": "",
+  "date": "25 Nov 2026",
+  "category": "PROGRAMMING",
+  "topic_type": "developer_tool",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "scenario_question",
+      "eyebrow": "SERVERLESS PLATFORMS (CLOUDFLARE WORKERS, VERCEL EDGE, DENO DEPLOY) UPDATE",
+      "title": "Tired of Managing Servers for Tiny Tools?",
+      "subtitle": "Build useful utilities that run globally with zero infrastructure.",
+      "body": "Every developer has ideas for small tools \u2014 URL shorteners, webhook catchers, API proxies \u2014 but spinning up a server feels like overkill. What if you could deploy them in minutes, pay nothing at idle, and scale automatically?",
+      "deep_dive": "Traditional hosting requires provisioning VMs, configuring load balancers, managing SSL certificates, and paying for idle capacity. Edge serverless platforms eliminate all of this by running your code directly in globally distributed data centers, invoked only when requests arrive. This shifts the mental model from 'managing servers' to 'writing request handlers.'",
+      "key_fact": "Edge functions execute in milliseconds cold-start, not seconds.",
+      "why_it_matters": "Removes infrastructure friction so you can ship weekend ideas to production users instantly."
+    },
+    {
+      "slide_number": 2,
+      "role": "tool_overview",
+      "layout_type": "whats_new",
+      "eyebrow": "WHAT IT DOES",
+      "title": "Three Utilities, Three Platforms, Zero Servers",
+      "subtitle": "Each utility showcases a different edge platform strength.",
+      "body": "Utility 1: Smart URL shortener with analytics on Cloudflare Workers. Utility 2: Webhook receiver with replay on Vercel Edge. Utility 3: API aggregator proxy on Deno Deploy. All deploy via CLI in under a minute.",
+      "deep_dive": "Cloudflare Workers excels at KV storage and durable objects for stateful edge logic. Vercel Edge integrates natively with Next.js middleware and offers seamless preview deployments. Deno Deploy provides first-class TypeScript support, standard library compatibility, and built-in testing. Each platform handles TLS, routing, and global distribution automatically.",
+      "key_fact": "No Docker, no Kubernetes, no cloud console clicking required.",
+      "why_it_matters": "Match the utility to the platform's superpower for optimal developer experience.",
+      "before_title": "Traditional Weekend Project",
+      "before_items": [
+        "Provision VPS or container",
+        "Configure reverse proxy",
+        "Set up SSL certificates",
+        "Monitor uptime and logs"
+      ],
+      "after_title": "Zero-Server Weekend Project",
+      "after_items": [
+        "Write single handler file",
+        "Run deploy command",
+        "Share global URL instantly",
+        "Pay only per request"
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "core_mechanism",
+      "layout_type": "process_flow",
+      "eyebrow": "EXECUTION FLOW",
+      "title": "How Edge Functions Handle Requests",
+      "subtitle": "Request hits nearest POP \u2192 isolates spins up \u2192 code runs \u2192 response returns.",
+      "body": "Your handler receives a standard Request object, processes it, and returns a Response. The platform manages isolation, scaling, and routing transparently.",
+      "deep_dive": "When a request arrives at the nearest point of presence, the platform either reuses a warm isolate or spins up a new V8 isolate (milliseconds). Your code executes with access to platform APIs: KV storage, caches, environment variables, and fetch. No Node.js process, no Express server \u2014 just a fetch event handler. The isolate terminates after response or CPU limit.",
+      "key_fact": "Isolates provide multi-tenancy without container overhead.",
+      "why_it_matters": "Understanding isolate lifecycle helps you design stateless, fast handlers.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Request Arrives",
+          "desc": "User hits your edge URL; DNS routes to nearest POP"
+        },
+        {
+          "step": "2",
+          "title": "Isolate Spins Up",
+          "desc": "V8 isolate created or reused in under 5ms"
+        },
+        {
+          "step": "3",
+          "title": "Handler Executes",
+          "desc": "Your fetch(event) runs with platform APIs"
+        },
+        {
+          "step": "4",
+          "title": "Response Returns",
+          "desc": "Response streams back; isolate stays warm briefly"
+        }
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "architecture",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "ARCHITECTURE",
+      "title": "Edge Utility Architecture Pattern",
+      "subtitle": "Minimal components, maximum distribution.",
+      "body": "Code lives in Git \u2192 CI/CD pushes to edge \u2192 global network serves requests \u2192 logs stream to dashboard.",
+      "deep_dive": "The architecture eliminates traditional tiers. Your handler is the API, the edge network is the load balancer, KV/Durable Objects replace databases for simple state, and the platform dashboard replaces monitoring stack. Git push triggers deployment to hundreds of locations simultaneously. Rollback is instant. Preview URLs generate per PR.",
+      "key_fact": "Single deploy command propagates to 300+ locations globally.",
+      "why_it_matters": "Architecture complexity drops from O(n) services to O(1) handler file.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "Git Repository",
+            "sub": "Source of truth"
+          },
+          {
+            "name": "CI/CD Pipeline",
+            "sub": "Build & deploy"
+          },
+          {
+            "name": "Edge Network",
+            "sub": "300+ POPs globally"
+          },
+          {
+            "name": "KV / Durable Objects",
+            "sub": "Edge state storage"
+          },
+          {
+            "name": "Observability",
+            "sub": "Logs, metrics, traces"
+          }
+        ],
+        "connections": [
+          {
+            "label": "push triggers"
+          },
+          {
+            "label": "deploys to"
+          },
+          {
+            "label": "reads/writes"
+          },
+          {
+            "label": "streams telemetry"
+          }
+        ]
+      }
+    },
+    {
+      "slide_number": 5,
+      "role": "system_workflow",
+      "layout_type": "input_output",
+      "eyebrow": "EXECUTION MECHANICS",
+      "title": "Developer Workflow: Idea to Global Endpoint",
+      "subtitle": "Write \u2192 Test locally \u2192 Deploy \u2192 Share URL.",
+      "body": "Local emulator mirrors production. One command deploys. Preview URLs for every branch. Zero config for custom domains.",
+      "deep_dive": "Each platform provides a local development server that mimics edge runtime: same APIs, same limits, same behavior. You write TypeScript, test with curl or browser, then deploy. The CLI handles bundling, minification, and upload. Environment secrets sync securely. Custom domains map via CNAME. Analytics appear in dashboard within seconds.",
+      "key_fact": "Local emulator runs identical V8 isolate as production.",
+      "why_it_matters": "No surprise bugs from environment differences; confidence in every deploy.",
+      "input": "TypeScript handler file + wrangler.toml / vercel.json / deno.json",
+      "processing": "Local emulator \u2192 Type-check \u2192 Bundle \u2192 Upload to edge",
+      "output": "Global HTTPS endpoint + preview URLs + analytics dashboard"
+    },
+    {
+      "slide_number": 6,
+      "role": "limitations_and_gotchas",
+      "layout_type": "common_mistake",
+      "eyebrow": "PRO TIPS & MISTAKES",
+      "title": "Edge Constraints That Bite Beginners",
+      "subtitle": "CPU time limits, no filesystem, cold starts on free tiers.",
+      "body": "Avoid long computations. Use streaming for large responses. Store state in KV, not memory. Batch external calls.",
+      "deep_dive": "Edge runtimes enforce strict CPU limits (typically 10-50ms on free tiers). No Node.js built-ins like fs, path, or child_process. Global variables reset per isolate. Cold starts add latency on free plans after inactivity. KV writes are eventually consistent. Durable Objects serialize access per key. Design for stateless, fast, parallelizable work.",
+      "key_fact": "Free tiers include millions of requests monthly across all three platforms.",
+      "why_it_matters": "Respecting constraints prevents timeout errors and unexpected bills.",
+      "items": [
+        "Don't run heavy loops \u2014 offload to queues or background workers",
+        "Don't assume in-memory state persists \u2014 use KV or Durable Objects",
+        "Don't block on sequential fetches \u2014 use Promise.all for parallel calls",
+        "Don't ignore CPU limits \u2014 profile locally with platform emulator",
+        "Do stream large responses \u2014 avoids buffering limits",
+        "Do use edge caching headers \u2014 reduces origin load dramatically"
+      ]
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "GET STARTED",
+      "title": "Deploy Your First Utility Tonight",
+      "subtitle": "Pick a platform, run one command, share a working URL.",
+      "body": "Cloudflare: npm create cloudflare@latest. Vercel: npx vercel. Deno: deno deploy. All free to start.",
+      "deep_dive": "Each platform's CLI scaffolds a starter project with TypeScript config, local dev server, and deploy script. Cloudflare Wrangler creates workers with KV bindings. Vercel CLI links to Git for auto-deploys. Deno Deploy imports directly from GitHub. Documentation includes templates for URL shorteners, webhook handlers, and API proxies. Community Discord servers offer instant help.",
+      "key_fact": "Zero credit card required for generous free tiers on all three.",
+      "why_it_matters": "Zero friction from idea to production \u2014 the ultimate developer velocity.",
+      "takeaways": [
+        "Install one CLI tonight and deploy a hello-world edge function",
+        "Build a URL shortener with Cloudflare Workers + KV this weekend",
+        "Share your endpoint and watch global requests hit your dashboard"
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI & engineering updates that level up your developer workflow"
+    }
+  ],
+  "_model_used": "OpenRouter:nvidia/nemotron-3-ultra-550b-a55b:free",
+  "_topic_intelligence": {
+    "topic_type": "developer_tool",
+    "domain": "programming",
+    "primary_entity": "Serverless Platforms (Cloudflare Workers, Vercel Edge, Deno Deploy)",
+    "content_depth": "medium",
+    "best_story_angle": "technical_breakdown",
+    "audience": [
+      "software_engineers",
+      "full_stack_developers"
+    ],
+    "key_questions": [
+      "What are the three zero-server utilities showcased?",
+      "Which serverless/edge platforms do they run on?",
+      "What are the code patterns and deployment steps for each?",
+      "What are the cost and scaling implications of zero-server architectures?"
+    ],
+    "recommended_slide_count": 7
+  },
+  "_archetype": "Developer Tool & IDE Innovation",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "Three Zero-Server Utilities Vibe Coders Can Build Over One Weekend and",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "Three Zero-Server Utilities Vibe Coders Can Build Over One W",
+    "fact_summary": "Every weekend, thousands of builders open Cursor, Claude Code, or Expo, ship a neat prototype by Sunday night, post one screenshot on X&#x2026;Continue reading on Medium \u00bb",
+    "source": "Medium - programming",
+    "news_source_url": "https://medium.com/@thebruteforceartist/three-zero-server-utilities-vibe-coders-can-build-over-one-weekend-and-scale-to-10k-month-6b259b85c670?source=rss------programming-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "three",
+      "zero",
+      "server",
+      "utilities",
+      "vibe"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}

@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI's Invisible Life Decoder",
     "Intel Transistor Breakthrough Powers Edge AI",
     "AI Invents Faces That Don't Exist",
     "Microchips: Built with Atomic Precision",
@@ -99,10 +98,10 @@
     "Mastering Multi-Agent Orchestration",
     "Claude's 5 Trending Developer Skills (Nov 2026)",
     "The Riemann Hypothesis Proof by Alp\u00f6ge and Claude,\u2026",
-    "How to Spot ChatGPT Writing"
+    "How to Spot ChatGPT Writing",
+    "3 Zero-Server Utilities You Can Build This Weekend"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI's Invisible Life Decoder",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-11-03T18:42:14.866876+00:00"
-    },
     {
       "title": "Intel Transistor Breakthrough Powers Edge AI",
       "news_source_url": "",
@@ -1303,6 +1293,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-24T23:26:52.805377+00:00"
+    },
+    {
+      "title": "3 Zero-Server Utilities You Can Build This Weekend",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-25T00:03:11.661679+00:00"
     }
   ]
 }
