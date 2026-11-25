@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Intel Transistor Breakthrough Powers Edge AI",
     "AI Invents Faces That Don't Exist",
     "Microchips: Built with Atomic Precision",
     "Your Phone Blends Digital and Real",
@@ -99,10 +98,10 @@
     "Claude's 5 Trending Developer Skills (Nov 2026)",
     "The Riemann Hypothesis Proof by Alp\u00f6ge and Claude,\u2026",
     "How to Spot ChatGPT Writing",
-    "3 Zero-Server Utilities You Can Build This Weekend"
+    "3 Zero-Server Utilities You Can Build This Weekend",
+    "RAG from Scratch: Grounding LLMs in Your Data"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Intel Transistor Breakthrough Powers Edge AI",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-11-03T20:33:04.347913+00:00"
-    },
     {
       "title": "AI Invents Faces That Don't Exist",
       "news_source_url": "",
@@ -1303,6 +1293,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-25T00:03:11.661679+00:00"
+    },
+    {
+      "title": "RAG from Scratch: Grounding LLMs in Your Data",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-25T17:33:53.264679+00:00"
     }
   ]
 }

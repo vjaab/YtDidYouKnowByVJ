@@ -1,0 +1,168 @@
+{
+  "headline": "RAG from Scratch: Grounding LLMs in Your Data",
+  "summary": "Retrieval-Augmented Generation (RAG) revolutionizes LLM accuracy by fetching external, relevant data. This approach combats hallucinations, ensuring LLMs deliver precise, up-to-date answers for critical engineering applications.",
+  "source": "Medium - machine-learning",
+  "source_url": "",
+  "date": "25 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "programming_concept",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "hero_hook",
+      "eyebrow": "ARCHITECTURE PATTERN",
+      "title": "LLMs Lie. How Do You Fix It?",
+      "subtitle": "Build RAG from scratch to ground LLMs in YOUR data.",
+      "body": "Generative AI models often \"hallucinate\" or lack current, domain-specific knowledge. This leads to inaccurate or irrelevant responses.",
+      "deep_dive": "Relying solely on a base LLM's pre-trained data creates a significant bottleneck for enterprise applications needing up-to-date, proprietary information. It's a key engineering challenge to ensure factual accuracy and domain relevance for LLM outputs.",
+      "key_fact": "RAG combines LLM power with external, factual data.",
+      "why_it_matters": "Ensures LLMs provide trustworthy, relevant answers."
+    },
+    {
+      "slide_number": 2,
+      "role": "concept_mental_model",
+      "layout_type": "process_flow",
+      "eyebrow": "MENTAL MODEL",
+      "title": "RAG: Your LLM's Smart Research Assistant",
+      "body": "Imagine your LLM needing to answer a complex question. Instead of guessing, RAG sends it to a \"research assistant\" first.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Query",
+          "desc": "User asks LLM a question."
+        },
+        {
+          "step": "2",
+          "title": "Retrieve Context",
+          "desc": "RAG's assistant finds relevant notes from a huge library of your data."
+        },
+        {
+          "step": "3",
+          "title": "Augment & Generate",
+          "desc": "LLM gets the notes along with the query, then crafts a precise answer."
+        }
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "execution_mechanics",
+      "layout_type": "input_output",
+      "eyebrow": "HOW IT WORKS",
+      "title": "The Data Prep Powerhouse: Chunking & Embeddings",
+      "body": "Raw documents are processed: chunked into smaller pieces, then converted into semantic numerical vectors (embeddings).",
+      "input": "Raw Documents (PDFs, internal knowledge base, web content)",
+      "processing": "1. Chunking: Large documents broken into digestible, meaningful segments. 2. Embedding: Each chunk transformed into a numerical vector (embedding) by an embedding model, capturing its semantic meaning.",
+      "output": "Vector Database (populated with embedded chunks, ready for fast semantic search)"
+    },
+    {
+      "slide_number": 4,
+      "role": "architectural_deep_dive",
+      "layout_type": "side_by_side",
+      "eyebrow": "PATTERN TRADE-OFFS",
+      "title": "Vector Database: Speed vs. Freshness",
+      "body": "Building a performant RAG system involves trade-offs between data freshness, retrieval speed, and the accuracy of retrieved context.",
+      "left_title": "Optimization Challenges",
+      "left_items": [
+        "Indexing Speed: Embedding new data can be slow, impacting data freshness.",
+        "Retrieval Latency: Larger databases or complex queries increase lookup time.",
+        "Scalability: Managing high concurrent queries requires robust infrastructure."
+      ],
+      "right_title": "Design Trade-offs",
+      "right_items": [
+        "Embeddings Quality: Better embedding models boost relevance but may cost more.",
+        "Chunk Size: Too small, context is lost; too large, introduces irrelevant noise.",
+        "Database Choice: Specialized vector DBs offer performance but add complexity."
+      ]
+    },
+    {
+      "slide_number": 5,
+      "role": "common_antipattern",
+      "layout_type": "common_mistake",
+      "eyebrow": "AVOID THIS MISTAKE",
+      "title": "Naive Context Injection Kills Performance",
+      "body": "Simply dumping all retrieved data into an LLM prompt can overwhelm it and degrade answer quality. Optimization is key.",
+      "before_title": "\u274c The Naive Approach",
+      "before_items": [
+        "Dump all retrieved chunks directly into the LLM prompt.",
+        "Ignore LLM token limits or context window constraints.",
+        "No relevance scoring or re-ranking of retrieved data."
+      ],
+      "after_title": "\u2705 Production-Ready Strategy",
+      "after_items": [
+        "Re-ranking: Use a secondary model to re-score and filter chunks.",
+        "Summarization: Condense relevant chunks to fit token limits.",
+        "Adaptive Chunking: Dynamically adjust chunk size based on query complexity."
+      ]
+    },
+    {
+      "slide_number": 6,
+      "role": "production_case_study",
+      "layout_type": "real_world_scenario",
+      "eyebrow": "SCALE IN PRODUCTION",
+      "title": "RAG in High-Throughput Systems",
+      "body": "For systems with millions of queries, RAG components must scale independently. Caching and distributed processing are crucial.",
+      "deep_dive": "High-throughput RAG systems employ distributed indexing to break down embedding jobs, multi-tenant vector databases for isolated data and scalable access, and query caching to reduce redundant vector lookups. Asynchronous processing handles context generation separately from LLM inference, ensuring responsiveness.",
+      "key_fact": "Scalable RAG ensures low latency and high accuracy even under heavy load.",
+      "why_it_matters": "Enables real-time, personalized AI experiences in demanding environments."
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "ENGINEERING CHEAT SHEET",
+      "title": "RAG: Your Blueprint for Grounded LLMs",
+      "body": "RAG is essential for reliable LLM applications. Master its core components for robust, context-aware AI solutions.",
+      "takeaways": [
+        "Enhance LLM Accuracy: Combat hallucinations by providing real-time, relevant external data.",
+        "Tailor to Domains: Easily adapt LLMs to specific industries or proprietary knowledge bases.",
+        "Optimize Retrieval: Focus on chunking strategies, embedding quality, and vector DB performance."
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI & engineering insights!"
+    }
+  ],
+  "_model_used": "gemini-2.5-flash",
+  "_topic_intelligence": {
+    "topic_type": "programming_concept",
+    "domain": "ai_ml",
+    "primary_entity": "RAG (Retrieval-Augmented Generation)",
+    "content_depth": "intermediate",
+    "best_story_angle": "technical_breakdown",
+    "audience": [
+      "software_engineers",
+      "ai_engineers",
+      "backend_developers"
+    ],
+    "key_questions": [
+      "What are the core components of a RAG pipeline built from scratch?",
+      "How do document chunking and vector embeddings work under the hood?",
+      "What role does the vector database play in retrieval accuracy?",
+      "How can developers implement and optimize context injection for LLMs?"
+    ],
+    "recommended_slide_count": 8
+  },
+  "_archetype": "Programming Concept & Architecture Pattern",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "Build Retrieval-Augmented Generation (RAG) from Scratch: The Beginner-",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "Build Retrieval-Augmented Generation (RAG) from Scratch: The",
+    "fact_summary": "Instead of memorizing another AI framework, let&#x2019;s build Retrieval-Augmented Generation from first principles and understand what actually&#x2026;Continue reading on Code Like A Girl \u00bb",
+    "source": "Medium - machine-learning",
+    "news_source_url": "https://code.likeagirl.io/build-retrieval-augmented-generation-rag-from-scratch-the-beginner-friendly-guide-i-wish-i-had-8e885981b508?source=rss------machine_learning-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "build",
+      "retrieval",
+      "augmented",
+      "generation",
+      "from"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}
