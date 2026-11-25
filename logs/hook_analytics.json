@@ -1909,12 +1909,12 @@
       "personal_stake": {
         "variants": {
           "B": {
-            "views": 67,
-            "retention": 0.19412878787878787,
-            "engagement": 0.05170068027210884,
-            "swipe_away_rate": 0.22855714285714288,
-            "avg_view_percentage": 20.00142857142857,
-            "count": 7,
+            "views": 68,
+            "retention": 0.1698626893939394,
+            "engagement": 0.17023809523809524,
+            "swipe_away_rate": 0.3249875,
+            "avg_view_percentage": 17.50125,
+            "count": 8,
             "hook_texts": [
               {
                 "text": "Your video editor is stealing your data",
@@ -1939,12 +1939,12 @@
             ]
           }
         },
-        "total_views": 67,
-        "total_videos": 7,
-        "avg_retention": 0.19412878787878787,
-        "avg_engagement": 0.05170068027210884,
-        "avg_swipe_away": 0.22855714285714288,
-        "avg_view_percentage": 20.00142857142857
+        "total_views": 68,
+        "total_videos": 8,
+        "avg_retention": 0.1698626893939394,
+        "avg_engagement": 0.17023809523809524,
+        "avg_swipe_away": 0.3249875,
+        "avg_view_percentage": 17.50125
       }
     },
     "AI Benchmark Showdowns": {
@@ -2009,13 +2009,13 @@
       "avg_view_percentage": 19.46044444444445
     },
     "personal_stake": {
-      "views": 1293,
-      "retention": 0.20803799528406547,
-      "engagement": 0.011076035599517618,
-      "count": 42,
-      "swipe_away_rate": 0.28756904761904767,
-      "avg_view_percentage": 40.607142857142854
+      "views": 1294,
+      "retention": 0.20319990237048255,
+      "engagement": 0.0340742673297614,
+      "count": 43,
+      "swipe_away_rate": 0.30413720930232563,
+      "avg_view_percentage": 39.66279069767441
     }
   },
-  "last_updated": "2026-11-19T22:52:01.216336"
+  "last_updated": "2026-11-25T23:38:28.939152"
 }
