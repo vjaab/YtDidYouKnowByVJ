@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Phone Talks to Satellites",
     "AI Agents Need Keys, Not Full Access",
     "Einstein's Relativity Makes GPS Accurate",
     "The 'Cloud' Isn't in the Sky",
@@ -99,10 +98,10 @@
     "Anthropic Claude Artifacts to Desktop Apps",
     "MoE vs Dense: Local AI Architecture Showdown",
     "9 LLM Evaluation Metrics: Production Architecture Pattern",
-    "Building Legal Tech AI Evidence Indices"
+    "Building Legal Tech AI Evidence Indices",
+    "Architecting Legal Tech AI Systems for Case Evidence"
   ],
   "used_keywords": [
-    "SEO automation",
     "keyword research",
     "content briefs",
     "AI strategy",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Phone Talks to Satellites",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-11-04T18:03:47.486267+00:00"
-    },
     {
       "title": "AI Agents Need Keys, Not Full Access",
       "news_source_url": "",
@@ -1303,6 +1293,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-26T19:31:39.831190+00:00"
+    },
+    {
+      "title": "Architecting Legal Tech AI Systems for Case Evidence",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-26T19:46:02.398193+00:00"
     }
   ]
 }
