@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Submarine Cables: The Ocean's Invisible Internet Backbone",
     "AI Knows Your Next Favorite Thing",
     "Your Phone Talks to Satellites",
     "AI Agents Need Keys, Not Full Access",
@@ -99,10 +98,10 @@
     "RAG from Scratch: Grounding LLMs in Your Data",
     "Harness Engineering: The Operator's Reality",
     "Anthropic Claude Artifacts to Desktop Apps",
-    "MoE vs Dense: Local AI Architecture Showdown"
+    "MoE vs Dense: Local AI Architecture Showdown",
+    "9 LLM Evaluation Metrics: Production Architecture Pattern"
   ],
   "used_keywords": [
-    "ChatGPT",
     "Gemini AI",
     "SEO automation",
     "keyword research",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Submarine Cables: The Ocean's Invisible Internet Backbone",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-11-04T14:52:36.158941+00:00"
-    },
     {
       "title": "AI Knows Your Next Favorite Thing",
       "news_source_url": "",
@@ -1303,6 +1293,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-26T10:11:15.095347+00:00"
+    },
+    {
+      "title": "9 LLM Evaluation Metrics: Production Architecture Pattern",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-26T10:56:07.324149+00:00"
     }
   ]
 }
