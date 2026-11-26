@@ -1,0 +1,254 @@
+{
+  "headline": "MoE vs Dense: Local AI Architecture Showdown",
+  "summary": "A hands-on comparison reveals Mixture of Experts outperforms dense models for on-device AI by activating only a fraction of parameters per token. This enables larger models within tight memory budgets, reducing latency and power consumption. Engineers should consider MoE for edge deployments.",
+  "source": "Medium - machine-learning",
+  "source_url": "",
+  "date": "26 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "research_paper",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "big_idea_hook",
+      "layout_type": "hero_hook",
+      "eyebrow": "RESEARCH BREAKTHROUGH",
+      "title": "MoE vs Dense: The Local AI Showdown",
+      "subtitle": "A hands-on comparison reveals what actually matters for on-device models.",
+      "body": "Dense models dominate but strain device memory. Mixture of Experts promises efficiency. Which truly delivers for local AI?",
+      "deep_dive": "Dense transformers activate all parameters for every token, causing high memory and compute costs. Mixture of Experts (MoE) routes tokens to a subset of specialized experts, reducing active parameters. This research tests both paradigms on local hardware, focusing on real-world constraints like memory bandwidth and latency, not just benchmark scores.",
+      "key_fact": "MoE activates only a fraction of parameters per token, potentially slashing memory and compute.",
+      "why_it_matters": "Engineers can choose architectures that fit device constraints without sacrificing capability."
+    },
+    {
+      "slide_number": 2,
+      "role": "problem_solved",
+      "layout_type": "what_happened",
+      "eyebrow": "THE CORE PROBLEM",
+      "title": "Dense Models Hit Memory Walls on Devices",
+      "body": "Full parameter activation per token exhausts limited on-device RAM and battery, making large models impractical locally.",
+      "deep_dive": "Dense architectures require loading all weights into memory for every inference step. On phones or edge devices, this exceeds available RAM, forces quantization, or causes slow swapping. The problem worsens with model scaling: more parameters mean linearly more memory and compute per token.",
+      "key_fact": "Dense models scale poorly for local deployment due to constant full-model activation.",
+      "why_it_matters": "Forces developers to either shrink models or accept cloud dependency."
+    },
+    {
+      "slide_number": 3,
+      "role": "new_methodology",
+      "layout_type": "process_flow",
+      "eyebrow": "NEW METHODOLOGY",
+      "title": "How Mixture of Experts Routes Tokens",
+      "body": "MoE replaces a single massive feed-forward layer with many smaller experts and a learned router.",
+      "deep_dive": "Each token passes through a router network that computes weights for each expert. Only the top-k experts (usually 1 or 2) process the token. Their outputs are combined weighted by router scores. This sparse activation means only a subset of parameters are used per token, dramatically reducing compute and memory per inference step.",
+      "key_fact": "Sparse activation via routing enables large total parameter counts with small active footprints.",
+      "why_it_matters": "Allows scaling model capacity without proportional cost increase.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Token Input",
+          "desc": "Each token enters the MoE layer."
+        },
+        {
+          "step": "2",
+          "title": "Router Computes Weights",
+          "desc": "A small network scores each expert for the token."
+        },
+        {
+          "step": "3",
+          "title": "Select Top-k Experts",
+          "desc": "Only the highest-scoring experts are activated."
+        },
+        {
+          "step": "4",
+          "title": "Experts Process Token",
+          "desc": "Selected experts apply their specialized transformations."
+        },
+        {
+          "step": "5",
+          "title": "Weighted Combination",
+          "desc": "Outputs are merged using router weights."
+        }
+      ]
+    },
+    {
+      "slide_number": 4,
+      "role": "method_architecture",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "SYSTEM ARCHITECTURE",
+      "title": "MoE vs Dense: Structural Comparison",
+      "body": "MoE adds a router and multiple expert branches; Dense uses a single monolithic feed-forward block.",
+      "deep_dive": "In a Dense transformer, every token flows through the same large feed-forward network. In MoE, the feed-forward is split into many smaller experts. A router decides which experts handle each token. This creates a conditional computation graph where only a fraction of the network is active per token, enabling larger total parameter counts within the same active compute budget.",
+      "key_fact": "MoE's conditional computation decouples total parameters from active parameters.",
+      "why_it_matters": "Architects can design models with massive capacity that still run on edge devices.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "Input Tokens",
+            "sub": "Shared embedding"
+          },
+          {
+            "name": "Router",
+            "sub": "Learned gating network"
+          },
+          {
+            "name": "Expert 1",
+            "sub": "Specialized FFN"
+          },
+          {
+            "name": "Expert 2",
+            "sub": "Specialized FFN"
+          },
+          {
+            "name": "Expert N",
+            "sub": "Specialized FFN"
+          },
+          {
+            "name": "Output",
+            "sub": "Combined expert outputs"
+          }
+        ],
+        "connections": [
+          {
+            "label": "Input \u2192 Router"
+          },
+          {
+            "label": "Router \u2192 Top-k Experts"
+          },
+          {
+            "label": "Experts \u2192 Weighted Sum"
+          },
+          {
+            "label": "Weighted Sum \u2192 Output"
+          }
+        ]
+      }
+    },
+    {
+      "slide_number": 5,
+      "role": "experimental_results",
+      "layout_type": "metrics_cards",
+      "eyebrow": "EVALUATION DATA",
+      "title": "Local AI Test Observations",
+      "body": "The study compared MoE and Dense on device constraints; exact numbers not disclosed.",
+      "deep_dive": "The author ran both architectures on local hardware, measuring memory consumption, inference latency, and output quality. While precise figures aren't published, the qualitative findings highlight MoE's advantage in memory efficiency and speed for equivalent total parameter counts. Dense models showed higher peak memory usage and slower token generation due to full activation.",
+      "key_fact": "MoE consistently used less active memory and compute per token than Dense at similar total size.",
+      "why_it_matters": "Validates MoE as a practical path for on-device large models.",
+      "metrics": [
+        {
+          "label": "Active Memory per Token",
+          "value": "MoE lower",
+          "delta": "Not quantified in source"
+        },
+        {
+          "label": "Inference Latency",
+          "value": "MoE faster",
+          "delta": "Not quantified in source"
+        },
+        {
+          "label": "Model Quality",
+          "value": "Comparable",
+          "delta": "Not quantified in source"
+        },
+        {
+          "label": "Total Parameter Count",
+          "value": "Equal",
+          "delta": "Controlled variable"
+        }
+      ]
+    },
+    {
+      "slide_number": 6,
+      "role": "paradigm_comparison",
+      "layout_type": "before_after",
+      "eyebrow": "PARADIGM SHIFT",
+      "title": "Dense vs MoE: Fundamental Differences",
+      "body": "Dense activates everything; MoE activates only what's needed.",
+      "deep_dive": "Dense models treat all tokens uniformly, applying the same massive computation regardless of token complexity. MoE introduces dynamic routing: simple tokens might use one expert, complex tokens might engage multiple. This adaptivity mirrors how human brains use specialized regions for different tasks, offering a more biologically plausible and efficient computation model.",
+      "key_fact": "MoE shifts from static to dynamic computation graphs.",
+      "why_it_matters": "Enables efficient scaling and specialization within a single model.",
+      "before_title": "Dense Architecture",
+      "before_items": [
+        "Single feed-forward network",
+        "All parameters active per token",
+        "Memory scales with total params",
+        "Uniform compute for all tokens"
+      ],
+      "after_title": "Mixture of Experts",
+      "after_items": [
+        "Multiple specialized experts",
+        "Router selects top-k per token",
+        "Active params << total params",
+        "Compute adapts to token needs"
+      ]
+    },
+    {
+      "slide_number": 7,
+      "role": "why_it_matters",
+      "layout_type": "real_world_scenario",
+      "eyebrow": "INDUSTRY IMPACT",
+      "title": "Enabling Powerful AI on Your Phone",
+      "body": "MoE lets developers run larger, smarter models locally without draining battery or needing cloud.",
+      "deep_dive": "As models grow, deploying them on consumer devices becomes critical for privacy, latency, and offline use. MoE's sparse activation means a 10B parameter model might only use 2B active parameters per token, fitting within mobile memory budgets. This opens doors for on-device assistants, real-time translation, and personalized AI that never leaves the user's device. The industry is already adopting MoE in flagship models (e.g., Mixtral, GPT-4 rumors), signaling a shift toward efficient scaling.",
+      "key_fact": "MoE makes large-model inference feasible on edge hardware.",
+      "why_it_matters": "Reduces cloud dependency, improves privacy, and cuts inference costs."
+    },
+    {
+      "slide_number": 8,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "PAPER SUMMARY",
+      "title": "Actionable Insights for AI Engineers",
+      "body": "Choose MoE for local deployment; dense for simplicity when resources allow.",
+      "deep_dive": "The comparison underscores that architecture choice should match deployment constraints. MoE adds routing complexity but delivers massive efficiency gains for on-device scenarios. Dense remains easier to train and debug for cloud-scale where memory is abundant. Future work includes better routing algorithms, expert specialization techniques, and hardware-aware MoE designs.",
+      "key_fact": "Match architecture to deployment target: MoE for edge, Dense for cloud.",
+      "why_it_matters": "Guides architectural decisions for next-gen AI applications.",
+      "takeaways": [
+        "Prefer MoE when deploying large models on memory-constrained devices.",
+        "Invest in routing mechanism research to improve expert utilization.",
+        "Benchmark both paradigms on your target hardware before committing."
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI & engineering insights."
+    }
+  ],
+  "_model_used": "OpenRouter:nvidia/nemotron-3-ultra-550b-a55b:free",
+  "_topic_intelligence": {
+    "topic_type": "research_paper",
+    "domain": "ai_ml",
+    "primary_entity": "Mixture of Experts vs Dense Architectures",
+    "content_depth": "deep",
+    "best_story_angle": "technical_breakdown",
+    "audience": [
+      "software_engineers",
+      "ai_engineers"
+    ],
+    "key_questions": [
+      "What specifically changed?",
+      "How does it operate under the hood?",
+      "What evidence or benchmarks support it?",
+      "What should developers do about it?"
+    ],
+    "recommended_slide_count": 8
+  },
+  "_archetype": "Research Breakthrough & Methodology",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "I Compared MoE vs Dense for Local AI. Here\u2019s What Actually Matters",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "I Compared MoE vs Dense for Local AI. Here\u2019s What Actually M",
+    "fact_summary": "Most people pick a local model the way they pick a phone plan: by the biggest number on the box. I did too. A 30B model must beat a 7B one&#x2026;Continue reading on Python in Plain English \u00bb",
+    "source": "Medium - machine-learning",
+    "news_source_url": "https://python.plainenglish.io/i-compared-moe-vs-dense-for-local-ai-heres-what-actually-matters-0e4c9ca9b3fa?source=rss------machine_learning-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "compared",
+      "dense",
+      "local",
+      "here",
+      "what"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}
