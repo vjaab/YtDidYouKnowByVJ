@@ -1,0 +1,35 @@
+[18:25:13] === STARTING DAILY AI PIPELINE (DID_YOU_KNOW) | COUNTRY: GB | SOURCE: HUGGINGFACE_HUB ===
+[18:25:13] 🔄 Sequential Topic Source: Active='HUGGINGFACE_HUB' (Rotation: github → medium → huggingface_hub)
+[18:25:13] Output folder cleaned: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output
+[18:25:13] STEP 1: Content Ecosystem Check -> Day: Thu, Slot: Slot A (Discovery), Category: Tech Gadgets & Inventions, Format: MYTH_BUSTER (Run 1/3)
+[18:25:13] STEP 2: Fetching articles (RSS + Trending Engine)...
+[18:25:40] 🔥 Trending Engine injected 204 high-signal articles (active_source='huggingface_hub', sources=['huggingface_hub', 'github', 'medium']).
+[18:25:41] 📈 vidIQ: Injected 8 high-signal topics.
+[18:27:03] ✅ Fetched 520 total articles (204 trending engine [huggingface_hub], 8 vidIQ, 224 research, 81 tools, 3 X.com).
+[18:27:03] 📚 Loaded 30 recent topics for deduplication
+[18:28:30] 🔍 Deduplication & classification: 520 → 20 candidates
+[18:28:30] 🏷️ Zero-shot re-categorized top candidate: Tech Gadgets & Inventions → AI & Tech Tools
+[18:28:30] STEP 3 (Attempt 1/10): Gemini Searching & Generating Script...
+[18:38:34] Selected Headline: tradermonty/claude-trading-skills GitHub repository
+[18:38:34] Selected URL: https://github.com/tradermonty/claude-trading-skills
+[18:38:34] Breaking Level: 9
+[18:38:34] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[18:38:48] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261126_183834.png
+[18:38:48] 🐙 GitHub repo detected — capturing README as evidence screenshot (MANDATORY)...
+[18:38:58] ✅ GitHub README captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_readme_20261126_183848.png
+[18:38:58] ℹ️ GitHub README already captured as evidence — skipping secondary screenshot
+[18:38:58] STEP 4: Generating voiceover + word timestamps...
+[18:38:58] Selected Lip-Sync Template: assets/video/green_springboot.mp4 (from 41 options)
+[18:38:58] ⚠️ Script too long (100 words > 84). Asking for a tighter rewrite (shorten retry 1/2) before GPU work.
+[18:38:58] STEP 3 (Attempt 2/10): Gemini Searching & Generating Script...
+[18:53:35] Selected Headline: Hugging Face Trending Dataset: Vyber07/cyber-security
+[18:53:35] Selected URL: https://huggingface.co/datasets/Vyber07/cyber-security
+[18:53:35] Breaking Level: 9
+[18:53:35] STEP 3b: Capturing article screenshot (MANDATORY — before audio)...
+[18:53:40] ✅ Main screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/screenshot_20261126_185335.png
+[18:53:44] Evidence screenshot captured: /home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/assets/screenshots/evidence_20261126_185340.png
+[18:53:44] STEP 4: Generating voiceover + word timestamps...
+[18:53:44] Selected Lip-Sync Template: assets/video/green_springboot.mp4 (from 41 options)
+[19:05:24] ❌ Kaggle Handover failed: [job_error] Kaggle job 'vijayakumarj/ytdidyouknowbyvj-gpu-worker' reported an error after 12 min.
+[19:05:24] 🔄 Kaggle GPU unavailable. Falling back to cloud TTS (ElevenLabs/Edge)...
+[19:05:24] ⚠️ Lip-sync will be SKIPPED for this video (requires GPU).
