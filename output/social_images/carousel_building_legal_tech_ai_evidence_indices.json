@@ -1,0 +1,212 @@
+{
+  "headline": "Building Legal Tech AI Evidence Indices",
+  "summary": "Explore three engineering architecture candidates for organizing case documents, preserving chronological order, and retrieving legal evidence accurately for AI systems.",
+  "source": "Medium - artificial-intelligence",
+  "source_url": "",
+  "date": "26 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "developer_tool",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "scenario_question",
+      "eyebrow": "LEGAL TECH AI SYSTEMS UPDATE",
+      "title": "Lost in a Maze of Legal Disclosures?",
+      "subtitle": "How do you map thousands of unstructured case documents into a precise timeline?",
+      "body": "Lawsuits generate endless paperwork. Building an AI evidence index requires strict chronology and flawless retrieval to prevent costly legal mistakes.",
+      "deep_dive": "Like a detective sorting through mountains of disorganized clues, an AI system must ingest disparate legal filings, depositions, and exhibits without losing temporal context.",
+      "key_fact": "Chronology preservation is vital for legal reasoning.",
+      "why_it_matters": "Inaccurate evidence retrieval breaks trust in automated legal analysis."
+    },
+    {
+      "slide_number": 2,
+      "role": "tool_overview",
+      "layout_type": "whats_new",
+      "eyebrow": "WHAT IT DOES",
+      "title": "The Evidence Index Pipeline",
+      "subtitle": "Transforming chaotic legal archives into structured, searchable timelines.",
+      "body": "Modern legal tech architectures ingest messy case files, extract entities and timestamps, and build multi-modal indices for deep semantic and temporal queries.",
+      "before_title": "Legacy Approach",
+      "before_items": [
+        "Manual document tagging",
+        "Keyword search failures",
+        "Scattered timelines"
+      ],
+      "after_title": "AI Evidence Index",
+      "after_items": [
+        "Automated event extraction",
+        "Semantic vector search",
+        "Unified chronological view"
+      ],
+      "deep_dive": "By combining relational metadata with vector embeddings, the system tracks exact dates while understanding complex conceptual arguments.",
+      "key_fact": "Bridges keyword searches with temporal reasoning.",
+      "why_it_matters": "Eliminates hours of manual document sorting for legal teams."
+    },
+    {
+      "slide_number": 3,
+      "role": "core_mechanism",
+      "layout_type": "process_flow",
+      "eyebrow": "EXECUTION FLOW",
+      "title": "Three-Step Evidence Processing",
+      "subtitle": "From raw digital file uploads to an interactive chronological timeline.",
+      "body": "The processing engine follows a strict sequence: ingestion and OCR, entity-event extraction, and index compilation for rapid querying.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Document Ingestion",
+          "desc": "Parse PDFs, exhibits, and scanned transcripts into clean text chunks."
+        },
+        {
+          "step": "2",
+          "title": "Chronicle Extraction",
+          "desc": "Identify timestamps, actors, and events to build a chronological spine."
+        },
+        {
+          "step": "3",
+          "title": "Index Compilation",
+          "desc": "Merge vector embeddings with structured relational timeline databases."
+        }
+      ],
+      "deep_dive": "Each layer refines the raw data, transforming unstructured text into a queryable graph of interconnected legal events.",
+      "key_fact": "Separates temporal metadata from semantic content.",
+      "why_it_matters": "Ensures the AI can answer both 'what happened' and 'when did it happen'."
+    },
+    {
+      "slide_number": 4,
+      "role": "architecture",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "ARCHITECTURE",
+      "title": "System Topology & Data Flow",
+      "subtitle": "How queries navigate through candidate indexing strategies.",
+      "body": "The architecture connects frontend user requests through an orchestrator agent that queries both the vector store and the chronological timeline engine.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "Case Files",
+            "sub": "Raw Inputs"
+          },
+          {
+            "name": "Extraction Agent",
+            "sub": "LLM + Parsers"
+          },
+          {
+            "name": "Evidence Index",
+            "sub": "Vector & Timeline DB"
+          }
+        ],
+        "connections": [
+          {
+            "label": "Ingest & Parse"
+          },
+          {
+            "label": "Index & Structure"
+          }
+        ]
+      },
+      "deep_dive": "Choosing between candidate architectures depends on whether your workload prioritizes deep semantic search or rigid timeline guarantees.",
+      "key_fact": "Decouples ingestion storage from real-time query routing.",
+      "why_it_matters": "Allows developers to scale storage and retrieval layers independently."
+    },
+    {
+      "slide_number": 5,
+      "role": "system_workflow",
+      "layout_type": "input_output",
+      "eyebrow": "EXECUTION MECHANICS",
+      "title": "Query to Verified Citation",
+      "subtitle": "Tracing how a legal question becomes a verified evidentiary timeline.",
+      "body": "When a lawyer asks a complex case question, the pipeline retrieves matching semantic fragments and aligns them chronologically.",
+      "input": "User query about specific incident dates and witness statements.",
+      "processing": "Vector similarity search combined with timeline range filtering and LLM synthesis.",
+      "output": "Structured chronology report with direct source document citations.",
+      "deep_dive": "This workflow prevents hallucinations by forcing the model to cite verified entries from the built evidence index.",
+      "key_fact": "Grounds every generated answer in verifiable source documents.",
+      "why_it_matters": "Builds absolute confidence for legal professionals auditing AI outputs."
+    },
+    {
+      "slide_number": 6,
+      "role": "limitations_and_gotchas",
+      "layout_type": "common_mistake",
+      "eyebrow": "PRO TIPS & MISTAKES",
+      "title": "Avoiding Chronology Traps",
+      "subtitle": "Common architectural pitfalls when building legal tech indices.",
+      "body": "Relying solely on vector embeddings often scrambles time. Always pair semantic search with a deterministic timeline database.",
+      "before_title": "Common Antipattern",
+      "before_items": [
+        "Pure vector search without date filters",
+        "Ignoring messy OCR scans",
+        "Single monolithic index"
+      ],
+      "after_title": "Recommended Practice",
+      "after_items": [
+        "Hybrid vector and relational storage",
+        "Multi-pass document parsing",
+        "Modular candidate pipelines"
+      ],
+      "deep_dive": "Treating legal time as just another embedding dimension leads to chronological errors. Keep dates explicitly indexed.",
+      "key_fact": "Time is chronological, not just semantic.",
+      "why_it_matters": "Prevents catastrophic errors in legal timeline reconstruction."
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "GET STARTED",
+      "title": "Mastering Legal AI Architecture",
+      "subtitle": "Key engineering principles for building robust evidence indices.",
+      "body": "Evaluate candidate architectures based on your document volume, temporal precision needs, and retrieval latency requirements.",
+      "takeaways": [
+        "Combine semantic vectors with explicit chronological tables.",
+        "Validate extractions with multi-pass document parsing agents.",
+        "Enforce source citations for every synthesized legal insight."
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily engineering insights and AI updates.",
+      "deep_dive": "Building legal tech requires balancing cutting-edge retrieval with absolute factual fidelity.",
+      "key_fact": "Architecture choice dictates system reliability.",
+      "why_it_matters": "Empowers engineers to design production-grade legal AI systems."
+    }
+  ],
+  "_model_used": "gemini-3.5-flash-lite",
+  "_topic_intelligence": {
+    "topic_type": "developer_tool",
+    "domain": "ai_ml",
+    "primary_entity": "Legal Tech AI Systems",
+    "content_depth": "moderate",
+    "best_story_angle": "practical_application",
+    "audience": [
+      "software_engineers",
+      "ai_engineers"
+    ],
+    "key_questions": [
+      "What are the architecture options for building an evidence index?",
+      "How do these tools handle document chronology and retrieval?",
+      "What are the trade-offs between the candidate approaches?",
+      "How can developers implement this in a real-world pipeline?"
+    ],
+    "recommended_slide_count": 7
+  },
+  "_archetype": "Developer Tool & IDE Innovation",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "3 candidates for building an evidence index and chronology from case d",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "3 candidates for building an evidence index and chronology f",
+    "fact_summary": "Three practical candidates are MiniMax Code, NotebookLM, and Claude Projects.Continue reading on Medium \u00bb",
+    "source": "Medium - artificial-intelligence",
+    "news_source_url": "https://medium.com/@1492844263/3-candidates-for-building-an-evidence-index-and-chronology-from-case-documents-1b1fd468d82e?source=rss------artificial_intelligence-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "candidates",
+      "building",
+      "evidence",
+      "index",
+      "chronology"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}

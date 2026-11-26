@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "AI Knows Your Next Favorite Thing",
     "Your Phone Talks to Satellites",
     "AI Agents Need Keys, Not Full Access",
     "Einstein's Relativity Makes GPS Accurate",
@@ -99,10 +98,10 @@
     "Harness Engineering: The Operator's Reality",
     "Anthropic Claude Artifacts to Desktop Apps",
     "MoE vs Dense: Local AI Architecture Showdown",
-    "9 LLM Evaluation Metrics: Production Architecture Pattern"
+    "9 LLM Evaluation Metrics: Production Architecture Pattern",
+    "Building Legal Tech AI Evidence Indices"
   ],
   "used_keywords": [
-    "Gemini AI",
     "SEO automation",
     "keyword research",
     "content briefs",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "AI Knows Your Next Favorite Thing",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-11-04T17:56:21.239172+00:00"
-    },
     {
       "title": "Your Phone Talks to Satellites",
       "news_source_url": "",
@@ -1303,6 +1293,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-26T10:56:07.324149+00:00"
+    },
+    {
+      "title": "Building Legal Tech AI Evidence Indices",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-26T19:31:39.831190+00:00"
     }
   ]
 }
