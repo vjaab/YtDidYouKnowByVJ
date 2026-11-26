@@ -1,0 +1,29 @@
+{
+  "topic": "LLM Inference: The 57% Speedup Illusion",
+  "category": "AI News",
+  "type": "carousel",
+  "slides": 7,
+  "instagram_images": [
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_LLM_Inference_The_57_Speedup_I_01_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_LLM_Inference_The_57_Speedup_I_02_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_LLM_Inference_The_57_Speedup_I_03_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_LLM_Inference_The_57_Speedup_I_04_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_LLM_Inference_The_57_Speedup_I_05_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_LLM_Inference_The_57_Speedup_I_06_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_LLM_Inference_The_57_Speedup_I_07_1080x1350.jpg"
+  ],
+  "facebook_images": [
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_llm_inference_the_57%_speedup_illusion_01.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_llm_inference_the_57%_speedup_illusion_02.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_llm_inference_the_57%_speedup_illusion_03.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_llm_inference_the_57%_speedup_illusion_04.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_llm_inference_the_57%_speedup_illusion_05.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_llm_inference_the_57%_speedup_illusion_06.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/facebook_llm_inference_the_57%_speedup_illusion_07.jpg"
+  ],
+  "caption": "\ud83d\udcf0 LLM Inference: The 57% Speedup Illusion\n\nPopular LLM inference forks claim dramatic speedups like 57%, but rigorous verification often reveals hidden trade-offs. Learn how token counting and architectural optimizations truly impact latency and output fidelity.\n\n\ud83d\udcc5 26 Nov 2026 | Source: Medium - machine-learning\n\ud83d\udd17 \n\nFollow @vijayakumarj_ai for daily AI updates!\n\n#MachineLearning #DeepLearning #AI #ArtificialIntelligence #LLM #GenerativeAI #RAG #LangChain #PyTorch #TensorFlow #HuggingFace #MLOps #DataScience #Tech #Technology\n\n\ud83d\udc49 Share this with your friends and family so they stay informed & safe!\n\ud83d\udcac Drop your reaction below!",
+  "hashtags": "#MachineLearning #DeepLearning #AI #ArtificialIntelligence #LLM #GenerativeAI #RAG #LangChain #PyTorch #TensorFlow #HuggingFace #MLOps #DataScience #Tech #Technology",
+  "poll_file": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/poll_llm_inference_the_57%_speedup_illusion.json",
+  "carousel_json": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_llm_inference_the_57%_speedup_illusion.json",
+  "generated_at": "2026-11-26T23:02:54.367234+00:00"
+}

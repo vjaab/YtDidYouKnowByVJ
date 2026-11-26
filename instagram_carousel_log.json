@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Einstein's Relativity Makes GPS Accurate",
     "The 'Cloud' Isn't in the Sky",
     "Headphones Silence Noise with Anti-Sound",
     "Capacitive Touch: The Invisible Engineering Behind Every Tap",
@@ -99,10 +98,10 @@
     "9 LLM Evaluation Metrics: Production Architecture Pattern",
     "Building Legal Tech AI Evidence Indices",
     "Architecting Legal Tech AI Systems for Case Evidence",
-    "AI Didn't Start in 2022: The Real 180-Year Story"
+    "AI Didn't Start in 2022: The Real 180-Year Story",
+    "LLM Inference: The 57% Speedup Illusion"
   ],
   "used_keywords": [
-    "content briefs",
     "AI strategy",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Einstein's Relativity Makes GPS Accurate",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-11-04T20:45:42.135852+00:00"
-    },
     {
       "title": "The 'Cloud' Isn't in the Sky",
       "news_source_url": "",
@@ -1303,6 +1293,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-26T22:53:20.307888+00:00"
+    },
+    {
+      "title": "LLM Inference: The 57% Speedup Illusion",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-26T23:02:56.264708+00:00"
     }
   ]
 }
