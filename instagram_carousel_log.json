@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Headphones Silence Noise with Anti-Sound",
     "Capacitive Touch: The Invisible Engineering Behind Every Tap",
     "Deep Learning Fundamentals: The Architecture of Intelligence",
     "Wi-Fi's Invisible Maze Navigation",
@@ -99,10 +98,10 @@
     "Architecting Legal Tech AI Systems for Case Evidence",
     "AI Didn't Start in 2022: The Real 180-Year Story",
     "LLM Inference: The 57% Speedup Illusion",
-    "Agent Evaluation \u2014 Medium Machine Learning"
+    "Agent Evaluation \u2014 Medium Machine Learning",
+    "Anthropic's Bold Python-to-Rust Migration"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Headphones Silence Noise with Anti-Sound",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-11-04T21:27:27.246213+00:00"
-    },
     {
       "title": "Capacitive Touch: The Invisible Engineering Behind Every Tap",
       "news_source_url": "",
@@ -1303,6 +1293,16 @@
       "source": "Did You Know By VJ",
       "platform": "instagram",
       "timestamp": "2026-11-27T10:16:51.377088+00:00"
+    },
+    {
+      "title": "Anthropic's Bold Python-to-Rust Migration",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-27T16:58:10.274238+00:00"
     }
   ]
 }
