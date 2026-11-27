@@ -1,0 +1,217 @@
+{
+  "headline": "Agent Evaluation \u2014 Medium Machine Learning",
+  "summary": "This carousel distills the engineering discipline of evaluating agent systems, moving beyond static accuracy to dynamic assessment of latency, throughput, and concurrency impacts. It provides conceptual mental models, architectural trade-off frameworks, and production-ready evaluation pipelines without fabricated metrics, empowering engineers to diagnose and prevent performance decay in multi-agent workflows.",
+  "source": "Medium - machine-learning",
+  "source_url": "",
+  "date": "27 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "programming_concept",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "hero_hook",
+      "eyebrow": "ARCHITECTURE PATTERN",
+      "title": "Why Agent Systems Fail Silently",
+      "subtitle": "Architectural evaluation for hidden performance decay",
+      "body": "Engineers often deploy agent systems without measuring how concurrency and resource contention erode accuracy over time. This carousel reveals the evaluation essentials.",
+      "deep_dive": "Beyond output accuracy, evaluate timing consistency, resource saturation, and error cascades across concurrent agent rounds.",
+      "key_fact": "Accuracy in agent systems is a dynamic property, not a static label, requiring continuous system-level observation.",
+      "why_it_matters": "Without this lens, teams ship agents that appear functional but degrade under real-world load."
+    },
+    {
+      "slide_number": 2,
+      "role": "concept_mental_model",
+      "layout_type": "process_flow",
+      "eyebrow": "MENTAL MODEL",
+      "title": "Mental Model: Agent Evaluation as a Flow",
+      "subtitle": "Visualizing intent through action to consequence",
+      "body": "Frame agent evaluation as a pipeline where each step transforms intent into observable system behavior, not just a pass/fail check.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Define Objectives",
+          "desc": "Clarify what success means for the agent's task beyond raw accuracy."
+        },
+        {
+          "step": "2",
+          "title": "Map Interactions",
+          "desc": "Trace hand-offs, tool calls, and data flow between agents in the workflow."
+        },
+        {
+          "step": "3",
+          "title": "Observe Consequences",
+          "desc": "Measure timing, state changes, and error signals across the full execution path."
+        }
+      ],
+      "deep_dive": "This model shifts focus from endpoint correctness to the integrity of the entire execution journey, exposing where latency or drift originates.",
+      "key_fact": "A strong mental model treats every agent interaction as a stateful transformation, not a black-box call.",
+      "why_it_matters": "Engineers can pinpoint degradation roots faster when they visualize the evaluation flow."
+    },
+    {
+      "slide_number": 3,
+      "role": "execution_mechanics",
+      "layout_type": "input_output",
+      "eyebrow": "HOW IT WORKS",
+      "title": "Execution Mechanics: Input to Output Path",
+      "subtitle": "The internal transformation journey of agent requests",
+      "body": "Agents receive prompts or data as input, orchestrate reasoning and tool use internally, then produce decisions or actions as output for downstream systems.",
+      "input": "Raw prompts, contextual data, or external signals entered by the user or system.",
+      "processing": "Internal reasoning loops, tool invocations, memory retrieval, and state updates occur sequentially or concurrently within the agent runtime.",
+      "output": "Structured decisions, actions, or responses delivered to consumers, APIs, or user interfaces.",
+      "deep_dive": "The processing phase is where latency budgets and accuracy trade-offs materialize; designing for idempotent tool use and bounded reasoning loops is key.",
+      "key_fact": "Input quality and processing boundaries directly dictate the upper limit of achievable agent accuracy.",
+      "why_it_matters": "Engineers can intervene early in the pipeline to enforce constraints that preserve both speed and correctness."
+    },
+    {
+      "slide_number": 4,
+      "role": "architectural_deep_dive",
+      "layout_type": "side_by_side",
+      "eyebrow": "PATTERN TRADE-OFFS",
+      "title": "Latency vs Throughput: Architectural Trade-offs",
+      "subtitle": "Concurrent design choices shape system responsiveness and capacity",
+      "body": "Architectural patterns dictate whether agents prioritize quick individual responses or maximize collective throughput under load.",
+      "left_title": "\u274c Naive Pattern",
+      "left_items": [
+        "Single-threaded execution blocks concurrent work",
+        "Implicit assumptions about request isolation",
+        "No built-in back-pressure or queueing"
+      ],
+      "right_title": "\u2705 Production Pattern",
+      "right_items": [
+        "Async batching aggregates work for efficient processing",
+        "Circuit breakers prevent cascading failures",
+        "Priority queues surface critical agent paths",
+        "Observability hooks expose latency distributions"
+      ],
+      "deep_dive": "Choosing between latency-optimized and throughput-optimized architectures requires matching agent autonomy to system capacity constraints.",
+      "key_fact": "The same agent code can exhibit dramatically different performance profiles depending on orchestration architecture.",
+      "why_it_matters": "Architectural misalignment is a silent cause of production incidents; matching pattern to workload prevents avoidable bottlenecks."
+    },
+    {
+      "slide_number": 5,
+      "role": "common_antipattern",
+      "layout_type": "common_mistake",
+      "eyebrow": "AVOID THIS MISTAKE",
+      "title": "Antipattern: Static Metrics Mask Dynamic Decline",
+      "subtitle": "Why one-shot accuracy checks fail in production",
+      "body": "Relying on single-run accuracy scores ignores how concurrency, resource contention, and timing variability erode performance across agent rounds.",
+      "before_title": "\u274c Naive Evaluation",
+      "before_items": [
+        "Single accuracy snapshot after deployment",
+        "Assuming static test conditions reflect runtime",
+        "Ignoring concurrency effects on error rates"
+      ],
+      "after_title": "\u2705 Robust Pattern",
+      "after_items": [
+        "Iterate evaluation across varied load scenarios",
+        "Profile latency and accuracy distributions per agent",
+        "Integrate continuous monitoring into CI/CD pipelines"
+      ],
+      "deep_dive": "Production agent systems operate under stochastic concurrency; static metrics cannot capture the probability of degradation under real usage patterns.",
+      "key_fact": "The \u274c approach creates false confidence; the \u2705 approach treats evaluation as an ongoing system property.",
+      "why_it_matters": "Teams adopting the robust pattern detect accuracy drift weeks earlier, reducing production fallout."
+    },
+    {
+      "slide_number": 6,
+      "role": "production_case_study",
+      "layout_type": "real_world_scenario",
+      "eyebrow": "SCALE IN PRODUCTION",
+      "title": "From Prototype to High-Throughput Production",
+      "subtitle": "Scaling agent systems while preserving evaluation integrity",
+      "body": "High-throughput systems replace manual checks with automated pipelines that validate accuracy and latency at scale, ensuring consistent agent behavior under load.",
+      "before_title": "\u274c Prototype Stage",
+      "before_items": [
+        "Manual accuracy spot-checks after each run",
+        "Latency measured only in ideal conditions",
+        "No coordination between parallel agent instances"
+      ],
+      "after_title": "\u2705 Production Scale",
+      "after_items": [
+        "Automated evaluation pipelines run on demand",
+        "Latency and accuracy profiled across simulated concurrent loads",
+        "Feedback loops adjust resource allocation and agent timeouts"
+      ],
+      "deep_dive": "Production systems treat evaluation as infrastructure, not an afterthought, embedding monitoring at every agent handoff point.",
+      "key_fact": "Scaling without re-evaluating architectural patterns introduces hidden accuracy and latency regressions.",
+      "why_it_matters": "Organizations that institutionalize continuous evaluation ship agent updates with confidence, avoiding surprise degradation."
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "ENGINEERING CHEAT SHEET",
+      "title": "When to Apply & Trade-off Summary",
+      "subtitle": "Quick reference for agent system evaluation decisions",
+      "body": "Match evaluation depth to system criticality: lightweight checks for prototypes, rigorous pipelines for customer-facing agents.",
+      "takeaways": [
+        "Profile latency percentiles before each deployment cycle.",
+        "Run accuracy benchmarks across varied concurrency levels.",
+        "Integrate evaluation metrics into your CI/CD gate criteria."
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI engineering insights.",
+      "deep_dive": "These three items form a minimal yet comprehensive evaluation routine applicable across agent frameworks."
+    },
+    {
+      "slide_number": 8,
+      "role": "checklist",
+      "layout_type": "checklist",
+      "eyebrow": "CONTINUOUS EVALUATION PIPELINE",
+      "title": "Checklist: Building Ongoing Agent System Validation",
+      "subtitle": "Step-by-step framework for sustained performance integrity",
+      "body": "A repeatable pipeline ensures agent accuracy and latency are monitored continuously, not just at release time.",
+      "items": [
+        "Define evaluation success criteria aligned with business goals.",
+        "Automate latency and accuracy tests across representative load profiles.",
+        "Integrate test results into pull request feedback loops.",
+        "Schedule periodic re-evaluation as agent models or workloads evolve."
+      ],
+      "deep_dive": "This checklist transforms evaluation from a one-time event into a living system property, aligning with continuous delivery practices.",
+      "key_fact": "Continuous evaluation pipelines close the feedback loop between agent development and production reliability.",
+      "why_it_matters": "Engineers gain visibility into gradual performance shifts, enabling proactive intervention before users notice."
+    }
+  ],
+  "_model_used": "OpenRouter:nvidia/nemotron-3.5-lightning:free",
+  "_topic_intelligence": {
+    "topic_type": "programming_concept",
+    "domain": "ai_ml",
+    "primary_entity": "Medium Machine Learning",
+    "content_depth": "deep",
+    "best_story_angle": "technical_breakdown",
+    "audience": [
+      "software_engineers",
+      "ai_engineers"
+    ],
+    "key_questions": [
+      "What metrics define agent system accuracy?",
+      "How do you identify latency and throughput bottlenecks?",
+      "What evaluation frameworks exist for multi-agent workflows?",
+      "How do you set up continuous evaluation pipelines?"
+    ],
+    "recommended_slide_count": 8
+  },
+  "_archetype": "Programming Concept & Architecture Pattern",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "How to evaluate an agent system for bottlenecks and accuracy",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "How to evaluate an agent system for bottlenecks and accuracy",
+    "fact_summary": "One agent system, one bad week. Every fix uncovers the next problem, and each problem needs a different way to measure.Continue reading on Medium \u00bb",
+    "source": "Medium - machine-learning",
+    "news_source_url": "https://medium.com/@sanyamwadhwa/how-to-evaluate-an-ai-agent-system-593e689b764f?source=rss------machine_learning-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "evaluate",
+      "agent",
+      "system",
+      "bottlenecks",
+      "accuracy"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}

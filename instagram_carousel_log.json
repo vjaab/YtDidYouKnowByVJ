@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "The 'Cloud' Isn't in the Sky",
     "Headphones Silence Noise with Anti-Sound",
     "Capacitive Touch: The Invisible Engineering Behind Every Tap",
     "Deep Learning Fundamentals: The Architecture of Intelligence",
@@ -99,10 +98,10 @@
     "Building Legal Tech AI Evidence Indices",
     "Architecting Legal Tech AI Systems for Case Evidence",
     "AI Didn't Start in 2022: The Real 180-Year Story",
-    "LLM Inference: The 57% Speedup Illusion"
+    "LLM Inference: The 57% Speedup Illusion",
+    "Agent Evaluation \u2014 Medium Machine Learning"
   ],
   "used_keywords": [
-    "AI strategy",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "The 'Cloud' Isn't in the Sky",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-11-04T20:51:35.071245+00:00"
-    },
     {
       "title": "Headphones Silence Noise with Anti-Sound",
       "news_source_url": "",
@@ -1303,6 +1293,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-26T23:02:56.264708+00:00"
+    },
+    {
+      "title": "Agent Evaluation \u2014 Medium Machine Learning",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-27T10:16:51.377088+00:00"
     }
   ]
 }
