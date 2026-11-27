@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Wi-Fi's Invisible Maze Navigation",
     "AI Engineering: Neural Core Unleashed",
     "AI's Billions of Learning Knobs",
     "Your Phone Battery: A Tiny Chemical Powerhouse",
@@ -99,10 +98,10 @@
     "Agent Evaluation \u2014 Medium Machine Learning",
     "Anthropic's Bold Python-to-Rust Migration",
     "How an LLM Actually Works: Under the Hood",
-    "Anthropic Claude AI as Hardware Engineer"
+    "Anthropic Claude AI as Hardware Engineer",
+    "The AI Syntax Trap in Computer Science Education"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "GPS",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Wi-Fi's Invisible Maze Navigation",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "threads",
-      "timestamp": "2026-11-05T14:58:19.816129+00:00"
-    },
     {
       "title": "AI Engineering: Neural Core Unleashed",
       "news_source_url": "",
@@ -1303,6 +1293,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-27T20:07:06.615657+00:00"
+    },
+    {
+      "title": "The AI Syntax Trap in Computer Science Education",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-27T22:34:06.947235+00:00"
     }
   ]
 }
