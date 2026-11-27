@@ -1,0 +1,208 @@
+{
+  "headline": "How an LLM Actually Works: Under the Hood",
+  "summary": "Large Language Models are not sentient knowledge bases; they are statistical next-token prediction engines powered by vector geometry and self-attention. Understanding their internal data flow unlocks better architecture and low-latency system design.",
+  "source": "Medium - machine-learning",
+  "source_url": "",
+  "date": "27 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "programming_concept",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "hero_hook",
+      "eyebrow": "ARCHITECTURE PATTERN",
+      "title": "How an LLM Actually Works",
+      "subtitle": "Demystifying the high-dimensional mathematics behind modern generative AI.",
+      "body": "LLMs appear to think, but they simply calculate probabilities. Understanding their internal architecture transforms how you design AI systems.",
+      "deep_dive": "Under the hood, LLMs execute mathematical matrix transformations to predict the single most probable next token in sequence without maintaining long-term conscious state.",
+      "key_fact": "An LLM evaluates billions of parameters per forward pass to predict just one single token at a time.",
+      "why_it_matters": "Enables engineers to optimize prompt latency, memory bandwidth, and production model architectures."
+    },
+    {
+      "slide_number": 2,
+      "role": "concept_mental_model",
+      "layout_type": "process_flow",
+      "eyebrow": "MENTAL MODEL",
+      "title": "The Core Execution Pipeline",
+      "subtitle": "From raw human text to calculated token probabilities.",
+      "body": "Every LLM processes language through three distinct transformations: tokenization, attention scoring, and probability projection.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Tokenization",
+          "desc": "Converts raw strings into discrete numerical IDs using predefined sub-word vocabularies."
+        },
+        {
+          "step": "2",
+          "title": "Vector Embedding",
+          "desc": "Maps token numbers into high-dimensional geometric coordinates that encode semantic relationships."
+        },
+        {
+          "step": "3",
+          "title": "Transformer Blocks",
+          "desc": "Runs multiple layers of self-attention and feed-forward networks to update contextual meanings."
+        },
+        {
+          "step": "4",
+          "title": "Softmax Head",
+          "desc": "Transforms final continuous vector states into a probability distribution over the entire vocabulary."
+        }
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "execution_mechanics",
+      "layout_type": "input_output",
+      "eyebrow": "HOW IT WORKS",
+      "title": "Tokenization & Embeddings",
+      "subtitle": "Translating human vocabulary into mathematical geometry.",
+      "body": "Words become coordinates in space. Concepts with similar meanings sit closer together, allowing arithmetic operations on concepts.",
+      "input": "User string: 'The satellite orbits Earth'",
+      "processing": "The tokenizer slices words into IDs, while an embedding matrix assigns a high-dimensional vector with positional coordinates.",
+      "output": "A dense matrix of floating-point numbers ready for attention computation."
+    },
+    {
+      "slide_number": 4,
+      "role": "architectural_deep_dive",
+      "layout_type": "architecture_diagram",
+      "eyebrow": "DEEP DIVE",
+      "title": "The Self-Attention Engine",
+      "subtitle": "How words dynamically update their meaning based on surrounding context.",
+      "body": "Like spotlights on a stage, attention allows each word to inspect every other word to resolve ambiguity dynamically.",
+      "diagram": {
+        "nodes": [
+          {
+            "name": "Queries (Q)",
+            "sub": "What information is this word searching for?"
+          },
+          {
+            "name": "Keys (K)",
+            "sub": "What contextual cues does this word offer?"
+          },
+          {
+            "name": "Values (V)",
+            "sub": "What raw content does this word carry?"
+          },
+          {
+            "name": "Attention Matrix",
+            "sub": "Softmax weights routing focus across tokens"
+          }
+        ],
+        "connections": [
+          {
+            "label": "Dot-product of Q and K computes relevance scores"
+          },
+          {
+            "label": "Softmax normalizes relevance into focus percentages"
+          },
+          {
+            "label": "Weights blend Value vectors into updated representations"
+          }
+        ]
+      }
+    },
+    {
+      "slide_number": 5,
+      "role": "architectural_trade_offs",
+      "layout_type": "side_by_side",
+      "eyebrow": "PATTERN TRADE-OFFS",
+      "title": "Training vs. Inference",
+      "subtitle": "Why training is compute-bound while real-time generation is memory-bound.",
+      "body": "Training processes thousands of tokens concurrently, while autoregressive generation is forced to run one serial step at a time.",
+      "left_title": "Training Phase (Compute-Bound)",
+      "left_items": [
+        "Processes the entire context window simultaneously using causal masks.",
+        "Bottlenecked by tensor core arithmetic throughput and FLOPs.",
+        "Optimized for high batch throughput over single-token latency."
+      ],
+      "right_title": "Inference Phase (Memory-Bound)",
+      "right_items": [
+        "Generates tokens sequentially, requiring a complete forward pass per token.",
+        "Bottlenecked by memory bandwidth moving weights from VRAM to compute cores.",
+        "Requires KV-caching to prevent quadratic recalculation overhead."
+      ]
+    },
+    {
+      "slide_number": 6,
+      "role": "common_antipattern",
+      "layout_type": "common_mistake",
+      "eyebrow": "AVOID THIS MISTAKE",
+      "title": "Treating LLMs as Databases",
+      "subtitle": "Confusing statistical word prediction with deterministic record lookups.",
+      "body": "LLMs approximate statistical associations, not factual tables. Forcing factual recall from weights leads directly to hallucinations.",
+      "mistake_title": "Naive: Direct Knowledge Querying",
+      "mistake_desc": "Relying on internal parametric weights to store exact enterprise data, dynamic prices, or private records.",
+      "solution_title": "Production: RAG Architecture",
+      "solution_desc": "Supplying verified facts in context, using the model purely as a reasoning and synthesis engine."
+    },
+    {
+      "slide_number": 7,
+      "role": "production_case_study",
+      "layout_type": "real_world_scenario",
+      "eyebrow": "SCALE IN PRODUCTION",
+      "title": "Taming the Context Bottleneck",
+      "subtitle": "How production inference engines handle high-concurrency requests.",
+      "body": "Without caching, generating token 1,000 recalculates tokens 1 to 999 from scratch. KV-caching stores keys and values in GPU memory.",
+      "scenario_title": "PagedAttention & KV-Caching",
+      "scenario_context": "Serving thousands of concurrent users with sub-second time-to-first-token requirements.",
+      "scenario_solution": "Inference runtimes allocate KV-cache like virtual memory pages, eliminating GPU memory fragmentation and multiplying concurrent serving capacity."
+    },
+    {
+      "slide_number": 8,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "ENGINEERING CHEAT SHEET",
+      "title": "System Design Summary",
+      "subtitle": "Foundational mental models for production AI architects.",
+      "body": "Master these structural mechanics to design cost-effective, low-latency applications on top of foundation models.",
+      "takeaways": [
+        "LLMs are next-token predictors, not databases; use RAG for verified facts.",
+        "Self-attention scales quadratically; optimize context length to maintain latency.",
+        "Inference is memory-bandwidth bound; deploy KV-cache and quantization for throughput."
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily high-impact AI architecture breakdowns."
+    }
+  ],
+  "_model_used": "gemini-3.8-flash",
+  "_topic_intelligence": {
+    "topic_type": "programming_concept",
+    "domain": "ai_ml",
+    "primary_entity": "Large Language Models",
+    "content_depth": "deep",
+    "best_story_angle": "technical_breakdown",
+    "audience": [
+      "software_engineers",
+      "ai_engineers",
+      "data_scientists"
+    ],
+    "key_questions": [
+      "How do tokenization and vector embeddings map text into continuous mathematical spaces?",
+      "How does the self-attention mechanism calculate contextual relationships across tokens?",
+      "What happens across transformer layers during forward pass and next-token prediction?",
+      "What are the computational bottlenecks during training vs. autoregressive inference?"
+    ],
+    "recommended_slide_count": 8
+  },
+  "_archetype": "Programming Concept & Architecture Pattern",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "How an LLM Actually Works",
+    "hook": "Did You Know: How an LLM Actually Works? \u26a1",
+    "headline": "How an LLM Actually Works",
+    "fact_summary": "A modern language model is still the 2017 transformer in outline, but almost everything inside it, and how it is trained, has changed.Continue reading on Medium \u00bb",
+    "source": "Medium - machine-learning",
+    "news_source_url": "https://medium.com/@jha.sanjiv1/how-an-llm-actually-works-d38e50b0d124?source=rss------machine_learning-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "actually",
+      "works"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}

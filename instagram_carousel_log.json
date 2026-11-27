@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Capacitive Touch: The Invisible Engineering Behind Every Tap",
     "Deep Learning Fundamentals: The Architecture of Intelligence",
     "Wi-Fi's Invisible Maze Navigation",
     "AI Engineering: Neural Core Unleashed",
@@ -99,10 +98,10 @@
     "AI Didn't Start in 2022: The Real 180-Year Story",
     "LLM Inference: The 57% Speedup Illusion",
     "Agent Evaluation \u2014 Medium Machine Learning",
-    "Anthropic's Bold Python-to-Rust Migration"
+    "Anthropic's Bold Python-to-Rust Migration",
+    "How an LLM Actually Works: Under the Hood"
   ],
   "used_keywords": [
-    "did you know",
     "did you know",
     "did you know",
     "did you know",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Capacitive Touch: The Invisible Engineering Behind Every Tap",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-11-05T08:43:27.915588+00:00"
-    },
     {
       "title": "Deep Learning Fundamentals: The Architecture of Intelligence",
       "news_source_url": "",
@@ -1303,6 +1293,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-27T16:58:10.274238+00:00"
+    },
+    {
+      "title": "How an LLM Actually Works: Under the Hood",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "instagram",
+      "timestamp": "2026-11-27T19:29:45.284037+00:00"
     }
   ]
 }

@@ -1,0 +1,22 @@
+{
+  "topic": "How an LLM Actually Works: Under the Hood",
+  "category": "AI News",
+  "type": "carousel",
+  "slides": 8,
+  "instagram_images": [
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_How_an_LLM_Actually_Works_Unde_01_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_How_an_LLM_Actually_Works_Unde_02_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_How_an_LLM_Actually_Works_Unde_03_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_How_an_LLM_Actually_Works_Unde_04_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_How_an_LLM_Actually_Works_Unde_05_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_How_an_LLM_Actually_Works_Unde_06_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_How_an_LLM_Actually_Works_Unde_07_1080x1350.jpg",
+    "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_How_an_LLM_Actually_Works_Unde_08_1080x1350.jpg"
+  ],
+  "facebook_images": [],
+  "caption": "\ud83d\udcf0 How an LLM Actually Works: Under the Hood\n\nLarge Language Models are not sentient knowledge bases; they are statistical next-token prediction engines powered by vector geometry and self-attention. Understanding their internal data flow unlocks better architecture and low-latency system design.\n\n\ud83d\udcc5 27 Nov 2026 | Source: Medium - machine-learning\n\ud83d\udd17 \n\nFollow @vijayakumarj_ai for daily AI updates!\n\n#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets\n\n\ud83d\udccc Save this cheatsheet for your toolkit! | \ud83d\udcac Drop a \ud83e\udd2f if this blew your mind!",
+  "hashtags": "#DidYouKnow #TechFacts #MindBlowingFacts #TechTrivia #ScienceFacts #EngineeringMarvels #ComputerScience #InterestingFacts #DailyFacts #TechLore #GeekFacts #DidYouKnowTech #LearnOnInstagram #STEMFacts #TechSecrets",
+  "poll_file": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/poll_how_an_llm_actually_works_under_the_hood.json",
+  "carousel_json": "/home/runner/work/YtDidYouKnowByVJ/YtDidYouKnowByVJ/output/social_images/carousel_how_an_llm_actually_works_under_the_hood.json",
+  "generated_at": "2026-11-27T19:29:43.029052+00:00"
+}
