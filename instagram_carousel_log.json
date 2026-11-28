@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Your Phone Battery: A Tiny Chemical Powerhouse",
     "Wi-Fi Bounces: New Era of Spatial Sensing Unlocked!",
     "Anthropic Unveils Claude Duet: Personal AI Agent",
     "10 AWS Mistakes to Avoid in Production",
@@ -99,10 +98,10 @@
     "Anthropic Claude AI as Hardware Engineer",
     "The AI Syntax Trap in Computer Science Education",
     "Demystifying 67 Tokens a Second on Million-Token Prompts",
-    "Diagnosing RAG Architecture Failures"
+    "Diagnosing RAG Architecture Failures",
+    "What Do You Know That ChatGPT Doesn't? The Dev Shift"
   ],
   "used_keywords": [
-    "GPS",
     "Einstein",
     "relativity",
     "time",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Your Phone Battery: A Tiny Chemical Powerhouse",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "instagram",
-      "timestamp": "2026-11-05T21:00:04.797786+00:00"
-    },
     {
       "title": "Wi-Fi Bounces: New Era of Spatial Sensing Unlocked!",
       "news_source_url": "",
@@ -1303,6 +1293,16 @@
       "source": "Did You Know By VJ",
       "platform": "facebook",
       "timestamp": "2026-11-28T13:07:51.048603+00:00"
+    },
+    {
+      "title": "What Do You Know That ChatGPT Doesn't? The Dev Shift",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "threads",
+      "timestamp": "2026-11-28T14:32:01.889293+00:00"
     }
   ]
 }
