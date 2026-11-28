@@ -1,0 +1,182 @@
+{
+  "headline": "7 Claude Prompt Habits to Unlearn (Anthropic Guide)",
+  "summary": "Prompting habits inherited from other LLMs degrade Claude's reasoning. Adopting Anthropic's structural prompt patterns unlocks deterministic, high-accuracy outputs.",
+  "source": "Medium - programming",
+  "source_url": "",
+  "date": "28 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "programming_concept",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "hero_hook",
+      "eyebrow": "ARCHITECTURE PATTERN",
+      "title": "7 Claude Prompt Habits to Unlearn Today",
+      "subtitle": "Why standard LLM prompting habits degrade Claude's intelligence",
+      "body": "Copy-pasting prompts designed for other LLMs into Claude leads to degraded reasoning. Anthropic designed Claude around distinct structural parsing principles.",
+      "deep_dive": "Most engineers treat LLMs identically. But Claude parses hierarchy, instructions, and context differently, demanding structured wrappers over conversational chatter.",
+      "key_fact": "Claude relies on structural tags rather than conversational markdown cues.",
+      "why_it_matters": "Eliminates hallucination and drastically boosts prompt determinism."
+    },
+    {
+      "slide_number": 2,
+      "role": "concept_mental_model",
+      "layout_type": "process_flow",
+      "eyebrow": "MENTAL MODEL",
+      "title": "The Structured Blueprint Model",
+      "subtitle": "Think of Claude as an architectural blueprint scanner",
+      "body": "Claude operates like a blueprint scanner. It isolates instructions, data, and context into clear semantic compartments rather than reading a flat script.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Isolate Context",
+          "desc": "Wrap raw reference material inside explicit semantic boundary tags."
+        },
+        {
+          "step": "2",
+          "title": "Assign Directives",
+          "desc": "Position rules and core questions after reference context for maximum focus."
+        },
+        {
+          "step": "3",
+          "title": "Prime Generation",
+          "desc": "Direct the response channel by prefilling the assistant turn directly."
+        }
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "execution_mechanics",
+      "layout_type": "input_output",
+      "eyebrow": "HOW IT WORKS",
+      "title": "The Structural Parsing Pipeline",
+      "subtitle": "How structured token boundaries eliminate prompt ambiguity",
+      "body": "Claude resolves instructions faster when input documents, background knowledge, and expected responses are partitioned into independent semantic regions.",
+      "input": "Reference documents and user queries isolated inside distinct structural envelopes.",
+      "processing": "Attention layers cleanly separate reference tokens from operational instructions.",
+      "output": "Deterministic, format-compliant responses without conversational preamble or context bleed."
+    },
+    {
+      "slide_number": 4,
+      "role": "architectural_deep_dive",
+      "layout_type": "side_by_side",
+      "eyebrow": "PATTERN TRADE-OFFS",
+      "title": "Flat Prompts vs. Structural Tagging",
+      "subtitle": "Comparing legacy prompting habits with Anthropic native design",
+      "body": "Moving to structural prompting trades minimal setup overhead for zero ambiguity and tighter schema compliance.",
+      "left_title": "Flat Conversational Prompts",
+      "left_items": [
+        "Instructions blend directly into reference text",
+        "Higher token confusion during long context retrieval",
+        "Vulnerable to unintended prompt injection risks"
+      ],
+      "right_title": "Structured Tag Envelopes",
+      "right_items": [
+        "Rigid boundaries isolate reference information",
+        "Eliminates context bleeding across multiple documents",
+        "Guarantees deterministic JSON and schema generation"
+      ]
+    },
+    {
+      "slide_number": 5,
+      "role": "common_antipattern",
+      "layout_type": "common_mistake",
+      "eyebrow": "AVOID THIS MISTAKE",
+      "title": "Negative Prompts & Empty Prefills",
+      "subtitle": "Telling Claude what NOT to do instead of framing boundaries",
+      "body": "Engineers often list negative restrictions or forget prefilling the assistant turn, causing Claude to ramble before answering.",
+      "mistake_title": "The Negative Constraint Trap",
+      "mistake_desc": "Stacking negative rules like 'Do not do this' and leaving the assistant response channel unguided.",
+      "fix_title": "Positive Framing & Turn Prefill",
+      "fix_desc": "Define explicit positive outcomes and prime the first output token inside the assistant turn."
+    },
+    {
+      "slide_number": 6,
+      "role": "production_case_study",
+      "layout_type": "real_world_scenario",
+      "eyebrow": "SCALE IN PRODUCTION",
+      "title": "High-Volume Document Pipelines",
+      "subtitle": "How enterprise systems leverage structured boundaries",
+      "body": "Enterprise data pipelines use prefilled responses and tagged boundaries to parse complex financial filings without post-processing failures.",
+      "scenario_title": "Financial Report Extraction Pipeline",
+      "challenge": "Legacy markdown prompts produced inconsistent JSON formats and conversational chatter across long documents.",
+      "solution": "Engineers wrapped documents in semantic boundary tags and prefilled the opening brace.",
+      "impact": "Eliminated downstream schema failures and removed preamble text across production workloads."
+    },
+    {
+      "slide_number": 7,
+      "role": "implementation_strategy",
+      "layout_type": "checklist",
+      "eyebrow": "PRODUCTION AUDIT",
+      "title": "Claude Optimization Checklist",
+      "subtitle": "Essential habits to audit across your AI engineering pipelines",
+      "body": "Audit your prompts with these four fundamental rules recommended directly by Anthropic engineering.",
+      "items": [
+        "Partition prompt components using explicit structural boundary tags",
+        "Place reference context above operational instructions in prompt flow",
+        "Prefill the assistant response turn to lock down output formats",
+        "Replace negative restrictions with clear positive behavioural targets"
+      ]
+    },
+    {
+      "slide_number": 8,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "ENGINEERING CHEAT SHEET",
+      "title": "Master Modern Claude Architecture",
+      "subtitle": "Shift from conversational chatting to structural engineering",
+      "body": "Claude excels when treated as a compiler of structured information rather than an open-ended conversational partner.",
+      "takeaways": [
+        "Use structural envelopes to prevent context bleeding across inputs",
+        "Prefill assistant responses to guarantee strict schema adherence",
+        "Position task instructions after context to sharpen attention focus"
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily production AI engineering breakdowns and architecture guides."
+    }
+  ],
+  "_model_used": "gemini-3.8-flash",
+  "_topic_intelligence": {
+    "topic_type": "programming_concept",
+    "domain": "ai_ml",
+    "primary_entity": "Anthropic",
+    "content_depth": "intermediate",
+    "best_story_angle": "practical_guide",
+    "audience": [
+      "ai_engineers",
+      "software_engineers",
+      "prompt_engineers"
+    ],
+    "key_questions": [
+      "Which common prompting habits inherited from other LLMs fail or degrade Claude's performance?",
+      "Why does Anthropic explicitly recommend XML tags and specific structured prompting patterns?",
+      "How does Claude's system prompt and reasoning behavior differ from models like GPT-4?",
+      "What specific prompting techniques should engineers adopt instead to optimize Claude output?"
+    ],
+    "recommended_slide_count": 8
+  },
+  "_archetype": "Programming Concept & Architecture Pattern",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "7 Claude Prompting Habits You Need to Unlearn (Even Anthropic Says So)",
+    "hook": "Did You Know About This New Breakthrough? \ud83d\ude80",
+    "headline": "7 Claude Prompting Habits You Need to Unlearn (Even Anthropi",
+    "fact_summary": "Two guides Anthropic published this month tell you to drop phrases most of us have typed for years. Here is what changed, in plain English&#x2026;Continue reading on AI Engineering Simplified \u00bb",
+    "source": "Medium - programming",
+    "news_source_url": "https://medium.com/ai-engineering-simplified/7-claude-prompting-habits-you-need-to-unlearn-even-anthropic-says-so-023679b74a77?source=rss------programming-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "claude",
+      "prompting",
+      "habits",
+      "need",
+      "unlearn"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}

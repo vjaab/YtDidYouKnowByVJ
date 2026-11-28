@@ -1,6 +1,5 @@
 {
   "used_titles": [
-    "Wi-Fi Bounces: New Era of Spatial Sensing Unlocked!",
     "Anthropic Unveils Claude Duet: Personal AI Agent",
     "10 AWS Mistakes to Avoid in Production",
     "AI Agent Disk Bloat: Main Sessions vs Subagents",
@@ -99,10 +98,10 @@
     "The AI Syntax Trap in Computer Science Education",
     "Demystifying 67 Tokens a Second on Million-Token Prompts",
     "Diagnosing RAG Architecture Failures",
-    "What Do You Know That ChatGPT Doesn't? The Dev Shift"
+    "What Do You Know That ChatGPT Doesn't? The Dev Shift",
+    "7 Claude Prompt Habits to Unlearn (Anthropic Guide)"
   ],
   "used_keywords": [
-    "Einstein",
     "relativity",
     "time",
     "satellites",
@@ -301,19 +300,10 @@
     "did you know",
     "did you know",
     "did you know",
+    "did you know",
     "did you know"
   ],
   "history": [
-    {
-      "title": "Wi-Fi Bounces: New Era of Spatial Sensing Unlocked!",
-      "news_source_url": "",
-      "keywords": [
-        "did you know"
-      ],
-      "source": "Did You Know By VJ",
-      "platform": "facebook",
-      "timestamp": "2026-11-05T21:10:57.321774+00:00"
-    },
     {
       "title": "Anthropic Unveils Claude Duet: Personal AI Agent",
       "news_source_url": "",
@@ -1303,6 +1293,16 @@
       "source": "Did You Know By VJ",
       "platform": "threads",
       "timestamp": "2026-11-28T14:32:01.889293+00:00"
+    },
+    {
+      "title": "7 Claude Prompt Habits to Unlearn (Anthropic Guide)",
+      "news_source_url": "",
+      "keywords": [
+        "did you know"
+      ],
+      "source": "Did You Know By VJ",
+      "platform": "facebook",
+      "timestamp": "2026-11-28T20:01:05.723525+00:00"
     }
   ]
 }
