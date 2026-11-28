@@ -1,0 +1,214 @@
+{
+  "headline": "Diagnosing RAG Architecture Failures",
+  "summary": "Discover how to isolate semantic retrieval errors, ranking mistakes, and LLM hallucinations in RAG systems. Learn proven evaluation and remediation strategies for high-throughput engineering architectures.",
+  "source": "Medium - machine-learning",
+  "source_url": "",
+  "date": "28 Nov 2026",
+  "category": "AI_ML",
+  "topic_type": "programming_concept",
+  "depth_score": 9,
+  "originality_score": 9,
+  "technical_specificity": 9,
+  "slides": [
+    {
+      "slide_number": 1,
+      "role": "problem_hook",
+      "layout_type": "hero_hook",
+      "eyebrow": "ARCHITECTURE PATTERN",
+      "title": "Your RAG Answer Is Wrong. Where Did It Go Wrong?",
+      "subtitle": "Uncovering hidden breakdown points in retrieval-augmented generation pipelines.",
+      "body": "When a production AI application generates an incorrect response, developers often blame the large language model. In reality, the failure usually happens long before text generation even begins.",
+      "deep_dive": "Debugging RAG systems requires systematic isolation across three distinct processing boundaries: vector retrieval, reranking, and final text generation.",
+      "key_fact": "Most RAG failures stem from retrieval and ranking defects rather than LLM reasoning flaws.",
+      "why_it_matters": "Fixing the wrong component wastes engineering time and leaves production systems fragile."
+    },
+    {
+      "slide_number": 2,
+      "role": "concept_mental_model",
+      "layout_type": "process_flow",
+      "eyebrow": "MENTAL MODEL",
+      "title": "The Three-Stage RAG Pipeline",
+      "subtitle": "Tracing data flow from vector storage to final synthesis.",
+      "body": "Think of a RAG pipeline like an automated corporate research department searching through a massive physical archive for a client.",
+      "deep_dive": "Data flows sequentially through indexing, semantic retrieval, reranking, and finally context injection into the language model.",
+      "key_fact": "A bottleneck at any single stage contaminates all downstream processing.",
+      "why_it_matters": "Visualizing the pipeline steps helps engineers pinpoint exact points of data loss.",
+      "steps": [
+        {
+          "step": "1",
+          "title": "Retrieval",
+          "desc": "Fetching candidate documents using vector similarity."
+        },
+        {
+          "step": "2",
+          "title": "Ranking",
+          "desc": "Filtering and sorting candidates by strict relevance."
+        },
+        {
+          "step": "3",
+          "title": "Generation",
+          "desc": "Synthesizing an answer strictly from provided context."
+        }
+      ]
+    },
+    {
+      "slide_number": 3,
+      "role": "execution_mechanics",
+      "layout_type": "input_output",
+      "eyebrow": "HOW IT WORKS",
+      "title": "Isolating Failure Inputs and Outputs",
+      "subtitle": "Mapping system inputs to state transformations and failure states.",
+      "body": "By inspecting state handoffs between stages, engineers can isolate whether a failure originates in semantic matching, context window clutter, or generation drift.",
+      "deep_dive": "Tracing input user queries against retrieved chunks and final generation reveals exact divergence points.",
+      "key_fact": "Clear stage boundaries make component-level evaluation possible.",
+      "why_it_matters": "Enables targeted debugging instead of random prompt engineering tweaks.",
+      "input": "Raw User Query & Knowledge Base Chunks",
+      "processing": "Vector Similarity Search, Hybrid Scoring, and Context Assembly",
+      "output": "Isolated Error Diagnosis: Retrieval Miss vs. Hallucination"
+    },
+    {
+      "slide_number": 4,
+      "role": "architectural_deep_dive",
+      "layout_type": "side_by_side",
+      "eyebrow": "PATTERN TRADE-OFFS",
+      "title": "Retrieval Accuracy vs. System Latency",
+      "subtitle": "Balancing thoroughness against performance constraints in backend systems.",
+      "body": "Enhancing retrieval depth often introduces latency overhead. Engineering teams must balance search precision with real-time response requirements.",
+      "deep_dive": "Using advanced hybrid search and heavy rerankers improves answer quality but increases CPU and network utilization across distributed services.",
+      "key_fact": "Deeper searches require efficient indexing strategies to maintain low latency.",
+      "why_it_matters": "Guarantees scalable performance under high concurrency workloads.",
+      "left_title": "Naive Retrieval",
+      "left_items": [
+        "Ultra-low latency responses",
+        "Misses nuanced context matches",
+        "Vulnerable to keyword mismatches",
+        "Low compute overhead"
+      ],
+      "right_title": "Optimized RAG",
+      "right_items": [
+        "Higher computational cost",
+        "Exceptional contextual precision",
+        "Uses hybrid search & reranking",
+        "Requires caching strategies"
+      ]
+    },
+    {
+      "slide_number": 5,
+      "role": "common_antipattern",
+      "layout_type": "common_mistake",
+      "eyebrow": "AVOID THIS MISTAKE",
+      "title": "Naive Context Stuffing vs. Structured Reranking",
+      "subtitle": "Steering clear of common architectural shortcuts.",
+      "body": "Dumping massive numbers of raw retrieved chunks directly into the LLM context window causes attention degradation and increases error rates.",
+      "deep_dive": "Production systems must implement precise reranking mechanisms to filter out noise before passing data to generation models.",
+      "key_fact": "More context does not equal better answers if relevance is low.",
+      "why_it_matters": "Prevents model confusion, token bloat, and soaring API costs."
+    },
+    {
+      "slide_number": 6,
+      "role": "production_case_study",
+      "layout_type": "real_world_scenario",
+      "eyebrow": "SCALE IN PRODUCTION",
+      "title": "Building Resilient Go-Based AI Services",
+      "subtitle": "Handling high-throughput concurrency and failure isolation.",
+      "body": "High-throughput systems utilizing RAG architecture implement rigorous tracing and structured evaluation frameworks to monitor retrieval accuracy in real time.",
+      "deep_dive": "Concurrency patterns in languages like Go allow parallel retrieval execution across multiple vector indices while maintaining strict timeout boundaries.",
+      "key_fact": "Production resilience requires automated telemetry at every pipeline stage.",
+      "why_it_matters": "Ensures predictable behavior and rapid incident root-cause analysis.",
+      "metrics": [
+        {
+          "label": "Retrieval Precision",
+          "value": "Measured",
+          "delta": "Tracked via Tracing"
+        },
+        {
+          "label": "Pipeline Latency",
+          "value": "Optimized",
+          "delta": "Parallel Execution"
+        },
+        {
+          "label": "Error Isolation",
+          "value": "Complete",
+          "delta": "Stage Separation"
+        }
+      ]
+    },
+    {
+      "slide_number": 7,
+      "role": "takeaway",
+      "layout_type": "takeaway",
+      "eyebrow": "ENGINEERING CHEAT SHEET",
+      "title": "Mastering RAG Architecture Diagnostics",
+      "subtitle": "Key rules for building bulletproof retrieval systems.",
+      "body": "Isolate failures by testing retrieval, ranking, and generation independently. Never rely on blind prompt engineering to fix search errors.",
+      "deep_dive": "Implement systematic evaluation metrics to continuously monitor and improve your AI system's reliability.",
+      "key_fact": "Systematic debugging turns unreliable prototypes into robust enterprise production systems.",
+      "why_it_matters": "Empowers engineers to ship accurate, trustworthy AI features with confidence.",
+      "takeaways": [
+        "Isolate retrieval misses from generation hallucinations using staged tracing.",
+        "Implement hybrid search and reranking to filter out irrelevant context noise.",
+        "Monitor token budgets and latency trade-offs continuously in production."
+      ],
+      "cta": "Follow @vijayakumarj_ai for daily AI and backend engineering deep dives."
+    },
+    {
+      "slide_number": 8,
+      "role": "takeaway",
+      "layout_type": "checklist",
+      "eyebrow": "FINAL VERIFICATION",
+      "title": "Production Readiness Checklist",
+      "subtitle": "Verify your RAG pipeline before deploying to production.",
+      "body": "Run through this core verification checklist to ensure your retrieval and generation layers are fully optimized and observable.",
+      "deep_dive": "Complete verification prevents silent failures and ensures robust handling of edge-case user queries.",
+      "key_fact": "Structured checklists drastically reduce post-deployment incidents.",
+      "why_it_matters": "Protects user trust and system stability at scale.",
+      "items": [
+        "Are retrieval precision and recall measured independently?",
+        "Is a reranking layer active before context injection?",
+        "Are request timeouts configured for vector database calls?",
+        "Is telemetry capturing stage-by-stage latency?"
+      ]
+    }
+  ],
+  "_model_used": "gemini-3.5-flash-lite",
+  "_topic_intelligence": {
+    "topic_type": "programming_concept",
+    "domain": "ai_ml",
+    "primary_entity": "RAG Architecture",
+    "content_depth": "deep",
+    "best_story_angle": "technical_breakdown",
+    "audience": [
+      "ai_engineers",
+      "software_engineers",
+      "data_engineers"
+    ],
+    "key_questions": [
+      "What are the distinct failure modes across retrieval, ranking, and generation stages in RAG?",
+      "How can developers isolate semantic retrieval failures from LLM hallucination and context-stuffing issues?",
+      "What evaluation metrics and tracing methodologies effectively diagnose RAG inaccuracies?",
+      "What architectural changes (e.g., hybrid search, reranking, chunking strategy) remediate each failure type?"
+    ],
+    "recommended_slide_count": 8
+  },
+  "_archetype": "Programming Concept & Architecture Pattern",
+  "_story": {
+    "mode": "did_you_know",
+    "category": "\ud83e\udde0 DID YOU KNOW?",
+    "title": "Your RAG Answer Is Wrong. Where Did It Go Wrong?",
+    "hook": "Did You Know: Your RAG Answer Is Wrong. Where Did It Go Wrong?? \u26a1",
+    "headline": "Your RAG Answer Is Wrong. Where Did It Go Wrong?",
+    "fact_summary": "RAG X-Ray, Part 2 &#xB7; Follow the evidence before changing the modelContinue reading on Medium \u00bb",
+    "source": "Medium - machine-learning",
+    "news_source_url": "https://medium.com/@prateek.dbg/your-rag-answer-is-wrong-where-did-it-go-wrong-535a2df29d11?source=rss------machine_learning-5",
+    "keywords": [
+      "did you know",
+      "tech trending",
+      "your",
+      "answer",
+      "wrong",
+      "where",
+      "wrong"
+    ],
+    "vector": "trending_breakthroughs"
+  }
+}
